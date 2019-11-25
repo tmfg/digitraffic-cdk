@@ -1,0 +1,293 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "version": "2.0",
+    "title": "Open311 GeoReport API",
+    "description": "Open311 allows you to get/post civic information of cities via a unified interface. The GeoReport part allows you to submit and view issues at the public local space",
+    "termsOfService": "(depends on server instance for example NYC http://dev.cityofchicago.org/docs/api/tos)",
+    "contact": {
+      "name": "Open311 community",
+      "url": "http://wiki.open311.org/GeoReport_v2/",
+      "email": "discuss@lists.open311.org"
+    },
+    "license": {
+      "name": "CC BY 3.0",
+      "url": "http://creativecommons.org/licenses/by/3.0/"
+    }
+  },
+  "consumes": [
+    "application/x-www-form-urlencoded"
+  ],
+  "produces": [
+    "application/json",
+    "text/xml"
+  ],
+  "definitions": {
+    "Service": {
+      "description": "A single service (type) offered via Open311",
+      "required": [
+        "service_code",
+        "service_name",
+        "type"
+      ],
+      "properties": {
+        "service_code": {
+          "type": "string",
+          "format": "uid",
+          "description": "unique identifier for the service request type"
+        },
+        "service_name": {
+          "type": "string",
+          "description": "human readable name of the service request type"
+        },
+        "description": {
+          "type": "string"
+        },
+        "metadata": {
+          "type": "boolean",
+          "description": "Are there additional form fields for this service type? If true use GET service definition for that one"
+        },
+        "type": {
+          "type": "string",
+          "description": "Possible values realtime, batch, blackbox",
+          "enum": [
+            "realtime",
+            "batch",
+            "blackbox"
+          ]
+        },
+        "keywords": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "list of keywords or tags seperated by comma"
+        },
+        "group": {
+          "type": "string",
+          "description": "Category or group to cluster different request types e.g. “sanitation”"
+        }
+      }
+    },
+    "ServiceDefinition": {
+      "description": "Attributes associated with a service code. These attributes can be unique to the city/jurisdiction.",
+      "required": [
+        "service_code",
+        "attributes"
+      ],
+      "properties": {
+        "service_code": {
+          "type": "string",
+          "format": "uid",
+          "description": "unique identifier for the service request type"
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/ServiceAttribute"
+          }
+        }
+      }
+    },
+    "ServiceAttribute": {
+      "description": "A single attribute extension for a service",
+      "required": [
+        "variable",
+        "code",
+        "datatype",
+        "required"
+      ],
+      "properties": {
+        "variable": {
+          "type": "boolean",
+          "description": "If only used to present information to the user within the description field or if that user input is needed"
+        },
+        "code": {
+          "type": "string",
+          "format": "uid",
+          "description": "Unique identifier for the attribute"
+        },
+        "datatype": {
+          "type": "string",
+          "enum": [
+            "string",
+            "number",
+            "datetime",
+            "text",
+            "singlevaluelist",
+            "multivaluelist"
+          ],
+          "description": "Type of field used for user input. According widgets will be picked for user inputs"
+        },
+        "required": {
+          "type": "boolean",
+          "description": "If attributes value required to submit service request"
+        },
+        "datatype_description": {
+          "type": "string",
+          "description": "Description of the datatype which helps the user provide their input"
+        },
+        "order": {
+          "type": "integer",
+          "format": "uint",
+          "description": "Sort order that the attributes will be presented to the user. 1 is shown first in the list."
+        },
+        "description": {
+          "type": "string",
+          "description": "description of the attribute field with instructions for the user to find and identify the requested information"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/AttributeValue"
+          }
+        }
+      }
+    },
+    "AttributeValue": {
+      "description": "Possible value for ServiceAttribute that defines lists",
+      "required": [
+        "key",
+        "name"
+      ],
+      "properties": {
+        "key": {
+          "type": "string",
+          "format": "uid",
+          "description": "Unique identifier associated with an option for singlevaluelist or multivaluelist (analogous to the value attribute in an html option tag)."
+        },
+        "name": {
+          "type": "string",
+          "description": "Human readable title of an option for singlevaluelist or multivaluelist (analogous to the innerhtml text node of an html option tag)."
+        }
+      }
+    },
+    "Request": {
+      "description": "Issues that have been reported as service requests. Location is submitted via lat/long or address or address_id",
+      "required": [
+        "service_request_id",
+        "status",
+        "service_code",
+        "requested_datetime"
+      ],
+      "properties": {
+        "service_request_id": {
+          "type": "string",
+          "format": "uid",
+          "description": "Unique ID of the service request created."
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "open",
+            "closed"
+          ],
+          "description": "Current status of the service request."
+        },
+        "status_notes": {
+          "type": "string",
+          "description": "Explanation of why status was changed to current state or more details on current status than conveyed with status alone."
+        },
+        "service_name": {
+          "type": "string",
+          "description": "The human readable name of the service request type."
+        },
+        "service_code": {
+          "type": "string",
+          "format": "uid",
+          "description": "The unique identifier for the service request type"
+        },
+        "description": {
+          "type": "string",
+          "description": "A full description of the request or report submitted."
+        },
+        "agency_responsible": {
+          "type": "string",
+          "description": "Agency responsible for fulfilling or otherwise addressing the service request."
+        },
+        "service_notice": {
+          "type": "string",
+          "description": "Information about the action expected to fulfill the request or otherwise address the information reported."
+        },
+        "requested_datetime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date and time when the service request was made."
+        },
+        "updated_datetime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Date and time when the service request was last modified. For requests with status=closed, this will be the date the request was closed."
+        },
+        "expected_datetime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time when the service request can be expected to be fulfilled. This may be based on a service-specific service level agreement."
+        },
+        "address": {
+          "type": "string",
+          "description": "Human readable address or description of location. This should be provided from most specific to most general geographic unit, eg address number or cross streets, street name, neighborhood/district, city/town/village, county, postal code."
+        },
+        "address_id": {
+          "type": "string",
+          "description": "Internal address ID used by a jurisdictions master address repository or other addressing system."
+        },
+        "zipcode": {
+          "type": "string",
+          "description": "postal code for the location of the service request. (Redundant and field might be removed as it should be part of adress string)"
+        },
+        "lat": {
+          "type": "number",
+          "format": "double",
+          "description": "latitude using the (WGS84) projection."
+        },
+        "long": {
+          "type": "number",
+          "format": "double",
+          "description": "longitude using the (WGS84) projection."
+        },
+        "media_url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to media associated with the request, eg an image. A convention for parsing media from this URL has yet to be established, so currently it will be done on a case by case basis much like Twitter.com does. For example, if a jurisdiction accepts photos submitted via Twitpic.com, then clients can parse the page at the Twitpic URL for the image given the conventions of Twitpic.com. This could also be a URL to a media RSS feed where the clients can parse for media in a more structured way."
+        }
+      }
+    },
+    "RequestResponse": {
+      "description": "Details for tracking an created service request",
+      "properties": {
+        "service_request_id": {
+          "type": "string",
+          "format": "uid",
+          "description": "Unique ID of the service request created."
+        },
+        "service_notice": {
+          "type": "string",
+          "description": "Information about the action expected to fulfill the request or otherwise address the information reported."
+        },
+        "account_id": {
+          "type": "string",
+          "format": "uid",
+          "description": "Unique ID for the user account of the person submitting the request."
+        }
+      }
+    }
+  },
+  "parameters": {
+    "jurisdiction_id": {
+      "name": "jurisdiction_id",
+      "in": "query",
+      "description": "<?>",
+      "required": true,
+      "type": "string",
+      "format": "uid"
+    },
+    "response_format": {
+      "name": "response_format",
+      "in": "path",
+      "required": true,
+      "type": "string",
+      "format": "uid"
+    }
+  }
+}
