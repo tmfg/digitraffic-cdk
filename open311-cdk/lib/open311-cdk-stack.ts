@@ -1,5 +1,6 @@
 import cdk = require('@aws-cdk/core');
 import apigateway = require('@aws-cdk/aws-apigateway');
+import ec2 = require('@aws-cdk/aws-ec2');
 
 const lambda = require('@aws-cdk/aws-lambda');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
@@ -19,11 +20,27 @@ export class Open311CdkStack extends cdk.Stack {
             endpointTypes: [EndpointType.PRIVATE]
         });
         const requests = integrationApi.root.addResource("requests");
-        requests.addMethod("POST", newRequestIntegration, {
+        requests.addMethod("POST", newRequestIntegration, {});
+
+        const vpc = ec2.Vpc.fromVpcAttributes(this, 'VPC', {
+            vpcId: process.env.VPC_ID as string,
+            availabilityZones: (process.env.VPC_AZS as string).split(','),
+            privateSubnetIds: (process.env.VPC_SUBNETS as string).split(',')
+        });
+        new ec2.InterfaceVpcEndpoint(this, 'APIGatewayEndpoint', {
+            vpc: vpc,
+            service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY,
+            privateDnsEnabled: true,
+            subnets: {subnets: vpc.privateSubnets}
         });
     }
 }
 
 const app = new cdk.App();
-new Open311CdkStack(app, 'Open311');
+new Open311CdkStack(app, 'Open311', {
+    env: {
+        account: process.env.CDK_DEPLOY_ACCOUNT,
+        region: process.env.CDK_DEPLOY_REGION
+    }
+});
 app.synth();
