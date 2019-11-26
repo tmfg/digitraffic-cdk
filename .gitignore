@@ -43,6 +43,7 @@ cdk.json
 !jest.config.js
 *.d.ts
 node_modules
+template.yaml
 
 # CDK asset staging directory
 .cdk.staging

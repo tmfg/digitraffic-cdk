@@ -8,7 +8,8 @@
     "build": "tsc",
     "watch": "tsc -w",
     "test": "jest",
-    "cdk": "cdk"
+    "cdk": "cdk",
+    "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
     "@aws-cdk/assert": "^1.17.1",
@@ -18,7 +19,8 @@
     "ts-jest": "^24.1.0",
     "aws-cdk": "^1.17.1",
     "ts-node": "^8.1.0",
-    "typescript": "~3.7.2"
+    "typescript": "~3.7.2",
+    "@types/aws-lambda": "latest"
   },
   "dependencies": {
     "@aws-cdk/core": "^1.17.1",

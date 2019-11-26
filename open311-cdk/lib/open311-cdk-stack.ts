@@ -2,7 +2,7 @@ import cdk = require('@aws-cdk/core');
 import apigateway = require('@aws-cdk/aws-apigateway');
 
 const lambda = require('@aws-cdk/aws-lambda');
-import {LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import {JsonSchemaType, JsonSchemaVersion, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 
 export class Open311CdkStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -10,7 +10,7 @@ export class Open311CdkStack extends cdk.Stack {
 
         const newRequestHandler = new lambda.Function(this, 'NewRequestLambda', {
             code: new lambda.AssetCode('lib'),
-            handler: 'new-request.handler',
+            handler: 'newrequest.handler',
             runtime: lambda.Runtime.NODEJS_10_X
         });
         const newRequestIntegration = new LambdaIntegration(newRequestHandler);
@@ -18,7 +18,8 @@ export class Open311CdkStack extends cdk.Stack {
             restApiName: 'Open311 integration API',
         });
         const requests = integrationApi.root.addResource("requests");
-        requests.addMethod("POST", newRequestIntegration);
+        requests.addMethod("POST", newRequestIntegration, {
+        });
     }
 }
 

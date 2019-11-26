@@ -1,0 +1,5 @@
+{
+  "body": "{ someInt: 3 }",
+  "httpMethod": "POST",
+  "headers": {}
+}
