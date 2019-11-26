@@ -11,4 +11,4 @@ export VPC_SUBNETS=$1
 shift
 export API_KEY=$1
 shift
-cdk deploy
+npm run-script synth-sam

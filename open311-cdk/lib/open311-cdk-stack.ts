@@ -1,8 +1,6 @@
 import cdk = require('@aws-cdk/core');
 import apigateway = require('@aws-cdk/aws-apigateway');
-import ec2 = require('@aws-cdk/aws-ec2');
 import iam = require('@aws-cdk/aws-iam');
-
 const lambda = require('@aws-cdk/aws-lambda');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 
@@ -42,25 +40,10 @@ export class Open311CdkStack extends cdk.Stack {
             })
         });
         const requests = integrationApi.root.addResource("requests");
-        requests.addMethod("POST", newRequestIntegration, {});
-
-        const vpc = ec2.Vpc.fromVpcAttributes(this, 'VPC', {
-            vpcId: process.env.VPC_ID as string,
-            availabilityZones: (process.env.VPC_AZS as string).split(','),
-            privateSubnetIds: (process.env.VPC_SUBNETS as string).split(',')
+        requests.addMethod("POST", newRequestIntegration, {
+            apiKeyRequired: true
         });
-        const apiGwEndpointSg = new ec2.SecurityGroup(this, 'APIGatewayEndpointSG', {
-            vpc
-        });
-        apiGwEndpointSg.addIngressRule(ec2.Peer.anyIpv4(), ec2.Port.tcp(443));
-        apiGwEndpointSg.addIngressRule(ec2.Peer.anyIpv6(), ec2.Port.tcp(443));
-        new ec2.InterfaceVpcEndpoint(this, 'APIGatewayEndpoint', {
-            vpc: vpc,
-            service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY,
-            privateDnsEnabled: true,
-            subnets: {subnets: vpc.privateSubnets},
-            securityGroups: [apiGwEndpointSg]
-        });
+        integrationApi.addApiKey(process.env.API_KEY as string);
     }
 }
 
