@@ -9,6 +9,4 @@ export VPC_AZS=$1
 shift
 export VPC_SUBNETS=$1
 shift
-export API_KEY=$1
-shift
 npm run-script synth-sam

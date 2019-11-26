@@ -2,7 +2,7 @@ import cdk = require('@aws-cdk/core');
 import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
 const lambda = require('@aws-cdk/aws-lambda');
-import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import {ApiKey, EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 
 export class Open311CdkStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -43,7 +43,14 @@ export class Open311CdkStack extends cdk.Stack {
         requests.addMethod("POST", newRequestIntegration, {
             apiKeyRequired: true
         });
-        integrationApi.addApiKey(process.env.API_KEY as string);
+        const apiKey = integrationApi.addApiKey('Integration API key');
+        const plan = integrationApi.addUsagePlan('Integration Usage Plan', {
+           name: 'Integration Usage Plan',
+           apiKey
+        });
+        plan.addApiStage({
+            stage: integrationApi.deploymentStage
+        });
     }
 }
 
