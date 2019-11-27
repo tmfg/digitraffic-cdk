@@ -34,7 +34,7 @@ export class Open311CdkStack extends cdk.Stack {
                         ],
                         conditions: {
                             "StringEquals": {
-                                "aws:sourceVpc": process.env.VPC_ID as string
+                                "aws:sourceVpc": TestStackProps.default.vpcId
                             }
                         },
                         principals: [
@@ -60,5 +60,5 @@ export class Open311CdkStack extends cdk.Stack {
 }
 
 const app = new cdk.App();
-new Open311CdkStack(app, 'Open311-test', TestStackProps.default);
+new Open311CdkStack(app, 'Open311-test', TestStackProps.default.props);
 app.synth();
