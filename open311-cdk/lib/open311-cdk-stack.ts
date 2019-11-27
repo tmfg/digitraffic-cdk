@@ -1,12 +1,9 @@
 import cdk = require('@aws-cdk/core');
 import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
-
 const lambda = require('@aws-cdk/aws-lambda');
-const logs = require('@aws-cdk/aws-logs');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import * as TestStackProps from './stackprops-test';
-import {RetentionDays} from "@aws-cdk/aws-logs";
 
 export class Open311CdkStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -15,9 +12,7 @@ export class Open311CdkStack extends cdk.Stack {
         const newRequestHandler = new lambda.Function(this, 'NewRequestLambda', {
             code: new lambda.AssetCode('lib'),
             handler: 'newrequest.handler',
-            runtime: lambda.Runtime.NODEJS_10_X,
-            functionName: 'Open311-NewRequest',
-            logRetention: RetentionDays.ONE_YEAR
+            runtime: lambda.Runtime.NODEJS_10_X
         });
         const newRequestIntegration = new LambdaIntegration(newRequestHandler);
 
