@@ -2,7 +2,8 @@ import cdk = require('@aws-cdk/core');
 import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
 const lambda = require('@aws-cdk/aws-lambda');
-import {ApiKey, EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import * as TestStackProps from './stackprops-test';
 
 export class Open311CdkStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
@@ -55,10 +56,5 @@ export class Open311CdkStack extends cdk.Stack {
 }
 
 const app = new cdk.App();
-new Open311CdkStack(app, 'Open311', {
-    env: {
-        account: process.env.CDK_DEPLOY_ACCOUNT,
-        region: process.env.CDK_DEPLOY_REGION
-    }
-});
+new Open311CdkStack(app, 'Open311-test', TestStackProps.default);
 app.synth();
