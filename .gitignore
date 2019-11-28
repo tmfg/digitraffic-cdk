@@ -44,6 +44,7 @@ cdk.json
 *.d.ts
 node_modules
 template.yaml
+.cache/
 
 # CDK asset staging directory
 .cdk.staging

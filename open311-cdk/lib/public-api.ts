@@ -4,8 +4,9 @@ const lambda = require('@aws-cdk/aws-lambda');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import * as TestStackProps from "./stackprops-test";
 import {Construct} from "@aws-cdk/core";
+import {DbProps} from "./app-props";
 
-export function create(stack: Construct) {
+export function create(stack: Construct, dbProps: DbProps) {
     const publicApi = new apigateway.RestApi(stack, 'Open311-public', {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
@@ -37,8 +38,13 @@ export function create(stack: Construct) {
 
     const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', {
         code: new lambda.AssetCode('lib'),
-        handler: 'get-requests.handler',
-        runtime: lambda.Runtime.NODEJS_10_X
+        handler: 'lambda-get-requests.handler',
+        runtime: lambda.Runtime.NODEJS_10_X,
+        environment: {
+            DB_USER: dbProps.username,
+            DB_PASS: dbProps.password,
+            DB_URI: dbProps.uri
+        }
     });
     const getRequestsIntegration = new LambdaIntegration(getRequestsHandler);
     const requests = publicApi.root.addResource("requests");
@@ -50,6 +56,6 @@ export function create(stack: Construct) {
         runtime: lambda.Runtime.NODEJS_10_X
     });
     const getRequestIntegration = new LambdaIntegration(getRequestHandler);
-    const request = requests.addResource("{request_id}")
+    const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration)
 }

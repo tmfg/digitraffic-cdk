@@ -8,10 +8,10 @@ export class Open311CdkStack extends cdk.Stack {
         super(scope, id, props);
 
         IntegrationApi.create(this);
-        PublicApi.create(this);
+        PublicApi.create(this, TestStackProps.default.dbProps);
     }
 }
 
 const app = new cdk.App();
-new Open311CdkStack(app, 'Open311-test', TestStackProps.default.props);
+new Open311CdkStack(app, 'Open311-test', TestStackProps.default.stackProps);
 app.synth();

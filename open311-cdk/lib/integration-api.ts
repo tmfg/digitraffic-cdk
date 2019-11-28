@@ -8,7 +8,7 @@ import {Construct} from "@aws-cdk/core";
 export function create(stack: Construct) {
     const newRequestHandler = new lambda.Function(stack, 'NewRequestLambda', {
         code: new lambda.AssetCode('lib'),
-        handler: 'newrequest.handler',
+        handler: 'lambda-new-request.handler',
         runtime: lambda.Runtime.NODEJS_10_X
     });
     const newRequestIntegration = new LambdaIntegration(newRequestHandler);
