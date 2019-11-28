@@ -8,7 +8,7 @@ export class Open311CdkStack extends cdk.Stack {
         super(scope, id, props);
 
         IntegrationApi.create(this);
-        PublicApi.create(this, TestStackProps.default.dbProps);
+        PublicApi.create(this, TestStackProps.default);
     }
 }
 
