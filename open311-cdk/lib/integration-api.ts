@@ -2,10 +2,10 @@ import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
 const lambda = require('@aws-cdk/aws-lambda');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import * as TestStackProps from "./stackprops-test";
 import {Construct} from "@aws-cdk/core";
+import {Props} from "./app-props";
 
-export function create(stack: Construct) {
+export function create(stack: Construct, props: Props) {
     const newRequestHandler = new lambda.Function(stack, 'NewRequestLambda', {
         code: new lambda.AssetCode('lib'),
         handler: 'lambda-new-request.handler',
@@ -31,7 +31,7 @@ export function create(stack: Construct) {
                     ],
                     conditions: {
                         "StringEquals": {
-                            "aws:sourceVpc": TestStackProps.default.vpcId
+                            "aws:sourceVpc": props.vpcId
                         }
                     },
                     principals: [

@@ -1,13 +1,10 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
-
 const lambda = require('@aws-cdk/aws-lambda');
 const ec2 = require('@aws-cdk/aws-ec2');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import * as TestStackProps from "./stackprops-test";
 import {Construct, Duration} from "@aws-cdk/core";
 import {Props} from "./app-props";
-import {SubnetType} from "@aws-cdk/aws-ec2";
 
 export function create(stack: Construct, props: Props) {
     const publicApi = new apigateway.RestApi(stack, 'Open311-public', {
@@ -28,7 +25,7 @@ export function create(stack: Construct, props: Props) {
                     ],
                     conditions: {
                         "StringEquals": {
-                            "aws:sourceVpc": TestStackProps.default.vpcId
+                            "aws:sourceVpc": props.vpcId
                         }
                     },
                     principals: [
@@ -40,9 +37,9 @@ export function create(stack: Construct, props: Props) {
     });
 
     const vpc = ec2.Vpc.fromVpcAttributes(stack, 'vpc', {
-        vpcId: TestStackProps.default.vpcId,
-        privateSubnetIds: TestStackProps.default.privateSubnetIds,
-        availabilityZones: TestStackProps.default.availabilityZones
+        vpcId: props.vpcId,
+        privateSubnetIds: props.privateSubnetIds,
+        availabilityZones: props.availabilityZones
     });
 
     const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', {
