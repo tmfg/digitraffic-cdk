@@ -10,7 +10,12 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Con
         code: new lambda.AssetCode('lib/lambda/new-request'),
         handler: 'lambda-new-request.handler',
         runtime: lambda.Runtime.NODEJS_10_X,
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds)
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+        environment: {
+            DB_USER: props.dbProps.username,
+            DB_PASS: props.dbProps.password,
+            DB_URI: props.dbProps.uri
+        }
     });
     const newRequestIntegration = new LambdaIntegration(newRequestHandler);
 
