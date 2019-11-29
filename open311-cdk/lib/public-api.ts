@@ -43,7 +43,7 @@ function createRequestsResource(
 
     const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', {
         code: new lambda.AssetCode('lib'),
-        handler: 'get-request.handler',
+        handler: 'lambda-get-request.handler',
         runtime: lambda.Runtime.NODEJS_10_X
     });
     const getRequestIntegration = new LambdaIntegration(getRequestHandler);
@@ -77,7 +77,7 @@ function createServicesResource(
 
     const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', {
         code: new lambda.AssetCode('lib'),
-        handler: 'get-service.handler',
+        handler: 'lambda-get-service.handler',
         runtime: lambda.Runtime.NODEJS_10_X
     });
     const getServiceIntegration = new LambdaIntegration(getServiceHandler);
