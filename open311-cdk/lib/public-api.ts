@@ -23,7 +23,7 @@ function createRequestsResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', {
-        code: new lambda.AssetCode('lib'),
+        code: new lambda.AssetCode('lib/lambda/get-requests'),
         handler: 'lambda-get-requests.handler',
         runtime: lambda.Runtime.NODEJS_10_X,
         environment: {
@@ -41,7 +41,7 @@ function createRequestsResource(
     requests.addMethod("GET", getRequestsIntegration);
 
     const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', {
-        code: new lambda.AssetCode('lib'),
+        code: new lambda.AssetCode('lib/lambda/get-request'),
         handler: 'lambda-get-request.handler',
         runtime: lambda.Runtime.NODEJS_10_X
     });
@@ -57,7 +57,7 @@ function createServicesResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getServicesHandler = new lambda.Function(stack, 'GetServicesLambda', {
-        code: new lambda.AssetCode('lib'),
+        code: new lambda.AssetCode('lib/lambda/get-services'),
         handler: 'lambda-get-services.handler',
         runtime: lambda.Runtime.NODEJS_10_X,
         environment: {
@@ -75,7 +75,7 @@ function createServicesResource(
     services.addMethod("GET", getServicesIntegration);
 
     const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', {
-        code: new lambda.AssetCode('lib'),
+        code: new lambda.AssetCode('lib/lambda/get-service'),
         handler: 'lambda-get-service.handler',
         runtime: lambda.Runtime.NODEJS_10_X
     });
