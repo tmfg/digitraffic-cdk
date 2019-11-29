@@ -31,7 +31,7 @@ function createRequestsResource(
             DB_PASS: props.dbProps.password,
             DB_URI: props.dbProps.uri
         },
-        timeout: Duration.seconds(10),
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         vpc: vpc,
         vpcSubnets: vpc.privateSubnets,
         securityGroup: lambdaDbSg
@@ -43,7 +43,8 @@ function createRequestsResource(
     const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', {
         code: new lambda.AssetCode('lib/lambda/get-request'),
         handler: 'lambda-get-request.handler',
-        runtime: lambda.Runtime.NODEJS_10_X
+        runtime: lambda.Runtime.NODEJS_10_X,
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds)
     });
     const getRequestIntegration = new LambdaIntegration(getRequestHandler);
     const request = requests.addResource("{request_id}");
@@ -65,7 +66,7 @@ function createServicesResource(
             DB_PASS: props.dbProps.password,
             DB_URI: props.dbProps.uri
         },
-        timeout: Duration.seconds(10),
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         vpc: vpc,
         vpcSubnets: vpc.privateSubnets,
         securityGroup: lambdaDbSg
@@ -77,7 +78,8 @@ function createServicesResource(
     const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', {
         code: new lambda.AssetCode('lib/lambda/get-service'),
         handler: 'lambda-get-service.handler',
-        runtime: lambda.Runtime.NODEJS_10_X
+        runtime: lambda.Runtime.NODEJS_10_X,
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds)
     });
     const getServiceIntegration = new LambdaIntegration(getServiceHandler);
     const service = services.addResource("{service_id}");

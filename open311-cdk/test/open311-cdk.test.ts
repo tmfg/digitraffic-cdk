@@ -14,7 +14,8 @@ test('Empty Stack', () => {
             username: 'test',
             password: 'test',
             uri: 'test:5432/test'
-        }
+        },
+        defaultLambdaDurationSeconds: 10
     });
     // THEN
     expectCDK(stack).to(matchTemplate({

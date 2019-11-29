@@ -9,6 +9,7 @@ const props: Props = {
         username: 'someuser',
         password: 'somepass',
         uri: 'someurl:5432/someschema'
-    }
+    },
+    defaultLambdaDurationSeconds: 10
 };
 export default props;
