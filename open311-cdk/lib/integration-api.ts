@@ -15,7 +15,10 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Con
             DB_USER: props.dbProps.username,
             DB_PASS: props.dbProps.password,
             DB_URI: props.dbProps.uri
-        }
+        },
+        vpc: vpc,
+        vpcSubnets: vpc.privateSubnets,
+        securityGroup: lambdaDbSg
     });
     const newRequestIntegration = new LambdaIntegration(newRequestHandler);
 
