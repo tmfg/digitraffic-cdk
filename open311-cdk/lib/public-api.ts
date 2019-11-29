@@ -74,6 +74,15 @@ function createServicesResource(
     const getServicesIntegration = new LambdaIntegration(getServicesHandler);
     const services = publicApi.root.addResource("services");
     services.addMethod("GET", getServicesIntegration);
+
+    const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', {
+        code: new lambda.AssetCode('lib'),
+        handler: 'get-service.handler',
+        runtime: lambda.Runtime.NODEJS_10_X
+    });
+    const getServiceIntegration = new LambdaIntegration(getServiceHandler);
+    const service = services.addResource("{service_id}");
+    service.addMethod("GET", getServiceIntegration);
 }
 
 function createApi(stack: Construct, props: Props) {
