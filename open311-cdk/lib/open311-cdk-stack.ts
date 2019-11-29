@@ -1,14 +1,11 @@
 import cdk = require('@aws-cdk/core');
 import * as IntegrationApi from './integration-api';
 import * as PublicApi from './public-api';
-import * as TestStackProps from '../stackprops-test';
 import * as ec2 from "@aws-cdk/aws-ec2";
 
 export class Open311CdkStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+    constructor(scope: cdk.Construct, id: string, open311Props: Props, props?: cdk.StackProps) {
         super(scope, id, props);
-
-        const open311Props = TestStackProps.default;
 
         const vpc = ec2.Vpc.fromVpcAttributes(this, 'vpc', {
             vpcId: open311Props.vpcId,
@@ -21,7 +18,3 @@ export class Open311CdkStack extends cdk.Stack {
         PublicApi.create(vpc, lambdaDbSg, this, open311Props);
     }
 }
-
-const app = new cdk.App();
-new Open311CdkStack(app, 'Open311-test', TestStackProps.default.stackProps);
-app.synth();

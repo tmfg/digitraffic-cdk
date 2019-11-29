@@ -37,7 +37,6 @@ typings/
 .env
 
 # build
-bin/
 cdk.json
 *.js
 !jest.config.js
@@ -51,4 +50,4 @@ template.yaml
 cdk.out
 
 # config
-stackprops*.ts
+dont-commit-this-props-*.ts

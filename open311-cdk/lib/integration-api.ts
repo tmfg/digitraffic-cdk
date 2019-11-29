@@ -3,7 +3,6 @@ import iam = require('@aws-cdk/aws-iam');
 const lambda = require('@aws-cdk/aws-lambda');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
-import {Props} from "./app-props";
 import * as ec2 from "@aws-cdk/aws-ec2";
 
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {

@@ -4,7 +4,6 @@ const lambda = require('@aws-cdk/aws-lambda');
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct, Duration} from "@aws-cdk/core";
-import {Props} from "./app-props";
 
 export function create(
     vpc: ec2.IVpc,
