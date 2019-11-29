@@ -1,6 +1,6 @@
 # digitraffic-cdk
 
-Digitraffic CDK stacks
+Digitraffic CDK stacks.
 
 ## Useful commands
 

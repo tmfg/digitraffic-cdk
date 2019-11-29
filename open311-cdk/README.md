@@ -1,8 +1,4 @@
-# Useful commands
-
- * `npm run build`   compile typescript to js
- * `npm run watch`   watch for changes and compile
- * `npm run test`    perform the jest unit tests
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk synth`       emits the synthesized CloudFormation template
+Before running CDK commands:
+* set the environment variable AWS_PROFILE to point to your destination account
+* create a copy of the bin/example-props.ts file, name this file dont-commit-this-props-<your_profile_name>.ts
+* configure the aforementioned file  
