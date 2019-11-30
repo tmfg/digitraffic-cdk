@@ -8,7 +8,8 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
         return {statusCode: 400, body: 'Invalid request'};
     }
 
-    const serviceRequest = JSON.parse(event.body) as ServiceRequest;
+    const obj = JSON.parse(event.body);
+    const serviceRequests: ServiceRequest[] = Array.isArray(obj) ? obj as ServiceRequest[] : [obj];
     const db = initDb(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
@@ -16,7 +17,8 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
     );
 
     await db.tx(t => {
-        t.none(`INSERT INTO open311_service_request(
+        const queries: any[] = serviceRequests.map(serviceRequest => {
+            return t.none(`INSERT INTO open311_service_request(
                         service_request_id,
                         status,
                         status_notes,
@@ -50,6 +52,8 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
                         $(zipcode),
                         $(geometry),
                         $(media_url))`, serviceRequest);
+        });
+        return t.batch(queries);
     });
     return {statusCode: 201, body: 'Created'};
 };
