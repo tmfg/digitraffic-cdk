@@ -1,5 +1,4 @@
 import * as pgPromise from "pg-promise";
-
 const pgp = require('pg-promise')();
 
 export function initDb(
