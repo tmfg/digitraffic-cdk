@@ -14,15 +14,15 @@ export function newServiceRequest(): ServiceRequest {
         service_name: "service_name",
         service_code: "123",
         description: "some description",
-        agency_responsible: undefined,
-        service_notice: undefined,
+        agency_responsible: "some agency",
+        service_notice: "some notice",
         requested_datetime: new Date(),
-        updated_datetime: undefined,
-        expected_datetime: undefined,
-        address: undefined,
-        address_id: undefined,
-        zipcode: undefined,
-        geometry: undefined,
-        media_url: undefined
+        updated_datetime: new Date(),
+        expected_datetime: new Date(),
+        address: "some address",
+        address_id: "2",
+        zipcode: "123456",
+        geometry: "POINT(0 0)",
+        media_url: "some url"
     };
 }

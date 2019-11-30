@@ -9,7 +9,8 @@
     "build": "tsc",
     "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d lib/lambda --bundle-node-modules --no-source-maps",
     "watch": "tsc -w",
-    "test": "jest",
+    "pretest": "npm run build",
+    "test": "jest --runInBand",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
