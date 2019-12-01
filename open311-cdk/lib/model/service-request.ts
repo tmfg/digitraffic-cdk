@@ -1,6 +1,11 @@
+export enum ServiceRequestStatus {
+    open,
+    closed
+}
+
 export interface ServiceRequest {
     readonly service_request_id: string;
-    readonly status: string;
+    readonly status: ServiceRequestStatus;
     readonly status_notes?: string;
     readonly service_name?: string;
     readonly service_code?: string;

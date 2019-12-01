@@ -1,9 +1,9 @@
-import {ServiceRequest} from "../../lib/model/service-request";
+import {ServiceRequest, ServiceRequestStatus} from "../../lib/model/service-request";
 
 export function newServiceRequest(): ServiceRequest {
     return {
         service_request_id: "SRQ" + Math.random().toFixed(10).split('.')[1],
-        status: "some status",
+        status: Math.floor(Math.random() * 10) > 5 ? ServiceRequestStatus.open : ServiceRequestStatus.closed,
         status_notes: "status_notes",
         service_name: "service_name",
         service_code: "123",
