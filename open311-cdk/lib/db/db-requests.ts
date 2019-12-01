@@ -1,4 +1,4 @@
-import {ServiceRequest} from "../model/service-request";
+import {ServiceRequest, ServiceRequestStatus} from "../model/service-request";
 import * as pgPromise from "pg-promise";
 
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequest[]> {
@@ -60,6 +60,36 @@ export function insert(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
                                    $(zipcode),
                                    $(geometry),
                                    $(media_url))`, serviceRequest);
+        });
+        return t.batch(queries);
+    });
+}
+
+export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequest[]): Promise<void> {
+    return db.tx(t => {
+        const queries: any[] = serviceRequests.map(serviceRequest => {
+            if (serviceRequest.status == ServiceRequestStatus.closed) {
+                return t.none('DELETE FROM open311_service_request WHERE service_request_id = $1', serviceRequest.service_request_id);
+            } else {
+                return t.none(`
+                    UPDATE open311_service_request SET
+                       status_notes = $(status_notes),
+                       service_name = $(service_name),
+                       service_code = $(service_code),
+                       description = $(description),
+                       agency_responsible = $(agency_responsible),
+                       service_notice = $(service_notice),
+                       requested_datetime = $(requested_datetime),
+                       updated_datetime = $(updated_datetime),
+                       expected_datetime = $(expected_datetime),
+                       address = $(address),
+                       address_id = $(address_id),
+                       zipcode = $(zipcode),
+                       geometry = $(geometry),
+                       media_url = $(media_url)
+                    WHERE service_request_id = $(service_request_id)
+                `, serviceRequest);
+            }
         });
         return t.batch(queries);
     });

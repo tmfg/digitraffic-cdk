@@ -3,7 +3,6 @@ import {initDb} from 'digitraffic-lambda-postgres/database';
 import {handler} from "../../../../lib/lambda/get-requests/lambda-get-requests";
 import {insert} from "../../../../lib/db/db-requests";
 import {newServiceRequest} from "../../testdata";
-
 const testEvent = require('../../test-event');
 
 var db: pgPromise.IDatabase<any, any>;
