@@ -11,7 +11,6 @@ export function create(
     stack: Construct,
     props: Props) {
     const publicApi = createApi(stack, props);
-
     createRequestsResource(publicApi, vpc, props, lambdaDbSg, stack)
     createServicesResource(publicApi, vpc, props, lambdaDbSg, stack)
 }

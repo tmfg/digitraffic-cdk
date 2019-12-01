@@ -6,23 +6,13 @@ import {Construct, Duration} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
-    const newRequestHandler = new lambda.Function(stack, 'NewRequestLambda', {
-        code: new lambda.AssetCode('lib/lambda/new-request'),
-        handler: 'lambda-new-request.handler',
-        runtime: lambda.Runtime.NODEJS_10_X,
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
-        environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri
-        },
-        vpc: vpc,
-        vpcSubnets: vpc.privateSubnets,
-        securityGroup: lambdaDbSg
-    });
-    const newRequestIntegration = new LambdaIntegration(newRequestHandler);
+    const integrationApi = createApi(stack, props.vpcId);
+    createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
+    createUsagePlan(integrationApi);
+}
 
-    const integrationApi = new apigateway.RestApi(stack, 'Open311-integration', {
+function createApi(stack: Construct, vpcId: string) {
+    return new apigateway.RestApi(stack, 'Open311-integration', {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         },
@@ -40,7 +30,7 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Con
                     ],
                     conditions: {
                         "StringEquals": {
-                            "aws:sourceVpc": props.vpcId
+                            "aws:sourceVpc": vpcId
                         }
                     },
                     principals: [
@@ -50,10 +40,56 @@ export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Con
             ]
         })
     });
+}
+
+function createRequestsResource(
+    stack: Construct,
+    integrationApi: apigateway.RestApi,
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    props: Props) {
     const requests = integrationApi.root.addResource("requests");
+
+    const newRequestHandler = new lambda.Function(stack, 'NewRequestLambda', {
+        code: new lambda.AssetCode('lib/lambda/new-request'),
+        handler: 'lambda-new-request.handler',
+        runtime: lambda.Runtime.NODEJS_10_X,
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+        environment: {
+            DB_USER: props.dbProps.username,
+            DB_PASS: props.dbProps.password,
+            DB_URI: props.dbProps.uri
+        },
+        vpc: vpc,
+        vpcSubnets: vpc.privateSubnets,
+        securityGroup: lambdaDbSg
+    });
+    const newRequestIntegration = new LambdaIntegration(newRequestHandler);
     requests.addMethod("POST", newRequestIntegration, {
         apiKeyRequired: true
     });
+
+    const editRequestHandler = new lambda.Function(stack, 'EditRequestLambda', {
+        code: new lambda.AssetCode('lib/lambda/edit-request'),
+        handler: 'lambda-edit-request.handler',
+        runtime: lambda.Runtime.NODEJS_10_X,
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+        environment: {
+            DB_USER: props.dbProps.username,
+            DB_PASS: props.dbProps.password,
+            DB_URI: props.dbProps.uri
+        },
+        vpc: vpc,
+        vpcSubnets: vpc.privateSubnets,
+        securityGroup: lambdaDbSg
+    });
+    const editRequestIntegration = new LambdaIntegration(editRequestHandler);
+    requests.addMethod("PUT", editRequestIntegration, {
+        apiKeyRequired: true
+    });
+}
+
+function createUsagePlan(integrationApi: apigateway.RestApi) {
     const apiKey = integrationApi.addApiKey('Integration API key');
     const plan = integrationApi.addUsagePlan('Integration Usage Plan', {
         name: 'Integration Usage Plan',
