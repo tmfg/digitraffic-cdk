@@ -1,5 +1,6 @@
 import {APIGatewayEvent} from 'aws-lambda';
 import {initDb} from 'digitraffic-lambda-postgres/database';
+import {findAll} from "../../db/db-requests";
 
 export const handler = async (event: APIGatewayEvent): Promise<any> => {
     const db = initDb(
@@ -7,26 +8,8 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
         process.env.DB_PASS as string,
         process.env.DB_URI as string
     );
-    const requests = await db.many(`
-        SELECT service_request_id,
-               status,
-               status_notes,
-               service_name,
-               service_code,
-               description,
-               agency_responsible,
-               service_notice,
-               requested_datetime,
-               updated_datetime,
-               expected_datetime,
-               address,
-               address_id,
-               zipcode,
-               ST_X(geometry) AS long,
-               ST_Y(geometry) AS lat,
-               media_url
-        FROM open311_service_request
-    `);
+
+    const requests = await findAll(db);
 
     db.$pool.end();
 

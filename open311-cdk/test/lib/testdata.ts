@@ -1,10 +1,4 @@
-import * as pgPromise from "pg-promise";
-import {insert} from "../../lib/db/db-requests";
 import {ServiceRequest} from "../../lib/model/service-request";
-
-export function insertServiceRequest(db: pgPromise.IDatabase<any, any>): Promise<void> {
-    return insert(db, []);
-}
 
 export function newServiceRequest(): ServiceRequest {
     return {
