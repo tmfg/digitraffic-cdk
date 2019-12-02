@@ -43,7 +43,15 @@ function createRequestsResource(
         code: new lambda.AssetCode('lib/lambda/get-request'),
         handler: 'lambda-get-request.handler',
         runtime: lambda.Runtime.NODEJS_10_X,
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds)
+        environment: {
+            DB_USER: props.dbProps.username,
+            DB_PASS: props.dbProps.password,
+            DB_URI: props.dbProps.uri
+        },
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+        vpc: vpc,
+        vpcSubnets: vpc.privateSubnets,
+        securityGroup: lambdaDbSg
     });
     const getRequestIntegration = new LambdaIntegration(getRequestHandler);
     const request = requests.addResource("{request_id}");

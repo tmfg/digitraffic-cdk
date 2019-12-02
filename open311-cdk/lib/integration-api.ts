@@ -104,7 +104,9 @@ function createRequestsResource(
     });
     const editRequestIntegration = new LambdaIntegration(editRequestHandler);
     const request = requests.addResource("{request_id}");
-    request.addMethod("PUT", editRequestIntegration);
+    request.addMethod("PUT", editRequestIntegration, {
+        apiKeyRequired: true
+    });
 }
 
 function createUsagePlan(integrationApi: apigateway.RestApi) {
