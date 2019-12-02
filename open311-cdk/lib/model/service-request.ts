@@ -1,6 +1,6 @@
 export enum ServiceRequestStatus {
-    open,
-    closed
+    open = 'open',
+    closed = 'closed'
 }
 
 export interface ServiceRequest {
