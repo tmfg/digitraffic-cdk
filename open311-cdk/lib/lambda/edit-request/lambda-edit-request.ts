@@ -1,23 +1,16 @@
 import {APIGatewayEvent} from 'aws-lambda';
-import {initDb} from 'digitraffic-lambda-postgres/database';
-import {ServiceRequest} from "../../model/service-request";
 import {update} from "../../db/db-requests";
+import {invalidRequest} from "../../request-util";
+import {initDb} from 'digitraffic-lambda-postgres/database';
 
-function invalidRequest(): object {
-    return {statusCode: 400, body: 'Invalid request'};
-}
+export const handler = async (event: APIGatewayEvent) : Promise <any> => {
+    const serviceRequestId = event.pathParameters?.['service_id'];
 
-export const handler = async (event: APIGatewayEvent): Promise<any> => {
-    if (!event.body) {
+    if (!serviceRequestId || !event.body) {
         return invalidRequest();
     }
 
-    const obj = JSON.parse(event.body);
-    const serviceRequests: ServiceRequest[] = Array.isArray(obj) ? obj as ServiceRequest[] : [obj];
-
-    if (serviceRequests.length == 0) {
-        return invalidRequest();
-    }
+    const serviceRequest = JSON.parse(event.body);
 
     const db = initDb(
         process.env.DB_USER as string,
@@ -25,7 +18,9 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
         process.env.DB_URI as string
     );
 
-    await update(db, serviceRequests);
+    await update(db, [Object.assign(serviceRequest, {
+        service_request_id: serviceRequestId
+    })]);
 
     db.$pool.end();
 

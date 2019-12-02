@@ -69,6 +69,25 @@ function createRequestsResource(
         apiKeyRequired: true
     });
 
+    const editRequestsHandler = new lambda.Function(stack, 'EditRequestsLambda', {
+        code: new lambda.AssetCode('lib/lambda/edit-requests'),
+        handler: 'lambda-edit-requests.handler',
+        runtime: lambda.Runtime.NODEJS_10_X,
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+        environment: {
+            DB_USER: props.dbProps.username,
+            DB_PASS: props.dbProps.password,
+            DB_URI: props.dbProps.uri
+        },
+        vpc: vpc,
+        vpcSubnets: vpc.privateSubnets,
+        securityGroup: lambdaDbSg
+    });
+    const editRequestsIntegration = new LambdaIntegration(editRequestsHandler);
+    requests.addMethod("PUT", editRequestsIntegration, {
+        apiKeyRequired: true
+    });
+
     const editRequestHandler = new lambda.Function(stack, 'EditRequestLambda', {
         code: new lambda.AssetCode('lib/lambda/edit-request'),
         handler: 'lambda-edit-request.handler',
@@ -84,9 +103,8 @@ function createRequestsResource(
         securityGroup: lambdaDbSg
     });
     const editRequestIntegration = new LambdaIntegration(editRequestHandler);
-    requests.addMethod("PUT", editRequestIntegration, {
-        apiKeyRequired: true
-    });
+    const request = requests.addResource("{request_id}");
+    request.addMethod("PUT", editRequestIntegration);
 }
 
 function createUsagePlan(integrationApi: apigateway.RestApi) {
