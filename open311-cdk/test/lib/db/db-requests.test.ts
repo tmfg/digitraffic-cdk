@@ -66,7 +66,13 @@ test('update - modify', async () => {
     });
     await insert(db, [serviceRequest]);
 
-    // TODO geometry, dates
+    // round off millis
+    const requested_datetime = new Date();
+    requested_datetime.setMilliseconds(0);
+    const updated_datetime = new Date();
+    updated_datetime.setMilliseconds(0);
+    const expected_datetime = new Date();
+    expected_datetime.setMilliseconds(0);
     const updatingServiceRequest = {
         status_notes: "other status notes",
         service_name: "other service name",
@@ -74,6 +80,9 @@ test('update - modify', async () => {
         description: "other description",
         agency_responsible: "other agency",
         service_notice: "other notice",
+        requested_datetime,
+        updated_datetime,
+        expected_datetime,
         address: "other address",
         address_id: "other than 2",
         zipcode: "other than 123456",
@@ -88,6 +97,9 @@ test('update - modify', async () => {
     expect(foundServiceRequest.service_name).toBe(updatingServiceRequest.service_name);
     expect(foundServiceRequest.service_code).toBe(updatingServiceRequest.service_code);
     expect(foundServiceRequest.description).toBe(updatingServiceRequest.description);
+    expect(foundServiceRequest.requested_datetime).toMatchObject(updatingServiceRequest.requested_datetime);
+    expect(foundServiceRequest.updated_datetime).toMatchObject(updatingServiceRequest.updated_datetime);
+    expect(foundServiceRequest.expected_datetime).toMatchObject(updatingServiceRequest.expected_datetime);
     expect(foundServiceRequest.agency_responsible).toBe(updatingServiceRequest.agency_responsible);
     expect(foundServiceRequest.service_notice).toBe(updatingServiceRequest.service_notice);
     expect(foundServiceRequest.address).toBe(updatingServiceRequest.address);
