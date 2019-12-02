@@ -1,4 +1,4 @@
-import {ServiceRequest, ServiceRequestStatus} from "../model/service-request";
+import {Open311Point, ServiceRequest, ServiceRequestStatus} from "../model/service-request";
 import * as pgPromise from "pg-promise";
 
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequest[]> {
@@ -100,6 +100,10 @@ const SELECT_REQUEST = `SELECT service_request_id,
                         FROM open311_service_request`;
 
 function toServiceRequest(r: any): ServiceRequest {
+    const geometry: Open311Point | null = r.long == null && r.lat == null ? null : {
+        long: r.long,
+        lat: r.lat
+    };
     return {
         service_request_id: r.service_request_id,
         status: r.status,
@@ -115,10 +119,7 @@ function toServiceRequest(r: any): ServiceRequest {
         address: r.address,
         address_id: r.address_id,
         zipcode: r.zipcode,
-        geometry: {
-            long: r.long,
-            lat: r.lat
-        },
+        geometry,
         media_url: r.media_url
     };
 }
