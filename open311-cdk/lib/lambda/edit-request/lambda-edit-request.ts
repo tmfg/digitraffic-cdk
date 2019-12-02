@@ -4,7 +4,7 @@ import {invalidRequest} from "../../request-util";
 import {initDb} from 'digitraffic-lambda-postgres/database';
 
 export const handler = async (event: APIGatewayEvent) : Promise <any> => {
-    const serviceRequestId = event.pathParameters?.['service_id'];
+    const serviceRequestId = event.pathParameters?.['request_id'];
 
     if (!serviceRequestId || !event.body) {
         return invalidRequest();
