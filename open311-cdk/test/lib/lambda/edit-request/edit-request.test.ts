@@ -3,6 +3,7 @@ import {initDb} from 'digitraffic-lambda-postgres/database';
 import {handler} from "../../../../lib/lambda/edit-request/lambda-edit-request";
 import {newServiceRequest} from "../../testdata";
 import {ServiceRequestStatus} from "../../../../lib/model/service-request";
+import {findAll, insert} from "../../../../lib/db/db-requests";
 const testEvent = require('../../test-event');
 
 var db: pgPromise.IDatabase<any, any>;
@@ -40,8 +41,12 @@ test('Empty array - invalid request', async () => {
 });
 
 test('Single service request update - delete', async () => {
+    const sr = Object.assign(newServiceRequest(), {
+        status: ServiceRequestStatus.open
+    });
+    await insert(db, [sr]);
     const response = await handler(Object.assign({}, testEvent, {
-        body: JSON.stringify([Object.assign({}, newServiceRequest(), {
+        body: JSON.stringify([Object.assign({}, sr, {
             status: ServiceRequestStatus.closed
         })])
     }));
@@ -50,6 +55,10 @@ test('Single service request update - delete', async () => {
 });
 
 test('Single service request update - modify', async () => {
+    const sr = Object.assign(newServiceRequest(), {
+        status: ServiceRequestStatus.open
+    });
+    await insert(db, [sr]);
     const response = await handler(Object.assign({}, testEvent, {
         body: JSON.stringify([Object.assign({}, newServiceRequest(), {
             status: ServiceRequestStatus.open,

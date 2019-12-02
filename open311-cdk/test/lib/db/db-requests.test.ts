@@ -47,7 +47,9 @@ test('findAll', async () => {
 });
 
 test('update - delete', async () => {
-    const serviceRequest = newServiceRequest();
+    const serviceRequest = Object.assign(newServiceRequest(), {
+        status: ServiceRequestStatus.open
+    });
     await insert(db, [serviceRequest]);
 
     await update(db, [Object.assign({}, serviceRequest, {
@@ -59,7 +61,9 @@ test('update - delete', async () => {
 });
 
 test('update - modify', async () => {
-    const serviceRequest = newServiceRequest();
+    const serviceRequest = Object.assign(newServiceRequest(), {
+        status: ServiceRequestStatus.open
+    });
     await insert(db, [serviceRequest]);
 
     // TODO geometry, dates
