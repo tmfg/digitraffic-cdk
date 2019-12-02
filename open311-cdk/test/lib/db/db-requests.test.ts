@@ -35,6 +35,16 @@ test('Insert', async () => {
     expect(foundServiceRequests.length).toBe(serviceRequests.length);
 });
 
+test("Insert - null geometry doesn't fail", async () => {
+    const serviceRequest = newServiceRequest();
+    // @ts-ignore
+    delete serviceRequest.long;
+    // @ts-ignore
+    delete serviceRequest.lat;
+
+    await insert(db, [serviceRequest]);
+});
+
 test('findAll', async () => {
     const serviceRequests = Array.from({ length: Math.floor(Math.random() * 10) }).map(() => {
         return newServiceRequest();
@@ -122,4 +132,18 @@ test('update - modify', async () => {
     expect(foundServiceRequest.address_id).toBe(updatingServiceRequest.address_id);
     expect(foundServiceRequest.zipcode).toBe(updatingServiceRequest.zipcode);
     expect(foundServiceRequest.media_url).toBe(updatingServiceRequest.media_url);
+});
+
+test("update - null geometry doesn't fail", async () => {
+    const serviceRequest = Object.assign(newServiceRequest(), {
+        status: ServiceRequestStatus.open
+    });
+    await insert(db, [serviceRequest]);
+
+    const updatingServiceRequest = Object.assign({}, serviceRequest);
+    // @ts-ignore
+    delete updatingServiceRequest.long;
+    // @ts-ignore
+    delete updatingServiceRequest.lat;
+    await update(db, [updatingServiceRequest]);
 });

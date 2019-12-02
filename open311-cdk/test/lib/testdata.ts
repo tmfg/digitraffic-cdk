@@ -22,10 +22,8 @@ export function newServiceRequest(): ServiceRequest {
         address: "some address",
         address_id: "2",
         zipcode: "123456",
-        geometry: {
-            long: 1,
-            lat: 2
-        },
+        long: 1,
+        lat: 2,
         media_url: "some url"
     };
 }

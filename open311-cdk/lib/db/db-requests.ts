@@ -1,4 +1,4 @@
-import {Open311Point, ServiceRequest, ServiceRequestStatus} from "../model/service-request";
+import {ServiceRequest, ServiceRequestStatus} from "../model/service-request";
 import * as pgPromise from "pg-promise";
 
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequest[]> {
@@ -43,8 +43,8 @@ export function insert(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
                                    $(address),
                                    $(address_id),
                                    $(zipcode),
-                                   ST_POINT($(geometry.long), $(geometry.lat)),
-                                   $(media_url))`, serviceRequest);
+                                   ST_POINT($(long), $(lat)),
+                                   $(media_url))`, createEditObject(serviceRequest));
         });
         return t.batch(queries);
     });
@@ -70,10 +70,9 @@ export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
                        address = $(address),
                        address_id = $(address_id),
                        zipcode = $(zipcode),
-                       geometry = ST_POINT($(geometry.long), $(geometry.lat)),
+                       geometry = ST_POINT($(long), $(lat)),
                        media_url = $(media_url)
-                    WHERE service_request_id = $(service_request_id)
-                `, serviceRequest);
+                    WHERE service_request_id = $(service_request_id)`, createEditObject(serviceRequest));
             }
         });
         return t.batch(queries);
@@ -100,10 +99,6 @@ const SELECT_REQUEST = `SELECT service_request_id,
                         FROM open311_service_request`;
 
 function toServiceRequest(r: any): ServiceRequest {
-    const geometry: Open311Point | null = r.long == null && r.lat == null ? null : {
-        long: r.long,
-        lat: r.lat
-    };
     return {
         service_request_id: r.service_request_id,
         status: r.status,
@@ -119,7 +114,29 @@ function toServiceRequest(r: any): ServiceRequest {
         address: r.address,
         address_id: r.address_id,
         zipcode: r.zipcode,
-        geometry,
+        long: r.long,
+        lat: r.lat,
         media_url: r.media_url
     };
+}
+
+/**
+ * Creates an object with all necessary properties for pg-promise
+ */
+function createEditObject(serviceRequest: ServiceRequest): ServiceRequest {
+    return Object.assign({
+        status_notes: undefined,
+        service_name: undefined,
+        service_code: undefined,
+        agency_responsible: undefined,
+        service_notice: undefined,
+        updated_datetime: undefined,
+        expected_datetime: undefined,
+        address: undefined,
+        address_id: undefined,
+        zipcode: undefined,
+        long: undefined,
+        lat: undefined,
+        media_url: undefined
+    }, serviceRequest);
 }
