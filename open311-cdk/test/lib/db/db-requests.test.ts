@@ -1,14 +1,15 @@
 import * as pgPromise from "pg-promise";
 import {initDb} from 'digitraffic-lambda-postgres/database';
-import {findAll, insert, update} from "../../../lib/db/db-requests";
+import {find, findAll, insert, update} from "../../../lib/db/db-requests";
 import {newServiceRequest} from "../testdata";
 import {truncate} from "../db-testutils";
 import {ServiceRequestStatus} from "../../../lib/model/service-request";
 
 var db: pgPromise.IDatabase<any, any>
 
-beforeAll(() => {
+beforeAll(async () => {
    db = initDb('road', 'road', 'localhost:54322/road');
+    await truncate(db);
 });
 
 beforeEach(async () => {
@@ -44,6 +45,21 @@ test('findAll', async () => {
 
     // TODO match object, date millisecond difference
     expect(foundServiceRequests.length).toBe(serviceRequests.length);
+});
+
+test('find - found', async () => {
+    const serviceRequest = newServiceRequest();
+    await insert(db, [serviceRequest]);
+
+    const foundServiceRequest = await find(db, serviceRequest.service_request_id);
+
+    expect(foundServiceRequest).toMatchObject(serviceRequest);
+});
+
+test('find - not found', async () => {
+    const foundServiceRequest = await find(db, 'lol');
+
+    expect(foundServiceRequest).toBeNull();
 });
 
 test('update - delete', async () => {

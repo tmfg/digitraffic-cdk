@@ -18,6 +18,11 @@ export interface ServiceRequest {
     readonly address?: string;
     readonly address_id?: string;
     readonly zipcode?: string;
-    readonly geometry?: string;
+    readonly geometry?: Open311Point;
     readonly media_url?: string;
+}
+
+export interface Open311Point {
+    readonly long: number;
+    readonly lat: number;
 }
