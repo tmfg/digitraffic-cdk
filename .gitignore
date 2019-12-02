@@ -37,7 +37,6 @@ typings/
 .env
 
 # build
-cdk.json
 *.js
 !jest.config.js
 *.d.ts
