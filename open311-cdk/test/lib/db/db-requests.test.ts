@@ -2,7 +2,7 @@ import * as pgPromise from "pg-promise";
 import {initDb} from 'digitraffic-lambda-postgres/database';
 import {find, findAll, insert, update} from "../../../lib/db/db-requests";
 import {newServiceRequest} from "../testdata";
-import {truncate} from "../db-testutils";
+import {truncate} from "../db-testutil";
 import {ServiceRequestStatus} from "../../../lib/model/service-request";
 
 var db: pgPromise.IDatabase<any, any>
