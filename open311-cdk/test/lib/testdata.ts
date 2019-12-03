@@ -1,4 +1,17 @@
 import {ServiceRequest, ServiceRequestStatus} from "../../lib/model/service-request";
+import {Service, ServiceType} from "../../lib/model/service";
+
+export function newService(): Service {
+    return {
+      service_code: Math.random().toFixed(3).split('.')[1],
+      service_name: 'some name',
+      keywords: 'some, words',
+      description: 'some description',
+      type: ServiceType.batch,
+      metadata: false,
+      group: 'some group'
+    };
+}
 
 export function newServiceRequest(): ServiceRequest {
     const requested_datetime = new Date();
