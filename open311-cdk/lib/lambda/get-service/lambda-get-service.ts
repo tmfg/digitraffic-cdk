@@ -1,5 +1,5 @@
 import {APIGatewayEvent} from 'aws-lambda';
-import {initDb} from 'digitraffic-lambda-postgres/database';
+import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {find} from "../../db/db-services";
 import {invalidRequest, notFound} from "../../request-util";
 
@@ -10,7 +10,7 @@ export const handler = async (event: APIGatewayEvent) : Promise <any> => {
         return invalidRequest();
     }
 
-    const db = initDb(
+    const db = initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string

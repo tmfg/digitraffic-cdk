@@ -1,51 +1,35 @@
 import * as pgPromise from "pg-promise";
-import {initDb} from 'digitraffic-lambda-postgres/database';
 import {find, findAll, insert} from "../../../lib/db/db-services";
 import {newService} from "../testdata";
-import {truncate} from "../db-testutil";
+import {dbTestBase} from "../db-testutil";
 
-var db: pgPromise.IDatabase<any, any>
+describe('db-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
-beforeAll(async () => {
-   db = initDb('road', 'road', 'localhost:54322/road');
-    await truncate(db);
-});
+    test('findAll', async () => {
+        const services = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
+            return newService();
+        });
+        await insert(db, services);
 
-beforeEach(async () => {
-    await truncate(db);
-});
+        const foundservices = await findAll(db);
 
-afterEach(async () => {
-    await truncate(db);
-});
-
-afterAll(async () => {
-    db.$pool.end();
-});
-
-test('findAll', async () => {
-    const services = Array.from({ length: Math.floor(Math.random() * 10) }).map(() => {
-        return newService();
+        // TODO match object, date millisecond difference
+        expect(foundservices.length).toBe(services.length);
     });
-    await insert(db, services);
 
-    const foundservices = await findAll(db);
+    test('find - found', async () => {
+        const service = newService();
+        await insert(db, [service]);
 
-    // TODO match object, date millisecond difference
-    expect(foundservices.length).toBe(services.length);
-});
+        const foundservice = await find(db, service.service_code);
 
-test('find - found', async () => {
-    const service = newService();
-    await insert(db, [service]);
+        expect(foundservice).toMatchObject(service);
+    });
 
-    const foundservice = await find(db, service.service_code);
+    test('find - not found', async () => {
+        const foundservice = await find(db, 'lol');
 
-    expect(foundservice).toMatchObject(service);
-});
+        expect(foundservice).toBeNull();
+    });
 
-test('find - not found', async () => {
-    const foundservice = await find(db, 'lol');
-
-    expect(foundservice).toBeNull();
-});
+}));

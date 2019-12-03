@@ -1,9 +1,9 @@
 import * as pgPromise from "pg-promise";
-import {initDb} from "digitraffic-lambda-postgres/database";
+import {initDbConnection} from "digitraffic-lambda-postgres/database";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
-        const db: pgPromise.IDatabase<any, any> = initDb('road', 'road', 'localhost:54322/road');
+        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54322/road');
 
         beforeAll(async () => {
             process.env.DB_USER = 'road';

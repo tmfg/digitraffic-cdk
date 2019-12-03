@@ -1,9 +1,9 @@
 import {APIGatewayEvent} from 'aws-lambda';
-import {initDb} from 'digitraffic-lambda-postgres/database';
+import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {findAll} from "../../db/db-requests";
 
 export const handler = async (event: APIGatewayEvent): Promise<any> => {
-    const db = initDb(
+    const db = initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string

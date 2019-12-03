@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {initDb} from 'digitraffic-lambda-postgres/database';
+import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {handler} from "../../../../lib/lambda/new-request/lambda-new-request";
 import {newServiceRequest} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";

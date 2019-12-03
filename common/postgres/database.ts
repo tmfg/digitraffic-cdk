@@ -1,7 +1,7 @@
 import * as pgPromise from "pg-promise";
 const pgp = require('pg-promise')();
 
-export function initDb(
+export function initDbConnection(
     username: string,
     password: string,
     url: string
