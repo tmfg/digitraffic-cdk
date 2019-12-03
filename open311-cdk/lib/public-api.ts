@@ -4,6 +4,7 @@ const lambda = require('@aws-cdk/aws-lambda');
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct, Duration} from "@aws-cdk/core";
+import {defaultLambdaConfiguration} from "./cdk-util";
 
 export function create(
     vpc: ec2.IVpc,
@@ -21,38 +22,18 @@ function createRequestsResource(
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
-    const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', {
+    const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', defaultLambdaConfiguration(vpc, lambdaDbSg, props, {
         code: new lambda.AssetCode('lib/lambda/get-requests'),
-        handler: 'lambda-get-requests.handler',
-        runtime: lambda.Runtime.NODEJS_10_X,
-        environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri
-        },
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
-        vpc: vpc,
-        vpcSubnets: vpc.privateSubnets,
-        securityGroup: lambdaDbSg
-    });
+        handler: 'lambda-get-requests.handler'
+    }));
     const getRequestsIntegration = new LambdaIntegration(getRequestsHandler);
     const requests = publicApi.root.addResource("requests");
     requests.addMethod("GET", getRequestsIntegration);
 
-    const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', {
+    const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', defaultLambdaConfiguration(vpc, lambdaDbSg, props, {
         code: new lambda.AssetCode('lib/lambda/get-request'),
-        handler: 'lambda-get-request.handler',
-        runtime: lambda.Runtime.NODEJS_10_X,
-        environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri
-        },
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
-        vpc: vpc,
-        vpcSubnets: vpc.privateSubnets,
-        securityGroup: lambdaDbSg
-    });
+        handler: 'lambda-get-request.handler'
+    }));
     const getRequestIntegration = new LambdaIntegration(getRequestHandler);
     const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration);
@@ -64,20 +45,10 @@ function createServicesResource(
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
-    const getServicesHandler = new lambda.Function(stack, 'GetServicesLambda', {
+    const getServicesHandler = new lambda.Function(stack, 'GetServicesLambda', defaultLambdaConfiguration(vpc, lambdaDbSg, props, {
         code: new lambda.AssetCode('lib/lambda/get-services'),
-        handler: 'lambda-get-services.handler',
-        runtime: lambda.Runtime.NODEJS_10_X,
-        environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri
-        },
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
-        vpc: vpc,
-        vpcSubnets: vpc.privateSubnets,
-        securityGroup: lambdaDbSg
-    });
+        handler: 'lambda-get-services.handler'
+    }));
     const getServicesIntegration = new LambdaIntegration(getServicesHandler);
     const services = publicApi.root.addResource("services");
     services.addMethod("GET", getServicesIntegration);
