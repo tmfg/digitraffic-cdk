@@ -1,3 +1,7 @@
+/*
+    Example stack configuration interfaces
+ */
+
 declare interface Props {
     vpcId: string;
     privateSubnetIds: string[];

@@ -2,7 +2,7 @@ import {APIGatewayEvent} from 'aws-lambda';
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {ServiceRequest} from "../../model/service-request";
 import {update} from "../../db/db-requests";
-import {invalidRequest} from "../../request-util";
+import {invalidRequest} from "../../http-util";
 
 export const handler = async (event: APIGatewayEvent): Promise<any> => {
     if (!event.body) {

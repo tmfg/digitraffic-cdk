@@ -2,7 +2,8 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import {Duration} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 
-export function defaultLambdaConfiguration(
+// Base configuration for a database-reading Lambda function
+export function dbLambdaConfiguration(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,

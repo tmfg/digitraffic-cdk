@@ -4,7 +4,7 @@ const lambda = require('@aws-cdk/aws-lambda');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct, Duration} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
-import {defaultLambdaConfiguration} from "./cdk-util";
+import {dbLambdaConfiguration} from "./cdk-util";
 
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
     const integrationApi = createApi(stack, props.vpcId);
@@ -51,7 +51,7 @@ function createRequestsResource(
     props: Props) {
     const requests = integrationApi.root.addResource("requests");
 
-    const newRequestHandler = new lambda.Function(stack, 'NewRequestLambda', defaultLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const newRequestHandler = new lambda.Function(stack, 'NewRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         code: new lambda.AssetCode('lib/lambda/new-request'),
         handler: 'lambda-new-request.handler'
     }));
@@ -60,7 +60,7 @@ function createRequestsResource(
         apiKeyRequired: true
     });
 
-    const editRequestsHandler = new lambda.Function(stack, 'EditRequestsLambda', defaultLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const editRequestsHandler = new lambda.Function(stack, 'EditRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         code: new lambda.AssetCode('lib/lambda/edit-requests'),
         handler: 'lambda-edit-requests.handler'
     }));
@@ -69,7 +69,7 @@ function createRequestsResource(
         apiKeyRequired: true
     });
 
-    const editRequestHandler = new lambda.Function(stack, 'EditRequestLambda', defaultLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const editRequestHandler = new lambda.Function(stack, 'EditRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         code: new lambda.AssetCode('lib/lambda/edit-request'),
         handler: 'lambda-edit-request.handler'
     }));

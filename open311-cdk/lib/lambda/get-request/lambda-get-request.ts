@@ -1,7 +1,7 @@
 import {APIGatewayEvent} from 'aws-lambda';
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {find} from "../../db/db-requests";
-import {invalidRequest, notFound} from "../../request-util";
+import {invalidRequest, notFound} from "../../http-util";
 
 export const handler = async (event: APIGatewayEvent) : Promise <any> => {
     const serviceRequestId = event.pathParameters?.['request_id'];
