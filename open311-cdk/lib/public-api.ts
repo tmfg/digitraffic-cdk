@@ -23,6 +23,7 @@ function createRequestsResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: 'GetRequestsLambda',
         code: new lambda.AssetCode('lib/lambda/get-requests'),
         handler: 'lambda-get-requests.handler'
     }));
@@ -31,6 +32,7 @@ function createRequestsResource(
     requests.addMethod("GET", getRequestsIntegration);
 
     const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: 'GetRequestLambda',
         code: new lambda.AssetCode('lib/lambda/get-request'),
         handler: 'lambda-get-request.handler'
     }));
@@ -46,6 +48,7 @@ function createServicesResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getServicesHandler = new lambda.Function(stack, 'GetServicesLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: 'GetServicesLambda',
         code: new lambda.AssetCode('lib/lambda/get-services'),
         handler: 'lambda-get-services.handler'
     }));
@@ -53,12 +56,11 @@ function createServicesResource(
     const services = publicApi.root.addResource("services");
     services.addMethod("GET", getServicesIntegration);
 
-    const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', {
+    const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: 'GetServiceLambda',
         code: new lambda.AssetCode('lib/lambda/get-service'),
-        handler: 'lambda-get-service.handler',
-        runtime: lambda.Runtime.NODEJS_10_X,
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds)
-    });
+        handler: 'lambda-get-service.handler'
+    }));
     const getServiceIntegration = new LambdaIntegration(getServiceHandler);
     const service = services.addResource("{service_id}");
     service.addMethod("GET", getServiceIntegration);
