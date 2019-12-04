@@ -35,5 +35,5 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
 
 async function doUpdate(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequest[]) {
     await update(db, serviceRequests);
-    return {statusCode: 201, body: 'Created'};
+    return {statusCode: 200, body: 'Ok'};
 }
