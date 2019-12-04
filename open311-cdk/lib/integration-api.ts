@@ -2,7 +2,7 @@ import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
 const lambda = require('@aws-cdk/aws-lambda');
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import {Construct, Duration} from "@aws-cdk/core";
+import {Construct} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import {dbLambdaConfiguration} from "./cdk-util";
 
@@ -51,31 +51,13 @@ function createRequestsResource(
     props: Props) {
     const requests = integrationApi.root.addResource("requests");
 
-    const newRequestHandler = new lambda.Function(stack, 'NewRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const updateRequestsHandler = new lambda.Function(stack, 'UpdateRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: 'UpdateRequestsLambda',
         code: new lambda.AssetCode('lib/lambda/new-request'),
         handler: 'lambda-new-request.handler'
     }));
-    const newRequestIntegration = new LambdaIntegration(newRequestHandler);
-    requests.addMethod("POST", newRequestIntegration, {
-        apiKeyRequired: true
-    });
-
-    const editRequestsHandler = new lambda.Function(stack, 'EditRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/edit-requests'),
-        handler: 'lambda-edit-requests.handler'
-    }));
-    const editRequestsIntegration = new LambdaIntegration(editRequestsHandler);
-    requests.addMethod("PUT", editRequestsIntegration, {
-        apiKeyRequired: true
-    });
-
-    const editRequestHandler = new lambda.Function(stack, 'EditRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/edit-request'),
-        handler: 'lambda-edit-request.handler'
-    }));
-    const editRequestIntegration = new LambdaIntegration(editRequestHandler);
-    const request = requests.addResource("{request_id}");
-    request.addMethod("PUT", editRequestIntegration, {
+    const updateRequestsIntegration = new LambdaIntegration(updateRequestsHandler);
+    requests.addMethod("POST", updateRequestsIntegration, {
         apiKeyRequired: true
     });
 }

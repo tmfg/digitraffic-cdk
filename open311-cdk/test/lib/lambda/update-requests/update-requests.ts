@@ -1,11 +1,10 @@
 import * as pgPromise from "pg-promise";
-import {initDbConnection} from 'digitraffic-lambda-postgres/database';
-import {handler} from "../../../../lib/lambda/new-request/lambda-new-request";
+import {handler} from "../../../../lib/lambda/update-requests/lambda-update-requests";
 import {newServiceRequest} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 const testEvent = require('../../test-event');
 
-describe('lambda-new-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('No body - invalid request', async () => {
         const response = await handler(Object.assign({}, testEvent, {

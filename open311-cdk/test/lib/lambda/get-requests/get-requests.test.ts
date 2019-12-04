@@ -1,11 +1,8 @@
 import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/get-requests/lambda-get-requests";
-import {insert} from "../../../../lib/db/db-requests";
 import {newServiceRequest} from "../../testdata";
-import {dbTestBase} from "../../db-testutil";
+import {dbTestBase, insertServiceRequest} from "../../db-testutil";
 const testEvent = require('../../test-event');
-
-var db: pgPromise.IDatabase<any, any>;
 
 describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
@@ -24,7 +21,7 @@ describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
     test('some service requests', async () => {
         const serviceRequests =
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newServiceRequest());
-        await insert(db, serviceRequests);
+        await insertServiceRequest(db, serviceRequests);
 
         const response = await handler(testEvent);
 

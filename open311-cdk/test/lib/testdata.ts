@@ -13,7 +13,7 @@ export function newService(): Service {
     };
 }
 
-export function newServiceRequest(): ServiceRequest {
+export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestStatus.open): ServiceRequest {
     const requested_datetime = new Date();
     requested_datetime.setMilliseconds(0);
     const updated_datetime = new Date();
@@ -22,7 +22,7 @@ export function newServiceRequest(): ServiceRequest {
     expected_datetime.setMilliseconds(0);
     return {
         service_request_id: "SRQ" + Math.random().toFixed(10).split('.')[1],
-        status: Math.floor(Math.random() * 10) > 5 ? ServiceRequestStatus.open : ServiceRequestStatus.closed,
+        status: status,
         status_notes: "status_notes",
         service_name: "service_name",
         service_code: "123",

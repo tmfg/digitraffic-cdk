@@ -1,37 +1,16 @@
 import * as pgPromise from "pg-promise";
-import {find, findAll, insert, update} from "../../../lib/db/db-requests";
+import {find, findAll, update} from "../../../lib/db/db-requests";
 import {newServiceRequest} from "../testdata";
-import {dbTestBase} from "../db-testutil";
+import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestStatus} from "../../../lib/model/service-request";
 
 describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
-
-    test('Insert', async () => {
-        const serviceRequests = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
-            return newServiceRequest();
-        });
-
-        await insert(db, serviceRequests);
-        const foundServiceRequests = await findAll(db);
-
-        expect(foundServiceRequests.length).toBe(serviceRequests.length);
-    });
-
-    test("Insert - null geometry doesn't fail", async () => {
-        const serviceRequest = newServiceRequest();
-        // @ts-ignore
-        delete serviceRequest.long;
-        // @ts-ignore
-        delete serviceRequest.lat;
-
-        await insert(db, [serviceRequest]);
-    });
 
     test('findAll', async () => {
         const serviceRequests = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
             return newServiceRequest();
         });
-        await insert(db, serviceRequests);
+        await insertServiceRequest(db, serviceRequests);
 
         const foundServiceRequests = await findAll(db);
 
@@ -41,7 +20,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('find - found', async () => {
         const serviceRequest = newServiceRequest();
-        await insert(db, [serviceRequest]);
+        await insertServiceRequest(db, [serviceRequest]);
 
         const foundServiceRequest = await find(db, serviceRequest.service_request_id);
 
@@ -55,10 +34,8 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('update - delete', async () => {
-        const serviceRequest = Object.assign(newServiceRequest(), {
-            status: ServiceRequestStatus.open
-        });
-        await insert(db, [serviceRequest]);
+        const serviceRequest = newServiceRequest();
+        await insertServiceRequest(db, [serviceRequest]);
 
         await update(db, [Object.assign({}, serviceRequest, {
             status: ServiceRequestStatus.closed
@@ -69,10 +46,8 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('update - modify', async () => {
-        const serviceRequest = Object.assign(newServiceRequest(), {
-            status: ServiceRequestStatus.open
-        });
-        await insert(db, [serviceRequest]);
+        const serviceRequest = newServiceRequest();
+        await insertServiceRequest(db, [serviceRequest]);
 
         // round off millis
         const requested_datetime = new Date();
@@ -117,10 +92,8 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test("update - null geometry doesn't fail", async () => {
-        const serviceRequest = Object.assign(newServiceRequest(), {
-            status: ServiceRequestStatus.open
-        });
-        await insert(db, [serviceRequest]);
+        const serviceRequest = newServiceRequest();
+        await insertServiceRequest(db, [serviceRequest]);
 
         const updatingServiceRequest = Object.assign({}, serviceRequest);
         // @ts-ignore
@@ -128,6 +101,27 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         // @ts-ignore
         delete updatingServiceRequest.lat;
         await update(db, [updatingServiceRequest]);
+    });
+
+    test('Insert', async () => {
+        const serviceRequests = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
+            return newServiceRequest();
+        });
+
+        await update(db, serviceRequests);
+        const foundServiceRequests = await findAll(db);
+
+        expect(foundServiceRequests.length).toBe(serviceRequests.length);
+    });
+
+    test("Insert - null geometry doesn't fail", async () => {
+        const serviceRequest = newServiceRequest();
+        // @ts-ignore
+        delete serviceRequest.long;
+        // @ts-ignore
+        delete serviceRequest.lat;
+
+        await update(db, [serviceRequest]);
     });
 
 }));

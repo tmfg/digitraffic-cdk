@@ -1,8 +1,9 @@
 import {APIGatewayEvent} from 'aws-lambda';
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {ServiceRequest} from "../../model/service-request";
-import {insert} from "../../db/db-requests";
-import {invalidRequest} from "../../http-util";
+import {update} from "../../db/db-requests";
+import {invalidRequest, serverError} from "../../http-util";
+import * as pgPromise from "pg-promise";
 
 export const handler = async (event: APIGatewayEvent): Promise<any> => {
     if (!event.body) {
@@ -22,9 +23,17 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
         process.env.DB_URI as string
     );
 
-    await insert(db, serviceRequests);
-
-    db.$pool.end();
-
-    return {statusCode: 201, body: 'Created'};
+    try {
+        return await doUpdate(db, serviceRequests);
+    } catch (e) {
+        console.error('Error', e);
+        return serverError();
+    } finally {
+        db.$pool.end();
+    }
 };
+
+async function doUpdate(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequest[]) {
+    await update(db, serviceRequests);
+    return {statusCode: 201, body: 'Created'};
+}

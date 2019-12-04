@@ -5,3 +5,7 @@ export function invalidRequest(): object {
 export function notFound(): object {
     return {statusCode: 401, body: 'Not found'};
 }
+
+export function serverError() {
+    return {statusCode: 500, body: 'Server error'};
+}
