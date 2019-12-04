@@ -53,8 +53,8 @@ function createRequestsResource(
 
     const updateRequestsHandler = new lambda.Function(stack, 'UpdateRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: 'UpdateRequestsLambda',
-        code: new lambda.AssetCode('lib/lambda/new-request'),
-        handler: 'lambda-new-request.handler'
+        code: new lambda.AssetCode('lib/lambda/update-requests'),
+        handler: 'lambda-update-requests.handler'
     }));
     const updateRequestsIntegration = new LambdaIntegration(updateRequestsHandler);
     requests.addMethod("POST", updateRequestsIntegration, {

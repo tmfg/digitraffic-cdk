@@ -1,6 +1,5 @@
 import {Service} from "../model/service";
 import * as pgPromise from "pg-promise";
-import {ServiceRequest} from "../model/service-request";
 
 export function insert(db: pgPromise.IDatabase<any, any>, services: Service[]): Promise<void> {
     return db.tx(t => {
