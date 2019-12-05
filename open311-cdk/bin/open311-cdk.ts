@@ -6,6 +6,9 @@ import { Open311CdkStack } from '../lib/open311-cdk-stack';
 
 (async () => {
     const profileName = process.env.AWS_PROFILE as string;
+    if (!profileName) {
+        throw Error('AWS_PROFILE not set');
+    }
     const profilePropsFile = await import(`./dont-commit-this-props-${profileName}`);
     const profileProps = profilePropsFile['default'];
 
