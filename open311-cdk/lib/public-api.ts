@@ -3,7 +3,7 @@ import iam = require('@aws-cdk/aws-iam');
 const lambda = require('@aws-cdk/aws-lambda');
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import {Construct, Duration} from "@aws-cdk/core";
+import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
 
 export function create(
@@ -23,7 +23,6 @@ function createRequestsResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: 'GetRequestsLambda',
         code: new lambda.AssetCode('lib/lambda/get-requests'),
         handler: 'lambda-get-requests.handler'
     }));
@@ -32,7 +31,6 @@ function createRequestsResource(
     requests.addMethod("GET", getRequestsIntegration);
 
     const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: 'GetRequestLambda',
         code: new lambda.AssetCode('lib/lambda/get-request'),
         handler: 'lambda-get-request.handler'
     }));
@@ -48,7 +46,6 @@ function createServicesResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getServicesHandler = new lambda.Function(stack, 'GetServicesLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: 'GetServicesLambda',
         code: new lambda.AssetCode('lib/lambda/get-services'),
         handler: 'lambda-get-services.handler'
     }));
@@ -57,7 +54,6 @@ function createServicesResource(
     services.addMethod("GET", getServicesIntegration);
 
     const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: 'GetServiceLambda',
         code: new lambda.AssetCode('lib/lambda/get-service'),
         handler: 'lambda-get-service.handler'
     }));
