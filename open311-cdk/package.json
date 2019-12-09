@@ -25,7 +25,8 @@
     "rimraf": "^3.0.0",
     "ts-jest": "^24.1.0",
     "ts-node": "^8.1.0",
-    "typescript": "~3.7.2"
+    "typescript": "~3.7.2",
+    "@types/xml2js": "^0.4.5"
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "latest",
@@ -33,6 +34,8 @@
     "digitraffic-lambda-postgres": "file:../common/postgres",
     "pg-native": "^3.0.0",
     "pg-promise": "latest",
-    "source-map-support": "^0.5.16"
+    "source-map-support": "^0.5.16",
+    "@aws-cdk/aws-events-targets": "latest",
+    "axios": "latest"
   }
 }

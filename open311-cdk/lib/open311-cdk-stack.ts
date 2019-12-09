@@ -1,6 +1,7 @@
 import cdk = require('@aws-cdk/core');
 import * as IntegrationApi from './integration-api';
 import * as PublicApi from './public-api';
+import * as InternalLambdas from './internal-lambdas';
 import * as ec2 from "@aws-cdk/aws-ec2";
 
 export class Open311CdkStack extends cdk.Stack {
@@ -20,5 +21,6 @@ export class Open311CdkStack extends cdk.Stack {
         // 'this' reference must be passed to all child resources to keep them tied to this stack
         IntegrationApi.create(vpc, lambdaDbSg, this, open311Props);
         PublicApi.create(vpc, lambdaDbSg, this, open311Props);
+        InternalLambdas.create(vpc, lambdaDbSg, this, open311Props);
     }
 }

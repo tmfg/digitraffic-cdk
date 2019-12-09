@@ -1,6 +1,10 @@
 import {Service} from "../model/service";
 import * as pgPromise from "pg-promise";
 
+interface ServiceServiceCode {
+    readonly service_code: string;
+}
+
 export function insert(db: pgPromise.IDatabase<any, any>, services: Service[]): Promise<void> {
     return db.tx(t => {
         const queries: any[] = services.map(service => {
@@ -22,6 +26,10 @@ export function insert(db: pgPromise.IDatabase<any, any>, services: Service[]): 
         });
         return t.batch(queries);
     });
+}
+
+export function findAllServiceCodes(db: pgPromise.IDatabase<any, any>): Promise<ServiceServiceCode[]> {
+    return db.manyOrNone("SELECT service_code FROM open311_service");
 }
 
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<Service[]> {

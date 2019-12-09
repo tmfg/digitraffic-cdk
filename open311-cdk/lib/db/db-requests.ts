@@ -1,6 +1,14 @@
 import {ServiceRequest, ServiceRequestStatus} from "../model/service-request";
 import * as pgPromise from "pg-promise";
 
+interface ServiceRequestServiceCode {
+    readonly service_code: string | null;
+}
+
+export function findServiceCodes(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestServiceCode[]> {
+    return db.manyOrNone("SELECT service_code FROM open311_service_request");
+}
+
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequest[]> {
     return db.manyOrNone(SELECT_REQUEST).then(requests => requests.map(r => toServiceRequest(r)));
 }
