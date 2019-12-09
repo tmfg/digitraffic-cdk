@@ -10,6 +10,11 @@ const props: Props = {
         password: 'somepass',
         uri: 'someurl:5432/someschema'
     },
-    defaultLambdaDurationSeconds: 10
+    defaultLambdaDurationSeconds: 10,
+    integration: {
+        username: 'username',
+        password: 'password',
+        url: 'http://some.url'
+    }
 };
 export default props;

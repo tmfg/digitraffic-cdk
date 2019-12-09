@@ -35,7 +35,7 @@ function createCheckOrphansLambda(
     lambdaConf.environment.ORPHAN_SNS_TOPIC_ARN = orphanRequestsFoundTopic.topicArn;
     const checkOrphansLambda = new lambda.Function(stack, 'CheckOrphanRequests', lambdaConf);
     const rule = new events.Rule(stack, 'Rule', {
-        schedule: events.Schedule.expression('cron(0 2 * * *)')
+        schedule: events.Schedule.expression('cron(0 2 * * ? *)')
     });
     rule.addTarget(new targets.LambdaFunction(checkOrphansLambda));
 }
@@ -52,11 +52,11 @@ function createUpdateServicesLambda(
         handler: 'lambda-update-services.handler'
     });
     // @ts-ignore
-    lambdaConf.environment.ENDPOINT_USER = '';
+    lambdaConf.environment.ENDPOINT_USER = props.integration.username;
     // @ts-ignore
-    lambdaConf.environment.ENDPOINT_PASS = '';
+    lambdaConf.environment.ENDPOINT_PASS = props.integration.password;
     // @ts-ignore
-    lambdaConf.environment.ENDPOINT_URL = '';
+    lambdaConf.environment.ENDPOINT_URL = props.integration.url;
     const updateServicesLambda = new lambda.Function(stack, 'UpdateServices', lambdaConf);
     orphanRequestsFoundTopic.addSubscription(new subscriptions.LambdaSubscription(updateServicesLambda));
 }
