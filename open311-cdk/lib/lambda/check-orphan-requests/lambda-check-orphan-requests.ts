@@ -12,12 +12,11 @@ export const handler = async () : Promise <any> => {
     try {
         const requestServiceCodesPromise = await DbRequests.findServiceCodes(db);
         const serviceCodesPromise = await DbService.findAllServiceCodes(db);
-        // @ts-ignore
-        const requestServiceCodes: string[] = requestServiceCodesPromise
-            .map(r => r.service_code)
-            .filter(s => s != null);
         const serviceCodes = new Set(serviceCodesPromise.map(s => s.service_code));
-        const missingServices = requestServiceCodes.filter(rsc => !serviceCodes.has(rsc));
+        const missingServices = requestServiceCodesPromise
+            .map(r => r.service_code)
+            .filter(s => s != null)
+            .filter(rsc => !serviceCodes.has(rsc as string));
 
         if (missingServices.length > 0) {
             console.warn('Missing services found: ' + missingServices.join(','));
