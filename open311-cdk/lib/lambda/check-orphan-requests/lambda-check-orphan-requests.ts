@@ -15,7 +15,7 @@ export const handler = async () : Promise <any> => {
         const serviceCodes = new Set(serviceCodesPromise.map(s => s.service_code));
         const missingServices = requestServiceCodesPromise
             .map(r => r.service_code)
-            .filter(s => s != null)
+            .filter(s => s != null && s.length > 0)
             .filter(rsc => !serviceCodes.has(rsc as string));
 
         if (missingServices.length > 0) {
