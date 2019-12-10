@@ -27,5 +27,5 @@
     },
     "declarationDir": "tsd"
   },
-  "exclude": ["cdk.out"]
+  "exclude": ["cdk.out", "tsd"]
 }
