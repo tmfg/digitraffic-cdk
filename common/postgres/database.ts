@@ -4,7 +4,8 @@ const pgp = require('pg-promise')();
 export function initDbConnection(
     username: string,
     password: string,
-    url: string
+    url: string,
+    options?: object
 ): pgPromise.IDatabase<any, any> {
-    return pgp(`postgresql://${username}:${password}@${url}`);
+    return pgp(`postgresql://${username}:${password}@${url}`, options);
 }

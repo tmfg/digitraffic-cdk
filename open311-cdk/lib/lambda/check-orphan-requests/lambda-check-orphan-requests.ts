@@ -1,7 +1,7 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import * as DbRequests from '../../db/db-requests';
 import * as DbService from '../../db/db-services';
-const SNS = require('aws-sdk/clients/sns');
+import {SNS} from 'aws-sdk';
 
 export const handler = async () : Promise <any> => {
     const db = initDbConnection(

@@ -5,7 +5,9 @@ import {createEditObject} from "../../lib/db/db-requests";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
-        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54322/road');
+        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54322/road', {
+            noWarnings: true // ignore duplicate connection warning for tests
+        });
 
         beforeAll(async () => {
             process.env.DB_USER = 'road';

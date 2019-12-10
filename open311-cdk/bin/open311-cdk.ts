@@ -14,4 +14,5 @@ import { Open311CdkStack } from '../lib/open311-cdk-stack';
 
     const app = new cdk.App();
     new Open311CdkStack(app, 'Open311CdkStack', profileProps);
+    app.synth();
 })();

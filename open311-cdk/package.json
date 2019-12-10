@@ -7,9 +7,8 @@
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
-    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d lib/lambda --bundle-node-modules --no-source-maps",
+    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
     "watch": "tsc -w",
-    "pretest": "npm run build",
     "test": "jest --runInBand",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
@@ -22,7 +21,6 @@
     "@types/sinon": "^7.5.1",
     "@types/xml2js": "^0.4.5",
     "aws-cdk": "^1.18.0",
-    "aws-sdk-mock": "^4.5.0",
     "jest": "^24.9.0",
     "parcel": "^1.12.4",
     "rimraf": "^3.0.0",

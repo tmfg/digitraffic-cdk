@@ -52,7 +52,7 @@ function createRequestsResource(
     const requests = integrationApi.root.addResource("requests");
 
     const updateRequestsHandler = new lambda.Function(stack, 'UpdateRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/update-requests'),
+        code: new lambda.AssetCode('dist/lambda/update-requests'),
         handler: 'lambda-update-requests.handler'
     }));
     const updateRequestsIntegration = new LambdaIntegration(updateRequestsHandler);

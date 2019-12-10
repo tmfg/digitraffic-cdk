@@ -28,7 +28,7 @@ function createCheckOrphansLambda(
     stack: Construct) {
 
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/check-orphan-requests'),
+        code: new lambda.AssetCode('dist/lambda/check-orphan-requests'),
         handler: 'lambda-check-orphan-requests.handler'
     });
     // @ts-ignore
@@ -48,7 +48,7 @@ function createUpdateServicesLambda(
     stack: Construct) {
 
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/update-services'),
+        code: new lambda.AssetCode('dist/lambda/update-services'),
         handler: 'lambda-update-services.handler'
     });
     // @ts-ignore

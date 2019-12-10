@@ -23,7 +23,7 @@ function createRequestsResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/get-requests'),
+        code: new lambda.AssetCode('dist/lambda/get-requests'),
         handler: 'lambda-get-requests.handler'
     }));
     const getRequestsIntegration = new LambdaIntegration(getRequestsHandler);
@@ -31,7 +31,7 @@ function createRequestsResource(
     requests.addMethod("GET", getRequestsIntegration);
 
     const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/get-request'),
+        code: new lambda.AssetCode('dist/lambda/get-request'),
         handler: 'lambda-get-request.handler'
     }));
     const getRequestIntegration = new LambdaIntegration(getRequestHandler);
@@ -46,7 +46,7 @@ function createServicesResource(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct) {
     const getServicesHandler = new lambda.Function(stack, 'GetServicesLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/get-services'),
+        code: new lambda.AssetCode('dist/lambda/get-services'),
         handler: 'lambda-get-services.handler'
     }));
     const getServicesIntegration = new LambdaIntegration(getServicesHandler);
@@ -54,7 +54,7 @@ function createServicesResource(
     services.addMethod("GET", getServicesIntegration);
 
     const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('lib/lambda/get-service'),
+        code: new lambda.AssetCode('dist/lambda/get-service'),
         handler: 'lambda-get-service.handler'
     }));
     const getServiceIntegration = new LambdaIntegration(getServiceHandler);
