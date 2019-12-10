@@ -3,7 +3,7 @@
 Digitraffic AWS CDK apps.
 
 ## Suggested architecture
-`
+```
 bin
 └───some-cdk.ts
 |   dont-commit-this-props-some-environment.ts
@@ -24,7 +24,7 @@ lib
 |   └───foo.ts
 |
 └───some-cdk-stack.ts
-`
+```
 - separate source code to their own directories by category (API operations, database queries etc)
 - Lambdas are in their own directory to facilitate bundling (lambda.AssetCode)
 - properties files under *bin* are loaded by active AWS_PROFILE env variable, e.g. file above loads when using profile *some-environment* 
