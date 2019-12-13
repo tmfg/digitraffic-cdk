@@ -2,7 +2,7 @@ import {Annotation} from "../../model/annotations";
 import {login, getAnnotations, LoginResponse} from "../../api/api-annotations";
 
 export const handler = async () : Promise <any> => {
-    const annotations = getAnnotationsFromServer();
+    const annotations = await getAnnotationsFromServer();
 
     saveAnnotations(annotations);
 };
