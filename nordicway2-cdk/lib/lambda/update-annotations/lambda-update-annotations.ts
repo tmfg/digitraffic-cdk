@@ -7,7 +7,7 @@ export const handler = async () : Promise <any> => {
     saveAnnotations(annotations);
 };
 
-async function getAnnotationsFromServer():Annotation[] {
+async function getAnnotationsFromServer():Promise<Annotation[]> {
     const endpointUser = process.env.ENDPOINT_USER as string;
     const endpointPass = process.env.ENDPOINT_PASS as string;
     const loginUrl = process.env.ENDPOINT_LOGIN_URL as string;
