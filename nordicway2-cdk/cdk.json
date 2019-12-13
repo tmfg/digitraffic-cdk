@@ -1,0 +1,3 @@
+{
+  "app": "npx ts-node bin/nordicway2-cdk.ts"
+}
