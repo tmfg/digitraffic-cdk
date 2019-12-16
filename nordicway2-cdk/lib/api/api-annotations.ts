@@ -1,22 +1,26 @@
 import axios from 'axios';
+import * as qs from 'querystring';
 
 export async function login(
     endpointUser: string,
     endpointPass: string,
     endpointUrl: string
 ) {
-    const resp = await axios.get(endpointUrl, {
+    const body = {
+        username: endpointUser,
+        password: endpointPass,
+        hashed: ''
+    };
+    const form = qs.stringify(body);
+    const resp = await axios.post(endpointUrl, form, {
         headers: {
-            'Accept': 'application/json'
-        },
-        auth: {
-            username: endpointUser,
-            password: endpointPass
+            'accept': 'application/json',
+            'Content-Type': 'application/x-www-form-urlencoded'
         }
     });
 
     if (resp.status != 200) {
-        throw Error('Fetching annotations failed: ' + resp.statusText);
+        throw Error('Login failed: ' + resp.statusText);
     }
     return resp.data;
 }
@@ -26,7 +30,7 @@ export async function getAnnotations(
     authToken: string,
     endpointUrl: string
 ) {
-    const url = endpointUrl + 'date_from_created=2019-12-10T00%3A00%3A00.000Z&client_id=c65fd29cd845035329ee4cd0';
+    const url = endpointUrl + '?date_from_created=2019-12-10T00%3A00%3A00.000Z&client_id=c65fd29cd845035329ee4cd0';
 
     const resp = await axios.get(url, {
         headers: {
@@ -35,6 +39,8 @@ export async function getAnnotations(
             'X-Auth-Token': authToken
         }
     });
+
+    console.info("response " + resp);
 
     if (resp.status != 200) {
         throw Error('Fetching annotations failed: ' + resp.statusText);
