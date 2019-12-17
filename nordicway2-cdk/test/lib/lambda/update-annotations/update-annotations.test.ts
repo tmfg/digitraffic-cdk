@@ -46,7 +46,7 @@ function fakeAnnotations() {
     return `
 [
    {
-    "_id": "5def976ddebbb00be74bb89b",
+    "_id": "test1",
     "user": "vionice",
     "author": "vionice",
     "address": [],
@@ -80,7 +80,38 @@ function fakeAnnotations() {
         ]
       ]
     }
-  }  
+  },
+  {
+    "_id": "test2",
+    "user": "vionice",
+    "author": "vionice",
+    "address": [],
+    "created_at": "2019-12-10T13:02:34.681Z",
+    "tags": [
+      "NonWeatherRelatedRoadConditions:slipperyRoad"
+    ],
+    "shares": [
+      {
+        "id": "zGWmHYMeBkdggqNfo"
+      }
+    ],
+    "text": null,
+    "type": "image",
+    "video_id": "DzuJAZShueHHBfO3Wd05aTbVyJCsU6fG",
+    "resolved": false,
+    "image_url": null,
+    "recorded_at": "2019-12-10T12:48:04.955Z",
+    "location": {
+      "type": "Point",
+      "coordinates": [
+        [
+          27.66730664221279,
+          61.863140990337484,
+          77
+        ]
+      ]
+    }
+  }    
 ]  
 `;
 }
