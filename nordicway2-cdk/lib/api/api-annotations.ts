@@ -1,11 +1,14 @@
 import axios from 'axios';
 import * as qs from 'querystring';
+import { inspect } from 'util';
 
 export async function login(
     endpointUser: string,
     endpointPass: string,
     endpointUrl: string
 ) {
+    console.info("logging to " + endpointUrl);
+
     const body = {
         username: endpointUser,
         password: endpointPass,
@@ -32,6 +35,8 @@ export async function getAnnotations(
 ) {
     const url = endpointUrl + '?date_from_created=2019-12-10T00%3A00%3A00.000Z&client_id=c65fd29cd845035329ee4cd0';
 
+    console.info("getting annotations from " + url);
+
     const resp = await axios.get(url, {
         headers: {
             'Accept': 'application/json',
@@ -40,11 +45,10 @@ export async function getAnnotations(
         }
     });
 
-    console.info("response " + resp);
-
     if (resp.status != 200) {
         throw Error('Fetching annotations failed: ' + resp.statusText);
     }
+
     return resp.data;
 }
 
