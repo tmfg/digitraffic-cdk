@@ -19,10 +19,13 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
             }
         });
 
-        const response = await handler();
-        server.close();
+        try {
+            const response = await handler();
 
-        expect(response).not.toBeNull();
+            expect(response).not.toBeNull();
+        } finally {
+            server.close();
+        }
     });
 }));
 

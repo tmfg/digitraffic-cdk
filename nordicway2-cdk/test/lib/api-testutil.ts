@@ -11,7 +11,7 @@ export class TestHttpServer {
         this.server = http.createServer(((req, res) => {
             this.debuglog('Received request to url ' + req.url + '..');
             const path = require('url').parse(req.url).pathname;
-            console.info("path " + path);
+
             if (path in props) {
                 this.debuglog('..url matched');
                 res.writeHead(200);

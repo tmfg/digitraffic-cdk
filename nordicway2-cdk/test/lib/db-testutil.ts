@@ -11,11 +11,6 @@ export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
             process.env.DB_USER = 'road';
             process.env.DB_PASS = 'road';
             process.env.DB_URI = 'localhost:54322/road';
-
-//            process.env.ENDPOINT_USER = 'apiuser@tmfg';
-//            process.env.ENDPOINT_PASS = 'sydrcQ5TUCzBZ3tA';
-//            process.env.ENDPOINT_LOGIN_URL = 'https://api.vionice.io/api/v1/login';
-//            process.env.ENDPOINT_URL = 'https://api.vionice.io/api/v1/annotations';
         });
 
         afterAll(async () => {

@@ -37,6 +37,7 @@
     "pg-promise": "latest",
     "source-map-support": "^0.5.16",
     "@aws-cdk/aws-events-targets": "latest",
-    "axios": "latest"
+    "axios": "latest",
+    "moment": "latest"
   }
 }

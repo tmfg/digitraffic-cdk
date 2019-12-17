@@ -2,14 +2,17 @@ import {Annotation} from "../../model/annotations";
 import {login, getAnnotations, LoginResponse} from "../../api/api-annotations";
 import {insert} from "../../db/db-annotations";
 import {initDbConnection} from "../../../../common/postgres/database";
+import {getLastUpdated, updateLastUpdated} from "../../db/db-last-updated";
 
 export const handler = async () : Promise <any> => {
-    const annotations = await getAnnotationsFromServer();
+    const timestampFrom = await lastUpdated();
+    const timeStampTo = new Date();
+    const annotations = await getAnnotationsFromServer(timestampFrom, timeStampTo);
 
-    await saveAnnotations(annotations);
+    await saveAnnotations(annotations, timeStampTo);
 };
 
-async function getAnnotationsFromServer():Promise<Annotation[]> {
+async function getAnnotationsFromServer(timestampFrom: Date, timeStampTo: Date):Promise<Annotation[]> {
     const endpointUser = process.env.ENDPOINT_USER as string;
     const endpointPass = process.env.ENDPOINT_PASS as string;
     const loginUrl = process.env.ENDPOINT_LOGIN_URL as string;
@@ -20,7 +23,8 @@ async function getAnnotationsFromServer():Promise<Annotation[]> {
 
         if(loginResponse.status == "success") {
             console.info("login successfull!");
-            return await getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl);
+
+            return await getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo);
         } else {
             console.error("Could not login! " + loginResponse);
         }
@@ -31,12 +35,37 @@ async function getAnnotationsFromServer():Promise<Annotation[]> {
     return [];
 }
 
-async function saveAnnotations(annotations: Annotation[]) {
+async function lastUpdated() {
     const db = initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string
     );
 
-    await insert(db, annotations);
+    try {
+        const timestamp = await getLastUpdated(db)
+
+        return timestamp == null ? new Date() : timestamp;
+    } finally {
+        if (db != null) {
+            db.$pool.end()
+        }
+    }
+}
+
+async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
+    const db = initDbConnection(
+        process.env.DB_USER as string,
+        process.env.DB_PASS as string,
+        process.env.DB_URI as string
+    );
+
+    try {
+        await insert(db, annotations);
+        await updateLastUpdated(db, timeStampTo);
+    } finally {
+        if (db != null) {
+            db.$pool.end()
+        }
+    }
 }

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import * as qs from 'querystring';
-import { inspect } from 'util';
+import * as moment from 'moment';
 
 export async function login(
     endpointUser: string,
@@ -31,9 +31,13 @@ export async function login(
 export async function getAnnotations(
     userId: string,
     authToken: string,
-    endpointUrl: string
-) {
-    const url = endpointUrl + '?date_from_created=2019-12-10T00%3A00%3A00.000Z&client_id=c65fd29cd845035329ee4cd0';
+    endpointUrl: string,
+    timestampFrom: Date,
+    timestampTo: Date) {
+    const fromString = getDateString(timestampFrom);
+    const toString = getDateString(timestampTo)
+
+    const url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0`;
 
     console.info("getting annotations from " + url);
 
@@ -50,6 +54,10 @@ export async function getAnnotations(
     }
 
     return resp.data;
+}
+
+function getDateString(date: Date) {
+    return moment(date).toISOString()
 }
 
 // properties deserialized as singleton arrays
