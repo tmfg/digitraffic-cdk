@@ -7,7 +7,7 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
     test('Test', async () => {
         const response = await handler();
 
-        expect(response.statusCode).toBe(200);
+        expect(response).not.toBeNull();
     });
 
 }));

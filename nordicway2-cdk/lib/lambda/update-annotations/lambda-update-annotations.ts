@@ -19,7 +19,7 @@ async function getAnnotationsFromServer():Promise<Annotation[]> {
         if(loginResponse.status == "success") {
             return await getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl);
         } else {
-            console.error("Could not login!");
+            console.error("Could not login! " + loginResponse);
         }
     } catch(e) {
         console.error('Error', e);
@@ -29,5 +29,5 @@ async function getAnnotationsFromServer():Promise<Annotation[]> {
 }
 
 function saveAnnotations(annotations: Annotation[]) {
-
+    console.info("annotations " + annotations);
 }
