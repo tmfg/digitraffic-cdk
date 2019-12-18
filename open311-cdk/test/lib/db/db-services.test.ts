@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {find, findAll, insert} from "../../../lib/db/db-services";
+import {find, findAll, update} from "../../../lib/db/db-services";
 import {newService} from "../testdata";
 import {dbTestBase} from "../db-testutil";
 
@@ -9,7 +9,7 @@ describe('db-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const services = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
             return newService();
         });
-        await insert(db, services);
+        await update(db, services);
 
         const foundservices = await findAll(db);
 
@@ -19,7 +19,7 @@ describe('db-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('find - found', async () => {
         const service = newService();
-        await insert(db, [service]);
+        await update(db, [service]);
 
         const foundservice = await find(db, service.service_code);
 

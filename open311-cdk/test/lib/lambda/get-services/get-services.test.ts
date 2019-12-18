@@ -1,6 +1,6 @@
 import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/get-services/lambda-get-services";
-import {insert} from "../../../../lib/db/db-services";
+import {update} from "../../../../lib/db/db-services";
 import {newService} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 const testEvent = require('../../test-event');
@@ -24,7 +24,7 @@ describe('lambda-get-services', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
     test('some service services', async () => {
         const services =
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newService());
-        await insert(db, services);
+        await update(db, services);
 
         const response = await handler(testEvent);
 

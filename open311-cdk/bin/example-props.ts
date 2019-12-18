@@ -11,6 +11,7 @@ const props: Props = {
         uri: 'someurl:5432/someschema'
     },
     defaultLambdaDurationSeconds: 10,
+    logsDestinationArn: 'arn:aws:logs:some-region:123123123123:destination:some-destination',
     integration: {
         username: 'username',
         password: 'password',

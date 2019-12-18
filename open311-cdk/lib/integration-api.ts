@@ -1,15 +1,17 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
-const lambda = require('@aws-cdk/aws-lambda');
+import * as lambda from '@aws-cdk/aws-lambda';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import {dbLambdaConfiguration} from "./cdk-util";
 
-export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
+// returns lambda names for log group subscriptions
+export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props): string[] {
     const integrationApi = createApi(stack, props.vpcId);
-    createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
+    const lambdaName = createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
     createUsagePlan(integrationApi);
+    return [lambdaName];
 }
 
 function createApi(stack: Construct, vpcId: string) {
@@ -48,10 +50,12 @@ function createRequestsResource(
     integrationApi: apigateway.RestApi,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props) {
+    props: Props): string {
     const requests = integrationApi.root.addResource("requests");
 
-    const updateRequestsHandler = new lambda.Function(stack, 'UpdateRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const updateRequestsId = 'UpdateRequests';
+    const updateRequestsHandler = new lambda.Function(stack, updateRequestsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: updateRequestsId,
         code: new lambda.AssetCode('dist/lambda/update-requests'),
         handler: 'lambda-update-requests.handler'
     }));
@@ -59,6 +63,8 @@ function createRequestsResource(
     requests.addMethod("POST", updateRequestsIntegration, {
         apiKeyRequired: true
     });
+
+    return updateRequestsId;
 }
 
 function createUsagePlan(integrationApi: apigateway.RestApi) {

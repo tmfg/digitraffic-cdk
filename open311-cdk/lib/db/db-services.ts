@@ -5,24 +5,31 @@ interface ServiceServiceCode {
     readonly service_code: string;
 }
 
-export function insert(db: pgPromise.IDatabase<any, any>, services: Service[]): Promise<void> {
+export function update(db: pgPromise.IDatabase<any, any>, services: Service[]): Promise<void> {
     return db.tx(t => {
         const queries: any[] = services.map(service => {
             return t.none(
                 `INSERT INTO open311_service(service_code,
-                            service_name,
-                            description,
-                            metadata,
-                            type,
-                            keywords,
-                            "group")
+                                    service_name,
+                                    description,
+                                    metadata,
+                                    type,
+                                    keywords,
+                                    "group")
                             VALUES ($(service_code),
-                                   $(service_name),
-                                   $(description),
-                                   $(metadata),
-                                   $(type),
-                                   $(keywords),
-                                   $(group))`, createEditObject(service));
+                                    $(service_name),
+                                    $(description),
+                                    $(metadata),
+                                    $(type),
+                                    $(keywords),
+                                    $(group))
+                            ON CONFLICT (service_code) DO UPDATE SET
+                                    service_name = $(service_name),
+                                    description = $(description),
+                                    metadata = $(metadata),
+                                    type = $(type),
+                                    keywords = $(keywords),
+                                    "group" = $(group)`, createEditObject(service));
         });
         return t.batch(queries);
     });

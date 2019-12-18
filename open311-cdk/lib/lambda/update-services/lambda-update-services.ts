@@ -1,7 +1,7 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import * as pgPromise from "pg-promise";
 import {getServices} from "../../api/api-services";
-import {insert} from "../../db/db-services";
+import {update} from "../../db/db-services";
 
 export const handler = async (): Promise<any> => {
     const endpointUser = process.env.ENDPOINT_USER as string;
@@ -15,7 +15,7 @@ export const handler = async (): Promise<any> => {
             process.env.DB_PASS as string,
             process.env.DB_URI as string
         );
-        await insert(db, services);
+        await update(db, services);
     } catch (e) {
         console.error('Error', e);
         return;

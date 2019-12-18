@@ -1,6 +1,6 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
-const lambda = require('@aws-cdk/aws-lambda');
+import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
@@ -10,10 +10,11 @@ export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct,
-    props: Props) {
+    props: Props): string[] {
     const publicApi = createApi(stack, props);
-    createRequestsResource(publicApi, vpc, props, lambdaDbSg, stack)
-    createServicesResource(publicApi, vpc, props, lambdaDbSg, stack)
+    const requestLambdaNames = createRequestsResource(publicApi, vpc, props, lambdaDbSg, stack)
+    const serviceLambdaNames = createServicesResource(publicApi, vpc, props, lambdaDbSg, stack)
+    return requestLambdaNames.concat(serviceLambdaNames);
 }
 
 function createRequestsResource(
@@ -21,8 +22,11 @@ function createRequestsResource(
     vpc: ec2.IVpc,
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
-    stack: Construct) {
-    const getRequestsHandler = new lambda.Function(stack, 'GetRequestsLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    stack: Construct): string[] {
+
+    const getRequestsId = 'GetRequests';
+    const getRequestsHandler = new lambda.Function(stack, getRequestsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getRequestsId,
         code: new lambda.AssetCode('dist/lambda/get-requests'),
         handler: 'lambda-get-requests.handler'
     }));
@@ -30,13 +34,17 @@ function createRequestsResource(
     const requests = publicApi.root.addResource("requests");
     requests.addMethod("GET", getRequestsIntegration);
 
-    const getRequestHandler = new lambda.Function(stack, 'GetRequestLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const getRequestId = 'GetRequest';
+    const getRequestHandler = new lambda.Function(stack, getRequestId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getRequestId,
         code: new lambda.AssetCode('dist/lambda/get-request'),
         handler: 'lambda-get-request.handler'
     }));
     const getRequestIntegration = new LambdaIntegration(getRequestHandler);
     const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration);
+
+    return [getRequestsId, getRequestId];
 }
 
 function createServicesResource(
@@ -44,22 +52,31 @@ function createServicesResource(
     vpc: ec2.IVpc,
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
-    stack: Construct) {
-    const getServicesHandler = new lambda.Function(stack, 'GetServicesLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    stack: Construct): string[] {
+
+    const getServicesId = 'GetServices';
+    const getServicesHandler = new lambda.Function(stack, getServicesId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getServicesId,
         code: new lambda.AssetCode('dist/lambda/get-services'),
         handler: 'lambda-get-services.handler'
     }));
     const getServicesIntegration = new LambdaIntegration(getServicesHandler);
+
     const services = publicApi.root.addResource("services");
     services.addMethod("GET", getServicesIntegration);
 
-    const getServiceHandler = new lambda.Function(stack, 'GetServiceLambda', dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const getServiceId = 'GetService';
+    const getServiceHandler = new lambda.Function(stack, getServiceId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getServiceId,
         code: new lambda.AssetCode('dist/lambda/get-service'),
         handler: 'lambda-get-service.handler'
     }));
+
     const getServiceIntegration = new LambdaIntegration(getServiceHandler);
     const service = services.addResource("{service_id}");
     service.addMethod("GET", getServiceIntegration);
+
+    return [getServicesId, getServiceId];
 }
 
 function createApi(stack: Construct, props: Props) {
