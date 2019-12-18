@@ -21,7 +21,7 @@ function createUpdateAnnotationsLambda(
     stack: Construct) {
 
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        code: new lambda.AssetCode('dist/lambda/update-annotations'),
+        code: new lambda.AssetCode('dist/lambda'),
         handler: 'lambda-update-annotations.handler'
     });
     // @ts-ignore
