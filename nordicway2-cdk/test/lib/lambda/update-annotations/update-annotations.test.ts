@@ -2,6 +2,7 @@ import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/update-annotations/lambda-update-annotations";
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "../../api-testutil";
+import {findAll} from "../../../../lib/db/db-annotations";
 
 process.env.ENDPOINT_LOGIN_URL = "http://localhost:8089/login";
 process.env.ENDPOINT_URL = "http://localhost:8089/annotations";
@@ -21,8 +22,12 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 
         try {
             const response = await handler();
-
             expect(response).not.toBeNull();
+
+            const annotations = await findAll(db);
+            expect(annotations).not.toBeNull();
+
+            console.info("annotation " + JSON.stringify(annotations));
         } finally {
             server.close();
         }
@@ -107,11 +112,9 @@ function fakeAnnotations() {
     "location": {
       "type": "Point",
       "coordinates": [
-        [
-          27.66730664221279,
-          61.863140990337484,
-          77
-        ]
+      27.66730664221279,
+      61.863140990337484,
+      77
       ]
     }
   }    
