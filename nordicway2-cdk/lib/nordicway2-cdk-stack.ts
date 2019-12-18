@@ -1,6 +1,8 @@
 import cdk = require('@aws-cdk/core');
 import * as InternalLambdas from './internal-lambdas';
 import * as ec2 from "@aws-cdk/aws-ec2";
+import * as LogGroupSubscriptions from "../../open311-cdk/lib/log-group-subscriptions";
+import * as PublicApi from "public-api";
 
 export class Nordicway2CdkStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, nordicwayProps: Props, props?: cdk.StackProps) {
@@ -17,6 +19,11 @@ export class Nordicway2CdkStack extends cdk.Stack {
         const lambdaDbSg = ec2.SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', nordicwayProps.lambdaDbSgId);
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
-        InternalLambdas.create(vpc, lambdaDbSg, this, nordicwayProps);
+        const internalLambdaNames = InternalLambdas.create(vpc, lambdaDbSg, this, nordicwayProps);
+        const publicLambdaNames = PublicApi.create(vpc, lambdaDbSg, this, open311Props);
+
+        LogGroupSubscriptions.create(integrationLambdaNames.concat(publicLambdaNames).concat(internalLambdaNames),
+            props, this);
+
     }
 }

@@ -42,7 +42,7 @@ export async function findAll(db: pgPromise.IDatabase<any, any>): Promise<Featur
     });
 
     return <FeatureCollection> {
-        type: "FeatureCollection";
+        type: "FeatureCollection",
         features: features
     }
 }
