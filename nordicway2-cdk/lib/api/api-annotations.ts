@@ -1,6 +1,5 @@
 import axios from 'axios';
 import * as qs from 'querystring';
-import * as moment from 'moment';
 
 export async function login(
     endpointUser: string,
@@ -57,7 +56,7 @@ export async function getAnnotations(
 }
 
 function getDateString(date: Date) {
-    return moment(date).toISOString()
+    return date.toISOString();
 }
 
 // properties deserialized as singleton arrays

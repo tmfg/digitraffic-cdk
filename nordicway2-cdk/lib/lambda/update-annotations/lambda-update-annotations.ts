@@ -61,6 +61,8 @@ async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
     );
 
     try {
+        console.info("updateCount=" + annotations.length);
+
         await insert(db, annotations);
         await updateLastUpdated(db, timeStampTo);
     } finally {
