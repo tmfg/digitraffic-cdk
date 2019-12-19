@@ -6,6 +6,7 @@
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
+    "resolveJsonModule": true,
     "strictNullChecks": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
@@ -17,7 +18,14 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization":false,
-    "typeRoots": ["./node_modules/@types"]
+    "typeRoots": ["./node_modules/@types"],
+    "moduleResolution": "node",
+    "preserveSymlinks": true,
+    "baseUrl": ".",
+    "paths": {
+      "digitraffic-lambda-postgres": ["node_modules/digitraffic-lambda-postgres"]
+    },
+    "declarationDir": "tsd"
   },
-  "exclude": ["cdk.out"]
+  "exclude": ["cdk.out", "tsd"]
 }

@@ -6,7 +6,9 @@ test('Empty Stack', () => {
     const app = new cdk.App();
     // WHEN
     const stack = new CloudWatchLogsRecipient.CloudWatchLogsRecipientStack(app, 'MyTestStack', {
-        applicationAccountId: '1234567890'
+        accounts: [],
+        elasticSearchEndpoint: 'http://no-such-doma.in',
+        elasticSearchDomainArn: 'arn:aws:es:some-region:123456789012:domain/some-domain'
     });
     // THEN
     expectCDK(stack).to(matchTemplate({
