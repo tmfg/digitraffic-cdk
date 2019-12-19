@@ -22,7 +22,7 @@ const knownAccounts: [
 const endpoint = new AWS.Endpoint(esDomain.endpoint);
 const creds = new AWS.EnvironmentCredentials("AWS");
 
-export const handler = (event: KinesisStreamEvent, context: Context): void => {
+export const handler = (event: KinesisStreamEvent, context: Context, callback: any): void => {
     event.Records.forEach(function(record: KinesisStreamRecord) {
         let zippedInput = Buffer.from(record.kinesis.data, "base64");
 
@@ -47,16 +47,16 @@ export const handler = (event: KinesisStreamEvent, context: Context): void => {
                 context.succeed("Control message handled successfully");
                 return;
             }
-            postToES(elasticsearchBulkData, context);
+            postToES(elasticsearchBulkData, callback);
         });
     });
 };
 
-function postToES(doc: string, context: Context) {
+function postToES(doc: string, callback: any) {
     let req = new AWS.HttpRequest(endpoint);
 
     req.method = "POST";
-    req.path = "/_bulk";
+    req.path = "/_bulk?pipeline=keyval";
     req.region = esDomain.region;
     req.headers["presigned-expires"] = false;
     req.headers["Host"] = endpoint.host;
@@ -77,12 +77,12 @@ function postToES(doc: string, context: Context) {
             });
             httpResp.on("end", function(chunk: any) {
                 console.log("Response: " + respBody);
-                context.succeed("Lambda added document " + doc);
+                callback(null);
             });
         },
         function(err: any) {
             console.log("Error: " + err);
-            context.fail("Lambda failed with error " + err);
+            callback(Error(err));
         }
     );
 }
@@ -111,7 +111,10 @@ function transform(payload: CloudWatchLogsDecodedData) {
         source["@timestamp"] = new Date(1 * logEvent.timestamp).toISOString();
         source["message"] = logEvent.message;
         source["log_group"] = payload.logGroup;
-        source["app"] = getAppFromSenderAccount(payload.owner);
+
+        const app = getAppFromSenderAccount(payload.owner);
+        source["app"] = app;
+        source["fields"] = {app: app};
 
         let action = { index: { _id: logEvent.id, _index: null } } as any;
         action.index._index = indexName;
