@@ -2,7 +2,7 @@ import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/update-annotations/lambda-update-annotations";
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "../../api-testutil";
-import {findAll} from "../../../../lib/db/db-annotations";
+import {findAll, findAllActive} from "../../../../lib/db/db-annotations";
 
 process.env.ENDPOINT_LOGIN_URL = "http://localhost:8089/login";
 process.env.ENDPOINT_URL = "http://localhost:8089/annotations";
@@ -21,13 +21,15 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
         });
 
         try {
-            const response = await handler();
-            expect(response).not.toBeNull();
+            await handler();
 
             const annotations = await findAll(db);
-            expect(annotations).not.toBeNull();
+            expect(annotations).toBeTruthy();
+            expect(annotations.features).toHaveLength(2);
 
-            console.info("annotation " + JSON.stringify(annotations));
+            const activeAnnotations = await findAllActive(db);
+            expect(activeAnnotations).toBeTruthy();
+            expect(activeAnnotations.features).toHaveLength(1);
         } finally {
             server.close();
         }
@@ -73,6 +75,7 @@ function fakeAnnotations() {
     "resolved": false,
     "image_url": null,
     "recorded_at": "2019-12-10T12:48:01.955Z",
+    "expires_at": "2019-12-10T13:48:01.955Z",
     "location": {
       "type": "LineString",
       "coordinates": [

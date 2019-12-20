@@ -3,13 +3,14 @@ import {Annotation} from "../model/annotations";
 import {FeatureCollection,Feature,GeoJsonProperties,Geometry} from "geojson";
 import * as wkx from "wkx";
 
-const FIND_ALL_SQL = "select id, created_at, recorded_at, type, location from nw2_annotation";
-const FIND_ALL_ACTIVE_SQL = "select id, created_at, recorded_at, type, location from nw2_annotation " +
+const FIND_ALL_SQL = "select id, created_at, recorded_at, expires_at, type, location from nw2_annotation";
+const FIND_ALL_ACTIVE_SQL = "select id, created_at, recorded_at, expires_at, type, location from nw2_annotation " +
     "where expires_at is null or expires_at > current_timestamp";
 
 const UPSERT_ANNOTATIONS_SQL = "insert into nw2_annotation(id, created_at, recorded_at, expires_at, type, location)" +
     "values(${id},${created_at},${recorded_at},${expires_at},${type},${geometry}) " +
     "on conflict (id) " +
+    "do update set " +
     "do update set " +
     "   expires_at = ${expires_at}," +
     "   location = ${geometry}";
@@ -38,6 +39,7 @@ function convertToFeatureCollection(aa: any[]) {
         const properties = <GeoJsonProperties>{
             createdAt: a.created_at,
             recordedAt: a.recorded_at,
+            expiresAt: a.expires_at,
             type: a.type
         };
 
