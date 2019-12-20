@@ -9,18 +9,20 @@ export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct,
-    props: Props) {
+    props: Props): string[] {
 
-    createUpdateAnnotationsLambda(vpc, lambdaDbSg, props, stack);
+    return [createUpdateAnnotationsLambda(vpc, lambdaDbSg, props, stack)];
 }
 
 function createUpdateAnnotationsLambda(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct) {
+    stack: Construct): string {
 
+    const functionName = "UpdateAnnotations";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: functionName,
         code: new lambda.AssetCode('dist/lambda/update-annotations'),
         handler: 'lambda-update-annotations.handler'
     });
@@ -39,4 +41,6 @@ function createUpdateAnnotationsLambda(
         schedule: events.Schedule.expression('cron(1 * * ? * * *)')
     });
     rule.addTarget(new targets.LambdaFunction(updateAnnotationsLambda));
+
+    return functionName;
 }

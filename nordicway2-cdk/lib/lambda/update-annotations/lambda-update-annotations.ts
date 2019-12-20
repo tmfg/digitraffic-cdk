@@ -1,6 +1,6 @@
 import {Annotation} from "../../model/annotations";
 import {login, getAnnotations, LoginResponse} from "../../api/api-annotations";
-import {insert} from "../../db/db-annotations";
+import {updateAnnotations} from "../../db/db-annotations";
 import {initDbConnection} from "../../../../common/postgres/database";
 import {getLastUpdated, updateLastUpdated} from "../../db/db-last-updated";
 
@@ -63,7 +63,7 @@ async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
     try {
         console.info("updateCount=" + annotations.length);
 
-        await insert(db, annotations);
+        await updateAnnotations(db, annotations);
         await updateLastUpdated(db, timeStampTo);
     } finally {
         if (db != null) {
