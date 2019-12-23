@@ -10,19 +10,18 @@ import * as AWSx from "aws-sdk";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 
-const esDomain = {
-    region: process.env.AWS_REGION,
-    endpoint: process.env.ES_ENDPOINT
-};
-
-const knownAccounts: [
-    { accountNumber: string; env: string; app: string }
-] = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
-
-const endpoint = new AWS.Endpoint(esDomain.endpoint);
-const creds = new AWS.EnvironmentCredentials("AWS");
-
 export const handler = (event: KinesisStreamEvent, context: Context, callback: any): void => {
+    const esDomain = {
+        region: process.env.AWS_REGION as string,
+        endpoint: process.env.ES_ENDPOINT
+    };
+
+    const knownAccounts: Account[] = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
+
+    const endpoint = new AWS.Endpoint(esDomain.endpoint);
+
+    const creds = new AWS.EnvironmentCredentials("AWS");
+
     event.Records.forEach(function(record: KinesisStreamRecord) {
         let zippedInput = Buffer.from(record.kinesis.data, "base64");
 
@@ -39,7 +38,7 @@ export const handler = (event: KinesisStreamEvent, context: Context, callback: a
             );
 
             // transform the input to Elasticsearch documents
-            let elasticsearchBulkData = transform(awslogsData);
+            let elasticsearchBulkData = transform(awslogsData, knownAccounts);
 
             // skip control messages
             if (!elasticsearchBulkData) {
@@ -47,17 +46,26 @@ export const handler = (event: KinesisStreamEvent, context: Context, callback: a
                 context.succeed("Control message handled successfully");
                 return;
             }
-            postToES(elasticsearchBulkData, callback);
+            postToES(endpoint,
+                esDomain.region,
+                creds,
+                elasticsearchBulkData,
+                callback);
         });
     });
 };
 
-function postToES(doc: string, callback: any) {
+function postToES(
+    endpoint: AWS.Endpoint,
+    esRegion: string,
+    creds: AWS.EnvironmentCredentials,
+    doc: string,
+    callback: any) {
     let req = new AWS.HttpRequest(endpoint);
 
     req.method = "POST";
     req.path = "/_bulk?pipeline=keyval";
-    req.region = esDomain.region;
+    req.region = esRegion;
     req.headers["presigned-expires"] = false;
     req.headers["Host"] = endpoint.host;
     req.body = doc;
@@ -87,7 +95,7 @@ function postToES(doc: string, callback: any) {
     );
 }
 
-function transform(payload: CloudWatchLogsDecodedData) {
+export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Account[]): string | null {
     if (payload.messageType === "CONTROL_MESSAGE") {
         return null;
     }
@@ -99,7 +107,7 @@ function transform(payload: CloudWatchLogsDecodedData) {
             return;
         }
 
-        const env = getEnvFromSenderAccount(payload.owner);
+        const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
         const timestamp = new Date(1 * logEvent.timestamp);
         const year = timestamp.getUTCFullYear();
         const month = ("0" + (timestamp.getUTCMonth() + 1)).slice(-2);
@@ -112,7 +120,7 @@ function transform(payload: CloudWatchLogsDecodedData) {
         source["message"] = logEvent.message;
         source["log_group"] = payload.logGroup;
 
-        const app = getAppFromSenderAccount(payload.owner);
+        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
         source["app"] = app;
         source["fields"] = {app: app};
 
@@ -126,11 +134,11 @@ function transform(payload: CloudWatchLogsDecodedData) {
     return bulkRequestBody;
 }
 
-function isLambdaLifecycleEvent(message: string) {
+export function isLambdaLifecycleEvent(message: string) {
     return message.startsWith('START RequestId') || message.startsWith('END RequestId') || message.startsWith('REPORT RequestId');
 }
 
-function buildSource(message: string, extractedFields: { [key: string]: string } | undefined): any {
+export function buildSource(message: string, extractedFields: { [key: string]: string } | undefined): any {
     let jsonSubString: any;
 
     message = message.replace("[, ]", "[0.0,0.0]")
@@ -211,20 +219,26 @@ function isNumeric(n: any) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-function getEnvFromSenderAccount(owner: string) {
+export function getEnvFromSenderAccount(owner: string, knownAccounts: Account[]) {
     // @ts-ignore
     return knownAccounts.find(value => {
         if (value.accountNumber === owner) {
             return true;
         }
-    }).env;
+    })?.env;
 }
 
-function getAppFromSenderAccount(owner: string) {
+export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]) {
     // @ts-ignore
     return knownAccounts.find(value => {
         if (value.accountNumber === owner) {
             return true;
         }
     })?.app;
+}
+
+export interface Account {
+    accountNumber: string;
+    env: string;
+    app: string;
 }
