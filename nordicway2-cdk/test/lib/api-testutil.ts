@@ -1,7 +1,6 @@
 import * as http from 'http';
 
 export class TestHttpServer {
-
     private server: http.Server;
     private debug: boolean;
 
@@ -33,7 +32,6 @@ export class TestHttpServer {
             console.debug(str);
         }
     }
-
 }
 
 interface ListenProperties {

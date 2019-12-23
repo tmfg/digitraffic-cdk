@@ -26,6 +26,7 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
             const annotations = await findAllAnnotations();
             expect(annotations).toBeTruthy();
             expect(annotations.features).toHaveLength(2);
+            expect(annotations.features[0].type).toEqual('slipperyRoad');
 
             const activeAnnotations = await findAllActiveAnnotations();
             expect(activeAnnotations).toBeTruthy();
@@ -37,8 +38,6 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 }));
 
 function fakeLogin() {
-    console.info("fakeLogin!");
-
     return `
 {
   "status": "success",
@@ -51,8 +50,6 @@ function fakeLogin() {
 }
 
 function fakeAnnotations() {
-    console.info("fakeAnnotations!");
-
     return `
 [
    {
