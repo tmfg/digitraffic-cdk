@@ -8,9 +8,9 @@ export function dbLambdaConfiguration(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    config: object) {
+    config: object): lambda.FunctionProps {
 
-    return Object.assign({}, {
+    return <lambda.FunctionProps> Object.assign({}, {
         runtime: lambda.Runtime.NODEJS_10_X,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {

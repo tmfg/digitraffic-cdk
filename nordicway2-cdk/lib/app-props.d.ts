@@ -9,6 +9,7 @@ declare interface Props {
     lambdaDbSgId: string;
     dbProps: DbProps;
     defaultLambdaDurationSeconds: number;
+    logsDestinationArn: string;
     integration: {
         username: string;
         password: string;
