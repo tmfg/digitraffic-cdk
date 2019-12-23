@@ -2,14 +2,14 @@ import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/update-annotations/lambda-update-annotations";
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "../../api-testutil";
-import {findAll, findAllActive} from "../../../../lib/db/db-annotations";
+import {findAllActiveAnnotations, findAllAnnotations} from "../../../../lib/service/annotations";
 
 process.env.ENDPOINT_LOGIN_URL = "http://localhost:8089/login";
 process.env.ENDPOINT_URL = "http://localhost:8089/annotations";
 
 describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
-    test('Test', async () => {
+    test('test update', async () => {
         const server = new TestHttpServer();
         server.listen({
             "/annotations": () => {
@@ -23,11 +23,11 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
         try {
             await handler();
 
-            const annotations = await findAll(db);
+            const annotations = await findAllAnnotations();
             expect(annotations).toBeTruthy();
             expect(annotations.features).toHaveLength(2);
 
-            const activeAnnotations = await findAllActive(db);
+            const activeAnnotations = await findAllActiveAnnotations();
             expect(activeAnnotations).toBeTruthy();
             expect(activeAnnotations.features).toHaveLength(1);
         } finally {

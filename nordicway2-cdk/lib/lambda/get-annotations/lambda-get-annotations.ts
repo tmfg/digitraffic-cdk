@@ -1,17 +1,9 @@
 import {APIGatewayEvent} from 'aws-lambda';
-import {initDbConnection} from 'digitraffic-lambda-postgres/database';
-//import {findAll} from "../../db/db-annotations";
+import {findAllActiveAnnotations} from "../../service/annotations";
 
 export const handler = async (event: APIGatewayEvent): Promise<any> => {
-    const db = initDbConnection(
-        process.env.DB_USER as string,
-        process.env.DB_PASS as string,
-        process.env.DB_URI as string
-    );
+    const annotations = await findAllActiveAnnotations();
 
-//    const annotations = await findAll(db);
-
-    db.$pool.end();
-
-    return {statusCode: 200, body: JSON.stringify([])};
+    return {statusCode: 200, body: JSON.stringify(annotations)};
 };
+
