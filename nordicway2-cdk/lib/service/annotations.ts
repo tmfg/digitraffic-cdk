@@ -40,6 +40,7 @@ function convertFeatures(aa: any[]) {
             type: a.type
         };
 
+        // convert geometry from db to geojson
         const geometry = wkx.Geometry.parse(new Buffer(a.location, "hex")).toGeoJSON();
 
         return <Feature>{

@@ -39,6 +39,7 @@
     "@aws-cdk/aws-events-targets": "latest",
     "axios": "latest",
     "@types/geojson": "latest",
-    "wkx": "latest"
+    "wkx": "latest",
+    "parse-link-header": "latest"
   }
 }

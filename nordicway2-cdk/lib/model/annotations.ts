@@ -4,5 +4,10 @@ export interface Annotation {
     recorded_at: Date,
     expires_at: Date | null,
     tags: string[],
-    location: any
+    location: Location
+}
+
+export interface Location {
+    type: string,
+    coordinates: any
 }

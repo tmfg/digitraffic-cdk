@@ -1,5 +1,6 @@
 import axios from 'axios';
 import * as qs from 'querystring';
+import {Annotation} from "../model/annotations";
 
 export async function login(
     endpointUser: string,
@@ -32,15 +33,52 @@ export async function getAnnotations(
     authToken: string,
     endpointUrl: string,
     timestampFrom: Date,
-    timestampTo: Date) {
+    timestampTo: Date): Promise<Annotation[]> {
     const fromString = getDateString(timestampFrom);
     const toString = getDateString(timestampTo)
+    const annotations = [];
 
-    const url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0&limit=1000`;
+    let url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0&limit=100`;
 
-    console.info("getting annotations from " + url);
+    do {
+        console.info("getting annotations from " + url);
+        const resp = await getAnnotationsFromServer(url, userId, authToken);
 
-    const resp = await axios.get(url, {
+        if (resp.status != 200) {
+            throw Error('Fetching annotations failed: ' + resp.statusText);
+        }
+
+//        console.info("headers " + JSON.stringify(resp.headers.link));
+
+        // add all items from array to annotations-array
+        annotations.push(...resp.data);
+
+        url = getNextUrl(resp.headers);
+    } while(url != null)
+
+    return annotations;
+}
+
+function getNextUrl(headers: any) {
+    const parse = require('parse-link-header');
+
+    if(headers.link == null) {
+        return null;
+    }
+
+    const parsedHeaders = parse(headers.link);
+
+//    console.info("parsed " + JSON.stringify(parsedHeaders));
+
+    if(parsedHeaders == null || parsedHeaders.cursornext == null) {
+        return null;
+    }
+
+    return parsedHeaders.cursornext.url;
+}
+
+export async function getAnnotationsFromServer(url: string, userId: string, authToken: string) {
+    return await axios.get(url, {
         headers: {
             'Accept': 'application/json',
             'X-User-Id': userId,
@@ -48,11 +86,6 @@ export async function getAnnotations(
         }
     });
 
-    if (resp.status != 200) {
-        throw Error('Fetching annotations failed: ' + resp.statusText);
-    }
-
-    return resp.data;
 }
 
 function getDateString(date: Date) {
