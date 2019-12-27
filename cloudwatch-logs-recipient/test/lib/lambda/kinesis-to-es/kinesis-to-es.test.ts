@@ -1,30 +1,13 @@
-import * as sinon from 'sinon';
-import * as AWS from 'aws-sdk';
 import {CloudWatchLogsDecodedData, CloudWatchLogsLogEvent} from "aws-lambda";
-const zlib = require("zlib");
 import {
     buildSource,
     isLambdaLifecycleEvent,
     getAppFromSenderAccount,
     getEnvFromSenderAccount,
-    postToES,
     transform
 } from '../../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es';
 
 describe('kinesis-to-es', () => {
-/*
-    beforeAll(() => {
-        process.env.AWS_REGION = 'someregion';
-        process.env.ES_ENDPOINT = 'https://some-endpoint.com';
-        process.env.KNOWN_ACCOUNTS = JSON.stringify([{
-            accountNumber: '123456789012',
-            env: 'local',
-            app: 'road'
-        }]);
-    });
-    */
-    const sandbox = sinon.createSandbox();
-    afterEach(() => sandbox.restore());
 
     test('isLambdaLifecycleEvent true', () => {
         expect(isLambdaLifecycleEvent('START RequestId')).toBe(true);
@@ -84,31 +67,3 @@ describe('kinesis-to-es', () => {
     });
 
 });
-/*
-
-const handleRequestSpy = sinon.spy();
-        // @ts-ignore
-        sandbox.stub(AWS, 'NodeHttpClient').returns({
-            handleRequest: handleRequestSpy
-        });
-        const handler = require('../../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es').handler;
-
-        const data: CloudWatchLogsDecodedData = {
-          owner: '123456789012',
-          logGroup: '',
-          logStream: '',
-          subscriptionFilters: [],
-          messageType: '',
-          logEvents: []
-        };
-        zlib.gzip(JSON.stringify(data), (err: Error | null, result: Buffer) => {
-            const context = {fail: sinon.stub(), succeed: sinon.stub()};
-            handler({
-                Records: [{kinesis: { data: result }}]
-            }, context, () => {});
-
-            //expect(handleRequestSpy.calledOnce).toBe(true);
-            done();
-        });
-
- */
