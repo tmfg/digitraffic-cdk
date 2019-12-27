@@ -81,18 +81,18 @@ function getNextUrl(headers: any) {
 
 export async function getAnnotationsFromServer(url: string, userId: string, authToken: string) {
     const start = Date.now();
-    try {
-        return await axios.get(url, {
-            headers: {
-                'Accept': 'application/json',
-                'X-User-Id': userId,
-                'X-Auth-Token': authToken
-            }
-        });
-    } finally {
+
+    return await axios.get(url, {
+        headers: {
+            'Accept': 'application/json',
+            'X-User-Id': userId,
+            'X-Auth-Token': authToken
+        }
+    }).then(a => {
         const end = Date.now();
-        console.info("method=getAnnotationsFromServer tookMs=" + (end-start));
-    }
+        console.info("method=getAnnotationsFromServer annotationsCount=" + a.data.length + " tookMs=" + (end-start));
+        return a;
+    });
 }
 
 function getDateString(date: Date) {

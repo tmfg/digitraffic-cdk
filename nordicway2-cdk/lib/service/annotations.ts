@@ -53,22 +53,18 @@ function convertFeatures(aa: any[]) {
 }
 
 export async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
-    console.info("updateCount=" + annotations.length);
     const start = Date.now();
 
     await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
-        console.info("inDatabase saveAnnotations");
-
-        await db.tx(t => {
-            console.info("inDatabase inside transaction saveAnnotations");
+        return await db.tx(t => {
             return t.batch(
                 AnnotationsDB.updateAnnotations(db, annotations),
                 LastUpdatedDB.updateLastUpdated(db, timeStampTo)
             );
         });
-    });
-
-    const end = Date.now();
-    console.info("method=saveAnnotations tookMs=" + (end-start));
+    }).then(a => {
+        const end = Date.now();
+        console.info("method=saveAnnotations updatedCount=" + a.length + " tookMs=" + (end-start));
+    })
 }
 
