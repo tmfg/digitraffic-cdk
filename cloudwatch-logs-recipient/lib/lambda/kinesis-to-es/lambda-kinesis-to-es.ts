@@ -243,9 +243,3 @@ export function getAppFromSenderAccount(owner: string, knownAccounts: Account[])
         return app;
     }
 }
-
-export interface Account {
-    accountNumber: string;
-    env: string;
-    app: string;
-}

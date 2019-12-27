@@ -3,7 +3,6 @@ import * as AWS from 'aws-sdk';
 import {CloudWatchLogsDecodedData, CloudWatchLogsLogEvent} from "aws-lambda";
 const zlib = require("zlib");
 import {
-    Account,
     buildSource,
     isLambdaLifecycleEvent,
     getAppFromSenderAccount,
