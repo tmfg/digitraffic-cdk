@@ -20,8 +20,6 @@ export const handler = (event: KinesisStreamEvent, context: Context, callback: a
 
     const endpoint = new AWS.Endpoint(esDomain.endpoint);
 
-    const creds = new AWS.EnvironmentCredentials("AWS");
-
     event.Records.forEach(function(record: KinesisStreamRecord) {
         let zippedInput = Buffer.from(record.kinesis.data, "base64");
 
@@ -48,19 +46,18 @@ export const handler = (event: KinesisStreamEvent, context: Context, callback: a
             }
             postToES(endpoint,
                 esDomain.region,
-                creds,
                 elasticsearchBulkData,
                 callback);
         });
     });
 };
 
-function postToES(
+export function postToES(
     endpoint: AWS.Endpoint,
     esRegion: string,
-    creds: AWS.EnvironmentCredentials,
     doc: string,
     callback: any) {
+    const creds = new AWS.EnvironmentCredentials("AWS")
     let req = new AWS.HttpRequest(endpoint);
 
     req.method = "POST";
@@ -219,22 +216,32 @@ function isNumeric(n: any) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
-export function getEnvFromSenderAccount(owner: string, knownAccounts: Account[]) {
-    // @ts-ignore
-    return knownAccounts.find(value => {
+export function getEnvFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
+    const env = knownAccounts.find(value => {
         if (value.accountNumber === owner) {
             return true;
         }
+        return null;
     })?.env;
+    if (!env) {
+        throw new Error('No env for account ' + owner);
+    } else {
+        return env;
+    }
 }
 
-export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]) {
-    // @ts-ignore
-    return knownAccounts.find(value => {
+export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
+    const app = knownAccounts.find(value => {
         if (value.accountNumber === owner) {
             return true;
         }
+        return null;
     })?.app;
+    if (!app) {
+        throw new Error('No app for account ' + owner);
+    } else {
+        return app;
+    }
 }
 
 export interface Account {

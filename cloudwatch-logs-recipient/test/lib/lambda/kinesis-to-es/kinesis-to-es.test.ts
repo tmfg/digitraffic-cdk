@@ -8,6 +8,7 @@ import {
     isLambdaLifecycleEvent,
     getAppFromSenderAccount,
     getEnvFromSenderAccount,
+    postToES,
     transform
 } from '../../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es';
 
@@ -22,9 +23,9 @@ describe('kinesis-to-es', () => {
             app: 'road'
         }]);
     });
+    */
     const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
- */
 
     test('isLambdaLifecycleEvent true', () => {
         expect(isLambdaLifecycleEvent('START RequestId')).toBe(true);
@@ -41,9 +42,9 @@ describe('kinesis-to-es', () => {
         expect(getAppFromSenderAccount(account.accountNumber, [account])).toBe(account.app);
     });
 
-    test('getAppFromSenderAccount false', () => {
+    test('getAppFromSenderAccount error', () => {
         const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
-        expect(getAppFromSenderAccount('4567890123', [account])).not.toBe(account.app);
+        expect(() => getAppFromSenderAccount('4567890123', [account])).toThrow();
     });
 
     test('getEnvFromSenderAccount true', () => {
@@ -51,9 +52,9 @@ describe('kinesis-to-es', () => {
         expect(getEnvFromSenderAccount('123456789012', [account])).toBe(account.env);
     });
 
-    test('getEnvFromSenderAccount false', () => {
+    test('getEnvFromSenderAccount error', () => {
         const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
-        expect(getEnvFromSenderAccount('4567890123', [account])).not.toBe(account.env);
+        expect(() => getEnvFromSenderAccount('4567890123', [account])).toThrow();
     });
 
     test('buildSource', () => {
@@ -62,13 +63,14 @@ describe('kinesis-to-es', () => {
     });
 
     test('transform', () => {
+        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
         const logEvent: CloudWatchLogsLogEvent = {
             id: 'some-id',
             timestamp: 0,
             message: 'message'
         };
         const data: CloudWatchLogsDecodedData = {
-            owner: '123456789012',
+            owner: account.accountNumber,
             logGroup: '',
             logStream: '',
             subscriptionFilters: [],
@@ -76,10 +78,10 @@ describe('kinesis-to-es', () => {
             logEvents: [logEvent]
         };
 
-        const transformed = transform(data, []);
+        const transformed = transform(data, [account]);
 
-        expect(transformed).toBe('{"index":{"_id":"some-id","_index":"aws-undefined-1970.01","_type":"doc"}}\n' +
-            '{"log_line":"\\bmessage\\b","id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","message":"message","log_group":"","fields":{}}\n');
+        expect(transformed).toBe('{"index":{"_id":"some-id","_index":"aws-someenv-1970.01","_type":"doc"}}\n' +
+            '{"log_line":"\\bmessage\\b","id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","message":"message","log_group":"","app":"some-app","fields":{"app":"some-app"}}\n');
     });
 
 });
