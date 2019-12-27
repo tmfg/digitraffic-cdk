@@ -22,6 +22,6 @@ export class Nordicway2CdkStack extends cdk.Stack {
         const internalLambdaNames = InternalLambdas.create(vpc, lambdaDbSg, this, nordicwayProps);
         const publicLambdaNames = PublicApi.create(vpc, lambdaDbSg, this, nordicwayProps);
 
-        create(publicLambdaNames.concat(internalLambdaNames), "logDestinationArn", this);
+        create(publicLambdaNames.concat(internalLambdaNames), nordicwayProps.logsDestinationArn, this);
     }
 }

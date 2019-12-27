@@ -12,22 +12,20 @@ const UPSERT_ANNOTATIONS_SQL = "insert into nw2_annotation(id, created_at, recor
     "   expires_at = ${expires_at}," +
     "   location = ${geometry}";
 
-export function updateAnnotations(db: pgPromise.IDatabase<any, any>, annotations: Annotation[]): Promise<void> {
-    return db.tx(t => {
-        annotations.map(a => {
-            const geometry = createGeometry(a.location);
+export function updateAnnotations(db: pgPromise.IDatabase<any, any>, annotations: Annotation[]): Promise<any>[] {
+    console.info("updating annotations " + annotations);
 
-            console.info("annotation " + JSON.stringify(a));
+    return annotations.map(a => {
+        const geometry = createGeometry(a.location);
 
-            return t.none(UPSERT_ANNOTATIONS_SQL, {
-                    id: a._id,
-                    created_at: a.created_at,
-                    recorded_at: a.recorded_at,
-                    expires_at: a.expires_at,
-                    type: a.tags[0].split(":", 2)[1],
-                    geometry: geometry
-            });
-        })
+        return db.none(UPSERT_ANNOTATIONS_SQL, {
+            id: a._id,
+            created_at: a.created_at,
+            recorded_at: a.recorded_at,
+            expires_at: a.expires_at,
+            type: a.tags[0].split(":", 2)[1],
+            geometry: geometry
+        });
     });
 }
 

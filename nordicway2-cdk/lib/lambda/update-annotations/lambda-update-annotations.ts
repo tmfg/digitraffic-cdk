@@ -1,8 +1,9 @@
 import {Annotation} from "../../model/annotations";
 import {login, getAnnotations, LoginResponse} from "../../api/api-annotations";
-import {updateAnnotations} from "../../db/db-annotations";
-import {initDbConnection} from "../../../../common/postgres/database";
-import {getLastUpdated, updateLastUpdated} from "../../db/db-last-updated";
+import * as AnnotationsDB from "../../db/db-annotations";
+import {inDatabase} from "../../../../common/postgres/database";
+import * as LastUpdatedDB from "../../db/db-last-updated";
+import * as pgPromise from "pg-promise";
 
 export const handler = async () : Promise <any> => {
     const timestampFrom = await lastUpdated();
@@ -35,39 +36,26 @@ async function getAnnotationsFromServer(timestampFrom: Date, timeStampTo: Date):
     return [];
 }
 
-async function lastUpdated() {
-    const db = initDbConnection(
-        process.env.DB_USER as string,
-        process.env.DB_PASS as string,
-        process.env.DB_URI as string
-    );
-
-    try {
-        const timestamp = await getLastUpdated(db)
+function lastUpdated() {
+    return inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
+        const timestamp = await LastUpdatedDB.getLastUpdated(db)
 
         return timestamp == null ? new Date() : timestamp;
-    } finally {
-        if (db != null) {
-            db.$pool.end()
-        }
-    }
+    });
 }
 
 async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
-    const db = initDbConnection(
-        process.env.DB_USER as string,
-        process.env.DB_PASS as string,
-        process.env.DB_URI as string
-    );
+    console.info("updateCount=" + annotations.length);
 
-    try {
-        console.info("updateCount=" + annotations.length);
+    await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
+        console.info("inDatabase saveAnnotations");
 
-        await updateAnnotations(db, annotations);
-        await updateLastUpdated(db, timeStampTo);
-    } finally {
-        if (db != null) {
-            db.$pool.end()
-        }
-    }
+        await db.tx(t => {
+            console.info("inDatabase inside transaction saveAnnotations");
+            return t.batch(
+                AnnotationsDB.updateAnnotations(db, annotations),
+                LastUpdatedDB.updateLastUpdated(db, timeStampTo)
+            );
+        });
+    });
 }

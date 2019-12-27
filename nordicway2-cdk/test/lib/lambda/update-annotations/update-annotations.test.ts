@@ -1,14 +1,12 @@
-import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/update-annotations/lambda-update-annotations";
-import {dbTestBase} from "../../db-testutil";
+import {testBase} from "../../db-testutil";
 import {TestHttpServer} from "../../api-testutil";
 import {findAllActiveAnnotations, findAllAnnotations} from "../../../../lib/service/annotations";
 
 process.env.ENDPOINT_LOGIN_URL = "http://localhost:8089/login";
 process.env.ENDPOINT_URL = "http://localhost:8089/annotations";
 
-describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
-
+describe('update-annotations', testBase(async () => {
     test('test update', async () => {
         const server = new TestHttpServer();
         server.listen({
@@ -24,13 +22,21 @@ describe('update-annotations', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
             await handler();
 
             const annotations = await findAllAnnotations();
+
             expect(annotations).toBeTruthy();
             expect(annotations.features).toHaveLength(2);
-            expect(annotations.features[0].type).toEqual('slipperyRoad');
+            expect(annotations.features[0].properties).toBeTruthy();
+            if (annotations.features[0].properties != null) {
+               expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
+            }
 
             const activeAnnotations = await findAllActiveAnnotations();
             expect(activeAnnotations).toBeTruthy();
             expect(activeAnnotations.features).toHaveLength(1);
+            expect(annotations.features[0].properties).toBeTruthy();
+            if (annotations.features[0].properties != null) {
+                expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
+            }
         } finally {
             server.close();
         }

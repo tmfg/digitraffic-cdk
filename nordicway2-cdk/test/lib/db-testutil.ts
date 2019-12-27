@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {initDbConnection} from "digitraffic-lambda-postgres/database";
+import {initDbConnection, inDatabase} from "digitraffic-lambda-postgres/database";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
@@ -23,12 +23,28 @@ export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     };
 }
 
+export function testBase(fn: (arg0: any) => void) {
+    return () => {
+        beforeAll(async () => {
+            process.env.DB_USER = 'road';
+            process.env.DB_PASS = 'road';
+            process.env.DB_URI = 'localhost:54322/road';
+        });
+
+        afterAll(async () => {
+            return inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
+                await truncate(db);
+            });
+        });
+
+        // @ts-ignore
+        fn();
+    };
+}
+
+
 export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {
-    return db.tx(t => {
-        return t.batch([
-            db.none('DELETE FROM nw2_annotation')
-        ]);
-    });
+    return db.none('DELETE FROM nw2_annotation');
 }
 
 

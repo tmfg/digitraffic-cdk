@@ -1,44 +1,29 @@
-import {initDbConnection} from 'digitraffic-lambda-postgres/database';
+import {inDatabase} from 'digitraffic-lambda-postgres/database';
 import {findAllActive, findAll} from "../db/db-annotations";
 import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
 import * as wkx from "wkx";
 import {getLastUpdated} from "../db/db-last-updated";
+import * as pgPromise from "pg-promise";
 
 export async function findAllAnnotations(): Promise<FeatureCollection> {
-    const db = initDbConnection(
-        process.env.DB_USER as string,
-        process.env.DB_PASS as string,
-        process.env.DB_URI as string
-    );
-
-    try {
-        const annotations = await findAll(db).then(convertFeatures)
+    return await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
+        const annotations = await findAll(db).then(convertFeatures);
         const lastUpdated = await getLastUpdated(db);
 
-        return await createFeatureCollection(annotations, lastUpdated);
-    } finally {
-        db.$pool.end();
-    }
+        return createFeatureCollection(annotations, lastUpdated);
+    });
 }
 
 export async function findAllActiveAnnotations(): Promise<FeatureCollection> {
-    const db = initDbConnection(
-        process.env.DB_USER as string,
-        process.env.DB_PASS as string,
-        process.env.DB_URI as string
-    );
-
-    try {
+    return await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
         const annotations = await findAllActive(db).then(convertFeatures);
         const lastUpdated = await getLastUpdated(db);
 
-        return await createFeatureCollection(annotations, lastUpdated);
-    } finally {
-        db.$pool.end();
-    }
+        return createFeatureCollection(annotations, lastUpdated);
+    });
 }
 
-async function createFeatureCollection(features: Feature[], lastUpdated: Date | null) {
+function createFeatureCollection(features: Feature[], lastUpdated: Date | null) {
     return <FeatureCollection> {
         type: "FeatureCollection",
         lastUpdated: lastUpdated,

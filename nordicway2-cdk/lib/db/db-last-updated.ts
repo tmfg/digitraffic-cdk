@@ -9,6 +9,8 @@ export function getLastUpdated(db: pgPromise.IDatabase<any, any>): Promise<Date 
 }
 
 export function updateLastUpdated(db: pgPromise.IDatabase<any, any>, date: Date): Promise<null> {
+    console.info("updateLastUpdated to " + date);
+
     return db.none("update data_updated set updated=${date} where data_type=${datatype}",
         {
             date: date,

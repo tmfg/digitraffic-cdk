@@ -36,7 +36,7 @@ export async function getAnnotations(
     const fromString = getDateString(timestampFrom);
     const toString = getDateString(timestampTo)
 
-    const url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0`;
+    const url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0&limit=1000`;
 
     console.info("getting annotations from " + url);
 
