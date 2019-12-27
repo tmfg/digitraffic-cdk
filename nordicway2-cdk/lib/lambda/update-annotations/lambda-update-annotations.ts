@@ -1,9 +1,7 @@
 import {Annotation} from "../../model/annotations";
 import {login, getAnnotations, LoginResponse} from "../../api/api-annotations";
-import * as AnnotationsDB from "../../db/db-annotations";
-import {inDatabase} from "../../../../common/postgres/database";
-import * as LastUpdatedDB from "../../db/db-last-updated";
-import * as pgPromise from "pg-promise";
+import {saveAnnotations} from "../../service/annotations";
+import {lastUpdated} from "../../service/last-updated";
 
 export const handler = async () : Promise <any> => {
     const timestampFrom = await lastUpdated();
@@ -34,28 +32,4 @@ async function getAnnotationsFromServer(timestampFrom: Date, timeStampTo: Date):
     }
 
     return [];
-}
-
-function lastUpdated() {
-    return inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
-        const timestamp = await LastUpdatedDB.getLastUpdated(db)
-
-        return timestamp == null ? new Date() : timestamp;
-    });
-}
-
-async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
-    console.info("updateCount=" + annotations.length);
-
-    await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
-        console.info("inDatabase saveAnnotations");
-
-        await db.tx(t => {
-            console.info("inDatabase inside transaction saveAnnotations");
-            return t.batch(
-                AnnotationsDB.updateAnnotations(db, annotations),
-                LastUpdatedDB.updateLastUpdated(db, timeStampTo)
-            );
-        });
-    });
 }

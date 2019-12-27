@@ -1,14 +1,15 @@
 import {inDatabase} from 'digitraffic-lambda-postgres/database';
-import {findAllActive, findAll} from "../db/db-annotations";
+import * as AnnotationsDB from "../db/db-annotations";
 import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
 import * as wkx from "wkx";
-import {getLastUpdated} from "../db/db-last-updated";
+import * as LastUpdatedDB from "../db/db-last-updated";
 import * as pgPromise from "pg-promise";
+import {Annotation} from "../model/annotations";
 
 export async function findAllAnnotations(): Promise<FeatureCollection> {
     return await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
-        const annotations = await findAll(db).then(convertFeatures);
-        const lastUpdated = await getLastUpdated(db);
+        const annotations = await AnnotationsDB.findAll(db).then(convertFeatures);
+        const lastUpdated = await LastUpdatedDB.getLastUpdated(db);
 
         return createFeatureCollection(annotations, lastUpdated);
     });
@@ -16,8 +17,8 @@ export async function findAllAnnotations(): Promise<FeatureCollection> {
 
 export async function findAllActiveAnnotations(): Promise<FeatureCollection> {
     return await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
-        const annotations = await findAllActive(db).then(convertFeatures);
-        const lastUpdated = await getLastUpdated(db);
+        const annotations = await AnnotationsDB.findAllActive(db).then(convertFeatures);
+        const lastUpdated = await LastUpdatedDB.getLastUpdated(db);
 
         return createFeatureCollection(annotations, lastUpdated);
     });
@@ -50,3 +51,24 @@ function convertFeatures(aa: any[]) {
         };
     })
 }
+
+export async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
+    console.info("updateCount=" + annotations.length);
+    const start = Date.now();
+
+    await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
+        console.info("inDatabase saveAnnotations");
+
+        await db.tx(t => {
+            console.info("inDatabase inside transaction saveAnnotations");
+            return t.batch(
+                AnnotationsDB.updateAnnotations(db, annotations),
+                LastUpdatedDB.updateLastUpdated(db, timeStampTo)
+            );
+        });
+    });
+
+    const end = Date.now();
+    console.info("method=saveAnnotations tookMs=" + (end-start));
+}
+

@@ -48,6 +48,8 @@ export async function getAnnotations(
             throw Error('Fetching annotations failed: ' + resp.statusText);
         }
 
+
+        console.info("data " + JSON.stringify(resp.data));
 //        console.info("headers " + JSON.stringify(resp.headers.link));
 
         // add all items from array to annotations-array
@@ -78,14 +80,19 @@ function getNextUrl(headers: any) {
 }
 
 export async function getAnnotationsFromServer(url: string, userId: string, authToken: string) {
-    return await axios.get(url, {
-        headers: {
-            'Accept': 'application/json',
-            'X-User-Id': userId,
-            'X-Auth-Token': authToken
-        }
-    });
-
+    const start = Date.now();
+    try {
+        return await axios.get(url, {
+            headers: {
+                'Accept': 'application/json',
+                'X-User-Id': userId,
+                'X-Auth-Token': authToken
+            }
+        });
+    } finally {
+        const end = Date.now();
+        console.info("method=getAnnotationsFromServer tookMs=" + (end-start));
+    }
 }
 
 function getDateString(date: Date) {

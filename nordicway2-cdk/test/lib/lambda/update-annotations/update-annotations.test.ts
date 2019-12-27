@@ -1,7 +1,7 @@
 import {handler} from "../../../../lib/lambda/update-annotations/lambda-update-annotations";
 import {testBase} from "../../db-testutil";
-import {TestHttpServer} from "../../api-testutil";
 import {findAllActiveAnnotations, findAllAnnotations} from "../../../../lib/service/annotations";
+import {TestHttpServer} from "../../../../../common/test/httpserver";
 
 process.env.ENDPOINT_LOGIN_URL = "http://localhost:8089/login";
 process.env.ENDPOINT_URL = "http://localhost:8089/annotations";
@@ -9,7 +9,7 @@ process.env.ENDPOINT_URL = "http://localhost:8089/annotations";
 describe('update-annotations', testBase(async () => {
     test('test update', async () => {
         const server = new TestHttpServer();
-        server.listen({
+        server.listen(8089, {
             "/annotations": () => {
                 return fakeAnnotations();
             },
@@ -23,17 +23,13 @@ describe('update-annotations', testBase(async () => {
 
             const annotations = await findAllAnnotations();
 
-            expect(annotations).toBeTruthy();
             expect(annotations.features).toHaveLength(2);
-            expect(annotations.features[0].properties).toBeTruthy();
             if (annotations.features[0].properties != null) {
                expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
             }
 
             const activeAnnotations = await findAllActiveAnnotations();
-            expect(activeAnnotations).toBeTruthy();
             expect(activeAnnotations.features).toHaveLength(1);
-            expect(annotations.features[0].properties).toBeTruthy();
             if (annotations.features[0].properties != null) {
                 expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
             }
