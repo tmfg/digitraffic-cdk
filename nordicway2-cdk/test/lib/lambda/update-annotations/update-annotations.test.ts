@@ -3,13 +3,15 @@ import {testBase} from "../../db-testutil";
 import {findAllActiveAnnotations, findAllAnnotations} from "../../../../lib/service/annotations";
 import {TestHttpServer} from "../../../../../common/test/httpserver";
 
-process.env.ENDPOINT_LOGIN_URL = "http://localhost:8089/login";
-process.env.ENDPOINT_URL = "http://localhost:8089/annotations";
+const SERVER_PORT = 8089;
+
+process.env.ENDPOINT_LOGIN_URL = `http://localhost:${SERVER_PORT}/login`;
+process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}/annotations`;
 
 describe('update-annotations', testBase(async () => {
     test('test update', async () => {
         const server = new TestHttpServer();
-        server.listen(8089, {
+        server.listen(SERVER_PORT, {
             "/annotations": () => {
                 return fakeAnnotations();
             },

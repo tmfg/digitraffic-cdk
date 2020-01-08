@@ -52,19 +52,32 @@ function convertFeatures(aa: any[]) {
     })
 }
 
+function validate(annotation: Annotation) {
+    return annotation.tags != null && annotation.tags.length > 0 && annotation.tags[0].indexOf(":") != -1 && annotation.location != null;
+}
+
 export async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
     const start = Date.now();
+    let validated: any[] = [];
+
+    annotations.forEach(a => {
+        if(validate(a)) {
+            validated.push(a);
+        } else {
+            console.error("invalid annotation json={}", JSON.stringify(a));
+        }
+    })
 
     await inDatabase(async (db: pgPromise.IDatabase<any,any>) => {
         return await db.tx(t => {
             return t.batch(
-                AnnotationsDB.updateAnnotations(db, annotations),
+                AnnotationsDB.updateAnnotations(db, validated),
                 LastUpdatedDB.updateLastUpdated(db, timeStampTo)
             );
         });
     }).then(a => {
         const end = Date.now();
-        console.info("method=saveAnnotations updatedCount=" + a.length + " tookMs=" + (end-start));
+        console.info("method=saveAnnotations updatedCount={} tookMs={}", a.length, (end-start));
     })
 }
 

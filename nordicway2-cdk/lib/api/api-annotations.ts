@@ -49,7 +49,7 @@ export async function getAnnotations(
         }
 
 
-        console.info("data " + JSON.stringify(resp.data));
+//        console.info("data " + JSON.stringify(resp.data));
 //        console.info("headers " + JSON.stringify(resp.headers.link));
 
         // add all items from array to annotations-array
@@ -90,7 +90,7 @@ export async function getAnnotationsFromServer(url: string, userId: string, auth
         }
     }).then(a => {
         const end = Date.now();
-        console.info("method=getAnnotationsFromServer annotationsCount=" + a.data.length + " tookMs=" + (end-start));
+        console.info("method=getAnnotationsFromServer annotationsCount={} tookMs={}", a.data.length, (end-start));
         return a;
     });
 }

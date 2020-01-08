@@ -16,26 +16,17 @@ export function updateAnnotations(db: pgPromise.IDatabase<any, any>, annotations
     let promises: any[] = [];
 
     annotations.forEach(a => {
-        //console.info("updating annotation " + JSON.stringify(a));
-        if (validate(a)) {
-            promises.push(db.none(UPSERT_ANNOTATIONS_SQL, {
-                id: a._id,
-                created_at: a.created_at,
-                recorded_at: a.recorded_at,
-                expires_at: a.expires_at,
-                type: a.tags == null ? null : a.tags[0].split(":", 2)[1],
-                geometry: createGeometry(a.location)
-            }));
-        } else {
-            console.error("invalid annotation " + JSON.stringify(a));
-        }
+        promises.push(db.none(UPSERT_ANNOTATIONS_SQL, {
+            id: a._id,
+            created_at: a.created_at,
+            recorded_at: a.recorded_at,
+            expires_at: a.expires_at,
+            type: a.tags == null ? null : a.tags[0].split(":", 2)[1],
+            geometry: createGeometry(a.location)
+        }));
     });
 
     return promises;
-}
-
-function validate(annotation: Annotation) {
-    return annotation.tags != null && annotation.tags.length > 0 && annotation.tags[0].indexOf(":") != -1 && annotation.location != null;
 }
 
 export async function findAllActive(db: pgPromise.IDatabase<any, any>): Promise<any[]> {
