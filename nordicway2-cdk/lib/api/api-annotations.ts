@@ -90,7 +90,7 @@ export async function getAnnotationsFromServer(url: string, userId: string, auth
         }
     }).then(a => {
         const end = Date.now();
-        console.info("method=getAnnotationsFromServer annotationsCount={} tookMs={}", a.data.length, (end-start));
+        console.info("method=getAnnotationsFromServer annotationsCount=%d tookMs=%d", a.data.length, (end-start));
         return a;
     });
 }

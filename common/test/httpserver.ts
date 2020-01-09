@@ -13,6 +13,7 @@ export class TestHttpServer {
 
             if (path in props) {
                 this.debuglog('..url matched');
+                res.setHeader('Access-Control-Allow-Origin', '*');
                 res.writeHead(200);
                 res.end(props[path]());
             } else {

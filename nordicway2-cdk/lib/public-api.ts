@@ -3,18 +3,18 @@ import iam = require('@aws-cdk/aws-iam');
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import {Construct} from "@aws-cdk/core";
+import {Stack} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
+import {createSubscription} from '../../common/stack/subscription';
 
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    stack: Construct,
-    props: Props): string[] {
+    props: Props,
+    stack: Stack): lambda.Function {
     const publicApi = createApi(stack, props);
-    const annotationLambdaNames = createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, stack)
 
-    return annotationLambdaNames;
+    return createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, stack)
 }
 
 function createAnnotationsResource(
@@ -22,28 +22,30 @@ function createAnnotationsResource(
     vpc: ec2.IVpc,
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
-    stack: Construct): string[] {
+    stack: Stack): lambda.Function {
 
-    const getAnnotations = 'GetAnnotations';
-    const getAnnotationsHandler = new lambda.Function(stack, getAnnotations, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: getAnnotations,
+    const functionName = 'NW2-GetAnnotations';
+    const getAnnotationsLambda = new lambda.Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: functionName,
         code: new lambda.AssetCode('dist/lambda/get-annotations'),
-        handler: 'lambda-get-annotations.handler'
+        handler: 'lambda-get-annotations.handler',
     }));
-    const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsHandler);
+    const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsLambda);
     const requests = publicApi.root.addResource("annotations");
     requests.addMethod("GET", getAnnotationsIntegration);
 
-    return [getAnnotations];
+    createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
+
+    return getAnnotationsLambda;
 }
 
-function createApi(stack: Construct, props: Props) {
+function createApi(stack: Stack, props: Props) {
     return new apigateway.RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         },
         restApiName: 'Nordicway2 public API',
-        endpointTypes: [EndpointType.PRIVATE],
+        endpointTypes: [EndpointType.REGIONAL],
         policy: new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
@@ -55,8 +57,10 @@ function createApi(stack: Construct, props: Props) {
                         "*"
                     ],
                     conditions: {
-                        "StringEquals": {
-                            "aws:sourceVpc": props.vpcId
+                        "IpAddress": {
+                            "aws:SourceIp" : [
+                                "185.18.77.12/32"
+                            ]
                         }
                     },
                     principals: [

@@ -1,0 +1,14 @@
+{
+  "name": "digitraffic-lambda-stack",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "dependencies": {
+    "@aws-cdk/core": "1.18.0",
+    "@aws-cdk/aws-logs": "1.18.0",
+    "@aws-cdk/aws-lambda": "1.18.0",
+    "@types/node": "10.17.5"
+  }
+}

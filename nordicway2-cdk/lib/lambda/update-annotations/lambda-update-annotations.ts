@@ -21,11 +21,9 @@ async function getAnnotationsFromServer(timestampFrom: Date, timeStampTo: Date):
         const loginResponse = <LoginResponse> await login(endpointUser, endpointPass, loginUrl);
 
         if(loginResponse.status == "success") {
-            console.info("login successfull!");
-
             return await getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo);
         } else {
-            console.error("Could not login! " + loginResponse);
+            console.error("Could not login! loginResponse=%s ", loginResponse);
         }
     } catch(e) {
         console.error('Error', e);

@@ -42,7 +42,7 @@ function convertFeatures(aa: any[]) {
         };
 
         // convert geometry from db to geojson
-        const geometry = wkx.Geometry.parse(new Buffer(a.location, "hex")).toGeoJSON();
+        const geometry = wkx.Geometry.parse(Buffer.from(a.location, "hex")).toGeoJSON();
 
         return <Feature>{
             id: a.id,
@@ -64,7 +64,7 @@ export async function saveAnnotations(annotations: Annotation[], timeStampTo: Da
         if(validate(a)) {
             validated.push(a);
         } else {
-            console.error("invalid annotation json={}", JSON.stringify(a));
+            console.error("invalid annotation json=%s", JSON.stringify(a));
         }
     })
 
@@ -77,7 +77,7 @@ export async function saveAnnotations(annotations: Annotation[], timeStampTo: Da
         });
     }).then(a => {
         const end = Date.now();
-        console.info("method=saveAnnotations updatedCount={} tookMs={}", a.length, (end-start));
+        console.info("method=saveAnnotations updatedCount=%d tookMs=%d", a.length, (end-start));
     })
 }
 
