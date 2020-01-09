@@ -14,6 +14,7 @@ export class TestHttpServer {
             if (path in props) {
                 this.debuglog('..url matched');
                 res.setHeader('Access-Control-Allow-Origin', '*');
+                res.setHeader('Access-Control-Allow-Headers', 'X-User-Id,X-Auth-Token');
                 res.writeHead(200);
                 res.end(props[path]());
             } else {
