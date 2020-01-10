@@ -59,7 +59,9 @@ function createApi(stack: Stack, props: Props) {
                     conditions: {
                         "IpAddress": {
                             "aws:SourceIp" : [
-                                "185.18.77.12/32"
+                                "185.18.77.12/32",
+                                "109.204.231.81/32",
+                                "46.30.132.132/32"
                             ]
                         }
                     },
