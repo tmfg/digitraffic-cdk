@@ -46,6 +46,7 @@ function createApi(stack: Stack, props: Props) {
         },
         restApiName: 'Nordicway2 public API',
         endpointTypes: [EndpointType.REGIONAL],
+        minimumCompressionSize: 1000,
         policy: new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
