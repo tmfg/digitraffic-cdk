@@ -1,4 +1,4 @@
-declare interface Props {
+interface Props {
 
     accounts: Account[];
     elasticSearchEndpoint: string;
