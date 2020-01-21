@@ -46,6 +46,7 @@ function createApi(stack: Stack, props: Props) {
         },
         restApiName: 'Nordicway2 public API',
         endpointTypes: [EndpointType.REGIONAL],
+        minimumCompressionSize: 1000,
         policy: new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
@@ -59,7 +60,9 @@ function createApi(stack: Stack, props: Props) {
                     conditions: {
                         "IpAddress": {
                             "aws:SourceIp" : [
-                                "185.18.77.12/32"
+                                "185.18.77.12/32",
+                                "109.204.231.81/32",
+                                "46.30.132.132/32"
                             ]
                         }
                     },

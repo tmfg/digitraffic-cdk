@@ -35,6 +35,7 @@ function createFeatureCollection(features: Feature[], lastUpdated: Date | null) 
 function convertFeatures(aa: any[]) {
     return aa.map(a => {
         const properties = <GeoJsonProperties>{
+            id: a.id,
             createdAt: a.created_at,
             recordedAt: a.recorded_at,
             expiresAt: a.expires_at,
@@ -45,7 +46,7 @@ function convertFeatures(aa: any[]) {
         const geometry = wkx.Geometry.parse(Buffer.from(a.location, "hex")).toGeoJSON();
 
         return <Feature>{
-            id: a.id,
+            type: "Feature",
             properties: properties,
             geometry: geometry
         };

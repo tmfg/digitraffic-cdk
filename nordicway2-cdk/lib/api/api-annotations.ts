@@ -38,7 +38,7 @@ export async function getAnnotations(
     const toString = getDateString(timestampTo)
     const annotations = [];
 
-    let url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0&limit=100`;
+    let url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0&limit=100&expired=false`;
 
     do {
         console.info("getting annotations from " + url);
@@ -47,7 +47,6 @@ export async function getAnnotations(
         if (resp.status != 200) {
             throw Error('Fetching annotations failed: ' + resp.statusText);
         }
-
 
 //        console.info("data " + JSON.stringify(resp.data));
 //        console.info("headers " + JSON.stringify(resp.headers.link));
