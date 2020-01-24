@@ -1,13 +1,12 @@
 {
-  "name": "nordicway2-cdk",
+  "name": "cloudfront-cdk",
   "version": "0.1.0",
   "bin": {
-    "open311-cdk": "bin/nordicway2-cdk.js"
+    "cloudfront-cdk": "bin/cloudfront-cdk.js"
   },
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
-    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps --no-minify",
     "watch": "tsc -w",
     "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
@@ -30,13 +29,9 @@
     "typescript": "~3.7.2"
   },
   "dependencies": {
-    "digitraffic-lambda-postgres": "file:../common/postgres",
-    "digitraffic-lambda-stack": "file:../common/stack",
     "@aws-cdk/aws-apigateway": "1.18.0",
     "@aws-cdk/core": "1.18.0",
     "@aws-cdk/aws-events-targets": "1.18.0",
-    "pg-native": "^3.0.0",
-    "pg-promise": "latest",
     "source-map-support": "^0.5.16",
     "axios": "latest",
     "@types/geojson": "latest",
