@@ -9,12 +9,28 @@ export class CloudfrontCdkStack extends cdk.Stack {
             originConfigs: [
                 {
                     customOriginSource: {
-                        domainName: cloudfrontProps.domainName
+                        domainName: cloudfrontProps.nw2DomainName
                     },
-                    behaviors : [ {isDefaultBehavior: true}],
+                    behaviors: [{isDefaultBehavior: true}],
                     originPath: cloudfrontProps.originPath
+                },
+                {
+                    customOriginSource: {
+                        domainName: cloudfrontProps.open311DomainName
+                    },
+                    behaviors: [{isDefaultBehavior: false, pathPattern: "requests/*"},
+                                {isDefaultBehavior: false, pathPattern: "services/*"}],
+                    originPath: cloudfrontProps.originPath
+
                 }
-            ]
-        });
+            ]/*,
+            viewerCertificate: {
+                aliases: [cloudfrontProps.aliasName ],
+                props: {
+                    cloudFrontDefaultCertificate: true
+                }
+            }*/
+        }
+    );
     }
 }
