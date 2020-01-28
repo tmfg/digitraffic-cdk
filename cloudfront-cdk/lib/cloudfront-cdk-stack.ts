@@ -30,7 +30,10 @@ export class CloudfrontCdkStack extends cdk.Stack {
                     cloudFrontDefaultCertificate: true
                 }
             }*/
-        }
-    );
+            }
+        );
+
+        cdk.Tag.add(distribution, 'CloudFront', 'Value');
+
     }
 }
