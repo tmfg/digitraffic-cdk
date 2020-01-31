@@ -3,16 +3,12 @@ import {handler} from "../../../../lib/lambda/get-request/lambda-get-request";
 import {newServiceRequest} from "../../testdata";
 import {ServiceRequestStatus} from "../../../../lib/model/service-request";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
-import {errorMessages} from "../../../../lib/lambda/get-request/lambda-get-request";
+import {NOT_FOUND_MESSAGE} from "../../../../../common/api/errors";
 
 describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
-    test('No request id throws error', async () => {
-        expect(handler({})).rejects.toEqual(new Error(errorMessages.NO_REQUEST_ID));
-    });
-
     test('Unknown request throws error', async () => {
-        expect(handler({ request_id: '123' })).rejects.toEqual(new Error(errorMessages.NOT_FOUND));
+        expect(handler({ request_id: '123' })).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
     });
 
     test('Get', async () => {

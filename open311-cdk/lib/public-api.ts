@@ -7,8 +7,7 @@ import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
-import {errorMessages as getServiceErrorMessages} from "./lambda/get-service/lambda-get-service";
-import {errorMessages as getRequestErrorMessages} from "./lambda/get-request/lambda-get-request";
+import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 import {
     InternalServerErrorResponseTemplate,
     MessageModel,
@@ -21,7 +20,14 @@ export function create(
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct,
     props: Props): string[] {
+
     const publicApi = createApi(stack, props);
+
+    const validator = publicApi.addRequestValidator('DefaultValidator', {
+        validateRequestParameters: true,
+        validateRequestBody: true
+    });
+
     const serviceModel = publicApi.addModel('ServiceModel', {
         contentType: 'application/json',
         modelName: 'ServiceModel',
@@ -53,6 +59,7 @@ export function create(
         }
     });
     const messageResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
+
     const requestLambdaNames = createRequestsResource(publicApi,
         vpc,
         props,
@@ -60,6 +67,7 @@ export function create(
         requestModel,
         requestsModel,
         messageResponseModel,
+        validator,
         stack);
     const serviceLambdaNames = createServicesResource(publicApi,
         vpc,
@@ -68,7 +76,9 @@ export function create(
         serviceModel,
         servicesModel,
         messageResponseModel,
+        validator,
         stack);
+
     return requestLambdaNames.concat(serviceLambdaNames);
 }
 
@@ -80,6 +90,7 @@ function createRequestsResource(
     requestModel: apigateway.Model,
     requestsModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator,
     stack: Construct): string[] {
 
     const requests = publicApi.root.addResource("requests");
@@ -106,7 +117,8 @@ function createRequestsResource(
         requests,
         getRequestHandler,
         requestModel,
-        messageResponseModel);
+        messageResponseModel,
+        validator);
 
     return [getRequestsId, getRequestId];
 }
@@ -116,7 +128,8 @@ function createGetRequestIntegration(
     requests: apigateway.Resource,
     getRequestHandler: lambda.Function,
     requestModel: apigateway.Model,
-    messageResponseModel: apigateway.Model) {
+    messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator) {
 
     const getRequestIntegration = new LambdaIntegration(getRequestHandler, {
         proxy: false,
@@ -131,15 +144,8 @@ function createGetRequestIntegration(
                 statusCode: '200'
             },
             {
-                statusCode: '400',
-                selectionPattern: getRequestErrorMessages.NO_REQUEST_ID,
-                responseTemplates: {
-                    'application/json': 'No request_id specified'
-                }
-            },
-            {
                 statusCode: '404',
-                selectionPattern: getRequestErrorMessages.NOT_FOUND,
+                selectionPattern: NOT_FOUND_MESSAGE,
                 responseTemplates: NotFoundResponseTemplate
             },
             {
@@ -151,6 +157,7 @@ function createGetRequestIntegration(
     });
     const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration, {
+        requestValidator: validator,
         requestParameters: {
             'method.request.path.request_id': true
         },
@@ -159,12 +166,6 @@ function createGetRequestIntegration(
                 statusCode: '200',
                 responseModels: {
                     'application/json': requestModel
-                }
-            },
-            {
-                statusCode: '400',
-                responseModels: {
-                    'application/json': messageResponseModel
                 }
             },
             {
@@ -228,6 +229,7 @@ function createServicesResource(
     serviceModel: apigateway.Model,
     servicesModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator,
     stack: Construct): string[] {
 
     const services = publicApi.root.addResource("services");
@@ -254,7 +256,8 @@ function createServicesResource(
         services,
         getServiceHandler,
         serviceModel,
-        messageResponseModel);
+        messageResponseModel,
+        validator);
 
     return [getServicesId, getServiceId];
 }
@@ -301,7 +304,8 @@ function createGetServiceIntegration(
     services: apigateway.Resource,
     getServiceHandler: lambda.Function,
     serviceModel: apigateway.Model,
-    messageResponseModel: apigateway.Model) {
+    messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator) {
     const getServiceIntegration = new LambdaIntegration(getServiceHandler, {
         proxy: false,
         requestParameters: {
@@ -315,15 +319,8 @@ function createGetServiceIntegration(
                 statusCode: '200'
             },
             {
-                statusCode: '400',
-                selectionPattern: getServiceErrorMessages.NO_SERVICE_ID,
-                responseTemplates: {
-                    'application/json': 'No service_id specified'
-                }
-            },
-            {
                 statusCode: '404',
-                selectionPattern: getServiceErrorMessages.NOT_FOUND,
+                selectionPattern: NOT_FOUND_MESSAGE,
                 responseTemplates: NotFoundResponseTemplate
             },
             {
@@ -335,6 +332,7 @@ function createGetServiceIntegration(
     });
     const service = services.addResource("{service_id}");
     service.addMethod("GET", getServiceIntegration, {
+        requestValidator: validator,
         requestParameters: {
             'method.request.path.service_id': true
         },
@@ -343,12 +341,6 @@ function createGetServiceIntegration(
                 statusCode: '200',
                 responseModels: {
                     'application/json': serviceModel
-                }
-            },
-            {
-                statusCode: '400',
-                responseModels: {
-                    'application/json': messageResponseModel
                 }
             },
             {

@@ -1,12 +1,9 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {find} from "../../db/db-requests";
+import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 
 export const handler = async (event: any) : Promise <any> => {
-    const serviceRequestId = event['request_id'] as string | null;
-
-    if (!serviceRequestId) {
-        throw new Error(errorMessages.NO_REQUEST_ID);
-    }
+    const serviceRequestId = event['request_id'] as string;
 
     const db = initDbConnection(
         process.env.DB_USER as string,
@@ -18,13 +15,8 @@ export const handler = async (event: any) : Promise <any> => {
     db.$pool.end();
 
     if (!request) {
-        throw new Error(errorMessages.NOT_FOUND);
+        throw new Error(NOT_FOUND_MESSAGE);
     }
 
     return request;
-};
-
-export const errorMessages = {
-    NOT_FOUND: 'NOT_FOUND',
-    NO_REQUEST_ID: 'NO_REQUEST_ID'
 };
