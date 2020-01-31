@@ -9,7 +9,7 @@
     "build": "tsc",
     "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
     "watch": "tsc -w",
-    "test": "jest --runInBand",
+    "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
@@ -34,6 +34,7 @@
     "@aws-cdk/aws-apigateway": "latest",
     "@aws-cdk/core": "latest",
     "digitraffic-lambda-postgres": "file:../common/postgres",
+    "digitraffic-cdk-api": "file:../common/api",
     "pg-native": "^3.0.0",
     "pg-promise": "latest",
     "source-map-support": "^0.5.16",

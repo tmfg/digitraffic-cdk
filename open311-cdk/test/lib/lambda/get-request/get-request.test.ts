@@ -3,17 +3,16 @@ import {handler} from "../../../../lib/lambda/get-request/lambda-get-request";
 import {newServiceRequest} from "../../testdata";
 import {ServiceRequestStatus} from "../../../../lib/model/service-request";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
-const testEvent = require('../../test-event');
+import {errorMessages} from "../../../../lib/lambda/get-request/lambda-get-request";
 
 describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
-    test('No request_id - invalid request', async () => {
-        const response = await handler(Object.assign({}, testEvent, {
-            pathParameters: {},
-            body: JSON.stringify(newServiceRequest())
-        }));
+    test('No request id throws error', async () => {
+        expect(handler({})).rejects.toEqual(new Error(errorMessages.NO_REQUEST_ID));
+    });
 
-        expect(response.statusCode).toBe(400);
+    test('Unknown request throws error', async () => {
+        expect(handler({ request_id: '123' })).rejects.toEqual(new Error(errorMessages.NOT_FOUND));
     });
 
     test('Get', async () => {
@@ -22,11 +21,11 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
         });
         await insertServiceRequest(db, [sr]);
 
-        const response = await handler(Object.assign({}, testEvent, {
-            pathParameters: {request_id: sr.service_request_id}
-        }));
+        const response = await handler({
+            request_id: sr.service_request_id
+        });
 
-        expect(response.statusCode).toBe(200);
+        expect(response).toMatchObject(sr);
     });
 
 }));

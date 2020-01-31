@@ -1,8 +1,7 @@
-import {APIGatewayEvent} from 'aws-lambda';
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {findAll} from "../../db/db-services";
 
-export const handler = async (event: APIGatewayEvent): Promise<any> => {
+export const handler = async (): Promise<any> => {
     const db = initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
@@ -13,5 +12,5 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
 
     db.$pool.end();
 
-    return {statusCode: 200, body: JSON.stringify(services)};
+    return services;
 };

@@ -1,27 +1,31 @@
 import * as pgPromise from "pg-promise";
 import {handler} from '../../../../lib/lambda/update-services/lambda-update-services';
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
-import {TestHttpServer} from "../../api-testutil";
+import {TestHttpServer} from "../../../../../common/test/httpserver";
 import {findAllServiceCodes} from "../../../../lib/db/db-services";
+
+const SERVER_PORT = 8089;
 
 process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
-process.env.ENDPOINT_URL = "http://localhost:8089/services";
+process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}/services`;
 
 describe('update-services', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('update', async () => {
         const server = new TestHttpServer();
-        server.listen({
+        server.listen(SERVER_PORT, {
             "/services": () => {
                 return fakeServices();
             }
         });
 
-        await handler();
-        server.close();
-
-        expect((await findAllServiceCodes(db)).map(s => Number(s.service_code))).toMatchObject([171,198,199]);
+        try {
+            await handler();
+            expect((await findAllServiceCodes(db)).map(s => Number(s.service_code))).toMatchObject([171,198,199]);
+        } finally {
+            server.close();
+        }
     });
 
 }));
