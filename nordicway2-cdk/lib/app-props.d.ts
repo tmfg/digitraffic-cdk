@@ -2,7 +2,7 @@
     Example stack configuration interfaces
  */
 
-declare interface Props {
+declare interface NW2Props {
     vpcId: string;
     privateSubnetIds: string[];
     availabilityZones: string[];
@@ -14,7 +14,8 @@ declare interface Props {
         username: string;
         password: string;
         url: string;
-    }
+    },
+    private: boolean
 }
 declare interface DbProps {
     username: string;

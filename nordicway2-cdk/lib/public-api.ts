@@ -10,7 +10,7 @@ import {createSubscription} from '../../common/stack/subscription';
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props,
+    props: NW2Props,
     stack: Stack): lambda.Function {
     const publicApi = createApi(stack, props);
 
@@ -20,7 +20,7 @@ export function create(
 function createAnnotationsResource(
     publicApi: apigateway.RestApi,
     vpc: ec2.IVpc,
-    props: Props,
+    props: NW2Props,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Stack): lambda.Function {
 
@@ -39,13 +39,25 @@ function createAnnotationsResource(
     return getAnnotationsLambda;
 }
 
-function createApi(stack: Stack, props: Props) {
+function getCondition(nw2Props: NW2Props):any {
+    return nw2Props.private ? {
+        "StringEquals": {
+            "aws:sourceVpc": nw2Props.vpcId
+        }
+    } : {
+        "StringEquals": {
+            "aws:RequestTag/CloudFront": "Value"
+        }
+    };
+}
+
+function createApi(stack: Stack, nw2Props: NW2Props) {
     return new apigateway.RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         },
         restApiName: 'Nordicway2 public API',
-        endpointTypes: [EndpointType.REGIONAL],
+        endpointTypes: [nw2Props.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
         minimumCompressionSize: 1000,
         policy: new iam.PolicyDocument({
             statements: [
@@ -57,11 +69,7 @@ function createApi(stack: Stack, props: Props) {
                     resources: [
                         "*"
                     ],
-                    conditions: {
-                        "StringEquals": {
-                            "aws:RequestTag/CloudFront": "Value"
-                        }
-                    },
+                    conditions: getCondition(nw2Props),
                     principals: [
                         new iam.AnyPrincipal()
                     ]
