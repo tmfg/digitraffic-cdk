@@ -6,15 +6,17 @@ export class TestHttpServer {
 
     listen(port: number, props: ListenProperties, debug: boolean = false) {
         this.debug = debug;
-        this.debuglog('Starting test server');
+        this.debuglog(`Starting test server on port ${port}`);
         this.server = http.createServer(((req, res) => {
+            this.debuglog('Mapped urls: ');
+            Object.keys(props).forEach(k => this.debuglog(k));
             this.debuglog('Received request to url ' + req.url + '..');
             const path = require('url').parse(req.url).pathname;
 
             if (path in props) {
                 this.debuglog('..url matched');
                 res.setHeader('Access-Control-Allow-Origin', '*');
-                res.setHeader('Access-Control-Allow-Headers', 'X-User-Id,X-Auth-Token');
+                res.setHeader('Access-Control-Allow-Headers', 'Authorization,X-User-Id,X-Auth-Token');
                 res.writeHead(200);
                 res.end(props[path]());
             } else {

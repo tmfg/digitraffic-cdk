@@ -1,0 +1,1 @@
+export const NOT_FOUND_MESSAGE = 'NOT_FOUND';

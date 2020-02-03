@@ -1,14 +1,9 @@
-import {APIGatewayEvent} from 'aws-lambda';
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {find} from "../../db/db-services";
-import {invalidRequest, notFound} from "../../http-util";
+import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 
-export const handler = async (event: APIGatewayEvent) : Promise <any> => {
-    const serviceserviceId = event.pathParameters?.['service_id'];
-
-    if (!serviceserviceId) {
-        return invalidRequest();
-    }
+export const handler = async (event: any) : Promise <any> => {
+    const serviceId = event['service_id'] as string | null;
 
     const db = initDbConnection(
         process.env.DB_USER as string,
@@ -16,12 +11,12 @@ export const handler = async (event: APIGatewayEvent) : Promise <any> => {
         process.env.DB_URI as string
     );
 
-    const service = await find(db, serviceserviceId);
+    const service = await find(db, serviceId as string);
     db.$pool.end();
 
     if (!service) {
-        return notFound();
+        throw new Error(NOT_FOUND_MESSAGE);
     }
 
-    return {statusCode: 200, body: JSON.stringify(service)};
+    return service;
 };

@@ -2,20 +2,13 @@ import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/get-requests/lambda-get-requests";
 import {newServiceRequest} from "../../testdata";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
-const testEvent = require('../../test-event');
 
 describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
-    test('status is ok', async () => {
-        const response = await handler(testEvent);
-
-        expect(response.statusCode).toBe(200);
-    });
-
     test('no service requests', async () => {
-        const response = await handler(testEvent);
+        const response = await handler();
 
-        expect(JSON.parse(response.body)).toMatchObject([]);
+        expect(response).toMatchObject([]);
     });
 
     test('some service requests', async () => {
@@ -23,9 +16,9 @@ describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newServiceRequest());
         await insertServiceRequest(db, serviceRequests);
 
-        const response = await handler(testEvent);
+        const response = await handler();
 
-        expect(JSON.parse(response.body).length).toBe(serviceRequests.length);
+        expect(response.length).toBe(serviceRequests.length);
     });
 
 }));

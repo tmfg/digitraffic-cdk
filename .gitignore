@@ -51,3 +51,4 @@ cdk.out
 
 # config
 dont-commit-this-props-*.ts
+cdk.context.json
