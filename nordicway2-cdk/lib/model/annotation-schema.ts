@@ -1,21 +1,41 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
 
-const schema: apigateway.JsonSchema = {
+const featureSchema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
-    description: 'NW2 Annotation',
-    required: ['type'],
+    description: 'NW2 Annotation Feature',
+    required: ['type', 'properties', 'geometry'],
     properties: {
         type: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Unique ID of the service request created.',
-            enum: ['FeatureCollection']
+            description: 'Feature',
+            enum: ['Feature']
+        },
+        properties: {
+            oneOf: [{type: apigateway.JsonSchemaType.NULL}, {type: apigateway.JsonSchemaType.OBJECT}]
+        },
+        geometry: {
+            oneOf: [{type: apigateway.JsonSchemaType.NULL}, {type: apigateway.JsonSchemaType.OBJECT}]
         }
-//        features: {
-//            type: apigateway.JsonSchemaType.ARRAY,
-//            items: apigateway.JsonSchemaType.STRING
-//        }
+    }
+}
+
+const annotationsGeoJsonSchema: apigateway.JsonSchema = {
+    schema: apigateway.JsonSchemaVersion.DRAFT4,
+    type: apigateway.JsonSchemaType.OBJECT,
+    description: 'NW2 Annotations GeoJson',
+    required: ['type', 'features'],
+    properties: {
+        type: {
+            type: apigateway.JsonSchemaType.STRING,
+            description: 'FeatureCollection',
+            enum: ['FeatureCollection']
+        },
+        features: {
+            type: apigateway.JsonSchemaType.ARRAY,
+            items: featureSchema
+        }
     }
 };
 
-export default schema;
+export default annotationsGeoJsonSchema;

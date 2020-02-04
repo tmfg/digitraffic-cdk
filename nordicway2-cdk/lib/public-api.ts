@@ -10,7 +10,6 @@ import {createSubscription} from '../../common/stack/subscription';
 import {addServiceModel} from 'digitraffic-cdk-api/utils';
 import {methodResponse, RESPONSE_200_OK, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
-import {createArraySchema} from "../../common/api/utils";
 
 export function create(
     vpc: ec2.IVpc,
@@ -19,8 +18,7 @@ export function create(
     stack: Construct): lambda.Function {
     const publicApi = createApi(stack, props);
 
-    const annotationModel = addServiceModel("AnnotationModel", publicApi, AnnotationSchema);
-    const annotationsModel = addServiceModel("AnnotationsModel", publicApi, createArraySchema(annotationModel, publicApi));
+    const annotationsModel = addServiceModel("AnnotationsModel", publicApi, AnnotationSchema);
 
     return createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, annotationsModel, stack)
 }
