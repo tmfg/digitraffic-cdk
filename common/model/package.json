@@ -1,0 +1,9 @@
+{
+  "name": "digitraffic-cdk-model",
+  "version": "1.0.0",
+  "description": "",
+  "license": "EUPL",
+  "dependencies": {
+    "@aws-cdk/aws-apigateway": "1.22.0"
+  }
+}
