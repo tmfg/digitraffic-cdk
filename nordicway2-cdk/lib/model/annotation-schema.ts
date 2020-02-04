@@ -8,20 +8,23 @@ const annotationsProperties: apigateway.JsonSchema = {
     properties: {
         id: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'FeatureCollection',
-            enum: ['FeatureCollection']
+            description: 'Annotation id'
         },
         type: {
             type: apigateway.JsonSchemaType.STRING,
+            description: 'Annotation type'
         },
         createdAt: {
             type: apigateway.JsonSchemaType.STRING,
+            description: 'Annotation created date time'
         },
         recordedAt: {
             type: apigateway.JsonSchemaType.STRING,
+            description: 'Annotation recorded date time'
         },
         expiresAt: {
             type: apigateway.JsonSchemaType.STRING,
+            description: 'Annotation expires date time'
         }
     }
 };

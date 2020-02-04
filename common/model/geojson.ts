@@ -1,6 +1,7 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
+import {getModelReference} from "../api/utils";
 
-export function featureSchema(propertiesSchema: apigateway.JsonSchema) {
+export function featureSchema(propertiesModel: any, publicApi: apigateway.RestApi) {
     return {
         schema: apigateway.JsonSchemaVersion.DRAFT4,
         type: apigateway.JsonSchemaType.OBJECT,
@@ -13,16 +14,16 @@ export function featureSchema(propertiesSchema: apigateway.JsonSchema) {
                 enum: ['Feature']
             },
             properties: {
-                oneOf: [{type: apigateway.JsonSchemaType.NULL}, propertiesSchema]
+                ref: getModelReference(propertiesModel.modelId, publicApi.restApiId)
             },
             geometry: {
-                oneOf: [{type: apigateway.JsonSchemaType.NULL}, {type: apigateway.JsonSchemaType.OBJECT}]
+                type: apigateway.JsonSchemaType.OBJECT
             }
         }
     };
 }
 
-export function geojsonSchema(propertiesSchema: apigateway.JsonSchema) {
+export function geojsonSchema(propertiesModel: any, publicApi: apigateway.RestApi) {
     return {
         schema: apigateway.JsonSchemaVersion.DRAFT4,
         type: apigateway.JsonSchemaType.OBJECT,
@@ -36,7 +37,9 @@ export function geojsonSchema(propertiesSchema: apigateway.JsonSchema) {
             },
             features: {
                 type: apigateway.JsonSchemaType.ARRAY,
-                items: featureSchema(propertiesSchema)
+                items: {
+                    ref: getModelReference(propertiesModel.modelId, publicApi.restApiId)
+                }
             }
         }
     };
