@@ -9,7 +9,7 @@ import {createSubscription} from '../../common/stack/subscription';
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props,
+    props: NW2Props,
     stack: Stack): lambda.Function {
 
     const functionName = "NW2-UpdateAnnotations";

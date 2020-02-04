@@ -3,18 +3,26 @@ import iam = require('@aws-cdk/aws-iam');
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import {Stack} from "@aws-cdk/core";
+import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
+import {default as AnnotationSchema} from './model/annotation-schema';
 import {createSubscription} from '../../common/stack/subscription';
+import {addServiceModel} from 'digitraffic-cdk-api/utils';
+import {methodResponse, RESPONSE_200_OK, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
+import {MessageModel} from "../../common/api/response";
+import {createArraySchema} from "../../common/api/utils";
 
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: NW2Props,
-    stack: Stack): lambda.Function {
+    stack: Construct): lambda.Function {
     const publicApi = createApi(stack, props);
 
-    return createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, stack)
+    const annotationModel = addServiceModel("AnnotationModel", publicApi, AnnotationSchema);
+    const annotationsModel = addServiceModel("AnnotationsModel", publicApi, createArraySchema(annotationModel, publicApi));
+
+    return createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, annotationsModel, stack)
 }
 
 function createAnnotationsResource(
@@ -22,17 +30,31 @@ function createAnnotationsResource(
     vpc: ec2.IVpc,
     props: NW2Props,
     lambdaDbSg: ec2.ISecurityGroup,
-    stack: Stack): lambda.Function {
+    annotationsModel: any,
+    stack: Construct): lambda.Function {
 
     const functionName = 'NW2-GetAnnotations';
+    const responseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const getAnnotationsLambda = new lambda.Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: new lambda.AssetCode('dist/lambda/get-annotations'),
         handler: 'lambda-get-annotations.handler',
     }));
-    const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsLambda);
+    const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsLambda, {
+        proxy: false,
+        integrationResponses: [
+            RESPONSE_200_OK,
+            RESPONSE_500_SERVER_ERROR
+        ]
+    });
+
     const requests = publicApi.root.addResource("annotations");
-    requests.addMethod("GET", getAnnotationsIntegration);
+    requests.addMethod("GET", getAnnotationsIntegration, {
+        methodResponses: [
+            methodResponse("200", annotationsModel),
+            methodResponse("500", responseModel)
+        ]
+    });
 
     createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
 
@@ -51,7 +73,7 @@ function getCondition(nw2Props: NW2Props):any {
     };
 }
 
-function createApi(stack: Stack, nw2Props: NW2Props) {
+function createApi(stack: Construct, nw2Props: NW2Props) {
     return new apigateway.RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,

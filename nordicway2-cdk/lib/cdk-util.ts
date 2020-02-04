@@ -7,7 +7,7 @@ import * as logs from '@aws-cdk/aws-logs';
 export function dbLambdaConfiguration(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props,
+    props: NW2Props,
     config: object): lambda.FunctionProps {
 
     return <lambda.FunctionProps> Object.assign({}, {
