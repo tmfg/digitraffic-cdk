@@ -37,6 +37,11 @@ export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestS
         zipcode: "123456",
         long: 1,
         lat: 2,
-        media_url: "some url"
+        media_url: "some url",
+        status_id: '123',
+        title: 'some title',
+        service_object_id: 'some service_object_id',
+        service_object_type: 'some service_object_type',
+        media_urls: ['http://example.com', 'http://example.net']
     };
 }

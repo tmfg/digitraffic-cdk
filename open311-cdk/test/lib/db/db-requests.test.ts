@@ -69,7 +69,12 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             address: "other address",
             address_id: "other than 2",
             zipcode: "other than 123456",
-            media_url: "other url"
+            media_url: "other url",
+            status_id: '321',
+            title: 'another title',
+            service_object_id: 'another service_object_id',
+            service_object_type: 'another service_object_type',
+            media_urls: ['http://doesnotexist.lol']
         };
         await update(db, [Object.assign({}, serviceRequest, updatingServiceRequest)]);
         const foundServiceRequests = await findAll(db);
@@ -89,6 +94,11 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         expect(foundServiceRequest.address_id).toBe(updatingServiceRequest.address_id);
         expect(foundServiceRequest.zipcode).toBe(updatingServiceRequest.zipcode);
         expect(foundServiceRequest.media_url).toBe(updatingServiceRequest.media_url);
+        expect(foundServiceRequest.status_id).toBe(updatingServiceRequest.status_id);
+        expect(foundServiceRequest.title).toBe(updatingServiceRequest.title);
+        expect(foundServiceRequest.service_object_id).toBe(updatingServiceRequest.service_object_id);
+        expect(foundServiceRequest.service_object_type).toBe(updatingServiceRequest.service_object_type);
+        expect(foundServiceRequest.media_urls).toMatchObject(updatingServiceRequest.media_urls);
     });
 
     test("update - null geometry doesn't fail", async () => {
