@@ -17,7 +17,8 @@ export function featureSchema(propertiesModel: any, publicApi: apigateway.RestAp
                 ref: getModelReference(propertiesModel.modelId, publicApi.restApiId)
             },
             geometry: {
-                type: apigateway.JsonSchemaType.OBJECT
+                type: apigateway.JsonSchemaType.OBJECT,
+                description: 'GeoJSON geometry'
             }
         }
     };
