@@ -58,7 +58,12 @@ export function insertServiceRequest(db: pgPromise.IDatabase<any, any>, serviceR
                                    address_id,
                                    zipcode,
                                    geometry,
-                                   media_url)
+                                   media_url,
+                                   status_id,
+                                   title,
+                                   service_object_id,
+                                   service_object_type,
+                                   media_urls)
                            VALUES ($(service_request_id),
                                    $(status),
                                    $(status_notes),
@@ -74,7 +79,12 @@ export function insertServiceRequest(db: pgPromise.IDatabase<any, any>, serviceR
                                    $(address_id),
                                    $(zipcode),
                                    ST_POINT($(long), $(lat)),
-                                   $(media_url))`, createEditObject(serviceRequest));
+                                   $(media_url),
+                                   $(status_id),
+                                   $(title),
+                                   $(service_object_id),
+                                   $(service_object_type),
+                                   $(media_urls))`, createEditObject(serviceRequest));
         });
         return t.batch(queries);
     });
