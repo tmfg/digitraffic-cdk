@@ -1,5 +1,6 @@
 import cdk = require('@aws-cdk/core');
 import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront'
+import {createOriginConfig} from "../../common/stack/origin-configs";
 
 export class CloudfrontCdkStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, cloudfrontProps: Props, props?: cdk.StackProps) {
@@ -7,33 +8,13 @@ export class CloudfrontCdkStack extends cdk.Stack {
 
         const distribution = new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
             originConfigs: [
-                {
-                    customOriginSource: {
-                        domainName: cloudfrontProps.nw2DomainName
-                    },
-                    behaviors: [{isDefaultBehavior: true}],
-                    originPath: cloudfrontProps.originPath
-                },
-                {
-                    customOriginSource: {
-                        domainName: cloudfrontProps.open311DomainName
-                    },
-                    behaviors: [{isDefaultBehavior: false, pathPattern: "requests/*"},
-                                {isDefaultBehavior: false, pathPattern: "services/*"}],
-                    originPath: cloudfrontProps.originPath
-
-                }
-            ]/*,
-            viewerCertificate: {
-                aliases: [cloudfrontProps.aliasName ],
-                props: {
-                    cloudFrontDefaultCertificate: true
-                }
-            }*/
-            }
+                createOriginConfig(cloudfrontProps.domains.loadBalancerDomainName, ""),
+                createOriginConfig(cloudfrontProps.domains.fargateDomainName, "", "api/v3/metadata/*"),
+                createOriginConfig(cloudfrontProps.domains.open311DomainName, cloudfrontProps.originPath,  "requests/*", "services/*"),
+                createOriginConfig(cloudfrontProps.domains.nw2DomainName, cloudfrontProps.originPath, "api/v1/annotations/*"),
+            ]}
         );
 
         cdk.Tag.add(distribution, 'CloudFront', 'Value');
-
     }
 }

@@ -11,6 +11,7 @@ import {addServiceModel} from 'digitraffic-cdk-api/utils';
 import {methodResponse, RESPONSE_200_OK, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
+import {getModelReference} from "../../common/api/utils";
 
 export function create(
     vpc: ec2.IVpc,
@@ -20,8 +21,8 @@ export function create(
     const publicApi = createApi(stack, props);
 
     const annotationModel = addServiceModel("AnnotationModel", publicApi, AnnotationSchema);
-    const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(annotationModel, publicApi));
-    const annotationsModel = addServiceModel("AnnotationsModel", publicApi, geojsonSchema(featureModel, publicApi));
+    const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(annotationModel.modelId, publicApi.restApiId)));
+    const annotationsModel = addServiceModel("AnnotationsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
     return createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, annotationsModel, stack)
 }
