@@ -71,6 +71,9 @@ function getCondition(nw2Props: NW2Props):any {
     } : {
         "StringEquals": {
             "aws:RequestTag/CloudFront": "Value"
+        },
+        "ForAllValues:StringEquals": {
+            "aws:TagKeys": "CloudFront"
         }
     };
 }

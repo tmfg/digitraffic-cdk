@@ -11,7 +11,7 @@ export class CloudfrontCdkStack extends cdk.Stack {
                 createOriginConfig(cloudfrontProps.domains.loadBalancerDomainName, ""),
                 createOriginConfig(cloudfrontProps.domains.fargateDomainName, "", "api/v3/metadata/*"),
                 createOriginConfig(cloudfrontProps.domains.open311DomainName, cloudfrontProps.originPath,  "requests/*", "services/*"),
-                createOriginConfig(cloudfrontProps.domains.nw2DomainName, cloudfrontProps.originPath, "api/v1/annotations/*"),
+                createOriginConfig(cloudfrontProps.domains.nw2DomainName, cloudfrontProps.originPath, "annotations"),
             ]}
         );
 
