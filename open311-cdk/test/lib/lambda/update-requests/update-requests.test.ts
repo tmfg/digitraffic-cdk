@@ -1,8 +1,9 @@
 import * as pgPromise from "pg-promise";
 import {handler} from "../../../../lib/lambda/update-requests/lambda-update-requests";
-import {newServiceRequest} from "../../testdata";
+import {newServiceRequest, newServiceRequestWithExtensionsDto} from "../../testdata";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
 import {ServiceRequestStatus} from "../../../../lib/model/service-request";
+import {toServiceRequestWithExtensions} from "../../../../lib/service/requests";
 const testEvent = require('../../test-event');
 
 describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
@@ -25,6 +26,14 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Single service request - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
+            body: JSON.stringify([newServiceRequestWithExtensionsDto()])
+        }));
+
+        expect(response.statusCode).toBe(200);
+    });
+
+    test('Single service request without extended_attributes - created', async () => {
+        const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify([newServiceRequest()])
         }));
 
@@ -33,15 +42,15 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Multiple service requests - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
-            body: JSON.stringify([newServiceRequest(), newServiceRequest(), newServiceRequest()])
+            body: JSON.stringify([newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto()])
         }));
 
         expect(response.statusCode).toBe(200);
     });
 
     test('Single service request update - delete', async () => {
-        const sr = newServiceRequest();
-        await insertServiceRequest(db, [sr]);
+        const sr = newServiceRequestWithExtensionsDto();
+        await insertServiceRequest(db, [toServiceRequestWithExtensions(sr)]);
 
         const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify([Object.assign({}, sr, {
@@ -53,14 +62,15 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('Single service request update - modify', async () => {
-        const sr = newServiceRequest();
-        await insertServiceRequest(db, [sr]);
+        const sr = newServiceRequestWithExtensionsDto();
+        await insertServiceRequest(db, [toServiceRequestWithExtensions(sr)]);
+        const changeSr = {...newServiceRequestWithExtensionsDto(), ...{
+            status: ServiceRequestStatus.open,
+            description: "other description"
+        }};
 
         const response = await handler(Object.assign({}, testEvent, {
-            body: JSON.stringify([Object.assign({}, newServiceRequest(), {
-                status: ServiceRequestStatus.open,
-                description: "other description"
-            })])
+            body: JSON.stringify(changeSr)
         }));
 
         expect(response.statusCode).toBe(200);

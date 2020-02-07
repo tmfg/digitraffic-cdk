@@ -1,4 +1,4 @@
-import {ServiceRequest, ServiceRequestStatus} from "../model/service-request";
+import {ServiceRequest, ServiceRequestStatus, ServiceRequestWithExtensions} from "../model/service-request";
 import * as pgPromise from "pg-promise";
 
 interface ServiceRequestServiceCode {
@@ -9,15 +9,15 @@ export function findServiceCodes(db: pgPromise.IDatabase<any, any>): Promise<Ser
     return db.manyOrNone("SELECT service_code FROM open311_service_request");
 }
 
-export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequest[]> {
+export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
     return db.manyOrNone(SELECT_REQUEST).then(requests => requests.map(r => toServiceRequest(r)));
 }
 
-export function find(db: pgPromise.IDatabase<any, any>, service_request_id: string): Promise<ServiceRequest | null > {
+export function find(db: pgPromise.IDatabase<any, any>, service_request_id: string): Promise<ServiceRequestWithExtensions | null > {
     return db.oneOrNone(`${SELECT_REQUEST} WHERE service_request_id = $1`, service_request_id).then(r => r == null ? null : toServiceRequest(r));
 }
 
-export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequest[]): Promise<void> {
+export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensions[]): Promise<void> {
     return db.tx(t => {
         const queries: any[] = serviceRequests.map(serviceRequest => {
             if (serviceRequest.status == ServiceRequestStatus.closed) {
@@ -118,7 +118,7 @@ const SELECT_REQUEST = `SELECT service_request_id,
                                media_urls
                         FROM open311_service_request`;
 
-function toServiceRequest(r: any): ServiceRequest {
+function toServiceRequest(r: any): ServiceRequestWithExtensions {
     return {
         service_request_id: r.service_request_id,
         status: r.status,
@@ -148,7 +148,7 @@ function toServiceRequest(r: any): ServiceRequest {
 /**
  * Creates an object with all necessary properties for pg-promise
  */
-export function createEditObject(serviceRequest: ServiceRequest): ServiceRequest {
+export function createEditObject(serviceRequest: ServiceRequestWithExtensions): ServiceRequestWithExtensions {
     return Object.assign({
         status_notes: undefined,
         service_name: undefined,
@@ -162,6 +162,11 @@ export function createEditObject(serviceRequest: ServiceRequest): ServiceRequest
         zipcode: undefined,
         long: undefined,
         lat: undefined,
-        media_url: undefined
+        media_url: undefined,
+        status_id: undefined,
+        title: undefined,
+        service_object_id: undefined,
+        service_object_type: undefined,
+        media_urls: undefined
     }, serviceRequest);
 }
