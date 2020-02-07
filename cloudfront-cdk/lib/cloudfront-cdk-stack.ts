@@ -6,14 +6,11 @@ export class CloudfrontCdkStack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, cloudfrontProps: Props, props?: cdk.StackProps) {
         super(scope, id, props);
 
+        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(d.domainName, d.originPath, d.behaviors));
+
         const distribution = new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
-            originConfigs: [
-                createOriginConfig(cloudfrontProps.domains.loadBalancerDomainName, ""),
-                createOriginConfig(cloudfrontProps.domains.fargateDomainName, "", "api/v3/metadata/*"),
-                createOriginConfig(cloudfrontProps.domains.open311DomainName, cloudfrontProps.originPath,  "requests/*", "services/*"),
-                createOriginConfig(cloudfrontProps.domains.nw2DomainName, cloudfrontProps.originPath, "annotations"),
-            ]}
-        );
+            originConfigs: originConfigs
+        });
 
         cdk.Tag.add(distribution, 'CloudFront', 'Value');
     }

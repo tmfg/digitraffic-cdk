@@ -1,4 +1,4 @@
-export function createOriginConfig(domainName: string, originPath: string, ...paths: string[]) {
+export function createOriginConfig(domainName: string, originPath: string, paths: string[]) {
     return {
         customOriginSource: {
             domainName: domainName
@@ -13,11 +13,8 @@ function createBehaviors(paths: string[]) {
         return [{isDefaultBehavior: true}];
     }
 
-    let behaviors: any[] = [];
-
-    paths.forEach(path => {
-        behaviors.push({isDefaultBehavior: false, pathPattern: path})
-    })
-
-    return behaviors;
+    return paths.map(p => ({
+        isDefaultBehavior: false,
+        pathPattern: p
+    }));
 }
