@@ -2,7 +2,8 @@
 
 const props: Props = {
     distributionName: "BetaDistribution",
-    aliasName: "tie-test.digitraffic.fi",
+    aliasNames: null,
+    acmCertRef: null,
     domains: [
         {
             domainName: "xxx.amazonaws.com",

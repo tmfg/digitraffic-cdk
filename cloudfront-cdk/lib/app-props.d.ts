@@ -10,6 +10,7 @@ declare interface Domain {
 
 declare interface Props {
     distributionName: string,
-    aliasName: string,
+    aliasNames: string[] | null,
+    acmCertRef: string | null,
     domains: Domain[]
 }
