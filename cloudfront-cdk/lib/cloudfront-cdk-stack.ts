@@ -1,5 +1,6 @@
 import cdk = require('@aws-cdk/core');
-import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront'
+import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront';
+import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 
@@ -13,7 +14,13 @@ export class CloudfrontCdkStack extends cdk.Stack {
     }
 
     createDistribution(cloudfrontProps: Props) {
-        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(d.domainName, d.originPath, d.behaviors));
+        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(d.domainName, d.originPath, d.protocolPolicy, d.behaviors));
+        const bucket = new Bucket(this, 'logBucket', {
+            versioned: false,
+            bucketName: `${cloudfrontProps.environmentName}-cloudfront-logs`,
+            publicReadAccess: false,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+        });
 
         if(cloudfrontProps.acmCertRef == null) {
             return new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
@@ -24,7 +31,11 @@ export class CloudfrontCdkStack extends cdk.Stack {
 
             return new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
                 originConfigs: originConfigs,
-                aliasConfiguration: aliasConfig
+                aliasConfiguration: aliasConfig,
+                loggingConfig: {
+                    bucket: bucket,
+                    prefix: 'logs'
+                }
             });
         }
     }

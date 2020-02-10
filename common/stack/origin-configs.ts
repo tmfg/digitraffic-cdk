@@ -1,10 +1,11 @@
-export function createOriginConfig(domainName: string, originPath: string, paths: string[]) {
+export function createOriginConfig(domainName: string, originPath: string, protocolPolicy: string, paths: string[]) {
     return {
         customOriginSource: {
             domainName: domainName
         },
         behaviors: createBehaviors(paths),
-        originPath: originPath
+        originPath: originPath,
+        originProtocolPolicy: protocolPolicy
     }
 }
 
