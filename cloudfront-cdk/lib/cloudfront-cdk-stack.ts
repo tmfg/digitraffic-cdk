@@ -14,7 +14,7 @@ export class CloudfrontCdkStack extends cdk.Stack {
     }
 
     createDistribution(cloudfrontProps: Props) {
-        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(d.domainName, d.originPath, d.protocolPolicy, d.behaviors));
+        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(d));
         const bucket = new Bucket(this, 'logBucket', {
             versioned: false,
             bucketName: `${cloudfrontProps.environmentName}-cloudfront-logs`,

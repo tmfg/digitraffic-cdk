@@ -9,7 +9,6 @@ const props: Props = {
         {
             domainName: "xxx.amazonaws.com",
             originPath: "prod",
-            protocolPolicy: "HTTP_ONLY",
             behaviors: [""]
     }]
 };

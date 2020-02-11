@@ -5,7 +5,9 @@
 declare interface Domain {
     domainName: string,
     originPath: string,
-    protocolPolicy: string,
+    protocolPolicy?: string,
+    httpPort?: number,
+    httpsPort?: number,
     behaviors: string[]
 }
 

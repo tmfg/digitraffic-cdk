@@ -1,11 +1,13 @@
-export function createOriginConfig(domainName: string, originPath: string, protocolPolicy: string, paths: string[]) {
+export function createOriginConfig(domain: any) {
     return {
         customOriginSource: {
-            domainName: domainName
+            domainName: domain.domainName,
+            httpPort: domain.httpPort || 80,
+            httpsPort: domain.httpsPort || 443,
         },
-        behaviors: createBehaviors(paths),
-        originPath: originPath,
-        originProtocolPolicy: protocolPolicy
+        behaviors: createBehaviors(domain.behaviors),
+        originPath: domain.originPath,
+        originProtocolPolicy: domain.protocolPolicy || "http-only"
     }
 }
 
