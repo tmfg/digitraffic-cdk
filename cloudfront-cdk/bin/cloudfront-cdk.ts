@@ -9,7 +9,7 @@ import {CloudfrontCdkStack} from "../lib/cloudfront-cdk-stack";
     if (!profileName) {
         throw Error('AWS_PROFILE not set');
     }
-    const profilePropsFile = await import(`./dont-commit-this-props-${profileName}`);
+    const profilePropsFile = await import(`./dont-commit-this-cdk-${profileName}`);
     const profileProps = profilePropsFile['default'];
 
     const app = new cdk.App();

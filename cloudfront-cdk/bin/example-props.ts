@@ -2,9 +2,14 @@
 
 const props: Props = {
     distributionName: "BetaDistribution",
-    aliasName: "tie-test.digitraffic.fi",
-    nw2DomainName: "xxx.amazonaws.com",
-    open311DomainName: "xxx.amzonaws.com",
-    originPath: "/prod"
+    environmentName: "testenv",
+    aliasNames: null,
+    acmCertRef: null,
+    domains: [
+        {
+            domainName: "xxx.amazonaws.com",
+            originPath: "prod",
+            behaviors: [""]
+    }]
 };
 export default props;

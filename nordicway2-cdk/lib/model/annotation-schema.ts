@@ -16,14 +16,17 @@ const annotationsProperties: apigateway.JsonSchema = {
         },
         createdAt: {
             type: apigateway.JsonSchemaType.STRING,
+            format: "date-time",
             description: 'Annotation created date time'
         },
         recordedAt: {
             type: apigateway.JsonSchemaType.STRING,
+            format: "date-time",
             description: 'Annotation recorded date time'
         },
         expiresAt: {
             type: apigateway.JsonSchemaType.STRING,
+            format: "date-time",
             description: 'Annotation expires date time'
         }
     }
