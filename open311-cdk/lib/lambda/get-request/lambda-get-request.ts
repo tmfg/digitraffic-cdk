@@ -9,7 +9,9 @@ export const handler = async (event: GetRequestEvent) : Promise <any> => {
         process.env.DB_URI as string
     );
 
-    const request = await find(event.request_id, event.extensions, db);
+    const request = await find(event.request_id,
+        /true/.test(event.extensions),
+        db);
     db.$pool.end();
 
     if (!request) {
@@ -21,5 +23,5 @@ export const handler = async (event: GetRequestEvent) : Promise <any> => {
 
 interface GetRequestEvent {
     readonly request_id: string,
-    readonly extensions: boolean
+    readonly extensions: string
 }

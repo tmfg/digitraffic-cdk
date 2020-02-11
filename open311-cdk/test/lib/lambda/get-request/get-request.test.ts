@@ -7,7 +7,10 @@ import {NOT_FOUND_MESSAGE} from "../../../../../common/api/errors";
 describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Not found throws error', async () => {
-        expect(handler({ request_id: '123', extensions: false })).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
+        expect(handler({
+            request_id: '123',
+            extensions: 'false'
+        })).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
     });
 
     test('Get with extensions', async () => {
@@ -16,7 +19,7 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 
         const response = await handler({
             request_id: sr.service_request_id,
-            extensions: true
+            extensions: 'true'
         });
 
         expect(response['extended_attributes']).toBeDefined();
@@ -28,7 +31,7 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 
         const response = await handler({
             request_id: sr.service_request_id,
-            extensions: false
+            extensions: 'false'
         });
 
         expect(response['extended_attributes']).toBeUndefined();

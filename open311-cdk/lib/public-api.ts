@@ -134,10 +134,14 @@ function createGetRequestIntegration(
     const getRequestIntegration = new LambdaIntegration(getRequestHandler, {
         proxy: false,
         requestParameters: {
-            'integration.request.path.request_id': 'method.request.path.request_id'
+            'integration.request.path.request_id': 'method.request.path.request_id',
+            'integration.request.querystring.extensions': 'method.request.querystring.extensions'
         },
         requestTemplates: {
-            'application/json': JSON.stringify({request_id: "$util.escapeJavaScript($input.params('request_id'))"})
+            'application/json': JSON.stringify({
+                request_id: "$util.escapeJavaScript($input.params('request_id'))",
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
         },
         integrationResponses: [
             {
@@ -159,7 +163,8 @@ function createGetRequestIntegration(
     request.addMethod("GET", getRequestIntegration, {
         requestValidator: validator,
         requestParameters: {
-            'method.request.path.request_id': true
+            'method.request.path.request_id': true,
+            'method.request.querystring.extensions': false
         },
         methodResponses: [
             {
@@ -193,6 +198,14 @@ function createGetRequestsIntegration(
 
     const getRequestsIntegration = new LambdaIntegration(getRequestsHandler, {
         proxy: false,
+        requestParameters: {
+            'integration.request.querystring.extensions': 'method.request.querystring.extensions'
+        },
+        requestTemplates: {
+            'application/json': JSON.stringify({
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
+        },
         integrationResponses: [
             {
                 statusCode: '200'
@@ -204,6 +217,9 @@ function createGetRequestsIntegration(
         ]
     });
     requests.addMethod("GET", getRequestsIntegration, {
+        requestParameters: {
+            'method.request.querystring.extensions': false
+        },
         methodResponses: [
             {
                 statusCode: '200',
