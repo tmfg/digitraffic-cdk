@@ -21,9 +21,24 @@ export interface ServiceRequest {
     readonly long?: number;
     readonly lat?: number;
     readonly media_url?: string;
+}
+
+export interface ServiceRequestWithExtensions extends ServiceRequest{
     readonly status_id?: string;
     readonly title?: string;
     readonly service_object_id?: string;
     readonly service_object_type?: string;
     readonly media_urls?: string[];
+}
+
+export interface ExtensionsDto {
+    readonly status_id?: string;
+    readonly title?: string;
+    readonly service_object_id?: string;
+    readonly service_object_type?: string;
+    readonly media_urls?: string[];
+}
+
+export interface ServiceRequestWithExtensionsDto extends ServiceRequest {
+    readonly extended_attributes: ExtensionsDto
 }

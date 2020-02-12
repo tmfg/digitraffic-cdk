@@ -8,14 +8,14 @@ const SERVER_PORT = 8089;
 
 process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
-process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}/services`;
+process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
 
 describe('update-services', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('update', async () => {
         const server = new TestHttpServer();
         server.listen(SERVER_PORT, {
-            "/services": () => {
+            "/services.xml": () => {
                 return fakeServices();
             }
         });

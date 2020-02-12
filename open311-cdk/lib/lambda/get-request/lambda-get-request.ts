@@ -1,17 +1,17 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
-import {find} from "../../db/db-requests";
+import {find} from "../../service/requests";
 import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 
-export const handler = async (event: any) : Promise <any> => {
-    const serviceRequestId = event['request_id'] as string;
-
+export const handler = async (event: GetRequestEvent) : Promise <any> => {
     const db = initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string
     );
 
-    const request = await find(db, serviceRequestId);
+    const request = await find(event.request_id,
+        /true/.test(event.extensions),
+        db);
     db.$pool.end();
 
     if (!request) {
@@ -20,3 +20,8 @@ export const handler = async (event: any) : Promise <any> => {
 
     return request;
 };
+
+interface GetRequestEvent {
+    readonly request_id: string,
+    readonly extensions: string
+}

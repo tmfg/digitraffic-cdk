@@ -33,8 +33,9 @@ export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
 export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {
     return db.tx(t => {
        return t.batch([
+           db.none('DELETE FROM open311_service_request'),
+           db.none('DELETE FROM open311_service_request_state'),
            db.none('DELETE FROM open311_service'),
-           db.none('DELETE FROM open311_service_request')
        ]);
     });
 }

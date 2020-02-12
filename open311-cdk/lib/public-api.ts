@@ -2,65 +2,39 @@ import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
-import {EndpointType, LambdaIntegration, Model} from "@aws-cdk/aws-apigateway";
+import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
+import {default as StateSchema} from './model/state-schema';
 import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 import {
     InternalServerErrorResponseTemplate,
     MessageModel,
     NotFoundResponseTemplate
 } from 'digitraffic-cdk-api/response';
-import {getModelReference} from 'digitraffic-cdk-api/utils';
+import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
+import {createSubscription} from "../../common/stack/subscription";
 
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct,
-    props: Props): string[] {
+    props: Props) {
 
     const publicApi = createApi(stack, props);
 
-    const validator = publicApi.addRequestValidator('DefaultValidator', {
-        validateRequestParameters: true,
-        validateRequestBody: true
-    });
+    const validator = addDefaultValidator(publicApi);
 
-    const serviceModel = publicApi.addModel('ServiceModel', {
-        contentType: 'application/json',
-        modelName: 'ServiceModel',
-        schema: ServiceSchema
-    });
-    const servicesModel = publicApi.addModel('ServicesModel', {
-        contentType: 'application/json',
-        modelName: 'ServicesModel',
-        schema: {
-            type: apigateway.JsonSchemaType.ARRAY,
-            items: {
-                ref: getModelReference(serviceModel.modelId, publicApi.restApiId)
-            }
-        }
-    });
-    const requestModel = publicApi.addModel('RequestModel', {
-        contentType: 'application/json',
-        modelName: 'RequestModel',
-        schema: RequestSchema
-    });
-    const requestsModel = publicApi.addModel('RequestsModel', {
-        contentType: 'application/json',
-        modelName: 'RequestsModel',
-        schema: {
-            type: apigateway.JsonSchemaType.ARRAY,
-            items: {
-                ref: getModelReference(requestModel.modelId, publicApi.restApiId)
-            }
-        }
-    });
+    const requestModel = addServiceModel('RequestModel', publicApi, RequestSchema);
+    const requestsModel = addServiceModel('RequestsModel', publicApi, createArraySchema(requestModel, publicApi));
+    const stateModel = addServiceModel('StateModel', publicApi, StateSchema);
+    const serviceModel = addServiceModel('ServiceModel', publicApi, ServiceSchema);
+    const servicesModel = addServiceModel('ServicesModel', publicApi, createArraySchema(serviceModel, publicApi));
     const messageResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
-    const requestLambdaNames = createRequestsResource(publicApi,
+    createRequestsResource(publicApi,
         vpc,
         props,
         lambdaDbSg,
@@ -69,7 +43,15 @@ export function create(
         messageResponseModel,
         validator,
         stack);
-    const serviceLambdaNames = createServicesResource(publicApi,
+    createStatesResource(publicApi,
+        vpc,
+        props,
+        lambdaDbSg,
+        stateModel,
+        messageResponseModel,
+        validator,
+        stack);
+    createServicesResource(publicApi,
         vpc,
         props,
         lambdaDbSg,
@@ -78,8 +60,6 @@ export function create(
         messageResponseModel,
         validator,
         stack);
-
-    return requestLambdaNames.concat(serviceLambdaNames);
 }
 
 function createRequestsResource(
@@ -91,7 +71,7 @@ function createRequestsResource(
     requestsModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct): string[] {
+    stack: Construct) {
 
     const requests = publicApi.root.addResource("requests");
 
@@ -101,6 +81,7 @@ function createRequestsResource(
         code: new lambda.AssetCode('dist/lambda/get-requests'),
         handler: 'lambda-get-requests.handler'
     }));
+    createSubscription(getRequestsHandler, getRequestsId, props.logsDestinationArn, stack);
     createGetRequestsIntegration(getRequestsId,
         requests,
         getRequestsHandler,
@@ -113,14 +94,13 @@ function createRequestsResource(
         code: new lambda.AssetCode('dist/lambda/get-request'),
         handler: 'lambda-get-request.handler'
     }));
+    createSubscription(getRequestHandler, getRequestId, props.logsDestinationArn, stack);
     createGetRequestIntegration(getRequestsId,
         requests,
         getRequestHandler,
         requestModel,
         messageResponseModel,
         validator);
-
-    return [getRequestsId, getRequestId];
 }
 
 function createGetRequestIntegration(
@@ -134,10 +114,14 @@ function createGetRequestIntegration(
     const getRequestIntegration = new LambdaIntegration(getRequestHandler, {
         proxy: false,
         requestParameters: {
-            'integration.request.path.request_id': 'method.request.path.request_id'
+            'integration.request.path.request_id': 'method.request.path.request_id',
+            'integration.request.querystring.extensions': 'method.request.querystring.extensions'
         },
         requestTemplates: {
-            'application/json': JSON.stringify({request_id: "$util.escapeJavaScript($input.params('request_id'))"})
+            'application/json': JSON.stringify({
+                request_id: "$util.escapeJavaScript($input.params('request_id'))",
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
         },
         integrationResponses: [
             {
@@ -159,7 +143,8 @@ function createGetRequestIntegration(
     request.addMethod("GET", getRequestIntegration, {
         requestValidator: validator,
         requestParameters: {
-            'method.request.path.request_id': true
+            'method.request.path.request_id': true,
+            'method.request.querystring.extensions': false
         },
         methodResponses: [
             {
@@ -193,6 +178,14 @@ function createGetRequestsIntegration(
 
     const getRequestsIntegration = new LambdaIntegration(getRequestsHandler, {
         proxy: false,
+        requestParameters: {
+            'integration.request.querystring.extensions': 'method.request.querystring.extensions'
+        },
+        requestTemplates: {
+            'application/json': JSON.stringify({
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
+        },
         integrationResponses: [
             {
                 statusCode: '200'
@@ -204,11 +197,75 @@ function createGetRequestsIntegration(
         ]
     });
     requests.addMethod("GET", getRequestsIntegration, {
+        requestParameters: {
+            'method.request.querystring.extensions': false
+        },
         methodResponses: [
             {
                 statusCode: '200',
                 responseModels: {
                     'application/json': requestsModel
+                }
+            },
+            {
+                statusCode: '500',
+                responseModels: {
+                    'application/json': messageResponseModel
+                }
+            }
+        ]
+    });
+}
+
+function createStatesResource(
+    publicApi: apigateway.RestApi,
+    vpc: ec2.IVpc,
+    props: Props,
+    lambdaDbSg: ec2.ISecurityGroup,
+    stateModel: apigateway.Model,
+    messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator,
+    stack: Construct) {
+
+    const states = publicApi.root.addResource("states");
+
+    const getStatesId = 'GetStates';
+    const getStatesHandler = new lambda.Function(stack, getStatesId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getStatesId,
+        code: new lambda.AssetCode('dist/lambda/get-states'),
+        handler: 'lambda-get-states.handler'
+    }));
+    createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
+    createGetStatesIntegration(states,
+        getStatesHandler,
+        stateModel,
+        messageResponseModel);
+}
+
+function createGetStatesIntegration(
+    states: apigateway.Resource,
+    getStatesHandler: lambda.Function,
+    statesModel: apigateway.Model,
+    messageResponseModel: apigateway.Model) {
+
+    const getServicesIntegration = new LambdaIntegration(getStatesHandler, {
+        proxy: false,
+        integrationResponses: [
+            {
+                statusCode: '200'
+            },
+            {
+                statusCode: '500',
+                responseTemplates: InternalServerErrorResponseTemplate
+            }
+        ]
+    });
+    states.addMethod("GET", getServicesIntegration, {
+        methodResponses: [
+            {
+                statusCode: '200',
+                responseModels: {
+                    'application/json': statesModel
                 }
             },
             {
@@ -230,7 +287,7 @@ function createServicesResource(
     servicesModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct): string[] {
+    stack: Construct) {
 
     const services = publicApi.root.addResource("services");
 
@@ -240,6 +297,7 @@ function createServicesResource(
         code: new lambda.AssetCode('dist/lambda/get-services'),
         handler: 'lambda-get-services.handler'
     }));
+    createSubscription(getServicesHandler, getServicesId, props.logsDestinationArn, stack);
     createGetServicesIntegration(getServicesId,
         services,
         getServicesHandler,
@@ -252,14 +310,13 @@ function createServicesResource(
         code: new lambda.AssetCode('dist/lambda/get-service'),
         handler: 'lambda-get-service.handler'
     }));
+    createSubscription(getServiceHandler, getServiceId, props.logsDestinationArn, stack);
     createGetServiceIntegration(getServiceId,
         services,
         getServiceHandler,
         serviceModel,
         messageResponseModel,
         validator);
-
-    return [getServicesId, getServiceId];
 }
 
 function createGetServicesIntegration(

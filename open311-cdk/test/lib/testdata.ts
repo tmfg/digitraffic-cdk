@@ -1,5 +1,7 @@
-import {ServiceRequest, ServiceRequestStatus} from "../../lib/model/service-request";
+import {ServiceRequestWithExtensionsDto, ServiceRequestStatus, ServiceRequestWithExtensions} from "../../lib/model/service-request";
 import {Service, ServiceType} from "../../lib/model/service";
+import {toServiceRequestWithExtensions} from "../../lib/service/requests";
+import {ServiceRequestState} from "../../lib/model/service-request-state";
 
 export function newService(): Service {
     return {
@@ -13,7 +15,7 @@ export function newService(): Service {
     };
 }
 
-export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestStatus.open): ServiceRequest {
+export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestStatus.open): ServiceRequestWithExtensions {
     const requested_datetime = new Date();
     requested_datetime.setMilliseconds(0);
     const updated_datetime = new Date();
@@ -44,4 +46,15 @@ export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestS
         service_object_type: 'some service_object_type',
         media_urls: ['http://example.com', 'http://example.net']
     };
+}
+
+export function newState(): ServiceRequestState {
+    return {
+      key: Math.random().toFixed(3).split('.')[1],
+      name: Math.random().toFixed(10).split('.')[1]
+    };
+}
+
+export function newServiceRequestWithExtensionsDto(status: ServiceRequestStatus = ServiceRequestStatus.open): ServiceRequestWithExtensionsDto {
+    return toServiceRequestWithExtensions(newServiceRequest(status));
 }
