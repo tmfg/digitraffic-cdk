@@ -7,13 +7,14 @@ import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
+import {default as StateSchema} from './model/state-schema';
 import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 import {
     InternalServerErrorResponseTemplate,
     MessageModel,
     NotFoundResponseTemplate
 } from 'digitraffic-cdk-api/response';
-import {getModelReference} from 'digitraffic-cdk-api/utils';
+import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../common/stack/subscription";
 
 export function create(
@@ -24,41 +25,13 @@ export function create(
 
     const publicApi = createApi(stack, props);
 
-    const validator = publicApi.addRequestValidator('DefaultValidator', {
-        validateRequestParameters: true,
-        validateRequestBody: true
-    });
+    const validator = addDefaultValidator(publicApi);
 
-    const serviceModel = publicApi.addModel('ServiceModel', {
-        contentType: 'application/json',
-        modelName: 'ServiceModel',
-        schema: ServiceSchema
-    });
-    const servicesModel = publicApi.addModel('ServicesModel', {
-        contentType: 'application/json',
-        modelName: 'ServicesModel',
-        schema: {
-            type: apigateway.JsonSchemaType.ARRAY,
-            items: {
-                ref: getModelReference(serviceModel.modelId, publicApi.restApiId)
-            }
-        }
-    });
-    const requestModel = publicApi.addModel('RequestModel', {
-        contentType: 'application/json',
-        modelName: 'RequestModel',
-        schema: RequestSchema
-    });
-    const requestsModel = publicApi.addModel('RequestsModel', {
-        contentType: 'application/json',
-        modelName: 'RequestsModel',
-        schema: {
-            type: apigateway.JsonSchemaType.ARRAY,
-            items: {
-                ref: getModelReference(requestModel.modelId, publicApi.restApiId)
-            }
-        }
-    });
+    const requestModel = addServiceModel('RequestModel', publicApi, RequestSchema);
+    const requestsModel = addServiceModel('RequestsModel', publicApi, createArraySchema(requestModel, publicApi));
+    const stateModel = addServiceModel('StateModel', publicApi, StateSchema);
+    const serviceModel = addServiceModel('ServiceModel', publicApi, ServiceSchema);
+    const servicesModel = addServiceModel('ServicesModel', publicApi, createArraySchema(serviceModel, publicApi));
     const messageResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
     createRequestsResource(publicApi,
@@ -67,6 +40,14 @@ export function create(
         lambdaDbSg,
         requestModel,
         requestsModel,
+        messageResponseModel,
+        validator,
+        stack);
+    createStatesResource(publicApi,
+        vpc,
+        props,
+        lambdaDbSg,
+        stateModel,
         messageResponseModel,
         validator,
         stack);
@@ -224,6 +205,67 @@ function createGetRequestsIntegration(
                 statusCode: '200',
                 responseModels: {
                     'application/json': requestsModel
+                }
+            },
+            {
+                statusCode: '500',
+                responseModels: {
+                    'application/json': messageResponseModel
+                }
+            }
+        ]
+    });
+}
+
+function createStatesResource(
+    publicApi: apigateway.RestApi,
+    vpc: ec2.IVpc,
+    props: Props,
+    lambdaDbSg: ec2.ISecurityGroup,
+    stateModel: apigateway.Model,
+    messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator,
+    stack: Construct) {
+
+    const states = publicApi.root.addResource("states");
+
+    const getStatesId = 'GetStates';
+    const getStatesHandler = new lambda.Function(stack, getStatesId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getStatesId,
+        code: new lambda.AssetCode('dist/lambda/get-states'),
+        handler: 'lambda-get-states.handler'
+    }));
+    createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
+    createGetStatesIntegration(states,
+        getStatesHandler,
+        stateModel,
+        messageResponseModel);
+}
+
+function createGetStatesIntegration(
+    states: apigateway.Resource,
+    getStatesHandler: lambda.Function,
+    statesModel: apigateway.Model,
+    messageResponseModel: apigateway.Model) {
+
+    const getServicesIntegration = new LambdaIntegration(getStatesHandler, {
+        proxy: false,
+        integrationResponses: [
+            {
+                statusCode: '200'
+            },
+            {
+                statusCode: '500',
+                responseTemplates: InternalServerErrorResponseTemplate
+            }
+        ]
+    });
+    states.addMethod("GET", getServicesIntegration, {
+        methodResponses: [
+            {
+                statusCode: '200',
+                responseModels: {
+                    'application/json': statesModel
                 }
             },
             {
