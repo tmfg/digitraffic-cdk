@@ -1,9 +1,9 @@
 import {Construct} from '@aws-cdk/core';
-import * as logs from '@aws-cdk/aws-logs';
-import * as lambda from '@aws-cdk/aws-lambda';
+import {CfnSubscriptionFilter} from '@aws-cdk/aws-logs';
+import {Function} from '@aws-cdk/aws-lambda';
 
-export function createSubscription(lambda: lambda.Function, lambdaName: string, logDestinationArn: string, stack: Construct): logs.CfnSubscriptionFilter {
-    const filter = new logs.CfnSubscriptionFilter(stack, `${lambdaName}LogsSubscription`, {
+export function createSubscription(lambda: Function, lambdaName: string, logDestinationArn: string, stack: Construct): CfnSubscriptionFilter {
+    const filter = new CfnSubscriptionFilter(stack, `${lambdaName}LogsSubscription`, {
             logGroupName: `/aws/lambda/${lambdaName}`,
             filterPattern: '',
             destinationArn: logDestinationArn

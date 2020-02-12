@@ -15,12 +15,11 @@ export function createOriginConfig(domain: any) {
     }
 }
 
-function createOriginHeaders(domain: any) {
+function createOriginHeaders(domain: any): { [key: string] : string } {
     if(domain.apiKey) {
-        var headerMap: { [key: string] : string; } = {};
-        headerMap["x-api-key"] = domain.apiKey;
-
-        return headerMap
+        return {
+            'x-api-key': domain.apiKey
+        } as { [key: string] : string };
     }
 
     return {};

@@ -1,14 +1,14 @@
-import apigateway = require('@aws-cdk/aws-apigateway');
+import {JsonSchemaVersion, JsonSchemaType} from '@aws-cdk/aws-apigateway';
 
 export function featureSchema(modelReference: string) {
     return {
-        schema: apigateway.JsonSchemaVersion.DRAFT4,
-        type: apigateway.JsonSchemaType.OBJECT,
+        schema: JsonSchemaVersion.DRAFT4,
+        type: JsonSchemaType.OBJECT,
         description: 'GeoJson Feature',
         required: ['type', 'properties', 'geometry'],
         properties: {
             type: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: JsonSchemaType.STRING,
                 description: 'Feature',
                 enum: ['Feature']
             },
@@ -16,7 +16,7 @@ export function featureSchema(modelReference: string) {
                 ref: modelReference
             },
             geometry: {
-                type: apigateway.JsonSchemaType.OBJECT,
+                type: JsonSchemaType.OBJECT,
                 description: 'GeoJSON geometry'
             }
         }
@@ -25,18 +25,18 @@ export function featureSchema(modelReference: string) {
 
 export function geojsonSchema(modelReference: string) {
     return {
-        schema: apigateway.JsonSchemaVersion.DRAFT4,
-        type: apigateway.JsonSchemaType.OBJECT,
+        schema: JsonSchemaVersion.DRAFT4,
+        type: JsonSchemaType.OBJECT,
         description: 'GeoJson FeatureCollection',
         required: ['type', 'features'],
         properties: {
             type: {
-                type: apigateway.JsonSchemaType.STRING,
+                type: JsonSchemaType.STRING,
                 description: 'FeatureCollection',
                 enum: ['FeatureCollection']
             },
             features: {
-                type: apigateway.JsonSchemaType.ARRAY,
+                type: JsonSchemaType.ARRAY,
                 items: {
                     ref: modelReference
                 }
