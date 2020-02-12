@@ -12,6 +12,7 @@ import {methodResponse, RESPONSE_200_OK, RESPONSE_500_SERVER_ERROR} from "../../
 import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {getModelReference} from "../../common/api/utils";
+import {createUsagePlan} from "../../common/stack/usage-plans";
 
 export function create(
     vpc: ec2.IVpc,
@@ -19,6 +20,10 @@ export function create(
     props: NW2Props,
     stack: Construct): lambda.Function {
     const publicApi = createApi(stack, props);
+
+    if(!props.private) {
+        createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
+    }
 
     const annotationModel = addServiceModel("AnnotationModel", publicApi, AnnotationSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(annotationModel.modelId, publicApi.restApiId)));
@@ -52,6 +57,7 @@ function createAnnotationsResource(
 
     const requests = publicApi.root.addResource("annotations");
     requests.addMethod("GET", getAnnotationsIntegration, {
+        apiKeyRequired: !props.private,
         methodResponses: [
             methodResponse("200", annotationsModel),
             methodResponse("500", responseModel)
@@ -68,14 +74,7 @@ function getCondition(nw2Props: NW2Props):any {
         "StringEquals": {
             "aws:sourceVpc": nw2Props.vpcId
         }
-    } : {
-        "StringEquals": {
-            "aws:RequestTag/CloudFront": "Value"
-        },
-        "ForAllValues:StringEquals": {
-            "aws:TagKeys": "CloudFront"
-        }
-    };
+    } : {}
 }
 
 function createApi(stack: Construct, nw2Props: NW2Props) {

@@ -1,23 +1,45 @@
+import { Duration } from '@aws-cdk/core';
+import { OriginProtocolPolicy } from '@aws-cdk/aws-cloudfront';
+
 export function createOriginConfig(domain: any) {
     return {
         customOriginSource: {
             domainName: domain.domainName,
             httpPort: domain.httpPort || 80,
             httpsPort: domain.httpsPort || 443,
+            originProtocolPolicy: domain.protocolPolicy || OriginProtocolPolicy.HTTP_ONLY
         },
         behaviors: createBehaviors(domain.behaviors),
         originPath: domain.originPath,
-        originProtocolPolicy: domain.protocolPolicy || "http-only"
+        originHeaders: createOriginHeaders(domain)
     }
 }
 
-function createBehaviors(paths: string[]) {
-    if(paths == null || paths.length == 0) {
-        return [{isDefaultBehavior: true}];
+function createOriginHeaders(domain: any) {
+    if(domain.apiKey) {
+        var headerMap: { [key: string] : string; } = {};
+        headerMap["x-api-key"] = domain.apiKey;
+
+        return headerMap
     }
 
-    return paths.map(p => ({
+    return {};
+}
+
+function createBehaviors(behaviors: any[]) {
+    if(behaviors == null || behaviors.length == 0) {
+        return [{isDefaultBehavior: true, minTtl:Duration.seconds(0), maxTtl:Duration.seconds(0), defaultTtl: Duration.seconds(0), forwardedValues: { queryString: true }} ];
+    }
+
+    return behaviors.map(b => ({
         isDefaultBehavior: false,
-        pathPattern: p
+        pathPattern: b.path,
+        minTtl: Duration.seconds(0),
+        maxTtl: Duration.seconds(b.cacheTtl || 60),
+        defaultTtl: Duration.seconds(b.cacheTtl || 60),
+        forwardedValues: {
+            queryString: true,
+            queryCacheKeys: b.queryCacheKeys
+        }
     }));
 }

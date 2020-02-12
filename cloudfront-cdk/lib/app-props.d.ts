@@ -2,13 +2,20 @@
     Example stack configuration interfaces
  */
 
+declare interface Behavior {
+    path: string,
+    cacheTtl?: number,
+    queryCacheKeys?: string[]
+}
+
 declare interface Domain {
     domainName: string,
     originPath: string,
     protocolPolicy?: string,
     httpPort?: number,
     httpsPort?: number,
-    behaviors: string[]
+    apiKey?: string,
+    behaviors: Behavior[]
 }
 
 declare interface Props {

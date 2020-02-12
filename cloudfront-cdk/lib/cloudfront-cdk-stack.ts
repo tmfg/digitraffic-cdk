@@ -1,16 +1,16 @@
-import cdk = require('@aws-cdk/core');
-import { CloudFrontWebDistribution } from '@aws-cdk/aws-cloudfront';
+import {Stack, StackProps, Construct, Tag} from '@aws-cdk/core';
+import {CloudFrontWebDistribution} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 
-export class CloudfrontCdkStack extends cdk.Stack {
-    constructor(scope: cdk.Construct, id: string, cloudfrontProps: Props, props?: cdk.StackProps) {
+export class CloudfrontCdkStack extends Stack {
+    constructor(scope: Construct, id: string, cloudfrontProps: Props, props?: StackProps) {
         super(scope, id, props);
 
         const distribution = this.createDistribution(cloudfrontProps);
 
-        cdk.Tag.add(distribution, 'CloudFront', 'Value');
+        Tag.add(distribution, 'CloudFront', 'Value');
     }
 
     createDistribution(cloudfrontProps: Props) {

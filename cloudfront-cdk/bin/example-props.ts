@@ -9,7 +9,7 @@ const props: Props = {
         {
             domainName: "xxx.amazonaws.com",
             originPath: "prod",
-            behaviors: [""]
+            behaviors: []
     }]
 };
 export default props;
