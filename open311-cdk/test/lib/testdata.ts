@@ -1,6 +1,7 @@
 import {ServiceRequestWithExtensionsDto, ServiceRequestStatus, ServiceRequestWithExtensions} from "../../lib/model/service-request";
 import {Service, ServiceType} from "../../lib/model/service";
 import {toServiceRequestWithExtensions} from "../../lib/service/requests";
+import {ServiceRequestState} from "../../lib/model/service-request-state";
 
 export function newService(): Service {
     return {
@@ -47,6 +48,12 @@ export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestS
     };
 }
 
+export function newState(): ServiceRequestState {
+    return {
+      key: Math.random().toFixed(3).split('.')[1],
+      name: Math.random().toFixed(10).split('.')[1]
+    };
+}
 
 export function newServiceRequestWithExtensionsDto(status: ServiceRequestStatus = ServiceRequestStatus.open): ServiceRequestWithExtensionsDto {
     return toServiceRequestWithExtensions(newServiceRequest(status));

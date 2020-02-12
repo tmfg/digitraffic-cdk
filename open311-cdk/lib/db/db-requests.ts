@@ -5,8 +5,16 @@ interface ServiceRequestServiceCode {
     readonly service_code: string | null;
 }
 
+interface ServiceRequestStatusId {
+    readonly status_id: string | null;
+}
+
 export function findServiceCodes(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestServiceCode[]> {
     return db.manyOrNone("SELECT service_code FROM open311_service_request");
+}
+
+export function findStateIds(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestStatusId[]> {
+    return db.manyOrNone("SELECT status_id FROM open311_service_request");
 }
 
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
