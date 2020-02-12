@@ -17,8 +17,8 @@ export function create(
     const orphanRequestsFoundTopic = new sns.Topic(stack, 'OrphanRequestsFoundTopic', {
         displayName: 'OrphanRequestsFoundTopic'
     });
-    const missingStatesLambdaTopic = new sns.Topic(stack, 'OrphanRequestsFoundTopic', {
-        displayName: 'OrphanRequestsFoundTopic'
+    const missingStatesLambdaTopic = new sns.Topic(stack, 'MissingStatesFoundTopic', {
+        displayName: 'MissingStatesFoundTopic'
     });
     const checkOrphansLambdaName = createCheckOrphanRequestsLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
     const checkMissingStatesLambdaName = createCheckMissingStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
@@ -44,7 +44,7 @@ function createCheckOrphanRequestsLambda(
     // @ts-ignore
     lambdaConf.environment.ORPHAN_SNS_TOPIC_ARN = orphanRequestsFoundTopic.topicArn;
     const checkOrphansLambda = new lambda.Function(stack, checkOrphanRequestsId, lambdaConf);
-    const rule = new events.Rule(stack, 'Rule', {
+    const rule = new events.Rule(stack, 'CheckOrphanRequestsScheduleRule', {
         schedule: events.Schedule.expression('cron(0 2 * * ? *)')
     });
     rule.addTarget(new targets.LambdaFunction(checkOrphansLambda));
@@ -68,7 +68,7 @@ function createCheckMissingStatesLambda(
     // @ts-ignore
     lambdaConf.environment.ORPHAN_SNS_TOPIC_ARN = topic.topicArn;
     const checkMissingStatesLambda = new lambda.Function(stack, checkMissingStatesId, lambdaConf);
-    const rule = new events.Rule(stack, 'Rule', {
+    const rule = new events.Rule(stack, 'CheckMissingStatesScheduleRule', {
         schedule: events.Schedule.expression('cron(0 2 * * ? *)')
     });
     rule.addTarget(new targets.LambdaFunction(checkMissingStatesLambda));
