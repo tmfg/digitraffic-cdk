@@ -6,13 +6,14 @@ import {Construct} from '@aws-cdk/core';
 import * as sns from '@aws-cdk/aws-sns';
 import {dbLambdaConfiguration} from './cdk-util';
 import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
+import {createSubscription} from "../../common/stack/subscription";
 
 // returns lambda names for log group subscriptions
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct,
-    props: Props): string[] {
+    props: Props) {
 
     const orphanRequestsFoundTopic = new sns.Topic(stack, 'OrphanRequestsFoundTopic', {
         displayName: 'OrphanRequestsFoundTopic'
@@ -20,12 +21,10 @@ export function create(
     const missingStatesLambdaTopic = new sns.Topic(stack, 'MissingStatesFoundTopic', {
         displayName: 'MissingStatesFoundTopic'
     });
-    const checkOrphansLambdaName = createCheckOrphanRequestsLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
-    const checkMissingStatesLambdaName = createCheckMissingStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
-    const updateServicesLambdaName = createUpdateServicesLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
-    const updateStatesLambdaName = createUpdateStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
-
-    return [checkOrphansLambdaName, checkMissingStatesLambdaName, updateServicesLambdaName, updateStatesLambdaName];
+    createCheckOrphanRequestsLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
+    createCheckMissingStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
+    createUpdateServicesLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
+    createUpdateStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
 }
 
 function createCheckOrphanRequestsLambda(
@@ -33,7 +32,7 @@ function createCheckOrphanRequestsLambda(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): string {
+    stack: Construct) {
 
     const checkOrphanRequestsId = 'CheckOrphanRequests';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -44,12 +43,11 @@ function createCheckOrphanRequestsLambda(
     // @ts-ignore
     lambdaConf.environment.ORPHAN_SNS_TOPIC_ARN = orphanRequestsFoundTopic.topicArn;
     const checkOrphansLambda = new lambda.Function(stack, checkOrphanRequestsId, lambdaConf);
+    createSubscription(checkOrphansLambda, checkOrphanRequestsId, props.logsDestinationArn, stack);
     const rule = new events.Rule(stack, 'CheckOrphanRequestsScheduleRule', {
         schedule: events.Schedule.expression('cron(0 2 * * ? *)')
     });
     rule.addTarget(new targets.LambdaFunction(checkOrphansLambda));
-
-    return checkOrphanRequestsId;
 }
 
 function createCheckMissingStatesLambda(
@@ -57,7 +55,7 @@ function createCheckMissingStatesLambda(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): string {
+    stack: Construct) {
 
     const checkMissingStatesId = 'CheckMissingStates';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -68,12 +66,11 @@ function createCheckMissingStatesLambda(
     // @ts-ignore
     lambdaConf.environment.ORPHAN_SNS_TOPIC_ARN = topic.topicArn;
     const checkMissingStatesLambda = new lambda.Function(stack, checkMissingStatesId, lambdaConf);
+    createSubscription(checkMissingStatesLambda, checkMissingStatesId, props.logsDestinationArn, stack);
     const rule = new events.Rule(stack, 'CheckMissingStatesScheduleRule', {
         schedule: events.Schedule.expression('cron(0 2 * * ? *)')
     });
     rule.addTarget(new targets.LambdaFunction(checkMissingStatesLambda));
-
-    return checkMissingStatesId;
 }
 
 function createUpdateServicesLambda(
@@ -81,7 +78,7 @@ function createUpdateServicesLambda(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): string {
+    stack: Construct) {
 
     const updateServicesId = 'UpdateServices';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -96,9 +93,8 @@ function createUpdateServicesLambda(
     // @ts-ignore
     lambdaConf.environment.ENDPOINT_URL = props.integration.url;
     const updateServicesLambda = new lambda.Function(stack, updateServicesId, lambdaConf);
+    createSubscription(updateServicesLambda, updateServicesId, props.logsDestinationArn, stack);
     orphanRequestsFoundTopic.addSubscription(new subscriptions.LambdaSubscription(updateServicesLambda));
-
-    return updateServicesId;
 }
 
 function createUpdateStatesLambda(
@@ -106,7 +102,7 @@ function createUpdateStatesLambda(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): string {
+    stack: Construct) {
 
     const updateStatesId = 'UpdateStates';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -120,8 +116,7 @@ function createUpdateStatesLambda(
     lambdaConf.environment.ENDPOINT_PASS = props.integration.password;
     // @ts-ignore
     lambdaConf.environment.ENDPOINT_URL = props.integration.url;
-    const updateServicesLambda = new lambda.Function(stack, updateStatesId, lambdaConf);
-    topic.addSubscription(new subscriptions.LambdaSubscription(updateServicesLambda));
-
-    return updateStatesId;
+    const updateStatesLambda = new lambda.Function(stack, updateStatesId, lambdaConf);
+    createSubscription(updateStatesLambda, updateStatesId, props.logsDestinationArn, stack);
+    topic.addSubscription(new subscriptions.LambdaSubscription(updateStatesLambda));
 }

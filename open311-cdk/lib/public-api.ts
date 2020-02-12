@@ -2,7 +2,7 @@ import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
-import {EndpointType, LambdaIntegration, Model} from "@aws-cdk/aws-apigateway";
+import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
 import {default as ServiceSchema} from './model/service-schema';
@@ -14,12 +14,13 @@ import {
     NotFoundResponseTemplate
 } from 'digitraffic-cdk-api/response';
 import {getModelReference} from 'digitraffic-cdk-api/utils';
+import {createSubscription} from "../../common/stack/subscription";
 
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct,
-    props: Props): string[] {
+    props: Props) {
 
     const publicApi = createApi(stack, props);
 
@@ -60,7 +61,7 @@ export function create(
     });
     const messageResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
-    const requestLambdaNames = createRequestsResource(publicApi,
+    createRequestsResource(publicApi,
         vpc,
         props,
         lambdaDbSg,
@@ -69,7 +70,7 @@ export function create(
         messageResponseModel,
         validator,
         stack);
-    const serviceLambdaNames = createServicesResource(publicApi,
+    createServicesResource(publicApi,
         vpc,
         props,
         lambdaDbSg,
@@ -78,8 +79,6 @@ export function create(
         messageResponseModel,
         validator,
         stack);
-
-    return requestLambdaNames.concat(serviceLambdaNames);
 }
 
 function createRequestsResource(
@@ -91,7 +90,7 @@ function createRequestsResource(
     requestsModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct): string[] {
+    stack: Construct) {
 
     const requests = publicApi.root.addResource("requests");
 
@@ -101,6 +100,7 @@ function createRequestsResource(
         code: new lambda.AssetCode('dist/lambda/get-requests'),
         handler: 'lambda-get-requests.handler'
     }));
+    createSubscription(getRequestsHandler, getRequestsId, props.logsDestinationArn, stack);
     createGetRequestsIntegration(getRequestsId,
         requests,
         getRequestsHandler,
@@ -113,14 +113,13 @@ function createRequestsResource(
         code: new lambda.AssetCode('dist/lambda/get-request'),
         handler: 'lambda-get-request.handler'
     }));
+    createSubscription(getRequestHandler, getRequestId, props.logsDestinationArn, stack);
     createGetRequestIntegration(getRequestsId,
         requests,
         getRequestHandler,
         requestModel,
         messageResponseModel,
         validator);
-
-    return [getRequestsId, getRequestId];
 }
 
 function createGetRequestIntegration(
@@ -246,7 +245,7 @@ function createServicesResource(
     servicesModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
-    stack: Construct): string[] {
+    stack: Construct) {
 
     const services = publicApi.root.addResource("services");
 
@@ -256,6 +255,7 @@ function createServicesResource(
         code: new lambda.AssetCode('dist/lambda/get-services'),
         handler: 'lambda-get-services.handler'
     }));
+    createSubscription(getServicesHandler, getServicesId, props.logsDestinationArn, stack);
     createGetServicesIntegration(getServicesId,
         services,
         getServicesHandler,
@@ -268,14 +268,13 @@ function createServicesResource(
         code: new lambda.AssetCode('dist/lambda/get-service'),
         handler: 'lambda-get-service.handler'
     }));
+    createSubscription(getServiceHandler, getServiceId, props.logsDestinationArn, stack);
     createGetServiceIntegration(getServiceId,
         services,
         getServiceHandler,
         serviceModel,
         messageResponseModel,
         validator);
-
-    return [getServicesId, getServiceId];
 }
 
 function createGetServicesIntegration(

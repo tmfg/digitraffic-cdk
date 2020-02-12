@@ -5,6 +5,7 @@ import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import {dbLambdaConfiguration} from "./cdk-util";
+import {createSubscription} from "../../common/stack/subscription";
 
 // returns lambda names for log group subscriptions
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props): string[] {
@@ -59,6 +60,7 @@ function createRequestsResource(
         code: new lambda.AssetCode('dist/lambda/update-requests'),
         handler: 'lambda-update-requests.handler'
     }));
+    createSubscription(updateRequestsHandler, updateRequestsId, props.logsDestinationArn, stack);
     const updateRequestsIntegration = new LambdaIntegration(updateRequestsHandler);
     requests.addMethod("POST", updateRequestsIntegration, {
         apiKeyRequired: true

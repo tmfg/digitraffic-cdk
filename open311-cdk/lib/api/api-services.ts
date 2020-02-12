@@ -8,7 +8,7 @@ export async function getServices(
     endpointPass: string,
     endpointUrl: string
 ) {
-    const resp = await axios.get(endpointUrl, {
+    const resp = await axios.get(endpointUrl + '/services.xml', {
         headers: {
             'Accept': 'application/xml'
         },

@@ -6,7 +6,7 @@ export async function getStates(
     endpointPass: string,
     endpointUrl: string
 ): Promise<ServiceRequestState[]> {
-    const resp = await axios.get(endpointUrl, {
+    const resp = await axios.get(endpointUrl + '/states', {
         headers: {
             'Accept': 'application/xml'
         },
