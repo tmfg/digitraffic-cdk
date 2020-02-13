@@ -5,12 +5,13 @@
 declare interface Behavior {
     path: string,
     cacheTtl?: number,
-    queryCacheKeys?: string[]
+    queryCacheKeys?: string[],
+    removePath?: number
 }
 
 declare interface Domain {
     domainName: string,
-    originPath: string,
+    originPath?: string,
     protocolPolicy?: string,
     httpPort?: number,
     httpsPort?: number,
