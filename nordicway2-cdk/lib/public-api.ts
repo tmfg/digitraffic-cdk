@@ -1,7 +1,7 @@
-import apigateway = require('@aws-cdk/aws-apigateway');
-import iam = require('@aws-cdk/aws-iam');
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as ec2 from '@aws-cdk/aws-ec2';
+import {RestApi,MethodLoggingLevel}  from '@aws-cdk/aws-apigateway';
+import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
+import {Function, AssetCode} from '@aws-cdk/aws-lambda';
+import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
@@ -15,10 +15,10 @@ import {getModelReference} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
 
 export function create(
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
+    vpc: IVpc,
+    lambdaDbSg: ISecurityGroup,
     props: NW2Props,
-    stack: Construct): lambda.Function {
+    stack: Construct): Function {
     const publicApi = createApi(stack, props);
 
     if(!props.private) {
@@ -33,18 +33,18 @@ export function create(
 }
 
 function createAnnotationsResource(
-    publicApi: apigateway.RestApi,
-    vpc: ec2.IVpc,
+    publicApi: RestApi,
+    vpc: IVpc,
     props: NW2Props,
-    lambdaDbSg: ec2.ISecurityGroup,
+    lambdaDbSg: ISecurityGroup,
     annotationsModel: any,
-    stack: Construct): lambda.Function {
+    stack: Construct): Function {
 
     const functionName = 'NW2-GetAnnotations';
     const responseModel = publicApi.addModel('MessageResponseModel', MessageModel);
-    const getAnnotationsLambda = new lambda.Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const getAnnotationsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
-        code: new lambda.AssetCode('dist/lambda/get-annotations'),
+        code: new AssetCode('dist/lambda/get-annotations'),
         handler: 'lambda-get-annotations.handler',
     }));
     const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsLambda, {
@@ -55,7 +55,10 @@ function createAnnotationsResource(
         ]
     });
 
-    const requests = publicApi.root.addResource("annotations");
+    const apiResource = publicApi.root.addResource("api");
+    const v1Resource = apiResource.addResource("v1");
+    const nw2Resource = v1Resource.addResource("nw2");
+    const requests = nw2Resource.addResource("annotations");
     requests.addMethod("GET", getAnnotationsIntegration, {
         apiKeyRequired: !props.private,
         methodResponses: [
@@ -78,17 +81,17 @@ function getCondition(nw2Props: NW2Props):any {
 }
 
 function createApi(stack: Construct, nw2Props: NW2Props) {
-    return new apigateway.RestApi(stack, 'Nordicway2-public', {
+    return new RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
-            loggingLevel: apigateway.MethodLoggingLevel.ERROR,
+            loggingLevel: MethodLoggingLevel.ERROR,
         },
         restApiName: 'Nordicway2 public API',
         endpointTypes: [nw2Props.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
         minimumCompressionSize: 1000,
-        policy: new iam.PolicyDocument({
+        policy: new PolicyDocument({
             statements: [
-                new iam.PolicyStatement({
-                    effect: iam.Effect.ALLOW,
+                new PolicyStatement({
+                    effect: Effect.ALLOW,
                     actions: [
                         "execute-api:Invoke"
                     ],
@@ -97,7 +100,7 @@ function createApi(stack: Construct, nw2Props: NW2Props) {
                     ],
                     conditions: getCondition(nw2Props),
                     principals: [
-                        new iam.AnyPrincipal()
+                        new AnyPrincipal()
                     ]
                 })
             ]

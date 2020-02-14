@@ -6,7 +6,6 @@ declare interface Behavior {
     path: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
-    removePath?: number
 }
 
 declare interface Domain {
