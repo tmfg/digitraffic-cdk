@@ -26,7 +26,7 @@ export function create(
 
     const publicApi = createApi(stack, props);
 
-    createUsagePlan(publicApi, 'Open311 CloudFront API Key', 'Open311 CloudFront API Key');
+    createUsagePlan(publicApi, 'Open311 CloudFront API Key', 'Open311 CloudFront Usage Plan');
 
     const validator = addDefaultValidator(publicApi);
 
