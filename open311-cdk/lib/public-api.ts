@@ -16,6 +16,7 @@ import {
 } from 'digitraffic-cdk-api/response';
 import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../common/stack/subscription";
+import {createUsagePlan} from "../../common/stack/usage-plans";
 
 export function create(
     vpc: ec2.IVpc,
@@ -24,6 +25,8 @@ export function create(
     props: Props) {
 
     const publicApi = createApi(stack, props);
+
+    createUsagePlan(publicApi, 'Open311 CloudFront API Key', 'Open311 CloudFront API Key');
 
     const validator = addDefaultValidator(publicApi);
 
