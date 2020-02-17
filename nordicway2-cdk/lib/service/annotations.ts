@@ -36,6 +36,7 @@ function convertFeatures(aa: any[]) {
     return aa.map(a => {
         const properties = <GeoJsonProperties>{
             id: a.id,
+            author: a.author,
             createdAt: a.created_at,
             recordedAt: a.recorded_at,
             expiresAt: a.expires_at,
