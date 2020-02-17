@@ -422,7 +422,7 @@ function createApi(stack: Construct, props: Props) {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         },
         restApiName: 'Open311 public API',
-        endpointTypes: [EndpointType.PRIVATE],
+        endpointTypes: [EndpointType.REGIONAL],
         policy: new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
@@ -433,11 +433,6 @@ function createApi(stack: Construct, props: Props) {
                     resources: [
                         "*"
                     ],
-                    conditions: {
-                        "StringEquals": {
-                            "aws:sourceVpc": props.vpcId
-                        }
-                    },
                     principals: [
                         new iam.AnyPrincipal()
                     ]
