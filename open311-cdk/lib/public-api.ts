@@ -76,7 +76,10 @@ function createRequestsResource(
     validator: apigateway.RequestValidator,
     stack: Construct) {
 
-    const requests = publicApi.root.addResource("requests");
+    const apiResource = publicApi.root.addResource("api");
+    const v1Resource = apiResource.addResource("v1");
+    const open311Resource = v1Resource.addResource("open311");
+    const requests = open311Resource.addResource("requests");
 
     const getRequestsId = 'GetRequests';
     const getRequestsHandler = new lambda.Function(stack, getRequestsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -292,7 +295,10 @@ function createServicesResource(
     validator: apigateway.RequestValidator,
     stack: Construct) {
 
-    const services = publicApi.root.addResource("services");
+    const apiResource = publicApi.root.addResource("api");
+    const v1Resource = apiResource.addResource("v1");
+    const open311Resource = v1Resource.addResource("open311");
+    const services = open311Resource.addResource("services");
 
     const getServicesId = 'GetServices';
     const getServicesHandler = new lambda.Function(stack, getServicesId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
