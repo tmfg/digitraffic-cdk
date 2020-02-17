@@ -16,6 +16,7 @@ import {
 } from 'digitraffic-cdk-api/response';
 import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../common/stack/subscription";
+import {createUsagePlan} from "../../common/stack/usage-plans";
 
 export function create(
     vpc: ec2.IVpc,
@@ -24,6 +25,8 @@ export function create(
     props: Props) {
 
     const publicApi = createApi(stack, props);
+
+    createUsagePlan(publicApi, 'Open311 CloudFront API Key', 'Open311 CloudFront Usage Plan');
 
     const validator = addDefaultValidator(publicApi);
 
@@ -422,7 +425,7 @@ function createApi(stack: Construct, props: Props) {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         },
         restApiName: 'Open311 public API',
-        endpointTypes: [EndpointType.PRIVATE],
+        endpointTypes: [EndpointType.REGIONAL],
         policy: new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
@@ -433,11 +436,6 @@ function createApi(stack: Construct, props: Props) {
                     resources: [
                         "*"
                     ],
-                    conditions: {
-                        "StringEquals": {
-                            "aws:sourceVpc": props.vpcId
-                        }
-                    },
                     principals: [
                         new iam.AnyPrincipal()
                     ]
