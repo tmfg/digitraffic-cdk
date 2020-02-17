@@ -37,7 +37,11 @@ export function create(
     const servicesModel = addServiceModel('ServicesModel', publicApi, createArraySchema(serviceModel, publicApi));
     const messageResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
-    createRequestsResource(publicApi,
+    const apiResource = publicApi.root.addResource("api");
+    const v1Resource = apiResource.addResource("v1");
+    const open311Resource = v1Resource.addResource("open311");
+
+    createRequestsResource(open311Resource,
         vpc,
         props,
         lambdaDbSg,
@@ -46,7 +50,7 @@ export function create(
         messageResponseModel,
         validator,
         stack);
-    createStatesResource(publicApi,
+    createStatesResource(open311Resource,
         vpc,
         props,
         lambdaDbSg,
@@ -54,7 +58,7 @@ export function create(
         messageResponseModel,
         validator,
         stack);
-    createServicesResource(publicApi,
+    createServicesResource(open311Resource,
         vpc,
         props,
         lambdaDbSg,
@@ -66,7 +70,7 @@ export function create(
 }
 
 function createRequestsResource(
-    publicApi: apigateway.RestApi,
+    open311Resource: apigateway.Resource,
     vpc: ec2.IVpc,
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
@@ -76,9 +80,6 @@ function createRequestsResource(
     validator: apigateway.RequestValidator,
     stack: Construct) {
 
-    const apiResource = publicApi.root.addResource("api");
-    const v1Resource = apiResource.addResource("v1");
-    const open311Resource = v1Resource.addResource("open311");
     const requests = open311Resource.addResource("requests");
 
     const getRequestsId = 'GetRequests';
@@ -224,7 +225,7 @@ function createGetRequestsIntegration(
 }
 
 function createStatesResource(
-    publicApi: apigateway.RestApi,
+    open311Resource: apigateway.Resource,
     vpc: ec2.IVpc,
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
@@ -233,7 +234,7 @@ function createStatesResource(
     validator: apigateway.RequestValidator,
     stack: Construct) {
 
-    const states = publicApi.root.addResource("states");
+    const states = open311Resource.addResource("states");
 
     const getStatesId = 'GetStates';
     const getStatesHandler = new lambda.Function(stack, getStatesId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -285,7 +286,7 @@ function createGetStatesIntegration(
 }
 
 function createServicesResource(
-    publicApi: apigateway.RestApi,
+    open311Resource: apigateway.Resource,
     vpc: ec2.IVpc,
     props: Props,
     lambdaDbSg: ec2.ISecurityGroup,
@@ -295,9 +296,6 @@ function createServicesResource(
     validator: apigateway.RequestValidator,
     stack: Construct) {
 
-    const apiResource = publicApi.root.addResource("api");
-    const v1Resource = apiResource.addResource("v1");
-    const open311Resource = v1Resource.addResource("open311");
     const services = open311Resource.addResource("services");
 
     const getServicesId = 'GetServices';
