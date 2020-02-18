@@ -47,7 +47,10 @@ function createRequestsResource(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props): string {
-    const requests = integrationApi.root.addResource("requests");
+    const apiResource = integrationApi.root.addResource("api");
+    const v1Resource = apiResource.addResource("v1");
+    const open311Resource = v1Resource.addResource("open311");
+    const requests = open311Resource.addResource("requests");
 
     const updateRequestsId = 'UpdateRequests';
     const updateRequestsHandler = new lambda.Function(stack, updateRequestsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
