@@ -33,7 +33,7 @@
     "@aws-cdk/aws-logs-destinations": "latest",
     "@aws-cdk/core": "latest",
     "@types/aws-lambda": "latest",
-    "aws-lambda": "^0.1.2",
+    "aws-lambda": "^1.0.5",
     "digitraffic-lambda-postgres": "file:../common/postgres",
     "source-map-support": "^0.5.16"
   }
