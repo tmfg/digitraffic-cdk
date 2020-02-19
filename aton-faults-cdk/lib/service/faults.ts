@@ -22,7 +22,13 @@ function convertFeatures(fa: any[]) {
             fixed_timestamp: a.fixed_timestamp,
             type: a.type,
             domain: a.domain,
-            fixed: a.fixed
+            state: a.state,
+            fixed: a.fixed,
+            aton_id: a.navaid_id,
+            aton_name_fi: a.navaid_name_fi,
+            aton_name_se: a.navaid_name_se,
+            aton_type_fi: a.navaid_type_fi,
+            aton_type_se: a.navaid_type_se,
         };
 
         // convert geometry from db to geojson

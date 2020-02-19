@@ -1,6 +1,6 @@
 ///<reference path="../lib/app-props.d.ts"/>
 
-const props: NavaidFaultsProps = {
+const props: AtonFaultsProps = {
     vpcId: 'some-vpc-id',
     privateSubnetIds: ['some-subnet-id',],
     availabilityZones: ['some-az1'],

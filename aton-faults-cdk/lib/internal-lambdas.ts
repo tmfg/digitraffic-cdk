@@ -9,10 +9,10 @@ import {createSubscription} from '../../common/stack/subscription';
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
-    props: NavaidFaultsProps,
+    props: AtonFaultsProps,
     stack: Stack): Function {
 
-    const functionName = "NAF-UpdateFaults";
+    const functionName = "ATON-UpdateFaults";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-faults'),

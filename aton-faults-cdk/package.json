@@ -1,8 +1,8 @@
 {
-  "name": "navaid-faults-cdk",
+  "name": "aton-faults-cdk",
   "version": "0.1.0",
   "bin": {
-    "navaid-faults-cdk": "bin/navaid-faults-cdk.js"
+    "navaid-faults-cdk": "bin/aton-faults-cdk.js"
   },
   "scripts": {
     "prebuild": "rimraf tsd",

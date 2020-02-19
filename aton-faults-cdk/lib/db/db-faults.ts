@@ -16,7 +16,8 @@ const UPSERT_FAULTS_SQL = "insert into navaid_fault(id, entry_timestamp, fixed_t
     "   fixed_timestamp=${fixed_timestamp}," +
     "   fixed=${fixed}";
 
-const FIND_ALL_SQL = "select id, entry_timestamp, fixed_timestamp, type, domain, fixed, geometry" +
+const FIND_ALL_SQL = "select id, entry_timestamp, fixed_timestamp, type, domain, state, fixed, " +
+    " navaid_id, navaid_name_fi, navaid_name_se, navaid_type_fi, navaid_type_se, geometry" +
     " from navaid_fault";
 
 export async function findAll(db: IDatabase<any, any>) {

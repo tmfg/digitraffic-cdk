@@ -17,12 +17,12 @@ import {createUsagePlan} from "../../common/stack/usage-plans";
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
-    props: NavaidFaultsProps,
+    props: AtonFaultsProps,
     stack: Construct): Function {
     const publicApi = createApi(stack, props);
 
     if(!props.private) {
-        createUsagePlan(publicApi, 'NAF Api Key', 'NAF Usage Plan');
+        createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
     }
 
     const faultModel = addServiceModel("FaultModel", publicApi, FaultSchema);
@@ -35,12 +35,12 @@ export function create(
 function createAnnotationsResource(
     publicApi: RestApi,
     vpc: IVpc,
-    props: NavaidFaultsProps,
+    props: AtonFaultsProps,
     lambdaDbSg: ISecurityGroup,
     annotationsModel: any,
     stack: Construct): Function {
 
-    const functionName = 'NAF-GetFaults';
+    const functionName = 'ATON-GetFaults';
     const responseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const getFaultsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
@@ -57,7 +57,7 @@ function createAnnotationsResource(
 
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
-    const nw2Resource = v1Resource.addResource("nav-aid");
+    const nw2Resource = v1Resource.addResource("aton");
     const requests = nw2Resource.addResource("faults");
     requests.addMethod("GET", getAnnotationsIntegration, {
         apiKeyRequired: !props.private,
@@ -72,12 +72,12 @@ function createAnnotationsResource(
     return getFaultsLambda;
 }
 
-function createApi(stack: Construct, nw2Props: NavaidFaultsProps) {
-    return new RestApi(stack, 'NAF-public', {
+function createApi(stack: Construct, nw2Props: AtonFaultsProps) {
+    return new RestApi(stack, 'ATON-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
         },
-        restApiName: 'NAF public API',
+        restApiName: 'ATON public API',
         endpointTypes: [nw2Props.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
         minimumCompressionSize: 1000,
         policy: new PolicyDocument({

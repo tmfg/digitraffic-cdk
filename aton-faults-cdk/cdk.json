@@ -1,0 +1,3 @@
+{
+  "app": "npx ts-node bin/aton-faults-cdk.ts"
+}
