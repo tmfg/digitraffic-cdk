@@ -12,14 +12,12 @@ export function create(
     props: NavaidFaultsProps,
     stack: Stack): Function {
 
-    const functionName = "NF-UpdateFaults";
+    const functionName = "NAF-UpdateFaults";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-faults'),
         handler: 'lambda-update-faults.handler'
     });
-    // @ts-ignore
-    lambdaConf.environment.ENDPOINT_URLS = props.integration.urls.toString();
 
     const updateFaultsLambda = new Function(stack, 'UpdateFaults', lambdaConf);
 

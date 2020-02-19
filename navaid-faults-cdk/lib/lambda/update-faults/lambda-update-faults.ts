@@ -1,20 +1,27 @@
 import {getFaults} from "../../../api/get-faults";
-import {Fault} from "../../../model/fault";
+import {saveFaults} from "../../service/faults";
+
+// Commercial / Non-Commercial _ Navigation Aids / Navigation Marks
+const integrations = [
+    { domain: 'C_NA', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=kaupvayl_vi_dt&crs=EPSG:4326' },
+    { domain: 'NC_NA', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=muuvayl_vi_dt&crs=EPSG:4326' },
+    { domain: 'C_NM', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=kaupvayl_vlm_vi_dt&crs=EPSG:4326' },
+    { domain: 'NC_NM', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=muuvayl_vlm_vi_dt&crs=EPSG:4326' },
+];
 
 export const handler = async () : Promise <any> => {
     await updateAllFaults();
 };
 
 async function updateAllFaults(): Promise<any> {
-    const urls = (process.env.ENDPOINT_URLS || "").split(',');
+    for(const i of integrations) {
+        const newFaults = await getFaults(i.url);
 
-    for(const url of urls) {
-        const newFaults = await getFaults(url);
-
-        await saveFaults(newFaults);
+        await saveFaults(i.domain, newFaults);
     }
 }
 
-async function saveFaults(faults: Fault[]) {
-    console.info("saving faults " + faults.length);
+interface Integration {
+    url: string,
+    domain: string
 }
