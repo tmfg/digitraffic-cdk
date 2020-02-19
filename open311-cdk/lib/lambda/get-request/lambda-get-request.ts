@@ -2,6 +2,8 @@ import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {find} from "../../service/requests";
 import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 
+const stringTrueRegex = /true/;
+
 export const handler = async (event: GetRequestEvent) : Promise <any> => {
     const db = initDbConnection(
         process.env.DB_USER as string,
@@ -10,7 +12,7 @@ export const handler = async (event: GetRequestEvent) : Promise <any> => {
     );
 
     const request = await find(event.request_id,
-        /true/.test(event.extensions),
+        stringTrueRegex.test(event.extensions),
         db);
     db.$pool.end();
 
