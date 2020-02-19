@@ -4,6 +4,7 @@
   "description": "",
   "license": "EUPL",
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.23.0"
+    "@aws-cdk/aws-apigateway": "1.23.0",
+    "@types/geojson": "latest"
   }
 }

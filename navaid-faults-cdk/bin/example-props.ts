@@ -12,9 +12,6 @@ const props: NavaidFaultsProps = {
     },
     defaultLambdaDurationSeconds: 10,
     logsDestinationArn: 'something-something',
-    integration: {
-        urls: ['http://some.url' ]
-    },
     private: true
 };
 export default props;

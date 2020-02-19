@@ -1,7 +1,6 @@
-import {Fault} from "../model/fault";
 import axios from 'axios';
 
-export async function getFaults(endpointUrl: string): Promise<Fault[]> {
+export async function getFaults(endpointUrl: string): Promise<any[]> {
     const resp = await getFaultsFromServer(endpointUrl);
 
     if (resp.status != 200) {
