@@ -10,10 +10,12 @@ export const handler = async () : Promise <any> => {
         process.env.DB_URI as string
     );
     try {
-        const requestStateIdsPromise = await findStateIds(db);
-        const statesPromise = await findAll(db);
-        const stateKeys = new Set(statesPromise.map(s => s.key));
-        const missingStates = requestStateIdsPromise
+        const requestStateIds = await findStateIds(db);
+        const states = await findAll(db);
+        const stateKeys = new Set(states.map(s => s.key));
+
+        // TODO do in this in the database?
+        const missingStates = requestStateIds
             .map(r => r.status_id)
             .filter(s => s != null && s.length > 0)
             .filter(rsc => !stateKeys.has(rsc as string));

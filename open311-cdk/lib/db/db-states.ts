@@ -1,11 +1,11 @@
-import * as pgPromise from "pg-promise";
+import {IDatabase} from "pg-promise";
 import {ServiceRequestState} from "../model/service-request-state";
 
-export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestState[]> {
-    return db.manyOrNone("SELECT key, name FROM open311_service_request_state ORDER BY key").then(requests => requests.map(r => toServiceRequestState(r)));
+export function findAll(db: IDatabase<any, any>): Promise<ServiceRequestState[]> {
+    return db.manyOrNone("SELECT key, name FROM open311_service_request_state ORDER BY key");
 }
 
-export function update(db: pgPromise.IDatabase<any, any>, states: ServiceRequestState[]): Promise<void> {
+export function update(db: IDatabase<any, any>, states: ServiceRequestState[]): Promise<void> {
     return db.tx(t => {
         const queries: any[] = states.map(state => {
             return t.none(
@@ -18,11 +18,4 @@ export function update(db: pgPromise.IDatabase<any, any>, states: ServiceRequest
         });
         return t.batch(queries);
     });
-}
-
-function toServiceRequestState(r: any): ServiceRequestState {
-    return {
-        key: r.key,
-        name: r.name
-    };
 }

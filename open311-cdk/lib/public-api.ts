@@ -17,6 +17,7 @@ import {
 import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../common/stack/subscription";
 import {createUsagePlan} from "../../common/stack/usage-plans";
+import {methodResponse} from "../../common/api/responses";
 
 export function create(
     vpc: ec2.IVpc,
@@ -154,24 +155,9 @@ function createGetRequestIntegration(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            {
-                statusCode: '200',
-                responseModels: {
-                    'application/json': requestModel
-                }
-            },
-            {
-                statusCode: '404',
-                responseModels: {
-                    'application/json': messageResponseModel
-                }
-            },
-            {
-                statusCode: '500',
-                responseModels: {
-                    'application/json': messageResponseModel
-                }
-            }
+            methodResponse("200", requestModel),
+            methodResponse("404", messageResponseModel),
+            methodResponse("500", messageResponseModel)
         ]
     });
 }
@@ -208,18 +194,8 @@ function createGetRequestsIntegration(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            {
-                statusCode: '200',
-                responseModels: {
-                    'application/json': requestsModel
-                }
-            },
-            {
-                statusCode: '500',
-                responseModels: {
-                    'application/json': messageResponseModel
-                }
-            }
+            methodResponse("200", requestsModel),
+            methodResponse("500", messageResponseModel)
         ]
     });
 }
@@ -269,18 +245,8 @@ function createGetStatesIntegration(
     });
     states.addMethod("GET", getServicesIntegration, {
         methodResponses: [
-            {
-                statusCode: '200',
-                responseModels: {
-                    'application/json': statesModel
-                }
-            },
-            {
-                statusCode: '500',
-                responseModels: {
-                    'application/json': messageResponseModel
-                }
-            }
+            methodResponse("200", statesModel),
+            methodResponse("500", messageResponseModel)
         ]
     });
 }
@@ -347,18 +313,8 @@ function createGetServicesIntegration(
     });
     services.addMethod("GET", getServicesIntegration, {
         methodResponses: [
-            {
-                statusCode: '200',
-                responseModels: {
-                    'application/json': servicesModel
-                }
-            },
-            {
-                statusCode: '500',
-                responseModels: {
-                    'application/json': messageResponseModel
-                }
-            }
+            methodResponse("200", servicesModel),
+            methodResponse("500", messageResponseModel)
         ]
     });
 }
