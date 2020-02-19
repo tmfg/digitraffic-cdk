@@ -2,7 +2,7 @@
 ///<reference path="../lib/app-props.d.ts"/>
 import 'source-map-support/register';
 import cdk = require('@aws-cdk/core');
-import {NavaidFaultsCdkStack} from "../lib/navaid-faults-cdk-stack";
+import {AtonFaultsCdkStack} from "../lib/aton-faults-cdk-stack";
 
 (async () => {
     const profileName = process.env.AWS_PROFILE as string;
@@ -13,6 +13,6 @@ import {NavaidFaultsCdkStack} from "../lib/navaid-faults-cdk-stack";
     const profileProps = profilePropsFile['default'];
 
     const app = new cdk.App();
-    new NavaidFaultsCdkStack(app, 'NavaidFaultsCdkStack', profileProps);
+    new AtonFaultsCdkStack(app, 'atonFaultsCdkStack', profileProps);
     app.synth();
 })();
