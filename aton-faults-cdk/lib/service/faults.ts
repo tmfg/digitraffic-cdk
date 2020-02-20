@@ -1,16 +1,19 @@
+import * as LastUpdatedDB from "../../../common/db/last-updated";
 import * as FaultsDb from "../db/db-faults"
 import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
 import {Geometry} from "wkx";
-import {createFeatureCollection} from "../../../common/api/geojson"
+import {createFeatureCollection} from "../../../common/api/geojson";
+
+const ATON_DATA_TYPE = "ATON_FAULTS";
 
 export async function findAllFaults(): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
         const annotations = await FaultsDb.findAll(db).then(convertFeatures);
-        //const lastUpdated = await LastUpdatedDB.getLastUpdated(db);
+        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
-        return createFeatureCollection(annotations, null);
+        return createFeatureCollection(annotations, lastUpdated);
     });
 }
 
@@ -24,11 +27,17 @@ function convertFeatures(fa: any[]) {
             domain: a.domain,
             state: a.state,
             fixed: a.fixed,
-            aton_id: a.navaid_id,
-            aton_name_fi: a.navaid_name_fi,
-            aton_name_se: a.navaid_name_se,
-            aton_type_fi: a.navaid_type_fi,
-            aton_type_se: a.navaid_type_se,
+            aton_id: a.aton_id,
+            aton_name_fi: a.aton_name_fi,
+            aton_name_se: a.aton_name_se,
+            aton_type_fi: a.aton_type_fi,
+            aton_type_se: a.aton_type_se,
+            fairway_number: a.fairway_number,
+            fairway_name_fi: a.fairway_name_fi,
+            fairway_name_se: a.fairway_name_se,
+            area_number: a.area_number,
+            area_description_fi: a.area_description_fi,
+            area_description_se: a.area_description_se
         };
 
         // convert geometry from db to geojson
@@ -48,7 +57,8 @@ export async function saveFaults(domain: string, newFaults: any[]) {
     await inDatabase(async (db: IDatabase<any,any>) => {
         return await db.tx(t => {
             return t.batch(
-                FaultsDb.updateFaults(db, domain, newFaults)
+                FaultsDb.updateFaults(db, domain, newFaults),
+                LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start))
             );
         });
     }).then(a => {

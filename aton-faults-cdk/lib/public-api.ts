@@ -67,7 +67,9 @@ function createAnnotationsResource(
         ]
     });
 
-    createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
+    if(props.logsDestinationArn) {
+        createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
+    }
 
     return getFaultsLambda;
 }

@@ -1,0 +1,13 @@
+{
+  "name": "digitraffic-lambda-db",
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "private": true,
+  "dependencies": {
+    "pg-native": "^3.0.0",
+    "pg-promise": "^10.3.1",
+    "@types/node": "10.17.5"
+  }
+}

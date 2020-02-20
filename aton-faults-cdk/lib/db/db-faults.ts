@@ -3,12 +3,12 @@ import {createGeometry} from "../../../common/postgres/geometry";
 
 let moment = require('moment');
 
-const UPSERT_FAULTS_SQL = "insert into navaid_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, " +
-    "navaid_id, navaid_name_fi, navaid_name_se, navaid_type_fi, navaid_type_se, " +
+const UPSERT_FAULTS_SQL = "insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, " +
+    "aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se, " +
     "fairway_number, fairway_name_fi, fairway_name_se," +
     "area_number, area_description_fi, area_description_se, geometry)" +
     " values(${id}, ${entry_timestamp}, ${fixed_timestamp}, ${state}, ${type}, ${domain}, ${fixed}, " +
-    " ${navaid_id},${navaid_name_fi}, ${navaid_name_se}, ${navaid_type_fi}, ${navaid_type_se}," +
+    " ${aton_id},${aton_name_fi}, ${aton_name_se}, ${aton_type_fi}, ${aton_type_se}," +
     "  ${fairway_number}, ${fairway_name_fi}, ${fairway_name_se}, " +
     " ${area_number}, ${area_description_fi}, ${area_description_se}, ${geometry})" +
     " on conflict(id)" +
@@ -17,8 +17,9 @@ const UPSERT_FAULTS_SQL = "insert into navaid_fault(id, entry_timestamp, fixed_t
     "   fixed=${fixed}";
 
 const FIND_ALL_SQL = "select id, entry_timestamp, fixed_timestamp, type, domain, state, fixed, " +
-    " navaid_id, navaid_name_fi, navaid_name_se, navaid_type_fi, navaid_type_se, geometry" +
-    " from navaid_fault";
+    " aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se, " +
+    " fairway_number, fairway_name_fi, fairway_name_se, area_number, area_description_fi, area_description_se, geometry" +
+    " from aton_fault";
 
 export async function findAll(db: IDatabase<any, any>) {
     return await db.manyOrNone(FIND_ALL_SQL);
@@ -39,11 +40,11 @@ export function updateFaults(db: IDatabase<any, any>, domain: string, faults: an
             type: p.FAULT_TYPE,
             domain: domain,
             fixed: p.FAULT_FIXED == 1 ? true : false,
-            navaid_id: p.TL_NUMERO,
-            navaid_name_fi: p.TL_NIMI_FI,
-            navaid_name_se: p.TL_NIMI_SE,
-            navaid_type_fi: p.TL_TYYPPI_FI,
-            navaid_type_se: p.TL_TYYPPI_SE,
+            aton_id: p.TL_NUMERO,
+            aton_name_fi: p.TL_NIMI_FI,
+            aton_name_se: p.TL_NIMI_SE,
+            aton_type_fi: p.TL_TYYPPI_FI,
+            aton_type_se: p.TL_TYYPPI_SE,
             fairway_number: p.VAYLA_JNRO,
             fairway_name_fi: p.VAYLA_NIMI_FI,
             fairway_name_se: p.VAYLA_NIMI_SE,
