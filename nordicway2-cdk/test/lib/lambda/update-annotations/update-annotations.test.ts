@@ -1,6 +1,6 @@
 import {handler} from "../../../../lib/lambda/update-annotations/lambda-update-annotations";
 import {testBase} from "../../db-testutil";
-import {findAllActiveAnnotations, findAllAnnotations} from "../../../../lib/service/annotations";
+import {findActiveAnnotations, findAllAnnotations} from "../../../../lib/service/annotations";
 import {TestHttpServer} from "../../../../../common/test/httpserver";
 
 const SERVER_PORT = 8089;
@@ -30,11 +30,18 @@ describe('update-annotations', testBase(async () => {
                expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
             }
 
-            const activeAnnotations = await findAllActiveAnnotations();
+            const activeAnnotations = await findActiveAnnotations(null, null);
             expect(activeAnnotations.features).toHaveLength(1);
             if (annotations.features[0].properties != null) {
                 expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
             }
+
+            const testUserAnnotations = await findActiveAnnotations('testuser', null);
+            expect(testUserAnnotations.features).toHaveLength(1);
+
+            const vioniceAnnotations = await findActiveAnnotations('vionice', null);
+            expect(vioniceAnnotations.features).toHaveLength(0);
+
         } finally {
             server.close();
         }
@@ -96,7 +103,7 @@ function fakeAnnotations() {
   {
     "_id": "test2",
     "user": "vionice",
-    "author": "vionice",
+    "author": "testuser",
     "address": [],
     "created_at": "2019-12-10T13:02:34.681Z",
     "tags": [
@@ -113,6 +120,7 @@ function fakeAnnotations() {
     "resolved": false,
     "image_url": null,
     "recorded_at": "2019-12-10T12:48:04.955Z",
+    "expires_at": "2119-12-10T13:48:01.955Z",
     "location": {
       "type": "Point",
       "coordinates": [

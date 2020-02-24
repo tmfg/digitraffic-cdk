@@ -1,9 +1,10 @@
 import * as pgPromise from "pg-promise";
-import {Annotation,Location} from "../model/annotations";
+import {Annotation} from "../model/annotations";
+import {createGeometry} from "../../../common/postgres/geometry";
 
 const FIND_ALL_SQL = "select id, author, created_at, recorded_at, expires_at, type, location from nw2_annotation";
-const FIND_ALL_ACTIVE_SQL = "select id, author, created_at, recorded_at, expires_at, type, location from nw2_annotation " +
-    "where expires_at is null or expires_at > current_timestamp";
+const FIND_ACTIVE_SQL = "select id, author, created_at, recorded_at, expires_at, type, location from nw2_annotation" +
+    " where expires_at is null or expires_at > current_timestamp";
 
 const UPSERT_ANNOTATIONS_SQL = "insert into nw2_annotation(id, author, created_at, recorded_at, expires_at, type, location)" +
     "values(${id},${author},${created_at},${recorded_at},${expires_at},${type},${geometry}) " +
@@ -22,7 +23,7 @@ export function updateAnnotations(db: pgPromise.IDatabase<any, any>, annotations
             created_at: a.created_at,
             recorded_at: a.recorded_at,
             expires_at: a.expires_at,
-            type: a.tags == null ? null : a.tags[0].split(":", 2)[1],
+            type: getTypeFromTags(a.tags),
             geometry: createGeometry(a.location)
         }));
     });
@@ -30,31 +31,33 @@ export function updateAnnotations(db: pgPromise.IDatabase<any, any>, annotations
     return promises;
 }
 
-export async function findAllActive(db: pgPromise.IDatabase<any, any>): Promise<any[]> {
-    return await db.manyOrNone(FIND_ALL_ACTIVE_SQL);
+function getTypeFromTags(tags: string[]|null) {
+    if(tags == null) {
+        return null;
+    }
+    const first = tags[0];
+
+    // somethingIrrelevant:TYPE
+    if(first.indexOf(':') > 0) {
+        return first.split(":", 2)[1];
+    }
+
+    // just plain TYPE
+    return first;
+}
+
+export async function findActive(db: pgPromise.IDatabase<any, any>, author: string|null, type: string|null): Promise<any[]> {
+    let sql = FIND_ACTIVE_SQL;
+
+    if(author) sql+= ' and author=${author}';
+    if(type) sql+= ' and type=${type}';
+
+    return await db.manyOrNone(sql, {
+        author: author,
+        type: type
+    });
 }
 
 export async function findAll(db: pgPromise.IDatabase<any, any>): Promise<any[]> {
     return await db.manyOrNone(FIND_ALL_SQL);
-}
-
-function createGeometry(location: Location): string {
-//    console.info("location:" + JSON.stringify(location));
-
-    if(location.type == 'LineString') {
-        const coordinates = location.coordinates.map((c: any) =>  coordinatePair(c)).join(',');
-
-        return `LINESTRING(${coordinates})`;
-    } else if (location.type == 'Point') {
-        const coordinates = coordinatePair(location.coordinates);
-
-        return `POINT(${coordinates})`;
-    }
-
-    console.error("unsupported locationType=", location.type);
-    return "";
-}
-
-function coordinatePair(coordinate: [number, number, number]) {
-    return `${coordinate[0]} ${coordinate[1]}`;
 }

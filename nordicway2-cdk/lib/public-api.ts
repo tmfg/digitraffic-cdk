@@ -49,6 +49,16 @@ function createAnnotationsResource(
     }));
     const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsLambda, {
         proxy: false,
+        requestParameters: {
+            'integration.request.querystring.author': 'method.request.querystring.author',
+            'integration.request.querystring.type': 'method.request.querystring.type',
+        },
+        requestTemplates: {
+            'application/json': JSON.stringify({
+                author: "$util.escapeJavaScript($input.params('author'))",
+                type: "$util.escapeJavaScript($input.params('type'))"}
+                )
+        },
         integrationResponses: [
             RESPONSE_200_OK,
             RESPONSE_500_SERVER_ERROR
@@ -61,6 +71,10 @@ function createAnnotationsResource(
     const requests = nw2Resource.addResource("annotations");
     requests.addMethod("GET", getAnnotationsIntegration, {
         apiKeyRequired: !props.private,
+        requestParameters: {
+            'method.request.querystring.author': false,
+            'method.request.querystring.type': false
+        },
         methodResponses: [
             methodResponse("200", annotationsModel),
             methodResponse("500", responseModel)

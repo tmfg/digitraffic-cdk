@@ -1,3 +1,5 @@
+import {Location} from "../../../common/postgres/geometry";
+
 export interface Annotation {
     _id: string,
     author: string,
@@ -6,9 +8,4 @@ export interface Annotation {
     expires_at: Date | null,
     tags: string[],
     location: Location
-}
-
-export interface Location {
-    type: string,
-    coordinates: any
 }

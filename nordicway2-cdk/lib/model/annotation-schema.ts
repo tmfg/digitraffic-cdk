@@ -4,30 +4,29 @@ const annotationsProperties: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
     description: 'NW2 Annotations GeoJson',
-    required: ['id', 'type', 'createdAt', 'recordedAt'],
     properties: {
         id: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Annotation id'
+            description: 'Id'
         },
         type: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Annotation type'
+            description: 'type'
         },
         createdAt: {
             type: apigateway.JsonSchemaType.STRING,
             format: "date-time",
-            description: 'Annotation created date time'
+            description: 'Created date time'
         },
         recordedAt: {
             type: apigateway.JsonSchemaType.STRING,
             format: "date-time",
-            description: 'Annotation recorded date time'
+            description: 'Recorded date time'
         },
         expiresAt: {
             type: apigateway.JsonSchemaType.STRING,
             format: "date-time",
-            description: 'Annotation expires date time'
+            description: 'Expires date time'
         }
     }
 };
