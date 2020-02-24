@@ -1,20 +1,85 @@
 import * as LastUpdatedDB from "../../../common/db/last-updated";
-import * as FaultsDb from "../db/db-faults"
+import * as FaultsDB from "../db/db-faults"
 import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
 import {Geometry} from "wkx";
 import {createFeatureCollection} from "../../../common/api/geojson";
+import {create, fragment} from "xmlbuilder2";
 
 const ATON_DATA_TYPE = "ATON_FAULTS";
+const S124_NAMESPACE = "http://www.iho.int/S124/gml/1.0";
+const GML_NAMESPACE = "http://www.opengis.net/gml/3.2";
 
 export async function findAllFaults(): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        const annotations = await FaultsDb.findAll(db).then(convertFeatures);
+        const annotations = await FaultsDB.findAll(db).then(convertFeatures);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
         return createFeatureCollection(annotations, lastUpdated);
     });
+}
+
+export async function findAllFaultsS124(): Promise<String> {
+    return await inDatabase(async (db: IDatabase<any,any>) => {
+        const faults = await FaultsDB.findAll(db);
+
+        return createXmlDocument(faults);
+    });
+}
+
+function createXmlDocument(faults: any[]) {
+    const root = create({version: '1.0', encoding: 'UTF-8', namespaceAlias: {
+            'S124' : S124_NAMESPACE
+        }});
+
+    const datasets = root.ele('DataSets');
+
+    faults.forEach(f => {
+        datasets.import(createS124(f));
+    });
+
+    return {
+        body: root.end()
+    }
+}
+
+function createS124(fault: any) {
+    const faultId = -fault.id;
+    const year = fault.entry_timestamp.getFullYear() - 2000;
+
+    const id = `FI.${faultId}.${year}`;
+    const urn = `urn:mrn:s124:NW:${id}.P`;
+
+    return fragment()
+        .ele(S124_NAMESPACE, 'DataSet')
+            .ele('imember')
+                .ele(S124_NAMESPACE, 'S124_Preamble')
+                    .att(GML_NAMESPACE, 'id', 'PR,' + id)
+                    .ele({id: urn})
+                    .ele(createMessageSeriesIdentifier(faultId, year))
+                .up()
+            .up()
+            .ele('member')
+                .ele(S124_NAMESPACE, 'S124_NavigationalWarningPart')
+                    .att(GML_NAMESPACE, 'id', 'NW.' + id + '.1')
+                .ele({id: urn + '.1'})
+            .up()
+        .up();
+}
+
+function createMessageSeriesIdentifier(faultId: any, year: number) {
+    return fragment()
+        .ele('messageSeriesIdentifier')
+            .ele('NameOfSeries').txt('moi')
+            .ele('typeOfWarning').txt('local')
+            .ele('warningNumber').txt(faultId)
+            .ele('year').txt(year.toString())
+            .ele('productionAgency')
+                .ele('language').txt('eng')
+                .ele('text').txt('Finnish Maritime Agency')
+                .up()
+            .ele('country').txt('fi')
 }
 
 function convertFeatures(fa: any[]) {
@@ -57,7 +122,8 @@ export async function saveFaults(domain: string, newFaults: any[]) {
     await inDatabase(async (db: IDatabase<any,any>) => {
         return await db.tx(t => {
             return t.batch(
-                FaultsDb.updateFaults(db, domain, newFaults),
+                FaultsDB.updateFaults(db, domain, newFaults),
+
                 LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start))
             );
         });

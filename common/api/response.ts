@@ -20,18 +20,25 @@ export const MessageModel = {
 
 const NotFoundMessage = 'Not found';
 const NotFoundResponse = JSON.stringify({message: NotFoundMessage});
+
 export const NotFoundResponseTemplate = {
     'application/json': NotFoundResponse
 };
 
 const InternalServerErrorMessage = 'Error';
 const InternalServerErrorResponse = JSON.stringify({message: InternalServerErrorMessage});
+
 export const InternalServerErrorResponseTemplate = {
     'application/json': InternalServerErrorResponse
 };
 
 const BadRequestMessage = 'Bad request';
 const BadRequestResponse = JSON.stringify({message: BadRequestMessage});
+
 export const BadRequestResponseTemplate = {
     'application/json': BadRequestResponse
 };
+
+export const XmlResponseTemplate = {
+    'application/xml': "$input.path('$').body"
+}

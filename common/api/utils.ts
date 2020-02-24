@@ -11,11 +11,20 @@ export function addDefaultValidator(api: apigateway.RestApi): apigateway.Request
     });
 }
 
-export function addServiceModel(name:string, api: apigateway.RestApi, schema: apigateway.JsonSchema): any {
+export function addServiceModel(name:string, api: apigateway.RestApi,
+                                schema: apigateway.JsonSchema): any {
     return api.addModel(name, {
         contentType: 'application/json',
         modelName: name,
         schema: schema
+    });
+}
+
+export function addXmlserviceModel(name:string, api: apigateway.RestApi): any {
+    return api.addModel(name, {
+        contentType: 'application/xml',
+        modelName: name,
+        schema: {}
     });
 }
 

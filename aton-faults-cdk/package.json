@@ -42,6 +42,7 @@
     "@types/geojson": "latest",
     "wkx": "latest",
     "parse-link-header": "latest",
-    "moment": "2.24.0"
+    "moment": "2.24.0",
+    "xmlbuilder2": "1.3.0"
   }
 }
