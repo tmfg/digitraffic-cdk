@@ -16,6 +16,8 @@ const UPSERT_FAULTS_SQL = "insert into aton_fault(id, entry_timestamp, fixed_tim
     "   fixed_timestamp=${fixed_timestamp}," +
     "   fixed=${fixed}";
 
+const REMOVE_FAULTS_SQL = "delete from aton_fault where domain=${domain}";
+
 const FIND_ALL_SQL = "select id, entry_timestamp, fixed_timestamp, type, domain, state, fixed, " +
     " aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se, " +
     " fairway_number, fairway_name_fi, fairway_name_se, area_number, area_description_fi, area_description_se, geometry" +

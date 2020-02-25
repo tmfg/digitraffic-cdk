@@ -29,10 +29,7 @@ export async function findAllFaultsS124(): Promise<String> {
 }
 
 function createXmlDocument(faults: any[]) {
-    const root = create({version: '1.0', encoding: 'UTF-8', namespaceAlias: {
-            'S124' : S124_NAMESPACE
-        }});
-
+    const root = create({version: '1.0', encoding: 'UTF-8'});
     const datasets = root.ele('DataSets');
 
     faults.forEach(f => {
@@ -40,7 +37,7 @@ function createXmlDocument(faults: any[]) {
     });
 
     return {
-        body: root.end()
+        body: root.end({ prettyPrint: true })
     }
 }
 
@@ -49,37 +46,79 @@ function createS124(fault: any) {
     const year = fault.entry_timestamp.getFullYear() - 2000;
 
     const id = `FI.${faultId}.${year}`;
-    const urn = `urn:mrn:s124:NW:${id}.P`;
+    const urn = `urn:mrn:s124:NW.${id}.P`;
 
-    return fragment()
-        .ele(S124_NAMESPACE, 'DataSet')
+    return fragment({ namespaceAlias: {
+            'S124' : S124_NAMESPACE,
+            'GML' : GML_NAMESPACE
+        }})
+        .ele('S124:DataSet')
+            .att(S124_NAMESPACE, 'xsi:schemaLocation', "http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd")
+            .att('xmlns:xsi', "http://www.w3.org/2001/XMLSchema-instance")
+            .att('xmlns:gml', "http://www.opengis.net/gml/3.2")
+            .att('xmlns:S100', "http://www.iho.int/s100gml/1.0")
+            .att('xmlns:xlink', "http://www.w3.org/1999/xlink")
+            .att('gml:id', "SE.local.51.17")
             .ele('imember')
-                .ele(S124_NAMESPACE, 'S124_Preamble')
-                    .att(GML_NAMESPACE, 'id', 'PR,' + id)
-                    .ele({id: urn})
-                    .ele(createMessageSeriesIdentifier(faultId, year))
+                .ele('S124:S124_Preamble')
+                    .att('GML:id', `PR.${id}`)
+                    .ele('id').txt(urn).up()
+                    .import(createMessageSeriesIdentifier(faultId, year))
+                    .ele('sourceDate').txt(fault.entry_timestamp).up()
+                    .ele('generalArea').txt(fault.area_description_fi).up()
+                    .ele('locality')
+                        .ele('text').txt(fault.aton_name_fi).up()
+                    .up()
+                    .ele('title')
+                        .ele('text').txt(fault.type).up()
+                    .up()
                 .up()
             .up()
             .ele('member')
-                .ele(S124_NAMESPACE, 'S124_NavigationalWarningPart')
-                    .att(GML_NAMESPACE, 'id', 'NW.' + id + '.1')
-                .ele({id: urn + '.1'})
+                .ele('S124:S124_NavigationalWarningPart')
+                    .att('GML:id', `NW.${id}.1`)
+                    .ele('id').txt(`${urn}.1`).up()
+                        .import(createGeometryElement(fault, id))
+                .up()
             .up()
         .up();
+}
+
+function createGeometryElement(fault: any, id: string) {
+    return fragment()
+        .ele('geometry')
+            .ele('S100:pointProperty')
+                .att('gml:id', `s.NW.${id}.1`)
+                .att('srcName', 'EPSG:4326')
+                .ele('gml:pos')
+                    .import(createPoint(fault.geometry))
+                .up()
+            .up()
+        .up()
+}
+
+function createPoint(geometry: any) {
+    const g = Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as any;
+
+    console.info('g ' + JSON.stringify(g));
+
+    return fragment()
+        .ele('gml:pos').txt(`${g.coordinates[0]} ${g.coordinates[1]}`).up();
 }
 
 function createMessageSeriesIdentifier(faultId: any, year: number) {
     return fragment()
         .ele('messageSeriesIdentifier')
-            .ele('NameOfSeries').txt('moi')
-            .ele('typeOfWarning').txt('local')
-            .ele('warningNumber').txt(faultId)
-            .ele('year').txt(year.toString())
+            .ele('NameOfSeries').txt('Finnish Nav Warn').up()
+            .ele('typeOfWarning').txt('ATON').up()
+            .ele('warningNumber').txt(faultId).up()
+            .ele('year').txt(year.toString()).up()
             .ele('productionAgency')
-                .ele('language').txt('eng')
-                .ele('text').txt('Finnish Maritime Agency')
-                .up()
-            .ele('country').txt('fi')
+                .ele('language').txt('fin').up()
+                .ele('text').txt('Finnish Maritime Agency').up()
+            .up()
+            .ele('country').txt('fi').up()
+        .up();
 }
 
 function convertFeatures(fa: any[]) {
