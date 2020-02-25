@@ -7,9 +7,11 @@ import {Geometry} from "wkx";
 import {createFeatureCollection} from "../../../common/api/geojson";
 import {create, fragment} from "xmlbuilder2";
 
+let moment = require('moment');
+
 const ATON_DATA_TYPE = "ATON_FAULTS";
-const S124_NAMESPACE = "http://www.iho.int/S124/gml/1.0";
-const GML_NAMESPACE = "http://www.opengis.net/gml/3.2";
+const YEAR_MONTH_DAY = "YYYY-MM-DD";
+const HOUR_MINUTE_SECOND = "HH:MM:SSZ";
 
 export async function findAllFaults(): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
@@ -48,30 +50,29 @@ function createS124(fault: any) {
     const id = `FI.${faultId}.${year}`;
     const urn = `urn:mrn:s124:NW.${id}.P`;
 
-    return fragment({ namespaceAlias: {
-            'S124' : S124_NAMESPACE,
-            'GML' : GML_NAMESPACE
-        }})
+    return fragment()
         .ele('S124:DataSet')
-            .att(S124_NAMESPACE, 'xsi:schemaLocation', "http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd")
+            .att('xmlns:S124', "http://www.iho.int/S124/gml/1.0")
+            .att('xsi:schemaLocation', 'http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd')
             .att('xmlns:xsi', "http://www.w3.org/2001/XMLSchema-instance")
             .att('xmlns:gml', "http://www.opengis.net/gml/3.2")
             .att('xmlns:S100', "http://www.iho.int/s100gml/1.0")
             .att('xmlns:xlink', "http://www.w3.org/1999/xlink")
-            .att('gml:id', "SE.local.51.17")
+            .att('gml:id', id)
             .ele('imember')
                 .ele('S124:S124_Preamble')
                     .att('GML:id', `PR.${id}`)
                     .ele('id').txt(urn).up()
                     .import(createMessageSeriesIdentifier(faultId, year))
-                    .ele('sourceDate').txt(fault.entry_timestamp).up()
-                    .ele('generalArea').txt(fault.area_description_fi).up()
+                    .ele('sourceDate').txt(fault.entry_timestamp.toISOString()).up()
+                    .ele('generalArea').txt(`${fault.area_description_fi}, ${fault.fairway_name_fi}`).up()
                     .ele('locality')
-                        .ele('text').txt(fault.aton_name_fi).up()
+                        .ele('text').txt(`${fault.aton_type_fi}, ${fault.aton_name_fi}`).up()
                     .up()
                     .ele('title')
                         .ele('text').txt(fault.type).up()
                     .up()
+                    .import(createFixedDateRange(fault))
                 .up()
             .up()
             .ele('member')
@@ -82,6 +83,20 @@ function createS124(fault: any) {
                 .up()
             .up()
         .up();
+}
+
+function createFixedDateRange(fault: any) {
+    const f = fragment()
+        .ele('fixedDateRange')
+            .ele('timeOfDayStart').txt(moment(fault.entry_timestamp).format(YEAR_MONTH_DAY)).up()
+            .ele('dateStart').txt(moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND)).up();
+
+    if(fault.fixed_timestamp) {
+        return f.ele('timeOfDayEnd').txt(moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY)).up()
+                .ele('dateEnd').txt(moment(fault.fixed_timestamp).format(HOUR_MINUTE_SECOND)).up();
+    }
+
+    return f;
 }
 
 function createGeometryElement(fault: any, id: string) {
@@ -110,7 +125,7 @@ function createMessageSeriesIdentifier(faultId: any, year: number) {
     return fragment()
         .ele('messageSeriesIdentifier')
             .ele('NameOfSeries').txt('Finnish Nav Warn').up()
-            .ele('typeOfWarning').txt('ATON').up()
+            .ele('typeOfWarning').txt('local').up()
             .ele('warningNumber').txt(faultId).up()
             .ele('year').txt(year.toString()).up()
             .ele('productionAgency')
