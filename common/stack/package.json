@@ -6,11 +6,11 @@
   },
   "private": true,
   "dependencies": {
-    "@aws-cdk/core": "1.23.0",
-    "@aws-cdk/aws-cloudfront": "1.23.0",
-    "@aws-cdk/aws-apigateway": "1.23.0",
-    "@aws-cdk/aws-logs": "1.23.0",
-    "@aws-cdk/aws-lambda": "1.23.0",
+    "@aws-cdk/core": "1.26.0",
+    "@aws-cdk/aws-cloudfront": "1.26.0",
+    "@aws-cdk/aws-apigateway": "1.26.0",
+    "@aws-cdk/aws-logs": "1.26.0",
+    "@aws-cdk/aws-lambda": "1.26.0",
     "@types/node": "10.17.5"
   }
 }

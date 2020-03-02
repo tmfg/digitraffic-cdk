@@ -5,7 +5,7 @@ import {IDatabase} from "pg-promise";
 import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
 import {Geometry} from "wkx";
 import {createFeatureCollection} from "../../../common/api/geojson";
-import {create, fragment} from "xmlbuilder2";
+import {Builder} from 'xml2js';
 
 let moment = require('moment');
 
@@ -13,161 +13,164 @@ const ATON_DATA_TYPE = "ATON_FAULTS";
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
 const HOUR_MINUTE_SECOND = "HH:MM:SSZ";
 
+const PRODUCTION_AGENCY = {
+    'language' : 'fin',
+    'text' : 'Finnish Transport Infrastructure Agency'
+};
+
+const NAME_OF_SERIES = 'Finnish ATON Faults';
+
 export async function findAllFaults(): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        const annotations = await FaultsDB.findAll(db).then(convertFeatures);
+        const features = await FaultsDB.streamAllForJson(db, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
-        return createFeatureCollection(annotations, lastUpdated);
+        return createFeatureCollection(features, lastUpdated);
     });
 }
 
-export async function findAllFaultsS124(): Promise<String> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
-        const faults = await FaultsDB.findAll(db);
+export async function findAllFaultsS124(): Promise<any> {
+    const start = Date.now();
 
-        return createXmlDocument(faults);
-    });
-}
-
-function createXmlDocument(faults: any[]) {
-    const root = create({version: '1.0', encoding: 'UTF-8'});
-    const datasets = root.ele('DataSets');
-
-    faults.forEach(f => {
-        datasets.import(createS124(f));
+    const faults = await inDatabase(async (db: IDatabase<any,any>) => {
+        return await FaultsDB.streamAllForS124(db, createXml);
     });
 
-    return {
-        body: root.end({ prettyPrint: true })
+    try {
+        return {
+            body: new Builder().buildObject({
+                'DataSets': faults
+            })
+        }
+    } finally {
+        console.info("buildObject took %d", Date.now() - start);
     }
 }
 
-function createS124(fault: any) {
+function createXml(fault: any) {
     const faultId = -fault.id;
     const year = fault.entry_timestamp.getFullYear() - 2000;
 
     const id = `FI.${faultId}.${year}`;
     const urn = `urn:mrn:s124:NW.${id}.P`;
 
-    return fragment()
-        .ele('S124:DataSet')
-            .att('xmlns:S124', "http://www.iho.int/S124/gml/1.0")
-            .att('xsi:schemaLocation', 'http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd')
-            .att('xmlns:xsi', "http://www.w3.org/2001/XMLSchema-instance")
-            .att('xmlns:gml', "http://www.opengis.net/gml/3.2")
-            .att('xmlns:S100', "http://www.iho.int/s100gml/1.0")
-            .att('xmlns:xlink', "http://www.w3.org/1999/xlink")
-            .att('gml:id', id)
-            .ele('imember')
-                .ele('S124:S124_Preamble')
-                    .att('GML:id', `PR.${id}`)
-                    .ele('id').txt(urn).up()
-                    .import(createMessageSeriesIdentifier(faultId, year))
-                    .ele('sourceDate').txt(fault.entry_timestamp.toISOString()).up()
-                    .ele('generalArea').txt(`${fault.area_description_fi}, ${fault.fairway_name_fi}`).up()
-                    .ele('locality')
-                        .ele('text').txt(`${fault.aton_type_fi}, ${fault.aton_name_fi}`).up()
-                    .up()
-                    .ele('title')
-                        .ele('text').txt(fault.type).up()
-                    .up()
-                    .import(createFixedDateRange(fault))
-                .up()
-            .up()
-            .ele('member')
-                .ele('S124:S124_NavigationalWarningPart')
-                    .att('GML:id', `NW.${id}.1`)
-                    .ele('id').txt(`${urn}.1`).up()
-                        .import(createGeometryElement(fault, id))
-                .up()
-            .up()
-        .up();
+    return {
+        'S124:Dataset': {
+            '$': {
+                'xmlns:S124' : "http://www.iho.int/S124/gml/1.0",
+                'xsi:schemaLocation' : 'http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd',
+                'xmlns:xsi' : "http://www.w3.org/2001/XMLSchema-instance",
+                'xmlns:gml' : "http://www.opengis.net/gml/3.2",
+                'xmlns:S100' : "http://www.iho.int/s100gml/1.0",
+                'xmlns:xlink' : "http://www.w3.org/1999/xlink",
+                'gml:id' : id
+            },
+            'imember': {
+                'S124:S124_Preamble': {
+                    '$': {
+                        'GML:id' : `PR.${id}`
+                    },
+                    'id' : urn,
+                    'messageSeriesIdentifier' : createMessageSeriesIdentifier(faultId, year),
+                    'sourceDate': fault.entry_timestamp.toISOString(),
+                    'generalArea': fault.area_description_fi,
+                    'locality' : {
+                        'text': fault.fairway_name_fi
+                    },
+                    'title':  {
+                        'text' : `${fault.aton_id} ${fault.aton_type_fi} ${fault.aton_name_fi}, ${fault.type}`
+                    },
+                    'fixedDateRange' : createFixedDateRange(fault)
+                }
+            },
+            'member': {
+                'S124:S124_NavigationalWarningPart': {
+                    '$': {
+                        'GML:id' : `NW.${id}.1`
+                    },
+                    'id': `${urn}.1`,
+                    'geometry' : createGeometryElement(fault, id)
+                }
+            }
+        }
+    };
 }
 
 function createFixedDateRange(fault: any) {
-    const f = fragment()
-        .ele('fixedDateRange')
-            .ele('timeOfDayStart').txt(moment(fault.entry_timestamp).format(YEAR_MONTH_DAY)).up()
-            .ele('dateStart').txt(moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND)).up();
-
     if(fault.fixed_timestamp) {
-        return f.ele('timeOfDayEnd').txt(moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY)).up()
-                .ele('dateEnd').txt(moment(fault.fixed_timestamp).format(HOUR_MINUTE_SECOND)).up();
+        return {
+            'timeOfDayStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
+            'dateStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND) ,
+            'timeOfDayEnd' : moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY),
+            'dateEnd' : moment(fault.fixed_timestamp).format(HOUR_MINUTE_SECOND)
+        }
     }
 
-    return f;
+    return {
+        'timeOfDayStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
+        'dateStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND) ,
+    }
 }
 
 function createGeometryElement(fault: any, id: string) {
-    return fragment()
-        .ele('geometry')
-            .ele('S100:pointProperty')
-                .att('gml:id', `s.NW.${id}.1`)
-                .att('srcName', 'EPSG:4326')
-                .ele('gml:pos')
-                    .import(createPoint(fault.geometry))
-                .up()
-            .up()
-        .up()
+    return {
+        'S100:pointProperty' : {
+            '$' : {
+                'gml:id' : `s.NW.${id}.1`,
+                'srcName' : 'EPSG:4326'
+            },
+            'gml:pos' : createCoordinatePair(fault.geometry)
+        }
+    }
 }
 
-function createPoint(geometry: any) {
+function createCoordinatePair(geometry: any) {
     const g = Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as any;
 
-    console.info('g ' + JSON.stringify(g));
-
-    return fragment()
-        .ele('gml:pos').txt(`${g.coordinates[0]} ${g.coordinates[1]}`).up();
+    return`${g.coordinates[0]} ${g.coordinates[1]}`;
 }
 
 function createMessageSeriesIdentifier(faultId: any, year: number) {
-    return fragment()
-        .ele('messageSeriesIdentifier')
-            .ele('NameOfSeries').txt('Finnish Nav Warn').up()
-            .ele('typeOfWarning').txt('local').up()
-            .ele('warningNumber').txt(faultId).up()
-            .ele('year').txt(year.toString()).up()
-            .ele('productionAgency')
-                .ele('language').txt('fin').up()
-                .ele('text').txt('Finnish Maritime Agency').up()
-            .up()
-            .ele('country').txt('fi').up()
-        .up();
+    return {
+        'nameOfSeries' : NAME_OF_SERIES,
+        'typeOfWarning' : 'local',
+        'warningNumber' : faultId,
+        'year' : year,
+        'productionAgency' : PRODUCTION_AGENCY,
+        'country' : 'fi'
+    };
 }
 
-function convertFeatures(fa: any[]) {
-    return fa.map(a => {
-        const properties = <GeoJsonProperties>{
-            id: a.id,
-            entry_timestamp: a.entry_timestamp,
-            fixed_timestamp: a.fixed_timestamp,
-            type: a.type,
-            domain: a.domain,
-            state: a.state,
-            fixed: a.fixed,
-            aton_id: a.aton_id,
-            aton_name_fi: a.aton_name_fi,
-            aton_name_se: a.aton_name_se,
-            aton_type_fi: a.aton_type_fi,
-            aton_type_se: a.aton_type_se,
-            fairway_number: a.fairway_number,
-            fairway_name_fi: a.fairway_name_fi,
-            fairway_name_se: a.fairway_name_se,
-            area_number: a.area_number,
-            area_description_fi: a.area_description_fi,
-            area_description_se: a.area_description_se
-        };
+function convertFeature(fault: any) {
+    const properties = <GeoJsonProperties>{
+        id: fault.id,
+        entry_timestamp: fault.entry_timestamp,
+        fixed_timestamp: fault.fixed_timestamp,
+        type: fault.type,
+        domain: fault.domain,
+        state: fault.state,
+        fixed: fault.fixed,
+        aton_id: fault.aton_id,
+        aton_name_fi: fault.aton_name_fi,
+        aton_name_se: fault.aton_name_se,
+        aton_type_fi: fault.aton_type_fi,
+        aton_type_se: fault.aton_type_se,
+        fairway_number: fault.fairway_number,
+        fairway_name_fi: fault.fairway_name_fi,
+        fairway_name_se: fault.fairway_name_se,
+        area_number: fault.area_number,
+        area_description_fi: fault.area_description_fi,
+        area_description_se: fault.area_description_se
+    };
 
-        // convert geometry from db to geojson
-        const geometry = Geometry.parse(Buffer.from(a.geometry, "hex")).toGeoJSON();
+    // convert geometry from db to geojson
+    const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex")).toGeoJSON();
 
-        return <Feature>{
-            type: "Feature",
-            properties: properties,
-            geometry: geometry
-        };
-    })
+    return <Feature>{
+        type: "Feature",
+        properties: properties,
+        geometry: geometry
+    };
 }
 
 export async function saveFaults(domain: string, newFaults: any[]) {

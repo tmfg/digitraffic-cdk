@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "license": "EUPL",
+  "devDependencies": {
+    "typescript": "~3.7.2"
+  },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.23.0",
+    "@aws-cdk/aws-apigateway": "1.26.0",
     "@types/geojson": "latest"
   }
 }

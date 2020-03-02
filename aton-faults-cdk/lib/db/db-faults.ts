@@ -1,7 +1,9 @@
 import {IDatabase} from "pg-promise";
 import {createGeometry} from "../../../common/postgres/geometry";
+import {stream} from "../../../common/db/stream-util";
 
-let moment = require('moment');
+const QueryStream = require('pg-query-stream')
+const moment = require('moment');
 
 const UPSERT_FAULTS_SQL = "insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, " +
     "aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se, " +
@@ -18,13 +20,30 @@ const UPSERT_FAULTS_SQL = "insert into aton_fault(id, entry_timestamp, fixed_tim
 
 const REMOVE_FAULTS_SQL = "delete from aton_fault where domain=${domain}";
 
-const FIND_ALL_SQL = "select id, entry_timestamp, fixed_timestamp, type, domain, state, fixed, " +
+const ALL_FAULTS_JSON_SQL = "select id, entry_timestamp, fixed_timestamp, type, domain, state, fixed, " +
     " aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se, " +
     " fairway_number, fairway_name_fi, fairway_name_se, area_number, area_description_fi, area_description_se, geometry" +
     " from aton_fault";
 
-export async function findAll(db: IDatabase<any, any>) {
-    return await db.manyOrNone(FIND_ALL_SQL);
+const ALL_FAULTS_S124_WITH_DOMAIN_SQL = "select id, entry_timestamp, fixed_timestamp, type, " +
+    " aton_id, aton_name_fi, aton_type_fi, " +
+    " fairway_name_fi, area_description_fi, geometry" +
+    " from aton_fault" +
+    " where domain in ('C_NA', 'C_NM')";
+
+const DOMAINS_FOR_S124 = ['C_NA', 'C_NM'];
+
+export async function streamAllForJson(db: IDatabase<any, any>, conversion: (fault: any) => any) {
+    const qs = new QueryStream(ALL_FAULTS_JSON_SQL);
+
+    return await stream(db, qs, conversion);
+}
+
+export async function streamAllForS124(db: IDatabase<any, any>, conversion: (fault: any) => any) {
+    //const qs = new QueryStream(ALL_FAULTS_S124_WITH_DOMAIN_SQL, {domains: DOMAINS_FOR_S124});
+    const qs = new QueryStream(ALL_FAULTS_S124_WITH_DOMAIN_SQL);
+
+    return await stream(db, qs, conversion);
 }
 
 export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): any[] {

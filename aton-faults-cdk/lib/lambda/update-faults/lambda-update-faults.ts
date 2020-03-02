@@ -1,4 +1,4 @@
-import {getFaults} from "../../../api/get-faults";
+import {getFaults} from "../../api/get-faults";
 import {saveFaults} from "../../service/faults";
 
 // Commercial / Non-Commercial _ Navigation Aids / Navigation Marks

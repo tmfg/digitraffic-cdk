@@ -5,6 +5,9 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": true,
+  "devDependencies": {
+    "typescript": "~3.7.2"
+  },
   "dependencies": {
     "pg-native": "^3.0.0",
     "pg-promise": "^10.3.1",
