@@ -55,15 +55,15 @@ function createXml(fault: any) {
     const urn = `urn:mrn:s124:NW.${id}.P`;
 
     return {
-        'S124:Dataset': {
+        'S124:DataSet': {
             '$': {
                 'xmlns:S124' : "http://www.iho.int/S124/gml/1.0",
                 'xsi:schemaLocation' : 'http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd',
                 'xmlns:xsi' : "http://www.w3.org/2001/XMLSchema-instance",
-                'xmlns:gml' : "http://www.opengis.net/gml/3.2",
+                'xmlns:GML' : "http://www.opengis.net/gml/3.2",
                 'xmlns:S100' : "http://www.iho.int/s100gml/1.0",
                 'xmlns:xlink' : "http://www.w3.org/1999/xlink",
-                'gml:id' : id
+                'GML:id' : id
             },
             'imember': {
                 'S124:S124_Preamble': {
@@ -116,10 +116,10 @@ function createGeometryElement(fault: any, id: string) {
     return {
         'S100:pointProperty' : {
             '$' : {
-                'gml:id' : `s.NW.${id}.1`,
+                'GML:id' : `s.NW.${id}.1`,
                 'srcName' : 'EPSG:4326'
             },
-            'gml:pos' : createCoordinatePair(fault.geometry)
+            'GML:pos' : createCoordinatePair(fault.geometry)
         }
     }
 }
