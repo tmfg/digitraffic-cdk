@@ -1,8 +1,8 @@
 import {Duration} from '@aws-cdk/core';
-import {OriginProtocolPolicy, SourceConfiguration} from '@aws-cdk/aws-cloudfront';
-import {Behavior, Domain} from "../../cloudfront-cdk/lib/app-props";
+import {OriginProtocolPolicy, SourceConfiguration, Behavior} from '@aws-cdk/aws-cloudfront';
+import {CFBehavior, CFDomain} from "../../cloudfront-cdk/lib/app-props";
 
-export function createOriginConfig(domain: Domain): SourceConfiguration {
+export function createOriginConfig(domain: CFDomain): SourceConfiguration {
     return {
         customOriginSource: {
             domainName: domain.domainName,
@@ -16,7 +16,7 @@ export function createOriginConfig(domain: Domain): SourceConfiguration {
     }
 }
 
-function createOriginHeaders(domain: Domain): { [key: string] : string } {
+function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
     if (domain.apiKey) {
         return {
             'x-api-key': domain.apiKey
@@ -26,7 +26,7 @@ function createOriginHeaders(domain: Domain): { [key: string] : string } {
     return {};
 }
 
-function createBehaviors(behaviors: Behavior[]) {
+function createBehaviors(behaviors: CFBehavior[]): Behavior[] {
     if(behaviors == null || behaviors.length == 0) {
         return [{isDefaultBehavior: true, minTtl:Duration.seconds(0), maxTtl:Duration.seconds(0), defaultTtl: Duration.seconds(0), forwardedValues: { queryString: true }} ];
     }

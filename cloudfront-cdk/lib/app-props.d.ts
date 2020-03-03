@@ -1,21 +1,17 @@
-/*
-    Example stack configuration interfaces
- */
-
-export interface Behavior {
+export interface CFBehavior {
     path: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
 }
 
-export interface Domain {
+export interface CFDomain {
     domainName: string,
     originPath?: string,
     protocolPolicy?: string,
     httpPort?: number,
     httpsPort?: number,
     apiKey?: string,
-    behaviors: Behavior[]
+    behaviors: CFBehavior[]
 }
 
 export interface Props {
@@ -23,5 +19,5 @@ export interface Props {
     environmentName: string,
     aliasNames: string[] | null,
     acmCertRef: string | null,
-    domains: Domain[]
+    domains: CFDomain[]
 }
