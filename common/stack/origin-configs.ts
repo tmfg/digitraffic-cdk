@@ -1,13 +1,14 @@
-import { Duration } from '@aws-cdk/core';
-import { OriginProtocolPolicy } from '@aws-cdk/aws-cloudfront';
+import {Duration} from '@aws-cdk/core';
+import {OriginProtocolPolicy, SourceConfiguration} from '@aws-cdk/aws-cloudfront';
+import {Behavior, Domain} from "../../cloudfront-cdk/lib/app-props";
 
-export function createOriginConfig(domain: any) {
+export function createOriginConfig(domain: Domain): SourceConfiguration {
     return {
         customOriginSource: {
             domainName: domain.domainName,
             httpPort: domain.httpPort || 80,
             httpsPort: domain.httpsPort || 443,
-            originProtocolPolicy: domain.protocolPolicy || OriginProtocolPolicy.HTTP_ONLY
+            originProtocolPolicy: domain.protocolPolicy as OriginProtocolPolicy || OriginProtocolPolicy.HTTP_ONLY
         },
         behaviors: createBehaviors(domain.behaviors),
         originPath: domain.originPath,
@@ -15,8 +16,8 @@ export function createOriginConfig(domain: any) {
     }
 }
 
-function createOriginHeaders(domain: any): { [key: string] : string } {
-    if(domain.apiKey) {
+function createOriginHeaders(domain: Domain): { [key: string] : string } {
+    if (domain.apiKey) {
         return {
             'x-api-key': domain.apiKey
         } as { [key: string] : string };
@@ -25,7 +26,7 @@ function createOriginHeaders(domain: any): { [key: string] : string } {
     return {};
 }
 
-function createBehaviors(behaviors: any[]) {
+function createBehaviors(behaviors: Behavior[]) {
     if(behaviors == null || behaviors.length == 0) {
         return [{isDefaultBehavior: true, minTtl:Duration.seconds(0), maxTtl:Duration.seconds(0), defaultTtl: Duration.seconds(0), forwardedValues: { queryString: true }} ];
     }

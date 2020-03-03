@@ -1,4 +1,4 @@
-///<reference path="../lib/app-props.d.ts"/>
+import {Props} from '../lib/app-props';
 
 const props: Props = {
     distributionName: "BetaDistribution",

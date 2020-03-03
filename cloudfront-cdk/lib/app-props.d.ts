@@ -2,13 +2,13 @@
     Example stack configuration interfaces
  */
 
-declare interface Behavior {
+export interface Behavior {
     path: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
 }
 
-declare interface Domain {
+export interface Domain {
     domainName: string,
     originPath?: string,
     protocolPolicy?: string,
@@ -18,7 +18,7 @@ declare interface Domain {
     behaviors: Behavior[]
 }
 
-declare interface Props {
+export interface Props {
     distributionName: string,
     environmentName: string,
     aliasNames: string[] | null,
