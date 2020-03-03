@@ -1,6 +1,6 @@
-///<reference path="../lib/app-props.d.ts"/>
+import {LambdaConfiguration} from "../../common/stack/lambda-configs";
 
-const props: AtonFaultsProps = {
+const props: LambdaConfiguration = {
     vpcId: 'some-vpc-id',
     privateSubnetIds: ['some-subnet-id',],
     availabilityZones: ['some-az1'],

@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-///<reference path="../lib/app-props.d.ts"/>
 import 'source-map-support/register';
 import cdk = require('@aws-cdk/core');
 import {AtonFaultsCdkStack} from "../lib/aton-faults-cdk-stack";

@@ -4,7 +4,6 @@ import {Function, AssetCode} from '@aws-cdk/aws-lambda';
 import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
-import {dbLambdaConfiguration} from "./cdk-util";
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from '../../common/stack/subscription';
 import {methodResponse, defaultIntegration, defaultXmlIntegration} from "../../common/api/responses";
@@ -12,11 +11,12 @@ import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
+import {LambdaConfiguration, dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
-    props: AtonFaultsProps,
+    props: LambdaConfiguration,
     stack: Construct): Function {
     const publicApi = createApi(stack, props);
 
@@ -34,7 +34,7 @@ export function create(
 function createAnnotationsResource(
     publicApi: RestApi,
     vpc: IVpc,
-    props: AtonFaultsProps,
+    props: LambdaConfiguration,
     lambdaDbSg: ISecurityGroup,
     faultsJsonModel: any,
     stack: Construct): Function {
@@ -95,7 +95,7 @@ function createResourcePaths(publicApi: RestApi): any {
     }
 }
 
-function createApi(stack: Construct, atonProps: AtonFaultsProps) {
+function createApi(stack: Construct, atonProps: LambdaConfiguration) {
     return new RestApi(stack, 'ATON-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,

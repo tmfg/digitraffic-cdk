@@ -3,13 +3,13 @@ import {Function,AssetCode} from '@aws-cdk/aws-lambda';
 import {IVpc,ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {Stack, Duration} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from './cdk-util';
+import {LambdaConfiguration, dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import {createSubscription} from '../../common/stack/subscription';
 
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
-    props: AtonFaultsProps,
+    props: LambdaConfiguration,
     stack: Stack): Function {
 
     const functionName = "ATON-UpdateFaults";
