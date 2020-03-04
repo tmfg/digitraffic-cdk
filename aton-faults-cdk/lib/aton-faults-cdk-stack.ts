@@ -1,11 +1,11 @@
 import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
-import {LambdaConfiguration} from '../../common/stack/lambda-configs';
 import * as InternalLambdas from './internal-lambdas';
 import * as PublicApi from './public-api';
+import {AtonProps} from "./app-props";
 
 export class AtonFaultsCdkStack extends Stack {
-    constructor(scope: Construct, id: string, atonFaultsProps: LambdaConfiguration, props?: StackProps) {
+    constructor(scope: Construct, id: string, atonFaultsProps: AtonProps, props?: StackProps) {
         super(scope, id, props);
 
         // VPC reference construction requires vpcId and availability zones

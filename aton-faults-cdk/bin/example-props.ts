@@ -1,6 +1,6 @@
-import {LambdaConfiguration} from "../../common/stack/lambda-configs";
+import {AtonProps} from "../lib/app-props";
 
-const props: LambdaConfiguration = {
+const props: AtonProps = {
     vpcId: 'some-vpc-id',
     privateSubnetIds: ['some-subnet-id',],
     availabilityZones: ['some-az1'],
@@ -12,6 +12,9 @@ const props: LambdaConfiguration = {
     },
     defaultLambdaDurationSeconds: 10,
     logsDestinationArn: 'something-something',
-    private: true
+    private: true,
+    integrations: [
+        { domain: 'C_NA', url: 'integrationurl' }
+    ]
 };
 export default props;

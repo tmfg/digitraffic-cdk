@@ -1,13 +1,9 @@
 import {getFaults} from "../../api/get-faults";
 import {saveFaults} from "../../service/faults";
+import {Integration} from "../../app-props";
 
-// Commercial / Non-Commercial _ Navigation Aids / Navigation Marks
-const integrations = [
-    { domain: 'C_NA', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=kaupvayl_vi_dt&crs=EPSG:4326' },
-    { domain: 'NC_NA', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=muuvayl_vi_dt&crs=EPSG:4326' },
-    { domain: 'C_NM', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=kaupvayl_vlm_vi_dt&crs=EPSG:4326' },
-    { domain: 'NC_NM', url: 'https://testiextranet.vayla.fi/pooki_www/services/rest.ashx?layer=muuvayl_vlm_vi_dt&crs=EPSG:4326' },
-];
+const envValue = process.env.INTEGRATIONS as string;
+const integrations = JSON.parse(envValue) as Integration[];
 
 export const handler = async () : Promise <any> => {
     await updateAllFaults();
@@ -19,9 +15,4 @@ async function updateAllFaults(): Promise<any> {
 
         await saveFaults(i.domain, newFaults);
     }
-}
-
-interface Integration {
-    url: string,
-    domain: string
 }

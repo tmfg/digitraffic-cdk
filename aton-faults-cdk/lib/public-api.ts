@@ -11,12 +11,13 @@ import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
-import {LambdaConfiguration, dbLambdaConfiguration} from "../../common/stack/lambda-configs";
+import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
+import {AtonProps} from "./app-props";
 
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
-    props: LambdaConfiguration,
+    props: AtonProps,
     stack: Construct): Function {
     const publicApi = createApi(stack, props);
 
@@ -34,7 +35,7 @@ export function create(
 function createAnnotationsResource(
     publicApi: RestApi,
     vpc: IVpc,
-    props: LambdaConfiguration,
+    props: AtonProps,
     lambdaDbSg: ISecurityGroup,
     faultsJsonModel: any,
     stack: Construct): Function {
@@ -51,7 +52,7 @@ function createAnnotationsResource(
     const getFaultsS124Lambda = new Function(stack, functionNameS124, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionNameS124,
         code: new AssetCode('dist/lambda/get-faults'),
-        handler: 'lambda-get-faults-s124.handler',
+        handler: 'lambda-get-faults-s124.handler'
     }));
 
     const resources = createResourcePaths(publicApi);
@@ -95,7 +96,7 @@ function createResourcePaths(publicApi: RestApi): any {
     }
 }
 
-function createApi(stack: Construct, atonProps: LambdaConfiguration) {
+function createApi(stack: Construct, atonProps: AtonProps) {
     return new RestApi(stack, 'ATON-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
