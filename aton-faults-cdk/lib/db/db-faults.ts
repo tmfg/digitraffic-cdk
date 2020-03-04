@@ -5,31 +5,31 @@ import {stream} from "../../../common/db/stream-util";
 const QueryStream = require('pg-query-stream')
 const moment = require('moment');
 
-const UPSERT_FAULTS_SQL = "insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, " +
-    "aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se, " +
-    "fairway_number, fairway_name_fi, fairway_name_se," +
-    "area_number, area_description_fi, area_description_se, geometry)" +
-    " values(${id}, ${entry_timestamp}, ${fixed_timestamp}, ${state}, ${type}, ${domain}, ${fixed}, " +
-    " ${aton_id},${aton_name_fi}, ${aton_name_se}, ${aton_type_fi}, ${aton_type_se}," +
-    "  ${fairway_number}, ${fairway_name_fi}, ${fairway_name_se}, " +
-    " ${area_number}, ${area_description_fi}, ${area_description_se}, ${geometry})" +
-    " on conflict(id)" +
-    " do update set" +
-    "   fixed_timestamp=${fixed_timestamp}," +
-    "   fixed=${fixed}";
+const UPSERT_FAULTS_SQL =
+    `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_se, 
+    aton_type_fi, aton_type_se,  fairway_number, fairway_name_fi, fairway_name_se, area_number, area_description_fi, area_description_se, geometry)
+    values($(id), $(entry_timestamp), $(fixed_timestamp), $(state), $(type), $(domain), $(fixed),
+    $(aton_id),$(aton_name_fi), $(aton_name_se), $(aton_type_fi), $(aton_type_se),
+    $(fairway_number), $(fairway_name_fi), $(fairway_name_se),
+    $(area_number), $(area_description_fi), $(area_description_se), $(geometry))
+    on conflict(id)
+    do update set
+      fixed_timestamp=$(fixed_timestamp),
+      fixed=$(fixed)`;
 
 const REMOVE_FAULTS_SQL = "delete from aton_fault where domain=${domain}";
 
-const ALL_FAULTS_JSON_SQL = "select id, entry_timestamp, fixed_timestamp, type, domain, state, fixed, " +
-    " aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se, " +
-    " fairway_number, fairway_name_fi, fairway_name_se, area_number, area_description_fi, area_description_se, geometry" +
-    " from aton_fault";
+const ALL_FAULTS_JSON_SQL =
+    `select id, entry_timestamp, fixed_timestamp, type, domain, state, fixed,
+    aton_id, aton_name_fi, aton_name_se, aton_type_fi, aton_type_se,
+    fairway_number, fairway_name_fi, fairway_name_se, area_number, area_description_fi, area_description_se, geometry
+    from aton_fault`;
 
-const ALL_FAULTS_S124_WITH_DOMAIN_SQL = "select id, entry_timestamp, fixed_timestamp, type, " +
-    " aton_id, aton_name_fi, aton_type_fi, " +
-    " fairway_name_fi, area_description_fi, geometry" +
-    " from aton_fault" +
-    " where domain in ('C_NA', 'C_NM')";
+const ALL_FAULTS_S124_WITH_DOMAIN_SQL =
+    `select id, entry_timestamp, fixed_timestamp, type, aton_id, aton_name_fi, aton_type_fi, 
+        fairway_name_fi, area_description_fi, geometry
+    from aton_fault
+    where domain in ('C_NA', 'C_NM')`;
 
 const DOMAINS_FOR_S124 = ['C_NA', 'C_NM'];
 
