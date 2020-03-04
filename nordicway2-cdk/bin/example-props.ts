@@ -1,4 +1,4 @@
-///<reference path="../lib/app-props.d.ts"/>
+import {NW2Props} from "../lib/app-props";
 
 const props: NW2Props = {
     vpcId: 'some-vpc-id',

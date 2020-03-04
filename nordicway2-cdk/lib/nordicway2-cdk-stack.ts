@@ -2,6 +2,7 @@ import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
 import * as InternalLambdas from './internal-lambdas';
 import * as PublicApi from "./public-api";
+import {NW2Props} from "./app-props";
 
 export class Nordicway2CdkStack extends Stack {
     constructor(scope: Construct, id: string, nw2Props: NW2Props, props?: StackProps) {

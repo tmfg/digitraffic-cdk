@@ -4,7 +4,7 @@ import {Function, AssetCode} from '@aws-cdk/aws-lambda';
 import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
-import {dbLambdaConfiguration} from "./cdk-util";
+import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {default as AnnotationSchema} from './model/annotation-schema';
 import {createSubscription} from '../../common/stack/subscription';
 import {addServiceModel} from 'digitraffic-cdk-api/utils';
@@ -13,6 +13,7 @@ import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {getModelReference} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
+import {NW2Props} from "./app-props";
 
 export function create(
     vpc: IVpc,
@@ -81,7 +82,9 @@ function createAnnotationsResource(
         ]
     });
 
-    createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
+    if(props.logsDestinationArn) {
+        createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
+    }
 
     return getAnnotationsLambda;
 }

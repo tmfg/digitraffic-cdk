@@ -3,8 +3,9 @@ import {Function,AssetCode} from '@aws-cdk/aws-lambda';
 import {IVpc,ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {Stack, Duration} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from './cdk-util';
+import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import {createSubscription} from '../../common/stack/subscription';
+import {NW2Props} from "./app-props";
 
 export function create(
     vpc: IVpc,
@@ -34,7 +35,9 @@ export function create(
     });
     rule.addTarget(new LambdaFunction(updateAnnotationsLambda));
 
-    createSubscription(updateAnnotationsLambda, functionName, props.logsDestinationArn, stack);
+    if(props.logsDestinationArn) {
+        createSubscription(updateAnnotationsLambda, functionName, props.logsDestinationArn, stack);
+    }
 
     return updateAnnotationsLambda;
 }

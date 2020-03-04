@@ -33,12 +33,14 @@ export async function getAnnotations(
     authToken: string,
     endpointUrl: string,
     timestampFrom: Date,
-    timestampTo: Date): Promise<Annotation[]> {
+    timestampTo: Date, updated: boolean): Promise<Annotation[]> {
     const fromString = getDateString(timestampFrom);
     const toString = getDateString(timestampTo)
     const annotations = [];
 
-    let url = `${endpointUrl}?date_from_created=${fromString}&date_to_created=${toString}&client_id=c65fd29cd845035329ee4cd0&limit=100&expired=false`;
+    const field = updated ? 'updated' : 'created';
+
+    let url = `${endpointUrl}?date_from_${field}=${fromString}&date_to_${field}=${toString}&client_id=c65fd29cd845035329ee4cd0&limit=100&expired=false`;
 
     do {
         console.info("getting annotations from " + url);
@@ -48,7 +50,7 @@ export async function getAnnotations(
             throw Error('Fetching annotations failed: ' + resp.statusText);
         }
 
-//        console.info("data " + JSON.stringify(resp.data));
+        console.info("data " + JSON.stringify(resp.data));
 //        console.info("headers " + JSON.stringify(resp.headers.link));
 
         // add all items from array to annotations-array
