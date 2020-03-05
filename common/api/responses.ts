@@ -1,5 +1,10 @@
 import {NOT_FOUND_MESSAGE} from "./errors";
-import {InternalServerErrorResponseTemplate, NotFoundResponseTemplate, XmlResponseTemplate} from "./response";
+import {
+    APPLICATION_JSON,
+    InternalServerErrorResponseTemplate,
+    createResponses,
+    XmlResponseTemplate, APPLICATION_XML, NotFoundResponseTemplate
+} from "./response";
 import {LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
 
@@ -24,12 +29,17 @@ export const RESPONSE_500_SERVER_ERROR = {
     responseTemplates: InternalServerErrorResponseTemplate
 };
 
-export function methodResponse(status: string, model: any) {
+export function methodJsonResponse(status: string, model: any) {
     return  {
         statusCode: status,
-        responseModels: {
-            'application/json': model
-        }
+        responseModels: createResponses(APPLICATION_JSON, model)
+    };
+}
+
+export function methodXmlResponse(status: string, model: any) {
+    return  {
+        statusCode: status,
+        responseModels: createResponses(APPLICATION_XML, model)
     };
 }
 

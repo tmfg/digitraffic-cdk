@@ -6,8 +6,13 @@ import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from '../../common/stack/subscription';
-import {methodResponse, defaultIntegration, defaultXmlIntegration} from "../../common/api/responses";
-import {MessageModel} from "../../common/api/response";
+import {
+    methodJsonResponse,
+    defaultIntegration,
+    defaultXmlIntegration,
+    methodXmlResponse
+} from "../../common/api/responses";
+import { MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
@@ -60,8 +65,8 @@ function createAnnotationsResource(
     resources.faults.addMethod("GET", defaultIntegration(getFaultsLambda), {
         apiKeyRequired: !props.private,
         methodResponses: [
-            methodResponse("200", faultsJsonModel),
-            methodResponse("500", errorResponseModel)
+            methodJsonResponse("200", faultsJsonModel),
+            methodJsonResponse("500", errorResponseModel)
         ]
     });
 
@@ -70,8 +75,8 @@ function createAnnotationsResource(
     resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda), {
         apiKeyRequired: !props.private,
         methodResponses: [
-            methodResponse("200", xmlModel),
-            methodResponse("500", errorResponseModel)
+            methodXmlResponse("200", xmlModel),
+            methodJsonResponse("500", errorResponseModel)
         ]
     });
 
@@ -103,7 +108,6 @@ function createApi(stack: Construct, atonProps: AtonProps) {
         },
         restApiName: 'ATON public API',
         endpointTypes: [atonProps.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
-        minimumCompressionSize: 1000,
         policy: new PolicyDocument({
             statements: [
                 new PolicyStatement({

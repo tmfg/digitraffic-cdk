@@ -1,5 +1,8 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
 
+export const APPLICATION_JSON = 'application/json';
+export const APPLICATION_XML = 'application/xml';
+
 const messageSchema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
@@ -13,32 +16,29 @@ const messageSchema: apigateway.JsonSchema = {
 };
 
 export const MessageModel = {
-    contentType: 'application/json',
+    contentType: APPLICATION_JSON,
     modelName: 'MessageResponseModel',
     schema: messageSchema
 };
 
 const NotFoundMessage = 'Not found';
-const NotFoundResponse = JSON.stringify({message: NotFoundMessage});
-
-export const NotFoundResponseTemplate = {
-    'application/json': NotFoundResponse
-};
+export const NotFoundResponse = JSON.stringify({message: NotFoundMessage});
 
 const InternalServerErrorMessage = 'Error';
 const InternalServerErrorResponse = JSON.stringify({message: InternalServerErrorMessage});
 
-export const InternalServerErrorResponseTemplate = {
-    'application/json': InternalServerErrorResponse
-};
-
 const BadRequestMessage = 'Bad request';
 const BadRequestResponse = JSON.stringify({message: BadRequestMessage});
 
-export const BadRequestResponseTemplate = {
-    'application/json': BadRequestResponse
-};
+export const BadRequestResponseTemplate = createResponses(APPLICATION_JSON, BadRequestResponse);
+export const NotFoundResponseTemplate = createResponses(APPLICATION_JSON, NotFoundResponse);
+export const XmlResponseTemplate = createResponses(APPLICATION_XML, "$input.path('$').body");
+export const InternalServerErrorResponseTemplate = createResponses(APPLICATION_JSON, InternalServerErrorResponse);
 
-export const XmlResponseTemplate = {
-    'application/xml': "$input.path('$').body"
+export function createResponses(key: string, value: any) {
+    let map: {[key: string]: any} = {};
+
+    map[key] = value;
+
+    return map;
 }
