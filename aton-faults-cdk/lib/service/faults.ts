@@ -99,16 +99,16 @@ function createXml(fault: any) {
 function createFixedDateRange(fault: any) {
     if(fault.fixed_timestamp) {
         return {
-            'timeOfDayStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
-            'dateStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND) ,
-            'timeOfDayEnd' : moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY),
-            'dateEnd' : moment(fault.fixed_timestamp).format(HOUR_MINUTE_SECOND)
+            'timeOfDayStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND),
+            'dateStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY) ,
+            'timeOfDayEnd' : moment(fault.fixed_timestamp).format(HOUR_MINUTE_SECOND),
+            'dateEnd' : moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY)
         }
     }
 
     return {
-        'timeOfDayStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
-        'dateStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND) ,
+        'timeOfDayStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND),
+        'dateStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY) ,
     }
 }
 
