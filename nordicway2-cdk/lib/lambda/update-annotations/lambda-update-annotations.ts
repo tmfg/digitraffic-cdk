@@ -4,8 +4,10 @@ import {saveAnnotations} from "../../service/annotations";
 import {lastUpdated} from "../../service/last-updated";
 
 export const handler = async () : Promise <any> => {
-    const lastUpdated = await lastUpdated();
-    const timestampFrom = lastUpdated.setMinutes(lastUpdated.getMinutes() - 5); // overlap a bit, just to be safe
+    const updated = await lastUpdated();
+    const timestampFrom = updated;
+    updated.setMinutes(updated.getMinutes() - 5); // overlap a bit, just to be safe
+    
     const timeStampTo = new Date();
     const annotations = await getAnnotationsFromServer(timestampFrom, timeStampTo);
 
