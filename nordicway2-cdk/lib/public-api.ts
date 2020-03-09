@@ -8,7 +8,7 @@ import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {default as AnnotationSchema} from './model/annotation-schema';
 import {createSubscription} from '../../common/stack/subscription';
 import {addServiceModel} from 'digitraffic-cdk-api/utils';
-import {methodResponse, RESPONSE_200_OK, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
+import {methodJsonResponse, RESPONSE_200_OK, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {getModelReference} from "../../common/api/utils";
@@ -77,8 +77,8 @@ function createAnnotationsResource(
             'method.request.querystring.type': false
         },
         methodResponses: [
-            methodResponse("200", annotationsModel),
-            methodResponse("500", responseModel)
+            methodJsonResponse("200", annotationsModel),
+            methodJsonResponse("500", responseModel)
         ]
     });
 
@@ -104,7 +104,6 @@ function createApi(stack: Construct, nw2Props: NW2Props) {
         },
         restApiName: 'Nordicway2 public API',
         endpointTypes: [nw2Props.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
-        minimumCompressionSize: 1000,
         policy: new PolicyDocument({
             statements: [
                 new PolicyStatement({

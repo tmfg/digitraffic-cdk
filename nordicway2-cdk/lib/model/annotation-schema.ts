@@ -18,6 +18,11 @@ const annotationsProperties: apigateway.JsonSchema = {
             format: "date-time",
             description: 'Created date time'
         },
+        updatedAt: {
+            type: apigateway.JsonSchemaType.STRING,
+            format: "date-time",
+            description: 'Updated date time'
+        },
         recordedAt: {
             type: apigateway.JsonSchemaType.STRING,
             format: "date-time",

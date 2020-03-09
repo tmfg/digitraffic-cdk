@@ -33,6 +33,7 @@ function convertFeatures(aa: any[]) {
             id: a.id,
             author: a.author,
             createdAt: a.created_at,
+            updatedAt: a.updated_at,
             recordedAt: a.recorded_at,
             expiresAt: a.expires_at,
             type: a.type
