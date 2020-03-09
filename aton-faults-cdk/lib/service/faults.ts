@@ -73,12 +73,12 @@ function createXml(fault: any) {
                     'id' : urn,
                     'messageSeriesIdentifier' : createMessageSeriesIdentifier(faultId, year),
                     'sourceDate': fault.entry_timestamp.toISOString(),
-                    'generalArea': fault.area_description_fi,
+                    'generalArea': fault.area_description_en,
                     'locality' : {
                         'text': fault.fairway_name_fi
                     },
                     'title':  {
-                        'text' : `${fault.aton_id} ${fault.aton_type_fi} ${fault.aton_name_fi}, ${fault.type}`
+                        'text' : `${fault.aton_id} ${fault.aton_type_fi} ${fault.aton_name_fi}, ${fault.fault_type_en}`
                     },
                     'fixedDateRange' : createFixedDateRange(fault)
                 }
@@ -158,9 +158,7 @@ function convertFeature(fault: any) {
         fairway_number: fault.fairway_number,
         fairway_name_fi: fault.fairway_name_fi,
         fairway_name_se: fault.fairway_name_se,
-        area_number: fault.area_number,
-        area_description_fi: fault.area_description_fi,
-        area_description_se: fault.area_description_se
+        area_number: fault.area_number
     };
 
     // convert geometry from db to geojson
