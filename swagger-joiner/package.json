@@ -2,7 +2,7 @@
   "name": "swagger-joiner",
   "version": "0.1.0",
   "bin": {
-    "cloudfront-cdk": "bin/swagger-joiner.js"
+    "cloudfront-cdk": "bin/swagger-joiner-app.js"
   },
   "scripts": {
     "prebuild": "rimraf tsd",
