@@ -5,16 +5,20 @@ import {Props} from './app-props';
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Bucket} from "@aws-cdk/aws-s3";
-import {KEY_BUCKET_NAME, KEY_REGION} from "./lambda/update-swagger/lambda-update-swagger";
+import {KEY_BUCKET_NAME, KEY_REGION, KEY_APP_URL, KEY_APIGW_APPS} from "./lambda/update-swagger/lambda-update-swagger";
 
 export function create(
     bucket: Bucket,
     props: Props,
     stack: Stack) {
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
+
     const lambdaEnv: any = {};
     lambdaEnv[KEY_BUCKET_NAME] = bucket.bucketName;
     lambdaEnv[KEY_REGION] = stack.region;
+    lambdaEnv[KEY_APP_URL] = props.appUrl;
+    lambdaEnv[KEY_APIGW_APPS] = JSON.stringify(props.apiGwAppIds);
+
     const lambdaConf: FunctionProps = {
         functionName: functionName,
         logRetention: RetentionDays.ONE_YEAR,

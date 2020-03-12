@@ -4,13 +4,15 @@ import * as R from 'ramda';
 
 export const KEY_BUCKET_NAME = 'BUCKET_NAME';
 export const KEY_REGION = 'REGION';
+export const KEY_APP_URL = 'APP_URL';
+export const KEY_APIGW_APPS = 'APIGW_APPS';
 
 export const handler = async (): Promise<any> => {
     const bucketName = process.env[KEY_BUCKET_NAME] as string;
-    AWS.config.update({region: process.env[KEY_REGION] as string});
+    const appUrl = process.env[KEY_APP_URL] as string;
+    const apigatewayIds = JSON.parse(process.env[KEY_APIGW_APPS] as string) as string[];
 
-    const apigatewayIds = [];
-    const appUrl = '';
+    AWS.config.update({region: process.env[KEY_REGION] as string});
 
     const apiResponses = await Promise.all(apigatewayIds.map(exportApi));
     const apis = apiResponses.map(resp => JSON.parse(resp.body as string));
@@ -20,6 +22,7 @@ export const handler = async (): Promise<any> => {
     const merged = allApis.reduce((acc, curr) => R.mergeDeepLeft(curr, acc));
 
     const s3 = new AWS.S3();
+
     await s3.upload({
         Bucket: bucketName,
         Key: 'dt-swagger.js',
