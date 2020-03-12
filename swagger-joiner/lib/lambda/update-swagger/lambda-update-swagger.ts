@@ -1,11 +1,17 @@
 import * as AWS from "aws-sdk";
 import axios from 'axios';
 import * as R from 'ramda';
+import {PutObjectRequest} from "aws-sdk/clients/s3";
 
 export const KEY_BUCKET_NAME = 'BUCKET_NAME';
 export const KEY_REGION = 'REGION';
 export const KEY_APP_URL = 'APP_URL';
 export const KEY_APIGW_APPS = 'APIGW_APPS';
+
+export const S3_UPLOAD_SETTINGS = {
+    Key: 'dt-swagger.js',
+    ACL: 'public-read'
+};
 
 export const handler = async (): Promise<any> => {
     const bucketName = process.env[KEY_BUCKET_NAME] as string;
@@ -23,12 +29,12 @@ export const handler = async (): Promise<any> => {
 
     const s3 = new AWS.S3();
 
-    await s3.upload({
+    await s3.upload(Object.assign({}, S3_UPLOAD_SETTINGS, {
         Bucket: bucketName,
         Key: 'dt-swagger.js',
         Body: constructSwagger(merged),
         ACL: 'public-read'
-    }).promise();
+    } as PutObjectRequest)).promise();
 };
 
 function exportApi(apiId: string) {
@@ -42,7 +48,7 @@ function exportApi(apiId: string) {
 }
 
 
-function constructSwagger(spec: object) {
+export function constructSwagger(spec: object) {
     return `
         window.onload = function() {
             const ui = SwaggerUIBundle({
