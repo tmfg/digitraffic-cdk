@@ -3,7 +3,7 @@ import iam = require('@aws-cdk/aws-iam');
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
-import {Construct} from "@aws-cdk/core";
+import {Construct, Stack} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
@@ -17,15 +17,18 @@ import {
 import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../common/stack/subscription";
 import {createUsagePlan} from "../../common/stack/usage-plans";
-import {methodResponse} from "../../common/api/responses";
+import {methodJsonResponse} from "../../common/api/responses";
+import {addTags} from "../../common/api/documentation";
+
+const API_TAGS = ['Data v1'];
 
 export function create(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    stack: Construct,
+    stack: Stack,
     props: Props) {
 
-    const publicApi = createApi(stack, props);
+    const publicApi = createApi(stack);
 
     createUsagePlan(publicApi, 'Open311 CloudFront API Key', 'Open311 CloudFront Usage Plan');
 
@@ -94,7 +97,8 @@ function createRequestsResource(
         requests,
         getRequestsHandler,
         requestsModel,
-        messageResponseModel);
+        messageResponseModel,
+        stack);
 
     const getRequestId = 'GetRequest';
     const getRequestHandler = new lambda.Function(stack, getRequestId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -108,7 +112,8 @@ function createRequestsResource(
         getRequestHandler,
         requestModel,
         messageResponseModel,
-        validator);
+        validator,
+        stack);
 }
 
 function createGetRequestIntegration(
@@ -117,7 +122,8 @@ function createGetRequestIntegration(
     getRequestHandler: lambda.Function,
     requestModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
-    validator: apigateway.RequestValidator) {
+    validator: apigateway.RequestValidator,
+    stack: Construct) {
 
     const getRequestIntegration = new LambdaIntegration(getRequestHandler, {
         proxy: false,
@@ -155,11 +161,12 @@ function createGetRequestIntegration(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            methodResponse("200", requestModel),
-            methodResponse("404", messageResponseModel),
-            methodResponse("500", messageResponseModel)
+            methodJsonResponse("200", requestModel),
+            methodJsonResponse("404", messageResponseModel),
+            methodJsonResponse("500", messageResponseModel)
         ]
     });
+    addTags('GetRequest', API_TAGS, request, stack);
 }
 
 function createGetRequestsIntegration(
@@ -167,7 +174,8 @@ function createGetRequestsIntegration(
     requests: apigateway.Resource,
     getRequestsHandler: lambda.Function,
     requestsModel: apigateway.Model,
-    messageResponseModel: apigateway.Model) {
+    messageResponseModel: apigateway.Model,
+    stack: Construct) {
 
     const getRequestsIntegration = new LambdaIntegration(getRequestsHandler, {
         proxy: false,
@@ -194,10 +202,11 @@ function createGetRequestsIntegration(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            methodResponse("200", requestsModel),
-            methodResponse("500", messageResponseModel)
+            methodJsonResponse("200", requestsModel),
+            methodJsonResponse("500", messageResponseModel)
         ]
     });
+    addTags('GetRequests', API_TAGS, requests, stack);
 }
 
 function createStatesResource(
@@ -223,6 +232,7 @@ function createStatesResource(
         getStatesHandler,
         stateModel,
         messageResponseModel);
+    addTags('GetStates', API_TAGS, states, stack);
 }
 
 function createGetStatesIntegration(
@@ -245,8 +255,8 @@ function createGetStatesIntegration(
     });
     states.addMethod("GET", getServicesIntegration, {
         methodResponses: [
-            methodResponse("200", statesModel),
-            methodResponse("500", messageResponseModel)
+            methodJsonResponse("200", statesModel),
+            methodJsonResponse("500", messageResponseModel)
         ]
     });
 }
@@ -275,7 +285,8 @@ function createServicesResource(
         services,
         getServicesHandler,
         servicesModel,
-        messageResponseModel);
+        messageResponseModel,
+        stack);
 
     const getServiceId = 'GetService';
     const getServiceHandler = new lambda.Function(stack, getServiceId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -289,7 +300,8 @@ function createServicesResource(
         getServiceHandler,
         serviceModel,
         messageResponseModel,
-        validator);
+        validator,
+        stack);
 }
 
 function createGetServicesIntegration(
@@ -297,7 +309,8 @@ function createGetServicesIntegration(
     services: apigateway.Resource,
     getServicesHandler: lambda.Function,
     servicesModel: apigateway.Model,
-    messageResponseModel: apigateway.Model) {
+    messageResponseModel: apigateway.Model,
+    stack: Construct) {
 
     const getServicesIntegration = new LambdaIntegration(getServicesHandler, {
         proxy: false,
@@ -313,10 +326,11 @@ function createGetServicesIntegration(
     });
     services.addMethod("GET", getServicesIntegration, {
         methodResponses: [
-            methodResponse("200", servicesModel),
-            methodResponse("500", messageResponseModel)
+            methodJsonResponse("200", servicesModel),
+            methodJsonResponse("500", messageResponseModel)
         ]
     });
+    addTags('GetServices', API_TAGS, services, stack);
 }
 
 function createGetServiceIntegration(
@@ -325,7 +339,8 @@ function createGetServiceIntegration(
     getServiceHandler: lambda.Function,
     serviceModel: apigateway.Model,
     messageResponseModel: apigateway.Model,
-    validator: apigateway.RequestValidator) {
+    validator: apigateway.RequestValidator,
+    stack: Construct) {
     const getServiceIntegration = new LambdaIntegration(getServiceHandler, {
         proxy: false,
         requestParameters: {
@@ -377,9 +392,10 @@ function createGetServiceIntegration(
             }
         ]
     });
+    addTags('GetService', API_TAGS, service, stack);
 }
 
-function createApi(stack: Construct, props: Props) {
+function createApi(stack: Construct) {
     return new apigateway.RestApi(stack, 'Open311-public', {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
