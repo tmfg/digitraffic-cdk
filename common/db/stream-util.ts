@@ -8,6 +8,9 @@ export async function stream(db: IDatabase<any, any>, qs: any, conversion: (faul
         s.on('data', d => {
             things.push(conversion(d));
         });
+        s.on('error', error => {
+            throw error;
+        });
     });
 
     console.info("db streaming took %d", Date.now() - start);

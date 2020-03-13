@@ -6,6 +6,7 @@ import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
 import {Geometry} from "wkx";
 import {createFeatureCollection} from "../../../common/api/geojson";
 import {Builder} from 'xml2js';
+import {Language} from "../../../common/model/language";
 
 let moment = require('moment');
 
@@ -20,9 +21,9 @@ const PRODUCTION_AGENCY = {
 
 const NAME_OF_SERIES = 'Finnish ATON Faults';
 
-export async function findAllFaults(): Promise<FeatureCollection> {
+export async function findAllFaults(language: Language): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        const features = await FaultsDB.streamAllForJson(db, convertFeature);
+        const features = await FaultsDB.streamAllForJson(db, language, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
         return createFeatureCollection(features, lastUpdated);
@@ -73,12 +74,12 @@ function createXml(fault: any) {
                     'id' : urn,
                     'messageSeriesIdentifier' : createMessageSeriesIdentifier(faultId, year),
                     'sourceDate': fault.entry_timestamp.toISOString(),
-                    'generalArea': fault.area_description_fi,
+                    'generalArea': fault.area_description_en,
                     'locality' : {
                         'text': fault.fairway_name_fi
                     },
                     'title':  {
-                        'text' : `${fault.aton_id} ${fault.aton_type_fi} ${fault.aton_name_fi}, ${fault.type}`
+                        'text' : `${fault.aton_id} ${fault.aton_type_fi} ${fault.aton_name_fi}, ${fault.fault_type_en}`
                     },
                     'fixedDateRange' : createFixedDateRange(fault)
                 }
@@ -146,7 +147,7 @@ function convertFeature(fault: any) {
         id: fault.id,
         entry_timestamp: fault.entry_timestamp,
         fixed_timestamp: fault.fixed_timestamp,
-        type: fault.type,
+        type: fault.aton_fault_type,
         domain: fault.domain,
         state: fault.state,
         fixed: fault.fixed,
@@ -159,8 +160,7 @@ function convertFeature(fault: any) {
         fairway_name_fi: fault.fairway_name_fi,
         fairway_name_se: fault.fairway_name_se,
         area_number: fault.area_number,
-        area_description_fi: fault.area_description_fi,
-        area_description_se: fault.area_description_se
+        area_description: fault.area_description
     };
 
     // convert geometry from db to geojson

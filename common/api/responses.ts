@@ -43,13 +43,15 @@ export function methodXmlResponse(status: string, model: any) {
     };
 }
 
-export function defaultIntegration(lambdaFunction: Function): LambdaIntegration {
+export function defaultIntegration(lambdaFunction: Function, requestParameters: any = {}, requestTemplates: any = {}): LambdaIntegration {
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
             RESPONSE_200_OK,
             RESPONSE_500_SERVER_ERROR
-        ]
+        ],
+        requestParameters: requestParameters,
+        requestTemplates: requestTemplates
     });
 }
 

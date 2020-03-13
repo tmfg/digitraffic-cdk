@@ -8,9 +8,9 @@ export function createOriginConfig(domain: CFDomain): SourceConfiguration {
             domainName: domain.domainName,
             httpPort: domain.httpPort || 80,
             httpsPort: domain.httpsPort || 443,
-            originProtocolPolicy: domain.protocolPolicy as OriginProtocolPolicy || OriginProtocolPolicy.HTTP_ONLY
+            originProtocolPolicy: domain.protocolPolicy as OriginProtocolPolicy || OriginProtocolPolicy.HTTPS_ONLY
         },
-        behaviors: createBehaviors(domain.behaviors),
+        behaviors: createBehaviors(domain.behaviors || []),
         originPath: domain.originPath,
         originHeaders: createOriginHeaders(domain)
     }
