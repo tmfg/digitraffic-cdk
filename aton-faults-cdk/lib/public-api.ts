@@ -61,9 +61,19 @@ function createAnnotationsResource(
     }));
 
     const resources = createResourcePaths(publicApi);
+    const getFaultsIntegration = defaultIntegration(getFaultsLambda, {
+            'integration.request.querystring.language': 'method.request.querystring.language'
+        }, {
+            'application/json': JSON.stringify({
+                language: "$util.escapeJavaScript($input.params('language'))"
+            })
+        });
 
-    resources.faults.addMethod("GET", defaultIntegration(getFaultsLambda), {
+    resources.faults.addMethod("GET", getFaultsIntegration, {
         apiKeyRequired: !props.private,
+        requestParameters: {
+            'method.request.querystring.language': false
+        },
         methodResponses: [
             methodJsonResponse("200", faultsJsonModel),
             methodJsonResponse("500", errorResponseModel)
