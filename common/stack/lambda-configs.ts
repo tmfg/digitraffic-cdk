@@ -13,7 +13,7 @@ export interface LambdaConfiguration {
     logsDestinationArn?: string;
     memorySize?: number,
     runtime?: string,
-    private: boolean
+    private: boolean,
 }
 
 declare interface DbProps {

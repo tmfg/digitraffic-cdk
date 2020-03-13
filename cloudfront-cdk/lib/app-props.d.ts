@@ -11,7 +11,7 @@ export interface CFDomain {
     httpPort?: number,
     httpsPort?: number,
     apiKey?: string,
-    behaviors: CFBehavior[]
+    behaviors?: CFBehavior[]
 }
 
 export interface Props {
