@@ -5,7 +5,8 @@ export interface CFBehavior {
 }
 
 export interface CFDomain {
-    domainName: string,
+    s3BucketName?: string,
+    domainName?: string,
     originPath?: string,
     protocolPolicy?: string,
     httpPort?: number,
@@ -15,6 +16,7 @@ export interface CFDomain {
 }
 
 export interface Props {
+    originAccessIdentity?: boolean,
     distributionName: string,
     environmentName: string,
     aliasNames: string[] | null,
