@@ -1,7 +1,8 @@
 export interface CFBehavior {
-    path: string,
+    path?: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
+    lambdaFunction?: string
 }
 
 export interface CFDomain {

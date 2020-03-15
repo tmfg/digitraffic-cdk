@@ -4,22 +4,42 @@ import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 import {Props} from '../lib/app-props';
+import {Runtime, Function, AssetCode, Version} from '@aws-cdk/aws-lambda';
 
 export class CloudfrontCdkStack extends Stack {
-    constructor(scope: Construct, id: string, cloudfrontProps: Props[], props?: StackProps) {
-        super(scope, id, props);
+    constructor(scope: Construct, cloudfrontProps: Props[], props?: StackProps) {
+        super(scope, 'CloudfrontCdkStack', props);
 
-        cloudfrontProps.forEach(p => this.createDistribution(p));
+        const lambdaMap = this.createLambdas();
+
+        cloudfrontProps.forEach(p => this.createDistribution(p, lambdaMap));
     }
 
-    createDistribution(cloudfrontProps: Props) {
+    createLambdas() {
+        const lambdaMap:any = {};
+
+        const redirectFunction = new Function(this, 'weathercam-redirect', {
+            runtime: Runtime.NODEJS_12_X,
+            memorySize: 128,
+            code: new AssetCode('dist/lambda'),
+            handler: 'lambda-redirect.handler',
+        });
+
+        lambdaMap['redirect'] = new Version(this, "RedirectVersion", {
+            lambda: redirectFunction
+        }).functionArn;
+
+        return lambdaMap;
+    }
+
+    createDistribution(cloudfrontProps: Props, lambdaMap: any) {
         const env = cloudfrontProps.environmentName;
         const oai = cloudfrontProps.originAccessIdentity ? new OriginAccessIdentity(this, `${env}-oai`) : null;
 
-        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(this, d, oai));
-        const bucket = new Bucket(this, `${env}-cf-logBucket`, {
+        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(this, d, oai, lambdaMap));
+        const bucket = new Bucket(this, `${env}-CF-logBucket`, {
             versioned: false,
-            bucketName: `${env}-cf-cloudfront-logs`,
+            bucketName: `${env}-cf-logs`,
             publicReadAccess: false,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
