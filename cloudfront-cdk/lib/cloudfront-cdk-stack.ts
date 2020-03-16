@@ -3,31 +3,52 @@ import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-clou
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
-import {Props} from '../lib/app-props';
-import {Runtime, Function, AssetCode, Version} from '@aws-cdk/aws-lambda';
+import {CFProps, Props} from '../lib/app-props';
+import {Runtime, Function, InlineCode} from '@aws-cdk/aws-lambda';
+import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
+
+const fs = require('fs');
 
 export class CloudfrontCdkStack extends Stack {
-    constructor(scope: Construct, cloudfrontProps: Props[], props?: StackProps) {
+    constructor(scope: Construct, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, 'CloudfrontCdkStack', props);
 
-        const lambdaMap = this.createLambdas();
+        let lambdaMap = {};
+        if(cloudfrontProps.weathercamDomainName && cloudfrontProps.weathercamHostName) {
+            lambdaMap = this.createLambdas(cloudfrontProps.weathercamDomainName as string, cloudfrontProps.weathercamHostName as string);
+        }
 
-        cloudfrontProps.forEach(p => this.createDistribution(p, lambdaMap));
+        cloudfrontProps.props.forEach(p => this.createDistribution(p, lambdaMap));
     }
 
-    createLambdas() {
+    createLambdas(domainName: string, hostName: string) {
         const lambdaMap:any = {};
+        const versionString = new Date().toISOString();
+        const lambdaBody = fs.readFileSync('dist/lambda/lambda-redirect.js');
+        const functionBody = lambdaBody.toString()
+            .replace(/EXT_HOST_NAME/gi, hostName)
+            .replace(/EXT_DOMAIN_NAME/gi, domainName)
+            .replace(/EXT_VERSION/gi, versionString);
 
         const redirectFunction = new Function(this, 'weathercam-redirect', {
             runtime: Runtime.NODEJS_12_X,
             memorySize: 128,
-            code: new AssetCode('dist/lambda'),
-            handler: 'lambda-redirect.handler',
+            code: new InlineCode(functionBody),
+            handler: 'index.handler',
+            role: new Role(this, 'edgeLambdaRole', {
+                assumedBy:  new CompositePrincipal(
+                    new ServicePrincipal("lambda.amazonaws.com"),
+                    new ServicePrincipal("edgelambda.amazonaws.com"),
+                ),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
+                ]
+            }),
         });
 
-        lambdaMap['redirect'] = new Version(this, "RedirectVersion", {
-            lambda: redirectFunction
-        }).functionArn;
+        const version = redirectFunction.addVersion(versionString);
+
+        lambdaMap['redirect'] = version;
 
         return lambdaMap;
     }

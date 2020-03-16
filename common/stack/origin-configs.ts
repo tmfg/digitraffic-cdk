@@ -2,7 +2,6 @@ import {Duration, Stack} from '@aws-cdk/core';
 import {OriginProtocolPolicy, OriginAccessIdentity, SourceConfiguration, Behavior, LambdaEdgeEventType} from '@aws-cdk/aws-cloudfront';
 import {CFBehavior, CFDomain} from "../../cloudfront-cdk/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
-import {Version} from '@aws-cdk/aws-lambda';
 
 export function createOriginConfig(stack: Stack, domain: CFDomain,
                                    oai: OriginAccessIdentity|null,
@@ -76,8 +75,8 @@ function lambdaFunctionAssociations(stack: Stack, behavior: CFBehavior, lambdaMa
         const lambdaVersion = lambdaMap[behavior.lambdaFunction];
 
         return [{
-            eventType: LambdaEdgeEventType.VIEWER_REQUEST,
-            lambdaFunction: Version.fromVersionArn(stack, 'RedirectFunction', lambdaVersion)
+            eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
+            lambdaFunction: lambdaVersion
         }]
     }
 

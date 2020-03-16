@@ -24,3 +24,9 @@ export interface Props {
     acmCertRef: string | null,
     domains: CFDomain[]
 }
+
+export interface CFProps {
+    props: Props[],
+    weathercamDomainName?: string,
+    weathercamHostName?: string
+}
