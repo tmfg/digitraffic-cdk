@@ -1,22 +1,66 @@
 import {Stack, StackProps, Construct} from '@aws-cdk/core';
-import {CloudFrontWebDistribution} from '@aws-cdk/aws-cloudfront';
+import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
-import {Props} from '../lib/app-props';
+import {CFProps, Props} from '../lib/app-props';
+import {Runtime, Function, InlineCode} from '@aws-cdk/aws-lambda';
+import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
+
+const fs = require('fs');
 
 export class CloudfrontCdkStack extends Stack {
-    constructor(scope: Construct, id: string, cloudfrontProps: Props, props?: StackProps) {
-        super(scope, id, props);
+    constructor(scope: Construct, cloudfrontProps: CFProps, props?: StackProps) {
+        super(scope, 'CloudfrontCdkStack', props);
 
-        this.createDistribution(cloudfrontProps);
+        let lambdaMap = {};
+        if(cloudfrontProps.weathercamDomainName && cloudfrontProps.weathercamHostName) {
+            lambdaMap = this.createLambdas(cloudfrontProps.weathercamDomainName as string, cloudfrontProps.weathercamHostName as string);
+        }
+
+        cloudfrontProps.props.forEach(p => this.createDistribution(p, lambdaMap));
     }
 
-    createDistribution(cloudfrontProps: Props) {
-        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(d));
-        const bucket = new Bucket(this, 'logBucket', {
+    createLambdas(domainName: string, hostName: string) {
+        const lambdaMap:any = {};
+        const versionString = new Date().toISOString();
+        const lambdaBody = fs.readFileSync('dist/lambda/lambda-redirect.js');
+        const functionBody = lambdaBody.toString()
+            .replace(/EXT_HOST_NAME/gi, hostName)
+            .replace(/EXT_DOMAIN_NAME/gi, domainName)
+            .replace(/EXT_VERSION/gi, versionString);
+
+        const redirectFunction = new Function(this, 'weathercam-redirect', {
+            runtime: Runtime.NODEJS_12_X,
+            memorySize: 128,
+            code: new InlineCode(functionBody),
+            handler: 'index.handler',
+            role: new Role(this, 'edgeLambdaRole', {
+                assumedBy:  new CompositePrincipal(
+                    new ServicePrincipal("lambda.amazonaws.com"),
+                    new ServicePrincipal("edgelambda.amazonaws.com"),
+                ),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
+                ]
+            }),
+        });
+
+        const version = redirectFunction.addVersion(versionString);
+
+        lambdaMap['redirect'] = version;
+
+        return lambdaMap;
+    }
+
+    createDistribution(cloudfrontProps: Props, lambdaMap: any) {
+        const env = cloudfrontProps.environmentName;
+        const oai = cloudfrontProps.originAccessIdentity ? new OriginAccessIdentity(this, `${env}-oai`) : null;
+
+        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(this, d, oai, lambdaMap));
+        const bucket = new Bucket(this, `${env}-CF-logBucket`, {
             versioned: false,
-            bucketName: `${cloudfrontProps.environmentName}-cloudfront-logs`,
+            bucketName: `${env}-cf-logs`,
             publicReadAccess: false,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });

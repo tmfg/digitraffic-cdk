@@ -13,6 +13,7 @@ import {CloudfrontCdkStack} from "../lib/cloudfront-cdk-stack";
     const profileProps = profilePropsFile['default'];
 
     const app = new cdk.App();
-    new CloudfrontCdkStack(app, 'CloudfrontCdkStack', profileProps);
+    const cfStack = new CloudfrontCdkStack(app, profileProps, { env: { region: "us-east-1" } });
+
     app.synth();
 })();

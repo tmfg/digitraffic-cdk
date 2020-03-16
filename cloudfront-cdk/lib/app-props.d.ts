@@ -1,11 +1,13 @@
 export interface CFBehavior {
-    path: string,
+    path?: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
+    lambdaFunction?: string
 }
 
 export interface CFDomain {
-    domainName: string,
+    s3BucketName?: string,
+    domainName?: string,
     originPath?: string,
     protocolPolicy?: string,
     httpPort?: number,
@@ -15,9 +17,16 @@ export interface CFDomain {
 }
 
 export interface Props {
+    originAccessIdentity?: boolean,
     distributionName: string,
     environmentName: string,
     aliasNames: string[] | null,
     acmCertRef: string | null,
     domains: CFDomain[]
+}
+
+export interface CFProps {
+    props: Props[],
+    weathercamDomainName?: string,
+    weathercamHostName?: string
 }

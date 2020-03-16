@@ -7,6 +7,7 @@
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
+    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
     "watch": "tsc -w",
     "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
