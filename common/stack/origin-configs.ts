@@ -12,6 +12,8 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
             bucketRegionalDomainName: `${domain.s3BucketName}.s3.eu-west-1.amazonaws.com`
         });
 
+        bucket.grantRead(oai as OriginAccessIdentity);
+
         return {
             s3OriginSource: {
                 s3BucketSource: bucket,
