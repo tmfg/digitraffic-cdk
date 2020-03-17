@@ -2,8 +2,9 @@ const domainName = "EXT_DOMAIN_NAME";
 const hostName = "EXT_HOST_NAME";
 
 const hostHeader = [{ key: 'host', value: hostName}];
+const sslProtocols = ['TLSv1', 'TLSv1.1'];
 
-// VERSION: EXT_VERSION
+const VERSION = "EXT_VERSION";
 
 exports.handler = function handler(event: any, context: any, callback: any) {
     const { request } = event.Records[0].cf;
@@ -16,7 +17,7 @@ exports.handler = function handler(event: any, context: any, callback: any) {
                 port: 80,
                 protocol: 'http',
                 path: '',
-                sslProtocols: ['TLSv1', 'TLSv1.1'],
+                sslProtocols: sslProtocols,
                 readTimeout: 5,
                 keepaliveTimeout: 5,
                 customHeaders: {}
