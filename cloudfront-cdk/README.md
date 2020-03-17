@@ -10,3 +10,7 @@ What you need before installing?
 Now you can deploy cloudfront with:
 
 cdk deploy
+
+And after that?
+1. Check weathercam-bucket, you must give permission to created originAccessIdentity
+2. Route53, domain-names should be alias to created cloudfront distributions
