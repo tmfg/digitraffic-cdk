@@ -51,5 +51,5 @@ cdk.out
 
 # config
 dont-commit-this-props-*.ts
-**/bin/swagger-joiner-app.ts
 cdk.context.json
+**/dont-commit-this-*
