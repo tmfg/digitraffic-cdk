@@ -3,57 +3,29 @@ import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-clou
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
-import {CFProps, Props} from '../lib/app-props';
-import {Runtime, Function, InlineCode} from '@aws-cdk/aws-lambda';
-import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
-
-const fs = require('fs');
+import {CFLambdaProps, CFProps, Props} from '../lib/app-props';
+import {createWeathercamRedirect} from "./lambda/lambda-creator";
 
 export class CloudfrontCdkStack extends Stack {
-    constructor(scope: Construct, cloudfrontProps: CFProps, props?: StackProps) {
-        super(scope, 'CloudfrontCdkStack', props);
+    constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
+        super(scope, id, props);
 
-        const lambdaMap = this.createLambdaMap(cloudfrontProps);
+        const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
 
         cloudfrontProps.props.forEach(p => this.createDistribution(p, lambdaMap));
     }
 
-    createLambdaMap(cloudfrontProps: CFProps) {
-        if(cloudfrontProps.weathercamDomainName && cloudfrontProps.weathercamHostName) {
-            return this.createLambdas(cloudfrontProps.weathercamDomainName as string, cloudfrontProps.weathercamHostName as string);
+    createLambdaMap(lProps: CFLambdaProps | undefined): any {
+        let lambdaMap: any = {};
+
+        if(lProps != undefined) {
+//            console.info("got props " + JSON.stringify(lProps));
+
+            if(lProps.lambdaNames.includes('weathercam-redirect')) {
+                lambdaMap['weathercam-redirect'] =
+                    createWeathercamRedirect(this, lProps.lambdaParameters.weathercamDomainName, lProps.lambdaParameters.weathercamHostName);
+            }
         }
-
-        return {}
-    }
-
-    createLambdas(domainName: string, hostName: string) {
-        const lambdaMap:any = {};
-        const versionString = new Date().toISOString();
-        const lambdaBody = fs.readFileSync('dist/lambda/lambda-redirect.js');
-        const functionBody = lambdaBody.toString()
-            .replace(/EXT_HOST_NAME/gi, hostName)
-            .replace(/EXT_DOMAIN_NAME/gi, domainName)
-            .replace(/EXT_VERSION/gi, versionString);
-
-        const redirectFunction = new Function(this, 'weathercam-redirect', {
-            runtime: Runtime.NODEJS_12_X,
-            memorySize: 128,
-            code: new InlineCode(functionBody),
-            handler: 'index.handler',
-            role: new Role(this, 'edgeLambdaRole', {
-                assumedBy:  new CompositePrincipal(
-                    new ServicePrincipal("lambda.amazonaws.com"),
-                    new ServicePrincipal("edgelambda.amazonaws.com"),
-                ),
-                managedPolicies: [
-                    ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
-                ]
-            }),
-        });
-
-        const version = redirectFunction.addVersion(versionString);
-
-        lambdaMap['redirect'] = version;
 
         return lambdaMap;
     }

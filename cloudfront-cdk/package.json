@@ -2,42 +2,32 @@
   "name": "cloudfront-cdk",
   "version": "0.1.0",
   "bin": {
-    "cloudfront-cdk": "bin/cloudfront-cdk.js"
+    "cloudfront-cdk": "bin/cloudfront-app.js"
   },
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
     "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
     "watch": "tsc -w",
-    "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "^1.26.0",
-    "@types/aws-lambda": "latest",
-    "@types/jest": "^24.0.22",
+    "@aws-cdk/assert": "1.27.0",
+    "@types/aws-lambda": "8.10.46",
     "@types/node": "10.17.5",
-    "@types/sinon": "^7.5.1",
-    "@types/xml2js": "^0.4.5",
-    "aws-cdk": "1.26.0",
-    "jest": "^24.9.0",
-    "parcel": "^1.12.4",
-    "rimraf": "^3.0.0",
-    "sinon": "^7.5.0",
-    "ts-jest": "^24.1.0",
-    "ts-node": "^8.1.0",
-    "typescript": "~3.7.2"
+    "@types/sinon": "7.5.2",
+    "aws-cdk": "1.27.0",
+    "parcel": "1.12.4",
+    "rimraf": "3.0.2",
+    "sinon": "9.0.1",
+    "ts-node": "8.6.2",
+    "typescript": "3.8.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.26.0",
-    "@aws-cdk/aws-wafv2": "1.26.0",
-    "@aws-cdk/core": "1.26.0",
-    "@aws-cdk/aws-events-targets": "1.26.0",
-    "source-map-support": "^0.5.16",
-    "axios": "latest",
-    "@types/geojson": "latest",
-    "wkx": "latest",
-    "parse-link-header": "latest"
+    "@aws-cdk/aws-apigateway": "1.27.0",
+    "@aws-cdk/aws-wafv2": "1.27.0",
+    "@aws-cdk/core": "1.27.0",
+    "@aws-cdk/aws-events-targets": "1.27.0"
   }
 }

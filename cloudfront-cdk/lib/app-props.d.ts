@@ -27,6 +27,10 @@ export interface Props {
 
 export interface CFProps {
     props: Props[],
-    weathercamDomainName?: string,
-    weathercamHostName?: string
+    lambdaProps?: CFLambdaProps,
+}
+
+export interface CFLambdaProps {
+    lambdaNames: string[],
+    lambdaParameters?: any
 }

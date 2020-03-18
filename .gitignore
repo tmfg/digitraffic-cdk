@@ -54,3 +54,4 @@ dont-commit-this-props-*.ts
 cdk.context.json
 **/dont-commit-this-*
 nordicway2-cdk/bin/nordicway2-app.ts
+cloudfront-cdk/bin/cloudfront-app.ts

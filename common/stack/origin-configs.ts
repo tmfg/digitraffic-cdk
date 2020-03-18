@@ -38,7 +38,7 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
 }
 
 function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
-    if (domain.apiKey) {
+    if (domain.apiKey != undefined) {
         return {
             'x-api-key': domain.apiKey
         } as { [key: string] : string };
@@ -73,7 +73,9 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
 }
 
 function lambdaFunctionAssociations(stack: Stack, behavior: CFBehavior, lambdaMap: any) {
-    if(behavior.lambdaFunction) {
+//    console.info("creating function associations " + JSON.stringify(behavior.lambdaFunction));
+
+    if(behavior.lambdaFunction != undefined) {
         const lambdaVersion = lambdaMap[behavior.lambdaFunction];
 
         return [{
