@@ -75,8 +75,8 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
 function lambdaFunctionAssociations(stack: Stack, behavior: CFBehavior, lambdaMap: any) {
 //    console.info("creating function associations " + JSON.stringify(behavior.lambdaFunction));
 
-    if(behavior.lambdaFunction != undefined) {
-        const lambdaVersion = lambdaMap[behavior.lambdaFunction];
+    if(behavior.lambdaType != undefined) {
+        const lambdaVersion = lambdaMap[behavior.lambdaType];
 
         return [{
             eventType: LambdaEdgeEventType.ORIGIN_REQUEST,

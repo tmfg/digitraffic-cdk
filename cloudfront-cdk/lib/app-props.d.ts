@@ -1,8 +1,10 @@
+import {LambdaType} from "./lambda/lambda-creator";
+
 export interface CFBehavior {
     path?: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
-    lambdaFunction?: string
+    lambdaType?: LambdaType
 }
 
 export interface CFDomain {
@@ -31,6 +33,6 @@ export interface CFProps {
 }
 
 export interface CFLambdaProps {
-    lambdaNames: string[],
+    lambdaTypes: LambdaType[],
     lambdaParameters?: any
 }

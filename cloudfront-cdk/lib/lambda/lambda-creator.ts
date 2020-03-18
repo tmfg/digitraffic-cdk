@@ -4,6 +4,10 @@ import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cd
 
 const fs = require('fs');
 
+export enum LambdaType {
+    WEATHERCAM_REDIRECT, REQUIRE_GZIP
+}
+
 export function createWeathercamRedirect(stack: Stack, domainName: string, hostName: string) {
     const versionString = new Date().toISOString();
     const lambdaBody = fs.readFileSync('dist/lambda/lambda-redirect.js');

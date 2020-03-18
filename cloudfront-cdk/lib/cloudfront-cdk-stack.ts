@@ -4,7 +4,7 @@ import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 import {CFLambdaProps, CFProps, Props} from '../lib/app-props';
-import {createWeathercamRedirect} from "./lambda/lambda-creator";
+import {createWeathercamRedirect, LambdaType} from "./lambda/lambda-creator";
 
 export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
@@ -21,8 +21,8 @@ export class CloudfrontCdkStack extends Stack {
         if(lProps != undefined) {
 //            console.info("got props " + JSON.stringify(lProps));
 
-            if(lProps.lambdaNames.includes('weathercam-redirect')) {
-                lambdaMap['weathercam-redirect'] =
+            if(lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
+                lambdaMap[LambdaType.WEATHERCAM_REDIRECT] =
                     createWeathercamRedirect(this, lProps.lambdaParameters.weathercamDomainName, lProps.lambdaParameters.weathercamHostName);
             }
         }
