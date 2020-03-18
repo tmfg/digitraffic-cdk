@@ -13,12 +13,17 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, 'CloudfrontCdkStack', props);
 
-        let lambdaMap = {};
-        if(cloudfrontProps.weathercamDomainName && cloudfrontProps.weathercamHostName) {
-            lambdaMap = this.createLambdas(cloudfrontProps.weathercamDomainName as string, cloudfrontProps.weathercamHostName as string);
-        }
+        const lambdaMap = this.createLambdaMap(cloudfrontProps);
 
         cloudfrontProps.props.forEach(p => this.createDistribution(p, lambdaMap));
+    }
+
+    createLambdaMap(cloudfrontProps: CFProps) {
+        if(cloudfrontProps.weathercamDomainName && cloudfrontProps.weathercamHostName) {
+            return this.createLambdas(cloudfrontProps.weathercamDomainName as string, cloudfrontProps.weathercamHostName as string);
+        }
+
+        return {}
     }
 
     createLambdas(domainName: string, hostName: string) {
