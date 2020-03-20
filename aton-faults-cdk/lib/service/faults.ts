@@ -79,7 +79,7 @@ function createXml(fault: any) {
                         'text': fault.fairway_name_fi
                     },
                     'title':  {
-                        'text' : `${fault.aton_id} ${fault.aton_type_fi} ${fault.aton_name_fi}, ${fault.fault_type_en}`
+                        'text' : `${fault.aton_type_fi} ${fault.aton_name_fi} Nr. ${fault.aton_id}, ${fault.fault_type_en}`
                     },
                     'fixedDateRange' : createFixedDateRange(fault)
                 }
