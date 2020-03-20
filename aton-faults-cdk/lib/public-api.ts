@@ -48,15 +48,16 @@ function createAnnotationsResource(
     const functionName = 'ATON-GetFaults';
     const functionNameS124 = 'ATON-GetFaults-S124';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
+    const assetCode = new AssetCode('dist/lambda/get-faults');
     const getFaultsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
-        code: new AssetCode('dist/lambda/get-faults'),
+        code: assetCode,
         handler: 'lambda-get-faults.handler',
     }));
 
     const getFaultsS124Lambda = new Function(stack, functionNameS124, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionNameS124,
-        code: new AssetCode('dist/lambda/get-faults'),
+        code: assetCode,
         handler: 'lambda-get-faults-s124.handler'
     }));
 

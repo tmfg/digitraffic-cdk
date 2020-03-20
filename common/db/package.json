@@ -6,9 +6,9 @@
   },
   "private": true,
   "dependencies": {
-    "pg-native": "^3.0.0",
-    "pg-promise": "latest",
-    "@types/node": "10.17.17",
+    "pg-native": "3.0.0",
+    "pg-promise": "10.4.4",
+    "@types/node": "13.9.2",
     "pg-query-stream": "3.0.3"
   }
 }
