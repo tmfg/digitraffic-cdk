@@ -2,7 +2,7 @@ import {CfnWebACL} from '@aws-cdk/aws-wafv2';
 import {Stack} from '@aws-cdk/core';
 
 export enum AclRuleType {
-    AWSCommonRuleSet, AWSReputationList, AWSKnownBadInputs, ThrottleRule
+    AWSCommonRuleSet, AWSReputationList, AWSKnownBadInputs, ThrottleRule, GzipHeaderRule
 }
 
 export function createWebAcl(stack: Stack, rules: AclRuleType[]): CfnWebACL {
@@ -82,19 +82,46 @@ function createRule(rule: AclRuleType) {
         return {
             name: "ThrottleRule",
             priority: 3,
+            action: { block: {} },
             statement: {
                 rateBasedStatement: {
                     aggregateKeyType: 'IP',
-                    limit: 2010
+                    limit: 100
                 }
-            },
-            overrideAction: {
-                none: {}
             },
             visibilityConfig: {
                 sampledRequestsEnabled: true,
                 cloudWatchMetricsEnabled: true,
                 metricName: "ThrottleRule"
+            }
+        }
+    } else if(rule == AclRuleType.GzipHeaderRule) {
+        return {
+            name: "GzipRule",
+            priority: 4,
+            action: { block: {} },
+            statement: {
+                notStatement: {
+                    statement: {
+                        byteMatchStatement: {
+                            fieldToMatch: {
+                                singleHeader: {
+                                    name: 'accept-encoding'
+                                }
+                            },
+                            positionalConstraint: 'CONTAINS',
+                            searchString: 'gzip',
+                            textTransformations: [
+                                {type: 'LOWERCASE', priority: 0}
+                            ]
+                        }
+                    }
+                }
+            },
+            visibilityConfig: {
+                sampledRequestsEnabled: true,
+                cloudWatchMetricsEnabled: true,
+                metricName: "GzipRule"
             }
         }
     }
