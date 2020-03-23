@@ -1,4 +1,5 @@
 import {LambdaType} from "./lambda/lambda-creator";
+import {AclRuleType} from "./acl/acl-creator";
 
 export interface CFBehavior {
     path?: string,
@@ -24,6 +25,7 @@ export interface Props {
     environmentName: string,
     aliasNames: string[] | null,
     acmCertRef: string | null,
+    aclRules?: AclRuleType[],
     domains: CFDomain[]
 }
 

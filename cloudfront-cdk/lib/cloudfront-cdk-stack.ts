@@ -5,6 +5,7 @@ import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 import {CFLambdaProps, CFProps, Props} from '../lib/app-props';
 import {createWeathercamRedirect, LambdaType} from "./lambda/lambda-creator";
+import {createWebAcl} from "./acl/acl-creator";
 
 export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
@@ -30,6 +31,14 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaMap;
     }
 
+    createWebAcl(props: Props): any {
+        if(props.aclRules == undefined) {
+            return null;
+        }
+
+        return createWebAcl(this, props.aclRules);
+    }
+
     createDistribution(cloudfrontProps: Props, lambdaMap: any) {
         const env = cloudfrontProps.environmentName;
         const oai = cloudfrontProps.originAccessIdentity ? new OriginAccessIdentity(this, `${env}-oai`) : null;
@@ -43,6 +52,7 @@ export class CloudfrontCdkStack extends Stack {
         });
 
         const aliasConfig = cloudfrontProps.acmCertRef == null ? undefined: createAliasConfig(cloudfrontProps.acmCertRef as string, cloudfrontProps.aliasNames as string[]);
+        const webAcl = this.createWebAcl(cloudfrontProps);
 
         return new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
             originConfigs: originConfigs,
@@ -51,7 +61,7 @@ export class CloudfrontCdkStack extends Stack {
                 bucket: bucket,
                 prefix: 'logs'
             },
-//            webACLId: 'per-ip-rate-acl'
+            webACLId: webAcl?.attrArn
         });
     }
 }

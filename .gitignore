@@ -55,3 +55,4 @@ cdk.context.json
 **/dont-commit-this-*
 nordicway2-cdk/bin/nordicway2-app.ts
 cloudfront-cdk/bin/cloudfront-app.ts
+aton-faults-cdk/bin/aton-faults-app.ts
