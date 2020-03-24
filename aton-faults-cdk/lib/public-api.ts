@@ -53,12 +53,14 @@ function createAnnotationsResource(
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-faults.handler',
+        readOnly: true
     }));
 
     const getFaultsS124Lambda = new Function(stack, functionNameS124, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionNameS124,
         code: assetCode,
-        handler: 'lambda-get-faults.handlers124'
+        handler: 'lambda-get-faults.handlers124',
+        readOnly: true
     }));
 
     const resources = createResourcePaths(publicApi);

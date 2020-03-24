@@ -19,7 +19,8 @@ export interface LambdaConfiguration {
 declare interface DbProps {
     username: string;
     password: string;
-    uri: string;
+    uri?: string;
+    ro_uri?: string;
 }
 
 // Base configuration for a database-reading Lambda function
@@ -27,7 +28,7 @@ export function dbLambdaConfiguration(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: LambdaConfiguration,
-    config: object): FunctionProps {
+    config: any): FunctionProps {
 
     return <FunctionProps> Object.assign({}, {
         runtime: props.runtime || Runtime.NODEJS_12_X,
@@ -36,7 +37,7 @@ export function dbLambdaConfiguration(
         environment: {
             DB_USER: props.dbProps.username,
             DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri
+            DB_URI: config.readOnly ? props.dbProps.ro_uri : props.dbProps.uri
         },
         logRetention: RetentionDays.ONE_YEAR,
         vpc: vpc,
