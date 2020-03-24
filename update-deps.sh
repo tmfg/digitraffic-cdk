@@ -13,7 +13,9 @@ fi
 cd common
 for d in $(find ./* -maxdepth 0 -type d); do
   cd "$d"
-  ncu -u
+  if [ -f package.json ]; then
+    ncu -u --reject pg-promise
+  fi
   cd ..
 done
 cd ..
