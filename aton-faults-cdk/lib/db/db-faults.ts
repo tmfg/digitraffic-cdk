@@ -3,7 +3,7 @@ import {createGeometry} from "../../../common/postgres/geometry";
 import {stream} from "../../../common/db/stream-util";
 import {Language} from "../../../common/model/language";
 
-const QueryStream = require('pg-query-stream')
+const QueryStream = require('pg-query-stream');
 const moment = require('moment');
 
 const UPSERT_FAULTS_SQL =
