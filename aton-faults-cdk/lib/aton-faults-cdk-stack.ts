@@ -2,7 +2,7 @@ import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
 import * as InternalLambdas from './internal-lambdas';
 import * as PublicApi from './public-api';
-import {AtonProps} from "./app-props";
+import {AtonProps} from "./app-props.d";
 
 export class AtonFaultsCdkStack extends Stack {
     constructor(scope: Construct, id: string, atonFaultsProps: AtonProps, props?: StackProps) {

@@ -4,6 +4,6 @@
   "description": "",
   "license": "EUPL",
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.26.0"
+    "@aws-cdk/aws-apigateway": "1.30.0"
   }
 }
