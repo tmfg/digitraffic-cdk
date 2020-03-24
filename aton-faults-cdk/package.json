@@ -36,7 +36,7 @@
     "@aws-cdk/core": "1.30.0",
     "@aws-cdk/aws-events-targets": "1.30.0",
     "pg-native": "3.0.0",
-    "pg-promise": "10.3.5",
+    "pg-promise": "10.4.4",
     "source-map-support": "0.5.16",
     "axios": "0.19.2",
     "@types/geojson": "7946.0.7",
