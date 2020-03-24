@@ -24,7 +24,7 @@ cd ..
 for d in $(find ./* -maxdepth 0 -type d); do
   if [ "$d" != "./common" ]; then
     cd "$d"
-    ncu -u
+    ncu -u --reject pg-promise
     npm install
     npm run build
     cd ..
