@@ -50,7 +50,9 @@ function createUpdateSwaggerDescriptionsLambda(
     props: Props,
     stack: Stack
 ) {
-    const bucket = new Bucket(stack, 'SwaggerBucket');
+    const bucket = new Bucket(stack, 'SwaggerBucket', {
+        bucketName: props.bucketName
+    });
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
 
     const lambdaEnv: any = {};
