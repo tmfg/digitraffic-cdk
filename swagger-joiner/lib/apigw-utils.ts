@@ -19,10 +19,10 @@ export function getDocumentationVersion(apiId: string, apigw: APIGateway) {
     }));
 }
 
-export function createDocumentationVersion(apiId: string, latestVersion: unknown, apigw: APIGateway) {
+export function createDocumentationVersion(apiId: string, latestVersion: number, apigw: APIGateway) {
     return apigw.createDocumentationVersion({
         restApiId: apiId,
         stageName: 'prod',
-        documentationVersion: (Number(latestVersion) + 1).toString()
+        documentationVersion: (latestVersion + 1).toString()
     }).promise();
 }

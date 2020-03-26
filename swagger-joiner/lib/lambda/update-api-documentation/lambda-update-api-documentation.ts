@@ -1,5 +1,5 @@
 import {APIGateway, config as AWSConfig} from "aws-sdk";
-import {compose, head, sortBy, prop, reverse} from "ramda";
+import {compose, head, sort, prop, map} from "ramda";
 import {createDocumentationVersion, getDocumentationVersion} from "../../apigw-utils";
 import {ListOfDocumentationVersion} from "aws-sdk/clients/apigateway";
 
@@ -25,5 +25,5 @@ export const handler = async (): Promise<any> => {
 
 export function getLatestVersion(versions: ListOfDocumentationVersion) {
     // @ts-ignore compiler can't handle this
-    return compose(prop('version'), head, reverse, sortBy(prop('version')))(versions) as string;
+    return compose(head, sort((a,b)=>b-a), map(compose(parseInt, prop('version'))))(versions) as number;
 }
