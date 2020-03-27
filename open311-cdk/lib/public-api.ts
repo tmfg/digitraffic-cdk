@@ -2,22 +2,19 @@ import apigateway = require('@aws-cdk/aws-apigateway');
 import iam = require('@aws-cdk/aws-iam');
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
-import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct, Stack} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "./cdk-util";
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
 import {default as StateSchema} from './model/state-schema';
-import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
 import {
-    InternalServerErrorResponseTemplate,
     MessageModel,
-    NotFoundResponseTemplate
 } from 'digitraffic-cdk-api/response';
 import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../common/stack/subscription";
 import {createUsagePlan} from "../../common/stack/usage-plans";
-import {methodJsonResponse} from "../../common/api/responses";
+import {corsMethodJsonResponse, defaultIntegration, defaultSingleResourceIntegration} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
 
 const API_TAGS = ['Data v1'];
@@ -125,8 +122,7 @@ function createGetRequestIntegration(
     validator: apigateway.RequestValidator,
     stack: Construct) {
 
-    const getRequestIntegration = new LambdaIntegration(getRequestHandler, {
-        proxy: false,
+    const getRequestIntegration = defaultSingleResourceIntegration(getRequestHandler, {
         requestParameters: {
             'integration.request.path.request_id': 'method.request.path.request_id',
             'integration.request.querystring.extensions': 'method.request.querystring.extensions'
@@ -137,21 +133,7 @@ function createGetRequestIntegration(
                 extensions: "$util.escapeJavaScript($input.params('extensions'))"
             })
         },
-        integrationResponses: [
-            {
-                statusCode: '200'
-            },
-            {
-                statusCode: '404',
-                selectionPattern: NOT_FOUND_MESSAGE,
-                responseTemplates: NotFoundResponseTemplate
-            },
-            {
-                statusCode: '500',
-                selectionPattern: '(\n|.)+',
-                responseTemplates: InternalServerErrorResponseTemplate
-            }
-        ]
+        cors: true
     });
     const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration, {
@@ -161,9 +143,9 @@ function createGetRequestIntegration(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            methodJsonResponse("200", requestModel),
-            methodJsonResponse("404", messageResponseModel),
-            methodJsonResponse("500", messageResponseModel)
+            corsMethodJsonResponse("200", requestModel),
+            corsMethodJsonResponse("404", messageResponseModel),
+            corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
     addTags('GetRequest', API_TAGS, request, stack);
@@ -177,33 +159,22 @@ function createGetRequestsIntegration(
     messageResponseModel: apigateway.Model,
     stack: Construct) {
 
-    const getRequestsIntegration = new LambdaIntegration(getRequestsHandler, {
-        proxy: false,
+    const getRequestsIntegration = defaultIntegration(getRequestsHandler, {
         requestParameters: {
             'integration.request.querystring.extensions': 'method.request.querystring.extensions'
-        },
-        requestTemplates: {
+        }, requestTemplates: {
             'application/json': JSON.stringify({
                 extensions: "$util.escapeJavaScript($input.params('extensions'))"
             })
-        },
-        integrationResponses: [
-            {
-                statusCode: '200'
-            },
-            {
-                statusCode: '500',
-                responseTemplates: InternalServerErrorResponseTemplate
-            }
-        ]
+        }, cors: true
     });
     requests.addMethod("GET", getRequestsIntegration, {
         requestParameters: {
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            methodJsonResponse("200", requestsModel),
-            methodJsonResponse("500", messageResponseModel)
+            corsMethodJsonResponse("200", requestsModel),
+            corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
     addTags('GetRequests', API_TAGS, requests, stack);
@@ -241,22 +212,13 @@ function createGetStatesIntegration(
     statesModel: apigateway.Model,
     messageResponseModel: apigateway.Model) {
 
-    const getServicesIntegration = new LambdaIntegration(getStatesHandler, {
-        proxy: false,
-        integrationResponses: [
-            {
-                statusCode: '200'
-            },
-            {
-                statusCode: '500',
-                responseTemplates: InternalServerErrorResponseTemplate
-            }
-        ]
+    const getServicesIntegration = defaultIntegration(getStatesHandler, {
+        cors: true
     });
     states.addMethod("GET", getServicesIntegration, {
         methodResponses: [
-            methodJsonResponse("200", statesModel),
-            methodJsonResponse("500", messageResponseModel)
+            corsMethodJsonResponse("200", statesModel),
+            corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
 }
@@ -312,22 +274,13 @@ function createGetServicesIntegration(
     messageResponseModel: apigateway.Model,
     stack: Construct) {
 
-    const getServicesIntegration = new LambdaIntegration(getServicesHandler, {
-        proxy: false,
-        integrationResponses: [
-            {
-                statusCode: '200'
-            },
-            {
-                statusCode: '500',
-                responseTemplates: InternalServerErrorResponseTemplate
-            }
-        ]
+    const getServicesIntegration = defaultIntegration(getServicesHandler, {
+        cors: true
     });
     services.addMethod("GET", getServicesIntegration, {
         methodResponses: [
-            methodJsonResponse("200", servicesModel),
-            methodJsonResponse("500", messageResponseModel)
+            corsMethodJsonResponse("200", servicesModel),
+            corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
     addTags('GetServices', API_TAGS, services, stack);
@@ -341,29 +294,12 @@ function createGetServiceIntegration(
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
     stack: Construct) {
-    const getServiceIntegration = new LambdaIntegration(getServiceHandler, {
-        proxy: false,
+    const getServiceIntegration = defaultSingleResourceIntegration(getServiceHandler, {
         requestParameters: {
             'integration.request.path.service_id': 'method.request.path.service_id'
-        },
-        requestTemplates: {
+        }, requestTemplates: {
             'application/json': JSON.stringify({service_id: "$util.escapeJavaScript($input.params('service_id'))"})
-        },
-        integrationResponses: [
-            {
-                statusCode: '200'
-            },
-            {
-                statusCode: '404',
-                selectionPattern: NOT_FOUND_MESSAGE,
-                responseTemplates: NotFoundResponseTemplate
-            },
-            {
-                statusCode: '500',
-                selectionPattern: '(\n|.)+',
-                responseTemplates: InternalServerErrorResponseTemplate
-            }
-        ]
+        }, cors: true
     });
     const service = services.addResource("{service_id}");
     service.addMethod("GET", getServiceIntegration, {
@@ -372,24 +308,9 @@ function createGetServiceIntegration(
             'method.request.path.service_id': true
         },
         methodResponses: [
-            {
-                statusCode: '200',
-                responseModels: {
-                    'application/json': serviceModel
-                }
-            },
-            {
-                statusCode: '404',
-                responseModels: {
-                    'application/json': messageResponseModel
-                }
-            },
-            {
-                statusCode: '500',
-                responseModels: {
-                    'application/json': messageResponseModel
-                }
-            }
+            corsMethodJsonResponse("200", serviceModel),
+            corsMethodJsonResponse("404", messageResponseModel),
+            corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
     addTags('GetService', API_TAGS, service, stack);
@@ -397,6 +318,9 @@ function createGetServiceIntegration(
 
 function createApi(stack: Construct) {
     return new apigateway.RestApi(stack, 'Open311-public', {
+        defaultCorsPreflightOptions: {
+            allowOrigins: apigateway.Cors.ALL_ORIGINS
+        },
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         },
