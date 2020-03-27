@@ -8,7 +8,7 @@ import {
 import {LambdaIntegration, MethodResponse} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
 
-const CORS_INTEGRATION_RESPONSE = {
+const RESPONSE_CORS_INTEGRATION = {
     responseParameters: {
         'method.response.header.Access-Control-Allow-Origin': "'*'"
     }
@@ -18,12 +18,13 @@ export const RESPONSE_200_OK = {
     statusCode: '200'
 };
 
-export const RESPONSE_200_OK_CORS = Object.assign({}, RESPONSE_200_OK, CORS_INTEGRATION_RESPONSE);
-
-export const RESPONSE_200_OK_XML = {
-    statusCode: '200',
+const RESPONSE_XML = {
     responseTemplates: XmlResponseTemplate
-}
+};
+
+export const RESPONSE_200_OK_CORS = {...RESPONSE_200_OK, ...RESPONSE_CORS_INTEGRATION};
+
+export const RESPONSE_200_OK_XML = {...RESPONSE_200_OK, ...RESPONSE_XML};
 
 export const RESPONSE_404_NOT_FOUND = {
     statusCode: '404',
@@ -31,7 +32,7 @@ export const RESPONSE_404_NOT_FOUND = {
     responseTemplates: NotFoundResponseTemplate
 };
 
-const RESPONSE_404_NOT_FOUND_CORS = Object.assign({}, RESPONSE_404_NOT_FOUND, CORS_INTEGRATION_RESPONSE);
+const RESPONSE_404_NOT_FOUND_CORS = {...RESPONSE_404_NOT_FOUND, ...RESPONSE_CORS_INTEGRATION};
 
 export const RESPONSE_500_SERVER_ERROR = {
     statusCode: '500',
@@ -39,7 +40,7 @@ export const RESPONSE_500_SERVER_ERROR = {
     responseTemplates: InternalServerErrorResponseTemplate
 };
 
-export const RESPONSE_500_SERVER_ERROR_CORS = Object.assign({}, RESPONSE_500_SERVER_ERROR, CORS_INTEGRATION_RESPONSE);
+export const RESPONSE_500_SERVER_ERROR_CORS = {...RESPONSE_500_SERVER_ERROR, ...RESPONSE_CORS_INTEGRATION};
 
 export function methodJsonResponse(status: string, model: any) {
     return  {
