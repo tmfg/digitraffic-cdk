@@ -24,10 +24,24 @@ export class SwaggerJoinerStack extends Stack {
                 StringEquals: {
                     'aws:sourceVpce': swaggerJoinerProps.s3VpcEndpointId
                 }
-            }
+            },
+            resources: [`${bucket.bucketArn}/*`]
         });
         getObjectStatement.addAnyPrincipal();
         bucket.addToResourcePolicy(getObjectStatement);
+
+        const listObjectsStatement = new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: ['s3:ListBucket'],
+            conditions: {
+                StringEquals: {
+                    'aws:sourceVpce': swaggerJoinerProps.s3VpcEndpointId
+                }
+            },
+            resources: [bucket.bucketArn]
+        });
+        listObjectsStatement.addAnyPrincipal();
+        bucket.addToResourcePolicy(listObjectsStatement);
 
         return bucket;
     }
