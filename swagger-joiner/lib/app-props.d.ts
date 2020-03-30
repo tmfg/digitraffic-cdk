@@ -3,4 +3,5 @@ export interface Props {
     apiGwAppIds: string[];
     logsDestinationArn: string;
     bucketName: string;
+    s3VpcEndpointId: string;
 }

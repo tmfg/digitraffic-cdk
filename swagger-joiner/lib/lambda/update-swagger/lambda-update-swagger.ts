@@ -23,5 +23,5 @@ export const handler = async (): Promise<any> => {
 
     const merged = mergeApiDescriptions(allApis);
 
-    await uploadToS3(bucketName, constructSwagger(merged), 'dt-swagger.js', 'public-read');
+    await uploadToS3(bucketName, constructSwagger(merged), 'dt-swagger.js');
 };

@@ -9,10 +9,11 @@ import {KEY_BUCKET_NAME, KEY_REGION, KEY_APP_URL, KEY_APIGW_APPS} from "./lambda
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
 
 export function create(
-    props: Props,
-    stack: Stack) {
+    bucket: Bucket,
+    props: Props, stack: Stack
+) {
 
-    createUpdateSwaggerDescriptionsLambda(props, stack);
+    createUpdateSwaggerDescriptionsLambda(bucket, props, stack);
     createUpdateApiDocumentationLambda(props, stack);
 }
 
@@ -47,12 +48,10 @@ function createUpdateApiDocumentationLambda(
 }
 
 function createUpdateSwaggerDescriptionsLambda(
+    bucket: Bucket,
     props: Props,
     stack: Stack
 ) {
-    const bucket = new Bucket(stack, 'SwaggerBucket', {
-        bucketName: props.bucketName
-    });
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
 
     const lambdaEnv: any = {};

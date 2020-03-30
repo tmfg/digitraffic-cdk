@@ -1,11 +1,34 @@
-import {Stack, StackProps, Construct} from '@aws-cdk/core';
+import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {Props} from './app-props';
 import * as InternalLambdas from './internal-lambdas'
+import {Bucket} from "@aws-cdk/aws-s3";
+import {Effect, PolicyStatement} from "@aws-cdk/aws-iam";
 
 export class SwaggerJoinerStack extends Stack {
     constructor(scope: Construct, id: string, swaggerJoinerProps: Props, props?: StackProps) {
         super(scope, id, props);
 
-        InternalLambdas.create(swaggerJoinerProps, this);
+        const bucket = this.createBucket(swaggerJoinerProps);
+        InternalLambdas.create(bucket, swaggerJoinerProps, this);
+    }
+
+    private createBucket(swaggerJoinerProps: Props) {
+        const bucket = new Bucket(this, 'SwaggerBucket', {
+            bucketName: swaggerJoinerProps.bucketName
+        });
+
+        const getObjectStatement = new PolicyStatement({
+            effect: Effect.ALLOW,
+            actions: ['s3:GetObject'],
+            conditions: {
+                StringEquals: {
+                    'aws:sourceVpce': swaggerJoinerProps.s3VpcEndpointId
+                }
+            }
+        });
+        getObjectStatement.addAnyPrincipal();
+        bucket.addToResourcePolicy(getObjectStatement);
+
+        return bucket;
     }
 }
