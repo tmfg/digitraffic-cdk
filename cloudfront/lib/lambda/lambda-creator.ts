@@ -1,11 +1,12 @@
 import {Stack } from '@aws-cdk/core';
-import {Runtime, Function, InlineCode} from '@aws-cdk/aws-lambda';
+import {Runtime, Function, InlineCode, AssetCode} from '@aws-cdk/aws-lambda';
 import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
+import {Props} from "../app-props";
 
 const fs = require('fs');
 
 export enum LambdaType {
-    WEATHERCAM_REDIRECT, REQUIRE_GZIP
+    WEATHERCAM_REDIRECT
 }
 
 export function createWeathercamRedirect(stack: Stack, domainName: string, hostName: string) {
@@ -33,4 +34,16 @@ export function createWeathercamRedirect(stack: Stack, domainName: string, hostN
     });
 
     return redirectFunction.addVersion(versionString);
+}
+
+export function createWriteToEsLambda(stack: Stack, cloudfrontProps: Props) {
+    return new Function(stack, 'lambda-forward', {
+        runtime: Runtime.NODEJS_12_X,
+        memorySize: 128,
+        code: new AssetCode('dist/lambda'),
+        handler: 'lambda-elastic.handler',
+        environment: {
+            ELASTIC_ARN: cloudfrontProps.elasticArn as string
+        }
+    });
 }

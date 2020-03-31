@@ -47,6 +47,7 @@ function createAnnotationsResource(
         functionName: functionName,
         code: new AssetCode('dist/lambda/get-annotations'),
         handler: 'lambda-get-annotations.handler',
+        readOnly: true
     }));
     const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsLambda, {
         proxy: false,
