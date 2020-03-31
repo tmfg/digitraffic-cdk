@@ -1,3 +1,0 @@
-{
-  "app": "npx ts-node bin/open311-cdk.ts"
-}
