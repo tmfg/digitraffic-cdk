@@ -21,13 +21,28 @@ lib
 |       └───lambda-update-foos.ts
 |
 └───model
-|   └───foo.ts
+|   └───foo-schema.ts
+|
+└───service
+|   └───service-foos.ts
 |
 └───some-cdk-stack.ts
+|
+test
+│
+└───lambda
+    └───update-foos.test.ts
+
 ```
 - separate source code to their own directories by category (API operations, database queries etc)
 - Lambdas are in their own directory to facilitate bundling (lambda.AssetCode)
-- properties files under *bin* are loaded by active AWS_PROFILE env variable, e.g. file above loads when using profile *some-environment* 
+- document implicit dependencies, e.g. to run tests, use database from digitraffic-road/dbroad 
+
+## Naming conventions
+The CI server expects your app to follow these conventions. 
+- stack configuration goes under bin/ named after the app directory plus -app.ts, e.g. swagger-joiner.app.ts
+- stacks are named after your app in camelcase plus app name and environment, e.g. SwaggerJoinerRoadTest
+- use the env properties to specify the account id and region https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html
 
 ## Development workflow (in a cdk directory, e.g. open311-cdk)
 
