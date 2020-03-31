@@ -18,8 +18,9 @@ export const handler = async (): Promise<any> => {
 
     const apiResponses = await Promise.all(apigatewayIds.map(exportSwaggerApi));
     const apis = apiResponses.map(resp => JSON.parse(resp.body as string));
-    const appApi = (await axios.get(appUrl)).data;
-    const allApis = apis.concat([appApi]);
+    const appApi = (await axios.get(`${appUrl}?group=metadata-api`)).data;
+    const appBetaApi = (await axios.get(`${appUrl}?group=metadata-api-beta`)).data;
+    const allApis = apis.concat([appApi, appBetaApi]);
 
     const merged = mergeApiDescriptions(allApis);
 

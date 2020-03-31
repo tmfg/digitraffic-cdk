@@ -9,7 +9,7 @@ export function constructSwagger(spec: object) {
             deepLinking: true,
             presets: [
                 SwaggerUIBundle.presets.apis,
-                SwaggerUIStandalonePreset
+                SwaggerUIStandalonePreset.slice(1) // remove top bar plugin
             ],
             plugins: [
                 SwaggerUIBundle.plugins.DownloadUrl
