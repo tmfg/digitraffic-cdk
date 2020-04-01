@@ -14,6 +14,7 @@ export const handler = async (): Promise<any> => {
     const apigw = new APIGateway();
     const apisAndVersions = await Promise.all(apigatewayIds.map((apiId) => getDocumentationVersion(apiId, apigw)));
     await Promise.all(apisAndVersions
+        .filter(apiVersions => apiVersions.result.items != null && apiVersions.result.items.length)
         .map(apiVersions =>
             createDocumentationVersion(
                 apiVersions.apiId,
