@@ -2,18 +2,21 @@ import {RestApi,MethodLoggingLevel}  from '@aws-cdk/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
 import {Function, AssetCode} from '@aws-cdk/aws-lambda';
 import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
-import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {default as AnnotationSchema} from './model/annotation-schema';
 import {createSubscription} from '../../common/stack/subscription';
 import {addServiceModel} from 'digitraffic-cdk-api/utils';
-import {methodJsonResponse, RESPONSE_200_OK, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {getModelReference} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
 import {NW2Props} from "./app-props";
+import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
+import {addTags} from "../../common/api/documentation";
+
+const API_TAGS = ['Data v1'];
 
 export function create(
     vpc: IVpc,
@@ -49,8 +52,7 @@ function createAnnotationsResource(
         handler: 'lambda-get-annotations.handler',
         readOnly: true
     }));
-    const getAnnotationsIntegration = new LambdaIntegration(getAnnotationsLambda, {
-        proxy: false,
+    const getAnnotationsIntegration = defaultIntegration(getAnnotationsLambda, {
         requestParameters: {
             'integration.request.querystring.author': 'method.request.querystring.author',
             'integration.request.querystring.type': 'method.request.querystring.type',
@@ -61,10 +63,7 @@ function createAnnotationsResource(
                 type: "$util.escapeJavaScript($input.params('type'))"}
                 )
         },
-        integrationResponses: [
-            RESPONSE_200_OK,
-            RESPONSE_500_SERVER_ERROR
-        ]
+        cors: true,
     });
 
     const apiResource = publicApi.root.addResource("api");
@@ -78,14 +77,16 @@ function createAnnotationsResource(
             'method.request.querystring.type': false
         },
         methodResponses: [
-            methodJsonResponse("200", annotationsModel),
-            methodJsonResponse("500", responseModel)
+            corsMethodJsonResponse("200", annotationsModel),
+            corsMethodJsonResponse("500", responseModel)
         ]
     });
 
     if(props.logsDestinationArn) {
         createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
     }
+
+    addTags('GetAnnotations', API_TAGS, requests, stack);
 
     return getAnnotationsLambda;
 }
