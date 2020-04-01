@@ -1,10 +1,11 @@
 import {Stack, StackProps, Construct} from '@aws-cdk/core';
 import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
+import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 import {CFLambdaProps, CFProps, Props} from '../lib/app-props';
-import {createWeathercamRedirect, LambdaType} from "./lambda/lambda-creator";
+import {createWriteToEsLambda, createWeathercamRedirect, LambdaType} from "./lambda/lambda-creator";
 import {createWebAcl} from "./acl/acl-creator";
 
 export class CloudfrontCdkStack extends Stack {
@@ -51,6 +52,13 @@ export class CloudfrontCdkStack extends Stack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
+        if(cloudfrontProps.elasticArn) {
+            const lambda = createWriteToEsLambda(this, cloudfrontProps);
+
+            bucket.addObjectCreatedNotification(new LambdaDestination(lambda));
+            bucket.grantRead(lambda);
+        }
+
         const aliasConfig = cloudfrontProps.acmCertRef == null ? undefined: createAliasConfig(cloudfrontProps.acmCertRef as string, cloudfrontProps.aliasNames as string[]);
         const webAcl = this.createWebAcl(cloudfrontProps);
 
@@ -64,4 +72,5 @@ export class CloudfrontCdkStack extends Stack {
             webACLId: webAcl?.attrArn
         });
     }
+
 }

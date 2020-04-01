@@ -6,4 +6,5 @@ declare interface NW2Props extends LambdaConfiguration {
         password: string;
         url: string;
     }
+
 }

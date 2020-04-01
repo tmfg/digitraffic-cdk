@@ -1,6 +1,6 @@
 import {Duration, Stack} from '@aws-cdk/core';
 import {OriginProtocolPolicy, OriginAccessIdentity, SourceConfiguration, Behavior, LambdaEdgeEventType} from '@aws-cdk/aws-cloudfront';
-import {CFBehavior, CFDomain} from "../../cloudfront-cdk/lib/app-props";
+import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
 
 export function createOriginConfig(stack: Stack, domain: CFDomain,
