@@ -20,9 +20,18 @@ export const handler = async (): Promise<any> => {
     const apis = apiResponses.map(resp => JSON.parse(resp.body as string));
     const appApi = (await axios.get(`${appUrl}?group=metadata-api`)).data;
     const appBetaApi = (await axios.get(`${appUrl}?group=metadata-api-beta`)).data;
-    const allApis = apis.concat([appApi, appBetaApi]);
+
+    // order is crucial in order for beta for remain at the bottom
+    const allApis = [appBetaApi].concat(apis).concat([appApi]);
 
     const merged = mergeApiDescriptions(allApis);
+
+    // @ts-ignore
+    delete merged.schemes; // always https
+    // @ts-ignore
+    delete merged['x-amazon-apigateway-policy']; // implementation details
+
+    const beta =
 
     await uploadToS3(bucketName, constructSwagger(merged), 'dt-swagger.js');
 };

@@ -23,6 +23,6 @@ export function constructSwagger(spec: object) {
         `;
 }
 
-export function mergeApiDescriptions(allApis: object[]) {
+export function mergeApiDescriptions(allApis: object[]): object {
     return allApis.reduce((acc, curr) => mergeDeepLeft(curr, acc));
 }
