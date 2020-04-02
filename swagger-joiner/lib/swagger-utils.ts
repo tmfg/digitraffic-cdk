@@ -7,6 +7,7 @@ export function constructSwagger(spec: object) {
             spec: ${JSON.stringify(spec)},
             dom_id: '#swagger-ui',
             deepLinking: true,
+            docExpansion: 'none',
             presets: [
                 SwaggerUIBundle.presets.apis,
                 SwaggerUIStandalonePreset.slice(1) // remove top bar plugin
