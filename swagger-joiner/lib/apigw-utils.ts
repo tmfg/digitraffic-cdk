@@ -12,7 +12,8 @@ export function exportSwaggerApi(apiId: string) {
 
 export function getDocumentationVersion(apiId: string, apigw: APIGateway) {
     return apigw.getDocumentationVersions({
-        restApiId: apiId
+        restApiId: apiId,
+        limit: 500 // XXX maximum value, hope we won't hit this
     }).promise().then((result) => ({
         apiId,
         result
