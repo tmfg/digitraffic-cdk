@@ -72,8 +72,8 @@ export function corsMethodJsonResponse(status: string, model: any): MethodRespon
 
 interface IntegrationOptions {
     requestParameters?: {[dest: string]: string}
-    requestTemplates?: {[contentType: string]: string}
-    cors?: boolean
+    requestTemplates?: {[contentType: string]: string},
+    disableCors?: boolean
 }
 
 export function defaultIntegration(
@@ -83,8 +83,8 @@ export function defaultIntegration(
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            options?.cors ? RESPONSE_200_OK_CORS : RESPONSE_200_OK,
-            options?.cors ? RESPONSE_500_SERVER_ERROR_CORS :  RESPONSE_500_SERVER_ERROR
+            options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS,
+            options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {}
@@ -98,9 +98,9 @@ export function defaultSingleResourceIntegration(
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            options?.cors ? RESPONSE_200_OK_CORS : RESPONSE_200_OK,
-            options?.cors ? RESPONSE_404_NOT_FOUND_CORS : RESPONSE_404_NOT_FOUND,
-            options?.cors ? RESPONSE_500_SERVER_ERROR_CORS :  RESPONSE_500_SERVER_ERROR
+            options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS,
+            options?.disableCors ? RESPONSE_404_NOT_FOUND: RESPONSE_404_NOT_FOUND_CORS,
+            options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS,
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {}
@@ -111,8 +111,8 @@ export function defaultXmlIntegration(lambdaFunction: Function, options?: Integr
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            options?.cors ? RESPONSE_200_OK_XML_CORS : RESPONSE_200_OK_XML,
-            options?.cors ? RESPONSE_500_SERVER_ERROR_CORS: RESPONSE_500_SERVER_ERROR
+            options?.disableCors ? RESPONSE_200_OK_XML : RESPONSE_200_OK_XML_CORS,
+            options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {}

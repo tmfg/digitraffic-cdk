@@ -60,8 +60,7 @@ function createAnnotationsResource(
                 author: "$util.escapeJavaScript($input.params('author'))",
                 type: "$util.escapeJavaScript($input.params('type'))"}
                 )
-        },
-        cors: true,
+        }
     });
 
     const apiResource = publicApi.root.addResource("api");

@@ -73,8 +73,7 @@ function createAnnotationsResource(
             'application/json': JSON.stringify({
                 language: "$util.escapeJavaScript($input.params('language'))"
             })
-        },
-        cors: true
+        }
     });
 
     resources.faults.addMethod("GET", getFaultsIntegration, {
@@ -90,7 +89,7 @@ function createAnnotationsResource(
 
     const xmlModel = addXmlserviceModel('XmlModel', publicApi);
 
-    resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda, {cors: true}), {
+    resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda), {
         apiKeyRequired: true,
         methodResponses: [
             methodXmlResponse("200", xmlModel),
