@@ -17,7 +17,7 @@ describe('update-api-documentation', () => {
         // random length array with random versions
         const latest = await getLatestVersion([]);
 
-        expect(latest).toBe(1);
+        expect(latest).toBe(0);
     });
 
 });

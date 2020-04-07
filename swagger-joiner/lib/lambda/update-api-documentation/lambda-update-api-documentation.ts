@@ -14,7 +14,6 @@ export const handler = async (): Promise<any> => {
     const apigw = new APIGateway();
     const apisAndVersions = await Promise.all(apigatewayIds.map((apiId) => getDocumentationVersion(apiId, apigw)));
     await Promise.all(apisAndVersions
-        .filter(apiVersions => apiVersions.result.items != null && apiVersions.result.items.length)
         .map(apiVersions =>
             createDocumentationVersion(
                 apiVersions.apiId,
@@ -25,7 +24,7 @@ export const handler = async (): Promise<any> => {
 
 export function getLatestVersion(versions: ListOfDocumentationVersion) {
     if (isEmpty(versions)) {
-        return 1;
+        return 0;
     }
     // @ts-ignore compiler can't handle this
     return compose(head, sort((a,b)=>b-a), map(compose(parseInt, prop('version'))))(versions) as number;
