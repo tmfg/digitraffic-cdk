@@ -6,7 +6,12 @@ import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from '../../common/stack/subscription';
-import {methodJsonResponse,defaultIntegration,methodXmlResponse} from "../../common/api/responses";
+import {
+    methodJsonResponse,
+    defaultIntegration,
+    methodXmlResponse,
+    corsMethodJsonResponse, corsMethodXmlResponse
+} from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";
@@ -77,8 +82,8 @@ function createAnnotationsResource(
             'method.request.querystring.language': false
         },
         methodResponses: [
-            methodJsonResponse("200", faultsJsonModel),
-            methodJsonResponse("500", errorResponseModel)
+            corsMethodJsonResponse("200", faultsJsonModel),
+            corsMethodJsonResponse("500", errorResponseModel)
         ]
     });
 
@@ -88,8 +93,8 @@ function createAnnotationsResource(
     resources.faultsS124.addMethod("GET", getFaultsS124Integration, {
         apiKeyRequired: true,
         methodResponses: [
-            methodXmlResponse("200", xmlModel),
-            methodJsonResponse("500", errorResponseModel)
+            corsMethodXmlResponse("200", xmlModel),
+            corsMethodJsonResponse("500", errorResponseModel)
         ]
     });
 

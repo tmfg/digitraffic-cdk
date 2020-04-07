@@ -70,6 +70,10 @@ export function corsMethodJsonResponse(status: string, model: any): MethodRespon
     return corsHeaders(methodJsonResponse(status, model));
 }
 
+export function corsMethodXmlResponse(status: string, model: any) {
+    return corsHeaders(methodXmlResponse(status, model));
+}
+
 interface IntegrationOptions {
     requestParameters?: {[dest: string]: string}
     requestTemplates?: {[contentType: string]: string},
