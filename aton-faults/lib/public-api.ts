@@ -18,6 +18,9 @@ import {addXmlserviceModel, getModelReference, addServiceModel} from "../../comm
 import {createUsagePlan} from "../../common/stack/usage-plans";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {AtonProps} from "./app-props.d";
+import {addTags} from "../../common/api/documentation";
+
+const API_TAGS = ['Beta'];
 
 export function create(
     vpc: IVpc,
@@ -72,7 +75,8 @@ function createAnnotationsResource(
             'application/json': JSON.stringify({
                 language: "$util.escapeJavaScript($input.params('language'))"
             })
-        }
+        },
+        cors: true
     });
 
     resources.faults.addMethod("GET", getFaultsIntegration, {
@@ -100,6 +104,9 @@ function createAnnotationsResource(
         createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
         createSubscription(getFaultsS124Lambda, functionNameS124, props.logsDestinationArn, stack);
     }
+
+    addTags('GetFaults', API_TAGS, resources.faults, stack);
+    addTags('GetFaultsS124', API_TAGS, resources.faultsS124, stack);
 
     return getFaultsLambda;
 }
