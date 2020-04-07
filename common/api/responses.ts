@@ -114,5 +114,7 @@ export function defaultXmlIntegration(lambdaFunction: Function, options?: Integr
             options?.cors ? RESPONSE_200_OK_XML_CORS : RESPONSE_200_OK_XML,
             options?.cors ? RESPONSE_500_SERVER_ERROR_CORS: RESPONSE_500_SERVER_ERROR
         ],
+        requestParameters: options?.requestParameters || {},
+        requestTemplates: options?.requestTemplates || {}
     });
 }
