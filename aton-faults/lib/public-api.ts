@@ -90,7 +90,7 @@ function createAnnotationsResource(
 
     const xmlModel = addXmlserviceModel('XmlModel', publicApi);
 
-    resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda), {
+    resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda, {cors: true}), {
         apiKeyRequired: true,
         methodResponses: [
             methodXmlResponse("200", xmlModel),

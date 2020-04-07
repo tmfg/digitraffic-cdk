@@ -26,6 +26,8 @@ export const RESPONSE_200_OK_CORS = {...RESPONSE_200_OK, ...RESPONSE_CORS_INTEGR
 
 export const RESPONSE_200_OK_XML = {...RESPONSE_200_OK, ...RESPONSE_XML};
 
+export const RESPONSE_200_OK_XML_CORS = {...RESPONSE_200_OK_XML, ...RESPONSE_CORS_INTEGRATION};
+
 export const RESPONSE_404_NOT_FOUND = {
     statusCode: '404',
     selectionPattern: NOT_FOUND_MESSAGE,
@@ -105,12 +107,12 @@ export function defaultSingleResourceIntegration(
     });
 }
 
-export function defaultXmlIntegration(lambdaFunction: Function): LambdaIntegration {
+export function defaultXmlIntegration(lambdaFunction: Function, options?: IntegrationOptions): LambdaIntegration {
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            RESPONSE_200_OK_XML,
-            RESPONSE_500_SERVER_ERROR
-        ]
+            options?.cors ? RESPONSE_200_OK_XML_CORS : RESPONSE_200_OK_XML,
+            options?.cors ? RESPONSE_500_SERVER_ERROR_CORS: RESPONSE_500_SERVER_ERROR
+        ],
     });
 }
