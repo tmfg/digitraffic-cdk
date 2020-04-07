@@ -9,26 +9,27 @@ import {createSubscription} from '../../common/stack/subscription';
 import {
     methodJsonResponse,
     defaultIntegration,
-    defaultXmlIntegration,
-    methodXmlResponse
+    methodXmlResponse,
+    corsMethodJsonResponse, corsMethodXmlResponse
 } from "../../common/api/responses";
-import { MessageModel} from "../../common/api/response";
+import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
-import {AtonProps} from "./app-props.d";
+import {AtonProps} from "./app-props";
+import {addTags} from "../../common/api/documentation";
+
+const API_TAGS = ['Beta'];
 
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: AtonProps,
     stack: Construct): Function {
-    const publicApi = createApi(stack, props);
+    const publicApi = createApi(stack);
 
-    if(!props.private) {
-        createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
-    }
+    createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
 
     const faultModel = addServiceModel("FaultModel", publicApi, FaultSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
@@ -76,23 +77,24 @@ function createAnnotationsResource(
     });
 
     resources.faults.addMethod("GET", getFaultsIntegration, {
-        apiKeyRequired: !props.private,
+        apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.language': false
         },
         methodResponses: [
-            methodJsonResponse("200", faultsJsonModel),
-            methodJsonResponse("500", errorResponseModel)
+            corsMethodJsonResponse("200", faultsJsonModel),
+            corsMethodJsonResponse("500", errorResponseModel)
         ]
     });
 
     const xmlModel = addXmlserviceModel('XmlModel', publicApi);
+    const getFaultsS124Integration = defaultIntegration(getFaultsS124Lambda, {xml: true});
 
-    resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda), {
-        apiKeyRequired: !props.private,
+    resources.faultsS124.addMethod("GET", getFaultsS124Integration, {
+        apiKeyRequired: true,
         methodResponses: [
-            methodXmlResponse("200", xmlModel),
-            methodJsonResponse("500", errorResponseModel)
+            corsMethodXmlResponse("200", xmlModel),
+            corsMethodJsonResponse("500", errorResponseModel)
         ]
     });
 
@@ -100,6 +102,9 @@ function createAnnotationsResource(
         createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
         createSubscription(getFaultsS124Lambda, functionNameS124, props.logsDestinationArn, stack);
     }
+
+    addTags('GetFaults', API_TAGS, resources.faults, stack);
+    addTags('GetFaultsS124', API_TAGS, resources.faultsS124, stack);
 
     return getFaultsLambda;
 }
@@ -117,13 +122,13 @@ function createResourcePaths(publicApi: RestApi): any {
     }
 }
 
-function createApi(stack: Construct, atonProps: AtonProps) {
+function createApi(stack: Construct) {
     return new RestApi(stack, 'ATON-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
         },
         restApiName: 'ATON public API',
-        endpointTypes: [atonProps.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
+        endpointTypes: [EndpointType.REGIONAL],
         policy: new PolicyDocument({
             statements: [
                 new PolicyStatement({

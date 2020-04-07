@@ -1,6 +1,6 @@
 import {getFaults} from "../../api/get-faults";
 import {saveFaults} from "../../service/faults";
-import {Integration} from "../../app-props.d";
+import {Integration} from "../../app-props";
 
 const envValue = process.env.INTEGRATIONS as string;
 const integrations = JSON.parse(envValue) as Integration[];

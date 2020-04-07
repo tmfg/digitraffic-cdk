@@ -16,7 +16,7 @@ import {NW2Props} from "./app-props";
 import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
 
-const API_TAGS = ['Data v1'];
+const API_TAGS = ['Beta'];
 
 export function create(
     vpc: IVpc,
@@ -25,9 +25,7 @@ export function create(
     stack: Construct): Function {
     const publicApi = createApi(stack, props);
 
-    if(!props.private) {
-        createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
-    }
+    createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
 
     const annotationModel = addServiceModel("AnnotationModel", publicApi, AnnotationSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(annotationModel.modelId, publicApi.restApiId)));
@@ -62,8 +60,7 @@ function createAnnotationsResource(
                 author: "$util.escapeJavaScript($input.params('author'))",
                 type: "$util.escapeJavaScript($input.params('type'))"}
                 )
-        },
-        cors: true,
+        }
     });
 
     const apiResource = publicApi.root.addResource("api");
@@ -91,14 +88,6 @@ function createAnnotationsResource(
     return getAnnotationsLambda;
 }
 
-function getCondition(nw2Props: NW2Props):any {
-    return nw2Props.private ? {
-        "StringEquals": {
-            "aws:sourceVpc": nw2Props.vpcId
-        }
-    } : {}
-}
-
 function createApi(stack: Construct, nw2Props: NW2Props) {
     return new RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
@@ -116,7 +105,6 @@ function createApi(stack: Construct, nw2Props: NW2Props) {
                     resources: [
                         "*"
                     ],
-                    conditions: getCondition(nw2Props),
                     principals: [
                         new AnyPrincipal()
                     ]

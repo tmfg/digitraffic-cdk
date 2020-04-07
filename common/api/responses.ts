@@ -26,6 +26,8 @@ export const RESPONSE_200_OK_CORS = {...RESPONSE_200_OK, ...RESPONSE_CORS_INTEGR
 
 export const RESPONSE_200_OK_XML = {...RESPONSE_200_OK, ...RESPONSE_XML};
 
+export const RESPONSE_200_OK_XML_CORS = {...RESPONSE_200_OK_XML, ...RESPONSE_CORS_INTEGRATION};
+
 export const RESPONSE_404_NOT_FOUND = {
     statusCode: '404',
     selectionPattern: NOT_FOUND_MESSAGE,
@@ -68,10 +70,15 @@ export function corsMethodJsonResponse(status: string, model: any): MethodRespon
     return corsHeaders(methodJsonResponse(status, model));
 }
 
+export function corsMethodXmlResponse(status: string, model: any) {
+    return corsHeaders(methodXmlResponse(status, model));
+}
+
 interface IntegrationOptions {
     requestParameters?: {[dest: string]: string}
-    requestTemplates?: {[contentType: string]: string}
-    cors?: boolean
+    requestTemplates?: {[contentType: string]: string},
+    disableCors?: boolean,
+    xml?: boolean
 }
 
 export function defaultIntegration(
@@ -81,8 +88,8 @@ export function defaultIntegration(
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            options?.cors ? RESPONSE_200_OK_CORS : RESPONSE_200_OK,
-            options?.cors ? RESPONSE_500_SERVER_ERROR_CORS :  RESPONSE_500_SERVER_ERROR
+            get200Response(options),
+            get500Response(options)
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {}
@@ -96,21 +103,23 @@ export function defaultSingleResourceIntegration(
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            options?.cors ? RESPONSE_200_OK_CORS : RESPONSE_200_OK,
-            options?.cors ? RESPONSE_404_NOT_FOUND_CORS : RESPONSE_404_NOT_FOUND,
-            options?.cors ? RESPONSE_500_SERVER_ERROR_CORS :  RESPONSE_500_SERVER_ERROR
+            options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS,
+            options?.disableCors ? RESPONSE_404_NOT_FOUND: RESPONSE_404_NOT_FOUND_CORS,
+            options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS,
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {}
     });
 }
 
-export function defaultXmlIntegration(lambdaFunction: Function): LambdaIntegration {
-    return new LambdaIntegration(lambdaFunction, {
-        proxy: false,
-        integrationResponses: [
-            RESPONSE_200_OK_XML,
-            RESPONSE_500_SERVER_ERROR
-        ]
-    });
+function get200Response(options?: IntegrationOptions) {
+    if(options?.xml) {
+        return options?.disableCors ? RESPONSE_200_OK_XML : RESPONSE_200_OK_XML_CORS;
+    }
+
+    return options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS;
+}
+
+function get500Response(options?: IntegrationOptions) {
+    return options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS;
 }

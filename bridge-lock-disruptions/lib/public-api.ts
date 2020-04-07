@@ -14,7 +14,7 @@ import { MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {getModelReference, addServiceModel} from "../../common/api/utils";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
-import {Props} from "./app-props.d";
+import {Props} from "./app-props";
 
 export function create(
     vpc: IVpc,
