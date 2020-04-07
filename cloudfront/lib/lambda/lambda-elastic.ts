@@ -19,11 +19,11 @@ exports.handler = async function handler(event: any, context: any, callback: any
 
     const messageBody = await handleS3Object(s3, params);
 
-    sendToEs(messageBody, function(error, success, statusCode, failedItems) {
+    sendToEs(messageBody, function(error: any, success: any, statusCode: any, failedItems: any) {
         console.log('Response: ' + JSON.stringify({ "statusCode": statusCode }));
 
         if (error) {
-            logFailure(error, failedItems);
+//            logFailure(error, failedItems);
             context.fail(JSON.stringify(error));
         } else {
             console.log('Success: ' + JSON.stringify(success));
@@ -71,9 +71,9 @@ function createEsMessage(indexName: string) {
 function sendToEs(messageBody: string, callback: any) {
     var requestParams = buildRequest(elasticAddress, messageBody);
 
-    var request = https.request(requestParams, function(response) {
+    var request = https.request(requestParams, function(response: any) {
         var responseBody = '';
-        response.on('data', function(chunk) {
+        response.on('data', function(chunk: any) {
             responseBody += chunk;
         });
 
@@ -84,7 +84,7 @@ function sendToEs(messageBody: string, callback: any) {
             var error;
 
             if (response.statusCode >= 200 && response.statusCode < 299) {
-                failedItems = info.items.filter(function(x) {
+                failedItems = info.items.filter(function (x: any) {
                     return x.index.status >= 300;
                 });
 
@@ -107,14 +107,14 @@ function sendToEs(messageBody: string, callback: any) {
 
             callback(error, success, response.statusCode, failedItems);
         });
-    }).on('error', function(e) {
+    }).on('error', function(e: any) {
         callback(e);
     });
     request.end(requestParams.body);
 }
 
 function buildRequest(endpoint: string, body: string) {
-    const endpointParts = endpoint.match(AWS_REGEXP);
+    const endpointParts = endpoint.match(AWS_REGEXP) as RegExpMatchArray;
     const region = endpointParts[2];
     const service = endpointParts[3];
     const datetime = (new Date()).toISOString().replace(/[:\-]|\.\d{3}/g, '');
@@ -139,12 +139,12 @@ function buildRequest(endpoint: string, body: string) {
     };
 
     const canonicalHeaders = Object.keys(request.headers)
-        .sort(function(a, b) { return a.toLowerCase() < b.toLowerCase() ? -1 : 1; })
-        .map(function(k) { return k.toLowerCase() + ':' + request.headers[k]; })
+        .sort(function(a: string, b: string) { return a.toLowerCase() < b.toLowerCase() ? -1 : 1; })
+//        .map(function(k: string) { return k.toLowerCase() + ':' + request.headers[k]; })
         .join('\n');
 
     const signedHeaders = Object.keys(request.headers)
-        .map(function(k) { return k.toLowerCase(); })
+        .map(k => k.toLowerCase())
         .sort()
         .join(';');
 
@@ -165,16 +165,16 @@ function buildRequest(endpoint: string, body: string) {
         hash(canonicalString, 'hex')
     ] .join('\n');
 
-    request.headers.Authorization = [
-        'AWS4-HMAC-SHA256 Credential=' + process.env.AWS_ACCESS_KEY_ID + '/' + credentialString,
-        'SignedHeaders=' + signedHeaders,
-        'Signature=' + hmac(kSigning, stringToSign, 'hex')
-    ].join(', ');
+//    request.headers.Authorization = [
+//        'AWS4-HMAC-SHA256 Credential=' + process.env.AWS_ACCESS_KEY_ID + '/' + credentialString,
+//        'SignedHeaders=' + signedHeaders,
+//        'Signature=' + hmac(kSigning, stringToSign, 'hex')
+//    ].join(', ');
 
     return request;
 }
 
-function hmac(key: string, str: string, digest: string = undefined):string {
+function hmac(key: string, str: string, digest: string | undefined = undefined):string {
     return crypto.createHmac('sha256', key).update(str, 'utf8').digest(digest);
 }
 
