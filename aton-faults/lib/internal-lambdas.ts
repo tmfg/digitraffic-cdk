@@ -5,7 +5,7 @@ import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {Stack, Duration} from '@aws-cdk/core';
 import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import {createSubscription} from '../../common/stack/subscription';
-import {AtonProps} from "./app-props.d";
+import {AtonProps} from "./app-props";
 
 export function create(
     vpc: IVpc,

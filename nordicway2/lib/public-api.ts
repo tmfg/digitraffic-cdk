@@ -25,9 +25,7 @@ export function create(
     stack: Construct): Function {
     const publicApi = createApi(stack, props);
 
-    if(!props.private) {
-        createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
-    }
+    createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
 
     const annotationModel = addServiceModel("AnnotationModel", publicApi, AnnotationSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(annotationModel.modelId, publicApi.restApiId)));
@@ -91,14 +89,6 @@ function createAnnotationsResource(
     return getAnnotationsLambda;
 }
 
-function getCondition(nw2Props: NW2Props):any {
-    return nw2Props.private ? {
-        "StringEquals": {
-            "aws:sourceVpc": nw2Props.vpcId
-        }
-    } : {}
-}
-
 function createApi(stack: Construct, nw2Props: NW2Props) {
     return new RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
@@ -116,7 +106,6 @@ function createApi(stack: Construct, nw2Props: NW2Props) {
                     resources: [
                         "*"
                     ],
-                    conditions: getCondition(nw2Props),
                     principals: [
                         new AnyPrincipal()
                     ]

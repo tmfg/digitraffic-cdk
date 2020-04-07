@@ -17,7 +17,7 @@ import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
-import {AtonProps} from "./app-props.d";
+import {AtonProps} from "./app-props";
 import {addTags} from "../../common/api/documentation";
 
 const API_TAGS = ['Beta'];
@@ -27,11 +27,9 @@ export function create(
     lambdaDbSg: ISecurityGroup,
     props: AtonProps,
     stack: Construct): Function {
-    const publicApi = createApi(stack, props);
+    const publicApi = createApi(stack);
 
-    if(!props.private) {
-        createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
-    }
+    createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
 
     const faultModel = addServiceModel("FaultModel", publicApi, FaultSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
@@ -80,7 +78,7 @@ function createAnnotationsResource(
     });
 
     resources.faults.addMethod("GET", getFaultsIntegration, {
-        apiKeyRequired: !props.private,
+        apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.language': false
         },
@@ -93,7 +91,7 @@ function createAnnotationsResource(
     const xmlModel = addXmlserviceModel('XmlModel', publicApi);
 
     resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda), {
-        apiKeyRequired: !props.private,
+        apiKeyRequired: true,
         methodResponses: [
             methodXmlResponse("200", xmlModel),
             methodJsonResponse("500", errorResponseModel)
@@ -124,13 +122,13 @@ function createResourcePaths(publicApi: RestApi): any {
     }
 }
 
-function createApi(stack: Construct, atonProps: AtonProps) {
+function createApi(stack: Construct) {
     return new RestApi(stack, 'ATON-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
         },
         restApiName: 'ATON public API',
-        endpointTypes: [atonProps.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
+        endpointTypes: [EndpointType.REGIONAL],
         policy: new PolicyDocument({
             statements: [
                 new PolicyStatement({
