@@ -73,7 +73,8 @@ export function corsMethodJsonResponse(status: string, model: any): MethodRespon
 interface IntegrationOptions {
     requestParameters?: {[dest: string]: string}
     requestTemplates?: {[contentType: string]: string},
-    disableCors?: boolean
+    disableCors?: boolean,
+    xml?: boolean
 }
 
 export function defaultIntegration(
@@ -83,8 +84,8 @@ export function defaultIntegration(
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS,
-            options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS
+            get200Response(options),
+            get500Response(options)
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {}
@@ -107,14 +108,14 @@ export function defaultSingleResourceIntegration(
     });
 }
 
-export function defaultXmlIntegration(lambdaFunction: Function, options?: IntegrationOptions): LambdaIntegration {
-    return new LambdaIntegration(lambdaFunction, {
-        proxy: false,
-        integrationResponses: [
-            options?.disableCors ? RESPONSE_200_OK_XML : RESPONSE_200_OK_XML_CORS,
-            options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS
-        ],
-        requestParameters: options?.requestParameters || {},
-        requestTemplates: options?.requestTemplates || {}
-    });
+function get200Response(options?: IntegrationOptions) {
+    if(options?.xml) {
+        return options?.disableCors ? RESPONSE_200_OK_XML : RESPONSE_200_OK_XML_CORS;
+    }
+
+    return options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS;
+}
+
+function get500Response(options?: IntegrationOptions) {
+    return options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS;
 }

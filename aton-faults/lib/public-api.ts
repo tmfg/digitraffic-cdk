@@ -6,13 +6,8 @@ import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from '../../common/stack/subscription';
-import {
-    methodJsonResponse,
-    defaultIntegration,
-    defaultXmlIntegration,
-    methodXmlResponse
-} from "../../common/api/responses";
-import { MessageModel} from "../../common/api/response";
+import {methodJsonResponse,defaultIntegration,methodXmlResponse} from "../../common/api/responses";
+import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";
 import {createUsagePlan} from "../../common/stack/usage-plans";
@@ -88,8 +83,9 @@ function createAnnotationsResource(
     });
 
     const xmlModel = addXmlserviceModel('XmlModel', publicApi);
+    const getFaultsS124Integration = defaultIntegration(getFaultsS124Lambda, {xml: true});
 
-    resources.faultsS124.addMethod("GET", defaultXmlIntegration(getFaultsS124Lambda), {
+    resources.faultsS124.addMethod("GET", getFaultsS124Integration, {
         apiKeyRequired: true,
         methodResponses: [
             methodXmlResponse("200", xmlModel),
