@@ -23,7 +23,7 @@ export function create(
     lambdaDbSg: ISecurityGroup,
     props: NW2Props,
     stack: Construct): Function {
-    const publicApi = createApi(stack, props);
+    const publicApi = createApi(stack);
 
     createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
 
@@ -69,7 +69,7 @@ function createAnnotationsResource(
     const nw2Resource = betaResource.addResource("nw2");
     const requests = nw2Resource.addResource("annotations");
     requests.addMethod("GET", getAnnotationsIntegration, {
-        apiKeyRequired: !props.private,
+        apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.author': false,
             'method.request.querystring.type': false
@@ -89,13 +89,13 @@ function createAnnotationsResource(
     return getAnnotationsLambda;
 }
 
-function createApi(stack: Construct, nw2Props: NW2Props) {
+function createApi(stack: Construct) {
     return new RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
         },
         restApiName: 'Nordicway2 public API',
-        endpointTypes: [nw2Props.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
+        endpointTypes: [EndpointType.REGIONAL],
         policy: new PolicyDocument({
             statements: [
                 new PolicyStatement({
