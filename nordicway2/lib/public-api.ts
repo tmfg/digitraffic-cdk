@@ -65,7 +65,8 @@ function createAnnotationsResource(
 
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
-    const nw2Resource = v1Resource.addResource("nw2");
+    const betaResource = apiResource.addResource("beta");
+    const nw2Resource = betaResource.addResource("nw2");
     const requests = nw2Resource.addResource("annotations");
     requests.addMethod("GET", getAnnotationsIntegration, {
         apiKeyRequired: !props.private,
