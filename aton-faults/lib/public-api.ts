@@ -112,7 +112,8 @@ function createAnnotationsResource(
 function createResourcePaths(publicApi: RestApi): any {
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
-    const atonResource = v1Resource.addResource("aton");
+    const betaResource = apiResource.addResource("beta");
+    const atonResource = betaResource.addResource("aton");
     const faults = atonResource.addResource("faults");
     const faultsS124 = atonResource.addResource("faults-s124");
 

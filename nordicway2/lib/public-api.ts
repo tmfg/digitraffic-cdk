@@ -16,14 +16,14 @@ import {NW2Props} from "./app-props";
 import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
 
-const API_TAGS = ['Beta'];
+const API_TAGS = ['beta'];
 
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: NW2Props,
     stack: Construct): Function {
-    const publicApi = createApi(stack, props);
+    const publicApi = createApi(stack);
 
     createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
 
@@ -65,10 +65,11 @@ function createAnnotationsResource(
 
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
-    const nw2Resource = v1Resource.addResource("nw2");
+    const betaResource = apiResource.addResource("beta");
+    const nw2Resource = betaResource.addResource("nw2");
     const requests = nw2Resource.addResource("annotations");
     requests.addMethod("GET", getAnnotationsIntegration, {
-        apiKeyRequired: !props.private,
+        apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.author': false,
             'method.request.querystring.type': false
@@ -88,13 +89,13 @@ function createAnnotationsResource(
     return getAnnotationsLambda;
 }
 
-function createApi(stack: Construct, nw2Props: NW2Props) {
+function createApi(stack: Construct) {
     return new RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
         },
         restApiName: 'Nordicway2 public API',
-        endpointTypes: [nw2Props.private ? EndpointType.PRIVATE : EndpointType.REGIONAL],
+        endpointTypes: [EndpointType.REGIONAL],
         policy: new PolicyDocument({
             statements: [
                 new PolicyStatement({
