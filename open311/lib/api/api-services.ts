@@ -17,13 +17,20 @@ export async function getServices(
             password: endpointPass
         }
     });
-    const parse = util.promisify(xml2js.parseString);
-    const parsedServices = <ServicesResponse> await parse(resp.data);
-    const services = responseToServices(parsedServices);
     if (resp.status != 200) {
         throw Error('Fetching services failed: ' + resp.statusText);
     }
-    return services;
+    const parse = util.promisify(xml2js.parseString);
+    const parsedServices = <ServicesResponse> await parse(resp.data);
+    const services = responseToServices(parsedServices);
+
+    // integration can return services with all fields as null, ensure conformity with db constraints
+    return services.filter(s =>
+        s.service_code != null &&
+        s.service_name != null &&
+        s.metadata != null &&
+        s.type != null
+    );
 }
 
 interface ServicesResponse {

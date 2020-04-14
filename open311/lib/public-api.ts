@@ -132,8 +132,7 @@ function createGetRequestIntegration(
                 request_id: "$util.escapeJavaScript($input.params('request_id'))",
                 extensions: "$util.escapeJavaScript($input.params('extensions'))"
             })
-        },
-        cors: true
+        }
     });
     const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration, {
@@ -166,7 +165,7 @@ function createGetRequestsIntegration(
             'application/json': JSON.stringify({
                 extensions: "$util.escapeJavaScript($input.params('extensions'))"
             })
-        }, cors: true
+        }
     });
     requests.addMethod("GET", getRequestsIntegration, {
         requestParameters: {
@@ -212,9 +211,7 @@ function createGetStatesIntegration(
     statesModel: apigateway.Model,
     messageResponseModel: apigateway.Model) {
 
-    const getServicesIntegration = defaultIntegration(getStatesHandler, {
-        cors: true
-    });
+    const getServicesIntegration = defaultIntegration(getStatesHandler);
     states.addMethod("GET", getServicesIntegration, {
         methodResponses: [
             corsMethodJsonResponse("200", statesModel),
@@ -274,9 +271,7 @@ function createGetServicesIntegration(
     messageResponseModel: apigateway.Model,
     stack: Construct) {
 
-    const getServicesIntegration = defaultIntegration(getServicesHandler, {
-        cors: true
-    });
+    const getServicesIntegration = defaultIntegration(getServicesHandler);
     services.addMethod("GET", getServicesIntegration, {
         methodResponses: [
             corsMethodJsonResponse("200", servicesModel),
@@ -299,7 +294,7 @@ function createGetServiceIntegration(
             'integration.request.path.service_id': 'method.request.path.service_id'
         }, requestTemplates: {
             'application/json': JSON.stringify({service_id: "$util.escapeJavaScript($input.params('service_id'))"})
-        }, cors: true
+        }
     });
     const service = services.addResource("{service_id}");
     service.addMethod("GET", getServiceIntegration, {

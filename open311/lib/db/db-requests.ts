@@ -124,7 +124,8 @@ const SELECT_REQUEST = `SELECT service_request_id,
                                service_object_id,
                                service_object_type,
                                media_urls
-                        FROM open311_service_request`;
+                        FROM open311_service_request
+                        ORDER BY service_request_id`;
 
 function toServiceRequest(r: any): ServiceRequestWithExtensions {
     return {

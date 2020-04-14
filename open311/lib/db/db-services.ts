@@ -54,7 +54,7 @@ const SELECT_REQUEST = `SELECT service_code,
                                type,
                                keywords,
                                "group"
-                        FROM open311_service`;
+                        FROM open311_service ORDER BY service_code`;
 
 function toService(s: any): Service {
     return {
