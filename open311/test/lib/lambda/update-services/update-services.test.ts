@@ -21,7 +21,7 @@ describe('update-services', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
 
         try {
-            await handler(db);
+            await handler({}, {}, {}, db);
             expect((await findAllServiceCodes(db)).map(s => Number(s.service_code))).toMatchObject([171,198,199]);
         } finally {
             server.close();

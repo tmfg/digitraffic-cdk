@@ -5,6 +5,9 @@ import * as pgPromise from "pg-promise";
 let db: pgPromise.IDatabase<any, any> | null  = null;
 
 export const handler = async (
+    event: any,
+    context: any,
+    callback: any,
     dbParam?: pgPromise.IDatabase<any, any>
 ): Promise<any> => {
     db = db ? db : dbParam ? dbParam : initDbConnection(
@@ -14,6 +17,5 @@ export const handler = async (
     );
 
     const states = await findAll(db);
-
     return states;
 };

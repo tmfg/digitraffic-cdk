@@ -6,6 +6,8 @@ let db: pgPromise.IDatabase<any, any>;
 
 export const handler = async (
     event: DeleteRequestEvent,
+    context: any,
+    callback: any,
     dbParam?: pgPromise.IDatabase<any, any>
 ): Promise <void> => {
     db = db ? db : dbParam ? dbParam : initDbConnection(

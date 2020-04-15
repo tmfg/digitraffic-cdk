@@ -8,11 +8,10 @@ import {dbLambdaConfiguration} from "./cdk-util";
 import {createSubscription} from "../../common/stack/subscription";
 
 // returns lambda names for log group subscriptions
-export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props): string[] {
+export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
     const integrationApi = createApi(stack, props.vpcId);
-    const lambdaName = createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
+    createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
     createUsagePlan(integrationApi);
-    return [lambdaName];
 }
 
 function createApi(stack: Construct, vpcId: string) {
@@ -46,7 +45,7 @@ function createRequestsResource(
     integrationApi: apigateway.RestApi,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props): string {
+    props: Props) {
     const apiResource = integrationApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
     const open311Resource = v1Resource.addResource("open311");
@@ -58,13 +57,21 @@ function createRequestsResource(
         code: new lambda.AssetCode('dist/lambda/update-requests'),
         handler: 'lambda-update-requests.handler'
     }));
-    createSubscription(updateRequestsHandler, updateRequestsId, props.logsDestinationArn, stack);
-    const updateRequestsIntegration = new LambdaIntegration(updateRequestsHandler);
-    requests.addMethod("POST", updateRequestsIntegration, {
+    requests.addMethod("POST", new LambdaIntegration(updateRequestsHandler), {
         apiKeyRequired: true
     });
+    createSubscription(updateRequestsHandler, updateRequestsId, props.logsDestinationArn, stack);
 
-    return updateRequestsId;
+    const deleteRequestId = 'DeleteRequest';
+    const deleteRequestHandler = new lambda.Function(stack, deleteRequestId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: deleteRequestId,
+        code: new lambda.AssetCode('dist/lambda/delete-request'),
+        handler: 'lambda-delete-request.handler'
+    }));
+    requests.addMethod("DELETE", new LambdaIntegration(deleteRequestHandler), {
+        apiKeyRequired: true
+    });
+    createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);
 }
 
 function createUsagePlan(integrationApi: apigateway.RestApi) {

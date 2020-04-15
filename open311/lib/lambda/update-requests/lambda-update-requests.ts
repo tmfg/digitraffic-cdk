@@ -12,6 +12,8 @@ let db: pgPromise.IDatabase<any, any>;
 
 export const handler = async (
     event: APIGatewayEvent,
+    context: any,
+    callback: any,
     dbParam?: pgPromise.IDatabase<any, any>
 ): Promise<any> => {
     if (!event.body) {

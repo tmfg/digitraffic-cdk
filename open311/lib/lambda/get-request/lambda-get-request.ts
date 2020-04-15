@@ -8,6 +8,8 @@ let db: pgPromise.IDatabase<any, any>;
 
 export const handler = async (
     event: GetRequestEvent,
+    context: any,
+    callback: any,
     dbParam?: pgPromise.IDatabase<any, any>
 ) : Promise <any> => {
     db = db ? db : dbParam ? dbParam : initDbConnection(

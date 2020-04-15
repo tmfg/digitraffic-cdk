@@ -7,6 +7,8 @@ let db: pgPromise.IDatabase<any, any>;
 
 export const handler = async (
     event: any,
+    context: any,
+    callback: any,
     dbParam?: pgPromise.IDatabase<any, any>
 ) : Promise <any> => {
     const serviceId = event['service_id'] as string | null;

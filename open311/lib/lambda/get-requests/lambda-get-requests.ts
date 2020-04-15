@@ -6,6 +6,8 @@ let db: pgPromise.IDatabase<any, any>;
 
 export const handler = async (
     event: {extensions: string},
+    context: any,
+    callback: any,
     dbParam?: pgPromise.IDatabase<any, any>
 ): Promise<any> => {
     db = db ? db : dbParam ? dbParam : initDbConnection(
@@ -14,7 +16,5 @@ export const handler = async (
         process.env.DB_URI as string
     );
 
-    const requests = await findAll(/true/.test(event.extensions), db);
-
-    return requests;
+    return await findAll(/true/.test(event.extensions), db);
 };

@@ -25,7 +25,7 @@ describe('update-states', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
 
         try {
-            await handler(db);
+            await handler({}, {}, {}, db);
             expect((await findAll(db))).toMatchObject(states);
         } finally {
             server.close();

@@ -11,13 +11,13 @@ describe('lambda-delete-request', dbTestBase((db: pgPromise.IDatabase<any,any>) 
 
         await handler({
             request_id: sr.service_request_id
-        }, db);
+        }, {}, {},  db);
     });
 
     test('Delete nonexistent', async () => {
         await handler({
             request_id: 'foo'
-        }, db);
+        }, {}, {}, db);
     });
 
 }));

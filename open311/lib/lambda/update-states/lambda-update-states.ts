@@ -5,7 +5,12 @@ import {update} from "../../db/db-states";
 
 let db: pgPromise.IDatabase<any, any>;
 
-export const handler = async (dbParam?: pgPromise.IDatabase<any, any>): Promise<any> => {
+export const handler = async (
+    event: any,
+    context: any,
+    callback: any,
+    dbParam?: pgPromise.IDatabase<any, any>
+): Promise<any> => {
     const endpointUser = process.env.ENDPOINT_USER as string;
     const endpointPass = process.env.ENDPOINT_PASS as string;
     const endpointUrl = process.env.ENDPOINT_URL as string;
