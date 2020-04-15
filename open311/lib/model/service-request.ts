@@ -25,6 +25,7 @@ export interface ServiceRequest {
 
 export interface ServiceRequestWithExtensions extends ServiceRequest{
     readonly status_id?: string;
+    readonly vendor_status?: string;
     readonly title?: string;
     readonly service_object_id?: string;
     readonly service_object_type?: string;
@@ -33,6 +34,7 @@ export interface ServiceRequestWithExtensions extends ServiceRequest{
 
 export interface ExtensionsDto {
     readonly status_id?: string;
+    readonly vendor_status?: string;
     readonly title?: string;
     readonly service_object_id?: string;
     readonly service_object_type?: string;

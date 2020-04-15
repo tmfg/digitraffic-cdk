@@ -1,5 +1,5 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
-
+// TODO update this
 const schema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,

@@ -8,7 +8,7 @@ import {NOT_FOUND_MESSAGE} from "../../../../../common/api/errors";
 describe('lambda-get-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Unknown service throws error', async () => {
-        expect(handler({ service_id: '123' })).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
+        expect(handler({ service_id: '123' }, db)).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
     });
 
     test('Get', async () => {
@@ -17,7 +17,7 @@ describe('lambda-get-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 
         const response = await handler({
             service_id: sr.service_code
-        });
+        }, db);
 
         expect(response).toMatchObject(sr);
     });

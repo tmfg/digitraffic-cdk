@@ -41,6 +41,7 @@ export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestS
         lat: 2,
         media_url: "some url",
         status_id: '123',
+        vendor_status: 'some vendor status',
         title: 'some title',
         service_object_id: 'some service_object_id',
         service_object_type: 'some service_object_type',

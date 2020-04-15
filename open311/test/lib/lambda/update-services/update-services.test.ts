@@ -4,7 +4,7 @@ import {dbTestBase, insertServiceRequest} from "../../db-testutil";
 import {TestHttpServer} from "../../../../../common/test/httpserver";
 import {findAllServiceCodes} from "../../../../lib/db/db-services";
 
-const SERVER_PORT = 8089;
+const SERVER_PORT = 8088;
 
 process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
@@ -21,7 +21,7 @@ describe('update-services', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
 
         try {
-            await handler();
+            await handler(db);
             expect((await findAllServiceCodes(db)).map(s => Number(s.service_code))).toMatchObject([171,198,199]);
         } finally {
             server.close();

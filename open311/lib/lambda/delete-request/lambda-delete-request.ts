@@ -1,27 +1,22 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
-import {find} from "../../db/db-services";
-import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
+import {doDelete} from "../../service/requests";
 import * as pgPromise from "pg-promise";
 
 let db: pgPromise.IDatabase<any, any>;
 
 export const handler = async (
-    event: any,
+    event: DeleteRequestEvent,
     dbParam?: pgPromise.IDatabase<any, any>
-) : Promise <any> => {
-    const serviceId = event['service_id'] as string | null;
-
+): Promise <void> => {
     db = db ? db : dbParam ? dbParam : initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string
     );
 
-    const service = await find(db, serviceId as string);
-
-    if (!service) {
-        throw new Error(NOT_FOUND_MESSAGE);
-    }
-
-    return service;
+    return await doDelete(event.request_id, db);
 };
+
+interface DeleteRequestEvent {
+    readonly request_id: string;
+}

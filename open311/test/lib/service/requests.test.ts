@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {findAll, toServiceRequest, toServiceRequestWithExtensions} from "../../../lib/service/requests";
+import {doDelete, findAll, toServiceRequest, toServiceRequestWithExtensions} from "../../../lib/service/requests";
 import {newServiceRequest} from "../testdata";
 import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestWithExtensions} from "../../../lib/model/service-request";
@@ -43,11 +43,22 @@ describe('requests-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         expect(foundServiceRequests[0]).toMatchObject(toServiceRequestWithExtensions(sr));
     });
 
+    test('delete', async () => {
+        const sr = newServiceRequest();
+        await insertServiceRequest(db, [sr]);
+
+        await doDelete(sr.service_request_id, db);
+        const foundServiceRequests = await findAll(true, db);
+
+        expect(foundServiceRequests.length).toBe(0);
+    });
+
 }));
 
 function addNestedExtensionProps(r: any) {
     r.extended_attributes = {
         status_id: r.status_id,
+        vendor_status: r.vendor_status,
         title: r.title,
         service_object_id: r.service_object_id,
         service_object_type: r.service_object_type,
@@ -58,6 +69,8 @@ function addNestedExtensionProps(r: any) {
 function deleteExtensionProps(r: ServiceRequestWithExtensions) {
     // @ts-ignore
     delete r.status_id;
+    // @ts-ignore
+    delete r.vendor_status;
     // @ts-ignore
     delete r.title;
     // @ts-ignore

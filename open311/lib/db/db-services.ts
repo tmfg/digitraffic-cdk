@@ -40,7 +40,7 @@ export function findAllServiceCodes(db: pgPromise.IDatabase<any, any>): Promise<
 }
 
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<Service[]> {
-    return db.manyOrNone(SELECT_REQUEST).then(requests => requests.map(r => toService(r)));
+    return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_code`).then(requests => requests.map(r => toService(r)));
 }
 
 export function find(db: pgPromise.IDatabase<any, any>, service_request_id: string): Promise<Service | null > {
@@ -54,7 +54,7 @@ const SELECT_REQUEST = `SELECT service_code,
                                type,
                                keywords,
                                "group"
-                        FROM open311_service ORDER BY service_code`;
+                        FROM open311_service`;
 
 function toService(s: any): Service {
     return {

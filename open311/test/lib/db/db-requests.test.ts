@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {find, findAll, update} from "../../../lib/db/db-requests";
+import {doDelete, find, findAll, update} from "../../../lib/db/db-requests";
 import {newServiceRequest} from "../testdata";
 import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestStatus} from "../../../lib/model/service-request";
@@ -71,6 +71,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             zipcode: "other than 123456",
             media_url: "other url",
             status_id: '321',
+            vendor_status: 'other vendor status',
             title: 'another title',
             service_object_id: 'another service_object_id',
             service_object_type: 'another service_object_type',
@@ -95,6 +96,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         expect(foundServiceRequest.zipcode).toBe(updatingServiceRequest.zipcode);
         expect(foundServiceRequest.media_url).toBe(updatingServiceRequest.media_url);
         expect(foundServiceRequest.status_id).toBe(updatingServiceRequest.status_id);
+        expect(foundServiceRequest.vendor_status).toBe(updatingServiceRequest.vendor_status);
         expect(foundServiceRequest.title).toBe(updatingServiceRequest.title);
         expect(foundServiceRequest.service_object_id).toBe(updatingServiceRequest.service_object_id);
         expect(foundServiceRequest.service_object_type).toBe(updatingServiceRequest.service_object_type);
@@ -134,4 +136,21 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         await update(db, [serviceRequest]);
     });
 
+    test("Delete - missing doesn't fail", async () => {
+        await doDelete('foo', db);
+    });
+
+    test("Delete", async () => {
+        const serviceRequests = Array.from({length: 1 + Math.floor(Math.random() * 10)}).map(() => {
+            return newServiceRequest();
+        });
+        await insertServiceRequest(db, serviceRequests);
+
+        const srIdToDelete = serviceRequests[0].service_request_id;
+        await doDelete(srIdToDelete, db);
+
+        const foundServiceRequests = await findAll(db);
+
+        expect(foundServiceRequests.find(sr => sr.service_request_id === srIdToDelete)).toBeUndefined();
+    });
 }));

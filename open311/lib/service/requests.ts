@@ -1,5 +1,9 @@
 import * as pgPromise from "pg-promise";
-import {findAll as dbFindAll, find as dbFind} from '../db/db-requests';
+import {
+    findAll as dbFindAll,
+    find as dbFind,
+    doDelete as dbDelete
+} from '../db/db-requests';
 import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
 
 export async function findAll(extensions: Boolean, db: pgPromise.IDatabase<any, any>): Promise<ServiceRequest[]> {
@@ -23,11 +27,19 @@ export async function find(
     return extensions ? toServiceRequestWithExtensions(r) : toServiceRequest(r);
 }
 
+export async function doDelete(
+    serviceRequestId: string,
+    db: pgPromise.IDatabase<any, any>
+): Promise<void> {
+    return await dbDelete(serviceRequestId, db);
+}
+
 export function toServiceRequestWithExtensions(r: ServiceRequestWithExtensions): ServiceRequestWithExtensionsDto {
     return {
         ...toServiceRequest(r), ...{
             extended_attributes: {
                 status_id: r.status_id,
+                vendor_status: r.vendor_status,
                 title: r.title,
                 service_object_id: r.service_object_id,
                 service_object_type: r.service_object_type,

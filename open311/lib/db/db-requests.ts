@@ -18,7 +18,7 @@ export function findStateIds(db: pgPromise.IDatabase<any, any>): Promise<Service
 }
 
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
-    return db.manyOrNone(SELECT_REQUEST).then(requests => requests.map(r => toServiceRequest(r)));
+    return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`).then(requests => requests.map(r => toServiceRequest(r)));
 }
 
 export function find(db: pgPromise.IDatabase<any, any>, service_request_id: string): Promise<ServiceRequestWithExtensions | null > {
@@ -50,6 +50,7 @@ export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
                                  geometry,
                                  media_url,
                                  status_id,
+                                 vendor_status,
                                  title,
                                  service_object_id,
                                  service_object_type,
@@ -71,6 +72,7 @@ export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
                                  ST_POINT($(long), $(lat)),
                                  $(media_url),
                                  $(status_id),
+                                 $(vendor_status),
                                  $(title),
                                  $(service_object_id),
                                  $(service_object_type),
@@ -91,6 +93,7 @@ export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
                                  geometry = ST_POINT($(long), $(lat)),
                                  media_url = $(media_url),
                                  status_id = $(status_id),
+                                 vendor_status = $(vendor_status),
                                  title = $(title),
                                  service_object_id = $(service_object_id),
                                  service_object_type = $(service_object_type),
@@ -99,6 +102,15 @@ export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
             }
         });
         return t.batch(queries);
+    });
+}
+
+export function doDelete(
+    serviceRequestId: string,
+    db: pgPromise.IDatabase<any, any>
+) {
+    return db.tx(t => {
+       return t.none('DELETE FROM open311_service_request WHERE service_request_id = $1', serviceRequestId);
     });
 }
 
@@ -120,12 +132,12 @@ const SELECT_REQUEST = `SELECT service_request_id,
                                ST_Y(geometry) AS lat,
                                media_url,
                                status_id,
+                               vendor_status,
                                title,
                                service_object_id,
                                service_object_type,
                                media_urls
-                        FROM open311_service_request
-                        ORDER BY service_request_id`;
+                        FROM open311_service_request`;
 
 function toServiceRequest(r: any): ServiceRequestWithExtensions {
     return {
@@ -147,6 +159,7 @@ function toServiceRequest(r: any): ServiceRequestWithExtensions {
         lat: r.lat,
         media_url: r.media_url,
         status_id: r.status_id,
+        vendor_status: r.vendor_status,
         title: r.title,
         service_object_id: r.service_object_id,
         service_object_type: r.service_object_type,
@@ -173,6 +186,7 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
         lat: undefined,
         media_url: undefined,
         status_id: undefined,
+        vendor_status: undefined,
         title: undefined,
         service_object_id: undefined,
         service_object_type: undefined,

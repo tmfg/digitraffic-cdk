@@ -5,10 +5,15 @@ import {
     ServiceRequestWithExtensionsDto
 } from "../../model/service-request";
 import {update} from "../../db/db-requests";
-import {invalidRequest, serverError} from "../../http-util";
+import {invalidRequest} from "../../http-util";
 import * as pgPromise from "pg-promise";
 
-export const handler = async (event: APIGatewayEvent): Promise<any> => {
+let db: pgPromise.IDatabase<any, any>;
+
+export const handler = async (
+    event: APIGatewayEvent,
+    dbParam?: pgPromise.IDatabase<any, any>
+): Promise<any> => {
     if (!event.body) {
         return invalidRequest();
     }
@@ -20,20 +25,13 @@ export const handler = async (event: APIGatewayEvent): Promise<any> => {
         return invalidRequest();
     }
 
-    const db = initDbConnection(
+    db = db ? db : dbParam ? dbParam : initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string
     );
 
-    try {
-        return await doUpdate(db, serviceRequests);
-    } catch (e) {
-        console.error('Error', e);
-        return serverError();
-    } finally {
-        db.$pool.end();
-    }
+    return await doUpdate(db, serviceRequests);
 };
 
 async function doUpdate(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensionsDto[]) {
@@ -61,6 +59,7 @@ function toServiceRequestWithExtensions(r: ServiceRequestWithExtensionsDto): Ser
         lat: r.lat,
         media_url: r.media_url,
         status_id: r.extended_attributes?.status_id,
+        vendor_status: r.extended_attributes?.vendor_status,
         title: r.extended_attributes?.title,
         service_object_id: r.extended_attributes?.service_object_id,
         service_object_type: r.extended_attributes?.service_object_type,

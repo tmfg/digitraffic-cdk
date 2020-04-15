@@ -7,7 +7,7 @@ import {dbTestBase} from "../../db-testutil";
 describe('lambda-get-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('no services', async () => {
-        const response = await handler();
+        const response = await handler(db);
 
         expect(response).toMatchObject([]);
     });
@@ -17,7 +17,7 @@ describe('lambda-get-services', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newService());
         await update(db, services);
 
-        const response = await handler();
+        const response = await handler(db);
 
         expect(response.length).toBe(services.length);
     });
