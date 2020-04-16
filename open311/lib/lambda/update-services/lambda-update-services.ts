@@ -15,7 +15,7 @@ export const handler = async (
     const endpointPass = process.env.ENDPOINT_PASS as string;
     const endpointUrl = process.env.ENDPOINT_URL as string;
     const services = await getServices(endpointUser, endpointPass, endpointUrl);
-    db = db ? db : dbParam ? dbParam : initDbConnection(
+    db = db ?? dbParam ?? initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string
