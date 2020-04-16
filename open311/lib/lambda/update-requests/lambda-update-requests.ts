@@ -6,15 +6,15 @@ import {
 } from "../../model/service-request";
 import {update} from "../../db/db-requests";
 import {invalidRequest} from "../../http-util";
-import * as pgPromise from "pg-promise";
+import {IDatabase} from "pg-promise";
 
-let db: pgPromise.IDatabase<any, any>;
+let db: IDatabase<any, any>;
 
 export const handler = async (
     event: APIGatewayEvent,
     context: any,
     callback: any,
-    dbParam?: pgPromise.IDatabase<any, any>
+    dbParam?: IDatabase<any, any>
 ): Promise<any> => {
     if (!event.body) {
         return invalidRequest();
@@ -36,7 +36,7 @@ export const handler = async (
     return await doUpdate(db, serviceRequests);
 };
 
-async function doUpdate(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensionsDto[]) {
+async function doUpdate(db: IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensionsDto[]) {
     await update(db, serviceRequests.map(sr => toServiceRequestWithExtensions(sr)));
     return {statusCode: 200, body: 'Ok'};
 }

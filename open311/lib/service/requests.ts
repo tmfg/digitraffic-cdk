@@ -1,4 +1,4 @@
-import * as pgPromise from "pg-promise";
+import {IDatabase} from "pg-promise";
 import {
     findAll as dbFindAll,
     find as dbFind,
@@ -6,7 +6,7 @@ import {
 } from '../db/db-requests';
 import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
 
-export async function findAll(extensions: Boolean, db: pgPromise.IDatabase<any, any>): Promise<ServiceRequest[]> {
+export async function findAll(extensions: Boolean, db: IDatabase<any, any>): Promise<ServiceRequest[]> {
     const requests =await dbFindAll(db);
     if (!extensions) {
         return requests.map(r => toServiceRequest(r));
@@ -18,7 +18,7 @@ export async function findAll(extensions: Boolean, db: pgPromise.IDatabase<any, 
 export async function find(
     serviceRequestId: string,
     extensions: boolean,
-    db: pgPromise.IDatabase<any, any>
+    db: IDatabase<any, any>
 ): Promise<ServiceRequest | null> {
     const r = await dbFind(db, serviceRequestId)
     if (!r) {
@@ -29,7 +29,7 @@ export async function find(
 
 export async function doDelete(
     serviceRequestId: string,
-    db: pgPromise.IDatabase<any, any>
+    db: IDatabase<any, any>
 ): Promise<void> {
     return await dbDelete(serviceRequestId, db);
 }

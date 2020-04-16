@@ -1,15 +1,15 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
-import * as pgPromise from "pg-promise";
+import {IDatabase} from "pg-promise";
 import {getStates} from "../../api/api-states";
 import {update} from "../../db/db-states";
 
-let db: pgPromise.IDatabase<any, any>;
+let db: IDatabase<any, any>;
 
 export const handler = async (
     event: any,
     context: any,
     callback: any,
-    dbParam?: pgPromise.IDatabase<any, any>
+    dbParam?: IDatabase<any, any>
 ): Promise<any> => {
     const endpointUser = process.env.ENDPOINT_USER as string;
     const endpointPass = process.env.ENDPOINT_PASS as string;

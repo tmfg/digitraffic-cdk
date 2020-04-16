@@ -1,16 +1,16 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {find} from "../../service/requests";
 import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
-import * as pgPromise from "pg-promise";
+import {IDatabase} from "pg-promise";
 
 const stringTrueRegex = /true/;
-let db: pgPromise.IDatabase<any, any>;
+let db: IDatabase<any, any>;
 
 export const handler = async (
     event: GetRequestEvent,
     context: any,
     callback: any,
-    dbParam?: pgPromise.IDatabase<any, any>
+    dbParam?: IDatabase<any, any>
 ) : Promise <any> => {
     db = db ? db : dbParam ? dbParam : initDbConnection(
         process.env.DB_USER as string,

@@ -1,5 +1,5 @@
-import {ServiceRequest, ServiceRequestStatus, ServiceRequestWithExtensions} from "../model/service-request";
-import * as pgPromise from "pg-promise";
+import {ServiceRequestStatus, ServiceRequestWithExtensions} from "../model/service-request";
+import {IDatabase} from "pg-promise";
 
 interface ServiceRequestServiceCode {
     readonly service_code: string | null;
@@ -9,23 +9,23 @@ interface ServiceRequestStatusId {
     readonly status_id: string | null;
 }
 
-export function findServiceCodes(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestServiceCode[]> {
+export function findServiceCodes(db: IDatabase<any, any>): Promise<ServiceRequestServiceCode[]> {
     return db.manyOrNone("SELECT service_code FROM open311_service_request");
 }
 
-export function findStateIds(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestStatusId[]> {
+export function findStateIds(db: IDatabase<any, any>): Promise<ServiceRequestStatusId[]> {
     return db.manyOrNone("SELECT status_id FROM open311_service_request");
 }
 
-export function findAll(db: pgPromise.IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
+export function findAll(db: IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`).then(requests => requests.map(r => toServiceRequest(r)));
 }
 
-export function find(db: pgPromise.IDatabase<any, any>, service_request_id: string): Promise<ServiceRequestWithExtensions | null > {
+export function find(db: IDatabase<any, any>, service_request_id: string): Promise<ServiceRequestWithExtensions | null > {
     return db.oneOrNone(`${SELECT_REQUEST} WHERE service_request_id = $1`, service_request_id).then(r => r == null ? null : toServiceRequest(r));
 }
 
-export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensions[]): Promise<void> {
+export function update(db: IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensions[]): Promise<void> {
     return db.tx(t => {
         const queries: any[] = serviceRequests.map(serviceRequest => {
             if (serviceRequest.status == ServiceRequestStatus.closed) {
@@ -107,7 +107,7 @@ export function update(db: pgPromise.IDatabase<any, any>, serviceRequests: Servi
 
 export function doDelete(
     serviceRequestId: string,
-    db: pgPromise.IDatabase<any, any>
+    db: IDatabase<any, any>
 ) {
     return db.tx(t => {
        return t.none('DELETE FROM open311_service_request WHERE service_request_id = $1', serviceRequestId);

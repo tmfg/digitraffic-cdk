@@ -1,11 +1,11 @@
 import {Service} from "../model/service";
-import * as pgPromise from "pg-promise";
+import {IDatabase} from "pg-promise";
 
 interface ServiceServiceCode {
     readonly service_code: string;
 }
 
-export function update(db: pgPromise.IDatabase<any, any>, services: Service[]): Promise<void> {
+export function update(db: IDatabase<any, any>, services: Service[]): Promise<void> {
     return db.tx(t => {
         const queries: any[] = services.map(service => {
             return t.none(
@@ -35,15 +35,15 @@ export function update(db: pgPromise.IDatabase<any, any>, services: Service[]): 
     });
 }
 
-export function findAllServiceCodes(db: pgPromise.IDatabase<any, any>): Promise<ServiceServiceCode[]> {
+export function findAllServiceCodes(db: IDatabase<any, any>): Promise<ServiceServiceCode[]> {
     return db.manyOrNone("SELECT service_code FROM open311_service");
 }
 
-export function findAll(db: pgPromise.IDatabase<any, any>): Promise<Service[]> {
+export function findAll(db: IDatabase<any, any>): Promise<Service[]> {
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_code`).then(requests => requests.map(r => toService(r)));
 }
 
-export function find(db: pgPromise.IDatabase<any, any>, service_request_id: string): Promise<Service | null > {
+export function find(db: IDatabase<any, any>, service_request_id: string): Promise<Service | null > {
     return db.oneOrNone(`${SELECT_REQUEST} WHERE service_code = $1`, service_request_id).then(r => r == null ? null : toService(r));
 }
 
