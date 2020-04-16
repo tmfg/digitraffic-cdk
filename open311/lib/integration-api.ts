@@ -6,8 +6,10 @@ import {Construct} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import {dbLambdaConfiguration} from "./cdk-util";
 import {createSubscription} from "../../common/stack/subscription";
+import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
+import {addDefaultValidator} from "../../common/api/utils";
+import {MessageModel} from "../../common/api/response";
 
-// returns lambda names for log group subscriptions
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
     const integrationApi = createApi(stack, props.vpcId);
     createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
@@ -46,11 +48,24 @@ function createRequestsResource(
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props) {
+    const validator = addDefaultValidator(integrationApi);
     const apiResource = integrationApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
     const open311Resource = v1Resource.addResource("open311");
     const requests = open311Resource.addResource("requests");
+    const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
 
+    createUpdateRequestHandler(requests, stack, vpc, lambdaDbSg, props);
+    createDeleteRequestHandler(requests, messageResponseModel, validator, stack, vpc, lambdaDbSg, props);
+}
+
+function createUpdateRequestHandler(
+    requests: apigateway.Resource,
+    stack: Construct,
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    props: Props
+) {
     const updateRequestsId = 'UpdateRequests';
     const updateRequestsHandler = new lambda.Function(stack, updateRequestsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: updateRequestsId,
@@ -61,15 +76,47 @@ function createRequestsResource(
         apiKeyRequired: true
     });
     createSubscription(updateRequestsHandler, updateRequestsId, props.logsDestinationArn, stack);
+}
 
+function createDeleteRequestHandler(
+    requests: apigateway.Resource,
+    messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator,
+    stack: Construct,
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    props: Props
+) {
     const deleteRequestId = 'DeleteRequest';
     const deleteRequestHandler = new lambda.Function(stack, deleteRequestId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: deleteRequestId,
         code: new lambda.AssetCode('dist/lambda/delete-request'),
         handler: 'lambda-delete-request.handler'
     }));
-    requests.addMethod("DELETE", new LambdaIntegration(deleteRequestHandler), {
-        apiKeyRequired: true
+    const deleteRequestIntegration = defaultIntegration(deleteRequestHandler, {
+        requestParameters: {
+            'integration.request.path.request_id': 'method.request.path.request_id',
+            'integration.request.querystring.extensions': 'method.request.querystring.extensions'
+        },
+        requestTemplates: {
+            'application/json': JSON.stringify({
+                request_id: "$util.escapeJavaScript($input.params('request_id'))",
+                extensions: "$util.escapeJavaScript($input.params('extensions'))"
+            })
+        }
+    });
+    const request = requests.addResource("{request_id}");
+    request.addMethod("DELETE", deleteRequestIntegration, {
+        apiKeyRequired: true,
+        requestValidator: validator,
+        requestParameters: {
+            'method.request.path.request_id': true,
+            'method.request.querystring.extensions': false
+        },
+        methodResponses: [
+            corsMethodJsonResponse("200", messageResponseModel),
+            corsMethodJsonResponse("500", messageResponseModel)
+        ]
     });
     createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);
 }

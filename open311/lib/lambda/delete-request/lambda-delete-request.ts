@@ -16,7 +16,7 @@ export const handler = async (
         process.env.DB_URI as string
     );
 
-    return await doDelete(event.request_id, db);
+    await doDelete(event.request_id, db);
 };
 
 interface DeleteRequestEvent {
