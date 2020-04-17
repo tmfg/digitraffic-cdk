@@ -19,8 +19,7 @@ import {createUsagePlan} from "../../common/stack/usage-plans";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {AtonProps} from "./app-props";
 import {addTags} from "../../common/api/documentation";
-
-const API_TAGS = ['Beta'];
+import {BETA_TAGS} from "../../common/api/tags";
 
 export function create(
     vpc: IVpc,
@@ -103,8 +102,8 @@ function createAnnotationsResource(
         createSubscription(getFaultsS124Lambda, functionNameS124, props.logsDestinationArn, stack);
     }
 
-    addTags('GetFaults', API_TAGS, resources.faults, stack);
-    addTags('GetFaultsS124', API_TAGS, resources.faultsS124, stack);
+    addTags('GetFaults', BETA_TAGS, resources.faults, stack);
+    addTags('GetFaultsS124', BETA_TAGS, resources.faultsS124, stack);
 
     return getFaultsLambda;
 }
