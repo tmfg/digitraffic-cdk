@@ -16,7 +16,7 @@ import {NW2Props} from "./app-props";
 import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
 
-const API_TAGS = ['beta'];
+const API_TAGS = ['Beta'];
 
 export function create(
     vpc: IVpc,
