@@ -15,8 +15,7 @@ import {createUsagePlan} from "../../common/stack/usage-plans";
 import {NW2Props} from "./app-props";
 import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
-
-const API_TAGS = ['beta'];
+import {BETA_TAGS} from "../../common/api/tags";
 
 export function create(
     vpc: IVpc,
@@ -84,7 +83,7 @@ function createAnnotationsResource(
         createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
     }
 
-    addTags('GetAnnotations', API_TAGS, requests, stack);
+    addTags('GetAnnotations', BETA_TAGS, requests, stack);
 
     return getAnnotationsLambda;
 }

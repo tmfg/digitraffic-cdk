@@ -16,8 +16,7 @@ import {createSubscription} from "../../common/stack/subscription";
 import {createUsagePlan} from "../../common/stack/usage-plans";
 import {corsMethodJsonResponse, defaultIntegration, defaultSingleResourceIntegration} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
-
-const API_TAGS = ['Data v1'];
+import {DATA_V1_TAGS} from "../../common/api/tags";
 
 export function create(
     vpc: ec2.IVpc,
@@ -147,7 +146,7 @@ function createGetRequestIntegration(
             corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
-    addTags('GetRequest', API_TAGS, request, stack);
+    addTags('GetRequest', DATA_V1_TAGS, request, stack);
 }
 
 function createGetRequestsIntegration(
@@ -176,7 +175,7 @@ function createGetRequestsIntegration(
             corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
-    addTags('GetRequests', API_TAGS, requests, stack);
+    addTags('GetRequests', DATA_V1_TAGS, requests, stack);
 }
 
 function createStatesResource(
@@ -202,7 +201,7 @@ function createStatesResource(
         getStatesHandler,
         stateModel,
         messageResponseModel);
-    addTags('GetStates', API_TAGS, states, stack);
+    addTags('GetStates', DATA_V1_TAGS, states, stack);
 }
 
 function createGetStatesIntegration(
@@ -278,7 +277,7 @@ function createGetServicesIntegration(
             corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
-    addTags('GetServices', API_TAGS, services, stack);
+    addTags('GetServices', DATA_V1_TAGS, services, stack);
 }
 
 function createGetServiceIntegration(
@@ -308,7 +307,7 @@ function createGetServiceIntegration(
             corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
-    addTags('GetService', API_TAGS, service, stack);
+    addTags('GetService', DATA_V1_TAGS, service, stack);
 }
 
 function createApi(stack: Construct) {
