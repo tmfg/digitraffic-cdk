@@ -21,7 +21,8 @@
     "@types/sinon": "9.0.0",
     "@types/xml2js": "0.4.5",
     "jest": "25.3.0",
-    "parcel": "1.12.4",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-externals": "^0.4.0",
     "rimraf": "3.0.2",
     "sinon": "9.0.2",
     "ts-jest": "25.3.1",
@@ -45,5 +46,8 @@
     "moment": "2.24.0",
     "pg-query-stream": "3.0.6",
     "xml2js": "0.4.23"
-  }
+  },
+  "externals": [
+    "aws-sdk"
+  ]
 }
