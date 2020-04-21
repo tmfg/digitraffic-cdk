@@ -21,7 +21,8 @@
     "@types/sinon": "^9.0.0",
     "aws-cdk": "1.32.2",
     "jest": "^25.3.0",
-    "parcel": "^1.12.4",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-externals": "^0.4.0",
     "rimraf": "^3.0.2",
     "sinon": "^9.0.2",
     "ts-jest": "^25.3.1",
@@ -40,5 +41,8 @@
     "axios": "latest",
     "ramda": "^0.27.0",
     "source-map-support": "^0.5.16"
-  }
+  },
+  "externals": [
+    "aws-sdk"
+  ]
 }
