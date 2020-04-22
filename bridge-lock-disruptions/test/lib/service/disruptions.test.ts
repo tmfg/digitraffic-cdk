@@ -1,6 +1,6 @@
 import {dbTestBase, insertDisruption} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {disruptionFeatures, newDisruption} from "../testdata";
+import {newDisruption} from "../testdata";
 import {
     findAllDisruptions,
     normalizeDisruptionDate,
@@ -8,6 +8,7 @@ import {
     validateGeoJson
 } from "../../../lib/service/disruptions";
 import {findAll} from "../../../lib/db/db-disruptions";
+
 const testGeojson = require('../testdisruptions.json');
 
 describe('disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
