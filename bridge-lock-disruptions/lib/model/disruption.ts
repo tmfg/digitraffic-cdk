@@ -1,5 +1,3 @@
-import {Location} from "digitraffic-lambda-postgres/geometry";
-
 export interface Disruption {
     Id: number;
     Type_Id: number;
@@ -14,5 +12,5 @@ export interface Disruption {
 }
 
 export interface SpatialDisruption extends Disruption {
-    geometry: Location
+    geometry: any
 }

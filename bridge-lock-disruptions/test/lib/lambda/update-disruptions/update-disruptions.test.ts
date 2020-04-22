@@ -8,7 +8,7 @@ import {findAll} from "../../../../lib/db/db-disruptions";
 const SERVER_PORT = 8089;
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}/`;
 
-describe('lambda-update-disruptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('lambda-update-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('Update', async () => {
         const features = disruptionFeatures();
@@ -28,4 +28,3 @@ describe('lambda-update-disruptions', dbTestBase((db: pgPromise.IDatabase<any,an
     });
 
 }));
-

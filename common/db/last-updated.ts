@@ -17,7 +17,7 @@ export function updateLastUpdated(db: IDatabase<any, any>, datatype: string, dat
 export function getUpdatedTimestamp(db: IDatabase<any, any>, datatype: string): Promise<Date | null> {
     return db.oneOrNone("select updated_time from updated_timestamp where updated_name=${datatype}", {
         datatype: datatype
-    }, (x: { updated_time: any; }) => x.updated_time);
+    }, (x: { updated_time: any; } | null) => x?.updated_time);
 }
 
 export function updateUpdatedTimestamp(db: IDatabase<any, any>, datatype: string, date: Date): Promise<null> {

@@ -15,7 +15,7 @@ export class BridgeLockDisruptionsStack extends Stack {
         });
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
-        const internalLambda = InternalLambdas.create(vpc, lambdaDbSg, appProps, this);
-        const publicLambda = PublicApi.create(vpc, lambdaDbSg, appProps, this);
+        InternalLambdas.create(vpc, lambdaDbSg, appProps, this);
+        PublicApi.create(vpc, lambdaDbSg, appProps, this);
     }
 }

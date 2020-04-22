@@ -1,5 +1,4 @@
 import {findAllDisruptions} from "../../service/disruptions";
-import {Language} from "../../../../common/model/language";
 
 export const handler = async () : Promise <any> => {
     const start = Date.now();

@@ -19,6 +19,7 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization":false,
     "typeRoots": ["./node_modules/@types"],
+    "esModuleInterop": true,
     "moduleResolution": "node",
     "preserveSymlinks": true,
     "baseUrl": ".",

@@ -5,14 +5,14 @@ import {createEditObject} from "../../lib/db/db-disruptions";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
-        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54322/road', {
+        const db: pgPromise.IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
             noWarnings: true // ignore duplicate connection warning for tests
         });
 
         beforeAll(async () => {
-            process.env.DB_USER = 'road';
-            process.env.DB_PASS = 'road';
-            process.env.DB_URI = 'localhost:54322/road';
+            process.env.DB_USER = 'marine';
+            process.env.DB_PASS = 'marine';
+            process.env.DB_URI = 'localhost:54321/marine';
             await truncate(db);
         });
 
@@ -43,8 +43,8 @@ export function insertDisruption(db: pgPromise.IDatabase<any, any>, disruptions:
         const queries: any[] = disruptions.map(disruption => {
             return t.none(
                 `INSERT INTO bridgelock_disruption(
-                                  bridgelock_id,
-                                  bridgelock_type_id,
+                                  id,
+                                  type_id,
                                   start_date,
                                   end_date,
                                   geometry,
@@ -54,17 +54,19 @@ export function insertDisruption(db: pgPromise.IDatabase<any, any>, disruptions:
                                   additional_info_fi,
                                   additional_info_sv,
                                   additional_info_en)
-                           VALUES ($(bridgelock_id),
-                                   $(bridgelock_type_id),
-                                   $(start_date),
-                                   $(end_date),
-                                   $(geometry),
-                                   $(description_fi),
-                                   $(description_sv),
-                                   $(description_en),
-                                   $(additional_info_fi),
-                                   $(additional_info_sv),
-                                   $(additional_info_en))`, createEditObject(disruption));
+                           VALUES (
+                                  $(id),
+                                  $(type_id),
+                                  $(start_date),
+                                  $(end_date),
+                                  ST_GeomFromGeoJSON($(geometry)),
+                                  $(description_fi),
+                                  $(description_sv),
+                                  $(description_en),
+                                  $(additional_info_fi),
+                                  $(additional_info_sv),
+                                  $(additional_info_en))`,
+                createEditObject(disruption));
         });
         return t.batch(queries);
     });
