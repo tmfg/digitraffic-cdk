@@ -1,4 +1,4 @@
-import {RestApi, MethodLoggingLevel} from '@aws-cdk/aws-apigateway';
+import {RestApi, MethodLoggingLevel, RequestValidator} from '@aws-cdk/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
 import {Function, AssetCode} from '@aws-cdk/aws-lambda';
 import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
@@ -11,9 +11,11 @@ import {
 } from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
-import {getModelReference, addServiceModel} from "../../common/api/utils";
+import {getModelReference, addServiceModel, addDefaultValidator} from "../../common/api/utils";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {Props} from "./app-props";
+import {addTags} from "../../common/api/documentation";
+import {DATA_V1_TAGS} from "../../common/api/tags";
 
 export function create(
     vpc: IVpc,
@@ -22,19 +24,22 @@ export function create(
     stack: Construct) {
     const publicApi = createApi(stack, props);
 
+    const validator = addDefaultValidator(publicApi);
+
     const disruptionModel = addServiceModel("DisruptionModel", publicApi, DisruptionSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId)));
     const disruptionsModel = addServiceModel("DisruptionsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, disruptionsModel, stack)
+    createDisruptionsResource(publicApi, vpc, props, lambdaDbSg, disruptionsModel, validator, stack)
 }
 
-function createAnnotationsResource(
+function createDisruptionsResource(
     publicApi: RestApi,
     vpc: IVpc,
     props: Props,
     lambdaDbSg: ISecurityGroup,
     disruptionsJsonModel: any,
+    validator: RequestValidator,
     stack: Construct): Function {
 
     const functionName = 'BridgeLockDisruption-GetDisruptions';
@@ -51,15 +56,15 @@ function createAnnotationsResource(
     const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda);
 
     resources.addMethod("GET", getDisruptionsIntegration, {
+        requestValidator: validator,
         methodResponses: [
             corsMethodJsonResponse("200", disruptionsJsonModel),
             corsMethodJsonResponse("500", errorResponseModel)
         ]
     });
 
-    if (props.logsDestinationArn) {
-        createSubscription(getDisruptionsLambda, functionName, props.logsDestinationArn, stack);
-    }
+    createSubscription(getDisruptionsLambda, functionName, props.logsDestinationArn, stack);
+    addTags('GetDisruptions', DATA_V1_TAGS, resources, stack);
 
     return getDisruptionsLambda;
 }
