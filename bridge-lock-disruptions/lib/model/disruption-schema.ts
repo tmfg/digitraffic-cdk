@@ -5,6 +5,10 @@ const disruptionsProperties: apigateway.JsonSchema = {
     type: apigateway.JsonSchemaType.OBJECT,
     description: 'Bridge and lock Disruptions GeoJSON',
     properties: {
+        Id: {
+            type: apigateway.JsonSchemaType.NUMBER,
+            description: 'Id of disruption'
+        },
         Type_Id: {
             type: apigateway.JsonSchemaType.NUMBER,
             description: 'Id of disruption type'
