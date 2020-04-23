@@ -1,24 +1,30 @@
 import * as LastUpdatedDB from "../../../common/db/last-updated";
 import * as DisruptionsDB from "../db/db-disruptions"
+import {DbDisruption} from "../db/db-disruptions"
 import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
-import {FeatureCollection, Feature, Geometry as GeoJSONGeometry, GeoJsonObject, GeoJSON} from "geojson";
+import {Feature, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
 import {Geometry} from "wkx";
-import {createFeatureCollection} from "../../../common/api/geojson";
-import {DbDisruption} from "../db/db-disruptions";
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import {getDisruptions} from '../api/get-disruptions';
-const GeoJsonValidator = require('geojson-validation');
 import moment from "moment";
+
+const GeoJsonValidator = require('geojson-validation');
 
 export const DISRUPTIONS_DATE_FORMAT = 'D.M.YYYY H:mm';
 const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
 
-export async function findAllDisruptions(): Promise<FeatureCollection> {
+export async function findAllDisruptions(): Promise<Disruptions> {
+    const start = Date.now();
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        const features = await DisruptionsDB.findAll(db, convertFeature);
+        const disruptions = await DisruptionsDB.findAll(db, d => d);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE);
-        return createFeatureCollection(features, lastUpdated);
+        return {
+            disruptions,
+            lastUpdated
+        };
+    }).finally(() => {
+        console.info("method=findAllDisruptions tookMs=%d", (Date.now()-start));
     });
 }
 
@@ -73,7 +79,7 @@ export function validateGeoJson(geoJson: GeoJSON) {
     }
 }
 
-function convertFeature(disruption: DbDisruption): Feature {
+export function convertFeature(disruption: DbDisruption): Feature {
     const properties: Disruption = {
         Id: disruption.id,
         Type_Id: disruption.type_id,
@@ -93,4 +99,9 @@ function convertFeature(disruption: DbDisruption): Feature {
         properties,
         geometry
     };
+}
+
+interface Disruptions {
+    readonly disruptions: DbDisruption[];
+    readonly lastUpdated: Date | null;
 }

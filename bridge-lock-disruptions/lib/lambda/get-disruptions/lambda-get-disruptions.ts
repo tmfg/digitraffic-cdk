@@ -1,10 +1,7 @@
-import {findAllDisruptions} from "../../service/disruptions";
+import {findAllDisruptions, convertFeature} from "../../service/disruptions";
+import {createFeatureCollection} from "../../../../common/api/geojson";
 
-export const handler = async () : Promise <any> => {
-    const start = Date.now();
-    try {
-        return await findAllDisruptions();
-    } finally {
-        console.info("method=findAllDisruptions tookMs=%d", (Date.now()-start));
-    }
+export const handler = async (): Promise<any> => {
+    const disruptions = await findAllDisruptions();
+    return createFeatureCollection(disruptions.disruptions.map(convertFeature), disruptions.lastUpdated);
 };

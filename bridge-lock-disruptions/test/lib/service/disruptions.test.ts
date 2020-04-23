@@ -21,7 +21,7 @@ describe('disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const fetchedDisruptions = await findAllDisruptions();
 
-        expect(fetchedDisruptions.features.length).toBe(disruptions.length);
+        expect(fetchedDisruptions.disruptions.length).toBe(disruptions.length);
     });
 
     test('saveDisruptions', async () => {
