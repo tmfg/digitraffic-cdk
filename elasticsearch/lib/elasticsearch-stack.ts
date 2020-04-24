@@ -2,7 +2,7 @@ import core = require('@aws-cdk/core');
 import {CfnDomain} from "@aws-cdk/aws-elasticsearch";
 
 export class ElasticsearchStack extends core.Stack {
-    constructor(scope: core.App, id: string, props?: core.StackProps,) {
+    constructor(scope: core.App, id: string, elasticsearchProps: Props, props?: core.StackProps,) {
         super(scope, id, {
             env: {
                 account: '',
@@ -28,7 +28,7 @@ export class ElasticsearchStack extends core.Stack {
                         "Resource": "arn:aws:es:eu-west-1:111964331789:domain/dt-elasticsearch-domain/*",
                         "Condition": {
                             "IpAddress": {
-                                "aws:SourceIp": []
+                                "aws:SourceIp": elasticsearchProps.allowedIpAddresses
                             }
                         }
                     },
@@ -36,7 +36,7 @@ export class ElasticsearchStack extends core.Stack {
                         "Sid": "",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": []
+                            "AWS": elasticsearchProps.allowedRoles
                         },
                         "Action": "es:*",
                         "Resource": "arn:aws:es:eu-west-1:111964331789:domain/dt-elasticsearch-domain/*"
