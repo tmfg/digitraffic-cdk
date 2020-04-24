@@ -11,7 +11,7 @@ export const KEY_APIGW_APPS = 'APIGW_APPS';
 
 const apiRequestHeaders: AxiosRequestConfig = {
   headers: {
-      'Content-Encoding': 'gzip'
+      'Accept-Encoding': 'gzip'
   }
 };
 
