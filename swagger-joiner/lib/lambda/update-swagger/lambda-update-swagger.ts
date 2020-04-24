@@ -1,5 +1,5 @@
 import {config as AWSConfig} from "aws-sdk";
-import axios from 'axios';
+import {default as axios, AxiosRequestConfig} from 'axios';
 import {constructSwagger, mergeApiDescriptions} from "../../swagger-utils";
 import {exportSwaggerApi} from "../../apigw-utils";
 import {uploadToS3} from "../../s3-utils";
@@ -8,6 +8,12 @@ export const KEY_BUCKET_NAME = 'BUCKET_NAME';
 export const KEY_REGION = 'REGION';
 export const KEY_APP_URL = 'APP_URL';
 export const KEY_APIGW_APPS = 'APIGW_APPS';
+
+const apiRequestHeaders: AxiosRequestConfig = {
+  headers: {
+      'Content-Encoding': 'gzip'
+  }
+};
 
 export const handler = async (): Promise<any> => {
     const bucketName = process.env[KEY_BUCKET_NAME] as string;
@@ -18,8 +24,8 @@ export const handler = async (): Promise<any> => {
 
     const apiResponses = await Promise.all(apigatewayIds.map(exportSwaggerApi));
     const apis = apiResponses.map(resp => JSON.parse(resp.body as string));
-    const appApi = (await axios.get(`${appUrl}?group=metadata-api`)).data;
-    const appBetaApi = (await axios.get(`${appUrl}?group=metadata-api-beta`)).data;
+    const appApi = (await axios.get(`${appUrl}?group=metadata-api`, apiRequestHeaders)).data;
+    const appBetaApi = (await axios.get(`${appUrl}?group=metadata-api-beta`, apiRequestHeaders)).data;
 
     // order is crucial in order for beta for remain at the bottom
     const allApis = [appBetaApi].concat(apis).concat([appApi]);
@@ -30,8 +36,6 @@ export const handler = async (): Promise<any> => {
     delete merged.schemes; // always https
     // @ts-ignore
     delete merged['x-amazon-apigateway-policy']; // implementation details
-
-    const beta =
 
     await uploadToS3(bucketName, constructSwagger(merged), 'dt-swagger.js');
 };
