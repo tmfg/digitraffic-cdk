@@ -5,10 +5,10 @@ export enum AclRuleType {
     AWSCommonRuleSet, AWSReputationList, AWSKnownBadInputs, ThrottleRule, GzipHeaderRule
 }
 
-export function createWebAcl(stack: Stack, rules: AclRuleType[]): CfnWebACL {
+export function createWebAcl(stack: Stack, environment: string, rules: AclRuleType[]): CfnWebACL {
     const generatedRules = rules.map(createRule);
 
-    return new CfnWebACL(stack, 'DefaultWebAcl', {
+    return new CfnWebACL(stack, `DefaultWebAcl-${environment}`, {
         defaultAction: {allow: {}},
         scope: 'CLOUDFRONT',
         visibilityConfig: {

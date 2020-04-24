@@ -67,11 +67,11 @@ export class CloudfrontCdkStack extends Stack {
     }
 
     createWebAcl(props: Props): any {
-        if(props.aclRules == undefined) {
-            return null;
+        if(props.aclRules) {
+            return createWebAcl(this, props.environmentName, props.aclRules);
         }
 
-        return createWebAcl(this, props.aclRules);
+        return null;
     }
 
     createDistribution(cloudfrontProps: Props, role: Role, lambdaMap: any, elasticDomain: string, elasticAppName: string) {
