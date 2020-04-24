@@ -21,7 +21,6 @@ export interface CFDomain {
 
 export interface Props {
     originAccessIdentity?: boolean,
-    elasticArn?: string,
     distributionName: string,
     environmentName: string,
     aliasNames: string[] | null,
@@ -30,7 +29,14 @@ export interface Props {
     domains: CFDomain[]
 }
 
+export interface ElasticProps {
+    elasticDomain: string,
+    elasticArn: string,
+}
+
 export interface CFProps {
+    elasticProps: ElasticProps,
+    elasticAppName: string,
     props: Props[],
     lambdaProps?: CFLambdaProps,
 }

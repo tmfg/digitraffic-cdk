@@ -1,7 +1,6 @@
 import {Stack } from '@aws-cdk/core';
 import {Runtime, Function, InlineCode, AssetCode} from '@aws-cdk/aws-lambda';
 import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
-import {Props} from "../app-props";
 
 const fs = require('fs');
 
@@ -36,14 +35,16 @@ export function createWeathercamRedirect(stack: Stack, domainName: string, hostN
     return redirectFunction.addVersion(versionString);
 }
 
-export function createWriteToEsLambda(stack: Stack, cloudfrontProps: Props) {
-    return new Function(stack, 'lambda-forward', {
+export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Role, elasticDomain: string, elasticAppName: string): Function {
+    return new Function(stack, `${env}-lambda-forward`, {
         runtime: Runtime.NODEJS_12_X,
+        role: lambdaRole,
         memorySize: 128,
         code: new AssetCode('dist/lambda'),
         handler: 'lambda-elastic.handler',
         environment: {
-            ELASTIC_ARN: cloudfrontProps.elasticArn as string
+            APP_DOMAIN: elasticAppName,
+            ELASTIC_DOMAIN: elasticDomain
         }
     });
 }
