@@ -2,6 +2,7 @@ import {FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration} from "@aws-cdk/core";
 import {IVpc, ISecurityGroup} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
+import {mergeDeepRight} from 'ramda';
 
 export interface LambdaConfiguration {
     vpcId: string;
@@ -29,7 +30,7 @@ export function dbLambdaConfiguration(
     props: LambdaConfiguration,
     config: any): FunctionProps {
 
-    return <FunctionProps> Object.assign({}, {
+    return <FunctionProps> mergeDeepRight({
         runtime: props.runtime || Runtime.NODEJS_12_X,
         memorySize: props.memorySize || 1024,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),

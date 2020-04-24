@@ -20,7 +20,7 @@ describe('lambda-update-disruptions', dbTestBase((db: pgPromise.IDatabase<any, a
         });
         try {
             await handler();
-            const disruptions = await findAll(db, (d) => d);
+            const disruptions = await findAll(db);
             expect(disruptions.length).toBe(features.features.length);
         } finally {
             server.close();

@@ -1,36 +1,32 @@
 import * as LastUpdatedDB from "../../../common/db/last-updated";
 import * as DisruptionsDB from "../db/db-disruptions"
-import {DbDisruption} from "../db/db-disruptions"
 import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
-import {Feature, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
-import {Geometry} from "wkx";
-import {Disruption, SpatialDisruption} from "../model/disruption";
+import {Feature, FeatureCollection, GeoJSON} from "geojson";
+import {SpatialDisruption} from "../model/disruption";
 import {getDisruptions} from '../api/get-disruptions';
 import moment from "moment";
+import {createFeatureCollection} from "../../../common/api/geojson";
 
 const GeoJsonValidator = require('geojson-validation');
 
 export const DISRUPTIONS_DATE_FORMAT = 'D.M.YYYY H:mm';
 const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
 
-export async function findAllDisruptions(): Promise<Disruptions> {
+export async function findAllDisruptions(): Promise<FeatureCollection> {
     const start = Date.now();
-    return await inDatabase(async (db: IDatabase<any,any>) => {
-        const disruptions = await DisruptionsDB.findAll(db, d => d);
+    return await inDatabase(async (db: IDatabase<any, any>) => {
+        const disruptions = await DisruptionsDB.findAll(db);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE);
-        return {
-            disruptions,
-            lastUpdated
-        };
+        return createFeatureCollection(disruptions, lastUpdated);
     }).finally(() => {
-        console.info("method=findAllDisruptions tookMs=%d", (Date.now()-start));
+        console.info("method=findAllDisruptions tookMs=%d", (Date.now() - start));
     });
 }
 
 export async function saveDisruptions(disruptions: SpatialDisruption[]) {
     const start = Date.now();
-    await inDatabase(async (db: IDatabase<any,any>) => {
+    await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(t => {
             return t.batch(
                 DisruptionsDB.updateDisruptions(db, disruptions),
@@ -39,7 +35,7 @@ export async function saveDisruptions(disruptions: SpatialDisruption[]) {
         });
     }).then(a => {
         const end = Date.now();
-        console.info("method=saveDisruptions updatedCount=%d tookMs=%d", a.length, (end-start));
+        console.info("method=saveDisruptions updatedCount=%d tookMs=%d", a.length, (end - start));
     });
 }
 
@@ -77,31 +73,4 @@ export function validateGeoJson(geoJson: GeoJSON) {
         console.warn('Invalid GeoJSON', geoJson);
         return false;
     }
-}
-
-export function convertFeature(disruption: DbDisruption): Feature {
-    const properties: Disruption = {
-        Id: disruption.id,
-        Type_Id: disruption.type_id,
-        StartDate: disruption.start_date,
-        EndDate: disruption.end_date,
-        DescriptionFi: disruption.description_fi,
-        DescriptionSv: disruption.description_sv,
-        DescriptionEn: disruption.description_en,
-        AdditionalInformationFi: disruption.additional_info_fi,
-        AdditionalInformationSv: disruption.additional_info_sv,
-        AdditionalInformationEn: disruption.additional_info_en
-    };
-    // convert geometry from db to geojson
-    const geometry = Geometry.parse(Buffer.from(disruption.geometry, "hex")).toGeoJSON() as GeoJSONGeometry;
-    return {
-        type: "Feature",
-        properties,
-        geometry
-    };
-}
-
-interface Disruptions {
-    readonly disruptions: DbDisruption[];
-    readonly lastUpdated: Date | null;
 }

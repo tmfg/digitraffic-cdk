@@ -3,6 +3,7 @@ import {dbTestBase, insertDisruption} from "../db-testutil";
 import {newDisruption} from "../testdata";
 import {findAll, updateDisruptions} from "../../../lib/db/db-disruptions";
 import {Geometry} from "wkx";
+import {Disruption} from "../../../lib/model/disruption";
 
 describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -12,7 +13,7 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insertDisruption(db, disruptions);
 
-        const fetchedDisruptions = await findAll(db, (d) => d);
+        const fetchedDisruptions = await findAll(db);
 
         expect(fetchedDisruptions.length).toBe(disruptions.length);
     });
@@ -22,21 +23,21 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         await Promise.all(updateDisruptions(db, [disruption]));
 
-        const fetchedDisruptions = await findAll(db, (d) => d);
+        const fetchedDisruptions = await findAll(db);
 
         expect(fetchedDisruptions.length).toBe(1);
-        const fd = fetchedDisruptions[0];
-        expect(Number(fd.id)).toBe(disruption.Id);
-        expect(Number(fd.type_id)).toBe(disruption.Type_Id);
-        expect(fd.start_date).toMatchObject(disruption.StartDate);
-        expect(fd.end_date).toMatchObject(disruption.EndDate);
-        expect(fd.description_fi).toBe(disruption.DescriptionFi);
-        expect(fd.description_sv).toBe(disruption.DescriptionSv);
-        expect(fd.description_en).toBe(disruption.DescriptionEn);
-        expect(fd.additional_info_fi).toBe(disruption.AdditionalInformationFi);
-        expect(fd.additional_info_sv).toBe(disruption.AdditionalInformationSv);
-        expect(fd.additional_info_en).toBe(disruption.AdditionalInformationEn);
-        expect(Geometry.parse(Buffer.from(fd.geometry, "hex")).toGeoJSON()).toMatchObject(disruption.geometry);
+        const fd = fetchedDisruptions[0].properties as Disruption;
+        expect(Number(fd.Id)).toBe(disruption.Id);
+        expect(Number(fd.Type_Id)).toBe(disruption.Type_Id);
+        expect(fd.StartDate).toMatchObject(disruption.StartDate);
+        expect(fd.EndDate).toMatchObject(disruption.EndDate);
+        expect(fd.DescriptionFi).toBe(disruption.DescriptionFi);
+        expect(fd.DescriptionSv).toBe(disruption.DescriptionSv);
+        expect(fd.DescriptionEn).toBe(disruption.DescriptionEn);
+        expect(fd.AdditionalInformationFi).toBe(disruption.AdditionalInformationFi);
+        expect(fd.AdditionalInformationSv).toBe(disruption.AdditionalInformationSv);
+        expect(fd.AdditionalInformationEn).toBe(disruption.AdditionalInformationEn);
+        expect(fetchedDisruptions[0].geometry).toMatchObject(disruption.geometry);
     });
 
     test('updateDisruptions - update', async () => {
@@ -47,18 +48,18 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         await Promise.all(updateDisruptions(db, [updatedDisruption]));
 
-        const fetchedDisruptions = await findAll(db, (d) => d)
+        const fetchedDisruptions = await findAll(db);
         expect(fetchedDisruptions.length).toBe(1);
-        const fd = fetchedDisruptions[0];
-        expect(Number(fd.type_id)).toBe(updatedDisruption.Type_Id);
-        expect(fd.start_date).toMatchObject(updatedDisruption.StartDate);
-        expect(fd.end_date).toMatchObject(updatedDisruption.EndDate);
-        expect(fd.description_fi).toBe(updatedDisruption.DescriptionFi);
-        expect(fd.description_sv).toBe(updatedDisruption.DescriptionSv);
-        expect(fd.description_en).toBe(updatedDisruption.DescriptionEn);
-        expect(fd.additional_info_fi).toBe(updatedDisruption.AdditionalInformationFi);
-        expect(fd.additional_info_sv).toBe(updatedDisruption.AdditionalInformationSv);
-        expect(fd.additional_info_en).toBe(updatedDisruption.AdditionalInformationEn);
-        expect(Geometry.parse(Buffer.from(fd.geometry, "hex")).toGeoJSON()).toMatchObject(updatedDisruption.geometry);
+        const fd = fetchedDisruptions[0].properties as Disruption;
+        expect(Number(fd.Type_Id)).toBe(updatedDisruption.Type_Id);
+        expect(fd.StartDate).toMatchObject(updatedDisruption.StartDate);
+        expect(fd.EndDate).toMatchObject(updatedDisruption.EndDate);
+        expect(fd.DescriptionFi).toBe(updatedDisruption.DescriptionFi);
+        expect(fd.DescriptionSv).toBe(updatedDisruption.DescriptionSv);
+        expect(fd.DescriptionEn).toBe(updatedDisruption.DescriptionEn);
+        expect(fd.AdditionalInformationFi).toBe(updatedDisruption.AdditionalInformationFi);
+        expect(fd.AdditionalInformationSv).toBe(updatedDisruption.AdditionalInformationSv);
+        expect(fd.AdditionalInformationEn).toBe(updatedDisruption.AdditionalInformationEn);
+        expect(fetchedDisruptions[0].geometry).toMatchObject(updatedDisruption.geometry);
     });
 }));
