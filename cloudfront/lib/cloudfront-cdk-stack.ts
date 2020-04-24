@@ -2,9 +2,10 @@ import {Stack, StackProps, Construct} from '@aws-cdk/core';
 import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
+import {Role, ServicePrincipal, PolicyStatement} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
-import {CFLambdaProps, CFProps, Props} from '../lib/app-props';
+import {CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
 import {createWriteToEsLambda, createWeathercamRedirect, LambdaType} from "./lambda/lambda-creator";
 import {createWebAcl} from "./acl/acl-creator";
 
@@ -13,8 +14,41 @@ export class CloudfrontCdkStack extends Stack {
         super(scope, id, props);
 
         const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
+        const role = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
 
-        cloudfrontProps.props.forEach(p => this.createDistribution(p, lambdaMap));
+        cloudfrontProps.props.forEach(p => this.createDistribution(p, role, lambdaMap, cloudfrontProps.elasticProps.elasticDomain, cloudfrontProps.elasticAppName));
+    }
+
+    createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
+        const lambdaRole = new Role(stack, `S3LambdaToElasticRole`, {
+            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+            roleName: `S3LambdaToElasticRole`
+        });
+        lambdaRole.addToPolicy(new PolicyStatement({
+            actions: [
+                "es:DescribeElasticsearchDomain",
+                "es:DescribeElasticsearchDomains",
+                "es:DescribeElasticsearchDomainConfig",
+                "es:ESHttpPost",
+                "es:ESHttpPut"
+            ],
+            resources: [
+                elasticProps.elasticArn,
+                `${elasticProps.elasticArn}/*`
+            ]
+        }));
+        lambdaRole.addToPolicy(new PolicyStatement( {
+            actions: [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents",
+                "logs:DescribeLogStreams"
+            ], resources: [
+                "arn:aws:logs:*:*:*"
+            ]
+        }));
+
+        return lambdaRole;
     }
 
     createLambdaMap(lProps: CFLambdaProps | undefined): any {
@@ -40,7 +74,7 @@ export class CloudfrontCdkStack extends Stack {
         return createWebAcl(this, props.aclRules);
     }
 
-    createDistribution(cloudfrontProps: Props, lambdaMap: any) {
+    createDistribution(cloudfrontProps: Props, role: Role, lambdaMap: any, elasticDomain: string, elasticAppName: string) {
         const env = cloudfrontProps.environmentName;
         const oai = cloudfrontProps.originAccessIdentity ? new OriginAccessIdentity(this, `${env}-oai`) : null;
 
@@ -52,12 +86,11 @@ export class CloudfrontCdkStack extends Stack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
-        if(cloudfrontProps.elasticArn) {
-            const lambda = createWriteToEsLambda(this, cloudfrontProps);
+        const lambda = createWriteToEsLambda(this, env, role, elasticDomain, elasticAppName);
 
-            bucket.addObjectCreatedNotification(new LambdaDestination(lambda));
-            bucket.grantRead(lambda);
-        }
+        bucket.addObjectCreatedNotification(new LambdaDestination(lambda));
+        bucket.grantRead(lambda);
+
 
         const aliasConfig = cloudfrontProps.acmCertRef == null ? undefined: createAliasConfig(cloudfrontProps.acmCertRef as string, cloudfrontProps.aliasNames as string[]);
         const webAcl = this.createWebAcl(cloudfrontProps);

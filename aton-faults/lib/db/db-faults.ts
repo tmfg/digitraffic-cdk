@@ -47,8 +47,6 @@ export async function streamAllForJson(db: IDatabase<any, any>, language: Langua
 }
 
 export async function streamAllForS124(db: IDatabase<any, any>, conversion: (fault: any) => any) {
-    console.info("starting streaming...");
-
     const qs = new QueryStream(ALL_FAULTS_S124_WITH_DOMAIN_SQL);
 
     return await stream(db, qs, conversion);

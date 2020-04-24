@@ -27,8 +27,8 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
     return {
         customOriginSource: {
             domainName: domain.domainName as string,
-            httpPort: domain.httpPort || 80,
-            httpsPort: domain.httpsPort || 443,
+            httpPort: domain.httpPort ?? 80,
+            httpsPort: domain.httpsPort ?? 443,
             originProtocolPolicy: domain.protocolPolicy as OriginProtocolPolicy || OriginProtocolPolicy.HTTPS_ONLY
         },
         behaviors: createBehaviors(stack, domain.behaviors || [], lambdaMap),
@@ -62,8 +62,8 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
         isDefaultBehavior: defaultBehavior,
         pathPattern: b.path,
         minTtl: Duration.seconds(0),
-        maxTtl: Duration.seconds(b.cacheTtl || 60),
-        defaultTtl: Duration.seconds(b.cacheTtl || 60),
+        maxTtl: Duration.seconds(b.cacheTtl ?? 60),
+        defaultTtl: Duration.seconds(b.cacheTtl ?? 60),
         forwardedValues: {
             queryString: true,
             queryStringCacheKeys: b.queryCacheKeys as string[]
