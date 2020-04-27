@@ -25,7 +25,7 @@ cd ..
 
 # update others
 for d in $(find ./* -maxdepth 0 -type d); do
-  if [ "$d" != "./common" ]; then
+  if [ "$d" != "./common" ] && [ "$d" != "./elasticsearch" ]; then
     cd "$d"
     rm package-lock.json
     rm -rf node_modules

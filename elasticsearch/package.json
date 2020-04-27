@@ -11,18 +11,18 @@
     "cdk": "cdk"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.31.0",
-    "@types/jest": "^24.0.22",
-    "@types/node": "10.17.5",
-    "jest": "^24.9.0",
-    "ts-jest": "^24.1.0",
-    "aws-cdk": "1.31.0",
-    "ts-node": "^8.1.0",
-    "typescript": "~3.7.2"
+    "@aws-cdk/assert": "1.35.0",
+    "@types/jest": "^25.2.1",
+    "@types/node": "13.13.4",
+    "jest": "^25.4.0",
+    "ts-jest": "^25.4.0",
+    "aws-cdk": "1.35.0",
+    "ts-node": "^8.9.1",
+    "typescript": "~3.8.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-elasticsearch": "^1.31.0",
-    "@aws-cdk/core": "1.31.0",
-    "source-map-support": "^0.5.16"
+    "@aws-cdk/aws-elasticsearch": "^1.35.0",
+    "@aws-cdk/core": "1.35.0",
+    "source-map-support": "^0.5.19"
   }
 }

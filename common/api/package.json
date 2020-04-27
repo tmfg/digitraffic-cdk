@@ -7,7 +7,7 @@
     "typescript": "3.8.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.32.2",
+    "@aws-cdk/aws-apigateway": "1.35.0",
     "@types/geojson": "7946.0.7"
   }
 }

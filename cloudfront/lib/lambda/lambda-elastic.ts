@@ -1,6 +1,6 @@
 const zlib = require('zlib');
 const readline = require('readline');
-const AWS = require('aws-sdk');
+import * as AWS from 'aws-sdk';
 const elasticsearch = require('elasticsearch')
 const awsHttpClient = require('http-aws-es')
 

@@ -4,7 +4,7 @@
   "description": "",
   "license": "EUPL",
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.32.2"
+    "@aws-cdk/aws-apigateway": "1.35.0"
   },
   "devDependencies": {
     "typescript": "^3.8.3"

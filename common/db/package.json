@@ -11,7 +11,7 @@
   "dependencies": {
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5",
-    "@types/node": "13.11.1",
-    "pg-query-stream": "3.0.6"
+    "@types/node": "13.13.4",
+    "pg-query-stream": "3.0.7"
   }
 }
