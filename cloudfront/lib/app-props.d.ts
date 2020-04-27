@@ -5,6 +5,7 @@ export interface CFBehavior {
     path?: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
+    allowedMethods?: any,
     lambdaType?: LambdaType
 }
 

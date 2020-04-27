@@ -126,7 +126,7 @@ function parseLine(line: string): any {
     const httpDate = getHttpDate(date, time);
 
     return {
-        timestamp: httpDate,
+        '@timestamp': httpDate,
         remote_addr: ip,
         body_bytes_sent: bytes,
         http_referrer: referrer,

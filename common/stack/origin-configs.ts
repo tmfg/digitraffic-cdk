@@ -1,5 +1,5 @@
 import {Duration, Stack} from '@aws-cdk/core';
-import {OriginProtocolPolicy, OriginAccessIdentity, SourceConfiguration, Behavior, LambdaEdgeEventType} from '@aws-cdk/aws-cloudfront';
+import {OriginProtocolPolicy, OriginAccessIdentity, SourceConfiguration, Behavior, LambdaEdgeEventType, CloudFrontAllowedMethods} from '@aws-cdk/aws-cloudfront';
 import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
 
@@ -49,7 +49,7 @@ function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
 
 function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any): Behavior[] {
     if (behaviors == null || behaviors.length == 0) {
-        return [createBehavior(stack, {}, lambdaMap, true)];
+        return [createBehavior(stack, { allowedMethods: CloudFrontAllowedMethods.ALL }, lambdaMap, true)];
     }
 
     return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path == null));
@@ -60,6 +60,7 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
 
     return {
         isDefaultBehavior: defaultBehavior,
+        allowedMethods: b.allowedMethods ?? CloudFrontAllowedMethods.GET_HEAD,
         pathPattern: b.path,
         minTtl: Duration.seconds(0),
         maxTtl: Duration.seconds(b.cacheTtl ?? 60),
