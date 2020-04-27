@@ -9,7 +9,7 @@ describe('db-states', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const states = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
             return newState();
         });
-        await update(db, states);
+        await update(states, db);
 
         const foundStates = await findAll(db);
 

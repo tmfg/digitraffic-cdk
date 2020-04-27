@@ -15,7 +15,7 @@ describe('lambda-get-services', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
     test('some service services', async () => {
         const services =
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newService());
-        await update(db, services);
+        await update(services, db);
 
         const response = await handler({}, {}, {}, db);
 

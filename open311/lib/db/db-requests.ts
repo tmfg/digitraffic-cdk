@@ -21,11 +21,17 @@ export function findAll(db: IDatabase<any, any>): Promise<ServiceRequestWithExte
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`).then(requests => requests.map(r => toServiceRequest(r)));
 }
 
-export function find(db: IDatabase<any, any>, service_request_id: string): Promise<ServiceRequestWithExtensions | null > {
+export function find(
+    service_request_id: string,
+    db: IDatabase<any, any>
+): Promise<ServiceRequestWithExtensions | null > {
     return db.oneOrNone(`${SELECT_REQUEST} WHERE service_request_id = $1`, service_request_id).then(r => r == null ? null : toServiceRequest(r));
 }
 
-export function update(db: IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensions[]): Promise<void> {
+export function update(
+    serviceRequests: ServiceRequestWithExtensions[],
+    db: IDatabase<any, any>
+): Promise<void> {
     return db.tx(t => {
         const queries: any[] = serviceRequests.map(serviceRequest => {
             if (serviceRequest.status == ServiceRequestStatus.closed) {
@@ -33,28 +39,28 @@ export function update(db: IDatabase<any, any>, serviceRequests: ServiceRequestW
             } else {
                 return t.none(
                         `INSERT INTO open311_service_request(
-                                service_request_id,
-                                 status,
-                                 status_notes,
-                                 service_name,
-                                 service_code,
-                                 description,
-                                 agency_responsible,
-                                 service_notice,
-                                 requested_datetime,
-                                 updated_datetime,
-                                 expected_datetime,
-                                 address,
-                                 address_id,
-                                 zipcode,
-                                 geometry,
-                                 media_url,
-                                 status_id,
-                                 vendor_status,
-                                 title,
-                                 service_object_id,
-                                 service_object_type,
-                                 media_urls)
+                            service_request_id,
+                            status,
+                            status_notes,
+                            service_name,
+                            service_code,
+                            description,
+                            agency_responsible,
+                            service_notice,
+                            requested_datetime,
+                            updated_datetime,
+                            expected_datetime,
+                            address,
+                            address_id,
+                            zipcode,
+                            geometry,
+                            media_url,
+                            status_id,
+                            vendor_status,
+                            title,
+                            service_object_id,
+                            service_object_type,
+                            media_urls)
                          VALUES ($(service_request_id),
                                  $(status),
                                  $(status_notes),
@@ -77,28 +83,28 @@ export function update(db: IDatabase<any, any>, serviceRequests: ServiceRequestW
                                  $(service_object_id),
                                  $(service_object_type),
                                  $(media_urls))
-                        ON CONFLICT (service_request_id) DO UPDATE SET
+                         ON CONFLICT (service_request_id) DO UPDATE SET
                                  status_notes = $(status_notes),
-                                 service_name = $(service_name),
-                                 service_code = $(service_code),
-                                 description = $(description),
-                                 agency_responsible = $(agency_responsible),
-                                 service_notice = $(service_notice),
-                                 requested_datetime = $(requested_datetime),
-                                 updated_datetime = $(updated_datetime),
-                                 expected_datetime = $(expected_datetime),
-                                 address = $(address),
-                                 address_id = $(address_id),
-                                 zipcode = $(zipcode),
-                                 geometry = ST_POINT($(long), $(lat)),
-                                 media_url = $(media_url),
-                                 status_id = $(status_id),
-                                 vendor_status = $(vendor_status),
-                                 title = $(title),
-                                 service_object_id = $(service_object_id),
-                                 service_object_type = $(service_object_type),
-                                 media_urls = $(media_urls)
-                             `, createEditObject(serviceRequest));
+                                     service_name = $(service_name),
+                                     service_code = $(service_code),
+                                     description = $(description),
+                                     agency_responsible = $(agency_responsible),
+                                     service_notice = $(service_notice),
+                                     requested_datetime = $(requested_datetime),
+                                     updated_datetime = $(updated_datetime),
+                                     expected_datetime = $(expected_datetime),
+                                     address = $(address),
+                                     address_id = $(address_id),
+                                     zipcode = $(zipcode),
+                                     geometry = ST_POINT($(long), $(lat)),
+                                     media_url = $(media_url),
+                                     status_id = $(status_id),
+                                     vendor_status = $(vendor_status),
+                                     title = $(title),
+                                     service_object_id = $(service_object_id),
+                                     service_object_type = $(service_object_type),
+                                     media_urls = $(media_urls)
+                    `, createEditObject(serviceRequest));
             }
         });
         return t.batch(queries);
@@ -110,7 +116,7 @@ export function doDelete(
     db: IDatabase<any, any>
 ) {
     return db.tx(t => {
-       return t.none('DELETE FROM open311_service_request WHERE service_request_id = $1', serviceRequestId);
+        return t.none('DELETE FROM open311_service_request WHERE service_request_id = $1', serviceRequestId);
     });
 }
 

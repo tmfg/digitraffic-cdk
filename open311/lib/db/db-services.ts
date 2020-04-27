@@ -5,7 +5,10 @@ interface ServiceServiceCode {
     readonly service_code: string;
 }
 
-export function update(db: IDatabase<any, any>, services: Service[]): Promise<void> {
+export function update(
+    services: Service[],
+    db: IDatabase<any, any>
+): Promise<void> {
     return db.tx(t => {
         const queries: any[] = services.map(service => {
             return t.none(
@@ -43,7 +46,10 @@ export function findAll(db: IDatabase<any, any>): Promise<Service[]> {
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_code`).then(requests => requests.map(r => toService(r)));
 }
 
-export function find(db: IDatabase<any, any>, service_request_id: string): Promise<Service | null > {
+export function find(
+    service_request_id: string,
+    db: IDatabase<any, any>
+): Promise<Service | null > {
     return db.oneOrNone(`${SELECT_REQUEST} WHERE service_code = $1`, service_request_id).then(r => r == null ? null : toService(r));
 }
 

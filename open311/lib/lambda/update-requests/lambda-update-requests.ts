@@ -1,14 +1,11 @@
 import {APIGatewayEvent} from 'aws-lambda';
-import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {
     ServiceRequestWithExtensions,
     ServiceRequestWithExtensionsDto
 } from "../../model/service-request";
-import {update} from "../../db/db-requests";
+import {update} from "../../service/requests";
 import {invalidRequest} from "../../http-util";
 import {IDatabase} from "pg-promise";
-
-let db: IDatabase<any, any>;
 
 export const handler = async (
     event: APIGatewayEvent,
@@ -27,19 +24,10 @@ export const handler = async (
         return invalidRequest();
     }
 
-    db = db ?? dbParam ?? initDbConnection(
-        process.env.DB_USER as string,
-        process.env.DB_PASS as string,
-        process.env.DB_URI as string
-    );
+    await update(serviceRequests.map(sr => toServiceRequestWithExtensions(sr)), dbParam);
 
-    return await doUpdate(db, serviceRequests);
-};
-
-async function doUpdate(db: IDatabase<any, any>, serviceRequests: ServiceRequestWithExtensionsDto[]) {
-    await update(db, serviceRequests.map(sr => toServiceRequestWithExtensions(sr)));
     return {statusCode: 200, body: 'Ok'};
-}
+};
 
 function toServiceRequestWithExtensions(r: ServiceRequestWithExtensionsDto): ServiceRequestWithExtensions {
     return {

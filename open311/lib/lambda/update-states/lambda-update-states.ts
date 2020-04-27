@@ -1,9 +1,6 @@
-import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {IDatabase} from "pg-promise";
 import {getStates} from "../../api/api-states";
-import {update} from "../../db/db-states";
-
-let db: IDatabase<any, any>;
+import {update} from "../../service/states";
 
 export const handler = async (
     event: any,
@@ -16,12 +13,7 @@ export const handler = async (
     const endpointUrl = process.env.ENDPOINT_URL as string;
     try {
         const services = await getStates(endpointUser, endpointPass, endpointUrl);
-        db = db ?? dbParam ?? initDbConnection(
-            process.env.DB_USER as string,
-            process.env.DB_PASS as string,
-            process.env.DB_URI as string
-        );
-        await update(db, services);
+        await update(services, dbParam);
     } catch (e) {
         console.error('Error', e);
         return;

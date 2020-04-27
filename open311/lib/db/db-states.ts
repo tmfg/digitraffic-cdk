@@ -5,7 +5,10 @@ export function findAll(db: IDatabase<any, any>): Promise<ServiceRequestState[]>
     return db.manyOrNone("SELECT key, name FROM open311_service_request_state ORDER BY key");
 }
 
-export function update(db: IDatabase<any, any>, states: ServiceRequestState[]): Promise<void> {
+export function update(
+    states: ServiceRequestState[],
+    db: IDatabase<any, any>
+): Promise<void> {
     return db.tx(t => {
         const queries: any[] = states.map(state => {
             return t.none(

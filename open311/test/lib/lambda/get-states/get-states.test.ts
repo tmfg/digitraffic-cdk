@@ -15,7 +15,7 @@ describe('lambda-get-states', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('some states', async () => {
         const states =
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newState());
-        await update(db, states);
+        await update(states, db);
 
         const response = await handler({}, {}, {}, db);
 

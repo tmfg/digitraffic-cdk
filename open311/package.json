@@ -37,10 +37,10 @@
     "digitraffic-lambda-postgres": "file:../common/postgres",
     "digitraffic-cdk-api": "file:../common/api",
     "pg-native": "3.0.0",
-    "pg-promise": "latest",
+    "pg-promise": "10.3.5",
     "source-map-support": "0.5.16",
     "@aws-cdk/aws-events-targets": "1.32.2",
-    "axios": "latest"
+    "axios": "0.19.2"
   },
   "externals": [
     "aws-sdk"

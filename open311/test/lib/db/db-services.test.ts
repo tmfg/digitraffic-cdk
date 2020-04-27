@@ -9,7 +9,7 @@ describe('db-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const services = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
             return newService();
         });
-        await update(db, services);
+        await update(services, db);
 
         const foundservices = await findAll(db);
 
@@ -19,15 +19,15 @@ describe('db-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('find - found', async () => {
         const service = newService();
-        await update(db, [service]);
+        await update([service], db);
 
-        const foundservice = await find(db, service.service_code);
+        const foundservice = await find(service.service_code, db);
 
         expect(foundservice).toMatchObject(service);
     });
 
     test('find - not found', async () => {
-        const foundservice = await find(db, 'lol');
+        const foundservice = await find('lol', db);
 
         expect(foundservice).toBeNull();
     });

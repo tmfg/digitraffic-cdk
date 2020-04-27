@@ -1,6 +1,6 @@
 import * as pgPromise from "pg-promise";
 import {handler} from '../../../../lib/lambda/update-services/lambda-update-services';
-import {dbTestBase, insertServiceRequest} from "../../db-testutil";
+import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "../../../../../common/test/httpserver";
 import {findAllServiceCodes} from "../../../../lib/db/db-services";
 

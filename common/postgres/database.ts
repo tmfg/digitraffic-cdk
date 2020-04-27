@@ -11,18 +11,20 @@ export function initDbConnection(
     return pgp(`postgresql://${username}:${password}@${url}`, options);
 }
 
-export async function inDatabase(fn: (db: IDatabase<any, any>) => any) {
-    const db = initDbConnection(
+let db: IDatabase<any, any>;
+
+export async function inDatabase(
+    fn: (db: IDatabase<any, any>) => any,
+    dbParam?: IDatabase<any, any>)
+{
+    db = db ?? dbParam ?? initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string
     );
-
     try {
         return await fn(db);
     } catch(e) {
-        console.error("error in db:", e);
-    } finally {
-        db.$pool.end();
+        console.error("Error in db:", e);
     }
 }

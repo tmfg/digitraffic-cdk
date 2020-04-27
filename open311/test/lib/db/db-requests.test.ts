@@ -22,13 +22,13 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const serviceRequest = newServiceRequest();
         await insertServiceRequest(db, [serviceRequest]);
 
-        const foundServiceRequest = await find(db, serviceRequest.service_request_id);
+        const foundServiceRequest = await find(serviceRequest.service_request_id, db);
 
         expect(foundServiceRequest).toMatchObject(serviceRequest);
     });
 
     test('find - not found', async () => {
-        const foundServiceRequest = await find(db, 'lol');
+        const foundServiceRequest = await find('lol', db);
 
         expect(foundServiceRequest).toBeNull();
     });
@@ -37,9 +37,9 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const serviceRequest = newServiceRequest();
         await insertServiceRequest(db, [serviceRequest]);
 
-        await update(db, [Object.assign({}, serviceRequest, {
+        await update([Object.assign({}, serviceRequest, {
             status: ServiceRequestStatus.closed
-        })]);
+        })], db);
         const foundServiceRequests = await findAll(db);
 
         expect(foundServiceRequests.length).toBe(0);
@@ -77,7 +77,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             service_object_type: 'another service_object_type',
             media_urls: ['http://doesnotexist.lol']
         };
-        await update(db, [Object.assign({}, serviceRequest, updatingServiceRequest)]);
+        await update( [Object.assign({}, serviceRequest, updatingServiceRequest)], db);
         const foundServiceRequests = await findAll(db);
 
         expect(foundServiceRequests.length).toBe(1);
@@ -112,7 +112,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         delete updatingServiceRequest.long;
         // @ts-ignore
         delete updatingServiceRequest.lat;
-        await update(db, [updatingServiceRequest]);
+        await update([updatingServiceRequest], db);
     });
 
     test('Insert', async () => {
@@ -120,7 +120,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             return newServiceRequest();
         });
 
-        await update(db, serviceRequests);
+        await update(serviceRequests, db);
         const foundServiceRequests = await findAll(db);
 
         expect(foundServiceRequests.length).toBe(serviceRequests.length);
@@ -133,7 +133,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         // @ts-ignore
         delete serviceRequest.lat;
 
-        await update(db, [serviceRequest]);
+        await update([serviceRequest], db);
     });
 
     test("Delete - missing doesn't fail", async () => {

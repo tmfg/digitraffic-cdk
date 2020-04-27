@@ -13,7 +13,7 @@ describe('lambda-get-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 
     test('Get', async () => {
         const sr = newService();
-        await update(db, [sr]);
+        await update([sr], db);
 
         const response = await handler({
             service_id: sr.service_code
