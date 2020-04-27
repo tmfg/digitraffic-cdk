@@ -15,7 +15,6 @@ import {getModelReference, addServiceModel, addDefaultValidator} from "../../com
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addTags} from "../../common/api/documentation";
-import {DATA_V1_TAGS} from "../../common/api/tags";
 
 export function create(
     vpc: IVpc,
@@ -64,7 +63,7 @@ function createDisruptionsResource(
     });
 
     createSubscription(getDisruptionsLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetDisruptions', DATA_V1_TAGS, resources, stack);
+    addTags('GetDisruptions', ['bridge-lock-disruptions'], resources, stack);
 
     return getDisruptionsLambda;
 }
