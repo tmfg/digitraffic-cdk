@@ -16,12 +16,7 @@ export class SwaggerJoinerStack extends Stack {
         const bucket = new Bucket(this, 'SwaggerBucket', {
             bucketName: swaggerJoinerProps.bucketName,
             cors: [{
-                allowedOrigins: [
-                    'https://tie.digitraffic.fi',
-                    'https://tie-test.digitraffic.fi',
-                    'https://meri.digitraffic.fi',
-                    'https://meri-test.digitraffic.fi'
-                ],
+                allowedOrigins: ['*'],
                 allowedMethods: [HttpMethods.GET]
             }]
         });
