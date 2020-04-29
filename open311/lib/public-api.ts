@@ -135,6 +135,7 @@ function createGetRequestIntegration(
     });
     const request = requests.addResource("{request_id}");
     request.addMethod("GET", getRequestIntegration, {
+        apiKeyRequired: true,
         requestValidator: validator,
         requestParameters: {
             'method.request.path.request_id': true,
@@ -167,6 +168,7 @@ function createGetRequestsIntegration(
         }
     });
     requests.addMethod("GET", getRequestsIntegration, {
+        apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.extensions': false
         },
@@ -212,6 +214,7 @@ function createGetStatesIntegration(
 
     const getServicesIntegration = defaultIntegration(getStatesHandler);
     states.addMethod("GET", getServicesIntegration, {
+        apiKeyRequired: true,
         methodResponses: [
             corsMethodJsonResponse("200", statesModel),
             corsMethodJsonResponse("500", messageResponseModel)
@@ -272,6 +275,7 @@ function createGetServicesIntegration(
 
     const getServicesIntegration = defaultIntegration(getServicesHandler);
     services.addMethod("GET", getServicesIntegration, {
+        apiKeyRequired: true,
         methodResponses: [
             corsMethodJsonResponse("200", servicesModel),
             corsMethodJsonResponse("500", messageResponseModel)
@@ -297,6 +301,7 @@ function createGetServiceIntegration(
     });
     const service = services.addResource("{service_id}");
     service.addMethod("GET", getServiceIntegration, {
+        apiKeyRequired: true,
         requestValidator: validator,
         requestParameters: {
             'method.request.path.service_id': true

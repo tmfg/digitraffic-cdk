@@ -15,6 +15,8 @@ import {getModelReference, addServiceModel, addDefaultValidator} from "../../com
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addTags} from "../../common/api/documentation";
+import {BETA_TAGS} from "../../common/api/tags";
+import {createUsagePlan} from "../../common/stack/usage-plans";
 
 export function create(
     vpc: IVpc,
@@ -22,6 +24,8 @@ export function create(
     props: Props,
     stack: Construct) {
     const publicApi = createApi(stack, props);
+
+    createUsagePlan(publicApi, 'BridgeLock Api Key', 'BridgeLock Usage Plan');
 
     const validator = addDefaultValidator(publicApi);
 
@@ -55,6 +59,7 @@ function createDisruptionsResource(
     const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda);
 
     resources.addMethod("GET", getDisruptionsIntegration, {
+        apiKeyRequired: true,
         requestValidator: validator,
         methodResponses: [
             corsMethodJsonResponse("200", disruptionsJsonModel),
@@ -63,15 +68,15 @@ function createDisruptionsResource(
     });
 
     createSubscription(getDisruptionsLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetDisruptions', ['bridge-lock-disruptions'], resources, stack);
+    addTags('GetDisruptions', BETA_TAGS, resources, stack);
 
     return getDisruptionsLambda;
 }
 
 function createResourcePaths(publicApi: RestApi) {
     const apiResource = publicApi.root.addResource("api");
-    const v1Resource = apiResource.addResource("v1");
-    const bridgeLockResource = v1Resource.addResource("bridgelock");
+    const v1Resource = apiResource.addResource("beta");
+    const bridgeLockResource = v1Resource.addResource("bridge-lock");
     return bridgeLockResource.addResource("disruptions");
 }
 
