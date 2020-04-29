@@ -37,5 +37,18 @@ export const handler = async (): Promise<any> => {
     // @ts-ignore
     delete merged['x-amazon-apigateway-policy']; // implementation details
 
-    await uploadToS3(bucketName, constructSwagger(merged), 'dt-swagger.js');
+    await Promise.all([
+        uploadToS3(
+            bucketName,
+            constructSwagger(merged),
+            'dt-swagger.js'
+        ),
+        uploadToS3(
+            bucketName,
+            JSON.stringify(merged),
+            'swagger-spec.json',
+            'public-read',
+            'application/json'
+        )
+    ]);
 };
