@@ -25,7 +25,7 @@ export class ElasticsearchStack extends core.Stack {
                             "AWS": "*"
                         },
                         "Action": "es:*",
-                        "Resource": "arn:aws:es:eu-west-1:111964331789:domain/dt-elasticsearch-domain/*",
+                        "Resource": `arn:aws:es:eu-west-1:${props?.env?.account}:domain/dt-elasticsearch-domain/*`,
                         "Condition": {
                             "IpAddress": {
                                 "aws:SourceIp": elasticsearchProps.allowedIpAddresses
@@ -39,19 +39,19 @@ export class ElasticsearchStack extends core.Stack {
                             "AWS": elasticsearchProps.allowedRoles
                         },
                         "Action": "es:*",
-                        "Resource": "arn:aws:es:eu-west-1:111964331789:domain/dt-elasticsearch-domain/*"
+                        "Resource": `arn:aws:es:eu-west-1:${props?.env?.account}:domain/dt-elasticsearch-domain/*`
                     }
                 ]
             },
             domainName: domainName,
             ebsOptions: {
                 ebsEnabled: true,
-                volumeSize: 200,
+                volumeSize: elasticsearchProps.instanceStorageSize,
                 volumeType: 'gp2',
             },
             elasticsearchClusterConfig: {
-                instanceCount: 1,
-                instanceType: 'r5.large.elasticsearch'
+                instanceCount: elasticsearchProps.instanceCount,
+                instanceType: elasticsearchProps.instanceType
             },
             elasticsearchVersion: esVersion
         });
