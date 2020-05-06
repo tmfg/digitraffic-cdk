@@ -111,10 +111,13 @@ export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Acc
 
         const indexName = `aws-${env}-${year}.${month}`;
 
+        const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
+
         let source = buildSource(logEvent.message, logEvent.extractedFields) as any;
         source["id"] = logEvent.id;
         source["@timestamp"] = new Date(1 * logEvent.timestamp).toISOString();
-        source["message"] = logEvent.message;
+        source["level"] = messageParts[2];
+        source["message"] = messageParts[3];
         source["log_group"] = payload.logGroup;
 
         const app = getAppFromSenderAccount(payload.owner, knownAccounts);
