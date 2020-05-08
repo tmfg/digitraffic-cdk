@@ -33,12 +33,12 @@ function linestring(coordinates: any): string {
 }
 
 function polygon(coordinates: any):string {
-    const list = coordinates.map(c => linestring(c)).join(',');
+    const list = coordinates.map((c: any) => linestring(c)).join(',');
     return `(${list})`;
 }
 
 function multiPolygon(coordinates: any):string {
-    const list = coordinates.map(c => polygon(c)).join(',');
+    const list = coordinates.map((c: any) => polygon(c)).join(',');
     return `(${list})`;
 }
 
