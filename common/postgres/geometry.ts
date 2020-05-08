@@ -7,21 +7,39 @@ export function createGeometry(location: Location): string {
 //    console.info("location:" + JSON.stringify(location));
 
     if(location.type == 'LineString') {
-        const coordinates = location.coordinates.map((c: any) =>  coordinatePair(c)).join(',');
+        const coordinates = linestring(location.coordinates);
 
         return `LINESTRING(${coordinates})`;
     } else if(location.type == 'Point') {
         const coordinates = coordinatePair(location.coordinates);
 
         return `POINT(${coordinates})`;
+    } else if(location.type == 'Polygon') {
+        const coordinates = polygon(location.coordinates);
+
+        return `POLYGON(${coordinates})`;
+    } else if(location.type == 'MultiPolygon') {
+        const coordinates = multiPolygon(location.coordinates);
+
+        return `MULTIPOLYGON(${coordinates})`;
     }
 
     console.error("unsupported locationType=%s", location.type);
     return "POLYGON EMPTY";
 }
 
+function linestring(coordinates: any): string {
+    return coordinates.map((c: any) =>  coordinatePair(c)).join(',');
+}
+
+function polygon(coordinates: any):string {
+    const list = coordinates.map(c => linestring(c)).join(',');
+    return `(${list})`;
+}
+
 function multiPolygon(coordinates: any):string {
-    return ``;
+    const list = coordinates.map(c => polygon(c)).join(',');
+    return `(${list})`;
 }
 
 function coordinatePair(coordinate: [number, number, number]): string {
