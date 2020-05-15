@@ -10,7 +10,7 @@ export class ElasticsearchStack extends core.Stack {
             }
         });
 
-        const esVersion: string = '6.8';
+        const esVersion: string = '7.4';
         const esId = 'dt-elasticsearch';
         const domainName = 'dt-elasticsearch-domain';
 
@@ -55,5 +55,21 @@ export class ElasticsearchStack extends core.Stack {
             },
             elasticsearchVersion: esVersion
         });
+
+        domain.cfnOptions.updatePolicy = {
+            enableVersionUpgrade: true
+        };
+
+        // const metric = new Metric({
+        //     namespace: 'AWS/ES',
+        //     metricName: 'FreeStorageSpace',
+        // });
+        //
+        // const minFreeStorageSpaceAlarm = new Alarm(domain,"ElasticSearch min FreeStorageSpace", {
+        //     metric,
+        //     threshold: 100000,
+        //     evaluationPeriods: 1,
+        //     datapointsToAlarm: 1,
+        // })
     }
 }
