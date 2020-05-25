@@ -6,14 +6,14 @@
   },
   "private": true,
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.35.0",
-    "@aws-cdk/aws-cloudfront": "1.35.0",
-    "@aws-cdk/aws-ec2": "1.35.0",
-    "@aws-cdk/aws-lambda": "1.35.0",
-    "@aws-cdk/aws-logs": "1.35.0",
-    "@aws-cdk/core": "1.35.0",
-    "@types/node": "13.13.4",
-    "@types/ramda": "^0.27.4",
+    "@aws-cdk/aws-apigateway": "1.41.0",
+    "@aws-cdk/aws-cloudfront": "1.41.0",
+    "@aws-cdk/aws-ec2": "1.41.0",
+    "@aws-cdk/aws-lambda": "1.41.0",
+    "@aws-cdk/aws-logs": "1.41.0",
+    "@aws-cdk/core": "1.41.0",
+    "@types/node": "14.0.5",
+    "@types/ramda": "^0.27.6",
     "ramda": "^0.27.0"
   }
 }

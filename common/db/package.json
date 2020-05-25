@@ -5,13 +5,13 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "devDependencies": {
-    "typescript": "3.8.3"
+    "typescript": "3.9.3"
   },
   "private": true,
   "dependencies": {
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5",
-    "@types/node": "13.13.4",
-    "pg-query-stream": "3.0.7"
+    "@types/node": "14.0.5",
+    "pg-query-stream": "3.1.1"
   }
 }
