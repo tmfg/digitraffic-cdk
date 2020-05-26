@@ -8,9 +8,9 @@ const moment = require('moment');
 
 const UPSERT_FAULTS_SQL =
     `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_se, 
-    aton_type_fi, aton_type_se,  fairway_number, fairway_name_fi, fairway_name_se, area_number, geometry)
+    aton_type_fi, fairway_number, fairway_name_fi, fairway_name_se, area_number, geometry)
     values($(id), $(entry_timestamp), $(fixed_timestamp), $(state), $(type), $(domain), $(fixed),
-    $(aton_id),$(aton_name_fi), $(aton_type_fi),
+    $(aton_id),$(aton_name_fi), $(aton_name_se), $(aton_type_fi),
     $(fairway_number), $(fairway_name_fi), $(fairway_name_se),
     $(area_number), $(geometry))
     on conflict(id)
@@ -22,7 +22,7 @@ const REMOVE_FAULTS_SQL = "delete from aton_fault where domain=${domain}";
 
 const ALL_FAULTS_JSON_SQL =
     `select id, entry_timestamp, fixed_timestamp, aton_fault_type.name_LANG aton_fault_type, domain, aton_fault_state.name_LANG state, fixed,
-    aton_id, aton_name_fi, aton_name_se, aton_type.name_LANG aton_type, aton_type_se,
+    aton_id, aton_name_fi, aton_name_se, aton_type.name_LANG aton_type,
     fairway_number, fairway_name_fi, fairway_name_se, area.area_number, area.description_LANG area_description, geometry
     from aton_fault, area, aton_fault_type, aton_fault_state, aton_type
     where aton_fault.area_number = area.area_number
