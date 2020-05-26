@@ -10,7 +10,7 @@ export interface LambdaConfiguration {
     availabilityZones: string[];
     lambdaDbSgId: string;
     dbProps: DbProps;
-    defaultLambdaDurationSeconds: number;
+    defaultLambdaDurationSeconds?: number;
     logsDestinationArn?: string;
     memorySize?: number,
     runtime?: string
@@ -33,7 +33,7 @@ export function dbLambdaConfiguration(
     return <FunctionProps> mergeDeepRight({
         runtime: props.runtime || Runtime.NODEJS_12_X,
         memorySize: props.memorySize || 1024,
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+        timeout: Duration.seconds(props.defaultLambdaDurationSeconds || 60),
         environment: {
             DB_USER: props.dbProps.username,
             DB_PASS: props.dbProps.password,
