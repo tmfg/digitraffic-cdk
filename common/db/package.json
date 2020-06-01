@@ -10,8 +10,8 @@
   "private": true,
   "dependencies": {
     "pg-native": "3.0.0",
-    "pg-promise": "10.3.5",
-    "@types/node": "14.0.5",
+    "pg-promise": "10.5.6",
+    "@types/node": "14.0.6",
     "pg-query-stream": "3.1.1"
   }
 }
