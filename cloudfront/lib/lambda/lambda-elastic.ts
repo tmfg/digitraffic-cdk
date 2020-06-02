@@ -76,9 +76,6 @@ function handleLine(line: string, lines: any[], indexName: string) {
 }
 
 function createEsMessage(lines: any[]): any {
-    console.log("lines " + lines);
-    console.log("lines " + JSON.stringify(lines));
-
     return {
         "body": lines
     };
@@ -99,8 +96,6 @@ async function sendToEs(message: any, callback: any) {
         console.log("response " + JSON.stringify(response));
     } catch(e) {
         console.log("got exception " + JSON.stringify(e));
-    } finally {
-        console.log("done");
     }
 }
 
@@ -144,12 +139,5 @@ function parseLine(line: string): any {
 }
 
 function getHttpDate(date: string, time: string): string {
-    // date: YYYY-MM-DD
-    // time: HH:MM:SS
-    //target format: HTTPDATE %{MONTHDAY}/%{MONTH}/%{YEAR}:%{TIME} %{INT}
-
     return `${date}T${time}Z`;
-//    const ds = date.split('-');
-
- //   return `${ds[2]}/${monthNames[+ds[1] - 1]}/${ds[0]}:${time} +0000`; // Time is in UTC
 }

@@ -3,7 +3,7 @@ import {IDatabase} from "pg-promise";
 export function getLastUpdated(db: IDatabase<any, any>, datatype: string): Promise<Date | null> {
     return db.oneOrNone("select updated from data_updated where data_type=${datatype}", {
         datatype: datatype
-    }, (x: { updated: any; }) => x.updated);
+    }, (x: { updated: any; } | null) => x?.updated);
 }
 
 export function updateLastUpdated(db: IDatabase<any, any>, datatype: string, date: Date): Promise<null> {

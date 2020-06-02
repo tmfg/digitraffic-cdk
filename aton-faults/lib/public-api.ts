@@ -6,12 +6,7 @@ import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from '../../common/stack/subscription';
-import {
-    methodJsonResponse,
-    defaultIntegration,
-    methodXmlResponse,
-    corsMethodJsonResponse, corsMethodXmlResponse
-} from "../../common/api/responses";
+import {defaultIntegration,corsMethodJsonResponse, corsMethodXmlResponse} from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../common/model/geojson";
 import {addXmlserviceModel, getModelReference, addServiceModel} from "../../common/api/utils";

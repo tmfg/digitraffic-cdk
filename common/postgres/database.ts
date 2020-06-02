@@ -26,5 +26,7 @@ export async function inDatabase(
         return await fn(db);
     } catch(e) {
         console.error("Error in db:", e);
+
+        throw e;
     }
 }

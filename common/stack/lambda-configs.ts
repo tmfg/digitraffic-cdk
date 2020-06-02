@@ -11,7 +11,7 @@ export interface LambdaConfiguration {
     lambdaDbSgId: string;
     dbProps: DbProps;
     defaultLambdaDurationSeconds?: number;
-    logsDestinationArn?: string;
+    logsDestinationArn: string;
     memorySize?: number,
     runtime?: string
 }

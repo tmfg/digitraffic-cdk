@@ -1,6 +1,6 @@
 import {IDatabase} from "pg-promise";
 
-export async function stream(db: IDatabase<any, any>, qs: any, conversion: (fault: any) => any) {
+export async function stream(db: IDatabase<any, any>, qs: any, conversion: (object: any) => any) {
     const start = Date.now();
     let things = [] as any[];
 
