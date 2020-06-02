@@ -79,16 +79,13 @@ function createAnnotationsResource(
         ]
     });
 
-    if(props.logsDestinationArn) {
-        createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
-    }
-
+    createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
     addTags('GetAnnotations', BETA_TAGS, requests, stack);
 
     return getAnnotationsLambda;
 }
 
-function createApi(stack: Construct) {
+function createApi(stack: Construct): RestApi {
     return new RestApi(stack, 'Nordicway2-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
