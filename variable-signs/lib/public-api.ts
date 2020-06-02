@@ -6,7 +6,7 @@ import {EndpointType, MethodLoggingLevel, RestApi} from '@aws-cdk/aws-apigateway
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
+import {corsMethodXmlResponse, defaultIntegration} from "../../common/api/responses";
 import {createSubscription} from "../../common/stack/subscription";
 import {addTags} from "../../common/api/documentation";
 import {BETA_TAGS} from "../../common/api/tags";
@@ -47,8 +47,8 @@ function createDatex2Resource(
     datex2Resource.addMethod("GET", getDatex2Integration, {
         apiKeyRequired: true,
         methodResponses: [
-            corsMethodJsonResponse("200", xmlModel),
-            corsMethodJsonResponse("500", errorResponseModel)
+            corsMethodXmlResponse("200", xmlModel),
+            corsMethodXmlResponse("500", errorResponseModel)
         ]
     });
 
