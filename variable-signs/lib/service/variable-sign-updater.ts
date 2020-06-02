@@ -6,7 +6,7 @@ import {IDatabase} from "pg-promise";
 const payloadRegexp = /\<payloadPublication/g;
 const situationRegexp = /\<situation/g;
 
-const VS_DATEX2_DATA_TYPE = "VS_DATEX2";
+export const VS_DATEX2_DATA_TYPE = "VS_DATEX2";
 
 export interface Situation {
     readonly id: string,
@@ -24,13 +24,9 @@ export async function updateDatex2(datex2: string): Promise<any> {
     const situations = parseDatex(datex2);
 
     await inDatabase(async (db: IDatabase<any,any>) => {
-        return await db.tx(t => {
-            return t.batch(
-                DeviceDB.saveDatex2(db, situations),
-                LastUpdatedDB.updateLastUpdated(db, VS_DATEX2_DATA_TYPE, new Date(start))
-            );
-        });
-    }).then(a => {
+        await DeviceDB.saveDatex2(db, situations);
+        await LastUpdatedDB.updateLastUpdated(db, VS_DATEX2_DATA_TYPE, new Date(start));
+    }).then(() => {
         const end = Date.now();
         console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (end-start));
     })
@@ -82,7 +78,7 @@ function parseEffectDate(datex2: string): Date {
     const index2 = datex2.indexOf('</overallStartTime>', index);
     const dateString = datex2.substring(index, index2);
 
-    console.log("index=%d index2=%d substring=%s", index, index2, dateString)
+//    console.log("index=%d index2=%d substring=%s", index, index2, dateString)
 
     return new Date(dateString);
 }
@@ -95,7 +91,7 @@ function validate(datex2: string): boolean {
 
     const ppCount = occurances(datex2, payloadRegexp);
     if(ppCount != 1) {
-        console.log('contains {} payloadPublications', ppCount);
+        console.log('contains %d payloadPublications', ppCount);
         return false;
     }
 

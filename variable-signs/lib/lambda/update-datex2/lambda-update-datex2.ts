@@ -6,8 +6,12 @@ export const handler = async (event: any): Promise<any> => {
     console.log('got event ' + JSON.stringify(event));
 
     if(datex2) {
-        return await updateDatex2(datex2);
+        try {
+            return await updateDatex2(datex2);
+        } catch(e) {
+            return {statusCode:500};
+        }
     }
 
-    return {statusCode:500};
+    return {statusCode:400};
 };

@@ -1,6 +1,7 @@
 import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
 import * as IntegrationApi from "./integration-api";
+import * as PublicApi from "./public-api";
 import {LambdaConfiguration} from "../../common/stack/lambda-configs";
 
 export class VariableSignsCdkStack extends Stack {
@@ -19,5 +20,6 @@ export class VariableSignsCdkStack extends Stack {
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
         IntegrationApi.create(vpc, lambdaDbSg, lambdaProps, this);
+        PublicApi.create(vpc, lambdaDbSg, lambdaProps, this);
     }
 }
