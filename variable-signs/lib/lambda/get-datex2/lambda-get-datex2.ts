@@ -1,5 +1,11 @@
 import {findActiveSignsDatex2} from "../../service/variable-sign-service";
 
 export const handler = async (event: any): Promise<any> => {
-    return await findActiveSignsDatex2();
+    const start = Date.now();
+
+    try {
+        return await findActiveSignsDatex2();
+    } finally {
+        console.info("method=findActiveSignsDatex2 tookMs=%d", (Date.now()-start));
+    }
 };

@@ -92,10 +92,8 @@ function createAnnotationsResource(
         ]
     });
 
-    if(props.logsDestinationArn) {
-        createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
-        createSubscription(getFaultsS124Lambda, functionNameS124, props.logsDestinationArn, stack);
-    }
+    createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(getFaultsS124Lambda, functionNameS124, props.logsDestinationArn, stack);
 
     addTags('GetFaults', BETA_TAGS, resources.faults, stack);
     addTags('GetFaultsS124', BETA_TAGS, resources.faultsS124, stack);

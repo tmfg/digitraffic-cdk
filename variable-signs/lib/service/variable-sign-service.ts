@@ -28,10 +28,10 @@ const DATEX2_TEMPLATE = `
 
 export async function findActiveSignsDatex2(): Promise<string> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        const datex2 : string[] = await DatexDB.findAll(db);
+        const datex2 : string[] = (await DatexDB.findAll(db)).map(d => d.datex2);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, VS_DATEX2_DATA_TYPE);
 
-        return createResponse(datex2, lastUpdated);
+        return { body: createResponse(datex2, lastUpdated) };
     });
 }
 

@@ -34,8 +34,8 @@ function createDatex2Resource(
         handler: 'lambda-get-datex2.handler',
         readOnly: true
     }));
-    const getDatex2Integration = defaultIntegration(getDatex2Lambda);
 
+    const getDatex2Integration = defaultIntegration(getDatex2Lambda, {xml: true});
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const xmlModel = addXmlserviceModel('XmlModel', publicApi);
 
@@ -46,10 +46,6 @@ function createDatex2Resource(
     const datex2Resource = vsResource.addResource("datex2");
     datex2Resource.addMethod("GET", getDatex2Integration, {
         apiKeyRequired: true,
-        requestParameters: {
-            'method.request.querystring.author': false,
-            'method.request.querystring.type': false
-        },
         methodResponses: [
             corsMethodJsonResponse("200", xmlModel),
             corsMethodJsonResponse("500", errorResponseModel)
@@ -61,7 +57,6 @@ function createDatex2Resource(
 
     return getDatex2Lambda;
 }
-
 
 function createApi(stack: Construct): RestApi {
     return new RestApi(stack, 'VariableSigns-public', {

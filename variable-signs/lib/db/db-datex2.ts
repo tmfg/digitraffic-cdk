@@ -21,7 +21,7 @@ export function saveDatex2(db: IDatabase<any, any>, situations: Situation[]): Pr
     return promises;
 }
 
-export async function findAll(db: IDatabase<any, any>): Promise<string[]> {
+export async function findAll(db: IDatabase<any, any>): Promise<any[]> {
     return await db.any(SELECT_ALL);
 //    return await stream(db, new QueryStream(SELECT_ALL), d => d.datex2);
 }
