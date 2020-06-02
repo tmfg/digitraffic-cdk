@@ -5,8 +5,6 @@ import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {createSubscription} from "../../common/stack/subscription";
-import {addDefaultValidator} from "../../common/api/utils";
-import {MessageModel} from "../../common/api/response";
 import {LambdaConfiguration} from "../../common/stack/lambda-configs";
 import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 
@@ -50,8 +48,8 @@ function createUpdateRequestHandler(
     props: LambdaConfiguration) {
 
     const apiResource = integrationApi.root.addResource("api");
-    const v1Resource = apiResource.addResource("v1");
-    const vsResource = v1Resource.addResource("variable-signs");
+    const integrationResource = apiResource.addResource("integration");
+    const vsResource = integrationResource.addResource("variable-signs");
     const datex2Resource = vsResource.addResource("datex2");
 
     createUpdateDatex2RequestHandler(datex2Resource, stack, vpc, lambdaDbSg, props);
@@ -68,7 +66,7 @@ function createUpdateDatex2RequestHandler(
     const updateDatex2Handler = new Function(stack, updateDatex2Id, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: updateDatex2Id,
         code: new AssetCode('dist/lambda/update-datex2'),
-        handler: 'lambda-get-datex2.handler'
+        handler: 'lambda-update-datex2.handler'
     }));
     requests.addMethod("POST", new LambdaIntegration(updateDatex2Handler), {
         apiKeyRequired: true
