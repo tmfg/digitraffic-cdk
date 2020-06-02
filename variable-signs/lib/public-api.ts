@@ -1,6 +1,6 @@
 import {dbLambdaConfiguration, LambdaConfiguration} from "../../common/stack/lambda-configs";
 import {createUsagePlan} from "../../common/stack/usage-plans";
-import {addServiceModel} from "../../common/api/utils";
+import {addXmlserviceModel} from "../../common/api/utils";
 import {Construct} from "@aws-cdk/core";
 import {EndpointType, MethodLoggingLevel, RestApi} from '@aws-cdk/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
@@ -10,7 +10,6 @@ import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/respo
 import {createSubscription} from "../../common/stack/subscription";
 import {addTags} from "../../common/api/documentation";
 import {BETA_TAGS} from "../../common/api/tags";
-import {default as DisruptionSchema} from "../../bridge-lock-disruptions/lib/model/disruption-schema";
 import {MessageModel} from "../../common/api/response";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
@@ -18,61 +17,49 @@ export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfi
 
     createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
 
-    const datex2Model = addServiceModel("Datex2Model", publicApi, DisruptionSchema);
-
-    return createAnnotationsResource(publicApi, vpc, props, lambdaDbSg, datex2Model, stack)
+    return createDatex2Resource(publicApi, vpc, props, lambdaDbSg, stack)
 }
 
-function createAnnotationsResource(
+function createDatex2Resource(
     publicApi: RestApi,
     vpc: IVpc,
     props: LambdaConfiguration,
     lambdaDbSg: ISecurityGroup,
-    annotationsModel: any,
     stack: Construct): Function {
 
     const functionName = 'VS-GetDatex2';
-    const responseModel = publicApi.addModel('MessageResponseModel', MessageModel);
-    const getAnnotationsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const getDatex2Lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: new AssetCode('dist/lambda/get-datex2'),
-        handler: 'lambda-get-annotations.handler',
+        handler: 'lambda-get-datex2.handler',
         readOnly: true
     }));
-    const getAnnotationsIntegration = defaultIntegration(getAnnotationsLambda, {
-        requestParameters: {
-            'integration.request.querystring.author': 'method.request.querystring.author',
-            'integration.request.querystring.type': 'method.request.querystring.type',
-        },
-        requestTemplates: {
-            'application/json': JSON.stringify({
-                author: "$util.escapeJavaScript($input.params('author'))",
-                type: "$util.escapeJavaScript($input.params('type'))"}
-            )
-        }
-    });
+    const getDatex2Integration = defaultIntegration(getDatex2Lambda);
+
+    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
+    const xmlModel = addXmlserviceModel('XmlModel', publicApi);
 
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
     const betaResource = apiResource.addResource("beta");
-    const nw2Resource = betaResource.addResource("nw2");
-    const requests = nw2Resource.addResource("annotations");
-    requests.addMethod("GET", getAnnotationsIntegration, {
+    const vsResource = betaResource.addResource("variable-signs");
+    const datex2Resource = vsResource.addResource("datex2");
+    datex2Resource.addMethod("GET", getDatex2Integration, {
         apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.author': false,
             'method.request.querystring.type': false
         },
         methodResponses: [
-            corsMethodJsonResponse("200", annotationsModel),
-            corsMethodJsonResponse("500", responseModel)
+            corsMethodJsonResponse("200", xmlModel),
+            corsMethodJsonResponse("500", errorResponseModel)
         ]
     });
 
-    createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetAnnotations', BETA_TAGS, requests, stack);
+    createSubscription(getDatex2Lambda, functionName, props.logsDestinationArn, stack);
+    addTags('GetDatex2', BETA_TAGS, datex2Resource, stack);
 
-    return getAnnotationsLambda;
+    return getDatex2Lambda;
 }
 
 

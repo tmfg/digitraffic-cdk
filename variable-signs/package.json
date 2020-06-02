@@ -14,10 +14,10 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.41.0",
-    "@types/aws-lambda": "8.10.51",
+    "@aws-cdk/assert": "1.42.1",
+    "@types/aws-lambda": "8.10.52",
     "@types/jest": "^25.2.3",
-    "@types/node": "14.0.5",
+    "@types/node": "14.0.9",
     "@types/sinon": "^9.0.4",
     "@types/xml2js": "^0.4.5",
     "jest": "25.5.4",
@@ -40,9 +40,6 @@
     "pg-promise": "10.5.6",
     "source-map-support": "0.5.19",
     "axios": "0.19.2",
-    "@types/geojson": "7946.0.7",
-    "wkx": "0.5.0",
-    "parse-link-header": "1.0.1",
     "pg-query-stream": "3.1.1"
   },
   "externals": [
