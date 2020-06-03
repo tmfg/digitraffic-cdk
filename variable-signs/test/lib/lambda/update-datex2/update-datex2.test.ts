@@ -11,7 +11,7 @@ describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) =
 
         expect(response.statusCode).toBe(200);
 
-        const datex2 = await findActiveSignsDatex2();
+        const datex2 = (await findActiveSignsDatex2()).body;
 
         console.log("datex2 " + datex2);
 

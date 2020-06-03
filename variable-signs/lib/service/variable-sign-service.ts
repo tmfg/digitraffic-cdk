@@ -4,8 +4,7 @@ import * as DatexDB from "../db/db-datex2";
 import {IDatabase} from "pg-promise";
 import {VS_DATEX2_DATA_TYPE} from "./variable-sign-updater";
 
-const DATEX2_TEMPLATE = `
-<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2LogicalModel modelBaseVersion="2"
                 xsi:schemaLocation="http://datex2.eu/schema/2/2_0 https://raw.githubusercontent.com/tmfg/metadata/master/schema/DATEXIISchema_2_2_3_with_definitions_FI.xsd"
                 xmlns="http://datex2.eu/schema/2/2_0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -26,7 +25,7 @@ const DATEX2_TEMPLATE = `
 </d2LogicalModel>
 `;
 
-export async function findActiveSignsDatex2(): Promise<string> {
+export async function findActiveSignsDatex2(): Promise<any> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
         const datex2 : string[] = (await DatexDB.findAll(db)).map(d => d.datex2);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, VS_DATEX2_DATA_TYPE);

@@ -29,7 +29,7 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
             domainName: domain.domainName as string,
             httpPort: domain.httpPort ?? 80,
             httpsPort: domain.httpsPort ?? 443,
-            originProtocolPolicy: domain.protocolPolicy as OriginProtocolPolicy || OriginProtocolPolicy.HTTPS_ONLY
+            originProtocolPolicy: domain.protocolPolicy as OriginProtocolPolicy ?? OriginProtocolPolicy.HTTPS_ONLY
         },
         behaviors: createBehaviors(stack, domain.behaviors || [], lambdaMap),
         originPath: domain.originPath,
