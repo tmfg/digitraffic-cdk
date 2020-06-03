@@ -4,7 +4,6 @@ import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 
 const REG_PAYLOAD = /\<payloadPublication/g;
-const REG_SITUATION = /\<situation/g;
 
 const DATEX2_SITUATION_TAG_START = '<situation ';
 const DATEX2_SITUATION_TAG_END = '</situation>';
@@ -97,12 +96,6 @@ function validate(datex2: string): boolean {
     const ppCount = occurances(datex2, REG_PAYLOAD);
     if(ppCount != 1) {
         console.log('contains %d payloadPublications', ppCount);
-        return false;
-    }
-
-    const situationCount = occurances(datex2, REG_SITUATION);
-    if(situationCount < 1) {
-        console.log('did not contain any sitations');
         return false;
     }
 
