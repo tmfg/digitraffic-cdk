@@ -6,6 +6,7 @@ import {mergeDeepRight} from 'ramda';
 
 export interface LambdaConfiguration {
     vpcId: string;
+    allowFromIpAddresses?: string[];
     privateSubnetIds: string[];
     availabilityZones: string[];
     lambdaDbSgId: string;

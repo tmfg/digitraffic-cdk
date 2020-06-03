@@ -1,43 +1,17 @@
-import {RestApi,MethodLoggingLevel,Resource}  from '@aws-cdk/aws-apigateway';
-import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
+import {RestApi,Resource}  from '@aws-cdk/aws-apigateway';
 import {Function, AssetCode} from '@aws-cdk/aws-lambda';
-import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import {LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {createSubscription} from "../../common/stack/subscription";
 import {LambdaConfiguration} from "../../common/stack/lambda-configs";
 import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
+import {createRestApi} from "../../common/api/rest_apis";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
-    const integrationApi = createApi(stack);
+    const integrationApi = createRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API', props.allowFromIpAddresses);
     createUpdateRequestHandler(stack, integrationApi, vpc, lambdaDbSg, props);
     createUsagePlan(integrationApi);
-}
-
-function createApi(stack: Construct) {
-    return new RestApi(stack, 'VariableSigns-integration', {
-        deployOptions: {
-            loggingLevel: MethodLoggingLevel.ERROR,
-        },
-        restApiName: 'Variable Signs integration API',
-        endpointTypes: [EndpointType.REGIONAL],
-        policy: new PolicyDocument({
-            statements: [
-                new PolicyStatement({
-                    effect: Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke"
-                    ],
-                    resources: [
-                        "*"
-                    ],
-                    principals: [
-                        new AnyPrincipal()
-                    ]
-                })
-            ]
-        })
-    });
 }
 
 function createUpdateRequestHandler(
@@ -68,8 +42,8 @@ function createUpdateDatex2RequestHandler(
         code: new AssetCode('dist/lambda/update-datex2'),
         handler: 'lambda-update-datex2.handler'
     }));
-    requests.addMethod("POST", new LambdaIntegration(updateDatex2Handler), {
-        apiKeyRequired: true
+    requests.addMethod("PUT", new LambdaIntegration(updateDatex2Handler), {
+        apiKeyRequired: false
     });
     createSubscription(updateDatex2Handler, updateDatex2Id, props.logsDestinationArn, stack);
 }

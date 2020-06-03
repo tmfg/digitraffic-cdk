@@ -2,11 +2,13 @@ import {IDatabase} from "pg-promise";
 import {Situation} from "../service/variable-sign-updater";
 
 const INSERT_DATEX2 =
-    'insert into device_data_datex2(device_id,datex2,effect_date) ' +
-    'values($(device_id), $(datex2), $(effect_date)) ' +
-    'on conflict(device_id) do' +
-    '   update set datex2 = $(datex2), effect_date = $(effect_date)'
-const SELECT_ALL = 'select datex2 from device_data_datex2 order by device_id';
+`insert into device_data_datex2(device_id,datex2,effect_date)
+values($(device_id), $(datex2), $(effect_date))
+on conflict(device_id) do
+update set datex2 = $(datex2), effect_date = $(effect_date)`
+
+const SELECT_ALL =
+    'select datex2 from device_data_datex2 order by device_id';
 
 export function saveDatex2(db: IDatabase<any, any>, situations: Situation[]): Promise<any>[] {
     let promises: any[] = [];

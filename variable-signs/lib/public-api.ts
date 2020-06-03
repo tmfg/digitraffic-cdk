@@ -2,8 +2,7 @@ import {dbLambdaConfiguration, LambdaConfiguration} from "../../common/stack/lam
 import {createUsagePlan} from "../../common/stack/usage-plans";
 import {addXmlserviceModel} from "../../common/api/utils";
 import {Construct} from "@aws-cdk/core";
-import {EndpointType, MethodLoggingLevel, RestApi} from '@aws-cdk/aws-apigateway';
-import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
+import {RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {corsMethodXmlResponse, defaultIntegration} from "../../common/api/responses";
@@ -11,9 +10,10 @@ import {createSubscription} from "../../common/stack/subscription";
 import {addTags} from "../../common/api/documentation";
 import {BETA_TAGS} from "../../common/api/tags";
 import {MessageModel} from "../../common/api/response";
+import {createRestApi} from "../../common/api/rest_apis";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
-    const publicApi = createApi(stack);
+    const publicApi = createRestApi(stack, 'VariableSigns-public', 'VariableSigns public API', undefined);
 
     createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
 
@@ -57,30 +57,3 @@ function createDatex2Resource(
 
     return getDatex2Lambda;
 }
-
-function createApi(stack: Construct): RestApi {
-    return new RestApi(stack, 'VariableSigns-public', {
-        deployOptions: {
-            loggingLevel: MethodLoggingLevel.ERROR,
-        },
-        restApiName: 'VariableSigns public API',
-        endpointTypes: [EndpointType.REGIONAL],
-        policy: new PolicyDocument({
-            statements: [
-                new PolicyStatement({
-                    effect: Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke"
-                    ],
-                    resources: [
-                        "*"
-                    ],
-                    principals: [
-                        new AnyPrincipal()
-                    ]
-                })
-            ]
-        })
-    });
-}
-

@@ -3,8 +3,11 @@ import * as LastUpdatedDB from "../../../common/db/last-updated";
 import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 
-const payloadRegexp = /\<payloadPublication/g;
-const situationRegexp = /\<situation/g;
+const REG_PAYLOAD = /\<payloadPublication/g;
+const REG_SITUATION = /\<situation/g;
+
+const DATEX2_SITUATION_TAG_START = '<situation ';
+const DATEX2_SITUATION_TAG_END = '</situation>';
 
 export const VS_DATEX2_DATA_TYPE = "VS_DATEX2";
 
@@ -44,17 +47,19 @@ function parseSituations(datex2: string): Situation[] {
     const situations: Situation[] = [];
     var index = 0;
 
+    // go through the document and find all situation-blocks
+    // add them to the list and return them
     while(true) {
-        const sitIndex = datex2.indexOf('<situation ', index)
+        const sitIndex = datex2.indexOf(DATEX2_SITUATION_TAG_START, index)
 
         if(sitIndex == -1) {
             break;
         }
 
-        const sitEndIndex = datex2.indexOf('</situation>', sitIndex);
+        const sitEndIndex = datex2.indexOf(DATEX2_SITUATION_TAG_END, sitIndex + DATEX2_SITUATION_TAG_START.length);
         index = sitEndIndex;
 
-        situations.push(parseSituation(datex2.substr(sitIndex, sitEndIndex - sitIndex + 12)));
+        situations.push(parseSituation(datex2.substr(sitIndex, sitEndIndex - sitIndex + DATEX2_SITUATION_TAG_END.length)));
     }
 
     return situations;
@@ -89,13 +94,13 @@ function validate(datex2: string): boolean {
         return false;
     }
 
-    const ppCount = occurances(datex2, payloadRegexp);
+    const ppCount = occurances(datex2, REG_PAYLOAD);
     if(ppCount != 1) {
         console.log('contains %d payloadPublications', ppCount);
         return false;
     }
 
-    const situationCount = occurances(datex2, situationRegexp);
+    const situationCount = occurances(datex2, REG_SITUATION);
     if(situationCount < 1) {
         console.log('did not contain any sitations');
         return false;
