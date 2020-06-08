@@ -78,7 +78,7 @@ export function updateDisruptions(db: IDatabase<any, any>, disruptions: SpatialD
 export function createEditObject(disruption: SpatialDisruption): DbDisruption {
     return {
         id: disruption.Id,
-        type_id: disruption.Type_Id,
+        type_id: disruption.Type_id,
         start_date: disruption.StartDate,
         end_date: disruption.EndDate,
         geometry: disruption.geometry,
@@ -91,7 +91,7 @@ export function createEditObject(disruption: SpatialDisruption): DbDisruption {
 export function convertFeature(disruption: DbDisruption): Feature {
     const properties: Disruption = {
         Id: disruption.id,
-        Type_Id: disruption.type_id,
+        Type_id: disruption.type_id,
         StartDate: disruption.start_date,
         EndDate: disruption.end_date,
         DescriptionFi: disruption.description_fi,

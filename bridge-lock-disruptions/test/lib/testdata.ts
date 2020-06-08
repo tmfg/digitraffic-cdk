@@ -19,7 +19,7 @@ export function newDisruption(): SpatialDisruption {
         DescriptionSv: someNumber().toString(),
         EndDate,
         StartDate,
-        Type_Id: someNumber(),
+        Type_id: someNumber(),
         Id: someNumber(),
         geometry: {
             type: "Point",

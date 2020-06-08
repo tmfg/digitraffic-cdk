@@ -9,7 +9,7 @@ const disruptionsProperties: apigateway.JsonSchema = {
             type: apigateway.JsonSchemaType.NUMBER,
             description: 'Id of disruption'
         },
-        Type_Id: {
+        Type_id: {
             type: apigateway.JsonSchemaType.NUMBER,
             description: 'Id of disruption type'
         },

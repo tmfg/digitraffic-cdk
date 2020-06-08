@@ -49,7 +49,7 @@ export function featureToDisruption(feature: Feature): SpatialDisruption {
     const props = feature.properties as any;
     return {
         Id: props.Id,
-        Type_Id: props.Type_Id,
+        Type_id: props.Type_id,
         StartDate: normalizeDisruptionDate(props.StartDate),
         EndDate: normalizeDisruptionDate(props.EndDate),
         DescriptionFi: props.DescriptionFi,
