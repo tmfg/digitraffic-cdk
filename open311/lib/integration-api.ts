@@ -4,7 +4,7 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import {EndpointType, LambdaIntegration} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
-import {dbLambdaConfiguration} from "./cdk-util";
+import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import {createSubscription} from "../../common/stack/subscription";
 import {corsMethodJsonResponse, defaultIntegration} from "../../common/api/responses";
 import {addDefaultValidator} from "../../common/api/utils";

@@ -13,9 +13,6 @@ export interface DbDisruption {
     description_fi: string;
     description_sv?: string;
     description_en?: string;
-    additional_info_fi?: string;
-    additional_info_sv?: string;
-    additional_info_en?: string;
 }
 
 const QueryStream = require('pg-query-stream');
@@ -29,10 +26,7 @@ const UPSERT_DISRUPTIONS_SQL = `
         geometry,
         description_fi,
         description_sv,
-        description_en,
-        additional_info_fi,
-        additional_info_sv,
-        additional_info_en
+        description_en
     )
     VALUES (
                $(id),
@@ -42,10 +36,7 @@ const UPSERT_DISRUPTIONS_SQL = `
                ST_GeomFromGeoJSON($(geometry)),
                $(description_fi),
                $(description_sv),
-               $(description_en),
-               $(additional_info_fi),
-               $(additional_info_sv),
-               $(additional_info_en)
+               $(description_en)
            )
     ON CONFLICT(id) DO
     UPDATE SET
@@ -55,10 +46,7 @@ const UPSERT_DISRUPTIONS_SQL = `
         geometry = ST_GeomFromGeoJSON($(geometry)),
         description_fi = $(description_fi),
         description_sv = $(description_sv),
-        description_en = $(description_en),
-        additional_info_fi = $(additional_info_fi),
-        additional_info_sv = $(additional_info_sv),
-        additional_info_en = $(additional_info_en)
+        description_en = $(description_en)
 `;
 
 const SELECT_DISRUPTION_SQL = `
@@ -70,10 +58,7 @@ const SELECT_DISRUPTION_SQL = `
         geometry,
         description_fi,
         description_sv,
-        description_en,
-        additional_info_fi,
-        additional_info_sv,
-        additional_info_en
+        description_en
     FROM bridgelock_disruption
 `;
 
@@ -99,10 +84,7 @@ export function createEditObject(disruption: SpatialDisruption): DbDisruption {
         geometry: disruption.geometry,
         description_fi: disruption.DescriptionFi,
         description_sv: disruption.DescriptionSv,
-        description_en: disruption.DescriptionEn,
-        additional_info_fi: disruption.AdditionalInformationFi,
-        additional_info_sv: disruption.AdditionalInformationSv,
-        additional_info_en: disruption.AdditionalInformationEn
+        description_en: disruption.DescriptionEn
     };
 }
 
@@ -114,10 +96,7 @@ export function convertFeature(disruption: DbDisruption): Feature {
         EndDate: disruption.end_date,
         DescriptionFi: disruption.description_fi,
         DescriptionSv: disruption.description_sv,
-        DescriptionEn: disruption.description_en,
-        AdditionalInformationFi: disruption.additional_info_fi,
-        AdditionalInformationSv: disruption.additional_info_sv,
-        AdditionalInformationEn: disruption.additional_info_en
+        DescriptionEn: disruption.description_en
     };
     // convert geometry from db to geojson
     const geometry = Geometry.parse(Buffer.from(disruption.geometry, "hex")).toGeoJSON() as GeoJSONGeometry;

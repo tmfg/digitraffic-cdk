@@ -50,10 +50,7 @@ export function insertDisruption(db: pgPromise.IDatabase<any, any>, disruptions:
                                   geometry,
                                   description_fi,
                                   description_sv,
-                                  description_en,
-                                  additional_info_fi,
-                                  additional_info_sv,
-                                  additional_info_en)
+                                  description_en)
                            VALUES (
                                   $(id),
                                   $(type_id),
@@ -62,10 +59,7 @@ export function insertDisruption(db: pgPromise.IDatabase<any, any>, disruptions:
                                   ST_GeomFromGeoJSON($(geometry)),
                                   $(description_fi),
                                   $(description_sv),
-                                  $(description_en),
-                                  $(additional_info_fi),
-                                  $(additional_info_sv),
-                                  $(additional_info_en))`,
+                                  $(description_en))`,
                 createEditObject(disruption));
         });
         return t.batch(queries);

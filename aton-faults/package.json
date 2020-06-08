@@ -14,10 +14,10 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.41.0",
-    "@types/aws-lambda": "8.10.51",
+    "@aws-cdk/assert": "1.44.0",
+    "@types/aws-lambda": "8.10.53",
     "@types/jest": "25.2.3",
-    "@types/node": "14.0.5",
+    "@types/node": "14.0.12",
     "@types/sinon": "9.0.4",
     "@types/xml2js": "0.4.5",
     "jest": "26.0.1",
@@ -25,17 +25,17 @@
     "parcel-plugin-externals": "^0.4.0",
     "rimraf": "3.0.2",
     "sinon": "9.0.2",
-    "ts-jest": "26.0.0",
-    "ts-node": "8.10.1",
-    "typescript": "3.9.3"
+    "ts-jest": "26.1.0",
+    "ts-node": "8.10.2",
+    "typescript": "3.9.5"
   },
   "dependencies": {
     "digitraffic-lambda-postgres": "file:../common/postgres",
     "digitraffic-lambda-stack": "file:../common/stack",
     "digitraffic-cdk-api": "file:../common/api",
-    "@aws-cdk/aws-apigateway": "1.41.0",
-    "@aws-cdk/core": "1.41.0",
-    "@aws-cdk/aws-events-targets": "1.41.0",
+    "@aws-cdk/aws-apigateway": "1.44.0",
+    "@aws-cdk/core": "1.44.0",
+    "@aws-cdk/aws-events-targets": "1.44.0",
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5",
     "source-map-support": "0.5.19",

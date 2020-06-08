@@ -14,9 +14,6 @@ export function newDisruption(): SpatialDisruption {
     const EndDate = new Date();
     EndDate.setMilliseconds(0);
     return {
-        AdditionalInformationEn: someNumber().toString(),
-        AdditionalInformationFi: someNumber().toString(),
-        AdditionalInformationSv: someNumber().toString(),
         DescriptionEn: someNumber().toString(),
         DescriptionFi: someNumber().toString(),
         DescriptionSv: someNumber().toString(),

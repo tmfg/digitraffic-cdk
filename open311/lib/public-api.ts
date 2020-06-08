@@ -4,7 +4,7 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct, Stack} from "@aws-cdk/core";
-import {dbLambdaConfiguration} from "./cdk-util";
+import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
 import {default as StateSchema} from './model/state-schema';

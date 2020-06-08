@@ -4,7 +4,7 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import * as targets from '@aws-cdk/aws-events-targets';
 import {Construct} from '@aws-cdk/core';
 import * as sns from '@aws-cdk/aws-sns';
-import {dbLambdaConfiguration} from './cdk-util';
+import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
 import {createSubscription} from "../../common/stack/subscription";
 

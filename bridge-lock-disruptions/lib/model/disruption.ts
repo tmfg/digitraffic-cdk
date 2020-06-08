@@ -6,9 +6,6 @@ export interface Disruption {
     DescriptionFi: string;
     DescriptionSv?: string;
     DescriptionEn?: string;
-    AdditionalInformationFi?: string;
-    AdditionalInformationSv?: string;
-    AdditionalInformationEn?: string;
 }
 
 export interface SpatialDisruption extends Disruption {

@@ -55,9 +55,6 @@ export function featureToDisruption(feature: Feature): SpatialDisruption {
         DescriptionFi: props.DescriptionFi,
         DescriptionSv: props.DescriptionSv,
         DescriptionEn: props.DescriptionEn,
-        AdditionalInformationFi: props.AdditionalInformationFi,
-        AdditionalInformationSv: props.AdditionalInformationSv,
-        AdditionalInformationEn: props.AdditionalInformationEn,
         geometry: feature.geometry
     };
 }

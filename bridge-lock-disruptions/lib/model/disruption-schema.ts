@@ -32,18 +32,6 @@ const disruptionsProperties: apigateway.JsonSchema = {
         DescriptionEn: {
             type: apigateway.JsonSchemaType.STRING,
             description: 'Disruption description, english'
-        },
-        AdditionalInformationFi: {
-            type: apigateway.JsonSchemaType.STRING,
-            description: 'Additional information, finnish'
-        },
-        AdditionalInformationSv: {
-            type: apigateway.JsonSchemaType.STRING,
-            description: 'Additional information, swedish'
-        },
-        AdditionalInformationEn: {
-            type: apigateway.JsonSchemaType.STRING,
-            description: 'Additional information, english'
         }
     }
 };

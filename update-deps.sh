@@ -14,7 +14,7 @@ cd common
 for d in $(find ./* -maxdepth 0 -type d); do
   cd "$d"
   if [ -f package.json ]; then
-    rm package-lock.json
+    rm -f package-lock.json
     rm -rf node_modules
     ncu -u --reject pg-promise
     npm install
@@ -27,7 +27,7 @@ cd ..
 for d in $(find ./* -maxdepth 0 -type d); do
   if [ "$d" != "./common" ] && [ "$d" != "./elasticsearch" ]; then
     cd "$d"
-    rm package-lock.json
+    rm -f package-lock.json
     rm -rf node_modules
     ncu -u --reject pg-promise
     npm install

@@ -14,19 +14,19 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "^1.35.0",
-    "@types/jest": "^25.2.1",
-    "@types/node": "13.13.4",
-    "jest": "^25.4.0",
-    "ts-jest": "^25.4.0",
-    "aws-cdk": "^1.35.0",
-    "ts-node": "^8.9.1",
+    "@aws-cdk/assert": "^1.44.0",
+    "@types/jest": "^25.2.3",
+    "@types/node": "14.0.12",
+    "jest": "^26.0.1",
+    "ts-jest": "^26.1.0",
+    "aws-cdk": "^1.44.0",
+    "ts-node": "^8.10.2",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-externals": "^0.4.0",
     "rimraf": "^3.0.2",
-    "@types/sinon": "^9.0.0",
+    "@types/sinon": "^9.0.4",
     "sinon": "^9.0.2",
-    "typescript": "~3.8.3"
+    "typescript": "~3.9.5"
   },
   "dependencies": {
     "@aws-cdk/aws-kinesis": "latest",
@@ -34,7 +34,7 @@
     "@aws-cdk/aws-logs-destinations": "latest",
     "@aws-cdk/core": "latest",
     "@types/aws-lambda": "latest",
-    "aws-lambda": "^1.0.5",
+    "aws-lambda": "^1.0.6",
     "digitraffic-lambda-postgres": "file:../common/postgres",
     "source-map-support": "^0.5.19"
   },

@@ -4,10 +4,10 @@
   "description": "",
   "license": "EUPL",
   "devDependencies": {
-    "typescript": "3.9.3"
+    "typescript": "3.9.5"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.41.0",
+    "@aws-cdk/aws-apigateway": "1.44.0",
     "@types/geojson": "7946.0.7"
   }
 }

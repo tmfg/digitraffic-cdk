@@ -34,9 +34,6 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(fd.DescriptionFi).toBe(disruption.DescriptionFi);
         expect(fd.DescriptionSv).toBe(disruption.DescriptionSv);
         expect(fd.DescriptionEn).toBe(disruption.DescriptionEn);
-        expect(fd.AdditionalInformationFi).toBe(disruption.AdditionalInformationFi);
-        expect(fd.AdditionalInformationSv).toBe(disruption.AdditionalInformationSv);
-        expect(fd.AdditionalInformationEn).toBe(disruption.AdditionalInformationEn);
         expect(fetchedDisruptions[0].geometry).toMatchObject(disruption.geometry);
     });
 
@@ -57,9 +54,6 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(fd.DescriptionFi).toBe(updatedDisruption.DescriptionFi);
         expect(fd.DescriptionSv).toBe(updatedDisruption.DescriptionSv);
         expect(fd.DescriptionEn).toBe(updatedDisruption.DescriptionEn);
-        expect(fd.AdditionalInformationFi).toBe(updatedDisruption.AdditionalInformationFi);
-        expect(fd.AdditionalInformationSv).toBe(updatedDisruption.AdditionalInformationSv);
-        expect(fd.AdditionalInformationEn).toBe(updatedDisruption.AdditionalInformationEn);
         expect(fetchedDisruptions[0].geometry).toMatchObject(updatedDisruption.geometry);
     });
 }));
