@@ -2,6 +2,7 @@ import * as DeviceDB from "../db/db-datex2";
 import * as LastUpdatedDB from "../../../common/db/last-updated";
 import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
+import {DataType} from "../../../common/db/last-updated";
 
 const REG_PAYLOAD = /\<payloadPublication/g;
 
@@ -31,7 +32,7 @@ export async function updateDatex2(datex2: string): Promise<any> {
 
     await inDatabase(async (db: IDatabase<any,any>) => {
         await DeviceDB.saveDatex2(db, situations);
-        await LastUpdatedDB.updateLastUpdated(db, VS_DATEX2_DATA_TYPE, new Date(start));
+        await LastUpdatedDB.updateLastUpdated(db, DataType.VS_DATEX2, new Date(start));
     }).then(() => {
         const end = Date.now();
         console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (end-start));

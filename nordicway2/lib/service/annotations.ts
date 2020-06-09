@@ -66,7 +66,7 @@ export async function saveAnnotations(annotations: Annotation[], timeStampTo: Da
 
     await inDatabase(async (db: IDatabase<any,any>) => {
         await AnnotationsDB.updateAnnotations(db, validated);
-        await LastUpdatedDB.updateLastUpdated(db, NW2_DATA_TYPE, timeStampTo);
+        await LastUpdatedDB.updateLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS, timeStampTo);
     }).then(a => {
         const end = Date.now();
         console.info("method=saveAnnotations updatedCount=%d tookMs=%d", a.length, (end-start));

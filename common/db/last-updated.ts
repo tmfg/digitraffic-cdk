@@ -11,7 +11,7 @@ export function getLastUpdated(db: IDatabase<any, any>, datatype: DataType): Pro
     }, (x: { updated: any; } | null) => x?.updated);
 }
 
-export function updateLastUpdated(db: IDatabase<any, any>, datatype: string, date: Date): Promise<null> {
+export function updateLastUpdated(db: IDatabase<any, any>, datatype: DataType, date: Date): Promise<null> {
     return db.none("update data_updated set updated=${date} where data_type=${datatype}",
         {
             date: date,
