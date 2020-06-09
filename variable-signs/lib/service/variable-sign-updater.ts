@@ -7,6 +7,10 @@ const REG_PAYLOAD = /\<payloadPublication/g;
 
 const DATEX2_SITUATION_TAG_START = '<situation ';
 const DATEX2_SITUATION_TAG_END = '</situation>';
+const DATEX2_OVERALL_STARTTIME_TAG_START = '<overallStartTime>';
+const DATEX2_OVERALL_STARTTIME_TAG_END = '</overallStartTime>';
+const DATEX2_VERSION_ATTRIBUTE = 'version=';
+const XML_TAG_START = '<?xml';
 
 export const VS_DATEX2_DATA_TYPE = "VS_DATEX2";
 
@@ -73,22 +77,20 @@ function parseSituation(datex2: string): Situation {
 }
 
 function parseId(datex2: string): string {
-    const index = datex2.indexOf('version=');
+    const index = datex2.indexOf(DATEX2_VERSION_ATTRIBUTE);
     return datex2.substring(15, index-2);
 }
 
 function parseEffectDate(datex2: string): Date {
-    const index = datex2.indexOf('<overallStartTime>') + 18;
-    const index2 = datex2.indexOf('</overallStartTime>', index);
+    const index = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) + DATEX2_OVERALL_STARTTIME_TAG_START.length;
+    const index2 = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_END, index);
     const dateString = datex2.substring(index, index2);
-
-//    console.log("index=%d index2=%d substring=%s", index, index2, dateString)
 
     return new Date(dateString);
 }
 
 function validate(datex2: string): boolean {
-    if(!datex2.includes('<?xml')) {
+    if(!datex2.includes(XML_TAG_START)) {
         console.log('does not contain xml-tag')
         return false;
     }

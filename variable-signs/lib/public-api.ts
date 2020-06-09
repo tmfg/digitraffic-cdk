@@ -15,7 +15,7 @@ import {createRestApi} from "../../common/api/rest_apis";
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
     const publicApi = createRestApi(stack, 'VariableSigns-public', 'VariableSigns public API', undefined);
 
-    createUsagePlan(publicApi, 'NW2 Api Key', 'NW2 Usage Plan');
+    createUsagePlan(publicApi, 'VariableSigns Api Key', 'VariableSigns Usage Plan');
 
     return createDatex2Resource(publicApi, vpc, props, lambdaDbSg, stack)
 }

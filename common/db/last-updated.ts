@@ -1,6 +1,11 @@
 import {IDatabase} from "pg-promise";
 
-export function getLastUpdated(db: IDatabase<any, any>, datatype: string): Promise<Date | null> {
+export enum DataType {
+    NW2_ANNOTATIONS="NW2_ANNOTATIONS",
+    VS_DATEX2="VS_DATEX2"
+}
+
+export function getLastUpdated(db: IDatabase<any, any>, datatype: DataType): Promise<Date | null> {
     return db.oneOrNone("select updated from data_updated where data_type=${datatype}", {
         datatype: datatype
     }, (x: { updated: any; } | null) => x?.updated);

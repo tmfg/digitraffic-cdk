@@ -43,7 +43,7 @@ export function createIpRestrictionPolicyDocument(allowFromIpAddresses: string[]
                 effect: Effect.ALLOW,
                 conditions: {
                     "IpAddress": {
-                        "aws:SourceIp": allowFromIpAddresses
+                        "aws:SourceIp": allowFromIpAddresses.join(',')
                     },
                 },
                 actions: [
