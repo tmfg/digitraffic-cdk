@@ -7,12 +7,10 @@ import {IDatabase} from "pg-promise";
 import {Annotation} from "../model/annotations";
 import {createFeatureCollection} from "../../../common/api/geojson";
 
-const NW2_DATA_TYPE = "NW2_ANNOTATIONS";
-
 export async function findAllAnnotations(): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
         const annotations = await AnnotationsDB.findAll(db).then(convertFeatures);
-        const lastUpdated = await LastUpdatedDB.getLastUpdated(db, NW2_DATA_TYPE);
+        const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS);
 
         return createFeatureCollection(annotations, lastUpdated);
     });
@@ -21,7 +19,7 @@ export async function findAllAnnotations(): Promise<FeatureCollection> {
 export async function findActiveAnnotations(author: string|null, type: string|null): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
         const annotations = await AnnotationsDB.findActive(db, author, type).then(convertFeatures);
-        const lastUpdated = await LastUpdatedDB.getLastUpdated(db, NW2_DATA_TYPE);
+        const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS);
 
         return createFeatureCollection(annotations, lastUpdated);
     });
@@ -67,8 +65,8 @@ export async function saveAnnotations(annotations: Annotation[], timeStampTo: Da
     })
 
     await inDatabase(async (db: IDatabase<any,any>) => {
-        await AnnotationsDB.updateAnnotations(db, validated);
-        await LastUpdatedDB.updateLastUpdated(db, NW2_DATA_TYPE, timeStampTo);
+        await LastUpdatedDB.updateLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS, timeStampTo);
+        return AnnotationsDB.updateAnnotations(db, validated);
     }).then(a => {
         const end = Date.now();
         console.info("method=saveAnnotations updatedCount=%d tookMs=%d", a.length, (end-start));
