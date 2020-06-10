@@ -104,12 +104,12 @@ export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Acc
             return;
         }
 
-        const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
+        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
         const timestamp = new Date(1 * logEvent.timestamp);
         const year = timestamp.getUTCFullYear();
         const month = ("0" + (timestamp.getUTCMonth() + 1)).slice(-2);
 
-        const indexName = `aws-${env}-${year}.${month}`;
+        const indexName = `${app}-${year}.${month}`;
 
         const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
 
@@ -120,7 +120,6 @@ export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Acc
         source["message"] = messageParts[3];
         source["log_group"] = payload.logGroup;
 
-        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
         source["app"] = app;
         source["fields"] = {app: app};
 
@@ -217,20 +216,6 @@ function isValidJson(message: string): boolean {
 
 function isNumeric(n: any) {
     return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-export function getEnvFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
-    const env = knownAccounts.find(value => {
-        if (value.accountNumber === owner) {
-            return true;
-        }
-        return null;
-    })?.env;
-    if (!env) {
-        throw new Error('No env for account ' + owner);
-    } else {
-        return env;
-    }
 }
 
 export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
