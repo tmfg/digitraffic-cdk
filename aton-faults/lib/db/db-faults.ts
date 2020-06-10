@@ -26,6 +26,7 @@ const ALL_FAULTS_JSON_SQL =
     fairway_number, fairway_name_fi, fairway_name_se, area.area_number, area.description_LANG area_description, geometry
     from aton_fault, area, aton_fault_type, aton_fault_state, aton_type
     where aton_fault.area_number = area.area_number
+    and (aton_fault.fixed_timestamp is null or aton_fault.fixed_timestamp >= $1)
     and aton_fault.state = aton_fault_state.name_fi
     and aton_fault.type = aton_fault_type.name_fi
     and aton_fault.aton_type_fi = aton_type.name_fi`;
@@ -42,8 +43,12 @@ const ALL_FAULTS_S124_WITH_DOMAIN_SQL =
 const DOMAINS_FOR_S124 = ['C_NA', 'C_NM'];
 const langRex = /LANG/g;
 
-export async function streamAllForJson(db: IDatabase<any, any>, language: Language, conversion: (fault: any) => any) {
-    const qs = new QueryStream(ALL_FAULTS_JSON_SQL.replace(langRex, language.toString()));
+export async function streamAllForJson(db: IDatabase<any, any>, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
+    const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
+
+    const qs = new QueryStream(
+        ALL_FAULTS_JSON_SQL.replace(langRex, language.toString()), [fixedLimit]
+    );
 
     return await stream(db, qs, conversion);
 }

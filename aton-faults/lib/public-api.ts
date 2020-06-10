@@ -61,11 +61,13 @@ function createAnnotationsResource(
     const resources = createResourcePaths(publicApi);
     const getFaultsIntegration = defaultIntegration(getFaultsLambda, {
         requestParameters: {
-            'integration.request.querystring.language': 'method.request.querystring.language'
+            'integration.request.querystring.language': 'method.request.querystring.language',
+            'integration.request.querystring.fixed_in_hours': 'method.request.querystring.fixed_in_hours'
         },
         requestTemplates: {
             'application/json': JSON.stringify({
-                language: "$util.escapeJavaScript($input.params('language'))"
+                language: "$util.escapeJavaScript($input.params('language'))",
+                fixed_in_hours: "$util.escapeJavaScript($input.params('fixed_in_hours'))"
             })
         }
     });
@@ -73,7 +75,8 @@ function createAnnotationsResource(
     resources.faults.addMethod("GET", getFaultsIntegration, {
         apiKeyRequired: true,
         requestParameters: {
-            'method.request.querystring.language': false
+            'method.request.querystring.language': false,
+            'method.request.querystring.fixed_in_hours': false
         },
         methodResponses: [
             corsMethodJsonResponse("200", faultsJsonModel),
