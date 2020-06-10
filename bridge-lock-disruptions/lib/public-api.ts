@@ -52,7 +52,7 @@ function createDisruptionsResource(
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-disruptions.handler',
-        readOnly: true
+        readOnly: false
     }));
 
     const resources = createResourcePaths(publicApi);
