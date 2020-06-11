@@ -9,10 +9,8 @@ const VERSION_GZIP = "EXT_VERSION";
  */
 exports.handler = function handler(event: any, context: any, callback: any) {
     const request = event.Records[0].cf.request;
-    const headers = request.headers;
-    const acceptHeader = headers['accept-encoding'][0];
 
-    if(acceptHeader == null || acceptHeader.value == null || acceptHeader.value.indexOf('gzip') < 0) {
+    if(!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {
         const response = {
             status: 406,
             statusDescription: "Not Acceptable",
@@ -25,3 +23,15 @@ exports.handler = function handler(event: any, context: any, callback: any) {
     // correct header, please continue
     callback(null, request);
 };
+
+function isGetRequest(request: any): boolean {
+    return request.method === 'GET';
+}
+
+function isAcceptGzipHeaderPresent(request: any): boolean {
+    const headers = request.headers;
+    const acceptHeader = headers['accept-encoding'][0];
+
+    return acceptHeader != null && acceptHeader.value != null && acceptHeader.value.indexOf('gzip') > -1;
+
+}

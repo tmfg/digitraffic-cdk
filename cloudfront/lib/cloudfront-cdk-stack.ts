@@ -2,7 +2,7 @@ import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
-import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
+import {PolicyStatement, Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 import {CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
@@ -60,14 +60,24 @@ export class CloudfrontCdkStack extends Stack {
         let lambdaMap: any = {};
 
         if(lProps != undefined) {
+            const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
+                assumedBy:  new CompositePrincipal(
+                    new ServicePrincipal("lambda.amazonaws.com"),
+                    new ServicePrincipal("edgelambda.amazonaws.com"),
+                ),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
+                ]
+            });
+
             if(lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
                 lambdaMap[LambdaType.WEATHERCAM_REDIRECT] =
-                    createWeathercamRedirect(this, lProps.lambdaParameters.weathercamDomainName, lProps.lambdaParameters.weathercamHostName);
+                    createWeathercamRedirect(this, edgeLambdaRole, lProps.lambdaParameters.weathercamDomainName, lProps.lambdaParameters.weathercamHostName);
             }
 
             if(lProps.lambdaTypes.includes(LambdaType.GZIP_REQUIREMENT)) {
                 lambdaMap[LambdaType.GZIP_REQUIREMENT] =
-                    createGzipRequirement(this);
+                    createGzipRequirement(this, edgeLambdaRole);
             }
         }
 
