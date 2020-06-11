@@ -4,7 +4,7 @@ const hostName = "EXT_HOST_NAME";
 const hostHeader = [{ key: 'host', value: hostName}];
 const sslProtocols = ['TLSv1', 'TLSv1.1'];
 
-const VERSION = "EXT_VERSION";
+const VERSION_REDIRECT = "EXT_VERSION";
 
 /*
     This is a edge lambda that should be run at cloudfront at origin request event.

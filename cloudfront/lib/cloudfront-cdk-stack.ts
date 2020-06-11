@@ -1,12 +1,17 @@
-import {Stack, StackProps, Construct} from '@aws-cdk/core';
+import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
-import {Role, ServicePrincipal, PolicyStatement} from '@aws-cdk/aws-iam';
+import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 import {CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
-import {createWriteToEsLambda, createWeathercamRedirect, LambdaType} from "./lambda/lambda-creator";
+import {
+    createGzipRequirement,
+    createWeathercamRedirect,
+    createWriteToEsLambda,
+    LambdaType
+} from "./lambda/lambda-creator";
 import {createWebAcl} from "./acl/acl-creator";
 
 export class CloudfrontCdkStack extends Stack {
@@ -55,11 +60,14 @@ export class CloudfrontCdkStack extends Stack {
         let lambdaMap: any = {};
 
         if(lProps != undefined) {
-//            console.info("got props " + JSON.stringify(lProps));
-
             if(lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
                 lambdaMap[LambdaType.WEATHERCAM_REDIRECT] =
                     createWeathercamRedirect(this, lProps.lambdaParameters.weathercamDomainName, lProps.lambdaParameters.weathercamHostName);
+            }
+
+            if(lProps.lambdaTypes.includes(LambdaType.GZIP_REQUIREMENT)) {
+                lambdaMap[LambdaType.GZIP_REQUIREMENT] =
+                    createGzipRequirement(this);
             }
         }
 

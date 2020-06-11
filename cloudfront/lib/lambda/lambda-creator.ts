@@ -5,7 +5,16 @@ import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cd
 const fs = require('fs');
 
 export enum LambdaType {
-    WEATHERCAM_REDIRECT
+    WEATHERCAM_REDIRECT, GZIP_REQUIREMENT
+}
+
+export function createGzipRequirement(stack: Stack) {
+    const versionString = new Date().toISOString();
+    const lambdaBody = fs.readFileSync('dist/lambda/lambda-gzip-requirement.js');
+    const functionBody = lambdaBody.toString()
+        .replace(/EXT_VERSION/gi, versionString);
+
+    return createFunction(stack, 'gzip-requirement', functionBody, versionString);
 }
 
 export function createWeathercamRedirect(stack: Stack, domainName: string, hostName: string) {
@@ -16,7 +25,11 @@ export function createWeathercamRedirect(stack: Stack, domainName: string, hostN
         .replace(/EXT_DOMAIN_NAME/gi, domainName)
         .replace(/EXT_VERSION/gi, versionString);
 
-    const redirectFunction = new Function(stack, 'weathercam-redirect', {
+    return createFunction(stack, 'weathercam-redirect', functionBody, versionString);
+}
+
+export function createFunction(stack: Stack, functionName: string, functionBody: string, versionString: string) {
+    const edgeFunction = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
@@ -32,7 +45,7 @@ export function createWeathercamRedirect(stack: Stack, domainName: string, hostN
         }),
     });
 
-    return redirectFunction.addVersion(versionString);
+    return edgeFunction.addVersion(versionString);
 }
 
 export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Role, elasticDomain: string, elasticAppName: string): Function {
