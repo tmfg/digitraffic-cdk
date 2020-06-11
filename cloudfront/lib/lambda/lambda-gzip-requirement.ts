@@ -14,7 +14,7 @@ exports.handler = function handler(event: any, context: any, callback: any) {
         const response = {
             status: 406,
             statusDescription: "Not Acceptable",
-            body: "Use of gzip compression is required."
+            body: "Use of gzip compression is required with Accept-Encoding: gzip header."
         };
 
         callback(null, response);
@@ -29,6 +29,7 @@ function isGetRequest(request: any): boolean {
 }
 
 function isAcceptGzipHeaderPresent(request: any): boolean {
+    // everything will be lower-case, so no problemos!
     const headers = request.headers;
     const acceptHeader = headers['accept-encoding'][0];
 
