@@ -15,7 +15,6 @@ import {getModelReference, addServiceModel, addDefaultValidator} from "../../com
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addTags} from "../../common/api/documentation";
-import {BETA_TAGS} from "../../common/api/tags";
 import {createUsagePlan} from "../../common/stack/usage-plans";
 
 export function create(
@@ -33,7 +32,7 @@ export function create(
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId)));
     const disruptionsModel = addServiceModel("DisruptionsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    createDisruptionsResource(publicApi, vpc, props, lambdaDbSg, disruptionsModel, validator, stack)
+    createDisruptionsResource(publicApi, vpc, props, lambdaDbSg, disruptionsModel, validator, stack);
 }
 
 function createDisruptionsResource(
@@ -68,15 +67,15 @@ function createDisruptionsResource(
     });
 
     createSubscription(getDisruptionsLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetDisruptions', BETA_TAGS, resources, stack);
+    addTags('GetDisruptions', ['bridge-lock-disruptions'], resources, stack);
 
     return getDisruptionsLambda;
 }
 
 function createResourcePaths(publicApi: RestApi) {
     const apiResource = publicApi.root.addResource("api");
-    const v1Resource = apiResource.addResource("beta");
-    const bridgeLockResource = v1Resource.addResource("bridge-lock");
+    const v2Resource = apiResource.addResource("v2");
+    const bridgeLockResource = v2Resource.addResource("bridge-lock");
     return bridgeLockResource.addResource("disruptions");
 }
 
