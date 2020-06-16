@@ -8,4 +8,5 @@ interface Props {
 interface Account {
     accountNumber: string;
     app: string;
+    env: string;
 }

@@ -105,11 +105,13 @@ export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Acc
         }
 
         const app = getAppFromSenderAccount(payload.owner, knownAccounts);
+        const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
         const timestamp = new Date(1 * logEvent.timestamp);
         const year = timestamp.getUTCFullYear();
         const month = ("0" + (timestamp.getUTCMonth() + 1)).slice(-2);
+        const indexAppName = `${app}-${env}-lambda`;
 
-        const indexName = `${app}-${year}.${month}`;
+        const indexName = `${indexAppName}-${year}.${month}`;
 
         const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
 
@@ -119,9 +121,9 @@ export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Acc
         source["level"] = messageParts[2];
         source["message"] = messageParts[3];
         source["@log_group"] = payload.logGroup;
-
-        source["@app"] = app;
-        source["fields"] = {app: app};
+        source["@app"] = indexAppName;
+        source["fields"] = {app: indexAppName};
+        source["@transport_type"] = app;
 
         let action = { index: { _id: logEvent.id, _index: null } } as any;
         action.index._index = indexName;
@@ -231,3 +233,18 @@ export function getAppFromSenderAccount(owner: string, knownAccounts: Account[])
         return app;
     }
 }
+
+export function getEnvFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
+    const env = knownAccounts.find(value => {
+        if (value.accountNumber === owner) {
+            return true;
+        }
+        return null;
+    })?.env;
+    if (!env) {
+        throw new Error('No env for account ' + owner);
+    } else {
+        return env;
+    }
+}
+
