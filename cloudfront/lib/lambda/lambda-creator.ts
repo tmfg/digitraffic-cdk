@@ -1,4 +1,4 @@
-import {Stack } from '@aws-cdk/core';
+import {Stack,Duration } from '@aws-cdk/core';
 import {Runtime, Function, InlineCode, AssetCode, Version} from '@aws-cdk/aws-lambda';
 import {Role} from '@aws-cdk/aws-iam';
 
@@ -44,7 +44,8 @@ export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Rol
     return new Function(stack, `${env}-lambda-forward`, {
         runtime: Runtime.NODEJS_12_X,
         role: lambdaRole,
-        memorySize: 128,
+        memorySize: 256,
+        timeout: Duration.seconds(10),
         code: new AssetCode('dist/lambda'),
         handler: 'lambda-elastic.handler',
         environment: {

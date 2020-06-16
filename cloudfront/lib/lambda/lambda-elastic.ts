@@ -10,7 +10,7 @@ const appDomain = process.env.APP_DOMAIN as string;
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 exports.handler = async function handler(event: any, context: any, callback: any) {
-    console.info(JSON.stringify(event));
+//    console.info(JSON.stringify(event));
 
     const s3 = new AWS.S3();
 
@@ -89,7 +89,7 @@ async function sendToEs(message: any, callback: any) {
     });
 
     try {
-        console.log("sending to es: " + JSON.stringify(message));
+//        console.log("sending to es: " + JSON.stringify(message));
 
         const response = await client.bulk(message);
 
