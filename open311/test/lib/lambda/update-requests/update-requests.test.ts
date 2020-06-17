@@ -11,7 +11,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('No body - invalid request', async () => {
         const response = await handler(Object.assign({}, testEvent, {
             body: null
-        }), {}, {}, db);
+        }));
 
         expect(response.statusCode).toBe(400);
     });
@@ -19,7 +19,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('Empty array - invalid request', async () => {
         const response = await handler(Object.assign({}, testEvent, {
             body: "[]"
-        }), {}, {}, db);
+        }));
 
         expect(response.statusCode).toBe(400);
     });
@@ -27,7 +27,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('Single service request - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify([newServiceRequestWithExtensionsDto()])
-        }), {}, {}, db);
+        }));
 
         expect(response.statusCode).toBe(200);
     });
@@ -35,7 +35,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('Single service request without extended_attributes - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify([newServiceRequest()])
-        }), {}, {}, db);
+        }));
 
         expect(response.statusCode).toBe(200);
     });
@@ -43,7 +43,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('Multiple service requests - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify([newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto()])
-        }), {}, {}, db);
+        }));
 
         expect(response.statusCode).toBe(200);
     });
@@ -56,7 +56,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             body: JSON.stringify([Object.assign({}, sr, {
                 status: ServiceRequestStatus.closed
             })])
-        }), {}, {}, db);
+        }));
 
         expect(response.statusCode).toBe(200);
     });
@@ -71,7 +71,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
         const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify(changeSr)
-        }), {}, {}, db);
+        }));
 
         expect(response.statusCode).toBe(200);
     });

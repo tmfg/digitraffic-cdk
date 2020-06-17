@@ -29,7 +29,7 @@ describe('requests-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const sr = newServiceRequest();
         await insertServiceRequest(db, [sr]);
 
-        const foundServiceRequests = await findAll(false, db);
+        const foundServiceRequests = await findAll(false);
 
         expect(foundServiceRequests[0]).toMatchObject(toServiceRequest(sr));
     });
@@ -38,7 +38,7 @@ describe('requests-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const sr = newServiceRequest();
         await insertServiceRequest(db, [sr]);
 
-        const foundServiceRequests = await findAll(true, db);
+        const foundServiceRequests = await findAll(true);
 
         expect(foundServiceRequests[0]).toMatchObject(toServiceRequestWithExtensions(sr));
     });
@@ -47,8 +47,8 @@ describe('requests-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         const sr = newServiceRequest();
         await insertServiceRequest(db, [sr]);
 
-        await doDelete(sr.service_request_id, db);
-        const foundServiceRequests = await findAll(true, db);
+        await doDelete(sr.service_request_id);
+        const foundServiceRequests = await findAll(true);
 
         expect(foundServiceRequests.length).toBe(0);
     });

@@ -6,7 +6,7 @@ import {dbTestBase, insertServiceRequest} from "../../db-testutil";
 describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('no service requests', async () => {
-        const response = await handler({extensions: 'false'}, {}, {}, db);
+        const response = await handler({extensions: 'false'});
 
         expect(response).toMatchObject([]);
     });
@@ -16,7 +16,7 @@ describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newServiceRequest());
         await insertServiceRequest(db, serviceRequests);
 
-        const response = await handler({extensions: 'false'}, {}, {}, db);
+        const response = await handler({extensions: 'false'});
 
         expect(response.length).toBe(serviceRequests.length);
     });
@@ -24,7 +24,7 @@ describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
     test('extensions', async () => {
         await insertServiceRequest(db, [newServiceRequest()]);
 
-        const response = await handler({extensions: 'true'}, {}, {}, db);
+        const response = await handler({extensions: 'true'});
 
         expect(response[0]['extended_attributes']).toBeDefined();
     });
@@ -32,7 +32,7 @@ describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
     test('no extensions', async () => {
         await insertServiceRequest(db, [newServiceRequest()]);
 
-        const response = await handler({extensions: 'false'}, {}, {}, db);
+        const response = await handler({extensions: 'false'});
 
         expect(response[0]['extended_attributes']).toBeUndefined();
     });

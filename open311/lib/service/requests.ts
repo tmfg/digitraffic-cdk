@@ -9,8 +9,7 @@ import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensio
 import {inDatabase} from "digitraffic-lambda-postgres/database";
 
 export async function findAll(
-    extensions: Boolean,
-    dbParam?: IDatabase<any, any>
+    extensions: Boolean
 ): Promise<ServiceRequest[]> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         const requests = await dbFindAll(db);
@@ -19,13 +18,12 @@ export async function findAll(
         } else {
             return requests.map(r => toServiceRequestWithExtensions(r));
         }
-    }, dbParam);
+    });
 }
 
 export async function find(
     serviceRequestId: string,
-    extensions: boolean,
-    dbParam?: IDatabase<any, any>
+    extensions: boolean
 ): Promise<ServiceRequest | null> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         const r =  await dbFind(serviceRequestId, db);
@@ -33,25 +31,23 @@ export async function find(
             return null;
         }
         return extensions ? toServiceRequestWithExtensions(r) : toServiceRequest(r);
-    }, dbParam);
+    });
 }
 
 export async function doDelete(
-    serviceRequestId: string,
-    dbParam?: IDatabase<any, any>
+    serviceRequestId: string
 ): Promise<void> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await dbDelete(serviceRequestId, db);
-    }, dbParam);
+    });
 }
 
 export async function update(
-    requests: ServiceRequestWithExtensions[],
-    dbParam?: IDatabase<any, any>
+    requests: ServiceRequestWithExtensions[]
 ): Promise<void> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await dbUpdate(requests, db);
-    }, dbParam);
+    });
 }
 
 export function toServiceRequestWithExtensions(r: ServiceRequestWithExtensions): ServiceRequestWithExtensionsDto {

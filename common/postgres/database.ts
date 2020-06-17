@@ -11,13 +11,9 @@ export function initDbConnection(
     return pgp(`postgresql://${username}:${password}@${url}`, options);
 }
 
-let db: IDatabase<any, any>;
-
 export async function inDatabase(
-    fn: (db: IDatabase<any, any>) => any,
-    dbParam?: IDatabase<any, any>)
-{
-    db = db ?? dbParam ?? initDbConnection(
+    fn: (db: IDatabase<any, any>) => any) {
+    const db = initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
         process.env.DB_URI as string
@@ -26,7 +22,8 @@ export async function inDatabase(
         return await fn(db);
     } catch(e) {
         console.error("Error in db:", e);
-
         throw e;
+    } finally {
+        db.$pool.end();
     }
 }

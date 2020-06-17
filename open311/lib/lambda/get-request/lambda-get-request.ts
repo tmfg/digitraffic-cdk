@@ -1,18 +1,13 @@
 import {find} from "../../service/requests";
 import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
-import {IDatabase} from "pg-promise";
 
 const stringTrueRegex = /true/;
 
 export const handler = async (
-    event: GetRequestEvent,
-    context: any,
-    callback: any,
-    dbParam?: IDatabase<any, any>
+    event: GetRequestEvent
 ) : Promise <any> => {
     const request = await find(event.request_id,
-        stringTrueRegex.test(event.extensions),
-        dbParam);
+        stringTrueRegex.test(event.extensions));
     if (!request) {
         throw new Error(NOT_FOUND_MESSAGE);
     }

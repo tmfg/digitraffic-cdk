@@ -1,18 +1,10 @@
 import {APIGatewayEvent} from 'aws-lambda';
-import {
-    ServiceRequestWithExtensions,
-    ServiceRequestWithExtensionsDto
-} from "../../model/service-request";
+import {ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../../model/service-request";
 import {update} from "../../service/requests";
 import {invalidRequest} from "../../http-util";
-import {IDatabase} from "pg-promise";
 
 export const handler = async (
-    event: APIGatewayEvent,
-    context: any,
-    callback: any,
-    dbParam?: IDatabase<any, any>
-): Promise<any> => {
+    event: APIGatewayEvent): Promise<any> => {
     if (!event.body) {
         return invalidRequest();
     }
@@ -24,7 +16,7 @@ export const handler = async (
         return invalidRequest();
     }
 
-    await update(serviceRequests.map(sr => toServiceRequestWithExtensions(sr)), dbParam);
+    await update(serviceRequests.map(sr => toServiceRequestWithExtensions(sr)));
 
     return {statusCode: 200, body: 'Ok'};
 };

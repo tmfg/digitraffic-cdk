@@ -10,7 +10,7 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
         expect(handler({
             request_id: '123',
             extensions: 'false'
-        }, {}, {}, db)).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
+        })).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
     });
 
     test('Get with extensions', async () => {
@@ -20,7 +20,7 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
         const response = await handler({
             request_id: sr.service_request_id,
             extensions: 'true'
-        }, {}, {}, db);
+        });
 
         expect(response['extended_attributes']).toBeDefined();
     });
@@ -32,7 +32,7 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
         const response = await handler({
             request_id: sr.service_request_id,
             extensions: 'false'
-        }, {}, {}, db);
+        });
 
         expect(response['extended_attributes']).toBeUndefined();
     });
