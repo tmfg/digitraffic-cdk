@@ -45,8 +45,12 @@ export async function doDelete(
 export async function update(
     requests: ServiceRequestWithExtensions[]
 ): Promise<void> {
+    const start = Date.now();
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await dbUpdate(requests, db);
+    }).then(a => {
+        const end = Date.now();
+        console.info("method=updateRequests updatedCount=%d tookMs=%d", a.length, (end - start));
     });
 }
 

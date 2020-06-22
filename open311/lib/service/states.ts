@@ -15,7 +15,11 @@ export async function findAll(): Promise<ServiceRequestState[]> {
 export async function update(
     states: ServiceRequestState[]
 ): Promise<void> {
+    const start = Date.now();
     return inDatabase(async (db: IDatabase<any, any>) => {
         return await dbUpdate(states, db);
-    });
+    }).then(a => {
+        const end = Date.now();
+        console.info("method=updateStates updatedCount=%d tookMs=%d", a.length, (end - start));
+    });;
 }

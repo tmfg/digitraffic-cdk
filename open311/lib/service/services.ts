@@ -16,8 +16,12 @@ export async function findAll(): Promise<Service[]> {
 export async function update(
     services: Service[]
 ): Promise<void> {
+    const start = Date.now();
     return inDatabase(async (db: IDatabase<any, any>) => {
-        await dbUpdate(services, db);
+        return await dbUpdate(services, db);
+    }).then(a => {
+        const end = Date.now();
+        console.info("method=updateServices updatedCount=%d tookMs=%d", a.length, (end - start));
     });
 }
 
