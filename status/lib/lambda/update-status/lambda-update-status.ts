@@ -17,7 +17,7 @@ async function getStatuspageComponents(statuspagePageId: string, statuspageApiKe
     console.log("Fetching Statuspage components");
     const r = await axios.get(`${STATUSPAGE_API}/${statuspagePageId}/components`, {
         headers: {
-            'Authorization': `OAuth ${statuspageApiKey}`
+            Authorization: `OAuth ${statuspageApiKey}`
         }
     });
     if (r.status != 200) {
@@ -34,17 +34,17 @@ async function createStatuspageComponent(
     statuspageApiKey: string) {
     console.log("Creating Statuspage component for endpoint", endpoint)
     const r = await axios.post(`${STATUSPAGE_API}/${statuspagePageId}/components`, {
-        'component': {
-            'description': endpoint,
-            'status': 'operational',
-            'name': endpoint,
-            'only_show_if_degraded': 'false',
-            'group_id': statuspageComponentGroupId,
-            'showcase': 'true'
+        component: {
+            description: endpoint,
+            status: 'operational',
+            name: endpoint,
+            only_show_if_degraded: 'false',
+            group_id: statuspageComponentGroupId,
+            showcase: 'true'
         }
     }, {
         headers: {
-            'Authorization': `OAuth ${statuspageApiKey}`,
+            Authorization: `OAuth ${statuspageApiKey}`,
             'Content-type': 'application/json'
         }
     });
@@ -74,21 +74,21 @@ async function createNodepingContact(
     statuspageComponentId: string) {
     console.log("Creating NodePing contact for endpoint", endpoint)
     const r = await axios.post(`${NODEPING_API}/contacts`, {
-        'token': nodepingToken,
-        'customerid': nodepingSubaccountId,
-        'name': endpoint,
-        'newaddresses': [{
-            'address': `https://api.statuspage.io/v1/pages/${statuspagePageId}/components/${statuspageComponentId}.json`,
-            'type': 'webhook',
-            'action': 'patch',
-            'headers': {
-                'Authorization': `OAuth ${statuspageApiKey}`
+        token: nodepingToken,
+        customerid: nodepingSubaccountId,
+        name: endpoint,
+        newaddresses: [{
+            address: `https://api.statuspage.io/v1/pages/${statuspagePageId}/components/${statuspageComponentId}.json`,
+            type: 'webhook',
+            action: 'patch',
+            headers: {
+                Authorization: `OAuth ${statuspageApiKey}`
             },
-            'data': {"component[status]":"{if success}operational{else}major_outage{/if}"}
+            data: {"component[status]":"{if success}operational{else}major_outage{/if}"}
         }]
     });
     if (r.status != 200) {
-        throw new Error('Unable to create contact')
+        throw new Error('Unable to create contact');
     }
     console.log("..done");
 }
@@ -103,19 +103,24 @@ async function getNodepingChecks(nodepingToken: string, subaccountId: string) {
     return Object.values(r.data).map((check: any) => check.parameters.target);
 }
 
-    async function createNodepingCheck(endpoint: string, nodepingToken: string, subaccountId: string, contactId: string, app: string) {
+    async function createNodepingCheck(
+        endpoint: string,
+        nodepingToken: string,
+        subaccountId: string,
+        contactId: string,
+        app: string) {
     console.log("Creating NodePing check for endpoint", endpoint);
     const notification: any = {};
     notification[`${contactId}`] = {'delay': 0, 'schedule': 'All'};
     const data = {
-        'customerid': subaccountId,
-        'token': nodepingToken,
-        'type': 'HTTPADV',
-        'target': `https://${app}.digitraffic.fi${endpoint}`,
-        'interval': 1,
-        'enabled': true,
-        'sendheaders': {'accept-encoding': 'gzip'},
-        'notifications': [notification]
+        customerid: subaccountId,
+        token: nodepingToken,
+        type: 'HTTPADV',
+        target: `https://${app}.digitraffic.fi${endpoint}`,
+        interval: 1,
+        enabled: true,
+        sendheaders: {'accept-encoding': 'gzip'},
+        notifications: [notification]
 };
     const r = await axios.post(`${NODEPING_API}/checks`, data, {
         headers: {
@@ -129,7 +134,7 @@ async function getNodepingChecks(nodepingToken: string, subaccountId: string) {
 }
 
 export const handler = async () : Promise <any> => {
-    const endpoints: string[] = await getDigitrafficEndpoints(process.env.APP as string)
+    const endpoints: string[] = await getDigitrafficEndpoints(process.env.APP as string);
 
     const statuspageComponents: any[] = await getStatuspageComponents(process.env.STATUSPAGE_PAGE_ID as string,
         process.env.STATUSPAGE_API_KEY as string)
@@ -166,7 +171,7 @@ export const handler = async () : Promise <any> => {
         process.env.NODEPING_SUBACCOUNT_ID as string);
     const missingChecks = endpoints.filter(e => !checks.includes(e));
     console.log('Missing checks', missingChecks);
-    await Promise.all(missingChecks.slice(0,2).map(e => {
+    await Promise.all(missingChecks.map(e => {
         const contact: any = Object.values(contacts).find((c: any) => c.name === e);
         if (!contact) {
             throw new Error(`Contact for ${e} not found`);
