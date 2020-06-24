@@ -142,16 +142,19 @@ export const handler = async (): Promise<any> => {
     const endpoints: string[] = await getDigitrafficEndpoints(process.env.APP as string);
     console.log(endpoints);
 
-    const statuspageComponents: any[] = await getStatuspageComponents(process.env.STATUSPAGE_PAGE_ID as string,
-        process.env.STATUSPAGE_API_KEY as string)
+    let statuspageComponents: any[] = await getStatuspageComponents(process.env.STATUSPAGE_PAGE_ID as string,
+        process.env.STATUSPAGE_API_KEY as string);
     const statuspageComponentNames: string[] = statuspageComponents.map(c => c.name);
     const missingComponents = endpoints.filter(e => !statuspageComponentNames.includes(e));
     console.log('Missing components', missingComponents);
-
     await Promise.all(missingComponents.map(c => createStatuspageComponent(c,
         process.env.STATUSPAGE_PAGE_ID as string,
         process.env.STATUSPAGE_COMPONENT_GROUP_ID as string,
         process.env.STATUSPAGE_API_KEY as string)));
+    if (missingComponents.length > 0) {
+        statuspageComponents = await getStatuspageComponents(process.env.STATUSPAGE_PAGE_ID as string,
+            process.env.STATUSPAGE_API_KEY as string);
+    }
 
     let contacts = await getNodepingContacts(process.env.NODEPING_TOKEN as string,
         process.env.NODEPING_SUBACCOUNT_ID as string);
