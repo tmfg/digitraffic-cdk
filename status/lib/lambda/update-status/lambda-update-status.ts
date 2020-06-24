@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const NODEPING_API='https://api.nodeping.com/api/1';
-const STATUSPAGE_API='https://api.statuspage.io/v1/pages';
+const NODEPING_API = 'https://api.nodeping.com/api/1';
+const STATUSPAGE_API = 'https://api.statuspage.io/v1/pages';
 
 async function getDigitrafficEndpoints(app: string) {
     console.log("Fetching digitraffic endpoints")
@@ -10,7 +10,12 @@ async function getDigitrafficEndpoints(app: string) {
         throw new Error('Unable to fetch contacts');
     }
     console.log("..done");
-    return Object.keys(r.data.paths).filter(p => !p.includes('{'));
+    const all = Object.keys(r.data.paths).filter(p => !p.includes('{'));
+    const notBeta = all.filter((e) => !e.includes('beta'));
+    const beta = all.filter((e) => e.includes('beta'));
+    notBeta.sort();
+    beta.sort();
+    return ([] as string[]).concat(notBeta).concat(beta);
 }
 
 async function getStatuspageComponents(statuspagePageId: string, statuspageApiKey: string) {
@@ -84,7 +89,7 @@ async function createNodepingContact(
             headers: {
                 Authorization: `OAuth ${statuspageApiKey}`
             },
-            data: {"component[status]":"{if success}operational{else}major_outage{/if}"}
+            data: {"component[status]": "{if success}operational{else}major_outage{/if}"}
         }]
     });
     if (r.status != 200) {
@@ -103,12 +108,12 @@ async function getNodepingChecks(nodepingToken: string, subaccountId: string) {
     return Object.values(r.data).map((check: any) => check.parameters.target);
 }
 
-    async function createNodepingCheck(
-        endpoint: string,
-        nodepingToken: string,
-        subaccountId: string,
-        contactId: string,
-        app: string) {
+async function createNodepingCheck(
+    endpoint: string,
+    nodepingToken: string,
+    subaccountId: string,
+    contactId: string,
+    app: string) {
     console.log("Creating NodePing check for endpoint", endpoint);
     const notification: any = {};
     notification[`${contactId}`] = {'delay': 0, 'schedule': 'All'};
@@ -121,7 +126,7 @@ async function getNodepingChecks(nodepingToken: string, subaccountId: string) {
         enabled: true,
         sendheaders: {'accept-encoding': 'gzip'},
         notifications: [notification]
-};
+    };
     const r = await axios.post(`${NODEPING_API}/checks`, data, {
         headers: {
             'Content-type': 'application/json'
@@ -133,21 +138,23 @@ async function getNodepingChecks(nodepingToken: string, subaccountId: string) {
     console.log("..done");
 }
 
-export const handler = async () : Promise <any> => {
+export const handler = async (): Promise<any> => {
     const endpoints: string[] = await getDigitrafficEndpoints(process.env.APP as string);
+    console.log(endpoints);
 
     const statuspageComponents: any[] = await getStatuspageComponents(process.env.STATUSPAGE_PAGE_ID as string,
         process.env.STATUSPAGE_API_KEY as string)
     const statuspageComponentNames: string[] = statuspageComponents.map(c => c.name);
     const missingComponents = endpoints.filter(e => !statuspageComponentNames.includes(e));
     console.log('Missing components', missingComponents);
+
     await Promise.all(missingComponents.map(c => createStatuspageComponent(c,
         process.env.STATUSPAGE_PAGE_ID as string,
         process.env.STATUSPAGE_COMPONENT_GROUP_ID as string,
         process.env.STATUSPAGE_API_KEY as string)));
 
     let contacts = await getNodepingContacts(process.env.NODEPING_TOKEN as string,
-        process.env.NODEPING_SUBACCOUNT_ID  as string);
+        process.env.NODEPING_SUBACCOUNT_ID as string);
     const contactNames: string[] = Object.values(contacts).map((c: any) => c.name);
     const missingContacts = endpoints.filter(e => !contactNames.includes(e));
     console.log('Missing contacts', missingContacts);
@@ -182,4 +189,5 @@ export const handler = async () : Promise <any> => {
             Object.keys(contact['addresses'])[0] as string,
             process.env.APP as string);
     }));
+
 }
