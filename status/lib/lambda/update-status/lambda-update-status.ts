@@ -120,10 +120,12 @@ async function createNodepingCheck(
     const data = {
         customerid: subaccountId,
         token: nodepingToken,
+        label: endpoint,
         type: 'HTTPADV',
         target: `https://${app}.digitraffic.fi${endpoint}`,
         interval: 1,
         enabled: true,
+        follow: true,
         sendheaders: {'accept-encoding': 'gzip'},
         notifications: [notification]
     };
