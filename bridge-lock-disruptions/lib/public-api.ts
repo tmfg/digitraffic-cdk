@@ -84,6 +84,7 @@ function createApi(stack: Construct, Props: Props) {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
         },
+        description: 'Waterway traffic disturbances',
         restApiName: 'BridgeLockDisruption public API',
         endpointTypes: [EndpointType.REGIONAL],
         policy: new PolicyDocument({

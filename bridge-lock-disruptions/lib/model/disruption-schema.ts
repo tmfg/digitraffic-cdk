@@ -3,7 +3,7 @@ import apigateway = require('@aws-cdk/aws-apigateway');
 const disruptionsProperties: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
-    description: 'Bridge and lock Disruptions GeoJSON',
+    description: 'Waterway traffic disturbances GeoJSON',
     properties: {
         Id: {
             type: apigateway.JsonSchemaType.NUMBER,
@@ -15,23 +15,23 @@ const disruptionsProperties: apigateway.JsonSchema = {
         },
         StartDate: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disruption started date time'
+            description: 'Disturbance started date time'
         },
         EndDate: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disruption ended date time'
+            description: 'Disturbance ended date time'
         },
         DescriptionFi: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disruption description, finnish'
+            description: 'Disturbance description, finnish'
         },
         DescriptionSv: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disruption description, swedish'
+            description: 'Disturbance description, swedish'
         },
         DescriptionEn: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disruption description, english'
+            description: 'Disturbance description, english'
         }
     }
 };
