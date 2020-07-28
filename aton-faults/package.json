@@ -36,6 +36,8 @@
     "@aws-cdk/aws-apigateway": "1.44.0",
     "@aws-cdk/core": "1.44.0",
     "@aws-cdk/aws-events-targets": "1.44.0",
+    "@aws-cdk/aws-ec2": "1.44.0",
+    "@aws-cdk/aws-lambda": "1.44.0",
     "pg-native": "3.0.0",
     "pg-promise": "10.5.8",
     "source-map-support": "0.5.19",

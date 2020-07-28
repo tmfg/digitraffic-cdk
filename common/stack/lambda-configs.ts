@@ -2,7 +2,6 @@ import {FunctionProps, Runtime, Code} from '@aws-cdk/aws-lambda';
 import {Duration} from "@aws-cdk/core";
 import {IVpc, ISecurityGroup} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
-import {mergeDeepRight} from 'ramda';
 
 export interface LambdaConfiguration {
     vpcId: string;
@@ -31,20 +30,25 @@ export function dbLambdaConfiguration(
     props: LambdaConfiguration,
     config: FunctionParameters): FunctionProps {
 
-    return mergeDeepRight({
+    return {
         runtime: props.runtime || Runtime.NODEJS_12_X,
         memorySize: props.memorySize || 1024,
+        functionName: config.functionName,
+        code: config.code,
+        handler: config.handler,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds || 60),
-        environment: {
+        environment: config.environment || {
             DB_USER: props.dbProps.username,
             DB_PASS: props.dbProps.password,
             DB_URI: config.readOnly ? props.dbProps.ro_uri : props.dbProps.uri
         },
         logRetention: RetentionDays.ONE_YEAR,
         vpc: vpc,
-        vpcSubnets: vpc.privateSubnets,
+        vpcSubnets: {
+            subnets: vpc.privateSubnets
+        },
         securityGroup: lambdaDbSg
-    }, config);
+    };
 }
 
 interface FunctionParameters {
