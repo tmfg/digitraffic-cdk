@@ -31,7 +31,9 @@ export function dbLambdaConfiguration(
     props: LambdaConfiguration,
     config: any): FunctionProps {
 
-    return <FunctionProps> mergeDeepRight({
+    return mergeDeepRight({
+        code: {},
+        handler: {},
         runtime: props.runtime || Runtime.NODEJS_12_X,
         memorySize: props.memorySize || 1024,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds || 60),
