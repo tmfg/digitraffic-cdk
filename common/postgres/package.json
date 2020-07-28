@@ -6,11 +6,11 @@
   },
   "private": true,
   "devDependencies": {
-    "typescript": "3.9.5"
+    "typescript": "3.9.7"
   },
   "dependencies": {
     "pg-native": "3.0.0",
-    "pg-promise": "10.3.5",
-    "@types/node": "14.0.12"
+    "pg-promise": "10.5.8",
+    "@types/node": "14.0.26"
   }
 }

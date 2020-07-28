@@ -17,7 +17,7 @@
     "@aws-cdk/assert": "1.44.0",
     "@types/aws-lambda": "8.10.53",
     "@types/jest": "^25.2.3",
-    "@types/node": "14.0.12",
+    "@types/node": "14.0.26",
     "@types/sinon": "^9.0.4",
     "@types/xml2js": "^0.4.5",
     "jest": "26.0.1",
@@ -27,7 +27,7 @@
     "sinon": "9.0.2",
     "ts-jest": "26.1.0",
     "ts-node": "8.10.2",
-    "typescript": "3.9.5"
+    "typescript": "3.9.7"
   },
   "dependencies": {
     "digitraffic-lambda-postgres": "file:../common/postgres",
@@ -37,10 +37,10 @@
     "@aws-cdk/core": "1.44.0",
     "@aws-cdk/aws-events-targets": "1.44.0",
     "pg-native": "3.0.0",
-    "pg-promise": "10.5.6",
+    "pg-promise": "10.5.8",
     "source-map-support": "0.5.19",
     "axios": "0.19.2",
-    "pg-query-stream": "3.1.1"
+    "pg-query-stream": "3.2.0"
   },
   "externals": [
     "aws-sdk"
