@@ -14,7 +14,7 @@ export interface LambdaConfiguration {
     defaultLambdaDurationSeconds?: number;
     logsDestinationArn: string;
     memorySize?: number,
-    runtime?: string
+    runtime?: Runtime
 }
 
 declare interface DbProps {
