@@ -13,11 +13,11 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.44.0",
+    "@aws-cdk/assert": "1.55.0",
     "@types/aws-lambda": "8.10.59",
     "@types/node": "14.0.26",
     "@types/sinon": "9.0.4",
-    "aws-cdk": "1.44.0",
+    "aws-cdk": "1.55.0",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-externals": "^0.4.0",
     "rimraf": "3.0.2",
@@ -26,13 +26,13 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@aws-cdk/aws-kinesisfirehose": "1.44.0",
-    "@aws-cdk/aws-apigateway": "1.44.0",
-    "@aws-cdk/aws-wafv2": "1.44.0",
-    "@aws-cdk/aws-s3-notifications": "1.44.0",
+    "@aws-cdk/aws-kinesisfirehose": "1.55.0",
+    "@aws-cdk/aws-apigateway": "1.55.0",
+    "@aws-cdk/aws-wafv2": "1.55.0",
+    "@aws-cdk/aws-s3-notifications": "1.55.0",
     "@elastic/elasticsearch": "7.7.1",
-    "@aws-cdk/core": "1.44.0",
-    "@aws-cdk/aws-events-targets": "1.44.0",
+    "@aws-cdk/core": "1.55.0",
+    "@aws-cdk/aws-events-targets": "1.55.0",
     "aws-sdk": "^2.692.0"
   },
   "externals": [

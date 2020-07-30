@@ -14,12 +14,12 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "^1.44.0",
+    "@aws-cdk/assert": "^1.55.0",
     "@types/jest": "^25.2.3",
     "@types/node": "14.0.26",
     "jest": "^26.0.1",
     "ts-jest": "^26.1.0",
-    "aws-cdk": "^1.44.0",
+    "aws-cdk": "^1.55.0",
     "ts-node": "^8.10.2",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-externals": "^0.4.0",
