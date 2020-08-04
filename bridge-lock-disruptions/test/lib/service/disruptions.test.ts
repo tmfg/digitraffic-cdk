@@ -24,11 +24,24 @@ describe('disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(fetchedDisruptions.features.length).toBe(disruptions.length);
     });
 
-    test('saveDisruptions', async () => {
+    test('saveDisruptions - all new', async () => {
         const disruptions = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
             return newDisruption();
         });
 
+        await saveDisruptions(disruptions);
+
+        const savedDisruptions = await findAll(db);
+        expect(savedDisruptions.length).toBe(disruptions.length);
+    });
+
+    test('saveDisruptions - remove one old', async () => {
+        const disruptions = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
+            return newDisruption();
+        });
+
+        await insertDisruption(db, [newDisruption()]);
+        expect((await findAll(db)).length).toBe(1); // one already exists
         await saveDisruptions(disruptions);
 
         const savedDisruptions = await findAll(db);

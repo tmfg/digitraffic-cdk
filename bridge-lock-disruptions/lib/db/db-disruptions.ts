@@ -1,8 +1,5 @@
 import {IDatabase} from "pg-promise";
-import {stream} from "../../../common/db/stream-util";
-import {Disruption, SpatialDisruption} from "../model/disruption";
-import {Feature, Geometry as GeoJSONGeometry} from "geojson";
-import {Geometry} from "wkx";
+import {SpatialDisruption} from "../model/disruption";
 
 export interface DbDisruption {
     id: number;
@@ -14,8 +11,6 @@ export interface DbDisruption {
     description_sv?: string;
     description_en?: string;
 }
-
-const QueryStream = require('pg-query-stream');
 
 const UPSERT_DISRUPTIONS_SQL = `
     INSERT INTO bridgelock_disruption (
@@ -62,17 +57,21 @@ const SELECT_DISRUPTION_SQL = `
     FROM bridgelock_disruption
 `;
 
-export async function findAll(
-    db: IDatabase<any, any>): Promise<Feature[]>
-{
-    const qs = new QueryStream(SELECT_DISRUPTION_SQL);
-    return await stream(db, qs, convertFeature);
+export function findAll(
+    db: IDatabase<any, any>): Promise<DbDisruption[]> {
+    return db.tx(t => t.manyOrNone(SELECT_DISRUPTION_SQL));
 }
 
 export function updateDisruptions(db: IDatabase<any, any>, disruptions: SpatialDisruption[]): Promise<any>[] {
     return disruptions.map(disruption => {
         return db.none(UPSERT_DISRUPTIONS_SQL, createEditObject(disruption));
     });
+}
+
+export function deleteAllButDisruptions(
+    db: IDatabase<any, any>,
+    ids: number[]): Promise<any> {
+    return db.tx(t => t.none('DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)', ids));
 }
 
 export function createEditObject(disruption: SpatialDisruption): DbDisruption {
@@ -85,24 +84,5 @@ export function createEditObject(disruption: SpatialDisruption): DbDisruption {
         description_fi: disruption.DescriptionFi,
         description_sv: disruption.DescriptionSv,
         description_en: disruption.DescriptionEn
-    };
-}
-
-export function convertFeature(disruption: DbDisruption): Feature {
-    const properties: Disruption = {
-        Id: disruption.id,
-        Type_id: disruption.type_id,
-        StartDate: disruption.start_date,
-        EndDate: disruption.end_date,
-        DescriptionFi: disruption.description_fi,
-        DescriptionSv: disruption.description_sv,
-        DescriptionEn: disruption.description_en
-    };
-    // convert geometry from db to geojson
-    const geometry = Geometry.parse(Buffer.from(disruption.geometry, "hex")).toGeoJSON() as GeoJSONGeometry;
-    return {
-        type: "Feature",
-        properties,
-        geometry
     };
 }

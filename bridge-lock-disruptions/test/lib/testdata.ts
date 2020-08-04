@@ -3,7 +3,7 @@ import {FeatureCollection} from "geojson";
 import moment from 'moment';
 import {DISRUPTIONS_DATE_FORMAT} from "../../lib/service/disruptions";
 
-function someNumber() {
+export function someNumber() {
     return Math.floor(Math.random() * 999999);
 }
 
