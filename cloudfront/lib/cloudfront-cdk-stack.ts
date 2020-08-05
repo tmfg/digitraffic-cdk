@@ -62,7 +62,7 @@ export class CloudfrontCdkStack extends Stack {
         const lambdaRole = new Role(stack, `S3LambdaToElasticRole`, {
             assumedBy: new CompositePrincipal(
                 new ServicePrincipal("lambda.amazonaws.com"),
-                new ServicePrincipal("firehose.amazonaws.com")
+//                new ServicePrincipal("firehose.amazonaws.com")
             ),
             roleName: `S3LambdaToElasticRole`
         });
