@@ -1,6 +1,7 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
+import {CfnDeliveryStream } from "@aws-cdk/aws-kinesisfirehose";
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
 import {PolicyStatement, Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "../../common/stack/origin-configs";
@@ -19,14 +20,50 @@ export class CloudfrontCdkStack extends Stack {
         super(scope, id, props);
 
         const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
-        const role = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
+        const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
 
-        cloudfrontProps.props.forEach(p => this.createDistribution(p, role, lambdaMap, cloudfrontProps.elasticProps.elasticDomain, cloudfrontProps.elasticAppName));
+        cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, cloudfrontProps.elasticProps.elasticDomain, cloudfrontProps.elasticAppName));
+
+//        const firehose = this.createKinesisFirehose(cloudfrontProps.elasticProps, writeToESROle);
+//        firehose.node.addDependency(writeToESROle);
+    }
+
+    createKinesisFirehose(elasticProps: ElasticProps, writeToESRole: Role): CfnDeliveryStream {
+        return new CfnDeliveryStream(this, 'cloudfront-to-elastic-stream', {
+            deliveryStreamName: 'cloudfront-to-elastic-stream',
+            elasticsearchDestinationConfiguration: {
+                domainArn: elasticProps.elasticArn,
+                bufferingHints:  {
+                    intervalInSeconds:120,
+                    sizeInMBs: 5
+                },
+                indexName: 'road-test-cf',
+                indexRotationPeriod: 'OneMonth',
+                retryOptions: {
+                    durationInSeconds: 300
+                },
+                s3BackupMode: 'FailedDocumentsOnly',
+                typeName: 'TypeName',
+                s3Configuration: {
+                    bufferingHints:  {
+                        intervalInSeconds:120,
+                        sizeInMBs: 5
+                    },
+                    compressionFormat: 'GZIP',
+                    bucketArn: 'arn:aws:s3:::weathercam-test-digitraffic-cf-logs',
+                    roleArn: writeToESRole.roleArn
+                },
+                roleArn: writeToESRole.roleArn
+            }
+        });
     }
 
     createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
         const lambdaRole = new Role(stack, `S3LambdaToElasticRole`, {
-            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+            assumedBy: new CompositePrincipal(
+                new ServicePrincipal("lambda.amazonaws.com"),
+                new ServicePrincipal("firehose.amazonaws.com")
+            ),
             roleName: `S3LambdaToElasticRole`
         });
         lambdaRole.addToPolicy(new PolicyStatement({
@@ -35,11 +72,13 @@ export class CloudfrontCdkStack extends Stack {
                 "es:DescribeElasticsearchDomains",
                 "es:DescribeElasticsearchDomainConfig",
                 "es:ESHttpPost",
-                "es:ESHttpPut"
+                "es:ESHttpPut",
+                "es:ESHttpGet"
             ],
             resources: [
                 elasticProps.elasticArn,
-                `${elasticProps.elasticArn}/*`
+                `${elasticProps.elasticArn}/*`,
+                `${elasticProps.elasticArn}*`
             ]
         }));
         lambdaRole.addToPolicy(new PolicyStatement( {
@@ -48,7 +87,8 @@ export class CloudfrontCdkStack extends Stack {
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
                 "logs:DescribeLogStreams"
-            ], resources: [
+            ],
+            resources: [
                 "arn:aws:logs:*:*:*"
             ]
         }));
@@ -108,7 +148,6 @@ export class CloudfrontCdkStack extends Stack {
 
         bucket.addObjectCreatedNotification(new LambdaDestination(lambda));
         bucket.grantRead(lambda);
-
 
         const aliasConfig = cloudfrontProps.acmCertRef == null ? undefined: createAliasConfig(cloudfrontProps.acmCertRef as string, cloudfrontProps.aliasNames as string[]);
         const webAcl = this.createWebAcl(cloudfrontProps);

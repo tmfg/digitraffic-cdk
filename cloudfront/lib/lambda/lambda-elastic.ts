@@ -1,13 +1,13 @@
+import * as AWS from 'aws-sdk';
+import {ClientRequest, IncomingMessage, RequestOptions} from 'http';
+import {Client, Connection} from '@elastic/elasticsearch';
+import * as aws4 from 'aws4';
+
 const zlib = require('zlib');
 const readline = require('readline');
-import * as AWS from 'aws-sdk';
-const elasticsearch = require('elasticsearch')
-const awsHttpClient = require('http-aws-es')
 
 const elasticDomain = process.env.ELASTIC_DOMAIN as string;
 const appDomain = process.env.APP_DOMAIN as string;
-
-const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 exports.handler = async function handler(event: any, context: any, callback: any) {
 //    console.info(JSON.stringify(event));
@@ -19,22 +19,14 @@ exports.handler = async function handler(event: any, context: any, callback: any
             Key: event['Records'][0]['s3']['object']['key']
     };
 
+    console.log("logging " + Client);
+    console.log("logging " + Connection);
+
     const messageBody = await handleS3Object(s3, params);
+    const esMessages = createEsMessages(messageBody);
 
-    const esMessage = createEsMessage(messageBody);
-
-    await sendToEs(esMessage, function(error: any, success: any, statusCode: any, failedItems: any) {
-        console.log('Response: ' + JSON.stringify({ "statusCode": statusCode }));
-
-        if (error) {
-            console.log('Error: ' + JSON.stringify(failedItems));
-//            logFailure(error, failedItems);
-            context.fail(JSON.stringify(error));
-        } else {
-            console.log('Success: ' + JSON.stringify(success));
-            context.succeed('Success');
-        }
-    });
+    await sendToEs(esMessages);
+    //await sendToKinesis(esMessage);
 }
 
 async function handleS3Object(s3: any, params: any): Promise<string[]> {
@@ -75,27 +67,57 @@ function handleLine(line: string, lines: any[], indexName: string) {
     }
 }
 
-function createEsMessage(lines: any[]): any {
-    return {
-        "body": lines
-    };
+function createEsMessages(lines: any[]): any[] {
+    const messages = new Array();
+
+    do {
+        const linesForMessage = lines.splice(0, 1000);
+
+        messages.push({
+            "body": linesForMessage
+        });
+    } while(lines.length > 0);
+
+    return messages;
 }
 
-async function sendToEs(message: any, callback: any) {
-    const client = elasticsearch.Client({
-        host: elasticDomain,
-        connectionClass: awsHttpClient,
-        awsConfig: new AWS.Config({ region: "eu-west-1" })
+async function sendToKinesis(message: any) {
+    const firehose = new AWS.Firehose();
+
+    const params = {
+        DeliveryStreamName: 'cloudfront-to-elastic-stream',
+        Records: [
+            message.lines.map((l: string) => {Data: l})
+        ]
+    };
+
+    firehose.putRecordBatch(params, function(err, data) {
+        if(err) {
+            console.info("error occured", err, err.stack);
+        } else {
+            console.info("data", data);
+        }
+    });
+}
+
+async function sendToEs(messages: any[]) {
+    const esClient = new Client({
+        Connection: AwsSignedConnection,
+        node: elasticDomain,
+        suggestCompression: true,
+        compression: "gzip"
     });
 
-    try {
-//        console.log("sending to es: " + JSON.stringify(message));
+    for (const message of messages) {
+        try {
+            console.log("message " + JSON.stringify(message));
 
-        const response = await client.bulk(message);
+            const response = await esClient.bulk(message);
 
-        console.log("response " + JSON.stringify(response));
-    } catch(e) {
-        console.log("got exception " + JSON.stringify(e));
+            console.log("response " + JSON.stringify(response));
+        } catch (e) {
+            console.log("got exception " + JSON.stringify(e, Object.getOwnPropertyNames(e)));
+        }
     }
 }
 
@@ -140,4 +162,47 @@ function parseLine(line: string): any {
 
 function getHttpDate(date: string, time: string): string {
     return `${date}T${time}Z`;
+}
+
+class AwsSignedConnection extends Connection {
+    public request(
+        params: RequestOptions,
+        callback: (err: Error | null, response: IncomingMessage | null) => void,
+    ): ClientRequest {
+        console.log("awsignedconnection.request " + JSON.stringify(params));
+
+        try {
+            const signedParams = this.signParams(params);
+            return super.request(signedParams, callback);
+        } catch (e) {
+            console.log("exception on request " + JSON.stringify(e, Object.getOwnPropertyNames(e)));
+
+            throw e;
+        }
+    }
+
+    private signParams(params: any): RequestOptions {
+        const region = AWS.config.region || process.env.AWS_DEFAULT_REGION;
+        if (!region) throw new Error('missing region configuration');
+        if (!params.method) throw new Error('missing request method');
+        if (!params.path) throw new Error('missing request path');
+        if (!params.headers) throw new Error('missing request headers');
+
+        const endpoint = new AWS.Endpoint(this.url.href);
+        const request = new AWS.HttpRequest(endpoint, region);
+
+        request.method = params.method;
+        request.path = params.querystring
+            ? `${params.path}/?${params.querystring}`
+            : params.path;
+        request.body = params.body as string;
+        request.headers = params.headers;
+        request.headers.Host = endpoint.host;
+
+        return aws4.sign(request);
+
+//        const signer = new AWS.Signers.V4(request, 'es');
+//        signer.addAuthorization(AWS.config.credentials, new Date());
+//        return request;
+    }
 }

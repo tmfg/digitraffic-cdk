@@ -6,7 +6,8 @@ export interface CFBehavior {
     cacheTtl?: number,
     queryCacheKeys?: string[],
     allowedMethods?: any,
-    lambdaType?: LambdaType
+    lambdaType?: LambdaType,
+    viewerProtocolPolicy?: any,
 }
 
 export interface CFDomain {

@@ -46,7 +46,7 @@ export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Rol
         role: lambdaRole,
         memorySize: 256,
         timeout: Duration.seconds(10),
-        code: new AssetCode('dist/lambda'),
+        code: new AssetCode('dist/lambda', { exclude: ["**", `!lambda-elastic.js`] }),
         handler: 'lambda-elastic.handler',
         environment: {
             APP_DOMAIN: elasticAppName,
