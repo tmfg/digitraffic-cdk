@@ -79,4 +79,14 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(fetchedDisruptions.length).toBe(0);
     });
 
+    test("deleteAllButDisruptions - delete all", async () => {
+        const disruption = newDisruption();
+        await Promise.all(updateDisruptions(db, [disruption]));
+
+        await deleteAllButDisruptions(db, []);
+
+        const fetchedDisruptions = await findAll(db);
+        expect(fetchedDisruptions.length).toBe(0);
+    });
+
 }));
