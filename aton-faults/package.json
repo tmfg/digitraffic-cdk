@@ -39,7 +39,7 @@
     "@aws-cdk/aws-ec2": "1.56.0",
     "@aws-cdk/aws-lambda": "1.56.0",
     "pg-native": "3.0.0",
-    "pg-promise": "10.5.8",
+    "pg-promise": "10.3.5",
     "source-map-support": "0.5.19",
     "axios": "0.19.2",
     "@types/geojson": "7946.0.7",

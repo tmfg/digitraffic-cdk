@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "pg-native": "3.0.0",
-    "pg-promise": "10.5.8",
+    "pg-promise": "10.3.5",
     "@types/node": "14.0.27"
   }
 }

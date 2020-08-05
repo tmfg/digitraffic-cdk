@@ -37,7 +37,7 @@
     "digitraffic-lambda-postgres": "file:../common/postgres",
     "digitraffic-cdk-api": "file:../common/api",
     "pg-native": "3.0.0",
-    "pg-promise": "10.5.8",
+    "pg-promise": "10.3.5",
     "source-map-support": "0.5.19",
     "@aws-cdk/aws-events-targets": "1.56.0",
     "axios": "0.19.2",
