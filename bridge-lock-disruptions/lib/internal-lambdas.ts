@@ -19,6 +19,9 @@ export function create(
         code: new AssetCode('dist/lambda/update-disruptions'),
         handler: 'lambda-update-disruptions.handler',
         environment: {
+            DB_USER: props.dbProps.username,
+            DB_PASS: props.dbProps.password,
+            DB_URI: props.dbProps.uri,
             ENDPOINT_URL: props.endpointUrl
         }
     });
