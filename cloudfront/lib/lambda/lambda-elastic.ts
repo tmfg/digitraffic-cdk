@@ -1,7 +1,7 @@
-import * as AWS from 'aws-sdk';
+import * as AWSx from "aws-sdk";
+const AWS = AWSx as any;
 import {ClientRequest, IncomingMessage, RequestOptions} from 'http';
 import {Client, Connection} from '@elastic/elasticsearch';
-import * as aws4 from 'aws4';
 
 const zlib = require('zlib');
 const readline = require('readline');
@@ -9,18 +9,15 @@ const readline = require('readline');
 const elasticDomain = process.env.ELASTIC_DOMAIN as string;
 const appDomain = process.env.APP_DOMAIN as string;
 
-exports.handler = async function handler(event: any, context: any, callback: any) {
-//    console.info(JSON.stringify(event));
+const MAX_LINES_PER_MESSAGE = 4;
 
+exports.handler = async function handler(event: any, context: any, callback: any) {
     const s3 = new AWS.S3();
 
     const params = {
             Bucket: event['Records'][0]['s3']['bucket']['name'],
             Key: event['Records'][0]['s3']['object']['key']
     };
-
-    console.log("logging " + Client);
-    console.log("logging " + Connection);
 
     const messageBody = await handleS3Object(s3, params);
     const esMessages = createEsMessages(messageBody);
@@ -31,7 +28,6 @@ exports.handler = async function handler(event: any, context: any, callback: any
 
 async function handleS3Object(s3: any, params: any): Promise<string[]> {
     const s3InputStream = s3.getObject(params).createReadStream();
-    const indexName = createIndexName();
 
     const readStream = readline.createInterface({
         input: s3InputStream.pipe(zlib.createGunzip())
@@ -40,7 +36,7 @@ async function handleS3Object(s3: any, params: any): Promise<string[]> {
     return new Promise((resolve, reject) => {
         let lines = [] as any[];
 
-        readStream.on('line', (l: string) => handleLine(l, lines, indexName));
+        readStream.on('line', (l: string) => handleLine(l, lines));
         readStream.on('close', () => {
             resolve(lines);
         });
@@ -55,23 +51,24 @@ function createIndexName(): string {
     return `${appDomain}-cf-${year}.${month}`;
 }
 
-function handleLine(line: string, lines: any[], indexName: string) {
+function handleLine(line: string, lines: any[]) {
 //    console.info("line: %s", line);
 
     // skip first two lines
     if(!line.startsWith('#')) {
-        const action = { index: { _index: indexName, _type: 'doc' } } as any;
-
-        lines.push(action);
         lines.push(parseLine(line));
     }
 }
 
 function createEsMessages(lines: any[]): any[] {
     const messages = new Array();
+    const indexName = createIndexName();
 
     do {
-        const linesForMessage = lines.splice(0, 1000);
+        const linesForMessage = lines.splice(0, MAX_LINES_PER_MESSAGE);
+        const action = { index: { _index: indexName, _type: 'doc' } } as any;
+
+        linesForMessage.unshift(action);
 
         messages.push({
             "body": linesForMessage
@@ -91,21 +88,75 @@ async function sendToKinesis(message: any) {
         ]
     };
 
-    firehose.putRecordBatch(params, function(err, data) {
-        if(err) {
-            console.info("error occured", err, err.stack);
-        } else {
-            console.info("data", data);
-        }
-    });
+//    firehose.putRecordBatch(params, function(err, data) {
+//        if(err) {
+//            console.info("error occured", err, err.stack);
+//        } else {
+//            console.info("data", data);
+//        }
+//    });
 }
 
 async function sendToEs(messages: any[]) {
+    for (const message of messages) {
+        try {
+            console.log("sending message " + JSON.stringify(message));
+
+            const response = await sendMessageToEs(JSON.stringify(message));
+
+            console.log("response class " + response.constructor.name);
+            console.log("got response " + JSON.stringify(response));
+        } catch (e) {
+            console.log("got exception " + JSON.stringify(e, Object.getOwnPropertyNames(e)));
+        }
+    }
+}
+
+async function sendMessageToEs(message: string) {
+    const endpoint = new AWS.Endpoint(elasticDomain);
+    const creds = new AWS.EnvironmentCredentials("AWS")
+    const req = new AWS.HttpRequest(elasticDomain);
+
+    req.method = "POST";
+    req.path = "/_bulk";
+    req.region = AWS.config.region || process.env.AWS_DEFAULT_REGION;
+    req.headers["presigned-expires"] = false;
+    req.headers["Host"] = endpoint.host;
+    req.body = message;
+    req.headers["Content-Type"] = "application/json";
+
+    console.log("unsigned request " + JSON.stringify(req));
+
+    const signer = new AWS.Signers.V4(req, "es");
+    signer.addAuthorization(creds, new Date());
+
+    console.log("signed request " + JSON.stringify(req));
+
+    const client = new AWS.HttpClient();
+    return await client.handleRequest(
+        req,
+        null,
+        function(httpResp: any) {
+            let respBody = "";
+            httpResp.on("data", function(chunk: any) {
+                respBody += chunk;
+            });
+            httpResp.on("end", function(chunk: any) {
+                console.log("Response: " + respBody);
+            });
+        },
+        function(err: any) {
+            console.log("Error: " + err);
+        }
+    );
+}
+
+async function sendToEsWithClient(messages: any[]) {
     const esClient = new Client({
         Connection: AwsSignedConnection,
         node: elasticDomain,
-        suggestCompression: true,
-        compression: "gzip"
+//        suggestCompression: true,
+//        compression: "gzip"
     });
 
     for (const message of messages) {
@@ -169,10 +220,9 @@ class AwsSignedConnection extends Connection {
         params: RequestOptions,
         callback: (err: Error | null, response: IncomingMessage | null) => void,
     ): ClientRequest {
-        console.log("awsignedconnection.request " + JSON.stringify(params));
-
         try {
             const signedParams = this.signParams(params);
+
             return super.request(signedParams, callback);
         } catch (e) {
             console.log("exception on request " + JSON.stringify(e, Object.getOwnPropertyNames(e)));
@@ -196,13 +246,22 @@ class AwsSignedConnection extends Connection {
             ? `${params.path}/?${params.querystring}`
             : params.path;
         request.body = params.body as string;
+        request.bulkBody = params.bulkBody;
         request.headers = params.headers;
         request.headers.Host = endpoint.host;
+        request.querystring = params.querystring;
+        request.timeout = params.timeout;
 
-        return aws4.sign(request);
+//        return aws4.sign(request);
 
-//        const signer = new AWS.Signers.V4(request, 'es');
-//        signer.addAuthorization(AWS.config.credentials, new Date());
-//        return request;
+        console.log("params before " + JSON.stringify(params));
+        console.log("request before " + JSON.stringify(request));
+
+        const signer = new AWS.Signers.V4(request, 'es');
+        signer.addAuthorization(new AWS.EnvironmentCredentials('AWS'), new Date());
+
+        console.log("request after " + JSON.stringify(request));
+
+        return request;
     }
 }
