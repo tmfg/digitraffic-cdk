@@ -3,7 +3,7 @@ import iam = require('@aws-cdk/aws-iam');
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType} from "@aws-cdk/aws-apigateway";
-import {Construct, Stack} from "@aws-cdk/core";
+import {CfnOutput, Construct, Stack} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
@@ -67,6 +67,11 @@ export function create(
         messageResponseModel,
         validator,
         stack);
+
+    new CfnOutput(stack, 'Open311PublicArn', {
+        exportName: 'Open311PublicArn',
+        value: publicApi.restApiId
+    });
 }
 
 function createRequestsResource(
