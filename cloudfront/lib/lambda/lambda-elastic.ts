@@ -1,7 +1,6 @@
+import "source-map-support/register";
 import * as AWSx from "aws-sdk";
 const AWS = AWSx as any;
-import {ClientRequest, IncomingMessage, RequestOptions} from 'http';
-import {Client, Connection} from '@elastic/elasticsearch';
 
 const zlib = require('zlib');
 const readline = require('readline');
@@ -22,8 +21,7 @@ exports.handler = async function handler(event: any, context: any, callback: any
     const messageBody = await handleS3Object(s3, params);
     const esMessages = createEsMessages(messageBody);
 
-    await sendToEs(esMessages);
-    //await sendToKinesis(esMessage);
+    sendToEs(esMessages);
 }
 
 async function handleS3Object(s3: any, params: any): Promise<string[]> {
@@ -78,66 +76,49 @@ function createEsMessages(lines: any[]): any[] {
     return messages;
 }
 
-async function sendToKinesis(message: any) {
-    const firehose = new AWS.Firehose();
-
-    const params = {
-        DeliveryStreamName: 'cloudfront-to-elastic-stream',
-        Records: [
-            message.lines.map((l: string) => {Data: l})
-        ]
-    };
-
-//    firehose.putRecordBatch(params, function(err, data) {
-//        if(err) {
-//            console.info("error occured", err, err.stack);
-//        } else {
-//            console.info("data", data);
-//        }
-//    });
-}
-
-async function sendToEs(messages: any[]) {
+function sendToEs(messages: any[]) {
     for (const message of messages) {
         try {
             console.log("sending message " + JSON.stringify(message));
 
-            const response = await sendMessageToEs(JSON.stringify(message));
+            const response = sendMessageToEs(JSON.stringify(message));
 
-            console.log("response class " + response.constructor.name);
-            console.log("got response " + JSON.stringify(response));
+            console.log("got response " + response);
         } catch (e) {
             console.log("got exception " + JSON.stringify(e, Object.getOwnPropertyNames(e)));
         }
     }
 }
 
-async function sendMessageToEs(message: string) {
+function sendMessageToEs(message: string) {
     const endpoint = new AWS.Endpoint(elasticDomain);
     const creds = new AWS.EnvironmentCredentials("AWS")
-    const req = new AWS.HttpRequest(elasticDomain);
+    let request = new AWS.HttpRequest(endpoint);
 
-    req.method = "POST";
-    req.path = "/_bulk";
-    req.region = AWS.config.region || process.env.AWS_DEFAULT_REGION;
-    req.headers["presigned-expires"] = false;
-    req.headers["Host"] = endpoint.host;
-    req.body = message;
-    req.headers["Content-Type"] = "application/json";
+    request.method = "POST";
+    request.path = "/_bulk";
+    request.region = "eu-west-1";
+    request.headers["presigned-expires"] = false;
+    request.headers["Host"] = endpoint.host;
+    request.body = message;
+    request.headers["Content-Type"] = "application/json";
 
-    console.log("unsigned request " + JSON.stringify(req));
+    console.log("unsigned request " + JSON.stringify(request));
 
-    const signer = new AWS.Signers.V4(req, "es");
+    const signer = new AWS.Signers.V4(request, "es");
     signer.addAuthorization(creds, new Date());
 
-    console.log("signed request " + JSON.stringify(req));
+    console.log("signed request " + JSON.stringify(request));
 
-    const client = new AWS.HttpClient();
-    return await client.handleRequest(
-        req,
+    let client = new AWS.NodeHttpClient();
+    return client.handleRequest(
+        request,
         null,
         function(httpResp: any) {
             let respBody = "";
+
+            console.log("httpResp " + JSON.stringify(httpResp));
+
             httpResp.on("data", function(chunk: any) {
                 respBody += chunk;
             });
@@ -149,27 +130,6 @@ async function sendMessageToEs(message: string) {
             console.log("Error: " + err);
         }
     );
-}
-
-async function sendToEsWithClient(messages: any[]) {
-    const esClient = new Client({
-        Connection: AwsSignedConnection,
-        node: elasticDomain,
-//        suggestCompression: true,
-//        compression: "gzip"
-    });
-
-    for (const message of messages) {
-        try {
-            console.log("message " + JSON.stringify(message));
-
-            const response = await esClient.bulk(message);
-
-            console.log("response " + JSON.stringify(response));
-        } catch (e) {
-            console.log("got exception " + JSON.stringify(e, Object.getOwnPropertyNames(e)));
-        }
-    }
 }
 
 function parseLine(line: string): any {
@@ -213,55 +173,4 @@ function parseLine(line: string): any {
 
 function getHttpDate(date: string, time: string): string {
     return `${date}T${time}Z`;
-}
-
-class AwsSignedConnection extends Connection {
-    public request(
-        params: RequestOptions,
-        callback: (err: Error | null, response: IncomingMessage | null) => void,
-    ): ClientRequest {
-        try {
-            const signedParams = this.signParams(params);
-
-            return super.request(signedParams, callback);
-        } catch (e) {
-            console.log("exception on request " + JSON.stringify(e, Object.getOwnPropertyNames(e)));
-
-            throw e;
-        }
-    }
-
-    private signParams(params: any): RequestOptions {
-        const region = AWS.config.region || process.env.AWS_DEFAULT_REGION;
-        if (!region) throw new Error('missing region configuration');
-        if (!params.method) throw new Error('missing request method');
-        if (!params.path) throw new Error('missing request path');
-        if (!params.headers) throw new Error('missing request headers');
-
-        const endpoint = new AWS.Endpoint(this.url.href);
-        const request = new AWS.HttpRequest(endpoint, region);
-
-        request.method = params.method;
-        request.path = params.querystring
-            ? `${params.path}/?${params.querystring}`
-            : params.path;
-        request.body = params.body as string;
-        request.bulkBody = params.bulkBody;
-        request.headers = params.headers;
-        request.headers.Host = endpoint.host;
-        request.querystring = params.querystring;
-        request.timeout = params.timeout;
-
-//        return aws4.sign(request);
-
-        console.log("params before " + JSON.stringify(params));
-        console.log("request before " + JSON.stringify(request));
-
-        const signer = new AWS.Signers.V4(request, 'es');
-        signer.addAuthorization(new AWS.EnvironmentCredentials('AWS'), new Date());
-
-        console.log("request after " + JSON.stringify(request));
-
-        return request;
-    }
 }
