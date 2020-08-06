@@ -1,7 +1,6 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
-import {CfnDeliveryStream } from "@aws-cdk/aws-kinesisfirehose";
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
 import {PolicyStatement, Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "../../common/stack/origin-configs";
@@ -23,47 +22,11 @@ export class CloudfrontCdkStack extends Stack {
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
 
         cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, cloudfrontProps.elasticProps.elasticDomain, cloudfrontProps.elasticAppName));
-
-//        const firehose = this.createKinesisFirehose(cloudfrontProps.elasticProps, writeToESROle);
-//        firehose.node.addDependency(writeToESROle);
-    }
-
-    createKinesisFirehose(elasticProps: ElasticProps, writeToESRole: Role): CfnDeliveryStream {
-        return new CfnDeliveryStream(this, 'cloudfront-to-elastic-stream', {
-            deliveryStreamName: 'cloudfront-to-elastic-stream',
-            elasticsearchDestinationConfiguration: {
-                domainArn: elasticProps.elasticArn,
-                bufferingHints:  {
-                    intervalInSeconds:120,
-                    sizeInMBs: 5
-                },
-                indexName: 'road-test-cf',
-                indexRotationPeriod: 'OneMonth',
-                retryOptions: {
-                    durationInSeconds: 300
-                },
-                s3BackupMode: 'FailedDocumentsOnly',
-                typeName: 'TypeName',
-                s3Configuration: {
-                    bufferingHints:  {
-                        intervalInSeconds:120,
-                        sizeInMBs: 5
-                    },
-                    compressionFormat: 'GZIP',
-                    bucketArn: 'arn:aws:s3:::weathercam-test-digitraffic-cf-logs',
-                    roleArn: writeToESRole.roleArn
-                },
-                roleArn: writeToESRole.roleArn
-            }
-        });
     }
 
     createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
         const lambdaRole = new Role(stack, `S3LambdaToElasticRole`, {
-            assumedBy: new CompositePrincipal(
-                new ServicePrincipal("lambda.amazonaws.com"),
-//                new ServicePrincipal("firehose.amazonaws.com")
-            ),
+            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: `S3LambdaToElasticRole`
         });
         lambdaRole.addToPolicy(new PolicyStatement({
