@@ -93,8 +93,16 @@ async function sendToEs(messages: any[]) {
 
         return sendMessageToEs(message);
     })).then((results: any[]) => {
-        results.forEach(result => console.log("result " + JSON.stringify(result)));
+        results.forEach(result => logResponse(result));
     })
+}
+
+function logResponse(response: any) {
+    try {
+        console.log("result " + response);
+    } catch(e) {
+        console.log("got exception " + e);
+    }
 }
 
 function sendMessageToEs(message: string): Promise<any> {
@@ -105,8 +113,11 @@ function sendMessageToEs(message: string): Promise<any> {
     request.region = "eu-west-1";
     request.headers["presigned-expires"] = false;
     request.headers["Host"] = endpoint.host;
-    request.body = message;
+    request.body = zlib.gzipSync(message);
+    //request.body = message;
     request.headers["Content-Type"] = "application/x-ndjson";
+    request.headers["Content-Encoding"] = "gzip";
+    request.headers["Accept-Encoding"] = "gzip";
 
     const signer = new AWS.Signers.V4(request, "es");
     signer.addAuthorization(creds, new Date());
@@ -119,17 +130,17 @@ function sendMessageToEs(message: string): Promise<any> {
         request,
         null,
         function(httpResp: any) {
+            var gunzip = zlib.createGunzip();
             let respBody = "";
 
-            console.log("httpResp!");
-
-            httpResp.on("data", function(chunk: any) {
+            gunzip.on("data", function(chunk: any) {
                 respBody += chunk;
             });
-            httpResp.on("end", function(chunk: any) {
-                console.log("Response: " + respBody);
+            gunzip.on("end", function(chunk: any) {
                 resolve(respBody);
             });
+
+            httpResp.pipe(gunzip);
         },
         function(err: any) {
             console.log("Error: " + err);
