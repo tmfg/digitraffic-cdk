@@ -3,14 +3,9 @@ import {CfnDomain} from "@aws-cdk/aws-elasticsearch";
 
 export class ElasticsearchStack extends core.Stack {
     constructor(scope: core.App, id: string, elasticsearchProps: Props, props?: core.StackProps,) {
-        super(scope, id, {
-            env: {
-                account: '',
-                region: 'eu-west-1'
-            }
-        });
+        super(scope, id, props);
 
-        const esVersion: string = '7.4';
+        const esVersion: string = '7.7';
         const esId = 'dt-elasticsearch';
         const domainName = 'dt-elasticsearch-domain';
 
