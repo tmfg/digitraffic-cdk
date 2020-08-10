@@ -2,6 +2,7 @@ import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
+import {CfnWebACL} from '@aws-cdk/aws-wafv2';
 import {PolicyStatement, Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "../../common/stack/origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
@@ -40,8 +41,7 @@ export class CloudfrontCdkStack extends Stack {
             ],
             resources: [
                 elasticProps.elasticArn,
-                `${elasticProps.elasticArn}/*`,
-                `${elasticProps.elasticArn}*`
+                `${elasticProps.elasticArn}/*`
             ]
         }));
         lambdaRole.addToPolicy(new PolicyStatement( {
@@ -49,6 +49,7 @@ export class CloudfrontCdkStack extends Stack {
                 "logs:CreateLogGroup",
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
+                "logs:DescribeLogGroups",
                 "logs:DescribeLogStreams"
             ],
             resources: [
@@ -87,7 +88,7 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaMap;
     }
 
-    createWebAcl(props: Props): any {
+    createWebAcl(props: Props): CfnWebACL | null {
         if(props.aclRules) {
             return createWebAcl(this, props.environmentName, props.aclRules);
         }

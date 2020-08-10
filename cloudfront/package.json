@@ -8,7 +8,6 @@
     "prebuild": "rimraf tsd",
     "build": "tsc",
     "parcel_build": "parcel build lib/lambda/**/*.js --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
-    "parcel_elasticsearch": "parcel build node_modules/@elastic/elasticsearch/api/api/bulk.js --target=node --global handler -d dist/lambda/api --bundle-node-modules --no-source-maps",
     "postbuild": "npm runScript parcel_build",
     "watch": "tsc -w",
     "cdk": "cdk",
@@ -33,7 +32,6 @@
     "@aws-cdk/aws-s3-notifications": "1.56.0",
     "@aws-cdk/aws-cloudfront": "1.56.0",
     "@aws-cdk/core": "1.56.0",
-    "aws-sdk": "2.727.1",
     "source-map-support": "0.5.19"
   },
   "externals": [
