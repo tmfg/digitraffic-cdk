@@ -10,6 +10,7 @@ const elasticDomain = process.env.ELASTIC_DOMAIN as string;
 const appDomain = process.env.APP_DOMAIN as string;
 const endpoint = new AWS.Endpoint(elasticDomain);
 const creds = new AWS.EnvironmentCredentials("AWS")
+const s3 = new AWS.S3();
 
 const MAX_LINES_PER_MESSAGE = 4000;
 
@@ -20,11 +21,9 @@ const COMPRESS_OPTIONS = {
 };
 
 exports.handler = async function handler(event: any, context: any, callback: any) {
-    const s3 = new AWS.S3();
-
     const params = {
-            Bucket: event['Records'][0]['s3']['bucket']['name'],
-            Key: event['Records'][0]['s3']['object']['key']
+            Bucket: event.Records[0].s3.bucket.name,
+            Key: event.Records[0].s3.object.key
     };
 
     const accessLogLines = await handleS3Object(s3, params);
@@ -64,8 +63,6 @@ function createIndexName(): string {
 }
 
 function handleLine(line: string, lines: any[]) {
-//    console.info("line: %s", line);
-
     // skip first two lines
     if(!line.startsWith('#')) {
         lines.push(parseLine(line));
@@ -102,6 +99,7 @@ function createBulkMessage(action: any, lines: any[]): string {
 async function sendToEs(messages: any[]) {
     const limit = pLimit(4);
 
+    // limit concurrency to 4 with p-limit
     const results = await Promise.all(messages.map(message => limit(() => sendMessageToEs(message))));
 
     results.forEach(logResponse);
