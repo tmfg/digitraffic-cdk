@@ -2,6 +2,7 @@ import "source-map-support/register";
 import * as AWSx from "aws-sdk";
 const AWS = AWSx as any;
 
+const pLimit = require('p-limit');
 const zlib = require('zlib');
 const readline = require('readline');
 
@@ -10,7 +11,13 @@ const appDomain = process.env.APP_DOMAIN as string;
 const endpoint = new AWS.Endpoint(elasticDomain);
 const creds = new AWS.EnvironmentCredentials("AWS")
 
-const MAX_LINES_PER_MESSAGE = 4;
+const MAX_LINES_PER_MESSAGE = 4000;
+
+const COMPRESS_OPTIONS = {
+    level: 8,
+    memLevel: 9,
+    chunkSize: 1024*16*1024
+};
 
 exports.handler = async function handler(event: any, context: any, callback: any) {
     const s3 = new AWS.S3();
@@ -20,8 +27,13 @@ exports.handler = async function handler(event: any, context: any, callback: any
             Key: event['Records'][0]['s3']['object']['key']
     };
 
-    const messageBody = await handleS3Object(s3, params);
-    const esMessages = createEsMessages(messageBody);
+    const accessLogLines = await handleS3Object(s3, params);
+
+    console.log("access_log read from s3 logLinesCount=%d", accessLogLines.length);
+
+    const esMessages = createEsMessages(accessLogLines);
+
+    console.log("es messages created messageCount=%d", esMessages.length);
 
     await sendToEs(esMessages);
 }
@@ -30,7 +42,7 @@ async function handleS3Object(s3: any, params: any): Promise<any[]> {
     const s3InputStream = s3.getObject(params).createReadStream();
 
     const readStream = readline.createInterface({
-        input: s3InputStream.pipe(zlib.createGunzip())
+        input: s3InputStream.pipe(zlib.createGunzip(COMPRESS_OPTIONS))
     });
 
     return new Promise((resolve, reject) => {
@@ -68,13 +80,13 @@ function createEsMessages(lines: any[]): string[] {
     do {
         const linesForMessage = lines.splice(0, MAX_LINES_PER_MESSAGE);
 
-        messages.push(createPushMessage(action, linesForMessage));
+        messages.push(createBulkMessage(action, linesForMessage));
     } while(lines.length > 0);
 
     return messages;
 }
 
-function createPushMessage(action: any, lines: any[]): string {
+function createBulkMessage(action: any, lines: any[]): string {
     let message = "";
 
     lines.forEach(line => {
@@ -88,18 +100,23 @@ function createPushMessage(action: any, lines: any[]): string {
 }
 
 async function sendToEs(messages: any[]) {
-    await Promise.all(messages.map(message => {
-        console.log("sending message " + message);
+    const limit = pLimit(4);
 
-        return sendMessageToEs(message);
-    })).then((results: any[]) => {
-        results.forEach(result => logResponse(result));
-    })
+    const results = await Promise.all(messages.map(message => limit(() => sendMessageToEs(message))));
+
+    results.forEach(logResponse);
 }
 
 function logResponse(response: any) {
     try {
-        console.log("result " + response);
+        const json = JSON.parse(response);
+
+        if(json.errors) {
+            console.log("errors tookMs=%d errors=%d", json.took, json.errors);
+            console.log("response " + response);
+        } else {
+            console.log("succesful tookMs=%d", json.took);
+        }
     } catch(e) {
         console.log("got exception " + e);
     }
@@ -113,8 +130,7 @@ function sendMessageToEs(message: string): Promise<any> {
     request.region = "eu-west-1";
     request.headers["presigned-expires"] = false;
     request.headers["Host"] = endpoint.host;
-    request.body = zlib.gzipSync(message);
-    //request.body = message;
+    request.body = zlib.gzipSync(message, COMPRESS_OPTIONS);
     request.headers["Content-Type"] = "application/x-ndjson";
     request.headers["Content-Encoding"] = "gzip";
     request.headers["Accept-Encoding"] = "gzip";
@@ -122,7 +138,7 @@ function sendMessageToEs(message: string): Promise<any> {
     const signer = new AWS.Signers.V4(request, "es");
     signer.addAuthorization(creds, new Date());
 
-    console.log("signed request " + JSON.stringify(request));
+    console.log("sending POST to es unCompressedSize=%d requestSize=%d", message.length, request.body.length);
 
     const client = new AWS.NodeHttpClient();
     return new Promise((resolve, reject) => {
