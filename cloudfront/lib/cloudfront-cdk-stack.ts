@@ -10,6 +10,7 @@ import {CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
 import {
     createGzipRequirement,
     createWeathercamRedirect,
+    createHttpHeaders,
     createWriteToEsLambda,
     LambdaType
 } from "./lambda/lambda-creator";
@@ -83,6 +84,12 @@ export class CloudfrontCdkStack extends Stack {
                 lambdaMap[LambdaType.GZIP_REQUIREMENT] =
                     createGzipRequirement(this, edgeLambdaRole);
             }
+
+            if(lProps.lambdaTypes.includes(LambdaType.HTTP_HEADERS)) {
+                lambdaMap[LambdaType.HTTP_HEADERS] =
+                    createHttpHeaders(this, edgeLambdaRole);
+            }
+
         }
 
         return lambdaMap;

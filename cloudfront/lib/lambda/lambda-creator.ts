@@ -5,7 +5,7 @@ import {Role} from '@aws-cdk/aws-iam';
 const fs = require('fs');
 
 export enum LambdaType {
-    WEATHERCAM_REDIRECT, GZIP_REQUIREMENT
+    WEATHERCAM_REDIRECT, GZIP_REQUIREMENT, HTTP_HEADERS
 }
 
 export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role): Version {
@@ -26,6 +26,15 @@ export function createWeathercamRedirect(stack: Stack, edgeLambdaRole: Role, dom
         .replace(/EXT_VERSION/gi, versionString);
 
     return createFunction(stack, edgeLambdaRole, 'weathercam-redirect', functionBody, versionString);
+}
+
+export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
+    const versionString = new Date().toISOString();
+    const lambdaBody = fs.readFileSync('dist/lambda/lambda-http-headers.js');
+    const functionBody = lambdaBody.toString()
+        .replace(/EXT_VERSION/gi, versionString);
+
+    return createFunction(stack, edgeLambdaRole, 'http-headers', functionBody, versionString);
 }
 
 export function createFunction(stack: Stack, edgeLambdaRole: Role, functionName: string, functionBody: string, versionString: string): Version {

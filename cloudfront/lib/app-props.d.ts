@@ -1,13 +1,19 @@
 import {LambdaType} from "./lambda/lambda-creator";
 import {AclRuleType} from "./acl/acl-creator";
+import {LambdaEdgeEventType} from "@aws-cdk/aws-cloudfront";
+
+export interface CFBehaviorLambda {
+    lambdaType: LambdaType,
+    eventType: LambdaEdgeEventType
+}
 
 export interface CFBehavior {
     path?: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
     allowedMethods?: any,
-    lambdaType?: LambdaType,
     viewerProtocolPolicy?: any,
+    lambdas?: CFBehaviorLambda[]
 }
 
 export interface CFDomain {

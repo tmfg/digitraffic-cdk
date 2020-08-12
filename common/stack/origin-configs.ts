@@ -1,5 +1,5 @@
 import {Duration, Stack} from '@aws-cdk/core';
-import {OriginProtocolPolicy, OriginAccessIdentity, SourceConfiguration, Behavior, LambdaEdgeEventType, CloudFrontAllowedMethods} from '@aws-cdk/aws-cloudfront';
+import {OriginProtocolPolicy, OriginAccessIdentity, SourceConfiguration, Behavior, CloudFrontAllowedMethods} from '@aws-cdk/aws-cloudfront';
 import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
 
@@ -69,21 +69,9 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
             queryString: true,
             queryStringCacheKeys: b.queryCacheKeys as string[]
         },
-        lambdaFunctionAssociations: lambdaFunctionAssociations(stack, b, lambdaMap)
+        lambdaFunctionAssociations: b.lambdas?.map(l => ({
+            eventType: l.eventType,
+            lambdaFunction: lambdaMap[l.lambdaType]
+        }))
     };
-}
-
-function lambdaFunctionAssociations(stack: Stack, behavior: CFBehavior, lambdaMap: any) {
-//    console.info("creating function associations " + JSON.stringify(behavior.lambdaFunction));
-
-    if(behavior.lambdaType != undefined) {
-        const lambdaVersion = lambdaMap[behavior.lambdaType];
-
-        return [{
-            eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
-            lambdaFunction: lambdaVersion
-        }]
-    }
-
-    return [];
 }
