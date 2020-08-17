@@ -8,11 +8,11 @@ export interface CFBehaviorLambda {
 }
 
 export interface CFBehavior {
-    path?: string,
+    path: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
     allowedMethods?: any,
-    viewerProtocolPolicy?: any,
+    viewerProtocolPolicy?: string,
     lambdas?: CFBehaviorLambda[]
 }
 
@@ -20,11 +20,11 @@ export interface CFDomain {
     s3BucketName?: string,
     domainName?: string,
     originPath?: string,
-    protocolPolicy?: string,
+    originProtocolPolicy?: string,
     httpPort?: number,
     httpsPort?: number,
     apiKey?: string,
-    behaviors?: CFBehavior[]
+    behaviors: CFBehavior[]
 }
 
 export interface Props {
