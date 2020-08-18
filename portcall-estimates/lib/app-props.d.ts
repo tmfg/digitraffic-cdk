@@ -6,6 +6,7 @@ export interface Props {
     dbProps: DbProps;
     defaultLambdaDurationSeconds: number;
     logsDestinationArn: string;
+    sqsProcessLambdaConcurrentExecutions: number;
 }
 export interface DbProps {
     username: string;

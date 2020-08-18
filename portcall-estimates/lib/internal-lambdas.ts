@@ -24,7 +24,8 @@ export function create(
             DB_PASS: props.dbProps.password,
             DB_URI: props.dbProps.uri,
             QUEUE_ARN: queue.queueArn
-        }
+        },
+        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
 
     const updateDisruptionsLambda = new Function(stack, functionName, lambdaConf);

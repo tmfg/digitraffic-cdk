@@ -13,7 +13,7 @@ export interface LambdaConfiguration {
     defaultLambdaDurationSeconds?: number;
     logsDestinationArn: string;
     memorySize?: number,
-    runtime?: Runtime
+    runtime?: Runtime;
 }
 
 declare interface DbProps {
@@ -47,7 +47,8 @@ export function dbLambdaConfiguration(
         vpcSubnets: {
             subnets: vpc.privateSubnets
         },
-        securityGroup: lambdaDbSg
+        securityGroup: lambdaDbSg,
+        reservedConcurrentExecutions: config.reservedConcurrentExecutions
     };
 }
 
@@ -58,4 +59,5 @@ interface FunctionParameters {
     handler: string,
     readOnly?: boolean,
     environment?: any
+    reservedConcurrentExecutions?: number;
 }
