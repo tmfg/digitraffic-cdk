@@ -29,7 +29,7 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
             domainName: domain.domainName as string,
             httpPort: domain.httpPort ?? 80,
             httpsPort: domain.httpsPort ?? 443,
-            originProtocolPolicy: domain.protocolPolicy as OriginProtocolPolicy ?? OriginProtocolPolicy.HTTPS_ONLY
+            originProtocolPolicy: domain.originProtocolPolicy as OriginProtocolPolicy ?? OriginProtocolPolicy.HTTPS_ONLY
         },
         behaviors: createBehaviors(stack, domain.behaviors || [], lambdaMap),
         originPath: domain.originPath,
@@ -48,11 +48,11 @@ function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
 }
 
 function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any): Behavior[] {
-    if (behaviors == null || behaviors.length == 0) {
-        return [createBehavior(stack, { allowedMethods: CloudFrontAllowedMethods.ALL }, lambdaMap, true)];
+    if (behaviors.length == 0) {
+        return [createBehavior(stack, {  path: "*", allowedMethods: CloudFrontAllowedMethods.ALL }, lambdaMap, true)];
     }
 
-    return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path == null));
+    return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
 function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBehavior: boolean = false): Behavior {

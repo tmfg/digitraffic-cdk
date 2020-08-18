@@ -1,12 +1,12 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
-import {CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
+import {CloudFrontWebDistribution, OriginAccessIdentity, CfnDistribution} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
 import {CfnWebACL} from '@aws-cdk/aws-wafv2';
 import {PolicyStatement, Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
-import {createOriginConfig} from "../../common/stack/origin-configs";
+import {createOriginConfig} from "./origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
-import {CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
+import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
 import {
     createGzipRequirement,
     createWeathercamRedirect,
@@ -122,8 +122,7 @@ export class CloudfrontCdkStack extends Stack {
 
         const aliasConfig = cloudfrontProps.acmCertRef == null ? undefined: createAliasConfig(cloudfrontProps.acmCertRef as string, cloudfrontProps.aliasNames as string[]);
         const webAcl = this.createWebAcl(cloudfrontProps);
-
-        return new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
+        const distribution = new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
             originConfigs: originConfigs,
             aliasConfiguration: aliasConfig,
             loggingConfig: {
@@ -132,6 +131,39 @@ export class CloudfrontCdkStack extends Stack {
             },
             webACLId: webAcl?.attrArn
         });
+
+        // cdk does not support viewerPolicy as it should
+        // so collect map of policies and force them into cloudformation
+        const viewerPolicies = this.getViewerPolicies(cloudfrontProps.domains);
+
+        if(Object.keys(viewerPolicies).length > 0) {
+            const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
+            const distributionConfig = cfnDistribution.distributionConfig as CfnDistribution.DistributionConfigProperty;
+            const behaviors = distributionConfig?.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
+
+            behaviors?.forEach((cb: CfnDistribution.CacheBehaviorProperty) => {
+                const policy = viewerPolicies[cb.pathPattern];
+
+                if(policy) {
+                    (cb as any).viewerProtocolPolicy = policy;
+                }
+            });
+        }
+
+        return distribution;
     }
 
+    getViewerPolicies(domains: CFDomain[]) {
+        const policyMap: any = {};
+
+        domains.forEach(d => {
+            d.behaviors?.forEach(b => {
+                if(b.viewerProtocolPolicy != null) {
+                    policyMap[b.path] = b.viewerProtocolPolicy;
+                }
+            })
+        });
+
+        return policyMap;
+    }
 }
