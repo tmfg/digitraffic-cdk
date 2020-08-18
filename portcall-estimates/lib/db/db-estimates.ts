@@ -2,15 +2,19 @@ import {IDatabase} from "pg-promise";
 import {ApiEstimate, EventType} from "../model/estimate";
 import moment from "moment";
 
-export interface DbEstimate {
+interface DbEstimate {
     readonly event_type: EventType
     readonly event_time: Date
     readonly event_time_confidence_lower?: string
     readonly event_time_confidence_upper?: string
     readonly event_source: string;
     readonly record_time: Date
-    readonly ship_mmsi?: string;
-    readonly ship_imo?: string;
+    readonly ship_id: string;
+    readonly ship_id_type: ShipIdType;
+}
+
+enum ShipIdType {
+    MMSI = 's', IMO = 'o'
 }
 
 const INSERT_ESTIMATES_SQL = `
@@ -22,8 +26,8 @@ const INSERT_ESTIMATES_SQL = `
         event_time_confidence_upper,
         event_source,
         record_time,
-        ship_mmsi,
-        ship_imo)
+        ship_id,
+        ship_id_type)
     VALUES(
         nextval('seq_portcall_estimates'),
         $(event_type),
@@ -32,10 +36,10 @@ const INSERT_ESTIMATES_SQL = `
         $(event_time_confidence_upper),
         $(event_source),
         $(record_time),
-        $(ship_mmsi),
-        $(ship_imo)
+        $(ship_id),
+        $(ship_id_type)
     )
-    ON CONFLICT (event_type, event_time, event_source, ship_mmsi, ship_imo) DO NOTHING
+    ON CONFLICT (event_type, event_time, event_source, ship_id) DO NOTHING
 `;
 
 export function updateEstimates(db: IDatabase<any, any>, estimates: ApiEstimate[]): Promise<any>[] {
@@ -52,7 +56,7 @@ export function createEditObject(estimate: ApiEstimate): DbEstimate {
         event_time_confidence_upper: estimate.eventTimeConfidenceUpper,
         event_source: estimate.source,
         record_time: moment(estimate.recordTime).toDate(),
-        ship_mmsi: estimate.ship.mmsi,
-        ship_imo: estimate.ship.imo
+        ship_id: (estimate.ship.mmsi ?? estimate.ship.imo) as string,
+        ship_id_type: estimate.ship.mmsi ? ShipIdType.MMSI : ShipIdType.IMO
     };
 }
