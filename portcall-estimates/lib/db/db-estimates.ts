@@ -13,6 +13,7 @@ interface DbEstimate {
     readonly ship_id_type: ShipIdType;
     readonly secondary_ship_id?: number;
     readonly secondary_ship_id_type?: ShipIdType;
+    readonly location_locode: string;
 }
 
 enum ShipIdType {
@@ -31,7 +32,8 @@ const INSERT_ESTIMATES_SQL = `
         ship_id,
         ship_id_type,
         secondary_ship_id,
-        secondary_ship_id_type)
+        secondary_ship_id_type,
+        location_locode)
     VALUES(
         nextval('seq_portcall_estimates'),
         $(event_type),
@@ -43,9 +45,10 @@ const INSERT_ESTIMATES_SQL = `
         $(ship_id),
         $(ship_id_type),
         $(secondary_ship_id),
-        $(secondary_ship_id_type)
+        $(secondary_ship_id_type),
+        $(location_locode)
     )
-    ON CONFLICT (event_type, event_time, event_source, ship_id) DO NOTHING
+    ON CONFLICT (ship_id, event_source, event_time) DO NOTHING
 `;
 
 export function updateEstimates(db: IDatabase<any, any>, estimates: ApiEstimate[]): Promise<any>[] {
@@ -66,5 +69,6 @@ export function createEditObject(e: ApiEstimate): DbEstimate {
         ship_id_type: e.ship.mmsi ? ShipIdType.MMSI : ShipIdType.IMO,
         secondary_ship_id: e.ship.mmsi && e.ship.imo ? e.ship.imo : undefined,
         secondary_ship_id_type: e.ship.mmsi && e.ship.imo ? ShipIdType.IMO : undefined,
+        location_locode: e.location.port
     };
 }
