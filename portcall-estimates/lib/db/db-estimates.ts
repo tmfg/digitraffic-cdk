@@ -9,12 +9,14 @@ interface DbEstimate {
     readonly event_time_confidence_upper?: string
     readonly event_source: string;
     readonly record_time: Date
-    readonly ship_id: string;
+    readonly ship_id: number;
     readonly ship_id_type: ShipIdType;
+    readonly secondary_ship_id?: number;
+    readonly secondary_ship_id_type?: ShipIdType;
 }
 
 enum ShipIdType {
-    MMSI = 's', IMO = 'o'
+    MMSI = 'mmsi', IMO = 'imo'
 }
 
 const INSERT_ESTIMATES_SQL = `
@@ -27,7 +29,9 @@ const INSERT_ESTIMATES_SQL = `
         event_source,
         record_time,
         ship_id,
-        ship_id_type)
+        ship_id_type,
+        secondary_ship_id,
+        secondary_ship_id_type)
     VALUES(
         nextval('seq_portcall_estimates'),
         $(event_type),
@@ -37,7 +41,9 @@ const INSERT_ESTIMATES_SQL = `
         $(event_source),
         $(record_time),
         $(ship_id),
-        $(ship_id_type)
+        $(ship_id_type),
+        $(secondary_ship_id),
+        $(secondary_ship_id_type)
     )
     ON CONFLICT (event_type, event_time, event_source, ship_id) DO NOTHING
 `;
@@ -48,15 +54,17 @@ export function updateEstimates(db: IDatabase<any, any>, estimates: ApiEstimate[
     });
 }
 
-export function createEditObject(estimate: ApiEstimate): DbEstimate {
+export function createEditObject(e: ApiEstimate): DbEstimate {
     return {
-        event_type: estimate.eventType,
-        event_time: moment(estimate.eventTime).toDate(),
-        event_time_confidence_lower: estimate.eventTimeConfidenceLower,
-        event_time_confidence_upper: estimate.eventTimeConfidenceUpper,
-        event_source: estimate.source,
-        record_time: moment(estimate.recordTime).toDate(),
-        ship_id: (estimate.ship.mmsi ?? estimate.ship.imo) as string,
-        ship_id_type: estimate.ship.mmsi ? ShipIdType.MMSI : ShipIdType.IMO
+        event_type: e.eventType,
+        event_time: moment(e.eventTime).toDate(),
+        event_time_confidence_lower: e.eventTimeConfidenceLower,
+        event_time_confidence_upper: e.eventTimeConfidenceUpper,
+        event_source: e.source,
+        record_time: moment(e.recordTime).toDate(),
+        ship_id: (e.ship.mmsi ?? e.ship.imo) as number,
+        ship_id_type: e.ship.mmsi ? ShipIdType.MMSI : ShipIdType.IMO,
+        secondary_ship_id: e.ship.mmsi && e.ship.imo ? e.ship.imo : undefined,
+        secondary_ship_id_type: e.ship.mmsi && e.ship.imo ? ShipIdType.IMO : undefined,
     };
 }
