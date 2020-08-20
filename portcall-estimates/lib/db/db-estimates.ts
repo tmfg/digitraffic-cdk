@@ -2,11 +2,11 @@ import {IDatabase} from "pg-promise";
 import {ApiEstimate, EventType} from "../model/estimate";
 import moment from "moment";
 
-interface DbEstimate {
+export interface DbEstimate {
     readonly event_type: EventType
     readonly event_time: Date
-    readonly event_time_confidence_lower?: string
-    readonly event_time_confidence_upper?: string
+    readonly event_time_confidence_lower?: Date
+    readonly event_time_confidence_upper?: Date
     readonly event_source: string;
     readonly record_time: Date
     readonly ship_id: number;
@@ -16,7 +16,7 @@ interface DbEstimate {
     readonly location_locode: string;
 }
 
-enum ShipIdType {
+export enum ShipIdType {
     MMSI = 'mmsi', IMO = 'imo'
 }
 
@@ -61,8 +61,8 @@ export function createEditObject(e: ApiEstimate): DbEstimate {
     return {
         event_type: e.eventType,
         event_time: moment(e.eventTime).toDate(),
-        event_time_confidence_lower: e.eventTimeConfidenceLower,
-        event_time_confidence_upper: e.eventTimeConfidenceUpper,
+        event_time_confidence_lower: e.eventTimeConfidenceLower ? moment(e.eventTime).subtract(moment.duration(e.eventTimeConfidenceLower)).toDate() : undefined,
+        event_time_confidence_upper: e.eventTimeConfidenceUpper ? moment(e.eventTime).add(moment.duration(e.eventTimeConfidenceUpper)).toDate() : undefined,
         event_source: e.source,
         record_time: moment(e.recordTime).toDate(),
         ship_id: (e.ship.mmsi ?? e.ship.imo) as number,

@@ -28,7 +28,7 @@ function createUpdateEstimateResource(
     const apiResource = integrationApi.root.addResource('api');
     const integrationResource = apiResource.addResource('integration');
     const estimateResource = integrationResource.addResource('portcall-estimates');
-    attachQueueToApiGatewayResource(stack, queue, estimateResource, 'PortcallEstimate');
+    attachQueueToApiGatewayResource(stack, queue, estimateResource, 'PortcallEstimate', true);
 }
 
 function createUsagePlan(integrationApi: RestApi) {
