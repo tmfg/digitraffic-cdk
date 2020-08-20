@@ -6,11 +6,15 @@ import {PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 export function attachQueueToApiGatewayResource(
     stack: Construct,
     queue: Queue,
-    estimateResource: Resource,
-    resourceName: string) {
+    resource: Resource,
+    resourceName: string,
+    apiKeyRequired: boolean
+) {
+    // role for API Gateway
     const apiGwRole = new Role(stack, `${resourceName}APIGatewayToSQSRole`, {
         assumedBy: new ServicePrincipal('apigateway.amazonaws.com')
     });
+    // grants API Gateway the right to send SQS messages
     apiGwRole.addToPolicy(new PolicyStatement({
         resources: [
             queue.queueArn
@@ -19,6 +23,7 @@ export function attachQueueToApiGatewayResource(
             'sqs:SendMessage'
         ]
     }));
+    // grants API Gateway the right write CloudWatch Logs
     apiGwRole.addToPolicy(new PolicyStatement({
         resources: [
             '*'
@@ -33,6 +38,7 @@ export function attachQueueToApiGatewayResource(
             'logs:FilterLogEvents'
         ]
     }));
+    // create an integration between API Gateway and an SQS queue
     const sqsIntegration = new AwsIntegration({
         service: 'sqs',
         integrationHttpMethod: 'POST',
@@ -40,11 +46,14 @@ export function attachQueueToApiGatewayResource(
             passthroughBehavior: PassthroughBehavior.NEVER,
             credentialsRole: apiGwRole,
             requestParameters: {
+                // SQS requires the Content-Type of the HTTP request to be application/x-www-form-urlencoded
                 'integration.request.header.Content-Type': "'application/x-www-form-urlencoded'"
             },
             requestTemplates: {
+                // map the JSON request to a form parameter
                 'application/json': 'Action=SendMessage&MessageBody=$input.body'
             },
+            // these are required by SQS
             integrationResponses: [
                 {
                     statusCode: '200',
@@ -65,8 +74,8 @@ export function attachQueueToApiGatewayResource(
         },
         path: Aws.ACCOUNT_ID + '/' + queue.queueName
     });
-    estimateResource.addMethod('POST', sqsIntegration, {
-        apiKeyRequired: true,
+    resource.addMethod('POST', sqsIntegration, {
+        apiKeyRequired,
         methodResponses: [
             {
                 statusCode: '200',
