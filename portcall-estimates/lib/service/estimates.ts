@@ -1,21 +1,23 @@
 import * as LastUpdatedDB from "../../../common/db/last-updated";
-import {DataType} from "../../../common/db/last-updated";
 import * as EstimatesDB from "../db/db-estimates"
 import {inDatabase} from "../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {ApiEstimate} from "../model/estimate";
 
+const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
+
 export async function saveEstimates(estimates: ApiEstimate[]) {
     const start = Date.now();
     await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(t => {
-            return t.batch(
-                EstimatesDB.updateEstimates(db, estimates)
-                //LastUpdatedDB.updateLastUpdated(db, DataType.PORTCALL_ESTIMATES, new Date(start))
-            );
+            const queries = EstimatesDB.updateEstimates(db, estimates).concat([
+                LastUpdatedDB.updateUpdatedTimestamp(db, PORTCALL_ESTIMATES_DATA_TYPE, new Date(start))
+            ]);
+            return t.batch(queries);
         });
     }).then(a => {
         const end = Date.now();
-        console.info("method=saveEstimates updatedCount=%d tookMs=%d", a.length, (end - start));
+        // minus one for lastupdated
+        console.info("method=saveEstimates updatedCount=%d tookMs=%d", a.length-1, (end - start));
     });
 }
