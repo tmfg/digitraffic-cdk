@@ -136,21 +136,33 @@ export class CloudfrontCdkStack extends Stack {
         // so collect map of policies and force them into cloudformation
         const viewerPolicies = this.getViewerPolicies(cloudfrontProps.domains);
 
+//        console.info('viewer policies %s for distribution %s', JSON.stringify(viewerPolicies), cloudfrontProps.distributionName);
+
         if(Object.keys(viewerPolicies).length > 0) {
             const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
             const distributionConfig = cfnDistribution.distributionConfig as CfnDistribution.DistributionConfigProperty;
             const behaviors = distributionConfig?.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
 
+            // handle all behaviors
             behaviors?.forEach((cb: CfnDistribution.CacheBehaviorProperty) => {
-                const policy = viewerPolicies[cb.pathPattern];
-
-                if(policy) {
-                    (cb as any).viewerProtocolPolicy = policy;
-                }
+                this.setViewerPolicy(cb, viewerPolicies, cb.pathPattern);
             });
+
+            // and the default behavior
+            this.setViewerPolicy(distributionConfig.defaultCacheBehavior, viewerPolicies, '*');
         }
 
         return distribution;
+    }
+
+    setViewerPolicy(behavior: any, viewerPolicies: any, pathPattern: string) {
+        const policy = viewerPolicies[pathPattern];
+
+        if(policy) {
+//            console.info('setting viewer policy %s for %s', policy, pathPattern);
+
+            (behavior as any).viewerProtocolPolicy = policy;
+        }
     }
 
     getViewerPolicies(domains: CFDomain[]) {
