@@ -15,11 +15,14 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const fetchedEstimates = await findAll(db);
         expect(fetchedEstimates.length).toBe(1);
         const e = fetchedEstimates[0];
+        const eventTime = moment(e.event_time);
         expect(e.location_locode).toBe(estimate.location.port);
         expect(e.event_source).toBe(estimate.source);
         expect(moment(e.record_time).toISOString()).toBe(estimate.recordTime);
-        expect(moment(e.event_time).toISOString()).toBe(estimate.eventTime);
+        expect(eventTime.toISOString()).toBe(estimate.eventTime);
         expect(e.event_type).toBe(estimate.eventType);
+        expect(moment(e.event_time_confidence_lower).toISOString()).toBe(eventTime.subtract(moment.duration(estimate.eventTimeConfidenceLower)).toISOString());
+        expect(moment(e.event_time_confidence_upper).toISOString()).toBe(eventTime.add(moment.duration(estimate.eventTimeConfidenceUpper)).toISOString());
     });
 
     test('updateEstimates - mmsi over imo', async () => {

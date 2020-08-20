@@ -16,6 +16,8 @@ export function newEstimate(): ApiEstimate {
         eventTime: moment(eventTime).toISOString(),
         recordTime: moment(recordTime).toISOString(),
         source: someNumber().toString(),
+        eventTimeConfidenceLower: 'PT2H',
+        eventTimeConfidenceUpper: 'PT0H6M',
         ship: {
             mmsi: Number(someNumber().toString().slice(0,5))
         },
