@@ -58,6 +58,15 @@ function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any):
 function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBehavior: boolean = false): Behavior {
 //    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
 
+    const forwardedValues = {
+            queryString: true,
+            queryStringCacheKeys: b.queryCacheKeys as string[]
+        } as any;
+
+    if(b.viewerProtocolPolicy === 'https-only') {
+        forwardedValues.headers = ['Host'];
+    }
+
     return {
         isDefaultBehavior: defaultBehavior,
         allowedMethods: b.allowedMethods ?? CloudFrontAllowedMethods.GET_HEAD,
@@ -65,10 +74,7 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
         minTtl: Duration.seconds(0),
         maxTtl: Duration.seconds(b.cacheTtl ?? 60),
         defaultTtl: Duration.seconds(b.cacheTtl ?? 60),
-        forwardedValues: {
-            queryString: true,
-            queryStringCacheKeys: b.queryCacheKeys as string[]
-        },
+        forwardedValues: forwardedValues,
         lambdaFunctionAssociations: b.lambdas?.map(l => ({
             eventType: l.eventType,
             lambdaFunction: lambdaMap[l.lambdaType]
