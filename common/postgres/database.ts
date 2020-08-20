@@ -7,6 +7,7 @@ const pgp = require('pg-promise')();
  *
  * Note! Using this method opens a new RDS connection on every invocation. It is advised to
  * use RDS proxy to pool connections transparently.
+ * https://docs.amazonaws.cn/en_us/AmazonRDS/latest/AuroraUserGuide/rds-proxy.html
  * @param username Username
  * @param password Password
  * @param url Connection URL
