@@ -23,7 +23,13 @@ declare interface DbProps {
     ro_uri?: string;
 }
 
-// Base configuration for a database-reading Lambda function
+/**
+ * Creates a base configuration for a Lambda that uses an RDS database
+ * @param vpc "Private" Lambdas are associated with a VPC
+ * @param lambdaDbSg Security Group shared by Lambda and RDS
+ * @param props Database connection properties for the Lambda
+ * @param config Lambda configuration
+ */
 export function dbLambdaConfiguration(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,

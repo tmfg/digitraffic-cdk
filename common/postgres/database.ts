@@ -2,6 +2,16 @@ import {IDatabase} from "pg-promise";
 
 const pgp = require('pg-promise')();
 
+/**
+ * Creates a non-pooling database connection primarily used by Lambdas.
+ *
+ * Note! Using this method opens a new RDS connection on every invocation. It is advised to
+ * use RDS proxy to pool connections transparently.
+ * @param username Username
+ * @param password Password
+ * @param url Connection URL
+ * @param options pg-promise options
+ */
 export function initDbConnection(
     username: string,
     password: string,

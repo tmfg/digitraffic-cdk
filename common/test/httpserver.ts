@@ -1,5 +1,8 @@
 import * as http from 'http';
 
+/**
+ * A mock HTTP server created for testing connections from a Lambda to an outside integration
+ */
 export class TestHttpServer {
     private server: http.Server;
     private debug: boolean;
