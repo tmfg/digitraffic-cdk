@@ -21,3 +21,21 @@ export async function saveEstimates(estimates: ApiEstimate[]) {
         console.info("method=saveEstimates updatedCount=%d tookMs=%d", a.length-1, (end - start));
     });
 }
+
+export async function findAllEstimates(
+    locode?: string,
+    mmsi?: string,
+    imo?: string
+) {
+    const start = Date.now();
+    return await inDatabase(async (db: IDatabase<any, any>) => {
+        if (locode) {
+            return EstimatesDB.findByLocode(db, locode!!);
+        } else if (mmsi && !imo) {
+            return EstimatesDB.findByMmsi(db, mmsi!!);
+        }
+        throw new Error('No locode or mmsi, imo not yet supported');
+    }).finally(() => {
+        console.info("method=findAllEstimates tookMs=%d", (Date.now() - start));
+    });
+}

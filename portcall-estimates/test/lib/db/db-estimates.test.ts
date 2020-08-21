@@ -1,8 +1,8 @@
 import moment from 'moment';
 import * as pgPromise from "pg-promise";
-import {dbTestBase,findAll} from "../db-testutil";
+import {dbTestBase, findAll, insert} from "../db-testutil";
 import {newEstimate} from "../testdata";
-import {ShipIdType, updateEstimates} from "../../../lib/db/db-estimates";
+import {findByLocode, ShipIdType, updateEstimates} from "../../../lib/db/db-estimates";
 import {ApiEstimate} from "../../../lib/model/estimate";
 
 describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
@@ -15,14 +15,13 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const fetchedEstimates = await findAll(db);
         expect(fetchedEstimates.length).toBe(1);
         const e = fetchedEstimates[0];
-        const eventTime = moment(e.event_time);
         expect(e.location_locode).toBe(estimate.location.port);
         expect(e.event_source).toBe(estimate.source);
         expect(moment(e.record_time).toISOString()).toBe(estimate.recordTime);
-        expect(eventTime.toISOString()).toBe(estimate.eventTime);
+        expect(moment(e.event_time).toISOString()).toBe(estimate.eventTime);
         expect(e.event_type).toBe(estimate.eventType);
-        expect(moment(e.event_time_confidence_lower).toISOString()).toBe(eventTime.subtract(moment.duration(estimate.eventTimeConfidenceLower)).toISOString());
-        expect(moment(e.event_time_confidence_upper).toISOString()).toBe(eventTime.add(moment.duration(estimate.eventTimeConfidenceUpper)).toISOString());
+        expect(moment(e.event_time_confidence_lower).toISOString()).toBe(moment(e.event_time).subtract(moment.duration(estimate.eventTimeConfidenceLower)).toISOString());
+        expect(moment(e.event_time_confidence_upper).toISOString()).toBe(moment(e.event_time).add(moment.duration(estimate.eventTimeConfidenceUpper)).toISOString());
     });
 
     test('updateEstimates - mmsi over imo', async () => {
@@ -73,12 +72,30 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     test('updateEstimates - ignore duplicate', async () => {
-        const estimate: ApiEstimate = Object.assign(newEstimate());
+        const estimate: ApiEstimate = newEstimate();
 
         await Promise.all(updateEstimates(db, [estimate]));
         await Promise.all(updateEstimates(db, [estimate]));
 
         expect((await findAll(db)).length).toBe(1);
+    });
+
+    test('findByLocode - found', async () => {
+        const estimate: ApiEstimate = newEstimate();
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByLocode(db, estimate.location.port);
+
+        expect(foundEstimate.length).toBe(1);
+    });
+
+    test('findByLocode - not found', async () => {
+        const estimate: ApiEstimate = newEstimate();
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByLocode(db, 'AA111');
+
+        expect(foundEstimate.length).toBe(0);
     });
 
 }));

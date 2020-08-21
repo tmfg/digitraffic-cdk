@@ -56,3 +56,39 @@ export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbEstimate[]
         FROM portcall_estimate`);
     });
 }
+
+export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate[]) {
+    return db.tx(t => {
+        return t.batch(estimates.map(e => {
+            return t.none(`
+                INSERT INTO portcall_estimate(
+                    id,
+                    event_type,
+                    event_time,
+                    event_time_confidence_lower,
+                    event_time_confidence_upper,
+                    event_source,
+                    record_time,
+                    ship_id,
+                    ship_id_type,
+                    secondary_ship_id,
+                    secondary_ship_id_type,
+                    location_locode)
+                VALUES(
+                    nextval('seq_portcall_estimates'),
+                    $(event_type),
+                    $(event_time),
+                    $(event_time_confidence_lower),
+                    $(event_time_confidence_upper),
+                    $(event_source),
+                    $(record_time),
+                    $(ship_id),
+                    $(ship_id_type),
+                    $(secondary_ship_id),
+                    $(secondary_ship_id_type),
+                    $(location_locode)
+                )
+            `, createEditObject(e));
+        }));
+    });
+}
