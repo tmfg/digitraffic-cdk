@@ -13,8 +13,6 @@ const DATEX2_OVERALL_STARTTIME_TAG_END = '</overallStartTime>';
 const DATEX2_VERSION_ATTRIBUTE = 'version=';
 const XML_TAG_START = '<?xml';
 
-export const VS_DATEX2_DATA_TYPE = "VS_DATEX2";
-
 export interface Situation {
     readonly id: string,
     readonly datex2: string,
@@ -31,8 +29,14 @@ export async function updateDatex2(datex2: string): Promise<any> {
     const situations = parseDatex(datex2);
 
     await inDatabase(async (db: IDatabase<any,any>) => {
-        await DeviceDB.saveDatex2(db, situations);
-        await LastUpdatedDB.updateLastUpdated(db, DataType.VS_DATEX2, new Date(start));
+        return await db.tx((t: any) => {
+            const promises = [
+                ...DeviceDB.saveDatex2(db, situations),
+                LastUpdatedDB.updateLastUpdated(db, DataType.VS_DATEX2, new Date(start))
+            ];
+
+            return t.batch(promises);
+        })
     }).then(() => {
         const end = Date.now();
         console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (end-start));
