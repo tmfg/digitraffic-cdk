@@ -65,11 +65,17 @@ export async function saveAnnotations(annotations: Annotation[], timeStampTo: Da
     })
 
     await inDatabase(async (db: IDatabase<any,any>) => {
-        await LastUpdatedDB.updateLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS, timeStampTo);
-        return AnnotationsDB.updateAnnotations(db, validated);
+        return await db.tx((t: any) => {
+            const promises = [
+                ...AnnotationsDB.updateAnnotations(db, validated),
+                LastUpdatedDB.updateLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS, timeStampTo)
+            ];
+
+            return t.batch(promises);
+        })
     }).then(a => {
         const end = Date.now();
-        console.info("method=saveAnnotations updatedCount=%d tookMs=%d", a.length, (end-start));
+        console.info("method=saveAnnotations updatedCount=%d tookMs=%d", a.length - 1, (end-start));
     })
 }
 
