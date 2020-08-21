@@ -1,5 +1,5 @@
 import {ServiceRequestStatus, ServiceRequestWithExtensions} from "../model/service-request";
-import {IDatabase} from "pg-promise";
+import {IDatabase, PreparedStatement} from "pg-promise";
 
 interface ServiceRequestServiceCode {
     readonly service_code: string | null;
@@ -25,7 +25,12 @@ export function find(
     service_request_id: string,
     db: IDatabase<any, any>
 ): Promise<ServiceRequestWithExtensions | null > {
-    return db.oneOrNone(`${SELECT_REQUEST} WHERE service_request_id = $1`, service_request_id).then(r => r == null ? null : toServiceRequest(r));
+    const ps = new PreparedStatement({
+        name: 'find-service-request-by-id',
+        text: `${SELECT_REQUEST} WHERE service_request_id = $1`,
+        values: [service_request_id]
+    });
+    return db.oneOrNone(ps).then(r => r == null ? null : toServiceRequest(r));
 }
 
 export function update(

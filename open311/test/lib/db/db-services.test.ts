@@ -32,4 +32,17 @@ describe('db-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         expect(foundservice).toBeNull();
     });
 
+    test('update - deletes previous', async () => {
+        const previousService = newService();
+        await update([previousService], db);
+
+        const theNewService = newService();
+        await update([theNewService], db);
+
+        const foundServices = await findAll(db);
+
+        expect(foundServices.length).toBe(1);
+        expect(foundServices[0]).toMatchObject(theNewService);
+    });
+
 }));

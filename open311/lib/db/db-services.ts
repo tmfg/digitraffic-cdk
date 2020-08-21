@@ -1,15 +1,25 @@
 import {Service} from "../model/service";
-import {IDatabase} from "pg-promise";
+import {IDatabase, PreparedStatement} from "pg-promise";
 
 interface ServiceServiceCode {
     readonly service_code: string;
 }
+
+const SELECT_REQUEST = `SELECT service_code,
+                               service_name,
+                               description,
+                               metadata,
+                               type,
+                               keywords,
+                               "group"
+                        FROM open311_service`;
 
 export function update(
     services: Service[],
     db: IDatabase<any, any>
 ): Promise<void> {
     return db.tx(t => {
+        t.none('DELETE FROM open311_service');
         const queries: any[] = services.map(service => {
             return t.none(
                 `INSERT INTO open311_service(service_code,
@@ -50,17 +60,13 @@ export function find(
     service_request_id: string,
     db: IDatabase<any, any>
 ): Promise<Service | null > {
-    return db.oneOrNone(`${SELECT_REQUEST} WHERE service_code = $1`, service_request_id).then(r => r == null ? null : toService(r));
+    const ps = new PreparedStatement({
+        name: 'find-service-by-id',
+        text: `${SELECT_REQUEST} WHERE service_code = $1`,
+        values: [service_request_id]
+    });
+    return db.oneOrNone(ps).then(r => r == null ? null : toService(r));
 }
-
-const SELECT_REQUEST = `SELECT service_code,
-                               service_name,
-                               description,
-                               metadata,
-                               type,
-                               keywords,
-                               "group"
-                        FROM open311_service`;
 
 function toService(s: any): Service {
     return {

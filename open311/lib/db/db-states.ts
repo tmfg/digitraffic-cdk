@@ -10,6 +10,7 @@ export function update(
     db: IDatabase<any, any>
 ): Promise<void> {
     return db.tx(t => {
+        t.none('DELETE FROM open311_service_request_state');
         const queries: any[] = states.map(state => {
             return t.none(
                 `INSERT INTO open311_service_request_state(key,

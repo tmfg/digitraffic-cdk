@@ -16,4 +16,17 @@ describe('db-states', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         expect(foundStates.length).toBe(states.length);
     });
 
+    test('update - deletes previous', async () => {
+        const previousState = newState();
+        await update([previousState], db);
+
+        const theNewState = newState();
+        await update([theNewState], db);
+
+        const foundStates = await findAll(db);
+
+        expect(foundStates.length).toBe(1);
+        expect(foundStates[0]).toMatchObject(theNewState);
+    });
+
 }));
