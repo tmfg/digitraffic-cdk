@@ -23,22 +23,25 @@ describe('update-annotations', testBase(async () => {
         try {
             await handler();
 
+            // find all annotations
             const annotations = await findAllAnnotations();
-
             expect(annotations.features).toHaveLength(2);
             if (annotations.features[0].properties != null) {
                expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
             }
 
+            // find active annotations
             const activeAnnotations = await findActiveAnnotations(null, null);
             expect(activeAnnotations.features).toHaveLength(1);
             if (annotations.features[0].properties != null) {
                 expect(annotations.features[0].properties.type).toEqual('slipperyRoad');
             }
 
+            // find testusers annotations
             const testUserAnnotations = await findActiveAnnotations('testuser', null);
             expect(testUserAnnotations.features).toHaveLength(1);
 
+            // find vionice annotations(not finding any)
             const vioniceAnnotations = await findActiveAnnotations('vionice', null);
             expect(vioniceAnnotations.features).toHaveLength(0);
 

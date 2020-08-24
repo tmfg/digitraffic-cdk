@@ -1,4 +1,4 @@
-import * as pgPromise from "pg-promise";
+import {IDatabase, PreparedStatement} from "pg-promise";
 import {Annotation} from "../model/annotations";
 import {createGeometry} from "../../../common/postgres/geometry";
 
@@ -9,30 +9,30 @@ where expires_at is null or expires_at > current_timestamp`;
 
 const UPSERT_ANNOTATIONS_SQL =
 `insert into nw2_annotation(id, author, created_at, updated_at, recorded_at, expires_at, type, location)
-values($(id),$(author),$(created_at),$(updated_at), $(recorded_at),$(expires_at),$(type),$(geometry))
+values($1,$2,$3,$4,$5,$6,$7,$8)
 on conflict (id)
 do update set
-   expires_at = $(expires_at),
-   updated_at = $(updated_at),
-   location = $(geometry)`;
+   expires_at = $6,
+   updated_at = $4,
+   location = $8`;
 
-export function updateAnnotations(db: pgPromise.IDatabase<any, any>, annotations: Annotation[]): Promise<any>[] {
-    let promises: any[] = [];
-
-    annotations.forEach(a => {
-        promises.push(db.none(UPSERT_ANNOTATIONS_SQL, {
-            id: a._id,
-            author: a.author,
-            created_at: a.created_at,
-            updated_at: a.updated_at || a.created_at,
-            recorded_at: a.recorded_at,
-            expires_at: a.expires_at,
-            type: getTypeFromTags(a.tags),
-            geometry: createGeometry(a.location)
-        }));
+export function updateAnnotations(db: IDatabase<any, any>, annotations: Annotation[]): Promise<any>[] {
+    const ps = new PreparedStatement({
+        name: 'update-annotations',
+        text: UPSERT_ANNOTATIONS_SQL,
     });
 
-    return promises;
+    return annotations.map(a => {
+        return db.none(ps, [
+            a._id,
+            a.author,
+            a.created_at,
+            a.updated_at || a.created_at,
+            a.recorded_at,
+            a.expires_at,
+            getTypeFromTags(a.tags),
+            createGeometry(a.location)]);
+    });
 }
 
 function getTypeFromTags(tags: string[]|null) {
@@ -50,18 +50,37 @@ function getTypeFromTags(tags: string[]|null) {
     return first;
 }
 
-export async function findActive(db: pgPromise.IDatabase<any, any>, author: string|null, type: string|null): Promise<any[]> {
+export async function findActive(db: IDatabase<any, any>, author: string|null, type: string|null): Promise<any[]> {
     let sql = FIND_ACTIVE_SQL;
+    let values = [];
+    let name = 'find-active-annotations';
+    let index = 1;
 
-    if(author) sql+= ' and author=${author}';
-    if(type) sql+= ' and type=${type}';
+    if(author) {
+        sql+= ` and author=\$${index++}`;
+        values.push(author);
+        name+= "-author";
+    }
+    if(type) {
+        sql+= ` and type=\$${index++}`;
+        values.push(type);
+        name+= "-type";
+    }
 
-    return await db.manyOrNone(sql, {
-        author: author,
-        type: type
+    const ps = new PreparedStatement({
+        name: name,
+        text: sql,
+        values: values
     });
+
+    return await db.manyOrNone(ps);
 }
 
-export async function findAll(db: pgPromise.IDatabase<any, any>): Promise<any[]> {
-    return await db.manyOrNone(FIND_ALL_SQL);
+export async function findAll(db: IDatabase<any, any>): Promise<any[]> {
+    const ps = new PreparedStatement({
+        name: 'find-all-annotations',
+        text: FIND_ALL_SQL
+    });
+
+    return await db.manyOrNone(ps);
 }
