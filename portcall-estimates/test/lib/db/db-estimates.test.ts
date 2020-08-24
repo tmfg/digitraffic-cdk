@@ -2,100 +2,202 @@ import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll, insert} from "../db-testutil";
 import {newEstimate} from "../testdata";
-import {findByLocode, ShipIdType, updateEstimates} from "../../../lib/db/db-estimates";
-import {ApiEstimate} from "../../../lib/model/estimate";
+import {findByImo, findByLocode, findByMmsi, ShipIdType, updateEstimates} from "../../../lib/db/db-estimates";
 
 describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
-
-    test('updateEstimates - properties', async () => {
-        const estimate = newEstimate();
-
-        await Promise.all(updateEstimates(db, [estimate]));
-
-        const fetchedEstimates = await findAll(db);
-        expect(fetchedEstimates.length).toBe(1);
-        const e = fetchedEstimates[0];
-        expect(e.location_locode).toBe(estimate.location.port);
-        expect(e.event_source).toBe(estimate.source);
-        expect(moment(e.record_time).toISOString()).toBe(estimate.recordTime);
-        expect(moment(e.event_time).toISOString()).toBe(estimate.eventTime);
-        expect(e.event_type).toBe(estimate.eventType);
-        expect(moment(e.event_time_confidence_lower).toISOString()).toBe(moment(e.event_time).subtract(moment.duration(estimate.eventTimeConfidenceLower)).toISOString());
-        expect(moment(e.event_time_confidence_upper).toISOString()).toBe(moment(e.event_time).add(moment.duration(estimate.eventTimeConfidenceUpper)).toISOString());
-    });
-
-    test('updateEstimates - mmsi over imo', async () => {
-        const estimate: ApiEstimate = Object.assign(newEstimate(), {
-            ship: {
-                mmsi: 123,
-                imo: undefined
-            }
+    /*
+        FOUND
+     */
+    test('findByMmsi - found', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().toISOString() // avoid filtering
         });
+        await insert(db, [estimate]);
 
-        await Promise.all(updateEstimates(db, [estimate]));
-
-        const e = (await findAll(db))[0];
-        expect(e.ship_id).toBe(estimate.ship.mmsi);
-        expect(e.ship_id_type).toBe(ShipIdType.MMSI);
+        const foundEstimate = await findByMmsi(db, estimate.ship.mmsi!!);
+        expect(foundEstimate.length).toBe(1);
     });
 
-    test('updateEstimates - just imo', async () => {
-        const estimate: ApiEstimate = Object.assign(newEstimate(), {
-            ship: {
-                mmsi: undefined,
-                imo: 456
-            }
+    test('findByImo - found', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().toISOString() // avoid filtering
         });
+        await insert(db, [estimate]);
 
-        await Promise.all(updateEstimates(db, [estimate]));
-
-        const e = (await findAll(db))[0];
-        expect(e.ship_id).toBe(estimate.ship.imo);
-        expect(e.ship_id_type).toBe(ShipIdType.IMO);
-    });
-
-    test('updateEstimates - both ids', async () => {
-        const estimate: ApiEstimate = Object.assign(newEstimate(), {
-            ship: {
-                mmsi: 123,
-                imo: 456
-            }
-        });
-
-        await Promise.all(updateEstimates(db, [estimate]));
-
-        const e = (await findAll(db))[0];
-        expect(e.ship_id).toBe(estimate.ship.mmsi);
-        expect(e.ship_id_type).toBe(ShipIdType.MMSI);
-        expect(e.secondary_ship_id).toBe(estimate.ship.imo);
-        expect(e.secondary_ship_id_type).toBe(ShipIdType.IMO);
-    });
-
-    test('updateEstimates - ignore duplicate', async () => {
-        const estimate: ApiEstimate = newEstimate();
-
-        await Promise.all(updateEstimates(db, [estimate]));
-        await Promise.all(updateEstimates(db, [estimate]));
-
-        expect((await findAll(db)).length).toBe(1);
+        const foundEstimate = await findByImo(db, estimate.ship.imo!!);
+        expect(foundEstimate.length).toBe(1);
     });
 
     test('findByLocode - found', async () => {
-        const estimate: ApiEstimate = newEstimate();
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().toISOString() // avoid filtering
+        });
         await insert(db, [estimate]);
+
+        const foundEstimate = await findByLocode(db, estimate.location.port);
+        expect(foundEstimate.length).toBe(1);
+    });
+
+    /*
+        NOT FOUND
+     */
+    test('findByMmsi - not found', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().toISOString() // avoid filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByMmsi(db, estimate.ship.mmsi!! - 1);
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    test('findByImo - not found', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().toISOString() // avoid filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByImo(db, estimate.ship.imo!! - 1);
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    test('findByLocode - not found', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().toISOString() // avoid filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByLocode(db, estimate.location.port + 'asdf');
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    /*
+        NEWEST RECORD
+     */
+    test('findByMmsi - multiple - only newest', async () => {
+        const estimate = newEstimate();
+        const estimate2Date = new Date();
+        estimate2Date.setMilliseconds(0);
+        const estimate2 = {...estimate,
+            eventTime: moment(estimate2Date).add(5, 'hour').toISOString(),
+            recordTime: moment(estimate2Date).add(5, 'hour').toISOString()
+        };
+        await insert(db, [estimate, estimate2]);
+
+        const foundEstimate = await findByMmsi(db, estimate.ship.mmsi!!);
+
+        expect(foundEstimate.length).toBe(1);
+        expect(moment(foundEstimate[0].record_time).toISOString()).toBe(estimate2.recordTime);
+    });
+
+    test('findByImo - multiple - only newest', async () => {
+        const estimate = newEstimate();
+        const estimate2Date = new Date();
+        estimate2Date.setMilliseconds(0);
+        const estimate2 = {...estimate,
+            eventTime: moment(estimate2Date).add(5, 'hour').toISOString(),
+            recordTime: moment(estimate2Date).add(5, 'hour').toISOString()
+        };
+        await insert(db, [estimate, estimate2]);
+
+        const foundEstimate = await findByImo(db, estimate.ship.imo!!);
+
+        expect(foundEstimate.length).toBe(1);
+        expect(moment(foundEstimate[0].record_time).toISOString()).toBe(estimate2.recordTime);
+    });
+
+    test('findByLocode - multiple - only newest', async () => {
+        const estimate = newEstimate();
+        const estimate2Date = new Date();
+        estimate2Date.setMilliseconds(0);
+        const estimate2 = {...estimate,
+            eventTime: moment(estimate2Date).add(5, 'hour').toISOString(),
+            recordTime: moment(estimate2Date).add(5, 'hour').toISOString()
+        };
+        await insert(db, [estimate, estimate2]);
 
         const foundEstimate = await findByLocode(db, estimate.location.port);
 
         expect(foundEstimate.length).toBe(1);
+        expect(moment(foundEstimate[0].record_time).toISOString()).toBe(estimate2.recordTime);
     });
 
-    test('findByLocode - not found', async () => {
-        const estimate: ApiEstimate = newEstimate();
+    /*
+        DATE FILTERING
+     */
+    test('findByMmsi - single filtered', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
+        });
         await insert(db, [estimate]);
 
-        const foundEstimate = await findByLocode(db, 'AA111');
-
+        const foundEstimate = await findByMmsi(db, estimate.ship.mmsi!!);
         expect(foundEstimate.length).toBe(0);
+    });
+
+    test('findByImo - single filtered', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByImo(db, estimate.ship.imo!!);
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    test('findByLocode - single filtered', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByLocode(db, estimate.location.port);
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    /*
+        MULTIPLE SOURCES
+     */
+    test('findByMmsi - two sources', async () => {
+        const mmsi = 123;
+        const estimateSource1 = Object.assign(newEstimate({mmsi}), {
+            source: 'source1'
+        });
+        const estimateSource2 = Object.assign(newEstimate({mmsi}), {
+            source: 'source2'
+        });
+        await insert(db, [estimateSource1, estimateSource2]);
+
+        const foundEstimate = await findByMmsi(db, mmsi);
+        expect(foundEstimate.length).toBe(2);
+    });
+
+    test('findByImo - two sources', async () => {
+        const imo = 456;
+        const estimateSource1 = Object.assign(newEstimate({imo}), {
+            source: 'source1'
+        });
+        const estimateSource2 = Object.assign(newEstimate({imo}), {
+            source: 'source2'
+        });
+        await insert(db, [estimateSource1, estimateSource2]);
+
+        const foundEstimate = await findByImo(db, imo);
+        expect(foundEstimate.length).toBe(2);
+    });
+
+    test('findByLocode - two sources', async () => {
+        const locode = 'AA111';
+        const estimateSource1 = Object.assign(newEstimate({locode}), {
+            source: 'source1'
+        });
+        const estimateSource2 = Object.assign(newEstimate({locode}), {
+            source: 'source2'
+        });
+        await insert(db, [estimateSource1, estimateSource2]);
+
+        const foundEstimate = await findByLocode(db, locode);
+        expect(foundEstimate.length).toBe(2);
     });
 
 }));

@@ -1,6 +1,10 @@
 import {IDatabase} from "pg-promise";
-
 const pgp = require('pg-promise')();
+
+// convert numeric types to number instead of string
+pgp.pg.types.setTypeParser(pgp.pg.types.builtins.NUMERIC, (value: string) => {
+    return parseFloat(value);
+});
 
 /**
  * Creates a non-pooling database connection primarily used by Lambdas.

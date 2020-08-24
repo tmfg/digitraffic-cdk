@@ -5,9 +5,17 @@ export function someNumber() {
     return Math.floor(Math.random() * 999999);
 }
 
-export function newEstimate(): ApiEstimate {
+export function newEstimate(props?: {
+    mmsi?: number,
+    imo?: number,
+    locode?: string,
+    eventTime?: Date
+    eventTimeConfidenceLower?: string | null
+    eventTimeConfidenceUpper?: string | null
+    source?: string
+}): ApiEstimate {
     // round off millis
-    const eventTime = new Date();
+    const eventTime = props?.eventTime ?? new Date();
     eventTime.setMilliseconds(0);
     const recordTime = new Date();
     recordTime.setMilliseconds(0);
@@ -15,14 +23,15 @@ export function newEstimate(): ApiEstimate {
         eventType: EventType.ATB,
         eventTime: moment(eventTime).toISOString(),
         recordTime: moment(recordTime).toISOString(),
-        source: someNumber().toString(),
-        eventTimeConfidenceLower: 'PT2H',
-        eventTimeConfidenceUpper: 'PT0H6M',
+        source: props?.source ?? someNumber().toString(),
+        eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? undefined,
+        eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? undefined,
         ship: {
-            mmsi: Number(someNumber().toString().slice(0,5))
+            mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0,5)),
+            imo: props?.imo ?? Number(someNumber().toString().slice(0,5))
         },
         location: {
-            port: someNumber().toString().slice(0,5)
+            port: props?.locode ?? someNumber().toString().slice(0,5)
         }
     };
 }

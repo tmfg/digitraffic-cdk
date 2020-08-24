@@ -24,8 +24,8 @@ export async function saveEstimates(estimates: ApiEstimate[]) {
 
 export async function findAllEstimates(
     locode?: string,
-    mmsi?: string,
-    imo?: string
+    mmsi?: number,
+    imo?: number
 ) {
     const start = Date.now();
     return await inDatabase(async (db: IDatabase<any, any>) => {
