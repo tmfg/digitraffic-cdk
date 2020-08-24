@@ -2,7 +2,7 @@ import {config as AWSConfig} from "aws-sdk";
 import {default as axios, AxiosRequestConfig} from 'axios';
 import {constructSwagger, mergeApiDescriptions} from "../../swagger-utils";
 import {exportSwaggerApi} from "../../apigw-utils";
-import {uploadToS3} from "../../s3-utils";
+import {uploadToS3} from '../../../../common/stack/s3-utils';
 
 export const KEY_BUCKET_NAME = 'BUCKET_NAME';
 export const KEY_REGION = 'REGION';
