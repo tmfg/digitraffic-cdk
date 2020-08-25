@@ -20,8 +20,8 @@ export interface Location {
 export interface ApiEstimate {
     readonly eventType: EventType
     readonly eventTime: string
-    readonly eventTimeConfidenceLower?: string
-    readonly eventTimeConfidenceUpper?: string
+    readonly eventTimeConfidenceLower?: string | null
+    readonly eventTimeConfidenceUpper?: string | null
     readonly recordTime: string
     readonly source: string
     readonly ship: Ship

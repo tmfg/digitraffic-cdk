@@ -25,8 +25,8 @@ export function newEstimate(props?: {
         eventTime: moment(eventTime).toISOString(),
         recordTime: moment(recordTime).toISOString(),
         source: props?.source ?? someNumber().toString(),
-        eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? undefined,
-        eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? undefined,
+        eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? null,
+        eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? null,
         ship: {
             mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0,5)),
             imo: props?.imo ?? Number(someNumber().toString().slice(0,5))
