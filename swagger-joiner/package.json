@@ -38,7 +38,7 @@
     "@aws-cdk/aws-iam": "1.56.0",
     "@types/ramda": "^0.27.14",
     "aws-sdk": "2.726.0",
-    "axios": "latest",
+    "axios": "^0.19.0",
     "ramda": "^0.27.1",
     "source-map-support": "^0.5.19"
   },
