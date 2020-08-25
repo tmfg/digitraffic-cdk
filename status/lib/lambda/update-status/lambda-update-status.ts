@@ -5,7 +5,11 @@ const STATUSPAGE_API = 'https://api.statuspage.io/v1/pages';
 
 async function getDigitrafficEndpoints(app: string) {
     console.log("Fetching digitraffic endpoints")
-    const r = await axios.get(`https://${app}.digitraffic.fi/swagger/swagger-spec.json`);
+    const r = await axios.get(`https://${app}.digitraffic.fi/swagger/swagger-spec.json`, {
+        headers: {
+            'accept-encoding': 'gzip'
+        }
+    });
     if (r.status != 200) {
         throw new Error('Unable to fetch contacts');
     }
