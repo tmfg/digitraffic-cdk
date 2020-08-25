@@ -3,11 +3,11 @@ import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aw
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
-import {default as EstimateSchema} from './model/estimate-schema';
+import {createEstimateSchema, LocationSchema, ShipSchema} from './model/estimate-schema';
 import {createSubscription} from '../../common/stack/subscription';
 import {corsMethodJsonResponse, defaultIntegration,} from "../../common/api/responses";
 import {MessageModel} from "../../common/api/response";
-import {addDefaultValidator, addServiceModel, createArraySchema} from "../../common/api/utils";
+import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../common/api/utils";
 import {dbLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addTags} from "../../common/api/documentation";
@@ -24,7 +24,13 @@ export function create(
 
     const validator = addDefaultValidator(publicApi);
 
-    const estimateModel = addServiceModel("EstimateModel", publicApi, EstimateSchema);
+    const shipModel = addServiceModel("ShipModel", publicApi, ShipSchema);
+    const locationModel = addServiceModel("LocationModel", publicApi, LocationSchema);
+    const estimateModel = addServiceModel("EstimateModel",
+        publicApi,
+        createEstimateSchema(
+            getModelReference(shipModel.modelId, publicApi.restApiId),
+            getModelReference(locationModel.modelId, publicApi.restApiId)));
     const estimatesModel = addServiceModel("EstimatesModel", publicApi, createArraySchema(estimateModel, publicApi));
 
     createEstimatesResource(publicApi, vpc, props, lambdaDbSg, estimatesModel, validator, stack);

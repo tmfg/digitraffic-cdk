@@ -26,7 +26,6 @@ export enum ShipIdType {
 
 const INSERT_ESTIMATES_SQL = `
         INSERT INTO portcall_estimate(
-            id,
             event_type,
             event_time,
             event_time_confidence_lower,
@@ -40,20 +39,20 @@ const INSERT_ESTIMATES_SQL = `
             secondary_ship_id,
             secondary_ship_id_type,
             location_locode)
-        VALUES (nextval('seq_portcall_estimates'),
-            $(event_type),
-            $(event_time),
-            $(event_time_confidence_lower),
-            $(event_time_confidence_lower_diff),
-            $(event_time_confidence_upper),
-            $(event_time_confidence_upper_diff),
-            $(event_source),
-            $(record_time),
-            $(ship_id),
-            $(ship_id_type),
-            $(secondary_ship_id),
-            $(secondary_ship_id_type),
-            $(location_locode))
+        VALUES (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6,
+            $7,
+            $8,
+            $9,
+            $10,
+            $11,
+            $12,
+            $13)
         ON CONFLICT(ship_id, event_source, event_time) DO NOTHING
 `;
 
@@ -187,8 +186,12 @@ const SELECT_BY_IMO = `
 `;
 
 export function updateEstimates(db: IDatabase<any, any>, estimates: ApiEstimate[]): Promise<any>[] {
+    const ps = new PreparedStatement({
+        name: 'update-estimates',
+        text: INSERT_ESTIMATES_SQL,
+    });
     return estimates.map(estimate => {
-        return db.none(INSERT_ESTIMATES_SQL, createEditObject(estimate));
+        return db.none(ps, createUpdateValues(estimate));
     });
 }
 
@@ -228,22 +231,22 @@ export function findByImo(
     return db.tx(t => t.manyOrNone(ps));
 }
 
-export function createEditObject(e: ApiEstimate): DbEstimate {
-    return {
-        event_type: e.eventType,
-        event_time: moment(e.eventTime).toDate(),
-        event_time_confidence_lower: e.eventTimeConfidenceLower,
-        event_time_confidence_lower_diff: e.eventTimeConfidenceLower ? diffDuration(e.eventTime, e.eventTimeConfidenceLower) : undefined,
-        event_time_confidence_upper: e.eventTimeConfidenceUpper,
-        event_time_confidence_upper_diff: e.eventTimeConfidenceUpper ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper) : undefined,
-        event_source: e.source,
-        record_time: moment(e.recordTime).toDate(),
-        ship_id: (e.ship.mmsi ?? e.ship.imo) as number,
-        ship_id_type: e.ship.mmsi ? ShipIdType.MMSI : ShipIdType.IMO,
-        secondary_ship_id: e.ship.mmsi && e.ship.imo ? e.ship.imo : undefined,
-        secondary_ship_id_type: e.ship.mmsi && e.ship.imo ? ShipIdType.IMO : undefined,
-        location_locode: e.location.port
-    };
+export function createUpdateValues(e: ApiEstimate): any[] {
+    return [
+        e.eventType,
+        moment(e.eventTime).toDate(),
+        e.eventTimeConfidenceLower,
+        e.eventTimeConfidenceLower ? diffDuration(e.eventTime, e.eventTimeConfidenceLower) : undefined,
+        e.eventTimeConfidenceUpper,
+        e.eventTimeConfidenceUpper ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper) : undefined,
+        e.source,
+        moment(e.recordTime).toDate(),
+        (e.ship.mmsi ?? e.ship.imo) as number,
+        e.ship.mmsi ? ShipIdType.MMSI : ShipIdType.IMO,
+        e.ship.mmsi && e.ship.imo ? e.ship.imo : undefined,
+        e.ship.mmsi && e.ship.imo ? ShipIdType.IMO : undefined,
+        e.location.port
+    ];
 }
 
 function diffDuration(eventTime: string, confLower: string): number {

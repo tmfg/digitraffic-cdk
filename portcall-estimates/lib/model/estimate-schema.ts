@@ -1,12 +1,69 @@
-import apigateway = require('@aws-cdk/aws-apigateway');
+import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
 
-const estimatesProperties: apigateway.JsonSchema = {
-    schema: apigateway.JsonSchemaVersion.DRAFT4,
-    type: apigateway.JsonSchemaType.OBJECT,
-    description: 'Portcall estimates schema',
+export const ShipSchema: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT4,
+    type: JsonSchemaType.OBJECT,
+    description: 'Portcall estimates ship schema',
     properties: {
-
+        port: {
+            type: JsonSchemaType.STRING,
+            description: 'Port LOCODE'
+        }
     }
 };
 
-export default estimatesProperties;
+export const LocationSchema: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT4,
+    type: JsonSchemaType.OBJECT,
+    description: 'Portcall estimates location schema',
+    properties: {
+        mmsi: {
+            type: JsonSchemaType.NUMBER,
+            description: 'MMSI'
+        },
+        imo: {
+            type: JsonSchemaType.NUMBER,
+            description: 'IMO'
+        }
+    }
+};
+
+export function createEstimateSchema(shipReference: string, locationReference: string): JsonSchema {
+    return {
+        schema: JsonSchemaVersion.DRAFT4,
+        type: JsonSchemaType.OBJECT,
+        description: 'Portcall estimates schema',
+        properties: {
+            eventType: {
+                type: JsonSchemaType.STRING,
+                description: 'Event type: ATB, ATB, ETD'
+            },
+            eventTime: {
+                type: JsonSchemaType.STRING,
+                description: 'Event time in ISO 8601 date format'
+            },
+            eventTimeConfidenceLower: {
+                type: JsonSchemaType.STRING,
+                description: 'Event time confidence, lower. ISO 8601 formatted duration'
+            },
+            eventTimeConfidenceUpper: {
+                type: JsonSchemaType.STRING,
+                description: 'Event time confidence, upper. ISO 8601 formatted duration'
+            },
+            recordTime: {
+                type: JsonSchemaType.STRING,
+                description: 'Timestamp of event creation in ISO 8601 date format'
+            },
+            source: {
+                type: JsonSchemaType.STRING,
+                description: 'Event source'
+            },
+            ship: {
+                ref: shipReference
+            },
+            location: {
+                ref: locationReference
+            }
+        }
+    };
+}
