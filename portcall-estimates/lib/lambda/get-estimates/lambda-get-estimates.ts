@@ -7,5 +7,8 @@ export const handler = async (
         imo?: number
     }
 ): Promise<any> => {
+    if (!event.locode && !event.mmsi && !event.imo) {
+        return 'Bad request';
+    }
     return await findAllEstimates(event.locode, event.mmsi, event.imo);
 };

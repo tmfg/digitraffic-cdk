@@ -52,11 +52,15 @@ function createEstimatesResource(
     const resources = createResourcePaths(publicApi);
     const getEstimatesIntegration = defaultIntegration(getEstimatesLambda, {
         requestParameters: {
-            'integration.request.querystring.locode': 'method.request.querystring.locode'
+            'integration.request.querystring.locode': 'method.request.querystring.locode',
+            'integration.request.querystring.mmsi': 'method.request.querystring.mmsi',
+            'integration.request.querystring.imo': 'method.request.querystring.imo'
         },
         requestTemplates: {
             'application/json': JSON.stringify({
-                locode: "$util.escapeJavaScript($input.params('locode'))"
+                locode: "$util.escapeJavaScript($input.params('locode'))",
+                mmsi: "$util.escapeJavaScript($input.params('mmsi'))",
+                imo: "$util.escapeJavaScript($input.params('imo'))"
             })
         }
     });
@@ -64,7 +68,9 @@ function createEstimatesResource(
     resources.addMethod("GET", getEstimatesIntegration, {
         apiKeyRequired: true,
         requestParameters: {
-            'method.request.querystring.locode': false
+            'method.request.querystring.locode': false,
+            'method.request.querystring.mmsi': false,
+            'method.request.querystring.imo': false
         },
         requestValidator: validator,
         methodResponses: [

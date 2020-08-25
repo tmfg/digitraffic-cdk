@@ -33,8 +33,10 @@ export async function findAllEstimates(
             return EstimatesDB.findByLocode(db, locode!!);
         } else if (mmsi && !imo) {
             return EstimatesDB.findByMmsi(db, mmsi!!);
+        } else if (imo) {
+            return EstimatesDB.findByImo(db, imo!!);
         }
-        throw new Error('No locode or mmsi, imo not yet supported');
+        throw new Error('No locode, mmsi or imo given');
     }).finally(() => {
         console.info("method=findAllEstimates tookMs=%d", (Date.now() - start));
     });
