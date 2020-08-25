@@ -66,6 +66,7 @@ const SELECT_BY_LOCODE = `
                event_source
         FROM portcall_estimate
         WHERE record_time > ${ESTIMATES_BEFORE}
+        AND location_locode = $1
         GROUP BY event_type,
                  ship_id,
                  location_locode,
