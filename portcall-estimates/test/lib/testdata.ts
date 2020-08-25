@@ -10,6 +10,7 @@ export function newEstimate(props?: {
     imo?: number,
     locode?: string,
     eventTime?: Date
+    eventType?: EventType
     eventTimeConfidenceLower?: string | null
     eventTimeConfidenceUpper?: string | null
     source?: string
@@ -20,7 +21,7 @@ export function newEstimate(props?: {
     const recordTime = new Date();
     recordTime.setMilliseconds(0);
     return {
-        eventType: EventType.ATB,
+        eventType: props?.eventType ?? EventType.ATB,
         eventTime: moment(eventTime).toISOString(),
         recordTime: moment(recordTime).toISOString(),
         source: props?.source ?? someNumber().toString(),

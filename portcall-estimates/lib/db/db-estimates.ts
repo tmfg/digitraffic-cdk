@@ -91,6 +91,8 @@ const SELECT_BY_LOCODE = `
         AND newest.event_source = pe.event_source
         AND newest.location_locode = $1
     ORDER BY
+        pe.event_type,
+        pe.ship_id,
         (CASE WHEN (event_time_confidence_lower_diff IS NULL OR event_time_confidence_upper_diff IS NULL) THEN -1 ELSE 1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
@@ -132,6 +134,8 @@ const SELECT_BY_MMSI = `
     AND newest.event_source = pe.event_source
     AND newest.ship_id = $1
     ORDER BY
+        pe.location_locode,
+        pe.event_type,
         (CASE WHEN (event_time_confidence_lower_diff IS NULL OR event_time_confidence_upper_diff IS NULL) THEN -1 ELSE 1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
@@ -173,6 +177,8 @@ const SELECT_BY_IMO = `
     AND newest.event_source = pe.event_source
     AND newest.shipid = $1
     ORDER BY
+        pe.location_locode,
+        pe.event_type,
         (CASE WHEN (event_time_confidence_lower_diff IS NULL OR event_time_confidence_upper_diff IS NULL) THEN -1 ELSE 1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
@@ -226,9 +232,9 @@ export function createEditObject(e: ApiEstimate): DbEstimate {
         event_type: e.eventType,
         event_time: moment(e.eventTime).toDate(),
         event_time_confidence_lower: e.eventTimeConfidenceLower,
-        event_time_confidence_lower_diff: e.eventTimeConfidenceLower ? diffConfidenceLower(e.eventTime, e.eventTimeConfidenceLower) : undefined,
+        event_time_confidence_lower_diff: e.eventTimeConfidenceLower ? diffDuration(e.eventTime, e.eventTimeConfidenceLower) : undefined,
         event_time_confidence_upper: e.eventTimeConfidenceUpper,
-        event_time_confidence_upper_diff: e.eventTimeConfidenceUpper ? diffConfidenceUpper(e.eventTime, e.eventTimeConfidenceUpper) : undefined,
+        event_time_confidence_upper_diff: e.eventTimeConfidenceUpper ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper) : undefined,
         event_source: e.source,
         record_time: moment(e.recordTime).toDate(),
         ship_id: (e.ship.mmsi ?? e.ship.imo) as number,
@@ -239,10 +245,6 @@ export function createEditObject(e: ApiEstimate): DbEstimate {
     };
 }
 
-function diffConfidenceLower(eventTime: string, confLower: string): number {
+function diffDuration(eventTime: string, confLower: string): number {
     return moment(eventTime).valueOf() - moment(eventTime).subtract(moment.duration(confLower)).valueOf();
-}
-
-function diffConfidenceUpper(eventTime: string, confUpper: string): number {
-    return moment(eventTime).add(moment.duration(confUpper)).valueOf() - moment(eventTime).valueOf();
 }
