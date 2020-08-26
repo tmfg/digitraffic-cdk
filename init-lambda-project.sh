@@ -20,6 +20,7 @@ fi
 echo
 echo "Create directories"
 mkdir -p "${LAMBDA}"
+mkdir -p "${LAMBDA}/bin"
 mkdir -p "${LAMBDA}/lib/api"
 mkdir -p "${LAMBDA}/lib/db"
 mkdir -p "${LAMBDA}/lib/lambda"

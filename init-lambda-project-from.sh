@@ -42,6 +42,7 @@ echo
 echo "Copy contents from  ${LAMBDA_FROM} to ${LAMBDA}"
 # recursive, do not overwrite, verbose
 cp -r -n -v "${LAMBDA_FROM}/" "${LAMBDA}"
+mkdir -p "${LAMBDA}/bin"
 echo "Copy contents done!"
 
 echo
