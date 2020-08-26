@@ -93,7 +93,7 @@ const SELECT_BY_LOCODE = `
     ORDER BY
         pe.event_type,
         pe.ship_id,
-        (CASE WHEN (event_time_confidence_lower_diff IS NULL OR event_time_confidence_upper_diff IS NULL) THEN -1 ELSE 1 END),
+        (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN -1 ELSE 1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
         pe.record_time DESC
@@ -136,7 +136,7 @@ const SELECT_BY_MMSI = `
     ORDER BY
         pe.location_locode,
         pe.event_type,
-        (CASE WHEN (event_time_confidence_lower_diff IS NULL OR event_time_confidence_upper_diff IS NULL) THEN -1 ELSE 1 END),
+        (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN -1 ELSE 1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
         pe.record_time DESC
@@ -179,7 +179,7 @@ const SELECT_BY_IMO = `
     ORDER BY
         pe.location_locode,
         pe.event_type,
-        (CASE WHEN (event_time_confidence_lower_diff IS NULL OR event_time_confidence_upper_diff IS NULL) THEN -1 ELSE 1 END),
+        (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN -1 ELSE 1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
         pe.record_time DESC
