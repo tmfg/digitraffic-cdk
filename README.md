@@ -44,6 +44,21 @@ The CI server expects your app to follow these conventions.
 - stacks are named after your app in camelcase plus app name and environment, e.g. SwaggerJoinerRoadTest
 - use the env properties to specify the account id and region https://docs.aws.amazon.com/cdk/latest/guide/getting_started.html
 
+## Starting a new project
+
+If some of the old projects seems like a good start for the new project run command:
+
+    init-lambda-project-from.sh <project-to-clone> <new-project-name>
+
+This copies contents from the existing project and does some replacements for the names.
+
+If you want to start from almost clear desk then run:
+
+    init-lambda-project.sh <new-project-name>
+   
+
+And you will get some initializations done for your project.
+
 ## Development workflow (in a cdk directory, e.g. open311-cdk)
 
 ### npm scripts
