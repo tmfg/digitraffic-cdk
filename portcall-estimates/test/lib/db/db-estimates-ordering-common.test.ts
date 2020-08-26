@@ -145,7 +145,7 @@ describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any
             expect(foundEstimate.event_time_confidence_upper).toBe(estimateSource2.eventTimeConfidenceUpper);
         });
 
-        test(`find by ${idPropText} - most accurate first - null lower first`, async () => {
+        test(`find by ${idPropText} - most accurate first - null lower last`, async () => {
             const estimateSource1 = newEstimate(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
@@ -171,12 +171,12 @@ describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any
             await insert(db, estimates);
 
             const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[0];
+            const foundEstimate = foundEstimates[2];
             expect(foundEstimate.event_time_confidence_lower).toBeNull();
             expect(foundEstimate.event_time_confidence_upper).toBe(estimateSource2.eventTimeConfidenceUpper);
         });
 
-        test(`find by ${idPropText} - most accurate first - null upper first`, async () => {
+        test(`find by ${idPropText} - most accurate first - null upper last`, async () => {
             const estimateSource1 = newEstimate(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
@@ -202,12 +202,12 @@ describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any
             await insert(db, estimates);
 
             const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[0];
+            const foundEstimate = foundEstimates[2];
             expect(foundEstimate.event_time_confidence_lower).toBe(estimateSource2.eventTimeConfidenceLower);
             expect(foundEstimate.event_time_confidence_upper).toBeNull();
         });
 
-        test(`find by ${idPropText} - most accurate first - both null first`, async () => {
+        test(`find by ${idPropText} - most accurate first - both null last`, async () => {
             const estimateSource1 = newEstimate(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
@@ -233,7 +233,7 @@ describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any
             await insert(db, estimates);
 
             const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[0];
+            const foundEstimate = foundEstimates[2];
             expect(foundEstimate.event_time_confidence_lower).toBeNull();
             expect(foundEstimate.event_time_confidence_upper).toBeNull();
         });

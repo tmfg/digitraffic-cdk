@@ -17,7 +17,7 @@ export function create(
     const functionName = "PortcallEstimates-ProcessQueue";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
-        code: new AssetCode('dist/lambda'),
+        code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment: {
             DB_USER: props.dbProps.username,
