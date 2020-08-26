@@ -53,7 +53,7 @@ const INSERT_ESTIMATES_SQL = `
             $11,
             $12,
             $13)
-        ON CONFLICT(ship_id, event_source, event_time) DO NOTHING
+        ON CONFLICT(ship_id, event_source, event_time, record_time) DO NOTHING
 `;
 
 const SELECT_BY_LOCODE = `
