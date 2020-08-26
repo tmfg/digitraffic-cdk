@@ -1,7 +1,15 @@
 import {Duration, Stack} from '@aws-cdk/core';
-import {OriginProtocolPolicy, OriginAccessIdentity, SourceConfiguration, Behavior, CloudFrontAllowedMethods} from '@aws-cdk/aws-cloudfront';
+import {
+    OriginProtocolPolicy,
+    OriginAccessIdentity,
+    SourceConfiguration,
+    Behavior,
+    CloudFrontAllowedMethods,
+    CfnDistribution
+} from '@aws-cdk/aws-cloudfront';
 import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
+import ForwardedValuesProperty = CfnDistribution.ForwardedValuesProperty;
 
 export function createOriginConfig(stack: Stack, domain: CFDomain,
                                    oai: OriginAccessIdentity|null,
@@ -58,13 +66,24 @@ function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any):
 function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBehavior: boolean = false): Behavior {
 //    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
 
-    const forwardedValues = {
+    const forwardedValues: ForwardedValuesProperty = {
             queryString: true,
             queryStringCacheKeys: b.queryCacheKeys as string[]
         } as any;
 
     if(b.viewerProtocolPolicy === 'https-only') {
-        forwardedValues.headers = ['Host'];
+        if (forwardedValues.headers == null) {
+            (forwardedValues as any).headers = ['Host'];
+        } else {
+            forwardedValues.headers.push('Host');
+        }
+    }
+    if(b.cacheHeaders != null) {
+        if (forwardedValues.headers == null) {
+            (forwardedValues as any).headers = b.cacheHeaders;
+        } else {
+            (forwardedValues as any).headers = forwardedValues.headers.concat(b.cacheHeaders);
+        }
     }
 
     return {

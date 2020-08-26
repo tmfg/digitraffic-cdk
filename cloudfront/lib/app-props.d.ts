@@ -13,7 +13,8 @@ export interface CFBehavior {
     queryCacheKeys?: string[],
     allowedMethods?: any,
     viewerProtocolPolicy?: string,
-    lambdas?: CFBehaviorLambda[]
+    lambdas?: CFBehaviorLambda[],
+    cacheHeaders?: string[]
 }
 
 export interface CFDomain {
