@@ -27,13 +27,15 @@
     "sinon": "9.0.2",
     "ts-jest": "26.1.4",
     "ts-node": "8.10.2",
-    "typescript": "3.9.7"
+    "typescript": "3.9.7",
+    "aws-sdk": "2.730.0"
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "1.56.0",
     "@aws-cdk/aws-events-targets": "1.56.0",
     "@aws-cdk/aws-iam": "1.56.0",
     "@aws-cdk/aws-lambda-event-sources": "1.56.0",
+    "@aws-cdk/aws-s3": "1.56.0",
     "@aws-cdk/aws-sqs": "1.56.0",
     "@aws-cdk/core": "1.56.0",
     "digitraffic-cdk-api": "file:../common/api",

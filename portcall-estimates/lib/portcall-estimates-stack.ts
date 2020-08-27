@@ -17,9 +17,9 @@ export class PortcallEstimatesStack extends Stack {
         });
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
-        const queue = Sqs.createQueue(this);
-        InternalLambdas.create(queue, vpc, lambdaDbSg, appProps, this);
-        IntegrationApi.create(queue, vpc, lambdaDbSg, appProps, this);
+        const queueAndDLQ = Sqs.createQueue(this);
+        InternalLambdas.create(queueAndDLQ, vpc, lambdaDbSg, appProps, this);
+        IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
         PublicApi.create(vpc, lambdaDbSg, appProps, this);
     }
 }

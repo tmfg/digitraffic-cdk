@@ -3,6 +3,7 @@ export interface Props {
     privateSubnetIds: string[];
     availabilityZones: string[];
     lambdaDbSgId: string;
+    dlqBucketName: string;
     dbProps: DbProps;
     defaultLambdaDurationSeconds: number;
     logsDestinationArn: string;
