@@ -28,7 +28,8 @@ function createRule(rule: AclRuleType): any {
             statement: {
                 managedRuleGroupStatement: {
                     vendorName: "AWS",
-                    name: "AWSManagedRulesCommonRuleSet"
+                    name: "AWSManagedRulesCommonRuleSet",
+                    excludedRules: [{name: 'NoUserAgent_HEADER'}]
                 }
             },
             overrideAction: {
