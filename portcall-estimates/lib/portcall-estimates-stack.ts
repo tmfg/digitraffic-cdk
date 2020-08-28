@@ -1,4 +1,4 @@
-import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
+import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
 import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
@@ -7,8 +7,9 @@ import * as Sqs from './sqs';
 import {Props} from './app-props'
 import {Bucket} from "@aws-cdk/aws-s3";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
-import {Subscription, SubscriptionProtocol, Topic} from "@aws-cdk/aws-sns";
+import {Topic} from "@aws-cdk/aws-sns";
 import {Queue} from "@aws-cdk/aws-sqs";
+import {TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 
 export class PortcallEstimatesStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -38,7 +39,8 @@ export class PortcallEstimatesStack extends Stack {
         }).createAlarm(this, alarmName, {
             alarmName,
             threshold: 0,
-            evaluationPeriods: 1
+            evaluationPeriods: 1,
+            treatMissingData: TreatMissingData.NOT_BREACHING
         }).addAlarmAction(new SnsAction(Topic.fromTopicArn(this, 'Topic', appProps.dlqNotificationTopicArn)));
     }
 }
