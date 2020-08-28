@@ -48,11 +48,11 @@ export function validateEstimate(estimate: ApiEstimate): boolean {
         console.warn('Invalid eventTime for estimate', estimate);
         return false;
     }
-    if (estimate.eventTimeConfidenceLower != null && estimate.eventTimeConfidenceLower != moment(estimate.eventTimeConfidenceLower).toISOString()) {
+    if (estimate.eventTimeConfidenceLower != null && estimate.eventTimeConfidenceLower != moment.duration(estimate.eventTimeConfidenceLower).toISOString()) {
         console.warn('Invalid eventTimeConfidenceLower for estimate', estimate);
         return false;
     }
-    if (estimate.eventTimeConfidenceUpper != null && estimate.eventTimeConfidenceUpper != moment(estimate.eventTimeConfidenceUpper).toISOString()) {
+    if (estimate.eventTimeConfidenceUpper != null && estimate.eventTimeConfidenceUpper != moment.duration(estimate.eventTimeConfidenceUpper).toISOString()) {
         console.warn('Invalid eventTimeConfidenceUpper for estimate', estimate);
         return false;
     }

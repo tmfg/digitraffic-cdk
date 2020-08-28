@@ -7,19 +7,16 @@ import {ApiEstimate} from "../model/estimate";
 
 const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
 
-export async function saveEstimates(estimates: ApiEstimate[]) {
+export async function saveEstimate(estimate: ApiEstimate): Promise<any> {
     const start = Date.now();
     await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(t => {
-            const queries = EstimatesDB.updateEstimates(db, estimates).concat([
+            const queries = [
+                EstimatesDB.updateEstimate(db, estimate),
                 LastUpdatedDB.updateUpdatedTimestamp(db, PORTCALL_ESTIMATES_DATA_TYPE, new Date(start))
-            ]);
+            ];
             return t.batch(queries);
         });
-    }).then(a => {
-        const end = Date.now();
-        // minus one for lastupdated
-        console.info("method=saveEstimates updatedCount=%d tookMs=%d", a.length-1, (end - start));
     });
 }
 

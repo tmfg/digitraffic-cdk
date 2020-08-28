@@ -1,9 +1,17 @@
-import {saveEstimates} from "../../service/estimates";
-import {ApiEstimate, validateEstimate} from "../../model/estimate";
+import {saveEstimate} from "../../service/estimates";
+import {validateEstimate} from "../../model/estimate";
+import {SQSEvent} from "aws-lambda";
+const middy = require('@middy/core')
+const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
-export const handler = async (event: any, context: any): Promise<any> => {
-    console.info(`method=portcallEstimatesProcessQueue portCallRecordsReceived=${event.Records.length}`);
-    const estimates = event.Records.map((e: any) => JSON.parse(e.body) as ApiEstimate);
-    estimates.forEach(validateEstimate);
-    return await saveEstimates(estimates);
-};
+async function handlerFn(event: SQSEvent) {
+    return Promise.allSettled(event.Records.map(r => {
+        const estimate = JSON.parse(r.body);
+        if (!validateEstimate(estimate)) {
+            return Promise.reject();
+        }
+        return saveEstimate(estimate);
+    }));
+}
+
+export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn).use(sqsPartialBatchFailureMiddleware());

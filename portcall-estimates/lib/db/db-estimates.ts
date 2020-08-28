@@ -24,7 +24,7 @@ export enum ShipIdType {
     MMSI = 'mmsi', IMO = 'imo'
 }
 
-const INSERT_ESTIMATES_SQL = `
+const INSERT_ESTIMATE_SQL = `
         INSERT INTO portcall_estimate(
             event_type,
             event_time,
@@ -185,14 +185,12 @@ const SELECT_BY_IMO = `
         pe.record_time DESC
 `;
 
-export function updateEstimates(db: IDatabase<any, any>, estimates: ApiEstimate[]): Promise<any>[] {
+export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): Promise<any> {
     const ps = new PreparedStatement({
         name: 'update-estimates',
-        text: INSERT_ESTIMATES_SQL,
+        text: INSERT_ESTIMATE_SQL,
     });
-    return estimates.map(estimate => {
-        return db.none(ps, createUpdateValues(estimate));
-    });
+    return db.none(ps, createUpdateValues(estimate));
 }
 
 export function findByLocode(

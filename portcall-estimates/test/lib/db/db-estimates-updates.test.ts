@@ -2,16 +2,16 @@ import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll, insert} from "../db-testutil";
 import {newEstimate} from "../testdata";
-import {findByImo, findByLocode, findByMmsi, ShipIdType, updateEstimates} from "../../../lib/db/db-estimates";
+import {findByImo, findByLocode, findByMmsi, ShipIdType, updateEstimate} from "../../../lib/db/db-estimates";
 
 describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
-    test('updateEstimates - properties', async () => {
+    test('updateEstimate - properties', async () => {
         const estimate = newEstimate({
             eventTimeConfidenceLower: 'PT1H',
             eventTimeConfidenceUpper: 'PT4H'
         });
 
-        await Promise.all(updateEstimates(db, [estimate]));
+        await updateEstimate(db, estimate);
 
         const fetchedEstimates = await findAll(db);
         expect(fetchedEstimates.length).toBe(1);
@@ -27,7 +27,7 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         expect(e.event_time_confidence_upper_diff).toBe(moment(estimate.eventTime).add(moment.duration(estimate.eventTimeConfidenceUpper)).valueOf() - moment(estimate.eventTime).valueOf());
     });
 
-    test('updateEstimates - mmsi over imo', async () => {
+    test('updateEstimate - mmsi over imo', async () => {
         const estimate = Object.assign(newEstimate(), {
             ship: {
                 mmsi: 123,
@@ -35,14 +35,14 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
             }
         });
 
-        await Promise.all(updateEstimates(db, [estimate]));
+        await updateEstimate(db, estimate);
 
         const e = (await findAll(db))[0];
         expect(e.ship_id).toBe(estimate.ship.mmsi);
         expect(e.ship_id_type).toBe(ShipIdType.MMSI);
     });
 
-    test('updateEstimates - just imo', async () => {
+    test('updateEstimate - just imo', async () => {
         const estimate = Object.assign(newEstimate(), {
             ship: {
                 mmsi: undefined,
@@ -50,14 +50,14 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
             }
         });
 
-        await Promise.all(updateEstimates(db, [estimate]));
+        await updateEstimate(db, estimate);
 
         const e = (await findAll(db))[0];
         expect(e.ship_id).toBe(estimate.ship.imo);
         expect(e.ship_id_type).toBe(ShipIdType.IMO);
     });
 
-    test('updateEstimates - both ids', async () => {
+    test('updateEstimate - both ids', async () => {
         const estimate = Object.assign(newEstimate(), {
             ship: {
                 mmsi: 123,
@@ -65,7 +65,7 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
             }
         });
 
-        await Promise.all(updateEstimates(db, [estimate]));
+        await updateEstimate(db, estimate);
 
         const e = (await findAll(db))[0];
         expect(e.ship_id).toBe(estimate.ship.mmsi);
@@ -74,11 +74,11 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         expect(e.secondary_ship_id_type).toBe(ShipIdType.IMO);
     });
 
-    test('updateEstimates - ignore duplicate', async () => {
+    test('updateEstimate - ignore duplicate', async () => {
         const estimate = newEstimate();
 
-        await Promise.all(updateEstimates(db, [estimate]));
-        await Promise.all(updateEstimates(db, [estimate]));
+        await updateEstimate(db, estimate);
+        await updateEstimate(db, estimate);
 
         expect((await findAll(db)).length).toBe(1);
     });

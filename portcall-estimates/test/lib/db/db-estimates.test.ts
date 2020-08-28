@@ -2,7 +2,7 @@ import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll, insert} from "../db-testutil";
 import {newEstimate} from "../testdata";
-import {findByImo, findByLocode, findByMmsi, ShipIdType, updateEstimates} from "../../../lib/db/db-estimates";
+import {findByImo, findByLocode, findByMmsi} from "../../../lib/db/db-estimates";
 
 describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*
