@@ -14,15 +14,11 @@ import {PolicyStatement} from "@aws-cdk/aws-iam";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
+    dlqBucket: Bucket,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
     stack: Stack) {
-
-    const dlqBucket = new Bucket(stack, 'DLQBucket', {
-        bucketName: props.dlqBucketName
-    });
-
     createProcessQueueLambda(queueAndDLQ.queue, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 }
