@@ -29,7 +29,7 @@ function createRule(rule: AclRuleType): any {
                 managedRuleGroupStatement: {
                     vendorName: "AWS",
                     name: "AWSManagedRulesCommonRuleSet",
-                    excludedRules: [{name: 'NoUserAgent_HEADER'}]
+                    excludedRules: [{name: 'NoUserAgent_HEADER'}, {name: 'SizeRestrictions_BODY'}]
                 }
             },
             overrideAction: {
