@@ -1,14 +1,17 @@
 import {Aws, Construct} from "@aws-cdk/core";
-import {AwsIntegration, PassthroughBehavior, Resource} from "@aws-cdk/aws-apigateway";
+import {AwsIntegration, Model, PassthroughBehavior, RequestValidator, Resource} from "@aws-cdk/aws-apigateway";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {IModel} from "@aws-cdk/aws-apigateway/lib/model";
 
 export function attachQueueToApiGatewayResource(
     stack: Construct,
     queue: Queue,
     resource: Resource,
+    requestValidator: RequestValidator,
     resourceName: string,
-    apiKeyRequired: boolean
+    apiKeyRequired: boolean,
+    requestModels?: {[param: string]: IModel}
 ) {
     // role for API Gateway
     const apiGwRole = new Role(stack, `${resourceName}APIGatewayToSQSRole`, {
@@ -75,7 +78,9 @@ export function attachQueueToApiGatewayResource(
         path: Aws.ACCOUNT_ID + '/' + queue.queueName
     });
     resource.addMethod('POST', sqsIntegration, {
+        requestValidator,
         apiKeyRequired,
+        requestModels: requestModels ?? {},
         methodResponses: [
             {
                 statusCode: '200',

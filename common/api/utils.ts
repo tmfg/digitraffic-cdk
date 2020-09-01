@@ -1,4 +1,5 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
+import {Model} from "@aws-cdk/aws-apigateway";
 
 /**
  * Get a reference to an OpenAPI model object in a REST API.
@@ -30,7 +31,7 @@ export function addDefaultValidator(api: apigateway.RestApi): apigateway.Request
  * @param schema JSON Schema
  */
 export function addServiceModel(name:string, api: apigateway.RestApi,
-                                schema: apigateway.JsonSchema): any {
+                                schema: apigateway.JsonSchema): Model {
     return api.addModel(name, {
         contentType: 'application/json',
         modelName: name,

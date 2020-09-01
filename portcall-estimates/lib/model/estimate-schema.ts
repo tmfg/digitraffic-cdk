@@ -4,6 +4,7 @@ export const ShipSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
     description: 'Portcall estimates ship schema',
+    required: ['port'],
     properties: {
         port: {
             type: JsonSchemaType.STRING,
@@ -33,10 +34,19 @@ export function createEstimateSchema(shipReference: string, locationReference: s
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,
         description: 'Portcall estimates schema',
+        required: [
+            'eventType',
+            'eventTime',
+            'recordTime',
+            'source',
+            'ship',
+            'location'
+        ],
         properties: {
             eventType: {
                 type: JsonSchemaType.STRING,
-                description: 'Event type: ATB, ATB, ETD'
+                enum: ['ATB', 'ETA', 'ETD'],
+                description: 'Event type: ATB, ETA, ETD'
             },
             eventTime: {
                 type: JsonSchemaType.STRING,
