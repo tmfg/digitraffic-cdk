@@ -7,9 +7,16 @@ import {ApiEstimate} from "../model/estimate";
 
 const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
 
-export async function saveEstimate(estimate: ApiEstimate): Promise<any> {
+export interface UpdatedEstimate {
+    readonly ship_id?: number
+    readonly ship_id_type?: ShipIdType
+    readonly secondary_ship_id?: number
+    readonly secondary_ship_id_type?: ShipIdType
+}
+
+export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate | undefined> {
     const start = Date.now();
-    await inDatabase(async (db: IDatabase<any, any>) => {
+    return await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(t => {
             const queries = [
                 EstimatesDB.updateEstimate(db, estimate),

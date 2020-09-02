@@ -26,6 +26,7 @@ export class PortcallEstimatesStack extends Stack {
         const dlqBucket = new Bucket(this, 'DLQBucket', {
             bucketName: appProps.dlqBucketName
         });
+
         InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
         PublicApi.create(vpc, lambdaDbSg, appProps, this);

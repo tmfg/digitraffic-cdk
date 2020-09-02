@@ -54,6 +54,7 @@ const INSERT_ESTIMATE_SQL = `
             $12,
             $13)
         ON CONFLICT(ship_id, event_source, event_time, record_time) DO NOTHING
+        RETURNING ship_id, ship_id_type, secondary_ship_id, secondary_ship_id_type
 `;
 
 const SELECT_BY_LOCODE = `
@@ -190,7 +191,7 @@ export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): 
         name: 'update-estimates',
         text: INSERT_ESTIMATE_SQL,
     });
-    return db.none(ps, createUpdateValues(estimate));
+    return db.oneOrNone(ps, createUpdateValues(estimate));
 }
 
 export function findByLocode(
