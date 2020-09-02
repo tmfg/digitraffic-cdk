@@ -4,11 +4,14 @@ export const ShipSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
     description: 'Portcall estimates ship schema',
-    required: ['port'],
     properties: {
-        port: {
-            type: JsonSchemaType.STRING,
-            description: 'Port LOCODE'
+        mmsi: {
+            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING],
+            description: 'MMSI'
+        },
+        imo: {
+            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING],
+            description: 'IMO'
         }
     }
 };
@@ -17,14 +20,11 @@ export const LocationSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
     description: 'Portcall estimates location schema',
+    required: ['port'],
     properties: {
-        mmsi: {
-            type: JsonSchemaType.NUMBER,
-            description: 'MMSI'
-        },
-        imo: {
-            type: JsonSchemaType.NUMBER,
-            description: 'IMO'
+        port: {
+            type: JsonSchemaType.STRING,
+            description: 'Port LOCODE'
         }
     }
 };
