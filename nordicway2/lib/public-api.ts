@@ -80,6 +80,7 @@ function createAnnotationsResource(
     });
 
     createSubscription(getAnnotationsLambda, functionName, props.logsDestinationArn, stack);
+
     addTags('GetAnnotations', BETA_TAGS, requests, stack);
 
     return getAnnotationsLambda;

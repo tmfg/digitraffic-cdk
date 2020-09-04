@@ -45,6 +45,7 @@ function createUpdateDatex2RequestHandler(
     requests.addMethod("PUT", new LambdaIntegration(updateDatex2Handler), {
         apiKeyRequired: false
     });
+
     createSubscription(updateDatex2Handler, updateDatex2Id, props.logsDestinationArn, stack);
 }
 

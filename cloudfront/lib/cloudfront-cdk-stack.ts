@@ -1,16 +1,16 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
-import {CloudFrontWebDistribution, OriginAccessIdentity, CfnDistribution} from '@aws-cdk/aws-cloudfront';
+import {CfnDistribution, CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
 import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
 import {CfnWebACL} from '@aws-cdk/aws-wafv2';
-import {PolicyStatement, Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
+import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "./origin-configs";
 import {createAliasConfig} from "../../common/stack/alias-configs";
 import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
 import {
     createGzipRequirement,
+    createHttpHeaders, createIpRestriction,
     createWeathercamRedirect,
-    createHttpHeaders,
     createWriteToEsLambda,
     LambdaType
 } from "./lambda/lambda-creator";
@@ -90,6 +90,10 @@ export class CloudfrontCdkStack extends Stack {
                     createHttpHeaders(this, edgeLambdaRole);
             }
 
+            if(lProps.lambdaTypes.includes(LambdaType.IP_RESTRICTION)) {
+                lambdaMap[LambdaType.IP_RESTRICTION] =
+                    createIpRestriction(this, edgeLambdaRole, lProps.lambdaParameters.vsAllowedIpAddresses);
+            }
         }
 
         return lambdaMap;
