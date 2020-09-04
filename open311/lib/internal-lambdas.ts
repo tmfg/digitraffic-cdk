@@ -43,6 +43,7 @@ function createCheckOrphanRequestsLambda(
     // @ts-ignore
     lambdaConf.environment.ORPHAN_SNS_TOPIC_ARN = orphanRequestsFoundTopic.topicArn;
     const checkOrphansLambda = new lambda.Function(stack, checkOrphanRequestsId, lambdaConf);
+    orphanRequestsFoundTopic.grantPublish(checkOrphansLambda);
     createSubscription(checkOrphansLambda, checkOrphanRequestsId, props.logsDestinationArn, stack);
     const rule = new events.Rule(stack, 'CheckOrphanRequestsScheduleRule', {
         schedule: events.Schedule.expression('cron(0 2 * * ? *)')
@@ -66,6 +67,7 @@ function createCheckMissingStatesLambda(
     // @ts-ignore
     lambdaConf.environment.ORPHAN_SNS_TOPIC_ARN = topic.topicArn;
     const checkMissingStatesLambda = new lambda.Function(stack, checkMissingStatesId, lambdaConf);
+    topic.grantPublish(checkMissingStatesLambda);
     createSubscription(checkMissingStatesLambda, checkMissingStatesId, props.logsDestinationArn, stack);
     const rule = new events.Rule(stack, 'CheckMissingStatesScheduleRule', {
         schedule: events.Schedule.expression('cron(0 2 * * ? *)')
