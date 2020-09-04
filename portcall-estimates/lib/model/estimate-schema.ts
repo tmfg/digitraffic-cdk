@@ -53,11 +53,11 @@ export function createEstimateSchema(shipReference: string, locationReference: s
                 description: 'Event time in ISO 8601 date format'
             },
             eventTimeConfidenceLower: {
-                type: JsonSchemaType.STRING,
+                type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
                 description: 'Event time confidence, lower. ISO 8601 formatted duration'
             },
             eventTimeConfidenceUpper: {
-                type: JsonSchemaType.STRING,
+                type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
                 description: 'Event time confidence, upper. ISO 8601 formatted duration'
             },
             recordTime: {
