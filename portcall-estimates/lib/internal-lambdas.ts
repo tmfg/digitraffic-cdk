@@ -1,6 +1,6 @@
 import {Function,AssetCode,Runtime} from '@aws-cdk/aws-lambda';
 import {IVpc,ISecurityGroup} from '@aws-cdk/aws-ec2';
-import {Duration, Stack} from '@aws-cdk/core';
+import {Stack} from '@aws-cdk/core';
 import {dbLambdaConfiguration} from '../../common/stack/lambda-configs';
 import {createSubscription} from '../../common/stack/subscription';
 import {Props} from "./app-props";
@@ -54,9 +54,7 @@ function createProcessQueueLambda(
     const processQueueLambda = new Function(stack, functionName, lambdaConf);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
     estimatesUpdatedTopic.grantPublish(processQueueLambda);
-    if(props.logsDestinationArn) {
-        createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
-    }
+    createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
 }
 
 function createProcessDLQLambda(
@@ -79,9 +77,7 @@ function createProcessDLQLambda(
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
 
-    if(props.logsDestinationArn) {
-        createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
-    }
+    createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
 
     const statement = new PolicyStatement();
     statement.addActions('s3:PutObject');

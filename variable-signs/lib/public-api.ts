@@ -52,6 +52,7 @@ function createDatex2Resource(
         ]
     });
 
+
     createSubscription(getDatex2Lambda, functionName, props.logsDestinationArn, stack);
     addTags('GetDatex2', BETA_TAGS, datex2Resource, stack);
 

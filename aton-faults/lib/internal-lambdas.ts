@@ -34,9 +34,7 @@ export function create(
     });
     rule.addTarget(new LambdaFunction(updateFaultsLambda));
 
-    if(props.logsDestinationArn) {
-        createSubscription(updateFaultsLambda, functionName, props.logsDestinationArn, stack);
-    }
+    createSubscription(updateFaultsLambda, functionName, props.logsDestinationArn, stack);
 
     return updateFaultsLambda;
 }

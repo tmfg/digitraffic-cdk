@@ -35,9 +35,7 @@ export function create(
     });
     rule.addTarget(new LambdaFunction(updateAnnotationsLambda));
 
-    if(props.logsDestinationArn) {
-        createSubscription(updateAnnotationsLambda, functionName, props.logsDestinationArn, stack);
-    }
+    createSubscription(updateAnnotationsLambda, functionName, props.logsDestinationArn, stack);
 
     return updateAnnotationsLambda;
 }
