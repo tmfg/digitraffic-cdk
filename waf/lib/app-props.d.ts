@@ -9,7 +9,10 @@ export interface Props {
 }
 
 export interface IpRestrictionProps {
+    // IP restriction name
     readonly name: string
+    // API Gateway arn
     readonly resourceArn: string
+    // IP Set names
     readonly ipSetNames: string[]
 }

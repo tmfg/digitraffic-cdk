@@ -20,6 +20,7 @@ export class WafStack extends Stack {
     }
 
     createIpRestriction(ipRestriction: IpRestrictionProps, ipSets: CfnIPSet[]) {
+        // deny by default, allow for IP addresses
         const webAcl = new CfnWebACL(this, ipRestriction.name, {
             name: ipRestriction.name,
             defaultAction: {block: {block: true}},
