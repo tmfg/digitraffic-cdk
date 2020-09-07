@@ -24,6 +24,15 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         expect(response.statusCode).toBe(400);
     });
 
+    test('Invalid request', async () => {
+        const req = newServiceRequestWithExtensionsDto();
+        (req as any).requested_datetime = '';
+
+        await expect(handler(Object.assign({}, testEvent, {
+            body: JSON.stringify([req])
+        }))).rejects.toThrow();
+    });
+
     test('Single service request - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify([newServiceRequestWithExtensionsDto()])

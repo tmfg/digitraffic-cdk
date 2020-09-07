@@ -51,6 +51,9 @@ export async function update(
     }).then(a => {
         const end = Date.now();
         console.info("method=updateRequests updatedCount=%d tookMs=%d", a.length, (end - start));
+    }).catch(error => {
+        console.error('method=updateRequests', requests);
+        throw error;
     });
 }
 
