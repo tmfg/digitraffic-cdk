@@ -3,6 +3,7 @@ import {ApiEstimate, EventType} from "../model/estimate";
 import moment from "moment";
 
 const ESTIMATES_BEFORE = `CURRENT_DATE - INTERVAL '12 DAYS'`;
+const ESTIMATES_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
 
 export interface DbEstimate {
     readonly event_type: EventType
@@ -66,6 +67,7 @@ const SELECT_BY_LOCODE = `
                event_source
         FROM portcall_estimate
         WHERE record_time > ${ESTIMATES_BEFORE}
+        AND event_time < ${ESTIMATES_IN_THE_FUTURE}
         AND location_locode = $1
         GROUP BY event_type,
                  ship_id,
@@ -110,6 +112,7 @@ const SELECT_BY_MMSI = `
         FROM portcall_estimate
         WHERE ship_id_type = '${ShipIdType.MMSI}'
         AND record_time > ${ESTIMATES_BEFORE}
+        AND event_time < ${ESTIMATES_IN_THE_FUTURE}
         GROUP BY event_type,
                  ship_id,
                  location_locode,
@@ -153,6 +156,7 @@ const SELECT_BY_IMO = `
         FROM portcall_estimate
         WHERE (ship_id_type = '${ShipIdType.IMO}' or secondary_ship_id_type = '${ShipIdType.IMO}')
         AND record_time > ${ESTIMATES_BEFORE}
+        AND event_time < ${ESTIMATES_IN_THE_FUTURE}
         GROUP BY event_type,
                  (CASE WHEN ship_id_type = '${ShipIdType.IMO}' then ship_id ELSE secondary_ship_id END),
                  location_locode,

@@ -125,7 +125,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*
         DATE FILTERING
      */
-    test('findByMmsi - single filtered', async () => {
+    test('findByMmsi - too old', async () => {
         const estimate = Object.assign(newEstimate(), {
             recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
         });
@@ -135,7 +135,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundEstimate.length).toBe(0);
     });
 
-    test('findByImo - single filtered', async () => {
+    test('findByImo - too old', async () => {
         const estimate = Object.assign(newEstimate(), {
             recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
         });
@@ -145,9 +145,39 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundEstimate.length).toBe(0);
     });
 
-    test('findByLocode - single filtered', async () => {
+    test('findByLocode - too old', async () => {
         const estimate = Object.assign(newEstimate(), {
             recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByLocode(db, estimate.location.port);
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    test('findByMmsi - too far in the future', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            eventTime: moment().add('4', 'days').toISOString() // enable filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByMmsi(db, estimate.ship.mmsi!!);
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    test('findByImo - too far in the future', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            eventTime: moment().add('4', 'days').toISOString() // enable filtering
+        });
+        await insert(db, [estimate]);
+
+        const foundEstimate = await findByImo(db, estimate.ship.imo!!);
+        expect(foundEstimate.length).toBe(0);
+    });
+
+    test('findByLocode - too far in the future', async () => {
+        const estimate = Object.assign(newEstimate(), {
+            eventTime: moment().add('4', 'days').toISOString() // enable filtering
         });
         await insert(db, [estimate]);
 
