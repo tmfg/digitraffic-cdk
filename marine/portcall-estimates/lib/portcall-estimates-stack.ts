@@ -10,6 +10,7 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Topic} from "@aws-cdk/aws-sns";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
+import {CfnApp, CfnSMSChannel} from "@aws-cdk/aws-pinpoint";
 
 export class PortcallEstimatesStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -30,7 +31,9 @@ export class PortcallEstimatesStack extends Stack {
         InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
         PublicApi.create(vpc, lambdaDbSg, appProps, this);
+
         this.addDLQAlarm(queueAndDLQ.dlq, appProps);
+        this.createPinPointApp(appProps);
     }
 
     addDLQAlarm(queue: Queue, appProps: Props) {
@@ -44,5 +47,15 @@ export class PortcallEstimatesStack extends Stack {
             treatMissingData: TreatMissingData.NOT_BREACHING,
             comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
         }).addAlarmAction(new SnsAction(Topic.fromTopicArn(this, 'Topic', appProps.dlqNotificationTopicArn)));
+    }
+
+    private createPinPointApp(appProps: Props) {
+        const name = 'PortcallEstimatesApp';
+        const app = new CfnApp(this, name, {
+            name
+        });
+        new CfnSMSChannel(this, 'SMSChannel', {
+            applicationId: app.ref
+        });
     }
 }
