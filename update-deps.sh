@@ -9,30 +9,28 @@ if ! npm list --depth 0 --global | grep -q npm-check-updates; then
   echo "..done"
 fi
 
-# update common
+function update() {
+  for d in $(find ./* -maxdepth 0 -type d); do
+    if [ "$d" != "./common" ] && [ "$d" != "./elasticsearch" ]; then
+      cd "$d"
+      rm -f package-lock.json
+      rm -rf node_modules
+      ncu -u --reject pg-promise
+      npm install
+      npm run build
+      cd ..
+    fi
+  done
+}
+
 cd common
-for d in $(find ./* -maxdepth 0 -type d); do
-  cd "$d"
-  if [ -f package.json ]; then
-    rm -f package-lock.json
-    rm -rf node_modules
-    ncu -u --reject pg-promise
-    npm install
-  fi
-  cd ..
-done
+update
 cd ..
 
-# update others
-for d in $(find ./* -maxdepth 0 -type d); do
-  if [ "$d" != "./common" ] && [ "$d" != "./elasticsearch" ]; then
-    cd "$d"
-    rm -f package-lock.json
-    rm -rf node_modules
-    ncu -u --reject pg-promise
-    npm install
-    npm run build
-    cd ..
-  fi
-done
+cd road
+update
+cd ..
 
+cd marine
+update
+cd ..
