@@ -48,16 +48,11 @@ The CI server expects your app to follow these conventions.
 
 If some of the old projects seems like a good start for the new project run command:
 
-    init-cdk-project-from.sh <project-to-clone> <new-project-name>
+    ./init-cdk-project-from-project.sh  <project-to-clone> <new-project-name>
+    # For example: 
+    ./init-cdk-project-from-project.sh marine/portcall-estimates/ road/maintenance-tracking/
 
 This copies contents from the existing project and does some replacements for the names.
-
-If you want to start from almost clear desk then run:
-
-    init-cdk-project.sh <new-project-name>
-   
-
-And you will get some initializations done for your project.
 
 ## Development workflow (in a cdk directory, e.g. open311-cdk)
 
