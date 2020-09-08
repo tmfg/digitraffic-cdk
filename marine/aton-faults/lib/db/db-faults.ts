@@ -14,6 +14,7 @@ const UPSERT_FAULTS_SQL =
     do update set
       entry_timestamp=$2,
       fixed_timestamp=$3,
+      state=$4,
       fixed=$7`;
 
 const ALL_FAULTS_JSON_SQL =
