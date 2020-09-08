@@ -76,7 +76,9 @@ echo "Rename filenames containing ${FROM_PROJECT_NAME} to ${TO_PROJECT_NAME}"
 find "${TO_PROJECT_PATH}" -name '*'"${FROM_PROJECT_NAME}"'*' | rename -v "s/${FROM_PROJECT_NAME}/${TO_PROJECT_NAME}/g"
 echo "Rename done!"
 
-echo "TODO: Project base is copied from ${FROM_PROJECT_PATH}." > "${TO_PROJECT_PATH}/TODO.txt"
-echo "Go through the files and do required modifications." > "${TO_PROJECT_PATH}/TODO.txt"
+echo "TODO: Project base is copied from ${FROM_PROJECT_PATH}." >> "${TO_PROJECT_PATH}/TODO.txt"
+echo "TODO: Go through the files and do required modifications." >> "${TO_PROJECT_PATH}/TODO.txt"
 
 echo
+
+echo "All done. Open new project at ${TO_PROJECT_PATH}"
