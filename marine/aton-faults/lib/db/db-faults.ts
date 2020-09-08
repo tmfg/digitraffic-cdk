@@ -89,5 +89,5 @@ function toHelsinkiTime(date: string|null): Date|null {
         return null;
     }
 
-    return moment(date, 'dd.MM.yyyy hh:mm').toDate();
+    return moment(date, 'DD.MM.YYYY hh:mm').toDate();
 }
