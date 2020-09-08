@@ -53,7 +53,7 @@ export async function streamAllForS124(db: IDatabase<any, any>, conversion: (fau
     return await stream(db, qs, conversion);
 }
 
-export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): any[] {
+export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): Promise<any>[] {
     const ps = new PreparedStatement({
         name: 'update-faults',
         text: UPSERT_FAULTS_SQL,

@@ -179,7 +179,7 @@ export async function saveFaults(domain: string, newFaults: any[]) {
     await inDatabase(async (db: IDatabase<any,any>) => {
         return await db.tx(t => {
             return t.batch([
-                    ...FaultsDB.updateFaults(db, domain, validated),
+                    FaultsDB.updateFaults(db, domain, validated),
                     LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start))
                 ]);
         });
