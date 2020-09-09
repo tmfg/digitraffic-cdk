@@ -54,7 +54,7 @@ export function attachQueueToApiGatewayResource(
             },
             requestTemplates: {
                 // map the JSON request to a form parameter
-                'application/json': 'Action=SendMessage&MessageBody=$input.body'
+                'application/json': 'Action=SendMessage&MessageBody=$util.urlEncode($input.body)'
             },
             // these are required by SQS
             integrationResponses: [
