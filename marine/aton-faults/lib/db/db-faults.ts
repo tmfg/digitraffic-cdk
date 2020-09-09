@@ -12,7 +12,9 @@ const UPSERT_FAULTS_SQL =
     values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     on conflict(id)
     do update set
+      entry_timestamp=$2,
       fixed_timestamp=$3,
+      state=$4,
       fixed=$7`;
 
 const ALL_FAULTS_JSON_SQL =
@@ -53,7 +55,7 @@ export async function streamAllForS124(db: IDatabase<any, any>, conversion: (fau
     return await stream(db, qs, conversion);
 }
 
-export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): any[] {
+export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): Promise<any>[] {
     const ps = new PreparedStatement({
         name: 'update-faults',
         text: UPSERT_FAULTS_SQL,
@@ -88,5 +90,5 @@ function toHelsinkiTime(date: string|null): Date|null {
         return null;
     }
 
-    return moment(date, 'dd.MM.yyyy hh:mm').toDate();
+    return moment(date, 'DD.MM.YYYY hh:mm').toDate();
 }

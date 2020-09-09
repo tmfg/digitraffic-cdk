@@ -185,7 +185,7 @@ export async function saveFaults(domain: string, newFaults: any[]) {
         });
     }).then(a => {
         const end = Date.now();
-        console.info("method=saveAnnotations receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, validated.length, (end-start));
+        console.info("method=saveAnnotations receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, a.length - 1, (end - start));
     })
 }
 
