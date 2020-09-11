@@ -15,7 +15,7 @@ export function create(
 
     const functionName = "ATON-UpdateFaults";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        memorySize: 256,
+        memorySize: 512,
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-faults'),
         handler: 'lambda-update-faults.handler',

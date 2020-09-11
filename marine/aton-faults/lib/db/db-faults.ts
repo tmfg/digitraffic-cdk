@@ -4,7 +4,7 @@ import {stream} from "../../../../common/db/stream-util";
 import {Language} from "../../../../common/model/language";
 
 const QueryStream = require('pg-query-stream');
-const moment = require('moment');
+const moment = require('moment-timezone');
 
 const UPSERT_FAULTS_SQL =
     `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_se, 
@@ -66,8 +66,8 @@ export function updateFaults(db: IDatabase<any, any>, domain: string, faults: an
 
         return db.none(ps, [
             p.ID,
-            toHelsinkiTime(p.FAULT_ENTRY_TIMESTAMP),
-            toHelsinkiTime(p.FAULT_FIXED_TIMESTAMP),
+            parseHelsinkiTime(p.FAULT_ENTRY_TIMESTAMP),
+            parseHelsinkiTime(p.FAULT_FIXED_TIMESTAMP),
             p.FAULT_STATE,
             p.FAULT_TYPE,
             domain,
@@ -85,10 +85,16 @@ export function updateFaults(db: IDatabase<any, any>, domain: string, faults: an
     });
 }
 
-function toHelsinkiTime(date: string|null): Date|null {
+function parseHelsinkiTime(date: string|null): Date|null {
     if(date == null) {
         return null;
     }
 
-    return moment(date, 'DD.MM.YYYY hh:mm').toDate();
+    // incoming dates are in Finnish-time without timezone-info, this propably handles it correctly
+    // it also has no leading zeros in days, months or hours
+    const helsinkiDate = moment.tz(date, 'D.M.YYYY H:mm', 'Europe/Helsinki').toDate();
+
+//    console.info("%s -> %s !", date, helsinkiDate);
+
+    return helsinkiDate;
 }
