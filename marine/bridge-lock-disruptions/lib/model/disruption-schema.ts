@@ -1,5 +1,11 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
 
+const TypeIdDescription = `Id of disturbance type:
+1 - Lock malfunction
+2 - Opening bridge malfunction
+3 - Fairway restriction
+`;
+
 const disruptionsProperties: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
@@ -7,11 +13,11 @@ const disruptionsProperties: apigateway.JsonSchema = {
     properties: {
         Id: {
             type: apigateway.JsonSchemaType.NUMBER,
-            description: 'Id of disruption'
+            description: 'Id of disturbance'
         },
-        Type_id: {
+        Type_Id: {
             type: apigateway.JsonSchemaType.NUMBER,
-            description: 'Id of disruption type'
+            description: TypeIdDescription
         },
         StartDate: {
             type: apigateway.JsonSchemaType.STRING,
