@@ -5,6 +5,30 @@ import {CfnDocumentationPart, Resource, RestApi} from "@aws-cdk/aws-apigateway";
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-documenting-api.html
 
 /**
+ * Add description to a query parameter
+ * @param name query parameter name
+ * @param description query parameter description
+ * @param resource REST API resource
+ * @param stack CloudFormation stack
+ */
+export function addQueryParameterDescription(
+    name: string,
+    description: string,
+    resource: Resource,
+    stack: Construct
+) {
+    new CfnDocumentationPart(stack, `${name}Documentation`, {
+        restApiId: resource.api.restApiId,
+        location: {
+            type: 'QUERY_PARAMETER',
+            name,
+            path: resource.path
+        },
+        properties: JSON.stringify({description})
+    });
+}
+
+/**
  * Add a documentation part to a method
  * @param methodDescription
  * @param documentationProperties
@@ -18,7 +42,7 @@ export function addDocumentation(
     stack: Construct
 ) {
     new CfnDocumentationPart(stack, `${methodDescription}Documentation`, {
-        restApiId: resource.restApi.restApiId,
+        restApiId: resource.api.restApiId,
         location: {
             type: 'METHOD',
             path: resource.path
