@@ -214,5 +214,4 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
             lat: undefined
         }};
     }
-    return editObject
 }
