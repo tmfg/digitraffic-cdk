@@ -80,7 +80,7 @@ export function update(
                                  $(address),
                                  $(address_id),
                                  $(zipcode),
-                                 ST_POINT($(long), $(lat)),
+                                 (CASE WHEN $(long) IS NOT NULL AND $(lat) IS NOT NULL THEN ST_POINT($(long), $(lat)) ELSE NULL END),
                                  $(media_url),
                                  $(status_id),
                                  $(vendor_status),
@@ -90,25 +90,25 @@ export function update(
                                  $(media_urls))
                          ON CONFLICT (service_request_id) DO UPDATE SET
                                  status_notes = $(status_notes),
-                                     service_name = $(service_name),
-                                     service_code = $(service_code),
-                                     description = $(description),
-                                     agency_responsible = $(agency_responsible),
-                                     service_notice = $(service_notice),
-                                     requested_datetime = $(requested_datetime),
-                                     updated_datetime = $(updated_datetime),
-                                     expected_datetime = $(expected_datetime),
-                                     address = $(address),
-                                     address_id = $(address_id),
-                                     zipcode = $(zipcode),
-                                     geometry = ST_POINT($(long), $(lat)),
-                                     media_url = $(media_url),
-                                     status_id = $(status_id),
-                                     vendor_status = $(vendor_status),
-                                     title = $(title),
-                                     service_object_id = $(service_object_id),
-                                     service_object_type = $(service_object_type),
-                                     media_urls = $(media_urls)
+                                 service_name = $(service_name),
+                                 service_code = $(service_code),
+                                 description = $(description),
+                                 agency_responsible = $(agency_responsible),
+                                 service_notice = $(service_notice),
+                                 requested_datetime = $(requested_datetime),
+                                 updated_datetime = $(updated_datetime),
+                                 expected_datetime = $(expected_datetime),
+                                 address = $(address),
+                                 address_id = $(address_id),
+                                 zipcode = $(zipcode),
+                                 geometry = (CASE WHEN $(long) IS NOT NULL AND $(lat) IS NOT NULL THEN ST_POINT($(long), $(lat)) ELSE NULL END),
+                                 media_url = $(media_url),
+                                 status_id = $(status_id),
+                                 vendor_status = $(vendor_status),
+                                 title = $(title),
+                                 service_object_id = $(service_object_id),
+                                 service_object_type = $(service_object_type),
+                                 media_urls = $(media_urls)
                     `, createEditObject(serviceRequest));
             }
         });
@@ -182,7 +182,7 @@ function toServiceRequest(r: any): ServiceRequestWithExtensions {
  * Creates an object with all necessary properties for pg-promise
  */
 export function createEditObject(serviceRequest: ServiceRequestWithExtensions): ServiceRequestWithExtensions {
-    return Object.assign({
+    const editObject = { ...{
         status_notes: undefined,
         service_name: undefined,
         service_code: undefined,
@@ -202,5 +202,17 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
         service_object_id: undefined,
         service_object_type: undefined,
         media_urls: undefined
-    }, serviceRequest);
+    }, ...serviceRequest };
+
+    // DPO-1167 handle long/lat empty string
+    // @ts-ignore
+    if (serviceRequest.long != '' && serviceRequest.lat != '') {
+        return editObject;
+    } else {
+        return { ...serviceRequest, ...{
+            long: undefined,
+            lat: undefined
+        }};
+    }
+    return editObject
 }

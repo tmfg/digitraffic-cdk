@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {doDelete, find, findAll, update} from "../../../lib/db/db-requests";
+import {createEditObject, doDelete, find, findAll, update} from "../../../lib/db/db-requests";
 import {newServiceRequest} from "../testdata";
 import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestStatus} from "../../../lib/model/service-request";
@@ -115,6 +115,21 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         await update([updatingServiceRequest], db);
     });
 
+    test("update - invalid geometry is not saved", async () => {
+        const serviceRequest = newServiceRequest();
+        await insertServiceRequest(db, [serviceRequest]);
+
+        const updatingServiceRequest = Object.assign({}, serviceRequest);
+        (updatingServiceRequest as any).long = '';
+        (updatingServiceRequest as any).lat = '';
+
+        await update([updatingServiceRequest], db);
+
+        const foundServiceRequest = (await findAll(db))[0];
+        expect(foundServiceRequest.long).toBeNull();
+        expect(foundServiceRequest.lat).toBeNull();
+    });
+
     test('Insert', async () => {
         const serviceRequests = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
             return newServiceRequest();
@@ -134,6 +149,18 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         delete serviceRequest.lat;
 
         await update([serviceRequest], db);
+    });
+
+    test("insert - invalid geometry is not saved", async () => {
+        const serviceRequest = newServiceRequest();
+        (serviceRequest as any).long = '';
+        (serviceRequest as any).lat = '';
+
+        await update([serviceRequest], db);
+
+        const foundServiceRequest = (await findAll(db))[0];
+        expect(foundServiceRequest.long).toBeNull();
+        expect(foundServiceRequest.lat).toBeNull();
     });
 
     test("Delete - missing doesn't fail", async () => {
