@@ -16,7 +16,7 @@ describe('db-states', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         expect(foundStates.length).toBe(states.length);
     });
 
-    test('update - deletes previous', async () => {
+    test('update - old states are cleared', async () => {
         const previousState = newState();
         await update([previousState], db);
 

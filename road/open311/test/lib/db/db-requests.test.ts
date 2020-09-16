@@ -112,6 +112,7 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         delete updatingServiceRequest.long;
         // @ts-ignore
         delete updatingServiceRequest.lat;
+
         await update([updatingServiceRequest], db);
     });
 
