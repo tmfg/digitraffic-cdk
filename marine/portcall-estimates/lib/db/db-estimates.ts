@@ -94,6 +94,11 @@ const SELECT_BY_LOCODE = `
         AND newest.event_source = pe.event_source
         AND newest.location_locode = $1
     ORDER BY
+        (CASE
+            WHEN pe.event_type = 'ATB' THEN -1
+            WHEN pe.event_type = 'ETA' THEN 0
+            ELSE 1
+        END),
         pe.event_type,
         pe.ship_id,
         (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
@@ -139,7 +144,11 @@ const SELECT_BY_MMSI = `
     AND newest.ship_id = $1
     ORDER BY
         pe.location_locode,
-        pe.event_type,
+        (CASE
+            WHEN pe.event_type = 'ATB' THEN -1
+            WHEN pe.event_type = 'ETA' THEN 0
+            ELSE 1
+        END),
         (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
@@ -183,7 +192,11 @@ const SELECT_BY_IMO = `
     AND newest.shipid = $1
     ORDER BY
         pe.location_locode,
-        pe.event_type,
+        (CASE
+            WHEN pe.event_type = 'ATB' THEN -1
+            WHEN pe.event_type = 'ETA' THEN 0
+            ELSE 1
+        END),
         (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
         pe.event_time_confidence_lower_diff,
         pe.event_time_confidence_upper_diff,
