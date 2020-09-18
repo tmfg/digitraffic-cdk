@@ -67,7 +67,7 @@ const SELECT_BY_LOCODE = `
                location_locode,
                event_source
         FROM portcall_estimate
-        WHERE record_time > ${ESTIMATES_BEFORE}
+        WHERE event_time > ${ESTIMATES_BEFORE}
         AND event_time < ${ESTIMATES_IN_THE_FUTURE}
         AND location_locode = $1
         GROUP BY event_type,
@@ -90,7 +90,7 @@ const SELECT_BY_LOCODE = `
         pe.secondary_ship_id_type,
         pe.location_locode,
         FIRST_VALUE(pe.event_time) OVER (
-            PARTITION BY pe.event_type, pe.location_locode
+            PARTITION BY pe.event_type, pe.ship_id
             ORDER BY
                 (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
                 pe.event_time_confidence_lower_diff,
@@ -114,7 +114,7 @@ const SELECT_BY_MMSI = `
                event_source
         FROM portcall_estimate
         WHERE ship_id_type = '${ShipIdType.MMSI}'
-        AND record_time > ${ESTIMATES_BEFORE}
+        AND event_time > ${ESTIMATES_BEFORE}
         AND event_time < ${ESTIMATES_IN_THE_FUTURE}
         GROUP BY event_type,
                  ship_id,
@@ -160,7 +160,7 @@ const SELECT_BY_IMO = `
                event_source
         FROM portcall_estimate
         WHERE (ship_id_type = '${ShipIdType.IMO}' or secondary_ship_id_type = '${ShipIdType.IMO}')
-        AND record_time > ${ESTIMATES_BEFORE}
+        AND event_time > ${ESTIMATES_BEFORE}
         AND event_time < ${ESTIMATES_IN_THE_FUTURE}
         GROUP BY event_type,
                  (CASE WHEN ship_id_type = '${ShipIdType.IMO}' then ship_id ELSE secondary_ship_id END),

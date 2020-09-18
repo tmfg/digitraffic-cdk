@@ -127,7 +127,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
      */
     test('findByMmsi - too old', async () => {
         const estimate = Object.assign(newEstimate(), {
-            recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
+            eventTime: moment().subtract('13', 'days').toISOString() // enable filtering
         });
         await insert(db, [estimate]);
 
@@ -137,7 +137,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('findByImo - too old', async () => {
         const estimate = Object.assign(newEstimate(), {
-            recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
+            eventTime: moment().subtract('13', 'days').toISOString() // enable filtering
         });
         await insert(db, [estimate]);
 
@@ -147,7 +147,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('findByLocode - too old', async () => {
         const estimate = Object.assign(newEstimate(), {
-            recordTime: moment().subtract('13', 'days').toISOString() // enable filtering
+            eventTime: moment().subtract('13', 'days').toISOString() // enable filtering
         });
         await insert(db, [estimate]);
 
