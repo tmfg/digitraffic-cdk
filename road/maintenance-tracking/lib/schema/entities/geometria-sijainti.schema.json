@@ -1,21 +1,19 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
   "properties": {
-      "koordinaatit": {
-          "id": "urn:harja/koordinaattisijainti",
-          "type": "object",
-          "additionalProperties": false,
-          "$ref": "koordinaattisijainti.schema.json",
-          "required": false
-      },
-      "viivageometria": {
-          "id": "urn:harja/viivageometria",
-          "type": "object",
-          "additionalProperties": false,
-          "$ref": "viivageometriasijainti.schema.json",
-          "required": true
-      }
+    "koordinaatit": {
+      "id": "urn:harja/koordinaattisijainti",
+      "type": "object",
+      "additionalProperties": false,
+      "$ref": "koordinaattisijainti.schema.json"
+    },
+    "viivageometria": {
+      "id": "urn:harja/viivageometria",
+      "type": "object",
+      "additionalProperties": false,
+      "$ref": "viivageometriasijainti.schema.json"
+    }
   }
 }

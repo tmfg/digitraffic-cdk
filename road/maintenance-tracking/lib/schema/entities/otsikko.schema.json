@@ -1,26 +1,32 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
   "additionalProperties": false,
+  "required": [
+    "lahettaja",
+    "viestintunniste",
+    "lahetysaika"
+  ],
   "properties": {
     "lahettaja": {
       "id": "urn:harja/lahettaja",
       "type": "object",
       "additionalProperties": false,
-      "required": true,
+      "required": [
+        "jarjestelma",
+        "organisaatio"
+      ],
       "properties": {
         "jarjestelma": {
           "id": "urn:harja/lahettaja/jarjestelma",
-          "type": "string",
-          "required": true
+          "type": "string"
         },
         "organisaatio": {
           "id": "urn:harja/organisaatio",
           "type": "object",
           "additionalProperties": false,
-          "$ref": "organisaatio.schema.json",
-          "required": true
+          "$ref": "organisaatio.schema.json"
         }
       }
     },
@@ -28,14 +34,12 @@
       "id": "urn:harja/viestintunniste",
       "type": "object",
       "additionalProperties": false,
-      "$ref": "tunniste.schema.json",
-      "required": true
+      "$ref": "tunniste.schema.json"
     },
     "lahetysaika": {
       "id": "urn:harja/lahetysaika",
       "type": "string",
-      "format": "date-time",
-      "required": true
+      "format": "date-time"
     }
   }
 }

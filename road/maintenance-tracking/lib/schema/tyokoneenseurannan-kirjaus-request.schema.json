@@ -1,51 +1,60 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
   "additionalProperties": false,
+  "required": [
+    "otsikko",
+    "havainnot"
+  ],
   "properties": {
     "otsikko": {
       "id": "urn:harja/otsikko",
       "type": "object",
       "additionalProperties": false,
-      "$ref": "entities/otsikko.schema.json",
-      "required": true
+      "$ref": "entities/otsikko.schema.json"
     },
     "havainnot": {
       "id": "urn:harja/havainnot",
       "type": "array",
       "maxItems": 4096,
-      "required": true,
       "items": {
-        "id": "http://example.com/item-schema",
+
         "type": "object",
         "additionalProperties": false,
+        "required": [
+          "havainto"
+        ],
         "properties": {
           "havainto": {
             "id": "urn:harja/havainnot/0",
             "type": "object",
-            "required": true,
+            "required": [
+              "tyokone",
+              "sijainti",
+              "havaintoaika"
+            ],
             "properties": {
               "tyokone": {
                 "id": "urn:harja/havainnot/0/tyokone",
                 "type": "object",
                 "additionalProperties": false,
-                "required": true,
+                "required": [
+                  "id",
+                  "tyokonetyyppi"
+                ],
                 "properties": {
                   "id": {
                     "id": "urn:harja/havainnot/0/tyokone/id",
-                    "type": "integer",
-                    "required": true
+                    "type": "integer"
                   },
                   "tunnus": {
                     "id": "urn:harja/havainnot/0/tyokone/tunnus",
-                    "type": "string",
-                    "required": false
+                    "type": "string"
                   },
                   "tyokonetyyppi": {
                     "id": "urn:harja/havainnot/0/tyokone/tyyppi",
-                    "type": "string",
-                    "required": true
+                    "type": "string"
                   }
                 }
               },
@@ -53,8 +62,7 @@
                 "id": "urn:harja/havainnot/0/sijainti",
                 "type": "object",
                 "additionalProperties": false,
-                "$ref": "entities/geometria-sijainti.schema.json",
-                "required": true
+                "$ref": "entities/geometria-sijainti.schema.json"
               },
               "suunta": {
                 "id": "urn:harja/havainnot/0/suunta",
@@ -67,8 +75,7 @@
               "havaintoaika": {
                 "id": "urn:harja/havainnot/0/havaintoaika",
                 "type": "string",
-                "format": "date-time",
-                "required": true
+                "format": "date-time"
               },
               "suoritettavatTehtavat": {
                 "id": "urn:harja/havainnot/0/tyokonetehtava",

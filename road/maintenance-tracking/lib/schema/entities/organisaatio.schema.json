@@ -1,8 +1,11 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
   "additionalProperties": false,
+  "required": [
+    "ytunnus"
+  ],
   "properties": {
     "nimi": {
       "id": "urn:harja/nimi",
@@ -10,8 +13,7 @@
     },
     "ytunnus": {
       "id": "urn:harja/ytunnus",
-      "type": "string",
-      "required": true
+      "type": "string"
     }
   }
 }

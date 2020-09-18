@@ -1,15 +1,20 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
   "additionalProperties": false,
+  "required": [
+    "tunniste",
+    "alkanut",
+    "paattynyt",
+    "toteumatyyppi"
+  ],
   "properties": {
     "tunniste": {
       "id": "urn:harja/toteumat/0/toteuma/tunniste",
       "type": "object",
       "additionalProperties": false,
-      "$ref": "tunniste.schema.json",
-      "required": true
+      "$ref": "tunniste.schema.json"
     },
     "sopimusId": {
       "id": "urn:harja/toteumat/0/toteuma/sopimusId",
@@ -18,14 +23,12 @@
     "alkanut": {
       "id": "urn:harja/toteumat/0/toteuma/alkanut",
       "type": "string",
-      "format": "date-time",
-      "required": true
+      "format": "date-time"
     },
     "paattynyt": {
       "id": "urn:harja/toteumat/0/toteuma/paattynyt",
       "type": "string",
-      "format": "date-time",
-      "required": true
+      "format": "date-time"
     },
     "suorittaja": {
       "id": "urn:harja/suorittaja",
@@ -44,7 +47,6 @@
     },
     "toteumatyyppi": {
       "id": "urn:harja/toteumat/0/toteuma/kokonaishintainenTyo",
-      "required": true,
       "enum": [
         "yksikkohintainen",
         "kokonaishintainen",

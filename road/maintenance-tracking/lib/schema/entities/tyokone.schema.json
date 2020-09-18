@@ -1,12 +1,14 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
   "additionalProperties": false,
+  "required": [
+    "tyyppi"
+  ],
   "properties": {
     "tyyppi": {
       "id": "urn:harja/tyokone/tyyppi",
-      "required": true,
       "enum": [
         "Ei ajoneuvoa",
         "Henkilöauto",
@@ -28,16 +30,15 @@
         "Tiehöylä",
         "Traktori",
         "Turva-auto",
-        "Työkone"]
+        "Työkone"
+      ]
     },
     "tunniste": {
       "id": "urn:harja/tyokone/tunniste",
-      "required": false,
       "type": "string"
     },
     "lisatieto": {
       "id": "urn:harja/tyokone/lisatieto",
-      "required": false,
       "type": "string"
     }
   }

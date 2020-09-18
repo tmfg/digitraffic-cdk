@@ -1,28 +1,29 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
+  "required": [
+    "toteuma",
+    "reitti"
+  ],
   "properties": {
     "toteuma": {
       "id": "urn:harja/reittitoteuma/toteuma",
       "type": "object",
       "additionalProperties": false,
-      "required": true,
       "$ref": "toteuma.schema.json"
     },
     "reitti": {
       "id": "urn:harja/reittitoteuma/reitti",
       "type": "object",
       "additionalProperties": false,
-      "required": true,
       "$ref": "reitti.schema.json"
     },
     "tyokone": {
       "id": "urn:harja/reittitoteuma/tyokone",
       "type": "object",
       "additionalProperties": false,
-      "$ref": "tyokone.schema.json",
-      "required": false
+      "$ref": "tyokone.schema.json"
     }
   }
 }

@@ -1,12 +1,14 @@
 {
-  "$schema": "http://json-schema.org/draft-03/schema#",
+  "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "urn:harja",
   "type": "object",
+  "required": [
+    "id"
+  ],
   "properties": {
     "id": {
       "id": "urn:harja/tehtava/koodi",
-      "type": "integer",
-      "required": true
+      "type": "integer"
     },
     "maara": {
       "id": "urn:harja/maarat/0/maara",
