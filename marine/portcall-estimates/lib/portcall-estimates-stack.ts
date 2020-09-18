@@ -54,6 +54,10 @@ export class PortcallEstimatesStack extends Stack {
         const app = new CfnApp(this, name, {
             name
         });
+        const topicName = 'PortcallEstimatesIncomingSMS';
+        new Topic(this, topicName, {
+            topicName
+        });
         new CfnSMSChannel(this, 'SMSChannel', {
             applicationId: app.ref
         });

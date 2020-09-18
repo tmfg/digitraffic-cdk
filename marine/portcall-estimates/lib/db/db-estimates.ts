@@ -26,35 +26,36 @@ export enum ShipIdType {
 }
 
 const INSERT_ESTIMATE_SQL = `
-        INSERT INTO portcall_estimate(
-            event_type,
-            event_time,
-            event_time_confidence_lower,
-            event_time_confidence_lower_diff,
-            event_time_confidence_upper,
-            event_time_confidence_upper_diff,
-            event_source,
-            record_time,
-            ship_id,
-            ship_id_type,
-            secondary_ship_id,
-            secondary_ship_id_type,
-            location_locode)
-        VALUES (
-            $1,
-            $2,
-            $3,
-            $4,
-            $5,
-            $6,
-            $7,
-            $8,
-            $9,
-            $10,
-            $11,
-            $12,
-            $13)
-        ON CONFLICT(ship_id, event_source, event_time, record_time) DO NOTHING
+    INSERT INTO portcall_estimate(
+        event_type,
+        event_time,
+        event_time_confidence_lower,
+        event_time_confidence_lower_diff,
+        event_time_confidence_upper,
+        event_time_confidence_upper_diff,
+        event_source,
+        record_time,
+        ship_id,
+        ship_id_type,
+        secondary_ship_id,
+        secondary_ship_id_type,
+        location_locode)
+    VALUES (
+           $1,
+           $2,
+           $3,
+           $4,
+           $5,
+           $6,
+           $7,
+           $8,
+           $9,
+           $10,
+           $11,
+           $12,
+           $13
+    )
+    ON CONFLICT(ship_id, event_source, event_time, record_time) DO NOTHING
         RETURNING ship_id, ship_id_type, secondary_ship_id, secondary_ship_id_type
 `;
 
@@ -87,24 +88,21 @@ const SELECT_BY_LOCODE = `
         pe.ship_id_type,
         pe.secondary_ship_id,
         pe.secondary_ship_id_type,
-        pe.location_locode
+        pe.location_locode,
+        FIRST_VALUE(pe.event_time) OVER (
+            PARTITION BY pe.event_type, pe.location_locode
+            ORDER BY
+                (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
+                pe.event_time_confidence_lower_diff,
+                pe.event_time_confidence_upper_diff,
+                pe.record_time DESC
+        ) AS event_group_time
     FROM portcall_estimate pe
              JOIN newest ON newest.re = pe.record_time
         AND newest.event_type = pe.event_type
         AND newest.event_source = pe.event_source
         AND newest.location_locode = $1
-    ORDER BY
-        (CASE
-            WHEN pe.event_type = 'ATB' THEN -1
-            WHEN pe.event_type = 'ETA' THEN 0
-            ELSE 1
-        END),
-        pe.event_type,
-        pe.ship_id,
-        (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
-        pe.event_time_confidence_lower_diff,
-        pe.event_time_confidence_upper_diff,
-        pe.record_time DESC
+    ORDER BY event_group_time
 `;
 
 const SELECT_BY_MMSI = `
@@ -136,23 +134,21 @@ const SELECT_BY_MMSI = `
         pe.ship_id_type,
         pe.secondary_ship_id,
         pe.secondary_ship_id_type,
-        pe.location_locode
+        pe.location_locode,
+        FIRST_VALUE(pe.event_time) OVER (
+            PARTITION BY pe.event_type, pe.location_locode
+            ORDER BY
+                (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
+                pe.event_time_confidence_lower_diff,
+                pe.event_time_confidence_upper_diff,
+                pe.record_time DESC
+        ) AS event_group_time
     FROM portcall_estimate pe
     JOIN newest ON newest.re = pe.record_time
     AND newest.event_type = pe.event_type
     AND newest.event_source = pe.event_source
     AND newest.ship_id = $1
-    ORDER BY
-        pe.location_locode,
-        (CASE
-            WHEN pe.event_type = 'ATB' THEN -1
-            WHEN pe.event_type = 'ETA' THEN 0
-            ELSE 1
-        END),
-        (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
-        pe.event_time_confidence_lower_diff,
-        pe.event_time_confidence_upper_diff,
-        pe.record_time DESC
+    ORDER BY event_group_time
 `;
 
 const SELECT_BY_IMO = `
@@ -184,23 +180,21 @@ const SELECT_BY_IMO = `
         pe.ship_id_type,
         pe.secondary_ship_id,
         pe.secondary_ship_id_type,
-        pe.location_locode
+        pe.location_locode,
+        FIRST_VALUE(pe.event_time) OVER (
+            PARTITION BY pe.event_type, pe.location_locode
+            ORDER BY
+                (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
+                pe.event_time_confidence_lower_diff,
+                pe.event_time_confidence_upper_diff,
+                pe.record_time DESC
+        ) AS event_group_time
     FROM portcall_estimate pe
     JOIN newest ON newest.re = pe.record_time
     AND newest.event_type = pe.event_type
     AND newest.event_source = pe.event_source
     AND newest.shipid = $1
-    ORDER BY
-        pe.location_locode,
-        (CASE
-            WHEN pe.event_type = 'ATB' THEN -1
-            WHEN pe.event_type = 'ETA' THEN 0
-            ELSE 1
-        END),
-        (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
-        pe.event_time_confidence_lower_diff,
-        pe.event_time_confidence_upper_diff,
-        pe.record_time DESC
+    ORDER BY event_group_time
 `;
 
 export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): Promise<any> {
