@@ -1,7 +1,7 @@
 import * as pgPromise from "pg-promise";
 import {initDbConnection} from "digitraffic-lambda-postgres/database";
-import {ApiEstimate} from "../../lib/model/estimate";
-import {createUpdateValues, DbEstimate} from "../../lib/db/db-estimates";
+import {ApiEstimate} from "../../lib/estimates/model/estimate";
+import {createUpdateValues, DbEstimate} from "../../lib/estimates/db/db-estimates";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {

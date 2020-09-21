@@ -1,5 +1,5 @@
-import {validateEstimate} from "../../../lib/model/estimate";
-import {newEstimate} from "../testdata";
+import {validateEstimate} from "../../../../lib/estimates/model/estimate";
+import {newEstimate} from "../../testdata";
 
 describe('estimate model', () => {
 

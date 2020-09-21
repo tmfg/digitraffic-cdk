@@ -1,10 +1,10 @@
 import * as pgPromise from "pg-promise";
-import {dbTestBase, findAll} from "../db-testutil";
-import {handlerFn} from "../../../lib/lambda/process-queue/lambda-process-queue";
+import {dbTestBase, findAll} from "../../db-testutil";
+import {handlerFn} from "../../../../lib/estimates/lambda/process-queue/lambda-process-queue";
 import {SQSRecord} from "aws-lambda";
-import {ApiEstimate} from "../../../lib/model/estimate";
+import {ApiEstimate} from "../../../../lib/estimates/model/estimate";
 import * as sinon from 'sinon';
-import {newEstimate} from "../testdata";
+import {newEstimate} from "../../testdata";
 import {SNS} from "aws-sdk";
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {

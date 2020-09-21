@@ -1,5 +1,5 @@
 import moment from "moment";
-import {ApiEstimate, EventType} from "../../lib/model/estimate";
+import {ApiEstimate, EventType} from "../../lib/estimates/model/estimate";
 
 export function someNumber() {
     return Math.floor(Math.random() * 999999);

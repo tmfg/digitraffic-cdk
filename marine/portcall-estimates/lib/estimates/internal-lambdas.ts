@@ -1,9 +1,9 @@
 import {Function,AssetCode,Runtime} from '@aws-cdk/aws-lambda';
 import {IVpc,ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {Stack} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createSubscription} from '../../../common/stack/subscription';
-import {Props} from "./app-props";
+import {dbLambdaConfiguration} from '../../../../common/stack/lambda-configs';
+import {createSubscription} from '../../../../common/stack/subscription';
+import {Props} from "./app-props-estimates";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
 import {Bucket} from "@aws-cdk/aws-s3";
@@ -12,7 +12,6 @@ import {RetentionDays} from '@aws-cdk/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Topic} from "@aws-cdk/aws-sns";
-import {LambdaSubscription} from '@aws-cdk/aws-sns-subscriptions';
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -28,7 +27,6 @@ export function create(
     });
     createProcessQueueLambda(queueAndDLQ.queue, estimatesUpdatedTopic, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
-    createUpdatedEstimatesNotificationLambda(estimatesUpdatedTopic, vpc, lambdaDbSg, props, stack);
 }
 
 function createProcessQueueLambda(
@@ -41,7 +39,7 @@ function createProcessQueueLambda(
     const functionName = "PortcallEstimates-ProcessQueue";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
-        code: new AssetCode('dist/lambda/process-queue'),
+        code: new AssetCode('dist/estimates/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment: {
             DB_USER: props.dbProps.username,
@@ -69,7 +67,7 @@ function createProcessDLQLambda(
         runtime: Runtime.NODEJS_12_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
-        code: new AssetCode('dist/lambda/process-dlq'),
+        code: new AssetCode('dist/estimates/lambda/process-dlq'),
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
@@ -84,30 +82,4 @@ function createProcessDLQLambda(
     statement.addActions('s3:PutObjectAcl');
     statement.addResources(dlqBucket.bucketArn + '/*');
     processDLQLambda.addToRolePolicy(statement);
-}
-
-function createUpdatedEstimatesNotificationLambda(
-    topic: Topic,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: Props,
-    stack: Stack) {
-    const functionName = "PortcallEstimates-NotifyUpdatedEstimates";
-    const notifyLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: functionName,
-        code: new AssetCode('dist/lambda/notify-updated-estimates'),
-        handler: 'lambda-notify-updated-estimates.handler',
-        environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri,
-        },
-        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
-    }));
-
-    topic.addSubscription(new LambdaSubscription(notifyLambda));
-
-    if(props.logsDestinationArn) {
-        createSubscription(notifyLambda, functionName, props.logsDestinationArn, stack);
-    }
 }

@@ -1,9 +1,9 @@
 import * as pgPromise from "pg-promise";
-import {dbTestBase, insert} from "../db-testutil";
-import {newEstimate} from "../testdata";
-import {findByLocode} from "../../../lib/db/db-estimates";
-import {shuffle} from "../../../../../common/js/js-utils";
-import {EventType} from "../../../lib/model/estimate";
+import {dbTestBase, insert} from "../../db-testutil";
+import {newEstimate} from "../../testdata";
+import {findByLocode} from "../../../../lib/estimates/db/db-estimates";
+import {shuffle} from "../../../../../../common/js/js-utils";
+import {EventType} from "../../../../lib/estimates/model/estimate";
 
 describe('db-estimates - ordering - locode', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 

@@ -1,11 +1,11 @@
 import {Model, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
 import {Construct} from '@aws-cdk/core';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {LambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createRestApi} from '../../../common/api/rest_apis';
+import {LambdaConfiguration} from '../../../../common/stack/lambda-configs';
+import {createRestApi} from '../../../../common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
-import {attachQueueToApiGatewayResource} from "../../../common/api/sqs";
-import {addServiceModel, getModelReference} from "../../../common/api/utils";
+import {attachQueueToApiGatewayResource} from "../../../../common/api/sqs";
+import {addServiceModel, getModelReference} from "../../../../common/api/utils";
 import {createEstimateSchema, LocationSchema, ShipSchema} from "./model/estimate-schema";
 
 export function create(

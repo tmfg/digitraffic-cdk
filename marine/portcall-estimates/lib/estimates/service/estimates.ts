@@ -1,7 +1,7 @@
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
+import * as LastUpdatedDB from "../../../../../common/db/last-updated";
 import * as EstimatesDB from "../db/db-estimates"
 import {DbEstimate, ShipIdType} from "../db/db-estimates"
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "../../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {ApiEstimate} from "../model/estimate";
 

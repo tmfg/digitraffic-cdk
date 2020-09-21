@@ -1,9 +1,9 @@
-import {dbTestBase, insert} from "../db-testutil";
+import {dbTestBase, insert} from "../../db-testutil";
 import * as pgPromise from "pg-promise";
-import {newEstimate} from "../testdata";
+import {newEstimate} from "../../testdata";
 import {
     findAllEstimates
-} from "../../../lib/service/estimates";
+} from "../../../../lib/estimates/service/estimates";
 
 describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 

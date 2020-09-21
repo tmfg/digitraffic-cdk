@@ -1,13 +1,13 @@
 import * as pgPromise from "pg-promise";
-import {dbTestBase, insert} from "../db-testutil";
-import {newEstimate} from "../testdata";
+import {dbTestBase, insert} from "../../db-testutil";
+import {newEstimate} from "../../testdata";
 import {
     DbEstimate,
     findByImo,
     findByLocode,
     findByMmsi,
-} from "../../../lib/db/db-estimates";
-import {shuffle} from "../../../../../common/js/js-utils";
+} from "../../../../lib/estimates/db/db-estimates";
+import {shuffle} from "../../../../../../common/js/js-utils";
 
 describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 

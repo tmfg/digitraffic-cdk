@@ -1,8 +1,8 @@
 import moment from 'moment';
 import * as pgPromise from "pg-promise";
-import {dbTestBase, findAll, insert} from "../db-testutil";
-import {newEstimate} from "../testdata";
-import {findByImo, findByLocode, findByMmsi} from "../../../lib/db/db-estimates";
+import {dbTestBase, insert} from "../../db-testutil";
+import {newEstimate} from "../../testdata";
+import {findByImo, findByLocode, findByMmsi} from "../../../../lib/estimates/db/db-estimates";
 
 describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*

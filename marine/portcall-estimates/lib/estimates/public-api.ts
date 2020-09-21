@@ -4,14 +4,14 @@ import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {createEstimateSchema, LocationSchema, ShipSchema} from './model/estimate-schema';
-import {createSubscription} from '../../../common/stack/subscription';
-import {corsMethodJsonResponse, defaultIntegration,} from "../../../common/api/responses";
-import {MessageModel} from "../../../common/api/response";
-import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
-import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
-import {Props} from "./app-props";
-import {addTags} from "../../../common/api/documentation";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {createSubscription} from '../../../../common/stack/subscription';
+import {corsMethodJsonResponse, defaultIntegration,} from "../../../../common/api/responses";
+import {MessageModel} from "../../../../common/api/response";
+import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../../common/api/utils";
+import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
+import {Props} from "./app-props-estimates";
+import {addTags} from "../../../../common/api/documentation";
+import {createUsagePlan} from "../../../../common/stack/usage-plans";
 
 export function create(
     vpc: IVpc,
@@ -47,7 +47,7 @@ function createEstimatesResource(
 
     const functionName = 'PortcallEstimate-GetEstimates';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
-    const assetCode = new AssetCode('dist/lambda/get-estimates');
+    const assetCode = new AssetCode('dist/estimates/lambda/get-estimates');
     const getEstimatesLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: assetCode,
