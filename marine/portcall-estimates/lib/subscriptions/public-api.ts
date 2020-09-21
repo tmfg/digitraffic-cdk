@@ -42,7 +42,7 @@ function createSubscriptionsResource(
     props: Props,
     lambdaDbSg: ISecurityGroup,
     createSubscriptionLambda: Function,
-    estimatesJsonModel: any,
+    subscriptionModel: Model,
     validator: RequestValidator,
     stack: Construct) {
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
@@ -52,6 +52,9 @@ function createSubscriptionsResource(
     resources.addMethod("POST", createSubscriptionIntegration, {
         apiKeyRequired: true,
         requestValidator: validator,
+        requestModels: {
+            'application/json': subscriptionModel,
+        },
         methodResponses: [
             corsMethodJsonResponse("200", Model.EMPTY_MODEL),
             corsMethodJsonResponse("500", errorResponseModel)

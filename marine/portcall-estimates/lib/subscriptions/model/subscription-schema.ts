@@ -4,9 +4,9 @@ export const SubscriptionSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
     description: 'Portcall estimates subscription schema',
-    required: ['port'],
+    required: ['locode', 'phoneNumber', 'time'],
     properties: {
-        port: {
+        locode: {
             type: JsonSchemaType.STRING,
             description: 'Port LOCODE, e.g. FIXXX'
         },
