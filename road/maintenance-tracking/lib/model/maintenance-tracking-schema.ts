@@ -89,7 +89,7 @@ export const Viivageometriasijainti: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
     additionalProperties: false,
-    required: ['id', 'coordinates'],
+    required: ['type', 'coordinates'],
     properties: {
         type: {
             enum: [

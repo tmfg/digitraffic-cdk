@@ -34,4 +34,4 @@ function processedSuccessfully(p: PromiseSettledResult<any>) {
     return p.status === 'fulfilled';
 }
 
-export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn(new SNS())).use(sqsPartialBatchFailureMiddleware());
+export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());
