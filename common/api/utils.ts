@@ -1,5 +1,5 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
-import {Model} from "@aws-cdk/aws-apigateway";
+import {ModelWithReference} from "./model-with-reference";
 
 /**
  * Get a reference to an OpenAPI model object in a REST API.
@@ -29,14 +29,17 @@ export function addDefaultValidator(api: apigateway.RestApi): apigateway.Request
  * @param name Name of the model
  * @param api REST API
  * @param schema JSON Schema
+ * @return ModelWithReference A model object with a reference to an API Gateway model object.
  */
 export function addServiceModel(name:string, api: apigateway.RestApi,
-                                schema: apigateway.JsonSchema): Model {
-    return api.addModel(name, {
+                                schema: apigateway.JsonSchema): ModelWithReference {
+    const mwr = api.addModel(name, {
         contentType: 'application/json',
         modelName: name,
         schema: schema
-    });
+    }) as ModelWithReference;
+    mwr.modelReference = getModelReference(mwr.modelId, api.restApiId);
+    return mwr;
 }
 
 export function addXmlserviceModel(name:string, api: apigateway.RestApi): any {
