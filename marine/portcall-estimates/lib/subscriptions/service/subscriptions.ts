@@ -1,6 +1,9 @@
-import {EstimateSubscription} from "../model/subscription";
-import {TIME_FORMAT} from "../smsutils";
+import {EstimateSubscription, validateSubscription} from "../model/subscription";
 
 export async function addSubscription(subscription: EstimateSubscription) {
-    console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time.format(TIME_FORMAT)}`);
+    if (validateSubscription(subscription)) {
+        console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
+    } else {
+        console.error('Invalid subscription');
+    }
 }
