@@ -51,4 +51,5 @@ cdk.out
 
 # config
 bin
-.idea
+/.idea/workspace.xml
+/.idea/shelf/
