@@ -22,8 +22,7 @@ export const Tunniste: JsonSchema = {
     required: ['id'],
     properties: {
         id: {
-            type: JsonSchemaType.INTEGER,
-            maximum: 2147483647,
+            type: JsonSchemaType.INTEGER
         }
     }
 };
@@ -70,14 +69,10 @@ export const Koordinaattisijainti: JsonSchema = {
     required: ['x', 'y'],
     properties: {
         x: {
-            type: JsonSchemaType.NUMBER,
-            minimum: 60000,
-            maximum: 736400,
+            type: JsonSchemaType.NUMBER
         },
         y: {
-            type: JsonSchemaType.NUMBER,
-            minimum: 6500000,
-            maximum: 7800000,
+            type: JsonSchemaType.NUMBER
         },
         z: {
             type: JsonSchemaType.NUMBER
@@ -105,14 +100,10 @@ export const Viivageometriasijainti: JsonSchema = {
                 maxItems: 2,
                 items: [
                     {
-                        type: "number",
-                        minimum: 60000,
-                        maximum: 736400
+                        type: JsonSchemaType.NUMBER
                     },
                     {
-                        type: "number",
-                        minimum: 6500000,
-                        maximum: 7800000
+                        type: JsonSchemaType.NUMBER
                     }
                 ]
             } as JsonSchema
@@ -182,7 +173,6 @@ export function createSchemaHavainto(geometriaSijaintiRef: string): JsonSchema {
                     },
                     suoritettavatTehtavat: {
                         type: JsonSchemaType.ARRAY,
-                        maxItems: 10,
                         items: {
                             enum: [
                                 "asfaltointi",
@@ -245,7 +235,6 @@ export function createSchemaTyokoneenseurannanKirjaus(otsikkoRef: string, havain
             },
             havainnot: {
                 type: JsonSchemaType.ARRAY,
-                maxItems: 4096,
                 items: havainto
             }
         }

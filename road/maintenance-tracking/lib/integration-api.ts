@@ -5,14 +5,16 @@ import {LambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createRestApi} from '../../../common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
 import {attachQueueToApiGatewayResource} from "../../../common/api/sqs";
-import {addServiceModel} from "../../../common/api/utils";
+import {addDefaultValidator, addServiceModel} from "../../../common/api/utils";
 import {
     createSchemaGeometriaSijainti,
-    createSchemaOtsikko, createSchemaHavainto,
+    createSchemaOtsikko,
+    createSchemaHavainto,
+    createSchemaTyokoneenseurannanKirjaus,
     Koordinaattisijainti,
     Organisaatio,
     Tunniste,
-    Viivageometriasijainti, createSchemaTyokoneenseurannanKirjaus
+    Viivageometriasijainti,
 } from "./model/maintenance-tracking-schema";
 
 
@@ -44,11 +46,11 @@ export function create(
     const tyokoneenseurannanKirjausModel = addServiceModel("TyokoneenseurannanKirjaus", integrationApi,
                                                            createSchemaTyokoneenseurannanKirjaus(otsikkoModel.modelReference, havaintoSchema));
 
-    createUpdateMaintenanceTrackingResource(stack, integrationApi, queue, tyokoneenseurannanKirjausModel);
+    createUpdateMaintenanceTrackingApiGatewayResource(stack, integrationApi, queue, tyokoneenseurannanKirjausModel);
     // createUsagePlan(integrationApi); // TODO Ks. Teijon allowed ips
 }
 
-function createUpdateMaintenanceTrackingResource(
+function createUpdateMaintenanceTrackingApiGatewayResource(
     stack: Construct,
     integrationApi: RestApi,
     queue: Queue,
@@ -56,12 +58,7 @@ function createUpdateMaintenanceTrackingResource(
     const apiResource = integrationApi.root.addResource('api');
     const integrationResource = apiResource.addResource('integration');
     const estimateResource = integrationResource.addResource('maintenance-tracking');
-    const requestValidator = new RequestValidator(stack, 'RequestValidator', {
-        validateRequestBody: true,
-        validateRequestParameters: true,
-        requestValidatorName: 'MaintenanceTrackingIntegrationRequestValidator',
-        restApi: integrationApi
-    });
+    const requestValidator = addDefaultValidator(integrationApi);
     attachQueueToApiGatewayResource(
         stack,
         queue,

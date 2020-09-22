@@ -11,7 +11,6 @@ import {BUCKET_NAME} from "./lambda/process-dlq/lambda-process-dlq";
 import {RetentionDays} from '@aws-cdk/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
-import {Topic} from "@aws-cdk/aws-sns";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -20,18 +19,12 @@ export function create(
     lambdaDbSg: ISecurityGroup,
     props: AppProps,
     stack: Stack) {
-    const trackingsUpdatedTopicId = 'MaintenanceTrackingUpdatedTopic';
-    const trackingsUpdatedTopic = new Topic(stack, trackingsUpdatedTopicId, {
-        displayName: trackingsUpdatedTopicId,
-        topicName: trackingsUpdatedTopicId
-    });
-    createProcessQueueLambda(queueAndDLQ.queue, trackingsUpdatedTopic, vpc, lambdaDbSg, props, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 }
 
 function createProcessQueueLambda(
     queue: Queue,
-    trackingsUpdatedTopic: Topic,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: AppProps,
@@ -44,14 +37,12 @@ function createProcessQueueLambda(
         environment: {
             DB_USER: props.dbProps.username,
             DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri,
-            MAINTENANCE_TRACKING_SNS_TOPIC_ARN: trackingsUpdatedTopic.topicArn
+            DB_URI: props.dbProps.uri
         },
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const processQueueLambda = new Function(stack, functionName, lambdaConf);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
-    trackingsUpdatedTopic.grantPublish(processQueueLambda); // Creates IAM role
     createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
 }
 

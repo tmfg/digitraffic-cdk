@@ -17,7 +17,7 @@ export function createQueue(scope: Construct): QueueAndDLQ {
         encryption: QueueEncryption.KMS_MANAGED,
         deadLetterQueue: {
             // First fail puts it to DLQ as order must remain.
-            // Lamda should retry at least once before returning failed state. ie in case of network glitch.
+            // Lambda should retry at least once before returning failed state. ie in case of network glitch.
             maxReceiveCount: 1,
             queue: dlq
         }

@@ -10,10 +10,7 @@ export async function saveMaintenanceTrackingData(maintenanceTrackingDataJson: s
             status: Status.UNHANDLED
         };
         return await db.tx(t => {
-            const queries = [
-                MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData),
-            ];
-            return t.batch(queries);
+            return MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
         });
     });
 }
