@@ -1,4 +1,4 @@
-import {EstimateSubscription, SnsSubscriptionEvent} from "../../model/subscription";
+import {EstimateSubscription} from "../../model/subscription";
 import {addSubscription} from "../../service/subscriptions";
 import {parseSnsSubscriptionEvent} from "../../smsutils";
 import {SNSEvent} from "aws-lambda";

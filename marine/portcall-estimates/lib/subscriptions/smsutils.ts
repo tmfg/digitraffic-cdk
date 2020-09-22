@@ -23,3 +23,7 @@ export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): Estimate
         time: parts[2]
     };
 }
+
+export function createShiplistSms(): string {
+    return 'test';
+}
