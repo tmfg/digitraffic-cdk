@@ -1,6 +1,7 @@
 import {EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
 import {DynamoDB} from 'aws-sdk';
 import moment, {Moment} from 'moment';
+import {sendOKMessage, sendValidationFailedMessage} from "./pinpoint";
 
 const { v4: uuidv4 } = require('uuid');
 
@@ -15,8 +16,11 @@ export async function addSubscription(subscription: EstimateSubscription) {
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
 
-        await createSubscription(subscription);
+        await createSubscription(subscription)
+            .catch((e) => console.info("error " + e))
+            .then(() => sendOKMessage(subscription.phoneNumber))
     } else {
+        sendValidationFailedMessage(subscription.phoneNumber);
         console.error('Invalid subscription');
     }
 }

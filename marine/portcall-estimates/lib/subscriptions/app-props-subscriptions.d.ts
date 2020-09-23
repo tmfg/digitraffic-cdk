@@ -9,6 +9,8 @@ export interface Props {
     defaultLambdaDurationSeconds: number;
     logsDestinationArn: string;
     sqsProcessLambdaConcurrentExecutions: number;
+    pinpointApplicationId: string;
+    pinpointTelephoneNumber: string;
 }
 export interface DbProps {
     username: string;

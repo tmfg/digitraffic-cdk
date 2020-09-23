@@ -3,6 +3,7 @@ import {ISecurityGroup, IVpc, SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
 import {Props} from './app-props-subscriptions';
 import * as PublicApi from './public-api';
 import {Runtime} from '@aws-cdk/aws-lambda';
+import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Topic} from "@aws-cdk/aws-sns";
 import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
 import {AssetCode, Function} from "@aws-cdk/aws-lambda";
@@ -84,6 +85,18 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         });
     }
 
+    private createWriteToPolicy() {
+        return new PolicyStatement({
+            actions: [
+                "mobiletargeting:*"
+            ],
+            resources: [
+                "arn:aws:mobiletargeting:*:*:apps/d7755972dcf34f7499774a80913fc837",
+                "arn:aws:mobiletargeting:*:*:apps/d7755972dcf34f7499774a80913fc837/*"
+            ]
+        });
+    }
+
     private createSubscriptionCreatorLambda(
         incomingSmsTopic: Topic,
         vpc: IVpc,
@@ -97,12 +110,17 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             environment: {
                 DB_USER: props.dbProps.username,
                 DB_PASS: props.dbProps.password,
-                DB_URI: props.dbProps.uri
+                DB_URI: props.dbProps.uri,
+                PINPOINT_ID: props.pinpointApplicationId,
+                PINPOINT_NUMBER: props.pinpointTelephoneNumber,
             },
             reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
         });
+
         const subscriptionCreatorLambda = new Function(this, functionName, lambdaConf);
         subscriptionCreatorLambda.addEventSource(new SnsEventSource(incomingSmsTopic));
+        subscriptionCreatorLambda.addToRolePolicy(this.createWriteToPolicy());
+
         createSubscription(subscriptionCreatorLambda, functionName, props.logsDestinationArn, this);
         return subscriptionCreatorLambda;
     }
