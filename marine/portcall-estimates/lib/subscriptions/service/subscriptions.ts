@@ -11,31 +11,29 @@ enum SubscriptionType {
     VESSEL_LIST= "VESSEL_LIST"
 }
 
-export async function addSubscription(
-    subscription: EstimateSubscription) {
-
+export async function addSubscription(subscription: EstimateSubscription) {
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
 
-        createSubscription(subscription);
+        await createSubscription(subscription);
     } else {
         console.error('Invalid subscription');
     }
 }
 
-function createSubscription(subscription: EstimateSubscription) {
-    ddb.put({
+async function createSubscription(subscription: EstimateSubscription): Promise<any> {
+    const params = {
         TableName: 'PESubscriptions',
         Item: {
             "ID": uuidv4(),
             "Time": moment(subscription.time, TIME_FORMAT, true).format(DYNAMODB_TIME_FORMAT),
             "Type": SubscriptionType.VESSEL_LIST,
-            "Locode": subscription.locode,
+            "Locode": subscription.locode.toUpperCase(),
             "PhoneNumber": subscription.phoneNumber
         }
-    }, (err: any) => {
-        if (err) {
-            console.log("Error", err);
-        }
-    })
+    };
+
+//    console.log("params " + JSON.stringify(params));
+
+    return ddb.put(params).promise();
 }

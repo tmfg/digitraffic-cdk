@@ -51,7 +51,9 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const table = new Table(stack, 'subscription-table', {
             partitionKey: { name: 'ID', type: AttributeType.STRING},
             sortKey: {name: 'Time', type: AttributeType.STRING},
-            tableName: 'PESubscriptions'
+            tableName: 'PESubscriptions',
+            readCapacity: 1,
+            writeCapacity: 1
         });
 
         table.grantReadWriteData(subscriptionLambda);
