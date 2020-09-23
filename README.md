@@ -67,3 +67,8 @@ This copies contents from the existing project and does some replacements for th
  * `cdk diff` Compare your current stack to the deployed stack
  * `cdk synth > template.yaml` Emits a CloudFormation template
  * `cdk synth --no-staging > template.yaml` Emits a CloudFormation template suitable for invoking a SAM Lambda function locally via `sam local invoke DoStuffLambda123 --event event.json --env-vars env.json` (check the Lambda name from template.yaml)
+ 
+## Checking dependencies
+ * https://www.npmjs.com/package/npm-check
+ * `npm install -g npm-check` Install npm-check globally to check for outdated, incorrect, and unused dependencies.
+ * `npm-check` Run under project directory to check outdated, incorrect, and unused dependencies.

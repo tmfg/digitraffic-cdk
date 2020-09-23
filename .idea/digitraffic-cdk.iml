@@ -3,8 +3,12 @@
   <component name="NewModuleRootManager" inherit-compiler-output="true">
     <exclude-output />
     <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/open311-cdk/cdk.out" />
-      <excludeFolder url="file://$MODULE_DIR$/open311-cdk/tsd" />
+      <excludePattern pattern=".cache" />
+      <excludePattern pattern="cdk.out" />
+      <excludePattern pattern="dist" />
+      <excludePattern pattern="node_modules" />
+      <excludePattern pattern="tsd" />
+      <excludePattern pattern="tsd" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

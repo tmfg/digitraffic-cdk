@@ -1,7 +1,7 @@
 #!/bin/bash
 
 FROM_PROJECT_PATH=${1?Project path to use as the base is a required parameter. Ie. marine/portcall-estimates}
-TO_PROJECT_PATH=${2?New project paht is a required parameter. Ie. road/maintenance-tracking}
+TO_PROJECT_PATH=${2?New project path is a required parameter. Ie. road/maintenance-tracking}
 
 FROM_PROJECT_PATH=${FROM_PROJECT_PATH%/} # Removes possible trailing slash
 TO_PROJECT_PATH=${TO_PROJECT_PATH%/} # Removes possible trailing slash
@@ -18,18 +18,37 @@ echo FROM_PROJECT_NAME: ${FROM_PROJECT_NAME}
 echo TO_BASE_DIR: ${TO_BASE_DIR}
 echo TO_PROJECT_NAME: ${TO_PROJECT_NAME}
 
-# Resolve sed version if OS X (BSD or GNU)
-GSED=true
-OS=`uname -s`
-if [[ $OS == "Darwin" ]]; then
-    VERSION=$(sed --version 2>&1 | head -1)
-    if [[ "${VERSION}" != *"GNU"* ]]; then
-        echo "Using BSD sed on OS X"
-        GSED=false
-    else
-        echo "Using GNU sed on OS X"
-    fi
+SED_CMD=
+echo
+echo "Trying to find GNU sed installation"
+for i in `find /bin /usr/bin /usr/local -type f -name "*sed" 2>/dev/null`; do
+  echo "Checking GNU sed: $i"
+  RETVAL=$($i --version 2>/dev/null)
+  EXIT_CODE=$?
+  if [ $EXIT_CODE -eq 0 ]; then # GNU sed
+    SED_CMD=$i
+    break;
+  fi
+done
+
+if [[ $SED_CMD == "" ]]; then # GNU sed
+  echo
+  echo "No GNU sed found. Install it and then rerun the script."
+  echo
+  exit 1;
 fi
+echo
+echo "Using GNU sed: $SED_CMD"
+
+# Usage: findAndReplace '<FindString>' '<ReplaceString>'
+## Example: findAndReplace 'OldString' 'NewString'
+findAndReplace() {
+  FROM=$1
+  TO=$2
+  echo
+  echo "Replace \"${FROM}\" to \"${TO}\" inside project files"
+  find ${TO_PROJECT_PATH} -type f ! -path '*/node_modules/*' ! -path '*/cdk.out/*' -exec "$SED_CMD" -i 's/'"${FROM}"'/'"${TO}"'/g' {} +
+}
 
 if [ ! -d "${FROM_PROJECT_PATH}" ]; then
   echo
@@ -60,15 +79,35 @@ cp -r -n -v "${FROM_PROJECT_PATH}/" "${TO_PROJECT_PATH}"
 mkdir -p "${TO_PROJECT_PATH}/bin"
 echo "Copy contents done!"
 
-echo
-echo "Replace ${FROM_PROJECT_NAME} to ${TO_PROJECT_NAME} inside files"
-if $GSED; then
-  echo "Running GNU sed"
-  find ${TO_PROJECT_PATH} -type f -exec sed -i 's/'"${FROM_PROJECT_NAME}"'/'"${TO_PROJECT_NAME}"'/g' {} +
-else
-  echo "Running BSD sed"
-  find ${TO_PROJECT_PATH} -type f -exec sed  -i '' 's/'"${FROM_PROJECT_NAME}"'/'"${TO_PROJECT_NAME}"'/g' {} +
+findAndReplace "${FROM_PROJECT_NAME}" "${TO_PROJECT_NAME}"
+FROM_PROJECT_NAME_CAMEL=$(echo "${FROM_PROJECT_NAME}" | "$SED_CMD" -E "s~(^|-)(.)~\U\2~g")
+TO_PROJECT_NAME_CAMEL=$(echo "${TO_PROJECT_NAME}" | "$SED_CMD" -E "s~(^|-)(.)~\U\2~g")
+findAndReplace "${FROM_PROJECT_NAME_CAMEL}" "${TO_PROJECT_NAME_CAMEL}"
+
+# First not camel StartEnd -> startEnd
+FROM_PROJECT_NAME_FUNCTION=$(echo "${FROM_PROJECT_NAME_CAMEL}" | "$SED_CMD" -E "s~(^.)~\L\1~g")
+TO_PROJECT_NAME_FUNCTION=$(echo "${TO_PROJECT_NAME_CAMEL}" |  "$SED_CMD" -E "s~(^.)~\L\1~g")
+findAndReplace "${FROM_PROJECT_NAME_FUNCTION}" "${TO_PROJECT_NAME_FUNCTION}"
+
+findAndReplace "${FROM_PROJECT_NAME_CAMEL}" "${TO_PROJECT_NAME_CAMEL}"
+
+if [ "${FROM_BASE_DIR}" != "${TO_BASE_DIR}" ]; then
+  FROM_BASE_DIR_CAMEL=$(echo "${FROM_BASE_DIR%/}" | "$SED_CMD" -E "s~(^|-)(.)~\U\2~g")
+  TO_BASE_DIR_CAMEL=$(echo "${TO_BASE_DIR%/}" | "$SED_CMD" -E "s~(^|-)(.)~\U\2~g")
+  findAndReplace "${FROM_BASE_DIR%/}" "${TO_BASE_DIR%/}"
+  findAndReplace "${FROM_BASE_DIR_CAMEL}" "${TO_BASE_DIR_CAMEL}"
 fi
+
+# Remove - and then Uppercase all first letters of the words
+FROM_PROJECT_NAME_UPPER=$(echo "${FROM_PROJECT_NAME}" | "$SED_CMD" -E 's/-/ /g' | "$SED_CMD" -E 's/\b(.)/\u\1/g')
+TO_PROJECT_NAME_UPPER=$(echo "${TO_PROJECT_NAME}" | "$SED_CMD" -E 's/-/ /g' | "$SED_CMD" -E 's/\b(.)/\u\1/g')
+findAndReplace "${FROM_PROJECT_NAME_UPPER}" "${TO_PROJECT_NAME_UPPER}"
+
+# Remove - and then Uppercase only first letter on line
+FROM_PROJECT_NAME_UPPER=$(echo "${FROM_PROJECT_NAME}" | "$SED_CMD" -E 's/-/ /g' | "$SED_CMD" -E "s~(^.)~\U\1~g" )
+TO_PROJECT_NAME_UPPER=$(echo "${TO_PROJECT_NAME}" | "$SED_CMD" -E 's/-/ /g' | sed -E "s~(^.)~\U\1~g")
+findAndReplace "${FROM_PROJECT_NAME_UPPER}" "${TO_PROJECT_NAME_UPPER}"
+
 echo "Replace done!"
 
 echo
