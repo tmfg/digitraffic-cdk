@@ -55,7 +55,8 @@
     "pg-promise": "10.3.5",
     "pg-query-stream": "3.2.0",
     "source-map-support": "0.5.19",
-    "ramda": "^0.27.1"
+    "ramda": "^0.27.1",
+    "uuid": "^8.3.0"
   },
   "externals": [
     "aws-sdk"

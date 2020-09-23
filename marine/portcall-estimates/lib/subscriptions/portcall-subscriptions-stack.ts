@@ -7,6 +7,7 @@ import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
 import {AssetCode, Function} from "@aws-cdk/aws-lambda";
 import {SnsEventSource} from "@aws-cdk/aws-lambda-event-sources";
 import {createSubscription} from "../../../../common/stack/subscription";
+import {Table, AttributeType} from "@aws-cdk/aws-dynamodb";
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -34,6 +35,20 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             lambdaDbSg,
             createSubscriptionLambda,
             appProps, this);
+
+        const subscriptionTable = this.createSubscriptionTable(this, createSubscriptionLambda);
+    }
+
+    private createSubscriptionTable(stack: Stack, subscriptionLambda: Function): any {
+        const table = new Table(stack, 'subscription-table', {
+            partitionKey: { name: 'ID', type: AttributeType.STRING},
+            sortKey: {name: 'Time', type: AttributeType.STRING},
+            tableName: 'PESubscriptions'
+        });
+
+        table.grantReadWriteData(subscriptionLambda);
+
+        return table;
     }
 
     private createSubscriptionCreatorLambda(
