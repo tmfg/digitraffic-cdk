@@ -16,13 +16,13 @@ export async function addSubscription(subscription: EstimateSubscription) {
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
 
-        await createSubscription(subscription)
-            .catch((e) => console.info("error " + e))
-            .then(() => sendOKMessage(subscription.phoneNumber))
+        await createSubscription(subscription);
     } else {
         sendValidationFailedMessage(subscription.phoneNumber);
         console.error('Invalid subscription');
     }
+
+    return true;
 }
 
 async function createSubscription(subscription: EstimateSubscription): Promise<any> {

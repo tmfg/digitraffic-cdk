@@ -4,21 +4,23 @@ const pinpoint = new Pinpoint();
 
 const projectId = process.env["PINPOINT_ID"] as string;
 const originationNumber = process.env["PINPOINT_NUMBER"] as string;
-const OK_MESSAGE = "Ok.";
-const VALIDATION_FAILED_MESSAGE = "Validation failed";
 
-export async function sendOKMessage(destinationNumber: string) {
+const MESSAGE_HELP = "this is help!";
+const MESSAGE_OK = "Ok.";
+const MESSAGE_VALIDATION_FAILED = "Validation failed";
+
+async function sendMessage(body: string, number: string): Promise<any> {
     const params = {
         ApplicationId: projectId,
         MessageRequest: {
             Addresses: {
-                [destinationNumber]: {
+                [number]: {
                     ChannelType: 'SMS'
                 }
             },
             MessageConfiguration: {
                 SMSMessage: {
-                    Body: OK_MESSAGE,
+                    Body: body,
                     MessageType: "TRANSACTIONAL",
                     OriginationNumber: originationNumber
                 }
@@ -26,33 +28,20 @@ export async function sendOKMessage(destinationNumber: string) {
         }
     };
 
-    console.info("sending sms ok message");
-    await pinpoint.sendMessages(params).promise()
+    console.info("sending sms message");
+    return await pinpoint.sendMessages(params).promise()
         .catch(() => console.info("error!"))
         .then(() => console.info("done!"));
 }
 
-export async function sendValidationFailedMessage(destinationNumber: string) {
-    const params = {
-        ApplicationId: projectId,
-        MessageRequest: {
-            Addresses: {
-                [destinationNumber]: {
-                    ChannelType: 'SMS'
-                }
-            },
-            MessageConfiguration: {
-                SMSMessage: {
-                    Body: VALIDATION_FAILED_MESSAGE,
-                    MessageType: "TRANSACTIONAL",
-                    OriginationNumber: originationNumber
-                }
-            }
-        }
-    };
+export async function sendHelpMessage(destinationNumber: string): Promise<any> {
+    return await sendMessage(MESSAGE_HELP, destinationNumber);
+}
 
-    console.info("sending sms failed message")
-    await pinpoint.sendMessages(params).promise()
-        .catch(() => console.info("error!"))
-        .then(() => console.info("done!"));
+export async function sendOKMessage(destinationNumber: string): Promise<any> {
+    return await sendMessage(MESSAGE_OK, destinationNumber);
+}
+
+export async function sendValidationFailedMessage(destinationNumber: string): Promise<any> {
+    return await sendMessage(MESSAGE_VALIDATION_FAILED, destinationNumber);
 }

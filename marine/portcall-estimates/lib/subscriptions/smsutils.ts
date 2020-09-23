@@ -1,6 +1,27 @@
 import {EstimateSubscription, SnsSubscriptionEvent} from './model/subscription';
 
-const SUBSCRIBE_OPERATION = 'tilaa';
+export enum SubscriptionOperation {
+    INVALID, SUBSCRIBE, REMOVE, HELP
+}
+
+export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperation {
+    const operationString = event.messageBody.split(' ')[0].toUpperCase();
+
+    console.info("parsing " + operationString);
+
+    switch(operationString) {
+        case 'TILAA':
+            return SubscriptionOperation.SUBSCRIBE;
+        case 'POISTA':
+        case 'REMOVE':
+            return SubscriptionOperation.REMOVE;
+        case 'HELP':
+        case 'APUA':
+            return SubscriptionOperation.HELP;
+        default:
+            return SubscriptionOperation.INVALID;
+    }
+}
 
 // correct syntax: TILAA FINLI 23:30
 export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): EstimateSubscription | null {
@@ -8,12 +29,6 @@ export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): Estimate
 
     if (parts.length < 3) {
         console.error(`Invalid message ${event.messageBody}`);
-        return null;
-    }
-
-    const operation = parts[0].toLowerCase();
-    if (operation != SUBSCRIBE_OPERATION) {
-        console.warn(`Unknown operation ${operation}, event ${event.messageBody}`);
         return null;
     }
 
