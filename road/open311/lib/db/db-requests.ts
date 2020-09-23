@@ -86,7 +86,7 @@ interface ServiceRequestStatusId {
 }
 
 export function findServiceCodes(db: IDatabase<any, any>): Promise<ServiceRequestServiceCode[]> {
-    return db.manyOrNone("SELECT service_code FROM open311_service_request");
+    return db.manyOrNone("SELECT DISTINCT service_code FROM open311_service_request");
 }
 
 export function findStateIds(db: IDatabase<any, any>): Promise<ServiceRequestStatusId[]> {
