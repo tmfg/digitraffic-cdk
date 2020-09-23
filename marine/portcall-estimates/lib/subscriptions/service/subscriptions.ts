@@ -1,9 +1,11 @@
 import {EstimateSubscription, validateSubscription} from "../model/subscription";
 import {DynamoDB} from 'aws-sdk';
+import moment, {Moment} from 'moment';
 
 const { v4: uuidv4 } = require('uuid');
 
 const ddb = new DynamoDB.DocumentClient();
+const DYNAMODB_TIME_FORMAT = 'HHmm';
 
 enum SubscriptionType {
     VESSEL_LIST= "VESSEL_LIST"
@@ -26,7 +28,7 @@ function createSubscription(subscription: EstimateSubscription) {
         TableName: 'PESubscriptions',
         Item: {
             "ID": uuidv4(),
-            "Time": subscription.time,
+            "Time": moment(subscription.time, DYNAMODB_TIME_FORMAT, true),
             "Type": SubscriptionType.VESSEL_LIST,
             "Locode": subscription.locode,
             "PhoneNumber": subscription.phoneNumber
