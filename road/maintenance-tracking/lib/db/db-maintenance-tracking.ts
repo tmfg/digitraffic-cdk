@@ -3,7 +3,8 @@ import {IDatabase, PreparedStatement} from "pg-promise";
 
 export interface DbMaintenanceTrackingData {
     readonly json: string,
-    readonly status: Status
+    readonly status: Status,
+    readonly hash: string
 }
 
 export enum Status {
@@ -27,14 +28,14 @@ CREATE TABLE IF NOT EXISTS MAINTENANCE_TRACKING_DATA
  */
 
 const INSERT_ESTIMATE_SQL = `
-    INSERT INTO maintenance_tracking_data(id, json, status)
-    VALUES(NEXTVAL('SEQ_MAINTENANCE_TRACKING_DATA'), $1, $2)
+    INSERT INTO maintenance_tracking_data(id, json, status, hash)
+    VALUES(NEXTVAL('SEQ_MAINTENANCE_TRACKING_DATA'), $1, $2, $3)
+    ON CONFLICT(hash) DO NOTHING
 `;
-// ON CONFLICT(ship_id, event_source, event_time, record_time) DO NOTHING
 
 export function insertMaintenanceTrackingData(db: IDatabase<any, any>, tracking: DbMaintenanceTrackingData): Promise<any> {
     const ps = new PreparedStatement({
-        name: 'insert-tracking',
+        name: 'insert-maintenance-tracking-data',
         text: INSERT_ESTIMATE_SQL,
     });
     return db.oneOrNone(ps, createUpdateValues(tracking));
@@ -43,6 +44,7 @@ export function insertMaintenanceTrackingData(db: IDatabase<any, any>, tracking:
 export function createUpdateValues(e: DbMaintenanceTrackingData): any[] {
     return [
         e.json,
-        e.status
+        e.status,
+        e.hash
     ];
 }

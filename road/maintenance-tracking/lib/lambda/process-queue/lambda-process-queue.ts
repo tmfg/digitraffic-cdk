@@ -16,7 +16,9 @@ export function handlerFn() {
                 console.error(`method=handleMaintenanceTrackingJson Error while parsing JSON: ${r.body}`, e);
                 return Promise.reject();
             }
-            return saveMaintenanceTrackingData(r.body);
+            const saved = saveMaintenanceTrackingData(r.body);
+            console.info(`method=handleMaintenanceTrackingJson saved: ${JSON.stringify(saved)}`);
+            return saved;
 
         })).then(async estimates => {
 
