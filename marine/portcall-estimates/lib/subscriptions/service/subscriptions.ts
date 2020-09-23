@@ -1,4 +1,4 @@
-import {EstimateSubscription, validateSubscription} from "../model/subscription";
+import {EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
 import {DynamoDB} from 'aws-sdk';
 import moment, {Moment} from 'moment';
 
@@ -28,7 +28,7 @@ function createSubscription(subscription: EstimateSubscription) {
         TableName: 'PESubscriptions',
         Item: {
             "ID": uuidv4(),
-            "Time": moment(subscription.time, DYNAMODB_TIME_FORMAT, true),
+            "Time": moment(subscription.time, TIME_FORMAT, true).format(DYNAMODB_TIME_FORMAT),
             "Type": SubscriptionType.VESSEL_LIST,
             "Locode": subscription.locode,
             "PhoneNumber": subscription.phoneNumber
