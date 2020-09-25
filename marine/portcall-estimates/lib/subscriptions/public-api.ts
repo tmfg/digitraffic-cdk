@@ -1,14 +1,12 @@
 import {EndpointType, MethodLoggingLevel, Model, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {SubscriptionSchema} from './model/subscription-schema';
-import {createSubscription} from '../../../../common/stack/subscription';
 import {corsMethodJsonResponse, defaultIntegration,} from "../../../../common/api/responses";
 import {MessageModel} from "../../../../common/api/response";
 import {addDefaultValidator, addServiceModel} from "../../../../common/api/utils";
-import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
 import {Props} from "./app-props-subscriptions";
 import {addTags} from "../../../../common/api/documentation";
 import {createUsagePlan} from "../../../../common/stack/usage-plans";

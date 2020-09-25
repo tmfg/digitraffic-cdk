@@ -10,6 +10,7 @@ export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperati
     console.info("parsing " + operationString);
 
     switch(operationString) {
+        case 'SUBSCRIBE':
         case 'TILAA':
             return SubscriptionOperation.SUBSCRIBE;
         case 'POISTA':
@@ -37,8 +38,4 @@ export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): Estimate
         locode: parts[1].toLowerCase(),
         time: parts[2]
     };
-}
-
-export function createShiplistSms(): string {
-    return 'test';
 }

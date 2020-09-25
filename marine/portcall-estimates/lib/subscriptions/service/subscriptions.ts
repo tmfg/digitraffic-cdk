@@ -8,6 +8,8 @@ const { v4: uuidv4 } = require('uuid');
 const ddb = new DynamoDB.DocumentClient();
 const DYNAMODB_TIME_FORMAT = 'HHmm';
 
+export const SUBSCRIPTIONS_TABLE_NAME = "PortcallEstimates.Subscriptions";
+
 enum SubscriptionType {
     VESSEL_LIST= "VESSEL_LIST"
 }
@@ -27,7 +29,7 @@ export async function addSubscription(subscription: EstimateSubscription) {
 
 async function createSubscription(subscription: EstimateSubscription): Promise<any> {
     const params = {
-        TableName: 'PESubscriptions',
+        TableName: SUBSCRIPTIONS_TABLE_NAME,
         Item: {
             "ID": uuidv4(),
             "Time": moment(subscription.time, TIME_FORMAT, true).format(DYNAMODB_TIME_FORMAT),
@@ -36,8 +38,6 @@ async function createSubscription(subscription: EstimateSubscription): Promise<a
             "PhoneNumber": subscription.phoneNumber
         }
     };
-
-//    console.log("params " + JSON.stringify(params));
 
     return ddb.put(params).promise();
 }

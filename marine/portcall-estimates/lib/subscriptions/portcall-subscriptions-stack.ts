@@ -2,17 +2,17 @@ import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
 import {ISecurityGroup, IVpc, SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
 import {Props} from './app-props-subscriptions';
 import * as PublicApi from './public-api';
-import {Runtime} from '@aws-cdk/aws-lambda';
-import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
+import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
+import {PolicyStatement} from '@aws-cdk/aws-iam';
 import {Topic} from "@aws-cdk/aws-sns";
 import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
-import {AssetCode, Function} from "@aws-cdk/aws-lambda";
 import {SnsEventSource} from "@aws-cdk/aws-lambda-event-sources";
 import {createSubscription} from "../../../../common/stack/subscription";
 import {RetentionDays} from '@aws-cdk/aws-logs';
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
-import {Table, AttributeType} from "@aws-cdk/aws-dynamodb";
+import {AttributeType, Table} from "@aws-cdk/aws-dynamodb";
+import {SUBSCRIPTIONS_TABLE_NAME} from "./service/subscriptions";
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -52,7 +52,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const table = new Table(stack, 'subscription-table', {
             partitionKey: { name: 'ID', type: AttributeType.STRING},
             sortKey: {name: 'Time', type: AttributeType.STRING},
-            tableName: 'PESubscriptions',
+            tableName: SUBSCRIPTIONS_TABLE_NAME,
             readCapacity: 1,
             writeCapacity: 1
         });
@@ -85,14 +85,14 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         });
     }
 
-    private createWriteToPolicy() {
+    private createWriteToPolicy(pinpointApplicationId: string) {
         return new PolicyStatement({
             actions: [
                 "mobiletargeting:*"
             ],
             resources: [
-                "arn:aws:mobiletargeting:*:*:apps/d7755972dcf34f7499774a80913fc837",
-                "arn:aws:mobiletargeting:*:*:apps/d7755972dcf34f7499774a80913fc837/*"
+                `arn:aws:mobiletargeting:*:*:apps/${pinpointApplicationId}`,
+                `arn:aws:mobiletargeting:*:*:apps/${pinpointApplicationId}/*`
             ]
         });
     }
@@ -119,7 +119,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
 
         const subscriptionCreatorLambda = new Function(this, functionName, lambdaConf);
         subscriptionCreatorLambda.addEventSource(new SnsEventSource(incomingSmsTopic));
-        subscriptionCreatorLambda.addToRolePolicy(this.createWriteToPolicy());
+        subscriptionCreatorLambda.addToRolePolicy(this.createWriteToPolicy(props.pinpointApplicationId));
 
         createSubscription(subscriptionCreatorLambda, functionName, props.logsDestinationArn, this);
         return subscriptionCreatorLambda;
