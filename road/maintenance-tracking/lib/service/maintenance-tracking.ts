@@ -13,8 +13,10 @@ export async function saveMaintenanceTrackingData(maintenanceTrackingDataJson: s
             status: Status.UNHANDLED,
             hash: createHash(maintenanceTrackingDataJson)
         };
-        return await db.tx(t => {
-            return MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
+        return await db.tx(async () => {
+            const value = await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
+            console.info(`Return value ${JSON.stringify(value)}`);
+            return value;
         });
     });
 }

@@ -27,18 +27,20 @@ CREATE TABLE IF NOT EXISTS MAINTENANCE_TRACKING_DATA
 );
  */
 
-const INSERT_ESTIMATE_SQL = `
+const INSERT_MAINTENANCE_TRACKING_DATA_SQL = `
     INSERT INTO maintenance_tracking_data(id, json, status, hash)
     VALUES(NEXTVAL('SEQ_MAINTENANCE_TRACKING_DATA'), $1, $2, $3)
-    ON CONFLICT(hash) DO NOTHING
 `;
 
-export function insertMaintenanceTrackingData(db: IDatabase<any, any>, tracking: DbMaintenanceTrackingData): Promise<any> {
+/**
+ * On conflict database error is thrown if message with same hash already exists.
+ */
+export async function insertMaintenanceTrackingData(db: IDatabase<any, any>, tracking: DbMaintenanceTrackingData): Promise<any> {
     const ps = new PreparedStatement({
         name: 'insert-maintenance-tracking-data',
-        text: INSERT_ESTIMATE_SQL,
+        text: INSERT_MAINTENANCE_TRACKING_DATA_SQL,
     });
-    return db.oneOrNone(ps, createUpdateValues(tracking));
+    return await db.oneOrNone(ps, createUpdateValues(tracking));
 }
 
 export function createUpdateValues(e: DbMaintenanceTrackingData): any[] {

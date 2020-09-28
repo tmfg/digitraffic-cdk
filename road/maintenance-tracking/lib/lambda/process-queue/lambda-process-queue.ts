@@ -7,7 +7,7 @@ const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failu
 
 export function handlerFn() {
     return async (event: SQSEvent) => {
-        return Promise.allSettled(event.Records.map(r => {
+        return Promise.allSettled(event.Records.map(async r => {
 
             try {
                 // Parse JSON to validate it's JSON
@@ -16,15 +16,19 @@ export function handlerFn() {
                 console.error(`method=handleMaintenanceTrackingJson Error while parsing JSON: ${r.body}`, e);
                 return Promise.reject();
             }
-            const saved = saveMaintenanceTrackingData(r.body);
-            console.info(`method=handleMaintenanceTrackingJson saved: ${JSON.stringify(saved)}`);
-            return saved;
-
+            try {
+                const saved = await saveMaintenanceTrackingData(r.body);
+                console.info(`method=handleMaintenanceTrackingJson saved: ${JSON.stringify(saved)}`);
+                return saved;
+            } catch (e) {
+                console.error(`method=handleMaintenanceTrackingJson Error saving to db JSON: ${r.body}`, e);
+                return Promise.reject();
+            }
         })).then(async estimates => {
 
             const successful = estimates.filter(processedSuccessfully);
             if (successful.length) {
-                console.info(`method=handleMaintenanceTrackingJson successCount=${successful.length}`);
+                console.info(`method=handleMaintenanceTrackingJson insertCount=${successful.length}`);
             }
             return estimates;
 

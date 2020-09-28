@@ -6,7 +6,7 @@ const bucketName = process.env[BUCKET_NAME] as string;
 export const handler = async (event: any): Promise<any> => {
     const millis = new Date().getTime();
     //new Date().toISOString() ?
-    console.info(`method=maintenanceTrackingProcessDLQ maintenanceTrackingDLQRecordsReceived=${event.Records.length}`);
+    console.info(`method=maintenanceTrackingProcessDLQ receivedCount=${event.Records.length}`);
     const uploads = event.Records.map((e: any, idx: number) =>
         uploadToS3(bucketName, e.body, `maintenanceTracking-${millis}-${idx}.json`)
     );
