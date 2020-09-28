@@ -4,14 +4,14 @@ import {createUpdateValues, DbMaintenanceTrackingData} from "../../lib/db/db-mai
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
-        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54321/road', {
+        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54322/road', {
             noWarnings: true // ignore duplicate connection warning for tests
         });
 
         beforeAll(async () => {
             process.env.DB_USER = 'road';
             process.env.DB_PASS = 'road';
-            process.env.DB_URI = 'localhost:54321/road';
+            process.env.DB_URI = 'localhost:54322/road';
             await truncate(db);
         });
 
