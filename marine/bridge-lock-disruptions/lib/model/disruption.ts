@@ -1,6 +1,6 @@
 export interface Disruption {
     Id: number;
-    Type_id: number;
+    Type_Id: number;
     StartDate: Date;
     EndDate: Date;
     DescriptionFi: string;

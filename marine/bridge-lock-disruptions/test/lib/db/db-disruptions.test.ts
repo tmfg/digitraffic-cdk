@@ -28,7 +28,7 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(fetchedDisruptions.length).toBe(1);
         const fd = fetchedDisruptions[0] as DbDisruption;
         expect(Number(fd.id)).toBe(disruption.Id);
-        expect(Number(fd.type_id)).toBe(disruption.Type_id);
+        expect(Number(fd.type_id)).toBe(disruption.Type_Id);
         expect(fd.start_date).toMatchObject(disruption.StartDate);
         expect(fd.end_date).toMatchObject(disruption.EndDate);
         expect(fd.description_fi).toBe(disruption.DescriptionFi);
@@ -49,7 +49,7 @@ describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const fetchedDisruptions = await findAll(db);
         expect(fetchedDisruptions.length).toBe(1);
         const fd = fetchedDisruptions[0] as DbDisruption;
-        expect(Number(fd.type_id)).toBe(updatedDisruption.Type_id);
+        expect(Number(fd.type_id)).toBe(updatedDisruption.Type_Id);
         expect(fd.start_date).toMatchObject(updatedDisruption.StartDate);
         expect(fd.end_date).toMatchObject(updatedDisruption.EndDate);
         expect(fd.description_fi).toBe(updatedDisruption.DescriptionFi);

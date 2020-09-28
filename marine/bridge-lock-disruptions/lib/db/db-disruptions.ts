@@ -81,7 +81,7 @@ export function deleteAllButDisruptions(
 export function createEditObject(disruption: SpatialDisruption): DbDisruption {
     return {
         id: disruption.Id,
-        type_id: disruption.Type_id,
+        type_id: disruption.Type_Id,
         start_date: disruption.StartDate,
         end_date: disruption.EndDate,
         geometry: disruption.geometry,

@@ -53,7 +53,7 @@ export function featureToDisruption(feature: Feature): SpatialDisruption {
     const props = feature.properties as any;
     return {
         Id: props.Id,
-        Type_id: props.Type_id,
+        Type_Id: props.Type_Id,
         StartDate: normalizeDisruptionDate(props.StartDate),
         EndDate: normalizeDisruptionDate(props.EndDate),
         DescriptionFi: props.DescriptionFi,
@@ -79,7 +79,7 @@ export function validateGeoJson(geoJson: GeoJSON) {
 export function convertFeature(disruption: DbDisruption): Feature {
     const properties: Disruption = {
         Id: disruption.id,
-        Type_id: disruption.type_id,
+        Type_Id: disruption.type_id,
         StartDate: disruption.start_date,
         EndDate: disruption.end_date,
         DescriptionFi: disruption.description_fi,
