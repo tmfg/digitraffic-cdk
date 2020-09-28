@@ -11,7 +11,7 @@ import {RetentionDays} from '@aws-cdk/aws-logs';
 import {Rule, Schedule} from '@aws-cdk/aws-events';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {AttributeType, Table} from '@aws-cdk/aws-dynamodb';
-import {SUBSCRIPTIONS_TABLE_NAME} from './service/subscriptions';
+import {SUBSCRIPTIONS_PHONENUMBER_IDX_NAME, SUBSCRIPTIONS_TABLE_NAME} from './service/subscriptions';
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -33,26 +33,31 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const schedulingCloudWatchRule = this.createSchedulingCloudWatchRule();
         schedulingCloudWatchRule.addTarget(new LambdaFunction(sendShiplistLambda));
 
-        this.createSmsHandlerLambda(incomingSmsTopic, appProps);
-        
+        const smsHandlerLambda = this.createSmsHandlerLambda(incomingSmsTopic, appProps);
+
         const subscriptionTable = this.createSubscriptionTable();
-        
+        subscriptionTable.grantReadWriteData(smsHandlerLambda);
+
         PublicApi.create(vpc,
             lambdaDbSg,
             subscriptionTable,
             appProps,
             this);
-
     }
 
-    private createSubscriptionTable(): any {
-        return new Table(this, 'subscription-table', {
+    private createSubscriptionTable(): Table {
+        const table = new Table(this, 'subscription-table', {
             partitionKey: { name: 'ID', type: AttributeType.STRING},
             sortKey: {name: 'Time', type: AttributeType.STRING},
             tableName: SUBSCRIPTIONS_TABLE_NAME,
             readCapacity: 1,
             writeCapacity: 1
         });
+        table.addGlobalSecondaryIndex({
+            indexName: SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
+            partitionKey: { name: 'PhoneNumber', type: AttributeType.STRING }
+        });
+        return table;
     }
 
     private createSendShiplistLambda(props: Props): Function {
@@ -92,7 +97,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
 
     private createSmsHandlerLambda(
         incomingSmsTopic: Topic,
-        props: Props) {
+        props: Props): Function {
         const functionName = 'PortcallEstimateSubscriptions-HandleSMS';
         const smsHandlerLambda = new Function(this, functionName, {
             functionName,
@@ -111,5 +116,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         smsHandlerLambda.addToRolePolicy(
             PortcallEstimateSubscriptionsStack.createWriteToPolicy(props.pinpointApplicationId));
         createSubscription(smsHandlerLambda, functionName, props.logsDestinationArn, this);
+
+        return smsHandlerLambda;
     }
 }

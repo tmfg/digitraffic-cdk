@@ -1,5 +1,5 @@
 import {SnsSubscriptionEvent} from '../../model/subscription';
-import {addSubscription} from '../../service/subscriptions';
+import {addSubscription, sendSubscriptionList} from '../../service/subscriptions';
 import {parseOperation, parseSnsSubscriptionEvent, SubscriptionOperation} from '../../smsutils';
 import {SNSEvent} from 'aws-lambda';
 import {sendHelpMessage, sendOKMessage} from '../../service/pinpoint';
@@ -21,6 +21,8 @@ async function handleSms(operation: SubscriptionOperation, event: SnsSubscriptio
         case SubscriptionOperation.REMOVE:
             // TODO
             break;
+        case SubscriptionOperation.LIST:
+            return await sendSubscriptionList(event.originationNumber);
         case SubscriptionOperation.SUBSCRIBE:
             const snsSubscription = parseSnsSubscriptionEvent(event);
             if(!snsSubscription) {

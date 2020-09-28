@@ -1,7 +1,7 @@
 import {EstimateSubscription, SnsSubscriptionEvent} from './model/subscription';
 
 export enum SubscriptionOperation {
-    INVALID, SUBSCRIBE, REMOVE, HELP
+    INVALID, SUBSCRIBE, REMOVE, HELP, LIST
 }
 
 export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperation {
@@ -19,6 +19,9 @@ export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperati
         case 'HELP':
         case 'APUA':
             return SubscriptionOperation.HELP;
+        case 'LISTAA':
+        case 'LIST':
+            return SubscriptionOperation.LIST;
         default:
             return SubscriptionOperation.INVALID;
     }

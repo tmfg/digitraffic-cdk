@@ -9,7 +9,7 @@ const MESSAGE_HELP = 'Tee tilaus lähettämällä viesti TILAA LOCODE KELLONAIKA
 const MESSAGE_OK = 'Tilaus vastaanotettu';
 const MESSAGE_VALIDATION_FAILED = 'Odottamaton virhe!';
 
-async function sendMessage(body: string, number: string): Promise<any> {
+export async function sendMessage(body: string, number: string): Promise<any> {
     const params = {
         ApplicationId: projectId,
         MessageRequest: {
