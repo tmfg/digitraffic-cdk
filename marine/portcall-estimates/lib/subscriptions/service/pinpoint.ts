@@ -2,12 +2,12 @@ import {Pinpoint} from 'aws-sdk';
 
 const pinpoint = new Pinpoint();
 
-const projectId = process.env["PINPOINT_ID"] as string;
-const originationNumber = process.env["PINPOINT_NUMBER"] as string;
+const projectId = process.env['PINPOINT_ID'] as string;
+const originationNumber = process.env['PINPOINT_NUMBER'] as string;
 
-const MESSAGE_HELP = "this is help!";
-const MESSAGE_OK = "Ok.";
-const MESSAGE_VALIDATION_FAILED = "Validation failed";
+const MESSAGE_HELP = 'Tee tilaus lähettämällä viesti TILAA LOCODE KELLONAIKA, esim. TILAA FIKOK 07:00.';
+const MESSAGE_OK = 'Tilaus vastaanotettu';
+const MESSAGE_VALIDATION_FAILED = 'Odottamaton virhe!';
 
 async function sendMessage(body: string, number: string): Promise<any> {
     const params = {
@@ -21,17 +21,17 @@ async function sendMessage(body: string, number: string): Promise<any> {
             MessageConfiguration: {
                 SMSMessage: {
                     Body: body,
-                    MessageType: "TRANSACTIONAL",
+                    MessageType: 'TRANSACTIONAL',
                     OriginationNumber: originationNumber
                 }
             }
         }
     };
 
-    console.info("sending sms message");
+    console.info('method=sendMessage, Sending SMS');
     return await pinpoint.sendMessages(params).promise()
-        .catch(() => console.info("error!"))
-        .then(() => console.info("done!"));
+        .catch((error: Error) => console.error(`method=sendMessage error=${error}`))
+        .then(() => console.info('method=sendMessage SMS sent'));
 }
 
 export async function sendHelpMessage(destinationNumber: string): Promise<any> {

@@ -1,18 +1,17 @@
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
-import {ISecurityGroup, IVpc, SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
+import {SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
 import {Props} from './app-props-subscriptions';
 import * as PublicApi from './public-api';
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {PolicyStatement} from '@aws-cdk/aws-iam';
-import {Topic} from "@aws-cdk/aws-sns";
-import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
-import {SnsEventSource} from "@aws-cdk/aws-lambda-event-sources";
-import {createSubscription} from "../../../../common/stack/subscription";
+import {Topic} from '@aws-cdk/aws-sns';
+import {SnsEventSource} from '@aws-cdk/aws-lambda-event-sources';
+import {createSubscription} from '../../../../common/stack/subscription';
 import {RetentionDays} from '@aws-cdk/aws-logs';
-import {Rule, Schedule} from "@aws-cdk/aws-events";
-import {LambdaFunction} from "@aws-cdk/aws-events-targets";
-import {AttributeType, Table} from "@aws-cdk/aws-dynamodb";
-import {SUBSCRIPTIONS_TABLE_NAME} from "./service/subscriptions";
+import {Rule, Schedule} from '@aws-cdk/aws-events';
+import {LambdaFunction} from '@aws-cdk/aws-events-targets';
+import {AttributeType, Table} from '@aws-cdk/aws-dynamodb';
+import {SUBSCRIPTIONS_TABLE_NAME} from './service/subscriptions';
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -34,32 +33,26 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const schedulingCloudWatchRule = this.createSchedulingCloudWatchRule();
         schedulingCloudWatchRule.addTarget(new LambdaFunction(sendShiplistLambda));
 
-        const createSubscriptionLambda = this.createSubscriptionCreatorLambda(
-            incomingSmsTopic,
-            vpc,
-            lambdaDbSg,
-            appProps);
-
+        this.createSmsHandlerLambda(incomingSmsTopic, appProps);
+        
+        const subscriptionTable = this.createSubscriptionTable();
+        
         PublicApi.create(vpc,
             lambdaDbSg,
-            createSubscriptionLambda,
-            appProps, this);
+            subscriptionTable,
+            appProps,
+            this);
 
-        const subscriptionTable = this.createSubscriptionTable(this, createSubscriptionLambda);
     }
 
-    private createSubscriptionTable(stack: Stack, subscriptionLambda: Function): any {
-        const table = new Table(stack, 'subscription-table', {
+    private createSubscriptionTable(): any {
+        return new Table(this, 'subscription-table', {
             partitionKey: { name: 'ID', type: AttributeType.STRING},
             sortKey: {name: 'Time', type: AttributeType.STRING},
             tableName: SUBSCRIPTIONS_TABLE_NAME,
             readCapacity: 1,
             writeCapacity: 1
         });
-
-        table.grantReadWriteData(subscriptionLambda);
-
-        return table;
     }
 
     private createSendShiplistLambda(props: Props): Function {
@@ -85,10 +78,10 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         });
     }
 
-    private createWriteToPolicy(pinpointApplicationId: string) {
+    private static createWriteToPolicy(pinpointApplicationId: string) {
         return new PolicyStatement({
             actions: [
-                "mobiletargeting:*"
+                'mobiletargeting:*'
             ],
             resources: [
                 `arn:aws:mobiletargeting:*:*:apps/${pinpointApplicationId}`,
@@ -97,31 +90,26 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         });
     }
 
-    private createSubscriptionCreatorLambda(
+    private createSmsHandlerLambda(
         incomingSmsTopic: Topic,
-        vpc: IVpc,
-        lambdaDbSg: ISecurityGroup,
-        props: Props): Function {
-        const functionName = 'PortcallEstimateSubscriptions-CreateSubscription';
-        const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-            functionName: functionName,
-            code: new AssetCode('dist/subscriptions/lambda/create-subscription'),
-            handler: 'lambda-create-subscription.handler',
+        props: Props) {
+        const functionName = 'PortcallEstimateSubscriptions-HandleSMS';
+        const smsHandlerLambda = new Function(this, functionName, {
+            functionName,
+            code: new AssetCode('dist/subscriptions/lambda/handle-sms'),
+            handler: 'lambda-handle-sms.handler',
+            runtime: Runtime.NODEJS_12_X,
+            memorySize: 1024,
+            timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+            logRetention: RetentionDays.ONE_YEAR,
             environment: {
-                DB_USER: props.dbProps.username,
-                DB_PASS: props.dbProps.password,
-                DB_URI: props.dbProps.uri,
                 PINPOINT_ID: props.pinpointApplicationId,
-                PINPOINT_NUMBER: props.pinpointTelephoneNumber,
-            },
-            reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
+                PINPOINT_NUMBER: props.pinpointTelephoneNumber
+            }
         });
-
-        const subscriptionCreatorLambda = new Function(this, functionName, lambdaConf);
-        subscriptionCreatorLambda.addEventSource(new SnsEventSource(incomingSmsTopic));
-        subscriptionCreatorLambda.addToRolePolicy(this.createWriteToPolicy(props.pinpointApplicationId));
-
-        createSubscription(subscriptionCreatorLambda, functionName, props.logsDestinationArn, this);
-        return subscriptionCreatorLambda;
+        smsHandlerLambda.addEventSource(new SnsEventSource(incomingSmsTopic));
+        smsHandlerLambda.addToRolePolicy(
+            PortcallEstimateSubscriptionsStack.createWriteToPolicy(props.pinpointApplicationId));
+        createSubscription(smsHandlerLambda, functionName, props.logsDestinationArn, this);
     }
 }
