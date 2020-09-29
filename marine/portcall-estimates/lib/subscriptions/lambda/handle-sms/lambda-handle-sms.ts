@@ -28,6 +28,6 @@ async function handleSms(operation: SubscriptionOperation, event: SnsSubscriptio
             if(!snsSubscription) {
                 return await sendHelpMessage(event.originationNumber);
             }
-            return Promise.all([addSubscription(snsSubscription), sendOKMessage(event.originationNumber)]);
+            return await addSubscription(snsSubscription);
     }
 }

@@ -11,7 +11,11 @@ import {RetentionDays} from '@aws-cdk/aws-logs';
 import {Rule, Schedule} from '@aws-cdk/aws-events';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {AttributeType, Table} from '@aws-cdk/aws-dynamodb';
-import {SUBSCRIPTIONS_PHONENUMBER_IDX_NAME, SUBSCRIPTIONS_TABLE_NAME} from './service/subscriptions';
+import {
+    SUBSCRIPTION_ID_ATTRIBUTE,
+    SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
+    SUBSCRIPTIONS_TABLE_NAME
+} from "./db/db-subscriptions";
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -47,7 +51,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
 
     private createSubscriptionTable(): Table {
         const table = new Table(this, 'subscription-table', {
-            partitionKey: { name: 'ID', type: AttributeType.STRING},
+            partitionKey: { name: SUBSCRIPTION_ID_ATTRIBUTE, type: AttributeType.STRING},
             sortKey: {name: 'Time', type: AttributeType.STRING},
             tableName: SUBSCRIPTIONS_TABLE_NAME,
             readCapacity: 1,
@@ -79,7 +83,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const ruleName = 'PortcallEstimateSubscriptions-Scheduler'
         return new Rule(this, ruleName, {
             ruleName,
-            schedule: Schedule.expression('cron(0 * * * ? *)') // every minute
+            schedule: Schedule.expression('cron(* * * * ? *)') // every minute
         });
     }
 
