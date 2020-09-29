@@ -31,7 +31,6 @@ export async function sendMessage(body: string, number: string): Promise<any> {
     console.info('method=sendMessage, Sending SMS');
     return await pinpoint.sendMessages(params).promise()
         .catch((error: Error) => console.error(`method=sendMessage error=${error}`))
-        .then(() => console.info('method=sendMessage SMS sent'));
 }
 
 export async function sendHelpMessage(destinationNumber: string): Promise<any> {
@@ -44,4 +43,8 @@ export async function sendOKMessage(destinationNumber: string): Promise<any> {
 
 export async function sendValidationFailedMessage(destinationNumber: string): Promise<any> {
     return await sendMessage(MESSAGE_VALIDATION_FAILED, destinationNumber);
+}
+
+export async function sendShiplist(shiplist: string, destinationNumber: string) {
+    return await sendMessage(shiplist, destinationNumber);
 }

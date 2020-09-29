@@ -60,3 +60,7 @@ export async function findAllEstimates(
         }
     })));
 }
+
+export async function getShiplist(time: any, locode: any) {
+    return `shiplist for ${time} and ${locode}`;
+}

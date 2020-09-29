@@ -77,10 +77,16 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             code: new AssetCode('dist/subscriptions/lambda/send-shiplist'),
             handler: 'lambda-send-shiplist.handler',
             runtime: Runtime.NODEJS_12_X,
-            memorySize: 1024,
+            memorySize: 256,
             timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
             logRetention: RetentionDays.ONE_YEAR,
+            environment: {
+                PINPOINT_ID: props.pinpointApplicationId,
+                PINPOINT_NUMBER: props.pinpointTelephoneNumber
+            }
         });
+        sendShiplistLambda.addToRolePolicy(
+            PortcallEstimateSubscriptionsStack.createWriteToPinpointPolicy(props.pinpointApplicationId));
         createSubscription(sendShiplistLambda, functionName, props.logsDestinationArn, this);
         return sendShiplistLambda;
     }
@@ -93,7 +99,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         });
     }
 
-    private static createWriteToPolicy(pinpointApplicationId: string) {
+    private static createWriteToPinpointPolicy(pinpointApplicationId: string) {
         return new PolicyStatement({
             actions: [
                 'mobiletargeting:*'
@@ -114,7 +120,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             code: new AssetCode('dist/subscriptions/lambda/handle-sms'),
             handler: 'lambda-handle-sms.handler',
             runtime: Runtime.NODEJS_12_X,
-            memorySize: 1024,
+            memorySize: 256,
             timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
             logRetention: RetentionDays.ONE_YEAR,
             environment: {
@@ -124,7 +130,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         });
         smsHandlerLambda.addEventSource(new SnsEventSource(incomingSmsTopic));
         smsHandlerLambda.addToRolePolicy(
-            PortcallEstimateSubscriptionsStack.createWriteToPolicy(props.pinpointApplicationId));
+            PortcallEstimateSubscriptionsStack.createWriteToPinpointPolicy(props.pinpointApplicationId));
         createSubscription(smsHandlerLambda, functionName, props.logsDestinationArn, this);
 
         return smsHandlerLambda;
