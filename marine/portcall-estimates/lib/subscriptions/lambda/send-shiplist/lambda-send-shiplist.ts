@@ -1,10 +1,10 @@
 import {DYNAMODB_TIME_FORMAT, listSubscriptions} from "../../service/subscriptions";
-import moment, {Moment} from 'moment';
+
+const moment = require('moment-timezone');
 
 export async function handler() {
-    // this is zulu time? check timezone, and make sure dynamodb has same timezone times
-    const time = moment().format(DYNAMODB_TIME_FORMAT);
-    const subs = listSubscriptions(time);
+    const time = moment.tz(new Date(), "Europe/Helsinki").format(DYNAMODB_TIME_FORMAT);
+    const subscriptions = await listSubscriptions(time);
 
-    console.log("active subscriptions for %s, %s", time, JSON.stringify(subs));
+    console.log("active subscriptions for %s, %s", time, JSON.stringify(subscriptions));
 }

@@ -43,7 +43,10 @@ export async function sendSubscriptionList(destinationNumber: string) {
     await PinpointService.sendMessage(subs, destinationNumber);
 }
 
-
 export async function listSubscriptions(time: string): Promise<any> {
-    return await SubscriptionDB.listSubscriptionsForTime(time);
+    const value = await SubscriptionDB.listSubscriptionsForTime(time);
+
+    console.info("dynamodb value %s", JSON.stringify(value));
+
+    return value.Items;
 }

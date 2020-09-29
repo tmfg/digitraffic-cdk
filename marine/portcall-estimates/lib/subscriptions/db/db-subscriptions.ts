@@ -4,15 +4,20 @@ const ddb = new DynamoDB.DocumentClient();
 
 export const SUBSCRIPTIONS_TABLE_NAME = "PortcallEstimates.Subscriptions";
 export const SUBSCRIPTIONS_PHONENUMBER_IDX_NAME = 'PortcallEstimateSubscriptions_PhoneNumber_Idx';
+export const SUBSCRIPTIONS_TIME_IDX_NAME = 'PortcallEstimateSubscriptions_Time_Idx';
 export const SUBSCRIPTION_ID_ATTRIBUTE = "ID";
 
 export async function listSubscriptionsForTime(time: string): Promise<any> {
     return await ddb.query({
         TableName: SUBSCRIPTIONS_TABLE_NAME,
+        IndexName: SUBSCRIPTIONS_TIME_IDX_NAME,
         ExpressionAttributeValues: {
             ":Time": time
         },
-        KeyConditionExpression: 'Time = :Time'
+        ExpressionAttributeNames: {
+            "#time": "Time"
+        },
+        KeyConditionExpression: '#time = :Time'
     }).promise();
 }
 

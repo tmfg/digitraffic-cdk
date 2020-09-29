@@ -14,7 +14,7 @@ import {AttributeType, Table} from '@aws-cdk/aws-dynamodb';
 import {
     SUBSCRIPTION_ID_ATTRIBUTE,
     SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
-    SUBSCRIPTIONS_TABLE_NAME
+    SUBSCRIPTIONS_TABLE_NAME, SUBSCRIPTIONS_TIME_IDX_NAME
 } from "./db/db-subscriptions";
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
@@ -41,6 +41,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
 
         const subscriptionTable = this.createSubscriptionTable();
         subscriptionTable.grantReadWriteData(smsHandlerLambda);
+        subscriptionTable.grantReadData(sendShiplistLambda);
 
         PublicApi.create(vpc,
             lambdaDbSg,
@@ -58,9 +59,14 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             writeCapacity: 1
         });
         table.addGlobalSecondaryIndex({
+            indexName: SUBSCRIPTIONS_TIME_IDX_NAME,
+            partitionKey: { name: 'Time', type: AttributeType.STRING }
+        });
+        table.addGlobalSecondaryIndex({
             indexName: SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
             partitionKey: { name: 'PhoneNumber', type: AttributeType.STRING }
         });
+
         return table;
     }
 
