@@ -16,6 +16,7 @@ export interface DbSubscription {
     readonly PhoneNumber: string
     readonly Locode: string
     readonly Time: string
+    readonly Type: string
 }
 
 export async function listSubscriptionsForTime(time: string): Promise<any> {
@@ -43,7 +44,7 @@ export async function getSubscriptionList(destinationNumber: string): Promise<an
     }).promise();
 }
 
-export async function insertSubscription(item: any): Promise<any> {
+export async function insertSubscription(item: DbSubscription): Promise<any> {
     const params = {
         TableName: SUBSCRIPTIONS_TABLE_NAME,
         Item: item

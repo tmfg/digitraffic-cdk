@@ -1,11 +1,18 @@
-import {getSubscriptionList, SUBSCRIPTIONS_TABLE_NAME, _ddb} from '../../../../lib/subscriptions/db/db-subscriptions';
+import {
+    getSubscriptionList,
+    insertSubscription,
+    listSubscriptionsForTime,
+    SUBSCRIPTIONS_TABLE_NAME,
+    _ddb as ddb
+} from '../../../../lib/subscriptions/db/db-subscriptions';
 import {newSubscription} from "../../testdata";
+import {dynamoDbTestBase} from "../../db-testutil";
 
 describe('subscriptions', () => {
 
-    test('getSubscriptionList', async () => {
+    test('getSubscriptionList', dynamoDbTestBase(ddb, async () => {
         const sub = newSubscription();
-        await _ddb.put({
+        await ddb.put({
             TableName: SUBSCRIPTIONS_TABLE_NAME,
             Item: sub
         }).promise();
@@ -14,6 +21,29 @@ describe('subscriptions', () => {
 
         expect(subs.Items.length).toBe(1);
         expect(subs.Items[0]).toMatchObject(sub);
-    });
+    }));
+
+    test('insertSubscription', dynamoDbTestBase(ddb, async () => {
+        const sub = newSubscription();
+        await insertSubscription(sub);
+
+        const subs = await ddb.scan({
+            TableName: SUBSCRIPTIONS_TABLE_NAME
+        }).promise();
+        expect(subs.Items!!.length).toBe(1);
+        expect(subs.Items!![0]).toMatchObject(sub);
+    }));
+
+    test('listSubscriptionsForTime', dynamoDbTestBase(ddb, async () => {
+        const sub = newSubscription();
+        await ddb.put({
+            TableName: SUBSCRIPTIONS_TABLE_NAME,
+            Item: sub
+        }).promise();
+
+        const subs = await listSubscriptionsForTime(sub.Time);
+        expect(subs.Items!!.length).toBe(1);
+        expect(subs.Items!![0]).toMatchObject(sub);
+    }));
 
 });

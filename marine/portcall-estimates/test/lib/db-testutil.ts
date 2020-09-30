@@ -2,6 +2,8 @@ import * as pgPromise from "pg-promise";
 import {initDbConnection} from "digitraffic-lambda-postgres/database";
 import {ApiEstimate} from "../../lib/estimates/model/estimate";
 import {createUpdateValues, DbEstimate} from "../../lib/estimates/db/db-estimates";
+import {DocumentClient} from "aws-sdk/clients/dynamodb";
+import {SUBSCRIPTIONS_TABLE_NAME} from "../../lib/subscriptions/db/db-subscriptions";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
@@ -28,6 +30,28 @@ export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
         // @ts-ignore
         fn(db);
     };
+}
+
+export function dynamoDbTestBase(ddb: DocumentClient, fn: () => void) {
+    return async () => {
+        await truncateDynamoDb(ddb);
+        await fn();
+        await truncateDynamoDb(ddb);
+    };
+}
+
+async function truncateDynamoDb(ddb: DocumentClient) {
+    const items = await ddb.scan({
+        TableName: SUBSCRIPTIONS_TABLE_NAME
+    }).promise();
+    return Promise.all(items.Items!!.map(s =>
+        ddb.delete({
+            TableName: SUBSCRIPTIONS_TABLE_NAME,
+            Key: {
+                ID: s.ID
+            }
+        }).promise()
+    ));
 }
 
 export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {

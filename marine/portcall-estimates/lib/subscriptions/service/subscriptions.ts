@@ -16,11 +16,11 @@ export async function addSubscription(subscription: EstimateSubscription) {
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
         await SubscriptionDB.insertSubscription({
-            "ID": uuidv4(),
-            "Time": moment(subscription.time, TIME_FORMAT, true).format(DYNAMODB_TIME_FORMAT),
-            "Type": SubscriptionType.VESSEL_LIST,
-            "Locode": subscription.locode.toUpperCase(),
-            "PhoneNumber": subscription.phoneNumber
+            ID: uuidv4(),
+            Time: moment(subscription.time, TIME_FORMAT, true).format(DYNAMODB_TIME_FORMAT),
+            Type: SubscriptionType.VESSEL_LIST,
+            Locode: subscription.locode.toUpperCase(),
+            PhoneNumber: subscription.phoneNumber
         });
 
         await sendOKMessage(subscription.phoneNumber);

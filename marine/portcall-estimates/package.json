@@ -51,7 +51,6 @@
     "digitraffic-lambda-postgres": "file:../../common/postgres",
     "digitraffic-lambda-stack": "file:../../common/stack",
     "digitraffic-dynamodb": "file:../../common/dynamodb",
-    "moment": "^2.27.0",
     "moment": "^2.29.0",
     "moment-timezone": "0.5.31",
     "pg-native": "3.0.0",

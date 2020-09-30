@@ -2,6 +2,7 @@ import moment from "moment";
 import {ApiEstimate, EventType} from "../../lib/estimates/model/estimate";
 import {TIME_FORMAT} from "../../lib/subscriptions/model/subscription";
 import {DYNAMODB_TIME_FORMAT, SubscriptionType} from "../../lib/subscriptions/service/subscriptions";
+import {DbSubscription} from "../../lib/subscriptions/db/db-subscriptions";
 const { v4: uuidv4 } = require('uuid');
 
 export function someNumber() {
@@ -40,12 +41,12 @@ export function newEstimate(props?: {
     };
 }
 
-export function newSubscription() {
+export function newSubscription(): DbSubscription {
     return {
         ID: uuidv4(),
         Time: moment(new Date(+(new Date()) - Math.floor(Math.random()*10000000000))).format(DYNAMODB_TIME_FORMAT),
         Type: SubscriptionType.VESSEL_LIST,
         Locode: 'FIHKI',
-        PhoneNumber: '+1234567890'
+        PhoneNumber: '+1234567890',
     };
 }
