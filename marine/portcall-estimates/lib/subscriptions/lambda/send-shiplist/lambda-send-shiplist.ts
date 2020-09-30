@@ -8,7 +8,7 @@ export async function handler() {
     const time = moment.tz(new Date(), "Europe/Helsinki").format(SubscriptionsService.DYNAMODB_TIME_FORMAT);
     const subscriptions = await SubscriptionsService.listSubscriptions(time);
 
-    console.log("active subscriptions for %s, %s", time, JSON.stringify(subscriptions));
+    console.log("active subscriptions for %s %d", time, subscriptions.length);
 
     await Promise.allSettled(sendShipLists(subscriptions));
 }
