@@ -1,21 +1,15 @@
 import {EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
-import moment, {Moment} from 'moment';
+import moment from 'moment';
 const { v4: uuidv4 } = require('uuid');
 import * as PinpointService from "./pinpoint";
 import * as SubscriptionDB from '../db/db-subscriptions';
 import {sendOKMessage} from "./pinpoint";
+import {DbSubscription} from "../db/db-subscriptions";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
-enum SubscriptionType {
+export enum SubscriptionType {
     VESSEL_LIST= "VESSEL_LIST"
-}
-
-interface DbSubscription {
-    readonly ID: string
-    readonly PhoneNumber: string
-    readonly Locode: string
-    readonly Time: string
 }
 
 export async function addSubscription(subscription: EstimateSubscription) {
