@@ -1,6 +1,7 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {findStateIds} from '../../db/db-requests';
-import {findAll} from '../../db/db-states';
+import {findAll as findAllStates} from '../../db/db-states';
+import {findAll as findAllSubjects} from '../../db/db-subjects';
 import {SNS} from 'aws-sdk';
 
 export const handler = async () : Promise <any> => {
@@ -10,17 +11,21 @@ export const handler = async () : Promise <any> => {
         process.env.DB_URI as string
     );
     try {
-        const requestStateIds = await findStateIds(db);
-        const states = await findAll(db);
-        const stateKeys = new Set(states.map(s => s.key));
-
-        // TODO do in this in the database?
-        const missingStates = requestStateIds
+        const requestStateIds = (await findStateIds(db))
             .map(r => r.status_id)
-            .filter(s => s != null && s.length > 0)
+            .filter(s => s != null && s.length > 0);
+
+        const states = await findAllStates(db);
+        const stateKeys = new Set(states.map(s => s.key));
+        const missingStates = requestStateIds
             .filter(rsc => !stateKeys.has(rsc as string));
 
-        if (missingStates.length > 0) {
+        const subjects = await findAllSubjects(db);
+        const subjectIds = new Set(subjects.map(s => s.id));
+        const missingSubjects = requestStateIds
+            .filter(rsc => !subjectIds.has(Number(rsc)));
+
+        if (missingStates.length || missingSubjects.length) {
             console.warn('Missing states found: ' + missingStates.join(','));
             new SNS().publish({
                 Message: missingStates.join(','),

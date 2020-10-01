@@ -93,6 +93,10 @@ export function findStateIds(db: IDatabase<any, any>): Promise<ServiceRequestSta
     return db.manyOrNone("SELECT status_id FROM open311_service_request");
 }
 
+export function findSubjectIds(db: IDatabase<any, any>): Promise<ServiceRequestStatusId[]> {
+    return db.manyOrNone("SELECT DISTINCT status_id FROM open311_service_request");
+}
+
 export function findAll(db: IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`).then(requests => requests.map(r => toServiceRequest(r)));
 }

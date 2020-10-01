@@ -21,14 +21,11 @@ export function create(
     const missingStatesLambdaTopic = new sns.Topic(stack, 'MissingStatesFoundTopic', {
         displayName: 'MissingStatesFoundTopic'
     });
-    const missingSubjectsLambdaTopic = new sns.Topic(stack, 'MissingSubjectsFoundTopic', {
-        displayName: 'MissingSubjectsFoundTopic'
-    });
     createCheckOrphanRequestsLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
     createCheckMissingStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
     createUpdateServicesLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
     createUpdateStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
-    createUpdateSubjectsLambda(missingSubjectsLambdaTopic, vpc, lambdaDbSg, props, stack);
+    createUpdateSubjectsLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
 }
 
 function createCheckOrphanRequestsLambda(

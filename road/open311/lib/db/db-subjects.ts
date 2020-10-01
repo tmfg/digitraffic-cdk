@@ -8,13 +8,13 @@ const DELETE_SUBJECTS_PS = new PreparedStatement({
 });
 
 const INSERT_SUBJECT_PS = new PreparedStatement({
-    name: 'insert-state',
+    name: 'insert-subject',
     text: `INSERT INTO open311_subject(active, id, locale, name) VALUES ($1, $2, $3, $4)`
 });
 
 const SELECT_SUBJECTS_PS = new PreparedStatement({
     name: 'select-subjects',
-    text: 'SELECT active, id, locale, name FROM open311_subject ORDER BY id'
+    text: 'SELECT active, id, locale, name FROM open311_subject ORDER BY locale, id'
 });
 
 export function findAll(db: IDatabase<any, any>): Promise<Subject[]> {

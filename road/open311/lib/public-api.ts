@@ -8,6 +8,8 @@ import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
 import {default as StateSchema} from './model/state-schema';
+import {default as SubjectSchema} from './model/subject-schema';
+import {default as SubSubjectSchema} from './model/subsubject-schema';
 import {MessageModel} from 'digitraffic-cdk-api/response';
 import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../../common/stack/subscription";
@@ -31,6 +33,8 @@ export function create(
     const requestModel = addServiceModel('RequestModel', publicApi, RequestSchema);
     const requestsModel = addServiceModel('RequestsModel', publicApi, createArraySchema(requestModel, publicApi));
     const stateModel = addServiceModel('StateModel', publicApi, StateSchema);
+    const subjectModel = addServiceModel('SubjectModel', publicApi, SubjectSchema);
+    const subSubjectModel = addServiceModel('SubSubjectModel', publicApi, SubSubjectSchema);
     const serviceModel = addServiceModel('ServiceModel', publicApi, ServiceSchema);
     const servicesModel = addServiceModel('ServicesModel', publicApi, createArraySchema(serviceModel, publicApi));
     const messageResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
@@ -53,6 +57,22 @@ export function create(
         props,
         lambdaDbSg,
         stateModel,
+        messageResponseModel,
+        validator,
+        stack);
+    createSubjectsResource(open311Resource,
+        vpc,
+        props,
+        lambdaDbSg,
+        subjectModel,
+        messageResponseModel,
+        validator,
+        stack);
+    createSubSubjectsResource(open311Resource,
+        vpc,
+        props,
+        lambdaDbSg,
+        subSubjectModel,
         messageResponseModel,
         validator,
         stack);
@@ -197,27 +217,64 @@ function createStatesResource(
         handler: 'lambda-get-states.handler'
     }));
     createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
-    createGetStatesIntegration(states,
+    createGetResourcesIntegration(states,
         getStatesHandler,
         stateModel,
-        messageResponseModel);
-    addTags('GetStates', DATA_V1_TAGS, states, stack);
+        messageResponseModel,
+        'GetStates',
+        stack);
 }
 
-function createGetStatesIntegration(
-    states: apigateway.Resource,
-    getStatesHandler: lambda.Function,
-    statesModel: apigateway.Model,
-    messageResponseModel: apigateway.Model) {
+function createSubjectsResource(
+    open311Resource: apigateway.Resource,
+    vpc: ec2.IVpc,
+    props: Props,
+    lambdaDbSg: ec2.ISecurityGroup,
+    subjectModel: apigateway.Model,
+    messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator,
+    stack: Construct) {
 
-    const getServicesIntegration = defaultIntegration(getStatesHandler);
-    states.addMethod("GET", getServicesIntegration, {
-        apiKeyRequired: true,
-        methodResponses: [
-            corsMethodJsonResponse("200", statesModel),
-            corsMethodJsonResponse("500", messageResponseModel)
-        ]
-    });
+    const subjects = open311Resource.addResource("subjects");
+    const getSubjectsId = 'Open311-GetSubjects';
+    const getSubjectsHandler = new lambda.Function(stack, getSubjectsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getSubjectsId,
+        code: new lambda.AssetCode('dist/lambda/get-subjects'),
+        handler: 'lambda-get-subjects.handler'
+    }));
+    createSubscription(getSubjectsHandler, getSubjectsId, props.logsDestinationArn, stack);
+    createGetResourcesIntegration(subjects,
+        getSubjectsHandler,
+        subjectModel,
+        messageResponseModel,
+        'GetSubjects',
+        stack);
+}
+
+function createSubSubjectsResource(
+    open311Resource: apigateway.Resource,
+    vpc: ec2.IVpc,
+    props: Props,
+    lambdaDbSg: ec2.ISecurityGroup,
+    subSubjectModel: apigateway.Model,
+    messageResponseModel: apigateway.Model,
+    validator: apigateway.RequestValidator,
+    stack: Construct) {
+
+    const subSubjects = open311Resource.addResource("subsubjects");
+    const getSubSubjectsId = 'Open311-GetSubSubjects';
+    const getSubSubjectsHandler = new lambda.Function(stack, getSubSubjectsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: getSubSubjectsId,
+        code: new lambda.AssetCode('dist/lambda/get-subsubjects'),
+        handler: 'lambda-get-subsubjects.handler'
+    }));
+    createSubscription(getSubSubjectsHandler, getSubSubjectsId, props.logsDestinationArn, stack);
+    createGetResourcesIntegration(subSubjects,
+        getSubSubjectsHandler,
+        subSubjectModel,
+        messageResponseModel,
+        'GetSubSubjects',
+        stack);
 }
 
 function createServicesResource(
@@ -240,11 +297,12 @@ function createServicesResource(
         handler: 'lambda-get-services.handler'
     }));
     createSubscription(getServicesHandler, getServicesId, props.logsDestinationArn, stack);
-    createGetServicesIntegration(getServicesId,
+    createGetResourcesIntegration(
         services,
         getServicesHandler,
         servicesModel,
         messageResponseModel,
+        'GetServices',
         stack);
 
     const getServiceId = 'GetService';
@@ -263,23 +321,23 @@ function createServicesResource(
         stack);
 }
 
-function createGetServicesIntegration(
-    getServicesId: string,
-    services: apigateway.Resource,
-    getServicesHandler: lambda.Function,
-    servicesModel: apigateway.Model,
+function createGetResourcesIntegration(
+    resource: apigateway.Resource,
+    handler: lambda.Function,
+    model: apigateway.Model,
     messageResponseModel: apigateway.Model,
+    tag: string,
     stack: Construct) {
 
-    const getServicesIntegration = defaultIntegration(getServicesHandler);
-    services.addMethod("GET", getServicesIntegration, {
+    const integration = defaultIntegration(handler);
+    resource.addMethod("GET", integration, {
         apiKeyRequired: true,
         methodResponses: [
-            corsMethodJsonResponse("200", servicesModel),
+            corsMethodJsonResponse("200", model),
             corsMethodJsonResponse("500", messageResponseModel)
         ]
     });
-    addTags('GetServices', DATA_V1_TAGS, services, stack);
+    addTags(tag, DATA_V1_TAGS, resource, stack);
 }
 
 function createGetServiceIntegration(
