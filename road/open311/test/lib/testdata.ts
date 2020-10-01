@@ -2,6 +2,8 @@ import {ServiceRequestWithExtensionsDto, ServiceRequestStatus, ServiceRequestWit
 import {Service, ServiceType} from "../../lib/model/service";
 import {toServiceRequestWithExtensions} from "../../lib/service/requests";
 import {ServiceRequestState} from "../../lib/model/service-request-state";
+import {Subject} from "../../lib/model/subject";
+import {randomString} from "../../../../common/test/testutils";
 
 export function newService(): Service {
     return {
@@ -53,6 +55,15 @@ export function newState(): ServiceRequestState {
     return {
       key: Math.random().toFixed(3).split('.')[1],
       name: Math.random().toFixed(10).split('.')[1]
+    };
+}
+
+export function newSubject(): Subject {
+    return {
+        active: Math.round(Math.random()),
+        name: randomString(),
+        id: Math.floor(Math.random() * 10000),
+        locale: 'en'
     };
 }
 

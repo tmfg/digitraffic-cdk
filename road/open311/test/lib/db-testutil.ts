@@ -36,6 +36,7 @@ export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null>
            db.none('DELETE FROM open311_service_request'),
            db.none('DELETE FROM open311_service_request_state'),
            db.none('DELETE FROM open311_service'),
+           db.none('DELETE FROM open311_subject'),
        ]);
     });
 }

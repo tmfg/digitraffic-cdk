@@ -21,10 +21,14 @@ export function create(
     const missingStatesLambdaTopic = new sns.Topic(stack, 'MissingStatesFoundTopic', {
         displayName: 'MissingStatesFoundTopic'
     });
+    const missingSubjectsLambdaTopic = new sns.Topic(stack, 'MissingSubjectsFoundTopic', {
+        displayName: 'MissingSubjectsFoundTopic'
+    });
     createCheckOrphanRequestsLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
     createCheckMissingStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
     createUpdateServicesLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
     createUpdateStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
+    createUpdateSubjectsLambda(missingSubjectsLambdaTopic, vpc, lambdaDbSg, props, stack);
 }
 
 function createCheckOrphanRequestsLambda(
@@ -121,4 +125,28 @@ function createUpdateStatesLambda(
     const updateStatesLambda = new lambda.Function(stack, updateStatesId, lambdaConf);
     createSubscription(updateStatesLambda, updateStatesId, props.logsDestinationArn, stack);
     topic.addSubscription(new subscriptions.LambdaSubscription(updateStatesLambda));
+}
+
+function createUpdateSubjectsLambda(
+    topic: sns.Topic,
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    props: Props,
+    stack: Construct) {
+
+    const updateSubjectsId = 'Open311-UpdateSubjects';
+    const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: updateSubjectsId,
+        code: new lambda.AssetCode('dist/lambda/update-subjects'),
+        handler: 'lambda-update-subjects.handler'
+    });
+    // @ts-ignore
+    lambdaConf.environment.ENDPOINT_USER = props.integration.username;
+    // @ts-ignore
+    lambdaConf.environment.ENDPOINT_PASS = props.integration.password;
+    // @ts-ignore
+    lambdaConf.environment.ENDPOINT_URL = props.integration.url;
+    const updateSubjectsLambda = new lambda.Function(stack, updateSubjectsId, lambdaConf);
+    createSubscription(updateSubjectsLambda, updateSubjectsId, props.logsDestinationArn, stack);
+    topic.addSubscription(new subscriptions.LambdaSubscription(updateSubjectsLambda));
 }

@@ -2,24 +2,24 @@ import {IDatabase} from "pg-promise";
 import {
     findAll as dbFindAll,
     update as dbUpdate
-} from '../db/db-states';
+} from '../db/db-subjects';
 import {inDatabase} from "digitraffic-lambda-postgres/database";
-import {ServiceRequestState} from "../model/service-request-state";
+import {Subject} from "../model/subject";
 
-export async function findAll(): Promise<ServiceRequestState[]> {
+export async function findAll(): Promise<Subject[]> {
     return inDatabase(async (db: IDatabase<any, any>) => {
         return await dbFindAll(db);
     });
 }
 
 export async function update(
-    states: ServiceRequestState[]
+    subjects: Subject[]
 ): Promise<void> {
     const start = Date.now();
     return inDatabase(async (db: IDatabase<any, any>) => {
-        return await dbUpdate(states, db);
+        return await dbUpdate(subjects, db);
     }).then(a => {
         const end = Date.now();
-        console.info("method=updateStates updatedCount=%d tookMs=%d", a.length, (end - start));
+        console.info("method=updateSubjects updatedCount=%d tookMs=%d", a.length, (end - start));
     });
 }
