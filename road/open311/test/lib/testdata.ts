@@ -2,8 +2,9 @@ import {ServiceRequestWithExtensionsDto, ServiceRequestStatus, ServiceRequestWit
 import {Service, ServiceType} from "../../lib/model/service";
 import {toServiceRequestWithExtensions} from "../../lib/service/requests";
 import {ServiceRequestState} from "../../lib/model/service-request-state";
-import {Subject} from "../../lib/model/subject";
+import {Subject, SubjectLocale} from "../../lib/model/subject";
 import {randomString} from "../../../../common/test/testutils";
+import {shuffle} from "../../../../common/js/js-utils";
 
 export function newService(): Service {
     return {
@@ -63,7 +64,7 @@ export function newSubject(): Subject {
         active: Math.round(Math.random()),
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
-        locale: 'en'
+        locale: shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0]
     };
 }
 

@@ -1,14 +1,15 @@
 import axios from 'axios';
 import * as util from "util";
 import * as xml2js from "xml2js";
-import {Subject} from '../model/subject';
+import {Subject, SubjectLocale} from '../model/subject';
 
 export async function getSubjects(
     endpointUser: string,
     endpointPass: string,
-    endpointUrl: string
-) {
-    const resp = await axios.get(endpointUrl + '/subjects', {
+    endpointUrl: string,
+    locale: SubjectLocale
+): Promise<Subject[]> {
+    const resp = await axios.get(`${endpointUrl}/subjects?locale=${locale}`, {
         headers: {
             'Accept': 'application/xml'
         },
@@ -22,7 +23,8 @@ export async function getSubjects(
     }
     const parse = util.promisify(xml2js.parseString);
     const parsedSubjects = <SubjectsResponse> await parse(resp.data);
-    return responseToSubjects(parsedSubjects);
+    return responseToSubjects(parsedSubjects)
+        .filter(s => s.locale == locale); // integration returns mixed locales
 }
 
 interface SubjectsResponse {
@@ -46,6 +48,6 @@ function responseToSubjects(response: SubjectsResponse): Subject[] {
         active: s.active[0],
         name: s.name[0],
         id: s.id[0],
-        locale: s.locale[0]
+        locale: s.locale[0] as SubjectLocale
     }));
 }

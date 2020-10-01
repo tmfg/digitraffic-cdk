@@ -21,7 +21,7 @@ export class TestHttpServer {
                 res.setHeader('Access-Control-Allow-Origin', '*');
                 res.setHeader('Access-Control-Allow-Headers', 'Authorization,X-User-Id,X-Auth-Token');
                 res.writeHead(200);
-                res.end(props[path]());
+                res.end(props[path](req.url));
             } else {
                 this.debuglog('..no match');
             }
@@ -42,5 +42,5 @@ export class TestHttpServer {
 }
 
 interface ListenProperties {
-    [key:string]: () => string;
+    [key:string]: (url?: string) => string;
 }

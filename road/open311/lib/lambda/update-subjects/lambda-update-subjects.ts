@@ -1,15 +1,20 @@
 import {getSubjects} from '../../api/api-subjects';
 import {update} from "../../service/subjects";
+import {SubjectLocale} from "../../model/subject";
 
 export const handler = async (): Promise<any> => {
     const endpointUser = process.env.ENDPOINT_USER as string;
     const endpointPass = process.env.ENDPOINT_PASS as string;
     const endpointUrl = process.env.ENDPOINT_URL as string;
     try {
-        const subjects = await getSubjects(endpointUser, endpointPass, endpointUrl);
-        await update(subjects);
+        const subjects = await Promise.all([
+            getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.FINNISH),
+            getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.SWEDISH),
+            getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.ENGLISH)
+        ]);
+        await update(subjects.flat());
     } catch (e) {
-        console.error('Error', e);
+        console.error('method=updateSubjectsLambda', e);
         return;
     }
 };
