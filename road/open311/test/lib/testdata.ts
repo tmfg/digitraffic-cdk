@@ -60,21 +60,21 @@ export function newState(): ServiceRequestState {
     };
 }
 
-export function newSubject(): Subject {
+export function newSubject(locale?: SubjectLocale): Subject {
     return {
         active: Math.round(Math.random()),
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
-        locale: shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0]
+        locale: locale ?? shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0]
     };
 }
 
-export function newSubSubject(): SubSubject {
+export function newSubSubject(locale?: SubjectLocale): SubSubject {
     return {
         active: Math.round(Math.random()),
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
-        locale: shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0],
+        locale: locale ?? shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0],
         subject_id: Math.floor(Math.random() * 10000)
     };
 }

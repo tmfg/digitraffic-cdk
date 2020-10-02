@@ -5,10 +5,11 @@ import {
 } from '../db/db-subsubjects';
 import {inDatabase} from "digitraffic-lambda-postgres/database";
 import {SubSubject} from "../model/subsubject";
+import {SubjectLocale} from "../model/subject";
 
-export async function findAll(): Promise<SubSubject[]> {
+export async function findAll(locale: SubjectLocale): Promise<SubSubject[]> {
     return inDatabase(async (db: IDatabase<any, any>) => {
-        return await dbFindAll(db);
+        return await dbFindAll(locale, db);
     });
 }
 

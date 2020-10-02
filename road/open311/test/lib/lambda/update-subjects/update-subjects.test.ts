@@ -24,13 +24,20 @@ describe('update-subjects', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
 
         try {
-            const expectedIds = [2];
+            const expectedId = 2;
             await handler();
-            const foundSubjects = await findAll(db);
-            expect(foundSubjects.length).toBe(3);
-            expect(foundSubjects.filter(s => s.locale == SubjectLocale.FINNISH).map(s => s.id)).toMatchObject(expectedIds);
-            expect(foundSubjects.filter(s => s.locale == SubjectLocale.SWEDISH).map(s => s.id)).toMatchObject(expectedIds);
-            expect(foundSubjects.filter(s => s.locale == SubjectLocale.ENGLISH).map(s => s.id)).toMatchObject(expectedIds);
+
+            const foundSubjectsFi = await findAll(SubjectLocale.FINNISH, db);
+            expect(foundSubjectsFi.length).toBe(1);
+            expect(foundSubjectsFi[0].id).toBe(expectedId);
+
+            const foundSubjectsSv = await findAll(SubjectLocale.SWEDISH, db);
+            expect(foundSubjectsSv.length).toBe(1);
+            expect(foundSubjectsSv[0].id).toBe(expectedId);
+
+            const foundSubjectsEn = await findAll(SubjectLocale.ENGLISH, db);
+            expect(foundSubjectsEn.length).toBe(1);
+            expect(foundSubjectsEn[0].id).toBe(expectedId);
         } finally {
             server.close();
         }

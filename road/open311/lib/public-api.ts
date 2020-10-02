@@ -243,11 +243,11 @@ function createSubjectsResource(
         handler: 'lambda-get-subjects.handler'
     }));
     createSubscription(getSubjectsHandler, getSubjectsId, props.logsDestinationArn, stack);
-    createGetResourcesIntegration(subjects,
+    createGetSubjectsIntegration('GetSubjects',
+        subjects,
         getSubjectsHandler,
         subjectModel,
         messageResponseModel,
-        'GetSubjects',
         stack);
 }
 
@@ -269,11 +269,11 @@ function createSubSubjectsResource(
         handler: 'lambda-get-subsubjects.handler'
     }));
     createSubscription(getSubSubjectsHandler, getSubSubjectsId, props.logsDestinationArn, stack);
-    createGetResourcesIntegration(subSubjects,
+    createGetSubjectsIntegration('GetSubSubjects',
+        subSubjects,
         getSubSubjectsHandler,
         subSubjectModel,
         messageResponseModel,
-        'GetSubSubjects',
         stack);
 }
 
@@ -338,6 +338,36 @@ function createGetResourcesIntegration(
         ]
     });
     addTags(tag, DATA_V1_TAGS, resource, stack);
+}
+
+function createGetSubjectsIntegration(
+    id: string,
+    resource: apigateway.Resource,
+    handler: lambda.Function,
+    model: apigateway.Model,
+    messageResponseModel: apigateway.Model,
+    stack: Construct) {
+
+    const integration = defaultIntegration(handler, {
+        requestParameters: {
+            'integration.request.querystring.locale': 'method.request.querystring.locale'
+        }, requestTemplates: {
+            'application/json': JSON.stringify({
+                locale: "$util.escapeJavaScript($input.params('locale'))"
+            })
+        }
+    });
+    resource.addMethod("GET", integration, {
+        apiKeyRequired: true,
+        requestParameters: {
+            'method.request.querystring.locale': false
+        },
+        methodResponses: [
+            corsMethodJsonResponse("200", model),
+            corsMethodJsonResponse("500", messageResponseModel)
+        ]
+    });
+    addTags(id, DATA_V1_TAGS, resource, stack);
 }
 
 function createGetServiceIntegration(

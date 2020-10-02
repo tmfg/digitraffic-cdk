@@ -1,6 +1,6 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {ServiceRequestState} from "../model/service-request-state";
-import {Subject} from "../model/subject";
+import {Subject, SubjectLocale} from "../model/subject";
 
 const DELETE_SUBJECTS_PS = new PreparedStatement({
     name: 'delete-subjects',
@@ -14,11 +14,14 @@ const INSERT_SUBJECT_PS = new PreparedStatement({
 
 const SELECT_SUBJECTS_PS = new PreparedStatement({
     name: 'select-subjects',
-    text: 'SELECT active, id, locale, name FROM open311_subject ORDER BY locale, id'
+    text: 'SELECT active, id, locale, name FROM open311_subject WHERE locale = $1 ORDER BY id'
 });
 
-export function findAll(db: IDatabase<any, any>): Promise<Subject[]> {
-    return db.manyOrNone(SELECT_SUBJECTS_PS);
+export function findAll(
+    locale: SubjectLocale,
+    db: IDatabase<any, any>
+): Promise<Subject[]> {
+    return db.manyOrNone(SELECT_SUBJECTS_PS, [locale]);
 }
 
 export function update(
