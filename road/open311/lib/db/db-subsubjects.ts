@@ -13,7 +13,7 @@ const INSERT_SUBSUBJECT_PS = new PreparedStatement({
 
 const SELECT_SUBSUBJECTS_PS = new PreparedStatement({
     name: 'select-subsubjects',
-    text: 'SELECT active, id, locale, name FROM open311_subsubject ORDER BY locale, id'
+    text: 'SELECT active, id, locale, name, subject_id FROM open311_subsubject ORDER BY locale, id'
 });
 
 export function findAll(db: IDatabase<any, any>): Promise<SubSubject[]> {

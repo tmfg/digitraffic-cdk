@@ -5,6 +5,7 @@ import {ServiceRequestState} from "../../lib/model/service-request-state";
 import {Subject, SubjectLocale} from "../../lib/model/subject";
 import {randomString} from "../../../../common/test/testutils";
 import {shuffle} from "../../../../common/js/js-utils";
+import {SubSubject} from "../../lib/model/subsubject";
 
 export function newService(): Service {
     return {
@@ -65,6 +66,16 @@ export function newSubject(): Subject {
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
         locale: shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0]
+    };
+}
+
+export function newSubSubject(): SubSubject {
+    return {
+        active: Math.round(Math.random()),
+        name: randomString(),
+        id: Math.floor(Math.random() * 10000),
+        locale: shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0],
+        subject_id: Math.floor(Math.random() * 10000)
     };
 }
 

@@ -30,7 +30,9 @@ export function create(
     const updateSubjectsLambda = createUpdateSubjectsLambda(vpc, lambdaDbSg, props, stack);
     const updateSubSubjectsLambda = createUpdateSubSubjectsLambda(vpc, lambdaDbSg, props, stack);
 
-    const subjectsUpdateRule = new events.Rule(stack, 'Rule', {
+    const subjectsUpdateRuleId = 'Open311-UpdateSubjectsRule';
+    const subjectsUpdateRule = new events.Rule(stack, subjectsUpdateRuleId, {
+        ruleName: subjectsUpdateRuleId,
         schedule: events.Schedule.rate(Duration.days(1))
     });
     subjectsUpdateRule.addTarget(new LambdaFunction(updateSubjectsLambda));
