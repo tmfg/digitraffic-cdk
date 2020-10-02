@@ -2,11 +2,12 @@ import * as events from '@aws-cdk/aws-events';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import * as targets from '@aws-cdk/aws-events-targets';
-import {Construct} from '@aws-cdk/core';
+import {Construct, Duration} from '@aws-cdk/core';
 import * as sns from '@aws-cdk/aws-sns';
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
 import {createSubscription} from "../../../common/stack/subscription";
+import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 
 // returns lambda names for log group subscriptions
 export function create(
@@ -25,7 +26,15 @@ export function create(
     createCheckMissingStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
     createUpdateServicesLambda(orphanRequestsFoundTopic, vpc, lambdaDbSg, props, stack);
     createUpdateStatesLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
-    createUpdateSubjectsLambda(missingStatesLambdaTopic, vpc, lambdaDbSg, props, stack);
+
+    const updateSubjectsLambda = createUpdateSubjectsLambda(vpc, lambdaDbSg, props, stack);
+    const updateSubSubjectsLambda = createUpdateSubSubjectsLambda(vpc, lambdaDbSg, props, stack);
+
+    const subjectsUpdateRule = new events.Rule(stack, 'Rule', {
+        schedule: events.Schedule.rate(Duration.days(1))
+    });
+    subjectsUpdateRule.addTarget(new LambdaFunction(updateSubjectsLambda));
+    subjectsUpdateRule.addTarget(new LambdaFunction(updateSubSubjectsLambda));
 }
 
 function createCheckOrphanRequestsLambda(
@@ -125,11 +134,10 @@ function createUpdateStatesLambda(
 }
 
 function createUpdateSubjectsLambda(
-    topic: sns.Topic,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct) {
+    stack: Construct): lambda.Function {
 
     const updateSubjectsId = 'Open311-UpdateSubjects';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -145,5 +153,28 @@ function createUpdateSubjectsLambda(
     lambdaConf.environment.ENDPOINT_URL = props.integration.url;
     const updateSubjectsLambda = new lambda.Function(stack, updateSubjectsId, lambdaConf);
     createSubscription(updateSubjectsLambda, updateSubjectsId, props.logsDestinationArn, stack);
-    topic.addSubscription(new subscriptions.LambdaSubscription(updateSubjectsLambda));
+    return updateSubjectsLambda;
+}
+
+function createUpdateSubSubjectsLambda(
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    props: Props,
+    stack: Construct): lambda.Function {
+
+    const updateSubSubjectsId = 'Open311-UpdateSubSubjects';
+    const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: updateSubSubjectsId,
+        code: new lambda.AssetCode('dist/lambda/update-subsubjects'),
+        handler: 'lambda-update-subsubjects.handler'
+    });
+    // @ts-ignore
+    lambdaConf.environment.ENDPOINT_USER = props.integration.username;
+    // @ts-ignore
+    lambdaConf.environment.ENDPOINT_PASS = props.integration.password;
+    // @ts-ignore
+    lambdaConf.environment.ENDPOINT_URL = props.integration.url;
+    const updateSubSubjectsLambda = new lambda.Function(stack, updateSubSubjectsId, lambdaConf);
+    createSubscription(updateSubSubjectsLambda, updateSubSubjectsId, props.logsDestinationArn, stack);
+    return updateSubSubjectsLambda;
 }

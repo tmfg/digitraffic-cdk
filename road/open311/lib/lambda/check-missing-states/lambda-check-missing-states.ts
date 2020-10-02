@@ -1,7 +1,6 @@
 import {initDbConnection} from 'digitraffic-lambda-postgres/database';
 import {findStateIds} from '../../db/db-requests';
 import {findAll as findAllStates} from '../../db/db-states';
-import {findAll as findAllSubjects} from '../../db/db-subjects';
 import {SNS} from 'aws-sdk';
 
 export const handler = async () : Promise <any> => {
@@ -19,12 +18,7 @@ export const handler = async () : Promise <any> => {
         const stateKeys = new Set(states.map(s => s.key));
         const missingStates = requestStateIds.filter(rsc => !stateKeys.has(Number(rsc)));
 
-        const subjects = await findAllSubjects(db);
-        const subjectIds = new Set(subjects.map(s => s.id));
-        const missingSubjects = requestStateIds
-            .filter(rsc => !subjectIds.has(Number(rsc)));
-
-        if (missingStates.length || missingSubjects.length) {
+        if (missingStates.length) {
             console.warn('Missing states found: ' + missingStates.join(','));
             new SNS().publish({
                 Message: missingStates.join(','),
