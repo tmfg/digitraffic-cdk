@@ -40,8 +40,6 @@ export async function sendSubscriptionList(destinationNumber: string) {
 export async function listSubscriptions(time: string): Promise<any> {
     const value = await SubscriptionDB.listSubscriptionsForTime(time);
 
-    console.info("dynamodb value %s", JSON.stringify(value));
-
     return value.Items;
 }
 

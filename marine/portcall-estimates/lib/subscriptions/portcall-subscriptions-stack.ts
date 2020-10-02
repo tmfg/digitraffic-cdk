@@ -1,5 +1,5 @@
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
-import {SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
+import {SecurityGroup, ISecurityGroup, Vpc, IVpc} from '@aws-cdk/aws-ec2';
 import {Props} from './app-props-subscriptions';
 import * as PublicApi from './public-api';
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
@@ -33,7 +33,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             topicName
         });
 
-        const sendShiplistLambda = this.createSendShiplistLambda(appProps);
+        const sendShiplistLambda = this.createSendShiplistLambda(vpc, lambdaDbSg, appProps);
         const schedulingCloudWatchRule = this.createSchedulingCloudWatchRule();
         schedulingCloudWatchRule.addTarget(new LambdaFunction(sendShiplistLambda));
 
@@ -70,7 +70,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         return table;
     }
 
-    private createSendShiplistLambda(props: Props): Function {
+    private createSendShiplistLambda(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: Props): Function {
         const functionName = 'PortcallEstimateSubscriptions-SendShiplist';
         const sendShiplistLambda = new Function(this, functionName, {
             functionName,
@@ -80,9 +80,17 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             memorySize: 256,
             timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
             logRetention: RetentionDays.ONE_YEAR,
+            vpc: vpc,
+            vpcSubnets: {
+                subnets: vpc.privateSubnets
+            },
+            securityGroup: lambdaDbSg,
             environment: {
                 PINPOINT_ID: props.pinpointApplicationId,
-                PINPOINT_NUMBER: props.pinpointTelephoneNumber
+                PINPOINT_NUMBER: props.pinpointTelephoneNumber,
+                DB_USER: props.dbProps.username,
+                DB_PASS: props.dbProps.password,
+                DB_URI: props.dbProps.ro_uri
             }
         });
         sendShiplistLambda.addToRolePolicy(
