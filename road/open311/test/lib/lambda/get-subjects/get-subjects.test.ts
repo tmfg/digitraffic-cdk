@@ -14,6 +14,14 @@ describe('lambda-get-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
         expect(response).toMatchObject([]);
     });
 
+    test('default locale', async () => {
+        await update([newSubject(SubjectLocale.ENGLISH)], db);
+
+        const response = await handler({});
+
+        expect(response.length).toBe(1);
+    });
+
     test('some subjects', async () => {
         const locale = shuffle([SubjectLocale.ENGLISH, SubjectLocale.FINNISH, SubjectLocale.SWEDISH])[0];
         const subjects =
