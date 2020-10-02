@@ -54,7 +54,7 @@ export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestS
 
 export function newState(): ServiceRequestState {
     return {
-      key: Math.random().toFixed(3).split('.')[1],
+      key: Math.floor(Math.random() * 10000),
       name: Math.random().toFixed(10).split('.')[1]
     };
 }

@@ -6,7 +6,7 @@ const schema: apigateway.JsonSchema = {
     description: 'Extended state model for Open311 service requests',
     properties: {
         key: {
-            type: apigateway.JsonSchemaType.STRING,
+            type: apigateway.JsonSchemaType.NUMBER,
             description: 'Unique identifier for the state'
         },
         name: {

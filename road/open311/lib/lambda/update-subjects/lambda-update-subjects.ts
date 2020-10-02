@@ -6,15 +6,10 @@ export const handler = async (): Promise<any> => {
     const endpointUser = process.env.ENDPOINT_USER as string;
     const endpointPass = process.env.ENDPOINT_PASS as string;
     const endpointUrl = process.env.ENDPOINT_URL as string;
-    try {
-        const subjects = await Promise.all([
-            getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.FINNISH),
-            getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.SWEDISH),
-            getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.ENGLISH)
-        ]);
-        await update(subjects.flat());
-    } catch (e) {
-        console.error('method=updateSubjectsLambda', e);
-        return;
-    }
+    const subjects = await Promise.all([
+        getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.FINNISH),
+        getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.SWEDISH),
+        getSubjects(endpointUser, endpointPass, endpointUrl, SubjectLocale.ENGLISH)
+    ]);
+    await update(subjects.flat());
 };

@@ -1,4 +1,4 @@
 export interface ServiceRequestState {
-    readonly key: string;
-    readonly name: string;
+    readonly key: number
+    readonly name: string
 }

@@ -1,7 +1,5 @@
-import axios from 'axios';
-import * as util from "util";
-import * as xml2js from "xml2js";
 import {Subject, SubjectLocale} from '../model/subject';
+import {getXml} from './xmlapiutils';
 
 export async function getSubjects(
     endpointUser: string,
@@ -9,20 +7,10 @@ export async function getSubjects(
     endpointUrl: string,
     locale: SubjectLocale
 ): Promise<Subject[]> {
-    const resp = await axios.get(`${endpointUrl}/subjects?locale=${locale}`, {
-        headers: {
-            'Accept': 'application/xml'
-        },
-        auth: {
-            username: endpointUser,
-            password: endpointPass
-        }
-    });
-    if (resp.status != 200) {
-        throw Error('Fetching subjects failed: ' + resp.statusText);
-    }
-    const parse = util.promisify(xml2js.parseString);
-    const parsedSubjects = <SubjectsResponse> await parse(resp.data);
+    const parsedSubjects: SubjectsResponse = await getXml(endpointUser,
+        endpointPass,
+        endpointUrl,
+        `/subjects?locale=${locale}`);
     return responseToSubjects(parsedSubjects)
         .filter(s => s.locale == locale); // integration returns mixed locales
 }

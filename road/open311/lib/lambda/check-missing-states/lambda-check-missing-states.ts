@@ -17,8 +17,7 @@ export const handler = async () : Promise <any> => {
 
         const states = await findAllStates(db);
         const stateKeys = new Set(states.map(s => s.key));
-        const missingStates = requestStateIds
-            .filter(rsc => !stateKeys.has(rsc as string));
+        const missingStates = requestStateIds.filter(rsc => !stateKeys.has(Number(rsc)));
 
         const subjects = await findAllSubjects(db);
         const subjectIds = new Set(subjects.map(s => s.id));

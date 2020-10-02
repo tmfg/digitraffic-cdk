@@ -5,11 +5,6 @@ export const handler = async (): Promise<any> => {
     const endpointUser = process.env.ENDPOINT_USER as string;
     const endpointPass = process.env.ENDPOINT_PASS as string;
     const endpointUrl = process.env.ENDPOINT_URL as string;
-    try {
-        const services = await getStates(endpointUser, endpointPass, endpointUrl);
-        await update(services);
-    } catch (e) {
-        console.error('Error', e);
-        return;
-    }
+    const states = await getStates(endpointUser, endpointPass, endpointUrl);
+    await update(states);
 };

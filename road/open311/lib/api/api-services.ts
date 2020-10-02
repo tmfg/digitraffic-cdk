@@ -1,27 +1,15 @@
-import axios from 'axios';
-import * as util from "util";
-import * as xml2js from "xml2js";
 import {Service, ServiceType} from "../model/service";
+import {getXml} from "./xmlapiutils";
 
 export async function getServices(
     endpointUser: string,
     endpointPass: string,
     endpointUrl: string
 ) {
-    const resp = await axios.get(endpointUrl + '/services.xml', {
-        headers: {
-            'Accept': 'application/xml'
-        },
-        auth: {
-            username: endpointUser,
-            password: endpointPass
-        }
-    });
-    if (resp.status != 200) {
-        throw Error('Fetching services failed: ' + resp.statusText);
-    }
-    const parse = util.promisify(xml2js.parseString);
-    const parsedServices = <ServicesResponse> await parse(resp.data);
+    const parsedServices: ServicesResponse = await getXml(endpointUser,
+        endpointPass,
+        endpointUrl,
+        '/services.xml');
     const services = responseToServices(parsedServices);
 
     // integration can return services with all fields as null, ensure conformity with db constraints

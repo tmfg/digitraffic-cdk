@@ -7,16 +7,13 @@ export async function getStates(
     endpointUrl: string
 ): Promise<ServiceRequestState[]> {
     const resp = await axios.get(endpointUrl + '/states', {
-        headers: {
-            'Accept': 'application/xml'
-        },
         auth: {
             username: endpointUser,
             password: endpointPass
         }
     });
     if (resp.status != 200) {
-        throw Error('Fetching services failed: ' + resp.statusText);
+        throw Error('method=getStates Fetching states failed, status: ' + resp.status);
     }
     return resp.data;
 }
