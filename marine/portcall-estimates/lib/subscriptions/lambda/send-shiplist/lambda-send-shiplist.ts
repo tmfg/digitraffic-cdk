@@ -10,13 +10,15 @@ export async function handler() {
 
     console.log("active subscriptions for %s %d", time, subscriptions.length);
 
-    await Promise.allSettled(sendShipLists(subscriptions));
+    return await sendShipLists(subscriptions);
 }
 
-function sendShipLists(subscriptions: any[]): Promise<any>[] {
-    return subscriptions
+async function sendShipLists(subscriptions: any[]): Promise<any> {
+    return Promise.allSettled(subscriptions
         .map(async s => {
-            const shiplist = await EstimatesService.getShiplist(s.Time, s.Locode);
+            console.log("handling subscription for " + s.Locode);
+
+            const shiplist = await EstimatesService.getShiplist(s.Locode);
             return await PinpointService.sendShiplist(shiplist, s.PhoneNumber);
-        });
+        }));
 }

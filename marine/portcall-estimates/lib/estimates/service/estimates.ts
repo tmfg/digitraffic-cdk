@@ -5,6 +5,8 @@ import {inDatabase} from "../../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {ApiEstimate} from "../model/estimate";
 
+import moment from "moment";
+
 const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
 
 export interface UpdatedEstimate {
@@ -61,6 +63,24 @@ export async function findAllEstimates(
     })));
 }
 
-export async function getShiplist(time: any, locode: any) {
-    return `shiplist for ${time} and ${locode}`;
+export async function getShiplist(locode: string): Promise<string> {
+    const start = Date.now();
+
+    return await inDatabase(async (db: IDatabase<any, any>) => {
+        const date = new Date();
+        return await EstimatesDB.findByLocode(db, locode).then((estimates) => {
+            return convertToSms(moment(date).format("D.MM"), locode, estimates);
+        });
+    }).finally(() => {
+        console.info("method=getShiplist tookMs=%d", (Date.now() - start));
+    })
+}
+
+function convertToSms(date: string, locode: string, estimates: DbEstimate[]): string {
+    const shiplist = estimates.map(e => {
+        const timestring = moment(e.event_time).format("HH:mm");
+        return `${e.event_type} ${e.event_source} ${timestring} ${e.ship_id}`; }
+    ).join('\n');
+
+    return `Laivalista ${date} ${locode}:\n${shiplist}`;
 }
