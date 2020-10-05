@@ -31,7 +31,7 @@ export function update(
     return db.tx(t => {
         t.none(DELETE_SUBSUBJECTS_PS);
         const queries: any[] = subSubjects.map(s => {
-            return t.none(INSERT_SUBSUBJECT_PS, [s.active, s.id, s.locale, s.name, s.subject_id]);
+            return t.none(INSERT_SUBSUBJECT_PS, [s.active, s.id, s.locale.toLowerCase(), s.name, s.subject_id]);
         });
         return t.batch(queries);
     });
