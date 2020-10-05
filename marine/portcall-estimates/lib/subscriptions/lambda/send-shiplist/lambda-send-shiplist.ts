@@ -1,5 +1,5 @@
 import * as SubscriptionsService from "../../service/subscriptions";
-import * as EstimatesService from "../../../estimates/service/estimates";
+import * as ShiplistService from "../../service/shiplist";
 import * as PinpointService from "../../service/pinpoint";
 
 const moment = require('moment-timezone');
@@ -18,7 +18,7 @@ async function sendShipLists(subscriptions: any[]): Promise<any> {
         .map(async s => {
             console.log("handling subscription for " + s.Locode);
 
-            const shiplist = await EstimatesService.getShiplist(s.Locode);
+            const shiplist = await ShiplistService.getShiplist(s.Locode);
             return await PinpointService.sendShiplist(shiplist, s.PhoneNumber);
         }));
 }
