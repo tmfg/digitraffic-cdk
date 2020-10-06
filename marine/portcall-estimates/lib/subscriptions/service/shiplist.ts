@@ -30,7 +30,7 @@ function convertToSms(date: string, locode: string, estimates: ShiplistEstimate[
             timestring = moment(e.event_time).format("D.MM HH:mm")
         }
 
-        return `${e.event_type} ${e.event_source} ${timestring} ${e.ship_id}`; }
+        return `${e.event_type} ${e.event_source} ${timestring} ${e.ship_name}`; }
     ).join('\n');
 
     return `Laivalista ${date} ${locode}:\n${shiplist}`;

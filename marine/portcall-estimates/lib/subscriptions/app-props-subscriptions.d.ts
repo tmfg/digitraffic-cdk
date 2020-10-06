@@ -9,6 +9,7 @@ export interface Props {
     defaultLambdaDurationSeconds: number;
     logsDestinationArn: string;
     sqsProcessLambdaConcurrentExecutions: number;
+    shiplistSnsTopicArn: string,
     pinpointApplicationId: string;
     pinpointTelephoneNumber: string;
 }

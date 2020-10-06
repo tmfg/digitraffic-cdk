@@ -32,8 +32,11 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const incomingSmsTopic = new Topic(this, topicName, {
             topicName
         });
+        const emailTopic = Topic.fromTopicArn(this, "Topic", appProps.shiplistSnsTopicArn);
 
         const sendShiplistLambda = this.createSendShiplistLambda(vpc, lambdaDbSg, appProps);
+        emailTopic.grantPublish(sendShiplistLambda);
+
         const schedulingCloudWatchRule = this.createSchedulingCloudWatchRule();
         schedulingCloudWatchRule.addTarget(new LambdaFunction(sendShiplistLambda));
 
@@ -86,6 +89,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             },
             securityGroup: lambdaDbSg,
             environment: {
+                SHIPLIST_SNS_TOPIC_ARN: props.shiplistSnsTopicArn,
                 PINPOINT_ID: props.pinpointApplicationId,
                 PINPOINT_NUMBER: props.pinpointTelephoneNumber,
                 DB_USER: props.dbProps.username,

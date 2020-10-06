@@ -9,7 +9,9 @@ const MESSAGE_HELP = 'Tee tilaus lähettämällä viesti TILAA LOCODE KELLONAIKA
 const MESSAGE_OK = 'Tilaus vastaanotettu';
 const MESSAGE_VALIDATION_FAILED = 'Odottamaton virhe!';
 
-export async function sendMessage(body: string, number: string): Promise<any> {
+const EMAIL_CHARSET = 'UTF-8';
+
+export async function sendSmsMessage(body: string, number: string): Promise<any> {
     const params = {
         ApplicationId: projectId,
         MessageRequest: {
@@ -34,17 +36,17 @@ export async function sendMessage(body: string, number: string): Promise<any> {
 }
 
 export async function sendHelpMessage(destinationNumber: string): Promise<any> {
-    return await sendMessage(MESSAGE_HELP, destinationNumber);
+    return await sendSmsMessage(MESSAGE_HELP, destinationNumber);
 }
 
 export async function sendOKMessage(destinationNumber: string): Promise<any> {
-    return await sendMessage(MESSAGE_OK, destinationNumber);
+    return await sendSmsMessage(MESSAGE_OK, destinationNumber);
 }
 
 export async function sendValidationFailedMessage(destinationNumber: string): Promise<any> {
-    return await sendMessage(MESSAGE_VALIDATION_FAILED, destinationNumber);
+    return await sendSmsMessage(MESSAGE_VALIDATION_FAILED, destinationNumber);
 }
 
 export async function sendShiplist(shiplist: string, destinationNumber: string) {
-    return await sendMessage(shiplist, destinationNumber);
+    return await sendSmsMessage(shiplist, destinationNumber);
 }

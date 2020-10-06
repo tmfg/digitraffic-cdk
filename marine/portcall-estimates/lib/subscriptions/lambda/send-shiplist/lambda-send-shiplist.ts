@@ -1,6 +1,7 @@
 import * as SubscriptionsService from "../../service/subscriptions";
 import * as ShiplistService from "../../service/shiplist";
 import * as PinpointService from "../../service/pinpoint";
+import * as SnsService from "../../service/sns";
 
 const moment = require('moment-timezone');
 
@@ -19,6 +20,10 @@ async function sendShipLists(subscriptions: any[]): Promise<any> {
             console.log("handling subscription for " + s.Locode);
 
             const shiplist = await ShiplistService.getShiplist(s.Locode);
-            return await PinpointService.sendShiplist(shiplist, s.PhoneNumber);
+
+            console.log("shiplist " + shiplist);
+
+            return await SnsService.sendEmail(shiplist);
+            //return await PinpointService.sendShiplist(shiplist, s.PhoneNumber);
         }));
 }
