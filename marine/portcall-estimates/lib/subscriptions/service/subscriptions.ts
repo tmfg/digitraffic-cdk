@@ -34,7 +34,7 @@ export async function sendSubscriptionList(destinationNumber: string) {
     const dbSubs = await SubscriptionDB.getSubscriptionList(destinationNumber);
     const subs = (dbSubs.Items as DbSubscription[])?.map(s => `${s.Locode} ${s.Time}`).join('\n');
 
-    await PinpointService.sendMessage(subs, destinationNumber);
+    await PinpointService.sendSmsMessage(subs, destinationNumber);
 }
 
 export async function listSubscriptions(time: string): Promise<any> {
