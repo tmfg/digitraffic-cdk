@@ -101,7 +101,7 @@ const SELECT_BY_LOCODE = `
              JOIN newest ON newest.re = pe.record_time
         AND newest.event_type = pe.event_type
         AND newest.event_source = pe.event_source
-        AND newest.location_locode = $1
+        AND newest.location_locode = pe.location_locode
     ORDER BY event_group_time
 `;
 
@@ -116,6 +116,7 @@ const SELECT_BY_MMSI = `
         WHERE ship_id_type = '${ShipIdType.MMSI}'
         AND event_time > ${ESTIMATES_BEFORE}
         AND event_time < ${ESTIMATES_IN_THE_FUTURE}
+        AND ship_id = $1
         GROUP BY event_type,
                  ship_id,
                  location_locode,
@@ -147,7 +148,7 @@ const SELECT_BY_MMSI = `
     JOIN newest ON newest.re = pe.record_time
     AND newest.event_type = pe.event_type
     AND newest.event_source = pe.event_source
-    AND newest.ship_id = $1
+    AND newest.ship_id = pe.ship_id
     ORDER BY event_group_time
 `;
 
@@ -193,6 +194,7 @@ const SELECT_BY_IMO = `
     JOIN newest ON newest.re = pe.record_time
     AND newest.event_type = pe.event_type
     AND newest.event_source = pe.event_source
+    AND newest.shipid = (CASE WHEN pe.ship_id_type = 'imo' then pe.ship_id ELSE pe.secondary_ship_id END)
     AND newest.shipid = $1
     ORDER BY event_group_time
 `;

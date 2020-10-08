@@ -40,6 +40,7 @@ const SELECT_BY_LOCODE = `    WITH newest AS (
         WHERE date_trunc('day', pe.event_time) = date_trunc('day', current_date)
         AND newest.event_type = pe.event_type
         AND newest.event_source = pe.event_source
+        AND newest.location_locode = pe.location_locode
         AND newest.location_locode = $1 
     ORDER BY event_group_time
 `;
