@@ -50,7 +50,7 @@ export function findByLocode(
     locode: string
 ): Promise<ShiplistEstimate[]> {
     const ps = new PreparedStatement({
-        name: 'find-by-locode',
+        name: 'find-shiplist-by-locode',
         text: SELECT_BY_LOCODE,
         values: [locode]
     });

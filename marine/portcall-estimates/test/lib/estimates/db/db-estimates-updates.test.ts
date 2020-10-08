@@ -2,7 +2,14 @@ import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll, insert} from "../../db-testutil";
 import {newEstimate} from "../../testdata";
-import {findByImo, findByLocode, findByMmsi, ShipIdType, updateEstimate} from "../../../../lib/estimates/db/db-estimates";
+import {
+    createUpdateValues,
+    findByImo,
+    findByLocode,
+    findByMmsi,
+    ShipIdType,
+    updateEstimate
+} from "../../../../lib/estimates/db/db-estimates";
 
 describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('updateEstimate - properties', async () => {
@@ -81,6 +88,19 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         await updateEstimate(db, estimate);
 
         expect((await findAll(db)).length).toBe(1);
+    });
+
+    test('createUpdateValues - mmsi 0', () => {
+        const imo = 123456789;
+         const values = createUpdateValues(newEstimate({
+             mmsi: 0,
+             imo
+         }));
+
+         // ship_id
+         expect(values[8]).toBe(imo);
+         // ship_id_type
+         expect(values[9]).toBe('imo');
     });
 
 }));

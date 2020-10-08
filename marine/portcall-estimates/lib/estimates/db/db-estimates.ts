@@ -245,19 +245,19 @@ export function findByImo(
 
 export function createUpdateValues(e: ApiEstimate): any[] {
     return [
-        e.eventType,
-        moment(e.eventTime).toDate(),
-        e.eventTimeConfidenceLower,
-        (e.eventTimeConfidenceLower ? diffDuration(e.eventTime, e.eventTimeConfidenceLower) : undefined),
-        e.eventTimeConfidenceUpper,
-        (e.eventTimeConfidenceUpper ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper) : undefined),
-        e.source,
-        moment(e.recordTime).toDate(),
-        (e.ship.mmsi ?? e.ship.imo) as number,
-        e.ship.mmsi ? ShipIdType.MMSI : ShipIdType.IMO,
-        e.ship.mmsi && e.ship.imo ? e.ship.imo : undefined,
-        e.ship.mmsi && e.ship.imo ? ShipIdType.IMO : undefined,
-        e.location.port
+        e.eventType, // event_type
+        moment(e.eventTime).toDate(), // event_time
+        e.eventTimeConfidenceLower, // event_time_confidence_lower
+        (e.eventTimeConfidenceLower ? diffDuration(e.eventTime, e.eventTimeConfidenceLower) : undefined), // event_time_confidence_lower_diff
+        e.eventTimeConfidenceUpper, // event_time_confidence_upper
+        (e.eventTimeConfidenceUpper ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper) : undefined), // event_time_confidence_upper_diff
+        e.source, // event_source
+        moment(e.recordTime).toDate(), // record_time
+        e.ship.mmsi && e.ship.mmsi != 0 ? e.ship.mmsi : e.ship.imo,  // ship_id
+        e.ship.mmsi && e.ship.mmsi != 0 ? ShipIdType.MMSI : ShipIdType.IMO, // ship_id_type
+        e.ship.mmsi && e.ship.mmsi != 0 && e.ship.imo ? e.ship.imo : undefined, // secondary_ship_id
+        e.ship.mmsi && e.ship.mmsi != 0 && e.ship.imo ? ShipIdType.IMO : undefined, // secondary_ship_id_type
+        e.location.port // location_locode
     ];
 }
 
