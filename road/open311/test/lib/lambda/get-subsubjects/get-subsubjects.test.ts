@@ -22,15 +22,20 @@ describe('lambda-get-subsubjects', dbTestBase((db: pgPromise.IDatabase<any,any>)
         expect(response.length).toBe(1);
     });
 
-    test('some subsubjects', async () => {
+    test('response format', async () => {
         const locale = shuffle([SubjectLocale.ENGLISH, SubjectLocale.FINNISH, SubjectLocale.SWEDISH])[0];
-        const subSubjects =
-            Array.from({length: Math.floor(Math.random() * 10)}).map(() => newSubSubject(locale));
-        await update(subSubjects, db);
+        const subSubject = newSubSubject(locale);
+        await update([subSubject], db);
 
         const response = await handler({locale: locale});
 
-        expect(response.length).toBe(subSubjects.length);
+        expect(response[0]).toMatchObject({
+            active: subSubject.active,
+            name: subSubject.name,
+            id: subSubject.id,
+            locale: subSubject.locale,
+            subjectId: subSubject.subject_id
+        });
     });
 
 }));

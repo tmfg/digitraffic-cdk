@@ -21,7 +21,7 @@ const schema: apigateway.JsonSchema = {
             type: apigateway.JsonSchemaType.STRING,
             description: "Locale, e.g. 'en'"
         },
-        subject_id: {
+        subjectId: {
             type: apigateway.JsonSchemaType.NUMBER,
             description: "Corresponds to a subject's subject_id"
         }
