@@ -1,5 +1,5 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
-import iam = require('@aws-cdk/aws-iam');
+import {createIpRestrictionPolicyDocument} from '../../../common/api/rest_apis';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType} from "@aws-cdk/aws-apigateway";
@@ -24,7 +24,7 @@ export function create(
     stack: Stack,
     props: Props) {
 
-    const publicApi = createApi(stack);
+    const publicApi = createApi(stack, props.allowFromIpAddresses);
 
     createUsagePlan(publicApi, 'Open311 CloudFront API Key', 'Open311 CloudFront Usage Plan');
 
@@ -401,7 +401,7 @@ function createGetServiceIntegration(
     addTags('GetService', DATA_V1_TAGS, service, stack);
 }
 
-function createApi(stack: Construct) {
+function createApi(stack: Construct, allowFromIpAddresses: string[]) {
     return new apigateway.RestApi(stack, 'Open311-public', {
         defaultCorsPreflightOptions: {
             allowOrigins: apigateway.Cors.ALL_ORIGINS
@@ -412,21 +412,6 @@ function createApi(stack: Construct) {
         },
         restApiName: 'Open311 public API',
         endpointTypes: [EndpointType.REGIONAL],
-        policy: new iam.PolicyDocument({
-            statements: [
-                new iam.PolicyStatement({
-                    effect: iam.Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke"
-                    ],
-                    resources: [
-                        "*"
-                    ],
-                    principals: [
-                        new iam.AnyPrincipal()
-                    ]
-                })
-            ]
-        })
+        policy: createIpRestrictionPolicyDocument(allowFromIpAddresses)
     });
 }

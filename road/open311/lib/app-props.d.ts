@@ -14,7 +14,8 @@ declare interface Props {
         username: string;
         password: string;
         url: string;
-    }
+    },
+    allowFromIpAddresses: string[]
 }
 declare interface DbProps {
     username: string;
