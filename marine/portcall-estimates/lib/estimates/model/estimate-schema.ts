@@ -6,11 +6,11 @@ export const ShipSchema: JsonSchema = {
     description: 'Portcall estimates ship schema',
     properties: {
         mmsi: {
-            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING],
+            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING, JsonSchemaType.NULL],
             description: 'MMSI'
         },
         imo: {
-            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING],
+            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING, JsonSchemaType.NULL],
             description: 'IMO'
         }
     }
