@@ -63,15 +63,19 @@ const SELECT_BY_LOCODE = `
     WITH newest AS (
         SELECT MAX(record_time) re,
                event_type,
-               ship_id,
+               vessel.mmsi AS mmsi,
+               vessel.imo AS imo,
                location_locode,
                event_source
         FROM portcall_estimate
-        WHERE event_time > ${ESTIMATES_BEFORE}
-        AND event_time < ${ESTIMATES_IN_THE_FUTURE}
-        AND location_locode = $1
+        JOIN vessel ON CASE WHEN ship_id_type = 'mmsi' THEN vessel.mmsi = ship_id ELSE vessel.imo = ship_id END
+        WHERE
+            event_time > ${ESTIMATES_BEFORE} AND
+            event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+            location_locode = $1
         GROUP BY event_type,
-                 ship_id,
+                 vessel.mmsi,
+                 vessel.imo,
                  location_locode,
                  event_source
     )
@@ -96,7 +100,7 @@ const SELECT_BY_LOCODE = `
                 pe.event_time_confidence_lower_diff,
                 pe.event_time_confidence_upper_diff,
                 pe.record_time DESC
-        ) AS event_group_time
+            ) AS event_group_time
     FROM portcall_estimate pe
              JOIN newest ON newest.re = pe.record_time
         AND newest.event_type = pe.event_type
@@ -109,20 +113,23 @@ const SELECT_BY_MMSI = `
     WITH newest AS (
         SELECT MAX(record_time) re,
                event_type,
-               ship_id,
+               vessel.mmsi,
+               vessel.imo,
                location_locode,
                event_source
         FROM portcall_estimate
-        WHERE ship_id_type = '${ShipIdType.MMSI}'
-        AND event_time > ${ESTIMATES_BEFORE}
-        AND event_time < ${ESTIMATES_IN_THE_FUTURE}
-        AND ship_id = $1
+                 JOIN vessel ON vessel.mmsi = $1
+        WHERE
+            event_time > ${ESTIMATES_BEFORE} AND
+            event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+            CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
         GROUP BY event_type,
-                 ship_id,
+                 vessel.mmsi,
+                 vessel.imo,
                  location_locode,
                  event_source
     )
-    SELECT
+    SELECT DISTINCT
         pe.event_type,
         pe.event_time,
         pe.event_time_confidence_lower,
@@ -131,10 +138,10 @@ const SELECT_BY_MMSI = `
         pe.event_time_confidence_upper_diff,
         pe.event_source,
         pe.record_time,
-        pe.ship_id,
-        pe.ship_id_type,
-        pe.secondary_ship_id,
-        pe.secondary_ship_id_type,
+        vessel.mmsi AS ship_id,
+        '${ShipIdType.MMSI}' as ship_id_type,
+        vessel.imo as secondary_ship_id,
+        '${ShipIdType.IMO}' as secondary_ship_id_type,
         pe.location_locode,
         FIRST_VALUE(pe.event_time) OVER (
             PARTITION BY pe.event_type, pe.location_locode
@@ -143,12 +150,13 @@ const SELECT_BY_MMSI = `
                 pe.event_time_confidence_lower_diff,
                 pe.event_time_confidence_upper_diff,
                 pe.record_time DESC
-        ) AS event_group_time
+            ) AS event_group_time
     FROM portcall_estimate pe
-    JOIN newest ON newest.re = pe.record_time
-    AND newest.event_type = pe.event_type
-    AND newest.event_source = pe.event_source
-    AND newest.ship_id = pe.ship_id
+             JOIN vessel ON vessel.mmsi = $1
+             JOIN newest ON newest.re = pe.record_time
+        AND newest.event_type = pe.event_type
+        AND newest.event_source = pe.event_source
+        AND CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
     ORDER BY event_group_time
 `;
 
@@ -156,19 +164,23 @@ const SELECT_BY_IMO = `
     WITH newest AS (
         SELECT MAX(record_time) re,
                event_type,
-               (CASE WHEN ship_id_type = '${ShipIdType.IMO}' then ship_id ELSE secondary_ship_id END) as shipid,
+               vessel.mmsi,
+               vessel.imo,
                location_locode,
                event_source
         FROM portcall_estimate
-        WHERE (ship_id_type = '${ShipIdType.IMO}' or secondary_ship_id_type = '${ShipIdType.IMO}')
-        AND event_time > ${ESTIMATES_BEFORE}
-        AND event_time < ${ESTIMATES_IN_THE_FUTURE}
+        JOIN vessel ON vessel.imo = $1
+        WHERE
+            event_time > ${ESTIMATES_BEFORE} AND
+            event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+            CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
         GROUP BY event_type,
-                 (CASE WHEN ship_id_type = '${ShipIdType.IMO}' then ship_id ELSE secondary_ship_id END),
+                 vessel.mmsi,
+                 vessel.imo,
                  location_locode,
                  event_source
     )
-    SELECT
+    SELECT DISTINCT
         pe.event_type,
         pe.event_time,
         pe.event_time_confidence_lower,
@@ -177,10 +189,10 @@ const SELECT_BY_IMO = `
         pe.event_time_confidence_upper_diff,
         pe.event_source,
         pe.record_time,
-        pe.ship_id,
-        pe.ship_id_type,
-        pe.secondary_ship_id,
-        pe.secondary_ship_id_type,
+        vessel.mmsi AS ship_id,
+        '${ShipIdType.MMSI}' as ship_id_type,
+        vessel.imo as secondary_ship_id,
+        '${ShipIdType.IMO}' as secondary_ship_id_type,
         pe.location_locode,
         FIRST_VALUE(pe.event_time) OVER (
             PARTITION BY pe.event_type, pe.location_locode
@@ -189,13 +201,13 @@ const SELECT_BY_IMO = `
                 pe.event_time_confidence_lower_diff,
                 pe.event_time_confidence_upper_diff,
                 pe.record_time DESC
-        ) AS event_group_time
+            ) AS event_group_time
     FROM portcall_estimate pe
-    JOIN newest ON newest.re = pe.record_time
-    AND newest.event_type = pe.event_type
-    AND newest.event_source = pe.event_source
-    AND newest.shipid = (CASE WHEN pe.ship_id_type = 'imo' then pe.ship_id ELSE pe.secondary_ship_id END)
-    AND newest.shipid = $1
+             JOIN vessel ON vessel.imo = $1
+             JOIN newest ON newest.re = pe.record_time
+        AND newest.event_type = pe.event_type
+        AND newest.event_source = pe.event_source
+        AND CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
     ORDER BY event_group_time
 `;
 
