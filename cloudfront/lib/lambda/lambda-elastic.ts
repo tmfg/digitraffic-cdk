@@ -12,7 +12,7 @@ const endpoint = new AWS.Endpoint(elasticDomain);
 const creds = new AWS.EnvironmentCredentials("AWS")
 const s3 = new AWS.S3();
 
-const MAX_LINES_PER_MESSAGE = 4000;
+const MAX_LINES_PER_MESSAGE = 6000;
 
 const COMPRESS_OPTIONS = {
     level: 8,
@@ -97,9 +97,8 @@ function createBulkMessage(action: any, lines: any[]): string {
 }
 
 async function sendToEs(messages: any[]) {
-    const limit = pLimit(4);
-
     // limit concurrency to 4 with p-limit
+    const limit = pLimit(4);
     const results = await Promise.all(messages.map(message => limit(() => sendMessageToEs(message))));
 
     results.forEach(logResponse);
@@ -187,18 +186,18 @@ function parseLine(line: string): any {
     return {
         '@timestamp': httpDate,
         remote_addr: ip,
-        body_bytes_sent: bytes,
+        body_bytes_sent: +bytes,
         http_referrer: referrer,
         http_user_agent: userAgent,
         request_method: method,
-        request_time: timeTaken,
+        request_time: +timeTaken,
         request_uri: request,
         scheme: scheme,
         server_protocol: httpVersion,
-        status: responseStatus,
+        status: +responseStatus,
         upstream_cache_status: resultType,
         edge_location: edgeLocation,
-        upstream_response_time: timeToFirstByte
+        upstream_response_time: +timeToFirstByte
     };
 }
 
