@@ -1,59 +1,9 @@
 import {dbTestBase, findAll} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {saveMaintenanceTrackingData, createHash} from "../../../lib/service/maintenance-tracking";
-import {DbMaintenanceTrackingData, Status} from "../../../lib/db/db-maintenance-tracking";
+import {createHash, saveMaintenanceTrackingData} from "../../../lib/service/maintenance-tracking";
+import {assertData, getTrackingJson} from "../testdata";
 
 describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
-
-    const ID_PLACEHOLDER = 'ID_PLACEHOLDER'
-    const TK_PLACEHOLDER = 'TK_PLACEHOLDER'
-    const JSON =
-        `{
-            "otsikko": {
-                "lahettaja": {
-                    "jarjestelma": "Urakoitsijan järjestelmä",
-                    "organisaatio": {
-                        "nimi": "Urakoitsija viivageometrialla",
-                        "ytunnus": "6547365-0"
-                    }
-                },
-                "viestintunniste": {
-                    "id": ID_PLACEHOLDER
-                },
-                "lahetysaika": "2019-01-30T12:00:00+02:00"
-            },
-            "havainnot": [
-                {
-                    "havainto": {
-                        "tyokone": {
-                            "id": TK_PLACEHOLDER,
-                            "tyokonetyyppi": "aura-auto"
-                        },
-                        "sijainti": {
-                            "viivageometria": {
-                                "type": "LineString",
-                                "coordinates": [
-                                    [293359, 6889071],
-                                    [293358, 6889073],
-                                    [293358, 6889075],
-                                    [293359, 6889072],
-                                    [293356, 6889078]
-                                ]
-                            }
-                        },
-                        "suunta": 45,
-                        "havaintoaika": "2019-01-30T12:00:00+02:00",
-                        "urakkaid": 999999,
-                        "suoritettavatTehtavat": [
-                            "auraus ja sohjonpoisto",
-                            "suolaus"
-                        ]
-                    }
-                }
-            ]
-        }`;
-
-
 
     test('saveMaintenanceTrackingData', async () => {
         const json = getTrackingJson('1');
@@ -121,18 +71,4 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         expect(getTrackingJson('1', '123')).toBe(getTrackingJson('1', '123'));
         expect(getTrackingJson('1', '123')).not.toBe(getTrackingJson('1', '321'));
     });
-
-    function getTrackingJson(id: string, tyokoneId?: string) {
-        if (tyokoneId) {
-            return JSON.replace(ID_PLACEHOLDER, id).replace(TK_PLACEHOLDER, tyokoneId);
-        }
-        return JSON.replace(ID_PLACEHOLDER, id).replace(TK_PLACEHOLDER, '123456789');
-    }
-
-    function assertData(saved: DbMaintenanceTrackingData, json: string) {
-        expect(saved.hash).toBe(createHash(json));
-        expect(saved.json).toBe(json);
-        expect(saved.status).toBe(Status.UNHANDLED);
-    }
-
 }));
