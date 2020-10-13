@@ -14,9 +14,7 @@ export async function saveMaintenanceTrackingData(maintenanceTrackingDataJson: s
             hash: createHash(maintenanceTrackingDataJson)
         };
         return await db.tx(async () => {
-            const value = await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
-            console.info(`Return value ${JSON.stringify(value)}`);
-            return value;
+            return await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
         });
     });
 }
@@ -27,6 +25,5 @@ export function createHash(maintenanceTrackingDataJson: string) : string {
     const md = forge.md.sha256.create();
     md.update(data, 'utf8');
     const hash = md.digest().toHex();
-    console.info(`method=createHash data: ${data} hash: ${hash}`);
     return hash;
 }

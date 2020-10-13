@@ -37,61 +37,11 @@ export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null>
     });
 }
 
-// export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbMaintenanceTrackingData[]> {
-//     return db.tx(t => {
-//        return t.manyOrNone(`
-//         SELECT
-//             event_type,
-//             event_time,
-//             event_time_confidence_lower,
-//             event_time_confidence_lower_diff,
-//             event_time_confidence_upper,
-//             event_time_confidence_upper_diff,
-//             event_source,
-//             record_time,
-//             ship_id,
-//             ship_id_type,
-//             secondary_ship_id,
-//             secondary_ship_id_type,
-//             location_locode
-//         FROM portcall_estimate`);
-//     });
-// }
-//
-// export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate[]) {
-//     return db.tx(t => {
-//         return t.batch(estimates.map(e => {
-//             return t.none(`
-//                 INSERT INTO portcall_estimate(
-//                     event_type,
-//                     event_time,
-//                     event_time_confidence_lower,
-//                     event_time_confidence_lower_diff,
-//                     event_time_confidence_upper,
-//                     event_time_confidence_upper_diff,
-//                     event_source,
-//                     record_time,
-//                     ship_id,
-//                     ship_id_type,
-//                     secondary_ship_id,
-//                     secondary_ship_id_type,
-//                     location_locode)
-//                 VALUES(
-//                     $1,
-//                     $2,
-//                     $3,
-//                     $4,
-//                     $5,
-//                     $6,
-//                     $7,
-//                     $8,
-//                     $9,
-//                     $10,
-//                     $11,
-//                     $12,
-//                     $13
-//                 )
-//             `, createUpdateValues(e));
-//         }));
-//     });
-// }
+export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbMaintenanceTrackingData[]> {
+    return db.tx(t => {
+       return t.manyOrNone(`
+        SELECT
+            id, json, status, hash
+        FROM maintenance_tracking_data`);
+    });
+}
