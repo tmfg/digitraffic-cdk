@@ -79,7 +79,7 @@ const SELECT_BY_LOCODE = `
                  location_locode,
                  event_source
     )
-    SELECT
+    SELECT DISTINCT
         pe.event_type,
         pe.event_time,
         pe.event_time_confidence_lower,
@@ -88,10 +88,10 @@ const SELECT_BY_LOCODE = `
         pe.event_time_confidence_upper_diff,
         pe.event_source,
         pe.record_time,
-        pe.ship_id,
-        pe.ship_id_type,
-        pe.secondary_ship_id,
-        pe.secondary_ship_id_type,
+        vessel.mmsi AS ship_id,
+        '${ShipIdType.MMSI}' as ship_id_type,
+        vessel.imo as secondary_ship_id,
+        '${ShipIdType.IMO}' as secondary_ship_id_type,
         pe.location_locode,
         FIRST_VALUE(pe.event_time) OVER (
             PARTITION BY pe.event_type, pe.ship_id
@@ -102,10 +102,11 @@ const SELECT_BY_LOCODE = `
                 pe.record_time DESC
             ) AS event_group_time
     FROM portcall_estimate pe
-             JOIN newest ON newest.re = pe.record_time
+        JOIN newest ON newest.re = pe.record_time
         AND newest.event_type = pe.event_type
         AND newest.event_source = pe.event_source
         AND newest.location_locode = pe.location_locode
+        JOIN vessel ON CASE WHEN ship_id_type = 'mmsi' THEN vessel.mmsi = ship_id ELSE vessel.imo = ship_id END
     ORDER BY event_group_time
 `;
 
