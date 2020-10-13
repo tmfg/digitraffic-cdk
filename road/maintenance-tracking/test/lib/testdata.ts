@@ -1,5 +1,6 @@
 import {DbMaintenanceTrackingData, Status} from "../../lib/db/db-maintenance-tracking";
 import {createHash} from "../../lib/service/maintenance-tracking";
+import {getRandomNumberAsString} from "../../../../common/test/testutils";
 
 const ID_PLACEHOLDER = 'ID_PLACEHOLDER'
 const TK_PLACEHOLDER = 'TK_PLACEHOLDER'
@@ -62,6 +63,6 @@ export function assertData(saved: DbMaintenanceTrackingData, json: string) {
     expect(saved.status).toBe(Status.UNHANDLED);
 }
 
-export function someNumber() {
-    return Math.floor(Math.random() * 999999);
+export function getRandompId(): string {
+    return getRandomNumberAsString(100000, 100000000000)
 }

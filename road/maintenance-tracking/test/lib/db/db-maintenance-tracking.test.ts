@@ -2,14 +2,14 @@ import * as MaintenanceTrackingDB from "../../../lib/db/db-maintenance-tracking"
 import {DbMaintenanceTrackingData, Status} from "../../../lib/db/db-maintenance-tracking";
 import * as pgPromise from "pg-promise";
 import {createHash} from "../../../lib/service/maintenance-tracking";
-import {assertData, getTrackingJson, someNumber} from "../testdata";
+import {assertData, getRandompId, getTrackingJson} from "../testdata";
 import {dbTestBase, findAll} from "../db-testutil";
 
 describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('insertMaintenanceTrackingData', async () => {
 
-        const maintenanceTrackingDataJson = getTrackingJson(someNumber().toString(), someNumber().toString());
+        const maintenanceTrackingDataJson = getTrackingJson(getRandompId(), getRandompId());
         const dbMaintenanceTrackingData = createData(maintenanceTrackingDataJson);
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
@@ -23,8 +23,8 @@ describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabas
 
     test('insertMaintenanceTrackingData multiple machines', async () => {
 
-        const maintenanceTrackingDataJson1 = getTrackingJson(someNumber().toString(), '1');
-        const maintenanceTrackingDataJson2 = getTrackingJson(someNumber().toString(), '2');
+        const maintenanceTrackingDataJson1 = getTrackingJson(getRandompId(), '1');
+        const maintenanceTrackingDataJson2 = getTrackingJson(getRandompId(), '2');
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, createData(maintenanceTrackingDataJson1));
         await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, createData(maintenanceTrackingDataJson2));
@@ -35,11 +35,11 @@ describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabas
 
     test('insertMaintenanceTrackingData with same hash should fail', async () => {
 
-        const json = getTrackingJson(someNumber().toString(), someNumber().toString());
+        const json = getTrackingJson(getRandompId(), getRandompId());
         const dbMaintenanceTrackingData1 = createData(json);
         // Different data, same hash
         const dbMaintenanceTrackingData2: DbMaintenanceTrackingData = {
-            json: getTrackingJson(someNumber().toString(), someNumber().toString()),
+            json: getTrackingJson(getRandompId(), getRandompId()),
             status: Status.UNHANDLED,
             hash: dbMaintenanceTrackingData1.hash
         };

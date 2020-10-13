@@ -1,6 +1,6 @@
 import * as pgPromise from "pg-promise";
 import {initDbConnection} from "digitraffic-lambda-postgres/database";
-import {createUpdateValues, DbMaintenanceTrackingData} from "../../lib/db/db-maintenance-tracking";
+import {DbMaintenanceTrackingData} from "../../lib/db/db-maintenance-tracking";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
@@ -40,8 +40,9 @@ export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null>
 export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbMaintenanceTrackingData[]> {
     return db.tx(t => {
        return t.manyOrNone(`
-        SELECT
-            id, json, status, hash
-        FROM maintenance_tracking_data`);
+            SELECT id, json, status, hash
+            FROM maintenance_tracking_data
+            ORDER BY id
+       `);
     });
 }
