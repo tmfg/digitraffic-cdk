@@ -43,7 +43,7 @@ function createUpdateDatex2RequestHandler(
         handler: 'lambda-update-datex2.handler'
     }));
     requests.addMethod("PUT", new LambdaIntegration(updateDatex2Handler), {
-        apiKeyRequired: false
+        apiKeyRequired: true
     });
 
     createSubscription(updateDatex2Handler, updateDatex2Id, props.logsDestinationArn, stack);

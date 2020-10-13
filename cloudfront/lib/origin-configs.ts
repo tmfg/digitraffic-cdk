@@ -56,10 +56,6 @@ function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
 }
 
 function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any): Behavior[] {
-    if (behaviors.length == 0) {
-        return [createBehavior(stack, {  path: "*", allowedMethods: CloudFrontAllowedMethods.ALL }, lambdaMap, true)];
-    }
-
     return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
