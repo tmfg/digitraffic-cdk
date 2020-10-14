@@ -13,6 +13,9 @@ export const handler = async (
         const shiplist: DbDebugShiplist[] = await findByLocodeDebug(db, event.queryStringParameters.locode);
         return {
             statusCode: 200,
+            headers: {
+                'Content-Type': 'text/html'
+            },
             body: `
             <html>
                 <head>

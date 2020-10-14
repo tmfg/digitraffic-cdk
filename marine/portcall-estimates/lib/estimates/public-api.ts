@@ -127,7 +127,7 @@ function createDebugShiplistResource(
 
     const shiplistDebugResource = resource.addResource("shiplist-debug");
     shiplistDebugResource.addMethod("GET", integration, {
-        apiKeyRequired: true
+        apiKeyRequired: false
     });
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
