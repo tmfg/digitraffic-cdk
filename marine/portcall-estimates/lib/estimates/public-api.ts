@@ -1,4 +1,11 @@
-import {EndpointType, MethodLoggingLevel, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
+import {
+    EndpointType,
+    LambdaIntegration,
+    MethodLoggingLevel,
+    RequestValidator,
+    Resource,
+    RestApi
+} from '@aws-cdk/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
@@ -32,21 +39,26 @@ export function create(
             getModelReference(shipModel.modelId, publicApi.restApiId),
             getModelReference(locationModel.modelId, publicApi.restApiId)));
     const estimatesModel = addServiceModel("EstimatesModel", publicApi, createArraySchema(estimateModel, publicApi));
+    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
-    createEstimatesResource(publicApi, vpc, props, lambdaDbSg, estimatesModel, validator, stack);
+    const resource = createResourcePaths(publicApi);
+
+    createEstimatesResource(publicApi, vpc, props, resource, lambdaDbSg, estimatesModel, errorResponseModel, validator, stack);
+    createDebugShiplistResource(publicApi, vpc, props, resource, lambdaDbSg, stack);
 }
 
 function createEstimatesResource(
     publicApi: RestApi,
     vpc: IVpc,
     props: Props,
+    resource: Resource,
     lambdaDbSg: ISecurityGroup,
     estimatesJsonModel: any,
+    errorResponseModel: any,
     validator: RequestValidator,
     stack: Construct): Function {
 
     const functionName = 'PortcallEstimate-GetEstimates';
-    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const assetCode = new AssetCode('dist/estimates/lambda/get-estimates');
     const getEstimatesLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
@@ -55,7 +67,6 @@ function createEstimatesResource(
         readOnly: false
     }));
 
-    const resources = createResourcePaths(publicApi);
     const getEstimatesIntegration = defaultIntegration(getEstimatesLambda, {
         requestParameters: {
             'integration.request.querystring.locode': 'method.request.querystring.locode',
@@ -71,7 +82,8 @@ function createEstimatesResource(
         }
     });
 
-    resources.addMethod("GET", getEstimatesIntegration, {
+    const estimatesResource = resource.addResource("portcall-estimates");
+    estimatesResource.addMethod("GET", getEstimatesIntegration, {
         apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.locode': false,
@@ -86,15 +98,46 @@ function createEstimatesResource(
     });
 
     createSubscription(getEstimatesLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetEstimates', ['portcall-estimates'], resources, stack);
+    addTags('GetEstimates', ['portcall-estimates'], estimatesResource, stack);
 
     return getEstimatesLambda;
 }
 
+function createDebugShiplistResource(
+    publicApi: RestApi,
+    vpc: IVpc,
+    props: Props,
+    resource: Resource,
+    lambdaDbSg: ISecurityGroup,
+    stack: Construct): Function {
+
+    const functionName = 'PortcallEstimate-DebugShiplist';
+
+    const assetCode = new AssetCode('dist/estimates/lambda/get-shiplist-debug');
+    const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: functionName,
+        code: assetCode,
+        handler: 'lambda-get-shiplist-debug.handler',
+        readOnly: false
+    }));
+
+    const integration = new LambdaIntegration(lambda, {
+        proxy: true
+    });
+
+    const shiplistDebugResource = resource.addResource("shiplist-debug");
+    shiplistDebugResource.addMethod("GET", integration, {
+        apiKeyRequired: true
+    });
+
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+
+    return lambda;
+}
+
 function createResourcePaths(publicApi: RestApi) {
     const apiResource = publicApi.root.addResource("api");
-    const v2Resource = apiResource.addResource("v2");
-    return v2Resource.addResource("portcall-estimates");
+    return apiResource.addResource("v2");
 }
 
 function createApi(stack: Construct) {

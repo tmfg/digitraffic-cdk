@@ -2,8 +2,8 @@ import {IDatabase, PreparedStatement} from "pg-promise";
 import {ApiEstimate, EventType} from "../model/estimate";
 import moment from "moment";
 
-const ESTIMATES_BEFORE = `CURRENT_DATE - INTERVAL '12 DAYS'`;
-const ESTIMATES_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
+export const ESTIMATES_BEFORE = `CURRENT_DATE - INTERVAL '12 DAYS'`;
+export const ESTIMATES_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
 
 export interface DbEstimate {
     readonly event_type: EventType
