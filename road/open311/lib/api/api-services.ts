@@ -15,9 +15,7 @@ export async function getServices(
     // integration can return services with all fields as null, ensure conformity with db constraints
     return services.filter(s =>
         s.service_code != null &&
-        s.service_name != null &&
-        s.metadata != null &&
-        s.type != null
+        s.service_name != null
     );
 }
 
