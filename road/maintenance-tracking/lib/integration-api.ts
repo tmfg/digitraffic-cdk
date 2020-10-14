@@ -1,4 +1,4 @@
-import {Model, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
+import {Model, RestApi} from '@aws-cdk/aws-apigateway';
 import {Construct} from '@aws-cdk/core';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {LambdaConfiguration} from '../../../common/stack/lambda-configs';
@@ -8,14 +8,15 @@ import {attachQueueToApiGatewayResource} from "../../../common/api/sqs";
 import {addDefaultValidator, addServiceModel} from "../../../common/api/utils";
 import {
     createSchemaGeometriaSijainti,
-    createSchemaOtsikko,
     createSchemaHavainto,
+    createSchemaOtsikko,
     createSchemaTyokoneenseurannanKirjaus,
     Koordinaattisijainti,
     Organisaatio,
     Tunniste,
     Viivageometriasijainti,
 } from "./model/maintenance-tracking-schema";
+import {createDefaultUsagePlan} from "../../../common/stack/usage-plans";
 
 
 export function create(
@@ -47,7 +48,7 @@ export function create(
                                                            createSchemaTyokoneenseurannanKirjaus(otsikkoModel.modelReference, havaintoSchema));
 
     createUpdateMaintenanceTrackingApiGatewayResource(stack, integrationApi, queue, tyokoneenseurannanKirjausModel);
-    // createUsagePlan(integrationApi); // TODO Ks. Teijon allowed ips
+    createDefaultUsagePlan(integrationApi, 'Maintenance Tracking Integration');
 }
 
 function createUpdateMaintenanceTrackingApiGatewayResource(
