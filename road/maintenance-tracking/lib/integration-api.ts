@@ -19,7 +19,7 @@ import {
 import {createDefaultUsagePlan} from "../../../common/stack/usage-plans";
 
 
-export function create(
+export function createIntegrationApi(
     queue: Queue,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,

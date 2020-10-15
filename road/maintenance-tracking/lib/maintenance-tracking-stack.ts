@@ -24,6 +24,6 @@ export class MaintenanceTrackingStack extends Stack {
         });
 
         InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
-        IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
+        IntegrationApi.createIntegrationApi(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
     }
 }

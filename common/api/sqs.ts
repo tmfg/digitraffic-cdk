@@ -42,6 +42,7 @@ export function attachQueueToApiGatewayResource(
         ]
     }));
     // create an integration between API Gateway and an SQS queue
+    const fifoMessageGroupId = queue.queueName.endsWith(".fifo") ? '&MessageGroupId=SameGroupAlways' : '';
     const sqsIntegration = new AwsIntegration({
         service: 'sqs',
         integrationHttpMethod: 'POST',
@@ -53,8 +54,9 @@ export function attachQueueToApiGatewayResource(
                 'integration.request.header.Content-Type': "'application/x-www-form-urlencoded'"
             },
             requestTemplates: {
-                // map the JSON request to a form parameter
-                'application/json': 'Action=SendMessage&MessageBody=$util.urlEncode($input.body)'
+                // map the JSON request to a form parameter, FIFO needs also MessageGroupId
+                // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html
+                'application/json': `Action=SendMessage&MessageGroupId=SameGroupAlways&MessageBody=$util.urlEncode($input.body)${fifoMessageGroupId}`
             },
             // these are required by SQS
             integrationResponses: [
