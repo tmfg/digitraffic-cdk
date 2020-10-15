@@ -13,15 +13,15 @@ export function handlerFn() {
                 // Parse JSON to validate it's JSON
                 JSON.parse(r.body);
             } catch (e) {
-                console.error(`method=handleMaintenanceTrackingJson Error while parsing JSON: ${r.body}`, e);
+                console.error(`method=handleMaintenanceTrackingJson Error count=1 while parsing JSON: ${r.body}`, e);
                 return Promise.reject();
             }
             try {
                 const saved = await saveMaintenanceTrackingData(r.body);
-                console.info(`method=handleMaintenanceTrackingJson saved: ${JSON.stringify(saved)}`);
+                console.info(`method=handleMaintenanceTrackingJson saved count=1`);
                 return saved;
             } catch (e) {
-                console.error(`method=handleMaintenanceTrackingJson Error saving to db JSON: ${r.body}`, e);
+                console.error(`method=handleMaintenanceTrackingJson Error count=1 saving to db JSON: ${r.body}`, e);
                 return Promise.reject();
             }
         })).then(async estimates => {
