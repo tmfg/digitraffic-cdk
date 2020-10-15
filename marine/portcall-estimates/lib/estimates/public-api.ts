@@ -41,7 +41,10 @@ export function create(
     const estimatesModel = addServiceModel("EstimatesModel", publicApi, createArraySchema(estimateModel, publicApi));
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
-    const resource = createResourcePaths(publicApi);
+    const resource = publicApi.root
+        .addResource("api")
+        .addResource("v2")
+        .addResource('portcall-estimates');
 
     createEstimatesResource(publicApi, vpc, props, resource, lambdaDbSg, estimatesModel, errorResponseModel, validator, stack);
     createDebugShiplistResource(publicApi, vpc, props, resource, lambdaDbSg, stack);
@@ -82,8 +85,7 @@ function createEstimatesResource(
         }
     });
 
-    const estimatesResource = resource.addResource("portcall-estimates");
-    estimatesResource.addMethod("GET", getEstimatesIntegration, {
+    resource.addMethod("GET", getEstimatesIntegration, {
         apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.locode': false,
@@ -98,7 +100,7 @@ function createEstimatesResource(
     });
 
     createSubscription(getEstimatesLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetEstimates', ['portcall-estimates'], estimatesResource, stack);
+    addTags('GetEstimates', ['portcall-estimates'], resource, stack);
 
     return getEstimatesLambda;
 }
@@ -133,11 +135,6 @@ function createDebugShiplistResource(
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 
     return lambda;
-}
-
-function createResourcePaths(publicApi: RestApi) {
-    const apiResource = publicApi.root.addResource("api");
-    return apiResource.addResource("v2");
 }
 
 function createApi(stack: Construct) {
