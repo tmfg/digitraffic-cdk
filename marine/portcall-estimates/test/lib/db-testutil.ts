@@ -74,10 +74,8 @@ export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbEstimate[]
             event_time_confidence_upper_diff,
             event_source,
             record_time,
-            ship_id,
-            ship_id_type,
-            secondary_ship_id,
-            secondary_ship_id_type,
+            ship_mmsi,
+            ship_imo,
             location_locode
         FROM portcall_estimate`);
     });
@@ -96,11 +94,9 @@ export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate
                     event_time_confidence_upper_diff,
                     event_source,
                     record_time,
-                    ship_id,
-                    ship_id_type,
-                    secondary_ship_id,
-                    secondary_ship_id_type,
-                    location_locode)
+                    location_locode,
+                    ship_mmsi,
+                    ship_imo)
                 VALUES(
                     $1,
                     $2,
@@ -112,9 +108,7 @@ export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate
                     $8,
                     $9,
                     $10,
-                    $11,
-                    $12,
-                    $13
+                    $11
                 )
             `, createUpdateValues(e));
         }));

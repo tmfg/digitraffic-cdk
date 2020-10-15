@@ -5,6 +5,7 @@ import {updateEstimate} from "../../../../lib/estimates/db/db-estimates";
 import {EventType} from "../../../../lib/estimates/model/estimate";
 
 const TEST_MMSI = 12345;
+const TEST_IMO = 67890;
 
 describe('shiplists', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('getSubscriptionList - empty', async () => {
@@ -21,7 +22,7 @@ describe('shiplists', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             eventTimeConfidenceUpper:null,
             recordTime:new Date().toISOString(),
             location: { port: "FIRAU" },
-            ship: { mmsi: TEST_MMSI },
+            ship: { mmsi: TEST_MMSI, imo: TEST_IMO },
             source: 'test'
         });
 

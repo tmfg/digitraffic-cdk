@@ -14,15 +14,9 @@ export interface DbEstimate {
     readonly event_time_confidence_upper_diff?: number
     readonly event_source: string;
     readonly record_time: Date
-    readonly ship_id: number;
-    readonly ship_id_type: ShipIdType;
-    readonly secondary_ship_id?: number;
-    readonly secondary_ship_id_type?: ShipIdType;
-    readonly location_locode: string;
-}
-
-export enum ShipIdType {
-    MMSI = 'mmsi', IMO = 'imo'
+    readonly ship_mmsi: number
+    readonly ship_imo: number
+    readonly location_locode: string
 }
 
 const INSERT_ESTIMATE_SQL = `
@@ -35,11 +29,10 @@ const INSERT_ESTIMATE_SQL = `
         event_time_confidence_upper_diff,
         event_source,
         record_time,
-        ship_id,
-        ship_id_type,
-        secondary_ship_id,
-        secondary_ship_id_type,
-        location_locode)
+        location_locode,
+        ship_mmsi,
+        ship_imo
+        )
     VALUES (
            $1,
            $2,
@@ -50,32 +43,37 @@ const INSERT_ESTIMATE_SQL = `
            $7,
            $8,
            $9,
-           $10,
-           $11,
-           $12,
-           $13
+           COALESCE(
+               $10,
+               (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM vessel WHERE imo = $11),
+               (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM port_call WHERE imo_lloyds = $11)
+           ),
+           COALESCE(
+               $11,
+               (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM vessel WHERE mmsi = $10),
+               (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM port_call WHERE mmsi = $10)
+           )
     )
-    ON CONFLICT(ship_id, event_source, event_time, record_time) DO NOTHING
-        RETURNING ship_id, ship_id_type, secondary_ship_id, secondary_ship_id_type
+    ON CONFLICT(ship_mmsi, ship_imo, event_source, event_type, event_time, record_time) DO NOTHING
+        RETURNING ship_mmsi, ship_imo
 `;
 
 const SELECT_BY_LOCODE = `
     WITH newest AS (
         SELECT MAX(record_time) re,
                event_type,
-               vessel.mmsi AS mmsi,
-               vessel.imo AS imo,
+               ship_mmsi,
+               ship_imo,
                location_locode,
                event_source
         FROM portcall_estimate
-        JOIN vessel ON CASE WHEN ship_id_type = 'mmsi' THEN vessel.mmsi = ship_id ELSE vessel.imo = ship_id END
         WHERE
             event_time > ${ESTIMATES_BEFORE} AND
             event_time < ${ESTIMATES_IN_THE_FUTURE} AND
             location_locode = $1
         GROUP BY event_type,
-                 vessel.mmsi,
-                 vessel.imo,
+                 ship_mmsi,
+                 ship_imo,
                  location_locode,
                  event_source
     )
@@ -88,13 +86,11 @@ const SELECT_BY_LOCODE = `
         pe.event_time_confidence_upper_diff,
         pe.event_source,
         pe.record_time,
-        vessel.mmsi AS ship_id,
-        '${ShipIdType.MMSI}' as ship_id_type,
-        vessel.imo as secondary_ship_id,
-        '${ShipIdType.IMO}' as secondary_ship_id_type,
+        pe.ship_mmsi,
+        pe.ship_imo,            
         pe.location_locode,
         FIRST_VALUE(pe.event_time) OVER (
-            PARTITION BY pe.event_type, pe.ship_id
+            PARTITION BY pe.event_type, pe.ship_mmsi, pe.ship_imo
             ORDER BY
                 (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
                 pe.event_time_confidence_lower_diff,
@@ -106,7 +102,6 @@ const SELECT_BY_LOCODE = `
         AND newest.event_type = pe.event_type
         AND newest.event_source = pe.event_source
         AND newest.location_locode = pe.location_locode
-        JOIN vessel ON CASE WHEN ship_id_type = 'mmsi' THEN vessel.mmsi = ship_id ELSE vessel.imo = ship_id END
     ORDER BY event_group_time
 `;
 
@@ -114,19 +109,17 @@ const SELECT_BY_MMSI = `
     WITH newest AS (
         SELECT MAX(record_time) re,
                event_type,
-               vessel.mmsi,
-               vessel.imo,
+               ship_mmsi,
+               ship_imo,
                location_locode,
                event_source
         FROM portcall_estimate
-                 JOIN vessel ON vessel.mmsi = $1
         WHERE
             event_time > ${ESTIMATES_BEFORE} AND
-            event_time < ${ESTIMATES_IN_THE_FUTURE} AND
-            CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
+            event_time < ${ESTIMATES_IN_THE_FUTURE}
         GROUP BY event_type,
-                 vessel.mmsi,
-                 vessel.imo,
+                 ship_mmsi,
+                 ship_imo,
                  location_locode,
                  event_source
     )
@@ -139,10 +132,8 @@ const SELECT_BY_MMSI = `
         pe.event_time_confidence_upper_diff,
         pe.event_source,
         pe.record_time,
-        vessel.mmsi AS ship_id,
-        '${ShipIdType.MMSI}' as ship_id_type,
-        vessel.imo as secondary_ship_id,
-        '${ShipIdType.IMO}' as secondary_ship_id_type,
+        pe.ship_mmsi,
+        pe.ship_imo,
         pe.location_locode,
         FIRST_VALUE(pe.event_time) OVER (
             PARTITION BY pe.event_type, pe.location_locode
@@ -153,11 +144,10 @@ const SELECT_BY_MMSI = `
                 pe.record_time DESC
             ) AS event_group_time
     FROM portcall_estimate pe
-             JOIN vessel ON vessel.mmsi = $1
-             JOIN newest ON newest.re = pe.record_time
-        AND newest.event_type = pe.event_type
-        AND newest.event_source = pe.event_source
-        AND CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
+    JOIN newest ON newest.re = pe.record_time AND
+         newest.event_type = pe.event_type AND
+         newest.event_source = pe.event_source
+    WHERE pe.ship_mmsi = $1
     ORDER BY event_group_time
 `;
 
@@ -165,19 +155,17 @@ const SELECT_BY_IMO = `
     WITH newest AS (
         SELECT MAX(record_time) re,
                event_type,
-               vessel.mmsi,
-               vessel.imo,
+               ship_mmsi,
+               ship_imo,
                location_locode,
                event_source
         FROM portcall_estimate
-        JOIN vessel ON vessel.imo = $1
         WHERE
             event_time > ${ESTIMATES_BEFORE} AND
-            event_time < ${ESTIMATES_IN_THE_FUTURE} AND
-            CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
+            event_time < ${ESTIMATES_IN_THE_FUTURE}
         GROUP BY event_type,
-                 vessel.mmsi,
-                 vessel.imo,
+                 ship_mmsi,
+                 ship_imo,
                  location_locode,
                  event_source
     )
@@ -190,10 +178,8 @@ const SELECT_BY_IMO = `
         pe.event_time_confidence_upper_diff,
         pe.event_source,
         pe.record_time,
-        vessel.mmsi AS ship_id,
-        '${ShipIdType.MMSI}' as ship_id_type,
-        vessel.imo as secondary_ship_id,
-        '${ShipIdType.IMO}' as secondary_ship_id_type,
+        pe.ship_mmsi,
+        pe.ship_imo,
         pe.location_locode,
         FIRST_VALUE(pe.event_time) OVER (
             PARTITION BY pe.event_type, pe.location_locode
@@ -204,11 +190,10 @@ const SELECT_BY_IMO = `
                 pe.record_time DESC
             ) AS event_group_time
     FROM portcall_estimate pe
-             JOIN vessel ON vessel.imo = $1
-             JOIN newest ON newest.re = pe.record_time
-        AND newest.event_type = pe.event_type
-        AND newest.event_source = pe.event_source
-        AND CASE WHEN ship_id_type = 'mmsi' THEN ship_id = vessel.mmsi ELSE ship_id = vessel.imo END
+    JOIN newest ON newest.re = pe.record_time AND
+         newest.event_type = pe.event_type AND
+         newest.event_source = pe.event_source
+    WHERE pe.ship_imo = $1
     ORDER BY event_group_time
 `;
 
@@ -266,11 +251,9 @@ export function createUpdateValues(e: ApiEstimate): any[] {
         (e.eventTimeConfidenceUpper ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper) : undefined), // event_time_confidence_upper_diff
         e.source, // event_source
         moment(e.recordTime).toDate(), // record_time
-        e.ship.mmsi && e.ship.mmsi != 0 ? e.ship.mmsi : e.ship.imo,  // ship_id
-        e.ship.mmsi && e.ship.mmsi != 0 ? ShipIdType.MMSI : ShipIdType.IMO, // ship_id_type
-        e.ship.mmsi && e.ship.mmsi != 0 && e.ship.imo ? e.ship.imo : undefined, // secondary_ship_id
-        e.ship.mmsi && e.ship.mmsi != 0 && e.ship.imo ? ShipIdType.IMO : undefined, // secondary_ship_id_type
-        e.location.port // location_locode
+        e.location.port, // location_locode
+        e.ship.mmsi && e.ship.mmsi != 0 ? e.ship.mmsi : undefined,  // ship_mmsi
+        e.ship.imo && e.ship.imo != 0 ? e.ship.imo : undefined,  // ship_imo
     ];
 }
 

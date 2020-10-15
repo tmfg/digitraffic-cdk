@@ -4,10 +4,6 @@ import {dbTestBase, findAll, insert} from "../../db-testutil";
 import {newEstimate} from "../../testdata";
 import {
     createUpdateValues,
-    findByImo,
-    findByLocode,
-    findByMmsi,
-    ShipIdType,
     updateEstimate
 } from "../../../../lib/estimates/db/db-estimates";
 
@@ -34,7 +30,7 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         expect(e.event_time_confidence_upper_diff).toBe(moment(estimate.eventTime).add(moment.duration(estimate.eventTimeConfidenceUpper)).valueOf() - moment(estimate.eventTime).valueOf());
     });
 
-    test('updateEstimate - mmsi over imo', async () => {
+    test('updateEstimate - mmsi', async () => {
         const estimate = Object.assign(newEstimate(), {
             ship: {
                 mmsi: 123,
@@ -42,14 +38,10 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
             }
         });
 
-        await updateEstimate(db, estimate);
-
-        const e = (await findAll(db))[0];
-        expect(e.ship_id).toBe(estimate.ship.mmsi);
-        expect(e.ship_id_type).toBe(ShipIdType.MMSI);
+        await expect(() => updateEstimate(db, estimate)).rejects.toThrow();
     });
 
-    test('updateEstimate - just imo', async () => {
+    test('updateEstimate - imo', async () => {
         const estimate = Object.assign(newEstimate(), {
             ship: {
                 mmsi: undefined,
@@ -57,11 +49,7 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
             }
         });
 
-        await updateEstimate(db, estimate);
-
-        const e = (await findAll(db))[0];
-        expect(e.ship_id).toBe(estimate.ship.imo);
-        expect(e.ship_id_type).toBe(ShipIdType.IMO);
+        await expect(() => updateEstimate(db, estimate)).rejects.toThrow();
     });
 
     test('updateEstimate - both ids', async () => {
@@ -75,10 +63,8 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         await updateEstimate(db, estimate);
 
         const e = (await findAll(db))[0];
-        expect(e.ship_id).toBe(estimate.ship.mmsi);
-        expect(e.ship_id_type).toBe(ShipIdType.MMSI);
-        expect(e.secondary_ship_id).toBe(estimate.ship.imo);
-        expect(e.secondary_ship_id_type).toBe(ShipIdType.IMO);
+        expect(e.ship_mmsi).toBe(estimate.ship.mmsi);
+        expect(e.ship_imo).toBe(estimate.ship.imo);
     });
 
     test('updateEstimate - ignore duplicate', async () => {
@@ -97,10 +83,19 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
              imo
          }));
 
-         // ship_id
-         expect(values[8]).toBe(imo);
-         // ship_id_type
-         expect(values[9]).toBe('imo');
+        expect(values[9]).toBe(undefined);
+        expect(values[10]).toBe(imo);
+    });
+
+    test('createUpdateValues - imo 0', () => {
+        const mmsi = 123456789;
+        const values = createUpdateValues(newEstimate({
+            mmsi,
+            imo: 0
+        }));
+
+        expect(values[9]).toBe(mmsi);
+        expect(values[10]).toBe(undefined);
     });
 
 }));

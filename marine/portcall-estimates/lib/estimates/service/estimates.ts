@@ -1,6 +1,6 @@
 import * as LastUpdatedDB from "../../../../../common/db/last-updated";
 import * as EstimatesDB from "../db/db-estimates"
-import {DbEstimate, ShipIdType} from "../db/db-estimates"
+import {DbEstimate} from "../db/db-estimates"
 import {inDatabase} from "../../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {ApiEstimate} from "../model/estimate";
@@ -8,10 +8,8 @@ import {ApiEstimate} from "../model/estimate";
 const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
 
 export interface UpdatedEstimate {
-    readonly ship_id?: number
-    readonly ship_id_type?: ShipIdType
-    readonly secondary_ship_id?: number
-    readonly secondary_ship_id_type?: ShipIdType
+    readonly ship_mmsi: number
+    readonly ship_imo: number
 }
 
 export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate | undefined> {
@@ -52,8 +50,8 @@ export async function findAllEstimates(
         eventTimeConfidenceUpper: e.event_time_confidence_upper,
         source: e.event_source,
         ship: {
-            mmsi: e.ship_id_type == ShipIdType.MMSI ? e.ship_id : undefined,
-            imo: e.ship_id_type == ShipIdType.IMO ? e.ship_id : e.secondary_ship_id
+            mmsi: e.ship_mmsi,
+            imo: e.ship_imo
         },
         location: {
             port: e.location_locode
