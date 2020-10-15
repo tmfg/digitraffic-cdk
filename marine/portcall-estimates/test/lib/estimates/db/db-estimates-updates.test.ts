@@ -98,4 +98,15 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         expect(values[10]).toBe(undefined);
     });
 
+    test('portcall id', async () => {
+        const portcallId = 123;
+        const estimate = newEstimate({
+            portcallId
+        });
+
+        await updateEstimate(db, estimate);
+
+        expect((await findAll(db))[0].portcall_id).toBe(portcallId);
+    });
+
 }));

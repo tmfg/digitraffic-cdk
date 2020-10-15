@@ -73,7 +73,11 @@ export function createEstimateSchema(shipReference: string, locationReference: s
             },
             location: {
                 ref: locationReference
-            }
+            },
+            portcallId: {
+                type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
+                description: 'ID of Portnet port call'
+            },
         }
     };
 }

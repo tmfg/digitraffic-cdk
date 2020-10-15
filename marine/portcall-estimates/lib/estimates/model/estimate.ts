@@ -33,6 +33,7 @@ export interface ApiEstimate {
     readonly source: string
     readonly ship: Ship
     readonly location: Location
+    readonly portcallId?: number
 }
 
 export function validateEstimate(estimate: ApiEstimate): boolean {

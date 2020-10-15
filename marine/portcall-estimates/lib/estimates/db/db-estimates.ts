@@ -12,11 +12,12 @@ export interface DbEstimate {
     readonly event_time_confidence_lower_diff?: number
     readonly event_time_confidence_upper?: string
     readonly event_time_confidence_upper_diff?: number
-    readonly event_source: string;
+    readonly event_source: string
     readonly record_time: Date
     readonly ship_mmsi: number
     readonly ship_imo: number
     readonly location_locode: string
+    readonly portcall_id?: number
 }
 
 const INSERT_ESTIMATE_SQL = `
@@ -31,7 +32,8 @@ const INSERT_ESTIMATE_SQL = `
         record_time,
         location_locode,
         ship_mmsi,
-        ship_imo
+        ship_imo,
+        portcall_id
         )
     VALUES (
            $1,
@@ -52,7 +54,8 @@ const INSERT_ESTIMATE_SQL = `
                $11,
                (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM vessel WHERE mmsi = $10),
                (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM port_call WHERE mmsi = $10)
-           )
+           ),
+           $12
     )
     ON CONFLICT(ship_mmsi, ship_imo, event_source, event_type, event_time, record_time) DO NOTHING
         RETURNING ship_mmsi, ship_imo
@@ -70,7 +73,8 @@ const SELECT_BY_LOCODE = `
         pe.record_time,
         pe.ship_mmsi,
         pe.ship_imo,            
-        pe.location_locode
+        pe.location_locode,
+        pe.portcall_id
     FROM portcall_estimate pe
     WHERE pe.record_time =
           (
@@ -98,7 +102,8 @@ const SELECT_BY_MMSI = `
         pe.record_time,
         pe.ship_mmsi,
         pe.ship_imo,
-        pe.location_locode
+        pe.location_locode,
+        pe.portcall_id
     FROM portcall_estimate pe
     WHERE pe.record_time =
           (
@@ -126,7 +131,8 @@ const SELECT_BY_IMO = `
         pe.record_time,
         pe.ship_mmsi,
         pe.ship_imo,
-        pe.location_locode
+        pe.location_locode,
+        pe.portcall_id
     FROM portcall_estimate pe
     WHERE pe.record_time =
           (
@@ -198,7 +204,8 @@ export function createUpdateValues(e: ApiEstimate): any[] {
         moment(e.recordTime).toDate(), // record_time
         e.location.port, // location_locode
         e.ship.mmsi && e.ship.mmsi != 0 ? e.ship.mmsi : undefined,  // ship_mmsi
-        e.ship.imo && e.ship.imo != 0 ? e.ship.imo : undefined,  // ship_imo
+        e.ship.imo && e.ship.imo != 0 ? e.ship.imo : undefined,  // ship_imo,
+        e.portcallId
     ];
 }
 

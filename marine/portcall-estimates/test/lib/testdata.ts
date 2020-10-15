@@ -5,7 +5,7 @@ import {DYNAMODB_TIME_FORMAT, SubscriptionType} from "../../lib/subscriptions/se
 import {DbSubscription} from "../../lib/subscriptions/db/db-subscriptions";
 const { v4: uuidv4 } = require('uuid');
 
-export function someNumber() {
+export function someNumber(): number {
     return Math.floor(Math.random() * 999999);
 }
 
@@ -17,7 +17,8 @@ export function newEstimate(props?: {
     eventType?: EventType
     eventTimeConfidenceLower?: string | null
     eventTimeConfidenceUpper?: string | null
-    source?: string
+    source?: string,
+    portcallId?: number
 }): ApiEstimate {
     // round off millis
     const eventTime = props?.eventTime ?? new Date();
@@ -37,7 +38,8 @@ export function newEstimate(props?: {
         },
         location: {
             port: props?.locode ?? someNumber().toString().slice(0,5)
-        }
+        },
+        portcallId: props?.portcallId ?? someNumber()
     };
 }
 

@@ -76,7 +76,8 @@ export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbEstimate[]
             record_time,
             ship_mmsi,
             ship_imo,
-            location_locode
+            location_locode,
+            portcall_id
         FROM portcall_estimate`);
     });
 }
@@ -96,7 +97,8 @@ export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate
                     record_time,
                     location_locode,
                     ship_mmsi,
-                    ship_imo)
+                    ship_imo,
+                    portcall_id)
                 VALUES(
                     $1,
                     $2,
@@ -108,7 +110,8 @@ export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate
                     $8,
                     $9,
                     $10,
-                    $11
+                    $11,
+                    $12
                 )
             `, createUpdateValues(e));
         }));
