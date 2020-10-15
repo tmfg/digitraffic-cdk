@@ -1,6 +1,5 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
-import {ApiEstimate, EventType} from "../model/estimate";
-import moment from "moment";
+import {EventType} from "../model/estimate";
 import {ESTIMATES_BEFORE, ESTIMATES_IN_THE_FUTURE} from "./db-estimates";
 
 export interface DbDebugShiplist {
@@ -11,44 +10,26 @@ export interface DbDebugShiplist {
 }
 
 const SELECT_BY_LOCODE_DEBUG = `
-    WITH newest AS (
-        SELECT MAX(record_time) re,
-               event_type,
-               ship_mmsi,
-               ship_imo,
-               location_locode,
-               event_source
-        FROM portcall_estimate
-        WHERE
-            event_time > ${ESTIMATES_BEFORE} AND
-            event_time < ${ESTIMATES_IN_THE_FUTURE} AND
-            location_locode = $1
-        GROUP BY event_type,
-                 ship_mmsi,
-                 ship_imo,
-                 location_locode,
-                 event_source
-    )
     SELECT DISTINCT
         pe.event_type,
         pe.event_time,
         pe.event_source,
-        vessel.name AS ship_name,
-        FIRST_VALUE(pe.event_time) OVER (
-            PARTITION BY pe.event_type, pe.ship_mmsi, pe.ship_imo
-            ORDER BY
-                (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
-                pe.event_time_confidence_lower_diff,
-                pe.event_time_confidence_upper_diff,
-                pe.record_time DESC
-            ) AS event_group_time
+        COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name
     FROM portcall_estimate pe
-        JOIN newest ON newest.re = pe.record_time
-        AND newest.event_type = pe.event_type
-        AND newest.event_source = pe.event_source
-        AND newest.location_locode = pe.location_locode
-        JOIN vessel ON vessel.mmsi = pe.ship_mmsi AND vessel.imo = pe.ship_imo
-    ORDER BY event_group_time
+             LEFT JOIN vessel v on v.imo = pe.ship_imo
+             LEFT JOIN port_call pc on pc.imo_lloyds = pe.ship_imo
+    WHERE pe.record_time =
+          (
+              SELECT MAX(px.record_time) FROM portcall_estimate px
+              WHERE px.event_type = pe.event_type AND
+                  px.location_locode = pe.location_locode AND
+                  px.ship_imo = pe.ship_imo AND
+                  DATE(px.event_time) = DATE(pe.event_time)
+          ) AND
+        pe.event_time > NOW() AND
+        pe.event_time < CURRENT_DATE + INTERVAL '3 DAYS' AND
+        pe.location_locode = $1
+    ORDER BY pe.event_time
 `;
 
 export function findByLocodeDebug(

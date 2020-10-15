@@ -59,24 +59,6 @@ const INSERT_ESTIMATE_SQL = `
 `;
 
 const SELECT_BY_LOCODE = `
-    WITH newest AS (
-        SELECT MAX(record_time) re,
-               event_type,
-               ship_mmsi,
-               ship_imo,
-               location_locode,
-               event_source
-        FROM portcall_estimate
-        WHERE
-            event_time > ${ESTIMATES_BEFORE} AND
-            event_time < ${ESTIMATES_IN_THE_FUTURE} AND
-            location_locode = $1
-        GROUP BY event_type,
-                 ship_mmsi,
-                 ship_imo,
-                 location_locode,
-                 event_source
-    )
     SELECT DISTINCT
         pe.event_type,
         pe.event_time,
@@ -88,41 +70,23 @@ const SELECT_BY_LOCODE = `
         pe.record_time,
         pe.ship_mmsi,
         pe.ship_imo,            
-        pe.location_locode,
-        FIRST_VALUE(pe.event_time) OVER (
-            PARTITION BY pe.event_type, pe.ship_mmsi, pe.ship_imo
-            ORDER BY
-                (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
-                pe.event_time_confidence_lower_diff,
-                pe.event_time_confidence_upper_diff,
-                pe.record_time DESC
-            ) AS event_group_time
+        pe.location_locode
     FROM portcall_estimate pe
-        JOIN newest ON newest.re = pe.record_time
-        AND newest.event_type = pe.event_type
-        AND newest.event_source = pe.event_source
-        AND newest.location_locode = pe.location_locode
-    ORDER BY event_group_time
+    WHERE pe.record_time =
+          (
+              SELECT MAX(px.record_time) FROM portcall_estimate px
+              WHERE px.event_type = pe.event_type AND
+                  px.location_locode = pe.location_locode AND
+                  px.ship_mmsi = pe.ship_mmsi AND
+                  DATE(px.event_time) = DATE(pe.event_time)
+          ) AND
+          pe.event_time > ${ESTIMATES_BEFORE} AND
+          pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+          pe.location_locode = $1
+    ORDER by pe.event_time
 `;
 
 const SELECT_BY_MMSI = `
-    WITH newest AS (
-        SELECT MAX(record_time) re,
-               event_type,
-               ship_mmsi,
-               ship_imo,
-               location_locode,
-               event_source
-        FROM portcall_estimate
-        WHERE
-            event_time > ${ESTIMATES_BEFORE} AND
-            event_time < ${ESTIMATES_IN_THE_FUTURE}
-        GROUP BY event_type,
-                 ship_mmsi,
-                 ship_imo,
-                 location_locode,
-                 event_source
-    )
     SELECT DISTINCT
         pe.event_type,
         pe.event_time,
@@ -134,41 +98,23 @@ const SELECT_BY_MMSI = `
         pe.record_time,
         pe.ship_mmsi,
         pe.ship_imo,
-        pe.location_locode,
-        FIRST_VALUE(pe.event_time) OVER (
-            PARTITION BY pe.event_type, pe.location_locode
-            ORDER BY
-                (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
-                pe.event_time_confidence_lower_diff,
-                pe.event_time_confidence_upper_diff,
-                pe.record_time DESC
-            ) AS event_group_time
+        pe.location_locode
     FROM portcall_estimate pe
-    JOIN newest ON newest.re = pe.record_time AND
-         newest.event_type = pe.event_type AND
-         newest.event_source = pe.event_source
-    WHERE pe.ship_mmsi = $1
-    ORDER BY event_group_time
+    WHERE pe.record_time =
+          (
+              SELECT MAX(px.record_time) FROM portcall_estimate px
+              WHERE px.event_type = pe.event_type AND
+                  px.location_locode = pe.location_locode AND
+                  px.ship_mmsi = pe.ship_mmsi AND
+                  DATE(px.event_time) = DATE(pe.event_time)
+          ) AND
+        pe.event_time > ${ESTIMATES_BEFORE} AND
+        pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+        pe.ship_mmsi = $1
+    ORDER by pe.event_time
 `;
 
 const SELECT_BY_IMO = `
-    WITH newest AS (
-        SELECT MAX(record_time) re,
-               event_type,
-               ship_mmsi,
-               ship_imo,
-               location_locode,
-               event_source
-        FROM portcall_estimate
-        WHERE
-            event_time > ${ESTIMATES_BEFORE} AND
-            event_time < ${ESTIMATES_IN_THE_FUTURE}
-        GROUP BY event_type,
-                 ship_mmsi,
-                 ship_imo,
-                 location_locode,
-                 event_source
-    )
     SELECT DISTINCT
         pe.event_type,
         pe.event_time,
@@ -180,21 +126,20 @@ const SELECT_BY_IMO = `
         pe.record_time,
         pe.ship_mmsi,
         pe.ship_imo,
-        pe.location_locode,
-        FIRST_VALUE(pe.event_time) OVER (
-            PARTITION BY pe.event_type, pe.location_locode
-            ORDER BY
-                (CASE WHEN (event_time_confidence_lower IS NULL OR event_time_confidence_upper IS NULL) THEN 1 ELSE -1 END),
-                pe.event_time_confidence_lower_diff,
-                pe.event_time_confidence_upper_diff,
-                pe.record_time DESC
-            ) AS event_group_time
+        pe.location_locode
     FROM portcall_estimate pe
-    JOIN newest ON newest.re = pe.record_time AND
-         newest.event_type = pe.event_type AND
-         newest.event_source = pe.event_source
-    WHERE pe.ship_imo = $1
-    ORDER BY event_group_time
+    WHERE pe.record_time =
+          (
+              SELECT MAX(px.record_time) FROM portcall_estimate px
+              WHERE px.event_type = pe.event_type AND
+                  px.location_locode = pe.location_locode AND
+                  px.ship_mmsi = pe.ship_mmsi AND
+                  DATE(px.event_time) = DATE(pe.event_time)
+          ) AND
+        pe.event_time > ${ESTIMATES_BEFORE} AND
+        pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+        pe.ship_imo = $1
+    ORDER by pe.event_time
 `;
 
 export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): Promise<any> {
