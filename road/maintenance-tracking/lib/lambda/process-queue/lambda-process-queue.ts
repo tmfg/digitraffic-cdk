@@ -24,13 +24,13 @@ export function handlerFn() {
                 console.error(`method=handleMaintenanceTrackingJson Error count=1 saving to db JSON: ${r.body}`, e);
                 return Promise.reject();
             }
-        })).then(async estimates => {
+        })).then(async trackings => {
 
-            const successful = estimates.filter(processedSuccessfully);
+            const successful = trackings.filter(processedSuccessfully);
             if (successful.length) {
                 console.info(`method=handleMaintenanceTrackingJson insertCount=${successful.length}`);
             }
-            return estimates;
+            return trackings;
 
         });
     };
