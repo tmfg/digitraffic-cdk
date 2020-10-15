@@ -56,7 +56,7 @@ export function attachQueueToApiGatewayResource(
             requestTemplates: {
                 // map the JSON request to a form parameter, FIFO needs also MessageGroupId
                 // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/APIReference/API_SendMessage.html
-                'application/json': `Action=SendMessage&MessageGroupId=SameGroupAlways&MessageBody=$util.urlEncode($input.body)${fifoMessageGroupId}`
+                'application/json': `Action=SendMessage&MessageBody=$util.urlEncode($input.body)${fifoMessageGroupId}`
             },
             // these are required by SQS
             integrationResponses: [
