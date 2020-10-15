@@ -47,7 +47,7 @@ const SELECT_BY_LOCODE_DEBUG = `
         AND newest.event_type = pe.event_type
         AND newest.event_source = pe.event_source
         AND newest.location_locode = pe.location_locode
-        JOIN vessel ON vessel.mmsi = ship_mmsi AND vessel.imo = ship_imo
+        JOIN vessel ON vessel.mmsi = pe.ship_mmsi AND vessel.imo = pe.ship_imo
     ORDER BY event_group_time
 `;
 
