@@ -13,16 +13,16 @@ export function handlerFn() {
                 // Parse JSON to validate it's JSON
                 JSON.parse(r.body);
             } catch (e) {
-                console.error(`method=handleMaintenanceTrackingJson Error count=1 while parsing JSON: ${r.body}`, e);
-                return Promise.reject();
+                console.error(`method=handleMaintenanceTrackingJson Error while parsing JSON count=1`, e);
+                return Promise.reject(e);
             }
             try {
                 const saved = await saveMaintenanceTrackingData(r.body);
                 console.info(`method=handleMaintenanceTrackingJson saved count=1`);
                 return saved;
             } catch (e) {
-                console.error(`method=handleMaintenanceTrackingJson Error count=1 saving to db JSON: ${r.body}`, e);
-                return Promise.reject();
+                console.error(`method=handleMaintenanceTrackingJson Error saving JSON to db count=1 `, e);
+                return Promise.reject(e);
             }
         })).then(async trackings => {
 

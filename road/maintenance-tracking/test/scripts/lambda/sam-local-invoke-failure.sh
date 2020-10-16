@@ -10,4 +10,4 @@ cd ../../..
 
 set -x
 
-sam local invoke MaintenanceTrackingProcessQueue0DB4E4DC --env-vars test/scripts/lambda/env.json --event test/scripts/lambda/event.json
+sam local invoke MaintenanceTrackingProcessQueue0DB4E4DC --env-vars test/scripts/lambda/env.json --event test/scripts/lambda/event-not-valid.json
