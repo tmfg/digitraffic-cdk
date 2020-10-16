@@ -24,7 +24,10 @@ const SELECT_BY_LOCODE_DEBUG = `
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.ship_imo = pe.ship_imo AND
-                  DATE(px.event_time) = DATE(pe.event_time)
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
           ) AND
         pe.event_time > NOW() AND
         pe.event_time < CURRENT_DATE + INTERVAL '3 DAYS' AND
