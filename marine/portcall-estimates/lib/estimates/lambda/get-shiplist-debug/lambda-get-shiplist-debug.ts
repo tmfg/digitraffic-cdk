@@ -10,7 +10,7 @@ export const handler = async (
         return {statusCode: 400, body: 'Missing locode'};
     }
     return await inDatabase(async (db: IDatabase<any, any>) => {
-        const shiplist: DbDebugShiplist[] = await findByLocodeDebug(db, event.queryStringParameters.locode);
+        const shiplist: DbDebugShiplist[] = await findByLocodeDebug(db, (event.queryStringParameters.locode as string).toUpperCase());
         return {
             statusCode: 200,
             headers: {
