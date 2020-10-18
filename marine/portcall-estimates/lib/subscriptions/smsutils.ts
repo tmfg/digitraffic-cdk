@@ -7,8 +7,6 @@ export enum SubscriptionOperation {
 export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperation {
     const operationString = event.messageBody.split(' ')[0].toUpperCase();
 
-    console.info("parsing " + operationString);
-
     switch(operationString) {
         case 'SUBSCRIBE':
         case 'TILAA':
@@ -32,7 +30,7 @@ export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): Estimate
     const parts = event.messageBody.split(' ');
 
     if (parts.length < 3) {
-        console.error(`Invalid message ${event.messageBody}`);
+        console.error(`method=parseSnsSubscriptionEvent Invalid message ${event.messageBody}`);
         return null;
     }
 

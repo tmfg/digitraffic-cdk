@@ -2,7 +2,7 @@ import {SnsSubscriptionEvent} from '../../model/subscription';
 import {addSubscription, sendSubscriptionList} from '../../service/subscriptions';
 import {parseOperation, parseSnsSubscriptionEvent, SubscriptionOperation} from '../../smsutils';
 import {SNSEvent} from 'aws-lambda';
-import {sendHelpMessage, sendOKMessage} from '../../service/pinpoint';
+import {sendHelpMessage} from '../../service/pinpoint';
 
 export async function handler(event: SNSEvent) {
     const snsEvent = JSON.parse((event as SNSEvent).Records[0].Sns.Message);
@@ -10,7 +10,7 @@ export async function handler(event: SNSEvent) {
     return await handleSms(operation, snsEvent);
 }
 
-async function handleSms(operation: SubscriptionOperation, event: SnsSubscriptionEvent): Promise<any> {
+export async function handleSms(operation: SubscriptionOperation, event: SnsSubscriptionEvent): Promise<any> {
     console.info(`method=handleSms operation: ${operation}`);
     switch (operation) {
         case SubscriptionOperation.INVALID:
