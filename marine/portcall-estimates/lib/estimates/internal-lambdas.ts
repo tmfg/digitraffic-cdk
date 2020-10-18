@@ -12,6 +12,8 @@ import {RetentionDays} from '@aws-cdk/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Topic} from "@aws-cdk/aws-sns";
+import {Rule, Schedule} from "@aws-cdk/aws-events";
+import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -20,6 +22,7 @@ export function create(
     lambdaDbSg: ISecurityGroup,
     props: Props,
     stack: Stack) {
+
     const estimatesUpdatedTopicId = 'PortcallEstimatesUpdatedTopic';
     const estimatesUpdatedTopic = new Topic(stack, estimatesUpdatedTopicId, {
         displayName: estimatesUpdatedTopicId,
@@ -27,6 +30,10 @@ export function create(
     });
     createProcessQueueLambda(queueAndDLQ.queue, estimatesUpdatedTopic, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
+
+    const updateETAEstimatesLambda = createUpdateETAEstimatesLambda(vpc, lambdaDbSg, props, stack);
+    const updateETASchedulingRule = createETAUpdateSchedulingCloudWatchRule(stack);
+    updateETASchedulingRule.addTarget(new LambdaFunction(updateETAEstimatesLambda));
 }
 
 function createProcessQueueLambda(
@@ -82,4 +89,35 @@ function createProcessDLQLambda(
     statement.addActions('s3:PutObjectAcl');
     statement.addResources(dlqBucket.bucketArn + '/*');
     processDLQLambda.addToRolePolicy(statement);
+}
+
+function createETAUpdateSchedulingCloudWatchRule(stack: Stack): Rule {
+    const ruleName = 'PortcallEstimates-ETAScheduler'
+    return new Rule(stack, ruleName, {
+        ruleName,
+        schedule: Schedule.expression('cron(*/15 * * * ? *)') // every 15 minutes
+    });
+}
+
+function createUpdateETAEstimatesLambda(
+    vpc: IVpc,
+    lambdaDbSg: ISecurityGroup,
+    props: Props,
+    stack: Stack): Function {
+
+    const functionName = "PortcallEstimates-UpdateETAEstimates";
+    const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: functionName,
+        code: new AssetCode('dist/estimates/lambda/update-eta-estimates'),
+        handler: 'lambda-update-eta-estimates.handler',
+        environment: {
+            DB_USER: props.dbProps.username,
+            DB_PASS: props.dbProps.password,
+            DB_URI: props.dbProps.uri
+        },
+        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
+    });
+    const lambda = new Function(stack, functionName, lambdaConf);
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+    return lambda;
 }
