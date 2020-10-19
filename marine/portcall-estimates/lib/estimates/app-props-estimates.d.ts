@@ -12,6 +12,13 @@ export interface Props {
     defaultLambdaDurationSeconds: number;
     logsDestinationArn: string;
     sqsProcessLambdaConcurrentExecutions: number;
+    etaProps: {
+        readonly clientId: string
+        readonly clientSecret: string
+        readonly audience: string
+        readonly authUrl: string
+        readonly endpointUrl: string
+    }
 }
 export interface DbProps {
     username: string;

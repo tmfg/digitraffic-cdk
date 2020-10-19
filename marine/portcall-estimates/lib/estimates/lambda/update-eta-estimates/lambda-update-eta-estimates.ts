@@ -2,11 +2,11 @@ import {getEtas} from '../../api/api-etas';
 import {getPortAreaGeometries} from '../../service/portareas';
 import {findETAShipsByLocode} from '../../service/estimates';
 
-const KEY_ENDPOINT_CLIENT_ID = 'ENDPOINT_CLIENT_ID'
-const KEY_ENDPOINT_CLIENT_SECRET = 'ENDPOINT_CLIENT_SECRET'
-const KEY_ENDPOINT_AUDIENCE = 'ENDPOINT_AUDIENCE'
-const KEY_ENDPOINT_AUTH_URL = 'ENDPOINT_AUTH_URL'
-const KEY_ENDPOINT_URL = 'ENDPOINT_URL'
+export const KEY_ENDPOINT_CLIENT_ID = 'ENDPOINT_CLIENT_ID'
+export const KEY_ENDPOINT_CLIENT_SECRET = 'ENDPOINT_CLIENT_SECRET'
+export const KEY_ENDPOINT_AUDIENCE = 'ENDPOINT_AUDIENCE'
+export const KEY_ENDPOINT_AUTH_URL = 'ENDPOINT_AUTH_URL'
+export const KEY_ENDPOINT_URL = 'ENDPOINT_URL'
 
 export const handler = async (event: any): Promise<any> => {
     const endpointClientId = process.env[KEY_ENDPOINT_CLIENT_ID] as string;

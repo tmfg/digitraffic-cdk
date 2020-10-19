@@ -14,6 +14,11 @@ import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Topic} from "@aws-cdk/aws-sns";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {
+    KEY_ENDPOINT_AUDIENCE, KEY_ENDPOINT_AUTH_URL,
+    KEY_ENDPOINT_CLIENT_ID,
+    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL
+} from "./lambda/update-eta-estimates/lambda-update-eta-estimates";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -105,16 +110,23 @@ function createUpdateETAEstimatesLambda(
     props: Props,
     stack: Stack): Function {
 
-    const functionName = "PortcallEstimates-UpdateETAEstimates";
+    const environment: any = {
+        DB_USER: props.dbProps.username,
+        DB_PASS: props.dbProps.password,
+        DB_URI: props.dbProps.uri
+    };
+    environment[KEY_ENDPOINT_CLIENT_ID] = props.etaProps.clientId;
+    environment[KEY_ENDPOINT_CLIENT_SECRET] = props.etaProps.clientSecret;
+    environment[KEY_ENDPOINT_AUDIENCE] = props.etaProps.audience;
+    environment[KEY_ENDPOINT_AUTH_URL] = props.etaProps.authUrl;
+    environment[KEY_ENDPOINT_URL] = props.etaProps.endpointUrl;
+
+    const functionName = 'PortcallEstimates-UpdateETAEstimates';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: new AssetCode('dist/estimates/lambda/update-eta-estimates'),
         handler: 'lambda-update-eta-estimates.handler',
-        environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri
-        },
+        environment,
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const lambda = new Function(stack, functionName, lambdaConf);
