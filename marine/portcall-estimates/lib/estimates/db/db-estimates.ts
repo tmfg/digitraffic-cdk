@@ -58,7 +58,7 @@ const INSERT_ESTIMATE_SQL = `
            $12
     )
     ON CONFLICT(ship_mmsi, ship_imo, event_source, event_type, event_time, record_time) DO NOTHING
-        RETURNING ship_mmsi, ship_imo
+        RETURNING ship_mmsi, ship_imo, location_locode
 `;
 
 const SELECT_BY_LOCODE = `
