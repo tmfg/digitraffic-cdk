@@ -1,9 +1,9 @@
-import * as LastUpdatedDB from "../../../../../common/db/last-updated";
-import * as EstimatesDB from "../db/db-estimates"
-import {DbEstimate} from "../db/db-estimates"
-import {inDatabase} from "../../../../../common/postgres/database";
-import {IDatabase} from "pg-promise";
-import {ApiEstimate} from "../model/estimate";
+import * as LastUpdatedDB from '../../../../../common/db/last-updated';
+import * as EstimatesDB from '../db/db-estimates'
+import {DbEstimate, DbETA} from '../db/db-estimates'
+import {inDatabase} from 'digitraffic-lambda-postgres/database';
+import {IDatabase} from 'pg-promise';
+import {ApiEstimate} from '../model/estimate';
 
 const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
 
@@ -41,7 +41,7 @@ export async function findAllEstimates(
         }
         throw new Error('No locode, mmsi or imo given');
     }).finally(() => {
-        console.info("method=findAllEstimates tookMs=%d", (Date.now() - start));
+        console.info('method=findAllEstimates tookMs=%d', (Date.now() - start));
     }).then((estimates: DbEstimate[]) => estimates.map(e => ({
         eventType: e.event_type,
         eventTime: e.event_time.toISOString(),
@@ -58,4 +58,13 @@ export async function findAllEstimates(
         },
         portcallId: e.portcall_id
     })));
+}
+
+export async function findETAShipsByLocode(locodes: string[]): Promise<DbETA> {
+    const start = Date.now();
+    return await inDatabase(async (db: IDatabase<any, any>) => {
+        return EstimatesDB.findETAsByLocodes(db, locodes);
+    }).finally(() => {
+        console.info('method=findETAShipsByLocode tookMs=%d', (Date.now() - start));
+    });
 }

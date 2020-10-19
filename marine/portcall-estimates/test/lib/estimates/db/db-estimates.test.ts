@@ -2,7 +2,8 @@ import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../../db-testutil";
 import {newEstimate} from "../../testdata";
-import {findByImo, findByLocode, findByMmsi} from "../../../../lib/estimates/db/db-estimates";
+import {findByImo, findByLocode, findByMmsi, findETAsByLocodes} from "../../../../lib/estimates/db/db-estimates";
+import {EventType} from "../../../../lib/estimates/model/estimate";
 
 describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*
@@ -228,6 +229,67 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const foundEstimate = await findByLocode(db, locode);
         expect(foundEstimate.length).toBe(2);
+    });
+
+    test('findETAsByLocodes - 1 h in future is found', async () => {
+        const locode = 'AA123';
+        const eventTime = moment().add(1, 'hours').toDate();
+        const estimate = newEstimate({eventType: EventType.ETA, locode, eventTime});
+        await insert(db, [estimate]);
+
+        const foundEstimates = await findETAsByLocodes(db, [locode]);
+
+        expect(foundEstimates.length).toBe(1);
+        expect(foundEstimates[0]).toMatchObject({
+            locode,
+            imo: estimate.ship.imo
+        });
+    });
+
+    test('findETAsByLocodes - 1 h in past is not found', async () => {
+        const locode = 'AA123';
+        const eventTime = moment().subtract(1, 'hours').toDate();
+        const estimate = newEstimate({eventType: EventType.ETA, locode, eventTime});
+        await insert(db, [estimate]);
+
+        const foundEstimates = await findETAsByLocodes(db, [locode]);
+
+        expect(foundEstimates.length).toBe(0);
+    });
+
+    test('findETAsByLocodes - ETD not found', async () => {
+        const locode = 'AA123';
+        const eventTime = moment().add(1, 'hours').toDate();
+        const estimate = newEstimate({eventType: EventType.ETD, locode, eventTime});
+        await insert(db, [estimate]);
+
+        const foundEstimates = await findETAsByLocodes(db, [locode]);
+
+        expect(foundEstimates.length).toBe(0);
+    });
+
+    test('findETAsByLocodes - non-matching locode not found', async () => {
+        const locode = 'AA123';
+        const eventTime = moment().add(1, 'hours').toDate();
+        const estimate = newEstimate({eventType: EventType.ETA, locode: 'BB456', eventTime});
+        await insert(db, [estimate]);
+
+        const foundEstimates = await findETAsByLocodes(db, [locode]);
+
+        expect(foundEstimates.length).toBe(0);
+    });
+
+    test('findETAsByLocodes - multiple ships found', async () => {
+        const locode = 'AA123';
+        const eventTime = moment().add(1, 'hours').toDate();
+        const estimate1 = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'S1'});
+        const estimate2 = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'S2'});
+        const estimate3 = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'S3'});
+        await insert(db, [estimate1, estimate2, estimate3]);
+
+        const foundEstimates = await findETAsByLocodes(db, [locode]);
+
+        expect(foundEstimates.length).toBe(3);
     });
 
 }));

@@ -1,9 +1,8 @@
 import * as ShiplistDB from "../db/db-shiplist";
 import {ShiplistEstimate} from "../db/db-shiplist";
-import {inDatabase} from "../../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-lambda-postgres/database";
 import {IDatabase} from "pg-promise";
-
-import moment from "moment";
+import moment from 'moment-timezone';
 
 export async function getShiplist(locode: string): Promise<string> {
     const start = Date.now();
@@ -22,12 +21,13 @@ function convertToSms(date: string, locode: string, estimates: ShiplistEstimate[
     let currentDate = new Date();
 
     const shiplist = estimates.map(e => {
-        let timestring = moment(e.event_time).format("HH:mm");
+        const eventTime = moment(e.event_time).tz('Europe/Helsinki');
+        let timestring = eventTime.format("HH:mm");
 
         if(!isSameDate(currentDate, e.event_time)) {
             currentDate = e.event_time;
 
-            timestring = moment(e.event_time).format("D.MM HH:mm")
+            timestring = eventTime.format("D.MM HH:mm")
         }
 
         return `${e.event_type} ${e.event_source} ${timestring} ${e.ship_name}`; }

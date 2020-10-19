@@ -20,6 +20,11 @@ export interface DbEstimate {
     readonly portcall_id?: number
 }
 
+export interface DbETA {
+    readonly imo: number
+    readonly locode: string
+}
+
 const INSERT_ESTIMATE_SQL = `
     INSERT INTO portcall_estimate(
         event_type,
@@ -91,6 +96,28 @@ const SELECT_BY_LOCODE = `
           pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
           pe.location_locode = $1
     ORDER by pe.event_time
+`;
+
+const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
+    SELECT DISTINCT
+        pe.ship_imo AS imo, 
+        pe.location_locode AS locode
+    FROM portcall_estimate pe
+    WHERE pe.record_time =
+          (
+              SELECT MAX(px.record_time) FROM portcall_estimate px
+              WHERE px.event_type = pe.event_type AND
+                  px.location_locode = pe.location_locode AND
+                  px.ship_mmsi = pe.ship_mmsi AND
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
+          ) AND
+          pe.event_time > NOW() AND
+          pe.event_time < CURRENT_DATE + INTERVAL '1 DAY' AND
+          pe.event_type = 'ETA' AND
+          pe.location_locode IN ($1:csv)
 `;
 
 const SELECT_BY_MMSI = `
@@ -199,6 +226,14 @@ export function findByImo(
         values: [imo]
     });
     return db.tx(t => t.manyOrNone(ps));
+}
+
+export function findETAsByLocodes(
+    db: IDatabase<any, any>,
+    locodes: string[]
+): Promise<DbETA[]> {
+    // Prepared statement use not possible due to dynamic IN-list
+    return db.tx(t => t.manyOrNone(SELECT_ETA_SHIP_IMO_BY_LOCODE, locodes));
 }
 
 export function createUpdateValues(e: ApiEstimate): any[] {

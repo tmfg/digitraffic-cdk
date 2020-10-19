@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {PortareaGeometry} from "../service/portareas";
 
 export async function getEtas(
     endpointClientId: string,
@@ -6,7 +7,7 @@ export async function getEtas(
     endpointClientAudience: string,
     endpointAuthUrl: string,
     endpointUrl: string,
-    portAreaGeometries: any): Promise<any> {
+    portAreaGeometries: PortareaGeometry[]): Promise<any> {
 
     const token = await createEtaOAuthToken(
         endpointClientId,
@@ -53,7 +54,7 @@ async function createEtaOAuthToken(
 async function getETAs(
     endpointUrl: string,
     token: string,
-    portAreaGeometries: any): Promise<ETAsResponse> {
+    portAreaGeometries: PortareaGeometry[]): Promise<ETAsResponse> {
 
     const resp = await axios.get(endpointUrl, {
         headers: {
