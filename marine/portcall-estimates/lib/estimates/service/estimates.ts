@@ -10,9 +10,10 @@ const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
 export interface UpdatedEstimate {
     readonly ship_mmsi: number
     readonly ship_imo: number
+    readonly location_locode: string
 }
 
-export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate | undefined> {
+export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate | null> {
     const start = Date.now();
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(t => {
@@ -22,7 +23,7 @@ export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstima
             ];
             return t.batch(queries);
         });
-    });
+    }).then((r: any) => r[0]);
 }
 
 export async function findAllEstimates(

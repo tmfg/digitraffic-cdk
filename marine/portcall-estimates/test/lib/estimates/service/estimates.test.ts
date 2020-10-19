@@ -2,7 +2,7 @@ import {dbTestBase, insert} from "../../db-testutil";
 import * as pgPromise from "pg-promise";
 import {newEstimate} from "../../testdata";
 import {
-    findAllEstimates
+    findAllEstimates, saveEstimate
 } from "../../../../lib/estimates/service/estimates";
 
 describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
@@ -35,6 +35,25 @@ describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         expect(estimates.length).toBe(1);
         expect(estimates[0]).toMatchObject(estimate);
+    });
+
+    test('saveEstimate - no conflict returns updated', async () => {
+        const estimate = newEstimate();
+
+        const ret = await saveEstimate(estimate);
+
+        expect(ret?.location_locode).toBe(estimate.location.port);
+        expect(ret?.ship_mmsi).toBe(estimate.ship.mmsi);
+        expect(ret?.ship_imo).toBe(estimate.ship.imo);
+    });
+
+    test('saveEstimate - conflict returns undefined', async () => {
+        const estimate = newEstimate();
+
+        await saveEstimate(estimate);
+        const ret = await saveEstimate(estimate);
+
+        expect(ret).toBeNull();
     });
 
 }));
