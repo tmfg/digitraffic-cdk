@@ -9,6 +9,31 @@ export function getPortAreaGeometries(): PortareaGeometry[] {
             locode: 'FIKVH',
             latitude: 59.819656,
             longitude: 22.945464
+        },
+        {
+            locode: 'FIRAU',
+            longitude: 61.124633,
+            latitude: 21.449522
+        },
+        {
+            locode: 'FIUKI',
+            longitude: 60.795706,
+            latitude: 21.374408
+        },
+        {
+            locode: 'FIHEL',
+            longitude: 60.211016,
+            latitude: 25.197011
+        },
+        {
+            locode: 'FIKOK',
+            longitude: 63.864792,
+            latitude: 23.016646
+        },
+        {
+            locode: 'FIMUS',
+            longitude: 61.057657,
+            latitude: 28.329423
         }
     ];
 }
