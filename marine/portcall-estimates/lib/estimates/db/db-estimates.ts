@@ -87,6 +87,7 @@ const SELECT_BY_LOCODE = `
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
+                  px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
@@ -108,6 +109,7 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
               SELECT MAX(px.record_time) FROM portcall_estimate px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
+                  px.event_source = pe.event_source AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
@@ -117,6 +119,7 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
           pe.event_time > NOW() AND
           pe.event_time < CURRENT_DATE + INTERVAL '1 DAY' AND
           pe.event_type = 'ETA' AND
+          pe.event_source = 'Portnet' AND
           pe.location_locode IN ($1:csv)
 `;
 
@@ -141,6 +144,7 @@ const SELECT_BY_MMSI = `
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
+                  px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
@@ -173,6 +177,7 @@ const SELECT_BY_IMO = `
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
+                  px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
