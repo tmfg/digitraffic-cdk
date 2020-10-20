@@ -20,7 +20,7 @@ export interface DbEstimate {
     readonly portcall_id?: number
 }
 
-export interface DbETA {
+export interface DbETAShip {
     readonly imo: number
     readonly locode: string
 }
@@ -231,7 +231,7 @@ export function findByImo(
 export function findETAsByLocodes(
     db: IDatabase<any, any>,
     locodes: string[]
-): Promise<DbETA[]> {
+): Promise<DbETAShip[]> {
     // Prepared statement use not possible due to dynamic IN-list
     return db.tx(t => t.manyOrNone(SELECT_ETA_SHIP_IMO_BY_LOCODE, locodes));
 }

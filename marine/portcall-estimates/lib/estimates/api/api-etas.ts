@@ -1,5 +1,36 @@
 import axios from 'axios';
 import {PortareaGeometry} from "../service/portareas";
+import {DbETAShip} from "../db/db-estimates";
+
+async function createEtaOAuthToken(
+    endpointClientId: string,
+    endpointClientSecret: string,
+    endpointApiAudience: string,
+    endpointAuthUrl: string
+): Promise<OAuthTokenResponse> {
+
+    const start = Date.now();
+
+    // Try-catch because axios logs credentials
+    try {
+        const resp = await axios.post(endpointAuthUrl, {
+            client_id: endpointClientId,
+            client_secret: endpointClientSecret,
+            audience: endpointApiAudience,
+            grant_type: 'client_credentials'
+        });
+        if (resp.status != 200) {
+            console.error(`method=createEtaOAuthToken returned status ${resp.status}`);
+            return Promise.reject();
+        }
+        return Promise.resolve(resp.data);
+    } catch (error) {
+        console.error('method=createEtaOAuthToken login failed');
+        return Promise.reject();
+    } finally {
+        console.log(`method=createEtaOAuthToken tookMs=${Date.now() - start}`)
+    }
+}
 
 export async function getEtas(
     endpointClientId: string,
@@ -7,7 +38,10 @@ export async function getEtas(
     endpointClientAudience: string,
     endpointAuthUrl: string,
     endpointUrl: string,
+    ships: DbETAShip[],
     portAreaGeometries: PortareaGeometry[]): Promise<any> {
+
+    const start = Date.now();
 
     const token = await createEtaOAuthToken(
         endpointClientId,
@@ -19,51 +53,36 @@ export async function getEtas(
         throw new Error('Authentication to ETA API failed!');
     }
 
-    const etas = await getETAs(endpointUrl, token.access_token, portAreaGeometries);
-
-    if (!etas) {
-        throw new Error('Fetching ETAs failed!');
-    }
+    return Promise.all(await ships.map( ship =>
+        getETA(endpointUrl,
+            token.access_token,
+            ship,
+            portAreaGeometries.find(g => g.locode == ship.locode))))
+        .then(a => {
+            console.log(`method=getEtas tookMs=${Date.now() - start}`);
+            return a;
+        });
 }
 
-async function createEtaOAuthToken(
-    endpointClientId: string,
-    endpointClientSecret: string,
-    endpointApiAudience: string,
-    endpointAuthUrl: string
-): Promise<OAuthTokenResponse> {
-
-    const resp = await axios.post(endpointAuthUrl, {
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        data: {
-            client_id: endpointClientId,
-            client_secret: endpointClientSecret,
-            audience: endpointApiAudience,
-            grant_type: 'client_credentials'
-        }
-    });
-    if (resp.status != 200) {
-        console.error(`method=createEtaOAuthToken returned status ${resp.status}`);
-        return Promise.reject();
-    }
-    return Promise.resolve(resp.data);
-}
-
-async function getETAs(
+async function getETA(
     endpointUrl: string,
     token: string,
-    portAreaGeometries: PortareaGeometry[]): Promise<ETAsResponse> {
+    ship: DbETAShip,
+    portAreaGeometry?: PortareaGeometry): Promise<ETAsResponse> {
 
-    const resp = await axios.get(endpointUrl, {
+    if (!portAreaGeometry) {
+        console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} not found!`);
+        return Promise.reject();
+    }
+
+    const resp = await axios.get(`${endpointUrl}?imo=${ship.imo}&destination_lat=${portAreaGeometry.latitude}&destination_lon=${portAreaGeometry.longitude}`, {
         headers: {
-            Authorization: `Bearer ${token}`,
+            'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         }
     });
     if (resp.status != 200) {
-        console.error(`method=getETAs returned status ${resp.status}`);
+        console.error(`method=getETAs returned status: ${resp.status}`);
         return Promise.reject();
     }
     return Promise.resolve(resp.data);

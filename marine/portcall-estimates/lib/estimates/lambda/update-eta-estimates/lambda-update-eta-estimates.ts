@@ -18,16 +18,18 @@ export const handler = async (event: any): Promise<any> => {
     const portAreaGeometries = getPortAreaGeometries();
     const locodes = portAreaGeometries.map(p => p.locode);
     const ships = await findETAShipsByLocode(locodes);
-    console.log('SHIPS', ships);
 
     const etas = await getEtas(endpointClientId,
         endpointClientSecret,
         endpointClientAudience,
         endpointAuthUrl,
         endpointUrl,
+        ships,
         portAreaGeometries);
 
     if (!etas) {
         throw new Error('Failed to fetch ETAs!');
     }
+
+    console.log('Received ETAs', etas);
 };

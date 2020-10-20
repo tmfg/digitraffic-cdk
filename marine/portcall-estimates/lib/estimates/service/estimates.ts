@@ -1,6 +1,6 @@
 import * as LastUpdatedDB from '../../../../../common/db/last-updated';
 import * as EstimatesDB from '../db/db-estimates'
-import {DbEstimate, DbETA} from '../db/db-estimates'
+import {DbEstimate, DbETAShip} from '../db/db-estimates'
 import {inDatabase} from 'digitraffic-lambda-postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiEstimate} from '../model/estimate';
@@ -61,7 +61,7 @@ export async function findAllEstimates(
     })));
 }
 
-export async function findETAShipsByLocode(locodes: string[]): Promise<DbETA> {
+export async function findETAShipsByLocode(locodes: string[]): Promise<DbETAShip[]> {
     const start = Date.now();
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return EstimatesDB.findETAsByLocodes(db, locodes);
