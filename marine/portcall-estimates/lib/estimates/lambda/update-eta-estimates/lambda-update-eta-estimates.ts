@@ -22,6 +22,8 @@ export const handler = async (): Promise<any> => {
     const locodes = portAreaGeometries.map(p => p.locode);
     const ships = await findETAShipsByLocode(locodes);
 
+    console.log('About to fetch ETAs for ships:', ships);
+
     const etas = await getEtas(endpointClientId,
         endpointClientSecret,
         endpointClientAudience,
