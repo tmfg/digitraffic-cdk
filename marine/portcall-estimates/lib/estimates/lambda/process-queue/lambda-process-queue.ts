@@ -19,11 +19,14 @@ export function handlerFn(sns: SNS) {
                 // fulfilled promises have a 'value' property
                 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled
                 const updates = successful
-                    .map(s => (s as any).value);
-                await sns.publish({
-                    Message: JSON.stringify(updates),
-                    TopicArn: process.env.ESTIMATE_SNS_TOPIC_ARN
-                }).promise();
+                    .map(s => (s as any).value)
+                    .filter(s => s != null);
+                if (updates.length) {
+                    await sns.publish({
+                        Message: JSON.stringify(updates),
+                        TopicArn: process.env.ESTIMATE_SNS_TOPIC_ARN
+                    }).promise();
+                }
             }
             return estimates;
         });
