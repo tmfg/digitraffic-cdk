@@ -133,6 +133,7 @@ function createUpdateETAEstimatesLambda(
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const lambda = new Function(stack, functionName, lambdaConf);
+    estimatesUpdatedTopic.grantPublish(lambda);
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     return lambda;
 }

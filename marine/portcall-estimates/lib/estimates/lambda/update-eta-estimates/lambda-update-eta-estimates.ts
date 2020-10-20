@@ -26,7 +26,7 @@ export const handler = async (): Promise<any> => {
     const ships = await findETAShipsByLocode(locodes);
 
     if (ships.length) {
-        console.log(`About to fetch ETAs for ${ships.length} ships`);
+        console.log('About to fetch ETAs for ships:', ships);
         const etas = await getETAs(endpointClientId,
             endpointClientSecret,
             endpointClientAudience,
