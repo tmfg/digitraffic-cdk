@@ -293,4 +293,17 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundEstimates.length).toBe(1);
     });
 
+    test('findETAsByLocodes - multiple locodes', async () => {
+        const locode1 = 'AA123';
+        const locode2 = 'BB456';
+        const eventTime = moment().add(1, 'hours').toDate();
+        const estimate1 = newEstimate({eventType: EventType.ETA, locode: locode1, eventTime, source: 'Portnet'});
+        const estimate2 = newEstimate({eventType: EventType.ETA, locode: locode2, eventTime, source: 'Portnet'});
+        await insert(db, [estimate1, estimate2]);
+
+        const foundEstimates = await findETAsByLocodes(db, [locode1, locode2]);
+
+        expect(foundEstimates.length).toBe(2);
+    });
+
 }));

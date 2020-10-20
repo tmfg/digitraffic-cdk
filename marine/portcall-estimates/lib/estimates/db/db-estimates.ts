@@ -120,7 +120,7 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
           pe.event_time < CURRENT_DATE + INTERVAL '1 DAY' AND
           pe.event_type = 'ETA' AND
           pe.event_source = 'Portnet' AND
-          pe.location_locode IN ($1:csv)
+          pe.location_locode IN ($1:list)
 `;
 
 const SELECT_BY_MMSI = `
@@ -238,7 +238,7 @@ export function findETAsByLocodes(
     locodes: string[]
 ): Promise<DbETAShip[]> {
     // Prepared statement use not possible due to dynamic IN-list
-    return db.tx(t => t.manyOrNone(SELECT_ETA_SHIP_IMO_BY_LOCODE, locodes));
+    return db.tx(t => t.manyOrNone(SELECT_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
 }
 
 export function createUpdateValues(e: ApiEstimate): any[] {
