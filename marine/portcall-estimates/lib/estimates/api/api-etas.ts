@@ -32,7 +32,7 @@ async function createEtaOAuthToken(
     }
 }
 
-export async function getEtas(
+export async function getETAs(
     endpointClientId: string,
     endpointClientSecret: string,
     endpointClientAudience: string,
@@ -90,6 +90,7 @@ async function getETA(
             const props = e.features[0].properties;
             return {
                 locode: portAreaGeometry!!.locode,
+                imo: ship.imo,
                 mmsi: props.vessel.mmsi,
                 eta: props.destination.eta
             };
@@ -105,6 +106,7 @@ interface OAuthTokenResponse {
 interface ShipETA {
     readonly locode: string
     readonly mmsi: number
+    readonly imo: number
     readonly eta: string
 }
 

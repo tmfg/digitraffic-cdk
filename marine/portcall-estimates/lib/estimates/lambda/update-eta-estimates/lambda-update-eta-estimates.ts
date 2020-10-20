@@ -1,7 +1,8 @@
-import {getEtas} from '../../api/api-etas';
+import {getETAs} from '../../api/api-etas';
 import {getPortAreaGeometries} from '../../service/portareas';
-import {findETAShipsByLocode, saveEstimate} from '../../service/estimates';
+import {findETAShipsByLocode, saveEstimates} from '../../service/estimates';
 import {ApiEstimate, EventType} from "../../model/estimate";
+import {SNS} from "aws-sdk";
 
 export const KEY_ENDPOINT_CLIENT_ID = 'ENDPOINT_CLIENT_ID'
 export const KEY_ENDPOINT_CLIENT_SECRET = 'ENDPOINT_CLIENT_SECRET'
@@ -23,8 +24,8 @@ export const handler = async (): Promise<any> => {
     const ships = await findETAShipsByLocode(locodes);
 
     if (ships.length) {
-        console.log('About to fetch ETAs for ships:', ships);
-        const etas = await getEtas(endpointClientId,
+        console.log(`About to fetch ETAs for ${ships.length} ships`);
+        const etas = await getETAs(endpointClientId,
             endpointClientSecret,
             endpointClientAudience,
             endpointAuthUrl,
@@ -32,24 +33,32 @@ export const handler = async (): Promise<any> => {
             ships,
             portAreaGeometries);
 
-        await Promise.all(etas.map(eta => {
-            const estimate: ApiEstimate = {
-                eventType: EventType.ETA,
-                eventTime: eta.eta,
-                eventTimeConfidenceLower: null,
-                eventTimeConfidenceUpper: null,
-                recordTime: new Date().toISOString(),
-                source: endpointSource,
-                ship: {
-                    mmsi: eta.mmsi
-                },
-                location: {
-                    port: eta.locode
-                },
-                portcallId: null
-            };
-            return saveEstimate(estimate);
+        const estimates: ApiEstimate[] = etas.map(eta => ({
+            eventType: EventType.ETA,
+            eventTime: eta.eta,
+            eventTimeConfidenceLower: null,
+            eventTimeConfidenceUpper: null,
+            recordTime: new Date().toISOString(),
+            source: endpointSource,
+            ship: {
+                mmsi: eta.mmsi
+            },
+            location: {
+                port: eta.locode
+            },
+            portcallId: null
         }));
+
+        await saveEstimates(estimates);
+
+        await new SNS().publish({
+            Message: JSON.stringify(etas.map(eta => ({
+                ship_mmsi: eta.mmsi,
+                ship_imo: eta.imo,
+                location_locode: eta.locode
+            }))),
+            TopicArn: process.env.ESTIMATE_SNS_TOPIC_ARN
+        }).promise();
     } else {
         console.log('No ships for ETA update');
     }

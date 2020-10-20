@@ -1,11 +1,8 @@
-import * as LastUpdatedDB from '../../../../../common/db/last-updated';
 import * as EstimatesDB from '../db/db-estimates'
 import {DbEstimate, DbETAShip} from '../db/db-estimates'
 import {inDatabase} from 'digitraffic-lambda-postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiEstimate} from '../model/estimate';
-
-const PORTCALL_ESTIMATES_DATA_TYPE = 'PORTCALL_ESTIMATES';
 
 export interface UpdatedEstimate {
     readonly ship_mmsi: number
@@ -14,15 +11,16 @@ export interface UpdatedEstimate {
 }
 
 export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate | null> {
-    const start = Date.now();
     return await inDatabase(async (db: IDatabase<any, any>) => {
-        return await db.tx(t => {
-            const queries = [
-                EstimatesDB.updateEstimate(db, estimate),
-                LastUpdatedDB.updateUpdatedTimestamp(db, PORTCALL_ESTIMATES_DATA_TYPE, new Date(start))
-            ];
-            return t.batch(queries);
-        });
+        return await db.tx(_ => EstimatesDB.updateEstimate(db, estimate));
+    }).then((r: any) => r[0]);
+}
+
+export async function saveEstimates(estimates: ApiEstimate[]): Promise<UpdatedEstimate | null> {
+    return await inDatabase(async (db: IDatabase<any, any>) => {
+        return await db.tx(t => t.batch(
+            estimates.map(estimate => EstimatesDB.updateEstimate(db, estimate))
+        ));
     }).then((r: any) => r[0]);
 }
 
