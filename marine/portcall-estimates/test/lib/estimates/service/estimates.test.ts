@@ -2,7 +2,7 @@ import {dbTestBase, insert} from "../../db-testutil";
 import * as pgPromise from "pg-promise";
 import {newEstimate} from "../../testdata";
 import {
-    findAllEstimates, saveEstimate
+    findAllEstimates, saveEstimate, saveEstimates
 } from "../../../../lib/estimates/service/estimates";
 
 describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
@@ -54,6 +54,21 @@ describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const ret = await saveEstimate(estimate);
 
         expect(ret).toBeNull();
+    });
+
+    test('saveEstimates - multiple updates', async () => {
+        const estimate1 = newEstimate();
+        const estimate2 = newEstimate();
+
+        const ret = await saveEstimates([estimate1, estimate2]);
+
+        expect(ret[0]?.location_locode).toBe(estimate1.location.port);
+        expect(ret[0]?.ship_mmsi).toBe(estimate1.ship.mmsi);
+        expect(ret[0]?.ship_imo).toBe(estimate1.ship.imo);
+
+        expect(ret[1]?.location_locode).toBe(estimate2.location.port);
+        expect(ret[1]?.ship_mmsi).toBe(estimate2.ship.mmsi);
+        expect(ret[1]?.ship_imo).toBe(estimate2.ship.imo);
     });
 
 }));

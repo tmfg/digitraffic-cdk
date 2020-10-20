@@ -13,15 +13,15 @@ export interface UpdatedEstimate {
 export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate | null> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(_ => EstimatesDB.updateEstimate(db, estimate));
-    }).then((r: any) => r[0]);
+    });
 }
 
-export async function saveEstimates(estimates: ApiEstimate[]): Promise<UpdatedEstimate | null> {
+export async function saveEstimates(estimates: ApiEstimate[]): Promise<Array<UpdatedEstimate | null>> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(t => t.batch(
             estimates.map(estimate => EstimatesDB.updateEstimate(db, estimate))
         ));
-    }).then((r: any) => r[0]);
+    });
 }
 
 export async function findAllEstimates(
