@@ -17,9 +17,7 @@ export function handlerFn() {
                 return Promise.reject(e);
             }
             try {
-                const saved = await saveMaintenanceTrackingData(r.body);
-                console.info(`method=handleMaintenanceTrackingJson saved count=1`);
-                return saved;
+                return await saveMaintenanceTrackingData(r.body);
             } catch (e) {
                 console.error(`method=handleMaintenanceTrackingJson Error saving JSON to db count=1 `, e);
                 return Promise.reject(e);
