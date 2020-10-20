@@ -17,7 +17,7 @@ import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {
     KEY_ENDPOINT_AUDIENCE, KEY_ENDPOINT_AUTH_URL,
     KEY_ENDPOINT_CLIENT_ID,
-    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL
+    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE
 } from "./lambda/update-eta-estimates/lambda-update-eta-estimates";
 
 export function create(
@@ -120,6 +120,7 @@ function createUpdateETAEstimatesLambda(
     environment[KEY_ENDPOINT_AUDIENCE] = props.etaProps.audience;
     environment[KEY_ENDPOINT_AUTH_URL] = props.etaProps.authUrl;
     environment[KEY_ENDPOINT_URL] = props.etaProps.endpointUrl;
+    environment[KEY_ESTIMATE_SOURCE] = props.etaProps.estimateSource;
 
     const functionName = 'PortcallEstimates-UpdateETAEstimates';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {

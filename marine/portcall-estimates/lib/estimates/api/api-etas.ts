@@ -39,7 +39,7 @@ export async function getEtas(
     endpointAuthUrl: string,
     endpointUrl: string,
     ships: DbETAShip[],
-    portAreaGeometries: PortareaGeometry[]): Promise<any> {
+    portAreaGeometries: PortareaGeometry[]): Promise<ShipETA[]> {
 
     const start = Date.now();
 
@@ -68,7 +68,7 @@ async function getETA(
     endpointUrl: string,
     token: string,
     ship: DbETAShip,
-    portAreaGeometry?: PortareaGeometry): Promise<ETAsResponse> {
+    portAreaGeometry?: PortareaGeometry): Promise<ShipETA> {
 
     if (!portAreaGeometry) {
         console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} not found!`);
@@ -85,7 +85,15 @@ async function getETA(
         console.error(`method=getETAs returned status: ${resp.status}`);
         return Promise.reject();
     }
-    return Promise.resolve(resp.data);
+    return Promise.resolve(resp.data as ETAResponse)
+        .then(e => {
+            const props = e.features[0].properties;
+            return {
+                locode: portAreaGeometry!!.locode,
+                mmsi: props.vessel.mmsi,
+                eta: props.destination.eta
+            };
+        });
 }
 
 interface OAuthTokenResponse {
@@ -94,7 +102,13 @@ interface OAuthTokenResponse {
     readonly expires_in: number
 }
 
-interface ETAsResponse {
+interface ShipETA {
+    readonly locode: string
+    readonly mmsi: number
+    readonly eta: string
+}
+
+interface ETAResponse {
     readonly features: [
         {
             readonly properties: {
@@ -109,13 +123,6 @@ interface ETAsResponse {
                     }
                 }
                 readonly destination: {
-                    readonly eta: string
-                    readonly total_duration: string
-                    readonly historical_duration: string
-                    readonly synthetic_duration: string
-                    readonly straight_duration: string
-                }
-                readonly crosspoint: {
                     readonly eta: string
                     readonly total_duration: string
                     readonly historical_duration: string

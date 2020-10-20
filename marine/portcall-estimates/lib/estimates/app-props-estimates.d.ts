@@ -18,6 +18,7 @@ export interface Props {
         readonly audience: string
         readonly authUrl: string
         readonly endpointUrl: string
+        readonly estimateSource: string
     }
 }
 export interface DbProps {
