@@ -17,7 +17,7 @@ import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {
     KEY_ENDPOINT_AUDIENCE, KEY_ENDPOINT_AUTH_URL,
     KEY_ENDPOINT_CLIENT_ID,
-    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE
+    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE, KEY_ESTIMATE_SNS_TOPIC_ARN
 } from "./lambda/update-eta-estimates/lambda-update-eta-estimates";
 
 export function create(
@@ -36,7 +36,7 @@ export function create(
     createProcessQueueLambda(queueAndDLQ.queue, estimatesUpdatedTopic, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 
-    const updateETAEstimatesLambda = createUpdateETAEstimatesLambda(vpc, lambdaDbSg, props, stack);
+    const updateETAEstimatesLambda = createUpdateETAEstimatesLambda(estimatesUpdatedTopic, vpc, lambdaDbSg, props, stack);
     const updateETASchedulingRule = createETAUpdateSchedulingCloudWatchRule(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateETAEstimatesLambda));
 }
@@ -105,6 +105,7 @@ function createETAUpdateSchedulingCloudWatchRule(stack: Stack): Rule {
 }
 
 function createUpdateETAEstimatesLambda(
+    estimatesUpdatedTopic: Topic,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
@@ -121,6 +122,7 @@ function createUpdateETAEstimatesLambda(
     environment[KEY_ENDPOINT_AUTH_URL] = props.etaProps.authUrl;
     environment[KEY_ENDPOINT_URL] = props.etaProps.endpointUrl;
     environment[KEY_ESTIMATE_SOURCE] = props.etaProps.estimateSource;
+    environment[KEY_ESTIMATE_SNS_TOPIC_ARN] = estimatesUpdatedTopic.topicArn;
 
     const functionName = 'PortcallEstimates-UpdateETAEstimates';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {

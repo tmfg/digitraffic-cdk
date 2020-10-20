@@ -10,6 +10,7 @@ export const KEY_ENDPOINT_AUDIENCE = 'ENDPOINT_AUDIENCE'
 export const KEY_ENDPOINT_AUTH_URL = 'ENDPOINT_AUTH_URL'
 export const KEY_ENDPOINT_URL = 'ENDPOINT_URL'
 export const KEY_ESTIMATE_SOURCE = 'ESTIMATE_SOURCE'
+export const KEY_ESTIMATE_SNS_TOPIC_ARN = 'ESTIMATE_SNS_TOPIC_ARN';
 
 export const handler = async (): Promise<any> => {
     const endpointClientId = process.env[KEY_ENDPOINT_CLIENT_ID] as string;
@@ -18,6 +19,7 @@ export const handler = async (): Promise<any> => {
     const endpointAuthUrl = process.env[KEY_ENDPOINT_AUTH_URL] as string;
     const endpointUrl = process.env[KEY_ENDPOINT_URL] as string;
     const endpointSource = process.env[KEY_ESTIMATE_SOURCE] as string;
+    const snsTopicArn = process.env[KEY_ESTIMATE_SNS_TOPIC_ARN] as string;
 
     const portAreaGeometries = getPortAreaGeometries();
     const locodes = portAreaGeometries.map(p => p.locode);
@@ -57,7 +59,7 @@ export const handler = async (): Promise<any> => {
                 ship_imo: eta.imo,
                 location_locode: eta.locode
             }))),
-            TopicArn: process.env.ESTIMATE_SNS_TOPIC_ARN
+            TopicArn: snsTopicArn
         }).promise();
     } else {
         console.log('No ships for ETA update');
