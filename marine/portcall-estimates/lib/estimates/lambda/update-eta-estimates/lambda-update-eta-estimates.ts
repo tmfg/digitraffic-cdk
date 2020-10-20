@@ -22,33 +22,35 @@ export const handler = async (): Promise<any> => {
     const locodes = portAreaGeometries.map(p => p.locode);
     const ships = await findETAShipsByLocode(locodes);
 
-    console.log('About to fetch ETAs for ships:', ships);
+    if (ships.length) {
+        console.log('About to fetch ETAs for ships:', ships);
+        const etas = await getEtas(endpointClientId,
+            endpointClientSecret,
+            endpointClientAudience,
+            endpointAuthUrl,
+            endpointUrl,
+            ships,
+            portAreaGeometries);
 
-    const etas = await getEtas(endpointClientId,
-        endpointClientSecret,
-        endpointClientAudience,
-        endpointAuthUrl,
-        endpointUrl,
-        ships,
-        portAreaGeometries);
-
-
-    await Promise.all(etas.map(eta => {
-        const estimate: ApiEstimate = {
-            eventType: EventType.ETA,
-            eventTime: eta.eta,
-            eventTimeConfidenceLower: null,
-            eventTimeConfidenceUpper: null,
-            recordTime: new Date().toISOString(),
-            source: endpointSource,
-            ship: {
-                mmsi: eta.mmsi
-            },
-            location: {
-                port: eta.locode
-            },
-            portcallId: null
-        };
-        return saveEstimate(estimate);
-    }));
+        await Promise.all(etas.map(eta => {
+            const estimate: ApiEstimate = {
+                eventType: EventType.ETA,
+                eventTime: eta.eta,
+                eventTimeConfidenceLower: null,
+                eventTimeConfidenceUpper: null,
+                recordTime: new Date().toISOString(),
+                source: endpointSource,
+                ship: {
+                    mmsi: eta.mmsi
+                },
+                location: {
+                    port: eta.locode
+                },
+                portcallId: null
+            };
+            return saveEstimate(estimate);
+        }));
+    } else {
+        console.log('No ships for ETA update');
+    }
 };
