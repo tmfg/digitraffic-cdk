@@ -26,25 +26,21 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             privateSubnetIds: appProps.privateSubnetIds,
             availabilityZones: appProps.availabilityZones
         });
+
+        const incomingSmsTopic = this.createSmsTopic();
+
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
-
-        const topicName = 'PortcallEstimateSubscriptions-IncomingSMS';
-        const incomingSmsTopic = new Topic(this, topicName, {
-            topicName
-        });
-        const emailTopic = Topic.fromTopicArn(this, "Topic", appProps.shiplistSnsTopicArn);
-
         const sendShiplistLambda = this.createSendShiplistLambda(vpc, lambdaDbSg, appProps);
-        emailTopic.grantPublish(sendShiplistLambda);
-
-        const schedulingCloudWatchRule = this.createSchedulingCloudWatchRule();
-        schedulingCloudWatchRule.addTarget(new LambdaFunction(sendShiplistLambda));
-
         const smsHandlerLambda = this.createSmsHandlerLambda(incomingSmsTopic, appProps);
+        const estamationHandlerLambda = this.createEstimationHandlerLambda(appProps)
+
+        // grant publish to topic to lambda
+        Topic.fromTopicArn(this, "ShiplistTopic", appProps.shiplistSnsTopicArn).grantPublish(sendShiplistLambda);
 
         const subscriptionTable = this.createSubscriptionTable();
         subscriptionTable.grantReadWriteData(smsHandlerLambda);
-        subscriptionTable.grantReadData(sendShiplistLambda);
+        subscriptionTable.grantReadWriteData(sendShiplistLambda);
+        subscriptionTable.grantReadWriteData(estamationHandlerLambda);
 
         PublicApi.create(vpc,
             lambdaDbSg,
@@ -53,10 +49,16 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             this);
     }
 
-    private createSubscriptionTable(): Table {
+    private createSmsTopic(): any {
+        const topicName = 'PortcallEstimateSubscriptions-IncomingSMS';
+        return new Topic(this, topicName, {
+            topicName
+        });
+    }
+
+    private createSubscriptionTable() {
         const table = new Table(this, 'subscription-table', {
             partitionKey: { name: SUBSCRIPTION_ID_ATTRIBUTE, type: AttributeType.STRING},
-            sortKey: {name: 'Time', type: AttributeType.STRING},
             tableName: SUBSCRIPTIONS_TABLE_NAME,
             readCapacity: 1,
             writeCapacity: 1
@@ -100,6 +102,10 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         sendShiplistLambda.addToRolePolicy(
             PortcallEstimateSubscriptionsStack.createWriteToPinpointPolicy(props.pinpointApplicationId));
         createSubscription(sendShiplistLambda, functionName, props.logsDestinationArn, this);
+
+        const schedulingCloudWatchRule = this.createSchedulingCloudWatchRule();
+        schedulingCloudWatchRule.addTarget(new LambdaFunction(sendShiplistLambda));
+
         return sendShiplistLambda;
     }
 
@@ -146,5 +152,28 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         createSubscription(smsHandlerLambda, functionName, props.logsDestinationArn, this);
 
         return smsHandlerLambda;
+    }
+
+    private createEstimationHandlerLambda(props: Props): Function {
+        const functionName = 'PortcallEstimatesUpdated';
+        const estimateHandlerLambda = new Function(this, functionName, {
+            functionName,
+            code: new AssetCode('dist/subscriptions/lambda/handle-estimate'),
+            handler: 'lambda-handle-estimate.handler',
+            runtime: Runtime.NODEJS_12_X,
+            memorySize: 256,
+            timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
+            logRetention: RetentionDays.ONE_YEAR,
+            environment: {
+//                PINPOINT_ID: props.pinpointApplicationId,
+//                PINPOINT_NUMBER: props.pinpointTelephoneNumber
+            }
+        });
+        estimateHandlerLambda.addEventSource(new SnsEventSource(Topic.fromTopicArn(this, "EstimateTopic", props.estimateUpdatedTopicArn)));
+//        estimateHandlerLambda.addToRolePolicy(
+//            PortcallEstimateSubscriptionsStack.createWriteToPinpointPolicy(props.pinpointApplicationId));
+        createSubscription(estimateHandlerLambda, functionName, props.logsDestinationArn, this);
+
+        return estimateHandlerLambda;
     }
 }

@@ -4,6 +4,7 @@ export interface ShiplistEstimate {
     readonly event_type: string
     readonly event_time: Date
     readonly event_source: string;
+    readonly ship_imo: string;
     readonly ship_name: string;
 }
 
@@ -12,6 +13,7 @@ const SELECT_BY_LOCODE = `
         pe.event_type,
         pe.event_time,
         pe.event_source,
+        v.imo ship_imo,
         COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name
     FROM portcall_estimate pe
     LEFT JOIN vessel v on v.imo = pe.ship_imo

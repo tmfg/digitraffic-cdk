@@ -52,3 +52,19 @@ export async function insertSubscription(item: DbSubscription): Promise<any> {
 
     return ddb.put(params).promise();
 }
+
+export async function updateNotifications(id: string, notifications: any): Promise<any> {
+    return ddb.update({
+        TableName: SUBSCRIPTIONS_TABLE_NAME,
+        Key: {
+            ID: id
+        },
+        UpdateExpression: "set ShipsToNotificate = :notificate",
+        ExpressionAttributeValues: {
+            ":notificate": notifications
+        }
+    }, (err: any, data: any) => {
+        if (err) console.info(err, err.stack); // an error occurred
+        else console.info(data);
+    }).promise();
+}

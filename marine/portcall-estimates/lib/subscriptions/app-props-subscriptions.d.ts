@@ -1,5 +1,3 @@
-import {Duration} from "@aws-cdk/core";
-
 export interface Props {
     vpcId: string;
     privateSubnetIds: string[];
@@ -9,7 +7,8 @@ export interface Props {
     defaultLambdaDurationSeconds: number;
     logsDestinationArn: string;
     sqsProcessLambdaConcurrentExecutions: number;
-    shiplistSnsTopicArn: string,
+    shiplistSnsTopicArn: string;
+    estimateUpdatedTopicArn: string;
     pinpointApplicationId: string;
     pinpointTelephoneNumber: string;
 }
