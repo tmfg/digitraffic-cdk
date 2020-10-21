@@ -103,7 +103,7 @@ interface OAuthTokenResponse {
     readonly expires_in: number
 }
 
-interface ShipETA {
+export interface ShipETA {
     readonly locode: string
     readonly mmsi: number
     readonly imo: number
