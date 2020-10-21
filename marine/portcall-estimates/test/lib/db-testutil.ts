@@ -55,15 +55,15 @@ async function truncateDynamoDb(ddb: DocumentClient) {
     ));
 }
 
-export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {
+export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<any> {
     return db.tx(t => {
-       return t.batch([
-           db.none('DELETE FROM portcall_estimate'),
-           db.none('DELETE FROM vessel'),
-           db.none('DELETE FROM vessel_location'),
-           db.none('DELETE FROM port_call'),
-           db.none('DELETE FROM port_area_details')
-       ]);
+        return Promise.all([
+            db.none('DELETE FROM portcall_estimate'),
+            db.none('DELETE FROM vessel'),
+            db.none('DELETE FROM vessel_location'),
+            db.none('DELETE FROM port_area_details'),
+            db.none('DELETE FROM port_call')
+        ]);
     });
 }
 

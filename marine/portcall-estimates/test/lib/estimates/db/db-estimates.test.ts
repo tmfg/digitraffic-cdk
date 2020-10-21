@@ -291,7 +291,6 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         await createPortnetAISDataForVesselInTransit(estimate2);
         await createPortnetAISDataForVesselInTransit(estimate3);
         await createPortnetAISDataForVesselInTransit(estimate4);
-        
 
         const foundEstimates = await findETAsByLocodes(db, [locode]);
 
