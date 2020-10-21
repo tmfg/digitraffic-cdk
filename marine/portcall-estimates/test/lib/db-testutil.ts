@@ -196,7 +196,6 @@ export function insertVesselLocation(db: pgPromise.IDatabase<any, any>, vl: Vess
 }
 
 export function insertPortAreaDetails(db: pgPromise.IDatabase<any, any>, p: PortAreaDetails) {
-    console.log('inserting portareadetails', p)
     return db.tx(t => {
         db.none(`
             INSERT INTO port_area_details(
@@ -213,7 +212,6 @@ export function insertPortAreaDetails(db: pgPromise.IDatabase<any, any>, p: Port
 }
 
 export function insertPortCall(db: pgPromise.IDatabase<any, any>, p: PortCall) {
-    console.log('inserting portcall', p)
     return db.tx(t => {
         db.none(`
             INSERT INTO port_call(
