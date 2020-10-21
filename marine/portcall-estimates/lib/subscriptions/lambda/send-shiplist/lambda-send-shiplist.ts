@@ -19,11 +19,13 @@ async function sendShipLists(subscriptions: any[]): Promise<any> {
         .map(async s => {
             console.log("handling subscription for " + s.Locode);
 
-            const shiplist = await ShiplistService.getShiplist(s.Locode);
+            const estimates = await ShiplistService.getEstimates(s.Locode);
 
-            console.log("shiplist " + shiplist);
-
-            return await SnsService.sendEmail(shiplist);
-            //return await PinpointService.sendShiplist(shiplist, s.PhoneNumber);
+            return Promise.all([
+                await SubscriptionsService.updateSubscriptionNotifications(s.ID, estimates),
+                await SnsService.sendEstimatesEmail(s.Locode, estimates)
+            ]);
+//            return await PinpointService.sendShiplist(shiplist, s.PhoneNumber);
         }));
 }
+

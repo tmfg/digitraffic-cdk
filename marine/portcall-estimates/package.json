@@ -58,7 +58,7 @@
     "pg-query-stream": "3.2.0",
     "source-map-support": "0.5.19",
     "ramda": "^0.27.1",
-    "uuid": "^8.3.0",
+    "uuid": "^8.3.1",
     "axios": "0.19.2"
   },
   "externals": [

@@ -4,14 +4,17 @@ export interface ShiplistEstimate {
     readonly event_type: string
     readonly event_time: Date
     readonly event_source: string;
+    readonly ship_imo: number;
     readonly ship_name: string;
 }
 
-const SELECT_BY_LOCODE = `
+const SELECT_IMO = '          AND v.imo = $2';
+const SELECT_BY_LOCODE_AND_IMO = `
     SELECT DISTINCT
         pe.event_type,
         pe.event_time,
         pe.event_source,
+        v.imo ship_imo,
         COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name
     FROM portcall_estimate pe
     LEFT JOIN vessel v on v.imo = pe.ship_imo
@@ -27,11 +30,25 @@ const SELECT_BY_LOCODE = `
                   THEN px.portcall_id = pe.portcall_id
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
                   END
-          ) AND
-          date_trunc('day', pe.event_time) = date_trunc('day', current_date) AND
-          pe.location_locode = $1
+          ) 
+          AND date_trunc('day', pe.event_time) = date_trunc('day', current_date) 
+          AND pe.location_locode = $1
+          IMO_CONDITION
     ORDER BY pe.event_time
 `;
+
+export function findByLocodeAndImo(
+    db: IDatabase<any, any>,
+    locode: string,
+    imo: number|null
+): Promise<ShiplistEstimate[]> {
+    const ps = new PreparedStatement({
+        name: 'find-shiplist-by-locode-and-imo',
+        text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, SELECT_IMO),
+        values: [locode, imo]
+    });
+    return db.tx(t => t.manyOrNone(ps));
+}
 
 export function findByLocode(
     db: IDatabase<any, any>,
@@ -39,7 +56,7 @@ export function findByLocode(
 ): Promise<ShiplistEstimate[]> {
     const ps = new PreparedStatement({
         name: 'find-shiplist-by-locode',
-        text: SELECT_BY_LOCODE,
+        text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, ''),
         values: [locode]
     });
     return db.tx(t => t.manyOrNone(ps));
