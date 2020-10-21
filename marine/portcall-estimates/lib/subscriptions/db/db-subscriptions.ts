@@ -9,6 +9,7 @@ export const _ddb: DocumentClient = ddb;
 export const SUBSCRIPTIONS_TABLE_NAME = "PortcallEstimates.Subscriptions";
 export const SUBSCRIPTIONS_PHONENUMBER_IDX_NAME = 'PortcallEstimateSubscriptions_PhoneNumber_Idx';
 export const SUBSCRIPTIONS_TIME_IDX_NAME = 'PortcallEstimateSubscriptions_Time_Idx';
+export const SUBSCRIPTIONS_LOCODE_IDX_NAME = 'PortcallEstimateSubscriptions_Locode_Idx';
 export const SUBSCRIPTION_ID_ATTRIBUTE = "ID";
 
 export interface DbSubscription {
@@ -17,6 +18,18 @@ export interface DbSubscription {
     readonly Locode: string
     readonly Time: string
     readonly Type: string
+    readonly ShipsToNotificate?: any
+}
+
+export async function listSubscriptionsForLocode(locode: string): Promise<any> {
+    return await ddb.query({
+        TableName: SUBSCRIPTIONS_TABLE_NAME,
+        IndexName: SUBSCRIPTIONS_LOCODE_IDX_NAME,
+        ExpressionAttributeValues: {
+            ":Locode": locode
+        },
+        KeyConditionExpression: 'Locode = :Locode'
+    }).promise();
 }
 
 export async function listSubscriptionsForTime(time: string): Promise<any> {

@@ -12,7 +12,7 @@ import {Rule, Schedule} from '@aws-cdk/aws-events';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {AttributeType, Table} from '@aws-cdk/aws-dynamodb';
 import {
-    SUBSCRIPTION_ID_ATTRIBUTE,
+    SUBSCRIPTION_ID_ATTRIBUTE, SUBSCRIPTIONS_LOCODE_IDX_NAME,
     SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
     SUBSCRIPTIONS_TABLE_NAME, SUBSCRIPTIONS_TIME_IDX_NAME
 } from "./db/db-subscriptions";
@@ -32,7 +32,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
         const sendShiplistLambda = this.createSendShiplistLambda(vpc, lambdaDbSg, appProps);
         const smsHandlerLambda = this.createSmsHandlerLambda(incomingSmsTopic, appProps);
-        const estamationHandlerLambda = this.createEstimationHandlerLambda(appProps)
+        const estamationHandlerLambda = this.createEstimationHandlerLambda(vpc, lambdaDbSg, appProps)
 
         // grant publish to topic to lambda
         Topic.fromTopicArn(this, "ShiplistTopic", appProps.shiplistSnsTopicArn).grantPublish(sendShiplistLambda);
@@ -70,6 +70,10 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         table.addGlobalSecondaryIndex({
             indexName: SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
             partitionKey: { name: 'PhoneNumber', type: AttributeType.STRING }
+        });
+        table.addGlobalSecondaryIndex({
+            indexName: SUBSCRIPTIONS_LOCODE_IDX_NAME,
+            partitionKey: { name: 'Locode', type: AttributeType.STRING }
         });
 
         return table;
@@ -154,7 +158,7 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         return smsHandlerLambda;
     }
 
-    private createEstimationHandlerLambda(props: Props): Function {
+    private createEstimationHandlerLambda(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: Props): Function {
         const functionName = 'PortcallEstimatesUpdated';
         const estimateHandlerLambda = new Function(this, functionName, {
             functionName,
@@ -164,7 +168,15 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             memorySize: 256,
             timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
             logRetention: RetentionDays.ONE_YEAR,
+            vpc: vpc,
+            vpcSubnets: {
+                subnets: vpc.privateSubnets
+            },
+            securityGroup: lambdaDbSg,
             environment: {
+                DB_USER: props.dbProps.username,
+                DB_PASS: props.dbProps.password,
+                DB_URI: props.dbProps.ro_uri
 //                PINPOINT_ID: props.pinpointApplicationId,
 //                PINPOINT_NUMBER: props.pinpointTelephoneNumber
             }
