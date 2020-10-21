@@ -4,6 +4,7 @@ import {ApiEstimate} from "../../lib/estimates/model/estimate";
 import {createUpdateValues, DbEstimate} from "../../lib/estimates/db/db-estimates";
 import {DocumentClient} from "aws-sdk/clients/dynamodb";
 import {SUBSCRIPTIONS_TABLE_NAME} from "../../lib/subscriptions/db/db-subscriptions";
+import {PortAreaDetails, PortCall, Vessel, VesselLocation} from "./testdata";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
@@ -58,6 +59,10 @@ export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null>
     return db.tx(t => {
        return t.batch([
            db.none('DELETE FROM portcall_estimate'),
+           db.none('DELETE FROM vessel'),
+           db.none('DELETE FROM vessel_location'),
+           db.none('DELETE FROM port_call'),
+           db.none('DELETE FROM port_area_details')
        ]);
     });
 }
@@ -115,5 +120,113 @@ export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate
                 )
             `, createUpdateValues(e));
         }));
+    });
+}
+
+export function insertVessel(db: pgPromise.IDatabase<any, any>, vessel: Vessel) {
+    return db.tx(t => {
+        db.none(`
+            INSERT INTO vessel(
+                mmsi,
+                timestamp,
+                name,
+                ship_type,
+                reference_point_a,
+                reference_point_b,
+                reference_point_c,
+                reference_point_d,
+                pos_type,
+                draught,
+                imo,
+                eta,
+                call_sign,
+                destination
+            ) VALUES (
+                $(mmsi),
+                $(timestamp),
+                $(name),
+                $(ship_type),
+                $(reference_point_a),
+                $(reference_point_b),
+                $(reference_point_c),
+                $(reference_point_d),
+                $(pos_type),
+                $(draught),
+                $(imo),
+                $(eta),
+                $(call_sign),
+                $(destination)
+            )
+        `, vessel);
+    });
+}
+
+export function insertVesselLocation(db: pgPromise.IDatabase<any, any>, vl: VesselLocation) {
+    return db.tx(t => {
+        db.none(`
+            INSERT INTO vessel_location(
+                mmsi,
+                timestamp_ext,
+                x,
+                y,
+                sog,
+                cog,
+                nav_stat,
+                rot,
+                pos_acc,
+                raim,
+                timestamp,
+                heading
+            ) VALUES (
+                $(mmsi),
+                $(timestamp_ext),
+                $(x),
+                $(y),
+                $(sog),
+                $(cog),
+                $(nav_stat),
+                $(rot),
+                $(pos_acc),
+                $(raim),
+                $(timestamp),
+                $(heading)
+            )
+        `, vl);
+    });
+}
+
+export function insertPortAreaDetails(db: pgPromise.IDatabase<any, any>, p: PortAreaDetails) {
+    console.log('inserting portareadetails', p)
+    return db.tx(t => {
+        db.none(`
+            INSERT INTO port_area_details(
+                port_area_details_id,
+                port_call_id,
+                ata
+            ) VALUES (
+                $(port_area_details_id),
+                $(port_call_id),
+                $(ata)
+            )
+        `, p);
+    });
+}
+
+export function insertPortCall(db: pgPromise.IDatabase<any, any>, p: PortCall) {
+    console.log('inserting portcall', p)
+    return db.tx(t => {
+        db.none(`
+            INSERT INTO port_call(
+                port_call_id,
+                radio_call_sign,
+                radio_call_sign_type,
+                vessel_name
+            ) VALUES (
+                $(port_call_id),
+                $(radio_call_sign),
+                $(radio_call_sign_type),
+                $(vessel_name)
+            )
+        `, p);
     });
 }

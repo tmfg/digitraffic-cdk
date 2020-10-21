@@ -104,6 +104,9 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
         pe.ship_imo AS imo, 
         pe.location_locode AS locode
     FROM portcall_estimate pe
+    JOIN port_area_details pad on pad.port_call_id = pe.portcall_id
+    JOIN vessel v ON v.imo = pe.ship_imo
+    JOIN vessel_location vl ON vl.mmsi = (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM vessel WHERE imo = v.imo)
     WHERE pe.record_time =
           (
               SELECT MAX(px.record_time) FROM portcall_estimate px
@@ -116,12 +119,14 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
                   END
           ) AND
-          pe.event_time > NOW() AND
           pe.event_time < CURRENT_DATE + INTERVAL '1 DAY' AND
           pe.event_type = 'ETA' AND
           pe.event_source = 'Portnet' AND
-          pe.location_locode IN ($1:list)
+          pe.location_locode IN ($1:list) AND
+          pad.ata IS NULL AND
+          vl.nav_stat NOT IN (1, 5, 6)
 `;
+// 1 = at anchor, 5 = moored, 6 = aground
 
 const SELECT_BY_MMSI = `
     SELECT DISTINCT
