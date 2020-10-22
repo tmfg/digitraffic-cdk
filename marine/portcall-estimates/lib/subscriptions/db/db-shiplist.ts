@@ -6,16 +6,18 @@ export interface ShiplistEstimate {
     readonly event_source: string;
     readonly ship_imo: number;
     readonly ship_name: string;
+    readonly portcall_id: number;
 }
 
-const SELECT_IMO = '          AND v.imo = $2';
+const SELECT_IMO = '          AND v.imo = $3';
 const SELECT_BY_LOCODE_AND_IMO = `
     SELECT DISTINCT
         pe.event_type,
         pe.event_time,
         pe.event_source,
         v.imo ship_imo,
-        COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name
+        COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name,
+        pe.portcall_id
     FROM portcall_estimate pe
     LEFT JOIN vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM vessel WHERE imo = v.imo)
     LEFT JOIN port_call pc on pc.imo_lloyds = pe.ship_imo
@@ -31,7 +33,7 @@ const SELECT_BY_LOCODE_AND_IMO = `
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
                   END
           ) 
-          AND date_trunc('day', pe.event_time) = date_trunc('day', current_date) 
+          AND (pe.event_time between $2 and ($2 + interval '1 day')) 
           AND pe.location_locode = $1
           IMO_CONDITION
     ORDER BY pe.event_time
@@ -39,25 +41,31 @@ const SELECT_BY_LOCODE_AND_IMO = `
 
 export function findByLocodeAndImo(
     db: IDatabase<any, any>,
+    startTime: Date,
     locode: string,
     imo: number|null
 ): Promise<ShiplistEstimate[]> {
+    console.info("findByLocodeAndImo %s %d %s", locode, imo, startTime);
+
     const ps = new PreparedStatement({
         name: 'find-shiplist-by-locode-and-imo',
         text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, SELECT_IMO),
-        values: [locode, imo]
+        values: [locode, startTime, imo]
     });
     return db.tx(t => t.manyOrNone(ps));
 }
 
 export function findByLocode(
     db: IDatabase<any, any>,
+    startTime: Date,
     locode: string
 ): Promise<ShiplistEstimate[]> {
+    console.info("findByLocode %s", startTime);
+
     const ps = new PreparedStatement({
         name: 'find-shiplist-by-locode',
         text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, ''),
-        values: [locode]
+        values: [locode, startTime]
     });
     return db.tx(t => t.manyOrNone(ps));
 }

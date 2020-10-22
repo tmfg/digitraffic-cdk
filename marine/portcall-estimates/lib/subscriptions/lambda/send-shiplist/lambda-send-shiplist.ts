@@ -17,9 +17,7 @@ export async function handler() {
 async function sendShipLists(subscriptions: any[]): Promise<any> {
     return Promise.allSettled(subscriptions
         .map(async s => {
-            console.log("handling subscription for " + s.Locode);
-
-            const estimates = await ShiplistService.getEstimates(s.Locode);
+            const estimates = await ShiplistService.getEstimates(s.Time, s.Locode);
 
             return Promise.all([
                 await SubscriptionsService.updateSubscriptionNotifications(s.ID, estimates),

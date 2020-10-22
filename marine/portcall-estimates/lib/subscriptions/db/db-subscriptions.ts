@@ -76,8 +76,5 @@ export async function updateNotifications(id: string, notifications: any): Promi
         ExpressionAttributeValues: {
             ":notificate": notifications
         }
-    }, (err: any, data: any) => {
-        if (err) console.info(err, err.stack); // an error occurred
-        else console.info(data);
     }).promise();
 }

@@ -1,16 +1,17 @@
 import {EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
-import moment, {Moment} from 'moment';
+import moment from 'moment-timezone';
 import {IDatabase} from "pg-promise";
 
 const { v4: uuidv4 } = require('uuid');
 import * as PinpointService from "./pinpoint";
 import * as SubscriptionDB from '../db/db-subscriptions';
 import {sendOKMessage} from "./pinpoint";
-import {DbSubscription} from "../db/db-subscriptions";
+import {DbSubscription, updateNotifications} from "../db/db-subscriptions";
 import * as ShiplistDb from "../db/db-shiplist";
 import {inDatabase} from "../../../../../common/postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {SubscriptionLocale} from "../smsutils";
+import {getStartTime} from "../timeutil";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
@@ -53,64 +54,79 @@ export async function listSubscriptions(time: string): Promise<any> {
 }
 
 export async function updateSubscriptionNotifications(id: string, estimates: ShiplistEstimate[]): Promise<any> {
-    const notifications = createNotifications(estimates);
+    const notification = {};
 
-    console.info("got list %s to notifications %s", JSON.stringify(estimates), JSON.stringify(notifications));
+    updateEstimates(notification, estimates);
 
-    return await SubscriptionDB.updateNotifications(id, notifications);
-}
+//    console.info("got list %s to notifications %s", JSON.stringify(estimates), JSON.stringify(notification));
 
-function createNotifications(estimates: ShiplistEstimate[]): any {
-    const notificationMap = {} as any;
-    const currentDate = moment().toISOString();
-
-    estimates.forEach(e => {
-        const ship = notificationMap[e.ship_imo] || {};
-
-        ship[e.event_type] = {
-            'Sent' : currentDate
-        }
-
-        ship[e.event_type][e.event_source] = moment(e.event_time).toISOString();
-
-        notificationMap[e.ship_imo] = ship;
-    });
-
-    return notificationMap;
+    return await SubscriptionDB.updateNotifications(id, notification);
 }
 
 export function updateSubscriptionEstimates(imo: number, locode: string) {
-    console.info("new estimate for %s on %s", imo, locode);
-
     SubscriptionDB.listSubscriptionsForLocode(locode).then(subscriptions => {
-        console.info("got subscriptions %d", subscriptions.Items.length);
-
         subscriptions.Items.forEach((s: DbSubscription) => {
-            updateSubscription(locode, imo, s);
+            updateSubscription(imo, s);
         });
     }).finally(() => {
         console.info("updateSubscriptionEstimates final!");
     });
 }
 
-function updateSubscription(locode: string, imo: number, s: DbSubscription) {
-    console.info("moikkamoi3!");
+function updateSubscription(imo: number, s: DbSubscription) {
+    const startTime = getStartTime(s.Time);
 
     inDatabase(async (db: IDatabase<any, any>) => {
-        return await ShiplistDb.findByLocodeAndImo(db, locode, imo);
+        return await ShiplistDb.findByLocodeAndImo(db, startTime, s.Locode, imo);
     }).then(estimates => {
         console.info("got estimates %s", JSON.stringify(estimates));
 
-        if (s.ShipsToNotificate == null) {
-            console.info("subscription %s has no notifications", s.ID);
-        } else {
-            console.info("notifications %s", JSON.stringify(s.ShipsToNotificate));
+        if (estimates.length > 0 && s.ShipsToNotificate != null) {
+            updateEstimates(s.ShipsToNotificate, estimates);
 
-            const imoNotification = s.ShipsToNotificate[imo.toString()];
-
-            console.info("notification to update %s", JSON.stringify(imoNotification));
+            sendSmsNotications(s.ShipsToNotificate);
+            SubscriptionDB.updateNotifications(s.ID, s.ShipsToNotificate).then(_ => {
+                console.info("notifications updated");
+            });
         }
     }).finally(() => {
        console.info("updateSubscriptions final!");
+    });
+}
+
+function sendSmsNotications(notification: any) {
+    Object.keys(notification)?.forEach((portcall_id: string) => {
+        Object.keys(notification[portcall_id])?.forEach((eventType: string) => {
+            const data = notification[portcall_id][eventType];
+
+            const portnet = data.Portnet ? moment(data.Portnet) : null;
+            const vts = data.VTS ? moment(data.VTS) : null;
+            const sent = moment(data.Sent);
+
+            console.info("ship %s event %s portnet %s vts %s sent %s", portcall_id, eventType, portnet, vts, sent);
+
+            const bestEstimate = vts || portnet;
+            const difference = moment.duration(sent.diff(bestEstimate));
+
+            console.info("difference is %s", difference);
+        });
+    });
+}
+
+function updateEstimates(notification: any, estimates: ShiplistEstimate[]) {
+    console.info("new estimates %s", JSON.stringify(estimates));
+    console.info("notification to update %s", JSON.stringify(notification));
+
+    estimates.filter(e => {
+        return e.portcall_id != null
+    }).forEach(e => {
+        const ship = notification[e.portcall_id] || {};
+        const event = ship[e.event_type] || {};
+
+        event[e.event_source] = moment(e.event_time).toISOString();
+        event.Sent = event.Sent || event.VTS || event.Portnet;
+
+        ship[e.event_type] = event;
+        notification[e.portcall_id] = ship;
     });
 }

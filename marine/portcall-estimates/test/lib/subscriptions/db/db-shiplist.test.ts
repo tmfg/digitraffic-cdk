@@ -11,13 +11,13 @@ const LOCODE_HELSINKI = "FIHEL";
 
 describe('shiplists', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     async function assertFindByLocode(locode: string, count: number) {
-        const subs = await ShiplistDAO.findByLocode(db, locode);
+        const subs = await ShiplistDAO.findByLocode(db, new Date(), locode);
 
         expect(subs.length).toBe(count);
     }
 
     async function assertFindByLocodeAndImo(locode: string, imo: number, count: number) {
-        const subs = await ShiplistDAO.findByLocodeAndImo(db, locode, imo);
+        const subs = await ShiplistDAO.findByLocodeAndImo(db, new Date(), locode, imo);
 
         expect(subs.length).toBe(count);
     }
