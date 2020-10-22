@@ -1,8 +1,8 @@
 import {SnsSubscriptionEvent} from '../../model/subscription';
-import {addSubscription, sendSubscriptionList} from '../../service/subscriptions';
+import {addSubscription, removeSubscription, sendSubscriptionList} from '../../service/subscriptions';
 import {
     parseOperation,
-    parseSnsSubscriptionEvent,
+    parseSnsSubscriptionEvent, parseSnsSubscriptionRemovalEvent,
     SubscriptionLocaleOperation,
     SubscriptionOperation
 } from '../../smsutils';
@@ -24,8 +24,11 @@ export async function handleSms(locop: SubscriptionLocaleOperation, event: SnsSu
         case SubscriptionOperation.HELP:
             return await sendHelpMessage(event.originationNumber, locop.locale);
         case SubscriptionOperation.REMOVE:
-            // TODO
-            break;
+            const snsSubscriptionRemoval = parseSnsSubscriptionRemovalEvent(event);
+            if(!snsSubscriptionRemoval) {
+                return await sendHelpMessage(event.originationNumber, locop.locale);
+            }
+            return await removeSubscription(snsSubscriptionRemoval, locop.locale);
         case SubscriptionOperation.LIST:
             return await sendSubscriptionList(event.originationNumber);
         case SubscriptionOperation.SUBSCRIBE:

@@ -1,4 +1,4 @@
-import {EstimateSubscription, SnsSubscriptionEvent} from './model/subscription';
+import {EstimateRemoval, EstimateSubscription, SnsSubscriptionEvent} from './model/subscription';
 
 export enum SubscriptionLocale {
     FINNISH, ENGLISH
@@ -78,5 +78,19 @@ export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): Estimate
         phoneNumber: event.originationNumber,
         locode: parts[1].toLowerCase(),
         time: parts[2]
+    };
+}
+
+export function parseSnsSubscriptionRemovalEvent(event: SnsSubscriptionEvent): EstimateRemoval | null {
+    const parts = event.messageBody.split(' ');
+
+    if (parts.length < 2) {
+        console.error(`method=parseSnsSubscriptionRemovalEvent Invalid message ${event.messageBody}`);
+        return null;
+    }
+
+    return {
+        phoneNumber: event.originationNumber,
+        locode: parts[1].toLowerCase()
     };
 }

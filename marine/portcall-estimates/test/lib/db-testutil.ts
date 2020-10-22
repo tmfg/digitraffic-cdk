@@ -49,7 +49,8 @@ async function truncateDynamoDb(ddb: DocumentClient) {
         ddb.delete({
             TableName: SUBSCRIPTIONS_TABLE_NAME,
             Key: {
-                ID: s.ID
+                PhoneNumber: s.PhoneNumber,
+                Locode: s.Locode
             }
         }).promise()
     ));

@@ -1,14 +1,12 @@
-import {EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
+import {EstimateRemoval, EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
 import moment from 'moment-timezone';
 import {IDatabase} from "pg-promise";
-
-const { v4: uuidv4 } = require('uuid');
 import * as PinpointService from "./pinpoint";
 import * as SubscriptionDB from '../db/db-subscriptions';
-import {sendOKMessage} from "./pinpoint";
-import {DbSubscription, updateNotifications} from "../db/db-subscriptions";
+import {sendSubscriptionOKMessage, sendRemovalOKMessage} from "./pinpoint";
+import {DbSubscription} from "../db/db-subscriptions";
 import * as ShiplistDb from "../db/db-shiplist";
-import {inDatabase} from "../../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-lambda-postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {SubscriptionLocale} from "../smsutils";
 import {getStartTime} from "../timeutil";
@@ -26,18 +24,27 @@ export async function addSubscription(
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
         await SubscriptionDB.insertSubscription({
-            ID: uuidv4(),
             Time: moment(subscription.time, TIME_FORMAT, true).format(DYNAMODB_TIME_FORMAT),
             Type: SubscriptionType.VESSEL_LIST,
             Locode: subscription.locode.toUpperCase(),
             PhoneNumber: subscription.phoneNumber
         });
 
-        await sendOKMessage(subscription.phoneNumber, locale);
+        await sendSubscriptionOKMessage(subscription.phoneNumber, locale);
     } else {
         await PinpointService.sendValidationFailedMessage(subscription.phoneNumber, locale);
         console.error('Invalid subscription');
     }
+}
+
+export async function removeSubscription(
+    removal: EstimateRemoval,
+    locale: SubscriptionLocale) {
+
+    console.log(`Removing subscription for LOCODE ${removal.locode}`);
+
+    await SubscriptionDB.removeSubscription(removal.phoneNumber, removal.locode);
+    await sendRemovalOKMessage(removal.phoneNumber, locale);
 }
 
 export async function sendSubscriptionList(destinationNumber: string) {
@@ -53,14 +60,18 @@ export async function listSubscriptions(time: string): Promise<any> {
     return value.Items;
 }
 
-export async function updateSubscriptionNotifications(id: string, estimates: ShiplistEstimate[]): Promise<any> {
+export async function updateSubscriptionNotifications(
+    phoneNumber: string,
+    locode: string,
+    estimates: ShiplistEstimate[]): Promise<any> {
+
     const notification = {};
 
     updateEstimates(notification, estimates);
 
 //    console.info("got list %s to notifications %s", JSON.stringify(estimates), JSON.stringify(notification));
 
-    return await SubscriptionDB.updateNotifications(id, notification);
+    return await SubscriptionDB.updateNotifications(phoneNumber, locode, notification);
 }
 
 export function updateSubscriptionEstimates(imo: number, locode: string) {
@@ -85,7 +96,7 @@ function updateSubscription(imo: number, s: DbSubscription) {
             updateEstimates(s.ShipsToNotificate, estimates);
 
             sendSmsNotications(s.ShipsToNotificate);
-            SubscriptionDB.updateNotifications(s.ID, s.ShipsToNotificate).then(_ => {
+            SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, s.ShipsToNotificate).then(_ => {
                 console.info("notifications updated");
             });
         }

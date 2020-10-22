@@ -12,6 +12,9 @@ const MESSAGE_HELP_EN = 'Subscribe by sending a message SUBSCRIBE LOCODE TIME, e
 const MESSAGE_SUBSCRIPTION_OK_FI = 'Tilaus vastaanotettu.';
 const MESSAGE_SUBSCRIPTION_OK_EN = 'Subscription received.';
 
+const MESSAGE_REMOVAL_OK_FI = 'Tilaus poistettu.';
+const MESSAGE_REMOVAL_OK_EN = 'Subscription removed.';
+
 const MESSAGE_VALIDATION_FAILED_FI = 'Odottamaton virhe!';
 const MESSAGE_VALIDATION_FAILED_EN = 'An unexpected error has occurred!';
 
@@ -48,11 +51,19 @@ export async function sendHelpMessage(
         destinationNumber);
 }
 
-export async function sendOKMessage(
+export async function sendSubscriptionOKMessage(
     destinationNumber: string,
     locale: SubscriptionLocale): Promise<any> {
     return await sendSmsMessage(
         locale == SubscriptionLocale.FINNISH ? MESSAGE_SUBSCRIPTION_OK_FI : MESSAGE_SUBSCRIPTION_OK_EN,
+        destinationNumber);
+}
+
+export async function sendRemovalOKMessage(
+    destinationNumber: string,
+    locale: SubscriptionLocale): Promise<any> {
+    return await sendSmsMessage(
+        locale == SubscriptionLocale.FINNISH ? MESSAGE_REMOVAL_OK_FI : MESSAGE_REMOVAL_OK_EN,
         destinationNumber);
 }
 

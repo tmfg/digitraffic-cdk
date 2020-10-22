@@ -20,7 +20,7 @@ async function sendShipLists(subscriptions: any[]): Promise<any> {
             const estimates = await ShiplistService.getEstimates(s.Time, s.Locode);
 
             return Promise.all([
-                await SubscriptionsService.updateSubscriptionNotifications(s.ID, estimates),
+                await SubscriptionsService.updateSubscriptionNotifications(s.PhoneNumber, s.Locode, estimates),
                 await SnsService.sendEstimatesEmail(s.Locode, estimates)
             ]);
 //            return await PinpointService.sendShiplist(shiplist, s.PhoneNumber);

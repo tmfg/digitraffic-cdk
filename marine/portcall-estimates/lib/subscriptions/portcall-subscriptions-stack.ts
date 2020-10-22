@@ -1,5 +1,5 @@
 import {Construct, Duration, Stack, StackProps} from '@aws-cdk/core';
-import {SecurityGroup, ISecurityGroup, Vpc, IVpc} from '@aws-cdk/aws-ec2';
+import {ISecurityGroup, IVpc, SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
 import {Props} from './app-props-subscriptions';
 import * as PublicApi from './public-api';
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
@@ -12,9 +12,11 @@ import {Rule, Schedule} from '@aws-cdk/aws-events';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {AttributeType, Table} from '@aws-cdk/aws-dynamodb';
 import {
-    SUBSCRIPTION_ID_ATTRIBUTE, SUBSCRIPTIONS_LOCODE_IDX_NAME,
-    SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
-    SUBSCRIPTIONS_TABLE_NAME, SUBSCRIPTIONS_TIME_IDX_NAME
+    SUBSCRIPTION_LOCODE_ATTRIBUTE,
+    SUBSCRIPTION_PHONENUMBER_ATTRIBUTE,
+    SUBSCRIPTIONS_TABLE_NAME,
+    SUBSCRIPTIONS_TIME_IDX_NAME,
+    SUBSCRIPTIONS_LOCODE_IDX_NAME
 } from "./db/db-subscriptions";
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
@@ -58,7 +60,8 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
 
     private createSubscriptionTable() {
         const table = new Table(this, 'subscription-table', {
-            partitionKey: { name: SUBSCRIPTION_ID_ATTRIBUTE, type: AttributeType.STRING},
+            partitionKey: { name: SUBSCRIPTION_PHONENUMBER_ATTRIBUTE, type: AttributeType.STRING},
+            sortKey: { name: SUBSCRIPTION_LOCODE_ATTRIBUTE, type: AttributeType.STRING },
             tableName: SUBSCRIPTIONS_TABLE_NAME,
             readCapacity: 1,
             writeCapacity: 1
@@ -68,14 +71,9 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             partitionKey: { name: 'Time', type: AttributeType.STRING }
         });
         table.addGlobalSecondaryIndex({
-            indexName: SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
-            partitionKey: { name: 'PhoneNumber', type: AttributeType.STRING }
-        });
-        table.addGlobalSecondaryIndex({
             indexName: SUBSCRIPTIONS_LOCODE_IDX_NAME,
             partitionKey: { name: 'Locode', type: AttributeType.STRING }
         });
-
         return table;
     }
 

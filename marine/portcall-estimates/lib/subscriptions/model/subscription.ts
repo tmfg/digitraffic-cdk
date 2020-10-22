@@ -1,9 +1,15 @@
 import moment, {Moment} from 'moment';
+import {SubscriptionLocale} from "../smsutils";
 
 export interface EstimateSubscription {
     readonly phoneNumber: string
     readonly locode: string
     readonly time: string
+}
+
+export interface EstimateRemoval {
+    readonly phoneNumber: string
+    readonly locode: string
 }
 
 export interface SnsSubscriptionEvent {

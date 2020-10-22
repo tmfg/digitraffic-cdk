@@ -45,7 +45,6 @@ export function newEstimate(props?: {
 
 export function newSubscription(): DbSubscription {
     return {
-        ID: uuidv4(),
         Time: moment(new Date(+(new Date()) - Math.floor(Math.random()*10000000000))).format(DYNAMODB_TIME_FORMAT),
         Type: SubscriptionType.VESSEL_LIST,
         Locode: 'FIHKI',

@@ -7,13 +7,12 @@ const ddb = getDocumentClient();
 export const _ddb: DocumentClient = ddb;
 
 export const SUBSCRIPTIONS_TABLE_NAME = "PortcallEstimates.Subscriptions";
-export const SUBSCRIPTIONS_PHONENUMBER_IDX_NAME = 'PortcallEstimateSubscriptions_PhoneNumber_Idx';
 export const SUBSCRIPTIONS_TIME_IDX_NAME = 'PortcallEstimateSubscriptions_Time_Idx';
 export const SUBSCRIPTIONS_LOCODE_IDX_NAME = 'PortcallEstimateSubscriptions_Locode_Idx';
-export const SUBSCRIPTION_ID_ATTRIBUTE = "ID";
+export const SUBSCRIPTION_PHONENUMBER_ATTRIBUTE = "PhoneNumber";
+export const SUBSCRIPTION_LOCODE_ATTRIBUTE = "Locode";
 
 export interface DbSubscription {
-    readonly ID: string
     readonly PhoneNumber: string
     readonly Locode: string
     readonly Time: string
@@ -49,7 +48,6 @@ export async function listSubscriptionsForTime(time: string): Promise<any> {
 export async function getSubscriptionList(destinationNumber: string): Promise<any> {
     return await ddb.query({
         TableName: SUBSCRIPTIONS_TABLE_NAME,
-        IndexName: SUBSCRIPTIONS_PHONENUMBER_IDX_NAME,
         ExpressionAttributeValues: {
             ":PhoneNumber": destinationNumber
         },
@@ -66,15 +64,33 @@ export async function insertSubscription(item: DbSubscription): Promise<any> {
     return ddb.put(params).promise();
 }
 
-export async function updateNotifications(id: string, notifications: any): Promise<any> {
+export async function updateNotifications(
+    phoneNumber: string,
+    locode: string,
+    notifications: any): Promise<any> {
+
     return ddb.update({
         TableName: SUBSCRIPTIONS_TABLE_NAME,
         Key: {
-            ID: id
+            PhoneNumber: phoneNumber,
+            Locode: locode
         },
         UpdateExpression: "set ShipsToNotificate = :notificate",
         ExpressionAttributeValues: {
             ":notificate": notifications
+        }
+    }).promise();
+}
+
+export async function removeSubscription(
+    phoneNumber: string,
+    locode: string): Promise<any> {
+
+    return ddb.delete({
+        TableName: SUBSCRIPTIONS_TABLE_NAME,
+        Key: {
+            PhoneNumber: phoneNumber,
+            Locode: locode
         }
     }).promise();
 }
