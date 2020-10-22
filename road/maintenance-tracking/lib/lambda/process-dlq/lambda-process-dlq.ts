@@ -8,7 +8,7 @@ export const handler = async (event: any): Promise<any> => {
 
     console.info(`method=handleMaintenanceTrackingDlq receivedCount=${event.Records.length}`);
     const uploads = event.Records.map((e: any, idx: number) =>
-        uploadToS3(bucketName, e.body, `maintenanceTracking-${iso}-${idx}.json`)
+        uploadToS3(bucketName, e.body, `${iso}-maintenanceTracking-${idx}.json`)
     );
     return Promise.all(uploads);
 };
