@@ -28,7 +28,7 @@ export function createIntegrationApi(
 {
     const integrationApi = createRestApi(stack,
         'MaintenanceTracking-Integration',
-        'Maintenance Tracking integration API');
+        'Maintenance Tracking Integration API');
 
 
     const tunnisteModel = addServiceModel("Tunniste", integrationApi, Tunniste);
