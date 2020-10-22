@@ -16,7 +16,7 @@ const SELECT_BY_LOCODE_DEBUG = `
         pe.event_source,
         COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name
     FROM portcall_estimate pe
-             LEFT JOIN vessel v on v.imo = pe.ship_imo
+             LEFT JOIN vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM vessel WHERE imo = v.imo)
              LEFT JOIN port_call pc on pc.imo_lloyds = pe.ship_imo
     WHERE pe.record_time =
           (
