@@ -10,6 +10,7 @@ import {DbSubscription} from "../db/db-subscriptions";
 import * as ShiplistDb from "../db/db-shiplist";
 import {inDatabase} from "../../../../../common/postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
+import {SubscriptionLocale} from "../smsutils";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
@@ -17,7 +18,10 @@ export enum SubscriptionType {
     VESSEL_LIST= "VESSEL_LIST"
 }
 
-export async function addSubscription(subscription: EstimateSubscription) {
+export async function addSubscription(
+    subscription: EstimateSubscription,
+    locale: SubscriptionLocale) {
+
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
         await SubscriptionDB.insertSubscription({
@@ -28,9 +32,9 @@ export async function addSubscription(subscription: EstimateSubscription) {
             PhoneNumber: subscription.phoneNumber
         });
 
-        await sendOKMessage(subscription.phoneNumber);
+        await sendOKMessage(subscription.phoneNumber, locale);
     } else {
-        await PinpointService.sendValidationFailedMessage(subscription.phoneNumber);
+        await PinpointService.sendValidationFailedMessage(subscription.phoneNumber, locale);
         console.error('Invalid subscription');
     }
 }

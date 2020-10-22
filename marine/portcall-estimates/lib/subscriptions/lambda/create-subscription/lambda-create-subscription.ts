@@ -1,6 +1,8 @@
 import {EstimateSubscription} from "../../model/subscription";
 import {addSubscription} from "../../service/subscriptions";
+import {SubscriptionLocale} from "../../smsutils";
 
 export async function handler(event: EstimateSubscription) {
-    return await addSubscription(event);
+    // currenly no way to detect locale here
+    return await addSubscription(event, SubscriptionLocale.ENGLISH);
 }
