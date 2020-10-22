@@ -3,19 +3,19 @@ import {handler} from "../../../../lib/lambda/get-subjects/lambda-get-subjects";
 import {update} from "../../../../lib/db/db-subjects";
 import {newSubject} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
-import {SubjectLocale} from "../../../../lib/model/subject";
+import {Locale} from "../../../../lib/model/locale";
 import {shuffle} from "../../../../../../common/js/js-utils";
 
 describe('lambda-get-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('no subjects', async () => {
-        const response = await handler({locale: SubjectLocale.ENGLISH});
+        const response = await handler({locale: Locale.ENGLISH});
 
         expect(response).toMatchObject([]);
     });
 
     test('default locale', async () => {
-        await update([newSubject(SubjectLocale.ENGLISH)], db);
+        await update([newSubject(Locale.ENGLISH)], db);
 
         const response = await handler({});
 
@@ -23,7 +23,7 @@ describe('lambda-get-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
     });
 
     test('some subjects', async () => {
-        const locale = shuffle([SubjectLocale.ENGLISH, SubjectLocale.FINNISH, SubjectLocale.SWEDISH])[0];
+        const locale = shuffle([Locale.ENGLISH, Locale.FINNISH, Locale.SWEDISH])[0];
         const subjects =
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newSubject(locale));
         await update(subjects, db);

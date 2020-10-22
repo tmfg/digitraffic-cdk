@@ -3,7 +3,7 @@ import {handler} from '../../../../lib/lambda/update-subjects/lambda-update-subj
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "../../../../../../common/test/httpserver";
 import {findAll} from "../../../../lib/db/db-subjects";
-import {SubjectLocale} from "../../../../lib/model/subject";
+import {Locale} from "../../../../lib/model/locale";
 
 const SERVER_PORT = 8090;
 
@@ -27,15 +27,15 @@ describe('update-subjects', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             const expectedId = 2;
             await handler();
 
-            const foundSubjectsFi = await findAll(SubjectLocale.FINNISH, db);
+            const foundSubjectsFi = await findAll(Locale.FINNISH, db);
             expect(foundSubjectsFi.length).toBe(1);
             expect(foundSubjectsFi[0].id).toBe(expectedId);
 
-            const foundSubjectsSv = await findAll(SubjectLocale.SWEDISH, db);
+            const foundSubjectsSv = await findAll(Locale.SWEDISH, db);
             expect(foundSubjectsSv.length).toBe(1);
             expect(foundSubjectsSv[0].id).toBe(expectedId);
 
-            const foundSubjectsEn = await findAll(SubjectLocale.ENGLISH, db);
+            const foundSubjectsEn = await findAll(Locale.ENGLISH, db);
             expect(foundSubjectsEn.length).toBe(1);
             expect(foundSubjectsEn[0].id).toBe(expectedId);
         } finally {

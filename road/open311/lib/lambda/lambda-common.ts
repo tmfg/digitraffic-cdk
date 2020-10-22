@@ -1,5 +1,5 @@
-import {SubjectLocale} from "../model/subject";
+import {Locale} from "../model/locale";
 
 export interface LocaleEvent {
-    locale?: SubjectLocale
+    locale?: Locale
 }

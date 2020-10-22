@@ -1,6 +1,6 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
-import {ServiceRequestState} from "../model/service-request-state";
-import {Subject, SubjectLocale} from "../model/subject";
+import {Subject} from "../model/subject";
+import {Locale} from "../model/locale";
 
 const DELETE_SUBJECTS_PS = new PreparedStatement({
     name: 'delete-subjects',
@@ -18,7 +18,7 @@ const SELECT_SUBJECTS_PS = new PreparedStatement({
 });
 
 export function findAll(
-    locale: SubjectLocale,
+    locale: Locale,
     db: IDatabase<any, any>
 ): Promise<Subject[]> {
     return db.manyOrNone(SELECT_SUBJECTS_PS, [locale]);

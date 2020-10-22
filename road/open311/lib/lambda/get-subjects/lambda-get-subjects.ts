@@ -1,7 +1,8 @@
 import {findAll} from "../../service/subjects";
-import {Subject, SubjectLocale} from "../../model/subject";
+import {Subject} from "../../model/subject";
 import {LocaleEvent} from "../lambda-common";
+import {Locale} from "../../model/locale";
 
 export const handler = async (event: LocaleEvent): Promise<Subject[]> => {
-    return await findAll(event.locale && event.locale.length ? event.locale : SubjectLocale.ENGLISH);
+    return await findAll(event.locale && event.locale.length ? event.locale : Locale.ENGLISH);
 };

@@ -1,4 +1,4 @@
-import {SubjectLocale} from '../model/subject';
+import {Locale} from '../model/locale';
 import {SubSubject} from '../model/subsubject';
 import {getXml} from './xmlapiutils';
 
@@ -6,7 +6,7 @@ export async function getSubSubjects(
     endpointUser: string,
     endpointPass: string,
     endpointUrl: string,
-    locale: SubjectLocale
+    locale: Locale
 ): Promise<SubSubject[]> {
     const parsedSubSubjects: SubSubjectsResponse = await getXml(endpointUser,
         endpointPass,
@@ -38,7 +38,7 @@ function responseToSubjects(response: SubSubjectsResponse): SubSubject[] {
         active: s.active[0],
         name: s.name[0],
         id: s.id[0],
-        locale: s.locale[0] as SubjectLocale,
+        locale: s.locale[0] as Locale,
         subject_id: s.subject_id[0]
     }));
 }

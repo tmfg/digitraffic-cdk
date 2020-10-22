@@ -3,19 +3,19 @@ import {handler} from "../../../../lib/lambda/get-subsubjects/lambda-get-subsubj
 import {update} from "../../../../lib/db/db-subsubjects";
 import {newSubSubject} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
-import {SubjectLocale} from "../../../../lib/model/subject";
+import {Locale} from "../../../../lib/model/locale";
 import {shuffle} from "../../../../../../common/js/js-utils";
 
 describe('lambda-get-subsubjects', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('no subsubjects', async () => {
-        const response = await handler({locale: SubjectLocale.ENGLISH});
+        const response = await handler({locale: Locale.ENGLISH});
 
         expect(response).toMatchObject([]);
     });
 
     test('default locale', async () => {
-        await update([newSubSubject(SubjectLocale.ENGLISH)], db);
+        await update([newSubSubject(Locale.ENGLISH)], db);
 
         const response = await handler({});
 
@@ -23,7 +23,7 @@ describe('lambda-get-subsubjects', dbTestBase((db: pgPromise.IDatabase<any,any>)
     });
 
     test('response format', async () => {
-        const locale = shuffle([SubjectLocale.ENGLISH, SubjectLocale.FINNISH, SubjectLocale.SWEDISH])[0];
+        const locale = shuffle([Locale.ENGLISH, Locale.FINNISH, Locale.SWEDISH])[0];
         const subSubject = newSubSubject(locale);
         await update([subSubject], db);
 

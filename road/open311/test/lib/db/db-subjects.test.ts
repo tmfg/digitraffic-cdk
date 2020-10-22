@@ -3,12 +3,12 @@ import {findAll, update} from "../../../lib/db/db-subjects";
 import {newSubject} from "../testdata";
 import {dbTestBase} from "../db-testutil";
 import {shuffle} from "../../../../../common/js/js-utils";
-import {SubjectLocale} from "../../../lib/model/subject";
+import {Locale} from "../../../lib/model/locale";
 
 describe('db-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('findAll', async () => {
-        const locale = shuffle([SubjectLocale.ENGLISH, SubjectLocale.FINNISH, SubjectLocale.SWEDISH])[0];
+        const locale = shuffle([Locale.ENGLISH, Locale.FINNISH, Locale.SWEDISH])[0];
         const subjects = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
             return newSubject(locale);
         });
@@ -20,7 +20,7 @@ describe('db-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('update - old subjects are cleared', async () => {
-        const locale = shuffle([SubjectLocale.ENGLISH, SubjectLocale.FINNISH, SubjectLocale.SWEDISH])[0];
+        const locale = shuffle([Locale.ENGLISH, Locale.FINNISH, Locale.SWEDISH])[0];
         const previousSubject = newSubject(locale);
         await update([previousSubject], db);
 

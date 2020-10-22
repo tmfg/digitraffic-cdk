@@ -2,10 +2,11 @@ import {ServiceRequestWithExtensionsDto, ServiceRequestStatus, ServiceRequestWit
 import {Service, ServiceType} from "../../lib/model/service";
 import {toServiceRequestWithExtensions} from "../../lib/service/requests";
 import {ServiceRequestState} from "../../lib/model/service-request-state";
-import {Subject, SubjectLocale} from "../../lib/model/subject";
+import {Subject} from "../../lib/model/subject";
 import {randomString} from "../../../../common/test/testutils";
 import {shuffle} from "../../../../common/js/js-utils";
 import {SubSubject} from "../../lib/model/subsubject";
+import {Locale} from "../../lib/model/locale";
 
 export function newService(): Service {
     return {
@@ -53,28 +54,29 @@ export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestS
     };
 }
 
-export function newState(): ServiceRequestState {
+export function newState(locale: Locale): ServiceRequestState {
     return {
-      key: Math.floor(Math.random() * 10000),
-      name: Math.random().toFixed(10).split('.')[1]
+        key: Math.floor(Math.random() * 1000),
+        name: Math.random().toFixed(10).split('.')[1],
+        locale
     };
 }
 
-export function newSubject(locale?: SubjectLocale): Subject {
+export function newSubject(locale?: Locale): Subject {
     return {
         active: Math.round(Math.random()),
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
-        locale: locale ?? shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0]
+        locale: locale ?? shuffle([Locale.FINNISH,Locale.SWEDISH,Locale.ENGLISH])[0]
     };
 }
 
-export function newSubSubject(locale?: SubjectLocale): SubSubject {
+export function newSubSubject(locale?: Locale): SubSubject {
     return {
         active: Math.round(Math.random()),
         name: randomString(),
         id: Math.floor(Math.random() * 10000),
-        locale: locale ?? shuffle([SubjectLocale.FINNISH,SubjectLocale.SWEDISH,SubjectLocale.ENGLISH])[0],
+        locale: locale ?? shuffle([Locale.FINNISH,Locale.SWEDISH,Locale.ENGLISH])[0],
         subject_id: Math.floor(Math.random() * 10000)
     };
 }

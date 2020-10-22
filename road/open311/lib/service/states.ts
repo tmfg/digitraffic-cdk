@@ -5,10 +5,11 @@ import {
 } from '../db/db-states';
 import {inDatabase} from "digitraffic-lambda-postgres/database";
 import {ServiceRequestState} from "../model/service-request-state";
+import {Locale} from "../model/locale";
 
-export async function findAll(): Promise<ServiceRequestState[]> {
+export async function findAll(locale: Locale): Promise<ServiceRequestState[]> {
     return inDatabase(async (db: IDatabase<any, any>) => {
-        return await dbFindAll(db);
+        return await dbFindAll(locale, db);
     });
 }
 
