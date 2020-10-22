@@ -22,7 +22,16 @@ export async function updateETAEstimates(
         ships,
         portAreaGeometries);
 
-    const estimates: ApiEstimate[] = etas.map(eta => ({
+    const etaToEstimateWithSource = etaToEstimate(endpointSource);
+    const estimates: ApiEstimate[] = etas.map(etaToEstimateWithSource);
+
+    await saveEstimates(estimates);
+    
+    return etas;
+}
+
+export function etaToEstimate(endpointSource: string): (eta: ShipETA) => ApiEstimate {
+    return (eta: ShipETA): ApiEstimate => ({
         eventType: EventType.ETA,
         eventTime: eta.eta,
         eventTimeConfidenceLower: null,
@@ -30,15 +39,12 @@ export async function updateETAEstimates(
         recordTime: new Date().toISOString(),
         source: endpointSource,
         ship: {
-            mmsi: eta.mmsi
+            mmsi: eta.mmsi,
+            imo: eta.imo
         },
         location: {
             port: eta.locode
         },
-        portcallId: null
-    }));
-
-    await saveEstimates(estimates);
-    
-    return etas;
+        portcallId: eta.portcall_id
+    });
 }

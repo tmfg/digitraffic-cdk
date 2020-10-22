@@ -92,7 +92,8 @@ async function getETA(
                 locode: portAreaGeometry!!.locode,
                 imo: ship.imo,
                 mmsi: props.vessel.mmsi,
-                eta: props.destination.eta
+                eta: props.destination.eta,
+                portcall_id: ship.portcall_id
             };
         });
 }
@@ -108,6 +109,7 @@ export interface ShipETA {
     readonly mmsi: number
     readonly imo: number
     readonly eta: string
+    readonly portcall_id: number
 }
 
 interface ETAResponse {

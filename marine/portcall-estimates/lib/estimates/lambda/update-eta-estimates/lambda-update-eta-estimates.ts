@@ -40,7 +40,8 @@ export const handler = async (): Promise<any> => {
             Message: JSON.stringify(etas.map(eta => ({
                 ship_mmsi: eta.mmsi,
                 ship_imo: eta.imo,
-                location_locode: eta.locode
+                location_locode: eta.locode,
+                portcall_id: eta.portcall_id
             }))),
             TopicArn: snsTopicArn
         }).promise();

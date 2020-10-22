@@ -23,6 +23,7 @@ export interface DbEstimate {
 export interface DbETAShip {
     readonly imo: number
     readonly locode: string
+    readonly portcall_id: number
 }
 
 const INSERT_ESTIMATE_SQL = `
@@ -102,7 +103,8 @@ const SELECT_BY_LOCODE = `
 const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
     SELECT DISTINCT
         pe.ship_imo AS imo, 
-        pe.location_locode AS locode
+        pe.location_locode AS locode,
+        pe.portcall_id
     FROM portcall_estimate pe
     JOIN port_area_details pad on pad.port_call_id = pe.portcall_id
     JOIN vessel v ON v.imo = pe.ship_imo
