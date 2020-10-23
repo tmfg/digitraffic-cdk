@@ -1,7 +1,8 @@
+import {IDatabase} from "pg-promise";
+
 import * as ShiplistDB from "../db/db-shiplist";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {inDatabase} from "digitraffic-lambda-postgres/database";
-import {IDatabase} from "pg-promise";
 import {getStartTime} from "../timeutil";
 
 export async function getEstimates(time: string, locode: string): Promise<ShiplistEstimate[]> {

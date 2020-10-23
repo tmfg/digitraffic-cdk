@@ -1,5 +1,6 @@
 import {Pinpoint} from 'aws-sdk';
 import {SubscriptionLocale} from "../smsutils";
+import moment from 'moment-timezone';
 
 const pinpoint = new Pinpoint();
 
@@ -52,6 +53,17 @@ export async function sendHelpMessage(
     return await sendSmsMessage(
         locale == SubscriptionLocale.FINNISH ? MESSAGE_HELP_FI : MESSAGE_HELP_EN,
         destinationNumber);
+}
+
+export async function sendDifferenceNotification(
+    destinationNumber: string,
+    shipName: string,
+    eventType: string,
+    newTime: moment.Moment
+): Promise<any> {
+    const timeAsString = newTime.format("HH:mm");
+
+    return await(sendSmsMessage(destinationNumber, `Vessel ${shipName} has new estimate ${eventType} ${timeAsString}`));
 }
 
 export async function sendSubscriptionOKMessage(

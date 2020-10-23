@@ -85,8 +85,6 @@ export function updateSubscriptionEstimates(imo: number, locode: string) {
         subscriptions.Items.forEach((s: DbSubscription) => {
             updateSubscription(imo, s);
         });
-    }).finally(() => {
-        console.info("updateSubscriptionEstimates final!");
     });
 }
 
@@ -101,7 +99,7 @@ function updateSubscription(imo: number, s: DbSubscription) {
         if (estimates.length > 0 && s.ShipsToNotificate != null) {
             updateEstimates(s.ShipsToNotificate, estimates);
 
-            sendSmsNotications(s.ShipsToNotificate);
+            sendSmsNotications(s);
             SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, s.ShipsToNotificate).then(_ => {
                 console.info("notifications updated");
             });
@@ -111,7 +109,9 @@ function updateSubscription(imo: number, s: DbSubscription) {
     });
 }
 
-function sendSmsNotications(notification: any) {
+function sendSmsNotications(subscription: DbSubscription) {
+    const notification = subscription.ShipsToNotificate;
+
     Object.keys(notification)?.forEach((portcall_id: string) => {
         Object.keys(notification[portcall_id])?.forEach((eventType: string) => {
             const data = notification[portcall_id][eventType];
@@ -120,12 +120,16 @@ function sendSmsNotications(notification: any) {
             const vts = data.VTS ? moment(data.VTS) : null;
             const sent = moment(data.Sent);
 
-            console.info("ship %s event %s portnet %s vts %s sent %s", portcall_id, eventType, portnet, vts, sent);
+//            console.info("ship %s event %s portnet %s vts %s sent %s", portcall_id, eventType, portnet, vts, sent);
 
-            const bestEstimate = vts || portnet;
+            const bestEstimate = vts || portnet as moment.Moment;
             const difference = moment.duration(sent.diff(bestEstimate));
 
-            console.info("difference is %s", difference);
+            if(Math.abs(difference.hours()) >= 1) {
+                console.info("difference is %s, must send notification", difference);
+                PinpointService.sendDifferenceNotification(subscription.PhoneNumber, notification[portcall_id].name, eventType, bestEstimate);
+                data.Sent = bestEstimate?.toISOString();
+            }
         });
     });
 }
@@ -143,6 +147,7 @@ function updateEstimates(notification: any, estimates: ShiplistEstimate[]) {
         event[e.event_source] = moment(e.event_time).toISOString();
         event.Sent = event.Sent || event.VTS || event.Portnet;
 
+        ship.name = e.ship_name;
         ship[e.event_type] = event;
         notification[e.portcall_id] = ship;
     });
