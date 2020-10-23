@@ -90,7 +90,7 @@ export async function removeSubscription(
         TableName: SUBSCRIPTIONS_TABLE_NAME,
         Key: {
             PhoneNumber: phoneNumber,
-            Locode: locode
+            Locode: locode.toUpperCase()
         }
     }).promise();
 }
