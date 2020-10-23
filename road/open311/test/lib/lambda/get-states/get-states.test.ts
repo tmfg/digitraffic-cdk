@@ -23,7 +23,7 @@ describe('lambda-get-states', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('some states', async () => {
-        const locale = shuffle([Locale.ENGLISH, Locale.FINNISH, Locale.SWEDISH])[0];
+        const locale = shuffle([Locale.ENGLISH, Locale.FINNISH])[0];
         const subjects =
             Array.from({length: Math.floor(Math.random() * 10)}).map(() => newState(locale));
         await update(subjects, db);
