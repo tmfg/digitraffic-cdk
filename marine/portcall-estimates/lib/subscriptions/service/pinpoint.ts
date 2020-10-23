@@ -15,6 +15,9 @@ const MESSAGE_SUBSCRIPTION_OK_EN = 'Subscription received.';
 const MESSAGE_REMOVAL_OK_FI = 'Tilaus poistettu.';
 const MESSAGE_REMOVAL_OK_EN = 'Subscription removed.';
 
+const MESSAGE_NO_SUBSCRIPTIONS_FI = 'Ei tilauksia.';
+const MESSAGE_NO_SUBSCRIPTIONS_EN = 'No subscriptions.';
+
 const MESSAGE_VALIDATION_FAILED_FI = 'Odottamaton virhe!';
 const MESSAGE_VALIDATION_FAILED_EN = 'An unexpected error has occurred!';
 
@@ -78,4 +81,13 @@ export async function sendValidationFailedMessage(
 
 export async function sendShiplist(shiplist: string, destinationNumber: string) {
     return await sendSmsMessage(shiplist, destinationNumber);
+}
+
+export async function sendNoSubscriptionsMessage(
+    destinationNumber: string,
+    locale: SubscriptionLocale): Promise<any> {
+
+    return await sendSmsMessage(
+        locale == SubscriptionLocale.FINNISH ? MESSAGE_NO_SUBSCRIPTIONS_FI : MESSAGE_NO_SUBSCRIPTIONS_EN,
+        destinationNumber);
 }

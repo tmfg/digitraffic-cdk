@@ -47,11 +47,17 @@ export async function removeSubscription(
     await sendRemovalOKMessage(removal.phoneNumber, locale);
 }
 
-export async function sendSubscriptionList(destinationNumber: string) {
+export async function sendSubscriptionList(
+    destinationNumber: string,
+    locale: SubscriptionLocale) {
+
     const dbSubs = await SubscriptionDB.getSubscriptionList(destinationNumber);
     const subs = (dbSubs.Items as DbSubscription[])?.map(s => `${s.Locode} ${s.Time}`).join('\n');
-
-    await PinpointService.sendSmsMessage(subs, destinationNumber);
+    if (dbSubs.Items?.length) {
+        await PinpointService.sendSmsMessage(subs, destinationNumber);
+    } else {
+        await PinpointService.sendNoSubscriptionsMessage(destinationNumber, locale);
+    }
 }
 
 export async function listSubscriptions(time: string): Promise<any> {

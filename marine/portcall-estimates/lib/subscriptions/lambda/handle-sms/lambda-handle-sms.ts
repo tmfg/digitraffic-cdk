@@ -30,7 +30,7 @@ export async function handleSms(locop: SubscriptionLocaleOperation, event: SnsSu
             }
             return await removeSubscription(snsSubscriptionRemoval, locop.locale);
         case SubscriptionOperation.LIST:
-            return await sendSubscriptionList(event.originationNumber);
+            return await sendSubscriptionList(event.originationNumber, locop.locale);
         case SubscriptionOperation.SUBSCRIBE:
             const snsSubscription = parseSnsSubscriptionEvent(event);
             if(!snsSubscription) {
