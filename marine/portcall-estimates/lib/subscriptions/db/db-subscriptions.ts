@@ -6,7 +6,7 @@ const ddb = getDocumentClient();
 // export for testing, same instance is required
 export const _ddb: DocumentClient = ddb;
 
-export const SUBSCRIPTIONS_TABLE_NAME = "PortcallEstimates.Subscriptions";
+export const SUBSCRIPTIONS_TABLE_NAME = "PortcallEstimates.Subscription";
 export const SUBSCRIPTIONS_TIME_IDX_NAME = 'PortcallEstimateSubscriptions_Time_Idx';
 export const SUBSCRIPTIONS_LOCODE_IDX_NAME = 'PortcallEstimateSubscriptions_Locode_Idx';
 export const SUBSCRIPTION_PHONENUMBER_ATTRIBUTE = "PhoneNumber";
