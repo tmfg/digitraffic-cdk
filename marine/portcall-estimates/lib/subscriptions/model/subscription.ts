@@ -1,5 +1,4 @@
 import moment, {Moment} from 'moment';
-import {SubscriptionLocale} from "../smsutils";
 
 export interface EstimateSubscription {
     readonly phoneNumber: string

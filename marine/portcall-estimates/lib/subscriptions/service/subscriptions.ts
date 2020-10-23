@@ -4,7 +4,7 @@ import {IDatabase} from "pg-promise";
 import * as PinpointService from "./pinpoint";
 import * as SubscriptionDB from '../db/db-subscriptions';
 import {sendSubscriptionOKMessage, sendRemovalOKMessage} from "./pinpoint";
-import {DbSubscription} from "../db/db-subscriptions";
+import {DbShipsToNotificate, DbSubscription} from "../db/db-subscriptions";
 import * as ShiplistDb from "../db/db-shiplist";
 import {inDatabase} from "digitraffic-lambda-postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
@@ -71,9 +71,7 @@ export async function updateSubscriptionNotifications(
     locode: string,
     estimates: ShiplistEstimate[]): Promise<any> {
 
-    const notification = {};
-
-    updateEstimates(notification, estimates);
+    const notification = updateEstimates(estimates);
 
 //    console.info("got list %s to notifications %s", JSON.stringify(estimates), JSON.stringify(notification));
 
@@ -97,10 +95,10 @@ function updateSubscription(imo: number, s: DbSubscription) {
         console.info("got estimates %s", JSON.stringify(estimates));
 
         if (estimates.length > 0 && s.ShipsToNotificate != null) {
-            updateEstimates(s.ShipsToNotificate, estimates);
+            const newNotifications = updateEstimates(estimates);
 
-            sendSmsNotications(s);
-            SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, s.ShipsToNotificate).then(_ => {
+            sendSmsNotications(newNotifications, s.PhoneNumber);
+            SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, newNotifications).then(_ => {
                 console.info("notifications updated");
             });
         }
@@ -109,10 +107,10 @@ function updateSubscription(imo: number, s: DbSubscription) {
     });
 }
 
-function sendSmsNotications(subscription: DbSubscription) {
-    const notification = subscription.ShipsToNotificate;
+function sendSmsNotications(notification: DbShipsToNotificate, phoneNumber: string) {
 
-    Object.keys(notification)?.forEach((portcall_id: string) => {
+    Object.keys(notification)?.forEach((key: string) => {
+        const portcall_id = Number(key);
         Object.keys(notification[portcall_id])?.forEach((eventType: string) => {
             const data = notification[portcall_id][eventType];
 
@@ -127,15 +125,17 @@ function sendSmsNotications(subscription: DbSubscription) {
 
             if(Math.abs(difference.hours()) >= 1) {
                 console.info("difference is %s, must send notification", difference);
-                PinpointService.sendDifferenceNotification(subscription.PhoneNumber, notification[portcall_id].name, eventType, bestEstimate);
+                PinpointService.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate);
                 data.Sent = bestEstimate?.toISOString();
             }
         });
     });
 }
 
-function updateEstimates(notification: any, estimates: ShiplistEstimate[]) {
+function updateEstimates(estimates: ShiplistEstimate[]): DbShipsToNotificate {
+    const notification: DbShipsToNotificate = {};
     console.info("new estimates %s", JSON.stringify(estimates));
+
     console.info("notification to update %s", JSON.stringify(notification));
 
     estimates.filter(e => {
@@ -151,4 +151,6 @@ function updateEstimates(notification: any, estimates: ShiplistEstimate[]) {
         ship[e.event_type] = event;
         notification[e.portcall_id] = ship;
     });
+
+    return notification;
 }
