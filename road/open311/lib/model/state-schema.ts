@@ -12,6 +12,10 @@ const schema: apigateway.JsonSchema = {
         name: {
             type: apigateway.JsonSchemaType.STRING,
             description: "Description of the service request's state"
+        },
+        locale: {
+            type: apigateway.JsonSchemaType.STRING,
+            description: "Locale, e.g. 'en'"
         }
     }
 };

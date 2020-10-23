@@ -217,11 +217,12 @@ function createStatesResource(
         handler: 'lambda-get-states.handler'
     }));
     createSubscription(getStatesHandler, getStatesId, props.logsDestinationArn, stack);
-    createGetResourcesIntegration(states,
+    createGetLocalizedResourceIntegration(
+        'GetStates',
+        states,
         getStatesHandler,
         stateModel,
         messageResponseModel,
-        'GetStates',
         stack);
 }
 
@@ -243,7 +244,7 @@ function createSubjectsResource(
         handler: 'lambda-get-subjects.handler'
     }));
     createSubscription(getSubjectsHandler, getSubjectsId, props.logsDestinationArn, stack);
-    createGetSubjectsIntegration('GetSubjects',
+    createGetLocalizedResourceIntegration('GetSubjects',
         subjects,
         getSubjectsHandler,
         subjectModel,
@@ -269,7 +270,7 @@ function createSubSubjectsResource(
         handler: 'lambda-get-subsubjects.handler'
     }));
     createSubscription(getSubSubjectsHandler, getSubSubjectsId, props.logsDestinationArn, stack);
-    createGetSubjectsIntegration('GetSubSubjects',
+    createGetLocalizedResourceIntegration('GetSubSubjects',
         subSubjects,
         getSubSubjectsHandler,
         subSubjectModel,
@@ -340,7 +341,7 @@ function createGetResourcesIntegration(
     addTags(tag, DATA_V1_TAGS, resource, stack);
 }
 
-function createGetSubjectsIntegration(
+function createGetLocalizedResourceIntegration(
     id: string,
     resource: apigateway.Resource,
     handler: lambda.Function,
