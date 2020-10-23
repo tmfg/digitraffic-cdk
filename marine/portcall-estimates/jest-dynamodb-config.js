@@ -1,7 +1,7 @@
 module.exports = {
     tables: [
         {
-            TableName: 'PortcallEstimates.Subscriptions',
+            TableName: 'PortcallEstimates.Subscription',
             KeySchema: [
                 {
                     AttributeName: 'PhoneNumber',
