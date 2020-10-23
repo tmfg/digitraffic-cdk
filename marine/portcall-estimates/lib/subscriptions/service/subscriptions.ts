@@ -3,7 +3,7 @@ import moment from 'moment-timezone';
 import {IDatabase} from "pg-promise";
 import * as PinpointService from "./pinpoint";
 import * as SubscriptionDB from '../db/db-subscriptions';
-import {sendSubscriptionOKMessage, sendRemovalOKMessage} from "./pinpoint";
+import {sendSubscriptionOKMessage, sendRemovalOKMessage, sendSubscriptionLimitReached} from "./pinpoint";
 import {DbShipsToNotificate, DbSubscription} from "../db/db-subscriptions";
 import * as ShiplistDb from "../db/db-shiplist";
 import {inDatabase} from "digitraffic-lambda-postgres/database";
@@ -23,6 +23,12 @@ export async function addSubscription(
 
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
+
+        const existingSubscriptions = await SubscriptionDB.getSubscriptionList(subscription.phoneNumber);
+        if (existingSubscriptions.Items?.length >= 10) {
+            return await sendSubscriptionLimitReached(subscription.phoneNumber, locale);
+        }
+
         await SubscriptionDB.insertSubscription({
             Time: moment(subscription.time, TIME_FORMAT, true).format(DYNAMODB_TIME_FORMAT),
             Type: SubscriptionType.VESSEL_LIST,

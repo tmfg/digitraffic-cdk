@@ -19,6 +19,9 @@ const MESSAGE_REMOVAL_OK_EN = 'Subscription removed.';
 const MESSAGE_NO_SUBSCRIPTIONS_FI = 'Ei tilauksia.';
 const MESSAGE_NO_SUBSCRIPTIONS_EN = 'No subscriptions.';
 
+const MESSAGE_SUBSCRIPTION_LIMIT_REACHED_FI = 'Tilausten maksimimäärä saavutettu.';
+const MESSAGE_SUBSCRIPTION_LIMIT_REACHED_EN = 'Maximum number of subscriptions reached.';
+
 const MESSAGE_VALIDATION_FAILED_FI = 'Odottamaton virhe!';
 const MESSAGE_VALIDATION_FAILED_EN = 'An unexpected error has occurred!';
 
@@ -101,5 +104,14 @@ export async function sendNoSubscriptionsMessage(
 
     return await sendSmsMessage(
         locale == SubscriptionLocale.FINNISH ? MESSAGE_NO_SUBSCRIPTIONS_FI : MESSAGE_NO_SUBSCRIPTIONS_EN,
+        destinationNumber);
+}
+
+export async function sendSubscriptionLimitReached(
+    destinationNumber: string,
+    locale: SubscriptionLocale): Promise<any> {
+
+    return await sendSmsMessage(
+        locale == SubscriptionLocale.FINNISH ? MESSAGE_SUBSCRIPTION_LIMIT_REACHED_FI : MESSAGE_SUBSCRIPTION_LIMIT_REACHED_EN,
         destinationNumber);
 }
