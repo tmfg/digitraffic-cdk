@@ -53,7 +53,7 @@ function toShiplistRow(prevVal: string, e: DbDebugShiplist, idx: number): string
     }
 
     const source = e.event_source == 'Portnet' ? 'PNET' : e.event_source;
-    const hoursAgo = Math.floor((moment().valueOf() - moment(e.record_time).valueOf()) / 1000 / 60 / 60);
+    const hoursAgo = Math.ceil((moment().valueOf() - moment(e.record_time).valueOf()) / 1000 / 60 / 60);
     const sourceHoursAgo = `${source} (${hoursAgo} h)`;
 
     return prevVal + `
