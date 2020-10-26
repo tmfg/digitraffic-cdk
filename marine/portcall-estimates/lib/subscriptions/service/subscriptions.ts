@@ -13,6 +13,9 @@ import {getStartTime} from "../timeutil";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
+const SEND_NOTIFICATION_DIFFERENCE_MINUTES = 15;
+const VALID_EVENT_TYPES = ["ETA", "ETD"];
+
 export enum SubscriptionType {
     VESSEL_LIST= "VESSEL_LIST"
 }
@@ -108,28 +111,40 @@ function updateSubscription(imo: number, s: DbSubscription) {
 }
 
 function sendSmsNotications(notification: DbShipsToNotificate, phoneNumber: string) {
-
     Object.keys(notification)?.forEach((key: string) => {
         const portcall_id = Number(key);
-        Object.keys(notification[portcall_id])?.forEach((eventType: string) => {
+        Object.keys(notification[portcall_id])?.filter(key => VALID_EVENT_TYPES.includes(key)).forEach((eventType: string) => {
             const data = notification[portcall_id][eventType];
 
             const portnet = data.Portnet ? moment(data.Portnet) : null;
             const vts = data.VTS ? moment(data.VTS) : null;
-            const sent = moment(data.Sent);
+            const bestEstimate = vts || portnet as moment.Moment;
+
+            if(data.Sent) {
+                const sent = moment(data.Sent);
 
 //            console.info("ship %s event %s portnet %s vts %s sent %s", portcall_id, eventType, portnet, vts, sent);
 
-            const bestEstimate = vts || portnet as moment.Moment;
-            const difference = moment.duration(sent.diff(bestEstimate));
+                const difference = moment.duration(sent.diff(bestEstimate));
 
-            if(Math.abs(difference.hours()) >= 1) {
-                console.info("difference is %s, must send notification", difference);
+                if(isNotificationNeeded(sent, bestEstimate)) {
+                    console.info("difference is %s, must send notification", difference);
+                    PinpointService.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate);
+                    data.Sent = bestEstimate.toISOString();
+                }
+            } else {
+                console.info("A new estimate in window %s %s %s", portcall_id, eventType, JSON.stringify(notification));
                 PinpointService.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate);
-                data.Sent = bestEstimate?.toISOString();
+                data.Sent = bestEstimate.toISOString();
             }
         });
     });
+}
+
+function isNotificationNeeded(sent: moment.Moment, bestEstimate: moment.Moment): boolean {
+    const difference = moment.duration(sent.diff(bestEstimate));
+
+    return Math.abs(difference.minutes()) >= SEND_NOTIFICATION_DIFFERENCE_MINUTES;
 }
 
 function updateEstimates(estimates: ShiplistEstimate[]): DbShipsToNotificate {
@@ -138,6 +153,8 @@ function updateEstimates(estimates: ShiplistEstimate[]): DbShipsToNotificate {
 
     console.info("notification to update %s", JSON.stringify(notification));
 
+    const updateSent = notification == {};
+
     estimates.filter(e => {
         return e.portcall_id != null
     }).forEach(e => {
@@ -145,7 +162,12 @@ function updateEstimates(estimates: ShiplistEstimate[]): DbShipsToNotificate {
         const event = ship[e.event_type] || {};
 
         event[e.event_source] = moment(e.event_time).toISOString();
-        event.Sent = event.Sent || event.VTS || event.Portnet;
+
+        if(updateSent) {
+            event.Sent = event.Sent || event.VTS || event.Portnet;
+        } else {
+            event.Sent = event.Sent;
+        }
 
         ship.name = e.ship_name;
         ship[e.event_type] = event;

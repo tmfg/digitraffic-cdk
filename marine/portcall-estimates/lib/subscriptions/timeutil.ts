@@ -22,3 +22,11 @@ export function getStartTime(time: string): Date {
 
     return startTime.toDate();
 }
+
+export function getStartTimeForShiplist(time: string): Date {
+    const now = new Date();
+    const hours = +time.substring(0, 2);
+    const minutes = +time.substring(2);
+
+    return moment(now).hours(hours).minutes(minutes).seconds(0).tz('Europe/Helsinki').toDate();
+}

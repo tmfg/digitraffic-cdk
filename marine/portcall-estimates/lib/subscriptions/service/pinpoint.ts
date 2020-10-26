@@ -63,7 +63,7 @@ export async function sendDifferenceNotification(
 ): Promise<any> {
     const timeAsString = newTime.format("HH:mm");
 
-    return await(sendSmsMessage(destinationNumber, `Vessel ${shipName} has new estimate ${eventType} ${timeAsString}`));
+    return await(sendSmsMessage(destinationNumber, `Ship ${shipName} ${eventType} has a new estimate ${timeAsString}`));
 }
 
 export async function sendSubscriptionOKMessage(
