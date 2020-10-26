@@ -19,20 +19,24 @@ export const handler = async (
             body: `
             <html>
                 <head>
-                    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css">
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
                 </head>
                 <body>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Type</th>
-                                <th>Source</th>
-                                <th>Time</th>
-                                <th>Ship</th>
-                            </tr>
-                        </thead>
-                        <tbody>${shiplist.reduce(toShiplistRow, '')}</tbody>
-                    </table>
+                    <div class="container">
+                        <table class="table">
+                            <thead>
+                                <tr class="row">
+                                    <th class="col-2">Type</th>
+                                    <th class="col-4">Ship</th>
+                                    <th class="col-3">Time</th>
+                                    <th class="col-3">Source</th>
+                                </tr>
+                            </thead>
+                            <tbody>${shiplist.reduce(toShiplistRow, '')}</tbody>
+                        </table>
+                    </div>
                 </body>
             </html>
             `
@@ -47,7 +51,18 @@ function toShiplistRow(prevVal: string, e: DbDebugShiplist, idx: number): string
     if (!isSameDate(currentDate, e.event_time)) {
         timestring = eventTime.format("D.MM HH:mm")
     }
-    return prevVal + `<tr><td>${e.event_type}</td><td>${e.event_source}</td><td>${timestring}</td><td>${e.ship_name}</td></tr>`;
+
+    const source = e.event_source == 'Portnet' ? 'PNET' : e.event_source;
+    const hoursAgo = Math.floor((moment().valueOf() - moment(e.record_time).valueOf()) / 1000 / 60 / 60);
+    const sourceHoursAgo = `${source} (${hoursAgo} h)`;
+
+    return prevVal + `
+        <tr class="row">
+            <td class="col-2">${e.event_type}</td>
+            <td class="col-4">${e.ship_name}</td>
+            <td class="col-3">${timestring}</td>
+            <td class="col-3">${sourceHoursAgo}</td>
+        </tr>`;
 }
 
 
