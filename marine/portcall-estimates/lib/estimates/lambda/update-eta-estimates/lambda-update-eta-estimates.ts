@@ -1,7 +1,9 @@
-import {getPortAreaGeometries} from '../../service/portareas';
+import {getPortAreaGeometries, PortareaGeometry} from '../../service/portareas';
 import {findETAShipsByLocode} from '../../service/estimates';
 import {updateETAEstimates} from '../../service/etas';
 import {SNS} from 'aws-sdk';
+import {DbETAShip} from "../../db/db-estimates";
+import {ShipETA} from "../../api/api-etas";
 
 export const KEY_ENDPOINT_CLIENT_ID = 'ENDPOINT_CLIENT_ID'
 export const KEY_ENDPOINT_CLIENT_SECRET = 'ENDPOINT_CLIENT_SECRET'
@@ -22,30 +24,46 @@ const snsTopicArn = process.env[KEY_ESTIMATE_SNS_TOPIC_ARN] as string;
 const portAreaGeometries = getPortAreaGeometries();
 const locodes = portAreaGeometries.map(p => p.locode);
 
-export const handler = async (): Promise<any> => {
-    const ships = await findETAShipsByLocode(locodes);
+export function handlerFn(
+    sns: SNS,
+    doUpdateETAEstimates: (
+        endpointClientId: string,
+        endpointClientSecret: string,
+        endpointClientAudience: string,
+        endpointAuthUrl: string,
+        endpointUrl: string,
+        endpointSource: string,
+        ships: DbETAShip[],
+        portAreaGeometries: PortareaGeometry[]) => Promise<ShipETA[]>
+): () => Promise<any> {
 
-    if (ships.length) {
-        console.log('About to fetch ETAs for ships:', ships);
-        const etas = await updateETAEstimates(endpointClientId,
-            endpointClientSecret,
-            endpointClientAudience,
-            endpointAuthUrl,
-            endpointUrl,
-            endpointSource,
-            ships,
-            portAreaGeometries);
+    return async () => {
+        const ships = await findETAShipsByLocode(locodes);
 
-        await new SNS().publish({
-            Message: JSON.stringify(etas.map(eta => ({
-                ship_mmsi: eta.mmsi,
-                ship_imo: eta.imo,
-                location_locode: eta.locode,
-                portcall_id: eta.portcall_id
-            }))),
-            TopicArn: snsTopicArn
-        }).promise();
-    } else {
-        console.log('No ships for ETA update');
-    }
-};
+        if (ships.length) {
+            console.log('About to fetch ETAs for ships:', ships);
+            const etas = await doUpdateETAEstimates(endpointClientId,
+                endpointClientSecret,
+                endpointClientAudience,
+                endpointAuthUrl,
+                endpointUrl,
+                endpointSource,
+                ships,
+                portAreaGeometries);
+
+            await sns.publish({
+                Message: JSON.stringify(etas.map(eta => ({
+                    ship_mmsi: eta.mmsi,
+                    ship_imo: eta.imo,
+                    location_locode: eta.locode,
+                    portcall_id: eta.portcall_id
+                }))),
+                TopicArn: snsTopicArn
+            }).promise();
+        } else {
+            console.log('No ships for ETA update');
+        }
+    };
+}
+
+export const handler = handlerFn(new SNS(), updateETAEstimates);

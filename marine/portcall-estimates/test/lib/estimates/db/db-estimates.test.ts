@@ -239,6 +239,9 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundEstimate.length).toBe(2);
     });
 
+    /*
+        FIND ETA SHIPS
+    */
     test('findETAsByLocodes - 1 h in future is found', async () => {
         const locode = 'AA123';
         const eventTime = moment().add(1, 'hours').toDate();
