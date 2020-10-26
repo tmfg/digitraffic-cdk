@@ -47,7 +47,7 @@ export function create(
         .addResource('portcall-estimates');
 
     createEstimatesResource(publicApi, vpc, props, resource, lambdaDbSg, estimatesModel, errorResponseModel, validator, stack);
-    createDebugShiplistResource(publicApi, vpc, props, resource, lambdaDbSg, stack);
+    createShiplistResource(publicApi, vpc, props, resource, lambdaDbSg, stack);
 }
 
 function createEstimatesResource(
@@ -105,7 +105,7 @@ function createEstimatesResource(
     return getEstimatesLambda;
 }
 
-function createDebugShiplistResource(
+function createShiplistResource(
     publicApi: RestApi,
     vpc: IVpc,
     props: Props,
@@ -113,13 +113,13 @@ function createDebugShiplistResource(
     lambdaDbSg: ISecurityGroup,
     stack: Construct): Function {
 
-    const functionName = 'PortcallEstimate-DebugShiplist';
+    const functionName = 'PortcallEstimate-PublicShiplist';
 
-    const assetCode = new AssetCode('dist/estimates/lambda/get-shiplist-debug');
+    const assetCode = new AssetCode('dist/estimates/lambda/get-shiplist-public');
     const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: assetCode,
-        handler: 'lambda-get-shiplist-debug.handler',
+        handler: 'lambda-get-shiplist-public.handler',
         readOnly: false
     }));
 
@@ -127,8 +127,8 @@ function createDebugShiplistResource(
         proxy: true
     });
 
-    const shiplistDebugResource = resource.addResource("shiplist-debug");
-    shiplistDebugResource.addMethod("GET", integration, {
+    const shiplistResource = resource.addResource("shiplist");
+    shiplistResource.addMethod("GET", integration, {
         apiKeyRequired: false
     });
 

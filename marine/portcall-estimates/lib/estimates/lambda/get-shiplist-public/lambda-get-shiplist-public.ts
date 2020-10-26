@@ -1,4 +1,4 @@
-import {DbDebugShiplist, findByLocodeDebug} from '../../db/db-debug';
+import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/db-shiplist-public';
 import {inDatabase} from 'digitraffic-lambda-postgres/database';
 import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';
@@ -10,7 +10,7 @@ export const handler = async (
         return {statusCode: 400, body: 'Missing locode'};
     }
     return await inDatabase(async (db: IDatabase<any, any>) => {
-        const shiplist: DbDebugShiplist[] = await findByLocodeDebug(db, (event.queryStringParameters.locode as string).toUpperCase());
+        const shiplist: DbPublicShiplist[] = await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase());
         return {
             statusCode: 200,
             headers: {
@@ -44,7 +44,7 @@ export const handler = async (
     });
 };
 
-function toShiplistRow(prevVal: string, e: DbDebugShiplist, idx: number): string {
+function toShiplistRow(prevVal: string, e: DbPublicShiplist, idx: number): string {
     let currentDate = new Date();
     const eventTime = moment(e.event_time).tz('Europe/Helsinki') as moment.Moment;
     let timestring = eventTime.format("HH:mm");

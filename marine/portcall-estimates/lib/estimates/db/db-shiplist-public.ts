@@ -2,7 +2,7 @@ import {IDatabase, PreparedStatement} from "pg-promise";
 import {EventType} from "../model/estimate";
 import {ESTIMATES_BEFORE, ESTIMATES_IN_THE_FUTURE} from "./db-estimates";
 
-export interface DbDebugShiplist {
+export interface DbPublicShiplist {
     readonly event_type: EventType
     readonly event_time: Date
     readonly event_source: string
@@ -10,7 +10,7 @@ export interface DbDebugShiplist {
     readonly ship_name: string
 }
 
-const SELECT_BY_LOCODE_DEBUG = `
+const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
     SELECT DISTINCT
         pe.event_type,
         pe.event_time,
@@ -38,13 +38,13 @@ const SELECT_BY_LOCODE_DEBUG = `
     ORDER BY pe.event_time
 `;
 
-export function findByLocodeDebug(
+export function findByLocodePublicShiplist(
     db: IDatabase<any, any>,
     locode: string
-): Promise<DbDebugShiplist[]> {
+): Promise<DbPublicShiplist[]> {
     const ps = new PreparedStatement({
-        name: 'find-by-locode-debug',
-        text: SELECT_BY_LOCODE_DEBUG,
+        name: 'find-by-locode-public-shiplist',
+        text: SELECT_BY_LOCODE_PUBLIC_SHIPLIST,
         values: [locode]
     });
     return db.tx(t => t.manyOrNone(ps));
