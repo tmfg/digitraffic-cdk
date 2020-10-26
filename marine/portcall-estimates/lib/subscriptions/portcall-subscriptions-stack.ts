@@ -34,15 +34,17 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
         const sendShiplistLambda = this.createSendShiplistLambda(vpc, lambdaDbSg, appProps);
         const smsHandlerLambda = this.createSmsHandlerLambda(incomingSmsTopic, appProps);
-        const estamationHandlerLambda = this.createEstimationHandlerLambda(vpc, lambdaDbSg, appProps)
+        const estimationHandlerLambda = this.createEstimationHandlerLambda(vpc, lambdaDbSg, appProps)
 
         // grant publish to topic to lambda
-        Topic.fromTopicArn(this, "ShiplistTopic", appProps.shiplistSnsTopicArn).grantPublish(sendShiplistLambda);
+        const smsTopic = Topic.fromTopicArn(this, "SmsSendingTopic", appProps.shiplistSnsTopicArn);
+        smsTopic.grantPublish(sendShiplistLambda);
+        smsTopic.grantPublish(estimationHandlerLambda);
 
         const subscriptionTable = this.createSubscriptionTable();
         subscriptionTable.grantReadWriteData(smsHandlerLambda);
         subscriptionTable.grantReadWriteData(sendShiplistLambda);
-        subscriptionTable.grantReadWriteData(estamationHandlerLambda);
+        subscriptionTable.grantReadWriteData(estimationHandlerLambda);
 
         PublicApi.create(vpc,
             lambdaDbSg,
@@ -174,14 +176,14 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             environment: {
                 DB_USER: props.dbProps.username,
                 DB_PASS: props.dbProps.password,
-                DB_URI: props.dbProps.ro_uri
-//                PINPOINT_ID: props.pinpointApplicationId,
-//                PINPOINT_NUMBER: props.pinpointTelephoneNumber
+                DB_URI: props.dbProps.ro_uri,
+                PINPOINT_ID: props.pinpointApplicationId,
+                PINPOINT_NUMBER: props.pinpointTelephoneNumber
             }
         });
         estimateHandlerLambda.addEventSource(new SnsEventSource(Topic.fromTopicArn(this, "EstimateTopic", props.estimateUpdatedTopicArn)));
-//        estimateHandlerLambda.addToRolePolicy(
-//            PortcallEstimateSubscriptionsStack.createWriteToPinpointPolicy(props.pinpointApplicationId));
+        estimateHandlerLambda.addToRolePolicy(
+            PortcallEstimateSubscriptionsStack.createWriteToPinpointPolicy(props.pinpointApplicationId));
         createSubscription(estimateHandlerLambda, functionName, props.logsDestinationArn, this);
 
         return estimateHandlerLambda;
