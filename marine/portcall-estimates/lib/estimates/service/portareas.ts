@@ -2,13 +2,13 @@ export function getPortAreaGeometries(): PortareaGeometry[] {
     return [
         {
             locode: 'FIHKO',
-            longitude: 23.223845,
-            latitude: 59.880550
+            longitude: 22.945464,
+            latitude: 59.819656
         },
         {
             locode: 'FIKVH',
-            longitude: 22.945464,
-            latitude: 59.819656
+            longitude: 23.223845,
+            latitude: 59.880550
         },
         {
             locode: 'FIRAU',
