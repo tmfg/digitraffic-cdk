@@ -79,7 +79,7 @@ async function getETA(
     const resp = await axios.get(url, {
         headers: {
             'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json'
+            'Accept': 'application/json'
         },
         validateStatus: (status) => status == 200 || status == 204 || status == 404
     });
@@ -95,12 +95,11 @@ async function getETA(
     }
     return Promise.resolve(resp.data as ETAResponse)
         .then(e => {
-            const props = e.features[0].properties;
             return {
                 locode: portAreaGeometry!!.locode,
                 imo: ship.imo,
-                mmsi: props.vessel.mmsi,
-                eta: props.destination.eta,
+                mmsi: e.vessel.mmsi,
+                eta: e.destination.eta,
                 portcall_id: ship.portcall_id
             };
         });
@@ -121,27 +120,21 @@ export interface ShipETA {
 }
 
 interface ETAResponse {
-    readonly features: [
-        {
-            readonly properties: {
-                readonly vessel: {
-                    readonly mmsi: number
-                    readonly time: string
-                    readonly speed: number
-                    readonly heading: number
-                    readonly position: {
-                        readonly latitude: number
-                        readonly longitude: number
-                    }
-                }
-                readonly destination: {
-                    readonly eta: string
-                    readonly total_duration: string
-                    readonly historical_duration: string
-                    readonly synthetic_duration: string
-                    readonly straight_duration: string
-                }
-            }
+    readonly vessel: {
+        readonly mmsi: number
+        readonly time: string
+        readonly speed: number
+        readonly heading: number
+        readonly position: {
+            readonly latitude: number
+            readonly longitude: number
         }
-    ]
+    }
+    readonly destination: {
+        readonly eta: string
+        readonly total_duration: string
+        readonly historical_duration: string
+        readonly synthetic_duration: string
+        readonly straight_duration: string
+    }
 }
