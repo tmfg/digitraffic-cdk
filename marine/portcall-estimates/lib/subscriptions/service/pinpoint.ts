@@ -1,5 +1,4 @@
 import {Pinpoint} from 'aws-sdk';
-import {SubscriptionLocale} from "../smsutils";
 import moment from 'moment-timezone';
 
 const pinpoint = new Pinpoint();
@@ -7,23 +6,12 @@ const pinpoint = new Pinpoint();
 const projectId = process.env['PINPOINT_ID'] as string;
 const originationNumber = process.env['PINPOINT_NUMBER'] as string;
 
-const MESSAGE_HELP_FI = `Tee tilaus lähettämällä viesti TILAA LOCODE KELLONAIKA, esim. TILAA FIKOK 07:00. Katsele tekemiäsi tilauksia viestillä LISTAA. Poista tilaus viestillä POISTA LOCODE.`
-const MESSAGE_HELP_EN = 'Subscribe by sending a message SUBSCRIBE LOCODE TIME, e.g. SUBSCRIBE FIKOK 07:00. View existing subscriptions by sending LIST. Remove subscriptions by sending REMOVE LOCODE.';
-
-const MESSAGE_SUBSCRIPTION_OK_FI = 'Tilaus vastaanotettu.';
-const MESSAGE_SUBSCRIPTION_OK_EN = 'Subscription received.';
-
-const MESSAGE_REMOVAL_OK_FI = 'Tilaus poistettu.';
-const MESSAGE_REMOVAL_OK_EN = 'Subscription removed.';
-
-const MESSAGE_NO_SUBSCRIPTIONS_FI = 'Ei tilauksia.';
-const MESSAGE_NO_SUBSCRIPTIONS_EN = 'No subscriptions.';
-
-const MESSAGE_SUBSCRIPTION_LIMIT_REACHED_FI = 'Tilausten maksimimäärä saavutettu.';
-const MESSAGE_SUBSCRIPTION_LIMIT_REACHED_EN = 'Maximum number of subscriptions reached.';
-
-const MESSAGE_VALIDATION_FAILED_FI = 'Odottamaton virhe!';
-const MESSAGE_VALIDATION_FAILED_EN = 'An unexpected error has occurred!';
+const MESSAGE_HELP = 'Subscribe by sending a message SUBSCRIBE LOCODE TIME, e.g. SUBSCRIBE FIKOK 07:00. View existing subscriptions by sending LIST. Remove subscriptions by sending REMOVE LOCODE.';
+const MESSAGE_SUBSCRIPTION_OK = 'Subscription received.';
+const MESSAGE_REMOVAL_OK = 'Subscription removed.';
+const MESSAGE_NO_SUBSCRIPTIONS = 'No subscriptions.';
+const MESSAGE_SUBSCRIPTION_LIMIT_REACHED = 'Maximum number of subscriptions reached.';
+const MESSAGE_VALIDATION_FAILED = 'An unexpected error has occurred!';
 
 export async function sendSmsMessage(body: string, number: string): Promise<any> {
     const params = {
@@ -50,12 +38,8 @@ export async function sendSmsMessage(body: string, number: string): Promise<any>
 }
 
 export async function sendHelpMessage(
-    destinationNumber: string,
-    locale: SubscriptionLocale): Promise<any> {
-
-    return await sendSmsMessage(
-        locale == SubscriptionLocale.FINNISH ? MESSAGE_HELP_FI : MESSAGE_HELP_EN,
-        destinationNumber);
+    destinationNumber: string): Promise<any> {
+    return await sendSmsMessage(MESSAGE_HELP, destinationNumber);
 }
 
 export async function sendDifferenceNotification(
@@ -70,28 +54,18 @@ export async function sendDifferenceNotification(
 }
 
 export async function sendSubscriptionOKMessage(
-    destinationNumber: string,
-    locale: SubscriptionLocale): Promise<any> {
-    return await sendSmsMessage(
-        locale == SubscriptionLocale.FINNISH ? MESSAGE_SUBSCRIPTION_OK_FI : MESSAGE_SUBSCRIPTION_OK_EN,
-        destinationNumber);
+    destinationNumber: string): Promise<any> {
+    return await sendSmsMessage(MESSAGE_SUBSCRIPTION_OK, destinationNumber);
 }
 
 export async function sendRemovalOKMessage(
-    destinationNumber: string,
-    locale: SubscriptionLocale): Promise<any> {
-    return await sendSmsMessage(
-        locale == SubscriptionLocale.FINNISH ? MESSAGE_REMOVAL_OK_FI : MESSAGE_REMOVAL_OK_EN,
-        destinationNumber);
+    destinationNumber: string): Promise<any> {
+    return await sendSmsMessage(MESSAGE_REMOVAL_OK, destinationNumber);
 }
 
 export async function sendValidationFailedMessage(
-    destinationNumber: string,
-    locale: SubscriptionLocale): Promise<any> {
-
-    return await sendSmsMessage(
-        locale == SubscriptionLocale.FINNISH ? MESSAGE_VALIDATION_FAILED_FI : MESSAGE_VALIDATION_FAILED_EN,
-        destinationNumber);
+    destinationNumber: string): Promise<any> {
+    return await sendSmsMessage(MESSAGE_VALIDATION_FAILED, destinationNumber);
 }
 
 export async function sendShiplist(shiplist: string, destinationNumber: string) {
@@ -99,19 +73,11 @@ export async function sendShiplist(shiplist: string, destinationNumber: string) 
 }
 
 export async function sendNoSubscriptionsMessage(
-    destinationNumber: string,
-    locale: SubscriptionLocale): Promise<any> {
-
-    return await sendSmsMessage(
-        locale == SubscriptionLocale.FINNISH ? MESSAGE_NO_SUBSCRIPTIONS_FI : MESSAGE_NO_SUBSCRIPTIONS_EN,
-        destinationNumber);
+    destinationNumber: string): Promise<any> {
+    return await sendSmsMessage(MESSAGE_NO_SUBSCRIPTIONS, destinationNumber);
 }
 
 export async function sendSubscriptionLimitReached(
-    destinationNumber: string,
-    locale: SubscriptionLocale): Promise<any> {
-
-    return await sendSmsMessage(
-        locale == SubscriptionLocale.FINNISH ? MESSAGE_SUBSCRIPTION_LIMIT_REACHED_FI : MESSAGE_SUBSCRIPTION_LIMIT_REACHED_EN,
-        destinationNumber);
+    destinationNumber: string): Promise<any> {
+    return await sendSmsMessage(MESSAGE_SUBSCRIPTION_LIMIT_REACHED, destinationNumber);
 }

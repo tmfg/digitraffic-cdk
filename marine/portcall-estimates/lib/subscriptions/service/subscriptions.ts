@@ -8,7 +8,6 @@ import {DbShipsToNotificate, DbSubscription} from "../db/db-subscriptions";
 import * as ShiplistDb from "../db/db-shiplist";
 import {inDatabase} from "digitraffic-lambda-postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
-import {SubscriptionLocale} from "../smsutils";
 import {getStartTime} from "../timeutil";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
@@ -20,16 +19,13 @@ export enum SubscriptionType {
     VESSEL_LIST= "VESSEL_LIST"
 }
 
-export async function addSubscription(
-    subscription: EstimateSubscription,
-    locale: SubscriptionLocale) {
-
+export async function addSubscription(subscription: EstimateSubscription) {
     if (validateSubscription(subscription)) {
         console.log(`Adding subscription for LOCODE ${subscription.locode}, at time ${subscription.time}`);
 
         const existingSubscriptions = await SubscriptionDB.getSubscriptionList(subscription.phoneNumber);
         if (existingSubscriptions.Items?.length >= 10) {
-            return await sendSubscriptionLimitReached(subscription.phoneNumber, locale);
+            return await sendSubscriptionLimitReached(subscription.phoneNumber);
         }
 
         await SubscriptionDB.insertSubscription({
@@ -39,39 +35,32 @@ export async function addSubscription(
             PhoneNumber: subscription.phoneNumber
         });
 
-        await sendSubscriptionOKMessage(subscription.phoneNumber, locale);
+        await sendSubscriptionOKMessage(subscription.phoneNumber);
     } else {
-        await PinpointService.sendValidationFailedMessage(subscription.phoneNumber, locale);
+        await PinpointService.sendValidationFailedMessage(subscription.phoneNumber);
         console.error('Invalid subscription');
     }
 }
 
-export async function removeSubscription(
-    removal: EstimateRemoval,
-    locale: SubscriptionLocale) {
-
+export async function removeSubscription(removal: EstimateRemoval) {
     console.log(`Removing subscription for LOCODE ${removal.locode}`);
 
     await SubscriptionDB.removeSubscription(removal.phoneNumber, removal.locode);
-    await sendRemovalOKMessage(removal.phoneNumber, locale);
+    await sendRemovalOKMessage(removal.phoneNumber);
 }
 
-export async function sendSubscriptionList(
-    destinationNumber: string,
-    locale: SubscriptionLocale) {
-
+export async function sendSubscriptionList(destinationNumber: string) {
     const dbSubs = await SubscriptionDB.getSubscriptionList(destinationNumber);
     const subs = (dbSubs.Items as DbSubscription[])?.map(s => `${s.Locode} ${s.Time}`).join('\n');
     if (dbSubs.Items?.length) {
         await PinpointService.sendSmsMessage(subs, destinationNumber);
     } else {
-        await PinpointService.sendNoSubscriptionsMessage(destinationNumber, locale);
+        await PinpointService.sendNoSubscriptionsMessage(destinationNumber);
     }
 }
 
 export async function listSubscriptions(time: string): Promise<any> {
     const value = await SubscriptionDB.listSubscriptionsForTime(time);
-
     return value.Items;
 }
 

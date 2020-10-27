@@ -1,67 +1,23 @@
 import {EstimateRemoval, EstimateSubscription, SnsSubscriptionEvent} from './model/subscription';
 
-export enum SubscriptionLocale {
-    FINNISH, ENGLISH
-}
-
 export enum SubscriptionOperation {
     INVALID, SUBSCRIBE, REMOVE, HELP, LIST
 }
 
-export interface SubscriptionLocaleOperation {
-    readonly locale: SubscriptionLocale
-    readonly operation: SubscriptionOperation
-}
-
-export function parseOperation(event: SnsSubscriptionEvent): SubscriptionLocaleOperation {
+export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperation {
     const operationString = event.messageBody.split(' ')[0].toUpperCase();
 
-    switch(operationString) {
+    switch (operationString) {
         case 'SUBSCRIBE':
-            return {
-                locale: SubscriptionLocale.ENGLISH,
-                operation: SubscriptionOperation.SUBSCRIBE
-            };
-        case 'TILAA':
-            return {
-                locale: SubscriptionLocale.FINNISH,
-                operation: SubscriptionOperation.SUBSCRIBE
-            };
-        case 'POISTA':
-            return {
-                locale: SubscriptionLocale.FINNISH,
-                operation: SubscriptionOperation.REMOVE
-            };
+            return SubscriptionOperation.SUBSCRIBE;
         case 'REMOVE':
-            return {
-                locale: SubscriptionLocale.ENGLISH,
-                operation: SubscriptionOperation.REMOVE
-            };
+            return SubscriptionOperation.REMOVE;
         case 'HELP':
-            return {
-                locale: SubscriptionLocale.ENGLISH,
-                operation: SubscriptionOperation.HELP
-            };
-        case 'APUA':
-            return {
-                locale: SubscriptionLocale.FINNISH,
-                operation: SubscriptionOperation.HELP
-            };
-        case 'LISTAA':
-            return {
-                locale: SubscriptionLocale.FINNISH,
-                operation: SubscriptionOperation.LIST
-            };
+            return SubscriptionOperation.HELP;
         case 'LIST':
-            return {
-                locale: SubscriptionLocale.ENGLISH,
-                operation: SubscriptionOperation.LIST
-            };
+            return SubscriptionOperation.LIST;
         default:
-            return {
-                locale: SubscriptionLocale.ENGLISH,
-                operation: SubscriptionOperation.INVALID
-            };
+            return SubscriptionOperation.INVALID;
     }
 }
 
