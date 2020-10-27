@@ -1,10 +1,11 @@
-import {EstimateRemoval, EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
 import moment from 'moment-timezone';
-import {IDatabase} from "pg-promise";
+import {ITaskContext} from "pg-promise";
+
 import * as SubscriptionDB from '../db/db-subscriptions';
-import {DbShipsToNotificate, DbSubscription} from "../db/db-subscriptions";
 import * as ShiplistDb from "../db/db-shiplist";
-import {inDatabase} from "digitraffic-lambda-postgres/database";
+import {DbShipsToNotificate, DbSubscription} from "../db/db-subscriptions";
+import {EstimateRemoval, EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
+import {inTransaction} from "digitraffic-lambda-postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {getStartTime} from "../timeutil";
 import {PinpointService, default as pinpointService} from "./pinpoint";
@@ -77,7 +78,7 @@ export async function updateSubscriptionNotifications(
     locode: string,
     estimates: ShiplistEstimate[]): Promise<any> {
 
-    const notification = updateEstimates(estimates);
+    const notification = updateEstimates(estimates, {});
 
 //    console.info("got list %s to notifications %s", JSON.stringify(estimates), JSON.stringify(notification));
 
@@ -93,31 +94,32 @@ export function updateSubscriptionEstimates(imo: number, locode: string) {
 }
 
 function updateSubscription(imo: number, s: DbSubscription) {
-    const startTime = getStartTime(s.Time);
+    const startTime = new Date();
+    const endTime = getStartTime(s.Time);
 
-    inDatabase(async (db: IDatabase<any, any>) => {
-        return await ShiplistDb.findByLocodeAndImo(db, startTime, s.Locode, imo);
-    }).then(estimates => {
+    endTime.setDate(endTime.getDate() + 1);
+
+    inTransaction((t: ITaskContext) => ShiplistDb.findByLocodeAndImo(t, startTime, endTime, s.Locode, imo))
+    .then(async estimates => {
         console.info("got estimates %s", JSON.stringify(estimates));
 
         if (estimates.length > 0 && s.ShipsToNotificate != null) {
-            const newNotifications = updateEstimates(estimates);
+            const newNotifications = updateEstimates(estimates, s.ShipsToNotificate);
 
-            sendSmsNotications(newNotifications, s.PhoneNumber);
-            SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, newNotifications).then(_ => {
-                console.info("notifications updated");
-            });
+            await sendSmsNotications(newNotifications, s.PhoneNumber)
+                .then(_ => SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, newNotifications))
+                .then(_ => console.info("notifications updated"));
         }
-    }).finally(() => {
-       console.info("updateSubscriptions final!");
     });
 }
 
 function _createSendSmsNotications(pps: PinpointService): (notification: DbShipsToNotificate, phoneNumber: string) => Promise<any> {
     return async (notification: DbShipsToNotificate, phoneNumber: string): Promise<any> => {
-        Object.keys(notification)?.forEach((key: string) => {
+        const promises = [] as Promise<any>[];
+
+        for (const key of Object.keys(notification)) {
             const portcall_id = Number(key);
-            Object.keys(notification[portcall_id])?.filter(key => VALID_EVENT_TYPES.includes(key)).forEach((eventType: string) => {
+            for (const eventType of Object.keys(notification[portcall_id])?.filter(key => VALID_EVENT_TYPES.includes(key))) {
                 const data = notification[portcall_id][eventType];
 
                 const portnet = data.Portnet ? moment(data.Portnet) : null;
@@ -127,23 +129,27 @@ function _createSendSmsNotications(pps: PinpointService): (notification: DbShips
                 if (data.Sent) {
                     const sent = moment(data.Sent);
 
-//            console.info("ship %s event %s portnet %s vts %s sent %s", portcall_id, eventType, portnet, vts, sent);
-
                     const difference = moment.duration(sent.diff(bestEstimate));
 
                     if (isNotificationNeeded(sent, bestEstimate)) {
                         console.info("difference is %s, must send notification", difference);
-                        pps.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate);
-                        data.Sent = bestEstimate.toISOString();
+                        promises.push(pps.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate).then(_ => {
+                            console.info("notification sent!");
+                            data.Sent = bestEstimate.toISOString();
+                        }));
                     }
                 } else {
                     console.info("A new estimate in window %s %s %s", portcall_id, eventType, JSON.stringify(notification));
-                    pps.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate);
-                    data.Sent = bestEstimate.toISOString();
+                    promises.push(pps.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate).then(_ => {
+                        console.info("notification sent!");
+                        data.Sent = bestEstimate.toISOString();
+                    }));
                 }
-            });
-        });
-    };
+            }
+        }
+
+        return Promise.allSettled(promises);
+    }
 }
 export const sendSmsNotications = _createSendSmsNotications(pinpointService);
 
@@ -153,9 +159,8 @@ function isNotificationNeeded(sent: moment.Moment, bestEstimate: moment.Moment):
     return Math.abs(difference.minutes()) >= SEND_NOTIFICATION_DIFFERENCE_MINUTES;
 }
 
-function updateEstimates(estimates: ShiplistEstimate[]): DbShipsToNotificate {
-    const notification: DbShipsToNotificate = {};
-    console.info("new estimates %s", JSON.stringify(estimates));
+function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToNotificate): DbShipsToNotificate {
+//    console.info("new estimates %s", JSON.stringify(estimates));
 
     console.info("notification to update %s", JSON.stringify(notification));
 
