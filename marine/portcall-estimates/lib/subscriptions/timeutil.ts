@@ -14,7 +14,7 @@ export function getStartTime(time: string): Date {
     const hours = +time.substring(0, 2);
     const minutes = +time.substring(2);
 
-    const startTime = moment(now).hours(hours).minutes(minutes).seconds(0).tz('Europe/Helsinki') as moment.Moment;
+    const startTime = moment(now).hours(hours).minutes(minutes).seconds(0).milliseconds(0).tz('Europe/Helsinki') as moment.Moment;
 
     if(isAfter(now, hours, minutes)) {
         startTime.subtract(1, 'days');
@@ -28,5 +28,5 @@ export function getStartTimeForShiplist(time: string): Date {
     const hours = +time.substring(0, 2);
     const minutes = +time.substring(2);
 
-    return moment(now).hours(hours).minutes(minutes).seconds(0).tz('Europe/Helsinki').toDate();
+    return moment(now).hours(hours).minutes(minutes).seconds(0).milliseconds(0).tz('Europe/Helsinki').toDate();
 }

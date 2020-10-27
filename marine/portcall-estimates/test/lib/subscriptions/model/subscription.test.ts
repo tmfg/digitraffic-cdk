@@ -1,4 +1,4 @@
-import {EstimateSubscription, validateSubscription} from "../../../lib/subscriptions/model/subscription";
+import {EstimateSubscription, validateSubscription} from "../../../../lib/subscriptions/model/subscription";
 
 describe('subscription', () => {
 
