@@ -113,7 +113,7 @@ function updateSubscription(imo: number, s: DbSubscription) {
     });
 }
 
-function _createSendSmsNotications(pps: PinpointService): (notification: DbShipsToNotificate, phoneNumber: string) => Promise<any> {
+export function _createSendSmsNotications(pps: PinpointService): (notification: DbShipsToNotificate, phoneNumber: string) => Promise<any> {
     return async (notification: DbShipsToNotificate, phoneNumber: string): Promise<any> => {
         Object.keys(notification)?.forEach((key: string) => {
             const portcall_id = Number(key);
@@ -150,7 +150,7 @@ export const sendSmsNotications = _createSendSmsNotications(pinpointService);
 function isNotificationNeeded(sent: moment.Moment, bestEstimate: moment.Moment): boolean {
     const difference = moment.duration(sent.diff(bestEstimate));
 
-    return Math.abs(difference.minutes()) >= SEND_NOTIFICATION_DIFFERENCE_MINUTES;
+    return Math.abs(difference.as('minutes')) >= SEND_NOTIFICATION_DIFFERENCE_MINUTES;
 }
 
 function updateEstimates(estimates: ShiplistEstimate[]): DbShipsToNotificate {

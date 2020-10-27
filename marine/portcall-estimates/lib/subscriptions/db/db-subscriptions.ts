@@ -12,22 +12,13 @@ export const SUBSCRIPTIONS_LOCODE_IDX_NAME = 'PortcallEstimateSubscriptions_Loco
 export const SUBSCRIPTION_PHONENUMBER_ATTRIBUTE = "PhoneNumber";
 export const SUBSCRIPTION_LOCODE_ATTRIBUTE = "Locode";
 
-interface DbShipEvent {
-    [event: string]: string
-}
-
-interface DbNameableShip {
-    name: string
-}
-
 interface DbShipWithSources {
-    [source: string]: DbShipEvent
+    name: string
+    [source: string]: any
 }
-
-type DbShip = DbNameableShip & DbShipWithSources
 
 export interface DbShipsToNotificate {
-    [portcallId: number]: DbShip
+    [portcallId: number]: DbShipWithSources
 }
 
 export interface DbSubscription {
