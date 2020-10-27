@@ -37,7 +37,6 @@ export interface PinpointService {
     sendNoSubscriptionsMessage(destinationNumber: string): Promise<any>
 
     sendSubscriptionLimitReached(destinationNumber: string): Promise<any>
-
 }
 
 const defaultPinpoint: PinpointService = {
@@ -78,7 +77,7 @@ const defaultPinpoint: PinpointService = {
     ): Promise<any> => {
         const timeAsString = newTime.format("HH:mm");
 
-        return await(defaultPinpoint.sendSmsMessage(destinationNumber, `Ship ${shipName} ${eventType} has a new estimate ${timeAsString}`));
+        return await(defaultPinpoint.sendSmsMessage(destinationNumber, `Ship ${shipName} has a new ${eventType} estimate ${timeAsString}`));
     },
 
     sendSubscriptionOKMessage: async (destinationNumber: string): Promise<any> => {

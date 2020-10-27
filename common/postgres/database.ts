@@ -1,4 +1,4 @@
-import {IDatabase} from "pg-promise";
+import {IDatabase, ITaskContext} from "pg-promise";
 const pgp = require('pg-promise')();
 
 // convert numeric types to number instead of string
@@ -26,8 +26,14 @@ export function initDbConnection(
     return pgp(`postgresql://${username}:${password}@${url}`, options);
 }
 
+export async function inTransaction (
+    fn: (db: ITaskContext) => any): Promise<any> {
+
+    return await inDatabase(db => db.tx((t: ITaskContext) => fn(t)));
+}
+
 export async function inDatabase(
-    fn: (db: IDatabase<any, any>) => any) {
+    fn: (db: IDatabase<any, any>) => any): Promise<any> {
     const db = initDbConnection(
         process.env.DB_USER as string,
         process.env.DB_PASS as string,
