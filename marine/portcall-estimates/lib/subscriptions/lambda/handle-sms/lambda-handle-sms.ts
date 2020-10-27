@@ -6,7 +6,7 @@ import {
     SubscriptionOperation
 } from '../../smsutils';
 import {SNSEvent} from 'aws-lambda';
-import {sendHelpMessage} from '../../service/pinpoint';
+import {default as pinpointService} from '../../service/pinpoint';
 
 export async function handler(event: SNSEvent) {
     const snsEvent = JSON.parse((event as SNSEvent).Records[0].Sns.Message);
@@ -21,11 +21,11 @@ export async function handleSms(op: SubscriptionOperation, event: SnsSubscriptio
             console.error('method=handleSms, Invalid subscription operation');
             return Promise.reject('Invalid subscription operation');
         case SubscriptionOperation.HELP:
-            return await sendHelpMessage(event.originationNumber);
+            return await pinpointService.sendHelpMessage(event.originationNumber);
         case SubscriptionOperation.REMOVE:
             const snsSubscriptionRemoval = parseSnsSubscriptionRemovalEvent(event);
             if(!snsSubscriptionRemoval) {
-                return await sendHelpMessage(event.originationNumber);
+                return await pinpointService.sendHelpMessage(event.originationNumber);
             }
             return await removeSubscription(snsSubscriptionRemoval);
         case SubscriptionOperation.LIST:
@@ -33,7 +33,7 @@ export async function handleSms(op: SubscriptionOperation, event: SnsSubscriptio
         case SubscriptionOperation.SUBSCRIBE:
             const snsSubscription = parseSnsSubscriptionEvent(event);
             if(!snsSubscription) {
-                return await sendHelpMessage(event.originationNumber);
+                return await pinpointService.sendHelpMessage(event.originationNumber);
             }
             return await addSubscription(snsSubscription);
     }
