@@ -85,6 +85,9 @@ async function getETA(
     if (resp.status == 204) {
         console.log(`method=getETAs status=${resp.status} ship ${ship.imo} had speed lower than 0,2 knots`);
         return Promise.resolve(null);
+    } else if (resp.status == 404) {
+        console.log(`method=getETAs status=${resp.status} ship ${ship.imo} has not reported a position for more than 2 hours`);
+        return Promise.resolve(null);
     } else if (resp.status != 200) {
         console.error(`method=getETAs status=${resp.status}`);
         return Promise.reject();
