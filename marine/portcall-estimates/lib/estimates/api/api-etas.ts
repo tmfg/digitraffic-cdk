@@ -80,7 +80,8 @@ async function getETA(
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
-        }
+        },
+        validateStatus: (status) => status == 200 || status == 204 || status == 404
     });
     if (resp.status == 204) {
         console.log(`method=getETAs status=${resp.status} ship ${ship.imo} had speed lower than 0,2 knots`);
