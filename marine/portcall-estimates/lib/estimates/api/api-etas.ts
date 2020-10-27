@@ -93,8 +93,10 @@ async function getETA(
         console.error(`method=getETAs status=${resp.status}`);
         return Promise.reject();
     }
-    return Promise.resolve(resp.data as ETAResponse)
-        .then(e => {
+    return Promise.resolve(resp.data as ETAResponse[])
+        .then(etaResponse => {
+            // always an array with a single ETA
+            const e = etaResponse[0];
             return {
                 locode: portAreaGeometry!!.locode,
                 imo: ship.imo,
