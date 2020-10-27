@@ -20,7 +20,7 @@ async function createEtaOAuthToken(
             grant_type: 'client_credentials'
         });
         if (resp.status != 200) {
-            console.error(`method=createEtaOAuthToken returned status ${resp.status}`);
+            console.error(`method=createEtaOAuthToken returned status=${resp.status}`);
             return Promise.reject();
         }
         return Promise.resolve(resp.data);
@@ -39,7 +39,7 @@ export async function getETAs(
     endpointAuthUrl: string,
     endpointUrl: string,
     ships: DbETAShip[],
-    portAreaGeometries: PortareaGeometry[]): Promise<ShipETA[]> {
+    portAreaGeometries: PortareaGeometry[]): Promise<Array<ShipETA | null>> {
 
     const start = Date.now();
 
@@ -68,21 +68,25 @@ async function getETA(
     endpointUrl: string,
     token: string,
     ship: DbETAShip,
-    portAreaGeometry?: PortareaGeometry): Promise<ShipETA> {
+    portAreaGeometry?: PortareaGeometry): Promise<ShipETA | null> {
 
     if (!portAreaGeometry) {
         console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} not found!`);
         return Promise.reject();
     }
 
-    const resp = await axios.get(`${endpointUrl}?imo=${ship.imo}&destination_lat=${portAreaGeometry.latitude}&destination_lon=${portAreaGeometry.longitude}`, {
+    const url = `${endpointUrl}?imo=${ship.imo}&destination_lat=${portAreaGeometry.latitude}&destination_lon=${portAreaGeometry.longitude}&filter=faster(0.2)`
+    const resp = await axios.get(url, {
         headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
         }
     });
-    if (resp.status != 200) {
-        console.error(`method=getETAs returned status: ${resp.status}`);
+    if (resp.status == 204) {
+        console.log(`method=getETAs status=${resp.status} ship ${ship.imo} had speed lower than 0,2 knots`);
+        return Promise.resolve(null);
+    } else if (resp.status != 200) {
+        console.error(`method=getETAs status=${resp.status}`);
         return Promise.reject();
     }
     return Promise.resolve(resp.data as ETAResponse)

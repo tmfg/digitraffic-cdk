@@ -14,13 +14,13 @@ export async function updateETAEstimates(
     ships: DbETAShip[],
     portAreaGeometries: PortareaGeometry[]): Promise<ShipETA[]> {
     
-    const etas = await getETAs(endpointClientId,
+    const etas: ShipETA[] = (await getETAs(endpointClientId,
         endpointClientSecret,
         endpointClientAudience,
         endpointAuthUrl,
         endpointUrl,
         ships,
-        portAreaGeometries);
+        portAreaGeometries)).filter(eta => eta != null) as ShipETA[];
 
     const etaToEstimateWithSource = etaToEstimate(endpointSource);
     const estimates: ApiEstimate[] = etas.map(etaToEstimateWithSource);
