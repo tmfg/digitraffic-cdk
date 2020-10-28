@@ -52,20 +52,33 @@ export function newSubscription(): DbSubscription {
     };
 }
 
-export function newNotification(timeMap: any): DbShipsToNotificate {
+export function newNotification(etaMap: any, etdMap?: any): DbShipsToNotificate {
     const notification = {
         '12333': {
             'name': 'PURKKI',
             'ETA': {
                 'Sent': moment()
+            },
+            'ETD': {
+                'Sent': moment()
             }
         }
     } as any;
 
-    for(const key of Object.keys(timeMap)) {
-        const time = timeMap[key];
+    if(etaMap) {
+        for (const key of Object.keys(etaMap)) {
+            const time = etaMap[key];
 
-        notification["12333"]["ETA"][key] = time;
+            notification["12333"]["ETA"][key] = time;
+        }
+    }
+
+    if(etdMap) {
+        for (const key of Object.keys(etdMap)) {
+            const time = etdMap[key];
+
+            notification["12333"]["ETD"][key] = time;
+        }
     }
 
     return notification;

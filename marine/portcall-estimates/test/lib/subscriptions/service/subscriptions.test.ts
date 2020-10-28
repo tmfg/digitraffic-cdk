@@ -45,7 +45,24 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     async function assertSendNotifications(sendStub: any, notification: any, estimateTime: moment.Moment) {
         await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, PHONE_NUMBER);
 
-        expect(sendStub.calledWith(PHONE_NUMBER, 'PURKKI', 'ETA', estimateTime)).toBe(true);
+        await assertMultipleSendNotifications(sendStub, notification, {type: 'ETA', estimateTime: estimateTime});
+    }
+
+    async function assertMultipleSendNotifications(sendStub: any, notification: any, ...times: any[]) {
+        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, PHONE_NUMBER);
+
+        expect(sendStub.callCount).toBe(times.length);
+
+        let index = 0;
+        times.forEach(t => {
+            expect(sendStub.getCall(index++).calledWith(PHONE_NUMBER, 'PURKKI', t.type, t.estimateTime)).toBe(true);
+        });
+    }
+
+    async function assertNoNotifications(sendStub: any, notification: any) {
+        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, PHONE_NUMBER);
+
+        expect(sendStub.notCalled).toBe(true);
     }
 
     test('valid addSubscription sends "subscription created" SMS', async () => {
@@ -112,9 +129,9 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
         const estimateTime = moment();
         const notification = newNotification({
-            "Portnet": estimateTime
+            "Portnet": estimateTime,
+            "Sent": undefined
         });
-        notification[12333]["ETA"]["Sent"] = undefined;
 
         await assertSendNotifications(sendStub, notification, estimateTime);
     });
@@ -169,9 +186,20 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         await assertNoNotifications(sendStub, notification);
     });
 
-    async function assertNoNotifications(sendStub: any, notification: any) {
-        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, PHONE_NUMBER);
+    test('sendSmsNotications - updated estimate sends notification SMS', async () => {
+        const sendStub = stubPinpoint('sendDifferenceNotification');
 
-        expect(sendStub.notCalled).toBe(true);
-    }
+        const estimateTime1 = moment().subtract(2, 'hours');
+        const estimateTime2 = moment().subtract(3, 'hours');
+        const notification: DbShipsToNotificate = newNotification({
+            "Portnet": estimateTime1
+        }, {
+            "Portnet": estimateTime2
+        });
+
+        await assertMultipleSendNotifications(sendStub, notification,
+            {type: 'ETA', estimateTime: estimateTime1},
+            {type: 'ETD', estimateTime: estimateTime2}
+        );
+    });
 }));
