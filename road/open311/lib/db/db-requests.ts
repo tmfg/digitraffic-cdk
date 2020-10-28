@@ -8,94 +8,81 @@ const DELETE_REQUEST_PS = new PreparedStatement({
 
 const UPSERT_REQUEST_PS = new PreparedStatement({
     name: 'upsert-request-by-id',
-    text: `INSERT INTO open311_service_request(
-                            service_request_id,
-                            status,
-                            status_notes,
-                            service_name,
-                            service_code,
-                            description,
-                            agency_responsible,
-                            service_notice,
-                            requested_datetime,
-                            updated_datetime,
-                            expected_datetime,
-                            address,
-                            address_id,
-                            zipcode,
-                            geometry,
-                            media_url,
-                            status_id,
-                            vendor_status,
-                            title,
-                            service_object_id,
-                            service_object_type,
-                            media_urls)
-                         VALUES ($1,
-                                 $2,
-                                 $3,
-                                 $4,
-                                 $5,
-                                 $6,
-                                 $7,
-                                 $8,
-                                 $9,
-                                 $10,
-                                 $11,
-                                 $12,
-                                 $13,
-                                 $14,
-                                 (CASE WHEN $15::numeric IS NOT NULL AND $16::numeric IS NOT NULL THEN ST_POINT($15::numeric, $16::numeric) ELSE NULL END),
-                                 $17,
-                                 $18,
-                                 $19,
-                                 $20,
-                                 $21,
-                                 $22,
-                                 $23)
-                         ON CONFLICT (service_request_id) DO UPDATE SET
-                                 status_notes = $3,
-                                 service_name = $4,
-                                 service_code = $5,
-                                 description = $6,
-                                 agency_responsible = $7,
-                                 service_notice = $8,
-                                 requested_datetime = $9,
-                                 updated_datetime = $10,
-                                 expected_datetime = $11,
-                                 address = $12,
-                                 address_id = $13,
-                                 zipcode = $14,
-                                 geometry = (CASE WHEN $15::numeric IS NOT NULL AND $16::numeric IS NOT NULL THEN ST_POINT($15::numeric, $16::numeric) ELSE NULL END),
-                                 media_url = $17,
-                                 status_id = $18,
-                                 vendor_status = $19,
-                                 title = $20,
-                                 service_object_id = $21,
-                                 service_object_type = $22,
-                                 media_urls = $23
-                    `
+    text: `
+    INSERT INTO open311_service_request(
+        service_request_id,
+        status,
+        status_notes,
+        service_name,
+        service_code,
+        description,
+        agency_responsible,
+        service_notice,
+        requested_datetime,
+        updated_datetime,
+        expected_datetime,
+        address,
+        address_id,
+        zipcode,
+        geometry,
+        media_url,
+        status_id,
+        vendor_status,
+        title,
+        service_object_id,
+        service_object_type,
+        media_urls,
+        subject_id,
+        subsubject_id)
+     VALUES (
+         $1,
+         $2,
+         $3,
+         $4,
+         $5,
+         $6,
+         $7,
+         $8,
+         $9,
+         $10,
+         $11,
+         $12,
+         $13,
+         $14,
+         (CASE WHEN $15::numeric IS NOT NULL AND $16::numeric IS NOT NULL THEN ST_POINT($15::numeric, $16::numeric) ELSE NULL END),
+         $17,
+         $18,
+         $19,
+         $20,
+         $21,
+         $22,
+         $23,
+         $24,
+         $25)
+    ON CONFLICT (service_request_id) DO UPDATE SET
+        status_notes = $3,
+        service_name = $4,
+        service_code = $5,
+        description = $6,
+        agency_responsible = $7,
+        service_notice = $8,
+        requested_datetime = $9,
+        updated_datetime = $10,
+        expected_datetime = $11,
+        address = $12,
+        address_id = $13,
+        zipcode = $14,
+        geometry = (CASE WHEN $15::numeric IS NOT NULL AND $16::numeric IS NOT NULL THEN ST_POINT($15::numeric, $16::numeric) ELSE NULL END),
+        media_url = $17,
+        status_id = $18,
+        vendor_status = $19,
+        title = $20,
+        service_object_id = $21,
+        service_object_type = $22,
+        media_urls = $23,
+        subject_id = $24,
+        subsubject_id = $25`
 });
-
-interface ServiceRequestServiceCode {
-    readonly service_code: string | null;
-}
-
-interface ServiceRequestStatusId {
-    readonly status_id: string | null;
-}
-
-export function findServiceCodes(db: IDatabase<any, any>): Promise<ServiceRequestServiceCode[]> {
-    return db.manyOrNone("SELECT DISTINCT service_code FROM open311_service_request");
-}
-
-export function findStateIds(db: IDatabase<any, any>): Promise<ServiceRequestStatusId[]> {
-    return db.manyOrNone("SELECT status_id FROM open311_service_request");
-}
-
-export function findSubjectIds(db: IDatabase<any, any>): Promise<ServiceRequestStatusId[]> {
-    return db.manyOrNone("SELECT DISTINCT status_id FROM open311_service_request");
-}
 
 export function findAll(db: IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`).then(requests => requests.map(r => toServiceRequest(r)));
@@ -138,30 +125,33 @@ export function doDelete(
     });
 }
 
-const SELECT_REQUEST = `SELECT service_request_id,
-                               status,
-                               status_notes,
-                               service_name,
-                               service_code,
-                               description,
-                               agency_responsible,
-                               service_notice,
-                               requested_datetime,
-                               updated_datetime,
-                               expected_datetime,
-                               address,
-                               address_id,
-                               zipcode,
-                               ST_X(geometry) AS long,
-                               ST_Y(geometry) AS lat,
-                               media_url,
-                               status_id,
-                               vendor_status,
-                               title,
-                               service_object_id,
-                               service_object_type,
-                               media_urls
-                        FROM open311_service_request`;
+const SELECT_REQUEST = `
+    SELECT service_request_id,
+        status,
+        status_notes,
+        service_name,
+        service_code,
+        description,
+        agency_responsible,
+        service_notice,
+        requested_datetime,
+        updated_datetime,
+        expected_datetime,
+        address,
+        address_id,
+        zipcode,
+        ST_X(geometry) AS long,
+        ST_Y(geometry) AS lat,
+        media_url,
+        status_id,
+        vendor_status,
+        title,
+        service_object_id,
+        service_object_type,
+        media_urls,
+        subject_id,
+        subsubject_id
+FROM open311_service_request`;
 
 function toServiceRequest(r: any): ServiceRequestWithExtensions {
     return {
@@ -187,7 +177,9 @@ function toServiceRequest(r: any): ServiceRequestWithExtensions {
         title: r.title,
         service_object_id: r.service_object_id,
         service_object_type: r.service_object_type,
-        media_urls: r.media_urls
+        media_urls: r.media_urls,
+        subject_id: r.subject_id,
+        subSubject_id: r.subsubject_id
     };
 }
 
@@ -214,8 +206,10 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
         title: null,
         service_object_id: null,
         service_object_type: null,
-        media_urls: null
-    }, ...serviceRequest };
+        media_urls: null,
+        subject_id: null,
+        subSubject_id: null
+    }, ...serviceRequest};
 
     // DPO-1167 handle long/lat empty string
     // @ts-ignore
@@ -250,6 +244,8 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
     ret.push(editObjectWithLonLat.service_object_id);
     ret.push(editObjectWithLonLat.service_object_type);
     ret.push(editObjectWithLonLat.media_urls);
+    ret.push(editObjectWithLonLat.subject_id);
+    ret.push(editObjectWithLonLat.subSubject_id);
 
     return ret;
 }

@@ -66,7 +66,9 @@ export function toServiceRequestWithExtensions(r: ServiceRequestWithExtensions):
                 title: r.title,
                 service_object_id: r.service_object_id,
                 service_object_type: r.service_object_type,
-                media_urls: r.media_urls
+                media_urls: r.media_urls,
+                subject_id: r.subject_id,
+                subSubject_id: r.subSubject_id
             }
         }
     };

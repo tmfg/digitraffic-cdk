@@ -50,7 +50,9 @@ export function newServiceRequest(status: ServiceRequestStatus = ServiceRequestS
         title: 'some title',
         service_object_id: 'some service_object_id',
         service_object_type: 'some service_object_type',
-        media_urls: ['http://example.com', 'http://example.net']
+        media_urls: ['http://example.com', 'http://example.net'],
+        subject_id: 1,
+        subSubject_id: 2
     };
 }
 

@@ -62,7 +62,9 @@ function addNestedExtensionProps(r: any) {
         title: r.title,
         service_object_id: r.service_object_id,
         service_object_type: r.service_object_type,
-        media_urls: r.media_urls
+        media_urls: r.media_urls,
+        subject_id: r.subject_id,
+        subSubject_id: r.subSubject_id
     };
 }
 
@@ -79,4 +81,8 @@ function deleteExtensionProps(r: ServiceRequestWithExtensions) {
     delete r.service_object_type;
     // @ts-ignore
     delete r.media_urls;
+    // @ts-ignore
+    delete r.subject_id;
+    // @ts-ignore
+    delete r.subSubject_id;
 }
