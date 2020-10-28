@@ -2,7 +2,7 @@ import moment from "moment";
 import {ApiEstimate, EventType} from "../../lib/estimates/model/estimate";
 import {TIME_FORMAT} from "../../lib/subscriptions/model/subscription";
 import {DYNAMODB_TIME_FORMAT, SubscriptionType} from "../../lib/subscriptions/service/subscriptions";
-import {DbSubscription} from "../../lib/subscriptions/db/db-subscriptions";
+import {DbShipsToNotificate, DbSubscription} from "../../lib/subscriptions/db/db-subscriptions";
 const { v4: uuidv4 } = require('uuid');
 
 export function someNumber(): number {
@@ -50,6 +50,25 @@ export function newSubscription(): DbSubscription {
         Locode: 'FIHKI',
         PhoneNumber: '+1234567890',
     };
+}
+
+export function newNotification(timeMap: any): DbShipsToNotificate {
+    const notification = {
+        '12333': {
+            'name': 'PURKKI',
+            'ETA': {
+                'Sent': moment()
+            }
+        }
+    } as any;
+
+    for(const key of Object.keys(timeMap)) {
+        const time = timeMap[key];
+
+        notification["12333"]["ETA"][key] = time;
+    }
+
+    return notification;
 }
 
 export function newVessel(estimate: ApiEstimate): Vessel {
