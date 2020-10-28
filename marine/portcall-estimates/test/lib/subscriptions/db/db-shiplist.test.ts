@@ -1,6 +1,5 @@
-import * as pgPromise from "pg-promise"
 import * as ShiplistDAO from '../../../../lib/subscriptions/db/db-shiplist';
-import {dbTestBase} from "../../db-testutil";
+import {inTransaction, dbTestBase} from "../../db-testutil";
 import {updateEstimate} from "../../../../lib/estimates/db/db-estimates";
 import {EventType} from "../../../../lib/estimates/model/estimate";
 
@@ -9,25 +8,29 @@ const TEST_IMO = 67890;
 const LOCODE_RAUMA = "FIRAU";
 const LOCODE_HELSINKI = "FIHEL";
 
-describe('shiplists', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
-    async function assertFindByLocode(locode: string, count: number) {
-        //TODO: fix times
-        const subs = await ShiplistDAO.findByLocode(db, new Date(), new Date(), locode);
+describe('shiplists', dbTestBase((db) => {
+    const startTime = new Date();
+    startTime.setHours(startTime.getHours() - 1);
+
+    const endTime = new Date(startTime);
+    endTime.setDate(endTime.getDate() + 1);
+
+    async function assertFindByLocode(t: any, locode: string, count: number) {
+        const subs = await ShiplistDAO.findByLocode(t, startTime, endTime, locode);
 
         expect(subs.length).toBe(count);
     }
 
-    async function assertFindByLocodeAndImo(locode: string, imo: number, count: number) {
-//        const subs = await ShiplistDAO.findByLocodeAndImo(db, new Date(), locode, imo);
-    // TODO: use taskcontext
-//        expect(subs.length).toBe(count);
+    async function assertFindByLocodeAndImo(t: any, locode: string, imo: number, count: number) {
+        const subs = await ShiplistDAO.findByLocodeAndImo(t, startTime, endTime, locode, imo);
+        expect(subs.length).toBe(count);
     }
 
-    test('findByLocode - empty', async () => {
-        await assertFindByLocode(LOCODE_RAUMA, 0);
-    });
+   test('findByLocode - empty', inTransaction(db, async (t: any) => {
+        await assertFindByLocode(t, LOCODE_RAUMA, 0);
+    }));
 
-    test('findByLocode - one', async() => {
+    test('findByLocode - one', inTransaction(db, async (t: any) => {
         await updateEstimate(db, {
             eventTime:new Date().toISOString(),
             eventType:EventType.ETA,
@@ -39,11 +42,11 @@ describe('shiplists', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             source: 'test'
         });
 
-        assertFindByLocode(LOCODE_RAUMA, 1);
-        assertFindByLocode(LOCODE_HELSINKI, 0);
-    });
+        assertFindByLocode(t, LOCODE_RAUMA, 1);
+        assertFindByLocode(t, LOCODE_HELSINKI, 0);
+    }));
 
-    test('findByLocodeAndImo - one', async() => {
+    test('findByLocodeAndImo - one', inTransaction(db, async (t: any) => {
         await updateEstimate(db, {
             eventTime:new Date().toISOString(),
             eventType:EventType.ETA,
@@ -55,8 +58,9 @@ describe('shiplists', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
             source: 'test'
         });
 
-        assertFindByLocodeAndImo(LOCODE_RAUMA, TEST_IMO, 1);
-        assertFindByLocodeAndImo(LOCODE_RAUMA, TEST_IMO+1000, 0);
-        assertFindByLocodeAndImo(LOCODE_HELSINKI, TEST_IMO, 0);
-    });
+        assertFindByLocode(t, LOCODE_RAUMA, 1);
+        assertFindByLocodeAndImo(t, LOCODE_RAUMA, TEST_IMO, 1);
+        assertFindByLocodeAndImo(t, LOCODE_RAUMA, TEST_IMO+1000, 0);
+        assertFindByLocodeAndImo(t, LOCODE_HELSINKI, TEST_IMO, 0);
+    }));
 }));

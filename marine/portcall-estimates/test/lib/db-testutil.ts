@@ -1,4 +1,4 @@
-import * as pgPromise from "pg-promise";
+import {IDatabase, ITask} from "pg-promise";
 import {initDbConnection} from "digitraffic-lambda-postgres/database";
 import {ApiEstimate} from "../../lib/estimates/model/estimate";
 import {createUpdateValues, DbEstimate} from "../../lib/estimates/db/db-estimates";
@@ -6,9 +6,15 @@ import {DocumentClient} from "aws-sdk/clients/dynamodb";
 import {SUBSCRIPTIONS_TABLE_NAME} from "../../lib/subscriptions/db/db-subscriptions";
 import {PortAreaDetails, PortCall, Vessel, VesselLocation} from "./testdata";
 
-export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
+export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
+    return async () => {
+        await db.tx(async (t: any) => await fn(t));
+    };
+}
+
+export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
     return () => {
-        const db: pgPromise.IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
+        const db: IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
             noWarnings: true // ignore duplicate connection warning for tests
         });
 
@@ -20,7 +26,7 @@ export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
         });
 
         afterAll(async () => {
-            await truncate(db);
+//            await truncate(db);
             db.$pool.end();
         });
 
@@ -56,7 +62,7 @@ async function truncateDynamoDb(ddb: DocumentClient) {
     ));
 }
 
-export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<any> {
+export async function truncate(db: IDatabase<any, any>): Promise<any> {
     return db.tx(t => {
         return Promise.all([
             db.none('DELETE FROM portcall_estimate'),
@@ -68,7 +74,7 @@ export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<any> 
     });
 }
 
-export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbEstimate[]> {
+export function findAll(db: IDatabase<any, any>): Promise<DbEstimate[]> {
     return db.tx(t => {
        return t.manyOrNone(`
         SELECT
@@ -88,7 +94,7 @@ export function findAll(db: pgPromise.IDatabase<any, any>): Promise<DbEstimate[]
     });
 }
 
-export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate[]) {
+export function insert(db: IDatabase<any, any>, estimates: ApiEstimate[]) {
     return db.tx(t => {
         return t.batch(estimates.map(e => {
             return t.none(`
@@ -124,7 +130,7 @@ export function insert(db: pgPromise.IDatabase<any, any>, estimates: ApiEstimate
     });
 }
 
-export function insertVessel(db: pgPromise.IDatabase<any, any>, vessel: Vessel) {
+export function insertVessel(db: IDatabase<any, any>, vessel: Vessel) {
     return db.tx(t => {
         db.none(`
             INSERT INTO vessel(
@@ -162,7 +168,7 @@ export function insertVessel(db: pgPromise.IDatabase<any, any>, vessel: Vessel) 
     });
 }
 
-export function insertVesselLocation(db: pgPromise.IDatabase<any, any>, vl: VesselLocation) {
+export function insertVesselLocation(db: IDatabase<any, any>, vl: VesselLocation) {
     return db.tx(t => {
         db.none(`
             INSERT INTO vessel_location(
@@ -196,7 +202,7 @@ export function insertVesselLocation(db: pgPromise.IDatabase<any, any>, vl: Vess
     });
 }
 
-export function insertPortAreaDetails(db: pgPromise.IDatabase<any, any>, p: PortAreaDetails) {
+export function insertPortAreaDetails(db: IDatabase<any, any>, p: PortAreaDetails) {
     return db.tx(t => {
         db.none(`
             INSERT INTO port_area_details(
@@ -212,7 +218,7 @@ export function insertPortAreaDetails(db: pgPromise.IDatabase<any, any>, p: Port
     });
 }
 
-export function insertPortCall(db: pgPromise.IDatabase<any, any>, p: PortCall) {
+export function insertPortCall(db: IDatabase<any, any>, p: PortCall) {
     return db.tx(t => {
         db.none(`
             INSERT INTO port_call(

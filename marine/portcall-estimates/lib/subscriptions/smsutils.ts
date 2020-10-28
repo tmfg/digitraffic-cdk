@@ -21,7 +21,7 @@ export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperati
     }
 }
 
-// correct syntax: TILAA FINLI 23:30
+// correct syntax: SUBSCRIBE FINLI 23:30
 export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): EstimateSubscription | null {
     const parts = event.messageBody.split(' ');
 

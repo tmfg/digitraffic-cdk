@@ -1,9 +1,9 @@
-import {IDatabase} from "pg-promise";
+import {ITask} from "pg-promise";
 
 import * as ShiplistDB from "../db/db-shiplist";
 import {ShiplistEstimate} from "../db/db-shiplist";
-import {inDatabase} from "digitraffic-lambda-postgres/database";
 import {getStartTimeForShiplist} from "../timeutil";
+import {inTransaction} from "../../../../../common/postgres/database";
 
 export async function getEstimates(time: string, locode: string): Promise<ShiplistEstimate[]> {
     const start = Date.now();
@@ -12,8 +12,8 @@ export async function getEstimates(time: string, locode: string): Promise<Shipli
     const endTime = new Date(startTime);
     endTime.setDate(endTime.getDate() + 1);
 
-    return await inDatabase(async (db: IDatabase<any, any>) => {
-        return await ShiplistDB.findByLocode(db, startTime, endTime, locode);
+    return await inTransaction(async (t: ITask<any>) => {
+        return await ShiplistDB.findByLocode(t, startTime, endTime, locode);
     }).finally(() => {
         console.info("method=getShiplist tookMs=%d", (Date.now() - start));
     })
