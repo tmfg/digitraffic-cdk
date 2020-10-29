@@ -11,6 +11,7 @@ export interface Props {
     estimateUpdatedTopicArn: string;
     pinpointApplicationId: string;
     pinpointTelephoneNumber: string;
+    shiplistUrl: string
 }
 export interface DbProps {
     username: string;

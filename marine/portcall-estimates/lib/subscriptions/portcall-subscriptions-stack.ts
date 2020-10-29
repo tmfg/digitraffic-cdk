@@ -115,7 +115,8 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
                 PINPOINT_NUMBER: props.pinpointTelephoneNumber,
                 DB_USER: props.dbProps.username,
                 DB_PASS: props.dbProps.password,
-                DB_URI: props.dbProps.ro_uri
+                DB_URI: props.dbProps.ro_uri,
+                SHIPLIST_URL: props.shiplistUrl
             }
         });
         sendShiplistLambda.addToRolePolicy(

@@ -3,8 +3,9 @@ import * as ShiplistService from "../../service/shiplist";
 import {default as pinpointService} from "../../service/pinpoint";
 import * as SnsService from "../../service/sns";
 import {ShiplistEstimate} from "../../db/db-shiplist";
-
 const moment = require('moment-timezone');
+
+const shiplistUrl = process.env.SHIPLIST_URL as string
 
 export async function handler() {
     const time = moment.tz(new Date(), "Europe/Helsinki").format(SubscriptionsService.DYNAMODB_TIME_FORMAT);
@@ -43,7 +44,7 @@ function convertToSms(locode: string, estimates: ShiplistEstimate[]): string {
         return `${e.event_type} ${e.event_source} ${timestring} ${e.ship_name}`; }
     ).join('\n');
 
-    return `Laivalista ${moment().format("DD.MM")} ${locode}:\n${shiplist}`;
+    return `Laivalista ${moment().format("DD.MM")} ${locode}:\n${shiplist}\n${shiplistUrl}${locode}`;
 }
 
 function isSameDate(date1: Date, date2: Date): boolean {
