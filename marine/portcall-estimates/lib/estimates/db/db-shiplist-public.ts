@@ -32,7 +32,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
                   END
           ) AND
-        pe.event_time > NOW() AND
+        pe.event_time > NOW() - INTERVAL '3 HOURS' AND
         pe.event_time < CURRENT_DATE + INTERVAL '3 DAYS' AND
         pe.location_locode = $1
     ORDER BY pe.event_time
