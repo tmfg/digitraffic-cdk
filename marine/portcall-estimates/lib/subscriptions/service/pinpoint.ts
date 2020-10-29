@@ -1,5 +1,6 @@
 import {Pinpoint} from 'aws-sdk';
 import moment from 'moment-timezone';
+import {increaseSmsSentAmount} from "../db/db-info";
 
 const pinpoint = new Pinpoint();
 
@@ -61,8 +62,10 @@ const defaultPinpoint: PinpointService = {
         };
 
 //        console.info('method=sendMessage, Sending SMS');
-        return await pinpoint.sendMessages(params).promise()
-            .catch((error: Error) => console.error(`method=sendMessage error=${error}`))
+        return Promise.allSettled([
+            pinpoint.sendMessages(params).promise()
+                .catch((error: Error) => console.error(`method=sendMessage error=${error}`)),
+            increaseSmsSentAmount()]);
     },
 
     sendHelpMessage: async (destinationNumber: string): Promise<any>  => {

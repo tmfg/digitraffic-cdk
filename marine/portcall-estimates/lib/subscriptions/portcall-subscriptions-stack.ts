@@ -14,10 +14,11 @@ import {AttributeType, Table} from '@aws-cdk/aws-dynamodb';
 import {
     SUBSCRIPTION_LOCODE_ATTRIBUTE,
     SUBSCRIPTION_PHONENUMBER_ATTRIBUTE,
+    SUBSCRIPTIONS_LOCODE_IDX_NAME,
     SUBSCRIPTIONS_TABLE_NAME,
-    SUBSCRIPTIONS_TIME_IDX_NAME,
-    SUBSCRIPTIONS_LOCODE_IDX_NAME
+    SUBSCRIPTIONS_TIME_IDX_NAME
 } from "./db/db-subscriptions";
+import {INFO_ID_ATTRIBUTE, INFO_TABLE_NAME} from "./db/db-info";
 
 export class PortcallEstimateSubscriptionsStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -45,6 +46,8 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         subscriptionTable.grantReadWriteData(smsHandlerLambda);
         subscriptionTable.grantReadWriteData(sendShiplistLambda);
         subscriptionTable.grantReadWriteData(estimationHandlerLambda);
+
+        this.createSubscriptionInfoTable();
 
         PublicApi.create(vpc,
             lambdaDbSg,
@@ -77,6 +80,15 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
             partitionKey: { name: 'Locode', type: AttributeType.STRING }
         });
         return table;
+    }
+
+    private createSubscriptionInfoTable() {
+        return new Table(this, 'info-table', {
+            partitionKey: { name: INFO_ID_ATTRIBUTE, type: AttributeType.STRING},
+            tableName: INFO_TABLE_NAME,
+            readCapacity: 1,
+            writeCapacity: 1
+        });
     }
 
     private createSendShiplistLambda(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: Props): Function {
