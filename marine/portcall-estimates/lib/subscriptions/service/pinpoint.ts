@@ -63,9 +63,12 @@ const defaultPinpoint: PinpointService = {
 
 //        console.info('method=sendMessage, Sending SMS');
 
-        await pinpoint.sendMessages(params).promise()
-            .catch((error: Error) => console.error(`method=sendMessage error=${error}`));
-        await increaseSmsSentAmount();
+        try {
+            await pinpoint.sendMessages(params).promise()
+            await increaseSmsSentAmount();
+        } catch(error) {
+            console.error(`method=sendMessage error=${error}`)
+        }
     },
 
     sendHelpMessage: async (destinationNumber: string): Promise<any>  => {
