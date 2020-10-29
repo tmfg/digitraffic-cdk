@@ -201,6 +201,7 @@ export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): 
         name: 'update-estimates',
         text: INSERT_ESTIMATE_SQL,
     });
+
     return db.oneOrNone(ps, createUpdateValues(estimate));
 }
 

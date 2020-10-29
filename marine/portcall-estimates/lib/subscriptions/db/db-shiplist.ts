@@ -1,4 +1,4 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {ITask, PreparedStatement} from "pg-promise";
 
 export interface ShiplistEstimate {
     readonly event_type: string
@@ -9,7 +9,7 @@ export interface ShiplistEstimate {
     readonly portcall_id: number;
 }
 
-const SELECT_IMO = '          AND v.imo = $4';
+const SELECT_IMO = '          AND pe.ship_imo = $4';
 const SELECT_BY_LOCODE_AND_IMO = `
     SELECT DISTINCT
         pe.event_type,
@@ -40,13 +40,13 @@ const SELECT_BY_LOCODE_AND_IMO = `
 `;
 
 export function findByLocodeAndImo(
-    t: any,
+    t: ITask<any>,
     startTime: Date,
     endTime: Date,
     locode: string,
     imo: number
 ): Promise<ShiplistEstimate[]> {
-    console.info("findByLocodeAndImo %s %s %s %d", startTime, endTime, locode, imo);
+//    console.info("findByLocodeAndImo %s %s %s %d", startTime, endTime, locode, imo);
 
     const ps = new PreparedStatement({
         name: 'find-shiplist-by-locode-and-imo',
@@ -57,7 +57,7 @@ export function findByLocodeAndImo(
 }
 
 export function findByLocode(
-    db: IDatabase<any, any>,
+    t: ITask<any>,
     startTime: Date,
     endTime: Date,
     locode: string
@@ -67,5 +67,5 @@ export function findByLocode(
         text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, ''),
         values: [locode, startTime, endTime]
     });
-    return db.tx(t => t.manyOrNone(ps));
+    return t.manyOrNone(ps);
 }

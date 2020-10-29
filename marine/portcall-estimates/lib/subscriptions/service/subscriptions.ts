@@ -1,5 +1,5 @@
 import moment from 'moment-timezone';
-import {ITaskContext} from "pg-promise";
+import {ITask} from "pg-promise";
 
 import * as SubscriptionDB from '../db/db-subscriptions';
 import * as ShiplistDb from "../db/db-shiplist";
@@ -12,7 +12,7 @@ import {PinpointService, default as pinpointService} from "./pinpoint";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
-const SEND_NOTIFICATION_DIFFERENCE_MINUTES = 15;
+const SEND_NOTIFICATION_DIFFERENCE_MINUTES = 45;
 const VALID_EVENT_TYPES = ["ETA", "ETD"];
 
 export enum SubscriptionType {
@@ -99,7 +99,7 @@ function updateSubscription(imo: number, s: DbSubscription) {
 
     endTime.setDate(endTime.getDate() + 1);
 
-    inTransaction((t: ITaskContext) => ShiplistDb.findByLocodeAndImo(t, startTime, endTime, s.Locode, imo))
+    inTransaction((t: ITask<any>) => ShiplistDb.findByLocodeAndImo(t, startTime, endTime, s.Locode, imo))
     .then(async estimates => {
         console.info("got estimates %s", JSON.stringify(estimates));
 
@@ -121,6 +121,7 @@ export function _createSendSmsNotications(pps: PinpointService): (notification: 
             const portcall_id = Number(key);
             for (const eventType of Object.keys(notification[portcall_id])?.filter(key => VALID_EVENT_TYPES.includes(key))) {
                 const data = notification[portcall_id][eventType];
+                const shipName = notification[portcall_id].name;
 
                 const portnet = data.Portnet ? moment(data.Portnet) : null;
                 const vts = data.VTS ? moment(data.VTS) : null;
@@ -132,16 +133,16 @@ export function _createSendSmsNotications(pps: PinpointService): (notification: 
                     const difference = moment.duration(sent.diff(bestEstimate));
 
                     if (isNotificationNeeded(sent, bestEstimate)) {
-                        console.info("difference is %s, must send notification", difference);
-                        promises.push(pps.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate).then(_ => {
+                        console.info("difference for %s is %s, must send notification", shipName, difference);
+                        promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate).then(_ => {
                             console.info("notification sent!");
                             data.Sent = bestEstimate.toISOString();
                         }));
                     }
                 } else {
-                    console.info("A new estimate in window %s %s %s", portcall_id, eventType, JSON.stringify(notification));
-                    promises.push(pps.sendDifferenceNotification(phoneNumber, notification[portcall_id].name, eventType, bestEstimate).then(_ => {
-                        console.info("notification sent!");
+                    console.info("A new estimate in window %s %s %s", portcall_id, eventType, shipName);
+                    promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate).then(_ => {
+                        console.info("new notification sent!");
                         data.Sent = bestEstimate.toISOString();
                     }));
                 }

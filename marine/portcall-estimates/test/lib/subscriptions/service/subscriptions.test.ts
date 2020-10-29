@@ -8,7 +8,7 @@ import {
 import {default as pps, PinpointService} from '../../../../lib/subscriptions/service/pinpoint';
 import * as sinon from 'sinon';
 import {EstimateRemoval, EstimateSubscription} from "../../../../lib/subscriptions/model/subscription";
-import {newSubscription} from "../../testdata";
+import {newNotification, newSubscription} from "../../testdata";
 import {
     _ddb as ddb,
     DbShipsToNotificate,
@@ -16,14 +16,58 @@ import {
 } from "../../../../lib/subscriptions/db/db-subscriptions";
 import moment from 'moment';
 
+type PinpointFunctionName = "sendSubscriptionOKMessage" | "sendValidationFailedMessage" | "sendNoSubscriptionsMessage" | "sendDifferenceNotification" | "sendSmsMessage" | "sendRemovalOKMessage";
+
+const PHONE_NUMBER = "12345";
+
 describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
-    
-    test('valid addSubscription sends "subscription created" SMS', async () => {
-        const sendStub = sandbox.stub(pps, 'sendSubscriptionOKMessage');
+
+    function stubPinpoint(functionName: PinpointFunctionName): sinon.SinonStub {
+        const sendStub = sandbox.stub(pps, functionName);
         sendStub.returns(Promise.resolve());
+
+        return sendStub;
+    }
+
+    async function createDefaultSubscription() {
+        const sub = newSubscription();
+        await ddb.put({
+            TableName: SUBSCRIPTIONS_TABLE_NAME,
+            Item: sub
+        }).promise();
+
+        return sub;
+    }
+
+    async function assertSendNotifications(sendStub: any, notification: any, estimateTime: moment.Moment) {
+        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, PHONE_NUMBER);
+
+        await assertMultipleSendNotifications(sendStub, notification, {type: 'ETA', estimateTime: estimateTime});
+    }
+
+    async function assertMultipleSendNotifications(sendStub: any, notification: any, ...times: any[]) {
+        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, PHONE_NUMBER);
+
+        expect(sendStub.callCount).toBe(times.length);
+
+        let index = 0;
+        times.forEach(t => {
+            expect(sendStub.getCall(index++).calledWith(PHONE_NUMBER, 'PURKKI', t.type, t.estimateTime)).toBe(true);
+        });
+    }
+
+    async function assertNoNotifications(sendStub: any, notification: any) {
+        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, PHONE_NUMBER);
+
+        expect(sendStub.notCalled).toBe(true);
+    }
+
+    test('valid addSubscription sends "subscription created" SMS', async () => {
+        const sendStub = stubPinpoint('sendSubscriptionOKMessage');
+
         const sub = {
             phoneNumber: '+1234567890',
             locode: 'FIHKO',
@@ -36,8 +80,8 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('valid addSubscription sends "fail" SMS', async () => {
-        const Stub = sandbox.stub(pps, 'sendValidationFailedMessage');
-        Stub.returns(Promise.resolve());
+        const failedStub = stubPinpoint('sendValidationFailedMessage');
+
         const sub: EstimateSubscription = {
             phoneNumber: '+1234567890',
             locode: '39sdjf',
@@ -46,12 +90,12 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
         await _createAddSubscription(<PinpointService> <unknown> pps)(sub);
 
-        expect(Stub.calledWith(sub.phoneNumber)).toBe(true);
+        expect(failedStub.calledWith(sub.phoneNumber)).toBe(true);
     });
 
     test('removeSubscription sends "subscription removed" SMS', async () => {
-        const sendStub = sandbox.stub(pps, 'sendRemovalOKMessage');
-        sendStub.returns(Promise.resolve());
+        const okStub = stubPinpoint('sendRemovalOKMessage');
+
         const sub: EstimateRemoval = {
             phoneNumber: '+1234567890',
             locode: 'FIHKO'
@@ -59,12 +103,11 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
         await _createRemoveSubscription(<PinpointService> <unknown> pps)(sub);
 
-        expect(sendStub.calledWith(sub.phoneNumber)).toBe(true);
+        expect(okStub.calledWith(sub.phoneNumber)).toBe(true);
     });
 
     test('sendSubscriptionList sends "no subscriptions" SMS', async () => {
-        const sendStub = sandbox.stub(pps, 'sendNoSubscriptionsMessage');
-        sendStub.returns(Promise.resolve());
+        const sendStub = stubPinpoint('sendNoSubscriptionsMessage');
         const phoneNumber = '+1234567890';
 
         await _createSendSubscriptionList(<PinpointService> <unknown> pps)(phoneNumber);
@@ -73,13 +116,8 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('sendSubscriptionList sends subscriptions SMS', async () => {
-        const sendStub = sandbox.stub(pps, 'sendSmsMessage');
-        sendStub.returns(Promise.resolve());
-        const sub = newSubscription();
-        await ddb.put({
-            TableName: SUBSCRIPTIONS_TABLE_NAME,
-            Item: sub
-        }).promise();
+        const sendStub = stubPinpoint('sendSmsMessage');
+        const sub = await createDefaultSubscription();
 
         await _createSendSubscriptionList(<PinpointService> <unknown> pps)(sub.PhoneNumber);
 
@@ -87,76 +125,81 @@ describe('subscriptions', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     });
 
     test('sendSmsNotications - new estimate sends notification SMS', async () => {
-        const sendStub = sandbox.stub(pps, 'sendDifferenceNotification');
-        sendStub.returns(Promise.resolve());
-        const sub = newSubscription();
-        await ddb.put({
-            TableName: SUBSCRIPTIONS_TABLE_NAME,
-            Item: sub
-        }).promise();
-        const estimateTime = moment().toISOString();
-        const notification: DbShipsToNotificate = {
-            '12333': {
-               'name': 'PURKKI',
-                'ETA': {
-                   'Portnet': estimateTime
-                }
-            }
-        };
+        const sendStub = stubPinpoint('sendDifferenceNotification');
 
-        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, sub.PhoneNumber);
+        const estimateTime = moment();
+        const notification = newNotification({
+            "Portnet": estimateTime,
+            "Sent": undefined
+        });
 
-        expect(sendStub.calledWith(sub.PhoneNumber, 'PURKKI', 'ETA', moment(estimateTime))).toBe(true);
+        await assertSendNotifications(sendStub, notification, estimateTime);
     });
 
     test('sendSmsNotications - updated estimate sends notification SMS', async () => {
-        const sendStub = sandbox.stub(pps, 'sendDifferenceNotification');
-        sendStub.returns(Promise.resolve());
-        const sub = newSubscription();
-        await ddb.put({
-            TableName: SUBSCRIPTIONS_TABLE_NAME,
-            Item: sub
-        }).promise();
-        const sentTime = moment().subtract(1, 'hours')
-        const estimateTime = moment();
-        const notification: DbShipsToNotificate = {
-            '12333': {
-                'name': 'PURKKI',
-                'ETA': {
-                    'Sent': sentTime,
-                    'Portnet': estimateTime
-                }
-            }
-        };
+        const sendStub = stubPinpoint('sendDifferenceNotification');
 
-        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, sub.PhoneNumber);
+        const estimateTime = moment().subtract(2, 'hours');
+        const notification: DbShipsToNotificate = newNotification({
+            "Portnet": estimateTime
+        });
 
-        expect(sendStub.calledWith(sub.PhoneNumber, 'PURKKI', 'ETA', estimateTime)).toBe(true);
+        await assertSendNotifications(sendStub, notification, estimateTime);
+    });
+
+    test('sendSmsNotications - send notification SMS - two estimates use VTS', async () => {
+        const sendStub = stubPinpoint('sendDifferenceNotification');
+
+        const portnetEstimateTime = moment().subtract(3, 'hours');
+        const VTSEstimateTime = moment().subtract(2, 'hours');
+        const notification: DbShipsToNotificate = newNotification({
+            "Portnet": portnetEstimateTime,
+            "VTS": VTSEstimateTime
+        });
+
+        assertSendNotifications(sendStub, notification, VTSEstimateTime);
     });
 
     test('sendSmsNotications - no need to update', async () => {
-        const sendStub = sandbox.stub(pps, 'sendDifferenceNotification');
-        sendStub.returns(Promise.resolve());
-        const sub = newSubscription();
-        await ddb.put({
-            TableName: SUBSCRIPTIONS_TABLE_NAME,
-            Item: sub
-        }).promise();
-        const sentTime = moment().subtract(5, 'minutes')
-        const estimateTime = moment();
-        const notification: DbShipsToNotificate = {
-            '12333': {
-                'name': 'PURKKI',
-                'ETA': {
-                    'Sent': sentTime,
-                    'Portnet': estimateTime
-                }
-            }
-        };
+        const sendStub = stubPinpoint('sendDifferenceNotification');
 
-        await _createSendSmsNotications(<PinpointService> <unknown> pps)(notification, sub.PhoneNumber);
+        // only 15 minutes off, no need to notificate
+        const estimateTime = moment().subtract(15, 'minutes');
+        const notification: DbShipsToNotificate = newNotification({
+            "Portnet": estimateTime,
+        });
 
-        expect(sendStub.notCalled).toBe(true);
+        await assertNoNotifications(sendStub, notification);
     });
 
+    test('sendSmsNotications - no need to update - two estimates use VTS', async () => {
+        const sendStub = stubPinpoint('sendDifferenceNotification');
+
+        // VTS estimate is only 15 minutes off, no need to notificate
+        const portnetEstimateTime = moment().subtract(2, 'hours');
+        const VTSEstimateTime = moment().subtract(15, 'minutes');
+        const notification: DbShipsToNotificate = newNotification({
+            "Portnet": portnetEstimateTime,
+            "VTS": VTSEstimateTime
+        });
+
+        await assertNoNotifications(sendStub, notification);
+    });
+
+    test('sendSmsNotications - updated estimate sends notification SMS', async () => {
+        const sendStub = stubPinpoint('sendDifferenceNotification');
+
+        const estimateTime1 = moment().subtract(2, 'hours');
+        const estimateTime2 = moment().subtract(3, 'hours');
+        const notification: DbShipsToNotificate = newNotification({
+            "Portnet": estimateTime1
+        }, {
+            "Portnet": estimateTime2
+        });
+
+        await assertMultipleSendNotifications(sendStub, notification,
+            {type: 'ETA', estimateTime: estimateTime1},
+            {type: 'ETD', estimateTime: estimateTime2}
+        );
+    });
 }));

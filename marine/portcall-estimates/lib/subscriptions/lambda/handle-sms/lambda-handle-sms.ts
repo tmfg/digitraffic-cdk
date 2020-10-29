@@ -18,7 +18,7 @@ export async function handleSms(op: SubscriptionOperation, event: SnsSubscriptio
     console.info(`method=handleSms operation: ${op}`);
     switch (op) {
         case SubscriptionOperation.INVALID:
-            console.error('method=handleSms, Invalid subscription operation');
+            console.error('method=handleSms, Invalid subscription operation, message was: %s', event.messageBody);
             return Promise.reject('Invalid subscription operation');
         case SubscriptionOperation.HELP:
             return await pinpointService.sendHelpMessage(event.originationNumber);

@@ -1,4 +1,4 @@
-import {IDatabase, ITaskContext} from "pg-promise";
+import {IDatabase, ITask} from "pg-promise";
 const pgp = require('pg-promise')();
 
 // convert numeric types to number instead of string
@@ -27,9 +27,9 @@ export function initDbConnection(
 }
 
 export async function inTransaction (
-    fn: (db: ITaskContext) => any): Promise<any> {
+    fn: (db: ITask<any>) => any): Promise<any> {
 
-    return await inDatabase(db => db.tx((t: ITaskContext) => fn(t)));
+    return await inDatabase(db => db.tx((t: ITask<any>) => fn(t)));
 }
 
 export async function inDatabase(
