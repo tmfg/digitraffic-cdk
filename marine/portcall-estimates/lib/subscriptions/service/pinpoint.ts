@@ -80,7 +80,7 @@ const defaultPinpoint: PinpointService = {
     ): Promise<any> => {
         const timeAsString = newTime.format("HH:mm");
 
-        return await(defaultPinpoint.sendSmsMessage(destinationNumber, `Ship ${shipName} has a new ${eventType} estimate ${timeAsString}`));
+        return await defaultPinpoint.sendSmsMessage( `Ship ${shipName} has a new ${eventType} estimate ${timeAsString}`, destinationNumber);
     },
 
     sendSubscriptionOKMessage: async (destinationNumber: string): Promise<any> => {
