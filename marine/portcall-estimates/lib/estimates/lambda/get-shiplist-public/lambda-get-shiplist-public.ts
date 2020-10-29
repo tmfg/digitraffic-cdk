@@ -36,9 +36,49 @@ export const handler = async (
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"
         integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
         crossorigin="anonymous"></script>
+    <style>
+        /* Override Bootstrap row negative margins */
+        thead .row,
+        tbody .row {
+            margin-left: 0px;
+            margin-right: 0px;
+        }
+
+        .header {
+            background-color: #444444;
+        }
+
+        .header .col-1:first-child {
+            padding-left: 2rem;
+        }
+
+        .header img {
+            height: 50px;
+        }
+
+        .logo {
+            width: 50px;
+        }
+
+        .logo-name {
+            width: 150px;
+        }
+    </style>
 </head>
 
 <body>
+
+    <header class="header">
+        <div class="row">
+            <div class="col-1">
+                <img class="logo" src="https://www.digitraffic.fi/img/tmfg_logo-originaali_valkoinen.svg" />
+            </div>
+            <div class="col-1">
+                <img class="logo-name" src="https://www.digitraffic.fi/img/digitraffic-logo.svg" />
+            </div>
+        </div>
+    </header>
+
     <ul class="nav nav-tabs nav-fill" role="tablist">
         <li class="nav-item">
             <a class="nav-link active" id="aluslista-tab" data-toggle="tab" href="#aluslista" role="tab">Aluslista</a>
@@ -48,17 +88,35 @@ export const handler = async (
         </li>
     </ul>
 
-    <!-- Tab panes -->
     <div class="tab-content">
+
         <div class="tab-pane active" id="aluslista" role="tabpanel">
-            <div class="container">
-                <table id="aluslista-table" data-toggle="table"></table>
-            </div>
+
+            <table id="aluslista-table" data-toggle="table">
+                <thead>
+                    <tr class="row">
+                        <th class="col-4">Ship</th>
+                        <th class="col-2">Type</th>
+                        <th class="col-3">Time</th>
+                        <th class="col-3">Source</th>
+                    </tr>
+                </thead>
+            </table>
+
         </div>
         <div class="tab-pane" id="aikalista" role="tabpanel">
-            <div class="container">
-                <table id="aikalista-table" data-toggle="table"></table>
-            </div>
+
+            <table id="aikalista-table" data-toggle="table">
+                <thead>
+                    <tr class="row">
+                        <th class="col-4">Ship</th>
+                        <th class="col-2">Type</th>
+                        <th class="col-3">Time</th>
+                        <th class="col-3">Source</th>
+                    </tr>
+                </thead>
+            </table>
+
         </div>
     </div>
 
@@ -72,6 +130,11 @@ export const handler = async (
         var shipRows = R.compose(R.sortBy(R.prop('name')), R.map(toShipRow), R.toPairs, R.groupBy(R.prop('ship_name')))(shiplist);
 
         $('#aluslista-table').bootstrapTable({
+            rowStyle: () => {
+                return {
+                    classes: 'row'
+                }
+            },
             columns: [{
                 field: 'name',
                 class: 'col-4',
@@ -119,6 +182,11 @@ export const handler = async (
 
     function buildTimelist() {
         $('#aikalista-table').bootstrapTable({
+            rowStyle: () => {
+                return {
+                    classes: 'row'
+                }
+            },
             columns: [{
                 field: 'ship_name',
                 class: 'col-4',
