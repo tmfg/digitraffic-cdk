@@ -62,10 +62,10 @@ const defaultPinpoint: PinpointService = {
         };
 
 //        console.info('method=sendMessage, Sending SMS');
-        return Promise.allSettled([
-            pinpoint.sendMessages(params).promise()
-                .catch((error: Error) => console.error(`method=sendMessage error=${error}`)),
-            increaseSmsSentAmount()]);
+
+        await pinpoint.sendMessages(params).promise()
+            .catch((error: Error) => console.error(`method=sendMessage error=${error}`));
+        await increaseSmsSentAmount();
     },
 
     sendHelpMessage: async (destinationNumber: string): Promise<any>  => {
