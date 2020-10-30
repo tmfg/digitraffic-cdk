@@ -133,7 +133,8 @@ export function newPortCall(estimate: ApiEstimate): PortCall {
         port_call_id: estimate.portcallId!,
         radio_call_sign: 'a',
         radio_call_sign_type: 'fake',
-        vessel_name: uuidv4()
+        vessel_name: uuidv4(),
+        port_call_timestamp: new Date()
     };
 }
 
@@ -181,4 +182,5 @@ export interface PortCall {
     readonly radio_call_sign: string
     readonly radio_call_sign_type: string
     readonly vessel_name: string
+    readonly port_call_timestamp: Date
 }

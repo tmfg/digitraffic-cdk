@@ -106,6 +106,7 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
         pe.location_locode AS locode,
         pe.portcall_id
     FROM portcall_estimate pe
+    JOIN port_call pc ON pc.port_call_id = pe.portcall_id
     JOIN port_area_details pad on pad.port_call_id = pe.portcall_id
     JOIN vessel v ON v.imo = pe.ship_imo
     JOIN vessel_location vl ON vl.mmsi = (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM vessel WHERE imo = v.imo)
@@ -126,6 +127,7 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
           pe.event_source = 'Portnet' AND
           pe.location_locode IN ($1:list) AND
           pad.ata IS NULL AND
+          pc.port_call_timestamp > CURRENT_DATE - INTERVAL '1 DAY' AND
           vl.nav_stat NOT IN (1, 5, 6)
 `;
 // 1 = at anchor, 5 = moored, 6 = aground

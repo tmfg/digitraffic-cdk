@@ -238,12 +238,14 @@ export function insertPortCall(db: IDatabase<any, any>, p: PortCall) {
                 port_call_id,
                 radio_call_sign,
                 radio_call_sign_type,
-                vessel_name
+                vessel_name,
+                port_call_timestamp
             ) VALUES (
                 $(port_call_id),
                 $(radio_call_sign),
                 $(radio_call_sign_type),
-                $(vessel_name)
+                $(vessel_name),
+                $(port_call_timestamp)
             )
         `, p);
     });
