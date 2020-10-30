@@ -7,6 +7,7 @@ import {
 } from '../../smsutils';
 import {SNSEvent} from 'aws-lambda';
 import {default as pinpointService} from '../../service/pinpoint';
+import * as InfoService from '../../service/info';
 
 export async function handler(event: SNSEvent) {
     const snsEvent = JSON.parse((event as SNSEvent).Records[0].Sns.Message);
@@ -16,6 +17,9 @@ export async function handler(event: SNSEvent) {
 
 export async function handleSms(op: SubscriptionOperation, event: SnsSubscriptionEvent): Promise<any> {
     console.info(`method=handleSms operation: ${op}`);
+
+    await InfoService.increaseSmsReceivedAmount();
+
     switch (op) {
         case SubscriptionOperation.INVALID:
             console.error('method=handleSms, Invalid subscription operation, message was: %s', event.messageBody);

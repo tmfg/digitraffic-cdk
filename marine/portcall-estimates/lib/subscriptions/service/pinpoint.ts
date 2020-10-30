@@ -1,6 +1,6 @@
 import {Pinpoint} from 'aws-sdk';
 import moment from 'moment-timezone';
-import {increaseSmsSentAmount} from "../db/db-info";
+import * as InfoService from './info';
 
 const pinpoint = new Pinpoint();
 
@@ -65,7 +65,7 @@ const defaultPinpoint: PinpointService = {
 
         try {
             await pinpoint.sendMessages(params).promise()
-            await increaseSmsSentAmount();
+            await InfoService.increaseSmsSentAmount();
         } catch(error) {
             console.error(`method=sendMessage error=${error}`)
         }
