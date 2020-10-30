@@ -1,21 +1,22 @@
 export interface Props {
-    vpcId: string;
-    privateSubnetIds: string[];
-    availabilityZones: string[];
-    lambdaDbSgId: string;
-    dbProps: DbProps;
-    defaultLambdaDurationSeconds: number;
-    logsDestinationArn: string;
-    sqsProcessLambdaConcurrentExecutions: number;
-    shiplistSnsTopicArn: string;
-    estimateUpdatedTopicArn: string;
-    pinpointApplicationId: string;
-    pinpointTelephoneNumber: string;
-    shiplistUrl: string
+    readonly vpcId: string
+    readonly privateSubnetIds: string[]
+    readonly availabilityZones: string[]
+    readonly lambdaDbSgId: string
+    readonly dbProps: DbProps
+    readonly defaultLambdaDurationSeconds: number
+    readonly logsDestinationArn: string
+    readonly sqsProcessLambdaConcurrentExecutions: number
+    readonly shiplistSnsTopicArn: string
+    readonly estimateUpdatedTopicArn: string
+    readonly pinpointApplicationId: string
+    readonly pinpointTelephoneNumber: string
+    readonly shiplistUrl: string
+    readonly allowFromIpAddresses: string[]
 }
 export interface DbProps {
-    username: string;
-    password: string;
-    uri: string;
-    ro_uri: string;
+    readonly username: string
+    readonly password: string
+    readonly uri: string
+    readonly ro_uri: string
 }

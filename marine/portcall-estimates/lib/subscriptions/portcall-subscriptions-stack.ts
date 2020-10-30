@@ -52,9 +52,8 @@ export class PortcallEstimateSubscriptionsStack extends Stack {
         subscriptionInfoTable.grantReadWriteData(sendShiplistLambda);
         subscriptionInfoTable.grantReadWriteData(estimationHandlerLambda);
 
-        PublicApi.create(vpc,
-            lambdaDbSg,
-            subscriptionTable,
+        PublicApi.create(
+            subscriptionInfoTable,
             appProps,
             this);
     }

@@ -1,84 +1,41 @@
-import {EndpointType, MethodLoggingLevel, Model, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
-import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
+import {EndpointType, LambdaIntegration, MethodLoggingLevel, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
-import {SubscriptionSchema} from './model/subscription-schema';
-import {corsMethodJsonResponse, defaultIntegration,} from "../../../../common/api/responses";
-import {MessageModel} from "../../../../common/api/response";
-import {addDefaultValidator, addServiceModel} from "../../../../common/api/utils";
 import {Props} from "./app-props-subscriptions";
-import {addTags} from "../../../../common/api/documentation";
-import {createUsagePlan} from "../../../../common/stack/usage-plans";
-import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
+import {defaultLambdaConfiguration} from "../../../../common/stack/lambda-configs";
 import {createSubscription} from "../../../../common/stack/subscription";
 import {Table} from "@aws-cdk/aws-dynamodb";
+import {createIpRestrictionPolicyDocument} from "../../../../common/api/rest_apis";
 
 export function create(
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    subscriptionTable: Table,
+    subscriptionInfoTable: Table,
     props: Props,
     stack: Construct) {
-    const publicApi = createApi(stack);
-
-    createUsagePlan(publicApi, 'Portcall estimate subscriptions Api Key', 'Portcall estimates subscriptions Usage Plan');
-
-    const validator = addDefaultValidator(publicApi);
-
-    const subscriptionModel = addServiceModel("SubscriptionModel", publicApi, SubscriptionSchema);
-
-    const subscriptionCreatorLambda = createSubscriptionCreatorLambda(vpc,
-        lambdaDbSg,
-        props,
-        stack);
-
-    subscriptionTable.grantReadWriteData(subscriptionCreatorLambda);
-
+    const publicApi = createApi(props.allowFromIpAddresses, stack);
+    const subscriptionInfoLambda = createsubscriptionInfoLambda(props, stack);
+    subscriptionInfoTable.grantReadWriteData(subscriptionInfoLambda);
     createSubscriptionsResource(publicApi,
-        vpc,
         props,
-        lambdaDbSg,
-        subscriptionCreatorLambda,
-        subscriptionModel,
-        validator,
-        stack);
+        subscriptionInfoLambda);
 }
 
 function createSubscriptionsResource(
     publicApi: RestApi,
-    vpc: IVpc,
     props: Props,
-    lambdaDbSg: ISecurityGroup,
-    createSubscriptionLambda: Function,
-    subscriptionModel: Model,
-    validator: RequestValidator,
-    stack: Construct) {
-    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
+    createSubscriptionLambda: Function) {
     const resources = createResourcePaths(publicApi);
-    const createSubscriptionIntegration = defaultIntegration(createSubscriptionLambda);
-
-    resources.addMethod("POST", createSubscriptionIntegration, {
-        apiKeyRequired: true,
-        requestValidator: validator,
-        requestModels: {
-            'application/json': subscriptionModel,
-        },
-        methodResponses: [
-            corsMethodJsonResponse("200", Model.EMPTY_MODEL),
-            corsMethodJsonResponse("500", errorResponseModel)
-        ]
+    const createSubscriptionIntegration = new LambdaIntegration(createSubscriptionLambda, {
+        proxy: true
     });
 
-    addTags('CreateSubscription', ['portcall-estimate-subscriptions'], resources, stack);
+    resources.addMethod("GET", createSubscriptionIntegration);
 }
 
 function createResourcePaths(publicApi: RestApi) {
-    return publicApi.root.addResource("api")
-        .addResource("portcall-estimate-subscriptions");
+    return publicApi.root.addResource("api").addResource("portcall-estimate-subscriptions");
 }
 
-function createApi(stack: Construct) {
+function createApi(allowFromIpAddresses: string[], stack: Construct) {
     return new RestApi(stack, 'PortcallEstimateSubscriptions', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
@@ -86,46 +43,22 @@ function createApi(stack: Construct) {
         description: 'Portcall estimate subscriptions',
         restApiName: 'PortcallEstimateSubscriptions public API',
         endpointTypes: [EndpointType.REGIONAL],
-        policy: new PolicyDocument({
-            statements: [
-                new PolicyStatement({
-                    effect: Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke"
-                    ],
-                    resources: [
-                        "*"
-                    ],
-                    principals: [
-                        new AnyPrincipal()
-                    ]
-                })
-            ]
-        })
+        policy: createIpRestrictionPolicyDocument(allowFromIpAddresses)
     });
 }
 
-function createSubscriptionCreatorLambda(
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
+function createsubscriptionInfoLambda(
     props: Props,
     stack: Construct): Function {
     const functionName = 'PortcallEstimateSubscriptions-CreateSubscription';
-    const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const lambdaConf = defaultLambdaConfiguration({
         functionName: functionName,
-        code: new AssetCode('dist/subscriptions/lambda/create-subscription'),
-        handler: 'lambda-create-subscription.handler',
-        environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri,
-            PINPOINT_ID: props.pinpointApplicationId,
-            PINPOINT_NUMBER: props.pinpointTelephoneNumber,
-        },
-        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
+        code: new AssetCode('dist/subscriptions/lambda/get-subscription-info'),
+        handler: 'lambda-get-subscription-info.handler',
+        reservedConcurrentExecutions: 1
     });
 
-    const subscriptionCreatorLambda = new Function(stack, functionName, lambdaConf);
-    createSubscription(subscriptionCreatorLambda, functionName, props.logsDestinationArn, stack);
-    return subscriptionCreatorLambda;
+    const subscriptionInfoLambda = new Function(stack, functionName, lambdaConf);
+    createSubscription(subscriptionInfoLambda, functionName, props.logsDestinationArn, stack);
+    return subscriptionInfoLambda;
 }

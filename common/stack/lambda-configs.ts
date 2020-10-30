@@ -1,6 +1,6 @@
-import {FunctionProps, Runtime, Code} from '@aws-cdk/aws-lambda';
+import {Code, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration} from "@aws-cdk/core";
-import {IVpc, ISecurityGroup} from "@aws-cdk/aws-ec2";
+import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
 
 export interface LambdaConfiguration {
@@ -55,6 +55,19 @@ export function dbLambdaConfiguration(
         },
         securityGroup: lambdaDbSg,
         reservedConcurrentExecutions: config.reservedConcurrentExecutions
+    };
+}
+
+export function defaultLambdaConfiguration(config: FunctionParameters): FunctionProps {
+    return {
+        runtime: Runtime.NODEJS_12_X,
+        memorySize: config.memorySize ?? 1024,
+        functionName: config.functionName,
+        handler: config.handler,
+        environment: config.environment ?? {},
+        logRetention: RetentionDays.ONE_YEAR,
+        reservedConcurrentExecutions: config.reservedConcurrentExecutions,
+        code: config.code
     };
 }
 
