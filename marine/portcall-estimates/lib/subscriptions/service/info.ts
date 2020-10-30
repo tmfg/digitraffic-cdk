@@ -1,9 +1,9 @@
 import {DbSubscriptionInfo} from "../db/db-info";
 import * as DbInfo from '../db/db-info';
 
-export async function getInfo(): Promise<DbSubscriptionInfo> {
+export async function getInfo(): Promise<DbSubscriptionInfo[]> {
     const info = await DbInfo.getInfo();
-    return info.Items[0] as DbSubscriptionInfo;
+    return info.Items as DbSubscriptionInfo[];
 }
 
 export async function increaseSmsSentAmount() {

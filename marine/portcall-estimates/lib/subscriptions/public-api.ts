@@ -50,7 +50,7 @@ function createApi(allowFromIpAddresses: string[], stack: Construct) {
 function createsubscriptionInfoLambda(
     props: Props,
     stack: Construct): Function {
-    const functionName = 'PortcallEstimateSubscriptions-CreateSubscription';
+    const functionName = 'PortcallEstimateSubscriptions-GetSubscriptionInfo';
     const lambdaConf = defaultLambdaConfiguration({
         functionName: functionName,
         code: new AssetCode('dist/subscriptions/lambda/get-subscription-info'),
