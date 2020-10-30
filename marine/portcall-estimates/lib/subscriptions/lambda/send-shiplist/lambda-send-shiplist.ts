@@ -33,12 +33,12 @@ function convertToSms(locode: string, estimates: ShiplistEstimate[]): string {
     let currentDate = new Date();
 
     const shiplist = estimates.map(e => {
-        let timestring = moment(e.event_time).format("HH:mm");
+        let timestring = moment(e.event_time).tz('Europe/Helsinki').format("HH:mm");
 
         if(!isSameDate(currentDate, e.event_time)) {
             currentDate = e.event_time;
 
-            timestring = moment(e.event_time).format("D.MM HH:mm")
+            timestring = moment(e.event_time).tz('Europe/Helsinki').format("D.MM HH:mm");
         }
 
         return `${e.event_type} ${e.event_source} ${timestring} ${e.ship_name}`; }
