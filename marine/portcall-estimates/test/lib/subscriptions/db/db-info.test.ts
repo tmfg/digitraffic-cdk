@@ -2,7 +2,7 @@ import {_ddb as ddb} from '../../../../lib/subscriptions/db/db-subscriptions';
 import {dynamoDbTestBase} from "../../db-testutil";
 import {
     getInfo,
-    ID_VALUE,
+    getId,
     increaseSmsSentAmount,
     increaseSmsReceivedAmount,
     INFO_TABLE_NAME
@@ -16,7 +16,7 @@ describe('info', () => {
         await ddb.put({
             TableName: INFO_TABLE_NAME,
             Item: {
-                ID: ID_VALUE,
+                ID: getId(),
                 SmsSentAmount: smsSentAmount,
                 SmsReceivedAmount: smsReceivedAmount
             }
@@ -34,7 +34,7 @@ describe('info', () => {
         await ddb.put({
             TableName: INFO_TABLE_NAME,
             Item: {
-                ID: ID_VALUE,
+                ID: getId(),
                 SmsSentAmount: smsSentAmount
             }
         }).promise();
@@ -47,12 +47,12 @@ describe('info', () => {
         expect(subs.Items![0].SmsSentAmount).toBe(smsSentAmount + 1);
     }));
 
-    test('increaseSmsSentAmount', dynamoDbTestBase(ddb, async () => {
+    test('increaseSmsReceivedAmount', dynamoDbTestBase(ddb, async () => {
         const smsReceivedAmount = Math.floor(Math.random() * 1000);
         await ddb.put({
             TableName: INFO_TABLE_NAME,
             Item: {
-                ID: ID_VALUE,
+                ID: getId(),
                 SmsReceivedAmount: smsReceivedAmount
             }
         }).promise();
@@ -63,6 +63,24 @@ describe('info', () => {
         }).promise();
 
         expect(subs.Items![0].SmsReceivedAmount).toBe(smsReceivedAmount + 1);
+    }));
+
+    test('increaseSmsSentAmount - creates non-existing row', dynamoDbTestBase(ddb, async () => {
+        await increaseSmsSentAmount();
+        const subs = await ddb.scan({
+            TableName: INFO_TABLE_NAME
+        }).promise();
+
+        expect(subs.Items![0].SmsSentAmount).toBe(1);
+    }));
+
+    test('increaseSmsReceivedAmount - creates non-existing row', dynamoDbTestBase(ddb, async () => {
+        await increaseSmsReceivedAmount();
+        const subs = await ddb.scan({
+            TableName: INFO_TABLE_NAME
+        }).promise();
+
+        expect(subs.Items![0].SmsReceivedAmount).toBe(1);
     }));
 
 });

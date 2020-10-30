@@ -4,6 +4,7 @@ import {ApiEstimate} from "../../lib/estimates/model/estimate";
 import {createUpdateValues, DbEstimate} from "../../lib/estimates/db/db-estimates";
 import {DocumentClient} from "aws-sdk/clients/dynamodb";
 import {SUBSCRIPTIONS_TABLE_NAME} from "../../lib/subscriptions/db/db-subscriptions";
+import {INFO_TABLE_NAME} from "../../lib/subscriptions/db/db-info";
 import {PortAreaDetails, PortCall, Vessel, VesselLocation} from "./testdata";
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
@@ -48,15 +49,27 @@ export function dynamoDbTestBase(ddb: DocumentClient, fn: () => void) {
 }
 
 async function truncateDynamoDb(ddb: DocumentClient) {
-    const items = await ddb.scan({
+    const subItems = await ddb.scan({
         TableName: SUBSCRIPTIONS_TABLE_NAME
     }).promise();
-    return Promise.all(items.Items!!.map(s =>
+    await Promise.all(subItems.Items!!.map(s =>
         ddb.delete({
             TableName: SUBSCRIPTIONS_TABLE_NAME,
             Key: {
                 PhoneNumber: s.PhoneNumber,
                 Locode: s.Locode
+            }
+        }).promise()
+    ));
+
+    const infoItems = await ddb.scan({
+        TableName: INFO_TABLE_NAME
+    }).promise();
+    await Promise.all(infoItems.Items!!.map(s =>
+        ddb.delete({
+            TableName: INFO_TABLE_NAME,
+            Key: {
+                ID: s.ID
             }
         }).promise()
     ));
