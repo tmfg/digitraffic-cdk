@@ -43,6 +43,11 @@ export const handler = async (
             margin-left: 0px;
             margin-right: 0px;
         }
+        
+        /* Try to prevent time wrapping */
+        td.col-3 {
+            padding-right: 0.25rem;
+        }
 
         .header {
             background-color: #444444;
