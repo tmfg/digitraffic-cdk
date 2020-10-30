@@ -9,6 +9,7 @@ import {inTransaction} from "digitraffic-lambda-postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {getStartTime} from "../timeutil";
 import {PinpointService, default as pinpointService} from "./pinpoint";
+import {getBestEstimate} from "../event-sourceutil";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
@@ -125,7 +126,7 @@ export function _createSendSmsNotications(pps: PinpointService): (notification: 
 
                 const portnet = data.Portnet ? moment(data.Portnet) : null;
                 const vts = data.VTS ? moment(data.VTS) : null;
-                const bestEstimate = vts || portnet as moment.Moment;
+                const bestEstimate = getBestEstimate(portnet, vts);
 
                 if (data.Sent) {
                     const sent = moment(data.Sent);
@@ -176,7 +177,7 @@ function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToN
         event[e.event_source] = moment(e.event_time).toISOString();
 
         if(updateSent) {
-            event.Sent = event.Sent || event.VTS || event.Portnet;
+            event.Sent = event.Sent || getBestEstimate(event.Portnet, event.VTS);
         } else {
             event.Sent = event.Sent;
         }

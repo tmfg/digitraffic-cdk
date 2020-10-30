@@ -3,6 +3,7 @@ import * as ShiplistService from "../../service/shiplist";
 import {default as pinpointService} from "../../service/pinpoint";
 import * as SnsService from "../../service/sns";
 import {ShiplistEstimate} from "../../db/db-shiplist";
+import {getDisplayableNameForEventSource} from "../../event-sourceutil";
 const moment = require('moment-timezone');
 
 const shiplistUrl = process.env.SHIPLIST_URL as string
@@ -41,7 +42,7 @@ function convertToSms(locode: string, estimates: ShiplistEstimate[]): string {
             timestring = moment(e.event_time).tz('Europe/Helsinki').format("D.MM HH:mm");
         }
 
-        return `${e.event_type} ${e.event_source} ${timestring} ${e.ship_name}`; }
+        return `${e.event_type} ${getDisplayableNameForEventSource(e.event_source)} ${timestring} ${e.ship_name}`; }
     ).join('\n');
 
     return `Laivalista ${moment().format("DD.MM")} ${locode}:\n${shiplist}\n${shiplistUrl}${locode}`;
