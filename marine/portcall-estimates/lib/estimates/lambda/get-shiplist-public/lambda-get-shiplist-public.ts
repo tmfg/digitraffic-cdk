@@ -3,6 +3,7 @@ import {inDatabase} from 'digitraffic-lambda-postgres/database';
 import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';
 import * as R from 'ramda';
+import {getDisplayableNameForEventSource} from "../../../subscriptions/event-sourceutil";
 
 export const handler = async (
     event: any
@@ -11,7 +12,11 @@ export const handler = async (
         return {statusCode: 400, body: 'Missing locode'};
     }
     return await inDatabase(async (db: IDatabase<any, any>) => {
-        const shiplist: DbPublicShiplist[] = await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase());
+        const shiplist: DbPublicShiplist[] =
+            (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
+                .map(e => Object.assign(e, {
+                    event_source: getDisplayableNameForEventSource(e.event_source)
+                }));
         return {
             statusCode: 200,
             headers: {
@@ -127,7 +132,6 @@ export const handler = async (
 
 </body>
 <script>
-    import {getDisplayableNameForEventSource} from "./event-sourceutil"; 
 var shiplist = ${JSON.stringify(shiplist)};
 
     var currentDate = new Date();
@@ -232,9 +236,8 @@ var shiplist = ${JSON.stringify(shiplist)};
     }
 
     function sourceToString(e) {
-        var source = getDisplayableNameForEventSource(e.event_source);
         var hoursAgo = Math.floor((moment().valueOf() - moment(e.record_time).valueOf()) / 1000 / 60 / 60);
-        return source + ' (-' + hoursAgo + ' h)';
+        return e.event_source + ' (-' + hoursAgo + ' h)';
     }
 
     buildShiplist();
