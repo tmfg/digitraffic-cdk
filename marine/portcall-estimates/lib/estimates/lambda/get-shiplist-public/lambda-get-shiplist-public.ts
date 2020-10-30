@@ -127,7 +127,8 @@ export const handler = async (
 
 </body>
 <script>
-    var shiplist = ${JSON.stringify(shiplist)};
+    import {getDisplayableNameForEventSource} from "./event-sourceutil"; 
+var shiplist = ${JSON.stringify(shiplist)};
 
     var currentDate = new Date();
 
@@ -231,7 +232,7 @@ export const handler = async (
     }
 
     function sourceToString(e) {
-        var source = e.event_source == 'Portnet' ? 'PNET' : e.event_source;
+        var source = getDisplayableNameForEventSource(e.event_source);
         var hoursAgo = Math.floor((moment().valueOf() - moment(e.record_time).valueOf()) / 1000 / 60 / 60);
         return source + ' (-' + hoursAgo + ' h)';
     }
