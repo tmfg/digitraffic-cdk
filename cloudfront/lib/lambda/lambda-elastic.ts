@@ -130,7 +130,6 @@ function sendMessageToEs(message: string): Promise<any> {
     request.body = zlib.gzipSync(message, COMPRESS_OPTIONS);
     request.headers["Content-Type"] = "application/x-ndjson";
     request.headers["Content-Encoding"] = "gzip";
-    request.headers["Accept-Encoding"] = "gzip";
 
     const signer = new AWS.Signers.V4(request, "es");
     signer.addAuthorization(creds, new Date());
@@ -143,17 +142,14 @@ function sendMessageToEs(message: string): Promise<any> {
         request,
         null,
         function(httpResp: any) {
-            var gunzip = zlib.createGunzip();
             let respBody = "";
 
-            gunzip.on("data", function(chunk: any) {
+            httpResp.on("data", function(chunk: any) {
                 respBody += chunk;
             });
-            gunzip.on("end", function(chunk: any) {
+            httpResp.on("end", function(chunk: any) {
                 resolve(respBody);
             });
-
-            httpResp.pipe(gunzip);
         },
         function(err: any) {
             console.log("Error: " + err);
@@ -176,6 +172,7 @@ function parseLine(line: string): any {
     const referrer = fields[9];
     const userAgent = unescape(fields[10]);
     const scheme = fields[16];
+    const cHostHeader = fields[17];
     const timeTaken = fields[18];
     const resultType = fields[22];
     const httpVersion = fields[23];
@@ -192,6 +189,7 @@ function parseLine(line: string): any {
         request_method: method,
         request_time: +timeTaken,
         request_uri: request,
+        request_host: cHostHeader,
         scheme: scheme,
         server_protocol: httpVersion,
         status: +responseStatus,
