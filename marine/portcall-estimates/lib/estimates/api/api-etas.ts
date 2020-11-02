@@ -76,6 +76,10 @@ async function getETA(
     }
 
     const url = `${endpointUrl}?imo=${ship.imo}&destination_lat=${portAreaGeometry.latitude}&destination_lon=${portAreaGeometry.longitude}&filter=faster(0.2)`
+
+    // separate log to track requests
+    console.log(`method=getETATracking url=${url}`);
+
     const resp = await axios.get(url, {
         headers: {
             'Authorization': `Bearer ${token}`,
@@ -93,6 +97,10 @@ async function getETA(
         console.error(`method=getETAs status=${resp.status}`);
         return Promise.reject();
     }
+
+    // separate log to track responses
+    console.log(`method=getETATracking response=${JSON.stringify(resp.data)}`);
+
     return Promise.resolve(resp.data as ETAResponse[])
         .then(etaResponse => {
             // always an array with a single ETA
