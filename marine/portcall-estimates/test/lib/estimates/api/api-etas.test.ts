@@ -4,8 +4,6 @@ import {getPortAreaGeometries} from "../../../../lib/estimates/service/portareas
 describe('api-etas', () => {
 
     const geometries = getPortAreaGeometries();
-    const rauma =
-        geometries.find(g => g.locode == 'FIRAU')?.default!;
     const hankoWest =
         geometries.find(g => g.locode == 'FIHKO')!.default!;
     const hankoOut =
@@ -14,17 +12,6 @@ describe('api-etas', () => {
         geometries.find(g => g.locode == 'FIHKO')!.areas.find(a => a.portAreaCode == 'KOV')!;
     const helsinkiVuos =
         geometries.find(g => g.locode == 'FIHEL')!.areas.find(a => a.portAreaCode == 'VUOS')!;
-
-    test('getPortAreaGeometryForShip - just locode', () => {
-        const geometry = getPortAreaGeometryForShip(geometries, {
-            portcall_id: 0,
-            locode: 'FIRAU',
-            imo: 1
-        });
-
-        expect(geometry?.latitude).toBe(rauma.latitude);
-        expect(geometry?.longitude).toBe(rauma.longitude);
-    });
 
     test('getPortAreaGeometryForShip - FIHKO/OUT', () => {
         const geometry = getPortAreaGeometryForShip(geometries, {
