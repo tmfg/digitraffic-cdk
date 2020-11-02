@@ -166,7 +166,7 @@ function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToN
 
     console.info("notification to update %s", JSON.stringify(notification));
 
-    const updateSent = notification == {};
+    const populateSentWithEstimate = Object.keys(notification).length == 0;
 
     estimates.filter(e => {
         return e.portcall_id != null
@@ -176,7 +176,7 @@ function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToN
 
         event[e.event_source] = moment(e.event_time).toISOString();
 
-        if(updateSent) {
+        if(populateSentWithEstimate) {
             event.Sent = event.Sent || getBestEstimate(event.Portnet, event.VTS);
         } else {
             event.Sent = event.Sent;
