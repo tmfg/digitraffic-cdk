@@ -72,7 +72,7 @@ async function getETA(
 
     if (!portAreaGeometry) {
         console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} not found!`);
-        return Promise.reject();
+        return Promise.resolve(null);
     }
 
     const url = `${endpointUrl}?imo=${ship.imo}&destination_lat=${portAreaGeometry.latitude}&destination_lon=${portAreaGeometry.longitude}&filter=faster(0.2)`
