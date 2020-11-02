@@ -1,4 +1,4 @@
-import {getPortAreaGeometries, PortareaGeometry} from '../../service/portareas';
+import {getPortAreaGeometries, Port} from '../../service/portareas';
 import {findETAShipsByLocode} from '../../service/estimates';
 import {updateETAEstimates} from '../../service/etas';
 import {SNS} from 'aws-sdk';
@@ -34,7 +34,7 @@ export function handlerFn(
         endpointUrl: string,
         endpointSource: string,
         ships: DbETAShip[],
-        portAreaGeometries: PortareaGeometry[]) => Promise<ShipETA[]>
+        portAreaGeometries: Port[]) => Promise<ShipETA[]>
 ): () => Promise<any> {
 
     return async () => {

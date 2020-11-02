@@ -2,7 +2,7 @@ import {DbETAShip} from '../db/db-estimates';
 import {getETAs, ShipETA} from '../api/api-etas';
 import {ApiEstimate, EventType} from '../model/estimate';
 import {saveEstimates} from './estimates';
-import {PortareaGeometry} from './portareas';
+import {Port} from './portareas';
 
 export async function updateETAEstimates(
     endpointClientId: string,
@@ -12,7 +12,7 @@ export async function updateETAEstimates(
     endpointUrl: string,
     endpointSource: string,
     ships: DbETAShip[],
-    portAreaGeometries: PortareaGeometry[]): Promise<ShipETA[]> {
+    portAreaGeometries: Port[]): Promise<ShipETA[]> {
     
     const etas: ShipETA[] = (await getETAs(endpointClientId,
         endpointClientSecret,

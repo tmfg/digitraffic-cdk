@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {PortareaGeometry} from "../service/portareas";
+import {Port, PortAreaCoordinates} from "../service/portareas";
 import {DbETAShip} from "../db/db-estimates";
 
 async function createEtaOAuthToken(
@@ -39,7 +39,7 @@ export async function getETAs(
     endpointAuthUrl: string,
     endpointUrl: string,
     ships: DbETAShip[],
-    portAreaGeometries: PortareaGeometry[]): Promise<Array<ShipETA | null>> {
+    portAreaGeometries: Port[]): Promise<Array<ShipETA | null>> {
 
     const start = Date.now();
 
@@ -57,7 +57,7 @@ export async function getETAs(
         getETA(endpointUrl,
             token.access_token,
             ship,
-            portAreaGeometries.find(g => g.locode == ship.locode))))
+            getPortAreaGeometryForShip(portAreaGeometries, ship))))
         .then(a => {
             console.log(`method=getEtas tookMs=${Date.now() - start}`);
             return a;
@@ -68,7 +68,7 @@ async function getETA(
     endpointUrl: string,
     token: string,
     ship: DbETAShip,
-    portAreaGeometry?: PortareaGeometry): Promise<ShipETA | null> {
+    portAreaGeometry: ETADestination | null): Promise<ShipETA | null> {
 
     if (!portAreaGeometry) {
         console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} not found!`);
@@ -105,6 +105,51 @@ async function getETA(
                 portcall_id: ship.portcall_id
             };
         });
+}
+
+export function getPortAreaGeometryForShip(
+    portAreaGeometries: Port[],
+    ship: DbETAShip): ETADestination | null {
+
+    const portByLocode = portAreaGeometries.find(g => g.locode == ship.locode);
+    if (!portByLocode) {
+        return null;
+    }
+
+    const area = portByLocode.areas.find(a => a.portAreaCode == ship.port_area_code)
+    if (area) {
+        console.log(`
+            method=getETA
+            Using port by area: 
+            port-locode: ${portByLocode.locode},
+            port-areacode: ${area.portAreaCode},
+            ship-imo: ${ship.imo},
+            ship.locode: ${ship.locode}`);
+        return {
+            locode: portByLocode.locode,
+            latitude: area.latitude,
+            longitude: area.longitude
+        }
+    } else if (portByLocode.default) {
+        console.log(`
+            method=getETA
+            Using port default: 
+            port-locode: ${portByLocode.locode},
+            ship-imo: ${ship.imo},
+            ship.locode: ${ship.locode}`);
+        return {
+            locode: portByLocode.locode,
+            latitude: portByLocode.default.latitude,
+            longitude: portByLocode.default.longitude
+        }
+    }
+    return null;
+}
+
+interface ETADestination {
+    readonly locode: string
+    readonly latitude: number
+    readonly longitude: number
 }
 
 interface OAuthTokenResponse {
