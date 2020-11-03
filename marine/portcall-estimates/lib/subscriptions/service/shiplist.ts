@@ -36,7 +36,7 @@ export function convertToSms(locode: string, estimates: ShiplistEstimate[]): str
             timestring = moment(e.event_time).tz('Europe/Helsinki').format("D.MM HH:mm");
         }
 
-        return `${e.event_type} ${getDisplayableNameForEventSource(e.event_source)} ${timestring} ${e.ship_name}`; }
+        return `${e.ship_name} ${e.event_type} ${timestring} ${getDisplayableNameForEventSource(e.event_source)}`; }
     ).join('\n');
 
     return `Shiplist ${moment().format("DD.MM")} ${locode}:\n${shiplist}\n${shiplistUrl}${locode}`;

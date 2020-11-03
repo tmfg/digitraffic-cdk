@@ -13,7 +13,7 @@ import {getBestEstimate} from "../event-sourceutil";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
-const SEND_NOTIFICATION_DIFFERENCE_MINUTES = 45;
+const SEND_NOTIFICATION_DIFFERENCE_MINUTES = 60;
 const VALID_EVENT_TYPES = ["ETA", "ETD"];
 
 export enum SubscriptionType {

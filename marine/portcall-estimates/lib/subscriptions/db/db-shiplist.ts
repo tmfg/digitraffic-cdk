@@ -39,6 +39,16 @@ const SELECT_BY_LOCODE_AND_IMO = `
     ORDER BY pe.event_time
 `;
 
+const findByLocodeAndImoPs = new PreparedStatement({
+    name: 'find-shiplist-by-locode-and-imo',
+    text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, SELECT_IMO)
+});
+
+const findByLocodePs = new PreparedStatement({
+    name: 'find-shiplist-by-locode',
+    text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, '')
+});
+
 export function findByLocodeAndImo(
     t: ITask<any>,
     startTime: Date,
@@ -46,14 +56,7 @@ export function findByLocodeAndImo(
     locode: string,
     imo: number
 ): Promise<ShiplistEstimate[]> {
-//    console.info("findByLocodeAndImo %s %s %s %d", startTime, endTime, locode, imo);
-
-    const ps = new PreparedStatement({
-        name: 'find-shiplist-by-locode-and-imo',
-        text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, SELECT_IMO),
-        values: [locode, startTime, endTime, imo]
-    });
-    return t.manyOrNone(ps);
+    return t.manyOrNone(findByLocodeAndImoPs, [locode, startTime, endTime, imo]);
 }
 
 export function findByLocode(
@@ -62,10 +65,5 @@ export function findByLocode(
     endTime: Date,
     locode: string
 ): Promise<ShiplistEstimate[]> {
-    const ps = new PreparedStatement({
-        name: 'find-shiplist-by-locode',
-        text: SELECT_BY_LOCODE_AND_IMO.replace(/IMO_CONDITION/gi, ''),
-        values: [locode, startTime, endTime]
-    });
-    return t.manyOrNone(ps);
+    return t.manyOrNone(findByLocodeAndImoPs, [locode, startTime, endTime]);
 }
