@@ -42,15 +42,32 @@ export const handler = async (
         integrity="sha512-qTXRIMyZIFb8iQcfjXWCO8+M5Tbc38Qi5WzdPOYZHIlZpzBHG3L3by84BBBOiRGiEb7KKtAOAs5qYdUiZiQNNQ=="
         crossorigin="anonymous"></script>
     <style>
+        .nav-link:not(.active) {
+            background-color: #e6e6e6;
+            color: #aaaaaa;
+        }
+        .nav-link:hover, .nav-link {
+            font-weight: bold;
+            text-decoration: inherit;
+            color: inherit;
+        }
+        td,th {
+            font-size: 14px;
+        }
+        .table th {
+            border-top: 0;
+            padding-top: 1px;
+        }
         /* Override Bootstrap row negative margins */
         thead .row,
         tbody .row {
             margin-left: 0px;
             margin-right: 0px;
         }
-        
+
         /* Try to prevent time wrapping */
         td.col-3 {
+            padding-left: 0.25rem;
             padding-right: 0.25rem;
         }
 
@@ -73,6 +90,7 @@ export const handler = async (
         .logo-name {
             width: 150px;
         }
+    
     </style>
 </head>
 
@@ -91,10 +109,10 @@ export const handler = async (
 
     <ul class="nav nav-tabs nav-fill" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="aluslista-tab" data-toggle="tab" href="#aluslista" role="tab">Aluslista</a>
+            <a class="nav-link active" id="aluslista-tab" data-toggle="tab" href="#aluslista" role="tab">List by ship</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="aikalista-tab" data-toggle="tab" href="#aikalista" role="tab">Aikalista</a>
+            <a class="nav-link" id="aikalista-tab" data-toggle="tab" href="#aikalista" role="tab">List by time</a>
         </li>
     </ul>
 
@@ -132,7 +150,7 @@ export const handler = async (
 
 </body>
 <script>
-var shiplist = ${JSON.stringify(shiplist)};
+    var shiplist = ${JSON.stringify(shiplist)};
 
     var currentDate = new Date();
 
@@ -235,17 +253,20 @@ var shiplist = ${JSON.stringify(shiplist)};
         return timestring;
     }
 
+
     function sourceToString(e) {
+        var source = e.event_source == 'Portnet' ? 'PNET' : e.event_source;
         var hoursAgo = Math.floor((moment().valueOf() - moment(e.record_time).valueOf()) / 1000 / 60 / 60);
-        return e.event_source + ' (-' + hoursAgo + ' h)';
+        return source + ' (-' + hoursAgo + ' h)';
     }
+
 
     buildShiplist();
     buildTimelist();
 
 </script>
 
-</html>          
+</html>    
 `
         }
     });
