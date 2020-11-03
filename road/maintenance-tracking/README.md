@@ -37,5 +37,14 @@ Road application then reads saved data from the db and combines the contents of 
 
 # Misc
 
+## Send message to integration api
+
+* Got to scripts directory
+    * `cd test/scripts/`
+* Run script to post tracking json -message
+    * `./post-to-apigateway-lambda.sh <lambda-base-url|integration-url> <api-key-value> <path/to/message.json>`
+
+## Message count in
+
 Maximum count of messages in has been around 4000/5min -> 4000/5/60 = 14/s.
 Normally about 5000 msg/h -> 83 msg/min.
