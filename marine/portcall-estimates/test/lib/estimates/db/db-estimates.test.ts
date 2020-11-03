@@ -8,10 +8,9 @@ import {
     insertVessel,
     insertVesselLocation
 } from "../../db-testutil";
-import {newEstimate, newPortAreaDetails, newPortCall, newVessel, newVesselLocation} from "../../testdata";
+import {newEstimate, newPortAreaDetails, newPortCall} from "../../testdata";
 import {findByImo, findByLocode, findByMmsi, findETAsByLocodes} from "../../../../lib/estimates/db/db-estimates";
 import {ApiEstimate, EventType} from "../../../../lib/estimates/model/estimate";
-import {VesselLocationNavType} from "../../../../lib/estimates/service/vessel_location";
 
 describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*
@@ -247,7 +246,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const eventTime = moment().add(1, 'hours').toDate();
         const estimate = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'Portnet'});
         await insert(db, [estimate]);
-        await createPortnetAISDataForVesselInTransit(estimate);
+        await createPortcall(estimate);
 
         const foundEstimates = await findETAsByLocodes(db, [locode]);
 
@@ -263,7 +262,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const eventTime = moment().add(1, 'hours').toDate();
         const estimate = newEstimate({eventType: EventType.ETD, locode, eventTime, source: 'Portnet'});
         await insert(db, [estimate]);
-        await createPortnetAISDataForVesselInTransit(estimate);
+        await createPortcall(estimate);
 
         const foundEstimates = await findETAsByLocodes(db, [locode]);
 
@@ -275,7 +274,7 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const eventTime = moment().add(1, 'hours').toDate();
         const estimate = newEstimate({eventType: EventType.ETA, locode: 'BB456', eventTime, source: 'Portnet'});
         await insert(db, [estimate]);
-        await createPortnetAISDataForVesselInTransit(estimate);
+        await createPortcall(estimate);
 
         const foundEstimates = await findETAsByLocodes(db, [locode]);
 
@@ -290,10 +289,10 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const estimate3 = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'S2'});
         const estimate4 = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'S3'});
         await insert(db, [estimate1, estimate2, estimate3, estimate4]);
-        await createPortnetAISDataForVesselInTransit(estimate1);
-        await createPortnetAISDataForVesselInTransit(estimate2);
-        await createPortnetAISDataForVesselInTransit(estimate3);
-        await createPortnetAISDataForVesselInTransit(estimate4);
+        await createPortcall(estimate1);
+        await createPortcall(estimate2);
+        await createPortcall(estimate3);
+        await createPortcall(estimate4);
 
         const foundEstimates = await findETAsByLocodes(db, [locode]);
 
@@ -308,37 +307,17 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const estimate1 = newEstimate({eventType: EventType.ETA, locode: locode1, eventTime, source: 'Portnet'});
         const estimate2 = newEstimate({eventType: EventType.ETA, locode: locode2, eventTime, source: 'Portnet'});
         await insert(db, [estimate1, estimate2]);
-        await createPortnetAISDataForVesselInTransit(estimate1);
-        await createPortnetAISDataForVesselInTransit(estimate2);
+        await createPortcall(estimate1);
+        await createPortcall(estimate2);
 
         const foundEstimates = await findETAsByLocodes(db, [locode1, locode2]);
 
         expect(foundEstimates.length).toBe(2);
     });
 
-    testNavType(VesselLocationNavType.AT_ANCHOR);
-    testNavType(VesselLocationNavType.MOORED);
-    testNavType(VesselLocationNavType.AGROUND);
-
-    function testNavType(navType: VesselLocationNavType) {
-        test(`findETAsByLocodes - ${VesselLocationNavType[navType]} vessel not returned`, async () => {
-            const locode = 'AA123';
-            const eventTime = moment().add(1, 'hours').toDate();
-            const estimate = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'Portnet'});
-            await insert(db, [estimate]);
-            await createPortnetAISDataForVesselInTransit(estimate, navType);
-
-            const foundEstimates = await findETAsByLocodes(db, [locode]);
-
-            expect(foundEstimates.length).toBe(0);
-        });
-    }
-
-    async function createPortnetAISDataForVesselInTransit(estimate: ApiEstimate, navStat?: VesselLocationNavType) {
-        await insertVessel(db, newVessel(estimate));
-        await insertVesselLocation(db, newVesselLocation(estimate, navStat ?? 0));
+    async function createPortcall(estimate: ApiEstimate) {
         await insertPortCall(db, newPortCall(estimate));
         await insertPortAreaDetails(db, newPortAreaDetails(estimate));
     }
-    
+
 }));

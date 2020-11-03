@@ -110,8 +110,6 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
     FROM portcall_estimate pe
     JOIN port_call pc ON pc.port_call_id = pe.portcall_id
     JOIN port_area_details pad on pad.port_call_id = pe.portcall_id
-    JOIN vessel v ON v.imo = pe.ship_imo
-    JOIN vessel_location vl ON vl.mmsi = (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM vessel WHERE imo = v.imo)
     WHERE pe.record_time =
           (
               SELECT MAX(px.record_time) FROM portcall_estimate px
