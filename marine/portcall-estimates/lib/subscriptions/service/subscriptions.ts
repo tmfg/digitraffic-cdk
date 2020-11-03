@@ -83,35 +83,39 @@ export async function updateSubscriptionNotifications(
 
 //    console.info("got list %s to notifications %s", JSON.stringify(estimates), JSON.stringify(notification));
 
-    return await SubscriptionDB.updateNotifications(phoneNumber, locode, notification);
+    return SubscriptionDB.updateNotifications(phoneNumber, locode, notification);
 }
 
-export function updateSubscriptionEstimates(imo: number, locode: string) {
-    SubscriptionDB.listSubscriptionsForLocode(locode).then(subscriptions => {
-        subscriptions.Items.forEach((s: DbSubscription) => {
-            updateSubscription(imo, s);
+export async function updateSubscriptionEstimates(imo: number, locode: string) {
+    console.info("updating estimates for %s %d", locode, imo);
+
+    await SubscriptionDB.listSubscriptionsForLocode(locode).then(subscriptions => {
+        subscriptions.Items.forEach(async (s: DbSubscription) => {
+            await updateSubscription(imo, s);
         });
     });
 }
 
-function updateSubscription(imo: number, s: DbSubscription) {
+async function updateSubscription(imo: number, s: DbSubscription) {
     const startTime = new Date();
     const endTime = getStartTime(s.Time);
 
     endTime.setDate(endTime.getDate() + 1);
 
-    inTransaction((t: ITask<any>) => ShiplistDb.findByLocodeAndImo(t, startTime, endTime, s.Locode, imo))
-    .then(async estimates => {
-        console.info("got estimates %s", JSON.stringify(estimates));
+    console.info("updating subscription %s", s.Locode);
 
-        if (estimates.length > 0 && s.ShipsToNotificate != null) {
-            const newNotifications = updateEstimates(estimates, s.ShipsToNotificate);
+    await inTransaction(async (t: ITask<any>) => await ShiplistDb.findByLocodeAndImo(t, startTime, endTime, s.Locode, imo))
+        .then(async estimates => {
+            console.info("got estimates %s", JSON.stringify(estimates));
 
-            await sendSmsNotications(newNotifications, s.PhoneNumber)
-                .then(_ => SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, newNotifications))
-                .then(_ => console.info("notifications updated"));
-        }
-    });
+            if (estimates.length > 0 && s.ShipsToNotificate != null) {
+                const newNotifications = updateEstimates(estimates, s.ShipsToNotificate);
+
+                await sendSmsNotications(newNotifications, s.PhoneNumber)
+                    .then(_ => SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, newNotifications))
+                    .then(_ => console.info("notifications updated"));
+            }
+        });
 }
 
 export function _createSendSmsNotications(pps: PinpointService): (notification: DbShipsToNotificate, phoneNumber: string) => Promise<any> {
@@ -162,8 +166,6 @@ function isNotificationNeeded(sent: moment.Moment, bestEstimate: moment.Moment):
 }
 
 function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToNotificate): DbShipsToNotificate {
-//    console.info("new estimates %s", JSON.stringify(estimates));
-
     console.info("notification to update %s", JSON.stringify(notification));
 
     const populateSentWithEstimate = Object.keys(notification).length == 0;
@@ -177,7 +179,7 @@ function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToN
         event[e.event_source] = moment(e.event_time).toISOString();
 
         if(populateSentWithEstimate) {
-            event.Sent = event.Sent || getBestEstimate(event.Portnet, event.VTS);
+            event.Sent = getBestEstimate(event.Portnet, event.VTS);
         } else {
             event.Sent = event.Sent;
         }

@@ -17,7 +17,7 @@ export interface SnsSubscriptionEvent {
 }
 
 const LOCODE_PATTERN = /[a-zA-Z]{2}[a-zA-Z0-9]{3}/;
-export const TIME_FORMAT = ['H:m', 'H'];
+export const TIME_FORMAT = ['H:m', 'HHmm', 'H'];
 
 export function validateSubscription(subscription: EstimateSubscription): boolean {
     if (!LOCODE_PATTERN.test(subscription.locode)) {

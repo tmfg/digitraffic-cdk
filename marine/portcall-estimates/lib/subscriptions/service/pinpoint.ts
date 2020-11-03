@@ -7,8 +7,8 @@ const pinpoint = new Pinpoint();
 const projectId = process.env['PINPOINT_ID'] as string;
 const originationNumber = process.env['PINPOINT_NUMBER'] as string;
 
-const MESSAGE_HELP = 'Subscribe by sending a message SUBSCRIBE LOCODE TIME, e.g. SUBSCRIBE FIKOK 07:00. View existing subscriptions by sending LIST. Remove subscriptions by sending REMOVE LOCODE.';
-const MESSAGE_SUBSCRIPTION_OK = 'Subscription received.';
+const MESSAGE_HELP = 'Subscribe by sending a message ORDER LOCODE TIME, e.g. ORDER FIKOK 0700. View existing subscriptions by sending LIST. Remove subscriptions by sending REMOVE LOCODE.';
+const MESSAGE_SUBSCRIPTION_OK = 'Order received.';
 const MESSAGE_REMOVAL_OK = 'Subscription removed.';
 const MESSAGE_NO_SUBSCRIPTIONS = 'No subscriptions.';
 const MESSAGE_SUBSCRIPTION_LIMIT_REACHED = 'Maximum number of subscriptions reached.';

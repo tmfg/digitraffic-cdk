@@ -70,7 +70,8 @@ export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Rol
         handler: 'lambda-elastic.handler',
         environment: {
             APP_DOMAIN: elasticAppName,
-            ELASTIC_DOMAIN: elasticDomain
+            ELASTIC_DOMAIN: elasticDomain,
+            DEPLOY_DATE: new Date().toISOString()
         }
     });
 }

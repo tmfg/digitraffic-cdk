@@ -14,6 +14,8 @@ const s3 = new AWS.S3();
 
 const MAX_LINES_PER_MESSAGE = 6000;
 
+const VERSION_HEADERS = "EXT_VERSION";
+
 const COMPRESS_OPTIONS = {
     level: 8,
     memLevel: 9,
@@ -171,8 +173,8 @@ function parseLine(line: string): any {
     const responseStatus = fields[8];
     const referrer = fields[9];
     const userAgent = unescape(fields[10]);
+    const cHostHeader = fields[15];
     const scheme = fields[16];
-    const cHostHeader = fields[17];
     const timeTaken = fields[18];
     const resultType = fields[22];
     const httpVersion = fields[23];

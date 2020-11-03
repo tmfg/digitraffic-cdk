@@ -9,6 +9,7 @@ export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperati
 
     switch (operationString) {
         case 'SUBSCRIBE':
+        case 'ORDER':
             return SubscriptionOperation.SUBSCRIBE;
         case 'REMOVE':
             return SubscriptionOperation.REMOVE;
@@ -21,7 +22,7 @@ export function parseOperation(event: SnsSubscriptionEvent): SubscriptionOperati
     }
 }
 
-// correct syntax: SUBSCRIBE FINLI 23:30
+// correct syntax: ORDER FINLI 2330
 export function parseSnsSubscriptionEvent(event: SnsSubscriptionEvent): EstimateSubscription | null {
     const parts = event.messageBody.split(' ');
 
