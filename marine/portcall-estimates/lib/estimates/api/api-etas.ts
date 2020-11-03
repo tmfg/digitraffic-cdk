@@ -180,7 +180,7 @@ interface ETAResponse {
         readonly time: string
         readonly speed: number
         readonly heading: number
-        readonly position: {
+        readonly gpsPosition: {
             readonly latitude: number
             readonly longitude: number
         }
