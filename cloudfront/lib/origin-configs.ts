@@ -5,9 +5,10 @@ import {
     SourceConfiguration,
     Behavior,
     CloudFrontAllowedMethods,
-    CfnDistribution
+    CfnDistribution,
+    LambdaEdgeEventType
 } from '@aws-cdk/aws-cloudfront';
-import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
+import {CFBehavior, CFBehaviorLambda, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
 import ForwardedValuesProperty = CfnDistribution.ForwardedValuesProperty;
 
@@ -90,9 +91,22 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
         maxTtl: Duration.seconds(b.cacheTtl ?? 60),
         defaultTtl: Duration.seconds(b.cacheTtl ?? 60),
         forwardedValues: forwardedValues,
-        lambdaFunctionAssociations: b.lambdas?.map(l => ({
-            eventType: l.eventType,
-            lambdaFunction: lambdaMap[l.lambdaType]
-        }))
+        lambdaFunctionAssociations: getLambdas(b, lambdaMap)
     };
+}
+
+function getLambdas(b: CFBehavior, lambdaMap: any) {
+    const lambdas = b.lambdas?.map(l => ({
+        eventType: l.eventType,
+        lambdaFunction: lambdaMap[l.lambdaType]
+    })) || [];
+
+    if(b.ipRestriction) {
+        lambdas.push({
+            eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
+            lambdaFunction: lambdaMap[`IP_${b.ipRestriction}`]
+        });
+    }
+
+    return lambdas.length == 0 ? undefined : lambdas;
 }

@@ -146,6 +146,8 @@ function sendMessageToEs(message: string): Promise<any> {
         function(httpResp: any) {
             let respBody = "";
 
+            console.log("statuscode %d", httpResp.statusCode);
+
             httpResp.on("data", function(chunk: any) {
                 respBody += chunk;
             });

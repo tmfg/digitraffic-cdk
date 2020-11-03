@@ -20,7 +20,7 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
-        const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
+        const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps, cloudfrontProps.props);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
 
         cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, cloudfrontProps.elasticProps.elasticDomain, cloudfrontProps.elasticAppName));
@@ -61,12 +61,12 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaRole;
     }
 
-    createLambdaMap(lProps: CFLambdaProps | undefined): any {
+    createLambdaMap(lProps: CFLambdaProps | undefined, props: Props[]): any {
         let lambdaMap: any = {};
 
         if(lProps != undefined) {
             const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
-                assumedBy:  new CompositePrincipal(
+                assumedBy: new CompositePrincipal(
                     new ServicePrincipal("lambda.amazonaws.com"),
                     new ServicePrincipal("edgelambda.amazonaws.com"),
                 ),
@@ -75,25 +75,30 @@ export class CloudfrontCdkStack extends Stack {
                 ]
             });
 
-            if(lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
+            if (lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
                 lambdaMap[LambdaType.WEATHERCAM_REDIRECT] =
                     createWeathercamRedirect(this, edgeLambdaRole, lProps.lambdaParameters.weathercamDomainName, lProps.lambdaParameters.weathercamHostName);
             }
 
-            if(lProps.lambdaTypes.includes(LambdaType.GZIP_REQUIREMENT)) {
+            if (lProps.lambdaTypes.includes(LambdaType.GZIP_REQUIREMENT)) {
                 lambdaMap[LambdaType.GZIP_REQUIREMENT] =
                     createGzipRequirement(this, edgeLambdaRole);
             }
 
-            if(lProps.lambdaTypes.includes(LambdaType.HTTP_HEADERS)) {
+            if (lProps.lambdaTypes.includes(LambdaType.HTTP_HEADERS)) {
                 lambdaMap[LambdaType.HTTP_HEADERS] =
                     createHttpHeaders(this, edgeLambdaRole);
             }
 
-            if(lProps.lambdaTypes.includes(LambdaType.IP_RESTRICTION)) {
-                lambdaMap[LambdaType.IP_RESTRICTION] =
-                    createIpRestriction(this, edgeLambdaRole, lProps.lambdaParameters.vsAllowedIpAddresses);
-            }
+            // handle ip restrictions
+            if (lProps.lambdaParameters && lProps.lambdaParameters.ipRestrictions)
+                for (const key of Object.keys(lProps.lambdaParameters.ipRestrictions)) {
+                    const restriction = lProps.lambdaParameters.ipRestrictions[key];
+
+//                    console.info("creating ip restriction %s for %s", restriction, key);
+
+                    lambdaMap[`IP_${key}`] = createIpRestriction(this, edgeLambdaRole, key, restriction);
+                }
         }
 
         return lambdaMap;

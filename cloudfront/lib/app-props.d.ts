@@ -4,7 +4,8 @@ import {LambdaEdgeEventType} from "@aws-cdk/aws-cloudfront";
 
 export interface CFBehaviorLambda {
     lambdaType: LambdaType,
-    eventType: LambdaEdgeEventType
+    eventType: LambdaEdgeEventType,
+    lambdaParameter?: any
 }
 
 export interface CFBehavior {
@@ -14,7 +15,8 @@ export interface CFBehavior {
     allowedMethods?: any,
     viewerProtocolPolicy?: string,
     lambdas?: CFBehaviorLambda[],
-    cacheHeaders?: string[]
+    cacheHeaders?: string[],
+    ipRestriction?: string
 }
 
 export interface CFDomain {

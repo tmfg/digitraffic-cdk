@@ -37,15 +37,14 @@ export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
     return createFunction(stack, edgeLambdaRole, 'http-headers', functionBody, versionString);
 }
 
-export function createIpRestriction(stack: Stack, edgeLambdaRole: Role, ipList: string): Version {
+export function createIpRestriction(stack: Stack, edgeLambdaRole: Role, path: string, ipList: string): Version {
     const versionString = new Date().toISOString();
     const lambdaBody = fs.readFileSync('dist/lambda/lambda-ip-restriction.js');
     const functionBody = lambdaBody.toString()
         .replace(/EXT_IP/gi, ipList)
         .replace(/EXT_VERSION/gi, versionString);
 
-    return createFunction(stack, edgeLambdaRole, 'ip-restriction', functionBody, versionString);
-
+    return createFunction(stack, edgeLambdaRole, `ip-restriction-${path}`, functionBody, versionString);
 }
 
 export function createFunction(stack: Stack, edgeLambdaRole: Role, functionName: string, functionBody: string, versionString: string): Version {
