@@ -89,7 +89,7 @@ async function getETA(
         validateStatus: (status) => status == 200 || status == 204 || status == 404
     });
     if (resp.status == 204) {
-        console.log(`method=getETAs status=${resp.status} ship ${ship.imo} had speed lower than 0,2 knots`);
+        console.log(`method=getETAs status=${resp.status} ship ${ship.imo} had speed lower than 0,2 knots or was at_anchor/moored/aground`);
         return Promise.resolve(null);
     } else if (resp.status == 404) {
         console.log(`method=getETAs status=${resp.status} ship ${ship.imo} has not reported a position for more than 2 hours`);
