@@ -7,10 +7,10 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
-    "@aws-cdk/core": "1.56.0",
-    "@aws-cdk/aws-iam": "1.56.0",
-    "@aws-cdk/aws-apigateway": "1.56.0",
-    "@aws-cdk/aws-sqs": "1.56.0",
+    "@aws-cdk/core": "1.71.0",
+    "@aws-cdk/aws-iam": "1.71.0",
+    "@aws-cdk/aws-apigateway": "1.71.0",
+    "@aws-cdk/aws-sqs": "1.71.0",
     "@types/geojson": "7946.0.7"
   }
 }
