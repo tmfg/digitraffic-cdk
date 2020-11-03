@@ -39,7 +39,7 @@ export async function getETAs(
     endpointAuthUrl: string,
     endpointUrl: string,
     ships: DbETAShip[],
-    portAreaGeometries: Port[]): Promise<Array<ShipETA | null>> {
+    portAreaGeometries: Port[]): Promise<Array<ShipETA>> {
 
     const start = Date.now();
 
@@ -53,7 +53,7 @@ export async function getETAs(
         throw new Error('Authentication to ETA API failed!');
     }
 
-    return Promise.all(await ships.map( ship =>
+    const etas = await Promise.all(await ships.map( ship =>
         getETA(endpointUrl,
             token.access_token,
             ship,
@@ -62,6 +62,7 @@ export async function getETAs(
             console.log(`method=getEtas tookMs=${Date.now() - start}`);
             return a;
         });
+    return etas.filter(e => e != null) as ShipETA[];
 }
 
 async function getETA(
@@ -75,7 +76,7 @@ async function getETA(
         return Promise.resolve(null);
     }
 
-    const url = `${endpointUrl}?imo=${ship.imo}&destination_lat=${portAreaGeometry.latitude}&destination_lon=${portAreaGeometry.longitude}&filter=faster(0.2)`
+    const url = `${endpointUrl}?imo=${ship.imo}&destination_lat=${portAreaGeometry.latitude}&destination_lon=${portAreaGeometry.longitude}&filter=and(not(or(status(at_anchor),status(moored),status(aground))),faster(0.2))`
 
     // separate log to track requests
     console.log(`method=getETATracking url=${url}`);

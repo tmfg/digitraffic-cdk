@@ -129,8 +129,7 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
           pe.event_source = 'Portnet' AND
           pe.location_locode IN ($1:list) AND
           pad.ata IS NULL AND
-          pc.port_call_timestamp > CURRENT_DATE - INTERVAL '1 DAY' AND
-          vl.nav_stat NOT IN (1, 5, 6)
+          pc.port_call_timestamp > CURRENT_DATE - INTERVAL '1 DAY'
 `;
 // 1 = at anchor, 5 = moored, 6 = aground
 
