@@ -63,4 +63,19 @@ describe('shiplists', dbTestBase((db) => {
         assertFindByLocodeAndImo(t, LOCODE_RAUMA, TEST_IMO+1000, 0);
         assertFindByLocodeAndImo(t, LOCODE_HELSINKI, TEST_IMO, 0);
     }));
+
+    test('findByLocode - no ATAs', inTransaction(db, async (t: any) => {
+        await updateEstimate(db, {
+            eventTime:new Date().toISOString(),
+            eventType:EventType.ATA,
+            eventTimeConfidenceLower:null,
+            eventTimeConfidenceUpper:null,
+            recordTime:new Date().toISOString(),
+            location: { port: LOCODE_RAUMA },
+            ship: { mmsi: TEST_MMSI, imo: TEST_IMO },
+            source: 'test'
+        });
+
+        assertFindByLocode(t, LOCODE_RAUMA, 0);
+    }));
 }));

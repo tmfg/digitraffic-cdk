@@ -3,7 +3,8 @@ import moment from 'moment';
 export enum EventType {
     ETA = 'ETA',
     ATB = 'ATB',
-    ETD = 'ETD'
+    ETD = 'ETD',
+    ATA = 'ATA'
 }
 const eventTypes = [
     EventType.ETA,
