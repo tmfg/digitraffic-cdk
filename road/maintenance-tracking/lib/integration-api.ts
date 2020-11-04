@@ -56,14 +56,15 @@ function createUpdateMaintenanceTrackingApiGatewayResource(
     integrationApi: RestApi,
     queue: Queue,
     maintenanceTrackingModel: Model) {
-    const apiResource = integrationApi.root.addResource('api');
-    const integrationResource = apiResource.addResource('integration');
-    const estimateResource = integrationResource.addResource('maintenance-tracking');
+    const apiResource = integrationApi.root
+        .addResource('maintenance-tracking')
+        .addResource('v1')
+        .addResource('update');
     const requestValidator = addDefaultValidator(integrationApi);
     attachQueueToApiGatewayResource(
         stack,
         queue,
-        estimateResource,
+        apiResource,
         requestValidator,
         'MaintenanceTracking',
         true,
