@@ -45,8 +45,8 @@ export function createEstimateSchema(shipReference: string, locationReference: s
         properties: {
             eventType: {
                 type: JsonSchemaType.STRING,
-                enum: ['ATB', 'ETA', 'ETD'],
-                description: 'Event type: ATB, ETA, ETD'
+                enum: ['ATB', 'ETA', 'ETD', 'ATA'],
+                description: 'Event type: ATB, ETA, ETD, ATA'
             },
             eventTime: {
                 type: JsonSchemaType.STRING,

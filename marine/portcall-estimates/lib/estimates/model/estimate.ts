@@ -9,8 +9,9 @@ export enum EventType {
 const eventTypes = [
     EventType.ETA,
     EventType.ATB,
-    EventType.ETD
-]
+    EventType.ETD,
+    EventType.ATA
+];
 
 export interface Ship {
     readonly mmsi?: number
