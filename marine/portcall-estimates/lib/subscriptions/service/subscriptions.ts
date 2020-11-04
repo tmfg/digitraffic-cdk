@@ -89,14 +89,14 @@ export async function updateSubscriptionNotifications(
 export async function updateSubscriptionEstimates(imo: number, locode: string) {
     console.info("updating estimates for %s %d", locode, imo);
 
-    await SubscriptionDB.listSubscriptionsForLocode(locode).then(subscriptions => {
-        subscriptions.Items.forEach(async (s: DbSubscription) => {
+    await SubscriptionDB.listSubscriptionsForLocode(locode).then(async subscriptions => {
+        for(const s of subscriptions.Items) {
             await updateSubscription(imo, s);
-        });
+        };
     });
 }
 
-async function updateSubscription(imo: number, s: DbSubscription) {
+async function updateSubscription(imo: number, s: DbSubscription): Promise<any> {
     const startTime = new Date();
     const endTime = getStartTime(s.Time);
 
@@ -104,18 +104,18 @@ async function updateSubscription(imo: number, s: DbSubscription) {
 
     console.info("updating subscription %s", s.Locode);
 
-    await inTransaction(async (t: ITask<any>) => await ShiplistDb.findByLocodeAndImo(t, startTime, endTime, s.Locode, imo))
-        .then(async estimates => {
-            console.info("got estimates %s", JSON.stringify(estimates));
+    const estimates = await inTransaction(async (t: ITask<any>) => await ShiplistDb.findByLocodeAndImo(t, startTime, endTime, s.Locode, imo));
 
-            if (estimates.length > 0 && s.ShipsToNotificate != null) {
-                const newNotifications = updateEstimates(estimates, s.ShipsToNotificate);
+    console.info("got estimates %s", JSON.stringify(estimates));
 
-                await sendSmsNotications(newNotifications, s.PhoneNumber)
-                    .then(_ => SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, newNotifications))
-                    .then(_ => console.info("notifications updated"));
-            }
-        });
+    if (estimates.length > 0 && s.ShipsToNotificate != null) {
+        const newNotifications = updateEstimates(estimates, s.ShipsToNotificate);
+
+        await sendSmsNotications(newNotifications, s.PhoneNumber);
+        await SubscriptionDB.updateNotifications(s.PhoneNumber, s.Locode, newNotifications);
+
+        console.info("notifications updated");
+    }
 }
 
 export function _createSendSmsNotications(pps: PinpointService): (notification: DbShipsToNotificate, phoneNumber: string) => Promise<any> {
