@@ -66,5 +66,5 @@ export function findByLocode(
     endTime: Date,
     locode: string
 ): Promise<ShiplistEstimate[]> {
-    return t.manyOrNone(findByLocodeAndImoPs, [locode, startTime, endTime]);
+    return t.manyOrNone(findByLocodePs, [locode, startTime, endTime]);
 }

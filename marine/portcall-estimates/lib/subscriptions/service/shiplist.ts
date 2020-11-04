@@ -39,7 +39,7 @@ export function convertToSms(locode: string, estimates: ShiplistEstimate[]): str
         return `${e.ship_name} ${e.event_type} ${timestring} ${getDisplayableNameForEventSource(e.event_source)}`; }
     ).join('\n');
 
-    return `Shiplist ${moment().format("DD.MM")} ${locode}:\n${shiplist}\n${shiplistUrl}${locode}`;
+    return `Shiplist ${moment().format("DD.MM")} ${locode}:\n${shiplist}\nTo unsubscribe reply REMOVE ${locode}.\nFor more information: ${shiplistUrl}${locode}`;
 }
 
 function isSameDate(date1: Date, date2: Date): boolean {
