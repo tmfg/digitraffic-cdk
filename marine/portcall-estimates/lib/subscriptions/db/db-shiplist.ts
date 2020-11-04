@@ -35,6 +35,7 @@ const SELECT_BY_LOCODE_AND_IMO = `
           ) 
     AND (pe.event_time between $2 and $3) 
     AND pe.location_locode = $1
+    AND pe.event_type IN ('ETA', 'ETD')
     IMO_CONDITION
     ORDER BY pe.event_time
 `;
