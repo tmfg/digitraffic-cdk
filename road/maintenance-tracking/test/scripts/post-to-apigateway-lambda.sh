@@ -17,4 +17,4 @@ cat $FILE
 echo
 
 set -x
-curl -i -X POST -H "x-api-key: ${API_KEY}" -H "Content-Type: application/json" --data @${FILE} ${BASE_URL}api/integration/maintenance-tracking
+curl -i -X POST -H "x-api-key: ${API_KEY}" -H "Content-Type: application/json" --data @${FILE} ${BASE_URL}maintenance-tracking/v1/update
