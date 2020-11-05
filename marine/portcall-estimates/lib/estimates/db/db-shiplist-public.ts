@@ -1,6 +1,5 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {EventType} from "../model/estimate";
-import {ESTIMATES_BEFORE, ESTIMATES_IN_THE_FUTURE} from "./db-estimates";
 
 export interface DbPublicShiplist {
     readonly event_type: EventType
@@ -18,8 +17,8 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
         pe.record_time,
         COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name
     FROM portcall_estimate pe
-             LEFT JOIN vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM vessel WHERE imo = v.imo)
-             LEFT JOIN port_call pc on pc.imo_lloyds = pe.ship_imo
+    LEFT JOIN vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM vessel WHERE imo = v.imo)
+    LEFT JOIN port_call pc on pc.imo_lloyds = pe.ship_imo
     WHERE pe.record_time =
           (
               SELECT MAX(px.record_time) FROM portcall_estimate px
@@ -34,6 +33,10 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
           ) AND
         pe.event_time > NOW() - INTERVAL '3 HOURS' AND
         pe.event_time < CURRENT_DATE + INTERVAL '3 DAYS' AND
+        CASE WHEN pe.event_type = 'ETA'
+        THEN NOT EXISTS(SELECT px.id FROM portcall_estimate px WHERE px.portcall_id = pe.portcall_id AND px.event_type = 'ATA')
+        ELSE TRUE
+        END AND
         pe.location_locode = $1
     ORDER BY pe.event_time
 `;
