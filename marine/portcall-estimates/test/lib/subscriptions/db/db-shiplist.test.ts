@@ -16,7 +16,7 @@ describe('shiplists', dbTestBase((db) => {
     endTime.setDate(endTime.getDate() + 1);
 
     async function assertFindByLocode(t: any, locode: string, count: number) {
-        const subs = await ShiplistDAO.findByLocode(t, startTime, endTime, locode);
+        const subs = await ShiplistDAO.getShiplistForLocode(t, startTime, endTime, locode);
 
         expect(subs.length).toBe(count);
     }

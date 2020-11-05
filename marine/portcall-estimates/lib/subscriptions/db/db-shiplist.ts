@@ -27,6 +27,7 @@ const SELECT_SHIPLIST = `
               WHERE px.event_type = pe.event_type 
               AND px.location_locode = pe.location_locode 
               AND px.ship_imo = pe.ship_imo 
+              AND px.event_type IN ('ETA', 'ETD')
               AND px.event_source = pe.event_source 
               AND 
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
@@ -37,7 +38,7 @@ const SELECT_SHIPLIST = `
     AND (pe.event_time between $2 and $3) 
     AND pe.location_locode = $1
     AND pe.event_type IN ('ETA', 'ETD')
-    ORDER BY coalesce(cast(portcall_id as text), v.name, pc.vessel_name, 'Unknown'), pe.event_time
+    ORDER BY coalesce(cast(portcall_id as text), v.name, pc.vessel_name, 'Unknown'), pe.event_type
 `;
 
 const SELECT_BY_LOCODE_AND_IMO = `
@@ -56,6 +57,7 @@ const SELECT_BY_LOCODE_AND_IMO = `
               WHERE px.event_type = pe.event_type 
               AND px.location_locode = pe.location_locode 
               AND px.ship_imo = pe.ship_imo 
+              AND px.event_type IN ('ETA', 'ETD')
               AND px.event_source = pe.event_source 
               AND 
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
@@ -63,7 +65,7 @@ const SELECT_BY_LOCODE_AND_IMO = `
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
                   END
           ) 
-    AND (pe.event_time between $2 and $3) 
+    AND (pe.event_time between $2 and $3)
     AND pe.location_locode = $1
     AND pe.event_type IN ('ETA', 'ETD')
     AND pe.ship_imo = $4
@@ -90,11 +92,17 @@ export function findByLocodeAndImo(
     return t.manyOrNone(findByLocodeAndImoPs, [locode, startTime, endTime, imo]);
 }
 
-export function findByLocode(
+export function getShiplistForLocode(
     t: ITask<any>,
     startTime: Date,
     endTime: Date,
     locode: string
 ): Promise<ShiplistEstimate[]> {
-    return t.manyOrNone(findByLocodePs, [locode, startTime, endTime]);
+    const startMinusDay = new Date(startTime);
+    startMinusDay.setDate(startMinusDay.getDate() - 1);
+
+    const endPlusDay = new Date(endTime);
+    endPlusDay.setDate(endPlusDay.getDate() + 1);
+
+    return t.manyOrNone(findByLocodePs, [locode, startMinusDay, endPlusDay]);
 }

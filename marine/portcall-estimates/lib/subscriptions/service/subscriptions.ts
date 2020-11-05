@@ -165,7 +165,7 @@ function isNotificationNeeded(sent: moment.Moment, bestEstimate: moment.Moment):
     return Math.abs(difference.as('minutes')) >= SEND_NOTIFICATION_DIFFERENCE_MINUTES;
 }
 
-function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToNotificate): DbShipsToNotificate {
+export function updateEstimates(estimates: ShiplistEstimate[], notification: DbShipsToNotificate): DbShipsToNotificate {
     console.info("notification to update %s", JSON.stringify(notification));
 
     const populateSentWithEstimate = Object.keys(notification).length == 0;
