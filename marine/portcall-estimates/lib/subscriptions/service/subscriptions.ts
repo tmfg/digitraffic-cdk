@@ -86,14 +86,14 @@ export async function updateSubscriptionNotifications(
     return SubscriptionDB.updateNotifications(phoneNumber, locode, notification);
 }
 
-export async function updateSubscriptionEstimates(imo: number, locode: string) {
+export async function updateSubscriptionEstimates(imo: number, locode: string): Promise<any> {
     console.info("updating estimates for %s %d", locode, imo);
 
-    await SubscriptionDB.listSubscriptionsForLocode(locode).then(async subscriptions => {
-        for(const s of subscriptions.Items) {
-            await updateSubscription(imo, s);
-        };
-    });
+    const subscriptions = await SubscriptionDB.listSubscriptionsForLocode(locode);
+
+    for(const s of subscriptions.Items) {
+        await updateSubscription(imo, s);
+    }
 }
 
 async function updateSubscription(imo: number, s: DbSubscription): Promise<any> {

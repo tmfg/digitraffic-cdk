@@ -4,7 +4,7 @@ import * as ShiplistDB from "../db/db-shiplist";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {getStartTimeForShiplist} from "../timeutil";
 import {inTransaction} from "../../../../../common/postgres/database";
-import {getDisplayableNameForEventSource} from "../event-sourceutil";
+import {getDisplayableNameForEventSource, selectBetterEstimate} from "../event-sourceutil";
 
 const moment = require('moment-timezone');
 
@@ -18,10 +18,39 @@ export async function getEstimates(time: string, locode: string): Promise<Shipli
     endTime.setDate(endTime.getDate() + 1);
 
     return await inTransaction(async (t: ITask<any>) => {
-        return await ShiplistDB.findByLocode(t, startTime, endTime, locode);
+        return await ShiplistDB.findByLocode(t, startTime, endTime, locode).then(selectBestEstimates)
     }).finally(() => {
         console.info("method=getShiplist tookMs=%d", (Date.now() - start));
     })
+}
+
+function selectBestEstimates(estimates: ShiplistEstimate[]): ShiplistEstimate[] {
+    const bestEstimates: ShiplistEstimate[] = [];
+    let previousEstimate: ShiplistEstimate;
+
+    estimates.forEach(e => {
+        console.info("handling estimate %s for %s", e.event_source, e.ship_name)
+
+        // a new portcall
+        if(previousEstimate?.coalesce_id != e.coalesce_id) {
+            // and not the first one, push to list
+            if (previousEstimate) {
+                console.info("pushing %s %s", previousEstimate.event_source, e.ship_name);
+
+                bestEstimates.push(previousEstimate);
+            }
+
+            previousEstimate = e;
+        } else {
+            // portcall is not changing, so we check if it's better than the previous estimate
+            previousEstimate = selectBetterEstimate(previousEstimate, e);
+        }
+    });
+
+    // @ts-ignore
+    bestEstimates.push(previousEstimate);
+
+    return bestEstimates;
 }
 
 export function convertToSms(locode: string, estimates: ShiplistEstimate[]): string {
