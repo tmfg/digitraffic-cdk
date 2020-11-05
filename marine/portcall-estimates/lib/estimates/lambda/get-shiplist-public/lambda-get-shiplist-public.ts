@@ -173,21 +173,33 @@ export const handler = async (
                 class: 'col-2',
                 title: 'Type',
                 formatter: (e) => {
-                    return etasEtdsToString(R.map(R.prop('event_type'), e.etas), R.map(R.prop('event_type'), e.etds));
+                    return timestampsToString(
+                        R.map(R.prop('event_type'), e.etas),
+                        R.map(R.prop('event_type'), e.atas),
+                        R.map(R.prop('event_type'), e.etds)
+                    );
                 }
             }, {
                 field: 'estimates',
                 class: 'col-3',
                 title: 'Time',
                 formatter: (e) => {
-                    return etasEtdsToString(R.map(timeToString, e.etas), R.map(timeToString, e.etds))
+                    return timestampsToString(
+                        R.map(timeToString, e.etas),
+                        R.map(timeToString, e.atas),
+                        R.map(timeToString, e.etds)
+                    )
                 }
             }, {
                 field: 'estimates',
                 class: 'col-3',
                 title: 'Source',
                 formatter: (e) => {
-                    return etasEtdsToString(R.map(sourceToString, e.etas), R.map(sourceToString, e.etds))
+                    return timestampsToString(
+                        R.map(sourceToString, e.etas),
+                        R.map(sourceToString, e.atas),
+                        R.map(sourceToString, e.etds)
+                    )
                 }
             }],
             data: shipRows
@@ -198,13 +210,14 @@ export const handler = async (
                 name,
                 estimates: {
                     etas: R.filter(R.propEq('event_type', 'ETA'), subRows),
+                    atas: R.filter(R.propEq('event_type', 'ATA'), subRows),
                     etds: R.filter(R.propEq('event_type', 'ETD'), subRows),
                 }
             };
         }
 
-        function etasEtdsToString(etas, etds) {
-            return etas.join('<br/>') + (etas.length && etds.length ? '<br/>' : '') + etds.join('<br/>');
+        function timestampsToString(etas, atas, etds) {
+            return etas.concat(atas).concat(etds).join('<br/>');
         }
     }
 
