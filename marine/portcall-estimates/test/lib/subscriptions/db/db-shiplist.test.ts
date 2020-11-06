@@ -1,12 +1,21 @@
 import * as ShiplistDAO from '../../../../lib/subscriptions/db/db-shiplist';
-import {inTransaction, dbTestBase} from "../../db-testutil";
+import {dbTestBase, inTransaction} from "../../db-testutil";
 import {updateEstimate} from "../../../../lib/estimates/db/db-estimates";
 import {ApiEstimate, EventType} from "../../../../lib/estimates/model/estimate";
+import {newEstimate} from "../../testdata";
 
 const TEST_MMSI = 12345;
 const TEST_IMO = 67890;
 const LOCODE_RAUMA = "FIRAU";
 const LOCODE_HELSINKI = "FIHEL";
+
+const DEFAULT_ESTIMATE = {
+    eventType: EventType.ETA,
+    locode: LOCODE_RAUMA,
+    portcallId: 1,
+    mmsi: TEST_MMSI,
+    imo: TEST_IMO,
+};
 
 describe('shiplists', dbTestBase((db) => {
     const startTime = new Date();
@@ -27,17 +36,7 @@ describe('shiplists', dbTestBase((db) => {
     }
 
     async function createEstimate(override?: any): Promise<ApiEstimate> {
-        const estimate = { ...{
-            eventTime: new Date().toISOString(),
-            eventType: EventType.ETA,
-            eventTimeConfidenceLower: null,
-            eventTimeConfidenceUpper: null,
-            recordTime: new Date().toISOString(),
-            location: {port: LOCODE_RAUMA},
-            ship: {mmsi: TEST_MMSI, imo: TEST_IMO},
-            source: 'test',
-            portcallId: 1
-        }, ...override};
+        const estimate = newEstimate({ ...DEFAULT_ESTIMATE, ...override});
 
         await updateEstimate(db, estimate);
 

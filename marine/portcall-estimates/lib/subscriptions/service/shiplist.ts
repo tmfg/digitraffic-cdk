@@ -28,9 +28,9 @@ export async function getEstimates(time: string, locode: string): Promise<Shipli
 }
 
 function orderAndFilter(estimates: ShiplistEstimate[], startTime: Date, endTime: Date): ShiplistEstimate[] {
-    estimates.sort((a, b) => a.event_time.getTime() - b.event_time.getTime());
-
-    return estimates.filter(e => e.event_time.getTime() >= startTime.getTime() && e.event_time.getTime() <= endTime.getTime());
+    return estimates
+        .filter(e => e.event_time.getTime() >= startTime.getTime() && e.event_time.getTime() <= endTime.getTime())
+        .sort((a, b) => a.event_time.getTime() - b.event_time.getTime());
 }
 
 function selectBestEstimates(estimates: ShiplistEstimate[]): ShiplistEstimate[] {

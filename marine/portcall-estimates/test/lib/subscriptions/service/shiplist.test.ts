@@ -3,6 +3,7 @@ import {dbTestBase, inTransaction} from "../../db-testutil";
 import {ApiEstimate, EventType} from "../../../../lib/estimates/model/estimate";
 import {updateEstimate} from "../../../../lib/estimates/db/db-estimates";
 import {EVENTSOURCE_PORTNET, EVENTSOURCE_VTS} from "../../../../lib/subscriptions/event-sourceutil";
+import {newEstimate} from "../../testdata";
 
 const moment = require('moment-timezone');
 
@@ -25,20 +26,20 @@ const TEST_MMSI = 12345;
 const TEST_IMO = 67890;
 const LOCODE_RAUMA = "FIRAU";
 
+const DEFAULT_ESTIMATE = {
+    eventType: EventType.ETA,
+    locode: LOCODE_RAUMA,
+    portcallId: 1,
+    mmsi: TEST_MMSI,
+    imo: TEST_IMO,
+};
+
+
 describe('subscriptions', dbTestBase((db) => {
     async function createEstimate(override?: any): Promise<ApiEstimate> {
         console.info("creating estimate %s as string %s", eventTime, eventTime.toISOString());
 
-        const estimate = { ...{
-                eventTime: eventTime.toISOString(),
-                eventType: EventType.ETA,
-                eventTimeConfidenceLower: null,
-                eventTimeConfidenceUpper: null,
-                recordTime: eventTime.toISOString(),
-                location: {port: LOCODE_RAUMA},
-                ship: {mmsi: TEST_MMSI, imo: TEST_IMO},
-                source: 'test'
-            }, ...override};
+        const estimate = newEstimate({...DEFAULT_ESTIMATE, ...override});
 
         await updateEstimate(db, estimate);
 
@@ -76,8 +77,8 @@ describe('subscriptions', dbTestBase((db) => {
     test('findByLocodeAndImo - different sources multiple portcalls', inTransaction(db, async (t: any) => {
         const e1 = await createEstimate({source: EVENTSOURCE_VTS, portcallId: 1});
         const e2 = await createEstimate({source: EVENTSOURCE_PORTNET, portcallId: 1});
-        const e3 = await createEstimate({source: EVENTSOURCE_PORTNET, portcallId: 2, ship: {mmsi: TEST_MMSI + 1, imo: TEST_IMO + 1}});
-        const e4 = await createEstimate({source: EVENTSOURCE_VTS, portcallId: 2, ship: {mmsi: TEST_MMSI + 1, imo: TEST_IMO + 1}});
+        const e3 = await createEstimate({source: EVENTSOURCE_PORTNET, portcallId: 2, mmsi: TEST_MMSI + 1, imo: TEST_IMO + 1});
+        const e4 = await createEstimate({source: EVENTSOURCE_VTS, portcallId: 2, mmsi: TEST_MMSI + 1, imo: TEST_IMO + 1});
 
         const estimates = await ShiplistService.getEstimates("0700", LOCODE_RAUMA);
 
