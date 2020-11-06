@@ -7,7 +7,6 @@ export interface ShiplistEstimate {
     readonly ship_imo: number;
     readonly ship_name: string;
     readonly portcall_id: number;
-    readonly coalesce_id: string;
 }
 
 const SELECT_SHIPLIST = `
@@ -17,8 +16,7 @@ const SELECT_SHIPLIST = `
         pe.event_source,
         v.imo ship_imo,
         COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name,
-        pe.portcall_id,
-        coalesce(cast(portcall_id as text), v.name, pc.vessel_name, 'Unknown') as coalesce_id
+        pe.portcall_id
     FROM portcall_estimate pe
     LEFT JOIN vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM vessel WHERE imo = v.imo)
     LEFT JOIN port_call pc on pc.imo_lloyds = pe.ship_imo
@@ -29,16 +27,12 @@ const SELECT_SHIPLIST = `
               AND px.ship_imo = pe.ship_imo 
               AND px.event_type IN ('ETA', 'ETD')
               AND px.event_source = pe.event_source 
-              AND 
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+              AND px.portcall_id = pe.portcall_id
           ) 
     AND (pe.event_time between $2 and $3) 
     AND pe.location_locode = $1
     AND pe.event_type IN ('ETA', 'ETD')
-    ORDER BY coalesce(cast(portcall_id as text), v.name, pc.vessel_name, 'Unknown'), pe.event_type
+    ORDER BY portcall_id, pe.event_type
 `;
 
 const SELECT_BY_LOCODE_AND_IMO = `
@@ -59,11 +53,7 @@ const SELECT_BY_LOCODE_AND_IMO = `
               AND px.ship_imo = pe.ship_imo 
               AND px.event_type IN ('ETA', 'ETD')
               AND px.event_source = pe.event_source 
-              AND 
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+              AND px.portcall_id = pe.portcall_id
           ) 
     AND (pe.event_time between $2 and $3)
     AND pe.location_locode = $1

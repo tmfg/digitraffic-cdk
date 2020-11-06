@@ -38,11 +38,11 @@ function selectBestEstimates(estimates: ShiplistEstimate[]): ShiplistEstimate[] 
     let previousEstimate: ShiplistEstimate;
 
     estimates.forEach(e => {
-        console.info("handling estimate %s for %s %s", e.event_source, e.coalesce_id, e.event_type);
-        console.info("and previous is %s for %s %s", previousEstimate?.event_source, previousEstimate?.coalesce_id, previousEstimate?.event_type);
+        console.info("handling estimate %s for %s %s", e.event_source, e.portcall_id, e.event_type);
+        console.info("and previous is %s for %s %s", previousEstimate?.event_source, previousEstimate?.portcall_id, previousEstimate?.event_type);
 
         // a new portcall + eventtype
-        if(previousEstimate?.coalesce_id != e.coalesce_id || previousEstimate?.event_type != e.event_type) {
+        if(previousEstimate?.portcall_id != e.portcall_id || previousEstimate?.event_type != e.event_type) {
             console.info("a new portcall event!");
 
             // and not the first one, push to list

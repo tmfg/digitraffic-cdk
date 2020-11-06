@@ -93,7 +93,7 @@ const INSERT_ESTIMATE_SQL = `
             )
            )
     )
-    ON CONFLICT(ship_mmsi, ship_imo, event_source, location_locode, event_type, event_time, record_time) DO NOTHING
+    ON CONFLICT(ship_mmsi, ship_imo, event_source, location_locode, event_type, event_time, record_time, portcall_id) DO NOTHING
         RETURNING ship_mmsi, ship_imo, location_locode
 `;
 
