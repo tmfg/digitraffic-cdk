@@ -6,7 +6,7 @@ import {DbShipsToNotificate, DbSubscription} from "../../lib/subscriptions/db/db
 const { v4: uuidv4 } = require('uuid');
 
 export function someNumber(): number {
-    return Math.floor(Math.random() * 999999);
+    return 1 + Math.floor(Math.random() * 999999);
 }
 
 export function newEstimate(props?: {
@@ -120,21 +120,30 @@ export function newVesselLocation(estimate: ApiEstimate, navStat: number): Vesse
     };
 }
 
-export function newPortAreaDetails(estimate: ApiEstimate, ata?: Date): PortAreaDetails {
+export function newPortAreaDetails(
+    estimate: ApiEstimate,
+    props?: {
+        eta?: Date,
+        portcallId?: number
+    }): PortAreaDetails {
+
     return {
         port_area_details_id: Math.floor(Math.random() * 10000),
-        port_call_id: estimate.portcallId!,
-        ata: ata?.toISOString()
+        port_call_id: props?.portcallId ?? estimate.portcallId!,
+        eta: props?.eta?.toISOString()
     };
 }
 
-export function newPortCall(estimate: ApiEstimate): PortCall {
+export function newPortCall(estimate: ApiEstimate, portcallId?: number): PortCall {
     return {
-        port_call_id: estimate.portcallId!,
+        port_call_id: portcallId ?? estimate.portcallId!,
         radio_call_sign: 'a',
         radio_call_sign_type: 'fake',
         vessel_name: uuidv4(),
-        port_call_timestamp: new Date()
+        port_call_timestamp: new Date(),
+        port_to_visit: estimate.location.port,
+        mmsi: estimate.ship.mmsi ?? someNumber(),
+        imo_lloyds: estimate.ship.imo ?? someNumber()
     };
 }
 
@@ -174,7 +183,7 @@ export interface VesselLocation {
 export interface PortAreaDetails {
     readonly port_area_details_id: number
     readonly port_call_id: number
-    readonly ata?: string
+    readonly eta?: string
 }
 
 export interface PortCall {
@@ -183,4 +192,7 @@ export interface PortCall {
     readonly radio_call_sign_type: string
     readonly vessel_name: string
     readonly port_call_timestamp: Date
+    readonly port_to_visit: string
+    readonly mmsi: number
+    readonly imo_lloyds: number
 }

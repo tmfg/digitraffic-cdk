@@ -62,7 +62,36 @@ const INSERT_ESTIMATE_SQL = `
                (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM vessel WHERE mmsi = $10),
                (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM port_call WHERE mmsi = $10)
            ),
-           $12
+           COALESCE(
+            $12,
+            (
+                SELECT pc.port_call_id
+                FROM port_call pc
+                JOIN port_area_details pac ON pac.port_call_id = pc.port_call_id
+                WHERE
+                    (
+                        pc.mmsi = COALESCE(
+                                $10,
+                                (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM vessel WHERE imo = $11),
+                                (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM port_call WHERE imo_lloyds = $11)
+                        )
+                        OR
+                        pc.imo_lloyds = COALESCE(
+                                $11,
+                                (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM vessel WHERE mmsi = $10),
+                                (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM port_call WHERE mmsi = $10)
+                        )
+                    ) AND
+                    pc.port_to_visit = $9::CHARACTER VARYING(5)
+                ORDER BY
+                    CASE
+                        WHEN $1 = 'ETA' THEN ABS(EXTRACT(EPOCH FROM pac.eta - $2))
+                        WHEN $1 = 'ATA' THEN ABS(EXTRACT(EPOCH FROM pac.ata - $2))
+                        WHEN $1 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $2))
+                        END
+                LIMIT 1
+            )
+           )
     )
     ON CONFLICT(ship_mmsi, ship_imo, event_source, location_locode, event_type, event_time, record_time) DO NOTHING
         RETURNING ship_mmsi, ship_imo, location_locode

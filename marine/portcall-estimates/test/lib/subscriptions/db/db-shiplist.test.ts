@@ -39,7 +39,8 @@ describe('shiplists', dbTestBase((db) => {
             recordTime:new Date().toISOString(),
             location: { port: LOCODE_RAUMA },
             ship: { mmsi: TEST_MMSI, imo: TEST_IMO },
-            source: 'test'
+            source: 'test',
+            portcallId: 1
         });
 
         assertFindByLocode(t, LOCODE_RAUMA, 1);
@@ -55,7 +56,8 @@ describe('shiplists', dbTestBase((db) => {
             recordTime:new Date().toISOString(),
             location: { port: LOCODE_RAUMA },
             ship: { mmsi: TEST_MMSI, imo: TEST_IMO },
-            source: 'test'
+            source: 'test',
+            portcallId: 1
         });
 
         assertFindByLocode(t, LOCODE_RAUMA, 1);
@@ -73,7 +75,8 @@ describe('shiplists', dbTestBase((db) => {
             recordTime:new Date().toISOString(),
             location: { port: LOCODE_RAUMA },
             ship: { mmsi: TEST_MMSI, imo: TEST_IMO },
-            source: 'test'
+            source: 'test',
+            portcallId: 1
         });
 
         assertFindByLocode(t, LOCODE_RAUMA, 0);

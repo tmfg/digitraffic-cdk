@@ -1,11 +1,9 @@
 import moment from 'moment';
 import * as pgPromise from "pg-promise";
-import {dbTestBase, findAll, insert} from "../../db-testutil";
-import {newEstimate} from "../../testdata";
-import {
-    createUpdateValues,
-    updateEstimate
-} from "../../../../lib/estimates/db/db-estimates";
+import {dbTestBase, findAll, insertPortAreaDetails, insertPortCall} from "../../db-testutil";
+import {newEstimate, newPortAreaDetails, newPortCall, PortAreaDetails, PortCall} from "../../testdata";
+import {createUpdateValues, updateEstimate} from "../../../../lib/estimates/db/db-estimates";
+import {ApiEstimate, EventType} from "../../../../lib/estimates/model/estimate";
 
 describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('updateEstimate - properties', async () => {
@@ -98,7 +96,7 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         expect(values[10]).toBe(undefined);
     });
 
-    test('portcall id', async () => {
+    test('portcall id - supplied', async () => {
         const portcallId = 123;
         const estimate = newEstimate({
             portcallId
@@ -108,5 +106,44 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
 
         expect((await findAll(db))[0].portcall_id).toBe(portcallId);
     });
+
+    test('portcall id - deduced by nearest time', async () => {
+        const eventTime = moment();
+        const estimate = newEstimate({
+            eventType: EventType.ETA,
+            eventTime: eventTime.toDate()
+        });
+        // @ts-ignore
+        estimate.portcallId = null; // set to null to trigger automatic guessing of portcallid
+        const portAreaDetails = await generatePortCalls(estimate);
+        const nearestEstimate = // sort by nearest time
+            portAreaDetails.sort((a, b) => {
+                const aDiff = Math.abs(moment(a.eta).diff(eventTime));
+                const bDiff = Math.abs(moment(b.eta).diff(eventTime));
+                return aDiff - bDiff;
+            })[0];
+
+        await updateEstimate(db, estimate);
+
+        expect((await findAll(db))[0].portcall_id).toBe(nearestEstimate.port_call_id);
+    });
+
+    async function generatePortCalls(estimate: ApiEstimate): Promise<PortAreaDetails[]> {
+        // cumbersome way to generate a number range
+        const portCallData = [...new Set([...Array(5 + Math.floor(Math.random() * 10)).keys()])].map((i) => {
+            const portcallId = i + 1;
+            const pc = newPortCall(estimate, portcallId);
+            const pac = newPortAreaDetails(estimate, {
+                portcallId: portcallId,
+                eta: moment(estimate.eventTime).add(1 + Math.floor(Math.random() * 100), 'minutes').toDate()
+            });
+            return [pc, pac];
+        });
+        const portCalls = portCallData.map(p => p[0]) as PortCall[];
+        const portAreaDetails = portCallData.map(p => p[1]) as PortAreaDetails[];
+        await Promise.all(portCalls.map((p) => insertPortCall(db, p)));
+        await Promise.all(portAreaDetails.map((p) => insertPortAreaDetails(db, p)));
+        return portAreaDetails;
+    }
 
 }));

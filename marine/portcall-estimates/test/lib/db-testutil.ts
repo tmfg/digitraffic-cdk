@@ -27,7 +27,7 @@ export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
         });
 
         afterAll(async () => {
-//            await truncate(db);
+            await truncate(db);
             db.$pool.end();
         });
 
@@ -76,14 +76,12 @@ async function truncateDynamoDb(ddb: DocumentClient) {
 }
 
 export async function truncate(db: IDatabase<any, any>): Promise<any> {
-    return db.tx(t => {
-        return Promise.all([
-            db.none('DELETE FROM portcall_estimate'),
-            db.none('DELETE FROM vessel'),
-            db.none('DELETE FROM vessel_location'),
-            db.none('DELETE FROM port_area_details'),
-            db.none('DELETE FROM port_call')
-        ]);
+    return await db.tx(async t => {
+        await db.none('DELETE FROM portcall_estimate');
+        await db.none('DELETE FROM vessel');
+        await db.none('DELETE FROM vessel_location');
+        await db.none('DELETE FROM port_area_details');
+        await db.none('DELETE FROM port_call');
     });
 }
 
@@ -221,11 +219,11 @@ export function insertPortAreaDetails(db: IDatabase<any, any>, p: PortAreaDetail
             INSERT INTO port_area_details(
                 port_area_details_id,
                 port_call_id,
-                ata
+                eta
             ) VALUES (
                 $(port_area_details_id),
                 $(port_call_id),
-                $(ata)
+                $(eta)
             )
         `, p);
     });
@@ -239,13 +237,19 @@ export function insertPortCall(db: IDatabase<any, any>, p: PortCall) {
                 radio_call_sign,
                 radio_call_sign_type,
                 vessel_name,
-                port_call_timestamp
+                port_call_timestamp,
+                port_to_visit,
+                mmsi,
+                imo_lloyds
             ) VALUES (
                 $(port_call_id),
                 $(radio_call_sign),
                 $(radio_call_sign_type),
                 $(vessel_name),
-                $(port_call_timestamp)
+                $(port_call_timestamp),
+                $(port_to_visit),
+                $(mmsi),
+                $(imo_lloyds)
             )
         `, p);
     });

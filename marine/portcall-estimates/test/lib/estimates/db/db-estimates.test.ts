@@ -5,8 +5,6 @@ import {
     insert,
     insertPortAreaDetails,
     insertPortCall,
-    insertVessel,
-    insertVesselLocation
 } from "../../db-testutil";
 import {newEstimate, newPortAreaDetails, newPortCall} from "../../testdata";
 import {findByImo, findByLocode, findByMmsi, findETAsByLocodes} from "../../../../lib/estimates/db/db-estimates";
