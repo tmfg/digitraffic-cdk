@@ -38,6 +38,9 @@ test
 - Lambdas are in their own directory to facilitate bundling (lambda.AssetCode)
 - document implicit dependencies, e.g. to run tests, use database from digitraffic-road/dbroad 
 
+# Dependencies
+Use the caret ^ semver syntax to allow updates of minor and patch versions if possible, otherwise lock the dependency version.
+
 ## Naming conventions
 The CI server expects your app to follow these conventions. 
 - stack configuration goes under bin/ named after the app directory plus -app.ts, e.g. swagger-joiner.app.ts

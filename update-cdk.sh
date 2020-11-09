@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Updates all project dependencies (for versioning conventions see "Dependencies" under README.md)
+# Updates all CDK dependencies to the newest version
 
 # exit on any error
 set -ex
@@ -9,14 +9,18 @@ function update() {
   for d in $(find ./* -maxdepth 0 -type d); do
     if [ "$d" != "./elasticsearch" ]; then
       cd "$d"
-      rm -f package-lock.json
-      rm -rf node_modules
-      npm install
-      npm run build
+      if [ -f package.json ]; then
+        ncu -f /@aws-cdk/ -u
+        npm install
+      fi
       cd ..
     fi
   done
 }
+
+cd common
+update
+cd ..
 
 cd road
 update
