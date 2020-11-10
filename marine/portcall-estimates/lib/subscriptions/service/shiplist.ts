@@ -37,6 +37,15 @@ function selectBestEstimates(estimates: ShiplistEstimate[]): ShiplistEstimate[] 
     const bestEstimates: ShiplistEstimate[] = [];
     let previousEstimate: ShiplistEstimate;
 
+    /*
+        ShiplistDB returns all estimates for all events. But, we want to show only the best estimate for each portcall+event type.  So,
+        we have to iterate through and select the best ones.  Estimates returned from the db are sorted by (portcall_id, event_type) so
+        we can check when those change, we know a new set of estimates to choose from begins.
+
+        previousEstimate holds currently best estimate for the set.  selectBetterEstimate compares the current estimate to previousEstimate and
+        eventually we end up with the best estimate.
+     */
+
     estimates.forEach(e => {
         console.info("handling estimate %s for %s %s", e.event_source, e.portcall_id, e.event_type);
         console.info("and previous is %s for %s %s", previousEstimate?.event_source, previousEstimate?.portcall_id, previousEstimate?.event_type);
