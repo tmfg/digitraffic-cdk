@@ -8,7 +8,7 @@ import {
     CfnDistribution,
     LambdaEdgeEventType
 } from '@aws-cdk/aws-cloudfront';
-import {CFBehavior, CFBehaviorLambda, CFDomain} from "../../cloudfront/lib/app-props";
+import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
 import ForwardedValuesProperty = CfnDistribution.ForwardedValuesProperty;
 
