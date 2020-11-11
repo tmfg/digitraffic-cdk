@@ -9,7 +9,7 @@ import {inTransaction} from "digitraffic-lambda-postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {getStartTime} from "../timeutil";
 import {PinpointService, default as pinpointService} from "./pinpoint";
-import {getBestEstimate} from "../event-sourceutil";
+import {selectBestEstimate} from "../event-sourceutil";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 
@@ -128,27 +128,25 @@ export function _createSendSmsNotications(pps: PinpointService): (notification: 
                 const data = notification[portcall_id][eventType];
                 const shipName = notification[portcall_id].name;
 
-                const portnet = data.Portnet ? moment(data.Portnet) : null;
-                const vts = data.VTS ? moment(data.VTS) : null;
-                const bestEstimate = getBestEstimate(portnet, vts);
+                const bestEstimate = selectBestEstimate(data);
 
                 if (data.Sent) {
                     const sent = moment(data.Sent);
 
-                    const difference = moment.duration(sent.diff(bestEstimate));
+                    const difference = moment.duration(sent.diff(bestEstimate.time));
 
-                    if (isNotificationNeeded(sent, bestEstimate)) {
+                    if (isNotificationNeeded(sent, bestEstimate.time)) {
                         console.info("difference for %s is %s, must send notification", shipName, difference);
-                        promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate).then(_ => {
+                        promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source).then(_ => {
                             console.info("notification sent!");
-                            data.Sent = bestEstimate.toISOString();
+                            data.Sent = bestEstimate.time.toISOString();
                         }));
                     }
                 } else {
                     console.info("A new estimate in window %s %s %s", portcall_id, eventType, shipName);
-                    promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate).then(_ => {
+                    promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source).then(_ => {
                         console.info("new notification sent!");
-                        data.Sent = bestEstimate.toISOString();
+                        data.Sent = bestEstimate.time.toISOString();
                     }));
                 }
             }
@@ -179,7 +177,7 @@ export function updateEstimates(estimates: ShiplistEstimate[], notification: DbS
         event[e.event_source] = moment(e.event_time).toISOString();
 
         if(populateSentWithEstimate) {
-            event.Sent = getBestEstimate(event.Portnet, event.VTS);
+            event.Sent = selectBestEstimate(event);
         } else {
             event.Sent = event.Sent;
         }
