@@ -24,7 +24,8 @@ export interface PinpointService {
         destinationNumber: string,
         shipName: string,
         eventType: string,
-        newTime: moment.Moment
+        newTime: moment.Moment,
+        eventSource: string
     ): Promise<any>
 
     sendSubscriptionOKMessage(destinationNumber: string): Promise<any>
@@ -79,11 +80,12 @@ const defaultPinpoint: PinpointService = {
         destinationNumber: string,
         shipName: string,
         eventType: string,
-        newTime: moment.Moment
+        newTime: moment.Moment,
+        eventSource: string
     ): Promise<any> => {
         const timeAsString = newTime.tz('Europe/Helsinki').format("HH:mm");
 
-        return await defaultPinpoint.sendSmsMessage( `Ship ${shipName} has a new ${eventType} estimate ${timeAsString}`, destinationNumber);
+        return await defaultPinpoint.sendSmsMessage( `${shipName} new ${eventType} ${timeAsString} ${eventSource}`, destinationNumber);
     },
 
     sendSubscriptionOKMessage: async (destinationNumber: string): Promise<any> => {
