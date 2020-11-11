@@ -14,39 +14,63 @@ export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfi
     createUsagePlan(integrationApi);
 }
 
-function createUpdateRequestHandler(
+function createUpdateRequestHandler (
     stack: Construct,
     integrationApi: RestApi,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: LambdaConfiguration) {
+    const updateDatexV1Handler = createUpdateDatexV1(stack, vpc, lambdaDbSg, props);
 
+    const integrationV1Root = createIntegrationV1Root(integrationApi);
+
+    createOldPathResource(integrationApi, updateDatexV1Handler);
+    createIntegrationResource(integrationV1Root, updateDatexV1Handler);
+}
+
+function createIntegrationV1Root(integrationApi: RestApi) {
+    const vsResource = integrationApi.root.addResource("variable-signs");
+
+    return vsResource.addResource("v1");
+}
+
+
+function createIntegrationResource(intergrationRoot: Resource, updateDatexV1Handler: Function) {
+    const updateDatex2Resource = intergrationRoot.addResource("update-datex2");
+
+    updateDatex2Resource.addMethod("PUT", new LambdaIntegration(updateDatexV1Handler), {
+        apiKeyRequired: true
+    });
+}
+
+
+function createOldPathResource(integrationApi: RestApi, updateDatexV1Handler: Function) {
     const apiResource = integrationApi.root.addResource("api");
     const integrationResource = apiResource.addResource("integration");
     const vsResource = integrationResource.addResource("variable-signs");
     const datex2Resource = vsResource.addResource("datex2");
 
-    createUpdateDatex2RequestHandler(datex2Resource, stack, vpc, lambdaDbSg, props);
+    datex2Resource.addMethod("PUT", new LambdaIntegration(updateDatexV1Handler), {
+        apiKeyRequired: true
+    });
 }
 
-function createUpdateDatex2RequestHandler(
-    requests: Resource,
+function createUpdateDatexV1(
     stack: Construct,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
-    props: LambdaConfiguration
-) {
+    props: LambdaConfiguration,
+): Function {
     const updateDatex2Id = 'VS-UpdateDatex2';
     const updateDatex2Handler = new Function(stack, updateDatex2Id, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: updateDatex2Id,
         code: new AssetCode('dist/lambda/update-datex2'),
         handler: 'lambda-update-datex2.handler'
     }));
-    requests.addMethod("PUT", new LambdaIntegration(updateDatex2Handler), {
-        apiKeyRequired: true
-    });
 
     createSubscription(updateDatex2Handler, updateDatex2Id, props.logsDestinationArn, stack);
+
+    return updateDatex2Handler;
 }
 
 function createUsagePlan(integrationApi: RestApi) {
