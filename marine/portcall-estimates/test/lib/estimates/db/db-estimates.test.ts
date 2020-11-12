@@ -314,8 +314,10 @@ describe('db-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     async function createPortcall(estimate: ApiEstimate) {
-        await insertPortCall(db, newPortCall(estimate));
-        await insertPortAreaDetails(db, newPortAreaDetails(estimate));
+        return Promise.allSettled([
+            insertPortCall(db, newPortCall(estimate)),
+            insertPortAreaDetails(db, newPortAreaDetails(estimate))
+        ]);
     }
 
 }));
