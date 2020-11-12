@@ -136,14 +136,14 @@ export function _createSendSmsNotications(pps: PinpointService): (notification: 
                     const difference = moment.duration(sent.diff(bestEstimate.time));
 
                     if (isNotificationNeeded(sent, bestEstimate.time)) {
-                        console.info("difference for %s is %s, must send notification", shipName, difference);
+                        console.info("difference for %s is %s (%s), must send notification", shipName, difference, bestEstimate.source);
                         promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source).then(_ => {
                             console.info("notification sent!");
                             data.Sent = bestEstimate.time.toISOString();
                         }));
                     }
                 } else {
-                    console.info("A new estimate in window %s %s %s", portcall_id, eventType, shipName);
+                    console.info("A new estimate in window %s %s %s (%s)", portcall_id, eventType, shipName, bestEstimate.source);
                     promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source).then(_ => {
                         console.info("new notification sent!");
                         data.Sent = bestEstimate.time.toISOString();

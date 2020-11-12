@@ -79,14 +79,15 @@ export function convertToSms(locode: string, estimates: ShiplistEstimate[]): str
 
     const shiplist = estimates.length == 0 ? 'No estimates' : estimates.map(e => {
         let timestring = moment(e.event_time).tz('Europe/Helsinki').format("HH:mm");
+        let dateChange = '';
 
         if(!isSameDate(currentDate, e.event_time)) {
             currentDate = e.event_time;
 
-            timestring = moment(e.event_time).tz('Europe/Helsinki').format("D.MM HH:mm");
+            dateChange = moment(e.event_time).tz('Europe/Helsinki').format("DD.MM") + ":\n";
         }
 
-        return `${e.ship_name} ${e.event_type} ${timestring} ${getDisplayableNameForEventSource(e.event_source)}`; }
+        return `${dateChange}${e.ship_name} ${e.event_type} ${timestring} ${getDisplayableNameForEventSource(e.event_source)}`; }
     ).join('\n');
 
     return `Shiplist ${moment().format("DD.MM")} ${locode}:\n${shiplist}\nTo unsubscribe reply REMOVE ${locode}.\nFor more information: ${shiplistUrl}${locode}`;
