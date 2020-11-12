@@ -120,10 +120,7 @@ const SELECT_BY_LOCODE = `
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.event_source = pe.event_source AND
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+                  px.portcall_id = pe.portcall_id
           ) AND
           pe.event_time > ${ESTIMATES_BEFORE} AND
           pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
@@ -147,10 +144,7 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
                   px.location_locode = pe.location_locode AND
                   px.event_source = pe.event_source AND
                   px.ship_mmsi = pe.ship_mmsi AND
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+                  px.portcall_id = pe.portcall_id
           ) AND
           pe.event_time < CURRENT_DATE + INTERVAL '1 DAY' AND
           pe.event_type = 'ETA' AND
@@ -159,7 +153,6 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
           pad.ata IS NULL AND
           pc.port_call_timestamp > CURRENT_DATE - INTERVAL '1 DAY'
 `;
-// 1 = at anchor, 5 = moored, 6 = aground
 
 const SELECT_BY_MMSI = `
     SELECT DISTINCT
@@ -183,10 +176,7 @@ const SELECT_BY_MMSI = `
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.event_source = pe.event_source AND
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+                  px.portcall_id = pe.portcall_id
           ) AND
         pe.event_time > ${ESTIMATES_BEFORE} AND
         pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
@@ -216,10 +206,7 @@ const SELECT_BY_IMO = `
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.event_source = pe.event_source AND
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+                  px.portcall_id = pe.portcall_id
           ) AND
         pe.event_time > ${ESTIMATES_BEFORE} AND
         pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
