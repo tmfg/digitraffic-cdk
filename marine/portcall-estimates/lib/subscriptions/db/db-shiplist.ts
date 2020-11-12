@@ -1,4 +1,5 @@
 import {ITask, PreparedStatement} from "pg-promise";
+import {newPreparedStatement} from "../../../../../common/postgres/database";
 
 export interface ShiplistEstimate {
     readonly event_type: string
@@ -62,15 +63,9 @@ const SELECT_BY_LOCODE_AND_IMO = `
     ORDER BY pe.event_time
 `;
 
-const findByLocodeAndImoPs = new PreparedStatement({
-    name: 'find-shiplist-by-locode-and-imo',
-    text: SELECT_BY_LOCODE_AND_IMO
-});
+const findByLocodeAndImoPs = newPreparedStatement('find-shiplist-by-locode-and-imo', SELECT_BY_LOCODE_AND_IMO);
 
-const findByLocodePs = new PreparedStatement({
-    name: 'find-shiplist-by-locode',
-    text: SELECT_SHIPLIST
-});
+const findByLocodePs = newPreparedStatement('find-shiplist-by-locode', SELECT_SHIPLIST);
 
 export function findByLocodeAndImo(
     t: ITask<any>,
