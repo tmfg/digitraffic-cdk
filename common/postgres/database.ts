@@ -1,4 +1,4 @@
-import {IDatabase, ITask, PreparedStatement} from "pg-promise";
+import {IDatabase, ITask} from "pg-promise";
 const pgp = require('pg-promise')();
 
 // convert numeric types to number instead of string
@@ -40,6 +40,9 @@ export async function inDatabase(
         process.env.DB_URI as string
     );
     try {
+        // deallocate all prepared statements to allow for connection pooling
+        // DISCARD instead of DEALLOCATE as it didn't always clean all prepared statements
+        await db.none('DISCARD ALL');
         return await fn(db);
     } catch(e) {
         console.error("Error in db:", e);
@@ -47,27 +50,4 @@ export async function inDatabase(
     } finally {
         db.$pool.end();
     }
-}
-
-/**
- * Creates and returns a new prepared statement.
- * A random value is added to the name to avoid prepared statement name collisions when sharing pooled connections.
- * In order for prepared statement caching to work, create prepared statements outside the Lambda handler function.
- * @param name Name of the query
- * @param query SQL query
- * @param values Array of values, can also be changed dynamically
- */
-export function newPreparedStatement(
-    name: string,
-    query: string,
-    values?: any[]
-): PreparedStatement {
-    const options: any = {
-        name: name + new Date().getTime(),
-        text: query
-    };
-    if (values?.length) {
-        options.values = values;
-    }
-    return new PreparedStatement(options);
 }

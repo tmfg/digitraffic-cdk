@@ -1,6 +1,5 @@
-import {IDatabase} from "pg-promise";
+import {IDatabase, PreparedStatement} from "pg-promise";
 import {EventType} from "../model/estimate";
-import {newPreparedStatement} from "digitraffic-lambda-postgres/database";
 
 export interface DbPublicShiplist {
     readonly event_type: EventType
@@ -42,12 +41,14 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
     ORDER BY pe.event_time
 `;
 
-const SELECT_BY_LOCODE_PUBLIC_SHIPLIST_PS = newPreparedStatement('find-by-locode-public-shiplist', SELECT_BY_LOCODE_PUBLIC_SHIPLIST);
-
 export function findByLocodePublicShiplist(
     db: IDatabase<any, any>,
     locode: string
 ): Promise<DbPublicShiplist[]> {
-    SELECT_BY_LOCODE_PUBLIC_SHIPLIST_PS.values = [locode];
-    return db.tx(t => t.manyOrNone(SELECT_BY_LOCODE_PUBLIC_SHIPLIST_PS));
+    const ps = new PreparedStatement({
+        name:'find-by-locode-public-shiplist',
+        text: SELECT_BY_LOCODE_PUBLIC_SHIPLIST,
+        values: [locode]
+    });
+    return db.tx(t => t.manyOrNone(ps));
 }
