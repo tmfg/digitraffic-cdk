@@ -1,7 +1,6 @@
-import {IDatabase} from "pg-promise";
+import {IDatabase, PreparedStatement} from "pg-promise";
 import {ApiEstimate, EventType} from "../model/estimate";
 import moment from "moment";
-import {newPreparedStatement} from "digitraffic-lambda-postgres/database";
 
 export const ESTIMATES_BEFORE = `CURRENT_DATE - INTERVAL '12 HOURS'`;
 export const ESTIMATES_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
@@ -214,13 +213,19 @@ const SELECT_BY_IMO = `
     ORDER by pe.event_time
 `;
 
-const INSERT_ESTIMATE_PS = newPreparedStatement('update-estimates', INSERT_ESTIMATE_SQL);
+const INSERT_ESTIMATE_PS = new PreparedStatement({
+    name:'update-estimates',
+    text:INSERT_ESTIMATE_SQL
+});
 
 export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): Promise<any> {
     return db.oneOrNone(INSERT_ESTIMATE_PS, createUpdateValues(estimate));
 }
 
-const FIND_BY_LOCODE_PS = newPreparedStatement('find-by-locode', SELECT_BY_LOCODE);
+const FIND_BY_LOCODE_PS = new PreparedStatement({
+    name:'find-by-locode',
+    text:SELECT_BY_LOCODE
+});
 
 export function findByLocode(
     db: IDatabase<any, any>,
@@ -230,7 +235,10 @@ export function findByLocode(
     return db.tx(t => t.manyOrNone(FIND_BY_LOCODE_PS));
 }
 
-const FIND_BY_MMSI_PS = newPreparedStatement('find-by-mmsi', SELECT_BY_MMSI);
+const FIND_BY_MMSI_PS = new PreparedStatement({
+    name:'find-by-mmsi',
+    text:SELECT_BY_MMSI
+});
 
 export function findByMmsi(
     db: IDatabase<any, any>,
@@ -240,7 +248,10 @@ export function findByMmsi(
     return db.tx(t => t.manyOrNone(FIND_BY_MMSI_PS));
 }
 
-const FIND_BY_IMO_PS = newPreparedStatement('find-by-imo', SELECT_BY_IMO);
+const FIND_BY_IMO_PS = new PreparedStatement({
+    name:'find-by-imo',
+    text:SELECT_BY_IMO
+});
 
 export function findByImo(
     db: IDatabase<any, any>,
