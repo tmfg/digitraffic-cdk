@@ -177,7 +177,7 @@ export function updateEstimates(estimates: ShiplistEstimate[], notification: DbS
         event[e.event_source] = moment(e.event_time).toISOString();
 
         if(populateSentWithEstimate) {
-            event.Sent = selectBestEstimate(event);
+            event.Sent = selectBestEstimate(event).time;
         } else {
             event.Sent = event.Sent;
         }
