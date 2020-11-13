@@ -141,8 +141,14 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
         });
         const portCalls = portCallData.map(p => p[0]) as PortCall[];
         const portAreaDetails = portCallData.map(p => p[1]) as PortAreaDetails[];
-        await Promise.all(portCalls.map((p) => insertPortCall(db, p)));
-        await Promise.all(portAreaDetails.map((p) => insertPortAreaDetails(db, p)));
+        await db.tx(t => {
+            for (const pc of portCalls) {
+                insertPortCall(t, pc);
+            }
+            for (const pad of portAreaDetails) {
+                insertPortAreaDetails(t, pad);
+            }
+        });
         return portAreaDetails;
     }
 

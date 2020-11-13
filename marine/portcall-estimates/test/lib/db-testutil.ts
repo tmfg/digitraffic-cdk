@@ -213,44 +213,40 @@ export function insertVesselLocation(db: IDatabase<any, any>, vl: VesselLocation
     });
 }
 
-export function insertPortAreaDetails(db: IDatabase<any, any>, p: PortAreaDetails) {
-    return db.tx(t => {
-        db.none(`
-            INSERT INTO port_area_details(
-                port_area_details_id,
-                port_call_id,
-                eta
-            ) VALUES (
-                $(port_area_details_id),
-                $(port_call_id),
-                $(eta)
-            )
-        `, p);
-    });
+export function insertPortAreaDetails(db: IDatabase<any, any>, p: PortAreaDetails): Promise<any> {
+    return db.none(`
+        INSERT INTO port_area_details(
+            port_area_details_id,
+            port_call_id,
+            eta
+        ) VALUES (
+            $(port_area_details_id),
+            $(port_call_id),
+            $(eta)
+        )
+    `, p);
 }
 
-export function insertPortCall(db: IDatabase<any, any>, p: PortCall) {
-    return db.tx(t => {
-        db.none(`
-            INSERT INTO port_call(
-                port_call_id,
-                radio_call_sign,
-                radio_call_sign_type,
-                vessel_name,
-                port_call_timestamp,
-                port_to_visit,
-                mmsi,
-                imo_lloyds
-            ) VALUES (
-                $(port_call_id),
-                $(radio_call_sign),
-                $(radio_call_sign_type),
-                $(vessel_name),
-                $(port_call_timestamp),
-                $(port_to_visit),
-                $(mmsi),
-                $(imo_lloyds)
-            )
-        `, p);
-    });
+export function insertPortCall(db: IDatabase<any, any>, p: PortCall): Promise<any> {
+    return db.none(`
+        INSERT INTO port_call(
+            port_call_id,
+            radio_call_sign,
+            radio_call_sign_type,
+            vessel_name,
+            port_call_timestamp,
+            port_to_visit,
+            mmsi,
+            imo_lloyds
+        ) VALUES (
+            $(port_call_id),
+            $(radio_call_sign),
+            $(radio_call_sign_type),
+            $(vessel_name),
+            $(port_call_timestamp),
+            $(port_to_visit),
+            $(mmsi),
+            $(imo_lloyds)
+        )
+    `, p);
 }
