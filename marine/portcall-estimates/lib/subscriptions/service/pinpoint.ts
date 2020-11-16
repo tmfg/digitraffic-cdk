@@ -83,7 +83,7 @@ const defaultPinpoint: PinpointService = {
         newTime: moment.Moment,
         eventSource: string
     ): Promise<any> => {
-        const timeAsString = newTime.tz('Europe/Helsinki').format("HH:mm");
+        const timeAsString = moment(newTime).tz('Europe/Helsinki').format("HH:mm");
 
         return await defaultPinpoint.sendSmsMessage( `${shipName} new ${eventType} ${timeAsString} ${eventSource}`, destinationNumber);
     },

@@ -87,12 +87,19 @@ export async function updateSubscriptionNotifications(
 }
 
 export async function updateSubscriptionEstimates(imo: number, locode: string): Promise<any> {
-    console.info("updating estimates for %s %d", locode, imo);
+    const startTime = Date.now();
 
-    const subscriptions = await SubscriptionDB.listSubscriptionsForLocode(locode);
+    try {
+        console.info("updating estimates for %s %d", locode, imo);
 
-    for(const s of subscriptions.Items) {
-        await updateSubscription(imo, s);
+        const subscriptions = await SubscriptionDB.listSubscriptionsForLocode(locode);
+
+        for await (const s of subscriptions.Items) {
+            await updateSubscription(imo, s);
+            console.info("update subscription %s awaited", locode);
+        }
+    } finally {
+        console.log("updateSubscriptionEstimates took %d ms", Date.now() - startTime);
     }
 }
 
@@ -120,8 +127,6 @@ async function updateSubscription(imo: number, s: DbSubscription): Promise<any> 
 
 export function _createSendSmsNotications(pps: PinpointService): (notification: DbShipsToNotificate, phoneNumber: string) => Promise<any> {
     return async (notification: DbShipsToNotificate, phoneNumber: string): Promise<any> => {
-        const promises = [] as Promise<any>[];
-
         for (const key of Object.keys(notification)) {
             const portcall_id = Number(key);
             for (const eventType of Object.keys(notification[portcall_id])?.filter(key => VALID_EVENT_TYPES.includes(key))) {
@@ -137,22 +142,22 @@ export function _createSendSmsNotications(pps: PinpointService): (notification: 
 
                     if (isNotificationNeeded(sent, bestEstimate.time)) {
                         console.info("difference for %s is %s (%s), must send notification", shipName, difference, bestEstimate.source);
-                        promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source).then(_ => {
-                            console.info("notification sent!");
-                            data.Sent = bestEstimate.time.toISOString();
-                        }));
+
+                        await pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source);
+
+                        console.info("notification sent!");
+                        data.Sent = bestEstimate.time;
                     }
                 } else {
                     console.info("A new estimate in window %s %s %s (%s)", portcall_id, eventType, shipName, bestEstimate.source);
-                    promises.push(pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source).then(_ => {
-                        console.info("new notification sent!");
-                        data.Sent = bestEstimate.time.toISOString();
-                    }));
+
+                    await pps.sendDifferenceNotification(phoneNumber, shipName, eventType, bestEstimate.time, bestEstimate.source);
+
+                    console.info("new notification sent!");
+                    data.Sent = bestEstimate.time;
                 }
             }
         }
-
-        return Promise.allSettled(promises);
     }
 }
 export const sendSmsNotications = _createSendSmsNotications(pinpointService);
