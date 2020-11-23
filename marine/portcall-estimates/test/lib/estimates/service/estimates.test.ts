@@ -67,7 +67,6 @@ describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
 
         expect(ret.locodeChanged).toBe(false);
-        // single row
         expect((await findAll(db)).length).toBe(2);
     });
 
