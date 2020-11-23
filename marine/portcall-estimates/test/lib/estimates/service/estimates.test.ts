@@ -1,6 +1,7 @@
-import {dbTestBase, insert} from "../../db-testutil";
+import {dbTestBase, findAll, insert} from "../../db-testutil";
 import * as pgPromise from "pg-promise";
 import {newEstimate} from "../../testdata";
+import moment from 'moment-timezone';
 import {
     findAllEstimates, saveEstimate, saveEstimates
 } from "../../../../lib/estimates/service/estimates";
@@ -54,6 +55,32 @@ describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const ret = await saveEstimate(estimate);
 
         expect(ret).toBeNull();
+    });
+
+    test('saveEstimate - Portnet estimate with same portcallid, same locode is not replaced ', async () => {
+        const estimate = newEstimate({locode: 'FIRAU', source: 'Portnet'});
+
+        await saveEstimate(estimate);
+        const ret = await saveEstimate({
+            ...estimate,
+            eventTime: moment(estimate.eventTime).add(1,'hours').toISOString()
+        });
+
+        expect(ret.locodeChanged).toBe(false);
+        // single row
+        expect((await findAll(db)).length).toBe(2);
+    });
+
+    test('saveEstimate - Portnet estimate with same portcallid, different locode is replaced ', async () => {
+        const olderEstimate = newEstimate({locode: 'FIHKO', source: 'Portnet'});
+        const newerEstimate = { ...olderEstimate, location: { port: 'FIRAU' } };
+
+        await saveEstimate(olderEstimate);
+        const ret = await saveEstimate(newerEstimate);
+
+        expect(ret.locodeChanged).toBe(true);
+        expect((await findAllEstimates(olderEstimate.location.port)).length).toBe(0);
+        expect((await findAllEstimates(newerEstimate.location.port)).length).toBe(1);
     });
 
     test('saveEstimates - multiple updates', async () => {

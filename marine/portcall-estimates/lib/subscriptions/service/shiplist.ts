@@ -4,7 +4,7 @@ import * as ShiplistDB from "../db/db-shiplist";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {getStartTimeForShiplist} from "../timeutil";
 import {inTransaction} from "../../../../../common/postgres/database";
-import {getDisplayableNameForEventSource, selectBetterEstimate} from "../event-sourceutil";
+import {getDisplayableNameForEventSource, selectBetterEstimate} from "../../event-sourceutil";
 
 const moment = require('moment-timezone');
 

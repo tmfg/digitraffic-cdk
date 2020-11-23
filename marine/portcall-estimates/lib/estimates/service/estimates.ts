@@ -1,27 +1,48 @@
 import * as EstimatesDB from '../db/db-estimates'
-import {DbEstimate, DbETAShip} from '../db/db-estimates'
+import {DbEstimate, DbEstimateIdAndLocode, DbETAShip, DbUpdatedEstimate} from '../db/db-estimates'
 import {inDatabase} from 'digitraffic-lambda-postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiEstimate} from '../model/estimate';
+import {isPortnetEstimate} from "../../event-sourceutil";
 
-export interface UpdatedEstimate {
-    readonly ship_mmsi: number
-    readonly ship_imo: number
-    readonly location_locode: string
+export interface UpdatedEstimate extends DbUpdatedEstimate {
+    readonly locodeChanged: boolean
 }
 
-export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate | null> {
+export async function saveEstimate(estimate: ApiEstimate): Promise<UpdatedEstimate> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
-        return await db.tx(_ => EstimatesDB.updateEstimate(db, estimate));
+        return await db.tx(async t => {
+            return doSaveEstimate(t, estimate);
+        });
     });
 }
 
-export async function saveEstimates(estimates: ApiEstimate[]): Promise<Array<UpdatedEstimate | null>> {
+export async function saveEstimates(estimates: ApiEstimate[]): Promise<Array<DbUpdatedEstimate | null>> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(t => t.batch(
-            estimates.map(estimate => EstimatesDB.updateEstimate(db, estimate))
+            estimates.map(estimate => doSaveEstimate(t, estimate))
         ));
     });
+}
+
+async function doSaveEstimate(
+    tx: any,
+    estimate: ApiEstimate
+): Promise<UpdatedEstimate | null> {
+    let estimatesAnotherLocode: DbEstimateIdAndLocode[] = [];
+    if (isPortnetEstimate(estimate)) {
+        estimatesAnotherLocode = await EstimatesDB.findPortnetEstimatesForAnotherLocode(
+            tx,
+            estimate.portcallId!,
+            estimate.location.port
+        );
+        if (estimatesAnotherLocode.length) {
+            console.log(`method=doSaveEstimate deleting estimates with changed locode,estimate ids: ${estimatesAnotherLocode.map(e => e.id)}`);
+            await tx.batch(estimatesAnotherLocode.map(e => EstimatesDB.deleteById(tx, e.id)));
+        }
+    }
+    const updatedEstimate = await EstimatesDB.updateEstimate(tx, estimate);
+    return updatedEstimate ? { ...updatedEstimate, locodeChanged: estimatesAnotherLocode.length > 0 } : null
 }
 
 export async function findAllEstimates(

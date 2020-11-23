@@ -3,7 +3,7 @@ import {inDatabase} from 'digitraffic-lambda-postgres/database';
 import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';
 import * as R from 'ramda';
-import {getDisplayableNameForEventSource} from "../../../subscriptions/event-sourceutil";
+import {getDisplayableNameForEventSource} from "../../../event-sourceutil";
 
 export const handler = async (
     event: any
