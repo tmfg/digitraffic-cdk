@@ -58,13 +58,11 @@ describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     test('saveEstimate - Portnet estimate with same portcallid, same locode is not replaced ', async () => {
-        const estimate = newEstimate({locode: 'FIRAU', source: 'Portnet'});
+        const olderEstimate = newEstimate({locode: 'FIRAU', source: 'Portnet'});
+        const newerEstimate = { ...olderEstimate, eventTime: moment(olderEstimate.eventTime).add(1,'hours').toISOString() };
 
-        await saveEstimate(estimate);
-        const ret = await saveEstimate({
-            ...estimate,
-            eventTime: moment(estimate.eventTime).add(1,'hours').toISOString()
-        });
+        await saveEstimate(olderEstimate);
+        const ret = await saveEstimate(newerEstimate);
 
         expect(ret.locodeChanged).toBe(false);
         expect((await findAll(db)).length).toBe(2);
