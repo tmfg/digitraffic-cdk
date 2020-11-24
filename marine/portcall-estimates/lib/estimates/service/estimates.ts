@@ -29,6 +29,15 @@ async function doSaveEstimate(
     tx: any,
     estimate: ApiEstimate
 ): Promise<UpdatedEstimate | null> {
+    const removedEstimates = await removeOldEstimates(tx, estimate);
+    const updatedEstimate = await EstimatesDB.updateEstimate(tx, estimate);
+    return updatedEstimate ? { ...updatedEstimate, locodeChanged: removedEstimates.length > 0 } : null
+}
+
+async function removeOldEstimates(
+    tx: any,
+    estimate: ApiEstimate
+): Promise<DbEstimateIdAndLocode[]> {
     let estimatesAnotherLocode: DbEstimateIdAndLocode[] = [];
     if (isPortnetEstimate(estimate)) {
         estimatesAnotherLocode = await EstimatesDB.findPortnetEstimatesForAnotherLocode(
@@ -41,8 +50,7 @@ async function doSaveEstimate(
             await tx.batch(estimatesAnotherLocode.map(e => EstimatesDB.deleteById(tx, e.id)));
         }
     }
-    const updatedEstimate = await EstimatesDB.updateEstimate(tx, estimate);
-    return updatedEstimate ? { ...updatedEstimate, locodeChanged: estimatesAnotherLocode.length > 0 } : null
+    return estimatesAnotherLocode;
 }
 
 export async function findAllEstimates(
