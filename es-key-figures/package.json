@@ -1,0 +1,48 @@
+{
+  "name": "swagger-joiner",
+  "version": "0.1.0",
+  "bin": {
+    "cloudfront-cdk": "bin/swagger-joiner-app.js"
+  },
+  "scripts": {
+    "prebuild": "rimraf tsd",
+    "build": "tsc",
+    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps --no-minify",
+    "watch": "tsc -w",
+    "test": "jest --detectOpenHandles",
+    "cdk": "cdk",
+    "synth-sam": "cdk synth --no-staging > template.yaml"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "^1.35.0",
+    "@types/aws-lambda": "latest",
+    "@types/jest": "^25.2.1",
+    "@types/node": "13.13.4",
+    "@types/sinon": "^9.0.0",
+    "aws-cdk": "1.35.0",
+    "jest": "^25.4.0",
+    "parcel-bundler": "^1.12.4",
+    "parcel-plugin-externals": "^0.4.0",
+    "rimraf": "^3.0.2",
+    "sinon": "^9.0.2",
+    "ts-jest": "^25.4.0",
+    "ts-node": "^8.9.1",
+    "typescript": "~3.8.3"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-events-targets": "1.35.0",
+    "@aws-cdk/core": "1.35.0",
+    "@aws-cdk/aws-s3": "1.35.0",
+    "@aws-cdk/aws-lambda": "1.35.0",
+    "@aws-cdk/aws-logs": "1.35.0",
+    "@aws-cdk/aws-iam": "1.35.0",
+    "@types/ramda": "^0.27.4",
+    "aws-sdk": "2.663.0",
+    "axios": "latest",
+    "ramda": "^0.27.0",
+    "source-map-support": "^0.5.19"
+  },
+  "externals": [
+    "aws-sdk"
+  ]
+}
