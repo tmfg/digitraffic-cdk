@@ -10,7 +10,7 @@
     "postbuild": "parcel build lib/**/lambda/**/*.ts --target=node --global handler -d dist --bundle-node-modules --no-source-maps --no-minify",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "watch": "tsc -w",
-    "test": "jest --runInBand --detectOpenHandles",
+    "test": "jest --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
