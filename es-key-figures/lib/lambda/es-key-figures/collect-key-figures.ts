@@ -4,9 +4,27 @@ var https = require('https');
 var zlib = require('zlib');
 var crypto = require('crypto');
 
-const {endpoint} = process.env;
+const endpoint = 'search-dt-elasticsearch-domain-iop643hm4otjjxynfimjcs6ktu.eu-west-1.es.amazonaws.com';
 
-export const handler = async (): Promise<string> => {
+export const handler = async (input: any, context: any): Promise<string> => {
+  const elasticsearchBulkData = JSON.stringify({lol: 'moi'});
+
+  post(elasticsearchBulkData, function (error: any, success: any, statusCode: any, failedItems: any) {
+    if (error) {
+      console.log('Error: ' + JSON.stringify(error, null, 2));
+      console.log("Bulkdata: " + elasticsearchBulkData);
+
+      if (failedItems && failedItems.length > 0) {
+        console.log("Failed Items: " + JSON.stringify(failedItems, null, 2));
+      }
+
+      context.fail(JSON.stringify(error));
+    } else {
+      //console.log('Success: ' + JSON.stringify(success));
+      context.succeed('Success');
+    }
+  });
+
   return 'abc';
 };
 
@@ -69,7 +87,7 @@ function buildPostRequest(endpoint: string, body: string) {
       'Content-Type': 'application/json',
       'Host': endpoint,
       'Content-Length': Buffer.byteLength(body),
-      'X-Amz-Security-Token': process.env.AWS_SESSION_TOKEN,
+      // 'X-Amz-Security-Token': process.env.AWS_SESSION_TOKEN,
       'X-Amz-Date': datetime
     }
   };
