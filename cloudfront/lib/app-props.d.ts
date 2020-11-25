@@ -41,6 +41,7 @@ export interface Props {
 }
 
 export interface ElasticProps {
+    streaming: boolean,
     elasticDomain: string,
     elasticArn: string,
 }

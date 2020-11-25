@@ -1,35 +1,32 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
-import {CfnDistribution, CloudFrontWebDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
-import {BlockPublicAccess, Bucket} from '@aws-cdk/aws-s3';
-import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
-import {CfnWebACL} from '@aws-cdk/aws-wafv2';
+import {CfnDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {createOriginConfig} from "./origin-configs";
-import {createAliasConfig} from "../../common/stack/alias-configs";
 import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
 import {
     createGzipRequirement,
     createHttpHeaders, createIpRestriction,
     createWeathercamRedirect,
-    createWriteToEsLambda,
     LambdaType
 } from "./lambda/lambda-creator";
-import {createWebAcl} from "./acl/acl-creator";
+import {createDistribution} from "./distribution-util";
+import {createRealtimeLogging} from "./streaming-util";
 
 export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
-        const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps, cloudfrontProps.props);
+        const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
+        const streamingConfig = cloudfrontProps.elasticProps.streaming ? createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps.elasticDomain): null;
 
-        cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, cloudfrontProps.elasticProps.elasticDomain, cloudfrontProps.elasticAppName));
+        cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps));
     }
 
     createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
-        const lambdaRole = new Role(stack, `S3LambdaToElasticRole`, {
+        const lambdaRole = new Role(stack, `WriteToElasticRole`, {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: `S3LambdaToElasticRole`
+            roleName: `WriteToElasticRole`
         });
         lambdaRole.addToPolicy(new PolicyStatement({
             actions: [
@@ -61,7 +58,7 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaRole;
     }
 
-    createLambdaMap(lProps: CFLambdaProps | undefined, props: Props[]): any {
+    createLambdaMap(lProps: CFLambdaProps | undefined): any {
         let lambdaMap: any = {};
 
         if(lProps != undefined) {
@@ -104,46 +101,14 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaMap;
     }
 
-    createWebAcl(props: Props): CfnWebACL | null {
-        if(props.aclRules) {
-            return createWebAcl(this, props.environmentName, props.aclRules);
-        }
-
-        return null;
-    }
-
-    createDistribution(cloudfrontProps: Props, role: Role, lambdaMap: any, elasticDomain: string, elasticAppName: string) {
-        const env = cloudfrontProps.environmentName;
-        const oai = cloudfrontProps.originAccessIdentity ? new OriginAccessIdentity(this, `${env}-oai`) : null;
-
-        const originConfigs = cloudfrontProps.domains.map(d => createOriginConfig(this, d, oai, lambdaMap));
-        const bucket = new Bucket(this, `${env}-CF-logBucket`, {
-            versioned: false,
-            bucketName: `${env}-cf-logs`,
-            publicReadAccess: false,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
-        });
-
-        const lambda = createWriteToEsLambda(this, env, role, elasticDomain, elasticAppName);
-
-        bucket.addObjectCreatedNotification(new LambdaDestination(lambda));
-        bucket.grantRead(lambda);
-
-        const aliasConfig = cloudfrontProps.acmCertRef == null ? undefined: createAliasConfig(cloudfrontProps.acmCertRef as string, cloudfrontProps.aliasNames as string[]);
-        const webAcl = this.createWebAcl(cloudfrontProps);
-        const distribution = new CloudFrontWebDistribution(this, cloudfrontProps.distributionName, {
-            originConfigs: originConfigs,
-            aliasConfiguration: aliasConfig,
-            loggingConfig: {
-                bucket: bucket,
-                prefix: 'logs'
-            },
-            webACLId: webAcl?.attrArn
-        });
+    createDistribution(distributionProps: Props, role: Role, lambdaMap: any, streamingConfig: any, cloudfrontProps: CFProps) {
+        const oai = distributionProps.originAccessIdentity ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`) : null;
+        const originConfigs = distributionProps.domains.map(d => createOriginConfig(this, d, oai, lambdaMap));
+        const distribution = createDistribution(this, distributionProps, originConfigs, role, cloudfrontProps, streamingConfig);
 
         // cdk does not support viewerPolicy as it should
         // so collect map of policies and force them into cloudformation
-        const viewerPolicies = this.getViewerPolicies(cloudfrontProps.domains);
+        const viewerPolicies = this.getViewerPolicies(distributionProps.domains);
 
 //        console.info('viewer policies %s for distribution %s', JSON.stringify(viewerPolicies), cloudfrontProps.distributionName);
 
