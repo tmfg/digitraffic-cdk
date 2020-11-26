@@ -5,7 +5,7 @@ export class ElasticsearchStack extends core.Stack {
     constructor(scope: core.App, id: string, elasticsearchProps: Props, props?: core.StackProps,) {
         super(scope, id, props);
 
-        const esVersion: string = '7.7';
+        const esVersion: string = '7.9';
         const esId = 'dt-elasticsearch';
         const domainName = 'dt-elasticsearch-domain';
 
