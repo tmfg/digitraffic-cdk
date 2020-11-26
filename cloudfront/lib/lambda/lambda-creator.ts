@@ -1,14 +1,23 @@
-import {Stack } from '@aws-cdk/core';
-import {Runtime, Function, InlineCode, AssetCode} from '@aws-cdk/aws-lambda';
-import {Role, ServicePrincipal, CompositePrincipal, ManagedPolicy} from '@aws-cdk/aws-iam';
+import {Stack,Duration } from '@aws-cdk/core';
+import {Runtime, Function, InlineCode, AssetCode, Version} from '@aws-cdk/aws-lambda';
+import {Role} from '@aws-cdk/aws-iam';
 
 const fs = require('fs');
 
 export enum LambdaType {
-    WEATHERCAM_REDIRECT
+    WEATHERCAM_REDIRECT, GZIP_REQUIREMENT, HTTP_HEADERS, IP_RESTRICTION
 }
 
-export function createWeathercamRedirect(stack: Stack, domainName: string, hostName: string) {
+export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role): Version {
+    const versionString = new Date().toISOString();
+    const lambdaBody = fs.readFileSync('dist/lambda/lambda-gzip-requirement.js');
+    const functionBody = lambdaBody.toString()
+        .replace(/EXT_VERSION/gi, versionString);
+
+    return createFunction(stack, edgeLambdaRole, 'gzip-requirement', functionBody, versionString);
+}
+
+export function createWeathercamRedirect(stack: Stack, edgeLambdaRole: Role, domainName: string, hostName: string): Version {
     const versionString = new Date().toISOString();
     const lambdaBody = fs.readFileSync('dist/lambda/lambda-redirect.js');
     const functionBody = lambdaBody.toString()
@@ -16,35 +25,52 @@ export function createWeathercamRedirect(stack: Stack, domainName: string, hostN
         .replace(/EXT_DOMAIN_NAME/gi, domainName)
         .replace(/EXT_VERSION/gi, versionString);
 
-    const redirectFunction = new Function(stack, 'weathercam-redirect', {
+    return createFunction(stack, edgeLambdaRole, 'weathercam-redirect', functionBody, versionString);
+}
+
+export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
+    const versionString = new Date().toISOString();
+    const lambdaBody = fs.readFileSync('dist/lambda/lambda-http-headers.js');
+    const functionBody = lambdaBody.toString()
+        .replace(/EXT_VERSION/gi, versionString);
+
+    return createFunction(stack, edgeLambdaRole, 'http-headers', functionBody, versionString);
+}
+
+export function createIpRestriction(stack: Stack, edgeLambdaRole: Role, path: string, ipList: string): Version {
+    const versionString = new Date().toISOString();
+    const lambdaBody = fs.readFileSync('dist/lambda/lambda-ip-restriction.js');
+    const functionBody = lambdaBody.toString()
+        .replace(/EXT_IP/gi, ipList)
+        .replace(/EXT_VERSION/gi, versionString);
+
+    return createFunction(stack, edgeLambdaRole, `ip-restriction-${path}`, functionBody, versionString);
+}
+
+export function createFunction(stack: Stack, edgeLambdaRole: Role, functionName: string, functionBody: string, versionString: string): Version {
+    const edgeFunction = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
         handler: 'index.handler',
-        role: new Role(stack, 'edgeLambdaRole', {
-            assumedBy:  new CompositePrincipal(
-                new ServicePrincipal("lambda.amazonaws.com"),
-                new ServicePrincipal("edgelambda.amazonaws.com"),
-            ),
-            managedPolicies: [
-                ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
-            ]
-        }),
+        role: edgeLambdaRole
     });
 
-    return redirectFunction.addVersion(versionString);
+    return edgeFunction.addVersion(versionString);
 }
 
 export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Role, elasticDomain: string, elasticAppName: string): Function {
     return new Function(stack, `${env}-lambda-forward`, {
         runtime: Runtime.NODEJS_12_X,
         role: lambdaRole,
-        memorySize: 128,
-        code: new AssetCode('dist/lambda'),
+        memorySize: 1024,
+        timeout: Duration.seconds(60),
+        code: new AssetCode('dist/lambda', { exclude: ["lambda-creator.js", "lambda-gzip-requirement.js", "lambda-redirect.js"] }),
         handler: 'lambda-elastic.handler',
         environment: {
             APP_DOMAIN: elasticAppName,
-            ELASTIC_DOMAIN: elasticDomain
+            ELASTIC_DOMAIN: elasticDomain,
+            DEPLOY_DATE: new Date().toISOString()
         }
     });
 }

@@ -1,23 +1,33 @@
 import {LambdaType} from "./lambda/lambda-creator";
 import {AclRuleType} from "./acl/acl-creator";
+import {LambdaEdgeEventType} from "@aws-cdk/aws-cloudfront";
+
+export interface CFBehaviorLambda {
+    lambdaType: LambdaType,
+    eventType: LambdaEdgeEventType,
+    lambdaParameter?: any
+}
 
 export interface CFBehavior {
-    path?: string,
+    path: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
     allowedMethods?: any,
-    lambdaType?: LambdaType
+    viewerProtocolPolicy?: string,
+    lambdas?: CFBehaviorLambda[],
+    cacheHeaders?: string[],
+    ipRestriction?: string
 }
 
 export interface CFDomain {
     s3BucketName?: string,
     domainName?: string,
     originPath?: string,
-    protocolPolicy?: string,
+    originProtocolPolicy?: string,
     httpPort?: number,
     httpsPort?: number,
     apiKey?: string,
-    behaviors?: CFBehavior[]
+    behaviors: CFBehavior[]
 }
 
 export interface Props {
@@ -31,6 +41,7 @@ export interface Props {
 }
 
 export interface ElasticProps {
+    streaming: boolean,
     elasticDomain: string,
     elasticArn: string,
 }

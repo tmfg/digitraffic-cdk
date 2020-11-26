@@ -4,6 +4,6 @@ export function createAliasConfig(certRef: string, domainNames: string[]): Alias
     return {
         acmCertRef: certRef,
         names: domainNames,
-        securityPolicy: SecurityPolicyProtocol.TLS_V1_1_2016
+        securityPolicy: SecurityPolicyProtocol.TLS_V1_2_2019
     }
 }

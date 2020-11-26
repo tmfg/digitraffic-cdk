@@ -1,0 +1,3 @@
+{
+  "app": "npx ts-node bin/portcall-estimates-app.ts"
+}

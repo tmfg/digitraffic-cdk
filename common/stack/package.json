@@ -5,15 +5,20 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "private": true,
+  "devDependencies": {
+    "typescript": "3.9.7"
+  },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.41.0",
-    "@aws-cdk/aws-cloudfront": "1.41.0",
-    "@aws-cdk/aws-ec2": "1.41.0",
-    "@aws-cdk/aws-lambda": "1.41.0",
-    "@aws-cdk/aws-logs": "1.41.0",
-    "@aws-cdk/core": "1.41.0",
-    "@types/node": "14.0.5",
-    "@types/ramda": "^0.27.6",
-    "ramda": "^0.27.0"
-  }
+    "@aws-cdk/aws-apigateway": "1.72.0",
+    "@aws-cdk/aws-cloudfront": "1.72.0",
+    "@aws-cdk/aws-ec2": "1.72.0",
+    "@aws-cdk/aws-lambda": "1.72.0",
+    "@aws-cdk/aws-logs": "1.72.0",
+    "@aws-cdk/core": "1.72.0",
+    "@types/node": "^14.0.27",
+    "aws-sdk": "^2.783.0"
+  },
+  "externals": [
+    "aws-sdk"
+  ]
 }

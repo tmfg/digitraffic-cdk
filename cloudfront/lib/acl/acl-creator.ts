@@ -2,7 +2,7 @@ import {CfnWebACL} from '@aws-cdk/aws-wafv2';
 import {Stack} from '@aws-cdk/core';
 
 export enum AclRuleType {
-    AWSCommonRuleSet, AWSReputationList, AWSKnownBadInputs, ThrottleRule, GzipHeaderRule
+    AWSCommonRuleSet, AWSReputationList, AWSKnownBadInputs, ThrottleRule
 }
 
 export function createWebAcl(stack: Stack, environment: string, rules: AclRuleType[]): CfnWebACL {
@@ -20,7 +20,7 @@ export function createWebAcl(stack: Stack, environment: string, rules: AclRuleTy
     });
 }
 
-function createRule(rule: AclRuleType) {
+function createRule(rule: AclRuleType): any {
     if(rule == AclRuleType.AWSCommonRuleSet) {
         return {
             name: "AWS-AWSManagedRulesCommonRuleSet",
@@ -28,7 +28,8 @@ function createRule(rule: AclRuleType) {
             statement: {
                 managedRuleGroupStatement: {
                     vendorName: "AWS",
-                    name: "AWSManagedRulesCommonRuleSet"
+                    name: "AWSManagedRulesCommonRuleSet",
+                    excludedRules: [{name: 'NoUserAgent_HEADER'}, {name: 'SizeRestrictions_BODY'}, {name: 'GenericRFI_BODY'}]
                 }
             },
             overrideAction: {
@@ -93,35 +94,6 @@ function createRule(rule: AclRuleType) {
                 sampledRequestsEnabled: true,
                 cloudWatchMetricsEnabled: true,
                 metricName: "ThrottleRule"
-            }
-        }
-    } else if(rule == AclRuleType.GzipHeaderRule) {
-        return {
-            name: "GzipRule",
-            priority: 4,
-            action: { block: {} },
-            statement: {
-                notStatement: {
-                    statement: {
-                        byteMatchStatement: {
-                            fieldToMatch: {
-                                singleHeader: {
-                                    name: 'accept-encoding'
-                                }
-                            },
-                            positionalConstraint: 'CONTAINS',
-                            searchString: 'gzip',
-                            textTransformations: [
-                                {type: 'LOWERCASE', priority: 0}
-                            ]
-                        }
-                    }
-                }
-            },
-            visibilityConfig: {
-                sampledRequestsEnabled: true,
-                cloudWatchMetricsEnabled: true,
-                metricName: "GzipRule"
             }
         }
     }

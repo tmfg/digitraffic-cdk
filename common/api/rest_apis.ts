@@ -3,7 +3,7 @@ import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aw
 import {Construct} from "@aws-cdk/core";
 import {EndpointType} from "@aws-cdk/aws-apigateway";
 
-export function createRestApi(stack: Construct, apiId: string, apiName: string, allowFromIpAddresses: string[] | undefined): RestApi {
+export function createRestApi(stack: Construct, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined): RestApi {
     const policyDocument = allowFromIpAddresses == null ? createDefaultPolicyDocument() : createIpRestrictionPolicyDocument(allowFromIpAddresses);
 
     return new RestApi(stack, apiId, {

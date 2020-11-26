@@ -39,7 +39,7 @@ typings/
 # build
 *.js
 !jest.config.js
-*.d.ts
+tsd/
 node_modules
 template.yaml
 .cache/
@@ -51,3 +51,5 @@ cdk.out
 
 # config
 bin
+/.idea/workspace.xml
+/.idea/shelf/

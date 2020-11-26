@@ -1,5 +1,8 @@
 import * as http from 'http';
 
+/**
+ * A mock HTTP server created for testing connections from a Lambda to an outside integration
+ */
 export class TestHttpServer {
     private server: http.Server;
     private debug: boolean;
@@ -18,7 +21,7 @@ export class TestHttpServer {
                 res.setHeader('Access-Control-Allow-Origin', '*');
                 res.setHeader('Access-Control-Allow-Headers', 'Authorization,X-User-Id,X-Auth-Token');
                 res.writeHead(200);
-                res.end(props[path]());
+                res.end(props[path](req.url));
             } else {
                 this.debuglog('..no match');
             }
@@ -39,5 +42,5 @@ export class TestHttpServer {
 }
 
 interface ListenProperties {
-    [key:string]: () => string;
+    [key:string]: (url?: string) => string;
 }

@@ -104,25 +104,26 @@ export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Acc
             return;
         }
 
+        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
         const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
         const timestamp = new Date(1 * logEvent.timestamp);
         const year = timestamp.getUTCFullYear();
         const month = ("0" + (timestamp.getUTCMonth() + 1)).slice(-2);
+        const indexAppName = `${app}-${env}-lambda`;
 
-        const indexName = `aws-${env}-${year}.${month}`;
+        const indexName = `${indexAppName}-${year}.${month}`;
 
         const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
 
         let source = buildSource(logEvent.message, logEvent.extractedFields) as any;
-        source["id"] = logEvent.id;
+        source["@id"] = logEvent.id;
         source["@timestamp"] = new Date(1 * logEvent.timestamp).toISOString();
         source["level"] = messageParts[2];
         source["message"] = messageParts[3];
-        source["log_group"] = payload.logGroup;
-
-        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
-        source["app"] = app;
-        source["fields"] = {app: app};
+        source["@log_group"] = payload.logGroup;
+        source["@app"] = indexAppName;
+        source["fields"] = {app: indexAppName};
+        source["@transport_type"] = app;
 
         let action = { index: { _id: logEvent.id, _index: null } } as any;
         action.index._index = indexName;
@@ -219,6 +220,20 @@ function isNumeric(n: any) {
     return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
+export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
+    const app = knownAccounts.find(value => {
+        if (value.accountNumber === owner) {
+            return true;
+        }
+        return null;
+    })?.app;
+    if (!app) {
+        throw new Error('No app for account ' + owner);
+    } else {
+        return app;
+    }
+}
+
 export function getEnvFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
     const env = knownAccounts.find(value => {
         if (value.accountNumber === owner) {
@@ -233,16 +248,3 @@ export function getEnvFromSenderAccount(owner: string, knownAccounts: Account[])
     }
 }
 
-export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]): string | undefined {
-    const app = knownAccounts.find(value => {
-        if (value.accountNumber === owner) {
-            return true;
-        }
-        return null;
-    })?.app;
-    if (!app) {
-        throw new Error('No app for account ' + owner);
-    } else {
-        return app;
-    }
-}

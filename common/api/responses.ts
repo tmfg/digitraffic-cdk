@@ -81,6 +81,11 @@ interface IntegrationOptions {
     xml?: boolean
 }
 
+/**
+ * Creates a default Lambda integration for a REST API resource _root_
+ * @param lambdaFunction The Lambda function
+ * @param options Options
+ */
 export function defaultIntegration(
     lambdaFunction: Function,
     options?: IntegrationOptions
@@ -96,6 +101,11 @@ export function defaultIntegration(
     });
 }
 
+/**
+ * Creates a default Lambda integration for a _single_ REST API resource
+ * @param lambdaFunction The Lambda function
+ * @param options Options
+ */
 export function defaultSingleResourceIntegration(
     lambdaFunction: Function,
     options?: IntegrationOptions

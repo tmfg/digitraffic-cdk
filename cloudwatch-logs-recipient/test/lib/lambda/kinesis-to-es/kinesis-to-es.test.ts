@@ -20,22 +20,22 @@ describe('kinesis-to-es', () => {
     });
 
     test('getAppFromSenderAccount true', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
+        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
         expect(getAppFromSenderAccount(account.accountNumber, [account])).toBe(account.app);
     });
 
     test('getAppFromSenderAccount error', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
+        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
         expect(() => getAppFromSenderAccount('4567890123', [account])).toThrow();
     });
 
     test('getEnvFromSenderAccount true', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
+        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
         expect(getEnvFromSenderAccount('123456789012', [account])).toBe(account.env);
     });
 
     test('getEnvFromSenderAccount error', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
+        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
         expect(() => getEnvFromSenderAccount('4567890123', [account])).toThrow();
     });
 
@@ -45,7 +45,7 @@ describe('kinesis-to-es', () => {
     });
 
     test('transform', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'some-app' };
+        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
         const logEvent: CloudWatchLogsLogEvent = {
             id: 'some-id',
             timestamp: 0,
@@ -62,8 +62,8 @@ describe('kinesis-to-es', () => {
 
         const transformed = transform(data, [account]);
 
-        expect(transformed).toBe('{"index":{"_id":"some-id","_index":"aws-someenv-1970.01","_type":"doc"}}\n' +
-            '{"log_line":"\\bmessage\\b","id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","message":"message","log_group":"","app":"some-app","fields":{"app":"some-app"}}\n');
+        expect(transformed).toBe('{"index":{"_id":"some-id","_index":"someapp-someenv-lambda-1970.01","_type":"doc"}}\n' +
+            '{"log_line":"\\bmessage\\b","@id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","@log_group":"","@app":"someapp-someenv-lambda","fields":{"app":"someapp-someenv-lambda"},"@transport_type":"someapp"}\n');
     });
 
 });

@@ -1,9 +1,21 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
+import {ModelWithReference} from "./model-with-reference";
 
+/**
+ * Get a reference to an OpenAPI model object in a REST API.
+ * Can be used to supply a reference to properties of a GeoJSON feature.
+ * @param modelId Id of the referenced object
+ * @param restApiId Id of the REST API
+ */
 export function getModelReference(modelId: string, restApiId: string) {
     return `https://apigateway.amazonaws.com/restapis/${restApiId}/models/${modelId}`;
 }
 
+/**
+ * Adds a request validator to a REST API to enforce request parameters/body requirements.
+ * https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html
+ * @param api REST API
+ */
 export function addDefaultValidator(api: apigateway.RestApi): apigateway.RequestValidator {
     return api.addRequestValidator('DefaultValidator', {
         validateRequestParameters: true,
@@ -11,13 +23,23 @@ export function addDefaultValidator(api: apigateway.RestApi): apigateway.Request
     });
 }
 
+/**
+ * Adds a JSON Schema model to an API Gateway API. Can be used later to generate OpenAPI specifications.
+ * This method adds a schema for _a single object._
+ * @param name Name of the model
+ * @param api REST API
+ * @param schema JSON Schema
+ * @return ModelWithReference A model object with a reference to an API Gateway model object.
+ */
 export function addServiceModel(name:string, api: apigateway.RestApi,
-                                schema: apigateway.JsonSchema): any {
-    return api.addModel(name, {
+                                schema: apigateway.JsonSchema): ModelWithReference {
+    const mwr = api.addModel(name, {
         contentType: 'application/json',
         modelName: name,
         schema: schema
-    });
+    }) as ModelWithReference;
+    mwr.modelReference = getModelReference(mwr.modelId, api.restApiId);
+    return mwr;
 }
 
 export function addXmlserviceModel(name:string, api: apigateway.RestApi): any {
@@ -28,6 +50,12 @@ export function addXmlserviceModel(name:string, api: apigateway.RestApi): any {
     });
 }
 
+/**
+ * Adds a JSON Schema model to an API Gateway API. Can be used later to generate OpenAPI specifications.
+ * This method adds a schema for _an array._
+ * @param model
+ * @param api
+ */
 export function createArraySchema(model: apigateway.Model, api: apigateway.RestApi): any {
     return {
         type: apigateway.JsonSchemaType.ARRAY,

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 cd common
-cd api && npm install && cd ..
-cd db && npm install && cd ..
-cd model && npm install && cd ..
-cd postgres && npm install && cd ..
-cd stack && npm install && cd ..
+cd api && rm -rf node_modules && npm install && cd ..
+cd db && rm -rf node_modules && npm install && cd ..
+cd model && rm -rf node_modules && npm install && cd ..
+cd postgres && rm -rf node_modules && npm install && cd ..
+cd stack && rm -rf node_modules && npm install && cd ..
 cd ..
