@@ -7,9 +7,12 @@ import * as ssm from '@aws-cdk/aws-ssm';
 
 export class EsKeyFiguresStack extends cdk.Stack {
   constructor(app: cdk.App, id: string, props?: cdk.StackProps) {
-    super(app, id);
+    super(app, id, props);
+    this.createDatabase(id);
+  }
 
-    const databaseUsername = 'movies-database';
+  private createDatabase(id: string): void {
+    const databaseUsername = 'eskeyfiguredb';
 
     const databaseCredentialsSecret = new secretsmanager.Secret(this, 'DBCredentialsSecret', {
       secretName: `${id}-credentials`,
@@ -42,7 +45,7 @@ export class EsKeyFiguresStack extends cdk.Stack {
       scalingConfiguration: {
         autoPause: true,
         maxCapacity: 4,
-        minCapacity: 0,
+        minCapacity: 2,
         secondsUntilAutoPause: 3600,
       }
     };

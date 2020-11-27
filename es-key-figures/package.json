@@ -1,17 +1,14 @@
 {
-  "name": "swagger-joiner",
+  "name": "es-key-figures",
   "version": "0.1.0",
   "bin": {
-    "cloudfront-cdk": "bin/swagger-joiner-app.js"
+    "cloudfront-cdk": "bin/es-key-figure.js"
   },
   "scripts": {
-    "prebuild": "rimraf tsd",
     "build": "tsc",
-    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps --no-minify",
     "watch": "tsc -w",
-    "test": "jest --detectOpenHandles",
-    "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "test": "jest",
+    "cdk": "cdk"
   },
   "devDependencies": {
     "@aws-cdk/assert": "^1.35.0",
@@ -36,6 +33,7 @@
     "@aws-cdk/aws-lambda": "1.35.0",
     "@aws-cdk/aws-logs": "1.35.0",
     "@aws-cdk/aws-iam": "1.35.0",
+    "@aws-cdk/aws-rds": "1.35.0",
     "@types/ramda": "^0.27.4",
     "aws-sdk": "2.663.0",
     "axios": "latest",
