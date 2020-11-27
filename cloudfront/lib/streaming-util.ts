@@ -11,8 +11,8 @@ import {ElasticProps} from "./app-props";
 
 export function createRealtimeLogging(stack: Stack, writeToESRole: Role, appName: string, elasticProps: ElasticProps): any {
     const kinesis = createKinesisStream(stack, appName);
-    const cloudfrontRole = createRealtimeLoggingRole(stack, appName, kinesis);
-    const loggingConfig = createLoggingConfig(stack, appName, kinesis, cloudfrontRole);
+    const kinesisWriteRole = createRealtimeLoggingRole(stack, appName, kinesis);
+    const loggingConfig = createLoggingConfig(stack, appName, kinesis, kinesisWriteRole);
 
     createKinesisConsumerLambda(stack, appName, kinesis, elasticProps, writeToESRole);
 
@@ -23,7 +23,7 @@ export function createRealtimeLogging(stack: Stack, writeToESRole: Role, appName
 }
 
 function createRealtimeLoggingRole(stack: Stack, appName: string, kinesis: Stream): Role {
-    const name = `CloudfrontToElasticRole-${appName}`;
+    const name = `WriteToKinesisRole-${appName}`;
 
     const role = new Role(stack, name, {
         assumedBy: new ServicePrincipal('cloudfront.amazonaws.com'),

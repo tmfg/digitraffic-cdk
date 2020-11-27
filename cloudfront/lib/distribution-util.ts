@@ -38,13 +38,17 @@ function createDistributionWithStreamingLogging(stack: Stack, distributionProps:
         webACLId: webAcl?.attrArn
     });
 
-    addRealtimeLogging(stack, distribution, role, env, streamingConfig);
+    addRealtimeLogging(stack, distribution, role, env, streamingConfig, originConfigs.length);
 
     return distribution;
 }
 
-function addRealtimeLogging(stack: Stack, distribution: CloudFrontWebDistribution, role:Role, env: String, streamingConfig: any) {
+function addRealtimeLogging(stack: Stack, distribution: CloudFrontWebDistribution, role:Role, env: String, streamingConfig: any, originCount: number) {
     const distributionCf = distribution.node.defaultChild as CfnResource;
+    
+    for (let i = 1; i < originCount;i++) {
+        distributionCf.addPropertyOverride(`DistributionConfig.CacheBehaviors.${i - 1}.RealtimeLogConfigArn`, streamingConfig.loggingConfig.ref);
+    }
 
     distributionCf.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.RealtimeLogConfigArn', streamingConfig.loggingConfig.ref);
 }
