@@ -2,6 +2,7 @@ import {Code, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
+import {Role} from '@aws-cdk/aws-iam'
 
 export interface LambdaConfiguration {
     vpcId: string;
@@ -67,7 +68,8 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
         environment: config.environment ?? {},
         logRetention: RetentionDays.ONE_YEAR,
         reservedConcurrentExecutions: config.reservedConcurrentExecutions,
-        code: config.code
+        code: config.code,
+        role: config.role
     };
 }
 
@@ -79,4 +81,5 @@ interface FunctionParameters {
     readOnly?: boolean,
     environment?: any
     reservedConcurrentExecutions?: number;
+    role?: Role;
 }
