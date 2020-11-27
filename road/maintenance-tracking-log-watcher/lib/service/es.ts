@@ -14,36 +14,36 @@
 // });
 //
 //
-// /**
-//  * Parse json messages from ES response to JSON string
-//  * @param esRawDataJson
-//  */
-// function parseDataToJsonString(esRawDataJson : string): string {
-//     let es = JSON.parse(esRawDataJson);
-//
-//     let hits = es.rawResponse.hits.hits;
-//
-//     const existing = new Set();
-//     const jsons: string[] = [];
-//     hits.map( function(hit : any) {
-//         // console.log(_source.message)
-//         const message = hit.message;
-//         const start = message.substring(message.indexOf('JSON:') + 5);
-//         const jsonContent = start.substring(0, start.lastIndexOf('}') + 1);
-//         const tracking = JSON.parse(jsonContent);
-//
-//         const formattedJson = JSON.stringify(tracking, null, 2);
-//         if (!existing.has(formattedJson)) {
-//             console.log("");
-//             console.log(formattedJson)
-//             console.log("");
-//             existing.add(formattedJson);
-//             jsons.push(formattedJson);
-//         }
-//     });
-//
-//     return JSON.stringify(jsons);
-// }
+/**
+ * Parse json messages from ES response to JSON string
+ * @param esRawDataJson
+ */
+export function parseDataToJsonString(esRawDataJson : string): string {
+    let es = JSON.parse(esRawDataJson);
+
+    let hits = es.rawResponse.hits.hits;
+
+    const existing = new Set();
+    const jsons: string[] = [];
+    hits.map( function(hit : any) {
+        // console.log(_source.message)
+        const message = hit.message;
+        const start = message.substring(message.indexOf('JSON:') + 5);
+        const jsonContent = start.substring(0, start.lastIndexOf('}') + 1);
+        const tracking = JSON.parse(jsonContent);
+
+        const formattedJson = JSON.stringify(tracking, null, 2);
+        if (!existing.has(formattedJson)) {
+            console.log("");
+            console.log(formattedJson)
+            console.log("");
+            existing.add(formattedJson);
+            jsons.push(formattedJson);
+        }
+    });
+
+    return JSON.stringify(jsons);
+}
 //
 //
 // function fetchDataFromEs(esUrl : string, from: Date, to:  Date, region : string, accessKeyId : string, secretAccessKey : string) : string {

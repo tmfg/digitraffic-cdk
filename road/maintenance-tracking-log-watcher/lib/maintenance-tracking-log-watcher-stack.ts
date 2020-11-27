@@ -22,6 +22,7 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
         lambdaRole.addToPolicy(
             new PolicyStatement({
                 actions: [
+                    "es:ESHttpPost",
                     "es:ESHttpGet"
                 ],
                 resources: [

@@ -4,7 +4,8 @@ import {uploadToS3} from "../../../../common/stack/s3-utils";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 import moment from 'moment-timezone';
-// import {KEY_S3_BUCKET_NAME} from "./lambda-read-logs-and-upload-to-s3";
+import {parseDataToJsonString} from "../service/es";
+
 
 
 // import {fetchLogFromEsAndSaveToS3} from '../service/es'
@@ -51,7 +52,7 @@ function fetchDataFromEs(
       "must": [
         {
           "query_string": {
-            "query": "logger_name:\"fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService\" AND level:ERROR",
+            "query": "logger_name:\"fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService\" AND method:resolveGeometries",
             "time_zone": "Europe/Oslo"
           }
         }
@@ -73,9 +74,11 @@ function fetchDataFromEs(
   }
 }`;
 
-    req.method = "GET";
-    req.path = `${index}/_search`;
+    // req.method = "GET";
+    req.method = "POST";
+    req.path = `/${index}/_search`;
     req.region = region;
+    req.headers["presigned-expires"] = false;
     req.headers["Host"] = endpoint.host;
     req.headers["Content-Type"] = "application/json";
     req.body = query;
@@ -83,10 +86,8 @@ function fetchDataFromEs(
     let signer = new AWS.Signers.V4(req, "es");
     signer.addAuthorization(creds, new Date());
 
-    let send = new AWS.NodeHttpClient();
-
     console.log("Sending request " + JSON.stringify(req));
-
+    let send = new AWS.NodeHttpClient();
     send.handleRequest(
         req,
         null,
@@ -105,35 +106,4 @@ function fetchDataFromEs(
             console.error("Error: " + err);
         }
     )
-}
-
-/**
- * Parse json messages from ES response to JSON string
- * @param esRawDataJson
- */
-function parseDataToJsonString(esRawDataJson : string): string {
-    let es = JSON.parse(esRawDataJson);
-
-    let hits = es.rawResponse.hits.hits;
-
-    const existing = new Set();
-    const jsons: string[] = [];
-    hits.map( function(hit : any) {
-        // console.log(_source.message)
-        const message = hit.message;
-        const start = message.substring(message.indexOf('JSON:') + 5);
-        const jsonContent = start.substring(0, start.lastIndexOf('}') + 1);
-        const tracking = JSON.parse(jsonContent);
-
-        const formattedJson = JSON.stringify(tracking, null, 2);
-        if (!existing.has(formattedJson)) {
-            console.log("");
-            console.log(formattedJson)
-            console.log("");
-            existing.add(formattedJson);
-            jsons.push(formattedJson);
-        }
-    });
-
-    return JSON.stringify(jsons);
 }
