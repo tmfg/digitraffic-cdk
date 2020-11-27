@@ -69,12 +69,14 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
         logRetention: RetentionDays.ONE_YEAR,
         reservedConcurrentExecutions: config.reservedConcurrentExecutions,
         code: config.code,
-        role: config.role
+        role: config.role,
+        timeout: Duration.seconds(config.timeout || 60),
     };
 }
 
 interface FunctionParameters {
     memorySize?: number,
+    timeout?: number;
     functionName: string,
     code: Code,
     handler: string,

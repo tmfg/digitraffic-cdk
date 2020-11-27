@@ -22,8 +22,7 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
         lambdaRole.addToPolicy(
             new PolicyStatement({
                 actions: [
-                    "es:ESHttpPost",
-                    "es:ESHttpGet"
+                    "es:ESHttpPost"
                 ],
                 resources: [
                     appProps.elasticSearchDomainArn,
@@ -39,7 +38,7 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
-        const lambdaFunction = createWatchLogAndUploadToS3Lambda(appProps, lambdaRole, this);
+        const lambdaFunction = createWatchLogAndUploadToS3Lambda(appProps, lambdaRole, logBucket.bucketName, this);
 
         const rule = new Rule(this, 'Rule', {
             schedule: Schedule.rate(Duration.minutes(60))
@@ -60,11 +59,12 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
 function createWatchLogAndUploadToS3Lambda (
     appProps: Props,
     role: Role,
+    s3Bucketname : string,
     stack: Stack): Function {
 
     const environment: any = {};
     environment[KEY_ES_ENDPOINT] = appProps.elasticSearchEndpoint;
-    environment[KEY_S3_BUCKET_NAME] = appProps.s3BucketName;
+    environment[KEY_S3_BUCKET_NAME] = s3Bucketname;
 
     const functionName = 'MaintenanceTrackingLogWatcher';
     const lambdaConf = defaultLambdaConfiguration({

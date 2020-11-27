@@ -2,31 +2,24 @@ import "source-map-support/register";
 import * as AWSx from "aws-sdk";
 import {uploadToS3} from "../../../../common/stack/s3-utils";
 const AWS = AWSx as any;
-const zlib = require("zlib");
 import moment from 'moment-timezone';
 import {parseDataToJsonString} from "../service/es";
 
-
-
 // import {fetchLogFromEsAndSaveToS3} from '../service/es'
-
 export const KEY_ES_ENDPOINT = 'ES_ENDPOINT'
 export const KEY_S3_BUCKET_NAME = 'S3_BUCKET_NAME'
-
 const s3BucketName = process.env[KEY_S3_BUCKET_NAME] as string;
 const esEndpoint = process.env[KEY_ES_ENDPOINT] as string;
 const region = process.env.AWS_REGION as string;
 
 export const handler = (): void => {
+    const start = moment().tz('Europe/Helsinki').startOf('day').toDate();
+    const end = moment().tz('Europe/Helsinki').endOf('day').toDate();
+
     const esDomain = {
         region: region,
         endpoint: esEndpoint
     };
-
-    const start = moment().tz('Europe/Helsinki').startOf('day').toDate();
-    const end = moment().tz('Europe/Helsinki').endOf('day').toDate();
-    console.info("method=handlerFn at lambda")
-    console.info("process.env.AWS_ACCESS_KEY_ID=" + process.env.AWS_ACCESS_KEY_ID);
     const endpoint = new AWS.Endpoint(esDomain.endpoint);
 
     fetchDataFromEs(
@@ -42,17 +35,16 @@ function fetchDataFromEs(
     const creds = new AWS.EnvironmentCredentials("AWS")
     let req = new AWS.HttpRequest(endpoint);
 
-    const fromISOString = from.toISOString();
-    const toISOString = to.toISOString();
+    const fromISOString = "2020-11-27T13:33:24Z"; //Nov 27, 2020 @ 12:45:11.979 from.toISOString();
+    const toISOString = "2020-11-27T13:33:26Z"; //to.toISOString();
     const index = 'road-*-daemon-*';
-    const query =
-`{
+    const query =`{
   "query": {
     "bool": {
       "must": [
         {
           "query_string": {
-            "query": "logger_name:\"fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService\" AND method:resolveGeometries",
+            "query": "logger_name:fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService AND method:resolveGeometries",
             "time_zone": "Europe/Oslo"
           }
         }
@@ -74,9 +66,8 @@ function fetchDataFromEs(
   }
 }`;
 
-    // req.method = "GET";
     req.method = "POST";
-    req.path = `/${index}/_search`;
+    req.path += `${index}/_search`;
     req.region = region;
     req.headers["presigned-expires"] = false;
     req.headers["Host"] = endpoint.host;
@@ -97,9 +88,11 @@ function fetchDataFromEs(
                 respBody += chunk;
             });
             httpResp.on("end", function(chunk: any) {
-                console.log("Response: " + respBody);
+                console.log("s3BucketName: " + s3BucketName);
                 const invalidJsons = parseDataToJsonString(respBody);
-                uploadToS3(s3BucketName, invalidJsons, `maintenanceTracking-invalid-messages-${from}-${to}.json`)
+                if (invalidJsons.length > 0) {
+                    uploadToS3(s3BucketName, invalidJsons, `maintenanceTracking-invalid-messages-${fromISOString}-${toISOString}.json`)
+                }
             });
         },
         function(err: any) {

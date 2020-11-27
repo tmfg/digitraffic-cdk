@@ -16,20 +16,26 @@
 //
 /**
  * Parse json messages from ES response to JSON string
- * @param esRawDataJson
+ * @param esResultDataJsonString
  */
-export function parseDataToJsonString(esRawDataJson : string): string {
-    let es = JSON.parse(esRawDataJson);
+export function parseDataToJsonString(esResultDataJsonString : string): string {
 
-    let hits = es.rawResponse.hits.hits;
+    let resultJson = JSON.parse(esResultDataJsonString);
+
+    // console.info("es: " + JSON.stringify(resultJson));
+    let hits = resultJson.hits.hits;
 
     const existing = new Set();
     const jsons: string[] = [];
     hits.map( function(hit : any) {
+        console.info("hit: " + JSON.stringify(hit).substring(0, 1000));
         // console.log(_source.message)
-        const message = hit.message;
+        const message = hit._source.message;
+        console.info("message: " + message);
         const start = message.substring(message.indexOf('JSON:') + 5);
+        console.info("start: " + start);
         const jsonContent = start.substring(0, start.lastIndexOf('}') + 1);
+        console.info("jsonContent: " + jsonContent);
         const tracking = JSON.parse(jsonContent);
 
         const formattedJson = JSON.stringify(tracking, null, 2);
@@ -41,8 +47,11 @@ export function parseDataToJsonString(esRawDataJson : string): string {
             jsons.push(formattedJson);
         }
     });
-
-    return JSON.stringify(jsons);
+    console.info("jsons: " +JSON.stringify(existing))
+    if (existing.size > 0) {
+        return JSON.stringify(jsons);
+    }
+    return "";
 }
 //
 //

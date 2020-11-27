@@ -2,7 +2,7 @@
   "name": "maintenance-tracking-watch",
   "version": "0.1.0",
   "bin": {
-    "bridge-lock-disruptions": "bin/bridge-lock-disruptions-app.js"
+    "bridge-lock-disruptions": "bin/maintenance-tracking-log-watcher-app.js"
   },
   "scripts": {
     "prebuild": "rimraf tsd",
@@ -22,7 +22,6 @@
     "@types/sinon": "^9.0.8",
     "@types/xml2js": "v0.4.5",
     "aws-sdk": "^2.784.0",
-    "dynamodb-local": "^0.0.31",
     "jest": "v26.6.2",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-externals": "v0.5.1",
@@ -35,30 +34,17 @@
   },
   "dependencies": {
     "@aws-cdk/aws-cloudwatch-actions": "1.72.0",
-    "@aws-cdk/aws-apigateway": "1.72.0",
-    "@aws-cdk/aws-dynamodb": "1.72.0",
     "@aws-cdk/aws-events": "1.72.0",
     "@aws-cdk/aws-events-targets": "1.72.0",
     "@aws-cdk/aws-iam": "1.72.0",
     "@aws-cdk/aws-lambda-event-sources": "1.72.0",
-    "@aws-cdk/aws-pinpoint": "1.72.0",
-    "@aws-cdk/aws-sns": "1.72.0",
-    "@aws-cdk/aws-sqs": "1.72.0",
     "@aws-cdk/core": "1.72.0",
     "@middy/core": "^1.2.0",
-    "@middy/sqs-partial-batch-failure": "^1.2.0",
-    "@types/ramda": "^0.27.32",
     "digitraffic-cdk-api": "file:../../common/api",
-    "digitraffic-lambda-postgres": "file:../../common/postgres",
     "digitraffic-lambda-stack": "file:../../common/stack",
-    "digitraffic-dynamodb": "file:../../common/dynamodb",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
-    "pg-native": "3.0.0",
-    "pg-promise": "10.3.5",
-    "pg-query-stream": "3.2.0",
     "source-map-support": "^0.5.19",
-    "ramda": "^0.27.1",
     "uuid": "^8.3.1",
     "axios": "v0.21.0",
     "@types/node-fetch": "^2.5.7"
