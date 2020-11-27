@@ -1,29 +1,39 @@
-import * as cdk from '@aws-cdk/core';
-import {Duration} from '@aws-cdk/core';
-import * as rds from '@aws-cdk/aws-rds';
-import {CfnDBClusterProps} from '@aws-cdk/aws-rds';
-import * as secretsmanager from '@aws-cdk/aws-secretsmanager'
-import * as ssm from '@aws-cdk/aws-ssm';
-import * as iam from '@aws-cdk/aws-iam';
-import * as logs from '@aws-cdk/aws-logs';
-import * as lambda from '@aws-cdk/aws-lambda';
+import {App, Duration, Stack, StackProps} from '@aws-cdk/core';
+import {DatabaseClusterEngine, ServerlessCluster, ServerlessClusterProps} from '@aws-cdk/aws-rds';
+import {Secret} from '@aws-cdk/aws-secretsmanager'
+import {StringParameter} from '@aws-cdk/aws-ssm';
+import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
+import {RetentionDays} from '@aws-cdk/aws-logs';
+import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
+import {Rule, Schedule} from '@aws-cdk/aws-events'
+import {LambdaFunction} from '@aws-cdk/aws-events-targets'
+import {Peer, Port, SecurityGroup, Vpc} from "@aws-cdk/aws-ec2";
 
 export interface Props {
   elasticSearchEndpoint: string;
   elasticSearchDomainArn: string;
+  slackWebhook: string;
+  mysql: { password: string; database: string; host: string; user: string }
 }
 
-export class EsKeyFiguresStack extends cdk.Stack {
-  constructor(app: cdk.App, id: string, esKeyFiguresProps: Props, props?: cdk.StackProps) {
-    super(app, id, props);
-    this.createDatabase(id);
+const allowedIps = [
+  "0.0.0.0/0"
+];
 
-    const lambdaRole = new iam.Role(this, "CollectEsKeyFiguresRole", {
-      assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+export class EsKeyFiguresStack extends Stack {
+  constructor(app: App, id: string, esKeyFiguresProps: Props, props?: StackProps) {
+    super(app, id, props);
+    const vpc = this.createVpc();
+    const sg = this.createSecurityGroup(allowedIps, vpc);
+
+    const serverlessCluster = this.createDatabase(esKeyFiguresProps.mysql.database, id, vpc, sg);
+
+    const lambdaRole = new Role(this, "CollectEsKeyFiguresRole", {
+      assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
       roleName: "CollectEsKeyFiguresRole"
     });
     lambdaRole.addToPolicy(
-      new iam.PolicyStatement({
+      new PolicyStatement({
         actions: [
           "es:DescribeElasticsearchDomain",
           "es:DescribeElasticsearchDomains",
@@ -38,13 +48,14 @@ export class EsKeyFiguresStack extends cdk.Stack {
       })
     );
     lambdaRole.addToPolicy(
-      new iam.PolicyStatement({
+      new PolicyStatement({
         actions: [
           "logs:CreateLogStream",
           "logs:PutLogEvents",
           "logs:CreateLogGroup",
           "logs:DescribeLogGroups",
-          "logs:DescribeLogStreams"
+          "logs:DescribeLogStreams",
+          'ec2:CreateNetworkInterface', 'ec2:DescribeNetworkInterfaces', 'ec2:DeleteNetworkInterface'
         ],
         resources: ["*"]
       })
@@ -54,22 +65,58 @@ export class EsKeyFiguresStack extends cdk.Stack {
     const lambdaConf = {
       role: lambdaRole,
       functionName: functionName,
-      code: new lambda.AssetCode('dist/lambda'),
+      code: new AssetCode('dist/lambda'),
       handler: 'collect-es-key-figures.handler',
-      runtime: lambda.Runtime.NODEJS_10_X,
-      timeout: Duration.seconds(10),
-      logRetention: logs.RetentionDays.ONE_YEAR,
+      runtime: Runtime.NODEJS_10_X,
+      timeout: Duration.minutes(15),
+      logRetention: RetentionDays.ONE_YEAR,
+      vpc: vpc,
+      memorySize: 256,
       environment: {
-        ES_ENDPOINT: esKeyFiguresProps.elasticSearchEndpoint
+        ES_ENDPOINT: esKeyFiguresProps.elasticSearchEndpoint,
+        MYSQL_ENDPOINT: serverlessCluster.clusterEndpoint.hostname,
+        MYSQL_USERNAME: esKeyFiguresProps.mysql.user,
+        MYSQL_PASSWORD: esKeyFiguresProps.mysql.password,
+        MYSQL_DATABASE: esKeyFiguresProps.mysql.database,
+        SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook
       }
     };
-    const kinesisToESLambda = new lambda.Function(this, functionName, lambdaConf);
+    const collectEsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
+
+    const rule = new Rule(this, 'Rule', {
+      schedule: Schedule.expression('cron(0 1 1 * ? *)')
+    });
+
+    const target = new LambdaFunction(collectEsKeyFiguresLambda);
+    rule.addTarget(target);
   }
 
-  private createDatabase(id: string): void {
+  private createVpc(): Vpc {
+    return new Vpc(this, 'EsKeyFiguresVPC', {
+      natGateways: 1,
+      maxAzs: 2
+    });
+  }
+
+  private createSecurityGroup(solitaCidrs: string[], vpc: Vpc): SecurityGroup {
+    const jenkinsSg = new SecurityGroup(this, 'EsKeyFiguresSG', {
+      vpc,
+      securityGroupName: 'EsKeyFiguresSG',
+      allowAllOutbound: true
+    });
+    solitaCidrs.forEach(ip => {
+      jenkinsSg.addIngressRule(Peer.ipv4(ip),
+        Port.tcp(3306),
+        '',
+        false);
+    });
+    return jenkinsSg;
+  }
+
+  private createDatabase(name: string, id: string, vpc: Vpc, sg: SecurityGroup): ServerlessCluster {
     const databaseUsername = 'eskeyfiguredb';
 
-    const databaseCredentialsSecret = new secretsmanager.Secret(this, 'DBCredentialsSecret', {
+    const databaseCredentialsSecret = new Secret(this, 'DBCredentialsSecret', {
       secretName: `${id}-credentials`,
       generateSecretString: {
         secretStringTemplate: JSON.stringify({
@@ -81,37 +128,38 @@ export class EsKeyFiguresStack extends cdk.Stack {
       }
     });
 
-    new ssm.StringParameter(this, 'DBCredentialsArn', {
+    new StringParameter(this, 'DBCredentialsArn', {
       parameterName: `${id}-credentials-arn`,
       stringValue: databaseCredentialsSecret.secretArn,
     });
 
-    const dbConfig: CfnDBClusterProps = {
-      dbClusterIdentifier: `main-${id}-cluster`,
-      engineMode: 'serverless',
-      engine: 'aurora-postgresql',
-      engineVersion: '10.7',
-      enableHttpEndpoint: true,
-      deletionProtection: true,
-      databaseName: 'main',
-      masterUsername: databaseCredentialsSecret.secretValueFromJson('username').toString(),
-      masterUserPassword: databaseCredentialsSecret.secretValueFromJson('password').toString(),
-      backupRetentionPeriod: 14,
-      scalingConfiguration: {
-        autoPause: true,
+    const dbConfig: ServerlessClusterProps = {
+      clusterIdentifier: `main-${id}-cluster`,
+      engine: DatabaseClusterEngine.AURORA_MYSQL,
+      vpc: vpc,
+      securityGroups: [sg],
+      deletionProtection: false,
+      defaultDatabaseName: name,
+      enableDataApi: true,
+      credentials: {
+        username: databaseCredentialsSecret.secretValueFromJson('username').toString(),
+        password: databaseCredentialsSecret.secretValueFromJson('password')
+      },
+      backupRetention: Duration.days(14),
+      scaling: {
+        autoPause: Duration.hours(1),
         maxCapacity: 4,
         minCapacity: 2,
-        secondsUntilAutoPause: 3600,
       }
     };
 
-    const rdsCluster = new rds.CfnDBCluster(this, 'DBCluster', dbConfig);
+    const cluster = new ServerlessCluster(this, 'DBCluster', dbConfig);
 
-    const dbClusterArn = `arn:aws:rds:${this.region}:${this.account}:cluster:${rdsCluster.ref}`;
-
-    new ssm.StringParameter(this, 'DBResourceArn', {
+    new StringParameter(this, 'DBResourceArn', {
       parameterName: `${id}-resource-arn`,
-      stringValue: dbClusterArn,
+      stringValue: cluster.clusterArn,
     });
+
+    return cluster
   }
 }

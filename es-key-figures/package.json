@@ -7,17 +7,19 @@
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
-    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
+    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-minify",
     "watch": "tsc -w",
     "test": "jest --runInBand",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "parcel-watch": "parcel watch lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules",
+    "watch-bundle": "parallelshell \"npm run watch\" \"npm run parcel-watch\""
   },
   "devDependencies": {
     "@aws-cdk/assert": "^1.56.0",
     "@types/jest": "^26.0.8",
     "@types/node": "14.0.27",
-    "jest": "^26.2.2",
+    "jest": "24.2.0-alpha.0",
     "ts-jest": "^26.1.4",
     "aws-cdk": "^1.56.0",
     "ts-node": "^8.10.2",
@@ -29,16 +31,19 @@
     "typescript": "~3.9.7"
   },
   "dependencies": {
-    "@aws-cdk/aws-kinesis": "latest",
-    "@aws-cdk/aws-lambda-event-sources": "latest",
-    "@aws-cdk/aws-logs-destinations": "latest",
-    "@aws-cdk/core": "latest",
-    "@aws-cdk/aws-rds": "latest",
-    "@aws-cdk/aws-secretsmanager": "latest",
-    "@aws-cdk/aws-ssm": "latest",
-    "@types/aws-lambda": "latest",
+    "@aws-cdk/aws-events-targets": "^1.81.0",
+    "@aws-cdk/aws-kinesis": "^1.81.0",
+    "@aws-cdk/aws-lambda-event-sources": "^1.81.0",
+    "@aws-cdk/aws-logs-destinations": "^1.81.0",
+    "@aws-cdk/aws-rds": "^1.81.0",
+    "@aws-cdk/aws-secretsmanager": "^1.81.0",
+    "@aws-cdk/aws-ssm": "^1.81.0",
+    "@aws-cdk/core": "^1.81.0",
+    "@types/aws-lambda": "^8.10.68",
+    "@types/mysql": "^2.15.15",
     "aws-lambda": "^1.0.6",
-    "digitraffic-lambda-postgres": "file:../common/postgres",
+    "axios": "0.19.2",
+    "mysql": "^2.18.1",
     "source-map-support": "^0.5.19"
   },
   "externals": [
