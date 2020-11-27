@@ -7,13 +7,14 @@ import {Stream} from '@aws-cdk/aws-kinesis';
 import {KinesisEventSource} from '@aws-cdk/aws-lambda-event-sources';
 
 import {CLOUDFRONT_STREAMING_LOG_FIELDS} from "./lambda/stream-to-elastic/logging-util";
+import {ElasticProps} from "./app-props";
 
-export function createRealtimeLogging(stack: Stack, writeToESRole: Role, appName: string, elasticEndpoint: string): any {
+export function createRealtimeLogging(stack: Stack, writeToESRole: Role, appName: string, elasticProps: ElasticProps): any {
     const kinesis = createKinesisStream(stack, appName);
     const cloudfrontRole = createRealtimeLoggingRole(stack, appName, kinesis);
     const loggingConfig = createLoggingConfig(stack, appName, kinesis, cloudfrontRole);
 
-    createKinesisConsumerLambda(stack, appName, kinesis, elasticEndpoint, writeToESRole);
+    createKinesisConsumerLambda(stack, appName, kinesis, elasticProps, writeToESRole);
 
     return {
         kinesis: kinesis,
@@ -74,7 +75,7 @@ function createLoggingConfig(stack: Stack, appName: string, kinesis: Stream, rol
     });
 }
 
-function createKinesisConsumerLambda(stack: Stack, appName: string, kinesis: Stream, elasticEndpoint: string, writeToESRole: Role) {
+function createKinesisConsumerLambda(stack: Stack, appName: string, kinesis: Stream, elasticProps: ElasticProps, writeToESRole: Role) {
     const functionName = `RealtimeLoggingLambda-${appName}`;
 
     const dlq = new Queue(stack, 'DLQ', {
@@ -90,12 +91,12 @@ function createKinesisConsumerLambda(stack: Stack, appName: string, kinesis: Str
         tracing: Tracing.DISABLED,
         reservedConcurrentExecutions: 1,
         environment: {
-            ELASTIC_DOMAIN: elasticEndpoint,
+            ELASTIC_DOMAIN: elasticProps.elasticDomain,
             APP_DOMAIN: appName,
         },
         role: writeToESRole,
         timeout: Duration.seconds(60),
-        memorySize: 256,
+        memorySize: elasticProps.streamingProps?.memorySize ?? 256,
     });
 
 //    CloudWatchLogGroupUtil.createLambdaLogGroup(
@@ -106,8 +107,8 @@ function createKinesisConsumerLambda(stack: Stack, appName: string, kinesis: Str
 
     fn.addEventSource(
         new KinesisEventSource(kinesis, {
-            batchSize: 100,
-            maxBatchingWindow: Duration.seconds(10),
+            batchSize: elasticProps.streamingProps?.batchSize ?? 100,
+            maxBatchingWindow: Duration.seconds(elasticProps.streamingProps?.maxBatchingWindow ?? 20),
             startingPosition: StartingPosition.LATEST,
         })
     );

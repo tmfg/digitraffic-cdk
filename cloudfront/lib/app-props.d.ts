@@ -41,9 +41,15 @@ export interface Props {
 }
 
 export interface ElasticProps {
-    streaming: boolean,
+    streamingProps?: StreamingLogProps,
     elasticDomain: string,
     elasticArn: string,
+}
+
+export interface StreamingLogProps {
+    memorySize?: number,
+    batchSize?: number,
+    maxBatchingWindow?: number
 }
 
 export interface CFProps {

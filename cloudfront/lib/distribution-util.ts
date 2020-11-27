@@ -22,7 +22,7 @@ export function createDistribution(stack: Stack, distributionProps: Props, origi
     const webAcl = doCreateWebAcl(stack, distributionProps);
     const aliasConfig = distributionProps.acmCertRef == null ? undefined: createAliasConfig(distributionProps.acmCertRef as string, distributionProps.aliasNames as string[]);
 
-    if (cloudfrontProps.elasticProps.streaming) {
+    if (cloudfrontProps.elasticProps.streamingProps) {
         return createDistributionWithStreamingLogging(stack, distributionProps, originConfigs, aliasConfig, role, webAcl, streamingConfig);
     }
 

@@ -17,6 +17,7 @@ const COMPRESS_OPTIONS = {
     chunkSize: 1024*16*1024
 };
 
+// fields contains all the selected log fields in the order specified in loggint-utils.ts CLOUDFRONT_STREAMING_LOG_FIELDS
 async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
     const timestamp = new Date(1000 * Number(fields[0])).toISOString();
     const ip = fields[1];
@@ -34,7 +35,11 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
     const referrer = fields[13];
     const forwardedFor = fields[14];
     const resultType = fields[15];
+
     const digitrafficUser = findHeaderValue('digitraffic-user', fields[16]);
+    const host = findHeaderValue('host', fields[16]);
+
+//    console.log("header %s serverName %s", host, serverName);
 
     return {
         '@timestamp': timestamp,
@@ -45,7 +50,7 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
         request_method: requestMethod,
         request_time: +timeTaken,
         request_uri: request,
-        request_host: serverName,
+        request_host: host,
         scheme: scheme,
         server_protocol: httpVersion,
         status: +responseStatus,
@@ -83,11 +88,11 @@ export const handler = async (event: KinesisStreamEvent, context: Context, callb
         const data = await Promise.all(recordTransformPromises);
         const returnValue = await sendMessageToEs(createBulkMessage(action, data));
 
-        if(returnValue.length < 1000) {
+        if(returnValue.length < 200) {
             console.log("return value " + returnValue);
         }
     } catch (e) {
-        console.log('cloudfront_realtimelog_log_to_es: ' + e);
+        console.log('exception: ' + e);
         throw e;
     }
 }

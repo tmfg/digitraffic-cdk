@@ -18,7 +18,7 @@ export class CloudfrontCdkStack extends Stack {
 
         const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
-        const streamingConfig = cloudfrontProps.elasticProps.streaming ? createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps.elasticDomain): null;
+        const streamingConfig = cloudfrontProps.elasticProps.streamingProps ? createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps): null;
 
         cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps));
     }

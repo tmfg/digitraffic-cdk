@@ -22,7 +22,7 @@ export function findHeaderValue(headerName: string, allHeaders: string): string|
     for(const value of allHeaders.split('%0A')) {
        const values = value.split(':');
 
-       if(values[0].toUpperCase() === 'DIGITRAFFIC-USER') {
+       if(values[0].toUpperCase() === headerName.toUpperCase()) {
            return values[1];
        }
     };
