@@ -2,7 +2,6 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {Function,AssetCode} from '@aws-cdk/aws-lambda';
 import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam'
-import {Duration} from "@aws-cdk/core";
 import {Props} from './app-props';
 import {Bucket, BlockPublicAccess} from "@aws-cdk/aws-s3";
 import {KEY_ES_ENDPOINT, KEY_S3_BUCKET_NAME} from "./lambda/maintenance-tracking-log-watcher";
@@ -41,7 +40,7 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
         const lambdaFunction = createWatchLogAndUploadToS3Lambda(appProps, lambdaRole, logBucket.bucketName, this);
 
         const rule = new Rule(this, 'Rule', {
-            schedule: Schedule.rate(Duration.minutes(60))
+            schedule: Schedule.cron( { hour: '01' } )
         });
         rule.addTarget(new LambdaFunction(lambdaFunction));
 
@@ -50,10 +49,7 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
         statement.addActions('s3:PutObjectAcl');
         statement.addResources(logBucket.bucketArn + '/*');
         lambdaFunction.addToRolePolicy(statement);
-
     }
-
-
 }
 
 function createWatchLogAndUploadToS3Lambda (
