@@ -1,58 +1,112 @@
-// // const AWS = require('aws-sdk');
-// // import * as AWSx from 'aws-sdk';
-// // import {Endpoint, HttpRequest, Signer, Credentials, HttpClient} from 'aws-sdk';
-// import * as AWSx from 'aws-sdk';
-// import nodeFetch from 'node-fetch';
-// import {uploadToS3} from "../../../../common/stack/s3-utils";
-// const AWS = AWSx as any;
-// // const AWS = AWSx as any;
-// const https = require("https");
-//
-//
-// const agent = new https.Agent({
-//     rejectUnauthorized: false
-// });
-//
-//
+import * as AWSx from "aws-sdk";
+const AWS = AWSx as any;
+
+export async function fetchDataFromEs(
+    endpoint: AWS.Endpoint,
+    region: string,
+    index: string,
+    path: string,
+    query: string): Promise<any> {
+    return new Promise((resolve, reject) => {
+        const creds = new AWS.EnvironmentCredentials("AWS")
+        let req = new AWS.HttpRequest(endpoint);
+        req.method = "POST";
+        req.path = `/${index}/${path}`;
+        req.region = region;
+        req.headers["Host"] = endpoint.host;
+        req.headers["Content-Type"] = "application/json";
+        req.body = query;
+        let signer = new AWS.Signers.V4(req, "es");
+        signer.addAuthorization(creds, new Date());
+        let send = new AWS.NodeHttpClient();
+        console.log(`\nSending request `, JSON.stringify(req), '\n');
+        send.handleRequest(
+            req,
+            null,
+            function (httpResp: any) {
+                let respBody = "";
+                httpResp.on("data", function (chunk: any) {
+                    respBody += chunk;
+                });
+                httpResp.on("end", function (chunk: any) {
+                    // console.info(respBody)
+                    resolve(JSON.parse(respBody));
+                });
+            },
+            function (err: any) {
+                console.error("Error: " + err);
+                reject(err);
+            }
+        )
+    });
+}
+
+export function getQuery(fromISOString: string, toISOString: string) {
+    return `{
+  "query": {
+    "bool": {
+      "must": [
+        {
+          "query_string": {
+            "query": "logger_name:fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService AND method:resolveGeometries",
+            "time_zone": "Europe/Oslo"
+          }
+        }
+      ],
+      "filter": [
+        {
+          "range": {
+            "@timestamp": {
+              "gte": "${fromISOString}",
+              "lte": "${toISOString}",
+              "format": "strict_date_optional_time"
+            }
+          }
+        }
+      ],
+      "should": [],
+      "must_not": []
+    }
+  }
+}`;
+}
+
 /**
  * Parse json messages from ES response to JSON string
  * @param esResultDataJsonString
  */
-export function parseDataToJsonString(esResultDataJsonString : string): string {
+export function parseDataToString(resultJsonObj : any): string {
 
-    let resultJson = JSON.parse(esResultDataJsonString);
-
-    // console.info("es: " + JSON.stringify(resultJson));
-    let hits = resultJson.hits.hits;
-
-    const existing = new Set();
-    const jsons: string[] = [];
-    hits.map( function(hit : any) {
-        console.info("hit: " + JSON.stringify(hit).substring(0, 1000));
-        // console.log(_source.message)
-        const message = hit._source.message;
-        console.info("message: " + message);
-        const start = message.substring(message.indexOf('JSON:') + 5);
-        console.info("start: " + start);
-        const jsonContent = start.substring(0, start.lastIndexOf('}') + 1);
-        console.info("jsonContent: " + jsonContent);
-        const tracking = JSON.parse(jsonContent);
-
-        const formattedJson = JSON.stringify(tracking, null, 2);
-        if (!existing.has(formattedJson)) {
-            console.log("");
-            console.log(formattedJson)
-            console.log("");
-            existing.add(formattedJson);
-            jsons.push(formattedJson);
-        }
-    });
-    console.info("jsons: " +JSON.stringify(existing))
-    if (existing.size > 0) {
-        return JSON.stringify(jsons);
+    if (!resultJsonObj.hasOwnProperty('hits') || !resultJsonObj.hits.hasOwnProperty('hits')) {
+        return "";
     }
-    return "";
+    const hits = resultJsonObj.hits.hits;
+
+    let messages = "";
+    hits.map( function(hit : any) {
+        const message = hit._source.message;
+        messages += message + '\n\n';
+        // const start = message.substring(message.indexOf('JSON:') + 5);
+        // const jsonContent = start.substring(0, start.lastIndexOf('}') + 1);
+        //
+        // const tracking = JSON.parse(jsonContent);
+        // const formattedTrackingJson = JSON.stringify(tracking, null, 2);
+        //
+        // if (!existing.has(formattedTrackingJson)) {
+        //     existing.add(formattedTrackingJson);
+        //     trackings.push(tracking);
+        // }
+    });
+
+    console.info("Found: " + messages.length);
+    // if (trackings.length > 0) {
+    //     return JSON.stringify(trackings);
+    // }
+    return messages;
 }
+
+
+
 //
 //
 // function fetchDataFromEs(esUrl : string, from: Date, to:  Date, region : string, accessKeyId : string, secretAccessKey : string) : string {
