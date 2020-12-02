@@ -5,7 +5,6 @@ import moment from 'moment-timezone';
 import * as esService from "../service/es";
 import * as snsService from "../service/sns";
 
-
 export const KEY_ES_ENDPOINT = 'ES_ENDPOINT'
 export const KEY_S3_BUCKET_NAME = 'S3_BUCKET_NAME'
 export const KEY_SNS_TOPIC_ARN = 'SNS_TOPIC_ARN'
@@ -19,27 +18,30 @@ const path = '_search'
 export const handler = async (): Promise <void> => {
     const fromISOString = moment().subtract(1, 'weeks').startOf('isoWeek').toDate().toISOString();
     const toISOString = moment().subtract(1, 'weeks').endOf('isoWeek').toDate().toISOString();
-
     console.info(`method=maintenanceTrackingLogWatcherHandler from ${fromISOString} to ${toISOString}`)
-    const endpoint = new AWS.Endpoint(esEndpoint);
 
-    const query = esService.getQuery(fromISOString, toISOString);
+    const start = Date.now();
 
-    return esService.fetchDataFromEs(
-            endpoint,
-            region,
-            index,
-            path,
-            query)
-        .then(async function(jsonResult) {
-            const invalidJsons = esService.parseDataToString(jsonResult);
-            if (invalidJsons.length > 0) {
-                const fileName = `maintenanceTracking-invalid-messages-${fromISOString}-${toISOString}.log`;
-                console.log(`method=maintenanceTrackingLogWatcherHandler Upload file ${fileName} to S3 Bucket  ${s3BucketName}`);
-                const title = `Illegal maintenance trackings on period ${fromISOString}-${toISOString}`;
-                const log = `${title}\n\n${invalidJsons}`;
-                uploadToS3(s3BucketName, log, fileName);
-                return await snsService.sendEmail(log, snsTopicArn);
-            }
-        });
+    try {
+        const endpoint = new AWS.Endpoint(esEndpoint);
+        return await esService.fetchAndParseDataFromEs(
+                endpoint,
+                region,
+                index,
+                path,
+                fromISOString,
+                toISOString)
+            .then(async function(resultLogLines) {
+                if (resultLogLines.length > 0) {
+                    const fileName = `maintenanceTracking-invalid-messages-${fromISOString}-${toISOString}.log`;
+                    console.info(`method=maintenanceTrackingLogWatcherHandler Upload file ${fileName} to S3 Bucket  ${s3BucketName}`);
+                    const title = `Illegal maintenance trackings on period ${fromISOString}-${toISOString}`;
+                    const log = `${title}\n\n${resultLogLines}`;
+                    uploadToS3(s3BucketName, log, fileName);
+                    return await snsService.sendEmail(log, snsTopicArn);
+                }
+            });
+    } finally {
+        console.info(`method=maintenanceTrackingLogWatcherHandler from ${fromISOString} to ${toISOString} tookMs=${(Date.now()-start)}`);
+    }
 };
