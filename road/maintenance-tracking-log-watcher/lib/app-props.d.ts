@@ -3,6 +3,7 @@ export interface Props {
     elasticSearchEndpoint: string;
     elasticSearchDomainArn: string;
     s3BucketName: string;
+    emails: string[];
     app: string;
     env: string;
 }
