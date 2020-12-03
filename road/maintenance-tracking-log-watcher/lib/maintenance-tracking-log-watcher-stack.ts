@@ -16,49 +16,68 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
         super(scope, id, props);
 
-        const lambdaRole = new Role(this, "MaintenanceTrackingLogWatcherStackLambdaElasticSearchRole", {
-            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: "MaintenanceTrackingLogWatcherStackLambdaElasticSearchRole"
-        });
-        lambdaRole.addToPolicy(
-            new PolicyStatement({
-                actions: [
-                    "es:ESHttpPost"
-                ],
-                resources: [
-                    appProps.elasticSearchDomainArn,
-                    `${appProps.elasticSearchDomainArn}/*`
-                ]
-            })
-        );
-
-        const logBucket = new Bucket(this, 'LogBucket', {
-            bucketName: `${appProps.s3BucketName}-${appProps.app}-${appProps.env}`,
-            versioned: false,
-            publicReadAccess: false,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
-        });
-
-        const emailTopic = new sns.Topic(this, 'MaintenanceTrackingLogWatcherTopic');
-        for (const email of appProps.emails) {
-            emailTopic.addSubscription(new subscriptions.EmailSubscription(email));
-        }
-
+        const lambdaRole = createLambdaRole(this, appProps);
+        const logBucket = createLogBucket(this, appProps);
+        const emailTopic = createEmailTopic(this, appProps)
         const lambdaFunction = createWatchLogAndUploadToS3Lambda(appProps, lambdaRole, emailTopic, logBucket.bucketName, this);
+        const s3WritePolicy = createWritePolicyToS3(logBucket.bucketArn);
 
-        const rule = new Rule(this, 'MaintenanceTrackingLogWatcherScheduler', {
-            schedule: Schedule.cron( { hour: '01', weekDay: 'MON'  } )
-        });
-        rule.addTarget(new LambdaFunction(lambdaFunction));
+        createLambdaTrigger(this, lambdaFunction);
 
-        const statement = new PolicyStatement();
-        statement.addActions('s3:PutObject');
-        statement.addActions('s3:PutObjectAcl');
-        statement.addResources(logBucket.bucketArn + '/*');
-
-        lambdaFunction.addToRolePolicy(statement);
+        lambdaFunction.addToRolePolicy(s3WritePolicy);
         emailTopic.grantPublish(lambdaFunction);
     }
+}
+
+function createLambdaRole(stack: Stack, appProps: Props) {
+    const lambdaRole = new Role(stack, "MaintenanceTrackingLogWatcherStackLambdaElasticSearchRole", {
+        assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+        roleName: "MaintenanceTrackingLogWatcherStackLambdaElasticSearchRole"
+    });
+    lambdaRole.addToPolicy(
+        new PolicyStatement({
+            actions: [
+                "es:ESHttpPost"
+            ],
+            resources: [
+                appProps.elasticSearchDomainArn,
+                `${appProps.elasticSearchDomainArn}/*`
+            ]
+        })
+    );
+    return lambdaRole;
+}
+
+function createLogBucket(stack: Stack, appProps: Props) {
+    return new Bucket(stack, 'LogBucket', {
+        bucketName: `${appProps.s3BucketName}-${appProps.app}-${appProps.env}`,
+        versioned: false,
+        publicReadAccess: false,
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
+}
+
+function createEmailTopic(stack: Stack, appProps: Props) {
+    const emailTopic = new sns.Topic(stack, 'MaintenanceTrackingLogWatcherTopic');
+    for (const email of appProps.emails) {
+        emailTopic.addSubscription(new subscriptions.EmailSubscription(email));
+    }
+    return emailTopic;
+}
+
+function createLambdaTrigger(stack: Stack, lambdaFunction: Function) {
+    const rule = new Rule(stack, 'MaintenanceTrackingLogWatcherScheduler', {
+        schedule: Schedule.cron( { hour: '01', weekDay: 'MON'  } )
+    });
+    rule.addTarget(new LambdaFunction(lambdaFunction));
+}
+
+function createWritePolicyToS3(s3BucketArn: any): PolicyStatement {
+    const statement = new PolicyStatement();
+    statement.addActions('s3:PutObject');
+    statement.addActions('s3:PutObjectAcl');
+    statement.addResources(s3BucketArn + '/*');
+    return statement;
 }
 
 function createWatchLogAndUploadToS3Lambda (
