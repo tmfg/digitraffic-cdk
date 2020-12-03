@@ -1,4 +1,4 @@
-import {NOT_FOUND_MESSAGE} from "./errors";
+import {AUTHORIZATION_FAILED_MESSAGE, NOT_FOUND_MESSAGE} from "./errors";
 import {
     APPLICATION_JSON,
     InternalServerErrorResponseTemplate,
@@ -8,25 +8,30 @@ import {
 import {LambdaIntegration, MethodResponse} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
 
-const RESPONSE_CORS_INTEGRATION = {
-    responseParameters: {
-        'method.response.header.Access-Control-Allow-Origin': "'*'"
-    }
-};
+export const RESPONSE_401_UNAUTHORIZED = {
+    statusCode: '401',
+    selectionPattern: AUTHORIZATION_FAILED_MESSAGE
+}
 
 export const RESPONSE_200_OK = {
     statusCode: '200'
+};
+
+export const RESPONSE_500_SERVER_ERROR = {
+    statusCode: '500',
+    selectionPattern: 'Error',
+    responseTemplates: InternalServerErrorResponseTemplate
 };
 
 const RESPONSE_XML = {
     responseTemplates: XmlResponseTemplate
 };
 
-export const RESPONSE_200_OK_CORS = {...RESPONSE_200_OK, ...RESPONSE_CORS_INTEGRATION};
-
-export const RESPONSE_200_OK_XML = {...RESPONSE_200_OK, ...RESPONSE_XML};
-
-export const RESPONSE_200_OK_XML_CORS = {...RESPONSE_200_OK_XML, ...RESPONSE_CORS_INTEGRATION};
+const RESPONSE_CORS_INTEGRATION = {
+    responseParameters: {
+        'method.response.header.Access-Control-Allow-Origin': "'*'"
+    }
+};
 
 export const RESPONSE_404_NOT_FOUND = {
     statusCode: '404',
@@ -34,15 +39,10 @@ export const RESPONSE_404_NOT_FOUND = {
     responseTemplates: NotFoundResponseTemplate
 };
 
-const RESPONSE_404_NOT_FOUND_CORS = {...RESPONSE_404_NOT_FOUND, ...RESPONSE_CORS_INTEGRATION};
-
-export const RESPONSE_500_SERVER_ERROR = {
-    statusCode: '500',
-    selectionPattern: '(\n|.)+',
-    responseTemplates: InternalServerErrorResponseTemplate
-};
-
-export const RESPONSE_500_SERVER_ERROR_CORS = {...RESPONSE_500_SERVER_ERROR, ...RESPONSE_CORS_INTEGRATION};
+export const TEMPLATE_COGNITO_GROUPS = {
+    'application/json': JSON.stringify({
+        "groups": "$context.authorizer.claims['cognito:groups']"
+    })};
 
 export function methodJsonResponse(status: string, model: any) {
     return  {
@@ -59,11 +59,11 @@ export function methodXmlResponse(status: string, model: any) {
 }
 
 export function corsHeaders(methodResponse: MethodResponse): MethodResponse {
-    return Object.assign({}, methodResponse, {
+    return {...methodResponse, ...{
         responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': true
         }
-    });
+    }};
 }
 
 export function corsMethodJsonResponse(status: string, model: any): MethodResponse {
@@ -93,43 +93,19 @@ export function defaultIntegration(
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: [
-            get200Response(options),
-            get500Response(options)
+            getResponse(RESPONSE_200_OK, options),
+            getResponse(RESPONSE_401_UNAUTHORIZED, options),
+            getResponse(RESPONSE_404_NOT_FOUND, options),
+            getResponse(RESPONSE_500_SERVER_ERROR, options),
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {}
     });
 }
 
-/**
- * Creates a default Lambda integration for a _single_ REST API resource
- * @param lambdaFunction The Lambda function
- * @param options Options
- */
-export function defaultSingleResourceIntegration(
-    lambdaFunction: Function,
-    options?: IntegrationOptions
-): LambdaIntegration {
-    return new LambdaIntegration(lambdaFunction, {
-        proxy: false,
-        integrationResponses: [
-            options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS,
-            options?.disableCors ? RESPONSE_404_NOT_FOUND: RESPONSE_404_NOT_FOUND_CORS,
-            options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS,
-        ],
-        requestParameters: options?.requestParameters || {},
-        requestTemplates: options?.requestTemplates || {}
-    });
-}
+function getResponse(response: any, options?: IntegrationOptions): any {
+    if(options?.xml) response = {...response, ...RESPONSE_XML};
+    if(!options?.disableCors) response = {...response, ...RESPONSE_CORS_INTEGRATION};
 
-function get200Response(options?: IntegrationOptions) {
-    if(options?.xml) {
-        return options?.disableCors ? RESPONSE_200_OK_XML : RESPONSE_200_OK_XML_CORS;
-    }
-
-    return options?.disableCors ? RESPONSE_200_OK : RESPONSE_200_OK_CORS;
-}
-
-function get500Response(options?: IntegrationOptions) {
-    return options?.disableCors ? RESPONSE_500_SERVER_ERROR : RESPONSE_500_SERVER_ERROR_CORS;
+    return response;
 }

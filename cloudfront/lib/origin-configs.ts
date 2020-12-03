@@ -63,24 +63,17 @@ function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any):
 function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBehavior: boolean = false): Behavior {
 //    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
 
-    const forwardedValues: ForwardedValuesProperty = {
+    const forwardedValues = {
+            headers: [] as string[],
             queryString: true,
             queryStringCacheKeys: b.queryCacheKeys as string[]
         } as any;
 
     if(b.viewerProtocolPolicy === 'https-only') {
-        if (forwardedValues.headers == null) {
-            (forwardedValues as any).headers = ['Host'];
-        } else {
-            forwardedValues.headers.push('Host');
-        }
+        forwardedValues.headers.push('Host');
     }
     if(b.cacheHeaders != null) {
-        if (forwardedValues.headers == null) {
-            (forwardedValues as any).headers = b.cacheHeaders;
-        } else {
-            (forwardedValues as any).headers = forwardedValues.headers.concat(b.cacheHeaders);
-        }
+        (forwardedValues as any).headers = forwardedValues.headers.concat(b.cacheHeaders);
     }
 
     return {

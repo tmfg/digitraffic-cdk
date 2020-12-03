@@ -14,7 +14,7 @@ import {MessageModel} from 'digitraffic-cdk-api/response';
 import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
 import {createSubscription} from "../../../common/stack/subscription";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
-import {corsMethodJsonResponse, defaultIntegration, defaultSingleResourceIntegration} from "../../../common/api/responses";
+import {corsMethodJsonResponse, defaultIntegration} from "../../../common/api/responses";
 import {addTags} from "../../../common/api/documentation";
 import {DATA_V1_TAGS} from "../../../common/api/tags";
 
@@ -139,7 +139,7 @@ function createGetRequestIntegration(
     validator: apigateway.RequestValidator,
     stack: Construct) {
 
-    const getRequestIntegration = defaultSingleResourceIntegration(getRequestHandler, {
+    const getRequestIntegration = defaultIntegration(getRequestHandler, {
         requestParameters: {
             'integration.request.path.request_id': 'method.request.path.request_id',
             'integration.request.querystring.extensions': 'method.request.querystring.extensions'
@@ -379,7 +379,7 @@ function createGetServiceIntegration(
     messageResponseModel: apigateway.Model,
     validator: apigateway.RequestValidator,
     stack: Construct) {
-    const getServiceIntegration = defaultSingleResourceIntegration(getServiceHandler, {
+    const getServiceIntegration = defaultIntegration(getServiceHandler, {
         requestParameters: {
             'integration.request.path.service_id': 'method.request.path.service_id'
         }, requestTemplates: {
