@@ -1,15 +1,32 @@
 import * as AWSx from "aws-sdk";
 const AWS = AWSx as any;
 
+
+export async function fetchAndParseDataFromEs(
+    endpoint: AWS.Endpoint,
+    region: string,
+    index: string,
+    path: string,
+    fromISOString: string,
+    toISOString: string): Promise<string> {
+    return fetchDataFromEs(endpoint, region, index, path, fromISOString, toISOString)
+        .then(async function(resultJsonObj) {
+            return parseDataToString(resultJsonObj)
+        });
+}
+
 export async function fetchDataFromEs(
     endpoint: AWS.Endpoint,
     region: string,
     index: string,
     path: string,
-    query: string): Promise<any> {
+    fromISOString: string,
+    toISOString: string): Promise<any> {
     return new Promise((resolve, reject) => {
         const creds = new AWS.EnvironmentCredentials("AWS")
         let req = new AWS.HttpRequest(endpoint);
+        const query = getQuery(fromISOString, toISOString);
+
         req.method = "POST";
         req.path = `/${index}/${path}`;
         req.region = region;
@@ -41,33 +58,35 @@ export async function fetchDataFromEs(
 }
 
 export function getQuery(fromISOString: string, toISOString: string) {
-    return `{
-  "query": {
-    "bool": {
-      "must": [
-        {
-          "query_string": {
-            "query": "logger_name:fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService AND method:resolveGeometries",
-            "time_zone": "Europe/Oslo"
-          }
-        }
-      ],
-      "filter": [
-        {
-          "range": {
-            "@timestamp": {
-              "gte": "${fromISOString}",
-              "lte": "${toISOString}",
-              "format": "strict_date_optional_time"
+    const queryObj: any =
+    {
+        "query": {
+            "bool": {
+                "must": [
+                    {
+                        "query_string": {
+                            "query": "logger_name:fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService AND method:resolveGeometries",
+                            "time_zone": "Europe/Oslo"
+                        }
+                    }
+                ],
+                    "filter": [
+                    {
+                        "range": {
+                            "@timestamp": {
+                                "gte": fromISOString,
+                                "lte": toISOString,
+                                "format": "strict_date_optional_time"
+                            }
+                        }
+                    }
+                ],
+                "should": [],
+                "must_not": []
             }
-          }
         }
-      ],
-      "should": [],
-      "must_not": []
-    }
-  }
-}`;
+    };
+    return JSON.stringify(queryObj);
 }
 
 /**

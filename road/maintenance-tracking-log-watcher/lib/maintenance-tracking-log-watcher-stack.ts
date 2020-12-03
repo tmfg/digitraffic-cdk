@@ -46,7 +46,7 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
 
         const lambdaFunction = createWatchLogAndUploadToS3Lambda(appProps, lambdaRole, emailTopic, logBucket.bucketName, this);
 
-        const rule = new Rule(this, 'Rule', {
+        const rule = new Rule(this, 'MaintenanceTrackingLogWatcherScheduler', {
             schedule: Schedule.cron( { hour: '01', weekDay: 'MON'  } )
         });
         rule.addTarget(new LambdaFunction(lambdaFunction));
