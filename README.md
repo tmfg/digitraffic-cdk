@@ -75,3 +75,12 @@ This copies contents from the existing project and does some replacements for th
  * https://www.npmjs.com/package/npm-check
  * `npm install -g npm-check` Install npm-check globally to check for outdated, incorrect, and unused dependencies.
  * `npm-check` Run under project directory to check outdated, incorrect, and unused dependencies.
+
+## IDE debugging from IntelliJ IDEA
+- install the Node.js plugin
+- import the run configurations from runConfigurations
+- make sure python is available in /usr/bin/python or edit the Run Lambda run configuration
+- generate a no-staging template.yaml by running `npm run synth-sam -- StackName`
+- run the Attach Node.js debugger run configuration
+- create a breakpoint in a TypeScript file
+- select a Lambda

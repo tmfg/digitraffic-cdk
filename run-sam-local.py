@@ -1,4 +1,4 @@
-import os, yaml
+import os, yaml, subprocess, sys, time
 from collections import namedtuple
 
 Lambda = namedtuple("Lambda", "path lambdaname")
@@ -34,5 +34,10 @@ lambda_run_actual_idx = lambda_run_idx - 1
 if len(lambdas) - 1 < lambda_run_actual_idx:
     print 'Lambda with number {} not found'.format(lambda_run_idx)
 else:
+    devnull = open(os.devnull, 'w')
     lambda_to_run = lambdas[lambda_run_actual_idx]
-    os.system('cd {}; sam local invoke {} ;'.format(lambda_to_run.path, lambda_to_run.lambdaname))
+    p = subprocess.Popen('cd {}; sam local invoke {} -d 9999;'.format(lambda_to_run.path, lambda_to_run.lambdaname),
+                     shell=True,stdin=None,stdout=devnull,stderr=devnull,close_fds=True)
+    print 'Waiting 15 s for container to start..'
+    time.sleep(15)
+    print '..done'
