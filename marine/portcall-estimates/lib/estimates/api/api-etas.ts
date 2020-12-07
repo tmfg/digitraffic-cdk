@@ -182,8 +182,8 @@ interface ETAResponse {
         readonly speed: number
         readonly heading: number
         readonly gpsPosition: {
-            readonly latitude: number
-            readonly longitude: number
+            readonly lat: number
+            readonly lon: number
         }
     }
     readonly destination: {
