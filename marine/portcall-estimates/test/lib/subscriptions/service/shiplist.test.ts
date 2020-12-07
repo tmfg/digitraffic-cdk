@@ -2,7 +2,7 @@ import * as ShiplistService from "../../../../lib/subscriptions/service/shiplist
 import {dbTestBase, inTransaction} from "../../db-testutil";
 import {ApiEstimate, EventType} from "../../../../lib/estimates/model/estimate";
 import {updateEstimate} from "../../../../lib/estimates/db/db-estimates";
-import {EVENTSOURCE_PORTNET, EVENTSOURCE_VTS} from "../../../../lib/subscriptions/event-sourceutil";
+import {EVENTSOURCE_PORTNET, EVENTSOURCE_VTS} from "../../../../lib/event-sourceutil";
 import {newEstimate} from "../../testdata";
 
 const moment = require('moment-timezone');

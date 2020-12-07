@@ -27,6 +27,17 @@ export interface DbETAShip {
     readonly portcall_id: number
 }
 
+export interface DbUpdatedEstimate {
+    readonly ship_mmsi: number
+    readonly ship_imo: number
+    readonly location_locode: string
+}
+
+export interface DbEstimateIdAndLocode {
+    readonly id: number
+    readonly locode: string
+}
+
 const INSERT_ESTIMATE_SQL = `
     INSERT INTO portcall_estimate(
         event_type,
@@ -213,7 +224,24 @@ const SELECT_BY_IMO = `
     ORDER by pe.event_time
 `;
 
-export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): Promise<any> {
+const SELECT_BY_PORTCALL_ID_AND_LOCODE = `
+    SELECT
+    id,
+    location_locode
+    FROM portcall_estimate
+    WHERE
+          portcall_id = $1 AND
+          location_locode != $2 AND
+          event_source = 'Portnet'
+`;
+
+const DELETE_BY_ID = `
+    DELETE
+    FROM portcall_estimate
+    WHERE id = $1
+`;
+
+export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): Promise<DbUpdatedEstimate | null> {
     const ps = new PreparedStatement({
         name:'update-estimates',
         text:INSERT_ESTIMATE_SQL
@@ -263,6 +291,31 @@ export function findETAsByLocodes(
 ): Promise<DbETAShip[]> {
     // Prepared statement use not possible due to dynamic IN-list
     return db.tx(t => t.manyOrNone(SELECT_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
+}
+
+export function findPortnetEstimatesForAnotherLocode(
+    db: IDatabase<any, any>,
+    portcallId: number,
+    locode: string
+): Promise<DbEstimateIdAndLocode[]> {
+    const ps = new PreparedStatement({
+        name: 'find-by-portcall-id-and-locode',
+        text: SELECT_BY_PORTCALL_ID_AND_LOCODE,
+        values: [portcallId, locode]
+    });
+    return db.manyOrNone(ps);
+}
+
+export function deleteById(
+    db: IDatabase<any, any>,
+    id: number
+): Promise<null> {
+    const ps = new PreparedStatement({
+        name: 'delete-by-id',
+        text: DELETE_BY_ID,
+        values: [id]
+    });
+    return db.none(ps);
 }
 
 export function createUpdateValues(e: ApiEstimate): any[] {

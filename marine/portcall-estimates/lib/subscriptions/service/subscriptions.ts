@@ -9,7 +9,7 @@ import {inTransaction} from "digitraffic-lambda-postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {getStartTime} from "../timeutil";
 import {PinpointService, default as pinpointService} from "./pinpoint";
-import {selectBestEstimate} from "../event-sourceutil";
+import {selectBestEstimate} from "../../event-sourceutil";
 
 export const DYNAMODB_TIME_FORMAT = 'HHmm';
 

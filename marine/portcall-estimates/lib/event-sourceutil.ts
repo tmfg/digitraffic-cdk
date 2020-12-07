@@ -1,4 +1,5 @@
-import {ShiplistEstimate} from "./db/db-shiplist";
+import {ShiplistEstimate} from "./subscriptions/db/db-shiplist";
+import {ApiEstimate} from "./estimates/model/estimate";
 
 export const EVENTSOURCE_VTS = "VTS";
 export const EVENTSOURCE_PORTNET = "Portnet";
@@ -17,6 +18,10 @@ const eventSourcePriorities = new Map<string, number>([
     [EVENTSOURCE_VTS, 80],
     [EVENTSOURCE_PORT_HANKO, 100]
 ]);
+
+export function isPortnetEstimate(estimate: ApiEstimate) {
+    return estimate.source == EVENTSOURCE_PORTNET;
+}
 
 export function getDisplayableNameForEventSource(eventSource: string): string {
     return eventSourceMap.get(eventSource) || eventSource;
