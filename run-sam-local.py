@@ -10,7 +10,6 @@ def read_templates(paths):
         for f in os.listdir(path):
             joined_path = os.path.join(path, f)
             if os.path.isdir(joined_path) and os.path.isfile(os.path.join(joined_path, 'template.yaml')):
-                pass
                 lambdas.extend(read_lambdas(joined_path))
 
 def read_lambdas(dir):
