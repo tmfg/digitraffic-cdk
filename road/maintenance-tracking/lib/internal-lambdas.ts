@@ -64,7 +64,8 @@ function createAlarm(processQueueLambda: Function, errorNotificationSnsTopicArn:
         metric: lambdaMetric,
         threshold: 1,
         evaluationPeriods: 1,
-        datapointsToAlarm: 1
+        datapointsToAlarm: 1,
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
     }).addAlarmAction(new SnsAction(topic));
 }
 

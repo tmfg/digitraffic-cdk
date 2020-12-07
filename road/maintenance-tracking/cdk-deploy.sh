@@ -1,4 +1,16 @@
 #!/usr/bin/env bash
 
-#cdk deploy --verbose MaintenanceTrackingRoadTest
-cdk deploy MaintenanceTrackingRoadTest
+ENV=${1:-"NONE"}
+
+
+case "$ENV" in
+  ("test"):
+    cdk deploy MaintenanceTrackingRoadTest
+#    cdk deploy --verbose MaintenanceTrackingRoadTest
+  ;;
+  ("prod"):
+    cdk deploy MaintenanceTrackingRoadProd
+#    cdk deploy --verbose MaintenanceTrackingRoadProd
+  ;;
+  (*) echo "Allowed parameter values are 'test' and 'prod'" ;;
+esac
