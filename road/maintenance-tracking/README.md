@@ -17,23 +17,20 @@ Road application then reads saved data from the db and combines the contents of 
 
 ## Setup env
 
-* Sets AWS environment variables to road test/prod.
-    * `. ../cdk-set-env-road-test.sh` or 
-    * `. ../cdk-set-env-road-prod.sh`
 * Init mfa session
     * `~/.aws/bin/digitraffic_mfa_aws.sh <mfa-token>`  
 
 ## Deploy to AWS
 
 * Show changes
-    * `cdk diff MaintenanceTrackingRoadTest` or 
-    * `cdk diff MaintenanceTrackingRoadProd` 
+    * `./cdk-diff.sh test` or 
+    * `./cdk-diff.sh prod` 
 * Deploy
-    * `cdk deploy MaintenanceTrackingRoadTest` or 
-    * `cdk deploy MaintenanceTrackingRoadProd`
+    * `./cdk-deploy.sh test` or 
+    * `./cdk-deploy.sh prod`
 * Synthesize a CloudFormation template for local inspection (not required)
-    * `cdk synth MaintenanceTrackingRoadTest --no-staging > template.yaml` or
-    * `cdk synth MaintenanceTrackingRoadProd --no-staging > template.yaml` 
+    * `./cdk-synth.sh test` or
+    * `./cdk-synth.sh prod` 
 
 # Misc
 

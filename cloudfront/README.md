@@ -29,15 +29,26 @@ And after that?
 
 ## Setup env
 
-* Sets AWS environment variables to road test/prod.
-    * `. ../road/cdk-set-env-road-test.sh` or 
-    * `. ../road/cdk-set-env-road-prod.sh` or
-    * `. ../marine/cdk-set-env-marine-test.sh` or
-    * `. ../marine/cdk-set-env-marine-prod.sh`
 * Init mfa session
     * `~/.aws/bin/digitraffic_mfa_aws.sh <mfa-token>`  
 
 ## Deploy to AWS
+
+* Show changes
+    * `./cdk-diff.sh road-test` or 
+    * `./cdk-diff.sh road-prod` or
+    * `./cdk-diff.sh marine-test` or 
+    * `./cdk-diff.sh marine-prod` 
+* Deploy
+    * `./cdk-deploy.sh road-test` or 
+    * `./cdk-deploy.sh road-prod` or
+    * `./cdk-deploy.sh marine-test` or 
+    * `./cdk-deploy.sh marine-prod`
+* Synthesize a CloudFormation template for local inspection (not required)
+    * `./cdk-synth.sh road-test` or 
+    * `./cdk-synth.sh road-prod` or
+    * `./cdk-synth.sh marine-test` or 
+    * `./cdk-synth.sh marine-prod`
 
 * Show changes
     * `cdk diff CloudfrontRoadTest` or 
