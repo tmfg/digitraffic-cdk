@@ -15,7 +15,7 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.72.0",
+    "@aws-cdk/assert": "1.77.0",
     "@types/aws-lambda": "^8.10.59",
     "@types/jest": "^26.0.8",
     "@types/node": "^14.0.27",
@@ -37,9 +37,9 @@
     "digitraffic-lambda-postgres": "file:../../common/postgres",
     "digitraffic-lambda-stack": "file:../../common/stack",
     "digitraffic-cdk-api": "file:../../common/api",
-    "@aws-cdk/aws-apigateway": "1.72.0",
-    "@aws-cdk/core": "1.72.0",
-    "@aws-cdk/aws-events-targets": "1.72.0",
+    "@aws-cdk/aws-apigateway": "1.77.0",
+    "@aws-cdk/core": "1.77.0",
+    "@aws-cdk/aws-events-targets": "1.77.0",
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5",
     "source-map-support": "^0.5.19",

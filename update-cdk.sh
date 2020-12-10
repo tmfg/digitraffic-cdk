@@ -11,6 +11,8 @@ function update() {
       cd "$d"
       if [ -f package.json ]; then
         ncu -f /@aws-cdk/ -u
+        rm -f package-lock.json
+        rm -rf node_modules
         npm install
       fi
       cd ..
