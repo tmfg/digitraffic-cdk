@@ -65,7 +65,7 @@ export function getQuery(fromISOString: string, toISOString: string) {
                 "must": [
                     {
                         "query_string": {
-                            "query": "logger_name:fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService AND method:resolveGeometries",
+                            "query": "logger_name:fi.livi.digitraffic.tie.service.v2.maintenance.V2MaintenanceTrackingUpdateService AND level:WARN",
                             "time_zone": "Europe/Oslo"
                         }
                     }
