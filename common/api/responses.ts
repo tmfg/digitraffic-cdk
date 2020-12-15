@@ -5,19 +5,19 @@ import {
     createResponses,
     XmlResponseTemplate, APPLICATION_XML, NotFoundResponseTemplate
 } from "./response";
-import {LambdaIntegration, MethodResponse} from "@aws-cdk/aws-apigateway";
+import {LambdaIntegration, MethodResponse, IntegrationResponse} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
 
-export const RESPONSE_401_UNAUTHORIZED = {
+export const RESPONSE_401_UNAUTHORIZED: IntegrationResponse = {
     statusCode: '401',
     selectionPattern: AUTHORIZATION_FAILED_MESSAGE
 }
 
-export const RESPONSE_200_OK = {
+export const RESPONSE_200_OK: IntegrationResponse = {
     statusCode: '200'
 };
 
-export const RESPONSE_500_SERVER_ERROR = {
+export const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
     statusCode: '500',
     selectionPattern: 'Error',
     responseTemplates: InternalServerErrorResponseTemplate
@@ -41,17 +41,19 @@ export const RESPONSE_404_NOT_FOUND = {
 
 export const TEMPLATE_COGNITO_GROUPS = {
     'application/json': JSON.stringify({
-        "groups": "$context.authorizer.claims['cognito:groups']"
+        "groups": "$context.authorizer.claims['cognito:groups']",
+        "username": "$context.authorizer.claims['cognito:username']"
     })};
 
-export function methodJsonResponse(status: string, model: any) {
+export function methodJsonResponse(status: string, model: any, parameters?: any): MethodResponse {
     return  {
         statusCode: status,
-        responseModels: createResponses(APPLICATION_JSON, model)
+        responseModels: createResponses(APPLICATION_JSON, model),
+        responseParameters: parameters || {}
     };
 }
 
-export function methodXmlResponse(status: string, model: any) {
+export function methodXmlResponse(status: string, model: any): MethodResponse {
     return  {
         statusCode: status,
         responseModels: createResponses(APPLICATION_XML, model)
@@ -70,13 +72,14 @@ export function corsMethodJsonResponse(status: string, model: any): MethodRespon
     return corsHeaders(methodJsonResponse(status, model));
 }
 
-export function corsMethodXmlResponse(status: string, model: any) {
+export function corsMethodXmlResponse(status: string, model: any): MethodResponse {
     return corsHeaders(methodXmlResponse(status, model));
 }
 
 interface IntegrationOptions {
     requestParameters?: {[dest: string]: string}
     requestTemplates?: {[contentType: string]: string},
+    responses?: IntegrationResponse[],
     disableCors?: boolean,
     xml?: boolean
 }
@@ -88,11 +91,11 @@ interface IntegrationOptions {
  */
 export function defaultIntegration(
     lambdaFunction: Function,
-    options?: IntegrationOptions
+    options?: IntegrationOptions,
 ): LambdaIntegration {
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
-        integrationResponses: [
+        integrationResponses: options?.responses || [
             getResponse(RESPONSE_200_OK, options),
             getResponse(RESPONSE_401_UNAUTHORIZED, options),
             getResponse(RESPONSE_404_NOT_FOUND, options),

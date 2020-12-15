@@ -1,24 +1,25 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {UserPool, UserPoolClient} from '@aws-cdk/aws-cognito';
 
+import * as PublicApi from "./public-api";
+
 export class UserManagementCdkStack extends Stack {
-    constructor(scope: Construct, id: string, props?: StackProps) {
+    constructor(scope: Construct, id: string, userManagementProps: any, props?: StackProps) {
         super(scope, id, props);
 
-        this.createCognito(this);
-    }
-
-    createCognito(stack: Construct) {
-        const userPool = new UserPool(stack, 'UserPool', {
+        const userPool = new UserPool(this, 'UserPool', {
             userPoolName: 'DigitrafficUserPool'
         });
 
-        const userPoolClient = new UserPoolClient(stack, 'UserPoolClient', {
+        const userPoolClient = new UserPoolClient(this, 'UserPoolClient', {
             userPool: userPool,
             authFlows: {
-                userPassword: true
+                userPassword: true,
+                userSrp: true
             },
             disableOAuth: true
         });
+
+        PublicApi.create(this, userManagementProps, userPool.userPoolId, userPoolClient.userPoolClientId);
     }
 }

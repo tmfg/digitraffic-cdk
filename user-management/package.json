@@ -7,17 +7,17 @@
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
+    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-minify --public-url dist/lambda",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "watch": "tsc -w",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.71.0",
+    "@aws-cdk/assert": "1.77.0",
     "@types/aws-lambda": "8.10.64",
     "@types/node": "14.0.27",
     "@types/sinon": "9.0.8",
-    "aws-cdk": "1.71.0",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-externals": "0.5.1",
     "rimraf": "3.0.2",
@@ -27,7 +27,9 @@
     "aws-sdk": "2.783.0"
   },
   "dependencies": {
-    "@aws-cdk/aws-cognito": "1.71.0"
+    "@aws-cdk/aws-apigateway": "1.77.0",
+    "@aws-cdk/aws-cognito": "1.77.0",
+    "amazon-cognito-identity-js": "4.5.5"
   },
   "externals": [
     "aws-sdk"
