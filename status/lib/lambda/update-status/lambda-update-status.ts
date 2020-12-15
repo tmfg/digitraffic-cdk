@@ -170,12 +170,37 @@ async function createNodepingCheck(
     console.log('..done');
 }
 
+function getStatuspageComponentGroupId(appEndpoints: AppEndpoints, secret: UpdateStatusSecret): string {
+    switch (appEndpoints.app.toLowerCase()) {
+        case 'road':
+            return secret.statusPageRoadComponentGroupId;
+        case 'marine':
+            return secret.statusPageMarineComponentGroupId;
+        case 'rail':
+            return secret.statusPageRailComponentGroupId;
+    }
+    throw new Error(`Error fetching Status page component group id for app ${appEndpoints.app}! Unknown app or missing component group id`);
+}
+
 async function updateComponentsAndChecks(
-    endpoint: AppEndpoints,
+    appEndpoints: AppEndpoints,
     secret: UpdateStatusSecret): Promise<void> {
 
     let statuspageComponents: any[] = await getStatuspageComponents(secret.statuspagePageId, secret.statuspageApiKey);
     const statuspageComponentNames: string[] = statuspageComponents.map(c => c.name);
+    const missingComponents = appEndpoints.endpoints.filter(e => !statuspageComponentNames.includes(e));
+    console.log('Missing components', missingComponents);
+
+    // loop in order to preserve ordering
+    for (const component of missingComponents) {
+        await createStatuspageComponent(component,
+            secret.statuspagePageId,
+            getStatuspageComponentGroupId(appEndpoints, secret),
+            secret.statuspageApiKey);
+    }
+    if (missingComponents.length > 0) {
+        statuspageComponents = await getStatuspageComponents(secret.statuspagePageId, secret.statuspageApiKey);
+    }
 }
 
 export const handler = async (): Promise<any> => {

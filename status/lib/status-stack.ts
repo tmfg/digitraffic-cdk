@@ -17,7 +17,7 @@ export class StatusStack extends Stack {
             code: new AssetCode('dist/lambda'),
             handler: 'lambda-update-status.handler',
             runtime: Runtime.NODEJS_12_X,
-            memorySize: 1024,
+            memorySize: 128,
             timeout: Duration.seconds(appProps.defaultLambdaDurationSeconds),
             environment: {
                 APPS: JSON.stringify(appProps.monitoredApps),
