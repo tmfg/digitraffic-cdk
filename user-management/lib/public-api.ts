@@ -1,24 +1,26 @@
 import {Construct} from '@aws-cdk/core';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {RestApi, MethodResponse, IntegrationResponse}  from '@aws-cdk/aws-apigateway'; // don't remove RestApi! won't work without!
+import {RestApi, IntegrationResponse}  from '@aws-cdk/aws-apigateway'; // don't remove RestApi! won't work without!
 
 import {createRestApi} from "../../common/api/rest_apis";
 import {defaultLambdaConfiguration} from "../../common/stack/lambda-configs";
 import {defaultIntegration, methodJsonResponse, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
 import {USER_MANAGEMENT_TAGS} from "../../common/api/tags";
-import {addServiceModel} from "../../common/api/utils";
+import {addDefaultValidator, addServiceModel} from "../../common/api/utils";
 import {LOGIN_SCHEMA, LOGIN_SUCCESSFUL_SCHEMA} from './model/login-schema';
 import {MessageModel} from "../../common/api/response";
+import {createSubscription} from "../../common/stack/subscription";
 
 const RESPONSE_200_OK: IntegrationResponse = {
     statusCode: '200',
     responseTemplates: {
-        "application/json":
-            "{\"username\": $input.json('accessToken.payload.username'), " +
+        "application/json": "{" +
+            "\"username\": \"$input.path('$.accessToken.payload.username')\", " +
             "\"access_token\": $input.json('accessToken.jwtToken'), " +
-            "\"auth_time\": $input.json('accessToken.payload.auth_time'), " +
-            "\"exp_time\": $input.json('accessToken.payload.exp')"
+            "\"auth_time\": $input.path('accessToken.payload.auth_time'), " +
+            "\"exp_time\": $input.path('accessToken.payload.exp')" +
+            "}"
     }
 };
 
@@ -26,7 +28,7 @@ const RESPONSE_401_AUTHORIZATION_FAILED: IntegrationResponse = {
     statusCode: '401',
     selectionPattern: '.*AUTHORIZATION_FAILED.*',
     responseTemplates: {
-        "application/json": "Authorization failed. $input.path('$.errorMessage')"
+        "application/json": "Authorization failed. $input.path('$.errorMessage.errorMessage')"
     },
     responseParameters: {
         'method.response.header.WWW-Authenticate': "integration.response.body.errorMessage.errorMessage"
@@ -58,7 +60,10 @@ function createUserManagementResources(stack: Construct, publicApi: any, userMan
 
     const loginUserIntegration = defaultIntegration(loginUserLambda, {
         requestTemplates: {
-            "application/json": "{\"username\": $input.json('username'), \"password\": $input.json('password')}"
+            "application/json":
+                "{\"username\": $input.json('username'), " +
+                "\"password\": $input.json('password'), " +
+                "\"newPassword\": $input.json('newPassword')}"
         },
         disableCors: true,
         responses: [
@@ -74,6 +79,7 @@ function createUserManagementResources(stack: Construct, publicApi: any, userMan
     const loginResource = umResource.addResource("login");
 
     loginResource.addMethod("POST", loginUserIntegration, {
+        requestValidator: addDefaultValidator(publicApi),
         requestModels: {
             "application/json": loginModel
         },
@@ -84,7 +90,6 @@ function createUserManagementResources(stack: Construct, publicApi: any, userMan
         ]
     });
 
-    //  is not authorized to perform: logs:PutSubscriptionFilter on resource!!??
     //createSubscription(loginUserLambda, functionName, userManagementProps.logsDestinationArn, stack);
     addTags('Login', USER_MANAGEMENT_TAGS, loginResource, stack);
 

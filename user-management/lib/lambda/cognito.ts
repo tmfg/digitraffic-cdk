@@ -20,28 +20,32 @@ const AUTH_FAILED_CHANGE_PASSWORD = JSON.stringify({
 const userPool = new AmazonCognitoIdentity.CognitoUserPool(POOL_DATA);
 
 export const login_handler = async (event: any, context: any, callback: any): Promise<any> => {
-    return await loginUser(event.username, event.password);
+    return await loginUser(event.username, event.password, event.newPassword);
 };
 
-function loginUser(username: string, password: string): Promise<any> {
+function createCognitoUser(username: string) {
     const userData = {
         Username: username,
         Pool: userPool
     };
 
+    return new AmazonCognitoIdentity.CognitoUser(userData);
+}
+
+function loginUser(username: string, password: string, newPassword?: string): Promise<any> {
     const authDetails = new AmazonCognitoIdentity.AuthenticationDetails({
         Username: username,
         Password: password
     });
 
-    const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+    const cognitoUser = createCognitoUser(username);
 
     return new Promise(((resolve, reject) => {
         cognitoUser.authenticateUser(authDetails, {
             onSuccess: (result: any) => {
                 console.info("success " + JSON.stringify(result));
 
-                resolve(JSON.stringify(result));
+                resolve(result);
             },
 
             onFailure: (result: any) => {
@@ -50,11 +54,38 @@ function loginUser(username: string, password: string): Promise<any> {
                 reject(AUTH_FAILED_CREDS);
             },
 
-            newPasswordRequired: (result: any) => {
-                console.info("new password required " + JSON.stringify(result));
+            newPasswordRequired: async (userAttributes: any, requiredAttributes: any) => {
+                console.info("new password required " + JSON.stringify(userAttributes));
 
-                reject(AUTH_FAILED_CHANGE_PASSWORD);
+                if (newPassword) {
+                    return await changeUserPassword(cognitoUser, newPassword, userAttributes);
+                } else {
+                    reject(AUTH_FAILED_CHANGE_PASSWORD);
+                }
             }
         });
-    }))
+    }));
 }
+
+async function changeUserPassword(cognitoUser: any, newPassword: string, userAttributes: any): Promise<any> {
+    return new Promise(((resolve, reject) => {
+        cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
+            onSuccess: (result: any) => {
+                console.info("password changed " + JSON.stringify(result));
+
+                resolve(result);
+            },
+            onFailure: (result: any) => {
+                console.info("failed " + JSON.stringify(result));
+
+                reject(AUTH_FAILED_CREDS);
+            },
+            newPasswordRequired: (result: any) => {
+                console.info("newPasswordRequired:" + JSON.stringify(result));
+
+                reject(AUTH_FAILED_CREDS);
+            }
+        });
+    }));
+}
+
