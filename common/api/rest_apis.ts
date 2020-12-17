@@ -16,7 +16,7 @@ export function createRestApi(stack: Construct, apiId: string, apiName: string, 
     });
 }
 
-function createDefaultPolicyDocument() {
+export function createDefaultPolicyDocument() {
     return new PolicyDocument({
         statements: [
             new PolicyStatement({
