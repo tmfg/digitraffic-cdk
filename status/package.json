@@ -31,13 +31,17 @@
     "typescript": "3.9.7"
   },
   "dependencies": {
+    "@aws-cdk/aws-apigateway": "1.77.0",
     "@aws-cdk/aws-events-targets": "1.77.0",
     "@aws-cdk/aws-lambda": "1.77.0",
-    "@aws-cdk/core": "1.77.0",
     "@aws-cdk/aws-secretsmanager": "1.77.0",
-    "source-map-support": "0.5.19",
+    "@aws-cdk/core": "1.77.0",
+    "@types/paho-mqtt": "^1.0.4",
+    "aws-sdk": "2.726.0",
     "axios": "0.19.2",
-    "aws-sdk": "2.726.0"
+    "paho-mqtt": "^1.1.0",
+    "source-map-support": "0.5.19",
+    "ws": "^7.4.1"
   },
   "externals": [
     "aws-sdk"

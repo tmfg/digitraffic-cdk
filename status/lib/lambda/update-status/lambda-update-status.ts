@@ -1,10 +1,11 @@
 import axios from 'axios';
-import {MonitoredApp} from '../../app-props';
+import {MonitoredApp, MonitoredEndpoint} from '../../app-props';
 import {SecretsManager} from 'aws-sdk';
 
 interface AppEndpoints {
     readonly app: string
-    readonly endpoints: string[]
+    readonly endpoints: string[],
+    readonly extraEndpoints: MonitoredEndpoint[]
 }
 
 interface UpdateStatusSecret {
@@ -44,7 +45,8 @@ async function getAppEndpoints(app: MonitoredApp): Promise<AppEndpoints> {
     beta.sort();
     return {
         app: app.name,
-        endpoints: ([] as string[]).concat(notBeta).concat(beta)
+        endpoints: ([] as string[]).concat(notBeta).concat(beta),
+        extraEndpoints: app.endpoints
     };
 }
 
@@ -153,7 +155,7 @@ async function createNodepingCheck(
         label: endpoint,
         type: 'HTTPADV',
         target: `https://${app}.digitraffic.fi${endpoint}`,
-        interval: 1,
+        interval: 5,
         enabled: true,
         follow: true,
         sendheaders: {'accept-encoding': 'gzip'},
@@ -194,6 +196,12 @@ async function updateComponentsAndChecks(
     // loop in order to preserve ordering
     for (const component of missingComponents) {
         await createStatuspageComponent(component,
+            secret.statuspagePageId,
+            getStatuspageComponentGroupId(appEndpoints, secret),
+            secret.statuspageApiKey);
+    }
+    for (const component of appEndpoints.extraEndpoints) {
+        await createStatuspageComponent(component.name,
             secret.statuspagePageId,
             getStatuspageComponentGroupId(appEndpoints, secret),
             secret.statuspageApiKey);
