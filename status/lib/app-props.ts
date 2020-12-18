@@ -7,6 +7,7 @@ export interface MonitoredEndpoint {
     readonly name: string
     readonly url: string
     readonly protocol: EndpointProtocol
+    readonly sendData?: any
 }
 
 export interface MonitoredApp {

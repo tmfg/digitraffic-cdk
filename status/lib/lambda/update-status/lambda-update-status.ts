@@ -145,11 +145,12 @@ async function createNodepingCheck(
     nodepingToken: string,
     subaccountId: string,
     contactId: string,
-    app: string) {
+    app: string,
+    sendData?: string) {
     console.log('Creating NodePing check for endpoint', endpoint);
     const notification: any = {};
     notification[`${contactId}`] = {'delay': 0, 'schedule': 'All'};
-    const data = {
+    const data: any = {
         customerid: subaccountId,
         token: nodepingToken,
         label: endpoint,
@@ -161,6 +162,9 @@ async function createNodepingCheck(
         sendheaders: {'accept-encoding': 'gzip'},
         notifications: [notification]
     };
+    if (sendData) {
+        data.postdata = sendData;
+    }
     const r = await axios.post(`${NODEPING_API}/checks`, data, {
         headers: {
             'Content-type': 'application/json'
