@@ -194,18 +194,13 @@ async function updateComponentsAndChecks(
 
     let statuspageComponents: any[] = await getStatuspageComponents(secret.statuspagePageId, secret.statuspageApiKey);
     const statuspageComponentNames: string[] = statuspageComponents.map(c => c.name);
-    const missingComponents = appEndpoints.endpoints.filter(e => !statuspageComponentNames.includes(e));
+    const missingComponents = appEndpoints.endpoints.concat(appEndpoints.extraEndpoints.map(e => e.name))
+        .filter(e => !statuspageComponentNames.includes(e));
     console.log('Missing components', missingComponents);
 
     // loop in order to preserve ordering
     for (const component of missingComponents) {
         await createStatuspageComponent(component,
-            secret.statuspagePageId,
-            getStatuspageComponentGroupId(appEndpoints, secret),
-            secret.statuspageApiKey);
-    }
-    for (const component of appEndpoints.extraEndpoints) {
-        await createStatuspageComponent(component.name,
             secret.statuspagePageId,
             getStatuspageComponentGroupId(appEndpoints, secret),
             secret.statuspageApiKey);
