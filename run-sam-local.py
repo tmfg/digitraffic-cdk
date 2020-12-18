@@ -1,4 +1,4 @@
-import os, yaml, subprocess, sys, time
+import os, yaml, subprocess, sys, time, socket
 from collections import namedtuple
 
 Lambda = namedtuple("Lambda", "path lambdaname")
@@ -37,6 +37,14 @@ else:
     lambda_to_run = lambdas[lambda_run_actual_idx]
     p = subprocess.Popen('cd {}; sam local invoke {} -d 9999;'.format(lambda_to_run.path, lambda_to_run.lambdaname),
                      shell=True,stdin=None,stdout=devnull,stderr=devnull,close_fds=True)
-    print 'Waiting 15 s for container to start..'
-    time.sleep(15)
+    start_time = time.time()
+    print 'Waiting for container to start..'
+    while True:
+        debug_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        socket_connect_value = debug_socket.connect_ex(('127.0.0.1',9999))
+        if socket_connect_value == 0:
+            break
+        elif time.time() - start_time > 30:
+            print '..more than 30 seconds passed, aborting'
+            sys.exit(1)
     print '..done'
