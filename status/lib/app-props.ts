@@ -12,8 +12,10 @@ export interface MonitoredEndpoint {
 
 export interface MonitoredApp {
     readonly name: string
+    readonly hostPart: string
     readonly url: string
     readonly endpoints: MonitoredEndpoint[]
+    readonly excluded: string[]
 }
 
 export interface Props {

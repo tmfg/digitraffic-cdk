@@ -4,7 +4,8 @@ import {SecretsManager} from 'aws-sdk';
 
 interface AppEndpoints {
     readonly app: string
-    readonly endpoints: string[],
+    readonly hostPart: string
+    readonly endpoints: string[]
     readonly extraEndpoints: MonitoredEndpoint[]
 }
 
@@ -45,7 +46,8 @@ async function getAppEndpoints(app: MonitoredApp): Promise<AppEndpoints> {
     beta.sort();
     return {
         app: app.name,
-        endpoints: ([] as string[]).concat(notBeta).concat(beta),
+        hostPart: app.hostPart,
+        endpoints: (([] as string[]).concat(notBeta).concat(beta)).filter(e => !app.excluded.includes(e)),
         extraEndpoints: app.endpoints
     };
 }
@@ -137,7 +139,7 @@ async function getNodepingChecks(nodepingToken: string, subaccountId: string) {
         throw new Error('Unable to fetch checks');
     }
     console.log('..done');
-    return Object.values(r.data).map((check: any) => check.parameters.target);
+    return Object.values(r.data).map((check: any) => check.label);
 }
 
 async function createNodepingCheck(
@@ -146,7 +148,8 @@ async function createNodepingCheck(
     subaccountId: string,
     contactId: string,
     app: string,
-    sendData?: string) {
+    extraData?: MonitoredEndpoint) {
+
     console.log('Creating NodePing check for endpoint', endpoint);
     const notification: any = {};
     notification[`${contactId}`] = {'delay': 0, 'schedule': 'All'};
@@ -155,15 +158,15 @@ async function createNodepingCheck(
         token: nodepingToken,
         label: endpoint,
         type: 'HTTPADV',
-        target: `https://${app}.digitraffic.fi${endpoint}`,
+        target: extraData?.url ?? `https://${app}.digitraffic.fi${endpoint}`,
         interval: 5,
         enabled: true,
         follow: true,
         sendheaders: {'accept-encoding': 'gzip'},
         notifications: [notification]
     };
-    if (sendData) {
-        data.postdata = sendData;
+    if (extraData?.sendData) {
+        data.postdata = extraData.sendData;
     }
     const r = await axios.post(`${NODEPING_API}/checks`, data, {
         headers: {
@@ -229,6 +232,23 @@ async function updateComponentsAndChecks(
     }
     if (missingContacts.length > 0) {
         contacts = await getNodepingContacts(secret.nodePingToken, secret.nodepingSubAccountId);
+    }
+
+    const checks: string[] = await getNodepingChecks(secret.nodePingToken, secret.nodepingSubAccountId);
+    const missingChecks = allEndpoints.filter(e => !checks.includes(e));
+    console.log('Missing checks', missingChecks);
+    for (const missingCheck of missingChecks) {
+        const contact: any = Object.values(contacts).find((c: any) => c.name === missingCheck);
+        if (!contact) {
+            throw new Error(`Contact for ${missingCheck} not found`);
+        }
+        const correspondingExtraEndpoint = appEndpoints.extraEndpoints.find(e => e.name == missingCheck);
+        await createNodepingCheck(missingCheck,
+            secret.nodePingToken,
+            secret.nodepingSubAccountId,
+            Object.keys(contact['addresses'])[0] as string,
+            appEndpoints.hostPart,
+            correspondingExtraEndpoint);
     }
 }
 
