@@ -192,10 +192,11 @@ async function updateComponentsAndChecks(
     appEndpoints: AppEndpoints,
     secret: UpdateStatusSecret): Promise<void> {
 
+    const allEndpoints = appEndpoints.endpoints.concat(appEndpoints.extraEndpoints.map(e => e.name));
+
     let statuspageComponents: any[] = await getStatuspageComponents(secret.statuspagePageId, secret.statuspageApiKey);
     const statuspageComponentNames: string[] = statuspageComponents.map(c => c.name);
-    const missingComponents = appEndpoints.endpoints.concat(appEndpoints.extraEndpoints.map(e => e.name))
-        .filter(e => !statuspageComponentNames.includes(e));
+    const missingComponents = allEndpoints.filter(e => !statuspageComponentNames.includes(e));
     console.log('Missing components', missingComponents);
 
     // loop in order to preserve ordering
@@ -207,6 +208,27 @@ async function updateComponentsAndChecks(
     }
     if (missingComponents.length > 0) {
         statuspageComponents = await getStatuspageComponents(secret.statuspagePageId, secret.statuspageApiKey);
+    }
+
+    let contacts = await getNodepingContacts(secret.nodePingToken, secret.nodepingSubAccountId);
+    const contactNames: string[] = Object.values(contacts).map((c: any) => c.name);
+    const missingContacts = allEndpoints.filter(e => !contactNames.includes(e));
+    console.log('Missing contacts', missingContacts);
+
+    for (const missingContact of missingContacts) {
+        const component = statuspageComponents.find(c => c.name === missingContact);
+        if (!component) {
+            throw new Error(`Component for missing contact ${missingContact} not found`);
+        }
+        await createNodepingContact(missingContact,
+            secret.nodepingSubAccountId,
+            secret.statuspageApiKey,
+            secret.nodePingToken,
+            secret.statuspagePageId,
+            component['id'] as string)
+    }
+    if (missingContacts.length > 0) {
+        contacts = await getNodepingContacts(secret.nodePingToken, secret.nodepingSubAccountId);
     }
 }
 
