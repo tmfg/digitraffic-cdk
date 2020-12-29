@@ -17,9 +17,5 @@ async function getSecret<T>(secretId: string): Promise<T> {
 }
 
 export async function withSecret<T>(secretId: string, fn: (secret: T) => any): Promise<void> {
-    fn(await getSecret(secretId));
-}
-
-export async function withSecretAsync<T>(secretId: string, fn: (secret: T) => Promise<any>) {
-    await fn(await getSecret(secretId));
+    return fn(await getSecret(secretId));
 }

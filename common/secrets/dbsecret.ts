@@ -22,10 +22,3 @@ export async function withDbSecret<T>(secretId: string, fn: () => T): Promise<T>
     }
     return fn();
 }
-
-export async function withDbSecretAsync<T>(secretId: string, fn: () => Promise<T>): Promise<T> {
-    if (dbSecretUnset()) {
-        await withSecret(secretId, setSecret);
-    }
-    return await fn();
-}
