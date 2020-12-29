@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {MonitoredApp, MonitoredEndpoint} from '../../app-props';
+import {EndpointProtocol, MonitoredApp, MonitoredEndpoint} from '../../app-props';
 import {SecretsManager} from 'aws-sdk';
 
 interface AppEndpoints {
@@ -157,23 +157,25 @@ async function createNodepingCheck(
         customerid: subaccountId,
         token: nodepingToken,
         label: endpoint,
-        type: 'HTTPADV',
+        type: extraData?.protocol == EndpointProtocol.WebSocket ? 'WEBSOCKET' : 'HTTPADV',
         target: extraData?.url ?? `https://${app}.digitraffic.fi${endpoint}`,
         interval: 5,
         enabled: true,
         follow: true,
         sendheaders: {'accept-encoding': 'gzip'},
+        method: extraData?.sendData == null ? 'GET' : 'POST',
         notifications: [notification]
     };
     if (extraData?.sendData) {
         data.postdata = extraData.sendData;
+        data.sendheaders['content-type'] = 'application/json';
     }
     const r = await axios.post(`${NODEPING_API}/checks`, data, {
         headers: {
             'Content-type': 'application/json'
         }
     });
-    if (r.status != 200) {
+    if (r.status != 200 || r.data.error) {
         throw new Error('Unable to create check');
     }
     console.log('..done');
