@@ -8,6 +8,8 @@
     "prebuild": "rimraf tsd",
     "build": "tsc",
     "postbuild": "parcel build lib/lambda/*.js lib/lambda/**/*.js --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
+    "parcel-watch": "parcel watch lib/lambda/*.js lib/lambda/**/*.js --target=node --global handler -d dist/lambda --bundle-node-modules --no-source-maps",
+    "watch-bundle": "parallelshell \"npm run watch\" \"npm run parcel-watch\"",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "watch": "tsc -w",
     "cdk": "cdk",
@@ -25,7 +27,8 @@
     "sinon": "9.2.1",
     "ts-node": "8.10.2",
     "typescript": "3.9.7",
-    "aws-sdk": "2.783.0"
+    "aws-sdk": "2.783.0",
+    "parallelshell": "^3.0.1"
   },
   "dependencies": {
     "@aws-cdk/aws-logs": "1.71.0",

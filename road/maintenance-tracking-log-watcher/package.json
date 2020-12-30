@@ -9,6 +9,9 @@
     "build": "tsc",
     "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-minify --public-url dist/lambda",
     "watch": "tsc -w",
+    "parcel-watch": "parcel watch lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules",
+    "watch-bundle": "parallelshell \"npm run watch\" \"npm run parcel-watch\"",
+    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
@@ -22,6 +25,7 @@
     "@types/xml2js": "v0.4.5",
     "aws-sdk": "^2.784.0",
     "jest": "v26.6.2",
+    "parallelshell": "3.0.1",
     "parcel-bundler": "^1.12.4",
     "parcel-plugin-externals": "v0.5.1",
     "rimraf": "^3.0.2",
