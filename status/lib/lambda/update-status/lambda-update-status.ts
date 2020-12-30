@@ -17,6 +17,8 @@ interface UpdateStatusSecret {
     readonly statusPageRoadComponentGroupId: string
     readonly statusPageMarineComponentGroupId: string
     readonly statusPageRailComponentGroupId: string
+    readonly nodePingContactIdSlack1: string
+    readonly nodePingContactIdSlack2: string
 }
 
 const NODEPING_API = 'https://api.nodeping.com/api/1';
@@ -146,13 +148,15 @@ async function createNodepingCheck(
     endpoint: string,
     nodepingToken: string,
     subaccountId: string,
-    contactId: string,
+    contactIds: string[],
     app: string,
     extraData?: MonitoredEndpoint) {
 
     console.log('Creating NodePing check for endpoint', endpoint);
     const notification: any = {};
-    notification[`${contactId}`] = {'delay': 0, 'schedule': 'All'};
+    contactIds.forEach(contactId => {
+        notification[`${contactId}`] = {'delay': 0, 'schedule': 'All'};
+    });
     const data: any = {
         customerid: subaccountId,
         token: nodepingToken,
@@ -248,7 +252,11 @@ async function updateComponentsAndChecks(
         await createNodepingCheck(missingCheck,
             secret.nodePingToken,
             secret.nodepingSubAccountId,
-            Object.keys(contact['addresses'])[0] as string,
+            [
+                Object.keys(contact['addresses'])[0] as string,
+                secret.nodePingContactIdSlack1,
+                secret.nodePingContactIdSlack2
+            ],
             appEndpoints.hostPart,
             correspondingExtraEndpoint);
     }

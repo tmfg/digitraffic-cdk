@@ -19,9 +19,9 @@ export interface MonitoredApp {
 }
 
 export interface Props {
-    defaultLambdaDurationSeconds: number
-    logsDestinationArn: string
-    secretsManagerSecretArn: string
-    monitoredApps: MonitoredApp[]
-    allowFromIpAddresses: string[]
+    readonly defaultLambdaDurationSeconds: number
+    readonly logsDestinationArn: string
+    readonly secretsManagerSecretArn: string
+    readonly monitoredApps: MonitoredApp[]
+    readonly allowFromIpAddresses: string[]
 }
