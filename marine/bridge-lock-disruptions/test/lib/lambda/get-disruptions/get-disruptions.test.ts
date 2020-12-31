@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {handler} from '../../../../lib/lambda/get-disruptions/lambda-get-disruptions';
+import {handlerFn} from '../../../../lib/lambda/get-disruptions/lambda-get-disruptions';
 import {newDisruption} from "../../testdata";
 import {dbTestBase, insertDisruption} from "../../db-testutil";
 
@@ -11,7 +11,7 @@ describe('lambda-get-disruptions', dbTestBase((db: pgPromise.IDatabase<any,any>)
         });
         await insertDisruption(db, disruptions);
 
-        const response = await handler();
+        const response = await handlerFn();
 
         expect(response.features.length).toBe(disruptions.length);
     });

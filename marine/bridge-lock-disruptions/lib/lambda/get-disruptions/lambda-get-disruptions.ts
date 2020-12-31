@@ -1,5 +1,8 @@
 import {findAllDisruptions} from "../../service/disruptions";
+import {responseByMethod} from "../../../../../common/api/lambda-http";
 
-export const handler = async (): Promise<any> => {
+export async function handlerFn(): Promise<any> {
     return await findAllDisruptions();
-};
+}
+
+export const handler = responseByMethod(handlerFn);

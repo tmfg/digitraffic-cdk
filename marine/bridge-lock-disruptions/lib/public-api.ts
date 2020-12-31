@@ -55,16 +55,24 @@ function createDisruptionsResource(
     }));
 
     const resources = createResourcePaths(publicApi);
-    const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda);
+    const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda, {
+        requestTemplates: {
+            'application/json': JSON.stringify({
+                method: "$context.httpMethod",
+            })
+        }
+    });
 
-    resources.addMethod("GET", getDisruptionsIntegration, {
+    const methodOptions = {
         apiKeyRequired: true,
         requestValidator: validator,
         methodResponses: [
             corsMethodJsonResponse("200", disruptionsJsonModel),
             corsMethodJsonResponse("500", errorResponseModel)
         ]
-    });
+    };
+    resources.addMethod("GET", getDisruptionsIntegration, methodOptions);
+    resources.addMethod("HEAD", getDisruptionsIntegration, methodOptions);
 
     createSubscription(getDisruptionsLambda, functionName, props.logsDestinationArn, stack);
     addTags('GetDisruptions', ['bridge-lock-disruptions'], resources, stack);
