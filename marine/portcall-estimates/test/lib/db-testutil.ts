@@ -1,5 +1,5 @@
 import {IDatabase, ITask} from "pg-promise";
-import {initDbConnection} from "digitraffic-lambda-postgres/database";
+import {initDbConnection} from "../../../../common/postgres/database";
 import {ApiEstimate} from "../../lib/estimates/model/estimate";
 import {createUpdateValues, DbEstimate} from "../../lib/estimates/db/db-estimates";
 import {DocumentClient} from "aws-sdk/clients/dynamodb";

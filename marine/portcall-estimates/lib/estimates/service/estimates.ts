@@ -1,6 +1,6 @@
 import * as EstimatesDB from '../db/db-estimates'
 import {DbEstimate, DbEstimateIdAndLocode, DbETAShip, DbUpdatedEstimate} from '../db/db-estimates'
-import {inDatabase} from 'digitraffic-lambda-postgres/database';
+import {inDatabase} from '../../../../../common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiEstimate} from '../model/estimate';
 import {isPortnetEstimate} from "../../event-sourceutil";

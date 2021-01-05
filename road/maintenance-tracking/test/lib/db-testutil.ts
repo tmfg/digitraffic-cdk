@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {initDbConnection} from "digitraffic-lambda-postgres/database";
+import {initDbConnection} from "../../../../common/postgres/database";
 import {DbMaintenanceTrackingData} from "../../lib/db/db-maintenance-tracking";
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {

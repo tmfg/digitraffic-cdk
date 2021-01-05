@@ -3,7 +3,7 @@ import {
     findAll as dbFindAll,
     update as dbUpdate
 } from '../db/db-subsubjects';
-import {inDatabase} from "digitraffic-lambda-postgres/database";
+import {inDatabase} from "../../../../common/postgres/database";
 import {SubSubject} from "../model/subsubject";
 import {Locale} from "../model/locale";
 

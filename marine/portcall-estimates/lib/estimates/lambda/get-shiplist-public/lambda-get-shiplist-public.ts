@@ -1,5 +1,5 @@
 import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/db-shiplist-public';
-import {inDatabase} from 'digitraffic-lambda-postgres/database';
+import {inDatabase} from '../../../../../../common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';
 import * as R from 'ramda';

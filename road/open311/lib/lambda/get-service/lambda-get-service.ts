@@ -1,5 +1,5 @@
 import {find} from "../../service/services";
-import {NOT_FOUND_MESSAGE} from 'digitraffic-cdk-api/errors';
+import {NOT_FOUND_MESSAGE} from '../../../../../common/api/errors';
 
 export const handler = async (
     event: any

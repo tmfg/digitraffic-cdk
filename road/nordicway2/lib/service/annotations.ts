@@ -1,11 +1,13 @@
-import {inDatabase} from 'digitraffic-lambda-postgres/database';
+import {inDatabase} from '../../../../common/postgres/database';
+import {createFeatureCollection} from "../../../../common/api/geojson";
+import * as LastUpdatedDB from "../../../../common/db/last-updated";
+
 import * as AnnotationsDB from "../db/db-annotations";
+import {Annotation} from "../model/annotations";
+
 import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
 import {Geometry} from "wkx";
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
 import {IDatabase} from "pg-promise";
-import {Annotation} from "../model/annotations";
-import {createFeatureCollection} from "../../../../common/api/geojson";
 
 export async function findAllAnnotations(): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {

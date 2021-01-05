@@ -3,7 +3,7 @@ import {
     findAll as dbFindAll,
     update as dbUpdate
 } from '../db/db-states';
-import {inDatabase} from "digitraffic-lambda-postgres/database";
+import {inDatabase} from "../../../../common/postgres/database";
 import {ServiceRequestState} from "../model/service-request-state";
 import {Locale} from "../model/locale";
 

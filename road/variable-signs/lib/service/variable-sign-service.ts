@@ -1,4 +1,4 @@
-import {inDatabase} from 'digitraffic-lambda-postgres/database';
+import {inDatabase} from '../../../../common/postgres/database';
 import * as LastUpdatedDB from "../../../../common/db/last-updated";
 import * as DatexDB from "../db/db-datex2";
 import {IDatabase} from "pg-promise";

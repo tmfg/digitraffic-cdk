@@ -6,7 +6,7 @@ import {
     update as dbUpdate
 } from '../db/db-requests';
 import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
-import {inDatabase} from "digitraffic-lambda-postgres/database";
+import {inDatabase} from "../../../../common/postgres/database";
 
 export async function findAll(
     extensions: Boolean

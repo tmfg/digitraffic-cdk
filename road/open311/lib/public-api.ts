@@ -1,22 +1,24 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
-import {createIpRestrictionPolicyDocument} from '../../../common/api/rest_apis';
 import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct, Stack} from "@aws-cdk/core";
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {default as ServiceSchema} from './model/service-schema';
-import {default as RequestSchema} from './model/request-schema';
-import {default as StateSchema} from './model/state-schema';
-import {default as SubjectSchema} from './model/subject-schema';
-import {default as SubSubjectSchema} from './model/subsubject-schema';
-import {MessageModel} from 'digitraffic-cdk-api/response';
-import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-cdk-api/utils';
+
+import {createIpRestrictionPolicyDocument} from '../../../common/api/rest_apis';
+import {MessageModel} from '../../../common/api/response';
+import {addDefaultValidator, addServiceModel, createArraySchema} from '../../../common/api/utils';
 import {createSubscription} from "../../../common/stack/subscription";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {corsMethodJsonResponse, defaultIntegration} from "../../../common/api/responses";
 import {addTags} from "../../../common/api/documentation";
 import {DATA_V1_TAGS} from "../../../common/api/tags";
+import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
+
+import {default as ServiceSchema} from './model/service-schema';
+import {default as RequestSchema} from './model/request-schema';
+import {default as StateSchema} from './model/state-schema';
+import {default as SubjectSchema} from './model/subject-schema';
+import {default as SubSubjectSchema} from './model/subsubject-schema';
 
 export function create(
     vpc: ec2.IVpc,

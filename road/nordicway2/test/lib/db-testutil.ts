@@ -1,5 +1,6 @@
+import {inDatabase} from "../../../../common/postgres/database";
+
 import {IDatabase} from "pg-promise";
-import {inDatabase} from "digitraffic-lambda-postgres/database";
 
 export function testBase(fn: (arg0: any) => void) {
     return () => {

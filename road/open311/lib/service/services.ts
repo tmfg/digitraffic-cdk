@@ -4,7 +4,7 @@ import {
     find as dbFind,
     update as dbUpdate
 } from '../db/db-services';
-import {inDatabase} from "digitraffic-lambda-postgres/database";
+import {inDatabase} from "../../../../common/postgres/database";
 import {Service} from "../model/service";
 
 export async function findAll(): Promise<Service[]> {

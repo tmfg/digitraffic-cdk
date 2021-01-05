@@ -1,4 +1,4 @@
-import {getDocumentClient} from 'digitraffic-dynamodb/dynamodb';
+import {getDocumentClient} from '../../../../../common/dynamodb/dynamodb';
 import {DocumentClient} from 'aws-sdk/clients/dynamodb';
 import moment from 'moment';
 

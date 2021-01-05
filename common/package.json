@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "license": "EUPL",
+  "scripts": {
+    "build": "tsc"
+  },
   "devDependencies": {
     "typescript": "3.9.7"
   },

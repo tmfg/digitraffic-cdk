@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {initDbConnection} from "digitraffic-lambda-postgres/database";
+import {initDbConnection} from "../../../../common/postgres/database";
 import {ServiceRequest} from "../../lib/model/service-request";
 import {createEditObject} from "../../lib/db/db-requests";
 

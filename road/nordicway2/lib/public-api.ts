@@ -7,7 +7,7 @@ import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {default as AnnotationSchema} from './model/annotation-schema';
 import {createSubscription} from '../../../common/stack/subscription';
-import {addServiceModel} from 'digitraffic-cdk-api/utils';
+import {addServiceModel} from '../../../common/api/utils';
 import {MessageModel} from "../../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../../common/model/geojson";
 import {getModelReference} from "../../../common/api/utils";

@@ -1,6 +1,7 @@
-import {inDatabase} from 'digitraffic-lambda-postgres/database';
-import * as pgPromise from "pg-promise";
+import {inDatabase} from '../../../../common/postgres/database';
 import * as LastUpdatedDB from "../../../../common/db/last-updated";
+
+import * as pgPromise from "pg-promise";
 
 export function lastUpdated() {
     return inDatabase(async (db: pgPromise.IDatabase<any,any>) => {

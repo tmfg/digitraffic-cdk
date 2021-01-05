@@ -5,7 +5,7 @@ import * as SubscriptionDB from '../db/db-subscriptions';
 import * as ShiplistDb from "../db/db-shiplist";
 import {DbShipsToNotificate, DbSubscription} from "../db/db-subscriptions";
 import {EstimateRemoval, EstimateSubscription, TIME_FORMAT, validateSubscription} from "../model/subscription";
-import {inTransaction} from "digitraffic-lambda-postgres/database";
+import {inTransaction} from "../../../../../common/postgres/database";
 import {ShiplistEstimate} from "../db/db-shiplist";
 import {getStartTime} from "../timeutil";
 import {PinpointService, default as pinpointService} from "./pinpoint";

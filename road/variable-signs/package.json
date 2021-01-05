@@ -37,9 +37,6 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "digitraffic-lambda-postgres": "file:../../common/postgres",
-    "digitraffic-lambda-stack": "file:../../common/stack",
-    "digitraffic-cdk-api": "file:../../common/api",
     "@aws-cdk/aws-apigateway": "1.77.0",
     "@aws-cdk/core": "1.77.0",
     "@aws-cdk/aws-events-targets": "1.77.0",
