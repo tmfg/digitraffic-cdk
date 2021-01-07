@@ -17,7 +17,7 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.82.0",
+    "@aws-cdk/assert": "1.83.0",
     "@types/aws-lambda": "^8.10.64",
     "@types/jest": "^26.0.15",
     "@types/node": "v14.0.27",
@@ -36,10 +36,10 @@
     "node-fetch": "^2.6.1"
   },
   "dependencies": {
-    "@aws-cdk/aws-events": "1.82.0",
-    "@aws-cdk/aws-events-targets": "1.82.0",
-    "@aws-cdk/aws-iam": "1.82.0",
-    "@aws-cdk/core": "1.82.0",
+    "@aws-cdk/aws-events": "1.83.0",
+    "@aws-cdk/aws-events-targets": "1.83.0",
+    "@aws-cdk/aws-iam": "1.83.0",
+    "@aws-cdk/core": "1.83.0",
     "@types/node-fetch": "^2.5.7",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
