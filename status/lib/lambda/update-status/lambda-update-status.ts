@@ -1,24 +1,13 @@
 import axios from 'axios';
 import {EndpointProtocol, MonitoredApp, MonitoredEndpoint} from '../../app-props';
 import {SecretsManager} from 'aws-sdk';
+import {UpdateStatusSecret} from "../../secret";
 
 interface AppEndpoints {
     readonly app: string
     readonly hostPart: string
     readonly endpoints: string[]
     readonly extraEndpoints: MonitoredEndpoint[]
-}
-
-interface UpdateStatusSecret {
-    readonly nodePingToken: string
-    readonly nodepingSubAccountId: string
-    readonly statuspagePageId: string
-    readonly statuspageApiKey: string
-    readonly statusPageRoadComponentGroupId: string
-    readonly statusPageMarineComponentGroupId: string
-    readonly statusPageRailComponentGroupId: string
-    readonly nodePingContactIdSlack1: string
-    readonly nodePingContactIdSlack2: string
 }
 
 const NODEPING_API = 'https://api.nodeping.com/api/1';

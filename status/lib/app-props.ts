@@ -24,4 +24,5 @@ export interface Props {
     readonly secretsManagerSecretArn: string
     readonly monitoredApps: MonitoredApp[]
     readonly allowFromIpAddresses: string[]
+    readonly statusPageUrl: string
 }
