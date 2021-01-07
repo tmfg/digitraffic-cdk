@@ -17,7 +17,7 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.77.0",
+    "@aws-cdk/assert": "1.82.0",
     "@shelf/jest-dynamodb": "^1.7.0",
     "@types/aws-lambda": "^8.10.64",
     "@types/jest": "^26.0.15",
@@ -40,29 +40,29 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "@aws-cdk/aws-cloudwatch-actions": "1.77.0",
-    "@aws-cdk/aws-apigateway": "1.77.0",
-    "@aws-cdk/aws-dynamodb": "1.77.0",
-    "@aws-cdk/aws-events": "1.77.0",
-    "@aws-cdk/aws-events-targets": "1.77.0",
-    "@aws-cdk/aws-iam": "1.77.0",
-    "@aws-cdk/aws-lambda-event-sources": "1.77.0",
-    "@aws-cdk/aws-pinpoint": "1.77.0",
-    "@aws-cdk/aws-sns": "1.77.0",
-    "@aws-cdk/aws-sqs": "1.77.0",
-    "@aws-cdk/core": "1.77.0",
+    "@aws-cdk/aws-cloudwatch-actions": "1.82.0",
+    "@aws-cdk/aws-apigateway": "1.82.0",
+    "@aws-cdk/aws-dynamodb": "1.82.0",
+    "@aws-cdk/aws-events": "1.82.0",
+    "@aws-cdk/aws-events-targets": "1.82.0",
+    "@aws-cdk/aws-iam": "1.82.0",
+    "@aws-cdk/aws-lambda-event-sources": "1.82.0",
+    "@aws-cdk/aws-pinpoint": "1.82.0",
+    "@aws-cdk/aws-sns": "1.82.0",
+    "@aws-cdk/aws-sqs": "1.82.0",
+    "@aws-cdk/core": "1.82.0",
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",
     "@types/ramda": "^0.27.32",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
     "pg-native": "3.0.0",
-    "pg-promise": "10.3.5",
-    "pg-query-stream": "3.2.0",
+    "pg-promise": "10.8.6",
+    "pg-query-stream": "4.0.0",
     "source-map-support": "^0.5.19",
     "ramda": "^0.27.1",
     "uuid": "^8.3.1",
-    "axios": "v0.21.0"
+    "axios": "v0.21.1"
   },
   "externals": [
     "aws-sdk"
