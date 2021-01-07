@@ -5,6 +5,8 @@
 # exit on any error
 set -ex
 
+PACKAGE=${1:-@aws-cdk}
+
 function updateInDirectory() {
     if [ "$1" != "./elasticsearch" ]; then
       cd "$1"
@@ -12,7 +14,7 @@ function updateInDirectory() {
       if [ -f package.json ]; then
         rm -f package-lock.json
         rm -rf node_modules
-        ncu -f /@aws-cdk/ -u
+        ncu -f /$PACKAGE/ -u
 
         npm install
       fi

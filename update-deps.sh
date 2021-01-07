@@ -12,7 +12,9 @@ function updateInDirectory() {
       if [ -f package.json ]; then
         rm -f package-lock.json
         rm -rf node_modules
+
         npm install
+        npm update
         npm run build
       fi
 

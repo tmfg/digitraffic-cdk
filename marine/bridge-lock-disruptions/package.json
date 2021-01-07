@@ -43,7 +43,7 @@
     "@aws-cdk/aws-secretsmanager": "1.82.0",
     "@types/geojson": "^7946.0.7",
     "@types/moment": "^2.13.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "geojson-validation": "^1.0.2",
     "parse-link-header": "^1.0.1",
     "pg-native": "3.0.0",
