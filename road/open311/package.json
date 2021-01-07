@@ -45,7 +45,7 @@
     "pg-promise": "10.8.6",
     "source-map-support": "^0.5.19",
     "@aws-cdk/aws-events-targets": "1.82.0",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "aws-sdk": "^2.726.0"
   },
   "externals": [
