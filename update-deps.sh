@@ -5,23 +5,36 @@
 # exit on any error
 set -ex
 
-function update() {
-  for d in $(find ./* -maxdepth 0 -type d); do
-    if [ "$d" != "./elasticsearch" ]; then
-      cd "$d"
-      rm -f package-lock.json
-      rm -rf node_modules
-      npm install
-      npm run build
+function updateInDirectory() {
+    if [ "$1" != "./elasticsearch" ]; then
+      cd "$1"
+
+      if [ -f package.json ]; then
+        rm -f package-lock.json
+        rm -rf node_modules
+        npm install
+        npm run build
+      fi
+
       cd ..
     fi
-  done
+
 }
 
-cd road
-update
-cd ..
+function updateAllInDirectory() {
+  cd "$1"
 
-cd marine
-update
-cd ..
+  for d in $(find ./* -maxdepth 0 -type d); do
+    updateInDirectory $d
+  done
+
+  cd ..
+}
+
+updateInDirectory common
+updateInDirectory cloudfront
+updateInDirectory user-management
+updateInDirectory swagger-joiner
+
+updateAllInDirectory road
+updateAllInDirectory marine

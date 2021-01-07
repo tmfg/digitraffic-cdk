@@ -5,29 +5,37 @@
 # exit on any error
 set -ex
 
-function update() {
-  for d in $(find ./* -maxdepth 0 -type d); do
-    if [ "$d" != "./elasticsearch" ]; then
-      cd "$d"
+function updateInDirectory() {
+    if [ "$1" != "./elasticsearch" ]; then
+      cd "$1"
+
       if [ -f package.json ]; then
-        ncu -f /@aws-cdk/ -u
         rm -f package-lock.json
         rm -rf node_modules
+        ncu -f /@aws-cdk/ -u
+
         npm install
       fi
+
       cd ..
     fi
-  done
+
 }
 
-cd common
-update
-cd ..
+function updateAllInDirectory() {
+  cd "$1"
 
-cd road
-update
-cd ..
+  for d in $(find ./* -maxdepth 0 -type d); do
+    updateInDirectory $d
+  done
 
-cd marine
-update
-cd ..
+  cd ..
+}
+
+updateInDirectory common
+updateInDirectory cloudfront
+updateInDirectory user-management
+updateInDirectory swagger-joiner
+
+updateAllInDirectory road
+updateAllInDirectory marine
