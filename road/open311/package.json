@@ -42,7 +42,7 @@
     "@aws-cdk/aws-apigateway": "1.83.0",
     "@aws-cdk/core": "1.83.0",
     "pg-native": "3.0.0",
-    "pg-promise": "10.8.6",
+    "pg-promise": "10.3.5",
     "source-map-support": "^0.5.19",
     "@aws-cdk/aws-events-targets": "1.83.0",
     "axios": "^0.21.1",

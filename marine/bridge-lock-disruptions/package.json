@@ -47,7 +47,7 @@
     "geojson-validation": "^1.0.2",
     "parse-link-header": "^1.0.1",
     "pg-native": "3.0.0",
-    "pg-promise": "10.8.6",
+    "pg-promise": "10.3.5",
     "pg-query-stream": "4.0.0",
     "source-map-support": "^0.5.19",
     "wkx": "^0.5.0",
