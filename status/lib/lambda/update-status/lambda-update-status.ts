@@ -153,6 +153,7 @@ async function createNodepingCheck(
         type: extraData?.protocol == EndpointProtocol.WebSocket ? 'WEBSOCKET' : 'HTTPADV',
         target: extraData?.url ?? `https://${app}.digitraffic.fi${endpoint}`,
         interval: 5,
+        threshold: 30,
         enabled: true,
         follow: true,
         sendheaders: {'accept-encoding': 'gzip'},
