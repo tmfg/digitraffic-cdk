@@ -1,5 +1,5 @@
 import {AssetCode, Function, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
-import {Stack} from '@aws-cdk/core';
+import {Duration, Stack} from '@aws-cdk/core';
 import {createSubscription} from '../../common/stack/subscription';
 import {Props} from './app-props';
 import {RetentionDays} from "@aws-cdk/aws-logs";
@@ -7,6 +7,8 @@ import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Bucket} from "@aws-cdk/aws-s3";
 import {KEY_BUCKET_NAME, KEY_REGION, KEY_APP_URL, KEY_APIGW_APPS} from "./lambda/update-swagger/lambda-update-swagger";
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
+import {Rule, Schedule} from "@aws-cdk/aws-events";
+import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 
 export function create(
     bucket: Bucket,
@@ -66,6 +68,7 @@ function createUpdateSwaggerDescriptionsLambda(
         code: new AssetCode('dist/lambda/update-swagger'),
         handler: 'lambda-update-swagger.handler',
         runtime: Runtime.NODEJS_12_X,
+        memorySize: 192,
         environment: lambdaEnv
     };
 
@@ -82,4 +85,11 @@ function createUpdateSwaggerDescriptionsLambda(
     updateSwaggerLambda.addToRolePolicy(statement);
 
     createSubscription(updateSwaggerLambda, functionName, props.logsDestinationArn, stack);
+
+    const ruleName = 'UpdateSwaggerRule';
+    const rule = new Rule(stack, ruleName, {
+        schedule: Schedule.rate(Duration.hours(1)),
+        ruleName
+    });
+    rule.addTarget(new LambdaFunction(updateSwaggerLambda));
 }

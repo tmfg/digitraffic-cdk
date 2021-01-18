@@ -9,7 +9,7 @@ describe('apigw-utils', () => {
 
     test('exportSwaggerApi', async () => {
         const apiId = 'some-api-id';
-        const getExportStub = sandbox.stub().returns({promise: () => new Promise((resolve) => resolve())});
+        const getExportStub = sandbox.stub().returns({promise: () => new Promise<void>((resolve) => resolve())});
         sandbox.stub(AWS, 'APIGateway').returns({
             getExport: getExportStub
         });
@@ -25,7 +25,7 @@ describe('apigw-utils', () => {
 
     test('getDocumentationVersion', async () => {
         const apiId = 'some-api-id';
-        const getDocumentationVersionsStub = sandbox.stub().returns({promise: () => new Promise((resolve) => resolve())});
+        const getDocumentationVersionsStub = sandbox.stub().returns({promise: () => new Promise<void>((resolve) => resolve())});
         sandbox.stub(AWS, 'APIGateway').returns({
             getDocumentationVersions: getDocumentationVersionsStub
         });
@@ -40,7 +40,7 @@ describe('apigw-utils', () => {
     test('createDocumentationVersion', async () => {
         const apiId = 'some-api-id';
         const docVersion = Math.ceil(10 * Math.random());
-        const createDocumentationVersionStub = sandbox.stub().returns({promise: () => new Promise((resolve) => resolve())});
+        const createDocumentationVersionStub = sandbox.stub().returns({promise: () => new Promise<void>((resolve) => resolve())});
         sandbox.stub(AWS, 'APIGateway').returns({
             createDocumentationVersion: createDocumentationVersionStub
         });
