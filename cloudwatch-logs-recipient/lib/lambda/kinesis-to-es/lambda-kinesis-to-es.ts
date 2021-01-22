@@ -7,6 +7,7 @@ import {
 } from "aws-lambda";
 
 import * as AWSx from "aws-sdk";
+import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 
@@ -139,7 +140,7 @@ export function isLambdaLifecycleEvent(message: string) {
     return message.startsWith('START RequestId') || message.startsWith('END RequestId') || message.startsWith('REPORT RequestId');
 }
 
-export function buildSource(message: string, extractedFields: { [key: string]: string } | undefined): any {
+export function buildSource(message: string, extractedFields: CloudWatchLogsLogEventExtractedFields | undefined): any {
     let jsonSubString: any;
 
     message = message.replace("[, ]", "[0.0,0.0]")
@@ -165,9 +166,11 @@ export function buildSource(message: string, extractedFields: { [key: string]: s
                     continue;
                 }
 
-                jsonSubString = extractJson(value);
-                if (jsonSubString !== null) {
-                    source["$" + key] = JSON.parse(jsonSubString);
+                if (value) {
+                    jsonSubString = extractJson(value);
+                    if (jsonSubString !== null) {
+                        source["$" + key] = JSON.parse(jsonSubString);
+                    }
                 }
 
                 source[key] = value;
