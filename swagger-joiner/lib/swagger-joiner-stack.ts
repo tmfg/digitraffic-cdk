@@ -15,24 +15,28 @@ export class SwaggerJoinerStack extends Stack {
     private createBucket(swaggerJoinerProps: Props) {
         const bucket = new Bucket(this, 'SwaggerBucket', {
             bucketName: swaggerJoinerProps.bucketName,
+            publicReadAccess: swaggerJoinerProps.s3Website,
+            websiteIndexDocument: swaggerJoinerProps.s3Website ? 'index.html' : undefined,
             cors: [{
                 allowedOrigins: ['*'],
                 allowedMethods: [HttpMethods.GET]
             }]
         });
 
-        const getObjectStatement = new PolicyStatement({
-            effect: Effect.ALLOW,
-            actions: ['s3:GetObject'],
-            conditions: {
-                StringEquals: {
-                    'aws:sourceVpce': swaggerJoinerProps.s3VpcEndpointId
-                }
-            },
-            resources: [`${bucket.bucketArn}/*`]
-        });
-        getObjectStatement.addAnyPrincipal();
-        bucket.addToResourcePolicy(getObjectStatement);
+        if (!swaggerJoinerProps.s3Website && swaggerJoinerProps.s3VpcEndpointId) {
+            const getObjectStatement = new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ['s3:GetObject'],
+                conditions: {
+                    StringEquals: {
+                        'aws:sourceVpce': swaggerJoinerProps.s3VpcEndpointId
+                    }
+                },
+                resources: [`${bucket.bucketArn}/*`]
+            });
+            getObjectStatement.addAnyPrincipal();
+            bucket.addToResourcePolicy(getObjectStatement);
+        }
 
         return bucket;
     }

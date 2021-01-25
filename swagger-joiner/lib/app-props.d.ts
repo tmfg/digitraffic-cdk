@@ -1,12 +1,16 @@
 export interface Props {
     // Digitraffic application URL
-    appUrl: string;
+    readonly appUrl: string;
+    // Digitraffic beta application URL
+    readonly betaAppUrl?: string
     // API Gateway API ids
-    apiGwAppIds: string[];
+    readonly apiGwAppIds: string[];
     // log destination ARN
-    logsDestinationArn: string;
+    readonly logsDestinationArn: string;
     // bucket where merged Swagger description is stored
-    bucketName: string;
+    readonly bucketName: string;
     // S3 VPC endpoint id
-    s3VpcEndpointId: string;
+    readonly s3VpcEndpointId: string;
+    // S3 website, s3VpcEndpointId is ignored if true
+    readonly s3Website: boolean
 }
