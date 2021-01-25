@@ -67,7 +67,7 @@ function createEmailTopic(stack: Stack, appProps: Props) {
 
 function createLambdaTrigger(stack: Stack, lambdaFunction: Function) {
     const rule = new Rule(stack, 'MaintenanceTrackingLogWatcherScheduler', {
-        schedule: Schedule.cron( { weekDay: 'MON', hour: '01', minute: '01' } )
+        schedule: Schedule.cron( { weekDay: 'MON', hour: '1', minute: '0' } )
     });
     rule.addTarget(new LambdaFunction(lambdaFunction));
 }

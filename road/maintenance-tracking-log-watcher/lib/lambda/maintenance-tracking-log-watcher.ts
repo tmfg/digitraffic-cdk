@@ -18,7 +18,7 @@ const path = '_search'
 export const handler = async (): Promise <void> => {
     const fromISOString = moment().subtract(1, 'weeks').startOf('isoWeek').toDate().toISOString();
     const toISOString = moment().subtract(1, 'weeks').endOf('isoWeek').toDate().toISOString();
-    console.info(`method=maintenanceTrackingLogWatcherHandler from ${fromISOString} to ${toISOString}`)
+    console.info(`method=maintenanceTrackingLogWatcherHandler start from ${fromISOString} to ${toISOString}`)
 
     const start = Date.now();
 
@@ -41,6 +41,9 @@ export const handler = async (): Promise <void> => {
                     return await snsService.sendEmail(log, snsTopicArn);
                 }
             });
+    } catch (error) {
+        console.error(`method=maintenanceTrackingLogWatcherHandler Error in execution from ${fromISOString} to ${toISOString} error=${error}`);
+        return Promise.reject(error);
     } finally {
         console.info(`method=maintenanceTrackingLogWatcherHandler from ${fromISOString} to ${toISOString} tookMs=${(Date.now()-start)}`);
     }
