@@ -1,4 +1,4 @@
-import {SecretsManager} from "aws-sdk";
+import {SecretsManager} from 'aws-sdk';
 
 const smClient = new SecretsManager({
     region: process.env.AWS_REGION

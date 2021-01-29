@@ -16,11 +16,13 @@ import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addTags} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
+    secret: ISecret,
     stack: Construct) {
     const publicApi = createApi(stack, props);
 
@@ -32,7 +34,7 @@ export function create(
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId)));
     const disruptionsModel = addServiceModel("DisruptionsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    createDisruptionsResource(publicApi, vpc, props, lambdaDbSg, disruptionsModel, validator, stack);
+    createDisruptionsResource(publicApi, vpc, props, lambdaDbSg, disruptionsModel, validator, secret, stack);
 }
 
 function createDisruptionsResource(
@@ -42,6 +44,7 @@ function createDisruptionsResource(
     lambdaDbSg: ISecurityGroup,
     disruptionsJsonModel: any,
     validator: RequestValidator,
+    secret: ISecret,
     stack: Construct): Function {
 
     const functionName = 'BridgeLockDisruption-GetDisruptions';
@@ -51,8 +54,13 @@ function createDisruptionsResource(
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-disruptions.handler',
-        readOnly: false
+        readOnly: false,
+        environment: {
+            SECRET_ID: props.secretId
+        }
     }));
+
+    secret.grantRead(getDisruptionsLambda);
 
     const resources = createResourcePaths(publicApi);
     const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda);

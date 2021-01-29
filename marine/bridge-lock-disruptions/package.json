@@ -7,10 +7,10 @@
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
-    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-minify --public-url dist/lambda",
+    "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
     "watch": "tsc -w",
-    "parcel-watch": "parcel watch lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules",
-    "watch-bundle": "parallelshell \"npm run watch\" \"npm run parcel-watch\"",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
@@ -25,6 +25,7 @@
     "@types/xml2js": "^0.4.5",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
     "@typescript-eslint/parser": "^4.12.0",
+    "esbuild": "^0.8.36",
     "eslint": "^7.13.0",
     "jest": "^26.2.2",
     "parallelshell": "3.0.1",
@@ -51,9 +52,7 @@
     "pg-query-stream": "4.0.0",
     "source-map-support": "^0.5.19",
     "wkx": "^0.5.0",
-    "xml2js": "v0.4.23"
-  },
-  "externals": [
-    "aws-sdk"
-  ]
+    "xml2js": "v0.4.23",
+    "aws-sdk": "2.821.0"
+  }
 }

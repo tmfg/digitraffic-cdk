@@ -6,11 +6,13 @@ import {Stack, Duration} from '@aws-cdk/core';
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createSubscription} from '../../../common/stack/subscription';
 import {Props} from "./app-props";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
+    secret: ISecret,
     stack: Stack): Function {
 
     const functionName = "BridgeLockDisruption-UpdateDisruptions";
@@ -19,14 +21,13 @@ export function create(
         code: new AssetCode('dist/lambda/update-disruptions'),
         handler: 'lambda-update-disruptions.handler',
         environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri,
-            ENDPOINT_URL: props.endpointUrl
+            SECRET_ID: props.secretId
         }
     });
 
     const updateDisruptionsLambda = new Function(stack, 'UpdateDisruptions', lambdaConf);
+
+    secret.grantRead(updateDisruptionsLambda);
 
     const rule = new Rule(stack, 'Rule', {
         schedule: Schedule.rate(Duration.minutes(10))

@@ -2,6 +2,8 @@ import * as pgPromise from "pg-promise";
 import {initDbConnection} from "../../../../common/postgres/database";
 import {SpatialDisruption} from "../../lib/model/disruption";
 import {createEditObject} from "../../lib/db/db-disruptions";
+import * as sinon from 'sinon';
+import * as AWS from 'aws-sdk';
 
 export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
     return () => {
@@ -32,9 +34,9 @@ export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
 
 export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {
     return db.tx(t => {
-       return t.batch([
-           db.none('DELETE FROM bridgelock_disruption'),
-       ]);
+        return t.batch([
+            db.none('DELETE FROM bridgelock_disruption'),
+        ]);
     });
 }
 
@@ -42,24 +44,22 @@ export function insertDisruption(db: pgPromise.IDatabase<any, any>, disruptions:
     return db.tx(t => {
         const queries: any[] = disruptions.map(disruption => {
             return t.none(
-                `INSERT INTO bridgelock_disruption(
-                                  id,
-                                  type_id,
-                                  start_date,
-                                  end_date,
-                                  geometry,
-                                  description_fi,
-                                  description_sv,
-                                  description_en)
-                           VALUES (
-                                  $(id),
-                                  $(type_id),
-                                  $(start_date),
-                                  $(end_date),
-                                  ST_GeomFromGeoJSON($(geometry)),
-                                  $(description_fi),
-                                  $(description_sv),
-                                  $(description_en))`,
+                `INSERT INTO bridgelock_disruption(id,
+                                                   type_id,
+                                                   start_date,
+                                                   end_date,
+                                                   geometry,
+                                                   description_fi,
+                                                   description_sv,
+                                                   description_en)
+                 VALUES ($(id),
+                         $(type_id),
+                         $(start_date),
+                         $(end_date),
+                         ST_GeomFromGeoJSON($(geometry)),
+                         $(description_fi),
+                         $(description_sv),
+                         $(description_en))`,
                 createEditObject(disruption));
         });
         return t.batch(queries);

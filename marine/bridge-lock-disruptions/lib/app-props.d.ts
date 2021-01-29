@@ -1,16 +1,9 @@
 export interface Props {
-    vpcId: string;
-    privateSubnetIds: string[];
-    availabilityZones: string[];
-    lambdaDbSgId: string;
-    dbProps: DbProps;
-    defaultLambdaDurationSeconds: number;
-    logsDestinationArn: string;
-    endpointUrl: string;
-}
-export interface DbProps {
-    username: string;
-    password: string;
-    uri: string;
-    ro_uri: string;
+    readonly vpcId: string;
+    readonly privateSubnetIds: string[];
+    readonly availabilityZones: string[];
+    readonly lambdaDbSgId: string;
+    readonly defaultLambdaDurationSeconds: number;
+    readonly logsDestinationArn: string;
+    readonly secretId: string
 }

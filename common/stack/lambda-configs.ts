@@ -10,7 +10,7 @@ export interface LambdaConfiguration {
     privateSubnetIds: string[];
     availabilityZones: string[];
     lambdaDbSgId: string;
-    dbProps: DbProps;
+    dbProps?: DbProps;
     defaultLambdaDurationSeconds?: number;
     logsDestinationArn: string;
     memorySize?: number,
@@ -45,9 +45,9 @@ export function dbLambdaConfiguration(
         handler: config.handler,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds || 60),
         environment: config.environment || {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: config.readOnly ? props.dbProps.ro_uri : props.dbProps.uri
+            DB_USER: props.dbProps?.username,
+            DB_PASS: props.dbProps?.password,
+            DB_URI: config.readOnly ? props.dbProps?.ro_uri : props.dbProps?.uri
         },
         logRetention: RetentionDays.ONE_YEAR,
         vpc: vpc,

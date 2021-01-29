@@ -6,19 +6,35 @@ export interface DbSecret {
     readonly url: string
 }
 
-function setSecret(secret: DbSecret) {
+function setDbSecret(secret: DbSecret) {
     process.env.DB_USER = secret.username;
     process.env.DB_PASS = secret.password;
     process.env.DB_URI = secret.url;
 }
 
-function dbSecretUnset() {
-    return !process.env.DB_USER || !process.env.DB_PASS || !process.env.DB_URI;
-}
+// cached at Lambda container level
+let cachedSecret: any;
 
-export async function withDbSecret<T>(secretId: string, fn: () => T): Promise<T> {
-    if (dbSecretUnset()) {
-        await withSecret(secretId, setSecret);
+export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T): Promise<T> {
+    if (!secretId) {
+        console.warn('Missing or empty secretId');
     }
-    return fn();
+
+    if (!cachedSecret) {
+        await withSecret(secretId, (fetchedSecret: any) => {
+            setDbSecret(fetchedSecret);
+            cachedSecret = fetchedSecret;
+        });
+    }
+    try {
+        return await fn(cachedSecret);
+    } catch (error) {
+        console.error('method=withDbSecret Caught an error, refreshing secret', error);
+        // try to refetch secret in case it has changed
+        await withSecret(secretId, (fetchedSecret: any) => {
+            setDbSecret(fetchedSecret);
+            cachedSecret = fetchedSecret;
+        });
+        return fn(cachedSecret);
+    }
 }
