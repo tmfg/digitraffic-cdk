@@ -15,9 +15,12 @@ function setDbSecret(secret: DbSecret) {
 // cached at Lambda container level
 let cachedSecret: any;
 
+const missingSecretErrorText = 'Missing or empty secretId';
+
 export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T): Promise<T> {
     if (!secretId) {
-        console.warn('Missing or empty secretId');
+        console.error(missingSecretErrorText);
+        return Promise.reject(missingSecretErrorText);
     }
 
     if (!cachedSecret) {
