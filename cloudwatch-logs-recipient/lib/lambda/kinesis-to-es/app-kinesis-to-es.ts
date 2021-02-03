@@ -3,8 +3,12 @@ const zlib = require('zlib');
 const crypto = require('crypto');
 
 import {KinesisStreamEvent, KinesisStreamRecord} from "aws-lambda";
+import {SNS} from "aws-sdk";
 
 const endpoint = process.env.ES_ENDPOINT as string;
+const topicArn = process.env.TOPIC_ARN as string;
+
+const sns = new SNS();
 
 export const handler = function(event: KinesisStreamEvent, context: any) {
     try {
@@ -70,6 +74,15 @@ function postToElastic(context: any, awslogsData: any|null, elasticsearchBulkDat
 
 function notifyFailedItems(failedItems: any[]) {
     console.log("failed items " + JSON.stringify(failedItems));
+
+    sns.publish({
+        TopicArn: topicArn,
+        Message: JSON.stringify(failedItems)
+    }, (err: any, data: any) => {
+        if(err) {
+            console.info("publish failed " + err);
+        }
+    });
 }
 
 function getFailedIds(failedItems: any[]): string[] {
@@ -136,8 +149,8 @@ function buildSource(message: string, extractedFields: any[]) {
 
 function buildFromMessage(message: string): any {
     message = message.replace('[, ]', '[0.0,0.0]')
-//        .replace(/\"Infinity\"/g, "-1")
-//        .replace(/Infinity/gi, "-1")
+        .replace(/\"Infinity\"/g, "-1")
+        .replace(/Infinity/gi, "-1")
         .replace(/\\n/g, "\\n")
         .replace(/\\'/g, "\\'")
         .replace(/\\"/g, '\\"')

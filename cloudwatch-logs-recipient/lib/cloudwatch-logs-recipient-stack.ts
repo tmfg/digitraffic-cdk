@@ -1,11 +1,13 @@
 ///<reference path="../lib/app-props.d.ts"/>
 import {Stack, StackProps, Construct}  from '@aws-cdk/core';
-import * as iam from '@aws-cdk/aws-iam';
-import * as logs from '@aws-cdk/aws-logs';
-import * as kinesis from '@aws-cdk/aws-kinesis';
+import {Role, ServicePrincipal, PolicyStatement} from '@aws-cdk/aws-iam';
+import {CrossAccountDestination, CfnDestination, RetentionDays} from '@aws-cdk/aws-logs';
+import {Stream} from '@aws-cdk/aws-kinesis';
 import {Function, AssetCode, Runtime, StartingPosition} from '@aws-cdk/aws-lambda';
-import * as lambdaEventSources from '@aws-cdk/aws-lambda-event-sources';
+import {KinesisEventSource} from '@aws-cdk/aws-lambda-event-sources';
 import {Duration} from "@aws-cdk/core";
+import {Topic} from '@aws-cdk/aws-sns';
+import {EmailSubscription} from '@aws-cdk/aws-sns-subscriptions';
 
 export class CloudWatchLogsRecipientStack extends Stack {
     constructor(scope: Construct, id: string, cwlrProps: Props, props?: StackProps) {
@@ -28,21 +30,35 @@ export class CloudWatchLogsRecipientStack extends Stack {
             writeAppLogsToKinesisRole,
             cwlrProps.accounts.map(a => a.accountNumber));
 
+        const emailSqsTopic = this.createEmailTopic(cwlrProps.errorEmail);
+
         const lambdaRole = this.createWriteToElasticLambdaRole(cwlrProps.elasticSearchDomainArn, [lambdaLogsToESStream.streamArn, appLogsTOEsStream.streamArn]);
         const lambdaLogsToESLambda = this.createWriteLambdaLogsToElasticLambda(lambdaRole, JSON.stringify(cwlrProps.accounts), cwlrProps.elasticSearchEndpoint);
-        const appLogsToESLambda = this.createWriteAppLogsToElasticLambda(lambdaRole, cwlrProps.elasticSearchEndpoint);
+        const appLogsToESLambda = this.createWriteAppLogsToElasticLambda(lambdaRole, emailSqsTopic.topicArn, cwlrProps.elasticSearchEndpoint);
 
-        lambdaLogsToESLambda.addEventSource(new lambdaEventSources.KinesisEventSource(lambdaLogsToESStream, {
+        emailSqsTopic.grantPublish(appLogsToESLambda);
+
+        lambdaLogsToESLambda.addEventSource(new KinesisEventSource(lambdaLogsToESStream, {
             startingPosition: StartingPosition.TRIM_HORIZON
         }));
 
-        appLogsToESLambda.addEventSource(new lambdaEventSources.KinesisEventSource(appLogsTOEsStream, {
+        appLogsToESLambda.addEventSource(new KinesisEventSource(appLogsTOEsStream, {
             startingPosition: StartingPosition.TRIM_HORIZON
         }));
     }
 
-    createCrossAccountDestination(crossAccountDestinationId: string, streamArn: string, writeToKinesisRole: iam.Role, accountNumbers: string[]) {
-        const crossAccountDestination = new logs.CrossAccountDestination(
+    createEmailTopic(email: string): Topic {
+        const topic = new Topic(this, 'KinesisErrorsToEmailTopic', {
+            topicName: 'KinesisErrorsToEmailTopic'
+        });
+
+        topic.addSubscription(new EmailSubscription(email));
+
+        return topic;
+    }
+
+    createCrossAccountDestination(crossAccountDestinationId: string, streamArn: string, writeToKinesisRole: Role, accountNumbers: string[]) {
+        const crossAccountDestination = new CrossAccountDestination(
             this,
             crossAccountDestinationId,
             {
@@ -52,7 +68,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             }
         );
         crossAccountDestination.node.addDependency(writeToKinesisRole);
-        (crossAccountDestination.node.defaultChild as logs.CfnDestination).destinationPolicy = JSON.stringify({
+        (crossAccountDestination.node.defaultChild as CfnDestination).destinationPolicy = JSON.stringify({
             Version: '2012-10-17',
             Statement: [
                 {
@@ -69,28 +85,28 @@ export class CloudWatchLogsRecipientStack extends Stack {
     }
 
     createKinesisStream(streamName: string) {
-        return new kinesis.Stream(this, streamName, {
+        return new Stream(this, streamName, {
             shardCount: 1,
             streamName: streamName
         });
     }
 
-    createWriteToKinesisStreamRole(roleName: string, streamArn: string): iam.Role {
-        const cloudWatchLogsToKinesisRole = new iam.Role(this, roleName, {
-            assumedBy: new iam.ServicePrincipal(
+    createWriteToKinesisStreamRole(roleName: string, streamArn: string): Role {
+        const cloudWatchLogsToKinesisRole = new Role(this, roleName, {
+            assumedBy: new ServicePrincipal(
                 `logs.${this.region}.amazonaws.com`
             ),
             roleName: roleName
         });
 
         cloudWatchLogsToKinesisRole.addToPolicy(
-            new iam.PolicyStatement({
+            new PolicyStatement({
                 actions: ['kinesis:PutRecord'],
                 resources: [streamArn]
             })
         );
         cloudWatchLogsToKinesisRole.addToPolicy(
-            new iam.PolicyStatement({
+            new PolicyStatement({
                 actions: ['iam:PassRole'],
                 resources: [cloudWatchLogsToKinesisRole.roleArn]
             })
@@ -99,7 +115,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
         return cloudWatchLogsToKinesisRole;
     }
 
-    createWriteLambdaLogsToElasticLambda(lambdaRole: iam.Role, accounts: string, esEndpoint: string): Function {
+    createWriteLambdaLogsToElasticLambda(lambdaRole: Role, accounts: string, esEndpoint: string): Function {
         const kinesisToESId = 'KinesisToES';
         const lambdaConf = {
             role: lambdaRole,
@@ -108,7 +124,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             handler: 'lambda-kinesis-to-es.handler',
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(10),
-            logRetention: logs.RetentionDays.ONE_YEAR,
+            logRetention: RetentionDays.ONE_YEAR,
             environment: {
                 KNOWN_ACCOUNTS: accounts,
                 ES_ENDPOINT: esEndpoint
@@ -117,7 +133,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
         return new Function(this, kinesisToESId, lambdaConf);
     }
 
-    createWriteAppLogsToElasticLambda(lambdaRole: iam.Role, esEndpoint: string): Function {
+    createWriteAppLogsToElasticLambda(lambdaRole: Role, topicArn: string, esEndpoint: string): Function {
         const kinesisToESId = 'AppLogs-KinesisToES';
         const lambdaConf = {
             role: lambdaRole,
@@ -127,21 +143,22 @@ export class CloudWatchLogsRecipientStack extends Stack {
             handler: 'app-kinesis-to-es.handler',
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(20),
-            logRetention: logs.RetentionDays.ONE_YEAR,
+            logRetention: RetentionDays.ONE_YEAR,
             environment: {
-                ES_ENDPOINT: esEndpoint
+                ES_ENDPOINT: esEndpoint,
+                TOPIC_ARN: topicArn
             }
         };
         return new Function(this, kinesisToESId, lambdaConf);
     }
 
-    createWriteToElasticLambdaRole(elasticSearchDomainArn: string, streamArns: string[]): iam.Role {
-        const lambdaRole = new iam.Role(this, "KinesisLambdaToElasticSearchRole", {
-            assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
+    createWriteToElasticLambdaRole(elasticSearchDomainArn: string, streamArns: string[]): Role {
+        const lambdaRole = new Role(this, "KinesisLambdaToElasticSearchRole", {
+            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: "KinesisLambdaToElasticSearchRole"
         });
         lambdaRole.addToPolicy(
-            new iam.PolicyStatement({
+            new PolicyStatement({
                 actions: [
                     "es:DescribeElasticsearchDomain",
                     "es:DescribeElasticsearchDomains",
@@ -156,7 +173,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             })
         );
         lambdaRole.addToPolicy(
-            new iam.PolicyStatement({
+            new PolicyStatement({
                 actions: [
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
@@ -168,7 +185,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             })
         );
         lambdaRole.addToPolicy(
-            new iam.PolicyStatement({
+            new PolicyStatement({
                 actions: [
                     "kinesis:DescribeStream",
                     "kinesis:DescribeStreamSummary",

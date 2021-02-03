@@ -1,16 +1,17 @@
 interface Props {
-    accounts: Account[];
-    elasticSearchEndpoint: string;
-    elasticSearchDomainArn: string;
+    readonly accounts: Account[];
+    readonly elasticSearchEndpoint: string;
+    readonly elasticSearchDomainArn: string;
+    readonly errorEmail: string
 }
 
 interface Account {
-    accountNumber: string;
-    app: string;
-    env: string;
+    readonly accountNumber: string;
+    readonly app: string;
+    readonly env: string;
 }
 
 interface AppLogSubscription {
-    destinationArn: string,
-    logGroupNames: string[]
+    readonly destinationArn: string,
+    readonly logGroupNames: string[]
 }
