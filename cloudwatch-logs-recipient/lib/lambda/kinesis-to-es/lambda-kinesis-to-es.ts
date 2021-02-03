@@ -100,7 +100,7 @@ export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Acc
 
     let bulkRequestBody = "";
 
-    payload.logEvents.forEach(logEvent => {
+    payload.logEvents.forEach((logEvent: any) => {
         if (isLambdaLifecycleEvent(logEvent.message)) {
             return;
         }
@@ -141,10 +141,7 @@ export function isLambdaLifecycleEvent(message: string) {
 }
 
 export function buildSource(message: string, extractedFields: CloudWatchLogsLogEventExtractedFields | undefined): any {
-    let jsonSubString: any;
-
     message = message.replace("[, ]", "[0.0,0.0]")
-    message = message
         .replace(/\n/g, "\\n")
         .replace(/\'/g, "\\'")
         .replace(/\"/g, '\\"')
@@ -167,7 +164,7 @@ export function buildSource(message: string, extractedFields: CloudWatchLogsLogE
                 }
 
                 if (value) {
-                    jsonSubString = extractJson(value);
+                    const jsonSubString = extractJson(value);
                     if (jsonSubString !== null) {
                         source["$" + key] = JSON.parse(jsonSubString);
                     }
@@ -179,8 +176,9 @@ export function buildSource(message: string, extractedFields: CloudWatchLogsLogE
         source.message = message;
         return source;
     }
-    message = message.replace("[, ]", "[0.0,0.0]");
-    message = message
+    message = message.replace("[, ]", "[0.0,0.0]")
+        .replace(/\"Infinity\"/g, "-1")
+        .replace(/Infinity/gi, "-1")
         .replace(/\\n/g, "\\n")
         .replace(/\\'/g, "\\'")
         .replace(/\\"/g, '\\"')
@@ -189,7 +187,7 @@ export function buildSource(message: string, extractedFields: CloudWatchLogsLogE
         .replace(/\\t/g, "\\t")
         .replace(/\\b/g, "\\b")
         .replace(/\\f/g, "\\f");
-    jsonSubString = extractJson(message);
+    const jsonSubString = extractJson(message);
     if (jsonSubString !== null) {
         return JSON.parse(jsonSubString);
     } else {
@@ -204,9 +202,9 @@ export function buildSource(message: string, extractedFields: CloudWatchLogsLogE
 }
 
 function extractJson(message: string): any {
-    let jsonStart = message.indexOf("{");
+    const jsonStart = message.indexOf("{");
     if (jsonStart < 0) return null;
-    let jsonSubString = message.substring(jsonStart);
+    const jsonSubString = message.substring(jsonStart);
     return isValidJson(jsonSubString) ? jsonSubString : null;
 }
 
