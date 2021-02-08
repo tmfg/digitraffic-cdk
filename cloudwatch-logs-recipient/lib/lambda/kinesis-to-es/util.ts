@@ -23,15 +23,15 @@ export function buildFromMessage(message: string): any {
         .replace(/\\b/g, "\\b")
         .replace(/\\f/g, "\\f");
 
-    const jsonSubString = extractJson(message);
-    if (jsonSubString !== null) {
-        return JSON.parse(jsonSubString);
-    } else {
-        try {
+    try {
+        const jsonSubString = extractJson(message);
+        if (jsonSubString !== null) {
+            return JSON.parse(jsonSubString);
+        } else {
             return JSON.parse('{"log_line": "' + message.replace(/["']/g, "") + '"}');
-        } catch (e) {
-            console.info("Error converting to json:" + message);
         }
+    } catch (e) {
+        console.info("Error converting to json:" + message);
     }
 
     return {};
@@ -59,4 +59,33 @@ export function isNumeric(n: any): boolean {
 
 export function isInfinity(n: any): boolean {
     return !isNaN(parseFloat(n)) && !isFinite(n);
+}
+
+export function parseESReturnValue(response: any, responseBody: string): any {
+    const info = JSON.parse(responseBody);
+    let failedItems;
+    let success;
+
+    if (response.statusCode >= 200 && response.statusCode < 299) {
+        failedItems = info.items.filter(function(x: any) {
+            return x.index.status >= 300;
+        });
+
+        success = {
+            "attemptedItems": info.items.length,
+            "successfulItems": info.items.length - failedItems.length,
+            "failedItems": failedItems.length
+        };
+    }
+
+    const error = response.statusCode !== 200 || info.errors === true ? {
+        "statusCode": response.statusCode,
+        "responseBody": responseBody
+    } : null;
+
+    return {
+        success: success,
+        error: error,
+        failedItems: failedItems
+    }
 }

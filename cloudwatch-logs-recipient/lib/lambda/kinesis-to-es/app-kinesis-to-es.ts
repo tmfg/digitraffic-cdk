@@ -1,4 +1,4 @@
-import {buildFromMessage, extractJson, getIndexName, isInfinity, isNumeric} from "./util";
+import {buildFromMessage, extractJson, getIndexName, isInfinity, isNumeric, parseESReturnValue} from "./util";
 
 const https = require('https');
 const zlib = require('zlib');
@@ -11,6 +11,10 @@ import {getAppFromSenderAccount} from "./accounts";
 const endpoint = process.env.ES_ENDPOINT as string;
 const topicArn = process.env.TOPIC_ARN as string;
 const knownAccounts = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
+
+const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws\.com$/) as string[];
+const region = endpointParts[2];
+const service = endpointParts[3];
 
 const sns = new SNS();
 
@@ -170,7 +174,7 @@ function buildFromExtractedFields(extractedFields: any[]): any {
 }
 
 function post(body: string, callback: any) {
-    const requestParams = buildRequest(endpoint, body);
+    const requestParams = buildRequest(body);
 
     console.log("sending POST to es unCompressedSize=%d", body.length);
 
@@ -180,28 +184,9 @@ function post(body: string, callback: any) {
             responseBody += chunk;
         });
         response.on('end', function() {
-            const info = JSON.parse(responseBody);
-            let failedItems;
-            let success;
+            const parsedValues = parseESReturnValue(response, responseBody);
 
-            if (response.statusCode >= 200 && response.statusCode < 299) {
-                failedItems = info.items.filter(function(x: any) {
-                    return x.index.status >= 300;
-                });
-
-                success = {
-                    "attemptedItems": info.items.length,
-                    "successfulItems": info.items.length - failedItems.length,
-                    "failedItems": failedItems.length
-                };
-            }
-
-            const error = response.statusCode !== 200 || info.errors === true ? {
-                "statusCode": response.statusCode,
-                "responseBody": responseBody
-            } : null;
-
-            callback(error, success, response.statusCode, failedItems);
+            callback(parsedValues.error, parsedValues.success, response.statusCode, parsedValues.failedItems);
         });
     }).on('error', function(e: any) {
         callback(e);
@@ -209,10 +194,7 @@ function post(body: string, callback: any) {
     request.end(requestParams.body);
 }
 
-function buildRequest(endpoint: string, body: string): any {
-    const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws\.com$/) as string[];
-    const region = endpointParts[2];
-    const service = endpointParts[3];
+function buildRequest(body: string): any {
     const datetime = (new Date()).toISOString().replace(/[:\-]|\.\d{3}/g, '');
     const date = datetime.substr(0, 8);
     const kDate = hmac('AWS4' + process.env.AWS_SECRET_ACCESS_KEY, date);

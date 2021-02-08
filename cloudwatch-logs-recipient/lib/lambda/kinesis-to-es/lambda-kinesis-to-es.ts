@@ -12,22 +12,21 @@ import {
     buildFromMessage,
     extractJson,
     getIndexName,
-    isNumeric
+    isNumeric, parseESReturnValue
 } from "./util";
 import {getAppFromSenderAccount, getEnvFromSenderAccount} from "./accounts";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 
+const knownAccounts: Account[] = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
+const creds = new AWS.EnvironmentCredentials("AWS");
+
+const endpoint = process.env.ES_ENDPOINT as string;
+const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws\.com$/) as string[];
+const esEndpoint = new AWS.Endpoint(endpoint);
+const region = endpointParts[2];
+
 export const handler = (event: KinesisStreamEvent, context: Context, callback: any): void => {
-    const esDomain = {
-        region: process.env.AWS_REGION as string,
-        endpoint: process.env.ES_ENDPOINT
-    };
-
-    const knownAccounts: Account[] = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
-
-    const endpoint = new AWS.Endpoint(esDomain.endpoint);
-
     event.Records.forEach(function(record: KinesisStreamRecord) {
         let zippedInput = Buffer.from(record.kinesis.data, "base64");
 
@@ -39,12 +38,12 @@ export const handler = (event: KinesisStreamEvent, context: Context, callback: a
             }
 
             // parse the input from JSON
-            let awslogsData: CloudWatchLogsDecodedData = JSON.parse(
+            const awslogsData: CloudWatchLogsDecodedData = JSON.parse(
                 buffer.toString("utf8")
             );
 
             // transform the input to Elasticsearch documents
-            let elasticsearchBulkData = transform(awslogsData, knownAccounts);
+            const elasticsearchBulkData = transform(awslogsData, knownAccounts);
 
             // skip control messages
             if (!elasticsearchBulkData) {
@@ -52,27 +51,30 @@ export const handler = (event: KinesisStreamEvent, context: Context, callback: a
                 context.succeed("Control message handled successfully");
                 return;
             }
-            postToES(endpoint,
-                esDomain.region,
-                elasticsearchBulkData,
-                callback);
+            postToES(elasticsearchBulkData,
+                (error: any, success: any, statusCode: any, failedItems: any) => {
+                    if (error) {
+                        console.log('Error: ' + JSON.stringify(error, null, 2));
+                    }
+
+                    if (failedItems && failedItems.length > 0) {
+                        console.log("failed items " + JSON.stringify(failedItems));
+                    }
+                });
         });
     });
 };
 
-export function postToES(
-    endpoint: AWS.Endpoint,
-    esRegion: string,
-    doc: string,
-    callback: any) {
-    const creds = new AWS.EnvironmentCredentials("AWS")
-    let req = new AWS.HttpRequest(endpoint);
+export function postToES(doc: string, callback: any) {
+    const req = new AWS.HttpRequest(esEndpoint);
+
+    console.log("sending POST to es unCompressedSize=%d", doc.length);
 
     req.method = "POST";
     req.path = "/_bulk?pipeline=keyval";
-    req.region = esRegion;
+    req.region = region;
     req.headers["presigned-expires"] = false;
-    req.headers["Host"] = endpoint.host;
+    req.headers["Host"] = esEndpoint.host;
     req.body = doc;
     req.headers["Content-Type"] = "application/json";
 
@@ -89,7 +91,9 @@ export function postToES(
                 respBody += chunk;
             });
             httpResp.on("end", function(chunk: any) {
-                console.log("Response: " + respBody);
+                const parsedValues = parseESReturnValue(httpResp, respBody);
+
+//                console.log("Response: " + respBody);
                 callback(null);
             });
         },
