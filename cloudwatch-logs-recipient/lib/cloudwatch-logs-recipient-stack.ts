@@ -31,19 +31,24 @@ export class CloudWatchLogsRecipientStack extends Stack {
             cwlrProps.accounts.map(a => a.accountNumber));
 
         const emailSqsTopic = this.createEmailTopic(cwlrProps.errorEmail);
+        const accountsString = JSON.stringify(cwlrProps.accounts);
 
         const lambdaRole = this.createWriteToElasticLambdaRole(cwlrProps.elasticSearchDomainArn, [lambdaLogsToESStream.streamArn, appLogsTOEsStream.streamArn]);
-        const lambdaLogsToESLambda = this.createWriteLambdaLogsToElasticLambda(lambdaRole, JSON.stringify(cwlrProps.accounts), cwlrProps.elasticSearchEndpoint);
-        const appLogsToESLambda = this.createWriteAppLogsToElasticLambda(lambdaRole, emailSqsTopic.topicArn, cwlrProps.elasticSearchEndpoint);
+        const lambdaLogsToESLambda = this.createWriteLambdaLogsToElasticLambda(lambdaRole, accountsString, cwlrProps.elasticSearchEndpoint);
+        const appLogsToESLambda = this.createWriteAppLogsToElasticLambda(lambdaRole, accountsString, emailSqsTopic, cwlrProps.elasticSearchEndpoint);
 
         emailSqsTopic.grantPublish(appLogsToESLambda);
 
         lambdaLogsToESLambda.addEventSource(new KinesisEventSource(lambdaLogsToESStream, {
-            startingPosition: StartingPosition.TRIM_HORIZON
+            startingPosition: StartingPosition.TRIM_HORIZON,
+            batchSize: 10000,
+            maxBatchingWindow: Duration.seconds(30)
         }));
 
         appLogsToESLambda.addEventSource(new KinesisEventSource(appLogsTOEsStream, {
-            startingPosition: StartingPosition.TRIM_HORIZON
+            startingPosition: StartingPosition.TRIM_HORIZON,
+            batchSize: 10000,
+            maxBatchingWindow: Duration.seconds(30)
         }));
     }
 
@@ -133,11 +138,11 @@ export class CloudWatchLogsRecipientStack extends Stack {
         return new Function(this, kinesisToESId, lambdaConf);
     }
 
-    createWriteAppLogsToElasticLambda(lambdaRole: Role, topicArn: string, esEndpoint: string): Function {
+    createWriteAppLogsToElasticLambda(lambdaRole: Role, accounts: string, topic: Topic, esEndpoint: string): Function {
         const kinesisToESId = 'AppLogs-KinesisToES';
         const lambdaConf = {
             role: lambdaRole,
-            memorySize: 128,
+            memorySize: 256,
             functionName: kinesisToESId,
             code: new AssetCode('dist/lambda/', {exclude: ["lambda-*"]}),
             handler: 'app-kinesis-to-es.handler',
@@ -145,8 +150,9 @@ export class CloudWatchLogsRecipientStack extends Stack {
             timeout: Duration.seconds(20),
             logRetention: RetentionDays.ONE_YEAR,
             environment: {
+                KNOWN_ACCOUNTS: accounts,
                 ES_ENDPOINT: esEndpoint,
-                TOPIC_ARN: topicArn
+                TOPIC_ARN: topic.topicArn
             }
         };
         return new Function(this, kinesisToESId, lambdaConf);

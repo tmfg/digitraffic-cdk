@@ -1,12 +1,16 @@
+import {buildFromMessage, extractJson, getIndexName, isInfinity, isNumeric} from "./util";
+
 const https = require('https');
 const zlib = require('zlib');
 const crypto = require('crypto');
 
 import {KinesisStreamEvent, KinesisStreamRecord} from "aws-lambda";
 import {SNS} from "aws-sdk";
+import {getAppFromSenderAccount} from "./accounts";
 
 const endpoint = process.env.ES_ENDPOINT as string;
 const topicArn = process.env.TOPIC_ARN as string;
+const knownAccounts = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
 
 const sns = new SNS();
 
@@ -96,32 +100,22 @@ function transform(payload: any, filterIds: string[] = []): string|null {
 
     let bulkRequestBody = '';
 
-    payload.logEvents.filter((e: any) => !filterIds.includes(e.id))
-        .forEach((logEvent: any) => {
-        const timestamp = new Date(1 * logEvent.timestamp);
-
-        // index name format: cwl-YYYY.MM
-        const indexName = [
-            timestamp.getUTCFullYear(),              // year
-            ('0' + (timestamp.getUTCMonth() + 1)).slice(-2)  // month
-        ].join('.');
-
+    payload.logEvents.filter((e: any) => !filterIds.includes(e.id)).forEach((logEvent: any) => {
         const source = buildSource(logEvent.message, logEvent.extractedFields);
+        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
+        const appName = getAppName(payload.logGroup, app);
 
         source['@id'] = logEvent.id;
         source['@timestamp'] = new Date(1 * logEvent.timestamp).toISOString();
         source['@owner'] = payload.owner;
         source['@log_group'] = payload.logGroup;
         source['@log_stream'] = payload.logStream;
-        source['@transport_type'] = transportType(payload.logGroup);
+        source['@transport_type'] = app;
+        source['@app'] = appName;
 
         const action = { "index": {} } as any;
-        //action.index._type = "base"
         action.index._id = logEvent.id;
-
-        source['@app'] = (payload.logGroup.includes('nginx')? 'dt-nginx':payload.logGroup);
-
-        action.index._index =  source['@app'] + "-" + indexName;
+        action.index._index = getIndexName(appName, logEvent.timestamp);
 
         bulkRequestBody += [
             JSON.stringify(action),
@@ -131,47 +125,19 @@ function transform(payload: any, filterIds: string[] = []): string|null {
     return bulkRequestBody;
 }
 
-function transportType(logGroup: string) {
-    if(logGroup.indexOf('road') == 0) return 'road';
-    if(logGroup.indexOf('marine') == 0) return 'marine';
-    if(logGroup.indexOf('rail') == 0) return 'rail';
+function getAppName(logGroup: string, app: string): string {
+    if(logGroup.includes('amazonmq')) return `${app}-mqtt`;
+    if(logGroup.includes('nginx')) return 'dt-nginx;'
 
-    return 'unknown';
+    return logGroup;
 }
 
-function buildSource(message: string, extractedFields: any[]) {
+function buildSource(message: string, extractedFields: any[]): any {
     if (extractedFields) {
         return buildFromExtractedFields(extractedFields);
     }
 
     return buildFromMessage(message);
-}
-
-function buildFromMessage(message: string): any {
-    message = message.replace('[, ]', '[0.0,0.0]')
-        .replace(/\"Infinity\"/g, "-1")
-        .replace(/Infinity/gi, "-1")
-        .replace(/\\n/g, "\\n")
-        .replace(/\\'/g, "\\'")
-        .replace(/\\"/g, '\\"')
-        .replace(/\\&/g, "\\&")
-        .replace(/\\r/g, "\\r")
-        .replace(/\\t/g, "\\t")
-        .replace(/\\b/g, "\\b")
-        .replace(/\\f/g, "\\f");
-
-    const jsonSubString = extractJson(message);
-    if (jsonSubString !== null) {
-        return JSON.parse(jsonSubString);
-    } else {
-        try {
-            return JSON.parse('{"log_line": "' + message.replace(/["']/g, "") + '"}');
-        } catch (e) {
-            console.info("Error converting to json:" + message);
-        }
-    }
-
-    return {};
 }
 
 function buildFromExtractedFields(extractedFields: any[]): any {
@@ -201,28 +167,6 @@ function buildFromExtractedFields(extractedFields: any[]): any {
     }
 
     return source;
-}
-
-function extractJson(message: string) {
-    const jsonStart = message.indexOf('{');
-    if (jsonStart < 0) return null;
-    const jsonSubString = message.substring(jsonStart);
-    return isValidJson(jsonSubString) ? jsonSubString : null;
-}
-
-function isValidJson(message: string) {
-    try {
-        JSON.parse(message);
-    } catch (e) { return false; }
-    return true;
-}
-
-function isNumeric(n: any): boolean {
-    return !isNaN(parseFloat(n)) && isFinite(n);
-}
-
-function isInfinity(n: any): boolean {
-    return !isNaN(parseFloat(n)) && !isFinite(n);
 }
 
 function post(body: string, callback: any) {
@@ -265,7 +209,7 @@ function post(body: string, callback: any) {
     request.end(requestParams.body);
 }
 
-function buildRequest(endpoint: string, body: string) {
+function buildRequest(endpoint: string, body: string): any {
     const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws\.com$/) as string[];
     const region = endpointParts[2];
     const service = endpointParts[3];
@@ -326,10 +270,10 @@ function buildRequest(endpoint: string, body: string) {
     return request;
 }
 
-function hmac(key: string, str: string, encoding: string = '') {
+function hmac(key: string, str: string, encoding: string = ''): string {
     return crypto.createHmac('sha256', key).update(str, 'utf8').digest(encoding);
 }
 
-function hash(str: string, encoding: string = '') {
+function hash(str: string, encoding: string = ''): string {
     return crypto.createHash('sha256').update(str, 'utf8').digest(encoding);
 }
