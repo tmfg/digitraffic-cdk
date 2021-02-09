@@ -3,13 +3,13 @@ import {withSecret} from "./secret";
 export interface DbSecret {
     readonly username: string
     readonly password: string
-    readonly url: string
+    readonly host: string
 }
 
 function setDbSecret(secret: DbSecret) {
     process.env.DB_USER = secret.username;
     process.env.DB_PASS = secret.password;
-    process.env.DB_URI = secret.url;
+    process.env.DB_URI = secret.host;
 }
 
 // cached at Lambda container level
