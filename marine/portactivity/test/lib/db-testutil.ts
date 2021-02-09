@@ -12,13 +12,13 @@ export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => vo
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
     return () => {
-        const db: IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
+        const db: IDatabase<any, any> = initDbConnection('portactivity', 'portactivity', 'localhost:54321/marine', {
             noWarnings: true // ignore duplicate connection warning for tests
         });
 
         beforeAll(async () => {
-            process.env.DB_USER = 'marine';
-            process.env.DB_PASS = 'marine';
+            process.env.DB_USER = 'portactivity';
+            process.env.DB_PASS = 'portactivity';
             process.env.DB_URI = 'localhost:54321/marine';
             await truncate(db);
         });
@@ -39,7 +39,7 @@ export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
 
 export async function truncate(db: IDatabase<any, any>): Promise<any> {
     return await db.tx(async t => {
-        await db.none('DELETE FROM portcall_estimate');
+        await db.none('DELETE FROM port_call_timestamp');
         await db.none('DELETE FROM public.vessel');
         await db.none('DELETE FROM public.port_area_details');
         await db.none('DELETE FROM public.port_call');
@@ -62,7 +62,7 @@ export function findAll(db: IDatabase<any, any>): Promise<DbEstimate[]> {
             ship_imo,
             location_locode,
             portcall_id
-        FROM portcall_estimate`);
+        FROM port_call_timestamp`);
     });
 }
 
@@ -70,7 +70,7 @@ export function insert(db: IDatabase<any, any>, estimates: ApiEstimate[]) {
     return db.tx(t => {
         return t.batch(estimates.map(e => {
             return t.none(`
-                INSERT INTO portcall_estimate(
+                INSERT INTO port_call_timestamp(
                     event_type,
                     event_time,
                     event_time_confidence_lower,

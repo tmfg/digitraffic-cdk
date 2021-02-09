@@ -1,4 +1,6 @@
-# Portcall activity
+# Portcall activity CDK project
 
-In order to run tests with `npm run test` you need to set up:
-- The local database from the [digitraffic-marine project](https://github.com/tmfg/digitraffic-marine).
+Read db/README.md first to set up the project database.
+
+- Run tests with `npm run test`
+- Compile in watch mode with `npm run all-watch`

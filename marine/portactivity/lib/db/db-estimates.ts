@@ -39,7 +39,7 @@ export interface DbEstimateIdAndLocode {
 }
 
 const INSERT_ESTIMATE_SQL = `
-    INSERT INTO portcall_estimate(
+    INSERT INTO port_call_timestamp(
         event_type,
         event_time,
         event_time_confidence_lower,
@@ -122,10 +122,10 @@ const SELECT_BY_LOCODE = `
         pe.ship_imo,            
         pe.location_locode,
         pe.portcall_id
-    FROM portcall_estimate pe
+    FROM port_call_timestamp pe
     WHERE pe.record_time =
           (
-              SELECT MAX(px.record_time) FROM portcall_estimate px
+              SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
@@ -144,12 +144,12 @@ const SELECT_ETA_SHIP_IMO_BY_LOCODE = `
         pe.location_locode AS locode,
         pe.portcall_id,
         pad.port_area_code
-    FROM portcall_estimate pe
+    FROM port_call_timestamp pe
     JOIN public.port_call pc ON pc.port_call_id = pe.portcall_id
     JOIN public.port_area_details pad on pad.port_call_id = pe.portcall_id
     WHERE pe.record_time =
           (
-              SELECT MAX(px.record_time) FROM portcall_estimate px
+              SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.event_source = pe.event_source AND
@@ -178,10 +178,10 @@ const SELECT_BY_MMSI = `
         pe.ship_imo,
         pe.location_locode,
         pe.portcall_id
-    FROM portcall_estimate pe
+    FROM port_call_timestamp pe
     WHERE pe.record_time =
           (
-              SELECT MAX(px.record_time) FROM portcall_estimate px
+              SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
@@ -208,10 +208,10 @@ const SELECT_BY_IMO = `
         pe.ship_imo,
         pe.location_locode,
         pe.portcall_id
-    FROM portcall_estimate pe
+    FROM port_call_timestamp pe
     WHERE pe.record_time =
           (
-              SELECT MAX(px.record_time) FROM portcall_estimate px
+              SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
@@ -228,7 +228,7 @@ const SELECT_BY_PORTCALL_ID_AND_LOCODE = `
     SELECT
     id,
     location_locode
-    FROM portcall_estimate
+    FROM port_call_timestamp
     WHERE
           portcall_id = $1 AND
           location_locode != $2 AND
@@ -237,7 +237,7 @@ const SELECT_BY_PORTCALL_ID_AND_LOCODE = `
 
 const DELETE_BY_ID = `
     DELETE
-    FROM portcall_estimate
+    FROM port_call_timestamp
     WHERE id = $1
 `;
 
