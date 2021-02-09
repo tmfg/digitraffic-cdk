@@ -1,0 +1,179 @@
+import {IDatabase, ITask} from "pg-promise";
+import {initDbConnection} from "../../../../common/postgres/database";
+import {ApiEstimate} from "../../lib/model/estimate";
+import {createUpdateValues, DbEstimate} from "../../lib/db/db-estimates";
+import {PortAreaDetails, PortCall, Vessel} from "./testdata";
+
+export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
+    return async () => {
+        await db.tx(async (t: any) => await fn(t));
+    };
+}
+
+export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
+    return () => {
+        const db: IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
+            noWarnings: true // ignore duplicate connection warning for tests
+        });
+
+        beforeAll(async () => {
+            process.env.DB_USER = 'marine';
+            process.env.DB_PASS = 'marine';
+            process.env.DB_URI = 'localhost:54321/marine';
+            await truncate(db);
+        });
+
+        afterAll(async () => {
+            await truncate(db);
+            db.$pool.end();
+        });
+
+        beforeEach(async () => {
+            await truncate(db);
+        });
+
+        // @ts-ignore
+        fn(db);
+    };
+}
+
+export async function truncate(db: IDatabase<any, any>): Promise<any> {
+    return await db.tx(async t => {
+        await db.none('DELETE FROM portcall_estimate');
+        await db.none('DELETE FROM public.vessel');
+        await db.none('DELETE FROM public.port_area_details');
+        await db.none('DELETE FROM public.port_call');
+    });
+}
+
+export function findAll(db: IDatabase<any, any>): Promise<DbEstimate[]> {
+    return db.tx(t => {
+       return t.manyOrNone(`
+        SELECT
+            event_type,
+            event_time,
+            event_time_confidence_lower,
+            event_time_confidence_lower_diff,
+            event_time_confidence_upper,
+            event_time_confidence_upper_diff,
+            event_source,
+            record_time,
+            ship_mmsi,
+            ship_imo,
+            location_locode,
+            portcall_id
+        FROM portcall_estimate`);
+    });
+}
+
+export function insert(db: IDatabase<any, any>, estimates: ApiEstimate[]) {
+    return db.tx(t => {
+        return t.batch(estimates.map(e => {
+            return t.none(`
+                INSERT INTO portcall_estimate(
+                    event_type,
+                    event_time,
+                    event_time_confidence_lower,
+                    event_time_confidence_lower_diff,
+                    event_time_confidence_upper,
+                    event_time_confidence_upper_diff,
+                    event_source,
+                    record_time,
+                    location_locode,
+                    ship_mmsi,
+                    ship_imo,
+                    portcall_id)
+                VALUES(
+                    $1,
+                    $2,
+                    $3,
+                    $4,
+                    $5,
+                    $6,
+                    $7,
+                    $8,
+                    $9,
+                    $10,
+                    $11,
+                    $12
+                )
+            `, createUpdateValues(e));
+        }));
+    });
+}
+
+export function insertVessel(db: IDatabase<any, any>, vessel: Vessel) {
+    return db.tx(t => {
+        db.none(`
+            INSERT INTO public.vessel(
+                mmsi,
+                timestamp,
+                name,
+                ship_type,
+                reference_point_a,
+                reference_point_b,
+                reference_point_c,
+                reference_point_d,
+                pos_type,
+                draught,
+                imo,
+                eta,
+                call_sign,
+                destination
+            ) VALUES (
+                $(mmsi),
+                $(timestamp),
+                $(name),
+                $(ship_type),
+                $(reference_point_a),
+                $(reference_point_b),
+                $(reference_point_c),
+                $(reference_point_d),
+                $(pos_type),
+                $(draught),
+                $(imo),
+                $(eta),
+                $(call_sign),
+                $(destination)
+            )
+        `, vessel);
+    });
+}
+
+export function insertPortAreaDetails(db: IDatabase<any, any>, p: PortAreaDetails): Promise<any> {
+    return db.none(`
+        INSERT INTO public.port_area_details(
+            port_area_details_id,
+            port_call_id,
+            eta
+        ) VALUES (
+            $(port_area_details_id),
+            $(port_call_id),
+            $(eta)
+        )
+    `, p);
+}
+
+export function insertPortCall(db: IDatabase<any, any>, p: PortCall): Promise<any> {
+    return db.none(`
+        INSERT INTO public.port_call(
+            port_call_id,
+            radio_call_sign,
+            radio_call_sign_type,
+            vessel_name,
+            port_call_timestamp,
+            port_to_visit,
+            mmsi,
+            imo_lloyds
+        ) VALUES (
+            $(port_call_id),
+            $(radio_call_sign),
+            $(radio_call_sign_type),
+            $(vessel_name),
+            $(port_call_timestamp),
+            $(port_to_visit),
+            $(mmsi),
+            $(imo_lloyds)
+        )
+    `, p);
+}
