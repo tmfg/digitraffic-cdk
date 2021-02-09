@@ -2,10 +2,9 @@ import {CloudWatchLogsDecodedData, CloudWatchLogsLogEvent} from "aws-lambda";
 import {
     buildSource,
     isLambdaLifecycleEvent,
-    getAppFromSenderAccount,
-    getEnvFromSenderAccount,
     transform
 } from '../../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es';
+import {getAppFromSenderAccount, getEnvFromSenderAccount} from "../../../../lib/lambda/kinesis-to-es/accounts";
 
 describe('kinesis-to-es', () => {
 
