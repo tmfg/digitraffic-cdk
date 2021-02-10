@@ -15,6 +15,9 @@ import {newTimestamp, newPortAreaDetails, newPortCall, newVessel} from "../testd
 import {EventType} from "../../../lib/model/timestamp";
 import {ShipETA} from "../../../lib/api/api-etas";
 
+// empty sec usage function for tests
+const NOOP_WITH_SECRET = (secretId: string, fn: (secret: any) => Promise<void>) => fn({});
+
 describe('update-eta-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     const sandbox = sinon.createSandbox();
@@ -26,7 +29,7 @@ describe('update-eta-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>)
         sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
         const updateETATimestampsStub = sandbox.stub();
 
-        await handlerFn(sns, updateETATimestampsStub)();
+        await handlerFn(NOOP_WITH_SECRET, sns, updateETATimestampsStub)();
 
         expect(publishStub.called).toBe(false);
     });
@@ -52,7 +55,7 @@ describe('update-eta-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>)
         await insertPortCall(db, portcall);
         await insertPortAreaDetails(db, newPortAreaDetails(timestamp));
 
-        await handlerFn(sns, updateETATimestampsStub)();
+        await handlerFn(NOOP_WITH_SECRET, sns, updateETATimestampsStub)();
 
         expect(publishStub.calledOnce).toBe(true);
         expect(updateETATimestampsStub.calledOnce).toBe(true);

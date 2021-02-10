@@ -13,7 +13,6 @@ export interface Props {
     readonly logsDestinationArn: string
     readonly sqsProcessLambdaConcurrentExecutions: number
     readonly secretId: string
-    readonly dbProps: DbProps
     readonly etaProps: {
         readonly clientId: string
         readonly clientSecret: string
@@ -22,12 +21,4 @@ export interface Props {
         readonly endpointUrl: string
         readonly timestampSource: string
     }
-}
-
-
-export interface DbProps {
-    readonly username: string;
-    readonly password: string;
-    readonly uri: string;
-    readonly ro_uri: string;
 }

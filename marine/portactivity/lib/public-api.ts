@@ -19,8 +19,10 @@ import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addTags} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 export function create(
+    secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
@@ -46,12 +48,13 @@ export function create(
         .addResource("v2")
         .addResource('timestamps');
 
-    createTimestampsResource(publicApi, vpc, props, resource, lambdaDbSg, timestampsModel, errorResponseModel, validator, stack);
-    createShiplistResource(publicApi, vpc, props, resource, lambdaDbSg, stack);
+    createTimestampsResource(publicApi, secret, vpc, props, resource, lambdaDbSg, timestampsModel, errorResponseModel, validator, stack);
+    createShiplistResource(publicApi, secret, vpc, props, resource, lambdaDbSg, stack);
 }
 
 function createTimestampsResource(
     publicApi: RestApi,
+    secret: ISecret,
     vpc: IVpc,
     props: Props,
     resource: Resource,
@@ -67,9 +70,12 @@ function createTimestampsResource(
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-timestamps.handler',
-        readOnly: false
+        readOnly: false,
+        environment: {
+            SECRET_ID: props.secretId
+        }
     }));
-
+    secret.grantRead(getTimestampsLambda);
     const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
         requestParameters: {
             'integration.request.querystring.locode': 'method.request.querystring.locode',
@@ -107,6 +113,7 @@ function createTimestampsResource(
 
 function createShiplistResource(
     publicApi: RestApi,
+    secret: ISecret,
     vpc: IVpc,
     props: Props,
     resource: Resource,
@@ -120,9 +127,12 @@ function createShiplistResource(
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-shiplist-public.handler',
-        readOnly: false
+        readOnly: false,
+        environment: {
+            SECRET_ID: props.secretId
+        }
     }));
-
+    secret.grantRead(lambda);
     const integration = new LambdaIntegration(lambda, {
         proxy: true
     });

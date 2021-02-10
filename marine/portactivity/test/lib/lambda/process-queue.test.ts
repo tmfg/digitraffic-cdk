@@ -7,13 +7,16 @@ import * as sinon from 'sinon';
 import {newTimestamp} from "../testdata";
 import {SNS} from "aws-sdk";
 
+// empty sec usage function for tests
+const NOOP_WITH_SECRET = (secretId: string, fn: (secret: any) => Promise<void>) => fn({});
+
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
 
     test('no records', async () => {
-        await handlerFn(new SNS())({ Records: [] });
+        await handlerFn(NOOP_WITH_SECRET, new SNS())({ Records: [] });
     });
 
     test('single valid record', async () => {
@@ -22,7 +25,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
         const timestamp = newTimestamp();
 
-        await handlerFn(sns)({
+        await handlerFn(NOOP_WITH_SECRET, sns)({
             Records: [createRecord(timestamp)]
         });
 
@@ -38,7 +41,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp();
         delete (timestamp as any).eventType;
 
-        await handlerFn(sns)({
+        await handlerFn(NOOP_WITH_SECRET, sns)({
             Records: [createRecord(timestamp)]
         });
 
@@ -55,7 +58,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const invalidTimestamp = newTimestamp();
         delete (invalidTimestamp as any).eventType;
 
-        const promises = await handlerFn(sns)({
+        const promises = await handlerFn(NOOP_WITH_SECRET, sns)({
             Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)]
         });
 

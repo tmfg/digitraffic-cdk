@@ -4,26 +4,33 @@ import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';
 import * as R from 'ramda';
 import {getDisplayableNameForEventSource} from "../../event-sourceutil";
+import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 
-export const handler = async (
-    event: any
-): Promise<any> => {
-    if (!event.queryStringParameters.locode) {
-        return {statusCode: 400, body: 'Missing locode'};
-    }
-    return await inDatabase(async (db: IDatabase<any, any>) => {
-        const shiplist: DbPublicShiplist[] =
-            (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
-                .map(e => Object.assign(e, {
-                    event_source: getDisplayableNameForEventSource(e.event_source)
-                }));
-        return {
-            statusCode: 200,
-            headers: {
-                'Content-Type': 'text/html'
-            },
-            body:
-                `
+export const handler = async (event: any): Promise<any> => {
+    return handlerFn(event, withDbSecret);
+};
+
+export async function handlerFn(
+    event: any,
+    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>) => Promise<any>): Promise<any> {
+
+    return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
+        if (!event.queryStringParameters.locode) {
+            return Promise.resolve({statusCode: 400, body: 'Missing locode'});
+        }
+        return inDatabase(async (db: IDatabase<any, any>) => {
+            const shiplist: DbPublicShiplist[] =
+                (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
+                    .map(e => Object.assign(e, {
+                        event_source: getDisplayableNameForEventSource(e.event_source)
+                    }));
+            return {
+                statusCode: 200,
+                headers: {
+                    'Content-Type': 'text/html'
+                },
+                body:
+                    `
 <html>
 
 <head>
@@ -281,6 +288,7 @@ export const handler = async (
 
 </html>    
 `
-        }
+            }
+        });
     });
-};
+}

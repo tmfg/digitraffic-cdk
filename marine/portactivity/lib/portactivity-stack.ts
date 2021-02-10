@@ -16,11 +16,13 @@ import {
     DatabaseProxy,
     ProxyTarget
 } from "@aws-cdk/aws-rds";
-import {Secret} from "@aws-cdk/aws-secretsmanager";
+import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
 
 export class PortActivityStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
         super(scope, id, props);
+
+        const secret = Secret.fromSecretNameV2(this, 'PortActivitySecret', appProps.secretId);
 
         const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
             vpcId: appProps.vpcId,
@@ -29,16 +31,16 @@ export class PortActivityStack extends Stack {
         });
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
-        const rdsProxy = this.createRdsProxy(lambdaDbSg, vpc, appProps);
+        this.createRdsProxy(secret, lambdaDbSg, vpc, appProps);
 
         const queueAndDLQ = Sqs.createQueue(this);
         const dlqBucket = new Bucket(this, 'DLQBucket', {
             bucketName: appProps.dlqBucketName
         });
 
-        InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
+        InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
-        PublicApi.create(vpc, lambdaDbSg, appProps, this);
+        PublicApi.create(secret, vpc, lambdaDbSg, appProps, this);
 
         this.addDLQAlarm(queueAndDLQ.dlq, appProps);
     }
@@ -57,16 +59,16 @@ export class PortActivityStack extends Stack {
     }
 
     createRdsProxy(
+        secret: ISecret,
         sg: ISecurityGroup,
         vpc: IVpc,
-        appProps: Props): DatabaseProxy {
+        appProps: Props) {
         const cluster = DatabaseCluster.fromDatabaseClusterAttributes(this, 'DbCluster', {
             clusterIdentifier: appProps.dbClusterIdentifier,
             engine: DatabaseClusterEngine.AURORA_POSTGRESQL
         });
-        const secret = Secret.fromSecretNameV2(this, 'PortActivitySecret', appProps.secretId);
         const dbProxyName = 'PortActivityRDSProxy';
-        return new DatabaseProxy(this, dbProxyName, {
+        new DatabaseProxy(this, dbProxyName, {
             dbProxyName,
             vpc,
             secrets: [secret],

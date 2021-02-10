@@ -19,10 +19,12 @@ import {
     KEY_ENDPOINT_CLIENT_ID,
     KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE, KEY_ESTIMATE_SNS_TOPIC_ARN
 } from "./lambda/update-eta-timestamps/lambda-update-eta-timestamps";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
     dlqBucket: Bucket,
+    secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
@@ -33,10 +35,10 @@ export function create(
         displayName: timestampsUpdatedTopicId,
         topicName: timestampsUpdatedTopicId
     });
-    createProcessQueueLambda(queueAndDLQ.queue, timestampsUpdatedTopic, vpc, lambdaDbSg, props, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, timestampsUpdatedTopic, secret, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 
-    const updateETATimestampsLambda = createUpdateETATimestampsLambda(timestampsUpdatedTopic, vpc, lambdaDbSg, props, stack);
+    const updateETATimestampsLambda = createUpdateETATimestampsLambda(timestampsUpdatedTopic, secret, vpc, lambdaDbSg, props, stack);
     const updateETASchedulingRule = createETAUpdateSchedulingCloudWatchRule(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
 }
@@ -44,6 +46,7 @@ export function create(
 function createProcessQueueLambda(
     queue: Queue,
     timestampsUpdatedTopic: Topic,
+    secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
@@ -54,14 +57,13 @@ function createProcessQueueLambda(
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri,
+            SECRET_ID: props.secretId,
             ESTIMATE_SNS_TOPIC_ARN: timestampsUpdatedTopic.topicArn
         },
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const processQueueLambda = new Function(stack, functionName, lambdaConf);
+    secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
     timestampsUpdatedTopic.grantPublish(processQueueLambda);
     createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
@@ -86,7 +88,6 @@ function createProcessDLQLambda(
     });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
-
     createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
 
     const statement = new PolicyStatement();
@@ -106,15 +107,14 @@ function createETAUpdateSchedulingCloudWatchRule(stack: Stack): Rule {
 
 function createUpdateETATimestampsLambda(
     timestampsUpdatedTopic: Topic,
+    secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
     stack: Stack): Function {
 
     const environment: any = {
-        DB_USER: props.dbProps.username,
-        DB_PASS: props.dbProps.password,
-        DB_URI: props.dbProps.uri
+        SECRET_ID: props.secretId
     };
     environment[KEY_ENDPOINT_CLIENT_ID] = props.etaProps.clientId;
     environment[KEY_ENDPOINT_CLIENT_SECRET] = props.etaProps.clientSecret;
@@ -133,6 +133,7 @@ function createUpdateETATimestampsLambda(
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const lambda = new Function(stack, functionName, lambdaConf);
+    secret.grantRead(lambda);
     timestampsUpdatedTopic.grantPublish(lambda);
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     return lambda;
