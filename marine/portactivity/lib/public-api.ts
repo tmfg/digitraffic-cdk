@@ -44,7 +44,7 @@ export function create(
     const resource = publicApi.root
         .addResource("api")
         .addResource("v2")
-        .addResource('portcall-timestamps');
+        .addResource('timestamps');
 
     createTimestampsResource(publicApi, vpc, props, resource, lambdaDbSg, timestampsModel, errorResponseModel, validator, stack);
     createShiplistResource(publicApi, vpc, props, resource, lambdaDbSg, stack);
@@ -100,7 +100,7 @@ function createTimestampsResource(
     });
 
     createSubscription(getTimestampsLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetTimestamps', ['portcall-timestamps'], resource, stack);
+    addTags('GetTimestamps', ['timestamps'], resource, stack);
 
     return getTimestampsLambda;
 }

@@ -36,11 +36,11 @@ function createUpdateTimestampResource(
     timestampModel: Model) {
     const apiResource = integrationApi.root.addResource('api');
     const integrationResource = apiResource.addResource('integration');
-    const timestampResource = integrationResource.addResource('portcall-timestamps');
+    const timestampResource = integrationResource.addResource('timestamps');
     const requestValidator = new RequestValidator(stack, 'RequestValidator', {
         validateRequestBody: true,
         validateRequestParameters: true,
-        requestValidatorName: 'PortActivityIntegrationRequestValidator',
+        requestValidatorName: 'PortActivityTimestampIntegrationRequestValidator',
         restApi: integrationApi
     });
     attachQueueToApiGatewayResource(stack,
