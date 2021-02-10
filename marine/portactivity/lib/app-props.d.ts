@@ -1,18 +1,20 @@
-import {Duration} from "@aws-cdk/core";
+import {Duration} from "@aws-cdk/core"
 
 export interface Props {
-    vpcId: string;
-    privateSubnetIds: string[];
-    availabilityZones: string[];
-    lambdaDbSgId: string;
-    dlqBucketName: string;
-    dlqNotificationTopicArn: string;
-    dlqNotificationDuration: Duration;
-    dbProps: DbProps;
-    defaultLambdaDurationSeconds: number;
-    logsDestinationArn: string;
-    sqsProcessLambdaConcurrentExecutions: number;
-    etaProps: {
+    readonly vpcId: string
+    readonly privateSubnetIds: string[]
+    readonly availabilityZones: string[]
+    readonly lambdaDbSgId: string
+    readonly dlqBucketName: string
+    readonly dlqNotificationTopicArn: string
+    readonly dlqNotificationDuration: Duration
+    readonly dbClusterIdentifier: string
+    readonly defaultLambdaDurationSeconds: number
+    readonly logsDestinationArn: string
+    readonly sqsProcessLambdaConcurrentExecutions: number
+    readonly secretId: string
+    readonly dbProps: DbProps
+    readonly etaProps: {
         readonly clientId: string
         readonly clientSecret: string
         readonly audience: string
@@ -21,9 +23,11 @@ export interface Props {
         readonly timestampSource: string
     }
 }
+
+
 export interface DbProps {
-    username: string;
-    password: string;
-    uri: string;
-    ro_uri: string;
+    readonly username: string;
+    readonly password: string;
+    readonly uri: string;
+    readonly ro_uri: string;
 }

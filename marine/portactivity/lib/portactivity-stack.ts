@@ -1,5 +1,5 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
-import {SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
+import {ISecurityGroup, IVpc, SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
 import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
 import * as PublicApi from './public-api';
@@ -10,6 +10,13 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Topic} from "@aws-cdk/aws-sns";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
+import {
+    DatabaseCluster,
+    DatabaseClusterEngine,
+    DatabaseProxy,
+    ProxyTarget
+} from "@aws-cdk/aws-rds";
+import {Secret} from "@aws-cdk/aws-secretsmanager";
 
 export class PortActivityStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -21,6 +28,8 @@ export class PortActivityStack extends Stack {
             availabilityZones: appProps.availabilityZones
         });
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
+
+        const rdsProxy = this.createRdsProxy(lambdaDbSg, vpc, appProps);
 
         const queueAndDLQ = Sqs.createQueue(this);
         const dlqBucket = new Bucket(this, 'DLQBucket', {
@@ -45,6 +54,26 @@ export class PortActivityStack extends Stack {
             treatMissingData: TreatMissingData.NOT_BREACHING,
             comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
         }).addAlarmAction(new SnsAction(Topic.fromTopicArn(this, 'Topic', appProps.dlqNotificationTopicArn)));
+    }
+
+    createRdsProxy(
+        sg: ISecurityGroup,
+        vpc: IVpc,
+        appProps: Props): DatabaseProxy {
+        const cluster = DatabaseCluster.fromDatabaseClusterAttributes(this, 'DbCluster', {
+            clusterIdentifier: appProps.dbClusterIdentifier,
+            engine: DatabaseClusterEngine.AURORA_POSTGRESQL
+        });
+        const secret = Secret.fromSecretNameV2(this, 'PortActivitySecret', appProps.secretId);
+        const dbProxyName = 'PortActivityRDSProxy';
+        return new DatabaseProxy(this, dbProxyName, {
+            dbProxyName,
+            vpc,
+            secrets: [secret],
+            proxyTarget: ProxyTarget.fromCluster(cluster),
+            securityGroups: [sg],
+            requireTLS: false
+        });
     }
 
 }
