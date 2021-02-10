@@ -35,7 +35,7 @@ export class PortActivityStack extends Stack {
     }
 
     addDLQAlarm(queue: Queue, appProps: Props) {
-        const alarmName = 'PortcallEstimatesDLQAlarm';
+        const alarmName = 'PortActivity-TimestampsDLQAlarm';
         queue.metricNumberOfMessagesReceived({
             period: appProps.dlqNotificationDuration
         }).createAlarm(this, alarmName, {

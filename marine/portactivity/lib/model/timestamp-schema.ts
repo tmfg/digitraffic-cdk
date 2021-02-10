@@ -3,7 +3,7 @@ import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigat
 export const ShipSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Portcall estimates ship schema',
+    description: 'PortActivity timestamps ship schema',
     properties: {
         mmsi: {
             type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING, JsonSchemaType.NULL],
@@ -19,7 +19,7 @@ export const ShipSchema: JsonSchema = {
 export const LocationSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Portcall estimates location schema',
+    description: 'PortActivity timestamps location schema',
     required: ['port'],
     properties: {
         port: {
@@ -29,11 +29,11 @@ export const LocationSchema: JsonSchema = {
     }
 };
 
-export function createEstimateSchema(shipReference: string, locationReference: string): JsonSchema {
+export function createTimestampSchema(shipReference: string, locationReference: string): JsonSchema {
     return {
         schema: JsonSchemaVersion.DRAFT4,
         type: JsonSchemaType.OBJECT,
-        description: 'Portcall estimates schema',
+        description: 'PortActivity timestamps schema',
         required: [
             'eventType',
             'eventTime',

@@ -10,7 +10,7 @@ import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aw
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
-import {createEstimateSchema, LocationSchema, ShipSchema} from './model/estimate-schema';
+import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from '../../../common/stack/subscription';
 import {corsMethodJsonResponse, defaultIntegration,} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
@@ -27,50 +27,50 @@ export function create(
     stack: Construct) {
     const publicApi = createApi(stack);
 
-    createUsagePlan(publicApi, 'Portcall estimates Api Key', 'Portcall estimates Usage Plan');
+    createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan');
 
     const validator = addDefaultValidator(publicApi);
 
     const shipModel = addServiceModel("ShipModel", publicApi, ShipSchema);
     const locationModel = addServiceModel("LocationModel", publicApi, LocationSchema);
-    const estimateModel = addServiceModel("EstimateModel",
+    const timestampModel = addServiceModel("TimestampModel",
         publicApi,
-        createEstimateSchema(
+        createTimestampSchema(
             getModelReference(shipModel.modelId, publicApi.restApiId),
             getModelReference(locationModel.modelId, publicApi.restApiId)));
-    const estimatesModel = addServiceModel("EstimatesModel", publicApi, createArraySchema(estimateModel, publicApi));
+    const timestampsModel = addServiceModel("TimestampsModel", publicApi, createArraySchema(timestampModel, publicApi));
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
     const resource = publicApi.root
         .addResource("api")
         .addResource("v2")
-        .addResource('portcall-estimates');
+        .addResource('portcall-timestamps');
 
-    createEstimatesResource(publicApi, vpc, props, resource, lambdaDbSg, estimatesModel, errorResponseModel, validator, stack);
+    createTimestampsResource(publicApi, vpc, props, resource, lambdaDbSg, timestampsModel, errorResponseModel, validator, stack);
     createShiplistResource(publicApi, vpc, props, resource, lambdaDbSg, stack);
 }
 
-function createEstimatesResource(
+function createTimestampsResource(
     publicApi: RestApi,
     vpc: IVpc,
     props: Props,
     resource: Resource,
     lambdaDbSg: ISecurityGroup,
-    estimatesJsonModel: any,
+    timestampsJsonModel: any,
     errorResponseModel: any,
     validator: RequestValidator,
     stack: Construct): Function {
 
-    const functionName = 'PortcallEstimate-GetEstimates';
-    const assetCode = new AssetCode('dist/estimates/lambda/get-estimates');
-    const getEstimatesLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const functionName = 'PortActivity-GetTimestamps';
+    const assetCode = new AssetCode('dist/lambda/get-timestamps');
+    const getTimestampsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: assetCode,
-        handler: 'lambda-get-estimates.handler',
+        handler: 'lambda-get-timestamps.handler',
         readOnly: false
     }));
 
-    const getEstimatesIntegration = defaultIntegration(getEstimatesLambda, {
+    const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
         requestParameters: {
             'integration.request.querystring.locode': 'method.request.querystring.locode',
             'integration.request.querystring.mmsi': 'method.request.querystring.mmsi',
@@ -85,7 +85,7 @@ function createEstimatesResource(
         }
     });
 
-    resource.addMethod("GET", getEstimatesIntegration, {
+    resource.addMethod("GET", getTimestampsIntegration, {
         apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.locode': false,
@@ -94,15 +94,15 @@ function createEstimatesResource(
         },
         requestValidator: validator,
         methodResponses: [
-            corsMethodJsonResponse("200", estimatesJsonModel),
+            corsMethodJsonResponse("200", timestampsJsonModel),
             corsMethodJsonResponse("500", errorResponseModel)
         ]
     });
 
-    createSubscription(getEstimatesLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetEstimates', ['portcall-estimates'], resource, stack);
+    createSubscription(getTimestampsLambda, functionName, props.logsDestinationArn, stack);
+    addTags('GetTimestamps', ['portcall-timestamps'], resource, stack);
 
-    return getEstimatesLambda;
+    return getTimestampsLambda;
 }
 
 function createShiplistResource(
@@ -113,9 +113,9 @@ function createShiplistResource(
     lambdaDbSg: ISecurityGroup,
     stack: Construct): Function {
 
-    const functionName = 'PortcallEstimate-PublicShiplist';
+    const functionName = 'PortActivity-PublicShiplist';
 
-    const assetCode = new AssetCode('dist/estimates/lambda/get-shiplist-public');
+    const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
     const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: assetCode,
@@ -138,12 +138,12 @@ function createShiplistResource(
 }
 
 function createApi(stack: Construct) {
-    return new RestApi(stack, 'PortcallEstimate-public', {
+    return new RestApi(stack, 'PortActivity-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
         },
-        description: 'Portcall estimates',
-        restApiName: 'PortcallEstimates public API',
+        description: 'PortActivity timestamps',
+        restApiName: 'PortActivity public API',
         endpointTypes: [EndpointType.REGIONAL],
         policy: new PolicyDocument({
             statements: [

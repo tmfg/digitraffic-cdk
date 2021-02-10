@@ -1,5 +1,5 @@
 /*
-    A non-complete enumeration of AIS navigational statuses to be used with the ETA estimates API
+    A non-complete enumeration of AIS navigational statuses to be used with the ETA timestamps API
  */
 export enum NavStatus {
     UNDER_WAY_USING_ENGINE = 'under_way_using_engine',

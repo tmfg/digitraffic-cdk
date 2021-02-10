@@ -1,4 +1,4 @@
-import {findAllEstimates} from "../../service/estimates";
+import {findAllTimestamps} from "../../service/timestamps";
 
 export const handler = async (
     event: {
@@ -10,5 +10,5 @@ export const handler = async (
     if (!event.locode && !event.mmsi && !event.imo) {
         return 'Bad request';
     }
-    return await findAllEstimates(event.locode, event.mmsi, event.imo);
+    return await findAllTimestamps(event.locode, event.mmsi, event.imo);
 };

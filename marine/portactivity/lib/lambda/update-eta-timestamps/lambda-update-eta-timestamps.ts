@@ -1,8 +1,8 @@
 import {getPortAreaGeometries, Port} from '../../service/portareas';
-import {findETAShipsByLocode} from '../../service/estimates';
-import {updateETAEstimates} from '../../service/etas';
+import {findETAShipsByLocode} from '../../service/timestamps';
+import {updateETATimestamps} from '../../service/etas';
 import {SNS} from 'aws-sdk';
-import {DbETAShip} from "../../db/db-estimates";
+import {DbETAShip} from "../../db/db-timestamps";
 import {ShipETA} from "../../api/api-etas";
 
 export const KEY_ENDPOINT_CLIENT_ID = 'ENDPOINT_CLIENT_ID'
@@ -26,7 +26,7 @@ const locodes = portAreaGeometries.map(p => p.locode);
 
 export function handlerFn(
     sns: SNS,
-    doUpdateETAEstimates: (
+    doUpdateETATimestamps: (
         endpointClientId: string,
         endpointClientSecret: string,
         endpointClientAudience: string,
@@ -42,7 +42,7 @@ export function handlerFn(
 
         if (ships.length) {
             console.log('About to fetch ETAs for ships:', ships);
-            const etas = await doUpdateETAEstimates(endpointClientId,
+            const etas = await doUpdateETATimestamps(endpointClientId,
                 endpointClientSecret,
                 endpointClientAudience,
                 endpointAuthUrl,
@@ -66,4 +66,4 @@ export function handlerFn(
     };
 }
 
-export const handler = handlerFn(new SNS(), updateETAEstimates);
+export const handler = handlerFn(new SNS(), updateETATimestamps);

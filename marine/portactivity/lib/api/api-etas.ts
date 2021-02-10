@@ -1,6 +1,6 @@
 import axios from 'axios';
-import {Port, PortAreaCoordinates} from "../service/portareas";
-import {DbETAShip} from "../db/db-estimates";
+import {Port} from "../service/portareas";
+import {DbETAShip} from "../db/db-timestamps";
 
 async function createEtaOAuthToken(
     endpointClientId: string,

@@ -169,7 +169,7 @@ export const handler = async (
                 title: 'Ship',
                 sortable: true
             }, {
-                field: 'estimates',
+                field: 'timestamps',
                 class: 'col-2',
                 title: 'Type',
                 formatter: (e) => {
@@ -180,7 +180,7 @@ export const handler = async (
                     );
                 }
             }, {
-                field: 'estimates',
+                field: 'timestamps',
                 class: 'col-3',
                 title: 'Time',
                 formatter: (e) => {
@@ -191,7 +191,7 @@ export const handler = async (
                     )
                 }
             }, {
-                field: 'estimates',
+                field: 'timestamps',
                 class: 'col-3',
                 title: 'Source',
                 formatter: (e) => {
@@ -208,7 +208,7 @@ export const handler = async (
         function toShipRow([name, subRows]) {
             return {
                 name,
-                estimates: {
+                timestamps: {
                     etas: R.filter(R.propEq('event_type', 'ETA'), subRows),
                     atas: R.filter(R.propEq('event_type', 'ATA'), subRows),
                     etds: R.filter(R.propEq('event_type', 'ETD'), subRows),

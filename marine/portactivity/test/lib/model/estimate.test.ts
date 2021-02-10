@@ -1,117 +1,117 @@
-import {validateEstimate} from "../../../lib/model/estimate";
-import {newEstimate} from "../testdata";
+import {validateTimestamp} from "../../../lib/model/timestamp";
+import {newTimestamp} from "../testdata";
 
-describe('estimate model', () => {
+describe('timestamp model', () => {
 
-    test('validateEstimate - ok', () => {
-        expect(validateEstimate(newEstimate())).toBe(true);
+    test('validateTimestamp - ok', () => {
+        expect(validateTimestamp(newTimestamp())).toBe(true);
     });
 
-    test('validateEstimate - missing eventType', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing eventType', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate as any).eventType;
+        delete (timestamp as any).eventType;
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - missing eventTime', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing eventTime', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate as any).eventTime;
+        delete (timestamp as any).eventTime;
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - invalid eventTime', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - invalid eventTime', () => {
+        const timestamp = newTimestamp();
 
-        (estimate as any).eventTime = '123456-qwerty'
+        (timestamp as any).eventTime = '123456-qwerty'
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - invalid eventTimeConfidenceLower', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - invalid eventTimeConfidenceLower', () => {
+        const timestamp = newTimestamp();
 
-        (estimate as any).eventTimeConfidenceLower = 'PT1Hasdf'
+        (timestamp as any).eventTimeConfidenceLower = 'PT1Hasdf'
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - invalid eventTimeConfidenceUpper', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - invalid eventTimeConfidenceUpper', () => {
+        const timestamp = newTimestamp();
 
-        (estimate as any).eventTimeConfidenceUpper = 'PT1Hasdf'
+        (timestamp as any).eventTimeConfidenceUpper = 'PT1Hasdf'
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - invalid eventTimeConfidenceUpper', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - invalid eventTimeConfidenceUpper', () => {
+        const timestamp = newTimestamp();
 
-        (estimate as any).eventTimeConfidenceUpper = 'PT1Hasdf'
+        (timestamp as any).eventTimeConfidenceUpper = 'PT1Hasdf'
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - missing recordTime', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing recordTime', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate as any).recordTime;
+        delete (timestamp as any).recordTime;
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - invalid recordTime', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - invalid recordTime', () => {
+        const timestamp = newTimestamp();
 
-        (estimate as any).recordTime = '123456-qwerty'
+        (timestamp as any).recordTime = '123456-qwerty'
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - missing source', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing source', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate as any).source;
+        delete (timestamp as any).source;
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - missing ship', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing ship', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate as any).ship;
+        delete (timestamp as any).ship;
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - missing mmsi & imo', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing mmsi & imo', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate.ship as any).mmsi;
-        delete (estimate.ship as any).imo;
-        console.log(estimate)
+        delete (timestamp.ship as any).mmsi;
+        delete (timestamp.ship as any).imo;
+        console.log(timestamp)
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - missing location', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing location', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate as any).location;
+        delete (timestamp as any).location;
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
-    test('validateEstimate - missing port', () => {
-        const estimate = newEstimate();
+    test('validateTimestamp - missing port', () => {
+        const timestamp = newTimestamp();
 
-        delete (estimate.location as any).port;
-        console.log(estimate)
+        delete (timestamp.location as any).port;
+        console.log(timestamp)
 
-        expect(validateEstimate(estimate)).toBe(false);
+        expect(validateTimestamp(timestamp)).toBe(false);
     });
 
 });

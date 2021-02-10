@@ -1,12 +1,12 @@
 import moment from "moment";
-import {ApiEstimate, EventType} from "../../lib/model/estimate";
+import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 const { v4: uuidv4 } = require('uuid');
 
 export function someNumber(): number {
     return 1 + Math.floor(Math.random() * 999999);
 }
 
-export function newEstimate(props?: {
+export function newTimestamp(props?: {
     mmsi?: number,
     imo?: number,
     locode?: string,
@@ -16,7 +16,7 @@ export function newEstimate(props?: {
     eventTimeConfidenceUpper?: string | null
     source?: string,
     portcallId?: number
-}): ApiEstimate {
+}): ApiTimestamp {
     // round off millis
     const eventTime = props?.eventTime ?? new Date();
     eventTime.setMilliseconds(0);
@@ -40,9 +40,9 @@ export function newEstimate(props?: {
     };
 }
 
-export function newVessel(estimate: ApiEstimate): Vessel {
+export function newVessel(timestamp: ApiTimestamp): Vessel {
     return {
-        mmsi: estimate.ship.mmsi!,
+        mmsi: timestamp.ship.mmsi!,
         timestamp: new Date().getMilliseconds(),
         name: uuidv4(),
         ship_type: 1,
@@ -52,7 +52,7 @@ export function newVessel(estimate: ApiEstimate): Vessel {
         reference_point_d: 1,
         pos_type: 1,
         draught: 1,
-        imo: estimate.ship.imo!,
+        imo: timestamp.ship.imo!,
         eta: 1,
         call_sign: 'a',
         destination: 'b'
@@ -60,7 +60,7 @@ export function newVessel(estimate: ApiEstimate): Vessel {
 }
 
 export function newPortAreaDetails(
-    estimate: ApiEstimate,
+    timestamp: ApiTimestamp,
     props?: {
         eta?: Date,
         portcallId?: number
@@ -68,21 +68,21 @@ export function newPortAreaDetails(
 
     return {
         port_area_details_id: Math.floor(Math.random() * 10000),
-        port_call_id: props?.portcallId ?? estimate.portcallId!,
+        port_call_id: props?.portcallId ?? timestamp.portcallId!,
         eta: props?.eta?.toISOString()
     };
 }
 
-export function newPortCall(estimate: ApiEstimate, portcallId?: number): PortCall {
+export function newPortCall(timestamp: ApiTimestamp, portcallId?: number): PortCall {
     return {
-        port_call_id: portcallId ?? estimate.portcallId!,
+        port_call_id: portcallId ?? timestamp.portcallId!,
         radio_call_sign: 'a',
         radio_call_sign_type: 'fake',
         vessel_name: uuidv4(),
         port_call_timestamp: new Date(),
-        port_to_visit: estimate.location.port,
-        mmsi: estimate.ship.mmsi ?? someNumber(),
-        imo_lloyds: estimate.ship.imo ?? someNumber()
+        port_to_visit: timestamp.location.port,
+        mmsi: timestamp.ship.mmsi ?? someNumber(),
+        imo_lloyds: timestamp.ship.imo ?? someNumber()
     };
 }
 

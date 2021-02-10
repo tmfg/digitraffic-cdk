@@ -1,11 +1,11 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
-import {ApiEstimate, EventType} from "../model/estimate";
+import {ApiTimestamp, EventType} from "../model/timestamp";
 import moment from "moment";
 
-export const ESTIMATES_BEFORE = `CURRENT_DATE - INTERVAL '12 HOURS'`;
-export const ESTIMATES_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
+export const TIMESTAMPS_BEFORE = `CURRENT_DATE - INTERVAL '12 HOURS'`;
+export const TIMESTAMPS_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
 
-export interface DbEstimate {
+export interface DbTimestamp {
     readonly event_type: EventType
     readonly event_time: Date
     readonly event_time_confidence_lower?: string
@@ -27,13 +27,13 @@ export interface DbETAShip {
     readonly portcall_id: number
 }
 
-export interface DbUpdatedEstimate {
+export interface DbUpdatedTimestamp {
     readonly ship_mmsi: number
     readonly ship_imo: number
     readonly location_locode: string
 }
 
-export interface DbEstimateIdAndLocode {
+export interface DbTimestampIdAndLocode {
     readonly id: number
     readonly locode: string
 }
@@ -132,8 +132,8 @@ const SELECT_BY_LOCODE = `
                   px.event_source = pe.event_source AND
                   px.portcall_id = pe.portcall_id
           ) AND
-          pe.event_time > ${ESTIMATES_BEFORE} AND
-          pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+          pe.event_time > ${TIMESTAMPS_BEFORE} AND
+          pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
           pe.location_locode = $1
     ORDER by pe.event_time
 `;
@@ -188,8 +188,8 @@ const SELECT_BY_MMSI = `
                   px.event_source = pe.event_source AND
                   px.portcall_id = pe.portcall_id
           ) AND
-        pe.event_time > ${ESTIMATES_BEFORE} AND
-        pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+        pe.event_time > ${TIMESTAMPS_BEFORE} AND
+        pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
         pe.ship_mmsi = $1
     ORDER by pe.event_time
 `;
@@ -218,8 +218,8 @@ const SELECT_BY_IMO = `
                   px.event_source = pe.event_source AND
                   px.portcall_id = pe.portcall_id
           ) AND
-        pe.event_time > ${ESTIMATES_BEFORE} AND
-        pe.event_time < ${ESTIMATES_IN_THE_FUTURE} AND
+        pe.event_time > ${TIMESTAMPS_BEFORE} AND
+        pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
         pe.ship_imo = $1
     ORDER by pe.event_time
 `;
@@ -241,18 +241,18 @@ const DELETE_BY_ID = `
     WHERE id = $1
 `;
 
-export function updateEstimate(db: IDatabase<any, any>, estimate: ApiEstimate): Promise<DbUpdatedEstimate | null> {
+export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
-        name:'update-estimates',
+        name:'update-timestamps',
         text:INSERT_ESTIMATE_SQL
     });
-    return db.oneOrNone(ps, createUpdateValues(estimate));
+    return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
 export function findByLocode(
     db: IDatabase<any, any>,
     locode: string
-): Promise<DbEstimate[]> {
+): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
         name:'find-by-locode',
         text:SELECT_BY_LOCODE,
@@ -264,7 +264,7 @@ export function findByLocode(
 export function findByMmsi(
     db: IDatabase<any, any>,
     mmsi: number,
-): Promise<DbEstimate[]> {
+): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
         name: 'find-by-mmsi',
         text: SELECT_BY_MMSI,
@@ -276,7 +276,7 @@ export function findByMmsi(
 export function findByImo(
     db: IDatabase<any, any>,
     imo: number,
-): Promise<DbEstimate[]> {
+): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
         name: 'find-by-imo',
         text: SELECT_BY_IMO,
@@ -293,11 +293,11 @@ export function findETAsByLocodes(
     return db.tx(t => t.manyOrNone(SELECT_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
 }
 
-export function findPortnetEstimatesForAnotherLocode(
+export function findPortnetTimestampsForAnotherLocode(
     db: IDatabase<any, any>,
     portcallId: number,
     locode: string
-): Promise<DbEstimateIdAndLocode[]> {
+): Promise<DbTimestampIdAndLocode[]> {
     const ps = new PreparedStatement({
         name: 'find-by-portcall-id-and-locode',
         text: SELECT_BY_PORTCALL_ID_AND_LOCODE,
@@ -318,7 +318,7 @@ export function deleteById(
     return db.none(ps);
 }
 
-export function createUpdateValues(e: ApiEstimate): any[] {
+export function createUpdateValues(e: ApiTimestamp): any[] {
     return [
         e.eventType, // event_type
         moment(e.eventTime).toDate(), // event_time

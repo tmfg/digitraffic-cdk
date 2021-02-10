@@ -2,8 +2,8 @@ import {Queue, QueueEncryption} from "@aws-cdk/aws-sqs";
 import {Construct, Duration} from "@aws-cdk/core";
 
 export function createQueue(scope: Construct): QueueAndDLQ {
-    const queueName = 'PortcallEstimateQueue';
-    const dlqQueueName = 'PortcallEstimateQueue-DLQ'
+    const queueName = 'PortCallTimestampQueue';
+    const dlqQueueName = 'PortCallTimestampQueue-DLQ'
     const dlq = new Queue(scope, dlqQueueName, {
         queueName: dlqQueueName,
         receiveMessageWaitTime: Duration.seconds(20),

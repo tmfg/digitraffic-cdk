@@ -1,98 +1,98 @@
 import {dbTestBase, findAll, insert} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {newEstimate} from "../testdata";
+import {newTimestamp} from "../testdata";
 import moment from 'moment-timezone';
 import {
-    findAllEstimates, saveEstimate, saveEstimates
-} from "../../../lib/service/estimates";
+    findAllTimestamps, saveTimestamp, saveTimestamps
+} from "../../../lib/service/timestamps";
 
-describe('estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
-    test('findAllEstimates - locode', async () => {
-        const estimate = newEstimate();
-        await insert(db, [estimate]);
+    test('findAllTimestamps - locode', async () => {
+        const timestamp = newTimestamp();
+        await insert(db, [timestamp]);
 
-        const estimates = await findAllEstimates(estimate.location.port, undefined, undefined);
+        const timestamps = await findAllTimestamps(timestamp.location.port, undefined, undefined);
 
-        expect(estimates.length).toBe(1);
-        expect(estimates[0]).toMatchObject(estimate);
+        expect(timestamps.length).toBe(1);
+        expect(timestamps[0]).toMatchObject(timestamp);
     });
 
-    test('findAllEstimates - mmsi', async () => {
-        const estimate = newEstimate();
-        await insert(db, [estimate]);
+    test('findAllTimestamps - mmsi', async () => {
+        const timestamp = newTimestamp();
+        await insert(db, [timestamp]);
 
-        const estimates = await findAllEstimates(undefined, estimate.ship.mmsi, undefined);
+        const timestamps = await findAllTimestamps(undefined, timestamp.ship.mmsi, undefined);
 
-        expect(estimates.length).toBe(1);
-        expect(estimates[0]).toMatchObject(estimate);
+        expect(timestamps.length).toBe(1);
+        expect(timestamps[0]).toMatchObject(timestamp);
     });
 
-    test('findAllEstimates - imo', async () => {
-        const estimate = newEstimate();
-        await insert(db, [estimate]);
+    test('findAllTimestamps - imo', async () => {
+        const timestamp = newTimestamp();
+        await insert(db, [timestamp]);
 
-        const estimates = await findAllEstimates(undefined, undefined, estimate.ship.imo);
+        const timestamps = await findAllTimestamps(undefined, undefined, timestamp.ship.imo);
 
-        expect(estimates.length).toBe(1);
-        expect(estimates[0]).toMatchObject(estimate);
+        expect(timestamps.length).toBe(1);
+        expect(timestamps[0]).toMatchObject(timestamp);
     });
 
-    test('saveEstimate - no conflict returns updated', async () => {
-        const estimate = newEstimate();
+    test('saveTimestamp - no conflict returns updated', async () => {
+        const timestamp = newTimestamp();
 
-        const ret = await saveEstimate(estimate);
+        const ret = await saveTimestamp(timestamp);
 
-        expect(ret?.location_locode).toBe(estimate.location.port);
-        expect(ret?.ship_mmsi).toBe(estimate.ship.mmsi);
-        expect(ret?.ship_imo).toBe(estimate.ship.imo);
+        expect(ret?.location_locode).toBe(timestamp.location.port);
+        expect(ret?.ship_mmsi).toBe(timestamp.ship.mmsi);
+        expect(ret?.ship_imo).toBe(timestamp.ship.imo);
     });
 
-    test('saveEstimate - conflict returns undefined', async () => {
-        const estimate = newEstimate();
+    test('saveTimestamp - conflict returns undefined', async () => {
+        const timestamp = newTimestamp();
 
-        await saveEstimate(estimate);
-        const ret = await saveEstimate(estimate);
+        await saveTimestamp(timestamp);
+        const ret = await saveTimestamp(timestamp);
 
         expect(ret).toBeNull();
     });
 
-    test('saveEstimate - Portnet estimate with same portcallid, same locode is not replaced ', async () => {
-        const olderEstimate = newEstimate({locode: 'FIRAU', source: 'Portnet'});
-        const newerEstimate = { ...olderEstimate, eventTime: moment(olderEstimate.eventTime).add(1,'hours').toISOString() };
+    test('saveTimestamp - Portnet timestamp with same portcallid, same locode is not replaced ', async () => {
+        const olderTimestamp = newTimestamp({locode: 'FIRAU', source: 'Portnet'});
+        const newerTimestamp = { ...olderTimestamp, eventTime: moment(olderTimestamp.eventTime).add(1,'hours').toISOString() };
 
-        await saveEstimate(olderEstimate);
-        const ret = await saveEstimate(newerEstimate);
+        await saveTimestamp(olderTimestamp);
+        const ret = await saveTimestamp(newerTimestamp);
 
         expect(ret.locodeChanged).toBe(false);
         expect((await findAll(db)).length).toBe(2);
     });
 
-    test('saveEstimate - Portnet estimate with same portcallid, different locode is replaced ', async () => {
-        const olderEstimate = newEstimate({locode: 'FIHKO', source: 'Portnet'});
-        const newerEstimate = { ...olderEstimate, location: { port: 'FIRAU' } };
+    test('saveTimestamp - Portnet timestamp with same portcallid, different locode is replaced ', async () => {
+        const olderTimestamp = newTimestamp({locode: 'FIHKO', source: 'Portnet'});
+        const newerTimestamp = { ...olderTimestamp, location: { port: 'FIRAU' } };
 
-        await saveEstimate(olderEstimate);
-        const ret = await saveEstimate(newerEstimate);
+        await saveTimestamp(olderTimestamp);
+        const ret = await saveTimestamp(newerTimestamp);
 
         expect(ret.locodeChanged).toBe(true);
-        expect((await findAllEstimates(olderEstimate.location.port)).length).toBe(0);
-        expect((await findAllEstimates(newerEstimate.location.port)).length).toBe(1);
+        expect((await findAllTimestamps(olderTimestamp.location.port)).length).toBe(0);
+        expect((await findAllTimestamps(newerTimestamp.location.port)).length).toBe(1);
     });
 
-    test('saveEstimates - multiple updates', async () => {
-        const estimate1 = newEstimate();
-        const estimate2 = newEstimate();
+    test('saveTimestamps - multiple updates', async () => {
+        const timestamp1 = newTimestamp();
+        const timestamp2 = newTimestamp();
 
-        const ret = await saveEstimates([estimate1, estimate2]);
+        const ret = await saveTimestamps([timestamp1, timestamp2]);
 
-        expect(ret[0]?.location_locode).toBe(estimate1.location.port);
-        expect(ret[0]?.ship_mmsi).toBe(estimate1.ship.mmsi);
-        expect(ret[0]?.ship_imo).toBe(estimate1.ship.imo);
+        expect(ret[0]?.location_locode).toBe(timestamp1.location.port);
+        expect(ret[0]?.ship_mmsi).toBe(timestamp1.ship.mmsi);
+        expect(ret[0]?.ship_imo).toBe(timestamp1.ship.imo);
 
-        expect(ret[1]?.location_locode).toBe(estimate2.location.port);
-        expect(ret[1]?.ship_mmsi).toBe(estimate2.ship.mmsi);
-        expect(ret[1]?.ship_imo).toBe(estimate2.ship.imo);
+        expect(ret[1]?.location_locode).toBe(timestamp2.location.port);
+        expect(ret[1]?.ship_mmsi).toBe(timestamp2.ship.mmsi);
+        expect(ret[1]?.ship_imo).toBe(timestamp2.ship.imo);
     });
 
 }));

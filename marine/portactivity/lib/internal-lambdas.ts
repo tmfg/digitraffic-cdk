@@ -18,7 +18,7 @@ import {
     KEY_ENDPOINT_AUDIENCE, KEY_ENDPOINT_AUTH_URL,
     KEY_ENDPOINT_CLIENT_ID,
     KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE, KEY_ESTIMATE_SNS_TOPIC_ARN
-} from "./lambda/update-eta-estimates/lambda-update-eta-estimates";
+} from "./lambda/update-eta-timestamps/lambda-update-eta-timestamps";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -28,42 +28,42 @@ export function create(
     props: Props,
     stack: Stack) {
 
-    const estimatesUpdatedTopicId = 'PortcallEstimatesUpdatedTopic';
-    const estimatesUpdatedTopic = new Topic(stack, estimatesUpdatedTopicId, {
-        displayName: estimatesUpdatedTopicId,
-        topicName: estimatesUpdatedTopicId
+    const timestampsUpdatedTopicId = 'PortActivity-TimestampsUpdatedTopic';
+    const timestampsUpdatedTopic = new Topic(stack, timestampsUpdatedTopicId, {
+        displayName: timestampsUpdatedTopicId,
+        topicName: timestampsUpdatedTopicId
     });
-    createProcessQueueLambda(queueAndDLQ.queue, estimatesUpdatedTopic, vpc, lambdaDbSg, props, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, timestampsUpdatedTopic, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 
-    const updateETAEstimatesLambda = createUpdateETAEstimatesLambda(estimatesUpdatedTopic, vpc, lambdaDbSg, props, stack);
+    const updateETATimestampsLambda = createUpdateETATimestampsLambda(timestampsUpdatedTopic, vpc, lambdaDbSg, props, stack);
     const updateETASchedulingRule = createETAUpdateSchedulingCloudWatchRule(stack);
-    updateETASchedulingRule.addTarget(new LambdaFunction(updateETAEstimatesLambda));
+    updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
 }
 
 function createProcessQueueLambda(
     queue: Queue,
-    estimatesUpdatedTopic: Topic,
+    timestampsUpdatedTopic: Topic,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
     stack: Stack) {
-    const functionName = "PortcallEstimates-ProcessQueue";
+    const functionName = "PortActivity-ProcessTimestampQueue";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
-        code: new AssetCode('dist/estimates/lambda/process-queue'),
+        code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment: {
             DB_USER: props.dbProps.username,
             DB_PASS: props.dbProps.password,
             DB_URI: props.dbProps.uri,
-            ESTIMATE_SNS_TOPIC_ARN: estimatesUpdatedTopic.topicArn
+            ESTIMATE_SNS_TOPIC_ARN: timestampsUpdatedTopic.topicArn
         },
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const processQueueLambda = new Function(stack, functionName, lambdaConf);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
-    estimatesUpdatedTopic.grantPublish(processQueueLambda);
+    timestampsUpdatedTopic.grantPublish(processQueueLambda);
     createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
 }
 
@@ -74,12 +74,12 @@ function createProcessDLQLambda(
     stack: Stack) {
     const lambdaEnv: any = {};
     lambdaEnv[BUCKET_NAME] = dlqBucket.bucketName;
-    const functionName = "PortcallEstimates-ProcessDLQ";
+    const functionName = "PortActivity-ProcessTimestampsDLQ";
     const processDLQLambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
-        code: new AssetCode('dist/estimates/lambda/process-dlq'),
+        code: new AssetCode('dist/lambda/process-dlq'),
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
@@ -97,15 +97,15 @@ function createProcessDLQLambda(
 }
 
 function createETAUpdateSchedulingCloudWatchRule(stack: Stack): Rule {
-    const ruleName = 'PortcallEstimates-ETAScheduler'
+    const ruleName = 'PortActivity-ETAScheduler'
     return new Rule(stack, ruleName, {
         ruleName,
         schedule: Schedule.expression('cron(*/15 * * * ? *)') // every 15 minutes
     });
 }
 
-function createUpdateETAEstimatesLambda(
-    estimatesUpdatedTopic: Topic,
+function createUpdateETATimestampsLambda(
+    timestampsUpdatedTopic: Topic,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
@@ -121,19 +121,19 @@ function createUpdateETAEstimatesLambda(
     environment[KEY_ENDPOINT_AUDIENCE] = props.etaProps.audience;
     environment[KEY_ENDPOINT_AUTH_URL] = props.etaProps.authUrl;
     environment[KEY_ENDPOINT_URL] = props.etaProps.endpointUrl;
-    environment[KEY_ESTIMATE_SOURCE] = props.etaProps.estimateSource;
-    environment[KEY_ESTIMATE_SNS_TOPIC_ARN] = estimatesUpdatedTopic.topicArn;
+    environment[KEY_ESTIMATE_SOURCE] = props.etaProps.timestampSource;
+    environment[KEY_ESTIMATE_SNS_TOPIC_ARN] = timestampsUpdatedTopic.topicArn;
 
-    const functionName = 'PortcallEstimates-UpdateETAEstimates';
+    const functionName = 'PortActivity-UpdateETATimestamps';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
-        code: new AssetCode('dist/estimates/lambda/update-eta-estimates'),
-        handler: 'lambda-update-eta-estimates.handler',
+        code: new AssetCode('dist/lambda/update-eta-timestamps'),
+        handler: 'lambda-update-eta-timestamps.handler',
         environment,
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const lambda = new Function(stack, functionName, lambdaConf);
-    estimatesUpdatedTopic.grantPublish(lambda);
+    timestampsUpdatedTopic.grantPublish(lambda);
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     return lambda;
 }

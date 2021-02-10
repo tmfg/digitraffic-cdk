@@ -1,15 +1,15 @@
 import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
-import {newEstimate} from "../testdata";
+import {newTimestamp} from "../testdata";
 import {
-    DbEstimate,
+    DbTimestamp,
     findByImo,
     findByLocode,
     findByMmsi,
-} from "../../../lib/db/db-estimates";
+} from "../../../lib/db/db-timestamps";
 import {shuffle} from "../../../../../common/js/js-utils";
 
-describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-timestamps - ordering', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     const locode = 'BB456';
     generateOrderingTest(
@@ -44,76 +44,76 @@ describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any
         idPropText: string,
         idProp: { mmsi?: number, imo?: number, locode?: string },
         getIdProp: () => any,
-        fetchMethod: (identifier: any) => Promise<DbEstimate[]>) {
+        fetchMethod: (identifier: any) => Promise<DbTimestamp[]>) {
 
         const testMmsi = 123;
         const testLocode = 'AA123';
 
         test(`find by ${idPropText} - most accurate first - lower`, async () => {
-            const estimateSource1 = newEstimate(Object.assign({
+            const timestampSource1 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT4H',
                 eventTimeConfidenceUpper: 'PT10H'
             }, idProp));
-            const estimateSource2 = newEstimate(Object.assign({
+            const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: 'PT1H',
                 eventTimeConfidenceUpper: 'PT10H'
             }, idProp));
-            const estimateSource3 = newEstimate(Object.assign({
+            const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT8H',
                 eventTimeConfidenceUpper: 'PT10H'
             }, idProp));
-            const estimates = shuffle([estimateSource1, estimateSource2, estimateSource3]);
-            await insert(db, estimates);
+            const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
+            await insert(db, timestamps);
 
-            const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[0];
-            expect(foundEstimate.event_time_confidence_lower).toBe(estimateSource2.eventTimeConfidenceLower);
-            expect(foundEstimate.event_time_confidence_upper).toBe(estimateSource2.eventTimeConfidenceUpper);
+            const foundTimestamps = await fetchMethod(getIdProp());
+            const foundTimestamp = foundTimestamps[0];
+            expect(foundTimestamp.event_time_confidence_lower).toBe(timestampSource2.eventTimeConfidenceLower);
+            expect(foundTimestamp.event_time_confidence_upper).toBe(timestampSource2.eventTimeConfidenceUpper);
         });
 
         test(`find by ${idPropText} - most accurate first - upper`, async () => {
-            const estimateSource1 = newEstimate(Object.assign({
+            const timestampSource1 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
                 eventTimeConfidenceUpper: 'PT4H'
             }, idProp));
-            const estimateSource2 = newEstimate(Object.assign({
+            const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: 'PT10H',
                 eventTimeConfidenceUpper: 'PT2H'
             }, idProp));
-            const estimateSource3 = newEstimate(Object.assign({
+            const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
                 eventTimeConfidenceUpper: 'PT8H'
             }, idProp));
-            const estimates = shuffle([estimateSource1, estimateSource2, estimateSource3]);
-            await insert(db, estimates);
+            const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
+            await insert(db, timestamps);
 
-            const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[0];
-            expect(foundEstimate.event_time_confidence_lower).toBe(estimateSource2.eventTimeConfidenceLower);
-            expect(foundEstimate.event_time_confidence_upper).toBe(estimateSource2.eventTimeConfidenceUpper);
+            const foundTimestamps = await fetchMethod(getIdProp());
+            const foundTimestamp = foundTimestamps[0];
+            expect(foundTimestamp.event_time_confidence_lower).toBe(timestampSource2.eventTimeConfidenceLower);
+            expect(foundTimestamp.event_time_confidence_upper).toBe(timestampSource2.eventTimeConfidenceUpper);
         });
 
         test(`find by ${idPropText} - most accurate first - both`, async () => {
             // confidence 14 H
-            const estimateSource1 = newEstimate(Object.assign({
+            const timestampSource1 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source1',
@@ -121,7 +121,7 @@ describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any
                 eventTimeConfidenceUpper: 'PT4H'
             }, idProp));
             // confidence 12 H
-            const estimateSource2 = newEstimate(Object.assign({
+            const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
@@ -129,113 +129,113 @@ describe('db-estimates - ordering', dbTestBase((db: pgPromise.IDatabase<any, any
                 eventTimeConfidenceUpper: 'PT2H'
             }, idProp));
             // confidence 26 H
-            const estimateSource3 = newEstimate(Object.assign({
+            const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
                 eventTimeConfidenceUpper: 'PT8H'
             }, idProp));
-            const estimates = shuffle([estimateSource1, estimateSource2, estimateSource3]);
-            await insert(db, estimates);
+            const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
+            await insert(db, timestamps);
 
-            const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[0];
-            expect(foundEstimate.event_time_confidence_lower).toBe(estimateSource2.eventTimeConfidenceLower);
-            expect(foundEstimate.event_time_confidence_upper).toBe(estimateSource2.eventTimeConfidenceUpper);
+            const foundTimestamps = await fetchMethod(getIdProp());
+            const foundTimestamp = foundTimestamps[0];
+            expect(foundTimestamp.event_time_confidence_lower).toBe(timestampSource2.eventTimeConfidenceLower);
+            expect(foundTimestamp.event_time_confidence_upper).toBe(timestampSource2.eventTimeConfidenceUpper);
         });
 
         test(`find by ${idPropText} - most accurate first - null lower last`, async () => {
-            const estimateSource1 = newEstimate(Object.assign({
+            const timestampSource1 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
                 eventTimeConfidenceUpper: 'PT4H'
             }, idProp));
-            const estimateSource2 = newEstimate(Object.assign({
+            const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: null,
                 eventTimeConfidenceUpper: 'PT29H'
             }, idProp));
-            const estimateSource3 = newEstimate(Object.assign({
+            const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
                 eventTimeConfidenceUpper: 'PT8H'
             }, idProp));
-            const estimates = shuffle([estimateSource1, estimateSource2, estimateSource3]);
-            await insert(db, estimates);
+            const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
+            await insert(db, timestamps);
 
-            const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[2];
-            expect(foundEstimate.event_time_confidence_lower).toBeNull();
-            expect(foundEstimate.event_time_confidence_upper).toBe(estimateSource2.eventTimeConfidenceUpper);
+            const foundTimestamps = await fetchMethod(getIdProp());
+            const foundTimestamp = foundTimestamps[2];
+            expect(foundTimestamp.event_time_confidence_lower).toBeNull();
+            expect(foundTimestamp.event_time_confidence_upper).toBe(timestampSource2.eventTimeConfidenceUpper);
         });
 
         test(`find by ${idPropText} - most accurate first - null upper last`, async () => {
-            const estimateSource1 = newEstimate(Object.assign({
+            const timestampSource1 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
                 eventTimeConfidenceUpper: 'PT4H'
             }, idProp));
-            const estimateSource2 = newEstimate(Object.assign({
+            const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: 'PT29H',
                 eventTimeConfidenceUpper: null
             }, idProp));
-            const estimateSource3 = newEstimate(Object.assign({
+            const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
                 eventTimeConfidenceUpper: 'PT8H'
             }, idProp));
-            const estimates = shuffle([estimateSource1, estimateSource2, estimateSource3]);
-            await insert(db, estimates);
+            const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
+            await insert(db, timestamps);
 
-            const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[2];
-            expect(foundEstimate.event_time_confidence_lower).toBe(estimateSource2.eventTimeConfidenceLower);
-            expect(foundEstimate.event_time_confidence_upper).toBeNull();
+            const foundTimestamps = await fetchMethod(getIdProp());
+            const foundTimestamp = foundTimestamps[2];
+            expect(foundTimestamp.event_time_confidence_lower).toBe(timestampSource2.eventTimeConfidenceLower);
+            expect(foundTimestamp.event_time_confidence_upper).toBeNull();
         });
 
         test(`find by ${idPropText} - most accurate first - both null last`, async () => {
-            const estimateSource1 = newEstimate(Object.assign({
+            const timestampSource1 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
                 eventTimeConfidenceUpper: 'PT4H'
             }, idProp));
-            const estimateSource2 = newEstimate(Object.assign({
+            const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: null,
                 eventTimeConfidenceUpper: null
             }, idProp));
-            const estimateSource3 = newEstimate(Object.assign({
+            const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
                 eventTimeConfidenceUpper: 'PT8H'
             }, idProp));
-            const estimates = shuffle([estimateSource1, estimateSource2, estimateSource3]);
-            await insert(db, estimates);
+            const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
+            await insert(db, timestamps);
 
-            const foundEstimates = await fetchMethod(getIdProp());
-            const foundEstimate = foundEstimates[2];
-            expect(foundEstimate.event_time_confidence_lower).toBeNull();
-            expect(foundEstimate.event_time_confidence_upper).toBeNull();
+            const foundTimestamps = await fetchMethod(getIdProp());
+            const foundTimestamp = foundTimestamps[2];
+            expect(foundTimestamp.event_time_confidence_lower).toBeNull();
+            expect(foundTimestamp.event_time_confidence_upper).toBeNull();
         });
     }
 

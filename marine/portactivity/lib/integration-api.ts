@@ -6,7 +6,7 @@ import {createRestApi} from '../../../common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
 import {attachQueueToApiGatewayResource} from "../../../common/api/sqs";
 import {addServiceModel, getModelReference} from "../../../common/api/utils";
-import {createEstimateSchema, LocationSchema, ShipSchema} from "./model/estimate-schema";
+import {createTimestampSchema, LocationSchema, ShipSchema} from "./model/timestamp-schema";
 
 export function create(
     queue: Queue,
@@ -16,47 +16,47 @@ export function create(
     stack: Construct)
 {
     const integrationApi = createRestApi(stack,
-        'PortcallEstimates-Integration',
-        'Portcall Estimates integration API');
+        'PortActivity-Integration',
+        'Port Activity integration API');
     const shipModel = addServiceModel("ShipModel", integrationApi, ShipSchema);
     const locationModel = addServiceModel("LocationModel", integrationApi, LocationSchema);
-    const estimateModel = addServiceModel("EstimateModel",
+    const timestampModel = addServiceModel("TimestampModel",
         integrationApi,
-        createEstimateSchema(
+        createTimestampSchema(
             getModelReference(shipModel.modelId, integrationApi.restApiId),
             getModelReference(locationModel.modelId, integrationApi.restApiId)));
-    createUpdateEstimateResource(stack, integrationApi, queue, estimateModel);
+    createUpdateTimestampResource(stack, integrationApi, queue, timestampModel);
     createUsagePlan(integrationApi);
 }
 
-function createUpdateEstimateResource(
+function createUpdateTimestampResource(
     stack: Construct,
     integrationApi: RestApi,
     queue: Queue,
-    estimateModel: Model) {
+    timestampModel: Model) {
     const apiResource = integrationApi.root.addResource('api');
     const integrationResource = apiResource.addResource('integration');
-    const estimateResource = integrationResource.addResource('portcall-estimates');
+    const timestampResource = integrationResource.addResource('portcall-timestamps');
     const requestValidator = new RequestValidator(stack, 'RequestValidator', {
         validateRequestBody: true,
         validateRequestParameters: true,
-        requestValidatorName: 'PortcallEstimateIntegrationRequestValidator',
+        requestValidatorName: 'PortActivityIntegrationRequestValidator',
         restApi: integrationApi
     });
     attachQueueToApiGatewayResource(stack,
         queue,
-        estimateResource,
+        timestampResource,
         requestValidator,
-        'PortcallEstimate',
+        'PortCallTimestamp',
         true,
         {
-            'application/json': estimateModel
+            'application/json': timestampModel
         });
 }
 
 function createUsagePlan(integrationApi: RestApi) {
-    const apiKey = integrationApi.addApiKey('Portcall Estimates Integration API key');
-    const plan = integrationApi.addUsagePlan('Portcall Estimates Integration Usage Plan', {
+    const apiKey = integrationApi.addApiKey('Port Activity Integration API key');
+    const plan = integrationApi.addUsagePlan('Port Activity Integration Usage Plan', {
         name: 'Integration Usage Plan',
         apiKey
     });

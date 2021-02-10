@@ -1,5 +1,5 @@
-import {saveEstimate} from "../../service/estimates";
-import {validateEstimate} from "../../model/estimate";
+import {saveTimestamp} from "../../service/timestamps";
+import {validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
 import {SNS} from 'aws-sdk';
 const middy = require('@middy/core')
@@ -8,13 +8,13 @@ const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failu
 export function handlerFn(sns: SNS) {
     return async (event: SQSEvent) => {
         return Promise.allSettled(event.Records.map(r => {
-            const estimate = JSON.parse(r.body);
-            if (!validateEstimate(estimate)) {
+            const timestamp = JSON.parse(r.body);
+            if (!validateTimestamp(timestamp)) {
                 return Promise.reject();
             }
-            return saveEstimate(estimate);
-        })).then(async estimates => {
-            const successful = estimates.filter(processedSuccessfully);
+            return saveTimestamp(timestamp);
+        })).then(async timestamps => {
+            const successful = timestamps.filter(processedSuccessfully);
             if (successful.length) {
                 // fulfilled promises have a 'value' property
                 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled
@@ -28,7 +28,7 @@ export function handlerFn(sns: SNS) {
                     }).promise();
                 }
             }
-            return estimates;
+            return timestamps;
         });
     };
 }

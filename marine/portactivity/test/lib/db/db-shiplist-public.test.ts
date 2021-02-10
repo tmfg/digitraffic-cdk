@@ -1,8 +1,8 @@
 import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
-import {newEstimate} from "../testdata";
-import {EventType} from "../../../lib/model/estimate";
+import {newTimestamp} from "../testdata";
+import {EventType} from "../../../lib/model/timestamp";
 import {findByLocodePublicShiplist} from "../../../lib/db/db-shiplist-public";
 
 describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
@@ -10,77 +10,77 @@ describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
     test('findByLocodePublicShiplist - ETA not returned if ATA exists', async () => {
         const locode = 'AA123';
         const portcallId = 1;
-        const estimate1 = newEstimate({
+        const timestamp1 = newTimestamp({
             eventType: EventType.ETA,
             locode,
             eventTime: new Date(),
             source: 'Portnet',
             portcallId
         });
-        const estimate2 = newEstimate({
+        const timestamp2 = newTimestamp({
             eventType: EventType.ATA,
             locode,
             eventTime: moment().add(1, 'hours').toDate(),
             source: 'S1',
             portcallId
         });
-        await insert(db, [estimate1, estimate2]);
+        await insert(db, [timestamp1, timestamp2]);
 
-        const foundEstimates = await findByLocodePublicShiplist(db, locode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
 
-        expect(foundEstimates.length).toBe(1);
-        expect(foundEstimates[0].event_type).toBe(EventType.ATA);
+        expect(foundTimestamps.length).toBe(1);
+        expect(foundTimestamps[0].event_type).toBe(EventType.ATA);
     });
 
     test('findByLocodePublicShiplist - ETA without portcallId returned even if ATA exists', async () => {
         const locode = 'AA123';
         const portcallId = 1;
-        const estimate1 = newEstimate({
+        const timestamp1 = newTimestamp({
             eventType: EventType.ETA,
             locode,
             eventTime: new Date(),
             source: 'Portnet',
         });
-        const estimate2 = newEstimate({
+        const timestamp2 = newTimestamp({
             eventType: EventType.ATA,
             locode,
             eventTime: moment().add(1, 'hours').toDate(),
             source: 'S1',
             portcallId
         });
-        await insert(db, [estimate1, estimate2]);
+        await insert(db, [timestamp1, timestamp2]);
 
-        const foundEstimates = await findByLocodePublicShiplist(db, locode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
 
-        expect(foundEstimates.length).toBe(2);
-        expect(foundEstimates[0].event_type).toBe(EventType.ETA);
-        expect(foundEstimates[1].event_type).toBe(EventType.ATA);
+        expect(foundTimestamps.length).toBe(2);
+        expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
+        expect(foundTimestamps[1].event_type).toBe(EventType.ATA);
     });
 
     test('findByLocodePublicShiplist - ETA and ETD', async () => {
         const locode = 'AA123';
         const portcallId = 1;
-        const estimate1 = newEstimate({
+        const timestamp1 = newTimestamp({
             eventType: EventType.ETA,
             locode,
             eventTime: new Date(),
             source: 'Portnet',
             portcallId
         });
-        const estimate2 = newEstimate({
+        const timestamp2 = newTimestamp({
             eventType: EventType.ETD,
             locode,
             eventTime: moment().add(1, 'hours').toDate(),
             source: 'S1',
             portcallId
         });
-        await insert(db, [estimate1, estimate2]);
+        await insert(db, [timestamp1, timestamp2]);
 
-        const foundEstimates = await findByLocodePublicShiplist(db, locode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
 
-        expect(foundEstimates.length).toBe(2);
-        expect(foundEstimates[0].event_type).toBe(EventType.ETA);
-        expect(foundEstimates[1].event_type).toBe(EventType.ETD);
+        expect(foundTimestamps.length).toBe(2);
+        expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
+        expect(foundTimestamps[1].event_type).toBe(EventType.ETD);
     });
 
 }));

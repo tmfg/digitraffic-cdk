@@ -1,4 +1,4 @@
-import {ApiEstimate} from "./model/estimate";
+import {ApiTimestamp} from "./model/timestamp";
 
 export const EVENTSOURCE_VTS = "VTS";
 export const EVENTSOURCE_PORTNET = "Portnet";
@@ -18,29 +18,29 @@ const eventSourcePriorities = new Map<string, number>([
     [EVENTSOURCE_PORT_HANKO, 100]
 ]);
 
-export function isPortnetEstimate(estimate: ApiEstimate) {
-    return estimate.source == EVENTSOURCE_PORTNET;
+export function isPortnetTimestamp(timestamp: ApiTimestamp) {
+    return timestamp.source == EVENTSOURCE_PORTNET;
 }
 
 export function getDisplayableNameForEventSource(eventSource: string): string {
     return eventSourceMap.get(eventSource) || eventSource;
 }
 
-export function selectBestEstimate(estimate: any): any {
-    let bestEstimate = {} as any;
+export function selectBestTimestamp(timestamp: any): any {
+    let bestTimestamp = {} as any;
 
-    for(const sourceName of Object.keys(estimate)) {
-        const estimateTime = estimate[sourceName];
-        const estimatePriority = getPriority(sourceName);
+    for(const sourceName of Object.keys(timestamp)) {
+        const timestampTime = timestamp[sourceName];
+        const timestampPriority = getPriority(sourceName);
 
-        if(typeof bestEstimate.priority === 'undefined' || bestEstimate.priority < estimatePriority) {
-            bestEstimate.source = sourceName;
-            bestEstimate.priority = estimatePriority;
-            bestEstimate.time = estimateTime;
+        if(typeof bestTimestamp.priority === 'undefined' || bestTimestamp.priority < timestampPriority) {
+            bestTimestamp.source = sourceName;
+            bestTimestamp.priority = timestampPriority;
+            bestTimestamp.time = timestampTime;
         }
     }
 
-    return bestEstimate;
+    return bestTimestamp;
 }
 
 function getPriority(eventSource: string) {

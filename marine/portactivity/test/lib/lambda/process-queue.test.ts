@@ -2,9 +2,9 @@ import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll} from "../db-testutil";
 import {handlerFn} from "../../../lib/lambda/process-queue/lambda-process-queue";
 import {SQSRecord} from "aws-lambda";
-import {ApiEstimate} from "../../../lib/model/estimate";
+import {ApiTimestamp} from "../../../lib/model/timestamp";
 import * as sinon from 'sinon';
-import {newEstimate} from "../testdata";
+import {newTimestamp} from "../testdata";
 import {SNS} from "aws-sdk";
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
@@ -20,14 +20,14 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const sns = new SNS();
         const publishStub = sandbox.stub().returns(Promise.resolve());
         sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
-        const estimate = newEstimate();
+        const timestamp = newTimestamp();
 
         await handlerFn(sns)({
-            Records: [createRecord(estimate)]
+            Records: [createRecord(timestamp)]
         });
 
-        const allEstimates = await findAll(db);
-        expect(allEstimates.length).toBe(1);
+        const allTimestamps = await findAll(db);
+        expect(allTimestamps.length).toBe(1);
         expect(publishStub.calledOnce).toBe(true);
     });
 
@@ -35,15 +35,15 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const sns = new SNS();
         const publishStub = sandbox.stub().returns(Promise.resolve());
         sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
-        const estimate = newEstimate();
-        delete (estimate as any).eventType;
+        const timestamp = newTimestamp();
+        delete (timestamp as any).eventType;
 
         await handlerFn(sns)({
-            Records: [createRecord(estimate)]
+            Records: [createRecord(timestamp)]
         });
 
-        const allEstimates = await findAll(db);
-        expect(allEstimates.length).toBe(0);
+        const allTimestamps = await findAll(db);
+        expect(allTimestamps.length).toBe(0);
         expect(publishStub.calledOnce).toBe(false);
     });
 
@@ -51,12 +51,12 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const sns = new SNS();
         const publishStub = sandbox.stub().returns(Promise.resolve());
         sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
-        const validEstimate = newEstimate();
-        const invalidEstimate = newEstimate();
-        delete (invalidEstimate as any).eventType;
+        const validTimestamp = newTimestamp();
+        const invalidTimestamp = newTimestamp();
+        delete (invalidTimestamp as any).eventType;
 
         const promises = await handlerFn(sns)({
-            Records: [createRecord(validEstimate), createRecord(invalidEstimate)]
+            Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)]
         });
 
         expect(promises.find(p => p.status == 'fulfilled')).toBeDefined();
@@ -66,10 +66,10 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
 }));
 
-function createRecord(estimate: ApiEstimate): SQSRecord {
+function createRecord(timestamp: ApiTimestamp): SQSRecord {
     // none of these matter besides body
     return {
-        body: JSON.stringify(estimate),
+        body: JSON.stringify(timestamp),
         messageId: '',
         receiptHandle: '',
         messageAttributes: {},

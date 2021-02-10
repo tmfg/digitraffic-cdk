@@ -1,5 +1,5 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
-import {EventType} from "../model/estimate";
+import {EventType} from "../model/timestamp";
 
 export interface DbPublicShiplist {
     readonly event_type: EventType

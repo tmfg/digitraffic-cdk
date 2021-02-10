@@ -1,82 +1,82 @@
 import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll, insertPortAreaDetails, insertPortCall} from "../db-testutil";
-import {newEstimate, newPortAreaDetails, newPortCall, PortAreaDetails, PortCall} from "../testdata";
-import {createUpdateValues, updateEstimate} from "../../../lib/db/db-estimates";
-import {ApiEstimate, EventType} from "../../../lib/model/estimate";
+import {newTimestamp, newPortAreaDetails, newPortCall, PortAreaDetails, PortCall} from "../testdata";
+import {createUpdateValues, updateTimestamp} from "../../../lib/db/db-timestamps";
+import {ApiTimestamp, EventType} from "../../../lib/model/timestamp";
 
-describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
-    test('updateEstimate - properties', async () => {
-        const estimate = newEstimate({
+describe('db-timestamps - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+    test('updateTimestamp - properties', async () => {
+        const timestamp = newTimestamp({
             eventTimeConfidenceLower: 'PT1H',
             eventTimeConfidenceUpper: 'PT4H'
         });
 
-        await updateEstimate(db, estimate);
+        await updateTimestamp(db, timestamp);
 
-        const fetchedEstimates = await findAll(db);
-        expect(fetchedEstimates.length).toBe(1);
-        const e = fetchedEstimates[0];
-        expect(e.location_locode).toBe(estimate.location.port);
-        expect(e.event_source).toBe(estimate.source);
-        expect(moment(e.record_time).toISOString()).toBe(estimate.recordTime);
-        expect(moment(e.event_time).toISOString()).toBe(estimate.eventTime);
-        expect(e.event_type).toBe(estimate.eventType);
-        expect(e.event_time_confidence_lower).toBe(estimate.eventTimeConfidenceLower);
-        expect(e.event_time_confidence_lower_diff).toBe(moment(estimate.eventTime).valueOf() - moment(estimate.eventTime).subtract(moment.duration(estimate.eventTimeConfidenceLower)).valueOf());
-        expect(e.event_time_confidence_upper).toBe(estimate.eventTimeConfidenceUpper);
-        expect(e.event_time_confidence_upper_diff).toBe(moment(estimate.eventTime).add(moment.duration(estimate.eventTimeConfidenceUpper)).valueOf() - moment(estimate.eventTime).valueOf());
+        const fetchedTimestamps = await findAll(db);
+        expect(fetchedTimestamps.length).toBe(1);
+        const e = fetchedTimestamps[0];
+        expect(e.location_locode).toBe(timestamp.location.port);
+        expect(e.event_source).toBe(timestamp.source);
+        expect(moment(e.record_time).toISOString()).toBe(timestamp.recordTime);
+        expect(moment(e.event_time).toISOString()).toBe(timestamp.eventTime);
+        expect(e.event_type).toBe(timestamp.eventType);
+        expect(e.event_time_confidence_lower).toBe(timestamp.eventTimeConfidenceLower);
+        expect(e.event_time_confidence_lower_diff).toBe(moment(timestamp.eventTime).valueOf() - moment(timestamp.eventTime).subtract(moment.duration(timestamp.eventTimeConfidenceLower)).valueOf());
+        expect(e.event_time_confidence_upper).toBe(timestamp.eventTimeConfidenceUpper);
+        expect(e.event_time_confidence_upper_diff).toBe(moment(timestamp.eventTime).add(moment.duration(timestamp.eventTimeConfidenceUpper)).valueOf() - moment(timestamp.eventTime).valueOf());
     });
 
-    test('updateEstimate - mmsi', async () => {
-        const estimate = Object.assign(newEstimate(), {
+    test('updateTimestamp - mmsi', async () => {
+        const timestamp = Object.assign(newTimestamp(), {
             ship: {
                 mmsi: 123,
                 imo: undefined
             }
         });
 
-        await expect(() => updateEstimate(db, estimate)).rejects.toThrow();
+        await expect(() => updateTimestamp(db, timestamp)).rejects.toThrow();
     });
 
-    test('updateEstimate - imo', async () => {
-        const estimate = Object.assign(newEstimate(), {
+    test('updateTimestamp - imo', async () => {
+        const timestamp = Object.assign(newTimestamp(), {
             ship: {
                 mmsi: undefined,
                 imo: 456
             }
         });
 
-        await expect(() => updateEstimate(db, estimate)).rejects.toThrow();
+        await expect(() => updateTimestamp(db, timestamp)).rejects.toThrow();
     });
 
-    test('updateEstimate - both ids', async () => {
-        const estimate = Object.assign(newEstimate(), {
+    test('updateTimestamp - both ids', async () => {
+        const timestamp = Object.assign(newTimestamp(), {
             ship: {
                 mmsi: 123,
                 imo: 456
             }
         });
 
-        await updateEstimate(db, estimate);
+        await updateTimestamp(db, timestamp);
 
         const e = (await findAll(db))[0];
-        expect(e.ship_mmsi).toBe(estimate.ship.mmsi);
-        expect(e.ship_imo).toBe(estimate.ship.imo);
+        expect(e.ship_mmsi).toBe(timestamp.ship.mmsi);
+        expect(e.ship_imo).toBe(timestamp.ship.imo);
     });
 
-    test('updateEstimate - ignore duplicate', async () => {
-        const estimate = newEstimate();
+    test('updateTimestamp - ignore duplicate', async () => {
+        const timestamp = newTimestamp();
 
-        await updateEstimate(db, estimate);
-        await updateEstimate(db, estimate);
+        await updateTimestamp(db, timestamp);
+        await updateTimestamp(db, timestamp);
 
         expect((await findAll(db)).length).toBe(1);
     });
 
     test('createUpdateValues - mmsi 0', () => {
         const imo = 123456789;
-         const values = createUpdateValues(newEstimate({
+         const values = createUpdateValues(newTimestamp({
              mmsi: 0,
              imo
          }));
@@ -87,7 +87,7 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
 
     test('createUpdateValues - imo 0', () => {
         const mmsi = 123456789;
-        const values = createUpdateValues(newEstimate({
+        const values = createUpdateValues(newTimestamp({
             mmsi,
             imo: 0
         }));
@@ -98,44 +98,44 @@ describe('db-estimates - updates', dbTestBase((db: pgPromise.IDatabase<any, any>
 
     test('portcall id - supplied', async () => {
         const portcallId = 123;
-        const estimate = newEstimate({
+        const timestamp = newTimestamp({
             portcallId
         });
 
-        await updateEstimate(db, estimate);
+        await updateTimestamp(db, timestamp);
 
         expect((await findAll(db))[0].portcall_id).toBe(portcallId);
     });
 
     test('portcall id - deduced by nearest time', async () => {
         const eventTime = moment();
-        const estimate = newEstimate({
+        const timestamp = newTimestamp({
             eventType: EventType.ETA,
             eventTime: eventTime.toDate()
         });
         // @ts-ignore
-        estimate.portcallId = null; // set to null to trigger automatic guessing of portcallid
-        const portAreaDetails = await generatePortCalls(estimate);
-        const nearestEstimate = // sort by nearest time
+        timestamp.portcallId = null; // set to null to trigger automatic guessing of portcallid
+        const portAreaDetails = await generatePortCalls(timestamp);
+        const nearestTimestamp = // sort by nearest time
             portAreaDetails.sort((a, b) => {
                 const aDiff = Math.abs(moment(a.eta).diff(eventTime));
                 const bDiff = Math.abs(moment(b.eta).diff(eventTime));
                 return aDiff - bDiff;
             })[0];
 
-        await updateEstimate(db, estimate);
+        await updateTimestamp(db, timestamp);
 
-        expect((await findAll(db))[0].portcall_id).toBe(nearestEstimate.port_call_id);
+        expect((await findAll(db))[0].portcall_id).toBe(nearestTimestamp.port_call_id);
     });
 
-    async function generatePortCalls(estimate: ApiEstimate): Promise<PortAreaDetails[]> {
+    async function generatePortCalls(timestamp: ApiTimestamp): Promise<PortAreaDetails[]> {
         // cumbersome way to generate a number range
         const portCallData = [...new Set([...Array(5 + Math.floor(Math.random() * 10)).keys()])].map((i) => {
             const portcallId = i + 1;
-            const pc = newPortCall(estimate, portcallId);
-            const pac = newPortAreaDetails(estimate, {
+            const pc = newPortCall(timestamp, portcallId);
+            const pac = newPortAreaDetails(timestamp, {
                 portcallId: portcallId,
-                eta: moment(estimate.eventTime).add(1 + Math.floor(Math.random() * 100), 'minutes').toDate()
+                eta: moment(timestamp.eventTime).add(1 + Math.floor(Math.random() * 100), 'minutes').toDate()
             });
             return [pc, pac];
         });

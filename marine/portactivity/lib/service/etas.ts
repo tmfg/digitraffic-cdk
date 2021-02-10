@@ -1,10 +1,10 @@
-import {DbETAShip} from '../db/db-estimates';
+import {DbETAShip} from '../db/db-timestamps';
 import {getETAs, ShipETA} from '../api/api-etas';
-import {ApiEstimate, EventType} from '../model/estimate';
-import {saveEstimates} from './estimates';
+import {ApiTimestamp, EventType} from '../model/timestamp';
+import {saveTimestamps} from './timestamps';
 import {Port} from './portareas';
 
-export async function updateETAEstimates(
+export async function updateETATimestamps(
     endpointClientId: string,
     endpointClientSecret: string,
     endpointClientAudience: string,
@@ -22,16 +22,16 @@ export async function updateETAEstimates(
         ships,
         portAreaGeometries);
 
-    const etaToEstimateWithSource = etaToEstimate(endpointSource);
-    const estimates: ApiEstimate[] = etas.map(etaToEstimateWithSource);
+    const etaToTimestampWithSource = etaToTimestamp(endpointSource);
+    const timestamps: ApiTimestamp[] = etas.map(etaToTimestampWithSource);
 
-    await saveEstimates(estimates);
+    await saveTimestamps(timestamps);
     
     return etas;
 }
 
-export function etaToEstimate(endpointSource: string): (eta: ShipETA) => ApiEstimate {
-    return (eta: ShipETA): ApiEstimate => ({
+export function etaToTimestamp(endpointSource: string): (eta: ShipETA) => ApiTimestamp {
+    return (eta: ShipETA): ApiTimestamp => ({
         eventType: EventType.ETA,
         eventTime: eta.eta,
         eventTimeConfidenceLower: null,

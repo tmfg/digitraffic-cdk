@@ -9,13 +9,13 @@ import {
 } from "../db-testutil";
 import * as sinon from 'sinon';
 import {SNS} from "aws-sdk";
-import {handlerFn} from "../../../lib/lambda/update-eta-estimates/lambda-update-eta-estimates";
+import {handlerFn} from "../../../lib/lambda/update-eta-timestamps/lambda-update-eta-timestamps";
 import moment from "moment";
-import {newEstimate, newPortAreaDetails, newPortCall, newVessel} from "../testdata";
-import {EventType} from "../../../lib/model/estimate";
+import {newTimestamp, newPortAreaDetails, newPortCall, newVessel} from "../testdata";
+import {EventType} from "../../../lib/model/timestamp";
 import {ShipETA} from "../../../lib/api/api-etas";
 
-describe('update-eta-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('update-eta-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
@@ -24,9 +24,9 @@ describe('update-eta-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const sns = new SNS();
         const publishStub = sandbox.stub().returns(Promise.resolve());
         sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
-        const updateETAEstimatesStub = sandbox.stub();
+        const updateETATimestampsStub = sandbox.stub();
 
-        await handlerFn(sns, updateETAEstimatesStub)();
+        await handlerFn(sns, updateETATimestampsStub)();
 
         expect(publishStub.called).toBe(false);
     });
@@ -37,25 +37,25 @@ describe('update-eta-estimates', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
         const locode = 'FIHKO';
         const eventTime = moment().add(1, 'hours').toDate();
-        const estimate = newEstimate({eventType: EventType.ETA, locode, eventTime, source: 'Portnet'});
-        const portcall = newPortCall(estimate);
+        const timestamp = newTimestamp({eventType: EventType.ETA, locode, eventTime, source: 'Portnet'});
+        const portcall = newPortCall(timestamp);
         const shipEta: ShipETA = {
             portcall_id: portcall.port_call_id,
-            mmsi: estimate.ship.mmsi!,
-            imo: estimate.ship.imo!,
+            mmsi: timestamp.ship.mmsi!,
+            imo: timestamp.ship.imo!,
             locode,
             eta: new Date().toISOString()
         };
-        const updateETAEstimatesStub = sandbox.stub().returns([shipEta]);
-        await insert(db, [estimate]);
-        await insertVessel(db, newVessel(estimate));
+        const updateETATimestampsStub = sandbox.stub().returns([shipEta]);
+        await insert(db, [timestamp]);
+        await insertVessel(db, newVessel(timestamp));
         await insertPortCall(db, portcall);
-        await insertPortAreaDetails(db, newPortAreaDetails(estimate));
+        await insertPortAreaDetails(db, newPortAreaDetails(timestamp));
 
-        await handlerFn(sns, updateETAEstimatesStub)();
+        await handlerFn(sns, updateETATimestampsStub)();
 
         expect(publishStub.calledOnce).toBe(true);
-        expect(updateETAEstimatesStub.calledOnce).toBe(true);
+        expect(updateETATimestampsStub.calledOnce).toBe(true);
     });
 
 }));

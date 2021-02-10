@@ -1,7 +1,7 @@
 import {IDatabase, ITask} from "pg-promise";
 import {initDbConnection} from "../../../../common/postgres/database";
-import {ApiEstimate} from "../../lib/model/estimate";
-import {createUpdateValues, DbEstimate} from "../../lib/db/db-estimates";
+import {ApiTimestamp} from "../../lib/model/timestamp";
+import {createUpdateValues, DbTimestamp} from "../../lib/db/db-timestamps";
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
@@ -46,7 +46,7 @@ export async function truncate(db: IDatabase<any, any>): Promise<any> {
     });
 }
 
-export function findAll(db: IDatabase<any, any>): Promise<DbEstimate[]> {
+export function findAll(db: IDatabase<any, any>): Promise<DbTimestamp[]> {
     return db.tx(t => {
        return t.manyOrNone(`
         SELECT
@@ -66,9 +66,9 @@ export function findAll(db: IDatabase<any, any>): Promise<DbEstimate[]> {
     });
 }
 
-export function insert(db: IDatabase<any, any>, estimates: ApiEstimate[]) {
+export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
     return db.tx(t => {
-        return t.batch(estimates.map(e => {
+        return t.batch(timestamps.map(e => {
             return t.none(`
                 INSERT INTO port_call_timestamp(
                     event_type,
