@@ -54,3 +54,7 @@ cdk.out
 bin
 /.idea/workspace.xml
 /.idea/shelf/
+
+# flyway config for test, prod
+**/test/flyway.conf
+**/prod/flyway.conf
