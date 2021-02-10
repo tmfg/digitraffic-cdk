@@ -45,11 +45,11 @@ export function create(
 
     const resource = publicApi.root
         .addResource("api")
-        .addResource("v2")
+        .addResource("v1")
         .addResource('timestamps');
 
     createTimestampsResource(publicApi, secret, vpc, props, resource, lambdaDbSg, timestampsModel, errorResponseModel, validator, stack);
-    createShiplistResource(publicApi, secret, vpc, props, resource, lambdaDbSg, stack);
+    createShiplistResource(publicApi, secret, vpc, props, lambdaDbSg, stack);
 }
 
 function createTimestampsResource(
@@ -116,7 +116,6 @@ function createShiplistResource(
     secret: ISecret,
     vpc: IVpc,
     props: Props,
-    resource: Resource,
     lambdaDbSg: ISecurityGroup,
     stack: Construct): Function {
 
@@ -137,7 +136,7 @@ function createShiplistResource(
         proxy: true
     });
 
-    const shiplistResource = resource.addResource("shiplist");
+    const shiplistResource = publicApi.root.addResource("shiplist");
     shiplistResource.addMethod("GET", integration, {
         apiKeyRequired: false
     });
