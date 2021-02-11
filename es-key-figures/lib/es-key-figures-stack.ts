@@ -84,7 +84,7 @@ export class EsKeyFiguresStack extends Stack {
     const collectEsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
 
     const rule = new Rule(this, 'Rule', {
-      schedule: Schedule.expression('cron(0 1 1 * ? *)')
+      schedule: Schedule.expression('cron(30 3 1 * ? *)')
     });
 
     const target = new LambdaFunction(collectEsKeyFiguresLambda);
