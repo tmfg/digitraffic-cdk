@@ -10,11 +10,12 @@ import * as AWSx from "aws-sdk";
 import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
 import {
     buildFromMessage,
-    extractJson,
-    getIndexName,
+    extractJson, filterIds, getFailedIds,
+    getIndexName, isControlMessage,
     isNumeric, parseESReturnValue
 } from "./util";
 import {getAppFromSenderAccount, getEnvFromSenderAccount} from "./accounts";
+import {notifyFailedItems} from "./notify";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 
@@ -26,56 +27,87 @@ const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws
 const esEndpoint = new AWS.Endpoint(endpoint);
 const region = endpointParts[2];
 
+const MAX_BODY_SIZE = 1000000;
+
 export const handler = (event: KinesisStreamEvent, context: Context, callback: any): void => {
-    event.Records.forEach(function(record: KinesisStreamRecord) {
-        let zippedInput = Buffer.from(record.kinesis.data, "base64");
+    let batchBody = "";
 
-        // decompress the input
-        zlib.gunzip(zippedInput, function(error: any, buffer: any) {
-            if (error) {
-                context.fail(error);
-                return;
-            }
+    event.Records.forEach((record: KinesisStreamRecord) => {
+        const recordBody = handleRecord(record);
+        batchBody += recordBody;
 
-            // parse the input from JSON
-            const awslogsData: CloudWatchLogsDecodedData = JSON.parse(
-                buffer.toString("utf8")
-            );
-
-            // transform the input to Elasticsearch documents
-            const elasticsearchBulkData = transform(awslogsData, knownAccounts);
-
-            // skip control messages
-            if (!elasticsearchBulkData) {
-                console.log("Received a control message");
-                context.succeed("Control message handled successfully");
-                return;
-            }
-            postToES(elasticsearchBulkData,
-                (error: any, success: any, statusCode: any, failedItems: any) => {
-                    if (error) {
-                        console.log('Error: ' + JSON.stringify(error, null, 2));
-                    }
-
-                    if (failedItems && failedItems.length > 0) {
-                        console.log("failed items " + JSON.stringify(failedItems));
-                    }
-                });
-        });
+        if (batchBody.length > MAX_BODY_SIZE) {
+            postToElastic(context, true, batchBody);
+            batchBody = "";
+        }
     });
+
+    if (batchBody.length > 0) {
+        postToElastic(context, true, batchBody);
+    }
 };
 
-export function postToES(doc: string, callback: any) {
+function handleRecord(record: KinesisStreamRecord): string {
+    const zippedInput = Buffer.from(record.kinesis.data, "base64");
+
+    // decompress the input
+    const ucompressed = zlib.gunzipSync(zippedInput).toString();
+
+    // parse the input from JSON
+    const awslogsData = JSON.parse(ucompressed.toString('utf8'));
+
+    // skip control messages
+    if (isControlMessage(awslogsData)) {
+        console.log('Received a control message');
+        return "";
+    }
+
+    const logLine = transform(awslogsData);
+
+    return logLine;
+}
+
+function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkData: string) {
+    // post documents to the Amazon Elasticsearch Service
+    post(elasticsearchBulkData, (error: any, success: any, statusCode: any, failedItems: any) => {
+        if (error) {
+            console.log('Error: ' + JSON.stringify(error, null, 2));
+
+            if (failedItems && failedItems.length > 0) {
+                notifyFailedItems(failedItems);
+
+                // try repost only once
+                if (retryOnFailure) {
+                    const failedIds = getFailedIds(failedItems);
+
+                    console.log("reposting, failed ids " + failedIds);
+
+                    // some items failed, try to repost
+                    const filteredBulkData = filterIds(elasticsearchBulkData, failedIds);
+                    postToElastic(context, false, filteredBulkData);
+                }
+            } else {
+                context.fail(JSON.stringify(error));
+            }
+        }
+    });
+}
+
+export function post(body: string, callback: any) {
     const req = new AWS.HttpRequest(esEndpoint);
 
-    console.log("sending POST to es unCompressedSize=%d", doc.length);
+    console.log("sending POST to es unCompressedSize=%d", body.length);
+
+    if(body.length == 0) {
+        return;
+    }
 
     req.method = "POST";
     req.path = "/_bulk?pipeline=keyval";
     req.region = region;
     req.headers["presigned-expires"] = false;
     req.headers["Host"] = esEndpoint.host;
-    req.body = doc;
+    req.body = body;
     req.headers["Content-Type"] = "application/json";
 
     let signer = new AWS.Signers.V4(req, "es");
@@ -85,16 +117,16 @@ export function postToES(doc: string, callback: any) {
     send.handleRequest(
         req,
         null,
-        function(httpResp: any) {
+        function(response: any) {
             let respBody = "";
-            httpResp.on("data", function(chunk: any) {
+            response.on("data", function(chunk: any) {
                 respBody += chunk;
             });
-            httpResp.on("end", function(chunk: any) {
-                const parsedValues = parseESReturnValue(httpResp, respBody);
+            response.on("end", function(chunk: any) {
+                const parsedValues = parseESReturnValue(response, respBody);
 
 //                console.log("Response: " + respBody);
-                callback(null);
+                callback(parsedValues.error, parsedValues.success, response.statusCode, parsedValues.failedItems);
             });
         },
         function(err: any) {
@@ -104,14 +136,10 @@ export function postToES(doc: string, callback: any) {
     );
 }
 
-export function transform(payload: CloudWatchLogsDecodedData, knownAccounts: Account[]): string | null {
-    if (payload.messageType === "CONTROL_MESSAGE") {
-        return null;
-    }
-
+export function transform(payload: CloudWatchLogsDecodedData, filterIds: string[] = []): string {
     let bulkRequestBody = "";
 
-    payload.logEvents.forEach((logEvent: any) => {
+    payload.logEvents.filter((e: any) => !filterIds.includes(e.id)).forEach((logEvent: any) => {
         if (isLambdaLifecycleEvent(logEvent.message)) {
             return;
         }

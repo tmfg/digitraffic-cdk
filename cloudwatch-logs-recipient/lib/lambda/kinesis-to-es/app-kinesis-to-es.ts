@@ -1,59 +1,72 @@
-import {buildFromMessage, extractJson, getIndexName, isInfinity, isNumeric, parseESReturnValue} from "./util";
+import {
+    buildFromMessage,
+    extractJson, filterIds,
+    getFailedIds,
+    getIndexName, isControlMessage,
+    isInfinity,
+    isNumeric,
+    parseESReturnValue
+} from "./util";
 
 const https = require('https');
 const zlib = require('zlib');
 const crypto = require('crypto');
 
-import {KinesisStreamEvent, KinesisStreamRecord} from "aws-lambda";
-import {SNS} from "aws-sdk";
+import {KinesisStreamEvent, KinesisStreamRecord, CloudWatchLogsDecodedData} from "aws-lambda";
 import {getAppFromSenderAccount} from "./accounts";
+import {notifyFailedItems} from "./notify";
 
 const endpoint = process.env.ES_ENDPOINT as string;
-const topicArn = process.env.TOPIC_ARN as string;
 const knownAccounts = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
 
 const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws\.com$/) as string[];
 const region = endpointParts[2];
 const service = endpointParts[3];
 
-const sns = new SNS();
+const MAX_BODY_SIZE = 1000000;
 
 export const handler = function(event: KinesisStreamEvent, context: any) {
     try {
-        event.Records.forEach(record => handleRecord(context, record));
+        let batchBody = "";
+        event.Records.forEach((record: KinesisStreamRecord) => {
+            const recordBody = handleRecord(record);
+            batchBody += recordBody;
+
+            if (batchBody.length > MAX_BODY_SIZE) {
+                postToElastic(context, true, batchBody);
+                batchBody = "";
+            }
+        });
+
+        if (batchBody.length > 0) {
+            postToElastic(context, true, batchBody);
+        }
     } catch (e) {
         console.log('ERROR ', e);
     }
 };
 
-function handleRecord(context: any, record: KinesisStreamRecord) {
-    let zippedInput = Buffer.from(record.kinesis.data, "base64");
+function handleRecord(record: KinesisStreamRecord): string {
+    const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
-    zlib.gunzip(zippedInput, function(error: any, buffer: any) {
-        if (error) {
-            context.fail(error);
-            return;
-        }
+    const ucompressed = zlib.gunzipSync(zippedInput).toString();
 
-        // parse the input from JSON
-        const awslogsData = JSON.parse(buffer.toString('utf8'));
+    // parse the input from JSON
+    const awslogsData = JSON.parse(ucompressed.toString('utf8'));
 
-        // transform the input to Elasticsearch documents
-        const elasticsearchBulkData = transform(awslogsData);
+    // skip control messages
+    if (isControlMessage(awslogsData)) {
+        console.log('Received a control message');
+        return "";
+    }
 
-        // skip control messages
-        if (!elasticsearchBulkData) {
-            console.log('Received a control message');
-            context.succeed('Control message handled successfully');
-            return;
-        }
+    const logLine = transform(awslogsData);
 
-        postToElastic(context, awslogsData, elasticsearchBulkData);
-    });
+    return logLine;
 }
 
-function postToElastic(context: any, awslogsData: any|null, elasticsearchBulkData: string) {
+function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkData: string) {
     // post documents to the Amazon Elasticsearch Service
     post(elasticsearchBulkData, (error: any, success: any, statusCode: any, failedItems: any) => {
         if (error) {
@@ -64,14 +77,14 @@ function postToElastic(context: any, awslogsData: any|null, elasticsearchBulkDat
                 notifyFailedItems(failedItems);
 
                 // try repost only once
-                if (awslogsData != null) {
+                if (retryOnFailure) {
                     const failedIds = getFailedIds(failedItems);
 
                     console.log("reposting, failed ids " + failedIds);
 
                     // some items failed, try to repost
-                    const filteredBulkData = transform(awslogsData, failedIds) as string;
-                    postToElastic(context, null, filteredBulkData);
+                    const filteredBulkData = filterIds(elasticsearchBulkData, failedIds);
+                    postToElastic(context, false, filteredBulkData);
                 }
             } else {
                 context.fail(JSON.stringify(error));
@@ -80,28 +93,7 @@ function postToElastic(context: any, awslogsData: any|null, elasticsearchBulkDat
     });
 }
 
-function notifyFailedItems(failedItems: any[]) {
-    console.log("failed items " + JSON.stringify(failedItems));
-
-    sns.publish({
-        TopicArn: topicArn,
-        Message: JSON.stringify(failedItems)
-    }, (err: any, data: any) => {
-        if(err) {
-            console.info("publish failed " + err);
-        }
-    });
-}
-
-function getFailedIds(failedItems: any[]): string[] {
-    return failedItems.map(f => f.index._id);
-}
-
-function transform(payload: any, filterIds: string[] = []): string|null {
-    if (payload.messageType === 'CONTROL_MESSAGE') {
-        return null;
-    }
-
+function transform(payload: CloudWatchLogsDecodedData, filterIds: string[] = []): string {
     let bulkRequestBody = '';
 
     payload.logEvents.filter((e: any) => !filterIds.includes(e.id)).forEach((logEvent: any) => {
@@ -177,6 +169,10 @@ function post(body: string, callback: any) {
     const requestParams = buildRequest(body);
 
     console.log("sending POST to es unCompressedSize=%d", body.length);
+
+    if(body.length == 0) {
+        return;
+    }
 
     const request = https.request(requestParams, function(response: any) {
         let responseBody = '';

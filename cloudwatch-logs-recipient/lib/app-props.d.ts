@@ -2,7 +2,8 @@ interface Props {
     readonly accounts: Account[];
     readonly elasticSearchEndpoint: string;
     readonly elasticSearchDomainArn: string;
-    readonly errorEmail: string
+    readonly errorEmail: string,
+    readonly lambdaConfig?: any
 }
 
 interface Account {
