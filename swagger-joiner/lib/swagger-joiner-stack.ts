@@ -2,7 +2,7 @@ import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {Props} from './app-props';
 import * as InternalLambdas from './internal-lambdas'
 import {Bucket, HttpMethods} from "@aws-cdk/aws-s3";
-import {Effect, PolicyStatement} from "@aws-cdk/aws-iam";
+import {CanonicalUserPrincipal, Effect, PolicyStatement} from "@aws-cdk/aws-iam";
 
 export class SwaggerJoinerStack extends Stack {
     constructor(scope: Construct, id: string, swaggerJoinerProps: Props, props?: StackProps) {
@@ -36,6 +36,16 @@ export class SwaggerJoinerStack extends Stack {
             });
             getObjectStatement.addAnyPrincipal();
             bucket.addToResourcePolicy(getObjectStatement);
+        }
+        if (swaggerJoinerProps.cloudFrontCanonicalUser) {
+            bucket.addToResourcePolicy(new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ['s3:GetObject'],
+                principals: [
+                    new CanonicalUserPrincipal(swaggerJoinerProps.cloudFrontCanonicalUser)
+                ],
+                resources: [`${bucket.bucketArn}/*`]
+            }));
         }
 
         return bucket;

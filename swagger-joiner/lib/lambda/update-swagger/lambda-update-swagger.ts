@@ -18,7 +18,7 @@ const apiRequestHeaders: AxiosRequestConfig = {
 
 export const handler = async (): Promise<any> => {
     const bucketName = process.env[KEY_BUCKET_NAME] as string;
-    const appUrl = process.env[KEY_APP_URL] as string;
+    const appUrl = process.env[KEY_APP_URL] as string | undefined;
     const appBetaUrl = process.env[KEY_APP_BETA_URL] as string | undefined;
     const apigatewayIds = JSON.parse(process.env[KEY_APIGW_APPS] as string) as string[];
 
@@ -26,7 +26,7 @@ export const handler = async (): Promise<any> => {
 
     const apiResponses = await Promise.all(apigatewayIds.map(exportSwaggerApi));
     const apis = apiResponses.map(resp => JSON.parse(resp.body as string));
-    const appApi = (await axios.get(appUrl, apiRequestHeaders)).data;
+    const appApi = appUrl ? (await axios.get(appUrl, apiRequestHeaders)).data : [];
 
     const appBetaApi = appBetaUrl ? [(await axios.get(appBetaUrl, apiRequestHeaders)).data] : [];
 

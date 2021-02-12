@@ -89,7 +89,7 @@ function createUpdateSwaggerDescriptionsLambda(
 
     createSubscription(updateSwaggerLambda, functionName, props.logsDestinationArn, stack);
 
-    const ruleName = 'UpdateSwaggerRule';
+    const ruleName = `${stack.stackName}-UpdateSwaggerRule`;
     const rule = new Rule(stack, ruleName, {
         schedule: Schedule.rate(Duration.hours(1)),
         ruleName
