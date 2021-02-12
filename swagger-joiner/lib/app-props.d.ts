@@ -15,4 +15,10 @@ export interface Props {
     readonly s3Website: boolean
     // Canonical User ID if the Swagger bucket is served through CloudFront
     readonly cloudFrontCanonicalUser?: string
+    // Move generated files into a directory, instead of the bucket root
+    readonly directory?: string
+    // Host to use as endpoint for HTTP calls from Swagger
+    readonly host?: string
+    // Swagger page title
+    readonly title?: string
 }

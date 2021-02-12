@@ -5,7 +5,16 @@ import {Props} from './app-props';
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Bucket} from "@aws-cdk/aws-s3";
-import {KEY_BUCKET_NAME, KEY_REGION, KEY_APP_URL, KEY_APP_BETA_URL, KEY_APIGW_APPS} from "./lambda/update-swagger/lambda-update-swagger";
+import {
+    KEY_BUCKET_NAME,
+    KEY_REGION,
+    KEY_APP_URL,
+    KEY_APP_BETA_URL,
+    KEY_APIGW_APPS,
+    KEY_DIRECTORY,
+    KEY_HOST,
+    KEY_TITLE
+} from "./lambda/update-swagger/lambda-update-swagger";
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
@@ -63,6 +72,15 @@ function createUpdateSwaggerDescriptionsLambda(
     lambdaEnv[KEY_APP_URL] = props.appUrl;
     if (props.betaAppUrl) {
         lambdaEnv[KEY_APP_BETA_URL] = props.betaAppUrl;
+    }
+    if (props.directory) {
+        lambdaEnv[KEY_DIRECTORY] = props.directory;
+    }
+    if (props.host) {
+        lambdaEnv[KEY_HOST] = props.host;
+    }
+    if (props.title) {
+        lambdaEnv[KEY_TITLE] = props.title;
     }
 
     const lambdaConf: FunctionProps = {

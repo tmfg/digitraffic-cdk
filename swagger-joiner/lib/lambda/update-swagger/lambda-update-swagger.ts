@@ -9,6 +9,9 @@ export const KEY_REGION = 'REGION';
 export const KEY_APP_URL = 'APP_URL';
 export const KEY_APP_BETA_URL = 'APP_BETA_URL';
 export const KEY_APIGW_APPS = 'APIGW_APPS';
+export const KEY_DIRECTORY = 'DIRECTORY';
+export const KEY_HOST = 'HOST';
+export const KEY_TITLE = 'TITLE';
 
 const apiRequestHeaders: AxiosRequestConfig = {
   headers: {
@@ -21,6 +24,9 @@ export const handler = async (): Promise<any> => {
     const appUrl = process.env[KEY_APP_URL] as string | undefined;
     const appBetaUrl = process.env[KEY_APP_BETA_URL] as string | undefined;
     const apigatewayIds = JSON.parse(process.env[KEY_APIGW_APPS] as string) as string[];
+    const directory = process.env[KEY_DIRECTORY] as string | undefined;
+    const host = process.env[KEY_HOST] as string | undefined;
+    const title = process.env[KEY_TITLE] as string | undefined;
 
     AWSConfig.update({region: process.env[KEY_REGION] as string});
 
@@ -40,16 +46,34 @@ export const handler = async (): Promise<any> => {
     // @ts-ignore
     delete merged['x-amazon-apigateway-policy']; // implementation details
 
+    if (host) {
+        // @ts-ignore
+        merged['host'] = host;
+        // @ts-ignore
+        delete merged.basePath;
+    }
+
+    if (title) {
+        // @ts-ignore
+        merged['title'] = title;
+    }
+
+    const swaggerFilename = 'dt-swagger.js';
+    const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;
+
+    const swaggerSpecFilename = 'swagger-spec.json';
+    const swaggerSpecFilenameFinal = directory ? `${directory}/${swaggerSpecFilename}` : swaggerSpecFilename;
+
     await Promise.all([
         uploadToS3(
             bucketName,
             constructSwagger(merged),
-            'dt-swagger.js'
+            swaggerFilenameFinal
         ),
         uploadToS3(
             bucketName,
             JSON.stringify(merged),
-            'swagger-spec.json',
+            swaggerSpecFilenameFinal,
             'private',
             'application/json'
         )
