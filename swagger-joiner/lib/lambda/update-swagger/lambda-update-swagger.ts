@@ -55,7 +55,7 @@ export const handler = async (): Promise<any> => {
 
     if (title) {
         // @ts-ignore
-        merged['title'] = title;
+        merged.info.title = title;
     }
 
     const swaggerFilename = 'dt-swagger.js';
