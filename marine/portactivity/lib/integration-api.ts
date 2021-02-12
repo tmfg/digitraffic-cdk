@@ -7,6 +7,7 @@ import {Queue} from '@aws-cdk/aws-sqs';
 import {attachQueueToApiGatewayResource} from "../../../common/api/sqs";
 import {addServiceModel, getModelReference} from "../../../common/api/utils";
 import {createTimestampSchema, LocationSchema, ShipSchema} from "./model/timestamp-schema";
+import {addTags} from "../../../common/api/documentation";
 
 export function create(
     queue: Queue,
@@ -52,6 +53,7 @@ function createUpdateTimestampResource(
         {
             'application/json': timestampModel
         });
+    addTags('UpdateTimestamp', ['timestamps'], timestampResource, stack);
 }
 
 function createUsagePlan(integrationApi: RestApi) {
