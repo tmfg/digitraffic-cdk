@@ -22,6 +22,7 @@ export interface Ship {
 
 export interface Location {
     readonly port: string
+    readonly portArea?: string
     readonly terminal?: string
     readonly berth?: string
     readonly berthPosition?: string

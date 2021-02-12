@@ -93,6 +93,10 @@ export async function handlerFn(
         .logo {
             display: flex;
         }
+        
+        .logo svg {
+            width: 106px;
+        }
 
         .logo-name {
             width: 150px;

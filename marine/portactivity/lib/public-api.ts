@@ -142,6 +142,7 @@ function createShiplistResource(
     });
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+    addTags('Shiplist', ['shiplist'], publicApi.root as Resource, stack);
 
     return lambda;
 }
