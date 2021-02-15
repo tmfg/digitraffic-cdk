@@ -20,9 +20,9 @@ export function create(
         code: new AssetCode('dist/lambda/update-faults'),
         handler: 'lambda-update-faults.handler',
         environment: {
-            DB_USER: props.dbProps.username,
-            DB_PASS: props.dbProps.password,
-            DB_URI: props.dbProps.uri,
+            DB_USER: props.dbProps?.username,
+            DB_PASS: props.dbProps?.password,
+            DB_URI: props.dbProps?.uri,
             INTEGRATIONS: JSON.stringify(props.integrations)
         }
     });
