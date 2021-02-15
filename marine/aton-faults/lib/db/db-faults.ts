@@ -29,7 +29,7 @@ const ALL_FAULTS_JSON_SQL =
     and aton_fault.aton_type_fi = aton_type.name_fi`;
 
 const ALL_FAULTS_S124_WITH_DOMAIN_SQL =
-    `select id, entry_timestamp, fixed_timestamp, aton_fault_type.name_en fault_type_en, aton_id, aton_name_fi, aton_type.name_en, 
+    `select id, entry_timestamp, fixed_timestamp, aton_fault_type.name_en fault_type_en, aton_id, aton_name_fi, aton_type.name_en aton_type_en, 
         fairway_name_fi, description_en area_description_en, geometry
     from aton_fault, area, aton_fault_type, aton_type
     where domain in ('C_NA', 'C_NM') 
@@ -39,20 +39,25 @@ const ALL_FAULTS_S124_WITH_DOMAIN_SQL =
 
 const langRex = /LANG/g;
 
+const PS_124 = new PreparedStatement({
+    name: 'get-all-faults-s124',
+    text: ALL_FAULTS_S124_WITH_DOMAIN_SQL
+});
+
 export async function streamAllForJson(db: IDatabase<any, any>, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
     const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
+    const ps = new PreparedStatement({
+        name: 'get-all-faults',
+        text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString())
+    })
 
-    const qs = new QueryStream(
-        ALL_FAULTS_JSON_SQL.replace(langRex, language.toString()), [fixedLimit]
-    );
-
-    return await stream(db, qs, conversion);
+    return db.tx(t => t.manyOrNone(ps, [fixedLimit]))
+        .then(faults => faults.map(conversion));
 }
 
 export async function streamAllForS124(db: IDatabase<any, any>, conversion: (fault: any) => any) {
-    const qs = new QueryStream(ALL_FAULTS_S124_WITH_DOMAIN_SQL);
-
-    return await stream(db, qs, conversion);
+    return db.tx(t => t.manyOrNone(PS_124))
+        .then(faults => faults.map(conversion));
 }
 
 export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): Promise<any>[] {
