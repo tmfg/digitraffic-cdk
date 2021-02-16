@@ -1,5 +1,5 @@
-import {Function,AssetCode,Runtime} from '@aws-cdk/aws-lambda';
-import {IVpc,ISecurityGroup} from '@aws-cdk/aws-ec2';
+import {Function, AssetCode, Runtime} from '@aws-cdk/aws-lambda';
+import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
 import {Stack} from '@aws-cdk/core';
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createSubscription} from '../../../common/stack/subscription';
@@ -11,13 +11,12 @@ import {BUCKET_NAME} from "./lambda/process-dlq/lambda-process-dlq";
 import {RetentionDays} from '@aws-cdk/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
-import {Topic} from "@aws-cdk/aws-sns";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {
     KEY_ENDPOINT_AUDIENCE, KEY_ENDPOINT_AUTH_URL,
     KEY_ENDPOINT_CLIENT_ID,
-    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE, KEY_ESTIMATE_SNS_TOPIC_ARN
+    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE
 } from "./lambda/update-eta-timestamps/lambda-update-eta-timestamps";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
@@ -30,22 +29,16 @@ export function create(
     props: Props,
     stack: Stack) {
 
-    const timestampsUpdatedTopicId = 'PortActivity-TimestampsUpdatedTopic';
-    const timestampsUpdatedTopic = new Topic(stack, timestampsUpdatedTopicId, {
-        displayName: timestampsUpdatedTopicId,
-        topicName: timestampsUpdatedTopicId
-    });
-    createProcessQueueLambda(queueAndDLQ.queue, timestampsUpdatedTopic, secret, vpc, lambdaDbSg, props, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, secret, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 
-    const updateETATimestampsLambda = createUpdateETATimestampsLambda(timestampsUpdatedTopic, secret, vpc, lambdaDbSg, props, stack);
+    const updateETATimestampsLambda = createUpdateETATimestampsLambda(secret, vpc, lambdaDbSg, props, stack);
     const updateETASchedulingRule = createETAUpdateSchedulingCloudWatchRule(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
 }
 
 function createProcessQueueLambda(
     queue: Queue,
-    timestampsUpdatedTopic: Topic,
     secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
@@ -57,15 +50,13 @@ function createProcessQueueLambda(
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment: {
-            SECRET_ID: props.secretId,
-            ESTIMATE_SNS_TOPIC_ARN: timestampsUpdatedTopic.topicArn
+            SECRET_ID: props.secretId
         },
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const processQueueLambda = new Function(stack, functionName, lambdaConf);
     secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
-    timestampsUpdatedTopic.grantPublish(processQueueLambda);
     createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
 }
 
@@ -106,7 +97,6 @@ function createETAUpdateSchedulingCloudWatchRule(stack: Stack): Rule {
 }
 
 function createUpdateETATimestampsLambda(
-    timestampsUpdatedTopic: Topic,
     secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
@@ -122,7 +112,6 @@ function createUpdateETATimestampsLambda(
     environment[KEY_ENDPOINT_AUTH_URL] = props.etaProps.authUrl;
     environment[KEY_ENDPOINT_URL] = props.etaProps.endpointUrl;
     environment[KEY_ESTIMATE_SOURCE] = props.etaProps.timestampSource;
-    environment[KEY_ESTIMATE_SNS_TOPIC_ARN] = timestampsUpdatedTopic.topicArn;
 
     const functionName = 'PortActivity-UpdateETATimestamps';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
@@ -134,7 +123,6 @@ function createUpdateETATimestampsLambda(
     });
     const lambda = new Function(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
-    timestampsUpdatedTopic.grantPublish(lambda);
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     return lambda;
 }

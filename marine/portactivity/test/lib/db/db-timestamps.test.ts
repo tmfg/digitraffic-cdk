@@ -1,14 +1,16 @@
 import moment from 'moment';
 import * as pgPromise from "pg-promise";
+import {dbTestBase, insert, insertPortAreaDetails, insertPortCall,} from "../db-testutil";
+import {newPortAreaDetails, newPortCall, newTimestamp} from "../testdata";
 import {
-    dbTestBase,
-    insert,
-    insertPortAreaDetails,
-    insertPortCall,
-} from "../db-testutil";
-import {newTimestamp, newPortAreaDetails, newPortCall} from "../testdata";
-import {findByImo, findByLocode, findByMmsi, findETAsByLocodes} from "../../../lib/db/db-timestamps";
+    findByImo,
+    findByLocode,
+    findByMmsi,
+    findPortnetETAsByLocodes,
+    findVTSShipsNotCloseToPortByPortCallId
+} from "../../../lib/db/db-timestamps";
 import {ApiTimestamp, EventType} from "../../../lib/model/timestamp";
+import {EVENTSOURCE_VTS} from "../../../lib/event-sourceutil";
 
 describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*
@@ -84,7 +86,8 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp();
         const timestamp2Date = new Date();
         timestamp2Date.setMilliseconds(0);
-        const timestamp2 = {...timestamp,
+        const timestamp2 = {
+            ...timestamp,
             eventTime: moment(timestamp2Date).add(5, 'hour').toISOString(),
             recordTime: moment(timestamp2Date).add(5, 'hour').toISOString()
         };
@@ -100,7 +103,8 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp();
         const timestamp2Date = new Date();
         timestamp2Date.setMilliseconds(0);
-        const timestamp2 = {...timestamp,
+        const timestamp2 = {
+            ...timestamp,
             eventTime: moment(timestamp2Date).add(5, 'hour').toISOString(),
             recordTime: moment(timestamp2Date).add(5, 'hour').toISOString()
         };
@@ -116,7 +120,8 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp();
         const timestamp2Date = new Date();
         timestamp2Date.setMilliseconds(0);
-        const timestamp2 = {...timestamp,
+        const timestamp2 = {
+            ...timestamp,
             eventTime: moment(timestamp2Date).add(5, 'hour').toISOString(),
             recordTime: moment(timestamp2Date).add(5, 'hour').toISOString()
         };
@@ -239,14 +244,14 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*
         FIND ETA SHIPS
     */
-    test('findETAsByLocodes - 1 h in future is found', async () => {
+    test('findPortnetETAsByLocodes - 1 h in future is found', async () => {
         const locode = 'AA123';
         const eventTime = moment().add(1, 'hours').toDate();
         const timestamp = newTimestamp({eventType: EventType.ETA, locode, eventTime, source: 'Portnet'});
         await insert(db, [timestamp]);
         await createPortcall(timestamp);
 
-        const foundTimestamps = await findETAsByLocodes(db, [locode]);
+        const foundTimestamps = await findPortnetETAsByLocodes(db, [locode]);
 
         expect(foundTimestamps.length).toBe(1);
         expect(foundTimestamps[0]).toMatchObject({
@@ -255,31 +260,31 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     });
 
-    test('findETAsByLocodes - ETD not found', async () => {
+    test('findPortnetETAsByLocodes - ETD not found', async () => {
         const locode = 'AA123';
         const eventTime = moment().add(1, 'hours').toDate();
         const timestamp = newTimestamp({eventType: EventType.ETD, locode, eventTime, source: 'Portnet'});
         await insert(db, [timestamp]);
         await createPortcall(timestamp);
 
-        const foundTimestamps = await findETAsByLocodes(db, [locode]);
+        const foundTimestamps = await findPortnetETAsByLocodes(db, [locode]);
 
         expect(foundTimestamps.length).toBe(0);
     });
 
-    test('findETAsByLocodes - non-matching locode not found', async () => {
+    test('findPortnetETAsByLocodes - non-matching locode not found', async () => {
         const locode = 'AA123';
         const eventTime = moment().add(1, 'hours').toDate();
         const timestamp = newTimestamp({eventType: EventType.ETA, locode: 'BB456', eventTime, source: 'Portnet'});
         await insert(db, [timestamp]);
         await createPortcall(timestamp);
 
-        const foundTimestamps = await findETAsByLocodes(db, [locode]);
+        const foundTimestamps = await findPortnetETAsByLocodes(db, [locode]);
 
         expect(foundTimestamps.length).toBe(0);
     });
 
-    test('findETAsByLocodes - only Portnet is found', async () => {
+    test('findPortnetETAsByLocodes - only Portnet is found', async () => {
         const locode = 'AA123';
         const eventTime = moment().add(1, 'hours').toDate();
         const timestamp1 = newTimestamp({eventType: EventType.ETA, locode, eventTime, source: 'Portnet'});
@@ -292,12 +297,12 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         await createPortcall(timestamp3);
         await createPortcall(timestamp4);
 
-        const foundTimestamps = await findETAsByLocodes(db, [locode]);
+        const foundTimestamps = await findPortnetETAsByLocodes(db, [locode]);
 
         expect(foundTimestamps.length).toBe(1);
     });
 
-    test('findETAsByLocodes - multiple locodes', async () => {
+    test('findPortnetETAsByLocodes - multiple locodes', async () => {
         const locode1 = 'AA123';
         const locode2 = 'BB456';
         const eventTime = moment().add(1, 'hours').toDate();
@@ -308,9 +313,39 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         await createPortcall(timestamp1);
         await createPortcall(timestamp2);
 
-        const foundTimestamps = await findETAsByLocodes(db, [locode1, locode2]);
+        const foundTimestamps = await findPortnetETAsByLocodes(db, [locode1, locode2]);
 
         expect(foundTimestamps.length).toBe(2);
+    });
+
+    test('findVTSShipsNotCloseToPort - returns ships further than 15 min', async () => {
+        const eventTime = moment().add(16, 'minutes').toDate();
+        const ts = newTimestamp({
+            portcallId: 1,
+            eventType: EventType.ETA,
+            source: EVENTSOURCE_VTS,
+            eventTime
+        });
+        await insert(db, [ts]);
+
+        const ships = await findVTSShipsNotCloseToPortByPortCallId(db, [ts.portcallId!]);
+
+        expect(ships.length).toBe(1);
+    });
+
+    test("findVTSShipsNotCloseToPort - doesn't return ships closer than 15 min", async () => {
+        const eventTime = moment().add(14, 'minutes').toDate();
+        const ts = newTimestamp({
+            portcallId: 1,
+            eventType: EventType.ETA,
+            source: EVENTSOURCE_VTS,
+            eventTime
+        });
+        await insert(db, [ts]);
+
+        const ships = await findVTSShipsNotCloseToPortByPortCallId(db, [ts.portcallId!]);
+
+        expect(ships.length).toBe(0);
     });
 
     async function createPortcall(timestamp: ApiTimestamp) {
