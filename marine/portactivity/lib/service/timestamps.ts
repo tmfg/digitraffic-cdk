@@ -98,17 +98,16 @@ export async function findETAShipsByLocode(locodes: string[]): Promise<DbETAShip
     }) as DbETAShip[];
 
     if (portnetShips.length) {
-        const startFindVTSShipsNotCloseToPort = Date.now();
+        const startFindVtsShipsTooCloseToPort = Date.now();
         return await inDatabase(async (db: IDatabase<any, any>) => {
-            const vtsShips = await TimestampsDB.findVTSShipsNotCloseToPortByPortCallId(db, portnetShips.map(s => s.portcall_id));
-            if (portnetShips.length > vtsShips.length) {
-                const vtsShipImos = vtsShips.map(s => s.imo);
-                const filteredShips = portnetShips.filter(s => !vtsShipImos.includes(s.imo));
-                console.log('method=findETAShipsByLocode Did not fetch ETA for ships too close to port', filteredShips);
-            }
-            return vtsShips;
+            const shipsTooCloseToPortImos = (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(db, portnetShips.map(s => s.portcall_id)))
+                .map(s => s.imo);
+            console.log('method=findETAShipsByLocode Ships too close to port', shipsTooCloseToPortImos);
+            const filteredShips = portnetShips.filter(s => shipsTooCloseToPortImos.includes(s.imo));
+            console.log('method=findETAShipsByLocode Did not fetch ETA for ships too close to port', filteredShips);
+            return portnetShips.filter(s => !shipsTooCloseToPortImos.includes(s.imo));
         }).finally(() => {
-            console.info('method=startFindVTSShipsNotCloseToPort tookMs=%d', (Date.now() - startFindVTSShipsNotCloseToPort));
+            console.info('method=startFindVtsShipsTooCloseToPort tookMs=%d', (Date.now() - startFindVtsShipsTooCloseToPort));
         }) as DbETAShip[];
     } else {
         return Promise.resolve([]);

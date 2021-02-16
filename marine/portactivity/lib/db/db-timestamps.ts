@@ -4,7 +4,6 @@ import moment from "moment";
 
 export const TIMESTAMPS_BEFORE = `CURRENT_DATE - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
-export const ETA_SHIP_CLOSE_TO_PORT = `NOW() + INTERVAL '15 MINUTE'`;
 
 export interface DbTimestamp {
     readonly event_type: EventType
@@ -38,6 +37,10 @@ export interface DbUpdatedTimestamp {
 export interface DbTimestampIdAndLocode {
     readonly id: number
     readonly locode: string
+}
+
+export interface DbImo {
+    readonly imo: number
 }
 
 const INSERT_ESTIMATE_SQL = `
@@ -147,9 +150,8 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
     SELECT DISTINCT
         pe.ship_imo AS imo, 
         pe.location_locode AS locode,
-        pe.location_portarea AS portarea,
-        pe.portcall_id,
-        pad.port_area_code
+        pe.location_portarea AS port_area_code,
+        pe.portcall_id
     FROM port_call_timestamp pe
     JOIN public.port_call pc ON pc.port_call_id = pe.portcall_id
     JOIN public.port_area_details pad on pad.port_call_id = pe.portcall_id
@@ -170,12 +172,9 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
           pc.port_call_timestamp > CURRENT_DATE - INTERVAL '1 DAY'
 `;
 
-const SELECT_VTS_A_SHIP_NOT_CLOSE_TO_PORT = `
+const SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT = `
     SELECT DISTINCT
-        pe.ship_imo AS imo, 
-        pe.location_locode AS locode,
-        pe.location_portarea AS portarea,
-        pe.portcall_id
+        pe.ship_imo AS imo
     FROM port_call_timestamp pe
     WHERE pe.record_time =
           (
@@ -189,7 +188,7 @@ const SELECT_VTS_A_SHIP_NOT_CLOSE_TO_PORT = `
           pe.portcall_id IN ($1:list) AND
           pe.event_type = 'ETA' AND
           pe.event_source = 'VTS' AND
-          pe.event_time > ${ETA_SHIP_CLOSE_TO_PORT}
+          pe.event_time < NOW() + INTERVAL '15 MINUTE'
 `;
 
 const SELECT_BY_MMSI = `
@@ -323,12 +322,12 @@ export function findPortnetETAsByLocodes(
     return db.tx(t => t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
 }
 
-export function findVTSShipsNotCloseToPortByPortCallId(
+export function findVtsShipImosTooCloseToPortByPortCallId(
     db: IDatabase<any, any>,
     portcallIds: number[]
-): Promise<DbETAShip[]> {
+): Promise<DbImo[]> {
     // Prepared statement use not possible due to dynamic IN-list
-    return db.tx(t => t.manyOrNone(SELECT_VTS_A_SHIP_NOT_CLOSE_TO_PORT, [portcallIds]));
+    return db.tx(t => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds]));
 }
 
 export function findPortnetTimestampsForAnotherLocode(

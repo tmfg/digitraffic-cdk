@@ -108,6 +108,7 @@ async function getETA(
             const e = etaResponse[0];
             return {
                 locode: portAreaGeometry!!.locode,
+                portArea: ship.port_area_code,
                 imo: ship.imo,
                 mmsi: e.vessel.mmsi,
                 eta: e.destination.eta,
@@ -169,6 +170,7 @@ interface OAuthTokenResponse {
 
 export interface ShipETA {
     readonly locode: string
+    readonly portArea?: string
     readonly mmsi: number
     readonly imo: number
     readonly eta: string

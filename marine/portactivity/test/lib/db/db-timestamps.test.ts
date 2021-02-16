@@ -7,7 +7,7 @@ import {
     findByLocode,
     findByMmsi,
     findPortnetETAsByLocodes,
-    findVTSShipsNotCloseToPortByPortCallId
+    findVtsShipImosTooCloseToPortByPortCallId
 } from "../../../lib/db/db-timestamps";
 import {ApiTimestamp, EventType} from "../../../lib/model/timestamp";
 import {EVENTSOURCE_VTS} from "../../../lib/event-sourceutil";
@@ -318,22 +318,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundTimestamps.length).toBe(2);
     });
 
-    test('findVTSShipsNotCloseToPort - returns ships further than 15 min', async () => {
-        const eventTime = moment().add(16, 'minutes').toDate();
-        const ts = newTimestamp({
-            portcallId: 1,
-            eventType: EventType.ETA,
-            source: EVENTSOURCE_VTS,
-            eventTime
-        });
-        await insert(db, [ts]);
-
-        const ships = await findVTSShipsNotCloseToPortByPortCallId(db, [ts.portcallId!]);
-
-        expect(ships.length).toBe(1);
-    });
-
-    test("findVTSShipsNotCloseToPort - doesn't return ships closer than 15 min", async () => {
+    test('findVtsShipImosTooCloseToPortByPortCallId - returns ships closer than 15 min', async () => {
         const eventTime = moment().add(14, 'minutes').toDate();
         const ts = newTimestamp({
             portcallId: 1,
@@ -343,7 +328,22 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await findVTSShipsNotCloseToPortByPortCallId(db, [ts.portcallId!]);
+        const ships = await findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
+
+        expect(ships.length).toBe(1);
+    });
+
+    test("findVtsShipImosTooCloseToPortByPortCallId - doesn't return ships further than 15 min", async () => {
+        const eventTime = moment().add(16, 'minutes').toDate();
+        const ts = newTimestamp({
+            portcallId: 1,
+            eventType: EventType.ETA,
+            source: EVENTSOURCE_VTS,
+            eventTime
+        });
+        await insert(db, [ts]);
+
+        const ships = await findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
 
         expect(ships.length).toBe(0);
     });

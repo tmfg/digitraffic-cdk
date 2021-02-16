@@ -26,7 +26,7 @@ export async function updateETATimestamps(
     const timestamps: ApiTimestamp[] = etas.map(etaToTimestampWithSource);
 
     await saveTimestamps(timestamps);
-    
+
     return etas;
 }
 
@@ -43,7 +43,8 @@ export function etaToTimestamp(endpointSource: string): (eta: ShipETA) => ApiTim
             imo: eta.imo
         },
         location: {
-            port: eta.locode
+            port: eta.locode,
+            portArea: eta.portArea
         },
         portcallId: eta.portcall_id
     });
