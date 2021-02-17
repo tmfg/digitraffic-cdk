@@ -3,7 +3,7 @@ import {
     APPLICATION_JSON,
     InternalServerErrorResponseTemplate,
     createResponses,
-    XmlResponseTemplate, APPLICATION_XML, NotFoundResponseTemplate
+    XmlResponseTemplate, APPLICATION_XML, NotFoundResponseTemplate, IMAGE_SVG, SvgResponseTemplate
 } from "./response";
 import {LambdaIntegration, MethodResponse, IntegrationResponse} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
@@ -27,7 +27,11 @@ const RESPONSE_XML = {
     responseTemplates: XmlResponseTemplate
 };
 
-const RESPONSE_CORS_INTEGRATION = {
+export const RESPONSE_SVG = {
+    responseTemplates: SvgResponseTemplate
+}
+
+export const RESPONSE_CORS_INTEGRATION = {
     responseParameters: {
         'method.response.header.Access-Control-Allow-Origin': "'*'"
     }
@@ -60,6 +64,13 @@ export function methodXmlResponse(status: string, model: any): MethodResponse {
     };
 }
 
+function methodSvgResponse(status: string, model: any): MethodResponse {
+    return {
+        statusCode: status,
+        responseModels: createResponses(IMAGE_SVG, model)
+    }
+}
+
 export function corsHeaders(methodResponse: MethodResponse): MethodResponse {
     return {...methodResponse, ...{
         responseParameters: {
@@ -74,6 +85,10 @@ export function corsMethodJsonResponse(status: string, model: any): MethodRespon
 
 export function corsMethodXmlResponse(status: string, model: any): MethodResponse {
     return corsHeaders(methodXmlResponse(status, model));
+}
+
+export function corsMethodSvgResponse(status: string, model: any): MethodResponse {
+    return corsHeaders(methodSvgResponse(status, model));
 }
 
 interface IntegrationOptions {

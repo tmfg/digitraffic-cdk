@@ -2,6 +2,7 @@ import apigateway = require('@aws-cdk/aws-apigateway');
 
 export const APPLICATION_JSON = 'application/json';
 export const APPLICATION_XML = 'application/xml';
+export const IMAGE_SVG = 'image/svg+xml';
 
 const messageSchema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
@@ -33,6 +34,7 @@ const BadRequestResponse = JSON.stringify({message: BadRequestMessage});
 export const BadRequestResponseTemplate = createResponses(APPLICATION_JSON, BadRequestResponse);
 export const NotFoundResponseTemplate = createResponses(APPLICATION_JSON, NotFoundResponse);
 export const XmlResponseTemplate = createResponses(APPLICATION_XML, "$input.path('$').body");
+export const SvgResponseTemplate = createResponses(IMAGE_SVG, "$input.path('$').body");
 export const InternalServerErrorResponseTemplate = createResponses(APPLICATION_JSON, InternalServerErrorResponse);
 
 export function createResponses(key: string, value: any) {

@@ -1,11 +1,11 @@
 import {dbLambdaConfiguration, LambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
-import {addXmlserviceModel} from "../../../common/api/utils";
+import {addSimpleServiceModel} from "../../../common/api/utils";
 import {Construct} from "@aws-cdk/core";
 import {RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {corsMethodXmlResponse, defaultIntegration} from "../../../common/api/responses";
+import {corsMethodSvgResponse, corsMethodXmlResponse, defaultIntegration, RESPONSE_200_OK, RESPONSE_CORS_INTEGRATION, RESPONSE_SVG} from "../../../common/api/responses";
 import {createSubscription} from "../../../common/stack/subscription";
 import {addTags} from "../../../common/api/documentation";
 import {BETA_TAGS} from "../../../common/api/tags";
@@ -35,15 +35,26 @@ function createDatex2Resource(
         readOnly: true
     }));
 
+    const textFunctionName = 'VS-GetText';
+    const getSignTextGraphicsLambda = new Function(stack, textFunctionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+        functionName: textFunctionName,
+        code: new AssetCode('dist/lambda/get-sign-text'),
+        handler: 'lambda-get-sign-text.handler',
+        readOnly: true
+    }));
+
     const getDatex2Integration = defaultIntegration(getDatex2Lambda, {xml: true});
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
-    const xmlModel = addXmlserviceModel('XmlModel', publicApi);
+    const xmlModel = addSimpleServiceModel('XmlModel', publicApi);
+    const svgModel = addSimpleServiceModel('SvgModel', publicApi, 'image/svg+xml')
 
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
     const betaResource = apiResource.addResource("beta");
     const vsResource = betaResource.addResource("variable-signs");
     const datex2Resource = vsResource.addResource("datex2");
+    const textResource = vsResource.addResource("sign-text");
+
     datex2Resource.addMethod("GET", getDatex2Integration, {
         apiKeyRequired: true,
         methodResponses: [
@@ -52,9 +63,28 @@ function createDatex2Resource(
         ]
     });
 
-
     createSubscription(getDatex2Lambda, functionName, props.logsDestinationArn, stack);
     addTags('GetDatex2', BETA_TAGS, datex2Resource, stack);
+
+    const getSignTextIntegration = defaultIntegration(getSignTextGraphicsLambda, {
+        xml: true,
+        requestParameters: {
+            'integration.request.querystring.text': 'method.request.querystring.text'
+        },
+        requestTemplates: {
+            'application/json': JSON.stringify({text: "$util.escapeJavaScript($input.params('text'))"})
+        }
+    });
+    textResource.addMethod("GET", getSignTextIntegration, {
+        apiKeyRequired: true,
+        requestParameters: {
+            'method.request.querystring.text': true
+        },
+        methodResponses: [
+            corsMethodSvgResponse("200", svgModel),
+            corsMethodXmlResponse("500", errorResponseModel)            
+        ]
+    });
 
     return getDatex2Lambda;
 }

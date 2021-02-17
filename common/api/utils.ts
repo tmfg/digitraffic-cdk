@@ -42,9 +42,9 @@ export function addServiceModel(name:string, api: apigateway.RestApi,
     return mwr;
 }
 
-export function addXmlserviceModel(name:string, api: apigateway.RestApi): any {
+export function addSimpleServiceModel(name:string, api: apigateway.RestApi, contentType: string = 'application/xml'): any {
     return api.addModel(name, {
-        contentType: 'application/xml',
+        contentType: contentType,
         modelName: name,
         schema: {}
     });
