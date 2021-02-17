@@ -1,3 +1,5 @@
+export const DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES = 15;
+
 const ports: Port[] = [
     {
         locode: 'FIHKO',
@@ -70,6 +72,9 @@ export interface PortAreaCoordinates {
 
 export interface PortArea extends PortAreaCoordinates {
     readonly portAreaCode?: string
+    // A distance in time that indicates when can an approaching ship
+    // be considered to be entering the port area.
+    readonly shipApproachThresholdMinutes?: number
 }
 
 export interface Port {

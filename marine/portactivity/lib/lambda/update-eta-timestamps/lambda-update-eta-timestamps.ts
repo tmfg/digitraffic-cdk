@@ -37,7 +37,7 @@ export function handlerFn(
 
     return async () => {
         return withDbSecretFn(process.env.SECRET_ID as string, async (_: any): Promise<any> => {
-            const ships = await findETAShipsByLocode(locodes);
+            const ships = await findETAShipsByLocode(locodes, portAreaGeometries);
 
             if (ships.length) {
                 console.log('About to fetch ETAs for ships:', ships);

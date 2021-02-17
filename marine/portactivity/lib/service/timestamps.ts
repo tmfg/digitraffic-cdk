@@ -4,6 +4,7 @@ import {inDatabase} from '../../../../common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiTimestamp} from '../model/timestamp';
 import {isPortnetTimestamp} from "../event-sourceutil";
+import {Port} from "./portareas";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean
@@ -89,7 +90,10 @@ export async function findAllTimestamps(
     })));
 }
 
-export async function findETAShipsByLocode(locodes: string[]): Promise<DbETAShip[]> {
+export async function findETAShipsByLocode(
+    locodes: string[],
+    ports: Port[]): Promise<DbETAShip[]> {
+
     const startFindPortnetETAsByLocodes = Date.now();
     const portnetShips = await inDatabase(async (db: IDatabase<any, any>) => {
         return TimestampsDB.findPortnetETAsByLocodes(db, locodes);
@@ -100,7 +104,11 @@ export async function findETAShipsByLocode(locodes: string[]): Promise<DbETAShip
     if (portnetShips.length) {
         const startFindVtsShipsTooCloseToPort = Date.now();
         return await inDatabase(async (db: IDatabase<any, any>) => {
-            const shipsTooCloseToPortImos = (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(db, portnetShips.map(s => s.portcall_id)))
+            const shipsTooCloseToPortImos =
+                (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(
+                    db,
+                    portnetShips.map(s => s.portcall_id),
+                    ports))
                 .map(s => s.imo);
             console.log('method=findETAShipsByLocode Ships too close to port', shipsTooCloseToPortImos);
             const filteredShips = portnetShips.filter(s => shipsTooCloseToPortImos.includes(s.imo));

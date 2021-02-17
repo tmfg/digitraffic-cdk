@@ -11,6 +11,7 @@ import {
 } from "../../../lib/db/db-timestamps";
 import {ApiTimestamp, EventType} from "../../../lib/model/timestamp";
 import {EVENTSOURCE_VTS} from "../../../lib/event-sourceutil";
+import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../../../lib/service/portareas";
 
 describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*
@@ -318,8 +319,9 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundTimestamps.length).toBe(2);
     });
 
-    test('findVtsShipImosTooCloseToPortByPortCallId - returns ships closer than 15 min', async () => {
-        const eventTime = moment().add(14, 'minutes').toDate();
+    test('findVtsShipImosTooCloseToPortByPortCallId - returns ships closer than specified', async () => {
+        const shipApproachThresholdMinutes = 15;
+        const eventTime = moment().add(shipApproachThresholdMinutes-1, 'minutes').toDate();
         const ts = newTimestamp({
             portcallId: 1,
             eventType: EventType.ETA,
@@ -328,13 +330,23 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
+        const ships = await findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [{
+            locode: ts.location.port,
+            default: null,
+            areas: [{
+                longitude: 0,
+                latitude: 0,
+                portAreaCode: ts.location.portArea,
+                shipApproachThresholdMinutes
+            }]
+        }]);
 
         expect(ships.length).toBe(1);
     });
 
-    test("findVtsShipImosTooCloseToPortByPortCallId - doesn't return ships further than 15 min", async () => {
-        const eventTime = moment().add(16, 'minutes').toDate();
+    test("findVtsShipImosTooCloseToPortByPortCallId - doesn't return ships further than specified", async () => {
+        const shipApproachThresholdMinutes = 15;
+        const eventTime = moment().add(shipApproachThresholdMinutes+1, 'minutes').toDate();
         const ts = newTimestamp({
             portcallId: 1,
             eventType: EventType.ETA,
@@ -343,7 +355,16 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
+        const ships = await findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [{
+            locode: ts.location.port,
+            default: null,
+            areas: [{
+                longitude: 0,
+                latitude: 0,
+                portAreaCode: ts.location.portArea,
+                shipApproachThresholdMinutes
+            }]
+        }]);
 
         expect(ships.length).toBe(0);
     });
