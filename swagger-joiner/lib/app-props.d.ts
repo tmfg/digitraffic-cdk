@@ -21,4 +21,6 @@ export interface Props {
     readonly host?: string
     // Swagger page title
     readonly title?: string
+    // Swagger page description
+    readonly description?: string
 }

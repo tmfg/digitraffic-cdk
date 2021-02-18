@@ -12,6 +12,7 @@ export const KEY_APIGW_APPS = 'APIGW_APPS';
 export const KEY_DIRECTORY = 'DIRECTORY';
 export const KEY_HOST = 'HOST';
 export const KEY_TITLE = 'TITLE';
+export const KEY_DESCRIPTION = 'DESCRIPTION';
 
 const apiRequestHeaders: AxiosRequestConfig = {
   headers: {
@@ -27,6 +28,7 @@ export const handler = async (): Promise<any> => {
     const directory = process.env[KEY_DIRECTORY] as string | undefined;
     const host = process.env[KEY_HOST] as string | undefined;
     const title = process.env[KEY_TITLE] as string | undefined;
+    const description = process.env[KEY_DESCRIPTION] as string | undefined;
 
     AWSConfig.update({region: process.env[KEY_REGION] as string});
 
@@ -56,6 +58,11 @@ export const handler = async (): Promise<any> => {
     if (title) {
         // @ts-ignore
         merged.info.title = title;
+    }
+
+    if (description) {
+        // @ts-ignore
+        merged.info.description = description;
     }
 
     const swaggerFilename = 'dt-swagger.js';
