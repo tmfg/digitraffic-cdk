@@ -1,20 +1,20 @@
-import {RestApi,MethodLoggingLevel}  from '@aws-cdk/aws-apigateway';
-import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
-import {Function, AssetCode} from '@aws-cdk/aws-lambda';
-import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
-import {EndpointType} from "@aws-cdk/aws-apigateway";
+import {EndpointType, MethodLoggingLevel, RestApi} from '@aws-cdk/aws-apigateway';
+import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from '../../../common/stack/subscription';
-import {defaultIntegration,corsMethodJsonResponse, corsMethodXmlResponse} from "../../../common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../../common/model/geojson";
-import {addXmlserviceModel, getModelReference, addServiceModel} from "../../../common/api/utils";
+import {addServiceModel, addSimpleServiceModel, getModelReference} from "../../../common/api/utils";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {AtonProps} from "./app-props";
 import {addTags} from "../../../common/api/documentation";
 import {BETA_TAGS} from "../../../common/api/tags";
+import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(
     vpc: IVpc,
@@ -79,19 +79,19 @@ function createAnnotationsResource(
             'method.request.querystring.fixed_in_hours': false
         },
         methodResponses: [
-            corsMethodJsonResponse("200", faultsJsonModel),
-            corsMethodJsonResponse("500", errorResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, faultsJsonModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
         ]
     });
 
-    const xmlModel = addXmlserviceModel('XmlModel', publicApi);
+    const xmlModel = addSimpleServiceModel('XmlModel', publicApi);
     const getFaultsS124Integration = defaultIntegration(getFaultsS124Lambda, {xml: true});
 
     resources.faultsS124.addMethod("GET", getFaultsS124Integration, {
         apiKeyRequired: true,
         methodResponses: [
-            corsMethodXmlResponse("200", xmlModel),
-            corsMethodJsonResponse("500", errorResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_XML, xmlModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
         ]
     });
 

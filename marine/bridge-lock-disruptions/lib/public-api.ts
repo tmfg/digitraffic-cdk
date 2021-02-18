@@ -1,22 +1,20 @@
-import {RestApi, MethodLoggingLevel, RequestValidator} from '@aws-cdk/aws-apigateway';
-import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
-import {Function, AssetCode} from '@aws-cdk/aws-lambda';
-import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
-import {EndpointType} from "@aws-cdk/aws-apigateway";
+import {EndpointType, MethodLoggingLevel, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
+import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {default as DisruptionSchema} from './model/disruption-schema';
 import {createSubscription} from '../../../common/stack/subscription';
-import {
-    defaultIntegration, corsMethodJsonResponse,
-} from "../../../common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../../common/model/geojson";
-import {getModelReference, addServiceModel, addDefaultValidator} from "../../../common/api/utils";
+import {addDefaultValidator, addServiceModel, getModelReference} from "../../../common/api/utils";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addTags} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(
     vpc: IVpc,
@@ -69,8 +67,8 @@ function createDisruptionsResource(
         apiKeyRequired: true,
         requestValidator: validator,
         methodResponses: [
-            corsMethodJsonResponse("200", disruptionsJsonModel),
-            corsMethodJsonResponse("500", errorResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, disruptionsJsonModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
         ]
     });
 

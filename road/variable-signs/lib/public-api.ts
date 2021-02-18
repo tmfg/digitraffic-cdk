@@ -1,4 +1,8 @@
-import {dbLambdaConfiguration, LambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {
+    dbLambdaConfiguration,
+    defaultLambdaConfiguration,
+    LambdaConfiguration
+} from "../../../common/stack/lambda-configs";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {addSimpleServiceModel} from "../../../common/api/utils";
 import {Construct} from "@aws-cdk/core";
@@ -6,9 +10,7 @@ import {RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {
-    corsHeaders,
-    corsMethodSvgResponse,
-    corsMethodXmlResponse,
+    corsMethod,
     defaultIntegration, getResponse, methodResponse,
     RESPONSE_200_OK,
     RESPONSE_400_BAD_REQUEST
@@ -18,6 +20,7 @@ import {addTags} from "../../../common/api/documentation";
 import {BETA_TAGS} from "../../../common/api/tags";
 import {MessageModel} from "../../../common/api/response";
 import {createRestApi} from "../../../common/api/rest_apis";
+import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
     const publicApi = createRestApi(stack, 'VariableSigns-public', 'VariableSigns public API', undefined);
@@ -42,11 +45,11 @@ function createDatex2Resource(
         readOnly: true
     }));
 
-    const textFunctionName = 'VS-GetText';
-    const getSignTextGraphicsLambda = new Function(stack, textFunctionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: textFunctionName,
-        code: new AssetCode('dist/lambda/get-sign-text'),
-        handler: 'lambda-get-sign-text.handler',
+    const imageFunctionName = 'VS-GetImage';
+    const getImageLambda = new Function(stack, imageFunctionName, defaultLambdaConfiguration({
+        functionName: imageFunctionName,
+        code: new AssetCode('dist/lambda/get-sign-image'),
+        handler: 'lambda-get-sign-image.handler',
         readOnly: true
     }));
 
@@ -66,15 +69,15 @@ function createDatex2Resource(
     datex2Resource.addMethod("GET", getDatex2Integration, {
         apiKeyRequired: true,
         methodResponses: [
-            corsMethodXmlResponse("200", xmlModel),
-            corsMethodXmlResponse("500", errorResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_XML, xmlModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_XML, errorResponseModel))
         ]
     });
 
     createSubscription(getDatex2Lambda, functionName, props.logsDestinationArn, stack);
     addTags('GetDatex2', BETA_TAGS, datex2Resource, stack);
 
-    const getSignTextIntegration = defaultIntegration(getSignTextGraphicsLambda, {
+    const getImageIntegration = defaultIntegration(getImageLambda, {
         xml: true,
         requestParameters: {
             'integration.request.path.text': 'method.request.path.text'
@@ -87,14 +90,14 @@ function createDatex2Resource(
             getResponse(RESPONSE_400_BAD_REQUEST)
         ]
     });
-    imageResource.addMethod("GET", getSignTextIntegration, {
+    imageResource.addMethod("GET", getImageIntegration, {
         apiKeyRequired: true,
         requestParameters: {
             'method.request.path.text': true
         },
         methodResponses: [
-            corsMethodSvgResponse("200", svgModel),
-            corsHeaders(methodResponse("400", "application/xml", errorResponseModel))
+            corsMethod(methodResponse("200", MediaType.IMAGE_SVG, svgModel)),
+            corsMethod(methodResponse("400", MediaType.APPLICATION_XML, errorResponseModel))
         ]
     });
 

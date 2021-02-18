@@ -12,7 +12,7 @@ import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from '../../../common/stack/subscription';
-import {corsMethodJsonResponse, defaultIntegration,} from "../../../common/api/responses";
+import {corsMethod, methodResponse, defaultIntegration,} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
@@ -20,6 +20,8 @@ import {Props} from "./app-props";
 import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {APPLICATION_JSON} from "../../portcall-estimates/tsd/common/api/response";
+import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(
     secret: ISecret,
@@ -100,8 +102,8 @@ function createTimestampsResource(
         },
         requestValidator: validator,
         methodResponses: [
-            corsMethodJsonResponse("200", timestampsJsonModel),
-            corsMethodJsonResponse("500", errorResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, timestampsJsonModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
         ]
     });
 

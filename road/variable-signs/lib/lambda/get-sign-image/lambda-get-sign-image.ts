@@ -11,6 +11,6 @@ export const handler = async (event: any, context: any, callback: any): Promise<
             body: image
         });
     } finally {
-        console.info("method=findActiveSignsDatex2 tookMs=%d", (Date.now()-start));
+        console.info("method=getSignImageLambda tookMs=%d", (Date.now()-start));
     }
 };

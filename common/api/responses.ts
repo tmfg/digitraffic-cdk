@@ -1,12 +1,12 @@
 import {AUTHORIZATION_FAILED_MESSAGE, NOT_FOUND_MESSAGE} from "./errors";
 import {
-    APPLICATION_JSON,
     InternalServerErrorResponseTemplate,
     createResponses,
-    XmlResponseTemplate, APPLICATION_XML, NotFoundResponseTemplate, IMAGE_SVG, SvgResponseTemplate
+    XmlResponseTemplate, NotFoundResponseTemplate, SvgResponseTemplate
 } from "./response";
 import {LambdaIntegration, MethodResponse, IntegrationResponse} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
+import {MediaType} from './mediatypes';
 
 export const RESPONSE_401_UNAUTHORIZED: IntegrationResponse = {
     statusCode: '401',
@@ -57,19 +57,7 @@ export const TEMPLATE_COGNITO_GROUPS = {
         "username": "$context.authorizer.claims['cognito:username']"
     })};
 
-export function methodJsonResponse(status: string, model: any, parameters?: any): MethodResponse {
-    return methodResponse(status, model, APPLICATION_JSON, parameters);
-}
-
-export function methodXmlResponse(status: string, model: any): MethodResponse {
-    return methodResponse(status, model, APPLICATION_XML);
-}
-
-function methodSvgResponse(status: string, model: any): MethodResponse {
-    return methodResponse(status, model, IMAGE_SVG);
-}
-
-export function methodResponse(status: string, contentType: string, model: any, parameters?: any): MethodResponse {
+export function methodResponse(status: string, contentType: MediaType, model: any, parameters?: any): MethodResponse {
     return  {
         statusCode: status,
         responseModels: createResponses(contentType, model),
@@ -78,24 +66,12 @@ export function methodResponse(status: string, contentType: string, model: any, 
 
 }
 
-export function corsHeaders(methodResponse: MethodResponse): MethodResponse {
+export function corsMethod(methodResponse: MethodResponse): MethodResponse {
     return {...methodResponse, ...{
         responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': true
         }
     }};
-}
-
-export function corsMethodJsonResponse(status: string, model: any): MethodResponse {
-    return corsHeaders(methodJsonResponse(status, model));
-}
-
-export function corsMethodXmlResponse(status: string, model: any): MethodResponse {
-    return corsHeaders(methodXmlResponse(status, model));
-}
-
-export function corsMethodSvgResponse(status: string, model: any): MethodResponse {
-    return corsHeaders(methodSvgResponse(status, model));
 }
 
 interface IntegrationOptions {

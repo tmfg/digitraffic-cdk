@@ -112,10 +112,7 @@ addSymbol('D', 20, `<defs>
 </defs>
 <text class="cls-1" transform="translate(0.377 25.432)">D</text>`);
 addSymbol('E', 20, `<path d="M11.7,25.4H4.1V6.9h10.7v3.2H8v4.1h6.3v3.2H8v4.8h6.8V25.4z"/>`);
-addSymbol('F', 20, `<defs>
-    <style>.cls-1{font-size:26px;font-family:OpenSans-Bold, Open Sans;font-weight:700;}</style>
-</defs>
-<text class="cls-1" transform="translate(2.865 25.432)">F</text>`);
+addSymbol('F', 20, `<path d="M1.7,25.4H4.1V6.9h10.7v3.2H8v4.1h6.3v3.2H8v4.8V25.4z"/>`);
 
 export function getBorderType(first: string): BorderType {
     if(first === SymbolType.ROAD + BEGIN) return BorderType.ROAD;
