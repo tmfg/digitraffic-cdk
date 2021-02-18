@@ -1,21 +1,20 @@
-import {RestApi,MethodLoggingLevel}  from '@aws-cdk/aws-apigateway';
-import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
-import {Function, AssetCode} from '@aws-cdk/aws-lambda';
-import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
-import {EndpointType} from "@aws-cdk/aws-apigateway";
+import {EndpointType, MethodLoggingLevel, RestApi} from '@aws-cdk/aws-apigateway';
+import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {default as AnnotationSchema} from './model/annotation-schema';
 import {createSubscription} from '../../../common/stack/subscription';
-import {addServiceModel} from '../../../common/api/utils';
+import {addServiceModel, getModelReference} from '../../../common/api/utils';
 import {MessageModel} from "../../../common/api/response";
 import {featureSchema, geojsonSchema} from "../../../common/model/geojson";
-import {getModelReference} from "../../../common/api/utils";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {NW2Props} from "./app-props";
-import {corsMethodJsonResponse, defaultIntegration} from "../../../common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
 import {addTags} from "../../../common/api/documentation";
 import {BETA_TAGS} from "../../../common/api/tags";
+import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(
     vpc: IVpc,
@@ -74,8 +73,8 @@ function createAnnotationsResource(
             'method.request.querystring.type': false
         },
         methodResponses: [
-            corsMethodJsonResponse("200", annotationsModel),
-            corsMethodJsonResponse("500", responseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, annotationsModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, responseModel))
         ]
     });
 

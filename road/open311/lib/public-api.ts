@@ -9,10 +9,11 @@ import {MessageModel} from '../../../common/api/response';
 import {addDefaultValidator, addServiceModel, createArraySchema} from '../../../common/api/utils';
 import {createSubscription} from "../../../common/stack/subscription";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
-import {corsMethodJsonResponse, defaultIntegration} from "../../../common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
 import {addTags} from "../../../common/api/documentation";
 import {DATA_V1_TAGS} from "../../../common/api/tags";
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
+import {MediaType} from '../../../common/api/mediatypes';
 
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';
@@ -162,9 +163,9 @@ function createGetRequestIntegration(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            corsMethodJsonResponse("200", requestModel),
-            corsMethodJsonResponse("404", messageResponseModel),
-            corsMethodJsonResponse("500", messageResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, requestModel)),
+            corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, messageResponseModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
         ]
     });
     addTags('GetRequest', DATA_V1_TAGS, request, stack);
@@ -193,8 +194,8 @@ function createGetRequestsIntegration(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            corsMethodJsonResponse("200", requestsModel),
-            corsMethodJsonResponse("500", messageResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, requestsModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
         ]
     });
     addTags('GetRequests', DATA_V1_TAGS, requests, stack);
@@ -336,8 +337,8 @@ function createGetResourcesIntegration(
     resource.addMethod("GET", integration, {
         apiKeyRequired: true,
         methodResponses: [
-            corsMethodJsonResponse("200", model),
-            corsMethodJsonResponse("500", messageResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, model)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
         ]
     });
     addTags(tag, DATA_V1_TAGS, resource, stack);
@@ -366,8 +367,8 @@ function createGetLocalizedResourceIntegration(
             'method.request.querystring.locale': false
         },
         methodResponses: [
-            corsMethodJsonResponse("200", model),
-            corsMethodJsonResponse("500", messageResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, model)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
         ]
     });
     addTags(id, DATA_V1_TAGS, resource, stack);
@@ -396,9 +397,9 @@ function createGetServiceIntegration(
             'method.request.path.service_id': true
         },
         methodResponses: [
-            corsMethodJsonResponse("200", serviceModel),
-            corsMethodJsonResponse("404", messageResponseModel),
-            corsMethodJsonResponse("500", messageResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, serviceModel)),
+            corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, messageResponseModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
         ]
     });
     addTags('GetService', DATA_V1_TAGS, service, stack);

@@ -6,9 +6,10 @@ import {Construct} from "@aws-cdk/core";
 import * as ec2 from "@aws-cdk/aws-ec2";
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createSubscription} from "../../../common/stack/subscription";
-import {corsMethodJsonResponse, defaultIntegration} from "../../../common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
 import {addDefaultValidator} from "../../../common/api/utils";
 import {MessageModel} from "../../../common/api/response";
+import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
     const integrationApi = createApi(stack, props.vpcId);
@@ -114,8 +115,8 @@ function createDeleteRequestHandler(
             'method.request.querystring.extensions': false
         },
         methodResponses: [
-            corsMethodJsonResponse("200", messageResponseModel),
-            corsMethodJsonResponse("500", messageResponseModel)
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, messageResponseModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel))
         ]
     });
     createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);
