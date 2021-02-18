@@ -17,6 +17,14 @@ export const RESPONSE_200_OK: IntegrationResponse = {
     statusCode: '200'
 };
 
+export const RESPONSE_400_BAD_REQUEST: IntegrationResponse = {
+    statusCode: '400',
+    selectionPattern: 'ERROR.*',
+    responseTemplates: {
+        'application/json': "{\"Error\":\"$input.path('$').errorMessage\"}"
+    }
+}
+
 export const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
     statusCode: '500',
     selectionPattern: 'Error',
@@ -50,25 +58,24 @@ export const TEMPLATE_COGNITO_GROUPS = {
     })};
 
 export function methodJsonResponse(status: string, model: any, parameters?: any): MethodResponse {
-    return  {
-        statusCode: status,
-        responseModels: createResponses(APPLICATION_JSON, model),
-        responseParameters: parameters || {}
-    };
+    return methodResponse(status, model, APPLICATION_JSON, parameters);
 }
 
 export function methodXmlResponse(status: string, model: any): MethodResponse {
-    return  {
-        statusCode: status,
-        responseModels: createResponses(APPLICATION_XML, model)
-    };
+    return methodResponse(status, model, APPLICATION_XML);
 }
 
 function methodSvgResponse(status: string, model: any): MethodResponse {
-    return {
+    return methodResponse(status, model, IMAGE_SVG);
+}
+
+export function methodResponse(status: string, contentType: string, model: any, parameters?: any): MethodResponse {
+    return  {
         statusCode: status,
-        responseModels: createResponses(IMAGE_SVG, model)
-    }
+        responseModels: createResponses(contentType, model),
+        responseParameters: parameters || {}
+    };
+
 }
 
 export function corsHeaders(methodResponse: MethodResponse): MethodResponse {
@@ -121,7 +128,7 @@ export function defaultIntegration(
     });
 }
 
-function getResponse(response: any, options?: IntegrationOptions): any {
+export function getResponse(response: any, options?: IntegrationOptions): any {
     if(options?.xml) response = {...response, ...RESPONSE_XML};
     if(!options?.disableCors) response = {...response, ...RESPONSE_CORS_INTEGRATION};
 

@@ -1,6 +1,11 @@
-import {findSymbol, isValidSymbol, Symbol, BorderType} from "./symbol";
+import {findSymbol, isValidSymbol, Symbol} from "./symbol";
+import {getBorderType} from "../../lib/service/symbol";
 
 const MAX_LENGTH = 30;
+
+function error(errorText: string) {
+    throw new Error("ERROR:" + errorText);
+}
 
 export function convertTextToSvg(text: string): string {
     const checked = validate(text);
@@ -17,14 +22,14 @@ function validate(text: string): string {
 }
 
 function checkSize(text: string) {
-    if (text.length < 1) throw new Error("No content");
-    if (text.length > MAX_LENGTH) throw new Error("Max length is " + MAX_LENGTH);
+    if (text.length < 1) error("No content");
+    if (text.length > MAX_LENGTH) error("Max length is " + MAX_LENGTH);
 }
 
 function checkUnderlines(text: string) {
     const count = text.split('_').length - 1;
 
-    if(count > 1) throw new Error("Text can only contain 1 _");
+    if(count > 1) error("Text can only contain 1 _");
 }
 
 // text can be enclosed in brackets, but no more brackets can be used
@@ -37,13 +42,13 @@ function checkAndRemoveBrackets(text: string): string {
 
     if(firstChar === '[') {
         // ok, last char must be ]
-        if(lastChar !== ']') throw new Error("Text must be in form of [text]");
-        if(count1 > 1 || count2 > 1) throw new Error("Text must be in form of [text]");
+        if(lastChar !== ']') error("Text must be in form of [text]");
+        if(count1 > 1 || count2 > 1) error("Text must be in form of [text]");
 
         return text.substring(1, text.length - 1);
     }
 
-    if(count1 > 0 || count2 > 0) throw new Error("Text must be in form of [text]");
+    if(count1 > 0 || count2 > 0) error("Text must be in form of [text]");
 
     return text;
 }
@@ -52,16 +57,13 @@ function convert(text: string): string {
     const symbolList = findUsedSymbolTexts(text);
     const symbols = convertToSymbols(symbolList);
 
-    return mergeSymbols(symbols);
+    return creteSvg(symbols);
 }
 
-function mergeSymbols(symbolList: Symbol[]): string {
-    let symbolsText= '';
-
-    // first introduce symbols in svg, only once
-    new Set(symbolList).forEach((symbol: Symbol) => {
-        symbolsText+= symbol.getSvg() + '\n';
-    });
+// create svg from symbols
+function creteSvg(symbolList: Symbol[]): string {
+    // first introduce symbols in svg, only once each
+    const symbolsText = Array.from(new Set(symbolList).values()).map((s) => s.getSvg()).join('\n');
 
     let useText = '';
     let width= 0;
@@ -75,25 +77,19 @@ function mergeSymbols(symbolList: Symbol[]): string {
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} 32">\n${symbolsText}\n${useText}</svg>\n`;
 }
 
-function getBorderType(first: string): BorderType {
-    if(first === 'TIE_BEGIN') return BorderType.TIE;
-    if(first === 'VARATIE_BEGIN') return BorderType.VARATIE;
-    if(first === 'VARAREITTI_BEGIN') return BorderType.VARAREITTI;
-
-    return BorderType.NONE;
-}
-
+// convert given string-list to list of symbols, add end if needed
 function convertToSymbols(symbols: string[]): Symbol[] {
     const borderType = getBorderType(symbols[0]);
-
     const symbolList = symbols.map(s => findSymbol(borderType, s));
 
-    // and end symbol, if first symbol is beginning
-    if(symbolList[0].begins) symbolList.push(findSymbol(borderType, 'END'));
+    // and end symbol, if first symbol is starting borders
+    if(symbolList[0].startsBorders) symbolList.push(findSymbol(borderType, 'END'));
 
     return symbolList;
 }
 
+// split given string to list of symbols
+// TIE_123 -> [TIE_BEGIN, 1, 2, 3]
 function findUsedSymbolTexts(text: string): string[] {
     let index = 0;
     let symbolList = [] as string[];
@@ -114,7 +110,7 @@ function findUsedSymbolTexts(text: string): string[] {
         if(isValidSymbol(symbol)) {
             symbolList.push(symbol);
         } else {
-            throw new Error("invalid symbol " + symbol);
+            throw error("invalid symbol " + symbol);
         }
     }
 

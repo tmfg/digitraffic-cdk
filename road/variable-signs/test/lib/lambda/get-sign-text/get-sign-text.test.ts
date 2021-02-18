@@ -1,6 +1,6 @@
 import { convertTextToSvg } from "../../../../lib/service/text-converter";
 
-describe('text-converter-tests', () => { 
+describe('text-converter-tests', () => {
     test('empty', () => {
         expectError("");
     });
@@ -22,7 +22,7 @@ describe('text-converter-tests', () => {
     });
 
     test('wrong_characters', () => {
-        expectError("123a");
+        expectError("123Z");
     });
 
     test('1_symbol', () => {
@@ -30,7 +30,11 @@ describe('text-converter-tests', () => {
     });
 
     test('a_symbol', () => {
-        expectError("[A]");
+        expectValue("[A]");
+    });
+
+    test('z_symbol', () => {
+        expectError("[Z]");
     });
 
     test('tie1_with_brackets', () => {
@@ -47,6 +51,10 @@ describe('text-converter-tests', () => {
 
     test('varareitti', () => {
         expectValue("[VARAREITTI_123]");
+    })
+
+    test('ramppi', () => {
+        expectValue("[RAMPPI_123]");
     })
 
     test('varareitti_broken', () => {

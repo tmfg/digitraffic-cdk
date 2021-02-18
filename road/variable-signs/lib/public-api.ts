@@ -5,7 +5,14 @@ import {Construct} from "@aws-cdk/core";
 import {RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {corsMethodSvgResponse, corsMethodXmlResponse, defaultIntegration, RESPONSE_200_OK, RESPONSE_CORS_INTEGRATION, RESPONSE_SVG} from "../../../common/api/responses";
+import {
+    corsHeaders,
+    corsMethodSvgResponse,
+    corsMethodXmlResponse,
+    defaultIntegration, getResponse, methodResponse,
+    RESPONSE_200_OK,
+    RESPONSE_400_BAD_REQUEST
+} from "../../../common/api/responses";
 import {createSubscription} from "../../../common/stack/subscription";
 import {addTags} from "../../../common/api/documentation";
 import {BETA_TAGS} from "../../../common/api/tags";
@@ -53,7 +60,8 @@ function createDatex2Resource(
     const betaResource = apiResource.addResource("beta");
     const vsResource = betaResource.addResource("variable-signs");
     const datex2Resource = vsResource.addResource("datex2");
-    const textResource = vsResource.addResource("sign-text");
+    const imagesResource = vsResource.addResource("images");
+    const imageResource = imagesResource.addResource("{text}");
 
     datex2Resource.addMethod("GET", getDatex2Integration, {
         apiKeyRequired: true,
@@ -69,20 +77,24 @@ function createDatex2Resource(
     const getSignTextIntegration = defaultIntegration(getSignTextGraphicsLambda, {
         xml: true,
         requestParameters: {
-            'integration.request.querystring.text': 'method.request.querystring.text'
+            'integration.request.path.text': 'method.request.path.text'
         },
         requestTemplates: {
             'application/json': JSON.stringify({text: "$util.escapeJavaScript($input.params('text'))"})
-        }
+        },
+        responses: [
+            getResponse(RESPONSE_200_OK, {xml: true}),
+            getResponse(RESPONSE_400_BAD_REQUEST)
+        ]
     });
-    textResource.addMethod("GET", getSignTextIntegration, {
+    imageResource.addMethod("GET", getSignTextIntegration, {
         apiKeyRequired: true,
         requestParameters: {
-            'method.request.querystring.text': true
+            'method.request.path.text': true
         },
         methodResponses: [
             corsMethodSvgResponse("200", svgModel),
-            corsMethodXmlResponse("500", errorResponseModel)            
+            corsHeaders(methodResponse("400", "application/xml", errorResponseModel))
         ]
     });
 
