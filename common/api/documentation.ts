@@ -66,3 +66,21 @@ export function addTags(
 ) {
     addDocumentation(methodDescription, {tags}, resource, stack);
 }
+
+/**
+ * Adds OpenAPI tags and a method summary to an API method
+ * @param methodDescription Description of API method
+ * @param tags OpenAPI tags
+ * @param summary OpenAPI summary
+ * @param resource REST API resource
+ * @param stack CloudFormation stack
+ */
+export function addTagsAndSummary(
+    methodDescription: string,
+    tags: string[],
+    summary: string,
+    resource: Resource,
+    stack: Construct
+) {
+    addDocumentation(methodDescription, {tags, summary}, resource, stack);
+}

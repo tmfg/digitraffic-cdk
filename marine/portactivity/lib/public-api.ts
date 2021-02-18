@@ -17,7 +17,7 @@ import {MessageModel} from "../../../common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {Props} from "./app-props";
-import {addQueryParameterDescription, addTags} from "../../../common/api/documentation";
+import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
@@ -106,7 +106,11 @@ function createTimestampsResource(
     });
 
     createSubscription(getTimestampsLambda, functionName, props.logsDestinationArn, stack);
-    addTags('GetTimestamps', ['timestamps'], resource, stack);
+    addTagsAndSummary('GetTimestamps',
+        ['timestamps'],
+        'Retrieves ship timestamps by ship or port',
+        resource,
+        stack);
     addQueryParameterDescription('locode', 'Port LOCODE', resource, stack);
     addQueryParameterDescription('mmsi', 'Ship MMSI', resource, stack);
     addQueryParameterDescription('imo', 'Ship IMO', resource, stack);
@@ -145,7 +149,11 @@ function createShiplistResource(
     });
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
-    addTags('Shiplist', ['shiplist'], shiplistResource, stack);
+    addTagsAndSummary('Shiplist',
+        ['shiplist'],
+        'Returns a list of ships as an HTML page',
+        shiplistResource,
+        stack);
 
     return lambda;
 }
