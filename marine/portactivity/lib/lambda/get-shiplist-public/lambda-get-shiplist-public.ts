@@ -12,7 +12,11 @@ export const handler = async (event: any): Promise<any> => {
 
 export async function handlerFn(
     event: any,
-    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>) => Promise<any>): Promise<any> {
+    withDbSecretFn: (
+        secretId: string,
+        fn: (_: any) => Promise<void>
+    ) => Promise<any>
+): Promise<any> {
 
     return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
         if (!event.queryStringParameters.locode) {
