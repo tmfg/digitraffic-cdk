@@ -55,7 +55,8 @@
     "pg-promise": "10.3.5",
     "pg-query-stream": "4.0.0",
     "ramda": "^0.27.1",
-    "source-map-support": "v0.5.19"
+    "source-map-support": "v0.5.19",
+    "amqplib": "^0.6.0"
   },
   "externals": [
     "aws-sdk"
