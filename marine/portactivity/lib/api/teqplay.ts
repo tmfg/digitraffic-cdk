@@ -1,8 +1,8 @@
-import {Event} from "../model/teqplay-event";
+import {Event} from "../../../../road/maintenance-tracking/lib/model/teqplay-event";
 
 export async function getMessages(): Promise<Event[]> {
     const connection = await require('amqplib')
-        .connect('connection-string');
+        .connect('connectionstring');
 
     let messages = [] as Event[];
 
