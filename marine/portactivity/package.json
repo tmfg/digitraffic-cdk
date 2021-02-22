@@ -61,6 +61,7 @@
     "ramda": "^0.27.1",
     "uuid": "^8.3.1",
     "axios": "v0.21.1",
-    "amqplib": "^0.6.0"
+    "amqplib": "^0.6.0",
+    "@types/amqplib": "^0.5.17"
   }
 }

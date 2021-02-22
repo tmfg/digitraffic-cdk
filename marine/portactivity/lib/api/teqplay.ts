@@ -1,11 +1,10 @@
-import {Event} from "../../../../road/maintenance-tracking/lib/model/teqplay-event";
-
-const amqplib = require("amqplib");
+import {Event} from "../model/teqplay-event";
+import {connect} from 'amqplib';
 
 export async function getMessages(uri: string, channelName: string): Promise<Event[]> {
-    const connection = await amqplib.connect(uri);
+    const connection = await connect(uri);
 
-    let events = [] as Event[];
+    const events = [] as Event[];
     let message;
 
     try {
@@ -14,10 +13,12 @@ export async function getMessages(uri: string, channelName: string): Promise<Eve
         do {
             message = await channel.get(channelName);
 
-            const buffer = Buffer.from(message.content);
-            const event = JSON.parse(buffer.toString());
+            if(message) {
+                const buffer = Buffer.from(message.content);
+                const event = JSON.parse(buffer.toString());
 
-            events.push(event);
+                events.push(event);
+            }
 
             //channel.ack(message); not yet
 //        } while (message != null);
@@ -25,6 +26,6 @@ export async function getMessages(uri: string, channelName: string): Promise<Eve
 
         return events;
     } finally {
-        connection.close();
+        await connection.close();
     }
 }

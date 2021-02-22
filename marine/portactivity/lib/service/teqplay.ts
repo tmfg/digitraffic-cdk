@@ -1,14 +1,13 @@
 import * as TeqplayAPI from "../api/teqplay";
-import {Event} from "../../../../road/maintenance-tracking/lib/model/teqplay-event";
+import {Event} from "../model/teqplay-event";
 import {ApiTimestamp, EventType, Ship} from "../model/timestamp";
 
 const VALID_EVENT_TYPES = ['berth.eta.vessel'];
 
-const AMQP_URI = process.env.TEQPLAY_URL as string;
 const CHANNEL_NAME = 'fintraffic';
 
 export async function getMessagesFromTeqplay(): Promise<ApiTimestamp[]> {
-    const events = await TeqplayAPI.getMessages(AMQP_URI, CHANNEL_NAME);
+    const events = await TeqplayAPI.getMessages(process.env.TEQPLAY_URL as string, CHANNEL_NAME);
 
     return events
         .filter(isValid)
