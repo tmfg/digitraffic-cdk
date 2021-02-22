@@ -35,6 +35,33 @@ export function create(
     const updateETATimestampsLambda = createUpdateETATimestampsLambda(secret, vpc, lambdaDbSg, props, stack);
     const updateETASchedulingRule = createETAUpdateSchedulingCloudWatchRule(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
+
+    if(props.teqplayUrl) {
+        const updateTimestampsFromTeqplayLambda = createUpdateTimestampsFromTeqplayLambda(queueAndDLQ.queue, vpc, props, stack);
+        const teqplayScheduler = createTeqplayScheduler(stack);
+        teqplayScheduler.addTarget(new LambdaFunction(updateTimestampsFromTeqplayLambda));
+    }
+}
+
+function createUpdateTimestampsFromTeqplayLambda(queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
+    const functionName = 'PortActivity-UpdateTimestampsFromTeqplay';
+
+    const lambda = new Function(stack, functionName, {
+        runtime: Runtime.NODEJS_12_X,
+        logRetention: RetentionDays.ONE_YEAR,
+        functionName: functionName,
+        code: new AssetCode('dist/lambda/update-timestamps-from-teqplay'),
+        handler: 'lambda-update-timestamps-from-teqplay.handler',
+        environment: {
+            ESTIMATE_SQS_QUEUE_URL: queue.queueUrl,
+            TEQPLAY_URL: props.teqplayUrl as string
+        }
+    });
+
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+    queue.grantSendMessages(lambda);
+
+    return lambda;
 }
 
 function createProcessQueueLambda(
@@ -93,6 +120,14 @@ function createETAUpdateSchedulingCloudWatchRule(stack: Stack): Rule {
     return new Rule(stack, ruleName, {
         ruleName,
         schedule: Schedule.expression('cron(*/15 * * * ? *)') // every 15 minutes
+    });
+}
+
+function createTeqplayScheduler(stack: Stack): Rule {
+    const ruleName = 'PortActivity-TeqplayScheduler'
+    return new Rule(stack, ruleName, {
+        ruleName,
+        schedule: Schedule.expression('cron(*/2 * * * ? *)') // every 15 minutes
     });
 }
 

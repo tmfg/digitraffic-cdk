@@ -20,5 +20,6 @@ export interface Props {
         readonly authUrl: string
         readonly endpointUrl: string
         readonly timestampSource: string
-    }
+    },
+    readonly teqplayUrl?: string
 }

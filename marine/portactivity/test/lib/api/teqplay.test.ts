@@ -1,7 +1,7 @@
-import {getMessages} from "../../../lib/api/teqplay";
+import {getMessagesFromTeqplay} from "../../../lib/service/teqplay";
 
 describe('text-converter-tests', () => {
     test('empty', async () => {
-        console.info(await getMessages());
+        console.info(await getMessagesFromTeqplay());
     });
 });
