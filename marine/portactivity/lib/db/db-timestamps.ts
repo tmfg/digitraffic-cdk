@@ -177,10 +177,8 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
 // On the other hand this allows keeping all the configuration in code.
 function SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT(
     portAreaThresholds: { locode: string; threshold: number | undefined; portArea: string | undefined }[]): string {
-
     // fixed structure from SQL VALUES clause
-    const thresholdValues = portAreaThresholds.map( p => `('${p.locode}','${p.portArea}',${p.threshold})`).join(',');
-
+    const thresholdValues = portAreaThresholds.map( p => `('${p.locode}','${p.portArea}',${p.threshold ?? DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES})`).join(',');
     return `
         SELECT DISTINCT
             pe.ship_imo AS imo
