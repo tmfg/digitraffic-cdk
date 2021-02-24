@@ -7,11 +7,12 @@ import {createSubscription} from "../../../common/stack/subscription";
 import {LambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createRestApi} from "../../../common/api/rest_apis";
+import {createUsagePlan} from "../../../common/stack/usage-plans";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
     const integrationApi = createRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API', props.allowFromIpAddresses);
     createUpdateRequestHandler(stack, integrationApi, vpc, lambdaDbSg, props);
-    createUsagePlan(integrationApi);
+    createUsagePlan(integrationApi, 'Integration API key', 'Integration Usage Plan');
 }
 
 function createUpdateRequestHandler (
@@ -71,15 +72,4 @@ function createUpdateDatexV1(
     createSubscription(updateDatex2Handler, updateDatex2Id, props.logsDestinationArn, stack);
 
     return updateDatex2Handler;
-}
-
-function createUsagePlan(integrationApi: RestApi) {
-    const apiKey = integrationApi.addApiKey('Integration API key');
-    const plan = integrationApi.addUsagePlan('Integration Usage Plan', {
-        name: 'Integration Usage Plan',
-        apiKey
-    });
-    plan.addApiStage({
-        stage: integrationApi.deploymentStage
-    });
 }
