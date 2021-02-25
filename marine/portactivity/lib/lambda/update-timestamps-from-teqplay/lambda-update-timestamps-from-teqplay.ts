@@ -6,21 +6,21 @@ import {withSecret} from "../../../../../common/secrets/secret";
 const sqs = new SQS();
 
 export const handler = async function () {
-    await withSecret(process.env.SECRET_ID as string, (secret: any) => {
+    return withSecret(process.env.SECRET_ID as string, async (secret: any) => {
         const queueUrl = secret.teqplayQueueUrl;
+        const sqsQueueUrl = "https://sqs.eu-west-1.amazonaws.com/863956030060/PortActivity-Timestamps";
+        const timestamps = await TeqplayService.getMessagesFromTeqplay(queueUrl);
 
-        TeqplayService.getMessagesFromTeqplay().then((timestamps: ApiTimestamp[]) => {
-            timestamps.forEach(ts => sendMessage(ts, queueUrl));
-        });
+        timestamps.forEach(ts => sendMessage(ts, sqsQueueUrl));
     });
 }
 
-function sendMessage(ts: ApiTimestamp, queueUrl: string) {
-    sqs.sendMessage({
+async function sendMessage(ts: ApiTimestamp, sqsQueueUrl: string) {
+    await sqs.sendMessage({
         MessageBody: JSON.stringify(ts),
-        QueueUrl: queueUrl,
+        QueueUrl: sqsQueueUrl,
     }, (err: any, data: any) => {
         if (err) console.log("error " + err);
-        else console.log("success " + data.MessageId);
+        //else console.log("success " + data.MessageId);
     });
 }

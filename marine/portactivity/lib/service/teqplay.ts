@@ -6,8 +6,8 @@ const VALID_EVENT_TYPES = ['berth.eta.vessel'];
 
 const CHANNEL_NAME = 'fintraffic';
 
-export async function getMessagesFromTeqplay(): Promise<ApiTimestamp[]> {
-    const events = await TeqplayAPI.getMessages(process.env.TEQPLAY_URL as string, CHANNEL_NAME);
+export async function getMessagesFromTeqplay(queueUrl: string): Promise<ApiTimestamp[]> {
+    const events = await TeqplayAPI.getMessages(queueUrl, CHANNEL_NAME);
 
     return events
         .filter(isValid)
@@ -48,7 +48,7 @@ function convertShip(event: Event): Ship {
 }
 
 function convertPortcallId(event: Event): number|null {
-    if(event.portcallId) return +event.portcallId.substring(5);
+    if(event.portcallId) return +event.portcallId;
     return null;
 }
 
