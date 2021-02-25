@@ -94,6 +94,8 @@ export async function findETAShipsByLocode(
     locodes: string[],
     ports: Port[]): Promise<DbETAShip[]> {
 
+    console.info("find for " + locodes);
+
     const startFindPortnetETAsByLocodes = Date.now();
     const portnetShips = await inDatabase(async (db: IDatabase<any, any>) => {
         return TimestampsDB.findPortnetETAsByLocodes(db, locodes);

@@ -59,9 +59,12 @@ export async function getETAs(
             ship,
             getPortAreaGeometryForShip(portAreaGeometries, ship))))
         .then(a => {
-            console.log(`method=getEtas tookMs=${Date.now() - start}`);
+            console.log("method=getEtas tookMs=%d", Date.now() - start);
             return a;
         });
+
+    console.log("method=PortActivity.GetMessages source=Grieg receivedCount=%d", etas.length);
+
     return etas.filter(e => e != null) as ShipETA[];
 }
 
