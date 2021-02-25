@@ -296,7 +296,7 @@ export function findByLocode(
     const ps = new PreparedStatement({
         name:'find-by-locode',
         text:SELECT_BY_LOCODE,
-        values: [locode]
+        values: [locode.toUpperCase()]
     });
     return db.tx(t => t.manyOrNone(ps));
 }
