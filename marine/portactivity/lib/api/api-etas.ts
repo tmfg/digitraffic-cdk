@@ -97,6 +97,9 @@ async function getETA(
     } else if (resp.status == 404) {
         console.log(`method=getETAs status=${resp.status} ship ${ship.imo} has not reported a position for more than 2 hours`);
         return Promise.resolve(null);
+    } else if (resp.status == 400) {
+        console.error(`method=getETAs status=${resp.status} bad request`);
+        return Promise.reject();
     } else if (resp.status != 200) {
         console.error(`method=getETAs status=${resp.status}`);
         return Promise.reject();
