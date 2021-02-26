@@ -1,15 +1,16 @@
 const SYMBOL_CACHE = {} as any;
 
 // these will be used in ids
-export enum BorderType {
-    NONE= "",
+export enum SymbolType {
+    NORMAL= "",
     ROAD = "ROAD_",
     DETOUR = "DETOUR_",
-    DIVERSION = "DIVERSION_"
+    DIVERSION = "DIVERSION_",
+    SINGLE = "SINGLE_"
 }
 
-// these are in the input text
-enum SymbolType {
+// these are symbols used in the input text
+enum InputSymbols {
     ROAD = "TIE_",
     DETOUR = "VARATIE_",
     DIVERSION = "VARAREITTI_",
@@ -20,15 +21,21 @@ export class Symbol {
     public width: number;
     public svg: string;
     public name: string;
-    public id: string;
-    public startsBorders: boolean;
+    public symbolType: SymbolType
 
-    constructor(width: number, svg: string, name: string, id: string, startsBorders: boolean) {
+    constructor(width: number, svg: string, name: string, symbolType: SymbolType) {
         this.width = width;
         this.svg = svg;
         this.name = name;
-        this.id = id;
-        this.startsBorders = startsBorders;
+        this.symbolType = symbolType;
+    }
+
+    startsBorders(): boolean {
+        return [SymbolType.ROAD, SymbolType.DETOUR, SymbolType.DIVERSION].includes(this.symbolType);
+    }
+
+    isSingleSymbol(): boolean {
+        return this.symbolType === SymbolType.SINGLE;
     }
 
     getSvg(): string {
@@ -40,23 +47,23 @@ const END = 'END';
 const BEGIN = 'BEGIN';
 
 // start/end symbols
-addEnd(END, 5, '<polygon points="4,31 0,31 0,29 2,29 2,3 0,3 0,1 4,1"/>', BorderType.ROAD + END);
-addEnd(END, 5, `<path d="M1,31H3V29H1ZM1,1V3H3V1ZM1,19H3V17H1Zm0,8H3V25H1Zm0-4H3V21H1Zm0-8H3V13H1ZM1,7H3V5H1Zm0,4H3V9H1Z"/>`, BorderType.DIVERSION + END);
+addEnd(END, 5, '<polygon points="4,31 0,31 0,29 2,29 2,3 0,3 0,1 4,1"/>', SymbolType.ROAD + END, SymbolType.ROAD);
+addEnd(END, 5, `<path d="M1,31H3V29H1ZM1,1V3H3V1ZM1,19H3V17H1Zm0,8H3V25H1Zm0-4H3V21H1Zm0-8H3V13H1ZM1,7H3V5H1Zm0,4H3V9H1Z"/>`, SymbolType.DIVERSION + END, SymbolType.DIVERSION);
 addEnd(END, 5, `<polygon points="0 1 4 1 4 6.5 2 6.5 2 3 0 3 0 1"/>
 <path d="M2,9.682H4v4.227H2Zm0,8.409H4v4.227H2Z"/>
-<polygon points="2 25.5 4 25.5 4 31 0 31 0 29 2 29 2 25.5"/>`, BorderType.DETOUR + END);
+<polygon points="2 25.5 4 25.5 4 31 0 31 0 29 2 29 2 25.5"/>`, SymbolType.DETOUR + END, SymbolType.DETOUR);
 
-addEnd(BEGIN, 5, `<polygon points="5,31 1,31 1,1 5,1 5,3 3,3 3,29 5,29 "/>`, SymbolType.ROAD + BEGIN);
-addEnd(BEGIN, 5, `<path d="M2,31H4V29H2ZM2,1V3H4V1ZM2,19H4V17H2Zm0,8H4V25H2Zm0-4H4V21H2Zm0-8H4V13H2ZM2,7H4V5H2Zm0,4H4V9H2Z"/>`, SymbolType.DIVERSION + BEGIN);
+addEnd(BEGIN, 5, `<polygon points="5,31 1,31 1,1 5,1 5,3 3,3 3,29 5,29 "/>`, SymbolType.ROAD + BEGIN, SymbolType.ROAD);
+addEnd(BEGIN, 5, `<path d="M2,31H4V29H2ZM2,1V3H4V1ZM2,19H4V17H2Zm0,8H4V25H2Zm0-4H4V21H2Zm0-8H4V13H2ZM2,7H4V5H2Zm0,4H4V9H2Z"/>`, SymbolType.DIVERSION + BEGIN, SymbolType.DIVERSION);
 addEnd(BEGIN, 5, `<polygon points="5 31 1 31 1 25.5 3 25.5 3 29 5 29 5 31"/>
 <path d="M3,22.318H1V18.091H3Zm0-8.409H1V9.682H3Z"/>
-<polygon points="3 6.5 1 6.5 1 1 5 1 5 3 3 3 3 6.5"/>`, SymbolType.DETOUR + BEGIN)
+<polygon points="3 6.5 1 6.5 1 1 5 1 5 3 3 3 3 6.5"/>`, SymbolType.DETOUR + BEGIN, SymbolType.DETOUR)
 
 addEnd('RAMP', 30, `<polygon points="5.1,26 11.7,26 13.4,6 10.7,6"/>
 <polygon points="23.1,26 16.4,26 14.8,6 17.4,6"/>
 <polygon points="27.8,11.8 22,6 27.8,6"/>
 <path d="M16.2,21.2c0-5.2,1.8-8.6,4.5-10.6l5-3.7L26.9,8l-3.8,4.5c-1.4,1.8-2.3,4.3-1.6,8L16.2,21.2z"/>
-<polygon points="30,31 1,31 1,1 30,1 30,3 3,3 3,29 30,29"/>`, SymbolType.RAMP + BEGIN);
+<polygon points="30,31 1,31 1,1 30,1 30,3 3,3 3,29 30,29"/>`, SymbolType.ROAD + InputSymbols.RAMP + BEGIN, SymbolType.ROAD);
 
 // numbers
 addSymbol('n1', 16, `<path d="M11.3,25.4H7.4V14.7l0-1.8L7.5,11c-0.7,0.7-1.1,1.1-1.4,1.3L4,14l-1.9-2.4l6-4.8h3.2V25.4z"/>`, '1');
@@ -114,13 +121,51 @@ addSymbol('D', 20, `<defs>
 addSymbol('E', 20, `<path d="M11.7,25.4H4.1V6.9h10.7v3.2H8v4.1h6.3v3.2H8v4.8h6.8V25.4z"/>`);
 addSymbol('F', 20, `<path d="M1.7,25.4H4.1V6.9h10.7v3.2H8v4.1h6.3v3.2H8v4.8V25.4z"/>`);
 
-export function getBorderType(first: string): BorderType {
-    if(first === SymbolType.ROAD + BEGIN) return BorderType.ROAD;
-    if(first === SymbolType.DETOUR + BEGIN) return BorderType.DETOUR;
-    if(first === SymbolType.DIVERSION + BEGIN) return BorderType.DIVERSION;
-    if(first === SymbolType.RAMP + BEGIN) return BorderType.ROAD;
+// other symbols
+addSingle('HARBOUR', 48, `<polygon points="14.5,19 18.8,8.7 24,10.6 24,13.8 21.9,13.8 21.9,16.6 27,16.6 27,13.8 24.8,13.8 24.8,9.8 17.6,6 9.8,19"/>
+   <polygon points="37.7,19.3 37.7,15.6 34.7,15.6 33,19.3"/>
+   <polygon points="38.6,25.2 38.6,20 32.6,20 31.1,21.8 16.2,21.8 14.4,19.9 7.8,19.9 10,25.2"/>
+   <path d="M7.9,25l3.6,1l3.6-0.8l3.7,0.6l3.7-0.6l4.1,0.8l4.7-0.9l3.8,0.9l4.9-0.8l0.2-0.8l-5,0.7l-3.8-0.8l-4.7,0.8l-4.1-0.7
+\t\t\tc-2.5,0.7-4.3,0.8-5.5,0.4c-1.2-0.3-3.1-0.2-5.4,0.4l-3.6-0.9V25z"/>
+   <path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>`, 'LAIVA_VASEN');
+addSingle('HARBOUR', 48, `<polygon points="38.2,19 30.4,6 23.2,9.8 23.2,13.8 21,13.8 21,16.6 26.1,16.6 26.1,13.8 24,13.8 24,10.6 29.2,8.7 33.5,19 \t\t"/>
+   <polygon points="15,19.3 13.3,15.6 10.3,15.6 10.3,19.3 \t\t"/>
+   <polygon points="38,25.2 40.2,19.9 33.6,19.9 31.8,21.8 16.9,21.8 15.4,20 9.4,20 9.4,25.2 \t\t"/>
+   <path d="M40.1,24.3l-3.6,0.9c-2.4-0.6-4.2-0.7-5.4-0.4c-1.2,0.4-3.1,0.2-5.5-0.4l-4.1,0.7l-4.7-0.8l-3.8,0.8l-5-0.7L8,25.2
+\t\t\tl4.9,0.8l3.8-0.9l4.7,0.9l4.1-0.8l3.7,0.6l3.7-0.6l3.6,0.8l3.6-1V24.3z"/>
+   <path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>`, 'LAIVA_OIKEA');
+addSingle('RAMP', 48, `<path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>
+   <polygon points="12.6,26 19.3,26 21,6 18.3,6"/>
+   <polygon points="30.6,26 24,26 22.3,6 25,6"/>
+   <polygon points="35.4,11.8 29.5,6 35.4,6"/>
+   <path d="M23.8,21.2c0-5.2,1.8-8.6,4.5-10.6l5-3.7L34.4,8l-3.8,4.5c-1.4,1.8-2.3,4.3-1.6,8L23.8,21.2z"/>`, 'RAMPPI');
+addSingle('AIRPORT', 48, `<path d="M25.8,12.2L29.2,5h-1.6c-0.5,0-1,0.2-1.3,0.6L21,12.2H25.8z"/>
+   <path d="M32.9,18.3h-20c-2.2,0-3.4-0.4-4.1-0.9C8,16.8,8,16.3,8.9,15.3c1.1-1.2,2.8-2,4.5-2h21.4l2.5-3.3c0.3-0.3,0.7-0.5,1.2-0.5
+\t\t\th1.4L37,16C36.5,17.1,34.9,18.3,32.9,18.3z"/>
+   <path d="M29.2,27h-1.6c-0.5,0-1-0.2-1.3-0.6L19.5,18h5.4L29.2,27z"/>
+   <path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>`, 'LENTOKONE_VASEN');
+addSingle('AIRPORT', 48, `<path d="M22.2,12.2L18.8,5h1.6c0.5,0,1,0.2,1.3,0.6l5.3,6.5H22.2z"/>
+   <path d="M15.1,18.3h20c2.2,0,3.4-0.4,4.1-0.9c0.8-0.6,0.8-1.1-0.1-2.1c-1.1-1.2-2.8-2-4.5-2H13.3l-2.5-3.3
+\t\t\tC10.4,9.8,10,9.7,9.6,9.7H8.2L11,16C11.5,17.1,13.1,18.3,15.1,18.3z"/>
+   <path d="M18.8,27h1.6c0.5,0,1-0.2,1.3-0.6l6.8-8.3h-5.4L18.8,27z"/>
+   <path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>`, 'LENTOKONE_OIKEA');
+addSingle('AIRPORT', 48, `<path d="M18.9,24.2l17.3-10c1.9-1.1,2.8-2,3.1-2.8c0.4-0.9,0.2-1.3-1.1-1.7c-1.5-0.5-3.4-0.3-4.9,0.5L14.8,20.8L11,19.3
+\t\t\tc-0.4-0.1-0.9,0-1.3,0.2l-1.2,0.7l5.6,4.1C15.1,25,17.1,25.2,18.9,24.2z"/>
+   <path d="M24.6,20.6l-13.6-9.3l1.6-0.9c0.5-0.3,1.2-0.4,1.8-0.1l17.1,6.4L24.6,20.6z"/>
+   <path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>`, 'LENTOKONE_YLOS');
+addSingle('AIRPORT', 48, `<path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>
+   <path d="M13.9,19.4l18.8,6.8c2.1,0.7,3.3,0.8,4.2,0.6c1-0.3,1.1-0.7,0.6-2c-0.6-1.5-2-2.8-3.5-3.4l-20.1-7.3l-1.3-3.9
+\t\t\tc-0.2-0.4-0.5-0.7-1-0.9l-1.3-0.5l0.5,6.9C10.9,17,11.9,18.7,13.9,19.4z"/>
+   <path d="M20.3,21.5L18.8,5.1l1.8,0.6c0.6,0.2,1.1,0.7,1.3,1.3l6.1,17.2L20.3,21.5z"/>`, 'LENTOKONE_ALAS');
 
-    return BorderType.NONE;
+
+export function getSymbolType(first: string): SymbolType {
+    if(first === InputSymbols.ROAD) return SymbolType.ROAD;
+    if(first === InputSymbols.DETOUR) return SymbolType.DETOUR;
+    if(first === InputSymbols.DIVERSION) return SymbolType.DIVERSION;
+    if(first === InputSymbols.RAMP) return SymbolType.ROAD;
+
+    return SymbolType.NORMAL;
 }
 
 // put all versions of symbol to cache with correct borders:
@@ -138,21 +183,26 @@ function addSymbol(name: string, width: number, svg: string, id: string = name) 
     <rect x="14" y="29" width="2" height="2"/>`;
     const varareitti_svg = svg + `\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>`;
 
-    SYMBOL_CACHE[id] = new Symbol(width, svg, name, id, false);
-    SYMBOL_CACHE[BorderType.ROAD + id] = new Symbol(width, tie_svg, name, id, false);
-    SYMBOL_CACHE[BorderType.DETOUR + id] = new Symbol(width, varatie_svg, name, id, false);
-    SYMBOL_CACHE[BorderType.DIVERSION + id] = new Symbol(width, varareitti_svg, name, id, false);
+    SYMBOL_CACHE[id] = new Symbol(width, svg, name, SymbolType.NORMAL);
+    SYMBOL_CACHE[SymbolType.ROAD + id] = new Symbol(width, tie_svg, name, SymbolType.ROAD);
+    SYMBOL_CACHE[SymbolType.DETOUR + id] = new Symbol(width, varatie_svg, name, SymbolType.DETOUR);
+    SYMBOL_CACHE[SymbolType.DIVERSION + id] = new Symbol(width, varareitti_svg, name, SymbolType.DIVERSION);
 }
 
-function addEnd(name: string, width: number, svg: string, id: string) {
-    SYMBOL_CACHE[id] = new Symbol(width, svg, name, id, true);
+function addSingle(name: string, width: number, svg: string, id: string = name) {
+    SYMBOL_CACHE[SymbolType.SINGLE + id] = new Symbol(width, svg, name, SymbolType.SINGLE);
 }
 
-export function findSymbol(borderType: BorderType, name: string): Symbol {
-    const symbolKey = name.includes('_') ? name.toUpperCase() : borderType.valueOf() + name.toUpperCase();
+function addEnd(name: string, width: number, svg: string, id: string, symbolType: SymbolType) {
+    SYMBOL_CACHE[id] = new Symbol(width, svg, name, symbolType);
+}
+
+export function findSymbol(symbolType: SymbolType, name: string): Symbol {
+    const symbolKey = symbolType + name.toUpperCase();
+
     return SYMBOL_CACHE[symbolKey];
 }
 
-export function isValidSymbol(symbol: string): boolean {
-    return SYMBOL_CACHE[symbol.toUpperCase()];
+export function isValidSymbol(symbolType: SymbolType, symbol: string): boolean {
+    return SYMBOL_CACHE[symbolType + symbol.toUpperCase()];
 }

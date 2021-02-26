@@ -97,7 +97,7 @@ function createDatex2Resource(
         },
         methodResponses: [
             corsMethod(methodResponse("200", MediaType.IMAGE_SVG, svgModel)),
-            corsMethod(methodResponse("400", MediaType.APPLICATION_XML, errorResponseModel))
+            corsMethod(methodResponse("400", MediaType.APPLICATION_JSON, errorResponseModel))
         ]
     });
 

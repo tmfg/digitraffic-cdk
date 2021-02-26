@@ -1,5 +1,5 @@
-import {findSymbol, isValidSymbol, Symbol} from "./symbol";
-import {getBorderType} from "../../lib/service/symbol";
+import {findSymbol, isValidSymbol, Symbol, SymbolType} from "./symbol";
+import {getSymbolType} from "../../lib/service/symbol";
 
 const MAX_LENGTH = 30;
 
@@ -54,10 +54,10 @@ function checkAndRemoveBrackets(text: string): string {
 }
 
 function convert(text: string): string {
-    const symbolList = findUsedSymbolTexts(text);
-    const symbols = convertToSymbols(symbolList);
+    const symbols = findUsedSymbolTexts(text);
+    const symbolList = convertToSymbols(symbols);
 
-    return creteSvg(symbols);
+    return creteSvg(symbolList);
 }
 
 // create svg from symbols
@@ -78,27 +78,41 @@ function creteSvg(symbolList: Symbol[]): string {
 }
 
 // convert given string-list to list of symbols, add end if needed
-function convertToSymbols(symbols: string[]): Symbol[] {
-    const borderType = getBorderType(symbols[0]);
-    const symbolList = symbols.map(s => findSymbol(borderType, s));
+function convertToSymbols(symbols: Symbols): Symbol[] {
+//    console.info("symbols " + symbols);
+
+    const symbolList = symbols.symbols.map(s => findSymbol(symbols.symbolType, s));
+
+//    console.info("first type " + JSON.stringify(symbolList[0]));
 
     // and end symbol, if first symbol is starting borders
-    if(symbolList[0].startsBorders) symbolList.push(findSymbol(borderType, 'END'));
+    if(symbolList[0].startsBorders()) symbolList.push(findSymbol(symbols.symbolType, 'END'));
 
     return symbolList;
 }
 
-// split given string to list of symbols
-// TIE_123 -> [TIE_BEGIN, 1, 2, 3]
-function findUsedSymbolTexts(text: string): string[] {
+// split given string to list of symbols, first check if contains single-symbol
+// TIE_123 -> [BEGIN, 1, 2, 3]
+// LAIVA_VASEN -> [HARBOUR_A]
+function findUsedSymbolTexts(text: string): Symbols {
+    const singleSymbol = findSingleSymbol(text);
+
+    if(singleSymbol) return {
+        symbolType: SymbolType.SINGLE,
+        symbols: [singleSymbol]
+    }
+
     let index = 0;
     let symbolList = [] as string[];
-    
+    let symbolType = SymbolType.NORMAL;
+
     while(index < text.length) {
         const mark = text.indexOf('_', index);
         let symbol;
         if(mark != -1) {
-            symbol = text.substring(index, mark).toUpperCase() + "_BEGIN";
+            const symbolText = text.substring(index, mark + 1);
+            symbolType = getSymbolType(symbolText.toUpperCase());
+            symbol = getSymbol(symbolText);
 
             index = mark+1;
         } else {
@@ -107,12 +121,33 @@ function findUsedSymbolTexts(text: string): string[] {
             index++;
         }
 
-        if(isValidSymbol(symbol)) {
+        if(isValidSymbol(symbolType, symbol)) {
+//            console.info("adding symbol " + symbol);
+
             symbolList.push(symbol);
         } else {
-            throw error("invalid symbol " + symbol);
+            throw error("invalid symbol " + symbol + " for " + symbolType);
         }
     }
 
-    return symbolList;
+    return {
+        symbolType: symbolType,
+        symbols: symbolList
+    };
+}
+
+function getSymbol(text: string): string {
+    if(text === 'RAMPPI_') return "RAMPPI_BEGIN";
+    return "BEGIN";
+}
+
+function findSingleSymbol(text: string): string | null {
+    const symbol = findSymbol(SymbolType.SINGLE, text);
+
+    return symbol && symbol.isSingleSymbol() ? text : null;
+}
+
+interface Symbols {
+    readonly symbolType: SymbolType,
+    readonly symbols: string[]
 }
