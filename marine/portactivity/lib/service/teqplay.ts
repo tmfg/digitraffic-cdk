@@ -1,6 +1,7 @@
 import * as TeqplayAPI from "../api/teqplay";
 import {Event} from "../model/teqplay-event";
 import {ApiTimestamp, EventType, Ship} from "../model/timestamp";
+import {EVENTSOURCE_TEQPLAY} from "../event-sourceutil";
 
 const VALID_EVENT_TYPES = ['berth.eta.vessel'];
 
@@ -15,8 +16,7 @@ export async function getMessagesFromTeqplay(queueUrl: string): Promise<ApiTimes
 }
 
 function isValid(event: Event): boolean {
-    return true; // for now
-    //return VALID_EVENT_TYPES.includes(event.eventType.toLowerCase());
+    return VALID_EVENT_TYPES.includes(event.eventType.toLowerCase());
 }
 
 function convertToApiTimestamp(event: Event): ApiTimestamp {
@@ -28,7 +28,7 @@ function convertToApiTimestamp(event: Event): ApiTimestamp {
         eventType: eventType,
         eventTime: event.eventTime,
         recordTime: event.recordTime,
-        source: 'TEQPLAY',
+        source: EVENTSOURCE_TEQPLAY,
         ship: ship,
         location: {
             port: 'FIHEL',
