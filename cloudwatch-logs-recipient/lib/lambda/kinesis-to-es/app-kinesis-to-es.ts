@@ -23,13 +23,16 @@ const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws
 const region = endpointParts[2];
 const service = endpointParts[3];
 
-const MAX_BODY_SIZE = 1000000;
+const MAX_BODY_SIZE = 5000000;
 
 export const handler = function(event: KinesisStreamEvent, context: any) {
+    const statistics = {};
+
     try {
         let batchBody = "";
+
         event.Records.forEach((record: KinesisStreamRecord) => {
-            const recordBody = handleRecord(record);
+            const recordBody = handleRecord(record, statistics);
             batchBody += recordBody;
 
             if (batchBody.length > MAX_BODY_SIZE) {
@@ -43,10 +46,12 @@ export const handler = function(event: KinesisStreamEvent, context: any) {
         }
     } catch (e) {
         console.log('ERROR ', e);
+    } finally {
+        console.log("statistics " + JSON.stringify(statistics));
     }
 };
 
-function handleRecord(record: KinesisStreamRecord): string {
+function handleRecord(record: KinesisStreamRecord, statistics: any): string {
     const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
@@ -61,7 +66,7 @@ function handleRecord(record: KinesisStreamRecord): string {
         return "";
     }
 
-    const logLine = transform(awslogsData);
+    const logLine = transform(awslogsData, statistics);
 
     return logLine;
 }
@@ -93,10 +98,10 @@ function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkD
     });
 }
 
-function transform(payload: CloudWatchLogsDecodedData, filterIds: string[] = []): string {
+function transform(payload: CloudWatchLogsDecodedData, statistics: any): string {
     let bulkRequestBody = '';
 
-    payload.logEvents.filter((e: any) => !filterIds.includes(e.id)).forEach((logEvent: any) => {
+    payload.logEvents.forEach((logEvent: any) => {
         const source = buildSource(logEvent.message, logEvent.extractedFields);
         const app = getAppFromSenderAccount(payload.owner, knownAccounts);
         const appName = getAppName(payload.logGroup, app);
@@ -110,8 +115,13 @@ function transform(payload: CloudWatchLogsDecodedData, filterIds: string[] = [])
         source['@app'] = appName;
 
         const action = { "index": {} } as any;
+        const indexName = getIndexName(appName, logEvent.timestamp);
         action.index._id = logEvent.id;
-        action.index._index = getIndexName(appName, logEvent.timestamp);
+        action.index._index = indexName;
+
+        // update statistics
+        if(!statistics[indexName]) statistics[indexName] = 1;
+        else statistics[indexName] = statistics[indexName] + 1;
 
         bulkRequestBody += [
             JSON.stringify(action),
@@ -123,7 +133,7 @@ function transform(payload: CloudWatchLogsDecodedData, filterIds: string[] = [])
 
 function getAppName(logGroup: string, app: string): string {
     if(logGroup.includes('amazonmq')) return `${app}-mqtt`;
-    if(logGroup.includes('nginx')) return 'dt-nginx;'
+    if(logGroup.includes('nginx')) return 'dt-nginx';
 
     return logGroup;
 }
