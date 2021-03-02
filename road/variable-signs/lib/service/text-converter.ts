@@ -42,13 +42,13 @@ function checkAndRemoveBrackets(text: string): string {
 
     if(firstChar === '[') {
         // ok, last char must be ]
-        if(lastChar !== ']') error("Text must be in form of [text]");
-        if(count1 > 1 || count2 > 1) error("Text must be in form of [text]");
+        if(lastChar !== ']') error("Text must be in form of [text] or text");
+        if(count1 > 1 || count2 > 1) error("Text must be in form of [text] or text");
 
         return text.substring(1, text.length - 1);
     }
 
-    if(count1 > 0 || count2 > 0) error("Text must be in form of [text]");
+    if(count1 > 0 || count2 > 0) error("Text must be in form of [text] or text");
 
     return text;
 }
@@ -137,12 +137,12 @@ function findUsedSymbolTexts(text: string): Symbols {
 }
 
 function getSymbol(text: string): string {
-    if(text === 'RAMPPI_') return "RAMPPI_BEGIN";
+    if(text.toUpperCase() === 'RAMPPI_') return "RAMPPI_BEGIN";
     return "BEGIN";
 }
 
 function findSingleSymbol(text: string): string | null {
-    const symbol = findSymbol(SymbolType.SINGLE, text);
+    const symbol = findSymbol(SymbolType.SINGLE, text.toUpperCase());
 
     return symbol && symbol.isSingleSymbol() ? text : null;
 }

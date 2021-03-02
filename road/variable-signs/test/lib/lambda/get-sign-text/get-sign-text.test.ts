@@ -51,10 +51,17 @@ describe('text-converter-tests', () => {
 
     test('varareitti', () => {
         expectValue("[VARAREITTI_123]", ["BEGIN", "n1", "n2", "n3","END"]);
+        expectValue("[varareitti_123]", ["BEGIN", "n1", "n2", "n3","END"]);
+        expectValue("varareitti_123", ["BEGIN", "n1", "n2", "n3","END"]);
+    })
+
+    test('ramppi_123_brackets', () => {
+        expectValue("[RAMPPI_123]", ["RAMP", "n1", "n2", "n3", "END"]);
     })
 
     test('ramppi_123', () => {
-        expectValue("[RAMPPI_123]", ["RAMP", "n1", "n2", "n3", "END"]);
+        expectValue("RAMPPI_123", ["RAMP", "n1", "n2", "n3", "END"]);
+        expectValue("ramppi_123", ["RAMP", "n1", "n2", "n3", "END"]);
     })
 
     test('single_ramppi', () => {
@@ -91,7 +98,7 @@ describe('text-converter-tests', () => {
 
     function expectValue(text: string, elements: string[] = []) {
         const svg = convertTextToSvg(text);
-
+        
         if(elements) expectElements(svg, elements);
     }
 
@@ -103,6 +110,7 @@ describe('text-converter-tests', () => {
         const usedSymbols = findUsedSymbols(svg);
 
         console.info("symbols " + usedSymbols);
+        console.info("expected " + elements);
 
         expect(usedSymbols.length).toEqual(elements.length);
 
