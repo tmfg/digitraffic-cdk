@@ -90,5 +90,14 @@ export function validateTimestamp(timestamp: ApiTimestamp): boolean {
         console.warn('Missing port for timestamp', timestamp);
         return false;
     }
+    if (timestamp.location.port.length > 5) {
+        console.warn('Locode too long', timestamp);
+        return false;
+    }
+    if(timestamp.location.portArea && timestamp.location.portArea.length > 5) {
+        console.warn('PortArea too long', timestamp);
+        return false;
+    }
+
     return true;
 }
