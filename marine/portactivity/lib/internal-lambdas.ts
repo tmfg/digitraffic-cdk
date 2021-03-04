@@ -1,6 +1,6 @@
-import {Function, AssetCode, Runtime} from '@aws-cdk/aws-lambda';
-import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
-import {Duration, Stack} from '@aws-cdk/core';
+import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
+import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
+import {Stack} from '@aws-cdk/core';
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createSubscription} from '../../../common/stack/subscription';
 import {Props} from "./app-props";
@@ -14,9 +14,12 @@ import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {
-    KEY_ENDPOINT_AUDIENCE, KEY_ENDPOINT_AUTH_URL,
+    KEY_ENDPOINT_AUDIENCE,
+    KEY_ENDPOINT_AUTH_URL,
     KEY_ENDPOINT_CLIENT_ID,
-    KEY_ENDPOINT_CLIENT_SECRET, KEY_ENDPOINT_URL, KEY_ESTIMATE_SOURCE
+    KEY_ENDPOINT_CLIENT_SECRET,
+    KEY_ENDPOINT_URL,
+    KEY_ESTIMATE_SOURCE
 } from "./lambda/update-eta-timestamps/lambda-update-eta-timestamps";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
@@ -76,6 +79,7 @@ function createProcessQueueLambda(
     const functionName = "PortActivity-ProcessTimestampQueue";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
+        memorySize: 128,
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment: {
@@ -153,6 +157,7 @@ function createUpdateETATimestampsLambda(
     const functionName = 'PortActivity-UpdateETATimestamps';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
+        memorySize: 256,
         code: new AssetCode('dist/lambda/update-eta-timestamps'),
         handler: 'lambda-update-eta-timestamps.handler',
         environment,

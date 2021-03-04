@@ -39,7 +39,7 @@ export function dbLambdaConfiguration(
 
     return {
         runtime: props.runtime || Runtime.NODEJS_12_X,
-        memorySize: props.memorySize || 1024,
+        memorySize: props.memorySize || config.memorySize || 1024,
         functionName: config.functionName,
         code: config.code,
         handler: config.handler,

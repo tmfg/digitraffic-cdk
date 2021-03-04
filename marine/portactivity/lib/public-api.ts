@@ -12,7 +12,7 @@ import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from '../../../common/stack/subscription';
-import {corsMethod, methodResponse, defaultIntegration,} from "../../../common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse,} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
@@ -20,7 +20,6 @@ import {Props} from "./app-props";
 import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {APPLICATION_JSON} from "../../portcall-estimates/tsd/common/api/response";
 import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(
@@ -70,6 +69,7 @@ function createTimestampsResource(
     const assetCode = new AssetCode('dist/lambda/get-timestamps');
     const getTimestampsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
+        memorySize: 128,
         code: assetCode,
         handler: 'lambda-get-timestamps.handler',
         readOnly: false,
@@ -134,6 +134,7 @@ function createShiplistResource(
     const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: assetCode,
+        memorySize: 128,
         handler: 'lambda-get-shiplist-public.handler',
         readOnly: false,
         environment: {
