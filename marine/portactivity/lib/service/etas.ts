@@ -1,6 +1,6 @@
 import {DbETAShip} from '../db/db-timestamps';
 import {getETAs, ShipETA} from '../api/api-etas';
-import {ApiTimestamp, EventType} from '../model/timestamp';
+import {ApiTimestamp, EventType, validateTimestamp} from '../model/timestamp';
 import {saveTimestamps} from './timestamps';
 import {Port} from './portareas';
 
@@ -23,7 +23,9 @@ export async function updateETATimestamps(
         portAreaGeometries);
 
     const etaToTimestampWithSource = etaToTimestamp(endpointSource);
-    const timestamps: ApiTimestamp[] = etas.map(etaToTimestampWithSource);
+    const timestamps: ApiTimestamp[] = etas
+        .map(etaToTimestampWithSource)
+        .filter(validateTimestamp);
 
     await saveTimestamps(timestamps);
 
