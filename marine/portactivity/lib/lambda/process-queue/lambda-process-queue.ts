@@ -1,19 +1,20 @@
 import {saveTimestamp} from "../../service/timestamps";
 import {validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
-import {SNS} from 'aws-sdk';
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 const middy = require('@middy/core')
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
 export function handlerFn(
-    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>) => Promise<any>,
-    sns: SNS) {
+    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>) => Promise<any>) {
 
     return async (event: SQSEvent) => {
         return Promise.allSettled(event.Records.map(r => {
             return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
                 const timestamp = JSON.parse(r.body);
+
+                console.info("saving timestamp " + JSON.stringify(timestamp));
+
                 if (!validateTimestamp(timestamp)) {
                     return Promise.reject();
                 }
@@ -27,12 +28,8 @@ export function handlerFn(
                 const updates = successful
                     .map(s => (s as any).value)
                     .filter(s => s != null);
-                if (updates.length) {
-                    await sns.publish({
-                        Message: JSON.stringify(updates),
-                        TopicArn: process.env.ESTIMATE_SNS_TOPIC_ARN
-                    }).promise();
-                }
+
+                console.info("successful %d updates %d", successful.length, updates.length);
             }
             return timestamps;
         });
@@ -43,4 +40,4 @@ function processedSuccessfully(p: PromiseSettledResult<any>) {
     return p.status === 'fulfilled';
 }
 
-export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn(withDbSecret, new SNS())).use(sqsPartialBatchFailureMiddleware());
+export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());

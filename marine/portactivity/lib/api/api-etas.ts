@@ -2,6 +2,8 @@ import axios from 'axios';
 import {Port} from "../service/portareas";
 import {DbETAShip} from "../db/db-timestamps";
 
+const ETA_NOT_SUPPORTED_PORTAREAS = ['VUOS'];
+
 async function createEtaOAuthToken(
     endpointClientId: string,
     endpointClientSecret: string,
@@ -53,7 +55,11 @@ export async function getETAs(
         throw new Error('Authentication to ETA API failed!');
     }
 
-    const etas = await Promise.all(await ships.map( ship =>
+    const filtered = ships.filter(isEtaEnabled);
+
+    console.log("shipcount %d filtered %d", ships.length, filtered.length);
+
+    const etas = await Promise.all(await filtered.map( ship =>
         getETA(endpointUrl,
             token.access_token,
             ship,
@@ -68,6 +74,10 @@ export async function getETAs(
     return etas.filter(e => e != null) as ShipETA[];
 }
 
+function isEtaEnabled(ship: DbETAShip): boolean {
+    return ship.port_area_code == null || !ETA_NOT_SUPPORTED_PORTAREAS.includes(ship.port_area_code);
+}
+
 async function getETA(
     endpointUrl: string,
     token: string,
@@ -75,7 +85,7 @@ async function getETA(
     portAreaGeometry: ETADestination | null): Promise<ShipETA | null> {
 
     if (!portAreaGeometry) {
-        console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} not found!`);
+        console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} port area ${ship.port_area_code} not found!`);
         return Promise.resolve(null);
     }
 
