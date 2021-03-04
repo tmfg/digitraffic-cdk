@@ -1,23 +1,14 @@
 import { convertTextToSvg } from "../../../../lib/service/text-converter";
 
 describe('text-converter-tests', () => {
-    test('empty', () => {
+    test('empty_errors', () => {
         expectError("");
-    });
-
-    test('empty_with_brackets', () => {
         expectError("[]");
     });
 
-    test('brackets_error_1', () => {
+    test('bracket_errors', () => {
         expectError("[");
-    });
-
-    test('brackets_error_2', () => {
         expectError("123[");
-    });
-
-    test('brackets_error_3', () => {
         expectError("[12]3");
     });
 
@@ -25,28 +16,24 @@ describe('text-converter-tests', () => {
         expectError("123Z");
     });
 
-    test('1_symbol', () => {
+    test('single_symbols', () => {
         expectValue("[1]", ["n1"]);
-    });
-
-    test('a_symbol', () => {
+        expectValue("1", ["n1"]);
         expectValue("[A]", ["A"]);
-    });
-
-    test('z_symbol', () => {
+        expectValue("a", ["A"]);
         expectError("[Z]");
+        expectError("z");
     });
 
-    test('tie1_with_brackets', () => {
+    test('tie1', () => {
         expectValue("[TIE_1]", ["BEGIN", "n1", "END"]);
-    });
-
-    test('tie1_without_brackets', () => {
         expectValue("TIE_1", ["BEGIN", "n1", "END"]);
     });
 
     test('varatie', () => {
         expectValue("[VARATIE_123]", ["BEGIN", "n1", "n2", "n3", "END"]);
+        expectValue("VARATIE_123", ["BEGIN", "n1", "n2", "n3", "END"]);
+        expectValue("varatie_123", ["BEGIN", "n1", "n2", "n3", "END"]);
     })
 
     test('varareitti', () => {
@@ -55,11 +42,8 @@ describe('text-converter-tests', () => {
         expectValue("varareitti_123", ["BEGIN", "n1", "n2", "n3","END"]);
     })
 
-    test('ramppi_123_brackets', () => {
-        expectValue("[RAMPPI_123]", ["RAMP", "n1", "n2", "n3", "END"]);
-    })
-
     test('ramppi_123', () => {
+        expectValue("[RAMPPI_123]", ["RAMP", "n1", "n2", "n3", "END"]);
         expectValue("RAMPPI_123", ["RAMP", "n1", "n2", "n3", "END"]);
         expectValue("ramppi_123", ["RAMP", "n1", "n2", "n3", "END"]);
     })
@@ -68,15 +52,9 @@ describe('text-converter-tests', () => {
         expectValue("RAMPPI", ["RAMP"]);
     })
 
-    test('varareitti_broken', () => {
+    test('broken_texts', () => {
         expectError("[1VARAREITTI_123]");
-    })
-
-    test('varareitti_varareitti_broken', () => {
         expectError("[VARAREITTI_VARAREITTI_123]");
-    })
-
-    test('varareitti_varatie_broken', () => {
         expectError("[VARAREITTI_VARATIE_123]");
     })
 
@@ -94,11 +72,11 @@ describe('text-converter-tests', () => {
         expectValue("LENTOKONE_OIKEA", ["AIRPORT"])
         expectValue("LENTOKONE_ALAS", ["AIRPORT"])
         expectValue("LENTOKONE_YLOS", ["AIRPORT"])
-    })
+    });
 
     function expectValue(text: string, elements: string[] = []) {
         const svg = convertTextToSvg(text);
-        
+
         if(elements) expectElements(svg, elements);
     }
 
@@ -109,8 +87,8 @@ describe('text-converter-tests', () => {
     function expectElements(svg: string, elements: string[]) {
         const usedSymbols = findUsedSymbols(svg);
 
-        console.info("symbols " + usedSymbols);
-        console.info("expected " + elements);
+//        console.info("symbols " + usedSymbols);
+//        console.info("expected " + elements);
 
         expect(usedSymbols.length).toEqual(elements.length);
 

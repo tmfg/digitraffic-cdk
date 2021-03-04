@@ -181,7 +181,10 @@ function addSymbol(name: string, width: number, svg: string, id: string = name) 
     <rect y="29" width="2" height="2"/>
     <rect x="5.6" y="29" width="4.8" height="2"/>
     <rect x="14" y="29" width="2" height="2"/>`;
-    const varareitti_svg = svg + `\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>`;
+
+    // alphabets are widers, need different svg for varareitti
+    const varareitti_svg = svg + (width == 16 ? '\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>'
+        : '<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-16,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>');
 
     SYMBOL_CACHE[id] = new Symbol(width, svg, name, SymbolType.NORMAL);
     SYMBOL_CACHE[SymbolType.ROAD + id] = new Symbol(width, tie_svg, name, SymbolType.ROAD);
