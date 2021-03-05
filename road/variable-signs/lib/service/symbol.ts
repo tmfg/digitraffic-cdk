@@ -10,7 +10,7 @@ export enum SymbolType {
 }
 
 // these are symbols used in the input text
-enum InputSymbols {
+export enum InputSymbols {
     ROAD = "TIE_",
     DETOUR = "VARATIE_",
     DIVERSION = "VARAREITTI_",
@@ -167,7 +167,7 @@ addSingle('ARROW_DOWN', 32, `<rect x="14" y="4" width="4" height="18"/>
    <polygon points="22,22 16,28 10,22"/>`, 'NUOLI_ALAS');
 
 addSingle('ARROW_TOP_LEFT', 32, `<rect x="9.1" y="16.1" transform="matrix(0.7071 0.7071 -0.7071 0.7071 18.1219 -7.5063)" width="18" height="4"/>
-   <polygon points="7.5,16 7.5,7.5 16,7.5"/>`, 'NUOLI_VASENYYLOS');
+   <polygon points="7.5,16 7.5,7.5 16,7.5"/>`, 'NUOLI_VASENYLOS');
 addSingle('ARROW_TOP_RIGHT', 32, `<rect x="11.9" y="9.1" transform="matrix(0.7071 0.7071 -0.7071 0.7071 16.8787 -4.5061)" width="4" height="18"/>
    <polygon points="16,7.5 24.5,7.5 24.5,16"/>`, 'NUOLI_OIKEAYLOS');
 addSingle('ARROW_BOTTOM_LEFT', 32, `<rect x="16.1" y="4.9" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.1212 -8.749)" width="4" height="18"/>

@@ -16,6 +16,10 @@ describe('text-converter-tests', () => {
         expectError("123Z");
     });
 
+    test('wrong_symbol', () => {
+        expectError("temppu_123");
+    });
+
     test('single_symbols', () => {
         expectValue("[1]", ["n1"]);
         expectValue("1", ["n1"]);
@@ -72,6 +76,12 @@ describe('text-converter-tests', () => {
         expectValue("LENTOKONE_OIKEA", ["AIRPORT"])
         expectValue("LENTOKONE_ALAS", ["AIRPORT"])
         expectValue("LENTOKONE_YLOS", ["AIRPORT"])
+    });
+
+    test('nuoli', () => {
+        expectValue('NUOLI_VASENYLOS', ['ARROW_TOP_LEFT']);
+        expectValue('nuoli_oikea', ['ARROW_RIGHT']);
+        expectError('NUOLI_VASENYYLOS');
     });
 
     function expectValue(text: string, elements: string[] = []) {

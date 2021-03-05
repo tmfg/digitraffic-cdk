@@ -1,4 +1,4 @@
-import {findSymbol, isValidSymbol, Symbol, SymbolType} from "./symbol";
+import {findSymbol, InputSymbols, isValidSymbol, Symbol, SymbolType} from "./symbol";
 import {getSymbolType} from "../../lib/service/symbol";
 
 const MAX_LENGTH = 30;
@@ -112,7 +112,7 @@ function findUsedSymbolTexts(text: string): Symbols {
         if(mark != -1) {
             const symbolText = text.substring(index, mark + 1);
             symbolType = getSymbolType(symbolText.toUpperCase());
-            symbol = getSymbol(symbolText);
+            symbol = getSymbol(symbolText.toUpperCase());
 
             index = mark+1;
         } else {
@@ -136,9 +136,13 @@ function findUsedSymbolTexts(text: string): Symbols {
     };
 }
 
+const BEGIN_SYMBOLS = [InputSymbols.ROAD.toString(), InputSymbols.DETOUR.toString(), InputSymbols.DIVERSION.toString()];
+
 function getSymbol(text: string): string {
-    if(text.toUpperCase() === 'RAMPPI_') return "RAMPPI_BEGIN";
-    return "BEGIN";
+    if(text === InputSymbols.RAMP) return "RAMPPI_BEGIN";
+    if(BEGIN_SYMBOLS.includes(text)) return "BEGIN";
+
+    return text;
 }
 
 function findSingleSymbol(text: string): string | null {
