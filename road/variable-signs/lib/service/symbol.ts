@@ -157,7 +157,23 @@ addSingle('AIRPORT', 48, `<path d="M47,31H1V1h46V31z M3,29h42V3H3V29z"/>
    <path d="M13.9,19.4l18.8,6.8c2.1,0.7,3.3,0.8,4.2,0.6c1-0.3,1.1-0.7,0.6-2c-0.6-1.5-2-2.8-3.5-3.4l-20.1-7.3l-1.3-3.9
 \t\t\tc-0.2-0.4-0.5-0.7-1-0.9l-1.3-0.5l0.5,6.9C10.9,17,11.9,18.7,13.9,19.4z"/>
    <path d="M20.3,21.5L18.8,5.1l1.8,0.6c0.6,0.2,1.1,0.7,1.3,1.3l6.1,17.2L20.3,21.5z"/>`, 'LENTOKONE_ALAS');
+addSingle('ARROW_LEFT', 32, `<rect x="10" y="14" width="18" height="4"/>
+   <polygon points="10,22 4,16 10,10"/>`, 'NUOLI_VASEN');
+addSingle('ARROW_RIGHT', 32, `<rect x="4" y="14" width="18" height="4"/>
+   <polygon points="22,10 28,16 22,22 \t"/>`, 'NUOLI_OIKEA');
+addSingle('ARROW_UP', 32, `<rect x="14" y="10" width="4" height="18"/>
+   <polygon points="10,10 16,4 22,10 \t"/>`, 'NUOLI_YLOS');
+addSingle('ARROW_DOWN', 32, `<rect x="14" y="4" width="4" height="18"/>
+   <polygon points="22,22 16,28 10,22"/>`, 'NUOLI_ALAS');
 
+addSingle('ARROW_TOP_LEFT', 32, `<rect x="9.1" y="16.1" transform="matrix(0.7071 0.7071 -0.7071 0.7071 18.1219 -7.5063)" width="18" height="4"/>
+   <polygon points="7.5,16 7.5,7.5 16,7.5"/>`, 'NUOLI_VASENYYLOS');
+addSingle('ARROW_TOP_RIGHT', 32, `<rect x="11.9" y="9.1" transform="matrix(0.7071 0.7071 -0.7071 0.7071 16.8787 -4.5061)" width="4" height="18"/>
+   <polygon points="16,7.5 24.5,7.5 24.5,16"/>`, 'NUOLI_OIKEAYLOS');
+addSingle('ARROW_BOTTOM_LEFT', 32, `<rect x="16.1" y="4.9" transform="matrix(0.7071 0.7071 -0.7071 0.7071 15.1212 -8.749)" width="4" height="18"/>
+   <polygon points="16,24.5 7.5,24.5 7.5,16"/>`, 'NUOLI_VASENALAS');
+addSingle('ARROW_BOTTOM_RIGHT', 32, `<rect x="4.9" y="11.9" transform="matrix(0.7071 0.7071 -0.7071 0.7071 13.8781 -5.7488)" width="18" height="4"/>
+   <polygon points="24.5,16 24.5,24.5 16,24.5"/>`, 'NUOLI_OIKEAALAS');
 
 export function getSymbolType(first: string): SymbolType {
     if(first === InputSymbols.ROAD) return SymbolType.ROAD;

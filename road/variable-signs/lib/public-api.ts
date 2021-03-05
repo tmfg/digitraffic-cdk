@@ -60,8 +60,7 @@ function createDatex2Resource(
 
     const apiResource = publicApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
-    const betaResource = apiResource.addResource("beta");
-    const vsResource = betaResource.addResource("variable-signs");
+    const vsResource = v1Resource.addResource("variable-signs");
     const datex2Resource = vsResource.addResource("datex2");
     const imagesResource = vsResource.addResource("images");
     const imageResource = imagesResource.addResource("{text}");
