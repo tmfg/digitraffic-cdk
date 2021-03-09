@@ -4,13 +4,14 @@ import {RestApi, IntegrationResponse}  from '@aws-cdk/aws-apigateway'; // don't 
 
 import {createRestApi} from "../../common/api/rest_apis";
 import {defaultLambdaConfiguration} from "../../common/stack/lambda-configs";
-import {defaultIntegration, methodJsonResponse, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
+import {defaultIntegration, methodResponse, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
 import {addTags} from "../../common/api/documentation";
 import {USER_MANAGEMENT_TAGS} from "../../common/api/tags";
 import {addDefaultValidator, addServiceModel} from "../../common/api/utils";
 import {LOGIN_SCHEMA, LOGIN_SUCCESSFUL_SCHEMA} from './model/login-schema';
 import {MessageModel} from "../../common/api/response";
 import {createSubscription} from "../../common/stack/subscription";
+import {MediaType} from "../../common/api/mediatypes";
 
 const RESPONSE_200_OK: IntegrationResponse = {
     statusCode: '200',
@@ -84,9 +85,9 @@ function createUserManagementResources(stack: Construct, publicApi: any, userMan
             "application/json": loginModel
         },
         methodResponses: [
-            methodJsonResponse("200", loginSuccessfulModel),
-            methodJsonResponse("401", errorResponseModel, {"method.response.header.WWW-Authenticate": true}),
-            methodJsonResponse("500", errorResponseModel)
+            methodResponse("200", MediaType.APPLICATION_JSON, loginSuccessfulModel),
+            methodResponse("401", MediaType.APPLICATION_JSON, errorResponseModel, {"method.response.header.WWW-Authenticate": true}),
+            methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel)
         ]
     });
 

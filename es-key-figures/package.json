@@ -7,13 +7,13 @@
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
-    "postbuild": "parcel build lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules --no-minify",
+    "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
     "watch": "tsc -w",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "test": "jest --runInBand",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml",
-    "parcel-watch": "parcel watch lib/lambda/**/*.ts --target=node --global handler -d dist/lambda --bundle-node-modules",
-    "watch-bundle": "parallelshell \"npm run watch\" \"npm run parcel-watch\""
+    "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
     "@aws-cdk/assert": "^1.56.0",
@@ -23,8 +23,8 @@
     "ts-jest": "^26.1.4",
     "aws-cdk": "^1.56.0",
     "ts-node": "^8.10.2",
-    "parcel-bundler": "^1.12.4",
-    "parcel-plugin-externals": "0.5.1",
+    "parallelshell": "3.0.1",
+    "esbuild": "^0.8.36",
     "rimraf": "^3.0.2",
     "@types/sinon": "^9.0.4",
     "sinon": "^9.0.2",

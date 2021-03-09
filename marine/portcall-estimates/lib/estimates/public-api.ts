@@ -12,13 +12,14 @@ import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {createEstimateSchema, LocationSchema, ShipSchema} from './model/estimate-schema';
 import {createSubscription} from '../../../../common/stack/subscription';
-import {corsMethodJsonResponse, defaultIntegration,} from "../../../../common/api/responses";
+import {defaultIntegration, methodResponse,} from "../../../../common/api/responses";
 import {MessageModel} from "../../../../common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../../common/api/utils";
 import {dbLambdaConfiguration} from "../../../../common/stack/lambda-configs";
 import {Props} from "./app-props-estimates";
 import {addTags} from "../../../../common/api/documentation";
 import {createUsagePlan} from "../../../../common/stack/usage-plans";
+import {MediaType} from "../../../../common/api/mediatypes";
 
 export function create(
     vpc: IVpc,
@@ -94,8 +95,8 @@ function createEstimatesResource(
         },
         requestValidator: validator,
         methodResponses: [
-            corsMethodJsonResponse("200", estimatesJsonModel),
-            corsMethodJsonResponse("500", errorResponseModel)
+            methodResponse("200", MediaType.APPLICATION_JSON, estimatesJsonModel),
+            methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel)
         ]
     });
 

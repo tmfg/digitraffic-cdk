@@ -40,9 +40,9 @@ function createProcessQueueLambda(
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment: {
-            DB_USER: appProps.dbProps.username,
-            DB_PASS: appProps.dbProps.password,
-            DB_URI: appProps.dbProps.uri
+            DB_USER: appProps.dbProps?.username,
+            DB_PASS: appProps.dbProps?.password,
+            DB_URI: appProps.dbProps?.uri
         },
         reservedConcurrentExecutions: appProps.sqsProcessLambdaConcurrentExecutions
     });
