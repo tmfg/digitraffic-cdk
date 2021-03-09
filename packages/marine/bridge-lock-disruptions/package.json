@@ -1,0 +1,38 @@
+{
+  "name": "bridge-lock-disruptions",
+  "version": "0.1.0",
+  "bin": {
+    "bridge-lock-disruptions": "bin/bridge-lock-disruptions-app.js"
+  },
+  "scripts": {
+    "prebuild": "rimraf tsd",
+    "build": "tsc",
+    "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "watch": "tsc -w",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
+    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "test": "jest --runInBand --detectOpenHandles",
+    "cdk": "cdk",
+    "synth-sam": "cdk synth --no-staging > template.yaml"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-apigateway": "1.83.0",
+    "@aws-cdk/aws-events-targets": "1.83.0",
+    "@aws-cdk/aws-secretsmanager": "1.83.0",
+    "@aws-cdk/core": "1.83.0",
+    "@types/geojson": "^7946.0.7",
+    "@types/moment": "^2.13.0",
+    "aws-sdk": "2.821.0",
+    "axios": "^0.21.1",
+    "digitraffic-cdk-api": "1.0.0",
+    "geojson-validation": "^1.0.2",
+    "parse-link-header": "^1.0.1",
+    "pg-native": "3.0.0",
+    "pg-promise": "10.3.5",
+    "pg-query-stream": "4.0.0",
+    "source-map-support": "^0.5.19",
+    "wkx": "^0.5.0",
+    "xml2js": "^0.4.23"
+  }
+}

@@ -1,0 +1,7 @@
+{
+  "packages": [
+    "packages/*",
+    "packages/marine/*"
+  ],
+  "version": "0.0.0"
+}
