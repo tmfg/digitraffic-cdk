@@ -1,9 +1,30 @@
 #!/usr/bin/env bash
 
-cd common
-cd api && rm -rf node_modules && npm install && cd ..
-cd db && rm -rf node_modules && npm install && cd ..
-cd model && rm -rf node_modules && npm install && cd ..
-cd postgres && rm -rf node_modules && npm install && cd ..
-cd stack && rm -rf node_modules && npm install && cd ..
-cd ..
+# Installs all project dependencies from lockfiles
+
+# exit on any error
+set -ex
+
+function installInDirectory() {
+    if [ "$1" != "./elasticsearch" ]; then
+      cd "$1"
+      npm ci
+      cd ..
+    fi
+}
+
+function installAllInDirectory() {
+  cd "$1"
+  for d in $(find ./* -maxdepth 0 -type d); do
+    installInDirectory $d
+  done
+  cd ..
+}
+
+installInDirectory common
+installInDirectory cloudfront
+installInDirectory user-management
+installInDirectory swagger-joiner
+
+installAllInDirectory road
+installAllInDirectory marine
