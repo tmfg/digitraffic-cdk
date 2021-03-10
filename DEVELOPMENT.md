@@ -24,7 +24,7 @@ After adding a dependency, remember to commit the changes made to package-lock.j
 Run the script update-deps.sh. This script updates all dependencies to their latest patch version and compiles projects.
 Any compilation errors should be fixed before committing dependency changes. 
 
-### Running tests
+## Running tests
 1. Check the project README.md if a database Docker container is needed.
 2. Run ```npm run test```
 
