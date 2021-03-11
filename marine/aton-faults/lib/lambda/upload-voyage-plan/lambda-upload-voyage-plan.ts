@@ -1,7 +1,7 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
 import {RtzVoyagePlan} from "../../model/voyageplan";
-import {findFaultIdsForVoyagePlan} from "../../service/voyageplan-faults";
+import {findFaultIdsForVoyagePlan} from "../../service/faults";
 import {SNS} from "aws-sdk";
 import {ackReceivedVoyagePlan} from "../../api/vis-api";
 

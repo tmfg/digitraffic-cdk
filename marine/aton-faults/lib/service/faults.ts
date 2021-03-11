@@ -2,11 +2,11 @@ import * as LastUpdatedDB from "../../../../common/db/last-updated";
 import * as FaultsDB from "../db/db-faults"
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
-import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
-import {Geometry} from "wkx";
-import {createFeatureCollection} from "../../../../common/api/geojson";
+import {Feature,GeoJsonProperties} from "geojson";
+import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
-import {Language} from "../../../../common/model/language";
+import {RtzVoyagePlan} from "../model/voyageplan";
+import {findFaultIdsByRoute} from "../db/db-faults";
 
 let moment = require('moment');
 
@@ -21,31 +21,35 @@ const PRODUCTION_AGENCY = {
 
 const NAME_OF_SERIES = 'Finnish ATON Faults';
 
-export async function findAllFaults(language: Language, fixedInHours: number): Promise<any> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
-        const features = await FaultsDB.streamAllForJson(db, language, fixedInHours, convertFeature);
-        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
-
-        return createFeatureCollection(features, lastUpdated);
-    });
-}
-
-export async function findAllFaultsS124(): Promise<any> {
+export async function faultToS124(faultId: number): Promise<any> {
     const start = Date.now();
 
-    const faults = await inDatabase(async (db: IDatabase<any,any>) => {
-        return await FaultsDB.streamAllForS124(db, createXml);
+    const fault = await inDatabase(async (db: IDatabase<any,any>) => {
+        return await FaultsDB.getFaultById(db, faultId);
     });
 
     try {
         return {
             body: new Builder().buildObject({
-                'DataSets': faults
+                'DataSets': createXml(fault)
             })
         }
     } finally {
-        console.info("buildObject took %d", Date.now() - start);
+        console.info("method=findFaultById tookMs=%d", Date.now() - start);
     }
+}
+
+export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<number[]> {
+    const start = Date.now();
+    const faultIds = await inDatabase(async (db: IDatabase<any,any>) => {
+        const voyageLineString =
+            new LineString(voyagePlan.route.waypoints
+                .flatMap(w => w.waypoint.flatMap(x => x.position))
+                .map(p => new Point(p.$.lat, p.$.lon)));
+        return findFaultIdsByRoute(db, voyageLineString);
+    });
+    console.info("method=findFaultIdsForVoyagePlan tookMs=%d", Date.now() - start);
+    return faultIds;
 }
 
 function createXml(fault: any) {
@@ -185,7 +189,7 @@ export async function saveFaults(domain: string, newFaults: any[]) {
         });
     }).then(a => {
         const end = Date.now();
-        console.info("method=saveAnnotations receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, a.length - 1, (end - start));
+        console.info("method=saveFaults receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, a.length - 1, (end - start));
     })
 }
 

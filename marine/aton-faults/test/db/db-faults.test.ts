@@ -1,7 +1,7 @@
 import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newFault} from "../testdata";
-import {findFaultIdsByRoute} from "../../lib/db/db-voyageplan-faults";
+import {findFaultIdsByRoute} from "../../lib/db/db-faults";
 import {LineString, Point} from "wkx";
 
 describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
