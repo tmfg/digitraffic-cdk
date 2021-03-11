@@ -42,6 +42,7 @@
     "@aws-cdk/aws-lambda": "1.83.0",
     "@aws-cdk/core": "1.83.0",
     "@types/geojson": "^7946.0.7",
+    "aws-sdk": "^2.861.0",
     "axios": "^0.21.1",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
