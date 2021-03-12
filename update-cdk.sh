@@ -39,7 +39,9 @@ function updateAllInDirectory() {
 
 updateInDirectory common
 updateInDirectory cloudfront
+updateInDirectory es-key-figures
 updateInDirectory user-management
+updateInDirectory status
 updateInDirectory swagger-joiner
 
 updateAllInDirectory road

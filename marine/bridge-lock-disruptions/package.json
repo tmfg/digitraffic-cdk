@@ -29,8 +29,6 @@
     "eslint": "^7.13.0",
     "jest": "^26.2.2",
     "parallelshell": "3.0.1",
-    "parcel-bundler": "^1.12.4",
-    "parcel-plugin-externals": "^0.5.1",
     "rimraf": "^3.0.2",
     "sinon": "^9.0.2",
     "ts-jest": "^26.1.4",

@@ -23,7 +23,9 @@ function installAllInDirectory() {
 
 installInDirectory common
 installInDirectory cloudfront
+installInDirectory es-key-figures
 installInDirectory user-management
+installInDirectory status
 installInDirectory swagger-joiner
 
 installAllInDirectory road
