@@ -2,7 +2,6 @@ import * as LastUpdatedDB from "../../../../common/db/last-updated";
 import * as FaultsDB from "../db/db-faults"
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
-import {Feature,GeoJsonProperties} from "geojson";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "../model/voyageplan";
@@ -21,7 +20,7 @@ const PRODUCTION_AGENCY = {
 
 const NAME_OF_SERIES = 'Finnish ATON Faults';
 
-export async function faultToS124(faultId: number): Promise<any> {
+export async function getFaultS124ById(faultId: number): Promise<any> {
     const start = Date.now();
 
     const fault = await inDatabase(async (db: IDatabase<any,any>) => {
@@ -35,7 +34,7 @@ export async function faultToS124(faultId: number): Promise<any> {
             })
         }
     } finally {
-        console.info("method=findFaultById tookMs=%d", Date.now() - start);
+        console.info("method=getFaultS124ById tookMs=%d", Date.now() - start);
     }
 }
 
@@ -50,6 +49,23 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
     });
     console.info("method=findFaultIdsForVoyagePlan tookMs=%d", Date.now() - start);
     return faultIds;
+}
+
+export async function saveFaults(domain: string, newFaults: any[]) {
+    const start = Date.now();
+    const validated = newFaults.filter(validate);
+
+    await inDatabase(async (db: IDatabase<any,any>) => {
+        return await db.tx(t => {
+            return t.batch([
+                ...FaultsDB.updateFaults(db, domain, validated),
+                LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start))
+            ]);
+        });
+    }).then(a => {
+        const end = Date.now();
+        console.info("method=saveFaults receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, a.length - 1, (end - start));
+    })
 }
 
 function createXml(fault: any) {
@@ -144,53 +160,6 @@ function createMessageSeriesIdentifier(faultId: any, year: number) {
         'productionAgency' : PRODUCTION_AGENCY,
         'country' : 'fi'
     };
-}
-
-function convertFeature(fault: any) {
-    const properties = <GeoJsonProperties>{
-        id: fault.id,
-        entry_timestamp: fault.entry_timestamp,
-        fixed_timestamp: fault.fixed_timestamp,
-        type: fault.aton_fault_type,
-        domain: fault.domain,
-        state: fault.state,
-        fixed: fault.fixed,
-        aton_id: fault.aton_id,
-        aton_name_fi: fault.aton_name_fi,
-        aton_name_se: fault.aton_name_se,
-        aton_type: fault.aton_type,
-        fairway_number: fault.fairway_number,
-        fairway_name_fi: fault.fairway_name_fi,
-        fairway_name_se: fault.fairway_name_se,
-        area_number: fault.area_number,
-        area_description: fault.area_description
-    };
-
-    // convert geometry from db to geojson
-    const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex")).toGeoJSON();
-
-    return <Feature>{
-        type: "Feature",
-        properties: properties,
-        geometry: geometry
-    };
-}
-
-export async function saveFaults(domain: string, newFaults: any[]) {
-    const start = Date.now();
-    const validated = newFaults.filter(validate);
-
-    await inDatabase(async (db: IDatabase<any,any>) => {
-        return await db.tx(t => {
-            return t.batch([
-                    ...FaultsDB.updateFaults(db, domain, validated),
-                    LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start))
-                ]);
-        });
-    }).then(a => {
-        const end = Date.now();
-        console.info("method=saveFaults receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, a.length - 1, (end - start));
-    })
 }
 
 function validate(fault: any) {

@@ -1,4 +1,4 @@
-import {faultToS124} from "../../lib/service/faults";
+import {getFaultS124ById} from "../../lib/service/faults";
 import {newFault} from "../testdata";
 import {dbTestBase, insert} from "../db-testutil";
 import * as pgPromise from "pg-promise";
@@ -14,7 +14,7 @@ describe('faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [fault]);
 
-        const faultS124 = await faultToS124(fault.id);
+        const faultS124 = await getFaultS124ById(fault.id);
 
         // TODO expect based on XML structure
         expect(faultS124).toBeTruthy();

@@ -45,3 +45,11 @@ export interface UploadVoyagePlanAck {
 export async function ackReceivedVoyagePlan(uri: string) {
 
 }
+
+export async function uploadArea(faultS124: string, uri: string): Promise<void> {
+    const resp = await axios.post(uri, faultS124);
+    if (resp.status != 200) {
+        console.error(`method=uploadArea returned status=${resp.status}`);
+        return Promise.reject();
+    }
+}
