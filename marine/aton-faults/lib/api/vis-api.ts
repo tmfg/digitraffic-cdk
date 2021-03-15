@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {Agent} from 'https';
 
 export interface UploadVoyagePlanAck {
     /**
@@ -46,8 +47,18 @@ export async function ackReceivedVoyagePlan(uri: string) {
 
 }
 
-export async function uploadArea(faultS124: string, uri: string): Promise<void> {
-    const resp = await axios.post(uri, faultS124);
+export async function uploadArea(
+    faultS124: string,
+    uri: string,
+    clientCertificate: string,
+    privateKey: string): Promise<void> {
+
+    const resp = await axios.post(uri, faultS124, {
+        httpsAgent: new Agent({
+            cert: clientCertificate,
+            key: privateKey
+        })
+    });
     if (resp.status != 200) {
         console.error(`method=uploadArea returned status=${resp.status}`);
         return Promise.reject();

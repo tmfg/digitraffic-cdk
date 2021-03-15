@@ -1,6 +1,18 @@
 import {SNSEvent} from "aws-lambda";
 import {getFaultS124ById} from "../../service/faults";
 import {sendFault} from "../../service/fault-sender";
+import {withSecret} from "../../../../../common/secrets/secret";
+
+let clientCertificate: string;
+let privateKey: string;
+
+export const KEY_SECRET_ID = 'SECRET_ID'
+export const KEY_CLIENT_CERTIFICATE_SECRETKEY = 'CLIENT_CERTIFICATE_SECRETKEY'
+export const KEY_PRIVATE_KEY_SECRETKEY = 'PRIVATE_KEY_SECRETKEY'
+
+const secretId = process.env[KEY_SECRET_ID] as string;
+const clientCertificateSecretKey = process.env[KEY_CLIENT_CERTIFICATE_SECRETKEY] as string;
+const privateKeySecretKey = process.env[KEY_PRIVATE_KEY_SECRETKEY] as string;
 
 export interface SendFaultEvent {
     /**
@@ -18,9 +30,15 @@ export interface SendFaultEvent {
  * This handler should only receive and send a single fault
  */
 export async function handler(event: SNSEvent) {
+    if (!clientCertificate || !privateKey) {
+        await withSecret(secretId, (secret: any) => {
+            clientCertificate = secret[clientCertificateSecretKey];
+            privateKey = secret[privateKeySecretKey];
+        });
+    }
     const snsEvent = JSON.parse(event.Records[0].Sns.Message) as SendFaultEvent[];
     for (const event of snsEvent) {
         const faultS124 = await getFaultS124ById(event.faultId);
-        await sendFault(faultS124, event.callbackEndpoint);
+        await sendFault(faultS124, event.callbackEndpoint, clientCertificate, privateKey);
     }
 }

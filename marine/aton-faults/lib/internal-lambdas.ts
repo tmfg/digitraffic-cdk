@@ -7,8 +7,12 @@ import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createSubscription} from '../../../common/stack/subscription';
 import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
-import {KEY_SEND_FAULT_SNS_TOPIC_ARN} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
+import {
+    KEY_SECRET_ID,
+    KEY_CLIENT_CERTIFICATE_SECRETKEY,
+    KEY_PRIVATE_KEY_SECRETKEY
+} from "./lambda/send-fault/lambda-send-fault";
 
 export function create(
     sendFaultTopic: Topic,
@@ -64,7 +68,9 @@ function createSendFaultLambda(
         DB_PASS: props.dbProps?.password,
         DB_URI: props.dbProps?.uri
     } as any;
-    environment[KEY_SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn
+    environment[KEY_SECRET_ID] = props.secretId;
+    environment[KEY_CLIENT_CERTIFICATE_SECRETKEY] = props.clientCertificateSecretKey;
+    environment[KEY_PRIVATE_KEY_SECRETKEY] = props.privateKeySecretKey;
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         memorySize: 256,
         functionName: functionName,

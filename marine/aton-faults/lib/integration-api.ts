@@ -37,7 +37,7 @@ function createUploadAreaHandler (
 }
 
 function createIntegrationResource(resource: Resource, handler: Function) {
-    resource.addMethod("POST", new LambdaIntegration(handler), {
+    resource.addMethod("POST", new LambdaIntegration(handler, {
         requestParameters: {
             'integration.request.querystring.callbackEndpoint': 'method.request.querystring.callbackEndpoint',
             'integration.request.querystring.deliveryAckEndPoint': 'method.request.querystring.deliveryAckEndPoint'
@@ -47,6 +47,11 @@ function createIntegrationResource(resource: Resource, handler: Function) {
                 callbackEndpoint: "$util.escapeJavaScript($input.params('callbackEndpoint'))",
                 deliveryAckEndPoint: "$util.escapeJavaScript($input.params('deliveryAckEndPoint'))"
             })
+        }
+    }), {
+        requestParameters: {
+            'integration.request.querystring.callbackEndpoint': false,
+            'integration.request.querystring.deliveryAckEndPoint': false
         }
     });
 }

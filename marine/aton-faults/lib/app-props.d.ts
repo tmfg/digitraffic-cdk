@@ -1,10 +1,13 @@
 import {LambdaConfiguration} from "../../../common/stack/lambda-configs";
 
 declare interface AtonProps extends LambdaConfiguration {
-    integrations: Integration[]
+    readonly integrations: Integration[]
+    readonly secretId: string
+    readonly clientCertificateSecretKey: string
+    readonly privateKeySecretKey: string
 }
 
 interface Integration {
-    domain: string,
-    url: string
+    readonly domain: string,
+    readonly url: string
 }
