@@ -1,6 +1,7 @@
 import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
 import * as InternalLambdas from './internal-lambdas';
+import * as IntegrationApi from './integration-api';
 import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
 
@@ -21,7 +22,7 @@ export class AtonFaultsCdkStack extends Stack {
             displayName: sendFaultTopicName
         });
 
-        // TODO public API
+        IntegrationApi.create(sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
         InternalLambdas.create(sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
     }
 }
