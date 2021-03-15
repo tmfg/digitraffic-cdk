@@ -14,7 +14,7 @@ export interface RtzWaypoint {
 }
 
 export interface RtzRoute {
-    readonly waypoints: Array<RtzWaypoint>
+    readonly waypoints: RtzWaypoint[]
 }
 
 export interface RtzVoyagePlan {

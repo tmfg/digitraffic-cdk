@@ -40,11 +40,11 @@ export async function getFaultS124ById(faultId: number): Promise<any> {
 
 export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<number[]> {
     const start = Date.now();
+    const voyageLineString =
+        new LineString(voyagePlan.route.waypoints
+            .flatMap(w => w.waypoint.flatMap(x => x.position))
+            .map(p => new Point(p.$.lat, p.$.lon)));
     const faultIds = await inDatabase(async (db: IDatabase<any,any>) => {
-        const voyageLineString =
-            new LineString(voyagePlan.route.waypoints
-                .flatMap(w => w.waypoint.flatMap(x => x.position))
-                .map(p => new Point(p.$.lat, p.$.lon)));
         return findFaultIdsByRoute(db, voyageLineString);
     });
     console.info("method=findFaultIdsForVoyagePlan tookMs=%d", Date.now() - start);
