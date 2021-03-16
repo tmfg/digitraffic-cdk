@@ -6,8 +6,7 @@ import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "../model/voyageplan";
 import {findFaultIdsByRoute} from "../db/db-faults";
-
-let moment = require('moment');
+import moment from 'moment-timezone';
 
 const ATON_DATA_TYPE = "ATON_FAULTS";
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
@@ -83,21 +82,23 @@ function createXml(fault: any) {
                 'GML:id' : id
             },
             'imember': {
-                'S124:S124_Preamble': {
+                'S124:NWPreamble': {
                     '$': {
                         'GML:id' : `PR.${id}`
                     },
-                    'id' : urn,
                     'messageSeriesIdentifier' : createMessageSeriesIdentifier(faultId, year),
-                    'sourceDate': fault.entry_timestamp.toISOString(),
-                    'generalArea': fault.area_description_en,
+                    'generalArea': {
+                        language: 'eng',
+                        text: fault.area_description_en
+                    },
                     'locality' : {
                         'text': fault.fairway_name_fi
                     },
                     'title':  {
                         'text' : `${fault.aton_type_en} ${fault.aton_name_fi} Nr. ${fault.aton_id}, ${fault.fault_type_en}`
                     },
-                    'fixedDateRange' : createFixedDateRange(fault)
+                    'fixedDateRange' : createFixedDateRange(fault),
+                    'sourceDate': moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
                 }
             },
             'member': {
@@ -105,7 +106,6 @@ function createXml(fault: any) {
                     '$': {
                         'GML:id' : `NW.${id}.1`
                     },
-                    'id': `${urn}.1`,
                     'geometry' : createGeometryElement(fault, id)
                 }
             }
@@ -116,10 +116,12 @@ function createXml(fault: any) {
 function createFixedDateRange(fault: any) {
     if(fault.fixed_timestamp) {
         return {
-            'timeOfDayStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND),
-            'dateStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY) ,
-            'timeOfDayEnd' : moment(fault.fixed_timestamp).format(HOUR_MINUTE_SECOND),
-            'dateEnd' : moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY)
+            dateStart: {
+                date: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY)
+            },
+            dateEnd: {
+                date: moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY)
+            }
         }
     }
 
@@ -132,11 +134,12 @@ function createFixedDateRange(fault: any) {
 function createGeometryElement(fault: any, id: string) {
     return {
         'S100:pointProperty' : {
-            '$' : {
-                'GML:id' : `s.NW.${id}.1`,
-                'srcName' : 'EPSG:4326'
-            },
-            'GML:pos' : createCoordinatePair(fault.geometry)
+            'S100:Point' : {
+                '$' : {
+                    'GML:id' : `s.NW.${id}.1`
+                },
+                'GML:pos': createCoordinatePair(fault.geometry)
+            }
         }
     }
 }
@@ -149,12 +152,11 @@ function createCoordinatePair(geometry: any) {
 
 function createMessageSeriesIdentifier(faultId: any, year: number) {
     return {
-        'nameOfSeries' : NAME_OF_SERIES,
+        'navOrMetArea' : NAME_OF_SERIES,
         'typeOfWarning' : 'local',
         'warningNumber' : faultId,
         'year' : year,
-        'productionAgency' : PRODUCTION_AGENCY,
-        'country' : 'fi'
+        'productionAgency' : PRODUCTION_AGENCY
     };
 }
 
