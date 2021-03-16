@@ -21,7 +21,18 @@ export class TestHttpServer {
                 res.setHeader('Access-Control-Allow-Origin', '*');
                 res.setHeader('Access-Control-Allow-Headers', 'Authorization,X-User-Id,X-Auth-Token');
                 res.writeHead(200);
-                res.end(props[path](req.url));
+
+                let dataStr = '';
+                req.on('data', chunk => {
+                    if (chunk) {
+                        dataStr += chunk;
+                    }
+                })
+
+                req.on('end', () => {
+                    // assume sent data is in JSON format
+                    res.end(props[path](req.url, dataStr));
+                });
             } else {
                 this.debuglog('..no match');
             }
@@ -42,5 +53,5 @@ export class TestHttpServer {
 }
 
 interface ListenProperties {
-    [key:string]: (url?: string) => string;
+    [key:string]: (url?: string, data?: string) => string;
 }
