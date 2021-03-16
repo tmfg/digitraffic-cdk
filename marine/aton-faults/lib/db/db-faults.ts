@@ -77,7 +77,7 @@ const PS_FAULT_IDS_BY_AREA = new PreparedStatement({
     text: FAULT_IDS_BY_AREA
 });
 
-export function getFaultById(db: IDatabase<any, any>, faultId: number): Promise<any> {
+export function getFaultById(db: IDatabase<any, any>, faultId: number): Promise<Fault> {
     return db.one(PS_FAULT_BY_ID, [faultId]);
 }
 

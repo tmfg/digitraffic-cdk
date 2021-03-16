@@ -29,16 +29,18 @@ export interface SendFaultEvent {
 /**
  * This handler should only receive and send a single fault
  */
-export async function handler(event: SNSEvent) {
-    if (!clientCertificate || !privateKey) {
-        await withSecret(secretId, (secret: any) => {
-            clientCertificate = secret[clientCertificateSecretKey];
-            privateKey = secret[privateKeySecretKey];
-        });
-    }
-    const snsEvent = JSON.parse(event.Records[0].Sns.Message) as SendFaultEvent[];
-    for (const event of snsEvent) {
-        const faultS124 = await getFaultS124ById(event.faultId);
-        await sendFault(faultS124, event.callbackEndpoint, clientCertificate, privateKey);
-    }
+export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => any) => any) {
+    return async (event: SNSEvent): Promise<void> => {
+        if (!clientCertificate || !privateKey) {
+            await doWithSecret(secretId, (secret: any) => {
+                clientCertificate = secret[clientCertificateSecretKey];
+                privateKey = secret[privateKeySecretKey];
+            });
+        }
+        const snsEvent = JSON.parse(event.Records[0].Sns.Message) as SendFaultEvent;
+        const faultS124 = await getFaultS124ById(snsEvent.faultId);
+        await sendFault(faultS124, snsEvent.callbackEndpoint, clientCertificate, privateKey);
+    };
 }
+
+export const handler = handlerFn(withSecret);

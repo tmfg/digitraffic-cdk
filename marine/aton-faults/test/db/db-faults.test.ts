@@ -1,7 +1,7 @@
 import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newFault} from "../testdata";
-import {findFaultIdsByRoute} from "../../lib/db/db-faults";
+import {findFaultIdsByRoute,getFaultById} from "../../lib/db/db-faults";
 import {LineString, Point} from "wkx";
 
 describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
@@ -40,6 +40,22 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
 
         const faults = await findFaultIdsByRoute(db, route);
         expect(faults.length).toBe(0);
+    });
+
+    test('getFaultById - found', async () => {
+        const fault = newFault();
+        await insert(db, [fault]);
+
+        const foundFault = await getFaultById(db, fault.id);
+
+        expect(Number(foundFault.id)).toBe(fault.id);
+    });
+
+    test('getFaultById - not found', async () => {
+        const fault = newFault();
+        await insert(db, [fault]);
+
+        await expect(getFaultById(db, fault.id + 1)).rejects.toThrow();
     });
 
 }));

@@ -20,7 +20,7 @@ const PRODUCTION_AGENCY = {
 
 const NAME_OF_SERIES = 'Finnish ATON Faults';
 
-export async function getFaultS124ById(faultId: number): Promise<any> {
+export async function getFaultS124ById(faultId: number): Promise<string> {
     const start = Date.now();
 
     const fault = await inDatabase(async (db: IDatabase<any,any>) => {
@@ -28,11 +28,7 @@ export async function getFaultS124ById(faultId: number): Promise<any> {
     });
 
     try {
-        return {
-            body: new Builder().buildObject({
-                'DataSets': createXml(fault)
-            })
-        }
+        return new Builder().buildObject(createXml(fault));
     } finally {
         console.info("method=getFaultS124ById tookMs=%d", Date.now() - start);
     }
