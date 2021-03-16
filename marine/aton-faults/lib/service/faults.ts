@@ -81,32 +81,38 @@ function createXml(fault: any) {
                 'xmlns:xlink' : "http://www.w3.org/1999/xlink",
                 'GML:id' : id
             },
-            'imember': {
+            imember: {
                 'S124:NWPreamble': {
                     '$': {
                         'GML:id' : `PR.${id}`
                     },
-                    'messageSeriesIdentifier' : createMessageSeriesIdentifier(faultId, year),
-                    'generalArea': {
+                    messageSeriesIdentifier : createMessageSeriesIdentifier(faultId, year),
+                    generalArea: {
                         language: 'eng',
                         text: fault.area_description_en
                     },
-                    'locality' : {
-                        'text': fault.fairway_name_fi
+                    locality : {
+                        text: fault.fairway_name_fi
                     },
-                    'title':  {
-                        'text' : `${fault.aton_type_en} ${fault.aton_name_fi} Nr. ${fault.aton_id}, ${fault.fault_type_en}`
+                    title:  {
+                        text : `${fault.aton_type_en} ${fault.aton_name_fi} Nr. ${fault.aton_id}, ${fault.fault_type_en}`
                     },
-                    'fixedDateRange' : createFixedDateRange(fault),
-                    'sourceDate': moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
+                    fixedDateRange : createFixedDateRange(fault),
+                    sourceDate: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
                 }
             },
-            'member': {
-                'S124:S124_NavigationalWarningPart': {
+            member: {
+                'S124:NavigationalWarningPart': {
                     '$': {
                         'GML:id' : `NW.${id}.1`
                     },
-                    'geometry' : createGeometryElement(fault, id)
+                    information: {},
+                    header: {
+                        '$': {
+                            'owns': 'true'
+                        }
+                    },
+                    geometry: createGeometryElement(fault, id)
                 }
             }
         }
@@ -126,8 +132,8 @@ function createFixedDateRange(fault: any) {
     }
 
     return {
-        'timeOfDayStart' : moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND),
-        'dateStart' : moment(fault.entry_timestamp).format(YEAR_MONTH_DAY) ,
+        timeOfDayStart: moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND),
+        dateStart: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY) ,
     }
 }
 
@@ -152,11 +158,11 @@ function createCoordinatePair(geometry: any) {
 
 function createMessageSeriesIdentifier(faultId: any, year: number) {
     return {
-        'navOrMetArea' : NAME_OF_SERIES,
-        'typeOfWarning' : 'local',
-        'warningNumber' : faultId,
-        'year' : year,
-        'productionAgency' : PRODUCTION_AGENCY
+        navOrMetArea : NAME_OF_SERIES,
+        typeOfWarning : 'local',
+        warningNumber : faultId,
+        year,
+        productionAgency : PRODUCTION_AGENCY
     };
 }
 

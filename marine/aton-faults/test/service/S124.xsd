@@ -244,7 +244,7 @@
 					<xs:element name="theReferences" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
 					<xs:element name="referenceUVID" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
 					<xs:element name="header" type="gml:ReferenceType" minOccurs="1" maxOccurs="1"/>
-					<!--<xs:element name="geometry" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>-->
+					<xs:element name="geometry" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
