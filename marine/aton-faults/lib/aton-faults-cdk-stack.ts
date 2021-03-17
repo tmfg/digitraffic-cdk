@@ -4,10 +4,13 @@ import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
 import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
+import {Secret} from "@aws-cdk/aws-secretsmanager";
 
 export class AtonFaultsCdkStack extends Stack {
     constructor(scope: Construct, id: string, atonFaultsProps: AtonProps, props?: StackProps) {
         super(scope, id, props);
+
+        const secret = Secret.fromSecretNameV2(this, 'AtonSecret', atonFaultsProps.secretId);
 
         const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
             vpcId: atonFaultsProps.vpcId,
@@ -22,7 +25,7 @@ export class AtonFaultsCdkStack extends Stack {
             displayName: sendFaultTopicName
         });
 
-        IntegrationApi.create(sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
-        InternalLambdas.create(sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
+        IntegrationApi.create(secret, sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
+        InternalLambdas.create(secret, sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
     }
 }

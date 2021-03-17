@@ -14,19 +14,22 @@ import {
     KEY_PRIVATE_KEY_SECRETKEY, KEY_CA_SECRETKEY
 } from "./lambda/send-fault/lambda-send-fault";
 import {KEY_SECRET_ID as KEY_SECRET_ID_AF, KEY_INTEGRATIONS} from "./lambda/update-faults/lambda-update-faults";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 export function create(
+    secret: ISecret,
     sendFaultTopic: Topic,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: AtonProps,
     stack: Stack) {
 
-    createUpdateFaultsLambda(vpc, lambdaDbSg, props, stack);
-    createSendFaultLambda(sendFaultTopic, vpc, lambdaDbSg, props, stack);
+    createUpdateFaultsLambda(secret, vpc, lambdaDbSg, props, stack);
+    createSendFaultLambda(secret, sendFaultTopic, vpc, lambdaDbSg, props, stack);
 }
 
 function createUpdateFaultsLambda(
+    secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: AtonProps,
@@ -43,18 +46,17 @@ function createUpdateFaultsLambda(
         handler: 'lambda-update-faults.handler',
         environment
     });
-
-    const updateFaultsLambda = new Function(stack, 'UpdateFaults', lambdaConf);
-
+    const lambda = new Function(stack, 'UpdateFaults', lambdaConf);
+    secret.grantRead(lambda);
     const rule = new Rule(stack, 'Rule', {
         schedule: Schedule.rate(Duration.minutes(10))
     });
-    rule.addTarget(new LambdaFunction(updateFaultsLambda));
-
-    createSubscription(updateFaultsLambda, functionName, props.logsDestinationArn, stack);
+    rule.addTarget(new LambdaFunction(lambda));
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
 
 function createSendFaultLambda(
+    secret: ISecret,
     sendFaultTopic: Topic,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
@@ -74,10 +76,8 @@ function createSendFaultLambda(
         handler: 'lambda-send-fault.handler',
         environment
     });
-
     const lambda = new Function(stack, functionName, lambdaConf);
-
+    secret.grantRead(lambda);
     sendFaultTopic.addSubscription(new LambdaSubscription(lambda));
-
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }

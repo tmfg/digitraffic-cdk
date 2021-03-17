@@ -41,8 +41,14 @@ export function handlerFn(
 ): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function(event: UploadVoyagePlanEvent): Promise<void> {
         return await doWithSecret(secretId, async () => {
-            const parseXml = util.promisify(xml2js.parseString);
-            const voyagePlan = (await parseXml(event.voyagePlan)) as RtzVoyagePlan;
+            let voyagePlan: RtzVoyagePlan;
+            try {
+                const parseXml = util.promisify(xml2js.parseString);
+                voyagePlan = (await parseXml(event.voyagePlan)) as RtzVoyagePlan;
+            } catch (error) {
+                console.error('UploadVoyagePLan XML parsing failed', error);
+                return Promise.reject('Failed to parse XML');
+            }
 
             if (event.deliveryAckEndPoint) {
                 await ackFn(event.deliveryAckEndPoint);
@@ -63,6 +69,7 @@ export function handlerFn(
                     TopicArn: sendFaultSnsTopicArn
                 }).promise();
             }
+            return Promise.resolve('');
         });
     };
 }

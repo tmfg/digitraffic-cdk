@@ -1,8 +1,7 @@
-import {RestApi,Resource}  from '@aws-cdk/aws-apigateway';
-import {Function, AssetCode} from '@aws-cdk/aws-lambda';
-import {LambdaIntegration} from "@aws-cdk/aws-apigateway";
+import {Resource, RestApi} from '@aws-cdk/aws-apigateway';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
-import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
+import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {createSubscription} from "../../../common/stack/subscription";
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createRestApi} from "../../../common/api/rest_apis";
@@ -10,8 +9,11 @@ import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {KEY_SECRET_ID, KEY_SEND_FAULT_SNS_TOPIC_ARN} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 import {AtonProps} from "./app-props";
+import {defaultIntegration} from "../../../common/api/responses";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 export function create(
+    secret: ISecret,
     sendFaultTopic: Topic,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
@@ -23,10 +25,11 @@ export function create(
         'ATONFaults-Integration',
         'ATON Faults integration API');
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
-    createUploadAreaHandler(sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
+    createUploadAreaHandler(secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
 }
 
 function createUploadAreaHandler (
+    secret: ISecret,
     sendFaultTopic: Topic,
     stack: Construct,
     integrationApi: RestApi,
@@ -34,28 +37,39 @@ function createUploadAreaHandler (
     lambdaDbSg: ISecurityGroup,
     props: AtonProps) {
     const handler = createHandler(sendFaultTopic, stack, vpc, lambdaDbSg, props);
+    secret.grantRead(handler);
     const resource = integrationApi.root.addResource("upload-area")
     createIntegrationResource(resource, handler);
     sendFaultTopic.grantPublish(handler);
 }
 
 function createIntegrationResource(resource: Resource, handler: Function) {
-    resource.addMethod("POST", new LambdaIntegration(handler, {
+    const integration = defaultIntegration(handler, {
+        disableCors: true,
         requestParameters: {
             'integration.request.querystring.callbackEndpoint': 'method.request.querystring.callbackEndpoint',
             'integration.request.querystring.deliveryAckEndPoint': 'method.request.querystring.deliveryAckEndPoint'
         },
         requestTemplates: {
-            'application/json': JSON.stringify({
-                callbackEndpoint: "$util.escapeJavaScript($input.params('callbackEndpoint'))",
-                deliveryAckEndPoint: "$util.escapeJavaScript($input.params('deliveryAckEndPoint'))"
-            })
+            // transformation from XML to JSON in API Gateway
+            // some stuff needs to be quotes, other stuff does not, it's magic
+            'application/xml': `{
+                "callbackEndpoint": "$util.escapeJavaScript($input.params('callbackEndpoint'))",
+                "deliveryAckEndPoint": "$util.escapeJavaScript($input.params('deliveryAckEndPoint'))",
+                "voyagePlan": $input.json('$')
+            }`
         }
-    }), {
+    });
+    resource.addMethod("POST", integration, {
+        apiKeyRequired: true,
         requestParameters: {
-            'integration.request.querystring.callbackEndpoint': false,
-            'integration.request.querystring.deliveryAckEndPoint': false
-        }
+            'method.request.querystring.callbackEndpoint': false,
+            'method.request.querystring.deliveryAckEndPoint': false
+        },
+        methodResponses: [
+            {statusCode: '200'},
+            {statusCode: '500'}
+        ]
     });
 }
 
