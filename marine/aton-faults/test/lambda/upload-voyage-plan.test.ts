@@ -10,6 +10,8 @@ const sandbox = sinon.createSandbox();
 
 describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
+    const secretFn = async (secret: string, fn: any) => {await fn(secret)};
+
     afterEach(() => sandbox.restore());
 
     test('publishes to SNS per fault id', async () => {
@@ -32,7 +34,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         };
         const [sns, snsPublishStub] = makeSnsPublishStub();
 
-        await handlerFn(sns, async () => {})(uploadEvent);
+        await handlerFn(sns, async () => {}, secretFn)(uploadEvent);
 
         expect(snsPublishStub.calledTwice).toBe(true);
     });
@@ -44,7 +46,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         };
         const [sns, snsPublishStub] = makeSnsPublishStub();
 
-        await handlerFn(sns, async () => {})(uploadEvent);
+        await handlerFn(sns, async () => {}, secretFn)(uploadEvent);
 
         expect(snsPublishStub.notCalled).toBe(true);
     });
@@ -58,7 +60,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         const [sns] = makeSnsPublishStub();
         const ackStub = sandbox.stub().returns(Promise.resolve());
 
-        await handlerFn(sns, ackStub)(uploadEvent);
+        await handlerFn(sns, ackStub, secretFn)(uploadEvent);
 
         expect(ackStub.calledWith(uploadEvent.deliveryAckEndPoint)).toBe(true);
     });
@@ -71,19 +73,20 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         const [sns] = makeSnsPublishStub();
         const ackStub = sandbox.stub().returns(Promise.resolve());
 
-        await handlerFn(sns, ackStub)(uploadEvent);
+        await handlerFn(sns, ackStub, secretFn)(uploadEvent);
 
         expect(ackStub.notCalled).toBe(true);
     });
 
     test('no ack with failed route parsing', async () => {
         const uploadEvent: UploadVoyagePlanEvent = {
+            deliveryAckEndPoint: 'some-endpoint',
             voyagePlan: 'asdfasdf'
         };
         const [sns] = makeSnsPublishStub();
         const ackStub = sandbox.stub().returns(Promise.resolve());
 
-        await expect(handlerFn(sns, ackStub)(uploadEvent)).rejects.toThrow();
+        await expect(handlerFn(sns, ackStub, secretFn)(uploadEvent)).rejects.toThrow();
 
         expect(ackStub.notCalled).toBe(true);
     });

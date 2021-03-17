@@ -5,6 +5,7 @@ declare interface AtonProps extends LambdaConfiguration {
     readonly secretId: string
     readonly clientCertificateSecretKey: string
     readonly privateKeySecretKey: string
+    readonly caSecretKey: string
 }
 
 interface Integration {

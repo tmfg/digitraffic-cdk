@@ -16,7 +16,7 @@ export class AtonFaultsCdkStack extends Stack {
         });
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', atonFaultsProps.lambdaDbSgId);
 
-        const sendFaultTopicName = 'ATON-SendFault';
+        const sendFaultTopicName = 'ATON-SendFaultTopic';
         const sendFaultTopic = new Topic(this, sendFaultTopicName, {
             topicName: sendFaultTopicName,
             displayName: sendFaultTopicName

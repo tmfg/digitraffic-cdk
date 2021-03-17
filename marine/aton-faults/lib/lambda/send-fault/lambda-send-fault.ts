@@ -1,7 +1,7 @@
 import {SNSEvent} from "aws-lambda";
 import {getFaultS124ById} from "../../service/faults";
 import {sendFault} from "../../service/fault-sender";
-import {withSecret} from "../../../../../common/secrets/secret";
+import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 
 let clientCertificate: string;
 let privateKey: string;
@@ -45,4 +45,4 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
     };
 }
 
-export const handler = handlerFn(withSecret);
+export const handler = handlerFn(withDbSecret);

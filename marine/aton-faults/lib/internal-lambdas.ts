@@ -11,8 +11,9 @@ import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 import {
     KEY_SECRET_ID,
     KEY_CLIENT_CERTIFICATE_SECRETKEY,
-    KEY_PRIVATE_KEY_SECRETKEY
+    KEY_PRIVATE_KEY_SECRETKEY, KEY_CA_SECRETKEY
 } from "./lambda/send-fault/lambda-send-fault";
+import {KEY_SECRET_ID as KEY_SECRET_ID_AF, KEY_INTEGRATIONS} from "./lambda/update-faults/lambda-update-faults";
 
 export function create(
     sendFaultTopic: Topic,
@@ -31,18 +32,16 @@ function createUpdateFaultsLambda(
     props: AtonProps,
     stack: Stack) {
 
+    const environment: any = {};
+    environment[KEY_SECRET_ID_AF] = props.secretId;
+    environment[KEY_INTEGRATIONS] = JSON.stringify(props.integrations);
     const functionName = "ATON-UpdateFaults";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         memorySize: 512,
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-faults'),
         handler: 'lambda-update-faults.handler',
-        environment: {
-            DB_USER: props.dbProps?.username,
-            DB_PASS: props.dbProps?.password,
-            DB_URI: props.dbProps?.uri,
-            INTEGRATIONS: JSON.stringify(props.integrations)
-        }
+        environment
     });
 
     const updateFaultsLambda = new Function(stack, 'UpdateFaults', lambdaConf);
@@ -63,14 +62,11 @@ function createSendFaultLambda(
     stack: Stack) {
 
     const functionName = "ATON-SendFault";
-    const environment = {
-        DB_USER: props.dbProps?.username,
-        DB_PASS: props.dbProps?.password,
-        DB_URI: props.dbProps?.uri
-    } as any;
+    const environment = {} as any;
     environment[KEY_SECRET_ID] = props.secretId;
     environment[KEY_CLIENT_CERTIFICATE_SECRETKEY] = props.clientCertificateSecretKey;
     environment[KEY_PRIVATE_KEY_SECRETKEY] = props.privateKeySecretKey;
+    environment[KEY_CA_SECRETKEY] = props.caSecretKey;
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         memorySize: 256,
         functionName: functionName,
