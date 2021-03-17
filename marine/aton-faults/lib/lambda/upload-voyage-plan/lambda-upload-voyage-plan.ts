@@ -5,6 +5,7 @@ import {findFaultIdsForVoyagePlan} from "../../service/faults";
 import {SNS} from "aws-sdk";
 import {ackReceivedVoyagePlan} from "../../api/vis-api";
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {BAD_REQUEST_MESSAGE} from "../../../../../common/api/errors";
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
@@ -46,8 +47,8 @@ export function handlerFn(
                 const parseXml = util.promisify(xml2js.parseString);
                 voyagePlan = (await parseXml(event.voyagePlan)) as RtzVoyagePlan;
             } catch (error) {
-                console.error('UploadVoyagePLan XML parsing failed', error);
-                return Promise.reject('Failed to parse XML');
+                console.error('UploadVoyagePlan XML parsing failed', error);
+                return Promise.reject(BAD_REQUEST_MESSAGE);
             }
 
             if (event.deliveryAckEndPoint) {

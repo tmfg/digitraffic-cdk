@@ -1,4 +1,4 @@
-import {Resource, RestApi} from '@aws-cdk/aws-apigateway';
+import {Model, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
@@ -9,8 +9,10 @@ import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {KEY_SECRET_ID, KEY_SEND_FAULT_SNS_TOPIC_ARN} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 import {AtonProps} from "./app-props";
-import {defaultIntegration} from "../../../common/api/responses";
+import {defaultIntegration, methodResponse} from "../../../common/api/responses";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {MediaType} from "../../../common/api/mediatypes";
+import {MessageModel} from "../../../common/api/response";
 
 export function create(
     secret: ISecret,
@@ -25,10 +27,12 @@ export function create(
         'ATONFaults-Integration',
         'ATON Faults integration API');
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
-    createUploadAreaHandler(secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
+    const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
+    createUploadAreaHandler(messageResponseModel, secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
 }
 
-function createUploadAreaHandler (
+function createUploadAreaHandler(
+    messageResponseModel: Model,
     secret: ISecret,
     sendFaultTopic: Topic,
     stack: Construct,
@@ -39,11 +43,15 @@ function createUploadAreaHandler (
     const handler = createHandler(sendFaultTopic, stack, vpc, lambdaDbSg, props);
     secret.grantRead(handler);
     const resource = integrationApi.root.addResource("upload-area")
-    createIntegrationResource(resource, handler);
+    createIntegrationResource(messageResponseModel, resource, handler);
     sendFaultTopic.grantPublish(handler);
 }
 
-function createIntegrationResource(resource: Resource, handler: Function) {
+function createIntegrationResource(
+    messageResponseModel: Model,
+    resource: Resource,
+    handler: Function) {
+
     const integration = defaultIntegration(handler, {
         disableCors: true,
         requestParameters: {
@@ -67,8 +75,9 @@ function createIntegrationResource(resource: Resource, handler: Function) {
             'method.request.querystring.deliveryAckEndPoint': false
         },
         methodResponses: [
-            {statusCode: '200'},
-            {statusCode: '500'}
+            methodResponse("200", MediaType.APPLICATION_JSON, messageResponseModel),
+            methodResponse("400", MediaType.APPLICATION_JSON, messageResponseModel),
+            methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel)
         ]
     });
 }

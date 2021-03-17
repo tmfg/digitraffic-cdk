@@ -1,8 +1,8 @@
-import {AUTHORIZATION_FAILED_MESSAGE, NOT_FOUND_MESSAGE} from "./errors";
+import {AUTHORIZATION_FAILED_MESSAGE, BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE} from "./errors";
 import {
     InternalServerErrorResponseTemplate,
     createResponses,
-    XmlResponseTemplate, NotFoundResponseTemplate, SvgResponseTemplate
+    XmlResponseTemplate, NotFoundResponseTemplate, SvgResponseTemplate, BadRequestResponseTemplate
 } from "./response";
 import {LambdaIntegration, MethodResponse, IntegrationResponse} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
@@ -19,15 +19,13 @@ export const RESPONSE_200_OK: IntegrationResponse = {
 
 export const RESPONSE_400_BAD_REQUEST: IntegrationResponse = {
     statusCode: '400',
-    selectionPattern: 'ERROR.*',
-    responseTemplates: {
-        'application/json': "{\"Error\":\"$input.path('$').errorMessage\"}"
-    }
+    selectionPattern: BAD_REQUEST_MESSAGE,
+    responseTemplates: BadRequestResponseTemplate
 }
 
 export const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
     statusCode: '500',
-    selectionPattern: 'Error',
+    selectionPattern: ERROR_MESSAGE,
     responseTemplates: InternalServerErrorResponseTemplate
 };
 
@@ -95,6 +93,7 @@ export function defaultIntegration(
         proxy: false,
         integrationResponses: options?.responses || [
             getResponse(RESPONSE_200_OK, options),
+            getResponse(RESPONSE_400_BAD_REQUEST, options),
             getResponse(RESPONSE_401_UNAUTHORIZED, options),
             getResponse(RESPONSE_404_NOT_FOUND, options),
             getResponse(RESPONSE_500_SERVER_ERROR, options),
