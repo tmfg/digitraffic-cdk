@@ -50,11 +50,13 @@ export async function ackReceivedVoyagePlan(uri: string) {
 export async function uploadArea(
     faultS124: string,
     uri: string,
+    ca: string,
     clientCertificate: string,
     privateKey: string): Promise<void> {
 
     const resp = await axios.post(uri, faultS124, {
         httpsAgent: new Agent({
+            ca,
             cert: clientCertificate,
             key: privateKey
         })

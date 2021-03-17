@@ -7,10 +7,12 @@ let clientCertificate: string;
 let privateKey: string;
 
 export const KEY_SECRET_ID = 'SECRET_ID'
+export const KEY_CA_SECRETKEY = 'CA_SECRETKEY'
 export const KEY_CLIENT_CERTIFICATE_SECRETKEY = 'CLIENT_CERTIFICATE_SECRETKEY'
 export const KEY_PRIVATE_KEY_SECRETKEY = 'PRIVATE_KEY_SECRETKEY'
 
 const secretId = process.env[KEY_SECRET_ID] as string;
+const caSecretKey = process.env[KEY_CA_SECRETKEY] as string;
 const clientCertificateSecretKey = process.env[KEY_CLIENT_CERTIFICATE_SECRETKEY] as string;
 const privateKeySecretKey = process.env[KEY_PRIVATE_KEY_SECRETKEY] as string;
 
@@ -39,7 +41,7 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
         }
         const snsEvent = JSON.parse(event.Records[0].Sns.Message) as SendFaultEvent;
         const faultS124 = await getFaultS124ById(snsEvent.faultId);
-        await sendFault(faultS124, snsEvent.callbackEndpoint, clientCertificate, privateKey);
+        await sendFault(faultS124, snsEvent.callbackEndpoint, caSecretKey, clientCertificate, privateKey);
     };
 }
 
