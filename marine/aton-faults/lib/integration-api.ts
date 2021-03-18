@@ -24,7 +24,7 @@ export function create(
 
     const integrationApi = createRestApi(
         stack,
-        'ATONFaults-Integration',
+        'ATON-Integration',
         'ATON Faults integration API');
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
@@ -89,7 +89,7 @@ function createHandler(
     lambdaDbSg: ISecurityGroup,
     props: AtonProps,
 ): Function {
-    const functionName = 'ATONFaults-UploadVoyagePlan';
+    const functionName = 'ATON-UploadVoyagePlan';
     const environment: any = {};
     environment[KEY_SECRET_ID] = props.secretId;
     environment[KEY_SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
