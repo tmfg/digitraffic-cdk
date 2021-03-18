@@ -81,8 +81,15 @@ export function getFaultById(db: IDatabase<any, any>, faultId: number): Promise<
     return db.one(PS_FAULT_BY_ID, [faultId]);
 }
 
+interface DbFaultId {
+    readonly id: string
+}
+
 export async function findFaultIdsByRoute(db: IDatabase<any, any>, route: LineString): Promise<number[]> {
-    return db.tx(t => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()));
+    const ids = db.tx(t => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()))
+    // bigints are returned as string by pg-promise since they could overflow
+    // however these are plain integers
+    return ids.then((result: DbFaultId[]) => result.map(r => Number(r.id)));
 }
 
 export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): Promise<any>[] {
