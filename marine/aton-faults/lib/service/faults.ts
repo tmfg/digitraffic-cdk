@@ -37,12 +37,12 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
     const start = Date.now();
     const voyageLineString =
         new LineString(voyagePlan.route.waypoints
-            .flatMap(w => w.waypoint.flatMap(x => x.position))
-            .map(p => new Point(p.$.lat, p.$.lon)));
+            .flatMap(w => w.waypoint.flatMap( wp => wp.position))
+            .map(p => new Point(p.$.lon, p.$.lat)));
     const faultIds = await inDatabase(async (db: IDatabase<any,any>) => {
         return findFaultIdsByRoute(db, voyageLineString);
     });
-    console.info("method=findFaultIdsForVoyagePlan tookMs=%d", Date.now() - start);
+    console.info("method=findFaultIdsForVoyagePlan tookMs=%d count=%d", Date.now() - start, faultIds.length);
     return faultIds;
 }
 

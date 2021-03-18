@@ -14,8 +14,8 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
             }
         });
         const route = new LineString([
-            new Point(60.474496, 27.029835),
-            new Point(60.400138, 27.224842)
+            new Point(27.029835, 60.474496,),
+            new Point(27.224842, 60.400138)
         ]);
 
         await insert(db, [fault]);
@@ -32,8 +32,8 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
             }
         });
         const route = new LineString([
-            new Point(60.474496, 27.029835),
-            new Point(60.400138, 27.224842)
+            new Point(27.029835, 60.474496),
+            new Point(27.224842, 60.400138)
         ]);
 
         await insert(db, [fault]);

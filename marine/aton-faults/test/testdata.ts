@@ -23,6 +23,6 @@ export function newFault(props?: {
          fairway_name_fi: someNumber(),
          fairway_name_se: someNumber(),
          area_number: 1,
-         geometry: `POINT(${props?.geometry?.lat ?? someNumber()} ${props?.geometry?.lon ?? someNumber()})`
+         geometry: `POINT(${props?.geometry?.lon ?? someNumber()} ${props?.geometry?.lat ?? someNumber()})`
     };
 }

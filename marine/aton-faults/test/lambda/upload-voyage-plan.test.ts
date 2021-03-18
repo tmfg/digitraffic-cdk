@@ -5,6 +5,7 @@ import {newFault} from "../testdata";
 import {SNS} from "aws-sdk";
 import * as sinon from 'sinon';
 import {SinonStub} from "sinon";
+import {BAD_REQUEST_MESSAGE} from "../../../../common/api/errors";
 
 const sandbox = sinon.createSandbox();
 
@@ -86,7 +87,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         const [sns] = makeSnsPublishStub();
         const ackStub = sandbox.stub().returns(Promise.resolve());
 
-        await expect(handlerFn(sns, ackStub, secretFn)(uploadEvent)).rejects.toThrow();
+        await expect(handlerFn(sns, ackStub, secretFn)(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
 
         expect(ackStub.notCalled).toBe(true);
     });
