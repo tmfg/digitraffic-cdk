@@ -5,6 +5,7 @@ import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 
 let clientCertificate: string;
 let privateKey: string;
+let caCert: string;
 
 export const KEY_SECRET_ID = 'SECRET_ID'
 export const KEY_CA_SECRETKEY = 'CA_SECRETKEY'
@@ -37,11 +38,16 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
             await doWithSecret(secretId, (secret: any) => {
                 clientCertificate = secret[clientCertificateSecretKey];
                 privateKey = secret[privateKeySecretKey];
+                caCert = secret[caSecretKey];
             });
         }
         const snsEvent = JSON.parse(event.Records[0].Sns.Message) as SendFaultEvent;
         const faultS124 = await getFaultS124ById(snsEvent.faultId);
-        await sendFault(faultS124, snsEvent.callbackEndpoint, caSecretKey, clientCertificate, privateKey);
+        if (faultS124) {
+            await sendFault(faultS124, snsEvent.callbackEndpoint, caCert, clientCertificate, privateKey);
+        } else {
+            console.warn('Fault with id %d was not found', snsEvent.faultId);
+        }
     };
 }
 

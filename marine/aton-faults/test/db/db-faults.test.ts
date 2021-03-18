@@ -48,7 +48,7 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
 
         const foundFault = await getFaultById(db, fault.id);
 
-        expect(Number(foundFault.id)).toBe(fault.id);
+        expect(Number(foundFault?.id)).toBe(fault.id);
     });
 
     test('getFaultById - not found', async () => {

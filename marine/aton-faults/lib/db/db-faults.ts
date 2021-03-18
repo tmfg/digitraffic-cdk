@@ -55,6 +55,7 @@ const FAULT_IDS_BY_AREA =
      and aton_fault.area_number = area.area_number
      and aton_fault.type = aton_fault_type.name_fi
      and aton_fault.aton_type_fi = aton_type.name_fi
+     and state = 'Avoin'
      and st_intersects(
          st_setsrid(geometry, 4326),
          st_transform(
@@ -77,8 +78,8 @@ const PS_FAULT_IDS_BY_AREA = new PreparedStatement({
     text: FAULT_IDS_BY_AREA
 });
 
-export function getFaultById(db: IDatabase<any, any>, faultId: number): Promise<Fault> {
-    return db.one(PS_FAULT_BY_ID, [faultId]);
+export function getFaultById(db: IDatabase<any, any>, faultId: number): Promise<Fault | null> {
+    return db.oneOrNone(PS_FAULT_BY_ID, [faultId]);
 }
 
 interface DbFaultId {
