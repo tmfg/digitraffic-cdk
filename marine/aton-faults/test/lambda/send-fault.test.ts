@@ -13,7 +13,7 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     afterEach(() => sandbox.restore());
 
-    test('heh', async () => {
+    test('faults are sent to endpoint', async () => {
         const server = new TestHttpServer();
         try {
             let receivedData: string | undefined;
