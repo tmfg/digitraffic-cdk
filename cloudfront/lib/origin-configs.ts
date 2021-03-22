@@ -19,7 +19,7 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
         if (!oai) {
             throw new Error('OAI was null! OAI is needed for S3 origin');
         }
-        const bucket = Bucket.fromBucketAttributes(stack, 'ImportedBucket', {
+        const bucket = Bucket.fromBucketAttributes(stack, `ImportedBucketName-${domain.s3BucketName}`, {
             bucketArn: `arn:aws:s3:::${domain.s3BucketName}`,
             bucketRegionalDomainName: `${domain.s3BucketName}.s3.eu-west-1.amazonaws.com`
         });
