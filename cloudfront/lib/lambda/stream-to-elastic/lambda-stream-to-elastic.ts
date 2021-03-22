@@ -22,6 +22,7 @@ const COMPRESS_OPTIONS = {
 
 // fields contains all the selected log fields in the order specified in loggint-utils.ts CLOUDFRONT_STREAMING_LOG_FIELDS
 async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
+    // field order comes from documentation https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields
     const timestamp = new Date(1000 * Number(fields[0])).toISOString();
     const ip = fields[1];
     const timeToFirstByte = fields[2];

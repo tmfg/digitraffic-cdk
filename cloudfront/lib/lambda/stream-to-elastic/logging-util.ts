@@ -1,3 +1,6 @@
+// try to keep this in same order as in documentation
+// https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/real-time-logs.html#understand-real-time-log-config-fields
+// order here does not matter, but the fields in log will have the same order as in documentation
 export const CLOUDFRONT_STREAMING_LOG_FIELDS = [
     'timestamp',
     'c-ip',
@@ -15,8 +18,6 @@ export const CLOUDFRONT_STREAMING_LOG_FIELDS = [
     'x-forwarded-for',
     'x-edge-result-type',
     'cs-accept-encoding',
-
-    // keep headers last!
     'cs-headers',
 ];
 
