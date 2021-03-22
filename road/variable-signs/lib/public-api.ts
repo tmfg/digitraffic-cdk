@@ -17,7 +17,7 @@ import {
 } from "../../../common/api/responses";
 import {createSubscription} from "../../../common/stack/subscription";
 import {addQueryParameterDescription, addTags, addTagsAndSummary} from "../../../common/api/documentation";
-import {BETA_TAGS} from "../../../common/api/tags";
+import {BETA_TAGS, DATA_V1_TAGS} from "../../../common/api/tags";
 import {MessageModel} from "../../../common/api/response";
 import {createRestApi} from "../../../common/api/rest_apis";
 import {MediaType} from "../../../common/api/mediatypes";
@@ -74,7 +74,7 @@ function createDatex2Resource(
     });
 
     createSubscription(getDatex2Lambda, functionName, props.logsDestinationArn, stack);
-    addTagsAndSummary('GetDatex2', BETA_TAGS, 'Return all variables signs as datex2', datex2Resource, stack);
+    addTagsAndSummary('GetDatex2', DATA_V1_TAGS, 'Return all variables signs as datex2', datex2Resource, stack);
 
     const getImageIntegration = defaultIntegration(getImageLambda, {
         xml: true,
@@ -101,7 +101,7 @@ function createDatex2Resource(
     });
 
     createSubscription(getImageLambda, imageFunctionName, props.logsDestinationArn, stack);
-    addTagsAndSummary('GetImage', BETA_TAGS, 'Generate svg-image from given text', imageResource, stack);
+    addTagsAndSummary('GetImage', DATA_V1_TAGS, 'Generate svg-image from given text', imageResource, stack);
     addQueryParameterDescription('text', 'formatted [text] from variable sign textrows, without the brackets', imageResource, stack);
 
     return getDatex2Lambda;

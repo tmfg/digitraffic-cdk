@@ -58,3 +58,4 @@ bin
 # flyway config for test, prod
 **/test/flyway.conf
 **/prod/flyway.conf
+.idea

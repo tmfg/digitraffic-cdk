@@ -39,7 +39,7 @@ export class Symbol {
     }
 
     getSvg(): string {
-        return `<symbol id="${this.name}" width="${this.width}" height="32">\n${this.svg}\n</symbol>`;
+        return `<symbol id="${this.name}" width="${this.width}" height="32" viewBox="0 0 ${this.width} 32">\n${this.svg}\n</symbol>`;
     }
 }
 
