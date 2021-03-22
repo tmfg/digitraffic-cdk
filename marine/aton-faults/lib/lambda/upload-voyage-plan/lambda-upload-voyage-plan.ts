@@ -3,7 +3,6 @@ import * as xml2js from 'xml2js';
 import {RtzVoyagePlan} from "../../model/voyageplan";
 import {findFaultIdsForVoyagePlan} from "../../service/faults";
 import {SNS} from "aws-sdk";
-import {ackReceivedVoyagePlan} from "../../api/vis-api";
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 import {BAD_REQUEST_MESSAGE} from "../../../../../common/api/errors";
 
@@ -22,11 +21,6 @@ export interface UploadVoyagePlanEvent {
      * The route in RTZ format
      */
     readonly voyagePlan: string
-
-    /**
-     * Endpoint URL for ACK of received voyage plan
-     */
-    readonly deliveryAckEndPoint?: string
 }
 
 export const KEY_SECRET_ID = 'SECRET_ID';
@@ -37,7 +31,6 @@ const sendFaultSnsTopicArn = process.env[KEY_SEND_FAULT_SNS_TOPIC_ARN] as string
 
 export function handlerFn(
     sns: SNS,
-    ackFn: (url: string) => Promise<void>,
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any
 ): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function(event: UploadVoyagePlanEvent): Promise<void> {
@@ -46,13 +39,10 @@ export function handlerFn(
             try {
                 const parseXml = util.promisify(xml2js.parseString);
                 voyagePlan = (await parseXml(event.voyagePlan)) as RtzVoyagePlan;
+                console.log('got the plan now lets go')
             } catch (error) {
                 console.error('UploadVoyagePlan XML parsing failed', error);
                 return Promise.reject(BAD_REQUEST_MESSAGE);
-            }
-
-            if (event.deliveryAckEndPoint) {
-                await ackFn(event.deliveryAckEndPoint);
             }
 
             // no need to send faults
@@ -61,7 +51,9 @@ export function handlerFn(
             }
 
             const faultIds = await findFaultIdsForVoyagePlan(voyagePlan);
+            console.log('got some faultsids',faultIds)
             for (const faultId of faultIds) {
+                console.log('gonna post one')
                 await sns.publish({
                     Message: JSON.stringify({
                         faultId,
@@ -75,4 +67,4 @@ export function handlerFn(
     };
 }
 
-export const handler = handlerFn(new SNS(), ackReceivedVoyagePlan, withDbSecret);
+export const handler = handlerFn(new SNS(), withDbSecret);

@@ -35,7 +35,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         };
         const [sns, snsPublishStub] = makeSnsPublishStub();
 
-        await handlerFn(sns, async () => {}, secretFn)(uploadEvent);
+        await handlerFn(sns, secretFn)(uploadEvent);
 
         expect(snsPublishStub.calledTwice).toBe(true);
     });
@@ -47,47 +47,19 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         };
         const [sns, snsPublishStub] = makeSnsPublishStub();
 
-        await handlerFn(sns, async () => {}, secretFn)(uploadEvent);
+        await handlerFn(sns, secretFn)(uploadEvent);
 
         expect(snsPublishStub.notCalled).toBe(true);
     });
 
-    test('ack on received voyage plan', async () => {
-        await insertFault(db);
+    test('failed route parsing', async () => {
         const uploadEvent: UploadVoyagePlanEvent = {
-            voyagePlan,
-            deliveryAckEndPoint: 'ack-endpoint'
-        };
-        const [sns] = makeSnsPublishStub();
-        const ackStub = sandbox.stub().returns(Promise.resolve());
-
-        await handlerFn(sns, ackStub, secretFn)(uploadEvent);
-
-        expect(ackStub.calledWith(uploadEvent.deliveryAckEndPoint)).toBe(true);
-    });
-
-    test('no ack with no ack endpoint', async () => {
-        await insertFault(db);
-        const uploadEvent: UploadVoyagePlanEvent = {
-            voyagePlan
-        };
-        const [sns] = makeSnsPublishStub();
-        const ackStub = sandbox.stub().returns(Promise.resolve());
-
-        await handlerFn(sns, ackStub, secretFn)(uploadEvent);
-
-        expect(ackStub.notCalled).toBe(true);
-    });
-
-    test('no ack with failed route parsing', async () => {
-        const uploadEvent: UploadVoyagePlanEvent = {
-            deliveryAckEndPoint: 'some-endpoint',
             voyagePlan: 'asdfasdf'
         };
         const [sns] = makeSnsPublishStub();
         const ackStub = sandbox.stub().returns(Promise.resolve());
 
-        await expect(handlerFn(sns, ackStub, secretFn)(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
+        await expect(handlerFn(sns, secretFn)(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
 
         expect(ackStub.notCalled).toBe(true);
     });
@@ -124,11 +96,11 @@ const voyagePlan = `
             <leg />
         </defaultWaypoint>
         <waypoint id="1" >
-            <position lat="60.474496" lon="27.029835" />
+            <position lat="60.285805" lon="27.321650" />
             <leg />
         </waypoint>
         <waypoint id="2" >
-            <position lat="60.400138" lon="27.224842" />
+            <position lat="60.285815" lon="27.321660" />
             <leg />
         </waypoint>
     </waypoints>

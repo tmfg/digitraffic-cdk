@@ -55,7 +55,9 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const fault = newFault();
         await insert(db, [fault]);
 
-        await expect(getFaultById(db, fault.id + 1)).rejects.toThrow();
+        const foundFault = await getFaultById(db, fault.id + 1);
+
+        await expect(foundFault).toBeNull()
     });
 
 }));

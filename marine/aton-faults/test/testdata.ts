@@ -12,7 +12,7 @@ export function newFault(props?: {
          entry_timestamp: new Date(),
          fixed_timestamp: new Date(),
          domain: 'C_NA',
-         state: 'Kirjattu',
+         state: 'Avoin',
          type: 'Rikkoutunut',
          fixed: false,
          aton_id: someNumber(),
