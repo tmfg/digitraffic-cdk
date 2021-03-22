@@ -6,7 +6,7 @@ import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 
-export class AtonFaultsCdkStack extends Stack {
+export class AtonFaultsStack extends Stack {
     constructor(scope: Construct, id: string, atonFaultsProps: AtonProps, props?: StackProps) {
         super(scope, id, props);
 

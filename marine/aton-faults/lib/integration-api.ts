@@ -28,10 +28,10 @@ export function create(
         'ATON Faults integration API');
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
-    createUploadAreaHandler(messageResponseModel, secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
+    createUploadVoyagePlanHandler(messageResponseModel, secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
 }
 
-function createUploadAreaHandler(
+function createUploadVoyagePlanHandler(
     messageResponseModel: Model,
     secret: ISecret,
     sendFaultTopic: Topic,
@@ -42,7 +42,7 @@ function createUploadAreaHandler(
     props: AtonProps) {
     const handler = createHandler(sendFaultTopic, stack, vpc, lambdaDbSg, props);
     secret.grantRead(handler);
-    const resource = integrationApi.root.addResource("upload-area")
+    const resource = integrationApi.root.addResource("upload-voyage-plan")
     createIntegrationResource(messageResponseModel, resource, handler);
     sendFaultTopic.grantPublish(handler);
 }
