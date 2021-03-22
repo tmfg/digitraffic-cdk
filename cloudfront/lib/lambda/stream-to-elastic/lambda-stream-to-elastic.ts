@@ -6,8 +6,11 @@ const AWS = AWSx as any;
 
 const zlib = require('zlib');
 
-const elasticDomain = process.env.ELASTIC_DOMAIN as string;
 const appDomain = process.env.APP_DOMAIN as string;
+const application = appDomain.split('-')[0];
+const env = appDomain.split('-')[1];
+
+const elasticDomain = process.env.ELASTIC_DOMAIN as string;
 const endpoint = new AWS.Endpoint(elasticDomain);
 const creds = new AWS.EnvironmentCredentials("AWS")
 
@@ -25,46 +28,56 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
     const responseStatus = fields[3];
     const responseBytes = fields[4];
     const requestMethod = fields[5];
-    const scheme = fields[6];
-    const request = fields[7];
+    const requestProtocol = fields[6];
+    const requestUri = fields[7];
     const edgeLocation = fields[8];
-    const serverName = fields[9];
-    const timeTaken = fields[10];
-    const httpVersion = fields[11];
-    const userAgent = unescape(fields[12]);
-    const referrer = fields[13];
-    const forwardedFor = fields[14];
-    const resultType = fields[15];
+    const timeTaken = fields[9];
+    const httpVersion = fields[10];
+    const userAgent = fields[11];
+    const referrer = fields[12];
+    const forwardedFor = fields[13];
+    const resultType = fields[14];
+    const acceptEncoding = fields[15];
+    const headers = fields[16];
 
-    const digitrafficUser = findHeaderValue('digitraffic-user', fields[16]);
-    const host = findHeaderValue('host', fields[16]);
-
-//    console.log("header %s serverName %s", host, serverName);
+    const digitrafficUser = findHeaderValue('digitraffic-user', headers);
+    const host = findHeaderValue('host', headers);
+    const xForwardedProto = findHeaderValue('X-Forwarded-Proto', headers);
 
     return {
         '@timestamp': timestamp,
-        remote_addr: ip,
-        body_bytes_sent: +responseBytes,
-        http_referrer: referrer,
-        http_user_agent: userAgent,
-        request_method: requestMethod,
-        request_time: +timeTaken,
-        request_uri: request,
-        request_host: host,
-        scheme: scheme,
-        server_protocol: httpVersion,
-        status: +responseStatus,
-        upstream_cache_status: resultType,
-        edge_location: edgeLocation,
-        forwarded_for: forwardedFor,
-        upstream_response_time: +timeToFirstByte,
-        http_digitraffic_user: digitrafficUser
+        '@edge_location': edgeLocation,
+        '@transport_type': application,
+        '@app': `${application}-cloudfront`,
+        '@env': env,
+        '@fields': {
+            remote_addr: ip,
+            body_bytes_sent: +responseBytes,
+            http_referrer: referrer,
+            http_user_agent: unescape(userAgent),
+            request_method: requestMethod,
+            request_time: +timeTaken,
+            request_uri: requestUri,
+            request_host: host,
+            scheme: requestProtocol,
+            server_protocol: httpVersion,
+            status: +responseStatus,
+            upstream_cache_status: resultType,
+            http_x_forwarded_for: forwardedFor,
+            upstream_response_time: +timeToFirstByte,
+            http_digitraffic_user: digitrafficUser,
+            accept_encoding: acceptEncoding,
+            http_x_forwarded_proto: xForwardedProto
+        }
     };
 }
 
 async function transformRecord(record: KinesisStreamRecord): Promise<any> {
     const buffer = Buffer.from(record.kinesis.data, 'base64');
     const cloudfrontRealtimeLogData: string = buffer.toString('utf8');
+
+//    console.log('line: ' + cloudfrontRealtimeLogData);
+
     const logLineData = cloudfrontRealtimeLogData.trim().split('\t');
 
     return await convertFieldNamesAndFormats(logLineData);
@@ -75,12 +88,14 @@ function createIndexName(): string {
     const year = now.getFullYear();
     const month = String(now.getMonth() + 1).padStart(2, '0');
 
-    return `${appDomain}-cf-${year}.${month}`;
+    return `dt-nginx-${year}.${month}`;
 }
 
 export const handler = async (event: KinesisStreamEvent, context: Context, callback: any) => {
     try {
-        const action = { index: { _index: createIndexName(), _type: 'doc' } } as any;
+        const action = { index: { _index: createIndexName(), _type: '_doc' } } as any;
+
+//        console.log('using action ' + JSON.stringify(action));
 
         const recordTransformPromises = event.Records.map(
             async (record: KinesisStreamRecord) => await transformRecord(record));
@@ -99,6 +114,10 @@ export const handler = async (event: KinesisStreamEvent, context: Context, callb
 
 function createBulkMessage(action: any, lines: any[]): string {
     let message = "";
+
+//    if(lines.length > 0) {
+//        console.log("first line " + JSON.stringify(lines[0]));
+//    }
 
     lines.forEach(line => {
         message+= JSON.stringify(action) + '\n';

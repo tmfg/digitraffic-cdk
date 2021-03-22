@@ -63,7 +63,7 @@ export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Rol
     return new Function(stack, `${env}-lambda-forward`, {
         runtime: Runtime.NODEJS_12_X,
         role: lambdaRole,
-        memorySize: 1024,
+        memorySize: 512,
         timeout: Duration.seconds(60),
         code: new AssetCode('dist/lambda', { exclude: ["lambda-creator.js", "lambda-gzip-requirement.js", "lambda-redirect.js"] }),
         handler: 'lambda-elastic.handler',
