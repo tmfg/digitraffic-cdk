@@ -1,3 +1,5 @@
+import {Fault, FaultState} from "../lib/model/fault";
+
 const { v4: uuidv4 } = require('uuid');
 
 export function someNumber() {
@@ -5,14 +7,15 @@ export function someNumber() {
 }
 
 export function newFault(props?: {
-     geometry?: {lat: number, lon: number}
+     geometry?: {lat: number, lon: number},
+     state?: FaultState
 }): Fault {
     return {
          id: someNumber(),
          entry_timestamp: new Date(),
          fixed_timestamp: new Date(),
          domain: 'C_NA',
-         state: 'Avoin',
+         state: props?.state ?? FaultState.Avoin,
          type: 'Rikkoutunut',
          fixed: false,
          aton_id: someNumber(),

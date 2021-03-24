@@ -1,9 +1,9 @@
-interface Fault {
+export interface Fault {
     readonly id: number
     readonly entry_timestamp: Date
     readonly fixed_timestamp?: Date
     readonly domain: string
-    readonly state: string
+    readonly state: FaultState
     readonly type: string
     readonly fixed: boolean
     readonly aton_id: number
@@ -15,4 +15,12 @@ interface Fault {
     readonly fairway_name_se: number
     readonly area_number: number
     readonly geometry: any
+}
+
+export enum FaultState {
+    Avoin = 'Avoin',
+    Kirjattu = 'Kirjattu',
+    Peruttu = 'Peruttu',
+    Korjattu = 'Korjattu',
+    Aiheeton = 'Aiheeton'
 }

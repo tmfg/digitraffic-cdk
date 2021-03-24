@@ -39,7 +39,6 @@ export function handlerFn(
             try {
                 const parseXml = util.promisify(xml2js.parseString);
                 voyagePlan = (await parseXml(event.voyagePlan)) as RtzVoyagePlan;
-                console.log('got the plan now lets go')
             } catch (error) {
                 console.error('UploadVoyagePlan XML parsing failed', error);
                 return Promise.reject(BAD_REQUEST_MESSAGE);
@@ -51,9 +50,7 @@ export function handlerFn(
             }
 
             const faultIds = await findFaultIdsForVoyagePlan(voyagePlan);
-            console.log('got some faultsids',faultIds)
             for (const faultId of faultIds) {
-                console.log('gonna post one')
                 await sns.publish({
                     Message: JSON.stringify({
                         faultId,

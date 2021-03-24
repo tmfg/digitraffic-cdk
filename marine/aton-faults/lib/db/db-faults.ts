@@ -39,6 +39,7 @@ const GET_FAULT_BY_ID = `
     from aton_fault, area, aton_fault_type, aton_fault_state, aton_type
     where
         id = $1
+        and state IN ('Avoin', 'Kirjattu')
         and aton_fault.area_number = area.area_number
         and aton_fault.state = aton_fault_state.name_fi
         and aton_fault.type = aton_fault_type.name_fi
@@ -55,7 +56,7 @@ const FAULT_IDS_BY_AREA =
      and aton_fault.area_number = area.area_number
      and aton_fault.type = aton_fault_type.name_fi
      and aton_fault.aton_type_fi = aton_type.name_fi
-     and state = 'Avoin'
+     and state IN ('Avoin', 'Kirjattu')
      and st_intersects(
          st_setsrid(geometry, 4326),
          st_transform(
