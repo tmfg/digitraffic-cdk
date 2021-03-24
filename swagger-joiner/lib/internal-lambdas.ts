@@ -14,7 +14,8 @@ import {
     KEY_DIRECTORY,
     KEY_HOST,
     KEY_TITLE,
-    KEY_DESCRIPTION
+    KEY_DESCRIPTION,
+    KEY_REMOVESECURITY
 } from "./lambda/update-swagger/lambda-update-swagger";
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
@@ -85,6 +86,9 @@ function createUpdateSwaggerDescriptionsLambda(
     }
     if (props.description) {
         lambdaEnv[KEY_DESCRIPTION] = props.description;
+    }
+    if (props.removeSecurity) {
+        lambdaEnv[KEY_REMOVESECURITY] = 'true';
     }
 
     const lambdaConf: FunctionProps = {

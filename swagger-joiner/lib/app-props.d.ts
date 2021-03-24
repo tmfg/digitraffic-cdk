@@ -23,4 +23,6 @@ export interface Props {
     readonly title?: string
     // Swagger page description
     readonly description?: string
+    // Remove security (e.g. API key) from imported Swagger descriptioin
+    readonly removeSecurity?: boolean
 }

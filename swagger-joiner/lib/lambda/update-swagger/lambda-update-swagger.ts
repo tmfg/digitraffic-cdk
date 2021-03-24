@@ -13,6 +13,7 @@ export const KEY_DIRECTORY = 'DIRECTORY';
 export const KEY_HOST = 'HOST';
 export const KEY_TITLE = 'TITLE';
 export const KEY_DESCRIPTION = 'DESCRIPTION';
+export const KEY_REMOVESECURITY = 'REMOVESECURITY';
 
 const apiRequestHeaders: AxiosRequestConfig = {
   headers: {
@@ -29,6 +30,7 @@ export const handler = async (): Promise<any> => {
     const host = process.env[KEY_HOST] as string | undefined;
     const title = process.env[KEY_TITLE] as string | undefined;
     const description = process.env[KEY_DESCRIPTION] as string | undefined;
+    const removeSecurity = process.env[KEY_REMOVESECURITY] as string | undefined;
 
     AWSConfig.update({region: process.env[KEY_REGION] as string});
 
@@ -43,26 +45,29 @@ export const handler = async (): Promise<any> => {
 
     const merged = mergeApiDescriptions(allApis);
 
-    // @ts-ignore
     delete merged.schemes; // always https
-    // @ts-ignore
     delete merged['x-amazon-apigateway-policy']; // implementation details
 
     if (host) {
-        // @ts-ignore
         merged['host'] = host;
-        // @ts-ignore
         delete merged.basePath;
     }
 
     if (title) {
-        // @ts-ignore
         merged.info.title = title;
     }
 
     if (description) {
-        // @ts-ignore
         merged.info.description = description;
+    }
+
+    if (removeSecurity === 'true') {
+        delete merged.securityDefinitions;
+        for (const path in merged.paths) {
+            for (const method in merged.paths[path]) {
+                delete merged.paths[path][method].security;
+            }
+        }
     }
 
     const swaggerFilename = 'dt-swagger.js';
