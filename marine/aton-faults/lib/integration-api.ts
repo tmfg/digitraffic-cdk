@@ -14,7 +14,6 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "../../../common/api/mediatypes";
 import {MessageModel} from "../../../common/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
-import {BETA_TAGS} from "../../../common/api/tags";
 
 export function create(
     secret: ISecret,
@@ -59,7 +58,7 @@ function createIntegrationResource(
     const integration = defaultIntegration(handler, {
         disableCors: true,
         requestParameters: {
-            'integration.request.querystring.callbackEndpoint': 'method.request.querystring.callbackEndpoint',
+            'integration.request.querystring.callbackEndpoint': 'method.request.querystring.callbackEndpoint'
         },
         requestTemplates: {
             // transformation from XML to JSON in API Gateway
@@ -81,11 +80,15 @@ function createIntegrationResource(
             methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel)
         ]
     });
-    addQueryParameterDescription('callbackEndpoint', 'URL endpoint where S-124 ATON faults are sent', resource, stack);
+    addQueryParameterDescription(
+        'callbackEndpoint',
+        'URL endpoint where S-124 ATON faults are sent',
+        resource,
+        stack);
     addTagsAndSummary(
         'ATON Faults',
         ['API'],
-        'Upload voyage plan in RTZ format. Active ATON faults relevant to the voyage plan are sent back in S-124 format if the query parameter callbackEndpoint is supplied.',
+        'Upload voyage plan in RTZ format in HTTP POST body. Active ATON faults relevant to the voyage plan are sent back in S-124 format if the query parameter callbackEndpoint is supplied.',
         resource,
         stack);
 }
