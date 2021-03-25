@@ -7,6 +7,9 @@ import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "../model/voyageplan";
 import {findFaultIdsByRoute} from "../db/db-faults";
 import moment from 'moment-timezone';
+import {Feature, GeoJsonProperties} from "geojson";
+import {createFeatureCollection} from "../../../../common/api/geojson";
+import {Language} from "../../../../common/model/language";
 
 const ATON_DATA_TYPE = "ATON_FAULTS";
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
@@ -18,6 +21,15 @@ const PRODUCTION_AGENCY = {
 };
 
 const NAME_OF_SERIES = 'Finnish ATON Faults';
+
+export async function findAllFaults(language: Language, fixedInHours: number): Promise<any> {
+    return await inDatabase(async (db: IDatabase<any,any>) => {
+        const features = await FaultsDB.streamAllForJson(db, language, fixedInHours, convertFeature);
+        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
+
+        return createFeatureCollection(features, lastUpdated);
+    });
+}
 
 export async function getFaultS124ById(faultId: number): Promise<string> {
     const start = Date.now();
@@ -61,6 +73,36 @@ export async function saveFaults(domain: string, newFaults: any[]) {
         const end = Date.now();
         console.info("method=saveFaults receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, a.length - 1, (end - start));
     })
+}
+
+function convertFeature(fault: any) {
+    const properties = <GeoJsonProperties>{
+        id: fault.id,
+        entry_timestamp: fault.entry_timestamp,
+        fixed_timestamp: fault.fixed_timestamp,
+        type: fault.aton_fault_type,
+        domain: fault.domain,
+        state: fault.state,
+        fixed: fault.fixed,
+        aton_id: fault.aton_id,
+        aton_name_fi: fault.aton_name_fi,
+        aton_name_se: fault.aton_name_se,
+        aton_type: fault.aton_type,
+        fairway_number: fault.fairway_number,
+        fairway_name_fi: fault.fairway_name_fi,
+        fairway_name_se: fault.fairway_name_se,
+        area_number: fault.area_number,
+        area_description: fault.area_description
+    };
+
+    // convert geometry from db to geojson
+    const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex")).toGeoJSON();
+
+    return <Feature>{
+        type: "Feature",
+        properties: properties,
+        geometry: geometry
+    };
 }
 
 function createXml(fault: any) {

@@ -1,5 +1,6 @@
 import {IDatabase, ITask} from "pg-promise";
 import {initDbConnection} from "../../../common/postgres/database";
+import {Fault} from "../lib/model/fault";
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
     return async () => {
