@@ -7,7 +7,6 @@ export async function uploadArea(
     ca: string,
     clientCertificate: string,
     privateKey: string): Promise<void> {
-
     console.info(`method=uploadArea url=${url}`);
 
     // try-catch so axios won't log keys/certs

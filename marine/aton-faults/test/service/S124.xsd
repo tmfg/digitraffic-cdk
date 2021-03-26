@@ -1,5 +1,50 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:S100="http://www.iho.int/s100gml/1.0" xmlns:s100_profile="http://www.iho.int/S-100/profile/s100_gmlProfile" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns="http://www.iho.int/S124/gml/1.0" targetNamespace="http://www.iho.int/S124/gml/1.0" elementFormDefault="unqualified" version="0.5.0">
+<?xml version="1.0" encoding="utf-8"?>
+<!-- changelog
+
+Version: 0.0.7
+Revision date: 2017-05-04
+ - Attribute GeneralArea has been assigned type as directory
+ - Attribute extReferenceId has been added in the S124_FeatureType
+ - attribute "inForceDate" was renamed in "cancellationTime" in the References Information Type.
+ - Directory "countryType" has been extended by addition countries codes
+ - New attribute S124_affectedChart has been added
+
+Version: 0.0.7
+Revision date: 2017-04-12
+ - All reserved attributes for T&P NoticesToMariners have been removed. Remained Types and Attributes are related to the Navigational warning's content only.
+ - Element's content has been simplified. Redudant elements (types) like AbstractWarningPart, S124_PortWarningPart have been deleted
+
+Version: 0.0.6
+Revision date: 2017-03-23
+ - The references between The References and Information Notice Part, between the References and Navigational Warning Part were removed. 
+ These Parts of Nav Warning may reference on the header of the Nav Warning as NW Preamble
+
+Version: 0.0.5
+Revision date: 2017-02-13
+ - new attribute "inForceDate" was added in the References Information Type. This date-time is neeeded to define validity of message (in-force in bulletin)
+ - new value "in-force" was added in the ReferenceType 
+
+Version: 0.0.4
+Revision date: 2017-02-09
+ - type MRN was replaced in the parent elements: S124_FeatureType, S124_InformationType
+
+Version: 0.0.3
+Revision date: 2017-01-25
+ - For atribute SourceDate minOccurs was changed on "0" instead of "1"
+ - Atribute name was renamed from “navOrMetArea” in “NameOfSeries” 
+ - Atribute name was renamed from “keySubject” in “Subject”
+ - For atribute information in AbstractWarningPart minOccurs was changed on "0" instead of "1"
+ - For atribute FixedDateRange in AbstractWarningPart maxOccurs was changed on "unbounded" instead of "1"
+
+Version: 0.0.2
+Revision date: 2017-01-16
+ - Updated order for S124_NWPreamble for general category and title 
+ - Updated order for S124_AbstractWarningPart
+ - Added type MRN. Added MRN based identifiers for S124-messages
+ - Added "S124_" at the beginning of names NWPreample, AbstractWarningPart, InformationNoticePart, References, NavigationalWarningPart, PortWarningPart, InformationType, FeatureType
+ - Added attribute AreaAffected (The area affected by the warning. The geometric primitive must be a surface bounded by a polygon or circle by center point and radius as defined in S-100 Part 7.)
+ -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:S100="http://www.iho.int/s100gml/1.0" xmlns:s100_profile="http://www.iho.int/S-100/profile/s100_gmlProfile" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns="http://www.iho.int/S124/gml/1.0" targetNamespace="http://www.iho.int/S124/gml/1.0" elementFormDefault="unqualified" version="0.0.7">
 	<!-- ============================================================================================= -->
 	<!-- S100 XML/GML Schema for S-124 (Navigational Warnings).                                       -->
 	<!-- ============================================================================================= -->
@@ -11,47 +56,6 @@
 	<xs:import namespace="http://www.iho.int/s100gml/1.0" schemaLocation="s100gmlbase.xsd"/>
 	<xs:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="./S100_gmlProfile.xsd"/>
 	<xs:import namespace="http://www.iho.int/S-100/profile/s100_gmlProfile" schemaLocation="S100_gmlProfileLevels.xsd"/>
-
-	<!-- =============================================== -->
-	<!-- common types - consider defining a common -->
-	<!-- =============================================== -->
-	<xs:complexType name="S100_TruncatedDate">
-		<xs:annotation>
-			<xs:documentation>built in date types from W3C XML schema, implementing S-100 truncated date</xs:documentation>
-		</xs:annotation>
-		<xs:choice>
-			<xs:element name="gDay" type="xs:gDay"/>
-			<xs:element name="gMonth" type="xs:gMonth"/>
-			<xs:element name="gYear" type="xs:gYear"/>
-			<xs:element name="gMonthDay" type="xs:gMonthDay"/>
-			<xs:element name="gYearMonth" type="xs:gYearMonth"/>
-			<xs:element name="date" type="xs:date"/>
-		</xs:choice>
-	</xs:complexType>
-	<xs:simpleType name="ISO639-3">
-		<xs:annotation>
-			<xs:documentation>stub for ISO 639-3 language codes</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:pattern value="\w{3}"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="ISO639-2">
-		<xs:annotation>
-			<xs:documentation>stub for ISO 639-2 language codes</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:pattern value="\w{3}"/>
-		</xs:restriction>
-	</xs:simpleType>
-	<xs:simpleType name="ISO3166-alpha2">
-		<xs:annotation>
-			<xs:documentation>stub for ISO 3166 alpha2 country codes</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:pattern value="\w{2}"/>
-		</xs:restriction>
-	</xs:simpleType>
 
 	<!-- =============================================== -->
 	<!-- spatial property convenience types    -->
@@ -77,8 +81,8 @@
 	</xs:complexType>
 	<xs:complexType name="PointOrCurve">
 		<xs:choice>
+			<xs:element ref="S100:pointProperty"/>
 			<xs:element ref="S100:curveProperty"/>
-			<xs:element ref="S100:surfaceProperty"/>
 		</xs:choice>
 	</xs:complexType>
 	<xs:complexType name="GM_Point">
@@ -98,315 +102,118 @@
 	</xs:complexType>
 
 	<!-- ============================================================ -->
-	<!-- temporary type definitions pending model revisions by TSMAD  -->
-	<!-- ============================================================ -->
-	<xs:complexType name="informationType_s101">
-		<xs:annotation>
-			<xs:appinfo>?</xs:appinfo>
-			<xs:documentation>Textual information about an object and the language in which it is written</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="text" type="xs:string">
-				<xs:annotation>
-					<xs:appinfo/>
-					<xs:documentation/>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="language" type="ISO639-3" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation/>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-	<xs:complexType name="textualDescriptionType_s101">
-		<xs:annotation>
-			<xs:appinfo>?</xs:appinfo>
-			<xs:documentation/>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="fileReference" type="xs:string">
-				<xs:annotation>
-					<xs:appinfo/>
-					<xs:documentation>The name of a text file where more information can be found and the language in which it is written</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="language" type="ISO639-3" minOccurs="0">
-				<xs:annotation>
-					<xs:documentation/>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-
-	<!-- ============================================================ -->
 	<!-- complex attributes, feature, and information types           -->
 	<!-- ============================================================ -->
 
-	<xs:complexType name="graphicType">
-		<xs:sequence>
-			<xs:element name="pictorialRepresentation" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="pictureCaption" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Short description of the purpose of the image.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="sourceDate" type="xs:date" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="pictureInformation" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>A set of information to provide credits to picture creator, copyright owner etc.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<!--<xs:element name="bearingInformation" type="bearingInformationType" minOccurs="0" maxOccurs="1"/>-->
-		</xs:sequence>
-	</xs:complexType>
-	
-	<xs:complexType name="S124_LocalizedTextType">
-		<xs:sequence>
-			<xs:element name="language" type="ISO639-3" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="text" type="xs:string" minOccurs="1" maxOccurs="1"/>
-		</xs:sequence>
-	</xs:complexType>
-	
-
-	<!--<xs:complexType name="AbstractInformationNotice" abstract="true">
-		<xs:annotation>
-			<xs:documentation> xxx </xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="InformationTypeType">
-				<xs:sequence>
-					<xs:element name="sourceDate" type="xs:date" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="generalArea" type="xs:string" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="locality" type="xs:string" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="keySubject" type="xs:string" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="graphic" type="graphicType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="noticeIdentifier" type="noticeIdentifierType" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="information" type="informationType" minOccurs="1" maxOccurs="unbounded"/>
-					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="periodicDateRange" type="periodicDateRangeType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="theInformationNotice" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>-->
-
-	<xs:element name="FeatureType" type="FeatureTypeType" abstract="true" substitutionGroup="gml:AbstractFeature"/>
-	<xs:complexType name="FeatureTypeType" abstract="true">
+<xs:element name="S124_FeatureType" type="S124_FeatureTypeType" abstract="true" substitutionGroup="gml:AbstractFeature"/>
+	<xs:complexType name="S124_FeatureTypeType" abstract="true">
 		<xs:annotation>
 			<xs:documentation>Generalized feature type which carry all the common attributes</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="S100:AbstractFeatureType">
 				<xs:sequence>
-					<!--<xs:element name="provides" type="gml:ReferenceType" minOccurs="0" maxOccurs="1"/>-->
-					<xs:element name="geometry" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="id" type="MRN" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="extReferenceId" type="MRN" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="geometry" type="PointCurveSurface" minOccurs="1" maxOccurs="unbounded"/>
+					<xs:element name="areaAffected" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="radius" type="xs:float" minOccurs="0" maxOccurs="1"/>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:element name="InformationType" type="InformationTypeType" abstract="true"/>
-	<xs:complexType name="InformationTypeType" abstract="true">
+<xs:element name="S124_NavigationalWarningPart" type="S124_NavigationalWarningPartType" substitutionGroup="S124_FeatureType"/>
+	<xs:complexType name="S124_NavigationalWarningPartType">
+		<xs:annotation>
+			<xs:documentation> xxx </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="S124_FeatureTypeType">
+				<xs:sequence>
+					<xs:element name="horizontalDatum" type="EPSGType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="Subject" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="unbounded"/> 
+					<xs:element name="header" type="gml:ReferenceType" minOccurs="1" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+<xs:element name="S124_InformationType" type="S124_InformationTypeType" abstract="true"/>
+	<xs:complexType name="S124_InformationTypeType" abstract="true">
 		<xs:annotation>
 			<xs:documentation>Generalized information type which carry all the common attributes</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="S100:AbstractInformationType">
 				<xs:sequence>
-					<!--<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="periodicDateRange" type="periodicDateRangeType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="featureName" type="featureNameType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="sourceIndication" type="sourceIndicationType" minOccurs="0" maxOccurs="1"/>-->
+					<xs:element name="id" type="MRN" minOccurs="1" maxOccurs="1"/>
 					<xs:element name="provides" type="gml:ReferenceType" minOccurs="0" maxOccurs="1"/>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:element name="AbstractWarningPart" type="AbstractWarningPartType" substitutionGroup="FeatureType"/>
-	<xs:complexType name="AbstractWarningPartType">
-		<xs:annotation>
-			<xs:documentation> </xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="FeatureTypeType">
-				<xs:sequence>
-					<xs:element name="restriction" type="restrictionType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="horizontalDatum" type="EPSGType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="listOfLightNumber" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="keySubject" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="graphic" type="graphicType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="information" type="informationType" minOccurs="1" maxOccurs="unbounded"/>
-					<xs:element name="ENCFeatureReference" type="S124_ENCFeatureReferenceType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="scheduleByDoW" type="scheduleByDoWType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="theReferences" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="referenceUVID" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="header" type="gml:ReferenceType" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="geometry" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:element name="NavigationalWarningPart" type="NavigationalWarningPartType" substitutionGroup="AbstractWarningPart"/>
-	<xs:complexType name="NavigationalWarningPartType">
+<xs:element name="S124_NWPreamble" type="S124_NWPreambleType" substitutionGroup="S124_InformationType"/>
+	<xs:complexType name="S124_NWPreambleType">
 		<xs:annotation>
 			<xs:documentation> xxx </xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
-			<xs:extension base="AbstractWarningPartType">
-				<xs:sequence>
-				<!--<xs:element name="geometry" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>-->
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:element name="PortWarningPart" type="PortWarningPartType" substitutionGroup="NavigationalWarningPart"/>
-	<xs:complexType name="PortWarningPartType">
-		<xs:annotation>
-			<xs:documentation> xxx </xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="NavigationalWarningPartType">
-				<xs:sequence>
-					<xs:element name="berthName" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded"/>
-					<!--<xs:element name="geometry" type="PointCurveSurface" minOccurs="0" maxOccurs="unbounded"/>-->
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:element name="References" type="ReferencesType" substitutionGroup="InformationType"/>
-	<xs:complexType name="ReferencesType">
-		<xs:annotation>
-			<xs:documentation> xxx </xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="InformationTypeType">
-				<xs:sequence>
-					<xs:element name="referenceType" type="S124_referenceTypeType" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="messageReference" type="S124_messageSeriesIdentifierType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="sourceIndication" type="sourceIndicationType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="theWarning" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-
-	<xs:element name="InformationNoticePart" type="InformationNoticePartType" substitutionGroup="InformationType"/>
-	<xs:complexType name="InformationNoticePartType">
-		<xs:annotation>
-			<xs:documentation> xxx </xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="InformationTypeType">
-				<xs:sequence>
-					<xs:element name="keySubject" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="information" type="informationType" minOccurs="1" maxOccurs="unbounded"/>
-					<xs:element name="graphic" type="graphicType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="scheduleByDoW" type="scheduleByDoWType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="header" type="gml:ReferenceType" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="theReferences" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
-				</xs:sequence>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>
-	
-	<xs:element name="NWPreamble" type="NWPreambleType" substitutionGroup="InformationType"/>
-	<xs:complexType name="NWPreambleType">
-		<xs:annotation>
-			<xs:documentation> xxx </xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="InformationTypeType">
+			<xs:extension base="S124_InformationTypeType">
 				<xs:sequence>
 					<xs:element name="messageSeriesIdentifier" type="S124_messageSeriesIdentifierType" minOccurs="1" maxOccurs="1"/>
-					<xs:element name="generalArea" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="locality" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="title" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="affectedCharts" type="S124_affectedChartType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="1"/>
-					<xs:element name="periodicDateRange" type="periodicDateRangeType" minOccurs="0" maxOccurs="unbounded"/>
-					<xs:element name="sourceDate" type="xs:date" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="sourceDate" type="xs:date" minOccurs="0" maxOccurs="1"/>
 					<xs:element name="generalCategory" type="generalCategoryType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="generalArea" type="generalAreaType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="locality" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="title" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="1"/>
+					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="affectedCharts" type="S124_affectedChartType" minOccurs="0" maxOccurs="unbounded"/>
 					<xs:element name="theWarningPart" type="gml:ReferenceType" minOccurs="0" maxOccurs="unbounded"/>
 				</xs:sequence>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
 
-	<xs:simpleType name="dayOfWeekType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="monday">
-				<xs:annotation>
-					<xs:documentation>monday
-the day of the week before Tuesday and following Sunday </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="tuesday">
-				<xs:annotation>
-					<xs:documentation>the day of the week before Wednesday and following Monday </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="wednesday">
-				<xs:annotation>
-					<xs:documentation>wednesday
-the day of the week before Thursday and following Tuesday </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="thursday">
-				<xs:annotation>
-					<xs:documentation>thursday
-the day of the week before Friday and following Wednesday </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="friday">
-				<xs:annotation>
-					<xs:documentation>friday
-the day of the week before Saturday and following Thursday </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="saturday">
-				<xs:annotation>
-					<xs:documentation>saturday
-the day of the week before Sunday and following Friday (together with Sunday forming part of the weekend) </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="sunday">
-				<xs:annotation>
-					<xs:documentation>sunday
-the day of the week before Monday and following Saturday (together with Saturday forms part of the weekend) </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:complexType name="featureNameType">
+<xs:element name="S124_InformationNoticePart" type="S124_InformationNoticePartType" substitutionGroup="S124_InformationType"/>
+	<xs:complexType name="S124_InformationNoticePartType">
 		<xs:annotation>
 			<xs:documentation> xxx </xs:documentation>
 		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="S124_InformationTypeType">
+				<xs:sequence>
+					<xs:element name="Subject" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="fixedDateRange" type="fixedDateRangeType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="header" type="gml:ReferenceType" minOccurs="1" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+</xs:complexType>
+
+<xs:element name="S124_References" type="S124_ReferencesType" substitutionGroup="S124_InformationType"/>
+	<xs:complexType name="S124_ReferencesType">
+		<xs:annotation>
+			<xs:documentation> xxx </xs:documentation>
+		</xs:annotation>
+		<xs:complexContent>
+			<xs:extension base="S124_InformationTypeType">
+				<xs:sequence>
+					<xs:element name="referenceType" type="S124_referenceTypeType" minOccurs="1" maxOccurs="1"/>
+					<xs:element name="messageReference" type="S124_messageSeriesIdentifierType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="cancellationTime" type="cancellationTimeType" minOccurs="0" maxOccurs="unbounded"/>
+					<xs:element name="header" type="gml:ReferenceType" minOccurs="1" maxOccurs="1"/>
+				</xs:sequence>
+			</xs:extension>
+		</xs:complexContent>
+	</xs:complexType>
+
+	<xs:complexType name="S124_LocalizedTextType">
 		<xs:sequence>
-			<xs:element name="displayName" type="xs:boolean" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>A statement expressing if a feature name is to be displayed in certain display settings or not.
-Indication: Boolean. A True value is an indication that the name is intended to be displayed.
-Remarks:
-Where it is allowable to encode multiple instances of feature name for a single feature instance, only one feature name instance can indicate that the name is to be displayed (display name set to True) </xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="language" type="ISO639-3" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>The language is encoded by a character code following ISO 639-3</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="name" type="xs:string" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>The individual name of a feature.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
+			<xs:element name="language" type="ISO639-3" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="text" type="xs:string" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 
@@ -417,8 +224,8 @@ Remarks: Sub-attributes date end and date start must have the calendar year enco
 (This definition merges the planned S-100 temporal model with the current S-101 DCEG definition of fixed date range.)</xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="timeStart" type="xs:time" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="timeEnd" type="xs:time" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="timeOfDayStart" type="xs:time" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="timeOfDayEnd" type="xs:time" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="dateStart" type="S100_TruncatedDate" minOccurs="0" maxOccurs="1">
 				<xs:annotation>
 					<xs:documentation>The start date or time of the interval.</xs:documentation>
@@ -432,320 +239,96 @@ Remarks: Sub-attributes date end and date start must have the calendar year enco
 		</xs:sequence>
 	</xs:complexType>
 
+	<xs:complexType name="cancellationTimeType">
+		<xs:annotation>
+			<xs:documentation>Describes a end date before that message is left in-force.
+Remarks: Sub-attributes date end must have the calendar year encoded using 4 digits for the calendar year (CCYY). Month (MM) and day (DD) are optional.
+(This definition merges the planned S-100 temporal model with the current S-101 DCEG definition of fixed date range.)</xs:documentation>
+		</xs:annotation>
+		<xs:sequence>
+			<xs:element name="timeOfDayEnd" type="xs:time" minOccurs="0" maxOccurs="1"/>
+			<xs:element name="dateEnd" type="S100_TruncatedDate" minOccurs="0" maxOccurs="1">
+				<xs:annotation>
+					<xs:documentation>The end date\time.</xs:documentation>
+				</xs:annotation>
+			</xs:element>
+		</xs:sequence>
+	</xs:complexType>
+
 	<xs:complexType name="S124_messageSeriesIdentifierType">
 		<xs:annotation>
 			<xs:documentation> xxx </xs:documentation>
 		</xs:annotation>
 		<xs:sequence>
-			<xs:element name="navOrMetArea" type="xs:string" minOccurs="1" maxOccurs="1"/>
+			<xs:element name="NameOfSeries" type="xs:string" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="typeOfWarning" type="S124_typeOfWarningType" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="warningNumber" type="xs:int" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="year" type="xs:int" minOccurs="1" maxOccurs="1"/>
 			<xs:element name="productionAgency" type="S124_LocalizedTextType" minOccurs="1" maxOccurs="unbounded"/>
-			<!--<xs:element name="mainType" type="mainTypeType" minOccurs="1" maxOccurs="1"/>-->
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="scheduleByDoWType">
-		<xs:annotation>
-			<xs:documentation>Describes the nature and timings of a daily schedule by days of the week.</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="categoryOfSchedule" type="categoryOfScheduleType" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>Describes the type of schedule, e.g., opening, closure, etc.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="tmIntervalsByDoW" type="tmIntervalsByDoWType" minOccurs="1" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="tmIntervalsByDoWType">
-		<xs:annotation>
-			<xs:documentation>Remarks:
-				The sub-attribute dayOfWeekIsRanges indicates whether an instance of this attribute encodes a range of days or discrete days. The days or day-range(s) are encoded in sub-attribute dayOfWeek. Multiple ranges are allowed but mixing range with discrete days(s) is not allowed (encode another instance of this attribute instead).
-				An indeterminate range may be indicated with a null value at the appropriate position in the sequence.
-				Examples:
-				- To code the range “Monday through Friday” use the sequence: dayOfWeek=1, dayOfWeek=5 and set dayOfWeekIsRanges=TRUE.    
-				- To encode the days Monday, Wednesday, Friday, use the sequence dayOfWeek=1, dayOfWeek=3, dayOfWeek=5 and set dayOfWeekIsRanges=FALSE.    
-				- The sequence dayOfWeek=1, dayOfWeek=3, dayOfWeek=5  to indicate Mon-Wed and Thursday is not allowed. Encode the Mon-Wed and Thursday schedules in different instances of this complex attribute.    
-				Product specifications may need to allow this attribute to be repeated in order to allow encoding of schedules which vary for different days of the week.</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="dayOfWeek" type="dayOfWeekType" minOccurs="0" maxOccurs="7">
-				<xs:annotation>
-					<xs:documentation>Encodes either range(s) of days or discrete days. </xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="dayOfWeekIsRanges" type="xs:boolean" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>Indicates whether the values in dayOfWeek indicate a range of days (true) or discrete days (false).</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="timeReference" type="timeReferenceType" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>Indicates whether the time co-attributes are encoded in UTC or local time (LT).</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="timeOfDayStart" type="xs:time" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Starting time of day, possibly for a period within the day.
-						Distinction: Time start (TIMSTA) (S-101) which has a format YYYYMMDDThhmmss (mandatory) in the baseline S-101 DCEG as of October 2015.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="timeOfDayEnd" type="xs:time" minOccurs="0" maxOccurs="unbounded">
-				<xs:annotation>
-					<xs:documentation>Ending time of day, possibly for a period within the day.
-						Distinction: Time end (TIMEND) (S-101) which has a format YYYYMMDDThhmmss (mandatory) in the baseline S-101 DCEG as of October 2015.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="periodicDateRangeType">
-		<xs:annotation>
-			<xs:documentation>This complex attribute describes the active period for a seasonal feature or information type. </xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="dateStart" type="S100_TruncatedDate" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>The start date or time of the interval.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="dateEnd" type="S100_TruncatedDate" minOccurs="1" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>The end date or time of the interval.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:complexType name="sourceIndicationType">
-		<xs:annotation>
-			<xs:documentation>Content of featureName is source authority (reference) name</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="categoryOfAuthority" type="categoryOfAuthorityType" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="country" type="xs:string" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="featureName" type="featureNameType" minOccurs="0" maxOccurs="unbounded"/>
-			<xs:element name="reportedDate" type="S100_TruncatedDate" minOccurs="0" maxOccurs="1"/>
-			<xs:element name="source" type="S124_LocalizedTextType" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>The publication, document, or reference work from which information comes or is acquired.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="sourceType" type="sourceTypeType" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>Type of source</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-		</xs:sequence>
-	</xs:complexType>
-
-	<xs:simpleType name="sourceTypeType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="international law">
-				<xs:annotation>
-					<xs:documentation>treaty, convention, or international agreement; or European Union law</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="publication issued by international organisation">
-				<xs:annotation>
-					<xs:documentation>Publication issued by an international administration</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="national law or regulation">
-				<xs:annotation>
-					<xs:documentation>legislation by a national government</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="publication issued by national administration">
-				<xs:annotation>
-					<xs:documentation>publication issued by a national administration</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="local law or regulation">
-				<xs:annotation>
-					<xs:documentation>law made by a national sub-division such as a state, province, or local government</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="publication issued by local administration">
-				<xs:annotation>
-					<xs:documentation>publication issued by a local administration, such as local government or port authority</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="mariner report, confirmed">
-				<xs:annotation>
-					<xs:documentation>Reported by mariner(s) and confirmed by another source</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="mariner report, not confirmed">
-				<xs:annotation>
-					<xs:documentation>reported by mariner(s) but not confirmed</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="industry publications and reports">
-				<xs:annotation>
-					<xs:documentation>shipping and other industry publication, including graphics, charts and web sites</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="remotely sensed images">
-				<xs:annotation>
-					<xs:documentation>information obtained from satellite images</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="photographs">
-				<xs:annotation>
-					<xs:documentation>information obtained from photographs</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="products issued by HO services">
-				<xs:annotation>
-					<xs:documentation>information obtained from products issued by Hydropgrahic Offices</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="news media">
-				<xs:annotation>
-					<xs:documentation>information obtained from news media</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="traffic data">
-				<xs:annotation>
-					<xs:documentation>information obtained from the analysis of traffic data</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="timeReferenceType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="UTC">
-				<xs:annotation>
-					<xs:documentation>Coordinated Universal Time</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="LT">
-				<xs:annotation>
-					<xs:documentation>Local time </xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="categoryOfScheduleType">
-		<xs:annotation>
-			<xs:documentation>Describes the type of schedule, e.g., opening, closure, etc.</xs:documentation>
-		</xs:annotation>
-		<xs:union>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:enumeration value="normal operation">
-						<xs:annotation>
-							<xs:documentation>The service, office, is open, fully manned, and operating normally, or the area is accessible as usual.</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-					<xs:enumeration value="closure">
-						<xs:annotation>
-							<xs:documentation>The service, office, or area is closed.</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-					<xs:enumeration value="unmanned operation">
-						<xs:annotation>
-							<xs:documentation>The service is available but not manned.</xs:documentation>
-						</xs:annotation>
-					</xs:enumeration>
-				</xs:restriction>
-			</xs:simpleType>
-			<xs:simpleType>
-				<xs:restriction base="xs:string">
-					<xs:pattern value="other: [a-zA-Z0-9]+( [a-zA-Z0-9]+)*"/>
-				</xs:restriction>
-			</xs:simpleType>
-		</xs:union>
-	</xs:simpleType>
-
-	<xs:complexType name="informationType">
-		<xs:annotation>
-			<xs:documentation>Provides textual information that cannot be provided using other allowable attributes for the feature, in a defined language. The information may be provided as a string in sub-attribute text, or by encoding the file name of a single external text file that contains the text in sub-attribute file reference.
-Remarks:
-
-	- The sub-attribute text should be used, for example, to hold the information that is shown on paper charts by cautionary and explanatory notes. No formatting of text is possible within the sub-attribute text. If formatted text is required then an associated text file referenced by the sub-attribute file reference must be used.
-	- The sub-attribute file reference is generally used for long text strings or those that require formatting, however there is no restriction on the type of text (except for lexical level) that can be held in files referenced by sub-attribute file reference.</xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="fileLocator" type="xs:string" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>The string encodes the location of a fragment of text or other information in a support file.
-Remarks:
-
-	- Application schemas must describe how the associated file is identified. The associated file will commonly be named in a file reference co-attribute of the same complex attribute.
-	- Each DCEG must specify requirements for the format of the associated file and the semantics of file locator. For example, the value of file locator may be an HTML ID in an HTML file, line number in a text file) or a bookmark in a PDF file.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="fileReference" type="xs:string" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>The string encodes the file name of a single external text file that contains the text.
-Remarks:
-The attribute file reference is generally used for long text strings or those that require formatting, however there is no restriction on the type of text (except for lexical level) that can be held in files referenced by sub-attribute file reference.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="headline" type="xs:string" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>Words set at the head of a passage or page to introduce or categorize</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="language" type="ISO639-3" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>ISO 639-3 value</xs:documentation>
-				</xs:annotation>
-			</xs:element>
-			<xs:element name="text" type="xs:string" minOccurs="0" maxOccurs="1">
-				<xs:annotation>
-					<xs:documentation>A non-formatted digital text string.
-Remarks:
-The attribute should be used, for example, to hold the information that is shown on paper charts by short cautionary and explanatory notes. Therefore text populated in text must not exceed 300 characters.
-Text may be in English or in a national language defined by the attribute language.
-No formatting of text is possible within the sub-attribute text. If formatted text, or text strings exceeding 300 characters, is required, then the attribute file reference must be used.</xs:documentation>
-				</xs:annotation>
-			</xs:element>
+			<xs:element name="country" type="countryType" minOccurs="1" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
 
 	<xs:complexType name="S124_affectedChartType">
-		<xs:annotation>
-			<xs:documentation> xxx </xs:documentation>
-		</xs:annotation>
 		<xs:sequence>
 			<xs:element name="chartAffected" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="internationalChartAffected" type="xs:string" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="language" type="ISO639-3" minOccurs="0" maxOccurs="1"/>
 		</xs:sequence>
 	</xs:complexType>
-	<xs:complexType name="S124_ENCFeatureReferenceType">
-		<xs:annotation>
-			<xs:documentation> xxx </xs:documentation>
-		</xs:annotation>
-		<xs:sequence>
-			<xs:element name="ENCName" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="editionNumber" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="updateNumber" type="xs:string" minOccurs="1" maxOccurs="1"/>
-			<xs:element name="featureID" type="xs:string" minOccurs="1" maxOccurs="unbounded"/>
-		</xs:sequence>
-	</xs:complexType>
 
-	<xs:simpleType name="restrictionType">
+	<xs:simpleType name="generalAreaType">
 		<xs:restriction base="xs:string">
-			<xs:enumeration value="entry restricted">
+			<xs:enumeration value="Baltic sea">
 			</xs:enumeration>
-			<xs:enumeration value="entry prohibited">
+			<xs:enumeration value="Skagerrak">
 			</xs:enumeration>
-			<xs:enumeration value="area to be avoided">
+			<xs:enumeration value="Kattegat">
 			</xs:enumeration>
-			<xs:enumeration value="stopping prohibited">
+			<xs:enumeration value="Lake Vänern and Trollhätte Canal">
 			</xs:enumeration>
-			<xs:enumeration value="speed restricted">
+			<xs:enumeration value="The Sound">
+			</xs:enumeration>
+			<xs:enumeration value="The Belts">
+			</xs:enumeration>
+			<xs:enumeration value="Western Baltic">
+			</xs:enumeration>
+			<xs:enumeration value="Southern Baltic">
+			</xs:enumeration>
+			<xs:enumeration value="South-eastern Baltic">
+			</xs:enumeration>
+			<xs:enumeration value="Central Baltic">
+			</xs:enumeration>
+			<xs:enumeration value="Lake Mälaren and Södertälje Canal">
+			</xs:enumeration>
+			<xs:enumeration value="Northern Baltic">
+			</xs:enumeration>
+			<xs:enumeration value="Gulf of Riga">
+			</xs:enumeration>
+			<xs:enumeration value="Gulf of Finland">
+			</xs:enumeration>
+			<xs:enumeration value="Sea of Åland and Archipelago Sea">
+			</xs:enumeration>
+			<xs:enumeration value="Sea of Bothnia">
+			</xs:enumeration>
+			<xs:enumeration value="The Quark">
+			</xs:enumeration>
+			<xs:enumeration value="Bay of Bothnia">
+			</xs:enumeration>
+			<xs:enumeration value="Other lakes and canals">
+			</xs:enumeration>
+			<xs:enumeration value="Western Mediterranean Sea">
 			</xs:enumeration>
 		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="MRN">
+		<xs:annotation>
+			<xs:documentation>Marine Resource Name identifier, based on URN. Note that the NID, including the mrn: prefix can be no more than 31 characters long</xs:documentation>
+		</xs:annotation>
+			<xs:restriction base="xs:string">
+			<xs:pattern value="urn:mrn:[A-Za-z0-9][A-Za-z0-9-]{0,27}:[A-Za-z0-9()+,\-.:=@;$_!*'%/?#]+"/>
+			</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="S124_referenceTypeType">
@@ -754,9 +337,7 @@ No formatting of text is possible within the sub-attribute text. If formatted te
 			</xs:enumeration>
 			<xs:enumeration value="source reference">
 			</xs:enumeration>
-			<xs:enumeration value="repetition">
-			</xs:enumeration>
-			<xs:enumeration value="update">
+			<xs:enumeration value="in-force">
 			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
@@ -771,106 +352,12 @@ No formatting of text is possible within the sub-attribute text. If formatted te
 			</xs:enumeration>
 			<xs:enumeration value="NAVAREA">
 			</xs:enumeration>
-			<xs:enumeration value="no warnings">
-			</xs:enumeration>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="sourceType">
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="report">
-			</xs:enumeration>
-			<xs:enumeration value="graphic">
-			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
 
 	<xs:simpleType name="EPSGType">
 		<xs:restriction base="xs:string">
 			<xs:enumeration value="4326">
-			</xs:enumeration>
-		</xs:restriction>
-	</xs:simpleType>
-
-	<xs:simpleType name="categoryOfAuthorityType">
-		<xs:annotation>
-			<xs:documentation>The type of person, government agency or organisation, corporation, or private or publicly owned company entrusted or invested with powers of managing or controlling access or activity in an area.</xs:documentation>
-		</xs:annotation>
-		<xs:restriction base="xs:string">
-			<xs:enumeration value="customs">
-				<xs:annotation>
-					<xs:documentation>The agency or establishment for collecting duties, tolls. (Merriam-Websters online Dictionary 23rd February 2006, amended).</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="border control">
-				<xs:annotation>
-					<xs:documentation>The administration to prevent or detect and prosecute violations of rules and regulations at international boundaries (adapted from Merriam-Websters online Dictionary 23rd February 2006).</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="police">
-				<xs:annotation>
-					<xs:documentation>The department of government, or civil force, charged with maintaining public order. (Adapted from OED)</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="port">
-				<xs:annotation>
-					<xs:documentation>Person or corporation, owners of, or entrusted with or invested with the power of managing a port. May be called a Harbour Board, Port Trust, Port Commission, Harbour Commission, Marine Department (NP 100 8th Edition 14 Oct 2004)</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="immigration">
-				<xs:annotation>
-					<xs:documentation>The authority controlling people entering a country.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="health">
-				<xs:annotation>
-					<xs:documentation>The authority with responsibility for checking the validity of the health declaration of a vessel and for declaring free pratique.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="coast guard">
-				<xs:annotation>
-					<xs:documentation>Organisation keeping watch on shipping and coastal waters according to governmental law; normally the authority with reponsibility for search and rescue.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="agricultural">
-				<xs:annotation>
-					<xs:documentation>The authority with responsibility for preventing infection of the agriculture of a country and for the protection of the agricultural interests of a country.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="military">
-				<xs:annotation>
-					<xs:documentation>A military authority which provides control of access to or approval for transit through designated areas or airspace.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="private company">
-				<xs:annotation>
-					<xs:documentation>A private or publicly owned company or commercial enterprise which exercises control of facilities, for example a callibration area.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="maritime police">
-				<xs:annotation>
-					<xs:documentation>A governmental or military force with jurisdiction in territorial waters. Examples could include Gendarmerie Maritime, Carabinierie, and Guardia Civil.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="environmental">
-				<xs:annotation>
-					<xs:documentation>An authority with responsibility for the protection of the environment.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="fishery">
-				<xs:annotation>
-					<xs:documentation>An authority with responsibility for the control of fisheries.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="finance">
-				<xs:annotation>
-					<xs:documentation>an authority with responsibility for the control and movement of money.</xs:documentation>
-				</xs:annotation>
-			</xs:enumeration>
-			<xs:enumeration value="maritime">
-				<xs:annotation>
-					<xs:documentation>A national or regional authority charged with administration of maritime affairs.</xs:documentation>
-				</xs:annotation>
 			</xs:enumeration>
 		</xs:restriction>
 	</xs:simpleType>
@@ -917,6 +404,78 @@ No formatting of text is possible within the sub-attribute text. If formatted te
 			</xs:enumeration>
 			<xs:enumeration value="SailRaceEvent">
 			</xs:enumeration>
+			<xs:enumeration value="military exersices">
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<xs:simpleType name="countryType">
+		<xs:restriction base="xs:string">
+			<xs:enumeration value="SE">
+			</xs:enumeration>
+			<xs:enumeration value="RU">
+			</xs:enumeration>
+			<xs:enumeration value="GB">
+			</xs:enumeration>
+			<xs:enumeration value="DK">
+			</xs:enumeration>
+			<xs:enumeration value="FI">
+			</xs:enumeration>
+			<xs:enumeration value="NO">
+			</xs:enumeration>
+			<xs:enumeration value="EE">
+			</xs:enumeration>
+			<xs:enumeration value="LV">
+			</xs:enumeration>
+			<xs:enumeration value="LT">
+			</xs:enumeration>
+			<xs:enumeration value="PL">
+			</xs:enumeration>
+			<xs:enumeration value="DE">
+			</xs:enumeration>
+			<xs:enumeration value="ES">
+			</xs:enumeration>
+		</xs:restriction>
+	</xs:simpleType>
+
+	<!-- =============================================== -->
+	<!-- common types - consider defining a common -->
+	<!-- =============================================== -->
+	<xs:complexType name="S100_TruncatedDate">
+		<xs:annotation>
+			<xs:documentation>built in date types from W3C XML schema, implementing S-100 truncated date</xs:documentation>
+		</xs:annotation>
+		<xs:choice>
+			<xs:element name="gDay" type="xs:gDay"/>
+			<xs:element name="gMonth" type="xs:gMonth"/>
+			<xs:element name="gYear" type="xs:gYear"/>
+			<xs:element name="gMonthDay" type="xs:gMonthDay"/>
+			<xs:element name="gYearMonth" type="xs:gYearMonth"/>
+			<xs:element name="date" type="xs:date"/>
+		</xs:choice>
+	</xs:complexType>
+	<xs:simpleType name="ISO639-3">
+		<xs:annotation>
+			<xs:documentation>stub for ISO 639-3 language codes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\w{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ISO639-2">
+		<xs:annotation>
+			<xs:documentation>stub for ISO 639-2 language codes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\w{3}"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="ISO3166-alpha2">
+		<xs:annotation>
+			<xs:documentation>stub for ISO 3166 alpha2 country codes</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:string">
+			<xs:pattern value="\w{2}"/>
 		</xs:restriction>
 	</xs:simpleType>
 
@@ -925,7 +484,7 @@ No formatting of text is possible within the sub-attribute text. If formatted te
 	 <!-- ============================================= -->
 	<xs:complexType name="DatasetType">
 		<xs:annotation>
-			<xs:documentation>Dataset element for MPA dataset as "GML document"</xs:documentation>
+			<xs:documentation>Dataset element for Navigational Warnings dataset as "GML document"</xs:documentation>
 		</xs:annotation>
 		<xs:complexContent>
 			<xs:extension base="gml:AbstractFeatureType">
@@ -962,7 +521,7 @@ No formatting of text is possible within the sub-attribute text. If formatted te
 		</xs:complexContent>
 	</xs:complexType>
 
-	<!-- treatment of S-100 Information types is provisional, because GML does not have the concept, and they must be modeled as AbstractGML -->
+<!-- treatment of S-100 Information types is provisional, because GML does not have the concept, and they must be modeled as AbstractGML -->
 	<xs:complexType name="MemberType">
 		<xs:annotation>
 			<xs:documentation>dataset member</xs:documentation>
@@ -983,25 +542,12 @@ No formatting of text is possible within the sub-attribute text. If formatted te
 		<xs:complexContent>
 			<xs:extension base="gml:AbstractFeatureMemberType">
 				<xs:sequence>
-					<xs:element ref="InformationType"/>
+					<xs:element ref="S124_InformationType"/>
 				</xs:sequence>
 				<xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
 			</xs:extension>
 		</xs:complexContent>
 	</xs:complexType>
-	<!--<xs:complexType name="IMemberType">
-		<xs:annotation>
-			<xs:documentation>dataset member S-100 infotmation types</xs:documentation>
-		</xs:annotation>
-		<xs:complexContent>
-			<xs:extension base="gml:AbstractFeatureMemberType">
-				<xs:sequence>
-					<xs:element ref="gml:AbstractGML"/>
-				</xs:sequence>
-				<xs:attributeGroup ref="gml:AssociationAttributeGroup"/>
-			</xs:extension>
-		</xs:complexContent>
-	</xs:complexType>-->
 
 	<xs:element name="DataSet" type="DatasetType"/>
 </xs:schema>

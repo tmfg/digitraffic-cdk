@@ -118,21 +118,29 @@ function createXml(fault: any) {
                 'xmlns:S124' : "http://www.iho.int/S124/gml/1.0",
                 'xsi:schemaLocation' : 'http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd',
                 'xmlns:xsi' : "http://www.w3.org/2001/XMLSchema-instance",
-                'xmlns:GML' : "http://www.opengis.net/gml/3.2",
+                'xmlns:gml' : "http://www.opengis.net/gml/3.2",
                 'xmlns:S100' : "http://www.iho.int/s100gml/1.0",
                 'xmlns:xlink' : "http://www.w3.org/1999/xlink",
-                'GML:id' : id
+                'gml:id' : id
+            },
+            'gml:boundedBy': {
+                'gml:Envelope': {
+                    '$': {
+                        'srsName': 'EPSG:4326'
+                    },
+                    'gml:lowerCorner': createCoordinatePair(fault.geometry),
+                    'gml:upperCorner': createCoordinatePair(fault.geometry)
+                }
             },
             imember: {
-                'S124:NWPreamble': {
+                'S124:S124_NWPreamble': {
                     '$': {
-                        'GML:id' : `PR.${id}`
+                        'gml:id' : `PR.${id}`
                     },
+                    id: urn,
                     messageSeriesIdentifier : createMessageSeriesIdentifier(faultId, year),
-                    generalArea: {
-                        language: 'eng',
-                        text: fault.area_description_en
-                    },
+                    sourceDate: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
+                    generalArea: 'Baltic sea',
                     locality : {
                         text: fault.fairway_name_fi
                     },
@@ -140,21 +148,20 @@ function createXml(fault: any) {
                         text : `${fault.aton_type} ${fault.aton_name_fi} Nr. ${fault.aton_id}, ${fault.state}`
                     },
                     fixedDateRange : createFixedDateRange(fault),
-                    sourceDate: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
                 }
             },
             member: {
-                'S124:NavigationalWarningPart': {
+                'S124:S124_NavigationalWarningPart': {
                     '$': {
-                        'GML:id' : `NW.${id}.1`
+                        'gml:id' : `NW.${id}.1`
                     },
-                    information: {},
+                    id: `urn:mrn:s124:NW.${id}.1`,
+                    geometry: createGeometryElement(fault, id),
                     header: {
                         '$': {
                             'owns': 'true'
                         }
-                    },
-                    geometry: createGeometryElement(fault, id)
+                    }
                 }
             }
         }
@@ -184,9 +191,9 @@ function createGeometryElement(fault: any, id: string) {
         'S100:pointProperty' : {
             'S100:Point' : {
                 '$' : {
-                    'GML:id' : `s.NW.${id}.1`
+                    'gml:id' : `s.NW.${id}.1`
                 },
-                'GML:pos': createCoordinatePair(fault.geometry)
+                'gml:pos': createCoordinatePair(fault.geometry)
             }
         }
     }
@@ -200,11 +207,12 @@ function createCoordinatePair(geometry: any) {
 
 function createMessageSeriesIdentifier(faultId: any, year: number) {
     return {
-        navOrMetArea : NAME_OF_SERIES,
+        NameOfSeries: NAME_OF_SERIES,
         typeOfWarning : 'local',
         warningNumber : faultId,
         year,
-        productionAgency : PRODUCTION_AGENCY
+        productionAgency : PRODUCTION_AGENCY,
+        country: 'FI'
     };
 }
 
