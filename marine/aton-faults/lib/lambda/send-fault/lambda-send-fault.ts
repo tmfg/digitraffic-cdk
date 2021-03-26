@@ -36,9 +36,10 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
     return async (event: SNSEvent): Promise<void> => {
         if (!clientCertificate || !privateKey) {
             await doWithSecret(secretId, (secret: any) => {
-                clientCertificate = secret[clientCertificateSecretKey];
-                privateKey = secret[privateKeySecretKey];
-                caCert = secret[caSecretKey];
+                // certificates are stored as base64 to prevent Secrets Manager from stripping line breaks
+                clientCertificate = decodeBase64(secret[clientCertificateSecretKey]);
+                privateKey = decodeBase64(secret[privateKeySecretKey]);
+                caCert = decodeBase64(secret[caSecretKey]);
             });
         }
         const snsEvent = JSON.parse(event.Records[0].Sns.Message) as SendFaultEvent;
@@ -49,6 +50,10 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
             console.warn('Fault with id %d was not found', snsEvent.faultId);
         }
     };
+}
+
+function decodeBase64(str: string) {
+    return new Buffer(str, 'base64').toString('ascii');
 }
 
 export const handler = handlerFn(withDbSecret);
