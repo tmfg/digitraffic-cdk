@@ -1,3 +1,5 @@
+import {Camera} from "../model/camera";
+
 const FIELD_COMMUNICATION = "Communication";
 const FIELD_COMMAND = "Command"
 
@@ -52,6 +54,14 @@ export class Command {
     getResult(result: any): any {
         return result;
     }
+
+    checkError(result: any) {
+        const resultCode = result[FIELD_COMMUNICATION][FIELD_COMMAND].Result;
+
+        if (resultCode == 'Error') {
+            throw new Error('Command Failed');
+        }
+    }
 }
 
 export class ConnectCommand extends Command {
@@ -69,8 +79,8 @@ export class GetAllCamerasCommand extends Command {
         super('GetAllViewsAndCameras');
     }
 
-    getResult(response: any): any {
-        const cameras = response.Communication.Command[0].Items[0].Item[0].Items[0].Item[0].Items[0].Item[0].Items[0].Item;
+    getResult(response: any): Camera[] {
+        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0].Items[0].Item[0].Items[0].Item[0].Items[0].Item[0].Items[0].Item;
 
         const info = cameras.map((c: any) => {
             return {
