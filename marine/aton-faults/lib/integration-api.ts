@@ -44,7 +44,7 @@ function createUploadVoyagePlanHandler(
 
     const handler = createHandler(sendFaultTopic, stack, vpc, lambdaDbSg, props);
     secret.grantRead(handler);
-    const resource = integrationApi.root.addResource("upload-voyage-plan")
+    const resource = integrationApi.root.addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
     sendFaultTopic.grantPublish(handler);
 }
@@ -63,7 +63,7 @@ function createIntegrationResource(
         requestTemplates: {
             // transformation from XML to JSON in API Gateway
             // some stuff needs to be quotes, other stuff does not, it's magic
-            'application/xml': `{
+            'text/xml': `{
                 "callbackEndpoint": "$util.escapeJavaScript($input.params('callbackEndpoint'))",
                 "voyagePlan": $input.json('$')
             }`
