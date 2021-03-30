@@ -1,4 +1,4 @@
-import {Model, Resource, RestApi} from '@aws-cdk/aws-apigateway';
+import {GatewayResponse, Model, Resource, ResponseType, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
@@ -27,6 +27,15 @@ export function create(
         stack,
         'ATON-Integration',
         'ATON Faults integration API');
+    // set response for missing auth token to 501 as desired by API registrar
+    new GatewayResponse(stack, 'MissingAuthenticationTokenResponse', {
+        restApi: integrationApi,
+        type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
+        statusCode: '501',
+        templates: {
+            'application/json': 'Not implemented'
+        }
+    });
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
     createUploadVoyagePlanHandler(messageResponseModel, secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
