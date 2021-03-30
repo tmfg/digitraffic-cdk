@@ -1,4 +1,4 @@
-import {GatewayResponse, Model, Resource, ResponseType, RestApi} from '@aws-cdk/aws-apigateway';
+import {GatewayResponse, Model, PassthroughBehavior, Resource, ResponseType, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
@@ -65,6 +65,7 @@ function createIntegrationResource(
     handler: Function) {
 
     const integration = defaultIntegration(handler, {
+        passthroughBehavior: PassthroughBehavior.NEVER,
         disableCors: true,
         requestParameters: {
             'integration.request.querystring.callbackEndpoint': 'method.request.querystring.callbackEndpoint'

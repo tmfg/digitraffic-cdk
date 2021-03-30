@@ -4,7 +4,7 @@ import {
     createResponses,
     XmlResponseTemplate, NotFoundResponseTemplate, SvgResponseTemplate, BadRequestResponseTemplate
 } from "./response";
-import {LambdaIntegration, MethodResponse, IntegrationResponse} from "@aws-cdk/aws-apigateway";
+import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehavior} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
 import {MediaType} from './mediatypes';
 
@@ -77,7 +77,8 @@ interface IntegrationOptions {
     requestTemplates?: {[contentType: string]: string},
     responses?: IntegrationResponse[],
     disableCors?: boolean,
-    xml?: boolean
+    xml?: boolean,
+    passthroughBehavior?: PassthroughBehavior
 }
 
 /**
@@ -99,7 +100,8 @@ export function defaultIntegration(
             getResponse(RESPONSE_500_SERVER_ERROR, options),
         ],
         requestParameters: options?.requestParameters || {},
-        requestTemplates: options?.requestTemplates || {}
+        requestTemplates: options?.requestTemplates || {},
+        passthroughBehavior: options?.passthroughBehavior ?? PassthroughBehavior.WHEN_NO_MATCH
     });
 }
 
