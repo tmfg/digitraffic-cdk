@@ -14,6 +14,7 @@ export function buildFromMessage(message: string): any {
     message = message.replace('[, ]', '[0.0,0.0]')
         .replace(/\"Infinity\"/g, "-1")
         .replace(/Infinity/gi, "-1")
+        .replace(/\"null\"/gi, "null")
         .replace(/\\n/g, "\\n")
         .replace(/\\'/g, "\\'")
         .replace(/\\"/g, '\\"')
