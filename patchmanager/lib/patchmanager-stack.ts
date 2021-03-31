@@ -40,6 +40,15 @@ export class PatchManagerStack extends Stack {
             taskArn: 'AWS-RunPatchBaseline',
             taskInvocationParameters: {
                 maintenanceWindowRunCommandParameters: {
+                    notificationConfig: {
+                        notificationArn: appProps.notificationArn,
+                        notificationEvents: [
+                            'TimedOut',
+                            'Cancelled',
+                            'Failed'
+                        ],
+                        notificationType: 'Command' // status of whole command, not per-instance
+                    },
                     parameters: {
                         Operation: ['Install']
                     }
