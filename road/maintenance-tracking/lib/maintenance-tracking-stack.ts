@@ -15,6 +15,7 @@ export class MaintenanceTrackingStack extends Stack {
             privateSubnetIds: appProps.privateSubnetIds,
             availabilityZones: appProps.availabilityZones
         });
+        // security group that allows Lambda database access
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
         const queueAndDLQ = Sqs.createQueue(this);
@@ -22,8 +23,16 @@ export class MaintenanceTrackingStack extends Stack {
         const dlqBucket = new Bucket(this, 'DLQBucket', {
             bucketName: appProps.dlqBucketName
         });
+        const sqsExtendedMessageBucket = new Bucket(this, 'SqsExtendedMessageBucket', {
+            bucketName: appProps.sqsExtendedMessageBucketName
+        });
 
-        InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
-        IntegrationApi.createIntegrationApi(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
+        // 'this' reference must be passed to all child resources to keep them tied to this stack
+        // InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
+        IntegrationApi.createIntegrationApi(queueAndDLQ.queue, vpc, lambdaDbSg, sqsExtendedMessageBucket.bucketArn, appProps, this);
+
+        // // TODO create SqsQueue lambda-process-queue.ts
+        // https://github.com/aws/aws-cdk/issues/2381
+        InternalLambdas.createProcessQueueAndDlqLambda(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, sqsExtendedMessageBucket.bucketArn, appProps, this);
     }
 }

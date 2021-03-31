@@ -6,9 +6,11 @@ Road application then reads saved data from the db and combines the contents of 
 # Build
 
 * Install dependencies 
-    * `npm install` 
+    * `npm install` Install dependencies or 
+    * `npm ci` A clean install of your dependencies.  
 * Build project
     * `npm run build`
+    * `npm run all-watch` build continuously
 * Run tests
     * In order to run tests you need to set up the local database from the [digitraffic-road project](https://github.com/tmfg/digitraffic-road/tree/develop/dbroad).
     * `npm run test` 

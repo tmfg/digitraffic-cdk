@@ -1,75 +1,127 @@
+import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../../lib/lambda/constants";
+process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
+process.env[SQS_QUEUE_URL] = 'https://aws-queue-123';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll} from "../db-testutil";
 import {handlerFn} from "../../../lib/lambda/process-queue/lambda-process-queue";
 import {SQSRecord} from "aws-lambda";
 import {getRandompId, getTrackingJson} from "../testdata";
+import * as sinon from 'sinon';
+import {createSQSExtClient} from "../../../lib/sqs-ext";
+
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
+    const sandbox = sinon.createSandbox();
+    afterEach(() => sandbox.restore());
+
     test('no records', async () => {
-        await handlerFn()({ Records: [] });
+        const sns : any = createSQSExtClient("bucket-name");
+        const transformLambdaRecordsStub = sandbox.stub(sns, 'transformLambdaRecords').returns([]);
+        await handlerFn(sns)({ Records: [] });
+        expect(transformLambdaRecordsStub.calledWith([])).toBe(true);
     });
 
     test('single valid record', async () => {
-
         const json = getTrackingJson(getRandompId(),getRandompId());
+        const recordFromS3 : SQSRecord = createRecord(json);
+        const recordNoJson : SQSRecord = cloneRecordWithoutJson(recordFromS3)
 
-        await handlerFn()({
-            Records: [createRecord(json)]
+        const sqsClient : any = createSQSExtClient("bucket-name");
+        const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([recordFromS3]);
+        const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
+        await handlerFn(sqsClient)({
+            Records: [recordNoJson]
         });
 
         const allTrackings = await findAll(db);
         expect(allTrackings.length).toBe(1);
+        expect(transformLambdaRecordsStub.calledWith([recordNoJson])).toBe(true);
+        expect(deleteStub.calledOnceWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : recordFromS3.receiptHandle } )).toBe(true);
     });
 
 
     test('two valid records', async () => {
 
+        // Create two records
         const json1 = getTrackingJson(getRandompId(), getRandompId());
-        const json2 = getTrackingJson(getRandompId(), getRandompId());
+        const record1FromS3 : SQSRecord = createRecord(json1);
+        const record1NoJson : SQSRecord = cloneRecordWithoutJson(record1FromS3);
 
-        await handlerFn()({
-            Records: [createRecord(json1), createRecord(json2)]
+        const json2 = getTrackingJson(getRandompId(), getRandompId());
+        const record2FromS3 : SQSRecord = createRecord(json2);
+        const record2NoJson : SQSRecord = cloneRecordWithoutJson(record2FromS3);
+
+        const sqsClient : any = createSQSExtClient("bucket-name");
+        const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3, record2FromS3]);
+        const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
+
+        await handlerFn(sqsClient)({
+            Records: [record1NoJson, record2NoJson]
         });
 
         const allTrackings = await findAll(db);
         expect(allTrackings.length).toBe(2);
+        expect(transformLambdaRecordsStub.calledWith([record1NoJson, record2NoJson])).toBe(true);
+        expect(deleteStub.calledWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : record1NoJson.receiptHandle})).toBe(true);
+        expect(deleteStub.calledWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : record2NoJson.receiptHandle})).toBe(true);
+        expect(deleteStub.callCount).toEqual(2);
     });
 
     test('invalid record', async () => {
 
         const json1 = `invalid json ` + getTrackingJson(getRandompId(), getRandompId());
+        const record1FromS3 : SQSRecord = createRecord(json1);
+        const record1NoJson : SQSRecord = cloneRecordWithoutJson(record1FromS3);
 
-        await handlerFn()({
-            Records: [createRecord(json1)]
+        const sqsClient : any = createSQSExtClient("bucket-name");
+        const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3]);
+        const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
+
+        await handlerFn(sqsClient)({
+            Records: [record1NoJson]
         });
 
         const allTrackings = await findAll(db);
         expect(allTrackings.length).toBe(0);
+        expect(transformLambdaRecordsStub.calledWith([record1NoJson])).toBe(true);
+        expect(deleteStub.notCalled).toBe(true);
     });
 
     test('invalid and valid record', async () => {
 
-        const json1 = `invalid json ` + getTrackingJson(getRandompId(), getRandompId());
+        // Create two records
+        const invalidJson = `invalid json ` + getTrackingJson(getRandompId(), getRandompId());
+        const invalidRecordFromS3 : SQSRecord = createRecord(invalidJson);
+        const invalidRecordNoJson : SQSRecord = cloneRecordWithoutJson(invalidRecordFromS3);
 
-        const json2 = getTrackingJson(getRandompId(), getRandompId());
+        const validJson = getTrackingJson(getRandompId(), getRandompId());
+        const validRecordFromS3 : SQSRecord = createRecord(validJson);
+        const validRecordNoJson : SQSRecord = cloneRecordWithoutJson(validRecordFromS3);
 
-        await handlerFn()({
-            Records: [createRecord(json1), createRecord(json2)]
+        const sqsClient : any = createSQSExtClient("bucket-name");
+        const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([invalidRecordFromS3, validRecordFromS3]);
+        const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
+
+        await handlerFn(sqsClient)({
+            Records: [invalidRecordNoJson, validRecordNoJson]
         });
 
         const allTrackings = await findAll(db);
         expect(allTrackings.length).toBe(1);
+        expect(transformLambdaRecordsStub.calledWith([invalidRecordNoJson, validRecordNoJson])).toBe(true);
+        expect(deleteStub.calledWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : validRecordNoJson.receiptHandle})).toBe(true);
+        expect(deleteStub.callCount).toEqual(1);
     });
 
 }));
 
-function createRecord(trackingJson: string): SQSRecord {
+function createRecord(trackingJson = ''): SQSRecord {
     // none of these matter besides body
     return {
         body: trackingJson,
         messageId: '',
-        receiptHandle: '',
+        receiptHandle: getRandompId(),
         messageAttributes: {},
         md5OfBody: '',
         attributes: {
@@ -83,3 +135,12 @@ function createRecord(trackingJson: string): SQSRecord {
         awsRegion: ''
     };
 }
+
+function cloneRecordWithoutJson(recordToClone: SQSRecord) {
+    const clone = Object.assign({}, recordToClone);
+    clone.body = '';
+    return clone;
+}
+
+
+

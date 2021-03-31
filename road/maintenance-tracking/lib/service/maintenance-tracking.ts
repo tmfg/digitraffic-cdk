@@ -6,12 +6,13 @@ import {IDatabase} from "pg-promise";
 const crypto = require('crypto');
 
 const matchViestitunnisteRegex = /"viestintunniste"\s*:\s*{\s*"id"\s*:\s*[0-9]*\s*}\s*,/;
-export async function saveMaintenanceTrackingData(maintenanceTrackingDataJson: string): Promise<any | undefined> {
+export async function saveMaintenanceTrackingData(maintenanceTrackingDataJson: string, sendingTime: Date): Promise<any | undefined> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         const dbMaintenanceTrackingData: DbMaintenanceTrackingData = {
             json: maintenanceTrackingDataJson,
             status: Status.UNHANDLED,
-            hash: createHash(maintenanceTrackingDataJson)
+            hash: createHash(maintenanceTrackingDataJson),
+            sendingTime: sendingTime
         };
         return await db.tx(async () => {
             return await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
