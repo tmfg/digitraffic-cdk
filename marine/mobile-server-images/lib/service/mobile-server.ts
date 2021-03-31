@@ -14,13 +14,23 @@ const parse = util.promisify(parseString);
 
 export class Session {
     url: string;
+    acceptSelfSignedCertificate: boolean;
 
     sequenceId: number;
     connectionId: string;
 
-    constructor(url: string) {
+    constructor(url: string, acceptSelfSignedCertificate: boolean = false) {
         this.url = url;
         this.sequenceId = 1;
+        this.acceptSelfSignedCertificate = acceptSelfSignedCertificate;
+    }
+
+    async post(url: string, xml: string): Promise<any> {
+        if(this.acceptSelfSignedCertificate) {
+            return await axios.post(this.url, xml, { httpsAgent: agent });
+        }
+
+        return await axios.post(this.url, xml);
     }
 
     async sendMessage(command: Command) {
@@ -29,10 +39,7 @@ export class Session {
 
 //        console.info("sending:" + xml);
 
-        const resp = await axios.post(this.url, xml, { httpsAgent: agent })
-            .catch(e => {
-                throw new Error('posting failed with ' + e);
-            });
+        const resp = await this.post(this.url, xml);
 
         if (resp.status != 200) {
             throw Error("sendMessage failed " + JSON.stringify(resp));

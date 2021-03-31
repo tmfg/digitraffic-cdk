@@ -2,7 +2,7 @@ import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {MobileServerProps} from './app-props';
-import * as IntegrationApi from './integration-api';
+import * as InternalLambas from './internal-lambdas';
 import * as PublicApi from './public-api';
 
 export class MobileServerImageStack extends Stack {
@@ -19,7 +19,7 @@ export class MobileServerImageStack extends Stack {
 
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
-        IntegrationApi.create(secret, vpc, lambdaDbSg, appProps, this);
+        InternalLambas.create(secret, vpc, lambdaDbSg, appProps, this);
         PublicApi.create(secret, vpc, lambdaDbSg, appProps, this);
     }
 }
