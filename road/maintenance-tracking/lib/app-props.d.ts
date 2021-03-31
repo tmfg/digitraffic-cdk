@@ -3,6 +3,7 @@ import {LambdaConfiguration} from "../../../common/stack/lambda-configs";
 
 export interface AppProps extends LambdaConfiguration {
     dlqBucketName: string;
+    sqsExtendedMessageBucketName: string;
     dlqNotificationDuration: Duration;
     sqsProcessLambdaConcurrentExecutions: number;
     /** Topic to send errors in message handling **/

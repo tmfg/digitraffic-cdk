@@ -42,6 +42,7 @@ export function dbLambdaConfiguration(
         memorySize: props.memorySize || config.memorySize || 1024,
         functionName: config.functionName,
         code: config.code,
+        role: config.role,
         handler: config.handler,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds || 60),
         environment: config.environment || {

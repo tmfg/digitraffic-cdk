@@ -5,7 +5,8 @@ export interface DbMaintenanceTrackingData {
     readonly id?: bigint,
     readonly json: string,
     readonly status: Status,
-    readonly hash: string
+    readonly hash: string,
+    readonly sendingTime: Date
 }
 
 export enum Status {
@@ -15,8 +16,8 @@ export enum Status {
 }
 
 const INSERT_MAINTENANCE_TRACKING_DATA_SQL = `
-    INSERT INTO maintenance_tracking_data(id, json, status, hash)
-    VALUES(NEXTVAL('SEQ_MAINTENANCE_TRACKING_DATA'), $1, $2, $3)
+    INSERT INTO maintenance_tracking_data(id, json, status, hash, sending_time)
+    VALUES(NEXTVAL('SEQ_MAINTENANCE_TRACKING_DATA'), $1, $2, $3, $4)
 `;
 
 /**
@@ -34,6 +35,7 @@ export function createUpdateValues(e: DbMaintenanceTrackingData): any[] {
     return [
         e.json,
         e.status,
-        e.hash
+        e.hash,
+        e.sendingTime
     ];
 }

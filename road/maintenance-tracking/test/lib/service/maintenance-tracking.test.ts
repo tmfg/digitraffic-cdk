@@ -7,7 +7,7 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
 
     test('saveMaintenanceTrackingData', async () => {
         const json = getTrackingJson('1', '1');
-        await saveMaintenanceTrackingData(json);
+        await saveMaintenanceTrackingData(json, new Date());
 
         const fetchedTrackings = await findAll(db);
         expect(fetchedTrackings.length).toBe(1);
@@ -19,8 +19,8 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
     test('saveMaintenanceTrackingData should succeed for two different messages', async () => {
         const json1 = getTrackingJson('1', '456');
         const json2 = getTrackingJson('2', '654');
-        await saveMaintenanceTrackingData(json1);
-        await saveMaintenanceTrackingData(json2);
+        await saveMaintenanceTrackingData(json1, new Date());
+        await saveMaintenanceTrackingData(json2, new Date());
 
         const fetchedTrackings = await findAll(db);
         expect(fetchedTrackings.length).toBe(2);
@@ -30,11 +30,11 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
     test('saveMaintenanceTrackingData should succeed only for first message with same content and different id', async () => {
         const json1 = getTrackingJson('1', '1');
         const json2 = getTrackingJson('2', '1');
-        await saveMaintenanceTrackingData(json1);
+        await saveMaintenanceTrackingData(json1, new Date());
 
         let failure = false;
         try {
-            await saveMaintenanceTrackingData(json2);
+            await saveMaintenanceTrackingData(json2, new Date());
         } catch (error) {
             // Expect error: duplicate key value violates unique constraint "maintenance_tracking_data_hash_ui"
             failure = true;

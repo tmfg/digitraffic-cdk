@@ -41,7 +41,8 @@ describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabas
         const dbMaintenanceTrackingData2: DbMaintenanceTrackingData = {
             json: getTrackingJson(getRandompId(), getRandompId()),
             status: Status.UNHANDLED,
-            hash: dbMaintenanceTrackingData1.hash
+            hash: dbMaintenanceTrackingData1.hash,
+            sendingTime: new Date()
         };
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData1);
@@ -65,7 +66,8 @@ describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabas
         return {
             json: json,
             status: Status.UNHANDLED,
-            hash: createHash(json)
+            hash: createHash(json),
+            sendingTime: new Date()
         };
     }
 
