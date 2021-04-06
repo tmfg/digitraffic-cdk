@@ -1,7 +1,7 @@
 import {Rule,Schedule} from '@aws-cdk/aws-events';
 import {Function,AssetCode} from '@aws-cdk/aws-lambda';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
-import {Stack, Duration} from '@aws-cdk/core';
+import {Duration} from '@aws-cdk/core';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {Construct} from '@aws-cdk/core';
@@ -25,7 +25,7 @@ function createUpdateImagesLambda(secret: ISecret, vpc: IVpc, lambdaDbSg: ISecur
     const environment: any = {};
     environment[KEY_SECRET_ID] = props.secretId;
 
-    const functionName = "MSI-UpdateImages";
+    const functionName = "MC-UpdateImages";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         memorySize: 256,
         functionName: functionName,
