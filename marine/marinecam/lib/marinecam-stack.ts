@@ -5,7 +5,7 @@ import {MobileServerProps} from './app-props';
 import * as InternalLambas from './internal-lambdas';
 import * as PublicApi from './public-api';
 
-export class MobileServerImageStack extends Stack {
+export class MarinecamStack extends Stack {
     constructor(scope: Construct, id: string, appProps: MobileServerProps, props?: StackProps) {
         super(scope, id, props);
 

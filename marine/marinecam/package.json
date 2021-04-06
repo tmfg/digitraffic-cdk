@@ -1,9 +1,9 @@
 {
-  "name": "mobile-server-images",
+  "name": "marinecam",
   "version": "0.0.1",
   "license": "EUPL",
   "bin": {
-    "mobile-server": "bin/mobile-server-images-app.js"
+    "mobile-server": "bin/marinecam-app.js"
   },
   "scripts": {
     "prebuild": "rimraf tsd",
@@ -40,6 +40,7 @@
   "dependencies": {
     "@aws-cdk/aws-secretsmanager": "1.83.0",
     "@aws-cdk/core": "1.83.0",
+    "@aws-cdk/aws-events-targets": "1.83.0",
     "axios": "^0.21.1",
     "xml2js": "^0.4.23",
     "aws-sdk": "2.821.0"

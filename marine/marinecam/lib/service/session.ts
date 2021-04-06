@@ -13,10 +13,12 @@ const agent = new https.Agent({
 const parse = util.promisify(parseString);
 
 export class Session {
-    url: string;
-    acceptSelfSignedCertificate: boolean;
+    readonly url: string;
+    readonly acceptSelfSignedCertificate: boolean;
 
+    // this increases for every command
     sequenceId: number;
+    // this is received after succesful connect and must be used in every command after that
     connectionId: string;
 
     constructor(url: string, acceptSelfSignedCertificate: boolean = false) {
@@ -34,8 +36,7 @@ export class Session {
     }
 
     async sendMessage(command: Command) {
-        command.setConnectionId(this.connectionId);
-        const xml = command.createXml(this.sequenceId);
+        const xml = command.createXml(this.sequenceId++, this.connectionId);
 
 //        console.info("sending:" + xml);
 

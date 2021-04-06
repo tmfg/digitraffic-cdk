@@ -4,19 +4,12 @@ const FIELD_COMMUNICATION = "Communication";
 const FIELD_COMMAND = "Command"
 
 export class Command {
-    name: string;
-    connectionId: string|null;
-    inputParameters: any;
+    readonly name: string;
+    readonly inputParameters: any;
 
     constructor(name: string) {
         this.inputParameters = {};
         this.name = name;
-    }
-
-    setConnectionId(connectionId: string): Command {
-        this.connectionId = connectionId;
-
-        return this;
     }
 
     addInputParameters(name: string, value: string): Command {
@@ -35,8 +28,8 @@ export class Command {
         return `<InputParams>${inputs}</InputParams>`;
     }
 
-    createXml(sequenceId: number): string {
-        const connection = this.connectionId == null ? '<ConnectionId/>' : `<ConnectionId>${this.connectionId}</ConnectionId>`;
+    createXml(sequenceId: number, connectionId: string|null): string {
+        const connection = connectionId == null ? '<ConnectionId/>' : `<ConnectionId>${connectionId}</ConnectionId>`;
 
         return `<?xml version="1.0" encoding="utf-8"?>
 <Communication xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
