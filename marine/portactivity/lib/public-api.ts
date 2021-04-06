@@ -21,6 +21,7 @@ import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/a
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "../../../common/api/mediatypes";
+import {add404Support} from "../../../common/api/rest_apis";
 
 export function create(
     secret: ISecret,
@@ -29,7 +30,7 @@ export function create(
     props: Props,
     stack: Construct) {
     const publicApi = createApi(stack);
-
+    add404Support(publicApi, stack);
     createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan');
 
     const validator = addDefaultValidator(publicApi);
