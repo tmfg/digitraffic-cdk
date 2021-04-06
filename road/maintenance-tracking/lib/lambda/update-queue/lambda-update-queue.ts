@@ -1,5 +1,5 @@
-import {createHash} from "../../service/maintenance-tracking";
-import {createSQSExtClient} from "../../sqs-ext";
+import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
+import * as SqsExt from "../../sqs-ext";
 import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../constants";
 import aws from 'aws-sdk';
 import {SendMessageRequest} from "aws-sdk/clients/sqs";
@@ -30,7 +30,7 @@ export function handlerFn(sqsClient : aws.SQS) { // typeof SQSExt
     }
 }
 
-export const handler: (apiGWRequest: any) => Promise<any> = handlerFn(createSQSExtClient(sqsBucketName));
+export const handler: (apiGWRequest: any) => Promise<any> = handlerFn(SqsExt.createSQSExtClient(sqsBucketName));
 
 function invalidRequest(msg: string): object {
     return {
@@ -49,7 +49,7 @@ function ok(): object {
 export function createSendParams(json: string) : SendMessageRequest {
     return {
         MessageBody: json,
-        MessageDeduplicationId: createHash(json),  // Required for FIFO queues
+        MessageDeduplicationId: MaintenanceTrackingService.createHash(json),  // Required for FIFO queues
         MessageGroupId: "SameGroupAlways",  // Required for FIFO queues
         QueueUrl: sqsQueueUrl
     };
