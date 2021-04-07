@@ -6,11 +6,9 @@
 set -ex
 
 function installInDirectory() {
-    if [ "$1" != "./elasticsearch" ]; then
-      cd "$1"
-      npm ci
-      cd ..
-    fi
+    cd "$1"
+    npm ci
+    cd ..
 }
 
 function installAllInDirectory() {

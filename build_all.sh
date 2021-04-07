@@ -6,11 +6,9 @@
 set -ex
 
 function buildInDirectory() {
-    if [ "$1" != "./elasticsearch" ]; then
-      cd "$1"
-      npm run build
-      cd ..
-    fi
+    cd "$1"
+    npm run build
+    cd ..
 }
 
 function buildAllInDirectory() {
@@ -23,6 +21,7 @@ function buildAllInDirectory() {
 
 buildInDirectory common
 buildInDirectory cloudfront
+buildInDirectory elasticsearch
 buildInDirectory es-key-figures
 buildInDirectory user-management
 buildInDirectory status
