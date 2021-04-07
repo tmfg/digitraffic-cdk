@@ -6,11 +6,9 @@
 set -ex
 
 function installInDirectory() {
-    if [ "$1" != "./elasticsearch" ]; then
-      cd "$1"
-      npm ci
-      cd ..
-    fi
+    cd "$1"
+    npm ci
+    cd ..
 }
 
 function installAllInDirectory() {
@@ -23,6 +21,7 @@ function installAllInDirectory() {
 
 installInDirectory common
 installInDirectory cloudfront
+installInDirectory elasticsearch
 installInDirectory es-key-figures
 installInDirectory user-management
 installInDirectory status

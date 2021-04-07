@@ -8,23 +8,20 @@ set -ex
 PACKAGE=${1:-@aws-cdk}
 
 function updateInDirectory() {
-    if [ "$1" != "./elasticsearch" ]; then
-      cd "$1"
+    cd "$1"
 
-      if [ -f package.json ]; then
-        rm -f package-lock.json
-        rm -rf node_modules
-        ncu -f /$PACKAGE/ -u >ncu.log
+    if [ -f package.json ]; then
+      rm -f package-lock.json
+      rm -rf node_modules
+      ncu -f /$PACKAGE/ -u >ncu.log
 
-        # run install only if ncu finds packages to update
-        if grep -q "npm install" "ncu.log"; then
-          npm install
-        fi
+      # run install only if ncu finds packages to update
+      if grep -q "npm install" "ncu.log"; then
+        npm install
       fi
-
-      cd ..
     fi
 
+    cd ..
 }
 
 function updateAllInDirectory() {
@@ -39,6 +36,7 @@ function updateAllInDirectory() {
 
 updateInDirectory common
 updateInDirectory cloudfront
+updateInDirectory elasticsearch
 updateInDirectory es-key-figures
 updateInDirectory user-management
 updateInDirectory status
