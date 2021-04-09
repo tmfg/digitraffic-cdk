@@ -1,33 +1,11 @@
 import * as pgPromise from "pg-promise";
-import {initDbConnection} from "../../../../common/postgres/database";
 import {ServiceRequest} from "../../lib/model/service-request";
 import {createEditObject} from "../../lib/db/db-requests";
+import {dbTestBase as commonDbTestBase} from "../../../../common/test/db-testutils";
+import {IDatabase} from "pg-promise";
 
-export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
-    return () => {
-        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54322/road', {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
-
-        beforeAll(async () => {
-            process.env.DB_USER = 'road';
-            process.env.DB_PASS = 'road';
-            process.env.DB_URI = 'localhost:54322/road';
-            await truncate(db);
-        });
-
-        afterAll(async () => {
-            await truncate(db);
-            db.$pool.end();
-        });
-
-        beforeEach(async () => {
-            await truncate(db);
-        });
-
-        // @ts-ignore
-        fn(db);
-    };
+export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+    return commonDbTestBase(fn, truncate, 'road', 'road', 'localhost:54322/road');
 }
 
 export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {

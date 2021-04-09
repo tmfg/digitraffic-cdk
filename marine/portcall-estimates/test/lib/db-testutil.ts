@@ -6,37 +6,15 @@ import {DocumentClient} from "aws-sdk/clients/dynamodb";
 import {SUBSCRIPTIONS_TABLE_NAME} from "../../lib/subscriptions/db/db-subscriptions";
 import {INFO_TABLE_NAME} from "../../lib/subscriptions/db/db-info";
 import {PortAreaDetails, PortCall, Vessel, VesselLocation} from "./testdata";
+import {dbTestBase as commonDbTestBase} from "../../../../common/test/db-testutils";
+
+export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+    return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
+}
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
     return async () => {
         await db.tx(async (t: any) => await fn(t));
-    };
-}
-
-export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
-    return () => {
-        const db: IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
-
-        beforeAll(async () => {
-            process.env.DB_USER = 'marine';
-            process.env.DB_PASS = 'marine';
-            process.env.DB_URI = 'localhost:54321/marine';
-            await truncate(db);
-        });
-
-        afterAll(async () => {
-            await truncate(db);
-            db.$pool.end();
-        });
-
-        beforeEach(async () => {
-            await truncate(db);
-        });
-
-        // @ts-ignore
-        fn(db);
     };
 }
 

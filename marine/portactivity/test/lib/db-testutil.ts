@@ -1,39 +1,16 @@
 import {IDatabase, ITask} from "pg-promise";
-import {initDbConnection} from "../../../../common/postgres/database";
 import {ApiTimestamp} from "../../lib/model/timestamp";
 import {createUpdateValues, DbTimestamp} from "../../lib/db/db-timestamps";
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
+import {dbTestBase as commonDbTestBase} from "../../../../common/test/db-testutils";
+
+export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+    return commonDbTestBase(fn, truncate, 'portactivity', 'portactivity', 'localhost:54321/marine');
+}
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
     return async () => {
         await db.tx(async (t: any) => await fn(t));
-    };
-}
-
-export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
-    return () => {
-        const db: IDatabase<any, any> = initDbConnection('portactivity', 'portactivity', 'localhost:54321/marine', {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
-
-        beforeAll(async () => {
-            process.env.DB_USER = 'portactivity';
-            process.env.DB_PASS = 'portactivity';
-            process.env.DB_URI = 'localhost:54321/marine';
-            await truncate(db);
-        });
-
-        afterAll(async () => {
-            await truncate(db);
-            db.$pool.end();
-        });
-
-        beforeEach(async () => {
-            await truncate(db);
-        });
-
-        // @ts-ignore
-        fn(db);
     };
 }
 

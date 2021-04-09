@@ -1,35 +1,10 @@
 import * as pgPromise from "pg-promise";
-import {initDbConnection} from "../../../../common/postgres/database";
 import {SpatialDisruption} from "../../lib/model/disruption";
 import {createEditObject} from "../../lib/db/db-disruptions";
-import * as sinon from 'sinon';
-import * as AWS from 'aws-sdk';
+import {dbTestBase as commonDbTestBase} from "../../../../common/test/db-testutils";
 
-export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
-    return () => {
-        const db: pgPromise.IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
-
-        beforeAll(async () => {
-            process.env.DB_USER = 'marine';
-            process.env.DB_PASS = 'marine';
-            process.env.DB_URI = 'localhost:54321/marine';
-            await truncate(db);
-        });
-
-        afterAll(async () => {
-            await truncate(db);
-            db.$pool.end();
-        });
-
-        beforeEach(async () => {
-            await truncate(db);
-        });
-
-        // @ts-ignore
-        fn(db);
-    };
+export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+    return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
 }
 
 export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {
