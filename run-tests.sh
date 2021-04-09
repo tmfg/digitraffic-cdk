@@ -10,7 +10,7 @@ DIR=${1:-.}
 function testInDirectory() {
     cd "$1"
     if [ -f package.json ]; then
-      #npm ci
+      npm ci
       npm run test
     fi
     cd ..
