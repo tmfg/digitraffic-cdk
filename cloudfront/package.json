@@ -14,7 +14,7 @@
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "Echo no tests for this project"
+    "test": "echo no tests for this project"
   },
   "devDependencies": {
     "@aws-cdk/assert": "1.83.0",

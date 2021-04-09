@@ -11,7 +11,7 @@
     "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "test": "Echo no tests for this project",
+    "test": "echo no tests for this project",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },

@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "test": "Echo no tests for this project",
+    "test": "echo no tests for this project",
     "cdk": "cdk"
   },
   "devDependencies": {
