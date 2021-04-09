@@ -1,34 +1,9 @@
 import * as pgPromise from "pg-promise";
-import {initDbConnection, inDatabase} from "../../../../common/postgres/database";
+import {dbTestBase as commonDbTestBase} from "../../../../common/test/db-testutils";
+import {IDatabase} from "pg-promise";
 
-export function dbTestBase(fn: (db: pgPromise.IDatabase<any, any>) => void) {
-    return () => {
-        const db: pgPromise.IDatabase<any, any> = initDbConnection('road', 'road', 'localhost:54322/road', {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
-
-        beforeAll(async () => {
-            process.env.DB_USER = 'road';
-            process.env.DB_PASS = 'road';
-            process.env.DB_URI = 'localhost:54322/road';
-            await truncate(db);
-        });
-
-        beforeEach(async () => {
-           await setup(db);
-        });
-
-        afterEach(async () => {
-            await truncate(db);
-        });
-
-        afterAll(async () => {
-            db.$pool.end();
-        });
-
-        // @ts-ignore
-        fn(db);
-    };
+export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+    return commonDbTestBase(fn, truncate, 'road', 'road', 'localhost:54322/road');
 }
 
 export async function setup(db: pgPromise.IDatabase<any, any>): Promise<null> {

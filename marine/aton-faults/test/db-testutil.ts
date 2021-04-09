@@ -1,41 +1,12 @@
-import {IDatabase, ITask} from "pg-promise";
-import {initDbConnection} from "../../../common/postgres/database";
+import {IDatabase} from "pg-promise";
 import {Fault} from "../lib/model/fault";
+import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
 
-export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
-    return async () => {
-        await db.tx(async (t: any) => await fn(t));
-    };
+export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+    return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
 }
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
-    return () => {
-        const db: IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
-
-        beforeAll(async () => {
-            process.env.DB_USER = 'marine';
-            process.env.DB_PASS = 'marine';
-            process.env.DB_URI = 'localhost:54321/marine';
-            await truncate(db);
-        });
-
-        afterAll(async () => {
-            await truncate(db);
-            db.$pool.end();
-        });
-
-        beforeEach(async () => {
-            await truncate(db);
-        });
-
-        // @ts-ignore
-        fn(db);
-    };
-}
-
-export async function truncate(db: IDatabase<any, any>): Promise<any> {
+async function truncate(db: IDatabase<any, any>): Promise<any> {
     return await db.tx(async t => {
         await db.none('DELETE FROM aton_fault');
     });
