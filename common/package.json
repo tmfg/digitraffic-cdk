@@ -4,7 +4,8 @@
   "description": "",
   "license": "EUPL",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "Echo no tests for this project"
   },
   "devDependencies": {
     "typescript": "4.1.3",

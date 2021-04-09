@@ -10,7 +10,8 @@
     "watch": "tsc -w",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "test": "Echo no tests for this project"
   },
   "devDependencies": {
     "@types/node": "14.0.27",

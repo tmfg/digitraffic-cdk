@@ -1,3 +1,14 @@
+const accountNumber = '123456789012';
+const app = 'someapp';
+const env = 'someenv';
+const accounts: Account[] = [{
+    accountNumber,
+    app,
+    env
+}];
+process.env.KNOWN_ACCOUNTS = JSON.stringify(accounts);
+process.env.ES_ENDPOINT = 'some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com';
+
 import {CloudWatchLogsDecodedData, CloudWatchLogsLogEvent} from "aws-lambda";
 import {
     buildSource,
@@ -19,22 +30,22 @@ describe('kinesis-to-es', () => {
     });
 
     test('getAppFromSenderAccount true', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
+        const account: Account = { accountNumber: accountNumber, env, app };
         expect(getAppFromSenderAccount(account.accountNumber, [account])).toBe(account.app);
     });
 
     test('getAppFromSenderAccount error', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
+        const account: Account = { accountNumber: accountNumber, env, app };
         expect(() => getAppFromSenderAccount('4567890123', [account])).toThrow();
     });
 
     test('getEnvFromSenderAccount true', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
-        expect(getEnvFromSenderAccount('123456789012', [account])).toBe(account.env);
+        const account: Account = { accountNumber: accountNumber, env, app };
+        expect(getEnvFromSenderAccount(accountNumber, [account])).toBe(account.env);
     });
 
     test('getEnvFromSenderAccount error', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
+        const account: Account = { accountNumber: accountNumber, env, app };
         expect(() => getEnvFromSenderAccount('4567890123', [account])).toThrow();
     });
 
@@ -44,7 +55,7 @@ describe('kinesis-to-es', () => {
     });
 
     test('transform', () => {
-        const account: Account = { accountNumber: '123456789012', env: 'someenv', app: 'someapp' };
+        const account: Account = { accountNumber: accountNumber, env, app };
         const logEvent: CloudWatchLogsLogEvent = {
             id: 'some-id',
             timestamp: 0,
