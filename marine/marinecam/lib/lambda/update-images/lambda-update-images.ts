@@ -1,12 +1,14 @@
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
-import {updateAllCameras} from "../../service/image-fetcher";
+import * as ImageFetcher from "../../service/image-fetcher";
 
 export const KEY_SECRET_ID = 'SECRET_ID';
-export const KEY_IMAGE_SERVER_URL = 'IMAGE_SERVER_URL';
-export const KEY_IMAGE_SERVER_USERNAME = 'IMAGE_SERVER_USERNAME';
-export const KEY_IMAGE_SERVER_PASSWORD = 'IMAGE_SERVER_PASSWORD';
+export const KEY_IMAGE_SERVER_URL = 'mobile_server.url';
+export const KEY_IMAGE_SERVER_USERNAME = 'mobile_server.username';
+export const KEY_IMAGE_SERVER_PASSWORD = 'mobile_server.password';
+export const KEY_BUCKET_NAME = 's3_bucket_name';
 
 const secretId = process.env[KEY_SECRET_ID] as string;
+const bucketName = process.env[KEY_BUCKET_NAME] as string;
 
 let imageServerUrl: string;
 let imageServerUsername: string;
@@ -22,7 +24,7 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
             });
         }
 
-        await updateAllCameras(imageServerUrl, imageServerUsername, imageServerPassword);
+        return await ImageFetcher.updateAllCameras(imageServerUrl, imageServerUsername, imageServerPassword, bucketName);
     };
 }
 

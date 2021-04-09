@@ -2,7 +2,7 @@ import {S3} from "aws-sdk";
 
 export function uploadToS3(
     bucketName: string,
-    body: string,
+    body: any,
     filename: string,
     cannedAcl?: string,
     contentType?: string

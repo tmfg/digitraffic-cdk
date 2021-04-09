@@ -14,25 +14,35 @@ const parse = util.promisify(parseString);
 
 export class Session {
     readonly url: string;
-    readonly acceptSelfSignedCertificate: boolean;
+    readonly agent: https.Agent;
 
     // this increases for every command
     sequenceId: number;
     // this is received after succesful connect and must be used in every command after that
     connectionId: string;
 
-    constructor(url: string, acceptSelfSignedCertificate: boolean = false) {
+    constructor(url: string, acceptSelfSignedCertificate: boolean = false, certificate?: string) {
         this.url = url;
         this.sequenceId = 1;
-        this.acceptSelfSignedCertificate = acceptSelfSignedCertificate;
+
+        if(acceptSelfSignedCertificate) {
+            this.agent = new https.Agent({
+                rejectUnauthorized: false
+            });
+        } else {
+            if(!certificate) {
+                throw new Error("No certificate!");
+            }
+
+            this.agent = new https.Agent({
+                rejectUnauthorized: false,
+                cert: certificate
+            });
+        }
     }
 
     async post(url: string, xml: string): Promise<any> {
-        if(this.acceptSelfSignedCertificate) {
-            return await axios.post(this.url, xml, { httpsAgent: agent });
-        }
-
-        return await axios.post(this.url, xml);
+        return await axios.post(this.url, xml, { httpsAgent: agent });
     }
 
     async sendMessage(command: Command) {

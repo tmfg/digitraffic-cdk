@@ -1,18 +1,28 @@
 import {Session} from "./session";
-import {storeImage} from "./image-store";
+import * as ImageStore from "./image-store";
+import * as MetadataService from './metadata';
 
-const CAMERA_ID_LIST = ['bccf67f3-bec3-4716-aa28-63f3b7c187d8', 'd4d56ee5-6241-47d2-a3a7-cbca2792ec72'];
+export async function updateAllCameras(url: string, username: string, password: string, bucketName: string) {
+    const cameraIds = await MetadataService.getAllCameraIds();
+    const session = await loginToCameraServer(url, username, password);
 
-export async function updateAllCameras(url: string, username: string, password: string) {
+    return await updateAllImages(cameraIds, session, bucketName);
+}
+
+async function updateAllImages(cameraIds: string[], session: Session, bucketName: string): Promise<any> {
+    return await Promise.allSettled(cameraIds.map(cameraId => {
+        return session.getThumbnail(cameraId)
+            .then(thumbnail => ImageStore.storeImage(cameraId, thumbnail, bucketName))
+            .then(_ => MetadataService.updateMetadataUpdated(cameraId, new Date()));
+    }));
+}
+
+async function loginToCameraServer(url: string, username: string, password: string): Promise<Session> {
     const session = new Session(url, true);
-
     await session.connect();
     await session.login(username, password);
+
     //console.info(JSON.stringify(await session.getAllViewsAndCameras(), null, 2));
 
-    await Promise.allSettled(CAMERA_ID_LIST.map(async cameraId => {
-        const thumbnail = await session.getThumbnail(cameraId);
-
-        return storeImage(cameraId, thumbnail);
-    }));
+    return session;
 }

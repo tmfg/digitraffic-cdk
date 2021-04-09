@@ -4,6 +4,7 @@ import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {MobileServerProps} from './app-props';
 import * as InternalLambas from './internal-lambdas';
 import * as PublicApi from './public-api';
+import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 
 export class MarinecamStack extends Stack {
     constructor(scope: Construct, id: string, appProps: MobileServerProps, props?: StackProps) {
@@ -19,7 +20,18 @@ export class MarinecamStack extends Stack {
 
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
-        InternalLambas.create(secret, vpc, lambdaDbSg, appProps, this);
-        PublicApi.create(secret, vpc, lambdaDbSg, appProps, this);
+        const bucket = createImageBucket(this, appProps);
+
+        InternalLambas.create(secret, vpc, lambdaDbSg, appProps, bucket, this);
+        PublicApi.create(secret, vpc, lambdaDbSg, appProps, bucket, this);
     }
+}
+
+function createImageBucket(stack: Construct, props: MobileServerProps): Bucket {
+    return new Bucket(stack, 'MarinecamBucket', {
+        bucketName: `dt-marinecam-${props.env}`,
+        versioned: false,
+        publicReadAccess: false,
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
 }

@@ -1,7 +1,9 @@
 import {Camera} from "../model/camera";
 
 const FIELD_COMMUNICATION = "Communication";
-const FIELD_COMMAND = "Command"
+const FIELD_COMMAND = "Command";
+const FIELD_THUMBNAIL = "Thumbnail";
+const FIELD_PARAM = "Param";
 
 export class Command {
     readonly name: string;
@@ -63,7 +65,7 @@ export class ConnectCommand extends Command {
     }
 
     getResult(response: any): any {
-        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0].Param[0].$.Value;
+        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0][FIELD_PARAM][0].$.Value;
     }
 }
 
@@ -101,6 +103,6 @@ export class GetThumbnailCommand extends Command {
     }
 
     getResult(response: any): any {
-        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0].Thumbnail;
+        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_THUMBNAIL][0];
     }
 }
