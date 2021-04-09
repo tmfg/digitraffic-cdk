@@ -14,7 +14,7 @@ export function dbTestBase(
     dbPass: string,
     dbHost: string) {
 
-    const theDbHost = process.env.DB_HOST ?? dbHost;
+    const theDbHost = process.env.DB_URI ?? dbHost;
 
     return () => {
         const db: IDatabase<any, any> = initDbConnection(dbUser, dbPass, theDbHost, {
