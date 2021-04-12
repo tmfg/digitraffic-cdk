@@ -12,19 +12,20 @@ export function dbTestBase(
     truncateFn: (db: IDatabase<any, any>) => any,
     dbUser: string,
     dbPass: string,
-    dbHost: string) {
+    dbUri: string) {
 
-    const theDbHost = process.env.DB_URI ?? dbHost;
+    const theDbUri = process.env.DB_URI ?? dbUri;
+    console.log(`Test database URI: ${theDbUri}`);
 
     return () => {
-        const db: IDatabase<any, any> = initDbConnection(dbUser, dbPass, theDbHost, {
+        const db: IDatabase<any, any> = initDbConnection(dbUser, dbPass, theDbUri, {
             noWarnings: true // ignore duplicate connection warning for tests
         });
 
         beforeAll(async () => {
             process.env.DB_USER = dbUser;
             process.env.DB_PASS = dbPass;
-            process.env.DB_URI = theDbHost;
+            process.env.DB_URI = theDbUri;
             await truncateFn(db);
         });
 
