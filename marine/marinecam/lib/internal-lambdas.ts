@@ -34,7 +34,7 @@ function createUpdateImagesLambda(secret: ISecret, vpc: IVpc, lambdaDbSg: ISecur
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         memorySize: 256,
         functionName: functionName,
-        code: new AssetCode('dist/lambda/'),
+        code: new AssetCode('dist/lambda/update-images'),
         handler: 'lambda-update-images.handler',
         environment
     });

@@ -17,7 +17,7 @@ export async function storeImage(cameraId: string, image: string, bucketName: st
 
         return fs.writeFileSync(imageName, image, BASE64);
     } else {
-        const keyName = `images/saimaa/${imageName}`;
+        const keyName = `images/Saimaa/${imageName}`;
 
         const buffer = Buffer.from(image, BASE64);
 
