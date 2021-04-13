@@ -1,6 +1,6 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {RtzVoyagePlan} from "../../model/voyageplan";
+import {RtzVoyagePlan} from "../../../../../common/vis/voyageplan";
 import {findFaultIdsForVoyagePlan} from "../../service/faults";
 import {SNS} from "aws-sdk";
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
