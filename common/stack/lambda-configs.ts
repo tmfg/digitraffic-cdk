@@ -61,7 +61,7 @@ export function dbLambdaConfiguration(
 }
 
 export function defaultLambdaConfiguration(config: FunctionParameters): FunctionProps {
-    return {
+    const props: FunctionProps = {
         runtime: Runtime.NODEJS_12_X,
         memorySize: config.memorySize ?? 1024,
         functionName: config.functionName,
@@ -71,8 +71,17 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
         reservedConcurrentExecutions: config.reservedConcurrentExecutions,
         code: config.code,
         role: config.role,
-        timeout: Duration.seconds(config.timeout || 60),
+        timeout: Duration.seconds(config.timeout || 60)
     };
+    if (config.vpc) {
+        // @ts-ignore
+        props.vpc = config.vpc;
+        // @ts-ignore
+        props.vpcSubnets = {
+            subnets: config.vpc?.privateSubnets
+        };
+    }
+    return props;
 }
 
 interface FunctionParameters {

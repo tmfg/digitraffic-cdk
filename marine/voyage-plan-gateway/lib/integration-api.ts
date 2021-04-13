@@ -107,13 +107,10 @@ function createHandler(
     environment[KEY_SECRET_ID] = props.secretId;
     const handler = new Function(stack, functionName, defaultLambdaConfiguration({
         functionName,
-        code: new AssetCode('dist/lambda/upload-voyage-plan'),
+        code: new AssetCode('dist/lambda'),
         handler: 'lambda-upload-voyage-plan.handler',
         environment,
-        vpc: vpc,
-        vpcSubnets: {
-            subnets: vpc.privateSubnets
-        }
+        vpc: vpc
     }));
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     return handler;
