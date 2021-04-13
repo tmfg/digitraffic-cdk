@@ -1,8 +1,9 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {RtzVoyagePlan} from "../../model/voyageplan";
+import {RtzVoyagePlan} from "../../../../../common/vis/voyageplan";
 import {BAD_REQUEST_MESSAGE} from "../../../../../common/api/errors";
 import {withSecret} from "../../../../../common/secrets/secret";
+
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
@@ -38,8 +39,6 @@ export function handlerFn(
                 console.error('UploadVoyagePlan XML parsing failed', error);
                 return Promise.reject(BAD_REQUEST_MESSAGE);
             }
-
-
             // do nothing currently
             return Promise.resolve();
         });
