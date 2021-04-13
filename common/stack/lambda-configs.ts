@@ -9,7 +9,7 @@ export interface LambdaConfiguration {
     allowFromIpAddresses?: string[];
     privateSubnetIds: string[];
     availabilityZones: string[];
-    lambdaDbSgId: string;
+    lambdaDbSgId?: string;
     dbProps?: DbProps;
     defaultLambdaDurationSeconds?: number;
     logsDestinationArn: string;
@@ -85,4 +85,6 @@ interface FunctionParameters {
     environment?: any
     reservedConcurrentExecutions?: number;
     role?: Role;
+    vpc?: IVpc
+    vpcSubnets: any
 }
