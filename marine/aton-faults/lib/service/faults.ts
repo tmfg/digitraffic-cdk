@@ -4,7 +4,7 @@ import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
-import {RtzVoyagePlan} from "../model/voyageplan";
+import {RtzVoyagePlan} from "../../../../common/vis/voyageplan";
 import {findFaultIdsByRoute} from "../db/db-faults";
 import moment from 'moment-timezone';
 import {Feature, GeoJsonProperties} from "geojson";
