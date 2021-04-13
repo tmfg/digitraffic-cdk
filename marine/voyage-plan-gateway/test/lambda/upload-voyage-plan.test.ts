@@ -18,7 +18,7 @@ describe('upload-voyage-plan', () => {
         };
         await handlerFn(secretFn)(uploadEvent);
     });
-    
+
 });
 
 // generated with IntelliJ IDEA tool: XML from schema
