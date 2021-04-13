@@ -9,7 +9,7 @@ export interface LambdaConfiguration {
     allowFromIpAddresses?: string[];
     privateSubnetIds: string[];
     availabilityZones: string[];
-    lambdaDbSgId?: string;
+    lambdaDbSgId: string;
     dbProps?: DbProps;
     defaultLambdaDurationSeconds?: number;
     logsDestinationArn: string;
