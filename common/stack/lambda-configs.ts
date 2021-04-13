@@ -86,5 +86,5 @@ interface FunctionParameters {
     reservedConcurrentExecutions?: number;
     role?: Role;
     vpc?: IVpc
-    vpcSubnets: any
+    vpcSubnets?: any
 }
