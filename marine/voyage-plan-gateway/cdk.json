@@ -1,0 +1,3 @@
+{
+  "app": "npx ts-node bin/voyage-plan-gateway-app.ts"
+}
