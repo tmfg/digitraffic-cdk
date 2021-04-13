@@ -12,8 +12,13 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "../../../common/api/mediatypes";
 import {MessageModel} from "../../../common/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
+import {IVpc} from "@aws-cdk/aws-ec2";
 
-export function create(secret: ISecret, props: VoyagePlanGatewayProps, stack: Construct) {
+export function create(
+    secret: ISecret,
+    vpc: IVpc,
+    props: VoyagePlanGatewayProps,
+    stack: Construct) {
 
     const integrationApi = createRestApi(
         stack,
@@ -30,7 +35,7 @@ export function create(secret: ISecret, props: VoyagePlanGatewayProps, stack: Co
     });
     createUsagePlan(integrationApi, 'VPGW Faults CloudFront API Key', 'VPGW Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
-    createUploadVoyagePlanHandler(messageResponseModel, secret, stack, integrationApi, props);
+    createUploadVoyagePlanHandler(messageResponseModel, secret, stack, integrationApi, vpc, props);
 }
 
 function createUploadVoyagePlanHandler(
@@ -38,9 +43,10 @@ function createUploadVoyagePlanHandler(
     secret: ISecret,
     stack: Construct,
     integrationApi: RestApi,
+    vpc: IVpc,
     props: VoyagePlanGatewayProps) {
 
-    const handler = createHandler(stack, props);
+    const handler = createHandler(stack, vpc, props);
     secret.grantRead(handler);
     const resource = integrationApi.root.addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
@@ -93,6 +99,7 @@ function createIntegrationResource(
 
 function createHandler(
     stack: Construct,
+    vpc: IVpc,
     props: VoyagePlanGatewayProps,
 ): Function {
     const functionName = 'VPGW-UploadVoyagePlan';
@@ -102,7 +109,11 @@ function createHandler(
         functionName,
         code: new AssetCode('dist/lambda/upload-voyage-plan'),
         handler: 'lambda-upload-voyage-plan.handler',
-        environment
+        environment,
+        vpc: vpc,
+        vpcSubnets: {
+            subnets: vpc.privateSubnets
+        }
     }));
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     return handler;

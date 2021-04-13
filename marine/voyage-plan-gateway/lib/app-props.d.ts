@@ -1,4 +1,5 @@
-export interface VoyagePlanGatewayProps {
+import {LambdaConfiguration} from "../../../common/stack/lambda-configs";
+
+declare interface VoyagePlanGatewayProps extends LambdaConfiguration {
     readonly secretId: string
-    readonly logsDestinationArn: string
 }
