@@ -53,7 +53,7 @@ function createUploadVoyagePlanHandler(
 
     const handler = createHandler(sendFaultTopic, stack, vpc, lambdaDbSg, props);
     secret.grantRead(handler);
-    const resource = integrationApi.root.addResource("voyagePlans")
+    const resource = integrationApi.root.addResource("s124").addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
     sendFaultTopic.grantPublish(handler);
 }
