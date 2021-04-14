@@ -63,11 +63,12 @@ const GET_FAULT_BY_ID = `
 `;
 
 // find faults that are relevant for ships
+// return only commercial & non-commercial ATON faults, not any other type of faults
 // transform given ship route (linestring) from wgs84 to etrs89 / tm35fin for metric buffering and then back to wgs84
 const FAULT_IDS_BY_AREA =
     `select id
      from aton_fault, area, aton_fault_type, aton_type
-     where domain in ('C_NA', 'C_NM') 
+     where domain in ('C_NA', 'NC_NA') 
      and aton_fault.area_number = area.area_number
      and aton_fault.type = aton_fault_type.name_fi
      and aton_fault.aton_type_fi = aton_type.name_fi
