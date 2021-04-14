@@ -13,8 +13,6 @@ export function handlerFn(
             return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
                 const timestamp = JSON.parse(r.body);
 
-                console.info("saving timestamp " + JSON.stringify(timestamp));
-
                 if (!validateTimestamp(timestamp)) {
                     return Promise.reject();
                 }
