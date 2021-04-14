@@ -18,7 +18,7 @@ export class Session {
 
     // this increases for every command
     sequenceId: number;
-    // this is received after succesful connect and must be used in every command after that
+    // this is received after successful connect and must be used in every command after that
     connectionId: string;
 
     constructor(url: string, acceptSelfSignedCertificate: boolean = false, certificate?: string) {
@@ -42,13 +42,13 @@ export class Session {
     }
 
     async post(url: string, xml: string): Promise<any> {
-        return await axios.post(this.url, xml, { httpsAgent: agent });
+        return await axios.post(this.url, xml, { httpsAgent: agent, timeout: 3000 });
     }
 
     async sendMessage(command: Command) {
         const xml = command.createXml(this.sequenceId++, this.connectionId);
 
-//        console.info("sending:" + xml);
+        console.info("sending:" + xml);
 
         const resp = await this.post(this.url, xml);
 

@@ -2,9 +2,9 @@ import {Session} from "./session";
 import * as ImageStore from "./image-store";
 import * as MetadataService from './metadata';
 
-export async function updateAllCameras(url: string, username: string, password: string, bucketName: string) {
+export async function updateAllCameras(url: string, username: string, password: string, bucketName: string, certificate: string) {
     const cameraIds = await MetadataService.getAllCameraIds();
-    const session = await loginToCameraServer(url, username, password);
+    const session = await loginToCameraServer(url, username, password, certificate);
 
     return await updateAllImages(cameraIds, session, bucketName);
 }
@@ -17,8 +17,8 @@ async function updateAllImages(cameraIds: string[], session: Session, bucketName
     }));
 }
 
-async function loginToCameraServer(url: string, username: string, password: string): Promise<Session> {
-    const session = new Session(url, true);
+async function loginToCameraServer(url: string, username: string, password: string, certificate: string): Promise<Session> {
+    const session = new Session(url, true, certificate);
     await session.connect();
     await session.login(username, password);
 

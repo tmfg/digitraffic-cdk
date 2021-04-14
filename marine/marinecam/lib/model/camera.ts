@@ -1,5 +1,6 @@
 export interface Camera {
     readonly id: string,
     readonly name: string,
-    readonly type: string
+    readonly cameraGroupId: string,
+    readonly lastUpdated: Date
 }
