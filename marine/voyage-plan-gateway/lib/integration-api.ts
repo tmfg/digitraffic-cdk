@@ -48,7 +48,7 @@ function createUploadVoyagePlanHandler(
 
     const handler = createHandler(stack, vpc, props);
     secret.grantRead(handler);
-    const resource = integrationApi.root.addResource("voyagePlans")
+    const resource = integrationApi.root.addResource("vpgw").addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
 }
 
