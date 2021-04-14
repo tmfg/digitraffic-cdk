@@ -102,6 +102,10 @@ function createHandler(
     vpc: IVpc,
     props: VoyagePlanGatewayProps,
 ): Function {
+    // ATTENTION!
+    // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
+    // The reason for this is IP based restriction in another system's firewall.
+
     const functionName = 'VPGW-UploadVoyagePlan';
     const environment: any = {};
     environment[KEY_SECRET_ID] = props.secretId;
