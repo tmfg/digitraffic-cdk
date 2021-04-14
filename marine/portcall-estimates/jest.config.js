@@ -6,5 +6,6 @@ module.exports = {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
-    "preset": "@shelf/jest-dynamodb"
+    "preset": "@shelf/jest-dynamodb",
+    testResultsProcessor: "jest-junit"
   }

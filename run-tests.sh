@@ -9,7 +9,7 @@ DIR=${1:-.}
 
 function testInDirectory() {
     cd "$1"
-    if [ -f package.json ]; then
+    if [ -f jest.config.js ]; then
       npm ci
       npm run test
     fi
