@@ -6,4 +6,5 @@ module.exports = {
     "transform": {
       "^.+\\.tsx?$": "ts-jest"
     },
+    testResultsProcessor: "jest-junit"
   }
