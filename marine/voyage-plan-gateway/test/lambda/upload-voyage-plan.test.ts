@@ -1,22 +1,29 @@
-import * as pgPromise from "pg-promise";
-import {handlerFn, UploadVoyagePlanEvent} from '../../lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan';
+import {handlerFn} from '../../lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan';
 import * as sinon from 'sinon';
-import {BAD_REQUEST_MESSAGE} from "../../../../common/api/errors";
+import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../common/api/errors";
 
 const sandbox = sinon.createSandbox();
 
 describe('upload-voyage-plan', () => {
 
-    const secretFn = async (secret: string, fn: any) => {await fn(secret)};
+    const secretFn = async (secret: string, fn: any) => await fn(secret);
 
     afterEach(() => sandbox.restore());
 
-    test('empty', async () => {
-        const uploadEvent: UploadVoyagePlanEvent = {
-            voyagePlan,
-            callbackEndpoint: 'some-endpoint'
+    test('validation failure, some string', async () => {
+        const uploadEvent = {
+            voyagePlan: '<foo bar'
         };
-        await handlerFn(secretFn)(uploadEvent);
+
+        await expect(handlerFn(secretFn)(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
+    });
+
+    test('validation success with correct voyage plan', async () => {
+        const uploadEvent = {
+            voyagePlan
+        };
+
+        await expect(handlerFn(secretFn)(uploadEvent)).resolves.toMatch(OK_MESSAGE);
     });
 
 });
@@ -187,4 +194,4 @@ const voyagePlan = `
     </extension>
   </extensions>
 </route>
-`;
+`.trim();
