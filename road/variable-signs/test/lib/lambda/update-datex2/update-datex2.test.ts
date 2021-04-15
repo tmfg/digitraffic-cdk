@@ -6,14 +6,9 @@ import {findActiveSignsDatex2} from "../../../../lib/service/variable-sign-servi
 
 describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('update_valid_datex2', async () => {
-        const request = getRequest('valid_datex2.xml');
-        const response = await handler(request);
-
-        expect(response.statusCode).toBe(200);
+        const response = await updateFile('valid_datex2.xml', 200);
 
         const datex2 = (await findActiveSignsDatex2()).body;
-
-        console.log("datex2 " + datex2);
 
         expect(datex2).toMatch(/xml/);
         expect(datex2).toMatch(/KRM015651/);
@@ -21,20 +16,37 @@ describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) =
     });
 
     test('update_valid_datex2_without_body', async () => {
-        const request = getRequest('invalid_datex2_without_body.xml')
-        const response = await handler(request);
-
-        expect(response.statusCode).toBe(400);
+        await updateFile('invalid_datex2_without_body.xml', 400);
     });
 
     test('update_valid_datex2_without_publication', async () => {
-        const request = getRequest('invalid_datex2_without_publication.xml')
-        const response = await handler(request);
+        await updateFile('invalid_datex2_without_publication.xml', 400);
+    });
 
-        expect(response.statusCode).toBe(400);
+    test('insert_update', async () => {
+        await updateFile('valid_datex2.xml', 200);
+
+        const datex2 = (await findActiveSignsDatex2()).body;
+        expect(datex2).toMatch(/\<overallStartTime\>2020-02-19T14:45:02.013Z<\/overallStartTime>/);
+
+        // and then update
+        await updateFile('valid_datex2_updated.xml', 200);
+
+        const datex2_2 = (await findActiveSignsDatex2()).body;
+        expect(datex2_2).toMatch(/\<overallStartTime\>2020-02-20T14:45:02.013Z<\/overallStartTime>/);
+
     });
 }));
 
-function getRequest(filename: string) {
+async function updateFile(filename: string, expectedStatusCode: number): Promise<any> {
+    const request = getRequest(filename);
+    const response = await handler(request);
+
+    expect(response.statusCode).toBe(expectedStatusCode);
+
+    return response;
+}
+
+function getRequest(filename: string): any {
     return {body: readFileSync('test/lib/lambda/update-datex2/' + filename, 'utf8')}
 }

@@ -21,6 +21,7 @@ export interface Situation {
 
 export async function updateDatex2(datex2: string): Promise<any> {
     const start = Date.now();
+    const timestamp = new Date(start);
 
     if(!validate(datex2)) {
         return {statusCode: 400}
@@ -29,13 +30,11 @@ export async function updateDatex2(datex2: string): Promise<any> {
     const situations = parseDatex(datex2);
 
     await inDatabase(async (db: IDatabase<any,any>) => {
-        return await db.tx((t: any) => {
-            const promises = [
-                ...DeviceDB.saveDatex2(db, situations),
-                LastUpdatedDB.updateLastUpdated(db, DataType.VS_DATEX2, new Date(start))
-            ];
-
-            return t.batch(promises);
+        return await db.tx((tx: any) => {
+            return tx.batch([
+                ...DeviceDB.saveDatex2(tx, situations, timestamp),
+                LastUpdatedDB.updateLastUpdated(tx, DataType.VS_DATEX2, timestamp)
+            ]);
         })
     }).then(() => {
         const end = Date.now();
@@ -45,7 +44,7 @@ export async function updateDatex2(datex2: string): Promise<any> {
     return {statusCode: 200};
 }
 
-function parseDatex(datex2: string): Situation[] {
+export function parseDatex(datex2: string): Situation[] {
     const situations: Situation[] = parseSituations(datex2);
 
     return situations;
@@ -53,7 +52,7 @@ function parseDatex(datex2: string): Situation[] {
 
 function parseSituations(datex2: string): Situation[] {
     const situations: Situation[] = [];
-    var index = 0;
+    let index = 0;
 
     // go through the document and find all situation-blocks
     // add them to the list and return them
@@ -96,19 +95,19 @@ function parseEffectDate(datex2: string): Date {
 
 function validate(datex2: string): boolean {
     if(!datex2.includes(XML_TAG_START)) {
-        console.log('does not contain xml-tag')
+        console.error('no xml-tag')
         return false;
     }
 
-    const ppCount = occurances(datex2, REG_PAYLOAD);
+    const ppCount = occurrences(datex2, REG_PAYLOAD);
     if(ppCount != 1) {
-        console.log('contains %d payloadPublications', ppCount);
+        console.error('%d payloadPublications', ppCount);
         return false;
     }
 
     return true;
 }
 
-function occurances(string: string, regexp: any): number {
+function occurrences(string: string, regexp: any): number {
     return (string.match(regexp)||[]).length;
 }
