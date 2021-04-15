@@ -16,7 +16,10 @@ export async function uploadArea(
                 ca,
                 cert: clientCertificate,
                 key: privateKey
-            })
+            }),
+            headers: {
+                'Content-Type': 'text/xml;charset=utf-8'
+            }
         });
         if (resp.status != 200) {
             console.error(`method=uploadArea returned status=${resp.status}, status text: ${resp.statusText}`);
