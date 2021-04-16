@@ -1,5 +1,5 @@
 import {IDatabase, ITask} from "pg-promise";
-import {initDbConnection} from "../../../common/postgres/database";
+import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
     return async () => {
@@ -7,31 +7,8 @@ export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => vo
     };
 }
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
-    return () => {
-        const db: IDatabase<any, any> = initDbConnection('marine', 'marine', 'localhost:54321/marine', {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
-
-        beforeAll(async () => {
-            process.env.DB_USER = 'marine';
-            process.env.DB_PASS = 'marine';
-            process.env.DB_URI = 'localhost:54321/marine';
-            await truncate(db);
-        });
-
-        afterAll(async () => {
-            await truncate(db);
-            db.$pool.end();
-        });
-
-        beforeEach(async () => {
-            await truncate(db);
-        });
-
-        // @ts-ignore
-        fn(db);
-    };
+export function dbTestBase(fn: (db: IDatabase<any, any>) => void)
+    return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
 }
 
 export async function truncate(db: IDatabase<any, any>): Promise<any> {
