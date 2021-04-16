@@ -148,6 +148,11 @@ function createXml(fault: any) {
                         text : `${fault.aton_type} ${fault.aton_name_fi} Nr. ${fault.aton_id}, ${fault.state}`
                     },
                     fixedDateRange : createFixedDateRange(fault),
+                    theWarningPart: {
+                        '$': {
+                            'xlink:href': `NW.${id}.1`
+                        }
+                    }
                 }
             },
             member: {
