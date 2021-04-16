@@ -7,7 +7,7 @@ export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => vo
     };
 }
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => void)
+export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
     return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
 }
 
