@@ -7,9 +7,15 @@ import {Camera} from "../model/camera";
 export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
     console.info("listing cameras for " + usersGroups);
 
-    return await inDatabase(async (db: IDatabase<any,any>) => {
-        return await MetadataDB.getAllCameras(db, usersGroups);
-    });
+    const start = Date.now();
+
+    try {
+        return await inDatabase(async (db: IDatabase<any, any>) => {
+            return await MetadataDB.getAllCameras(db, usersGroups);
+        });
+    } finally {
+        console.info("method=listAllCameras tookMs=%d", (Date.now() - start));
+    }
 }
 
 export async function updateMetadataUpdated(cameraId: string, updated: Date): Promise<any> {

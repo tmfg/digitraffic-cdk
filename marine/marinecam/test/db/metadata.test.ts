@@ -1,12 +1,11 @@
-import * as pgPromise from "pg-promise";
+import {IDatabase} from "pg-promise";
 import {dbTestBase, insertCamera, insertCameraGroup} from "../db-testutil";
 import {getAllCameraIds, getAllCameras, updateCameraMetadata} from "../../lib/db/metadata";
 
 const GROUP_SAIMAA = 'Saimaa';
 const GROUP_LOIMAA = 'Loimaa';
 
-describe('db-metadata', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
-
+describe('db-metadata', dbTestBase((db: IDatabase<any, any>) => {
     test('getIds - empty', async () => {
         const ids = await getAllCameraIds(db);
 

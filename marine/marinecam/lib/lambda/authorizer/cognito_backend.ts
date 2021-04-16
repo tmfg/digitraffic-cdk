@@ -64,11 +64,6 @@ async function changeUserPassword(cognitoUser: any, newPassword: string, userAtt
                 console.info("failed " + JSON.stringify(result));
 
                 resolve(null);
-            },
-            newPasswordRequired: (result: any) => {
-                console.info("newPasswordRequired:" + JSON.stringify(result));
-
-                resolve(null);
             }
         });
     });
