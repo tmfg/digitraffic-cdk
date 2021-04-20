@@ -53,10 +53,12 @@ export class Command {
     }
 
     checkError(result: any) {
-        const resultCode = result[FIELD_COMMUNICATION][FIELD_COMMAND].Result;
+        const resultCode = result[FIELD_COMMUNICATION][FIELD_COMMAND][0].Result;
 
-        if (resultCode == 'Error') {
-            throw new Error('Command Failed');
+        if (resultCode === 'Error') {
+            console.error("Command failed: " + JSON.stringify(result));
+
+            throw new Error('Command Failed ' + resultCode);
         }
     }
 }
@@ -116,8 +118,6 @@ export class RequestStreamCommand extends Command {
 
     getResult(response: any): any {
         const output = response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0].Param as any[];
-
-        console.info("output " + JSON.stringify(output));
 
         const videoId = output.find(o => o.$.Name == 'VideoId');
 

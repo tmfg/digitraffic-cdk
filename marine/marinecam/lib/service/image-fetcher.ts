@@ -18,11 +18,9 @@ async function updateAllImages(cameraIds: string[], session: Session, bucketName
 }
 
 async function loginToCameraServer(url: string, username: string, password: string, certificate: string): Promise<Session> {
-    const session = new Session(url, true, certificate);
+    const session = new Session(url, false, certificate);
     await session.connect();
     await session.login(username, password);
-
-    //console.info(JSON.stringify(await session.getAllViewsAndCameras(), null, 2));
 
     return session;
 }

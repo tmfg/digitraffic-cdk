@@ -32,40 +32,39 @@ function getGroupFromPath(path: string): string {
 async function generatePolicy(group: string, username: string, password: string, methodArn: string): Promise<any> {
     const authResponse = {} as any;
 
+    let user;
     try {
-        const user = await loginUser(username, password);
-        const effect = await checkAuthorization(user, group);
-
-        const policyDocument = {} as any;
-        policyDocument.Version = '2012-10-17';
-        policyDocument.Statement = [];
-
-        const statementOne = {} as any;
-        statementOne.Action = 'execute-api:Invoke';
-        statementOne.Effect = effect;
-        statementOne.Resource = methodArn;
-
-        const context = {} as any;
-        context.groups = JSON.stringify(user.accessToken.payload[KEY_COGNITO_GROUPS]);
-
-        policyDocument.Statement[0] = statementOne;
-        authResponse.policyDocument = policyDocument;
-        authResponse.context = context;
-
-        return authResponse;
+        user = await loginUser(username, password);
     } catch(error) {
-        console.info("error " + JSON.stringify(error));
+        console.info("error in login " + JSON.stringify(error));
     }
 
+    const effect = await checkAuthorization(user, group);
+
+    const policyDocument = {} as any;
+    policyDocument.Version = '2012-10-17';
+    policyDocument.Statement = [];
+
+    const statementOne = {} as any;
+    statementOne.Action = 'execute-api:Invoke';
+    statementOne.Effect = effect;
+    statementOne.Resource = methodArn;
+
+    const context = {} as any;
+    context.groups = JSON.stringify(user ? user.accessToken.payload[KEY_COGNITO_GROUPS] : []);
+
+    policyDocument.Statement[0] = statementOne;
+    authResponse.policyDocument = policyDocument;
+    authResponse.context = context;
+
+    return authResponse;
 }
 
 async function checkAuthorization(user: any, group: string): Promise<string> {
     if(user) {
-        console.info("checking group " + group);
-
         const userGroups = user.accessToken.payload[KEY_COGNITO_GROUPS] as string[];
 
-        if (userGroups.includes(group) || group == 'metadata') {
+        if (group === 'metadata' || userGroups?.includes(group)) {
             return EFFECT_ALLOW;
         }
     }

@@ -60,7 +60,7 @@ export class Session {
     async sendMessage(command: Command) {
         const xml = command.createXml(this.sequenceId++, this.connectionId);
 
-        console.info("sending:" + xml);
+//        console.info("sending:" + xml);
 
         const resp = await this.post(this.url, xml);
 
@@ -71,7 +71,7 @@ export class Session {
         const response = await parse(resp.data) as any;
         command.checkError(response);
 
-        console.info("response " + JSON.stringify(response, null, 2));
+//        console.info("response " + JSON.stringify(response, null, 2));
 
         return command.getResult(response);
     }
