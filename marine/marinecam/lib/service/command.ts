@@ -4,6 +4,8 @@ const FIELD_COMMUNICATION = "Communication";
 const FIELD_COMMAND = "Command";
 const FIELD_THUMBNAIL = "Thumbnail";
 const FIELD_PARAM = "Param";
+const FIELD_ITEM = "Item";
+const FIELD_ITEMS = "Items";
 
 export class Command {
     readonly name: string;
@@ -75,7 +77,7 @@ export class GetAllCamerasCommand extends Command {
     }
 
     getResult(response: any): Camera[] {
-        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0].Items[0].Item[0].Items[0].Item[0].Items[0].Item[0].Items[0].Item;
+        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
 
         const info = cameras.map((c: any) => {
             return {
@@ -104,5 +106,27 @@ export class GetThumbnailCommand extends Command {
 
     getResult(response: any): any {
         return response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_THUMBNAIL][0];
+    }
+}
+
+export class RequestStreamCommand extends Command {
+    constructor() {
+        super('RequestStream');
+    }
+
+    getResult(response: any): any {
+        const output = response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0].Param as any[];
+
+        console.info("output " + JSON.stringify(output));
+
+        const videoId = output.find(o => o.$.Name == 'VideoId');
+
+        return videoId?.$?.Value || "";
+    }
+}
+
+export class CloseStreamCommand extends Command {
+    constructor() {
+        super('CloseStream');
     }
 }

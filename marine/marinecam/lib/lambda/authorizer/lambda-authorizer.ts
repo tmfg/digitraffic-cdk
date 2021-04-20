@@ -6,8 +6,6 @@ const EFFECT_DENY = 'Deny';
 const KEY_COGNITO_GROUPS = "cognito:groups";
 
 export const handler = async function (event: any, context: any, callback: any) {
-    console.log("event " + JSON.stringify(event));
-
     const [username, password] = parseAuthentication(event.headers.authorization, callback);
     const group = getGroupFromPath(event.path);
 
@@ -19,8 +17,6 @@ export const handler = async function (event: any, context: any, callback: any) 
 }
 
 function parseAuthentication(authorizationHeader: string, callback: any): [string, string] {
-    console.info("header " + authorizationHeader);
-
     if(!authorizationHeader) return callback('Unauthorized');
 
     const encodedCreds = authorizationHeader.split(' ')[1];

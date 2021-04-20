@@ -11,7 +11,7 @@ export async function updateAllCameras(url: string, username: string, password: 
 
 async function updateAllImages(cameraIds: string[], session: Session, bucketName: string): Promise<any> {
     return await Promise.allSettled(cameraIds.map(cameraId => {
-        return session.getThumbnail(cameraId)
+        return getCameraThumbnail(session, cameraId)
             .then(thumbnail => ImageStore.storeImage(cameraId, thumbnail, bucketName))
             .then(_ => MetadataService.updateMetadataUpdated(cameraId, new Date()));
     }));
@@ -25,4 +25,12 @@ async function loginToCameraServer(url: string, username: string, password: stri
     //console.info(JSON.stringify(await session.getAllViewsAndCameras(), null, 2));
 
     return session;
+}
+
+async function getCameraThumbnail(session: Session, cameraId: string): Promise<string> {
+    const videoId = await session.startStream(cameraId);
+    const thumbnail = await session.getThumbnail(cameraId);
+    await session.closeStream(videoId);
+
+    return thumbnail;
 }

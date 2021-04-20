@@ -4,7 +4,19 @@ import util from "util";
 import {parseString} from "xml2js";
 
 import {Camera} from "../model/camera";
-import {Command, ConnectCommand, GetAllCamerasCommand, GetThumbnailCommand, LoginCommand} from "./command";
+import {
+    CloseStreamCommand,
+    Command,
+    ConnectCommand,
+    GetAllCamerasCommand,
+    GetThumbnailCommand,
+    LoginCommand,
+    RequestStreamCommand
+} from "./command";
+
+const COMPR_LEVEL = '70';
+const DEST_WIDTH = '1280';
+const DEST_HEIGHT = '720';
 
 const agent = new https.Agent({
   rejectUnauthorized: false
@@ -59,7 +71,7 @@ export class Session {
         const response = await parse(resp.data) as any;
         command.checkError(response);
 
-        //console.info("response " + JSON.stringify(response, null, 2));
+        console.info("response " + JSON.stringify(response, null, 2));
 
         return command.getResult(response);
     }
@@ -85,9 +97,34 @@ export class Session {
     async getThumbnail(cameraId: string): Promise<string> {
         const command = new GetThumbnailCommand()
             .addInputParameters('CameraId', cameraId)
-            .addInputParameters('DestWidth', '1024')
-            .addInputParameters('DestHeight', '768')
-            .addInputParameters('ComprLevel', '80');
+            .addInputParameters('Time', Date.now().toString())
+            .addInputParameters('DestWidth', DEST_WIDTH)
+            .addInputParameters('DestHeight', DEST_HEIGHT)
+            .addInputParameters('ComprLevel', COMPR_LEVEL);
+
+        return await this.sendMessage(command);
+    }
+
+    async startStream(cameraId: string) {
+        const command = new RequestStreamCommand()
+            .addInputParameters('CameraId', cameraId)
+            .addInputParameters('DestWidth', DEST_WIDTH)
+            .addInputParameters('DestHeight', DEST_HEIGHT)
+            .addInputParameters('SignalType', 'Live')
+            .addInputParameters('MethodType', 'Pull')
+            .addInputParameters('Fps', '1')
+            .addInputParameters('ComprLevel', COMPR_LEVEL)
+            .addInputParameters('KeyFramesOnly', 'Yes')
+            .addInputParameters('RequestSize', 'Yes')
+            .addInputParameters('StreamType', 'Transcoded')
+            .addInputParameters('ResizeAvailable', 'Yes')
+
+        return await this.sendMessage(command);
+    }
+
+    async closeStream(videoId: string) {
+        const command = new CloseStreamCommand()
+            .addInputParameters('VideoId', videoId);
 
         return await this.sendMessage(command);
     }

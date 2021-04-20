@@ -29,25 +29,21 @@ export async function loginUser(username: string, password: string): Promise<any
         try {
             cognitoUser.authenticateUser(authDetails, {
                 onSuccess: (result: any) => {
-                    console.info("success " + JSON.stringify(result));
-
                     resolve(result);
                 },
 
                 onFailure: (result: any) => {
-                    console.info("failure " + JSON.stringify(result));
+                    console.info("authenticateUser failed:" + JSON.stringify(result));
 
                     resolve(null);
                 },
 
                 newPasswordRequired: async (userAttributes: any, requiredAttributes: any) => {
-                    console.info("new password required " + JSON.stringify(userAttributes));
-
                     return await changeUserPassword(cognitoUser, password, userAttributes);
                 }
             });
         } catch(error) {
-            console.info("errorz " + JSON.stringify(error));
+            console.info("error from authenticateUser:" + JSON.stringify(error));
         }
     });
 }
@@ -56,12 +52,10 @@ async function changeUserPassword(cognitoUser: any, newPassword: string, userAtt
     return new Promise(resolve => {
         cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
             onSuccess: (result: any) => {
-                console.info("password changed " + JSON.stringify(result));
-
                 resolve(result);
             },
             onFailure: (result: any) => {
-                console.info("failed " + JSON.stringify(result));
+                console.info("passwordchallenge failed:" + JSON.stringify(result));
 
                 resolve(null);
             }

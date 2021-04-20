@@ -1,4 +1,4 @@
-import {uploadToS3} from "../../../../common/stack/s3-utils";
+import {S3} from "aws-sdk";
 import {MediaType} from "../../../../common/api/mediatypes";
 
 const BASE64 = 'base64';
@@ -21,6 +21,18 @@ export async function storeImage(cameraId: string, image: string, bucketName: st
 
         const buffer = Buffer.from(image, BASE64);
 
-        return await uploadToS3(bucketName, buffer, keyName, 'private', MediaType.IMAGE_JPEG);
+        return await uploadToS3(bucketName, buffer, keyName);
     }
+}
+
+export function uploadToS3(bucketName: string, body: any, filename: string) {
+    const s3 = new S3();
+    return s3.upload({
+        Bucket: bucketName,
+        Body: body,
+        Key: filename,
+        ACL: 'private',
+        CacheControl: 'max-age=120',
+        ContentType: MediaType.IMAGE_JPEG
+    }).promise();
 }
