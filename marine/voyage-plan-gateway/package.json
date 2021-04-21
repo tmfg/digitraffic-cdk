@@ -7,12 +7,11 @@
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
-    "postbuild": "node -pe \"const fs=require('fs');const str=fs.readFileSync('RTZ_1_2.xsd');fs.writeFileSync('lib/lambda/upload-voyage-plan/rtz.js', 'module.exports=\\`'+str+'\\`')\";esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
     "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
-    "pretest": "node -pe \"const fs=require('fs');const str=fs.readFileSync('RTZ_1_2.xsd');fs.writeFileSync('lib/lambda/upload-voyage-plan/rtz.js', 'module.exports=\\`'+str+'\\`')\"",
     "test": "jest --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
@@ -24,7 +23,6 @@
     "@types/node": "14.0.27",
     "@types/sinon": "^9.0.4",
     "@types/xml2js": "^0.4.5",
-    "@types/xsd-schema-validator": "^0.5.4",
     "@typescript-eslint/eslint-plugin": "^4.12.0",
     "@typescript-eslint/parser": "^4.12.0",
     "esbuild": "^0.8.36",
@@ -40,22 +38,20 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "1.83.0",
+    "@aws-cdk/aws-certificatemanager": "^1.83.0",
     "@aws-cdk/aws-ec2": "1.83.0",
     "@aws-cdk/aws-events-targets": "1.83.0",
     "@aws-cdk/aws-lambda": "1.83.0",
     "@aws-cdk/core": "1.83.0",
     "aws-sdk": "^2.861.0",
     "axios": "^0.21.1",
+    "libxmljs": "^0.19.7",
     "libxmljs2-xsd": "^0.26.5",
     "moment": "^2.27.0",
     "moment-timezone": "^0.5.31",
     "parse-link-header": "^1.0.1",
-    "pg-native": "3.0.0",
-    "pg-promise": "10.3.5",
-    "pg-query-stream": "4.0.0",
     "source-map-support": "^0.5.19",
-    "wkx": "^0.5.0",
-    "xml2js": "^0.4.23"
+    "wkx": "^0.5.0"
   },
   "externals": [
     "aws-sdk"
