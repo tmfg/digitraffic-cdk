@@ -27,7 +27,7 @@ import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "./lambda/constants";
 import apigateway = require('@aws-cdk/aws-apigateway');
 
 
-export function createIntegrationApi(
+export function createIntegrationApiAndHandlerLambda(
     queue: Queue,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,

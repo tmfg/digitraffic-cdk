@@ -59,21 +59,7 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
 
                 await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
 
-                await MaintenanceTrackingService.saveMaintenanceTrackingData(jsonString, sendingTime);
-                console.info(`method=processMaintenanceTrackingQueue messageSendingTime: ${sendingTime.toUTCString()} insertCount=1`);
-                const deleteParams = {
-                    QueueUrl: sqsQueueUrl,
-                    ReceiptHandle: record.receiptHandle
-                };
-
-                // S3 LifeCycle to delete old messages
-                // try {
-                //     console.info('deleteMessage with params ', JSON.stringify(deleteParams));
-                //     await sqsClient.deleteMessage(deleteParams).promise();
-                // } catch (e) {
-                //     console.error(`method=processMaintenanceTrackingQueue Error while deleteting message from queue and S3 deleteParams: ${JSON.stringify(deleteParams)}`, e);
-                //     return Promise.reject(e); // This wont reject the whole processing as below will return resolve
-                // }
+                console.info(`method=processMaintenanceTrackingQueue messageSendingTime: ${sendingTime.toUTCString()} observations insertCount=%d`, observationDatas.length);
 
                 return Promise.resolve();
             } catch (e) {
