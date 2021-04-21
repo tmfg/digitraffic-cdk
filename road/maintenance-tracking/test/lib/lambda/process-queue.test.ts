@@ -32,13 +32,12 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([recordFromS3]);
-        // const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
         await handlerFn(sqsClient)({
             Records: [recordNoJson]
         });
 
         const allTrackings = await findAllTrackings(db);
-        expect(allTrackings.length).toBe(1);
+        expect(allTrackings.length).toBe(0);
 
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(3);
@@ -53,7 +52,6 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         }
 
         expect(transformLambdaRecordsStub.calledWith([recordNoJson])).toBe(true);
-        // expect(deleteStub.calledOnceWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : recordFromS3.receiptHandle } )).toBe(true);
     });
 
 
@@ -70,14 +68,13 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3, record2FromS3]);
-        // const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
 
         await handlerFn(sqsClient)({
             Records: [record1NoJson, record2NoJson]
         });
 
         const allTrackings = await findAllTrackings(db);
-        expect(allTrackings.length).toBe(2);
+        expect(allTrackings.length).toBe(0);
 
 
         const allObservations = await findAllObservations(db);
@@ -85,17 +82,12 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         let prevObservationTime = moment("2019-01-30T12:00:04+02:00").valueOf();
         for(const obs of allObservations) {
-            console.info(JSON.stringify(obs));
             const observationTime = moment(obs.observationTime).valueOf();
             expect(observationTime).toBeGreaterThanOrEqual(prevObservationTime);
             prevObservationTime = observationTime;
-            console.info("epoc: ", observationTime);
         }
 
         expect(transformLambdaRecordsStub.calledWith([record1NoJson, record2NoJson])).toBe(true);
-        // expect(deleteStub.calledWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : record1NoJson.receiptHandle})).toBe(true);
-        // expect(deleteStub.calledWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : record2NoJson.receiptHandle})).toBe(true);
-        // expect(deleteStub.callCount).toEqual(2);
     });
 
     test('invalid record', async () => {
@@ -106,7 +98,6 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3]);
-        const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
 
         await handlerFn(sqsClient)({
             Records: [record1NoJson]
@@ -114,8 +105,11 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const allTrackings = await findAllTrackings(db);
         expect(allTrackings.length).toBe(0);
+
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(0);
+
         expect(transformLambdaRecordsStub.calledWith([record1NoJson])).toBe(true);
-        expect(deleteStub.notCalled).toBe(true);
     });
 
     test('invalid and valid record', async () => {
@@ -131,23 +125,25 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([invalidRecordFromS3, validRecordFromS3]);
-        // const deleteStub = sandbox.stub(sqsClient, 'deleteMessage').returns({promise: () => Promise.resolve()});
 
         await handlerFn(sqsClient)({
             Records: [invalidRecordNoJson, validRecordNoJson]
         });
 
         const allTrackings = await findAllTrackings(db);
-        expect(allTrackings.length).toBe(1);
-        expect(transformLambdaRecordsStub.calledWith([invalidRecordNoJson, validRecordNoJson])).toBe(true);
-        // expect(deleteStub.calledWith({ "QueueUrl" : process.env[SQS_QUEUE_URL], "ReceiptHandle" : validRecordNoJson.receiptHandle})).toBe(true);
-        // expect(deleteStub.callCount).toEqual(1);
-    });
+        expect(allTrackings.length).toBe(0);
 
-    test('json', async () => {
-        console.info(RECEIPT_HANDLE_SEPARATOR);
-        const json = getTrackingJson(getRandompId(),getRandompId());
-        console.info("JSON: ", json)
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(3);
+
+        let prevObservationTime = moment("2019-01-30T12:00:04+02:00").valueOf();
+        for(const obs of allObservations) {
+            const observationTime = moment(obs.observationTime).valueOf();
+            expect(observationTime).toBeGreaterThan(prevObservationTime);
+            prevObservationTime = observationTime;
+        }
+
+        expect(transformLambdaRecordsStub.calledWith([invalidRecordNoJson, validRecordNoJson])).toBe(true);
     });
 }));
 
