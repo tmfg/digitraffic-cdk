@@ -1,6 +1,7 @@
 import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc} from '@aws-cdk/aws-ec2';
 import * as IntegrationApi from './integration-api';
+import * as PublicApi from './public-api';
 import {VoyagePlanGatewayProps} from "./app-props";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 
@@ -17,5 +18,6 @@ export class VoyagePlanGatewayStack extends Stack {
         });
 
         IntegrationApi.create(secret, vpc, appProps, this);
+        PublicApi.create(secret, vpc, appProps, this);
     }
 }

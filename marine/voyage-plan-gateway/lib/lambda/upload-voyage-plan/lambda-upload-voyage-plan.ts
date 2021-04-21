@@ -2,8 +2,6 @@ import * as util from 'util';
 import * as xml2js from 'xml2js';
 import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../../common/api/errors";
 import {withSecret} from "../../../../../common/secrets/secret";
-const libXml = require('libxmljs2-xsd');
-const rtzSchema = require('./rtz');
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
@@ -32,13 +30,6 @@ export function handlerFn(
     return async function(event: UploadVoyagePlanEvent): Promise<string> {
         return await doWithSecret(secretId, async () => {
             try {
-                const schema = libXml.parse(rtzSchema);
-                const validationErrors = schema.validate(event.voyagePlan);
-                if (validationErrors) {
-                    console.log('Got XML validation errors', validationErrors);
-                    return Promise.reject(BAD_REQUEST_MESSAGE);
-                }
-
                 const parseXml = util.promisify(xml2js.parseString);
                 // discard result for now, just make sure it parses ok
                 await parseXml(event.voyagePlan);
