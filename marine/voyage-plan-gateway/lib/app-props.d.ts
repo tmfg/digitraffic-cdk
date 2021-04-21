@@ -10,4 +10,12 @@ declare interface VoyagePlanGatewayProps extends LambdaConfiguration {
     readonly mutualTlsBucketName: string
     // name of certificate in S3 bucket
     readonly mutualTlsCertName: string
+
+    // secret key for schedules access token
+    readonly schedulesAccessTokenSecretKey: string
+    // secret key for schedules URL
+    readonly schedulesUrlSecretKey: string
+
+    // secret key for CRL URL
+    readonly crlUrlSecretKey: string
 }
