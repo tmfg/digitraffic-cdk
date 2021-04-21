@@ -27,6 +27,7 @@ import {createSubscription} from "../../../common/stack/subscription";
 import {defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {KEY_SECRET_ID} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
+import {KEY_SECRET_ID as AUTHORIZER_KEY_SECRET_ID, KEY_CRL_URL_SECRETKEY} from "./lambda/authorize-request/lambda-authorize-request";
 import {VoyagePlanGatewayProps} from "./app-props";
 import {
     defaultIntegration,
@@ -108,12 +109,13 @@ function createUploadVoyagePlanHandler(
     const handler = createHandler(stack, vpc, props);
     secret.grantRead(handler);
     const resource = api.addResource("voyagePlans")
-    createIntegrationResource(stack, props, messageResponseModel, resource, handler);
+    createIntegrationResource(stack, secret, props, messageResponseModel, resource, handler);
 }
 
 
 function createIntegrationResource(
     stack: Construct,
+    secret: ISecret,
     props: VoyagePlanGatewayProps,
     messageResponseModel: Model,
     resource: Resource,
@@ -136,7 +138,7 @@ function createIntegrationResource(
     });
 
     resource.addMethod("POST", integration, {
-        authorizer: createRequestAuthorizer(stack, props),
+        authorizer: createRequestAuthorizer(stack, secret, props),
         apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.callbackEndpoint': false
@@ -160,15 +162,26 @@ function createIntegrationResource(
         stack);
 }
 
-function createRequestAuthorizer(stack: Construct, props: VoyagePlanGatewayProps): IAuthorizer {
+function createRequestAuthorizer(
+    stack: Construct,
+    secret: ISecret,
+    props: VoyagePlanGatewayProps): IAuthorizer {
+
     const functionName = 'VPGW-UploadVoyagePlan-Authorizer';
+    const env: any = {};
+    env[AUTHORIZER_KEY_SECRET_ID] = props.secretId;
+    env[KEY_CRL_URL_SECRETKEY] = props.crlUrlSecretKey;
     const handler = new Function(stack, functionName, {
         functionName,
         runtime: Runtime.NODEJS_12_X,
+        memorySize: 256,
+        timeout: Duration.seconds(15),
         code: new AssetCode('dist/lambda/authorize-request'),
         handler: 'lambda-authorize-request.handler',
-        logRetention: RetentionDays.ONE_YEAR
+        logRetention: RetentionDays.ONE_YEAR,
+        environment: env
     });
+    secret.grantRead(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     return new RequestAuthorizer(stack, 'VPGWAuthorizer', {
         handler,

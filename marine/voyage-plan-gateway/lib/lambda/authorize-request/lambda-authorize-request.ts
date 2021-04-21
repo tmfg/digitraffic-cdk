@@ -1,65 +1,90 @@
-export function handler(event: any, context: any, callback: any) {
-    console.log('AUTH', event, context);
+/**
+ * This API Gateway authorizer requires mutual TLS to be enabled on the API Gateway.
+ */
 
-    console.log('Received event:', JSON.stringify(event, null, 2));
+import {withSecret} from "../../../../../common/secrets/secret";
+import axios from 'axios';
+const asn1 = require('asn1js');
+const pkijs = require('pkijs');
+const pvutils = require('pvutils');
+const NodeCache = require('node-cache');
 
-    // A simple request-based authorizer example to demonstrate how to use request
-    // parameters to allow or deny a request. In this example, a request is
-    // authorized if the client-supplied headerauth1 header, QueryString1
-    // query parameter, and stage variable of StageVar1 all match
-    // specified values of 'headerValue1', 'queryValue1', and 'stageValue1',
-    // respectively.
+export const KEY_SECRET_ID = 'SECRET_ID';
+export const KEY_CRL_URL_SECRETKEY = 'KEY_CRL_URL';
 
-    // Retrieve request parameters from the Lambda function input:
-    var headers = event.headers;
-    var queryStringParameters = event.queryStringParameters;
-    var pathParameters = event.pathParameters;
-    var stageVariables = event.stageVariables;
+const secretId = process.env[KEY_SECRET_ID] as string;
+const crlUrlSecretKey = process.env[KEY_CRL_URL_SECRETKEY] as string;
 
-    // Parse the input for the parameter values
-    var tmp = event.methodArn.split(':');
-    var apiGatewayArnTmp = tmp[5].split('/');
-    var awsAccountId = tmp[4];
-    var region = tmp[3];
-    var restApiId = apiGatewayArnTmp[0];
-    var stage = apiGatewayArnTmp[1];
-    var method = apiGatewayArnTmp[2];
-    var resource = '/'; // root resource
-    if (apiGatewayArnTmp[3]) {
-        resource += apiGatewayArnTmp[3];
-    }
+const crlCache = new NodeCache({
+    stdTTL: 300 // 5 minutes in seconds
+});
 
-    // Perform authorization to return the Allow policy for correct parameters and
-    // the 'Unauthorized' error, otherwise.
-    var authResponse = {};
-    var condition: any = {};
-    condition.IpAddress = {};
+/**
+ *  Use certificate revocation list (CRL) to check if client certificate is revoked
+ */
+export async function handler(event: any, _: any, callback: any) {
+    return await withSecret(secretId, async (secret: any) => {
+        let crlData = crlCache.get('crl');
+        if (!crlData) {
+            console.info('CRL was not in cache, refreshing')
+            const newCrlData = await getCrlData(secret[crlUrlSecretKey] as string);
+            crlData = newCrlData.replace(/(-----(BEGIN|END) X509 CRL-----|[\n\r])/g, '');
+            crlCache.set(crlData);
+        }
 
-    callback(null, generateAllow('me', event.methodArn));
+        const crl = buildCrl(crlData);
+
+        const clientCertPem = event.requestContext.identity.clientCert.clientCertPem;
+        const pkiCert = buildCert(clientCertPem.replace(/(-----(BEGIN|END) CERTIFICATE-----|[\n\r])/g, ''));
+        const serial = pvutils.bufferToHexCodes(pkiCert.serialNumber.valueBlock.valueHex)
+
+        for (const { userCertificate } of crl.revokedCertificates) {
+            if (pvutils.bufferToHexCodes(userCertificate.valueBlock.valueHex) == serial) {
+                return callback(null, generateDeny('principal', event.methodArn))
+            }
+        }
+        callback(null, generateAllow('principal', event.methodArn));
+    });
 }
 
-// Help function to generate an IAM policy
-var generatePolicy = function(principalId: any, effect: any, resource: any) {
-    // Required output:
-    var authResponse: any = {};
+async function getCrlData(crlUrl: string): Promise<string> {
+    const res = await axios.get(crlUrl);
+    return res.data;
+}
+
+function buildCrl(crlData: string): any {
+    const buf = Buffer.from(crlData, 'base64');
+    const ber = new Uint8Array(buf).buffer;
+
+    const asn1crl = asn1.fromBER(ber);
+    return new pkijs.CertificateRevocationList({
+        schema: asn1crl.result
+    });
+}
+
+function buildCert(cert: string): any {
+    const certBuf = Buffer.from(cert, 'base64');
+    const certBer = new Uint8Array(certBuf).buffer;
+    const asn1Cert = asn1.fromBER(certBer);
+    return new pkijs.Certificate({
+        schema: asn1Cert.result
+    });
+}
+
+function generatePolicy(principalId: any, effect: any, resource: any) {
+    const authResponse: any = {};
     authResponse.principalId = principalId;
     if (effect && resource) {
-        var policyDocument: any = {};
+        const policyDocument: any = {};
         policyDocument.Version = '2012-10-17'; // default version
         policyDocument.Statement = [];
-        var statementOne: any = {};
+        const statementOne: any = {};
         statementOne.Action = 'execute-api:Invoke'; // default action
         statementOne.Effect = effect;
         statementOne.Resource = resource;
         policyDocument.Statement[0] = statementOne;
         authResponse.policyDocument = policyDocument;
     }
-    // Optional output with custom properties of the String, Number or Boolean type.
-    authResponse.context = {
-        "stringKey": "stringval",
-        "numberKey": 123,
-        "booleanKey": true
-    };
     return authResponse;
 }
 
