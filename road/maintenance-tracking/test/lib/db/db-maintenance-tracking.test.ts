@@ -3,7 +3,7 @@ import {DbMaintenanceTrackingData, Status} from "../../../lib/db/db-maintenance-
 import * as pgPromise from "pg-promise";
 import {createHash} from "../../../lib/service/maintenance-tracking";
 import {assertData, getRandompId, getTrackingJson} from "../testdata";
-import {dbTestBase, findAll} from "../db-testutil";
+import {dbTestBase, findAllTrackings} from "../db-testutil";
 
 describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -14,7 +14,7 @@ describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabas
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
 
-        const fetchedTrackings = await findAll(db);
+        const fetchedTrackings = await findAllTrackings(db);
         expect(fetchedTrackings.length).toBe(1);
 
         const saved = fetchedTrackings[0];
@@ -29,7 +29,7 @@ describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabas
         await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, createData(maintenanceTrackingDataJson1));
         await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, createData(maintenanceTrackingDataJson2));
 
-        const fetchedTrackings = await findAll(db);
+        const fetchedTrackings = await findAllTrackings(db);
         expect(fetchedTrackings.length).toBe(2);
     });
 
@@ -55,7 +55,7 @@ describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabas
         }
         expect(failure).toBe(true);
 
-        const fetchedTrackings = await findAll(db);
+        const fetchedTrackings = await findAllTrackings(db);
         expect(fetchedTrackings.length).toBe(1);
 
         const saved = fetchedTrackings[0];

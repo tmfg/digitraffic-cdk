@@ -28,10 +28,10 @@ export async function insertMaintenanceTrackingData(db: IDatabase<any, any>, tra
         name: 'insert-maintenance-tracking-data',
         text: INSERT_MAINTENANCE_TRACKING_DATA_SQL,
     });
-    return await db.oneOrNone(ps, createUpdateValues(tracking));
+    return await db.oneOrNone(ps, createInsertMessageValues(tracking));
 }
 
-export function createUpdateValues(e: DbMaintenanceTrackingData): any[] {
+export function createInsertMessageValues(e: DbMaintenanceTrackingData): any[] {
     return [
         e.json,
         e.status,

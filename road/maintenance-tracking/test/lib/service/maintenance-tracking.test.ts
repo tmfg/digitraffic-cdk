@@ -1,4 +1,4 @@
-import {dbTestBase, findAll} from "../db-testutil";
+import {dbTestBase, findAllTrackings} from "../db-testutil";
 import * as pgPromise from "pg-promise";
 import {createHash, saveMaintenanceTrackingData} from "../../../lib/service/maintenance-tracking";
 import {assertData, getTrackingJson} from "../testdata";
@@ -9,7 +9,7 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const json = getTrackingJson('1', '1');
         await saveMaintenanceTrackingData(json, new Date());
 
-        const fetchedTrackings = await findAll(db);
+        const fetchedTrackings = await findAllTrackings(db);
         expect(fetchedTrackings.length).toBe(1);
         const saved = fetchedTrackings[0];
         assertData(saved, json);
@@ -22,7 +22,7 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         await saveMaintenanceTrackingData(json1, new Date());
         await saveMaintenanceTrackingData(json2, new Date());
 
-        const fetchedTrackings = await findAll(db);
+        const fetchedTrackings = await findAllTrackings(db);
         expect(fetchedTrackings.length).toBe(2);
     });
 
@@ -42,7 +42,7 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
 
         expect(failure).toBe(true);
 
-        const fetchedTrackings = await findAll(db);
+        const fetchedTrackings = await findAllTrackings(db);
         expect(fetchedTrackings.length).toBe(1);
         const saved = fetchedTrackings[0];
         assertData(saved, json1);
