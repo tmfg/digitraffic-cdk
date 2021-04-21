@@ -1,6 +1,7 @@
-import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../../lib/lambda/constants";
+import {RECEIPT_HANDLE_SEPARATOR, SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../../lib/lambda/constants";
+const QUEUE = 'MaintenanceTrackingQueue.fifo';
 process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
-process.env[SQS_QUEUE_URL] = 'https://aws-queue-123';
+process.env[SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAllObservations, findAllTrackings, truncate} from "../db-testutil";
 import {handlerFn} from "../../../lib/lambda/process-queue/lambda-process-queue";
@@ -9,7 +10,6 @@ import {getRandompId, getTrackingJson} from "../testdata";
 import * as sinon from 'sinon';
 import {createSQSExtClient} from "../../../lib/sqs-ext";
 import moment from 'moment-timezone';
-
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -25,6 +25,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     test('single valid record', async () => {
+        console.info(RECEIPT_HANDLE_SEPARATOR);
         const json = getTrackingJson(getRandompId(),getRandompId());
         const recordFromS3 : SQSRecord = createRecord(json);
         const recordNoJson : SQSRecord = cloneRecordWithoutJson(recordFromS3)
@@ -151,11 +152,10 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 }));
 
 function createRecord(trackingJson = ''): SQSRecord {
-    // none of these matter besides body
     return {
         body: trackingJson,
         messageId: '',
-        receiptHandle: getRandompId(),
+        receiptHandle: `s3://${process.env[SQS_BUCKET_NAME]}/${QUEUE}/${getRandompId()}${RECEIPT_HANDLE_SEPARATOR}${getRandompId()}`,
         messageAttributes: {},
         md5OfBody: '',
         attributes: {
@@ -175,6 +175,3 @@ function cloneRecordWithoutJson(recordToClone: SQSRecord) {
     clone.body = '';
     return clone;
 }
-
-
-
