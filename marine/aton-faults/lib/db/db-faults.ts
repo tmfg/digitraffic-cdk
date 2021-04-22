@@ -140,7 +140,7 @@ export function updateFaults(db: IDatabase<any, any>, domain: string, faults: an
     });
 }
 
-export async function streamAllForJson(db: IDatabase<any, any>, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
+export async function findAllForJson(db: IDatabase<any, any>, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
     const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
     const ps = new PreparedStatement({
         name: 'get-all-faults',

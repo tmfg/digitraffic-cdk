@@ -1,7 +1,7 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
 import {RtzVoyagePlan} from "../../../../../common/vis/voyageplan";
-import {findFaultIdsForVoyagePlan} from "../../service/faults";
+import * as FaultsService from "../../service/faults";
 import {SNS} from "aws-sdk";
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 import {BAD_REQUEST_MESSAGE} from "../../../../../common/api/errors";
@@ -49,7 +49,7 @@ export function handlerFn(
                 return;
             }
 
-            const faultIds = await findFaultIdsForVoyagePlan(voyagePlan);
+            const faultIds = await FaultsService.findFaultIdsForVoyagePlan(voyagePlan);
             for (const faultId of faultIds) {
                 await sns.publish({
                     Message: JSON.stringify({

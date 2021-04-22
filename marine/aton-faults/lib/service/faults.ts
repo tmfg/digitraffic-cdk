@@ -24,7 +24,7 @@ const NAME_OF_SERIES = 'Finnish ATON Faults';
 
 export async function findAllFaults(language: Language, fixedInHours: number): Promise<any> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        const features = await FaultsDB.streamAllForJson(db, language, fixedInHours, convertFeature);
+        const features = await FaultsDB.findAllForJson(db, language, fixedInHours, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
         return createFeatureCollection(features, lastUpdated);
