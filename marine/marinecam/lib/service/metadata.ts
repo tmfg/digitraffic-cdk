@@ -24,8 +24,8 @@ export async function updateMetadataUpdated(cameraId: string, updated: Date): Pr
     });
 }
 
-export async function getAllCameraIds(): Promise<string[]> {
+export async function getAllCameraIdsForGroup(groupId: string): Promise<string[]> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        return await MetadataDB.getAllCameraIds(db);
+        return await MetadataDB.getAllCameraIdsForGroup(db, groupId);
     });
 }

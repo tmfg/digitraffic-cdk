@@ -1,27 +1,34 @@
 import {IDatabase} from "pg-promise";
 import {dbTestBase, insertCamera, insertCameraGroup} from "../db-testutil";
-import {getAllCameraIds, getAllCameras, updateCameraMetadata} from "../../lib/db/metadata";
+import {getAllCameraIdsForGroup, getAllCameras, updateCameraMetadata} from "../../lib/db/metadata";
 
 const GROUP_SAIMAA = 'Saimaa';
 const GROUP_LOIMAA = 'Loimaa';
 
 describe('db-metadata', dbTestBase((db: IDatabase<any, any>) => {
     test('getIds - empty', async () => {
-        const ids = await getAllCameraIds(db);
+        const ids = await getAllCameraIdsForGroup(db, GROUP_SAIMAA);
 
         expect(ids.length).toEqual(0);
     });
 
     test('getIds', async () => {
         await insertCameraGroup(db, GROUP_SAIMAA, GROUP_SAIMAA);
+        await insertCameraGroup(db, GROUP_LOIMAA, GROUP_LOIMAA);
         await insertCamera(db, '1', 'kamera1', GROUP_SAIMAA);
         await insertCamera(db, '2', 'kamera2', GROUP_SAIMAA);
+        await insertCamera(db, '3', 'kamera3', GROUP_LOIMAA);
 
-        const ids = await getAllCameraIds(db);
+        const idsSaimaa = await getAllCameraIdsForGroup(db, GROUP_SAIMAA);
 
-        expect(ids.length).toEqual(2);
-        expect(ids).toContain('1');
-        expect(ids).toContain('2');
+        expect(idsSaimaa.length).toEqual(2);
+        expect(idsSaimaa).toContain('1');
+        expect(idsSaimaa).toContain('2');
+
+        const idsLoimaa = await getAllCameraIdsForGroup(db, GROUP_LOIMAA);
+
+        expect(idsLoimaa.length).toEqual(1);
+        expect(idsLoimaa).toContain('3');
     });
 
     test('getCameras-Saimaa', async () => {

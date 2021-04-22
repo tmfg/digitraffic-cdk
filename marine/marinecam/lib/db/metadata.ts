@@ -3,7 +3,7 @@ import {Camera} from "../model/camera";
 
 const PS_CAMERA_IDS = new PreparedStatement({
     name: 'get-camera-ids',
-    text: 'select id from camera'
+    text: 'select id from camera where camera_group_id = $1'
 });
 
 const SQL_LIST_CAMERAS = "select id, name, camera_group_id, last_updated  from camera where camera_group_id in ($1:list)";
@@ -27,6 +27,6 @@ export async function updateCameraMetadata(db: IDatabase<any, any>, cameraId: st
     return await db.none(PS_UPDATE_TIMESTAMP, [updated, cameraId]);
 }
 
-export async function getAllCameraIds(db: IDatabase<any, any>): Promise<string[]> {
-    return (await db.manyOrNone(PS_CAMERA_IDS)).map((x: any) => x.id);
+export async function getAllCameraIdsForGroup(db: IDatabase<any, any>, groupId: string): Promise<string[]> {
+    return (await db.manyOrNone(PS_CAMERA_IDS, [groupId])).map((x: any) => x.id);
 }

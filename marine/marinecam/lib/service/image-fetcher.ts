@@ -2,8 +2,10 @@ import {Session} from "./session";
 import * as ImageStore from "./image-store";
 import * as MetadataService from './metadata';
 
+export const CAMERA_GROUP_ID = 'Saimaa';
+
 export async function updateAllCameras(url: string, username: string, password: string, bucketName: string, certificate: string) {
-    const cameraIds = await MetadataService.getAllCameraIds();
+    const cameraIds = await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
     const session = await loginToCameraServer(url, username, password, certificate);
 
     return await updateAllImages(cameraIds, session, bucketName);
