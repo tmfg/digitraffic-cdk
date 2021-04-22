@@ -146,7 +146,7 @@ function createIntegrationResource(
         methodResponses: [
             methodResponse("200", MediaType.APPLICATION_JSON, messageResponseModel),
             methodResponse("400", MediaType.APPLICATION_JSON, messageResponseModel),
-            methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel)
+            methodResponse("500", MediaType.APPLICATION_JSON, Model.ERROR_MODEL)
         ]
     });
     addQueryParameterDescription(
