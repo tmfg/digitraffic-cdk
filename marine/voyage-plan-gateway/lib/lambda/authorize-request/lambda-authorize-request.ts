@@ -18,18 +18,19 @@ const crlUrlSecretKey = process.env[KEY_CRL_URL_SECRETKEY] as string;
 const crlCache = new NodeCache({
     stdTTL: 300 // 5 minutes in seconds
 });
+const CRL_CACHE_KEY = 'crl';
 
 /**
  *  Use certificate revocation list (CRL) to check if client certificate is revoked
  */
 export async function handler(event: any, _: any, callback: any) {
     return await withSecret(secretId, async (secret: any) => {
-        let crlData = crlCache.get('crl');
+        let crlData = crlCache.get(CRL_CACHE_KEY);
         if (!crlData) {
             console.info('CRL was not in cache, refreshing')
             const newCrlData = await getCrlData(secret[crlUrlSecretKey] as string);
             crlData = newCrlData.replace(/(-----(BEGIN|END) X509 CRL-----|[\n\r])/g, '');
-            crlCache.set(crlData);
+            crlCache.set(CRL_CACHE_KEY, crlData);
         }
 
         const crl = buildCrl(crlData);
@@ -39,7 +40,7 @@ export async function handler(event: any, _: any, callback: any) {
         const serial = pvutils.bufferToHexCodes(pkiCert.serialNumber.valueBlock.valueHex)
 
         for (const { userCertificate } of crl.revokedCertificates) {
-            if (pvutils.bufferToHexCodes(userCertificate.valueBlock.valueHex) == serial) {
+            if (pvutils.bufferToHexCodes(userCertificate.valueBlock.valueHex) === serial) {
                 return callback(null, generateDeny('principal', event.methodArn))
             }
         }
