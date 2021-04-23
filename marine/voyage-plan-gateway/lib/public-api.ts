@@ -7,7 +7,11 @@ import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {IVpc} from "@aws-cdk/aws-ec2";
 import {add404Support, createDefaultPolicyDocument,} from "../../../common/api/rest_apis";
-import {KEY_SECRET_ID, KEY_SCHEDULES_TOKEN_SECRETKEY, KEY_SCHEDULES_URL_SECRETKEY} from "./lambda/get-schedules/lambda-get-schedules";
+import {
+    KEY_SCHEDULES_TOKEN_SECRETKEY,
+    KEY_SCHEDULES_URL_SECRETKEY,
+    KEY_SECRET_ID
+} from "./lambda/get-schedules/env_keys";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 
 export function create(

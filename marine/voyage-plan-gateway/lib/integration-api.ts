@@ -16,32 +16,28 @@ import {
     GatewayResponse,
     MethodLoggingLevel,
     Model,
-    PassthroughBehavior, RequestAuthorizer,
+    PassthroughBehavior,
+    RequestAuthorizer,
     Resource,
     ResponseType,
-    RestApi, SecurityPolicy
+    RestApi,
+    SecurityPolicy
 } from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {Construct, Duration} from "@aws-cdk/core";
 import {createSubscription} from "../../../common/stack/subscription";
 import {defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createUsagePlan} from "../../../common/stack/usage-plans";
-import {KEY_SECRET_ID} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
-import {KEY_SECRET_ID as AUTHORIZER_KEY_SECRET_ID, KEY_CRL_URL_SECRETKEY} from "./lambda/authorize-request/lambda-authorize-request";
+import {KEY_SECRET_ID} from "./lambda/upload-voyage-plan/env_keys";
+import {KEY_CRL_URL_SECRETKEY, KEY_SECRET_ID as AUTHORIZER_KEY_SECRET_ID} from "./lambda/authorize-request/env_keys";
 import {VoyagePlanGatewayProps} from "./app-props";
-import {
-    defaultIntegration,
-    methodResponse,
-} from "../../../common/api/responses";
+import {defaultIntegration, methodResponse,} from "../../../common/api/responses";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "../../../common/api/mediatypes";
 import {MessageModel} from "../../../common/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
 import {IVpc} from "@aws-cdk/aws-ec2";
-import {
-    add404Support,
-    createDefaultPolicyDocument,
-} from "../../../common/api/rest_apis";
+import {add404Support, createDefaultPolicyDocument,} from "../../../common/api/rest_apis";
 import {Bucket} from "@aws-cdk/aws-s3";
 import {Certificate} from "@aws-cdk/aws-certificatemanager";
 import {IAuthorizer} from "@aws-cdk/aws-apigateway/lib/authorizer";
