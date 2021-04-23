@@ -1,9 +1,6 @@
 import axios from 'axios';
 import {withSecret} from "../../../../../common/secrets/secret";
-
-export const KEY_SECRET_ID = 'SECRET_ID';
-export const KEY_SCHEDULES_TOKEN_SECRETKEY = 'SCHEDULES_TOKEN_SECRETKEY'
-export const KEY_SCHEDULES_URL_SECRETKEY = 'SCHEDULES_URL_SECRETKEY';
+import {KEY_SCHEDULES_TOKEN_SECRETKEY, KEY_SCHEDULES_URL_SECRETKEY, KEY_SECRET_ID} from "./env_keys";
 
 const secretId = process.env[KEY_SECRET_ID] as string;
 const schedulesTokenSecretKey = process.env[KEY_SCHEDULES_TOKEN_SECRETKEY] as string;

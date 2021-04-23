@@ -4,13 +4,12 @@
 
 import {withSecret} from "../../../../../common/secrets/secret";
 import axios from 'axios';
+import * as CrlCache from './crl-cache';
+import {KEY_CRL_URL_SECRETKEY, KEY_SECRET_ID} from "./env_keys";
+
 const asn1 = require('asn1js');
 const pkijs = require('pkijs');
 const pvutils = require('pvutils');
-import * as CrlCache from './crl-cache';
-
-export const KEY_SECRET_ID = 'SECRET_ID';
-export const KEY_CRL_URL_SECRETKEY = 'KEY_CRL_URL';
 
 const secretId = process.env[KEY_SECRET_ID] as string;
 const crlUrlSecretKey = process.env[KEY_CRL_URL_SECRETKEY] as string;

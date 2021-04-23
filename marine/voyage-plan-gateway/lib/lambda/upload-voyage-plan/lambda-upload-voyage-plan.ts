@@ -2,6 +2,7 @@ import * as util from 'util';
 import * as xml2js from 'xml2js';
 import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../../common/api/errors";
 import {withSecret} from "../../../../../common/secrets/secret";
+import {KEY_SECRET_ID} from "./env_keys";
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
@@ -19,8 +20,6 @@ export interface UploadVoyagePlanEvent {
      */
     readonly voyagePlan: string
 }
-
-export const KEY_SECRET_ID = 'SECRET_ID';
 
 const secretId = process.env[KEY_SECRET_ID] as string;
 
