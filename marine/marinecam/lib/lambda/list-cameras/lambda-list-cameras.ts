@@ -1,9 +1,9 @@
 import * as MetadataService from '../../service/metadata';
 
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
-import {KEY_SECRET_ID} from "../update-images/lambda-update-images";
+import {MarinecamEnvKeys} from "../../keys";
 
-const secretId = process.env[KEY_SECRET_ID] as string;
+const secretId = process.env[MarinecamEnvKeys.SECRET_ID] as string;
 
 const GROUP_SEPARATOR=',';
 

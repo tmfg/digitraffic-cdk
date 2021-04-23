@@ -1,16 +1,9 @@
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 import * as ImageFetcher from "../../service/image-fetcher";
+import {MarinecamEnvKeys, MarinecamSecretKeys} from "../../keys";
 
-export const KEY_SECRET_ID = 'SECRET_ID';
-export const KEY_IMAGE_SERVER_URL = 'mobile_server.url';
-export const KEY_IMAGE_SERVER_USERNAME = 'mobile_server.username';
-export const KEY_IMAGE_SERVER_PASSWORD = 'mobile_server.password';
-export const KEY_IMAGE_SERVER_CERTIFICATE = 'mobile_server.certificate';
-
-export const KEY_BUCKET_NAME = 's3_bucket_name';
-
-const secretId = process.env[KEY_SECRET_ID] as string;
-const bucketName = process.env[KEY_BUCKET_NAME] as string;
+const secretId = process.env[MarinecamEnvKeys.SECRET_ID] as string;
+const bucketName = process.env[MarinecamEnvKeys.BUCKET_NAME] as string;
 
 let imageServerUrl: string;
 let imageServerUsername: string;
@@ -21,10 +14,10 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
     return async (): Promise<void> => {
         if(!imageServerUrl) {
             await doWithSecret(secretId, (secret: any) => {
-                imageServerUrl = secret[KEY_IMAGE_SERVER_URL];
-                imageServerUsername = secret[KEY_IMAGE_SERVER_USERNAME];
-                imageServerPassword = secret[KEY_IMAGE_SERVER_PASSWORD];
-                imageServerCertificate = secret[KEY_IMAGE_SERVER_CERTIFICATE];
+                imageServerUrl = secret[MarinecamSecretKeys.IMAGE_SERVER_URL];
+                imageServerUsername = secret[MarinecamSecretKeys.IMAGE_SERVER_USERNAME];
+                imageServerPassword = secret[MarinecamSecretKeys.IMAGE_SERVER_PASSWORD];
+                imageServerCertificate = secret[MarinecamSecretKeys.IMAGE_SERVER_CERTIFICATE];
             });
         }
 

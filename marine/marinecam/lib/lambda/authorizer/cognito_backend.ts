@@ -1,9 +1,9 @@
 import {CognitoUserPool, CognitoUser, AuthenticationDetails} from 'amazon-cognito-identity-js';
-import {KEY_POOLCLIENT_ID, KEY_USERPOOL_ID} from "./cognito_keys";
+import {MarinecamEnvKeys} from "../../keys";
 
 const POOL_DATA = {
-    UserPoolId: process.env[KEY_USERPOOL_ID] as string,
-    ClientId: process.env[KEY_POOLCLIENT_ID] as string
+    UserPoolId: process.env[MarinecamEnvKeys.USERPOOL_ID] as string,
+    ClientId: process.env[MarinecamEnvKeys.POOLCLIENT_ID] as string
 };
 
 const userPool = new CognitoUserPool(POOL_DATA);

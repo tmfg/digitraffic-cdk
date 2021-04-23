@@ -24,9 +24,8 @@ import {corsMethod, defaultIntegration, getResponse, methodResponse} from "../..
 import {MediaType} from "../../../common/api/mediatypes";
 import {addTagsAndSummary} from "../../../common/api/documentation";
 import {BETA_TAGS} from "../../../common/api/tags";
-import {KEY_POOLCLIENT_ID, KEY_USERPOOL_ID} from "./lambda/authorizer/cognito_keys";
-import {KEY_SECRET_ID} from "./lambda/update-images/lambda-update-images";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {MarinecamEnvKeys} from "./keys";
 
 export function create(
     secret: ISecret,
@@ -163,7 +162,7 @@ function createGetImageResource(resources: any, props: MobileServerProps, bucket
 function createListCamerasLambda(stack: Construct, vpc: IVpc, lambdaDbSg: ISecurityGroup, props: MobileServerProps): Function {
     const functionName = 'Marinecam-ListCameras';
     const environment = {} as any;
-    environment[KEY_SECRET_ID] = props.secretId;
+    environment[MarinecamEnvKeys.SECRET_ID] = props.secretId;
 
     return new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName,
@@ -177,8 +176,8 @@ function createListCamerasLambda(stack: Construct, vpc: IVpc, lambdaDbSg: ISecur
 function createLambdaAuthorizer(stack: Construct, userPool: UserPool, userPoolClient: UserPoolClient): RequestAuthorizer {
     const functionName = 'Marinecam-Authorizer';
     const environment = {} as any;
-    environment[KEY_USERPOOL_ID] = userPool.userPoolId;
-    environment[KEY_POOLCLIENT_ID] = userPoolClient.userPoolClientId;
+    environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;
+    environment[MarinecamEnvKeys.POOLCLIENT_ID] = userPoolClient.userPoolClientId;
 
     const authFunction = new Function(stack, functionName, {
         functionName,
