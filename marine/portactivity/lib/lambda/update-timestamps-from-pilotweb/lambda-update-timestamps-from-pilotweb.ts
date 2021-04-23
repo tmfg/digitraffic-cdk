@@ -1,17 +1,15 @@
 import {withSecret} from "../../../../../common/secrets/secret";
 import {sendMessage} from "../../service/queue-service";
 import * as PilotwebService from "../../service/pilotweb";
+import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 
-enum ProjectKeys {
-    SECRET_ID= "SECRET_ID"
-}
+const pilotwebUrl = process.env[PortactivityEnvKeys.PILOTWEB_URL] as string;
 
 export const handler = async function () {
-    return withSecret(process.env[ProjectKeys.SECRET_ID] as string, async (secret: any) => {
-        const url = secret.PILOTWEB_URL;
-        const authHeader = secret.PILOTWEB_AUTH;
-        const sqsQueueUrl = secret.PORTACTIVITY_QUEUE;
-        const timestamps = await PilotwebService.getMessagesFromPilotweb(url, authHeader);
+    return withSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: any) => {
+        const authHeader = secret[PortactivitySecretKeys.PILOTWEB_AUTH];
+        const sqsQueueUrl = secret[PortactivitySecretKeys.PORTACTIVITY_QUEUE];
+        const timestamps = await PilotwebService.getMessagesFromPilotweb(pilotwebUrl, authHeader);
 
         console.info("sending %d messages", timestamps.length);
 

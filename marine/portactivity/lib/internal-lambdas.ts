@@ -22,6 +22,7 @@ import {
     KEY_ESTIMATE_SOURCE
 } from "./lambda/update-eta-timestamps/lambda-update-eta-timestamps";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {PortactivityEnvKeys} from "./keys";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -54,6 +55,9 @@ export function create(
 
 function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
+    const environment = {} as any;
+    environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+    environment[PortactivityEnvKeys.PILOTWEB_URL] = props.pilotwebUrl;
 
     const lambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
@@ -61,10 +65,7 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
         handler: 'lambda-update-timestamps-from-pilotweb.handler',
-        environment: {
-            SECRET_ID: props.secretId,
-            ESTIMATE_SQS_QUEUE_URL: queue.queueUrl
-        }
+        environment
     });
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
@@ -77,6 +78,9 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
 
 function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromTeqplay';
+    const environment = {} as any;
+    environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+    environment[PortactivityEnvKeys.TEQPLAY_QUEUE] = props.teqplayUrl
 
     const lambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
@@ -84,10 +88,7 @@ function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, 
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-teqplay'),
         handler: 'lambda-update-timestamps-from-teqplay.handler',
-        environment: {
-            SECRET_ID: props.secretId,
-            ESTIMATE_SQS_QUEUE_URL: queue.queueUrl
-        }
+        environment
     });
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
@@ -106,14 +107,15 @@ function createProcessQueueLambda(
     props: Props,
     stack: Stack) {
     const functionName = "PortActivity-ProcessTimestampQueue";
+    const environment = {} as any;
+    environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         memorySize: 128,
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
-        environment: {
-            SECRET_ID: props.secretId
-        },
+        environment,
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const processQueueLambda = new Function(stack, functionName, lambdaConf);
