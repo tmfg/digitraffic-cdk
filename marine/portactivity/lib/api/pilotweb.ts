@@ -2,9 +2,9 @@ import axios from "axios";
 
 const https = require('https');
 
-const PILOTAGES_PATH = "/vts/active-pilotages";
+const PILOTAGES_PATH = "/digitraffic/pilotages/active";
 
-export async function getMessages(host: string, token: string): Promise<any> {
+export async function getMessages(host: string, authHeader: string): Promise<any> {
     let content = '';
 
     const promise = new Promise((resolve, reject) => {
@@ -13,7 +13,7 @@ export async function getMessages(host: string, token: string): Promise<any> {
             path: PILOTAGES_PATH,
             method: 'GET',
             headers: {
-                'Authorization': `Basic ${token}`,
+                'Authorization': `Basic ${authHeader}`,
                 'Content-Type': 'text/plain'
             }
         }, (response: any) => {
@@ -38,10 +38,12 @@ export async function getMessages(host: string, token: string): Promise<any> {
     return await promise;
 }
 
-export async function getMessagesold(url: string, token: string): Promise<any> {
+export async function getMessagesOld(host: string, authHeader: string): Promise<any> {
+    const url = `https://${host}${PILOTAGES_PATH}`;
+
     const response = await axios.get(url, {
         headers: {
-            'Authorization': `Basic ${token}`,
+            'Authorization': `Basic ${authHeader}`,
             'Content-Type': 'text/plain'
         },
         validateStatus: (status) => {

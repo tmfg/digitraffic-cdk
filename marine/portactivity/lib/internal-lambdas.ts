@@ -36,7 +36,7 @@ export function create(
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 
     const updateETATimestampsLambda = createUpdateETATimestampsLambda(secret, vpc, lambdaDbSg, props, stack);
-    const updateETASchedulingRule = createETAUpdateSchedulingCloudWatchRule(stack);
+    const updateETASchedulingRule = createETAScheduler(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
 
     if(props.teqplayUrl) {
@@ -44,6 +44,35 @@ export function create(
         const teqplayScheduler = createTeqplayScheduler(stack);
         teqplayScheduler.addTarget(new LambdaFunction(updateTimestampsFromTeqplayLambda));
     }
+
+    if(props.pilotwebUrl) {
+        const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(secret, queueAndDLQ.queue, vpc, props, stack);
+        const pilotwebScheduler = createPilotwebScheduler(stack);
+        pilotwebScheduler.addTarget(new LambdaFunction(updateTimestampsFromPilotwebLambda));
+    }
+}
+
+function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
+    const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
+
+    const lambda = new Function(stack, functionName, {
+        runtime: Runtime.NODEJS_12_X,
+        logRetention: RetentionDays.ONE_YEAR,
+        functionName: functionName,
+        code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
+        handler: 'lambda-update-timestamps-from-pilotweb.handler',
+        environment: {
+            SECRET_ID: props.secretId,
+            ESTIMATE_SQS_QUEUE_URL: queue.queueUrl
+        }
+    });
+
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+    queue.grantSendMessages(lambda);
+
+    secret.grantRead(lambda);
+
+    return lambda;
 }
 
 function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
@@ -121,7 +150,7 @@ function createProcessDLQLambda(
     processDLQLambda.addToRolePolicy(statement);
 }
 
-function createETAUpdateSchedulingCloudWatchRule(stack: Stack): Rule {
+function createETAScheduler(stack: Stack): Rule {
     const ruleName = 'PortActivity-ETAScheduler'
     return new Rule(stack, ruleName, {
         ruleName,
@@ -136,6 +165,15 @@ function createTeqplayScheduler(stack: Stack): Rule {
         schedule: Schedule.expression('cron(*/2 * * * ? *)') // every 15 minutes
     });
 }
+
+function createPilotwebScheduler(stack: Stack): Rule {
+    const ruleName = 'PortActivity-PilotwebScheduler'
+    return new Rule(stack, ruleName, {
+        ruleName,
+        schedule: Schedule.expression('cron(*/15 * * * ? *)') // every 15 minutes
+    });
+}
+
 
 function createUpdateETATimestampsLambda(
     secret: ISecret,
