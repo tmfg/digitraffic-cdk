@@ -22,10 +22,27 @@ export async function handler(event: any): Promise<any> {
         if (calculated) {
             url += '/calculated';
         }
-        const resp = await axios.get(`${url}?imo=${event.queryStringParameters.imo}`);
+
+        const params: string[] = [];
+        handleQueryParam('name', event.queryStringParameters, params);
+        handleQueryParam('callsign', event.queryStringParameters, params);
+        handleQueryParam('imo', event.queryStringParameters, params);
+        handleQueryParam('mmsi', event.queryStringParameters, params);
+        handleQueryParam('uuid', event.queryStringParameters, params);
+        handleQueryParam('locode', event.queryStringParameters, params);
+        handleQueryParam('externalID', event.queryStringParameters, params);
+
+        const fullUrl = url + (params.length ? '?' : '') + params.join('&');
+        const resp = await axios.get(fullUrl);
         return {
             statusCode: 200,
             body: resp.data
         }
     });
+}
+
+function handleQueryParam(param: string, queryParams: any, params: string[]) {
+    if (queryParams[param]) {
+        params.push(`${param}=${queryParams[param]}`);
+    }
 }
