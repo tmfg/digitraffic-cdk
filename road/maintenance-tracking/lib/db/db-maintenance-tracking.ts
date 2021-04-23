@@ -48,6 +48,7 @@ export interface DbObservationData {
     readonly json: string,
     readonly harjaWorkmachineId: number,
     readonly harjaContractId: number,
+    readonly sendingSystem: string,
     readonly status: Status,
     readonly hash: string,
     readonly s3Uri: string;
@@ -61,6 +62,7 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
         json,
         harja_workmachine_id,
         harja_contract_id,
+        sending_system,
         status,
         hash,
         s3_uri)
@@ -71,6 +73,7 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
         $(json),
         $(harjaWorkmachineId),
         $(harjaContractId),
+        $(sendingSystem),
         $(status),
         $(hash),
         $(s3Uri))
@@ -91,8 +94,9 @@ export function createInsertObservationValues(e: DbObservationData): any[] {
         e.json,
         e.harjaWorkmachineId,
         e.harjaContractId,
+        e.sendingSystem,
         e.status,
         e.hash,
-        e.hash
+        e.s3Uri
     ];
 }

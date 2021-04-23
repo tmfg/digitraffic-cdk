@@ -34,7 +34,7 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
                 const s3Uri = record.receiptHandle.split(RECEIPT_HANDLE_SEPARATOR)[0];
                 const trackingJson = JSON.parse(jsonString);
                 const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
-
+                const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma
                 const observationDatas: DbObservationData[] =
                 trackingJson.havainnot.map(( item: Havainto ) => {
                     const observationJson = JSON.stringify(item.havainto);
@@ -47,6 +47,7 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
                         json: observationJson,
                         harjaWorkmachineId: harjaWorkmachineId,
                         harjaContractId: harjaContractId,
+                        sendingSystem: sendingSystem,
                         status: Status.UNHANDLED,
                         hash: createObservationHash(observationJson),
                         s3Uri: s3Uri

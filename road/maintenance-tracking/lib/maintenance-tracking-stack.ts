@@ -5,7 +5,6 @@ import * as IntegrationApi from './integration-api';
 import * as Sqs from './sqs';
 import {AppProps} from './app-props'
 import {Bucket} from "@aws-cdk/aws-s3";
-import {LifecycleRule} from "@aws-cdk/aws-s3/lib/rule";
 
 export class MaintenanceTrackingStack extends Stack {
     constructor(scope: Construct, id: string, appProps: AppProps, props?: StackProps) {
