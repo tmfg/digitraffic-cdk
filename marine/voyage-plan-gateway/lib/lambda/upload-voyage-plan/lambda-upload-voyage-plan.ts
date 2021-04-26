@@ -11,9 +11,9 @@ import {KEY_SECRET_ID} from "./env_keys";
 
 export interface UploadVoyagePlanEvent {
     /**
-     * Endpoint URL for callback
+     * Endpoint URL for delivery acknowledgement
      */
-    readonly callbackEndpoint?: string
+    readonly deliveryAckEndpoint?: string
 
     /**
      * The route in RTZ format
@@ -36,6 +36,7 @@ export function handlerFn(
                 console.error('UploadVoyagePlan XML parsing failed', error);
                 return Promise.reject(BAD_REQUEST_MESSAGE);
             }
+            // TODO ack
             // do nothing currently
             return JSON.stringify({message: OK_MESSAGE});
         });

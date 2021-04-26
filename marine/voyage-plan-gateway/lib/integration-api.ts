@@ -121,13 +121,13 @@ function createIntegrationResource(
         passthroughBehavior: PassthroughBehavior.NEVER,
         disableCors: true,
         requestParameters: {
-            'integration.request.querystring.callbackEndpoint': 'method.request.querystring.callbackEndpoint'
+            'integration.request.querystring.deliveryAckEndpoint': 'method.request.querystring.deliveryAckEndpoint'
         },
         requestTemplates: {
             // transformation from XML to JSON in API Gateway
             // some stuff needs to be quotes, other stuff does not, it's magic
             'text/xml': `{
-                "callbackEndpoint": "$util.escapeJavaScript($input.params('callbackEndpoint'))",
+                "deliveryAckEndpoint": "$util.escapeJavaScript($input.params('deliveryAckEndpoint'))",
                 "voyagePlan": $input.json('$')
             }`
         }
