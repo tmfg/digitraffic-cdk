@@ -57,6 +57,7 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
     const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
     const environment = {} as any;
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+    environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE] = queue.queueUrl;
 
     const lambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
@@ -79,6 +80,7 @@ function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, 
     const functionName = 'PortActivity-UpdateTimestampsFromTeqplay';
     const environment = {} as any;
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+    environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE] = queue.queueUrl;
 
     const lambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
