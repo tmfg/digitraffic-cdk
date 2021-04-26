@@ -20,7 +20,7 @@ function convert(pilotage: any): ApiTimestamp {
     return {
         eventType,
         eventTime,
-        recordTime: new Date().toISOString(), // TODO: this will be pilotage.scheduleUpdated
+        recordTime: pilotage.scheduleUpdated,
         source: 'PILOTWEB',
         ship: {
             mmsi: pilotage.vessel.mmsi,

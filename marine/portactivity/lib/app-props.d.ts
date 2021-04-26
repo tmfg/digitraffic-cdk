@@ -21,6 +21,8 @@ export interface Props {
         readonly endpointUrl: string
         readonly timestampSource: string
     },
-    readonly teqplayUrl?: string;
-    readonly pilotwebUrl?: string;
+    readonly sources?: {
+        readonly teqplay?: boolean,
+        readonly pilotweb?: boolean,
+    }
 }

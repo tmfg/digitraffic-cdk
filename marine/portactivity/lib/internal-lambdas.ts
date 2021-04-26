@@ -40,13 +40,13 @@ export function create(
     const updateETASchedulingRule = createETAScheduler(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
 
-    if(props.teqplayUrl) {
+    if(props.sources?.teqplay) {
         const updateTimestampsFromTeqplayLambda = createUpdateTimestampsFromTeqplayLambda(secret, queueAndDLQ.queue, vpc, props, stack);
         const teqplayScheduler = createTeqplayScheduler(stack);
         teqplayScheduler.addTarget(new LambdaFunction(updateTimestampsFromTeqplayLambda));
     }
 
-    if(props.pilotwebUrl) {
+    if(props.sources?.pilotweb) {
         const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(secret, queueAndDLQ.queue, vpc, props, stack);
         const pilotwebScheduler = createPilotwebScheduler(stack);
         pilotwebScheduler.addTarget(new LambdaFunction(updateTimestampsFromPilotwebLambda));
@@ -57,7 +57,6 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
     const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
     const environment = {} as any;
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
-    environment[PortactivityEnvKeys.PILOTWEB_URL] = props.pilotwebUrl;
 
     const lambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
@@ -80,7 +79,6 @@ function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, 
     const functionName = 'PortActivity-UpdateTimestampsFromTeqplay';
     const environment = {} as any;
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
-    environment[PortactivityEnvKeys.TEQPLAY_QUEUE] = props.teqplayUrl
 
     const lambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
