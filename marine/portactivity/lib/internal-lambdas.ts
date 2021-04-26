@@ -1,7 +1,7 @@
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Stack} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
+import {dbLambdaConfiguration, defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createSubscription} from '../../../common/stack/subscription';
 import {Props} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
@@ -37,8 +37,10 @@ export function create(
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 
     const updateETATimestampsLambda = createUpdateETATimestampsLambda(secret, vpc, lambdaDbSg, props, stack);
+    const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(secret, queueAndDLQ.queue, vpc, props, stack);
     const updateETASchedulingRule = createETAScheduler(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
+    updateETASchedulingRule.addTarget(new LambdaFunction(updateScheduleTimestampsLambda));
 
     if(props.sources?.teqplay) {
         const updateTimestampsFromTeqplayLambda = createUpdateTimestampsFromTeqplayLambda(secret, queueAndDLQ.queue, vpc, props, stack);
@@ -90,6 +92,31 @@ function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, 
         handler: 'lambda-update-timestamps-from-teqplay.handler',
         environment
     });
+
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+    queue.grantSendMessages(lambda);
+
+    secret.grantRead(lambda);
+
+    return lambda;
+}
+
+// ATTENTION!
+// This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
+// The reason for this is IP based restriction in another system's firewall.
+function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
+    const functionName = 'PortActivity-UpdateTimestampsFromSchedules';
+    const environment = {} as any;
+    environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+
+    const lambda = new Function(stack, functionName, defaultLambdaConfiguration({
+        functionName: functionName,
+        code: new AssetCode('dist/lambda/update-timestamps-from-schedules'),
+        handler: 'lambda-update-timestamps-from-schedules.handler',
+        environment,
+        vpc,
+        vpcSubnets: vpc.privateSubnets
+    }));
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
