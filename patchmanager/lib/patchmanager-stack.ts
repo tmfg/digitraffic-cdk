@@ -1,6 +1,8 @@
 import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Props} from './app-props'
 import {CfnMaintenanceWindow, CfnMaintenanceWindowTarget, CfnMaintenanceWindowTask} from "@aws-cdk/aws-ssm";
+import {Topic} from "@aws-cdk/aws-sns";
+import {Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 
 export class PatchManagerStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -30,6 +32,12 @@ export class PatchManagerStack extends Stack {
             ]
         });
 
+        const snsTopic = Topic.fromTopicArn(this, 'snsTopic', appProps.notificationArn);
+        const snsRole = new Role(this, 'snsRole', {
+            assumedBy: new ServicePrincipal('ssm.amazonaws.com')
+        });
+        snsTopic.grantPublish(snsRole);
+
         // create a task to install patch base line updates to target EC2 instances
         const maintenanceWindowTaskName = 'UpdateEC2Task'
         new CfnMaintenanceWindowTask(this, maintenanceWindowTaskName, {
@@ -40,6 +48,7 @@ export class PatchManagerStack extends Stack {
             taskArn: 'AWS-RunPatchBaseline',
             taskInvocationParameters: {
                 maintenanceWindowRunCommandParameters: {
+                    serviceRoleArn: snsRole.roleArn,
                     notificationConfig: {
                         notificationArn: appProps.notificationArn,
                         notificationEvents: [
