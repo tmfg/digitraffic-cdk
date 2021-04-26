@@ -1,6 +1,6 @@
 export enum PortactivityEnvKeys {
     SECRET_ID="SECRET_ID",
-    PORTACTIVITY_QUEUE="portactivity.queue",
+    PORTACTIVITY_QUEUE_URL="SQS_QUEUE_URL",
 }
 
 export enum PortactivitySecretKeys {

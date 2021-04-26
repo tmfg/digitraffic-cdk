@@ -2,16 +2,21 @@ import * as SchedulesApi from "../api/schedules";
 import {Destination, SchedulesResponse, Timestamp, Vessel} from "../api/schedules";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EVENTSOURCE_SCHEDULES_CALCULATED, EVENTSOURCE_SCHEDULES_VTS_CONTROL} from "../event-sourceutil";
+import {getPortAreaGeometries} from "./portareas";
+import * as R from 'ramda';
+
+const locodes = R.groupBy(R.prop('locode'), getPortAreaGeometries());
 
 export async function getTimestampsUnderVtsControl(url: string): Promise<ApiTimestamp[]> {
     const resp = await SchedulesApi.getSchedulesTimestamps(url, false);
-    return schedulesToTimestamps(resp, false);
+    return schedulesToTimestamps(resp, false)
+        .filter(ts => locodes[ts.location.port] != null);;
 }
 
 export async function getCalculatedTimestamps(url: string): Promise<ApiTimestamp[]> {
     const resp = await SchedulesApi.getSchedulesTimestamps(url, true);
-
-    return schedulesToTimestamps(resp, true);
+    return schedulesToTimestamps(resp, true)
+        .filter(ts => locodes[ts.location.port] != null);
 }
 
 function schedulesToTimestamps(resp: SchedulesResponse, calculated: boolean): ApiTimestamp[] {
