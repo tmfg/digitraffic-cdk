@@ -54,10 +54,12 @@ cdk.out
 bin
 /.idea/workspace.xml
 /.idea/shelf/
+/.vscode/
 
 # flyway config for test, prod
 **/test/flyway.conf
 **/prod/flyway.conf
 .idea
 
+# test rersults
 junit.xml
