@@ -19,7 +19,7 @@ export async function getCalculatedTimestamps(url: string): Promise<ApiTimestamp
         .filter(ts => locodes[ts.location.port] != null);
 }
 
-function schedulesToTimestamps(resp: SchedulesResponse, calculated: boolean): ApiTimestamp[] {
+export function schedulesToTimestamps(resp: SchedulesResponse, calculated: boolean): ApiTimestamp[] {
     return resp.schedules.schedule.flatMap(s => {
         const timestamps: ApiTimestamp[] = [];
         const tt = s.timetable[0];

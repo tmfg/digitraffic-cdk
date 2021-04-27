@@ -9,3 +9,7 @@ export function getRandomNumber(min: number , max: number) : number {
 export function getRandomNumberAsString(min: number , max: number) : string {
     return (Math.random() * (max - min) + min).toString();
 }
+
+export function randomBoolean(): boolean {
+    return Math.random() < 0.5;
+}

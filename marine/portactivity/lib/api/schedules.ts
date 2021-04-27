@@ -44,7 +44,7 @@ export interface Schedule {
     readonly vessel: Vessel[]
     readonly timetable: [{
         readonly destination: Destination[]
-        readonly eta: Timestamp[]
+        readonly eta?: Timestamp[]
         readonly etd?: Timestamp[]
     }]
 }
