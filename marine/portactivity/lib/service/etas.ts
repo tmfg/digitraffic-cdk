@@ -1,5 +1,5 @@
-import {DbETAShip} from '../db/db-timestamps';
-import {getETAs, ShipETA} from '../api/api-etas';
+import {DbETAShip} from '../db/timestamps';
+import {getETAs, ShipETA} from '../api/etas';
 import {ApiTimestamp, EventType, validateTimestamp} from '../model/timestamp';
 import {saveTimestamps} from './timestamps';
 import {Port} from './portareas';

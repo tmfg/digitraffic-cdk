@@ -1,10 +1,4 @@
-import {dbTestBase, insert} from "../db-testutil";
-import * as pgPromise from "pg-promise";
-import {newTimestamp} from "../testdata";
-import {
-    findAllTimestamps, saveTimestamp, saveTimestamps
-} from "../../../lib/service/timestamps";
-import {ShipETA} from "../../../lib/api/api-etas";
+import {ShipETA} from "../../../lib/api/etas";
 import {etaToTimestamp} from "../../../lib/service/etas";
 
 describe('etas', () => {

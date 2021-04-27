@@ -6,7 +6,7 @@ import {
     findByImo,
     findByLocode,
     findByMmsi,
-} from "../../../lib/db/db-timestamps";
+} from "../../../lib/db/timestamps";
 import {shuffle} from "../../../../../common/js/js-utils";
 
 describe('db-timestamps - ordering', dbTestBase((db: pgPromise.IDatabase<any, any>) => {

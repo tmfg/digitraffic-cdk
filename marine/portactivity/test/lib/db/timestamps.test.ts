@@ -8,10 +8,9 @@ import {
     findByMmsi,
     findPortnetETAsByLocodes,
     findVtsShipImosTooCloseToPortByPortCallId
-} from "../../../lib/db/db-timestamps";
+} from "../../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../../lib/model/timestamp";
 import {EVENTSOURCE_VTS} from "../../../lib/event-sourceutil";
-import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../../../lib/service/portareas";
 
 describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     /*

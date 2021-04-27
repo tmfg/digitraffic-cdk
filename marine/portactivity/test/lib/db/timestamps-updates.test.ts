@@ -2,7 +2,7 @@ import moment from 'moment';
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll, insertPortAreaDetails, insertPortCall} from "../db-testutil";
 import {newTimestamp, newPortAreaDetails, newPortCall, PortAreaDetails, PortCall} from "../testdata";
-import {createUpdateValues, updateTimestamp} from "../../../lib/db/db-timestamps";
+import {createUpdateValues, updateTimestamp} from "../../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../../lib/model/timestamp";
 
 describe('db-timestamps - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {

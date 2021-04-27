@@ -1,4 +1,4 @@
-import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/db-shiplist-public';
+import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/shiplist-public';
 import {inDatabase} from '../../../../../common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';

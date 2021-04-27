@@ -1,6 +1,6 @@
 import {IDatabase, ITask} from "pg-promise";
 import {ApiTimestamp} from "../../lib/model/timestamp";
-import {createUpdateValues, DbTimestamp} from "../../lib/db/db-timestamps";
+import {createUpdateValues, DbTimestamp} from "../../lib/db/timestamps";
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 import {dbTestBase as commonDbTestBase} from "../../../../common/test/db-testutils";
 

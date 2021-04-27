@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {Port} from "../service/portareas";
-import {DbETAShip} from "../db/db-timestamps";
+import {DbETAShip} from "../db/timestamps";
 
 // timestamps for these port areas are updated from other sources
 const ETA_NOT_SUPPORTED_PORTAREAS = ['VUOS'];

@@ -9,10 +9,10 @@ bin
 lib
 │
 └───api (for external API requests)
-|   └───api-foos.ts
+|   └───foos.ts
 |
 └───db (database layer)
-|   └───db-foos.ts
+|   └───foos.ts
 |
 └───lambda (lambdas)
 |   └───update-foos
@@ -22,7 +22,7 @@ lib
 |   └───foo-schema.ts
 |
 └───service (service layer)
-|   └───service-foos.ts
+|   └───foos.ts
 |
 └───quux-stack.ts
 |

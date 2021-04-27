@@ -1,5 +1,5 @@
-import * as TimestampsDB from '../db/db-timestamps'
-import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/db-timestamps'
+import * as TimestampsDB from '../db/timestamps'
+import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps'
 import {inDatabase} from '../../../../common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiTimestamp} from '../model/timestamp';

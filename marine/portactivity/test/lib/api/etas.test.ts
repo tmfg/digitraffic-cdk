@@ -1,4 +1,4 @@
-import {getPortAreaGeometryForShip} from "../../../lib/api/api-etas";
+import {getPortAreaGeometryForShip} from "../../../lib/api/etas";
 import {getPortAreaGeometries} from "../../../lib/service/portareas";
 
 describe('api-etas', () => {

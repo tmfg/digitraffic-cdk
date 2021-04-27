@@ -3,7 +3,7 @@ import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import {EventType} from "../../../lib/model/timestamp";
-import {findByLocodePublicShiplist} from "../../../lib/db/db-shiplist-public";
+import {findByLocodePublicShiplist} from "../../../lib/db/shiplist-public";
 
 describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 

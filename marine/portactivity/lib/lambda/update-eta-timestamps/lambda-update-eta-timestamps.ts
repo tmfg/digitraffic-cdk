@@ -1,8 +1,8 @@
 import {getPortAreaGeometries, Port} from '../../service/portareas';
 import {findETAShipsByLocode} from '../../service/timestamps';
 import {updateETATimestamps} from '../../service/etas';
-import {DbETAShip} from "../../db/db-timestamps";
-import {ShipETA} from "../../api/api-etas";
+import {DbETAShip} from "../../db/timestamps";
+import {ShipETA} from "../../api/etas";
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
 
 export const KEY_ENDPOINT_CLIENT_ID = 'ENDPOINT_CLIENT_ID'
