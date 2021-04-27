@@ -1,7 +1,24 @@
-import {schedulesToTimestamps} from "../../../lib/service/schedules";
+import {filterTimestamps, schedulesToTimestamps} from "../../../lib/service/schedules";
 import {SchedulesResponse} from "../../../lib/api/schedules";
 import {ApiTimestamp, EventType} from "../../../lib/model/timestamp";
 import {EVENTSOURCE_SCHEDULES_CALCULATED, EVENTSOURCE_SCHEDULES_VTS_CONTROL} from "../../../lib/event-sourceutil";
+import {newTimestamp} from "../testdata";
+import moment from 'moment-timezone';
+import {getRandomNumber} from "../../../../../common/test/testutils";
+import {getPortAreaGeometries} from "../../../lib/service/portareas";
+
+const uuid = '123123123';
+const vesselName = 'TEST';
+const callsign = 'TEST_CALLSIGN';
+const mmsi = '123456789';
+const imo = '1234567';
+const locode = getPortAreaGeometries()[0].locode;
+const destination = 'Foobar';
+const portfacility = `${locode}-1`;
+const etaEventTime = '2021-04-27T20:00:00Z';
+const etaTimestamp = '2021-04-27T06:17:36Z';
+const etdEventTime = '2021-04-27T20:00:00Z';
+const etdTimestamp = '2021-04-27T06:17:36Z';
 
 describe('schedules', () => {
 
@@ -49,20 +66,27 @@ describe('schedules', () => {
         timestamps.filter(ts => ts.eventType == EventType.ETD).forEach(ts => verifyStructure(ts, EventType.ETD, true));
     });
 
-});
+    test('filterTimestamps - older than 5 minutes are filtered', () => {
+        const etd: ApiTimestamp = newTimestamp({
+            eventType: EventType.ETD,
+            eventTime: moment().subtract(getRandomNumber(6, 9999), 'minutes').toDate(),
+            locode
+        });
 
-const uuid = '123123123';
-const vesselName = 'TEST';
-const callsign = 'TEST_CALLSIGN';
-const mmsi = '123456789';
-const imo = '1234567';
-const locode = 'ASDFG';
-const destination = 'Foobar';
-const portfacility = 'ASDFG-1';
-const etaEventTime = '2021-04-27T20:00:00Z';
-const etaTimestamp = '2021-04-27T06:17:36Z';
-const etdEventTime = '2021-04-27T20:00:00Z';
-const etdTimestamp = '2021-04-27T06:17:36Z';
+        expect(filterTimestamps([etd]).length).toBe(0);
+    });
+
+    test('filterTimestamps - newer than 5 minutes are not filtered', () => {
+        const etd: ApiTimestamp = newTimestamp({
+            eventType: EventType.ETD,
+            eventTime: moment().subtract(getRandomNumber(1, 5), 'minutes').toDate(),
+            locode
+        });
+
+        expect(filterTimestamps([etd]).length).toBe(1);
+    });
+
+});
 
 function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean): SchedulesResponse {
     return {
