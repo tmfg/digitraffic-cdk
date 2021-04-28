@@ -15,7 +15,7 @@ import {createSubscription} from '../../../common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse,} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
-import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {dbLambdaConfiguration, defaultLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
@@ -47,11 +47,11 @@ export function create(
 
     const resource = publicApi.root
         .addResource("api")
-        .addResource("v1")
-        .addResource('timestamps');
+        .addResource("v1");
 
     createTimestampsResource(publicApi, secret, vpc, props, resource, lambdaDbSg, timestampsModel, errorResponseModel, validator, stack);
     createShiplistResource(publicApi, secret, vpc, props, lambdaDbSg, stack);
+    createTimestampMetadataResource(publicApi, props, resource, stack);
 }
 
 function createTimestampsResource(
@@ -94,7 +94,8 @@ function createTimestampsResource(
         }
     });
 
-    resource.addMethod("GET", getTimestampsIntegration, {
+    const timestampResource = resource.addResource('timestamps');
+    timestampResource.addMethod("GET", getTimestampsIntegration, {
         apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.locode': false,
@@ -112,11 +113,11 @@ function createTimestampsResource(
     addTagsAndSummary('GetTimestamps',
         ['timestamps'],
         'Retrieves ship timestamps by ship or port',
-        resource,
+        timestampResource,
         stack);
-    addQueryParameterDescription('locode', 'Port LOCODE', resource, stack);
-    addQueryParameterDescription('mmsi', 'Ship MMSI', resource, stack);
-    addQueryParameterDescription('imo', 'Ship IMO', resource, stack);
+    addQueryParameterDescription('locode', 'Port LOCODE', timestampResource, stack);
+    addQueryParameterDescription('mmsi', 'Ship MMSI', timestampResource, stack);
+    addQueryParameterDescription('imo', 'Ship IMO', timestampResource, stack);
 
     return getTimestampsLambda;
 }
@@ -160,6 +161,39 @@ function createShiplistResource(
         stack);
 
     return lambda;
+}
+
+function createTimestampMetadataResource(
+    publicApi: RestApi,
+    props: Props,
+    resource: Resource,
+    stack: Construct) {
+
+    const functionName = 'PortActivity-GetTimestampMetadata';
+
+    const assetCode = new AssetCode('dist/lambda/get-timestamp-metadata');
+    const lambda = new Function(stack, functionName, defaultLambdaConfiguration({
+        functionName: functionName,
+        code: assetCode,
+        memorySize: 128,
+        handler: 'lambda-get-timestamp-metadata.handler'
+    }));
+    const integration = new LambdaIntegration(lambda, {
+        proxy: true
+    });
+
+    const metadataResource = resource.addResource('metadata');
+
+    metadataResource.addMethod("GET", integration, {
+        apiKeyRequired: false
+    });
+
+    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+    addTagsAndSummary('Timestamp metadata',
+        ['metadata'],
+        'Returns timestamp related metadata',
+        metadataResource,
+        stack);
 }
 
 function createApi(stack: Construct) {
