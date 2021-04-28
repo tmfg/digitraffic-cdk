@@ -4,7 +4,7 @@ import {
     find as dbFind,
     doDelete as dbDelete,
     update as dbUpdate
-} from '../db/db-requests';
+} from '../db/requests';
 import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
 import {inDatabase} from "../../../../common/postgres/database";
 

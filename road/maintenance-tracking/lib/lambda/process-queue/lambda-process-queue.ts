@@ -4,7 +4,7 @@ import {SQSEvent} from "aws-lambda";
 import {SQSRecord} from "aws-lambda/trigger/sqs";
 import moment from 'moment-timezone';
 import {RECEIPT_HANDLE_SEPARATOR, SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../constants";
-import {DbObservationData, Status} from "../../db/db-maintenance-tracking";
+import {DbObservationData, Status} from "../../db/maintenance-tracking";
 import {createObservationHash} from "../../service/maintenance-tracking";
 
 const middy = require('@middy/core')

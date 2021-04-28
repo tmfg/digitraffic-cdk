@@ -1,6 +1,6 @@
 import {APIGatewayEvent} from 'aws-lambda';
 import {ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../../model/service-request";
-import {update} from "../../service/requests";
+import * as RequestsService from "../../service/requests";
 import {invalidRequest} from "../../http-util";
 
 export const handler = async (
@@ -16,7 +16,7 @@ export const handler = async (
         return invalidRequest();
     }
 
-    await update(serviceRequests.map(sr => toServiceRequestWithExtensions(sr)));
+    await RequestsService.update(serviceRequests.map(sr => toServiceRequestWithExtensions(sr)));
 
     return {statusCode: 200, body: 'Ok'};
 };

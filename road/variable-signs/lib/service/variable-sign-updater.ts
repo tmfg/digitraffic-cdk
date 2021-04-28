@@ -1,4 +1,4 @@
-import * as DeviceDB from "../db/db-datex2";
+import * as DeviceDB from "../db/datex2";
 import * as LastUpdatedDB from "../../../../common/db/last-updated";
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";

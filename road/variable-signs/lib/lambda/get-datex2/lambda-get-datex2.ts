@@ -1,4 +1,4 @@
-import {findActiveSignsDatex2} from "../../service/variable-sign-service";
+import {findActiveSignsDatex2} from "../../service/variable-signs";
 
 export const handler = async (event: any): Promise<any> => {
     const start = Date.now();

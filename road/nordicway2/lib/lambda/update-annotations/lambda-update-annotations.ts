@@ -1,7 +1,8 @@
 import {Annotation} from "../../model/annotations";
-import {login, getAnnotations, LoginResponse} from "../../api/api-annotations";
+import * as AnnotationsApi from "../../api/annotations";
 import {saveAnnotations} from "../../service/annotations";
 import {lastUpdated} from "../../service/last-updated";
+import {LoginResponse} from "../../api/annotations";
 
 export const handler = async () : Promise <any> => {
     const updated = await lastUpdated();
@@ -21,11 +22,11 @@ async function getAnnotationsFromServer(timestampFrom: Date, timeStampTo: Date):
     const endpointUrl = process.env.ENDPOINT_URL as string;
 
     try {
-        const loginResponse = <LoginResponse> await login(endpointUser, endpointPass, loginUrl);
+        const loginResponse = <LoginResponse> await AnnotationsApi.login(endpointUser, endpointPass, loginUrl);
 
         if(loginResponse.status == "success") {
-            const newAnnotations = await getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo, false);
-            const updatedAnnotations = await getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo, true);
+            const newAnnotations = await AnnotationsApi.getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo, false);
+            const updatedAnnotations = await AnnotationsApi.getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo, true);
 
             return newAnnotations.concat(updatedAnnotations);
         } else {

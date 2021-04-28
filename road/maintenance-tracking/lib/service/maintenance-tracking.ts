@@ -1,5 +1,5 @@
-import * as MaintenanceTrackingDB from "../db/db-maintenance-tracking"
-import {DbMaintenanceTrackingData, DbObservationData, Status} from "../db/db-maintenance-tracking"
+import * as MaintenanceTrackingDB from "../db/maintenance-tracking"
+import {DbMaintenanceTrackingData, DbObservationData, Status} from "../db/maintenance-tracking"
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 

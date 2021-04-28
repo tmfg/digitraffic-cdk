@@ -1,4 +1,4 @@
-import {uploadArea} from "../api/vis-api";
+import * as VisApi from '../api/vis';
 
 export async function sendFault(
     faultS124: string,
@@ -8,6 +8,6 @@ export async function sendFault(
     privateKey: string) {
 
     const start = Date.now();
-    await uploadArea(faultS124, url, ca, clientCertificate, privateKey);
+    await VisApi.uploadArea(faultS124, url, ca, clientCertificate, privateKey);
     console.info(`method=sendFault tookMs=%d`, Date.now() - start);
 }

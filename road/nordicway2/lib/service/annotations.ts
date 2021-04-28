@@ -2,7 +2,7 @@ import {inDatabase} from '../../../../common/postgres/database';
 import {createFeatureCollection} from "../../../../common/api/geojson";
 import * as LastUpdatedDB from "../../../../common/db/last-updated";
 
-import * as AnnotationsDB from "../db/db-annotations";
+import * as AnnotationsDB from "../db/annotations";
 import {Annotation} from "../model/annotations";
 
 import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";

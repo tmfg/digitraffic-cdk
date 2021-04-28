@@ -1,4 +1,4 @@
-import {getFaults} from "../../api/get-faults";
+import {getFaults} from "../../api/faults";
 import {saveFaults} from "../../service/faults";
 import {Integration} from "../../app-props";
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";

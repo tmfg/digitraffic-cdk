@@ -1,14 +1,14 @@
 import * as LastUpdatedDB from "../../../../common/db/last-updated";
-import * as DisruptionsDB from "../db/db-disruptions"
+import * as DisruptionsDB from "../db/disruptions"
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
-import {getDisruptions} from '../api/get-disruptions';
+import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
 import {createFeatureCollection} from "../../../../common/api/geojson";
 import {Geometry} from "wkx";
-import {DbDisruption} from "../db/db-disruptions";
+import {DbDisruption} from "../db/disruptions";
 
 const GeoJsonValidator = require('geojson-validation');
 
@@ -44,7 +44,7 @@ export async function saveDisruptions(disruptions: SpatialDisruption[]) {
 }
 
 export async function fetchRemoteDisruptions(endpointUrl: string) {
-    const disruptions = await getDisruptions(endpointUrl);
+    const disruptions = await DisruptionsApi.getDisruptions(endpointUrl);
     const validDisruptions = disruptions.filter(validateGeoJson);
     return validDisruptions.map(featureToDisruption);
 }

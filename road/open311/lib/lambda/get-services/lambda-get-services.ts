@@ -1,5 +1,5 @@
-import {findAll} from "../../service/services";
+import * as ServicesService from "../../service/services";
 
 export const handler = async (): Promise<any> => {
-    return await findAll();
+    return await ServicesService.findAll();
 };

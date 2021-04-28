@@ -1,11 +1,10 @@
 import * as LastUpdatedDB from "../../../../common/db/last-updated";
-import * as FaultsDB from "../db/db-faults"
+import * as FaultsDB from "../db/faults"
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "../../../../common/vis/voyageplan";
-import {findFaultIdsByRoute} from "../db/db-faults";
 import moment from 'moment-timezone';
 import {Feature, GeoJsonProperties} from "geojson";
 import {createFeatureCollection} from "../../../../common/api/geojson";
@@ -52,7 +51,7 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
             .flatMap(w => w.waypoint.flatMap( wp => wp.position))
             .map(p => new Point(p.$.lon, p.$.lat)));
     const faultIds = await inDatabase(async (db: IDatabase<any,any>) => {
-        return findFaultIdsByRoute(db, voyageLineString);
+        return FaultsDB.findFaultIdsByRoute(db, voyageLineString);
     });
     console.info("method=findFaultIdsForVoyagePlan tookMs=%d count=%d", Date.now() - start, faultIds.length);
     return faultIds;
