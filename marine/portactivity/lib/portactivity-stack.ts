@@ -43,6 +43,10 @@ export class PortActivityStack extends Stack {
         PublicApi.create(secret, vpc, lambdaDbSg, appProps, this);
 
         this.addDLQAlarm(queueAndDLQ.dlq, appProps);
+
+        new Bucket(this, 'DocumentationBucket', {
+            bucketName: appProps.documentationBucketName
+        });
     }
 
     addDLQAlarm(queue: Queue, appProps: Props) {

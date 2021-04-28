@@ -25,4 +25,5 @@ export interface Props {
         readonly teqplay?: boolean,
         readonly pilotweb?: boolean,
     }
+    readonly documentationBucketName: string
 }
