@@ -13,7 +13,7 @@ export const handler = async function () {
         const calculatedTimestamps = await SchedulesService.getCalculatedTimestamps(schedulesUrl);
         const timestamps = vtsControlTimestamps.concat(calculatedTimestamps);
 
-        console.info("sending %d messages", timestamps.length);
+        console.info("method=updateTimestampsFromSchedules count=%d", timestamps.length);
 
         timestamps.forEach(ts => sendMessage(ts, sqsQueueUrl));
     });
