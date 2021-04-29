@@ -9,6 +9,7 @@
       <excludePattern pattern="node_modules" />
       <excludePattern pattern="tsd" />
       <excludePattern pattern="tsd" />
+      <excludePattern pattern="*.js" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

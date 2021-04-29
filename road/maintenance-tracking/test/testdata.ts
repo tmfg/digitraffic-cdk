@@ -1,10 +1,9 @@
-import {DbMaintenanceTrackingData, Status} from "../lib/db/maintenance-tracking";
-import {createHash} from "../lib/service/maintenance-tracking";
-import {getRandomNumberAsString} from "../../../common/test/testutils";
+import {DbObservationData} from "../lib/db/maintenance-tracking";
+import {getRandomIntegerAsString} from "../../../common/test/testutils";
 
 const ID_PLACEHOLDER = 'ID_PLACEHOLDER'
 const TK_PLACEHOLDER = 'TK_PLACEHOLDER'
-const JSON =
+const TRACKING_JSON_WITH_3_OBSERVATIONS =
         `{
             "otsikko": {
                 "lahettaja": {
@@ -94,19 +93,26 @@ const JSON =
             ]
         }`;
 
-export function getTrackingJson(id: string, tyokoneId?: string): string {
+export function getTrackingJsonWith3Observations(id: string, tyokoneId?: string): string {
     if (tyokoneId) {
-        return JSON.replace(new RegExp(ID_PLACEHOLDER, 'g'), id).replace(new RegExp(TK_PLACEHOLDER, 'g'), tyokoneId);
+        return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(new RegExp(ID_PLACEHOLDER, 'g'), id).replace(new RegExp(TK_PLACEHOLDER, 'g'), tyokoneId);
     }
-    return JSON.replace(new RegExp(ID_PLACEHOLDER, 'g'), id).replace(new RegExp(TK_PLACEHOLDER, 'g'), '123456789');
+    return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(new RegExp(ID_PLACEHOLDER, 'g'), id).replace(new RegExp(TK_PLACEHOLDER, 'g'), '123456789');
 }
 
-export function assertData(saved: DbMaintenanceTrackingData, json: string) {
-    expect(saved.hash).toBe(createHash(json));
-    expect(saved.json).toBe(json);
-    expect(saved.status).toBe(Status.UNHANDLED);
+export function assertObservationData(srcObservations: DbObservationData[], results: DbObservationData[]) {
+    results.forEach((resultObservation) => {
+        // @ts-ignore remove id field that is not in scr data
+        delete resultObservation.id;
+
+        const foundSrcObservations = srcObservations.filter(o => o.observationTime.getTime() === resultObservation.observationTime.getTime());
+        expect(foundSrcObservations.length).toBe(1);
+
+        const srcObservation = foundSrcObservations[0];
+        expect(resultObservation).toEqual(srcObservation);
+    });
 }
 
 export function getRandompId(): string {
-    return getRandomNumberAsString(100000, 100000000000)
+    return getRandomIntegerAsString(100000, 100000000000)
 }

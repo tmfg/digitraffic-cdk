@@ -1,74 +1,49 @@
 import * as MaintenanceTrackingDB from "../../lib/db/maintenance-tracking";
-import {DbMaintenanceTrackingData, Status} from "../../lib/db/maintenance-tracking";
 import * as pgPromise from "pg-promise";
-import {createHash} from "../../lib/service/maintenance-tracking";
-import {assertData, getRandompId, getTrackingJson} from "../testdata";
-import {dbTestBase, findAllTrackings} from "../db-testutil";
+import {createObservationsDbDatas, dbTestBase, findAllObservations} from "../db-testutil";
+import {assertObservationData, getRandompId, getTrackingJsonWith3Observations} from "../testdata";
 
 describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('insertMaintenanceTrackingData', async () => {
 
-        const maintenanceTrackingDataJson = getTrackingJson(getRandompId(), getRandompId());
-        const dbMaintenanceTrackingData = createData(maintenanceTrackingDataJson);
+        const maintenanceTrackingDataJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const createdObservations = createObservationsDbDatas(maintenanceTrackingDataJson);
 
-        await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData);
+        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations);
 
-        const fetchedTrackings = await findAllTrackings(db);
-        expect(fetchedTrackings.length).toBe(1);
+        const fetchedObservations = await findAllObservations(db);
+        expect(fetchedObservations.length).toBe(3);
 
-        const saved = fetchedTrackings[0];
-        assertData(saved, maintenanceTrackingDataJson);
+        assertObservationData(createdObservations, fetchedObservations);
     });
 
     test('insertMaintenanceTrackingData multiple machines', async () => {
 
-        const maintenanceTrackingDataJson1 = getTrackingJson(getRandompId(), '1');
-        const maintenanceTrackingDataJson2 = getTrackingJson(getRandompId(), '2');
+        const maintenanceTrackingDataJson1 = getTrackingJsonWith3Observations(getRandompId(), '1');
+        const maintenanceTrackingDataJson2 = getTrackingJsonWith3Observations(getRandompId(), '2');
 
-        await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, createData(maintenanceTrackingDataJson1));
-        await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, createData(maintenanceTrackingDataJson2));
+        const createdObservations1 = createObservationsDbDatas(maintenanceTrackingDataJson1);
+        const createdObservations2 = createObservationsDbDatas(maintenanceTrackingDataJson2);
 
-        const fetchedTrackings = await findAllTrackings(db);
-        expect(fetchedTrackings.length).toBe(2);
+        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations1);
+        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations2);
+
+        const fetchedObservations = await findAllObservations(db);
+        expect(fetchedObservations.length).toBe(6);
     });
 
-    test('insertMaintenanceTrackingData with same hash should fail', async () => {
+    test('insertMaintenanceTrackingData with same hash should not be duplicated in db', async () => {
 
-        const json = getTrackingJson(getRandompId(), getRandompId());
-        const dbMaintenanceTrackingData1 = createData(json);
-        // Different data, same hash
-        const dbMaintenanceTrackingData2: DbMaintenanceTrackingData = {
-            json: getTrackingJson(getRandompId(), getRandompId()),
-            status: Status.UNHANDLED,
-            hash: dbMaintenanceTrackingData1.hash,
-            sendingTime: new Date()
-        };
+        const json = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const observationData = createObservationsDbDatas(json);
 
-        await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData1);
-        let failure = false;
-        try {
-            await MaintenanceTrackingDB.insertMaintenanceTrackingData(db, dbMaintenanceTrackingData2);
-        } catch (error) {
-            // Expect error: duplicate key value violates unique constraint "maintenance_tracking_data_hash_ui"
-            failure = true;
-        }
-        expect(failure).toBe(true);
+        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationData);
+        const fetchedTrackings1 = await findAllObservations(db);
+        expect(fetchedTrackings1.length).toBe(3);
 
-        const fetchedTrackings = await findAllTrackings(db);
-        expect(fetchedTrackings.length).toBe(1);
-
-        const saved = fetchedTrackings[0];
-        assertData(saved, json);
+        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationData);
+        const fetchedTrackings2 = await findAllObservations(db);
+        expect(fetchedTrackings2.length).toBe(3);
     });
-
-    function createData(json : string) : DbMaintenanceTrackingData {
-        return {
-            json: json,
-            status: Status.UNHANDLED,
-            hash: createHash(json),
-            sendingTime: new Date()
-        };
-    }
-
 }));

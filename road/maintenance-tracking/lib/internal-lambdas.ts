@@ -55,7 +55,10 @@ function createProcessQueueLambda(
         memorySize: 256
     });
     const processQueueLambda = new lambda.Function(stack, functionName, lambdaConf);
-    processQueueLambda.addEventSource(new SqsEventSource(queue));
+    // Handle only one message per time
+    processQueueLambda.addEventSource(new SqsEventSource(queue, {
+        batchSize: 1
+    }));
 
     createSubscription(processQueueLambda, functionName, appProps.logsDestinationArn, stack);
     createAlarm(processQueueLambda, appProps.errorNotificationSnsTopicArn, appProps.dlqBucketName, stack);

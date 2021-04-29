@@ -2,6 +2,14 @@ import {IDatabase, ITask} from "pg-promise";
 const pgp = require('pg-promise')();
 
 // convert numeric types to number instead of string
+pgp.pg.types.setTypeParser(pgp.pg.types.builtins.INT8, (value: string) => {
+    return parseInt(value);
+});
+
+pgp.pg.types.setTypeParser(pgp.pg.types.builtins.FLOAT8, (value: string) => {
+    return parseFloat(value);
+});
+
 pgp.pg.types.setTypeParser(pgp.pg.types.builtins.NUMERIC, (value: string) => {
     return parseFloat(value);
 });

@@ -2,9 +2,9 @@ import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../lib/lambda/constants";
 process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[SQS_QUEUE_URL] = 'https://aws-queue-123';
 import * as pgPromise from "pg-promise";
-import {dbTestBase, findAllTrackings} from "../db-testutil";
+import {dbTestBase} from "../db-testutil";
 import {createSendParams, handlerFn} from "../../lib/lambda/update-queue/lambda-update-queue";
-import {getRandompId, getTrackingJson} from "../testdata";
+import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
 import * as sinon from 'sinon';
 import {createSQSExtClient} from "../../lib/sqs-ext";
 
@@ -21,7 +21,7 @@ describe('update-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     test('single valid record', async () => {
-        const json = getTrackingJson(getRandompId(), getRandompId());
+        const json = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
 
         const sqsClient: any = createSQSExtClient("bucket-name");
         const sendMessageStub = sandbox.stub(sqsClient, 'sendMessage').returns({promise: () => Promise.resolve()});
@@ -39,7 +39,7 @@ describe('update-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     test('invalid record', async () => {
-        const json = `invalid json ` + getTrackingJson(getRandompId(), getRandompId());
+        const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const sqsClient: any = createSQSExtClient("bucket-name");
         const sendMessageStub = sandbox.stub(sqsClient, 'sendMessage').returns({promise: () => Promise.resolve()});
 

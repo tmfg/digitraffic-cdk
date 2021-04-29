@@ -1,83 +1,83 @@
-import {dbTestBase, findAllTrackings} from "../db-testutil";
+import {createObservationsDbDatas, dbTestBase, findAllObservations, truncate} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {createHash, saveMaintenanceTrackingData} from "../../lib/service/maintenance-tracking";
-import {assertData, getTrackingJson} from "../testdata";
+import {createMaintenanceTrackingMessageHash, saveMaintenanceTrackingObservationData} from "../../lib/service/maintenance-tracking";
+import {assertObservationData, getTrackingJsonWith3Observations} from "../testdata";
 
 describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
-    test('saveMaintenanceTrackingData', async () => {
-        const json = getTrackingJson('1', '1');
-        await saveMaintenanceTrackingData(json, new Date());
+    beforeEach(() => truncate(db))
 
-        const fetchedTrackings = await findAllTrackings(db);
-        expect(fetchedTrackings.length).toBe(1);
-        const saved = fetchedTrackings[0];
-        assertData(saved, json);
+    test('saveMaintenanceTrackingObservationData', async () => {
+        const json = getTrackingJsonWith3Observations('1', '1');
+        const data = createObservationsDbDatas(json);
+        await saveMaintenanceTrackingObservationData(data);
+
+        const fetchedObservations = await findAllObservations(db);
+        expect(fetchedObservations.length).toBe(3);
+        assertObservationData(data, fetchedObservations);
     });
 
 
-    test('saveMaintenanceTrackingData should succeed for two different messages', async () => {
-        const json1 = getTrackingJson('1', '456');
-        const json2 = getTrackingJson('2', '654');
-        await saveMaintenanceTrackingData(json1, new Date());
-        await saveMaintenanceTrackingData(json2, new Date());
+    test('saveMaintenanceTrackingObservationData should succeed for two different messages', async () => {
+        const json1 = getTrackingJsonWith3Observations('1', '456');
+        const json2 = getTrackingJsonWith3Observations('2', '654');
+        await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
+        await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));
 
-        const fetchedTrackings = await findAllTrackings(db);
-        expect(fetchedTrackings.length).toBe(2);
+        const fetchedTrackings = await findAllObservations(db);
+        expect(fetchedTrackings.length).toBe(6);
     });
 
+    test('saveMaintenanceTrackingObservationData should ony save once for same content and different message id', async () => {
+        const json1 = getTrackingJsonWith3Observations('1', '1');
+        const json2 = getTrackingJsonWith3Observations('2', '1');
+        await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
+        await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));
 
-    test('saveMaintenanceTrackingData should succeed only for first message with same content and different id', async () => {
-        const json1 = getTrackingJson('1', '1');
-        const json2 = getTrackingJson('2', '1');
-        await saveMaintenanceTrackingData(json1, new Date());
-
-        let failure = false;
-        try {
-            await saveMaintenanceTrackingData(json2, new Date());
-        } catch (error) {
-            // Expect error: duplicate key value violates unique constraint "maintenance_tracking_data_hash_ui"
-            failure = true;
-        }
-
-        expect(failure).toBe(true);
-
-        const fetchedTrackings = await findAllTrackings(db);
-        expect(fetchedTrackings.length).toBe(1);
-        const saved = fetchedTrackings[0];
-        assertData(saved, json1);
+        const fetchedTrackings = await findAllObservations(db);
+        expect(fetchedTrackings.length).toBe(3);
     });
 
-    test('createHash should equals for same message but different viestintunniste id', () => {
-        const h1 = createHash(getTrackingJson('1', '1'));
-        const h2 = createHash(getTrackingJson('2', '1'));
+    test('createMaintenanceTrackingMessageHash should equals for same message but different viestintunniste id', () => {
+        const h1 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations('1', '1'));
+        const h2 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations('2', '1'));
         // Assert has is same for same json with different viestitunniste
         expect(h1).toBe(h2);
     });
 
-    test('createHash should differ for different message', () => {
-        const h1 = createHash(getTrackingJson('1', '123'));
-        const h2 = createHash(getTrackingJson('1', '321'));
+    test('createMaintenanceTrackingMessageHash should differ for different message', () => {
+        const h1 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations('1', '123'));
+        const h2 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations('1', '321'));
         // Assert has is not same for same json with different data content excluding viestitunniste
         expect(h1).not.toBe(h2);
     });
 
-    test('getTrackingJson with viestintunniste id', () => {
-        expect(getTrackingJson('1', '1')).toBe(getTrackingJson('1', '1'));
-        expect(getTrackingJson('1', '1')).not.toBe(getTrackingJson('2', '1'));
+    test('createObservationHash should equals for same message', () => {
+        const tracking = JSON.parse(getTrackingJsonWith3Observations('1', '1'));
+        expect(tracking.havainnot.length).toBe(3);
+        const observation = tracking.havainnot[0].havainto;
+        const h1 = createMaintenanceTrackingMessageHash(JSON.stringify(observation));
+        const h2 = createMaintenanceTrackingMessageHash(JSON.stringify(observation));
+        // Assert has is same for same json with different viestitunniste
+        expect(h1).toBe(h2);
     });
 
-    test('getTrackingJson with viestintunniste and tyokone id', () => {
-        expect(getTrackingJson('1', '123')).toBe(getTrackingJson('1', '123'));
-        expect(getTrackingJson('1', '123')).not.toBe(getTrackingJson('1', '321'));
+    test('createObservationHash should differ for different message', () => {
+        const tracking = JSON.parse(getTrackingJsonWith3Observations('1', '1'));
+        expect(tracking.havainnot.length).toBe(3);
+        const observation1 = tracking.havainnot[0].havainto;
+        const observation2 = tracking.havainnot[1].havainto;
+        const h1 = createMaintenanceTrackingMessageHash(JSON.stringify(observation1));
+        const h2 = createMaintenanceTrackingMessageHash(JSON.stringify(observation2));
+        // Assert has is same for same json with different viestitunniste
+        expect(h1).not.toBe(h2);
     });
 
-    test('fifo', () => {
-        const queueName = 'MaintenanceTrackingQueue.fifo';
-        console.info(queueName.includes(".fifo"));
-        console.info(queueName.endsWith(".fifo"));
-        const fifoMessageGroupId = queueName.includes(".fifo") ? '&MessageGroupId=SameGroupAlways' : '';
-        console.info(fifoMessageGroupId);
-    });
 
+    test('getTrackingJsonWith3Observations works with viestintunniste and tyokone id', () => {
+        expect(getTrackingJsonWith3Observations('1', '1')).toBe(getTrackingJsonWith3Observations('1', '1'));
+        expect(getTrackingJsonWith3Observations('1', '1')).not.toBe(getTrackingJsonWith3Observations('2', '1'));
+        expect(getTrackingJsonWith3Observations('1', '123')).toBe(getTrackingJsonWith3Observations('1', '123'));
+        expect(getTrackingJsonWith3Observations('1', '123')).not.toBe(getTrackingJsonWith3Observations('1', '321'));
+    });
 }));
