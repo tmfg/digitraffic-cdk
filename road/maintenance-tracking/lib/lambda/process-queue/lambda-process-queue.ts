@@ -43,7 +43,7 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
 
                 await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
 
-                console.info(`method=processMaintenanceTrackingQueue messageSendingTime=${sendingTime.toUTCString()} observations insertCount=%d, sizeBytes==%d`, observationDatas.length, messageSizeBytes);
+                console.info(`method=processMaintenanceTrackingQueue messageSendingTime=${sendingTime.toUTCString()} observations insertCount=%d, sizeBytes=%d`, observationDatas.length, messageSizeBytes);
 
                 return Promise.resolve();
             } catch (e) {

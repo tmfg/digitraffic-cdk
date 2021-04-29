@@ -21,7 +21,7 @@ export function handlerFn(sqsClient : aws.SQS) { // typeof SQSExt
             var awnsParams : SendMessageRequest = createSendParams(apiGWRequest.body);
             // Will send message's body to S3 if it's larger than the threshold (or alwaysThroughS3)
             await sqsClient.sendMessage(awnsParams).promise();
-            console.info(`method=updateMaintenanceTrackingRequest sqs.sendMessage messageDeduplicationId: ${awnsParams.MessageDeduplicationId} sizeBytes=: ${messageSizeBytes} count=1`);
+            console.info(`method=updateMaintenanceTrackingRequest sqs.sendMessage messageDeduplicationId: ${awnsParams.MessageDeduplicationId} sizeBytes=${messageSizeBytes} count=1`);
             return Promise.resolve(ok());
         } catch (e) {
             console.error(`method=updateMaintenanceTrackingRequest Error while sending message to SQSExt`, e);
