@@ -1,0 +1,16 @@
+{
+  "name": "digitraffic-cdk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "git@github.com:tmfg/digitraffic-cdk.git",
+  "author": "Digitraffic <digitraffic@fintraffic.fi>",
+  "license": "EUPL",
+  "private": true,
+  "workspaces": [
+    "common",
+    "marine",
+    "marine/*",
+    "road",
+    "road/*"
+  ]
+}

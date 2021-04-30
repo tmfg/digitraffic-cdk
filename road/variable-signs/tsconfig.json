@@ -18,7 +18,10 @@
     "inlineSources": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization":false,
-    "typeRoots": ["./node_modules/@types"],
+    "typeRoots": [
+      "./node_modules/@types",
+      "../../node_modules/@types"
+    ],
     "moduleResolution": "node",
     "preserveSymlinks": true,
     "baseUrl": ".",

@@ -8,7 +8,7 @@ export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => vo
 }
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => void) {
-    return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
+    return commonDbTestBase(fn, truncate, 'marinecam', 'marinecam', 'localhost:54321/marine');
 }
 
 export async function truncate(db: IDatabase<any, any>): Promise<any> {
