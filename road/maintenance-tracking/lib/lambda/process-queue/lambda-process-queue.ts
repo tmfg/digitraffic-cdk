@@ -51,7 +51,7 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
                 const start = Date.now();
                 const insertCount :number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
                 const end = Date.now();
-                console.info(`method=processMaintenanceTrackingQueue messageSendingTime=%s observations insertCount=%d of %d observations tookMs=%d total message sizeBytes=%d s3Key=%s`,
+                console.info(`method=processMaintenanceTrackingQueue messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d s3Key=%s`,
                              sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes, s3Key);
 
                 return Promise.resolve();
