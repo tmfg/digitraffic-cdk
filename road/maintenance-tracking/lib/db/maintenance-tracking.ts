@@ -43,13 +43,14 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
         $(hash),
         $(s3Uri))
     ON CONFLICT(hash)  DO NOTHING
+    RETURNING id
 `;
 
 export function insertMaintenanceTrackingObservationData(db: IDatabase<any, any>, observations: DbObservationData[]): Promise<any> {
     return db.tx(t => {
         return t.batch(
             observations.map(observation =>
-                db.none(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
+                db.oneOrNone(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
             )
         )
     });

@@ -52,7 +52,8 @@ function createProcessQueueLambda(
         },
         reservedConcurrentExecutions: appProps.sqsProcessLambdaConcurrentExecutions,
         role: role,
-        memorySize: 256
+        memorySize: 256,
+        timeout: 1
     });
     const processQueueLambda = new lambda.Function(stack, functionName, lambdaConf);
     // Handle only one message per time

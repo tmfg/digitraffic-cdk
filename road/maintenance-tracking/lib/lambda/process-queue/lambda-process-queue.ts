@@ -15,12 +15,15 @@ const sqsQueueUrl = process.env[SQS_QUEUE_URL] as string;
 
 export function handlerFn(sqsClient : any) { // typeof SQSExt
     return async (event: SQSEvent) => {
-        console.info(`method=processMaintenanceTrackingQueue Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length}`)
+        // console.info(`method=processMaintenanceTrackingQueue Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length}`)
 
         let records : [];
         try {
             // console.info("Records: %s", JSON.stringify(event.Records));
             records = await sqsClient.transformLambdaRecords(event.Records);
+            if (records.length > 1) {
+                console.warn(`method=processMaintenanceTrackingQueue transformLambdaRecords count %s > 1`, records.length);
+            }
         } catch (e) {
             console.error(`method=processMaintenanceTrackingQueue transformLambdaRecords failed`, e);
             return Promise.reject(e);
@@ -33,6 +36,8 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
                 const messageSizeBytes = Buffer.byteLength(jsonString);
                 // Parse JSON to get sending time
                 const s3Uri = record.receiptHandle.split(RECEIPT_HANDLE_SEPARATOR)[0];
+                const s3Key = s3Uri.substring(s3Uri.lastIndexOf("/") + 1);
+
                 const trackingJson = JSON.parse(jsonString);
                 const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
                 const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma
@@ -41,9 +46,13 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
                         return convertToDbObservationData(havainto, sendingTime, sendingSystem, s3Uri);
                     });
 
-                await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
-
-                console.info(`method=processMaintenanceTrackingQueue messageSendingTime=${sendingTime.toUTCString()} observations insertCount=%d, sizeBytes=%d`, observationDatas.length, messageSizeBytes);
+                console.info(`method=processMaintenanceTrackingQueue saving %d observations message sizeBytes=%d s3Key=%s`,
+                             observationDatas.length, messageSizeBytes, s3Key);
+                const start = Date.now();
+                const insertCount :number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
+                const end = Date.now();
+                console.info(`method=processMaintenanceTrackingQueue messageSendingTime=%s observations insertCount=%d of %d observations tookMs=%d total message sizeBytes=%d s3Key=%s`,
+                             sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes, s3Key);
 
                 return Promise.resolve();
             } catch (e) {

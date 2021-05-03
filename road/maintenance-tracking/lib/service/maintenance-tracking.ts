@@ -9,14 +9,12 @@ const crypto = require('crypto');
 
 const matchViestitunnisteRegex = /"viestintunniste"\s*:\s*{\s*"id"\s*:\s*[0-9]*\s*}\s*,/;
 
-export async function saveMaintenanceTrackingObservationData(observationDatas: DbObservationData[]): Promise<any | undefined> {
-    const start = Date.now();
-    await inDatabase(async (db: IDatabase<any, any>) => {
+export async function saveMaintenanceTrackingObservationData(observationDatas: DbObservationData[]): Promise<number> {
+    const a : [] = await inDatabase(async (db: IDatabase<any, any>) => {
         return await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationDatas);
-    }).then(a => {
-        const end = Date.now();
-        console.info("method=saveMaintenanceTrackingObservationData updatedCount=%d tookMs=%d", a.length, (end - start));
     });
+    // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
+    return a.filter(id => id != null).length
 }
 
 export function createMaintenanceTrackingMessageHash(maintenanceTrackingDataJson: string) : string {

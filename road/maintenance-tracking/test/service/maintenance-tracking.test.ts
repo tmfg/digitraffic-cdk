@@ -17,7 +17,6 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         assertObservationData(data, fetchedObservations);
     });
 
-
     test('saveMaintenanceTrackingObservationData should succeed for two different messages', async () => {
         const json1 = getTrackingJsonWith3Observations('1', '456');
         const json2 = getTrackingJsonWith3Observations('2', '654');
@@ -31,11 +30,24 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
     test('saveMaintenanceTrackingObservationData should ony save once for same content and different message id', async () => {
         const json1 = getTrackingJsonWith3Observations('1', '1');
         const json2 = getTrackingJsonWith3Observations('2', '1');
+
         await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
         await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));
 
         const fetchedTrackings = await findAllObservations(db);
         expect(fetchedTrackings.length).toBe(3);
+    });
+
+    test('saveMaintenanceTrackingObservationData with two equal observations and one different should ony different be saved from second message', async () => {
+        const json1 = getTrackingJsonWith3Observations('1', '1');
+        const json2 = getTrackingJsonWith3Observations('2', '1')
+                        .replace('[293358, 6889073]', '[293358, 6889074]');
+
+        await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
+        await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));
+
+        const fetchedTrackings = await findAllObservations(db);
+        expect(fetchedTrackings.length).toBe(4);
     });
 
     test('createMaintenanceTrackingMessageHash should equals for same message but different viestintunniste id', () => {
@@ -72,7 +84,6 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         // Assert has is same for same json with different viestitunniste
         expect(h1).not.toBe(h2);
     });
-
 
     test('getTrackingJsonWith3Observations works with viestintunniste and tyokone id', () => {
         expect(getTrackingJsonWith3Observations('1', '1')).toBe(getTrackingJsonWith3Observations('1', '1'));
