@@ -9,7 +9,7 @@ const sqsQueueUrl = process.env[SQS_QUEUE_URL] as string;
 
 export function handlerFn(sqsClient : aws.SQS) { // typeof SQSExt
     return async (apiGWRequest: any): Promise<any> => {
-
+        const start = Date.now();
         console.info(`method=updateMaintenanceTrackingQueueRequest bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl}`);
         if (!apiGWRequest || !apiGWRequest.body) {
             console.error(`method=updateMaintenanceTrackingRequest Empty message`);
@@ -21,10 +21,12 @@ export function handlerFn(sqsClient : aws.SQS) { // typeof SQSExt
             var awnsParams : SendMessageRequest = createSendParams(apiGWRequest.body);
             // Will send message's body to S3 if it's larger than the threshold (or alwaysThroughS3)
             await sqsClient.sendMessage(awnsParams).promise();
-            console.info(`method=updateMaintenanceTrackingRequest sqs.sendMessage messageDeduplicationId: ${awnsParams.MessageDeduplicationId} sizeBytes=${messageSizeBytes} count=1`);
+            const end = Date.now();
+            console.info(`method=updateMaintenanceTrackingRequest sqs.sendMessage messageDeduplicationId: ${awnsParams.MessageDeduplicationId} sizeBytes=${messageSizeBytes} count=1 tookMs=${(end - start)}`);
             return Promise.resolve(ok());
         } catch (e) {
-            console.error(`method=updateMaintenanceTrackingRequest Error while sending message to SQSExt`, e);
+            const end = Date.now();
+            console.error(`method=updateMaintenanceTrackingRequest Error while sending message to SQSExt tookMs=${(end - start)}`, e);
             return Promise.reject(invalidRequest(`Error while sending message to SQSExt ${JSON.stringify(e)}`));
         }
     }
