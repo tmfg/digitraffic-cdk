@@ -67,7 +67,7 @@ const voyagePlan = `
     </defaultWaypoint>
     <!--2 or more repetitio-->
     <waypoint id="200" revision="200" name="string" radius="5.0">
-      <position lat="60.285805" lon="27.321650"/>
+      <position lat="58.5842" lon="19.7182"/>
       <!--Optional:-->
       <leg starboardXTD="9.0" portsideXTD="9.0" safetyContour="1000.00" safetyDepth="1000.00" geometryType="Orthodrome" speedMin="1000.00" speedMax="1000.00" draughtForward="1000.00" draughtAft="1000.00" staticUKC="1000.00" dynamicUKC="1000.00" masthead="1000.00" legReport="string" legInfo="string" legNote1="string" legNote2="string">
         <!--Optional:-->
@@ -89,7 +89,7 @@ const voyagePlan = `
       </extensions>
     </waypoint>
     <waypoint id="200" revision="200" name="string" radius="5.0">
-      <position lat="60.285815" lon="27.321660"/>
+      <position lat="61.5065" lon="20.3774"/>
       <!--Optional:-->
       <leg starboardXTD="9.0" portsideXTD="9.0" safetyContour="1000.00" safetyDepth="1000.00" geometryType="Orthodrome" speedMin="1000.00" speedMax="1000.00" draughtForward="1000.00" draughtAft="1000.00" staticUKC="1000.00" dynamicUKC="1000.00" masthead="1000.00" legReport="string" legInfo="string" legNote1="string" legNote2="string">
         <!--Optional:-->
