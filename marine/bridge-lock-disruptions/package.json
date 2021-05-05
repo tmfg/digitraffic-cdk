@@ -1,6 +1,7 @@
 {
   "name": "bridge-lock-disruptions",
   "version": "0.1.0",
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
