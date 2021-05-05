@@ -7,8 +7,8 @@ set -e
 
 if [ -z "$1" ]
 then
-  echo "no arg"
-  yarn workspaces run test
+  yarn workspace cloudwatch-logs-recipient run test
+  yarn workspace swagger-joiner run test
 else
   yarn workspace $1 run test
 fi
