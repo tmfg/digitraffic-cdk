@@ -35,5 +35,5 @@ method=resolveGeometries 2`;
 });
 
 function readFile(filename: string) : string {
-    return readFileSync('test/lib/service/' + filename, 'utf8');
+    return readFileSync('test/service/' + filename, 'utf8');
 }
