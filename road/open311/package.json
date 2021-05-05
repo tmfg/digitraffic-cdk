@@ -1,9 +1,7 @@
 {
   "name": "open311-cdk",
   "version": "0.1.0",
-  "bin": {
-    "open311-cdk": "bin/open311-cdk.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

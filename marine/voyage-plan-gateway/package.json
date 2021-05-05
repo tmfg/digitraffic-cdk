@@ -2,9 +2,6 @@
   "name": "voyage-plan-gateway",
   "version": "0.1.0",
   "private": true,
-  "bin": {
-    "voyage-plan-gateway": "bin/voyage-plan-gateway-app.js"
-  },
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

@@ -1,9 +1,7 @@
 {
   "name": "maintenance-tracking",
   "version": "0.1.0",
-  "bin": {
-    "maintenance-tracking-app": "bin/maintenance-tracking-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

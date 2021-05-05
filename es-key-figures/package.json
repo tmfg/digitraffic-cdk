@@ -1,9 +1,7 @@
 {
   "name": "es-key-figures",
   "version": "0.1.0",
-  "bin": {
-    "cloudfront-cdk": "bin/es-key-figure.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

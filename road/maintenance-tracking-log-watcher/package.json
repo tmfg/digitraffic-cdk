@@ -1,9 +1,7 @@
 {
   "name": "maintenance-tracking-watch",
   "version": "0.1.0",
-  "bin": {
-    "bridge-lock-disruptions": "bin/maintenance-tracking-log-watcher-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

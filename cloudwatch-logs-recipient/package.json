@@ -1,9 +1,7 @@
 {
   "name": "cloudwatch-logs-recipient",
   "version": "0.1.0",
-  "bin": {
-    "cloudwatch-logs-recipient": "bin/cloudwatch-logs-recipient.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

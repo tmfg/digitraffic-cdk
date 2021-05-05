@@ -1,9 +1,7 @@
 {
   "name": "elasticsearch",
   "version": "0.1.0",
-  "bin": {
-    "elasticsearch": "bin/elasticsearch-app.js"
-  },
+  "private": true,
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",

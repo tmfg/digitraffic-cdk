@@ -1,8 +1,8 @@
 {
   "name": "digitraffic-cdk-common",
   "version": "1.0.0",
+  "private": true,
   "description": "",
-  "license": "EUPL",
   "scripts": {
     "build": "tsc",
     "test": "echo no tests for this project"

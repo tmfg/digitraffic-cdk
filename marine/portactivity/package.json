@@ -1,9 +1,7 @@
 {
   "name": "portactivity",
   "version": "0.0.1",
-  "bin": {
-    "portactivity": "bin/portactivity-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

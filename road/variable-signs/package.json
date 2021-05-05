@@ -1,9 +1,7 @@
 {
   "name": "variable-signs-cdk",
   "version": "0.1.0",
-  "bin": {
-    "variable-signs-cdk": "bin/variable-signs-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

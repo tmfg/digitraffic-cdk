@@ -1,9 +1,6 @@
 {
   "name": "bridge-lock-disruptions",
   "version": "0.1.0",
-  "bin": {
-    "bridge-lock-disruptions": "bin/bridge-lock-disruptions-app.js"
-  },
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

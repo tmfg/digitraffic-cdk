@@ -1456,6 +1456,13 @@
   resolved "https://registry.yarnpkg.com/@types/json-schema/-/json-schema-7.0.7.tgz#98a993516c859eb0d5c4c8f098317a9ea68db9ad"
   integrity sha512-cxWFQVseBm6O9Gbw1IWb8r6OS4OhSt3hPZLkFApLjM8TEXROBuQGLAH2i2gZpcXdLBIrpXuTDhH7Vbm1iXmNGA==
 
+"@types/jsts@^0.17.5":
+  version "0.17.5"
+  resolved "https://registry.yarnpkg.com/@types/jsts/-/jsts-0.17.5.tgz#dd1f837930e4c1b298cd5d277d40b5d3a0c2827f"
+  integrity sha512-hpABy+XR2Pqcb7ALHd3wZG5t1XkAEEJm3h+bM6pvToEMo8kEulYcKdV8kkVYRkERvVhP6TV9bKIvozFYLOdLvQ==
+  dependencies:
+    "@types/openlayers" "*"
+
 "@types/moment@^2.13.0":
   version "2.13.0"
   resolved "https://registry.yarnpkg.com/@types/moment/-/moment-2.13.0.tgz#604ebd189bc3bc34a1548689404e61a2a4aac896"
@@ -1500,6 +1507,11 @@
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/@types/normalize-package-data/-/normalize-package-data-2.4.0.tgz#e486d0d97396d79beedd0a6e33f4534ff6b4973e"
   integrity sha512-f5j5b/Gf71L+dbqxIpQ4Z2WlmI/mPJ0fOkGGmFgtb6sAu97EPczzbS3/tJKxmcYDj55OX6ssqwDAWOHIYDRDGA==
+
+"@types/openlayers@*", "@types/openlayers@^4.6.17":
+  version "4.6.17"
+  resolved "https://registry.yarnpkg.com/@types/openlayers/-/openlayers-4.6.17.tgz#39a8dce631e284a26cf0958664509932e6cd7c7d"
+  integrity sha512-vCCV5MY3XRmHyED1ndHxXJ/5IpeA3pX9J6IKZnMY+uTerhYNfG7pM451dgS90tSkBBxszd8ETPrF5ggQ9mqwlA==
 
 "@types/prettier@^2.0.0":
   version "2.2.3"
@@ -4452,6 +4464,11 @@ jsprim@^1.2.2:
     extsprintf "1.3.0"
     json-schema "0.2.3"
     verror "1.10.0"
+
+jsts@^2.6.1:
+  version "2.6.1"
+  resolved "https://registry.yarnpkg.com/jsts/-/jsts-2.6.1.tgz#c6ab4208c8ac487e868ec708d189ffadeef2e516"
+  integrity sha512-+uKq5RhZ2ZBDghNVhd6fnHXPlpuBg5zGln4piL0fWlaWiP91WI4bsOM3BBCbntTvo2iYTQ+Kqrqhes5yPe0s9Q==
 
 just-extend@^4.0.2:
   version "4.2.1"

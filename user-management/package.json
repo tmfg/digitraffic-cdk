@@ -1,9 +1,7 @@
 {
   "name": "user-management-cdk",
   "version": "0.1.0",
-  "bin": {
-    "cloudfront-cdk": "bin/user-management-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

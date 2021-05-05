@@ -1,9 +1,7 @@
 {
   "name": "aton-faults-cdk",
   "version": "0.1.0",
-  "bin": {
-    "aton-faults-cdk": "bin/aton-faults-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

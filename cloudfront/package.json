@@ -1,9 +1,7 @@
 {
   "name": "cloudfront-cdk",
   "version": "0.1.0",
-  "bin": {
-    "cloudfront-cdk": "bin/cloudfront-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

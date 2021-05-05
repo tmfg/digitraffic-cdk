@@ -1,9 +1,7 @@
 {
   "name": "nordicway2-cdk",
   "version": "0.1.0",
-  "bin": {
-    "nordicway2-cdk": "bin/nordicway2-app.js"
-  },
+  "private": true,
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",

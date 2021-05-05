@@ -1,10 +1,6 @@
 {
   "name": "marinecam",
   "version": "0.0.1",
-  "license": "EUPL",
-  "bin": {
-    "mobile-server": "bin/marinecam-app.js"
-  },
   "scripts": {
     "prebuild": "rimraf tsd",
     "build": "tsc",
