@@ -1,14 +1,14 @@
 import {handler} from "../../../lib/lambda/update-annotations/lambda-update-annotations";
-import {testBase} from "../../db-testutil";
 import * as AnnotationsService from "../../../lib/service/annotations";
-import {TestHttpServer} from "../../../../../common/test/httpserver";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {dbTestBase} from "../../db-testutil";
 
 const SERVER_PORT = 8089;
 
 process.env.ENDPOINT_LOGIN_URL = `http://localhost:${SERVER_PORT}/login`;
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}/annotations`;
 
-describe('update-annotations', testBase(async () => {
+describe('update-annotations', dbTestBase(() => {
     test('test update', async () => {
         const server = new TestHttpServer();
         server.listen(SERVER_PORT, {
