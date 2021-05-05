@@ -3,4 +3,4 @@
 # exit on any error
 set -ex
 
-yarn install
+yarn install --frozen-lockfile
