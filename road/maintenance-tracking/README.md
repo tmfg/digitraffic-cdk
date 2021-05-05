@@ -3,25 +3,6 @@
 Maintenance tracking integration receives POST-request with tracking JSON, puts it in AWS SQS Queue and saves it to db from there. 
 Road application then reads saved data from the db and combines the contents of the messages for sharing it from the public API as trackings.
 
-# Build
-
-* Install dependencies 
-    * `npm install` Install dependencies or 
-    * `npm ci` A clean install of your dependencies.  
-* Build project
-    * `npm run build`
-    * `npm run all-watch` build continuously
-* Run tests
-    * In order to run tests you need to set up the local database from the [digitraffic-road project](https://github.com/tmfg/digitraffic-road/tree/develop/dbroad).
-    * `npm run test` 
-
-# Installation
-
-## Setup env
-
-* Init mfa session
-    * `~/.aws/bin/digitraffic_mfa_aws.sh <mfa-token>`  
-
 ## Deploy to AWS
 
 * Show changes

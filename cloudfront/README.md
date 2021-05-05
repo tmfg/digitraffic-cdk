@@ -15,18 +15,6 @@ And after that?
 1. Check weathercam-bucket, you must give permission to created originAccessIdentity
 2. Route53, domain-names should be alias to created cloudfront distributions
 
-
-# CloudFront
-
-# Build
-
-* Install dependencies 
-    * `npm install` 
-* Build project
-    * `npm run build`
-
-# Installation
-
 ## Setup env
 
 * Init mfa session
