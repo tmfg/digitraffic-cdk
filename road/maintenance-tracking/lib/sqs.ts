@@ -35,6 +35,8 @@ export function createQueue(scope: Construct): QueueAndDLQ {
         // SQS long polling
         // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html
         receiveMessageWaitTime: Duration.seconds(20),
+        // This is fifo and no parallel processing so this can be high
+        visibilityTimeout: Duration.seconds(120),
         encryption: QueueEncryption.KMS_MANAGED, // NONE?
         deadLetterQueue: {
             // First fail puts it to DLQ as order must remain.

@@ -5,6 +5,7 @@
 
 # Set test env
 set -v
-export AWS_PROFILE=digitraffic-road-prod
+# AWS_PROFILE=fintraffic-digitraffic-<road|marine|rail|status>-<tst|prd>
+export AWS_PROFILE=fintraffic-digitraffic-road-prd
 export AWS_DEFAULT_REGION=eu-west-1
 set +v

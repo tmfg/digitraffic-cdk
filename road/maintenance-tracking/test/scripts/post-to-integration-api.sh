@@ -4,7 +4,7 @@
 #BASE_URL=${1:?"1. param is api gw base url ie. https://xyz.execute-api.eu-west-1.amazonaws.com/prod/"}
 #API_KEY=${1:?"1. param is api key"}
 FILE=${1:?"1. param is file to post as payload"}
-BASE_URL="https://tie-test.integration.digitraffic.fi/"
+BASE_URL="http://tie-test.integration.digitraffic.fi/"
 # Add slash if missing
 length=${#BASE_URL}
 last_char=${BASE_URL:length-1:1}

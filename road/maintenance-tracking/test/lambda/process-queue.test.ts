@@ -3,10 +3,10 @@ const QUEUE = 'MaintenanceTrackingQueue.fifo';
 process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 import * as pgPromise from "pg-promise";
-import {dbTestBase, findAllObservations, findAllTrackings, truncate} from "../db-testutil";
+import {dbTestBase, findAllObservations, truncate} from "../db-testutil";
 import {handlerFn} from "../../lib/lambda/process-queue/lambda-process-queue";
 import {SQSRecord} from "aws-lambda";
-import {getRandompId, getTrackingJson} from "../testdata";
+import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
 import * as sinon from 'sinon';
 import {createSQSExtClient} from "../../lib/sqs-ext";
 import moment from 'moment-timezone';
@@ -14,7 +14,6 @@ import moment from 'moment-timezone';
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     const sandbox = sinon.createSandbox();
-    beforeEach(() => truncate(db))
     afterEach(() => sandbox.restore());
 
     test('no records', async () => {
@@ -26,7 +25,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('single valid record', async () => {
         console.info(RECEIPT_HANDLE_SEPARATOR);
-        const json = getTrackingJson(getRandompId(),getRandompId());
+        const json = getTrackingJsonWith3Observations(getRandompId(),getRandompId());
         const recordFromS3 : SQSRecord = createRecord(json);
         const recordNoJson : SQSRecord = cloneRecordWithoutJson(recordFromS3)
 
@@ -36,13 +35,10 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             Records: [recordNoJson]
         });
 
-        const allTrackings = await findAllTrackings(db);
-        expect(allTrackings.length).toBe(0);
-
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(3);
 
-        let prevObservationTime = moment("2019-01-30T12:00:04+02:00").valueOf();
+        let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
         for(const obs of allObservations) {
             console.info(JSON.stringify(obs));
             const observationTime = moment(obs.observationTime).valueOf();
@@ -58,11 +54,11 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('two valid records', async () => {
 
         // Create two records
-        const json1 = getTrackingJson(getRandompId(), getRandompId());
+        const json1 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const record1FromS3 : SQSRecord = createRecord(json1);
         const record1NoJson : SQSRecord = cloneRecordWithoutJson(record1FromS3);
 
-        const json2 = getTrackingJson(getRandompId(), getRandompId());
+        const json2 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const record2FromS3 : SQSRecord = createRecord(json2);
         const record2NoJson : SQSRecord = cloneRecordWithoutJson(record2FromS3);
 
@@ -73,14 +69,10 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             Records: [record1NoJson, record2NoJson]
         });
 
-        const allTrackings = await findAllTrackings(db);
-        expect(allTrackings.length).toBe(0);
-
-
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(6);
 
-        let prevObservationTime = moment("2019-01-30T12:00:04+02:00").valueOf();
+        let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
         for(const obs of allObservations) {
             const observationTime = moment(obs.observationTime).valueOf();
             expect(observationTime).toBeGreaterThanOrEqual(prevObservationTime);
@@ -92,7 +84,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('invalid record', async () => {
 
-        const json1 = `invalid json ` + getTrackingJson(getRandompId(), getRandompId());
+        const json1 = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const record1FromS3 : SQSRecord = createRecord(json1);
         const record1NoJson : SQSRecord = cloneRecordWithoutJson(record1FromS3);
 
@@ -103,9 +95,6 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             Records: [record1NoJson]
         });
 
-        const allTrackings = await findAllTrackings(db);
-        expect(allTrackings.length).toBe(0);
-
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(0);
 
@@ -115,11 +104,11 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('invalid and valid record', async () => {
 
         // Create two records
-        const invalidJson = `invalid json ` + getTrackingJson(getRandompId(), getRandompId());
+        const invalidJson = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const invalidRecordFromS3 : SQSRecord = createRecord(invalidJson);
         const invalidRecordNoJson : SQSRecord = cloneRecordWithoutJson(invalidRecordFromS3);
 
-        const validJson = getTrackingJson(getRandompId(), getRandompId());
+        const validJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const validRecordFromS3 : SQSRecord = createRecord(validJson);
         const validRecordNoJson : SQSRecord = cloneRecordWithoutJson(validRecordFromS3);
 
@@ -130,13 +119,10 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             Records: [invalidRecordNoJson, validRecordNoJson]
         });
 
-        const allTrackings = await findAllTrackings(db);
-        expect(allTrackings.length).toBe(0);
-
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(3);
 
-        let prevObservationTime = moment("2019-01-30T12:00:04+02:00").valueOf();
+        let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
         for(const obs of allObservations) {
             const observationTime = moment(obs.observationTime).valueOf();
             expect(observationTime).toBeGreaterThan(prevObservationTime);
