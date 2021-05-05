@@ -1,6 +1,6 @@
 {
-  "name": "digitraffic-cdk-common",
-  "version": "1.0.0",
+  "name": "digitraffic-common",
+  "version": "0.0.1",
   "private": true,
   "description": "",
   "scripts": {
