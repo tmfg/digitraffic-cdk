@@ -49,7 +49,7 @@
     "@aws-cdk/core": "1.83.0",
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",
-    "@types/ramda": "^0.27.27",
+    "@types/ramda": "0.27.1",
     "ajv-cli": "^3.3.0",
     "aws-sqs-xl-messages": "^1.1.0",
     "dtsgenerator": "^3.3.1",
@@ -58,7 +58,7 @@
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5",
     "pg-query-stream": "4.0.0",
-    "ramda": "^0.27.1",
+    "ramda": "0.27.1",
     "source-map-support": "v0.5.19"
   },
   "externals": [

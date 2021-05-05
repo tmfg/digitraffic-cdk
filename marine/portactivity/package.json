@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.64",
-    "@types/jest": "^26.0.15",
+    "@types/jest": "^26.0.22",
     "@types/node": "v14.0.27",
     "@types/sinon": "^9.0.8",
     "@types/xml2js": "v0.4.5",
@@ -50,7 +50,7 @@
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",
     "@types/amqplib": "^0.5.17",
-    "@types/ramda": "^0.27.32",
+    "@types/ramda": "0.27.1",
     "amqplib": "^0.6.0",
     "axios": "v0.21.1",
     "moment": "^2.29.1",
@@ -58,7 +58,7 @@
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5",
     "pg-query-stream": "4.0.0",
-    "ramda": "^0.27.1",
+    "ramda": "0.27.1",
     "source-map-support": "^0.5.19",
     "uuid": "^8.3.1"
   }
