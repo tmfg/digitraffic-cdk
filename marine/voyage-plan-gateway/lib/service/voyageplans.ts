@@ -1,6 +1,6 @@
-import {RtzVoyagePlan} from "../../../../common/vis/voyageplan";
+import {RtzSchedules, RtzVoyagePlan, RtzWaypoint} from "../../../../common/rtz/voyageplan";
 import * as jsts from 'jsts';
-import Coordinate = jsts.geom.Coordinate;
+import moment, {Moment} from 'moment-timezone';
 import GeometryFactory = jsts.geom.GeometryFactory;
 
 type ValidationError = string;
@@ -31,11 +31,18 @@ export function validateStructure(voyagePlan?: RtzVoyagePlan): ValidationError[]
     if (!voyagePlan.route) {
         return ['Missing route element'];
     }
-    const wps = voyagePlan.route.waypoints;
+
+    return validateWaypointsStructure(voyagePlan.route.waypoints)
+        .concat(validateSchedulesStructure(voyagePlan.route.schedules));
+}
+
+export function validateWaypointsStructure(wps?: RtzWaypoint[]): ValidationError[] {
+    const validationErrors: ValidationError[] = [];
+
     if (!wps || !wps.length) {
         return ['Missing route waypoints'];
     }
-    const validationErrors: ValidationError[] = [];
+
     wps.forEach(wp => {
         const w = wp.waypoint;
         if (!w || !w.length) {
@@ -65,12 +72,57 @@ export function validateStructure(voyagePlan?: RtzVoyagePlan): ValidationError[]
             });
         });
     });
+
+    return validationErrors;
+}
+
+export function validateSchedulesStructure(schedules?: RtzSchedules[]): ValidationError[] {
+    const validationErrors: ValidationError[] = [];
+
+    if (!schedules || !schedules.length) {
+        return ['Missing route schedules'];
+    }
+
+    schedules.forEach(scheds => {
+        if (!scheds.schedule || !scheds.schedule.length) {
+            validationErrors.push('Missing schedule element');
+            return;
+        }
+        scheds.schedule.forEach(sched => {
+            if (!sched.manual || !sched.manual.length) {
+                validationErrors.push('Missing manual element');
+                return;
+            }
+            sched.manual.forEach(s => {
+                if (!s.scheduleElement || !s.scheduleElement.length) {
+                    validationErrors.push('Missing scheduleElement element');
+                    return;
+                }
+                s.scheduleElement.forEach(se => {
+                    if (!se.$) {
+                        validationErrors.push('No attributes in scheduleElement');
+                        return;
+                    }
+                    if (!se.$.eta && !se.$.etd) {
+                        validationErrors.push('No ETA or ETD attribute in scheduleElement');
+                    }
+                });
+            });
+        });
+    });
+
     return validationErrors;
 }
 
 export function validateContent(voyagePlan: RtzVoyagePlan): ValidationError[] {
+    return validateWaypointsContent(voyagePlan.route.waypoints)
+        .concat(validateSchedulesContent(voyagePlan.route.schedules));
+}
+
+export function validateWaypointsContent(wps: RtzWaypoint[]): ValidationError[] {
     const validationErrors: ValidationError[] = [];
-    voyagePlan.route.waypoints.forEach(wp => {
+
+    wps.forEach(wp => {
         wp.waypoint.forEach(w => {
             w.position.forEach(pos => {
                 const lon = Number(pos.$.lon);
@@ -82,5 +134,39 @@ export function validateContent(voyagePlan: RtzVoyagePlan): ValidationError[] {
             });
         });
     });
+
     return validationErrors;
+}
+
+export function validateSchedulesContent(schedules: RtzSchedules[]): ValidationError[] {
+    const validationErrors: ValidationError[] = [];
+
+    const now = moment();
+
+    schedules.forEach(schedules => {
+        schedules.schedule.forEach(sched => {
+            sched.manual.forEach(s => {
+                s.scheduleElement.forEach(se => {
+                    if (se.$.eta) {
+                        const eta = moment(se.$.eta);
+                        if (!validateTimestamp(eta, now)) {
+                            validationErrors.push(`Invalid ETA timestamp ${se.$.eta}`);
+                        }
+                    }
+                    if (se.$.etd) {
+                        const etd = moment(se.$.etd);
+                        if (!validateTimestamp(etd, now)) {
+                            validationErrors.push(`Invalid ETD timestamp ${se.$.etd}`);
+                        }
+                    }
+                });
+            });
+        });
+    });
+
+    return validationErrors;
+}
+
+function validateTimestamp(timestamp: Moment, now: Moment): boolean {
+    return timestamp.isValid() && timestamp.isAfter(now);
 }

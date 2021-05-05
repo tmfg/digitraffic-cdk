@@ -4,7 +4,7 @@ import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../../common/api/errors"
 import {withSecret} from "../../../../../common/secrets/secret";
 import {KEY_SECRET_ID} from "./env_keys";
 import * as VoyagePlansService from '../../service/voyageplans';
-import {RtzVoyagePlan} from "../../../../../common/vis/voyageplan";
+import {RtzVoyagePlan} from "../../../../../common/rtz/voyageplan";
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.

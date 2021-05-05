@@ -1,6 +1,7 @@
 import {handlerFn} from '../../lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan';
 import * as sinon from 'sinon';
 import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../common/api/errors";
+import moment from 'moment-timezone';
 
 const sandbox = sinon.createSandbox();
 
@@ -20,7 +21,7 @@ describe('upload-voyage-plan', () => {
 
     test('validation success with correct voyage plan', async () => {
         const uploadEvent = {
-            voyagePlan
+            voyagePlan: voyagePlan()
         };
 
         await expect(handlerFn(secretFn)(uploadEvent)).resolves.toMatch(OK_MESSAGE);
@@ -29,7 +30,8 @@ describe('upload-voyage-plan', () => {
 });
 
 // generated with IntelliJ IDEA tool: XML from schema
-const voyagePlan = `
+function voyagePlan() {
+    return `
 <?xml version="1.0" encoding="UTF-8"?>
 <route version="1.2" xmlns="http://www.cirm.org/RTZ/1/2">
   <routeInfo routeName="string" routeAuthor="string" routeStatus="string" validityPeriodStart="2008-09-29T04:49:45" validityPeriodStop="2014-09-19T02:18:33" vesselName="string" vesselMMSI="200" vesselIMO="200" vesselVoyage="string" vesselDisplacement="200" vesselCargo="200" vesselGM="1000.00" optimizationMethod="string" vesselMaxRoll="200" vesselMaxWave="1000.00" vesselMaxWind="1000.00" vesselSpeedMax="1000.00" vesselServiceMin="1000.00" vesselServiceMax="1000.00" routeChangesHistory="string">
@@ -126,7 +128,7 @@ const voyagePlan = `
       <!--Optional:-->
       <manual>
         <!--1 or more repetitio-->
-        <scheduleElement waypointId="200" etd="2009-05-16T15:42:28" etdWindowBefore="P3M8DT13H38M37S" etdWindowAfter="P1Y2M8DT15H6M2S" eta="2002-06-24T18:46:32+03:00" etaWindowBefore="P1Y4M4DT18H29M49S" etaWindowAfter="P10M3DT16H58M52S" stay="P1Y2M6DT16H51M39S" speed="1000.00" speedWindow="1000.00" windSpeed="1000.00" windDirection="359.0" currentSpeed="1000.00" currentDirection="359.0" windLoss="1000.00" waveLoss="1000.00" totalLoss="1000.00" rpm="200" pitch="100" fuel="1000.00" relFuelSave="1000.00" absFuelSave="1000.00" Note="string">
+        <scheduleElement waypointId="200" etd="${moment().add(5, 'minutes').toISOString()}" etdWindowBefore="P3M8DT13H38M37S" etdWindowAfter="P1Y2M8DT15H6M2S" eta="${moment().add(5, 'minutes').toISOString()}" etaWindowBefore="P1Y4M4DT18H29M49S" etaWindowAfter="P10M3DT16H58M52S" stay="P1Y2M6DT16H51M39S" speed="1000.00" speedWindow="1000.00" windSpeed="1000.00" windDirection="359.0" currentSpeed="1000.00" currentDirection="359.0" windLoss="1000.00" waveLoss="1000.00" totalLoss="1000.00" rpm="200" pitch="100" fuel="1000.00" relFuelSave="1000.00" absFuelSave="1000.00" Note="string">
           <!--Optional:-->
           <extensions>
             <!--Zero or more repetitio-->
@@ -195,3 +197,4 @@ const voyagePlan = `
   </extensions>
 </route>
 `.trim();
+}
