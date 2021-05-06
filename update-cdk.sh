@@ -11,14 +11,7 @@ function updateInDirectory() {
     cd "$1"
 
     if [ -f package.json ]; then
-      rm -f package-lock.json
-      rm -rf node_modules
       ncu -f /$PACKAGE/ -u >ncu.log
-
-      # run install only if ncu finds packages to update
-      if grep -q "npm install" "ncu.log"; then
-        npm install
-      fi
     fi
 
     cd ..
