@@ -237,7 +237,7 @@ function getKeyFigures(): KeyFigure[] {
     },
     {
       'name': 'Http req 200',
-      'query': '{ "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:* AND @fields.status:200", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
+      'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:* AND @fields.status:200","analyze_wildcard":true,"time_zone":"Europe\/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
       'type': 'count'
     },
     {
