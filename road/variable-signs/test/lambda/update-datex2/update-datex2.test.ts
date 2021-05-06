@@ -48,5 +48,5 @@ async function updateFile(filename: string, expectedStatusCode: number): Promise
 }
 
 function getRequest(filename: string): any {
-    return {body: readFileSync('test/lib/lambda/update-datex2/' + filename, 'utf8')}
+    return {body: readFileSync('test/lambda/update-datex2/' + filename, 'utf8')}
 }
