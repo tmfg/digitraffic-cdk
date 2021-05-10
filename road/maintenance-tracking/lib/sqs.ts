@@ -39,9 +39,8 @@ export function createQueue(scope: Construct): QueueAndDLQ {
         visibilityTimeout: Duration.seconds(120),
         encryption: QueueEncryption.KMS_MANAGED, // NONE?
         deadLetterQueue: {
-            // First fail puts it to DLQ as order must remain.
             // Lambda should retry at least once before returning failed state. ie in case of network glitch.
-            maxReceiveCount: 1,
+            maxReceiveCount: 2,
             queue: dlq
         }
     });
