@@ -1,6 +1,7 @@
 import * as VoyagePlansService from '../../lib/service/voyageplans';
 import {getRandomNumber, randomBoolean} from "../../../../common/test/testutils";
 import moment from 'moment-timezone';
+import {ValidationError} from "../../lib/service/voyageplans";
 
 describe('voyageplans service', () => {
 
@@ -8,6 +9,7 @@ describe('voyageplans service', () => {
         const validationErrors = VoyagePlansService.validateWaypointsStructure(randomBoolean() ? undefined! : []);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_WAYPOINTS);
     });
 
     test('validateWaypointsStructure - no waypoint elements', () => {
@@ -17,6 +19,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_WAYPOINT);
     });
 
     test('validateWaypointsStructure - no position element', () => {
@@ -30,6 +33,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_POSITION);
     });
 
     test('validateWaypointsStructure - missing position attribute', () => {
@@ -47,6 +51,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.NO_POSITION_ATTRIBUTES);
     });
 
     test('validateWaypointsStructure - missing longitude', () => {
@@ -67,6 +72,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_LONGITUDE);
     });
 
     test('validateWaypointsStructure - missing latitude', () => {
@@ -87,6 +93,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_LATITUDE);
     });
 
     test('validateWaypointsStructure - multiple errors', () => {
@@ -110,6 +117,8 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(2);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_LATITUDE);
+        expect(validationErrors[1]).toBe(ValidationError.NO_POSITION_ATTRIBUTES);
     });
 
     test('validateWaypointsStructure - ok', () => {
@@ -136,6 +145,7 @@ describe('voyageplans service', () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure(randomBoolean() ? [] : undefined);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_SCHEDULES);
     });
 
     test('validateSchedulesStructure - missing schedule element', () => {
@@ -144,6 +154,7 @@ describe('voyageplans service', () => {
         }]);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_SCHEDULE);
     });
 
     test('validateSchedulesStructure - missing manual element', () => {
@@ -154,6 +165,7 @@ describe('voyageplans service', () => {
         }]);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_MANUAL);
     });
 
     test('validateSchedulesStructure - missing scheduleElement element', () => {
@@ -166,6 +178,7 @@ describe('voyageplans service', () => {
         }]);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_SCHEDULE_ELEMENT);
     });
 
     test('validateSchedulesStructure - missing scheduleElement attributes', () => {
@@ -180,6 +193,7 @@ describe('voyageplans service', () => {
         }]);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
     });
 
     test('validateSchedulesStructure - missing both ETA & ETD', () => {
@@ -197,6 +211,7 @@ describe('voyageplans service', () => {
         }]);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
     });
 
     test('validateSchedulesStructure - just ETA is ok', () => {
@@ -248,6 +263,8 @@ describe('voyageplans service', () => {
         }]);
 
         expect(validationErrors.length).toBe(2);
+        expect(validationErrors[0]).toBe(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
+        expect(validationErrors[1]).toBe(ValidationError.MISSING_MANUAL);
     });
 
     test('validateStructure - ok', () => {
@@ -289,6 +306,7 @@ describe('voyageplans service', () => {
         const validationErrors = VoyagePlansService.validateStructure(undefined);
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.EMPTY_VOYAGE_PLAN);
     });
 
     test('validateStructure - no route', () => {
@@ -297,6 +315,7 @@ describe('voyageplans service', () => {
         });
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.MISSING_ROUTE);
     });
 
     test('validateWaypointsContent - outside spatial limits', () => {
@@ -317,6 +336,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS);
     });
 
     test('validateWaypointsContent - inside spatial limits - Bothnian Bay', () => {
@@ -398,6 +418,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETA_TIMESTAMP);
     });
 
     test('validateSchedulesContent - malformed ETD', () => {
@@ -419,6 +440,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETD_TIMESTAMP);
     });
 
     test('validateSchedulesContent - ETA in past', () => {
@@ -440,6 +462,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETA_TIMESTAMP);
     });
 
     test('validateSchedulesContent - ETD in past', () => {
@@ -461,6 +484,7 @@ describe('voyageplans service', () => {
         );
 
         expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETD_TIMESTAMP);
     });
 
 });
