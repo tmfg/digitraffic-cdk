@@ -3,8 +3,6 @@ import * as jsts from 'jsts';
 import moment, {Moment} from 'moment-timezone';
 import GeometryFactory = jsts.geom.GeometryFactory;
 
-type ValidationError = string;
-
 const gf = new GeometryFactory();
 
 // roughly the Gulf of Finland, Bothnian Sea/Bay and Northern Baltic
@@ -24,12 +22,40 @@ const SPATIAL_LIMITS = gf.createPolygon(gf.createLinearRing([
     new jsts.geom.Coordinate(20.84, 68.82)
 ]), []);
 
+export enum ValidationError {
+    EMPTY_VOYAGE_PLAN = 'Empty or null voyage plan',
+    MISSING_ROUTE = 'Missing route element',
+
+    // waypoints structure
+    MISSING_WAYPOINTS = 'Missing route waypoints',
+    MISSING_WAYPOINT = 'Missing waypoint element',
+    MISSING_POSITION = 'Missing position element',
+    NO_POSITION_ATTRIBUTES = 'No attributes in position element',
+    MISSING_LONGITUDE = 'Missing longitude attribute',
+    MISSING_LATITUDE = 'Missing latitude attribute',
+
+    // waypoints content
+    COORDINATE_OUTSIDE_SPATIAL_LIMITS = 'Coordinate(s) outside spatial limits',
+
+    // schedules
+    MISSING_SCHEDULES = 'Missing route schedules',
+    MISSING_SCHEDULE = 'Missing schedule element',
+    MISSING_MANUAL = 'Missing manual element',
+    MISSING_SCHEDULE_ELEMENT = 'Missing scheduleElement element',
+    NO_SCHEDULE_ELEMENT_ATTRIBUTES = 'No attributes in scheduleElement',
+    NO_ETA_OR_ETD_ATTRIBUTES = 'No ETA or ETD attribute in scheduleElement',
+
+    // schedules content
+    INVALID_ETA_TIMESTAMP = 'Invalid ETA timestamp',
+    INVALID_ETD_TIMESTAMP = 'Invalid ETD timestamp'
+}
+
 export function validateStructure(voyagePlan?: RtzVoyagePlan): ValidationError[] {
     if (!voyagePlan) {
-        return ['Empty or null voyage plan'];
+        return [ValidationError.EMPTY_VOYAGE_PLAN];
     }
     if (!voyagePlan.route) {
-        return ['Missing route element'];
+        return [ValidationError.MISSING_ROUTE];
     }
 
     return validateWaypointsStructure(voyagePlan.route.waypoints)
@@ -40,34 +66,34 @@ export function validateWaypointsStructure(wps?: RtzWaypoint[]): ValidationError
     const validationErrors: ValidationError[] = [];
 
     if (!wps || !wps.length) {
-        return ['Missing route waypoints'];
+        return [ValidationError.MISSING_WAYPOINTS];
     }
 
     wps.forEach(wp => {
         const w = wp.waypoint;
         if (!w || !w.length) {
-            validationErrors.push('Missing waypoint element');
+            validationErrors.push(ValidationError.MISSING_WAYPOINT);
             return;
         }
         w.forEach(wpElem => {
             const pos = wpElem.position;
             if (!pos || !pos.length) {
-                validationErrors.push('Missing position element');
+                validationErrors.push(ValidationError.MISSING_POSITION);
                 return;
             }
             pos.forEach(p => {
                 const posAttrs = p.$;
                 if (!posAttrs) {
-                    validationErrors.push('No attributes in position element');
+                    validationErrors.push(ValidationError.NO_POSITION_ATTRIBUTES);
                     return;
                 }
                 const lon = posAttrs.lon;
                 if (!lon) {
-                    validationErrors.push('Missing longitude attribute');
+                    validationErrors.push(ValidationError.MISSING_LONGITUDE);
                 }
                 const lat = posAttrs.lat;
                 if (!lat) {
-                    validationErrors.push('Missing latitude attribute');
+                    validationErrors.push(ValidationError.MISSING_LATITUDE);
                 }
             });
         });
@@ -80,31 +106,31 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
     const validationErrors: ValidationError[] = [];
 
     if (!schedules || !schedules.length) {
-        return ['Missing route schedules'];
+        return [ValidationError.MISSING_SCHEDULES];
     }
 
     schedules.forEach(scheds => {
         if (!scheds.schedule || !scheds.schedule.length) {
-            validationErrors.push('Missing schedule element');
+            validationErrors.push(ValidationError.MISSING_SCHEDULE);
             return;
         }
         scheds.schedule.forEach(sched => {
             if (!sched.manual || !sched.manual.length) {
-                validationErrors.push('Missing manual element');
+                validationErrors.push(ValidationError.MISSING_MANUAL);
                 return;
             }
             sched.manual.forEach(s => {
                 if (!s.scheduleElement || !s.scheduleElement.length) {
-                    validationErrors.push('Missing scheduleElement element');
+                    validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                     return;
                 }
                 s.scheduleElement.forEach(se => {
                     if (!se.$) {
-                        validationErrors.push('No attributes in scheduleElement');
+                        validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                         return;
                     }
                     if (!se.$.eta && !se.$.etd) {
-                        validationErrors.push('No ETA or ETD attribute in scheduleElement');
+                        validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
                     }
                 });
             });
@@ -129,7 +155,7 @@ export function validateWaypointsContent(wps: RtzWaypoint[]): ValidationError[] 
                 const lat = Number(pos.$.lat);
                 const point = gf.createPoint(new jsts.geom.Coordinate(lon, lat));
                 if (!SPATIAL_LIMITS.contains(point)) {
-                    validationErrors.push(`Coordinate outside spatial limits lon: ${point.getX()}, lat: ${point.getY()}`);
+                    validationErrors.push(ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS);
                 }
             });
         });
@@ -150,13 +176,13 @@ export function validateSchedulesContent(schedules: RtzSchedules[]): ValidationE
                     if (se.$.eta) {
                         const eta = moment(se.$.eta);
                         if (!validateTimestamp(eta, now)) {
-                            validationErrors.push(`Invalid ETA timestamp ${se.$.eta}`);
+                            validationErrors.push(ValidationError.INVALID_ETA_TIMESTAMP);
                         }
                     }
                     if (se.$.etd) {
                         const etd = moment(se.$.etd);
                         if (!validateTimestamp(etd, now)) {
-                            validationErrors.push(`Invalid ETD timestamp ${se.$.etd}`);
+                            validationErrors.push(ValidationError.INVALID_ETD_TIMESTAMP);
                         }
                     }
                 });
