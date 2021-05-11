@@ -96,7 +96,7 @@ function createUpdateRequestHandlerLambda(
         functionName: lambdaFunctionName,
         code: new lambda.AssetCode('dist/lambda/update-queue'),
         handler: 'lambda-update-queue.handler',
-        reservedConcurrentExecutions: 1,
+        reservedConcurrentExecutions: 50,
         environment: lambdaEnv,
         role: lambdaRole,
         memorySize: 256
