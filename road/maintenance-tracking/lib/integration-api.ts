@@ -1,5 +1,5 @@
 import {Resource, RestApi} from '@aws-cdk/aws-apigateway';
-import {Construct} from '@aws-cdk/core';
+import {Construct, Stack, Duration} from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import * as lambda from '@aws-cdk/aws-lambda';
@@ -7,6 +7,10 @@ import {defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createRestApi} from '../../../common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
 import {addDefaultValidator, addServiceModel} from "../../../common/api/utils";
+import {getFullEnv} from "../../../common/stack/stack-util";
+import * as cloudwatch from "@aws-cdk/aws-cloudwatch";
+import {Topic} from "@aws-cdk/aws-sns";
+import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 
 
 import {
@@ -33,7 +37,7 @@ export function createIntegrationApiAndHandlerLambda(
     lambdaDbSg: ISecurityGroup,
     sqsExtendedMessageBucketArn: string,
     props: AppProps,
-    stack: Construct) {
+    stack: Stack) {
 
     const integrationApi = createRestApi(stack,
         'MaintenanceTracking-Integration',
@@ -83,12 +87,12 @@ function createUpdateRequestHandlerLambda(
     lambdaDbSg: ec2.ISecurityGroup,
     queue : Queue,
     sqsExtendedMessageBucketArn: string,
-    props: AppProps,
-    stack: Construct
+    appProps: AppProps,
+    stack: Stack
 ) {
     const lambdaFunctionName = 'MaintenanceTracking-UpdateQueue';
     const lambdaEnv: any = {};
-    lambdaEnv[SQS_BUCKET_NAME] = props.sqsExtendedMessageBucketName;
+    lambdaEnv[SQS_BUCKET_NAME] = appProps.sqsExtendedMessageBucketName;
     lambdaEnv[SQS_QUEUE_URL] = queue.queueUrl;
 
     const lambdaRole = createLambdaRoleWithWriteToSqsAndS3Policy(stack, queue.queueArn, sqsExtendedMessageBucketArn);
@@ -96,7 +100,6 @@ function createUpdateRequestHandlerLambda(
         functionName: lambdaFunctionName,
         code: new lambda.AssetCode('dist/lambda/update-queue'),
         handler: 'lambda-update-queue.handler',
-        reservedConcurrentExecutions: 50,
         environment: lambdaEnv,
         role: lambdaRole,
         memorySize: 256
@@ -106,7 +109,8 @@ function createUpdateRequestHandlerLambda(
         apiKeyRequired: true,
     });
     // Create log subscription
-    createSubscription(updateRequestsHandler, lambdaFunctionName, props.logsDestinationArn, stack);
+    createSubscription(updateRequestsHandler, lambdaFunctionName, appProps.logsDestinationArn, stack);
+    createAlarm(updateRequestsHandler, appProps.errorNotificationSnsTopicArn, appProps.dlqBucketName, stack);
 }
 
 function createLambdaRoleWithWriteToSqsAndS3Policy(stack: Construct, sqsArn: string, sqsExtendedMessageBucketArn: string) {
@@ -129,4 +133,34 @@ function createLambdaRoleWithWriteToSqsAndS3Policy(stack: Construct, sqsArn: str
     lambdaRole.addToPolicy(s3PolicyStatement);
 
     return lambdaRole;
+}
+
+function createAlarm(updateRequestHandlerLambda: lambda.Function, errorNotificationSnsTopicArn: string, dlqBucketName: string, stack: Stack) {
+
+    const fullEnv = getFullEnv(stack);
+    // Raise an alarm if we have more than 1 errors in last day
+    const topic = Topic.fromTopicArn(stack, 'MaintenanceTrackingAlarmUpdateSqsErrorTopic', errorNotificationSnsTopicArn)
+    new cloudwatch.Alarm(stack, "MaintenanceTrackingAlarmUpdateSqs", {
+        alarmName: updateRequestHandlerLambda.functionName + '-ErrorAlert-' + fullEnv,
+        alarmDescription: `Environment: ${fullEnv}. Error in handling of maintenance tracking message. Check DLQ and ` +
+            `S3: https://s3.console.aws.amazon.com/s3/buckets/${dlqBucketName}?region=${stack.region} for failed tracking messages.`,
+        metric: updateRequestHandlerLambda.metricErrors().with({ period: Duration.days(1) }),
+        threshold: 1,
+        evaluationPeriods: 1,
+        datapointsToAlarm: 1,
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
+    }).addAlarmAction(new SnsAction(topic));
+
+    // Raise alarm if there is more than 1 throttle in last day
+    const throttleTopic = Topic.fromTopicArn(stack, 'MaintenanceTrackingAlarmUpdateSqsThrottleTopic', errorNotificationSnsTopicArn)
+    new cloudwatch.Alarm(stack, "MaintenanceTrackingAlarmUpdateThrottle", {
+        alarmName: updateRequestHandlerLambda.functionName + '-ThrottleAlert-' + fullEnv,
+        alarmDescription: `Environment: ${fullEnv}. Error in handling of maintenance tracking message. Check DLQ and ` +
+            `S3: https://s3.console.aws.amazon.com/s3/buckets/${dlqBucketName}?region=${stack.region} for failed tracking messages.`,
+        metric: updateRequestHandlerLambda.metricThrottles().with({ period: Duration.days(1) }),
+        threshold: 1,
+        evaluationPeriods: 1,
+        datapointsToAlarm: 1,
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
+    }).addAlarmAction(new SnsAction(throttleTopic));
 }

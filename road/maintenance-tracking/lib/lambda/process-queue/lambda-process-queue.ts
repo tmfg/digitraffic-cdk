@@ -48,15 +48,22 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
 
                 console.info(`method=processMaintenanceTrackingQueue saving %d observations message sizeBytes=%d s3Key=%s`,
                              observationDatas.length, messageSizeBytes, s3Key);
+
                 const start = Date.now();
-                const insertCount :number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
-                const end = Date.now();
-                console.info(`method=processMaintenanceTrackingQueue messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d s3Key=%s`,
-                             sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes, s3Key);
+                try {
+                    const insertCount :number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
+                    const end = Date.now();
+                    console.info(`method=processMaintenanceTrackingQueue messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d s3Key=%s`,
+                                 sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes, s3Key);
+                } catch (e) {
+                    const clones = cloneObservationsWithoutJson(observationDatas);
+                    console.error(`method=processMaintenanceTrackingQueue Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(clones)}`, e);
+                    return Promise.reject(e);
+                }
 
                 return Promise.resolve();
             } catch (e) {
-                console.error(`method=processMaintenanceTrackingQueue Error while handling tracking from SQS to db data`, e);
+                console.error(`method=processMaintenanceTrackingQueue Error while handling tracking from SQS`, e);
                 return Promise.reject(e);
             }
 
@@ -76,3 +83,13 @@ export interface Havainto {
     }
 }
 
+function cloneObservationsWithoutJson(datas: DbObservationData[]) : DbObservationData[] {
+    const clones: DbObservationData[] =
+        datas.map(( data: DbObservationData ) => {
+            const clone = Object.assign({}, data);
+            // @ts-ignore
+            delete clone.json;
+            return clone;
+        });
+    return clones;
+}
