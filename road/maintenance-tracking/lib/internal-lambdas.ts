@@ -1,6 +1,6 @@
 import * as lambda from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {Construct, Stack} from '@aws-cdk/core';
+import {Construct, Stack, Duration} from '@aws-cdk/core';
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
 import {createSubscription} from '../../../common/stack/subscription';
 import {AppProps} from "./app-props";
@@ -65,15 +65,14 @@ function createProcessQueueLambda(
 }
 
 function createAlarm(processQueueLambda: lambda.Function, errorNotificationSnsTopicArn: string, dlqBucketName: string, stack: Stack) {
-    const lambdaMetric = processQueueLambda.metricErrors();
     const fullEnv = getFullEnv(stack);
     // Raise an alarm if we have more than 1 errors in last minute
-    const topic = Topic.fromTopicArn(stack, 'Topic', errorNotificationSnsTopicArn)
+    const topic = Topic.fromTopicArn(stack, 'MaintenanceTrackingAlarmProcessQueueErrorTopic', errorNotificationSnsTopicArn)
     new cloudwatch.Alarm(stack, "MaintenanceTrackingAlarm", {
         alarmName: processQueueLambda.functionName + '-ErrorAlert-' + fullEnv,
         alarmDescription: `Environment: ${fullEnv}. Error in handling of maintenance tracking message. Check DLQ and ` +
                           `S3: https://s3.console.aws.amazon.com/s3/buckets/${dlqBucketName}?region=${stack.region} for failed tracking messages.`,
-        metric: lambdaMetric,
+        metric: processQueueLambda.metricErrors().with({ period: Duration.days(1) }),
         threshold: 1,
         evaluationPeriods: 1,
         datapointsToAlarm: 1,

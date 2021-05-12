@@ -43,6 +43,5 @@ export function convertToDbObservationData(item: Havainto, sendingTime: Date, se
         hash: createObservationHash(observationJson),
         s3Uri: s3Uri
     };
-    // console.info("method=convertToDbObservationData havainto: ", JSON.stringify(data));
     return data;
 }
