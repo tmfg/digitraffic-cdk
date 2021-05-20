@@ -1,7 +1,6 @@
 import {Rule,Schedule} from '@aws-cdk/aws-events';
 import {Function,AssetCode} from '@aws-cdk/aws-lambda';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
-import {Duration} from '@aws-cdk/core';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {Construct} from '@aws-cdk/core';
@@ -41,7 +40,7 @@ function createUpdateImagesLambda(secret: ISecret, vpc: IVpc, lambdaDbSg: ISecur
     const lambda = new Function(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
     const rule = new Rule(stack, 'Rule', {
-        schedule: Schedule.rate(Duration.minutes(10))
+        schedule: Schedule.rate(props.updateFrequency)
     });
     rule.addTarget(new LambdaFunction(lambda));
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);

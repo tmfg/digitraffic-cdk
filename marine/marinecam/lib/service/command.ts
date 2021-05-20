@@ -111,6 +111,16 @@ export class GetThumbnailCommand extends Command {
     }
 }
 
+export class GetThumbnailByTimeCommand extends Command {
+    constructor() {
+        super('GetThumbnailByTime');
+    }
+
+    getResult(response: any): any {
+        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_THUMBNAIL][0];
+    }
+}
+
 export class RequestStreamCommand extends Command {
     constructor() {
         super('RequestStream');
@@ -122,6 +132,12 @@ export class RequestStreamCommand extends Command {
         const videoId = output.find(o => o.$.Name == 'VideoId');
 
         return videoId?.$?.Value || "";
+    }
+}
+
+export class ChangeStreamCommand extends Command {
+    constructor() {
+        super('ChangeStream');
     }
 }
 

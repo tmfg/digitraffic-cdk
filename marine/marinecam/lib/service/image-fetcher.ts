@@ -12,10 +12,17 @@ export async function updateAllCameras(url: string, username: string, password: 
 }
 
 async function updateAllImages(cameraIds: string[], session: Session, bucketName: string): Promise<any> {
-    return await Promise.allSettled(cameraIds.map(cameraId => {
-        return getCameraThumbnail(session, cameraId)
-            .then(thumbnail => ImageStore.storeImage(cameraId, thumbnail, bucketName))
-            .then(_ => MetadataService.updateMetadataUpdated(cameraId, new Date()));
+    return await Promise.allSettled(cameraIds.map(async cameraId => {
+        const image = await getImageFromCamera(session, cameraId);
+
+        if(image != '') {
+            return await ImageStore.storeImage(cameraId, image, bucketName)
+                .then(() => MetadataService.updateMetadataUpdated(cameraId, new Date()));
+        }
+
+        console.info("empty picture from camera " + cameraId);
+
+        return Promise.resolve();
     }));
 }
 
@@ -27,10 +34,14 @@ async function loginToCameraServer(url: string, username: string, password: stri
     return session;
 }
 
-async function getCameraThumbnail(session: Session, cameraId: string): Promise<string> {
-    const videoId = await session.startStream(cameraId);
-    const thumbnail = await session.getThumbnail(cameraId);
+async function getImageFromCamera(session: Session, cameraId: string): Promise<string> {
+    // to get image, we need to request stream, rewind stream to current time and then request on frame from the stream
+    // of course close stream after
+    const videoId = await session.requestStream(cameraId);
+    await session.setStreamTime(videoId);
+    const image = await session.getFrameFromStream(videoId);
+
     await session.closeStream(videoId);
 
-    return thumbnail;
+    return image;
 }
