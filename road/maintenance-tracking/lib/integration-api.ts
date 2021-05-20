@@ -100,6 +100,7 @@ function createUpdateRequestHandlerLambda(
         functionName: lambdaFunctionName,
         code: new lambda.AssetCode('dist/lambda/update-queue'),
         handler: 'lambda-update-queue.handler',
+        // reservedConcurrentExecutions: appProps.sqsProcessLambdaConcurrentExecutions,
         environment: lambdaEnv,
         role: lambdaRole,
         memorySize: 256
@@ -142,8 +143,7 @@ function createAlarm(updateRequestHandlerLambda: lambda.Function, errorNotificat
     const topic = Topic.fromTopicArn(stack, 'MaintenanceTrackingAlarmUpdateSqsErrorTopic', errorNotificationSnsTopicArn)
     new cloudwatch.Alarm(stack, "MaintenanceTrackingAlarmUpdateSqs", {
         alarmName: updateRequestHandlerLambda.functionName + '-ErrorAlert-' + fullEnv,
-        alarmDescription: `Environment: ${fullEnv}. Error in handling of maintenance tracking message. Check DLQ and ` +
-            `S3: https://s3.console.aws.amazon.com/s3/buckets/${dlqBucketName}?region=${stack.region} for failed tracking messages.`,
+        alarmDescription: `Environment: ${fullEnv}. Error in handling of incoming maintenance tracking messages from HARJA.`,
         metric: updateRequestHandlerLambda.metricErrors().with({ period: Duration.days(1) }),
         threshold: 1,
         evaluationPeriods: 1,
@@ -155,8 +155,7 @@ function createAlarm(updateRequestHandlerLambda: lambda.Function, errorNotificat
     const throttleTopic = Topic.fromTopicArn(stack, 'MaintenanceTrackingAlarmUpdateSqsThrottleTopic', errorNotificationSnsTopicArn)
     new cloudwatch.Alarm(stack, "MaintenanceTrackingAlarmUpdateThrottle", {
         alarmName: updateRequestHandlerLambda.functionName + '-ThrottleAlert-' + fullEnv,
-        alarmDescription: `Environment: ${fullEnv}. Error in handling of maintenance tracking message. Check DLQ and ` +
-            `S3: https://s3.console.aws.amazon.com/s3/buckets/${dlqBucketName}?region=${stack.region} for failed tracking messages.`,
+        alarmDescription: `Environment: ${fullEnv}. Lambda throttles while handling incoming maintenance tracking messages from HARJA`,
         metric: updateRequestHandlerLambda.metricThrottles().with({ period: Duration.days(1) }),
         threshold: 1,
         evaluationPeriods: 1,

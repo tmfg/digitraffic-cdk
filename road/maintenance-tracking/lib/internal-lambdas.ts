@@ -50,7 +50,7 @@ function createProcessQueueLambda(
             SQS_BUCKET_NAME: appProps.sqsExtendedMessageBucketName,
             SQS_QUEUE_URL: queue.queueUrl
         },
-        reservedConcurrentExecutions: appProps.sqsProcessLambdaConcurrentExecutions,
+        // reservedConcurrentExecutions: appProps.sqsProcessLambdaConcurrentExecutions,
         role: role,
         memorySize: 256
     });
