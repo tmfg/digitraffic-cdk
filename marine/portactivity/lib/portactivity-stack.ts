@@ -71,6 +71,12 @@ export class PortActivityStack extends Stack {
             clusterIdentifier: appProps.dbClusterIdentifier,
             engine: DatabaseClusterEngine.AURORA_POSTGRESQL
         });
+
+        // CDK tries to allow connections between proxy and cluster
+        // this does not work on cluster references
+        // @ts-ignore
+        cluster.connections.allowDefaultPortFrom = () => {};
+
         const dbProxyName = 'PortActivityRDSProxy';
         new DatabaseProxy(this, dbProxyName, {
             dbProxyName,

@@ -2,6 +2,8 @@ import {
     EndpointType,
     LambdaIntegration,
     MethodLoggingLevel,
+    MockIntegration,
+    PassthroughBehavior,
     RequestValidator,
     Resource,
     RestApi
@@ -22,6 +24,7 @@ import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "../../../common/api/mediatypes";
 import {add404Support} from "../../../common/api/rest_apis";
+import {TimestampMetadata} from './model/timestamp-metadata';
 
 export function create(
     secret: ISecret,
@@ -169,26 +172,30 @@ function createTimestampMetadataResource(
     resource: Resource,
     stack: Construct) {
 
-    const functionName = 'PortActivity-GetTimestampMetadata';
-
-    const assetCode = new AssetCode('dist/lambda/get-timestamp-metadata');
-    const lambda = new Function(stack, functionName, defaultLambdaConfiguration({
-        functionName: functionName,
-        code: assetCode,
-        memorySize: 128,
-        handler: 'lambda-get-timestamp-metadata.handler'
-    }));
-    const integration = new LambdaIntegration(lambda, {
-        proxy: true
+    const integration = new MockIntegration({
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+        requestTemplates: {
+            'application/json': `{
+                "statusCode": 200
+            }`
+        },
+        integrationResponses: [{
+            statusCode: '200',
+            responseTemplates: {
+                'application/json': JSON.stringify(TimestampMetadata)
+            }
+        }]
     });
 
     const metadataResource = resource.addResource('metadata');
 
     metadataResource.addMethod("GET", integration, {
-        apiKeyRequired: false
+        apiKeyRequired: false,
+        methodResponses: [{
+            statusCode: '200'
+        }]
     });
 
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     addTagsAndSummary('Timestamp metadata',
         ['metadata'],
         'Returns timestamp related metadata',

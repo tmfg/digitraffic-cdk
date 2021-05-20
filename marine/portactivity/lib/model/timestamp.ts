@@ -1,11 +1,15 @@
 import moment from 'moment';
 
 export enum EventType {
+    APC = 'APC',
+    APS = 'APS',
     ATA = 'ATA',
     ATB = 'ATB',
     ATD = 'ATD',
     ETA = 'ETA',
-    ETD = 'ETD'
+    ETD = 'ETD',
+    RPS = 'RPS',
+    PPS = 'PPS'
 }
 const eventTypes = [
     EventType.ATA,
