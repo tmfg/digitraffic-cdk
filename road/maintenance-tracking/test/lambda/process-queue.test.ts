@@ -4,12 +4,13 @@ process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAllObservations, truncate} from "../db-testutil";
-import {handlerFn} from "../../lib/lambda/process-queue/lambda-process-queue";
+import {cloneObservationsWithoutJson, handlerFn} from "../../lib/lambda/process-queue/lambda-process-queue";
 import {SQSRecord} from "aws-lambda";
 import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
 import * as sinon from 'sinon';
 import {createSQSExtClient} from "../../lib/sqs-ext";
 import moment from 'moment-timezone';
+import {DbObservationData, Status} from "../../lib/db/maintenance-tracking";
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -131,6 +132,17 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         expect(transformLambdaRecordsStub.calledWith([invalidRecordNoJson, validRecordNoJson])).toBe(true);
     });
+
+    test('remove json from DbObservationData', async () => {
+        const json = '{ "a" : "b" }';
+        const data : DbObservationData[] = createDbObservationData();
+        expect(data[0].json).toEqual(json);
+        expect(data[1].json).toEqual(json);
+        const clones = cloneObservationsWithoutJson(data);
+        const removed = '{...REMOVED...}';
+        expect(clones[0].json).toEqual(removed);
+        expect(clones[1].json).toEqual(removed);
+    });
 }));
 
 function createRecord(trackingJson = ''): SQSRecord {
@@ -156,4 +168,32 @@ function cloneRecordWithoutJson(recordToClone: SQSRecord) {
     const clone = Object.assign({}, recordToClone);
     clone.body = '';
     return clone;
+}
+
+function createDbObservationData() : DbObservationData[] {
+    return [
+        {
+            id: BigInt(1),
+            observationTime: new Date(),
+            sendingTime: new Date(),
+            json: '{ "a" : "b" }',
+            harjaWorkmachineId: 1,
+            harjaContractId: 1,
+            sendingSystem: 'System1',
+            status: Status.UNHANDLED,
+            hash: 'abcd',
+            s3Uri: 'URL'
+        },{
+            id: BigInt(1),
+            observationTime: new Date(),
+            sendingTime: new Date(),
+            json: '{ "a" : "b" }',
+            harjaWorkmachineId: 1,
+            harjaContractId: 1,
+            sendingSystem: 'System1',
+            status: Status.UNHANDLED,
+            hash: 'abcd',
+            s3Uri: 'URL'
+        }
+    ]
 }

@@ -6,12 +6,12 @@ import {SQSRecord} from "aws-lambda/trigger/sqs";
 import moment from 'moment-timezone';
 import {RECEIPT_HANDLE_SEPARATOR, SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../constants";
 import {DbObservationData} from "../../db/maintenance-tracking";
+import * as R from 'ramda';
 
 const middy = require('@middy/core')
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
 const sqsBucketName = process.env[SQS_BUCKET_NAME] as string;
-const sqsQueueUrl = process.env[SQS_QUEUE_URL] as string;
 
 export function handlerFn(sqsClient : any) { // typeof SQSExt
     return async (event: SQSEvent) => {
@@ -83,13 +83,6 @@ export interface Havainto {
     }
 }
 
-function cloneObservationsWithoutJson(datas: DbObservationData[]) : DbObservationData[] {
-    const clones: DbObservationData[] =
-        datas.map(( data: DbObservationData ) => {
-            const clone = Object.assign({}, data);
-            // @ts-ignore
-            delete clone.json;
-            return clone;
-        });
-    return clones;
+export function cloneObservationsWithoutJson(datas: DbObservationData[]) : DbObservationData[] {
+    return R.map(R.assoc('json', '{...REMOVED...}'), datas);
 }
