@@ -41,6 +41,7 @@
     "@aws-cdk/aws-events-targets": "1.102.0",
     "@aws-cdk/aws-lambda": "1.102.0",
     "@aws-cdk/core": "1.102.0",
+    "@aws-cdk/aws-sqs": "1.102.0",
     "@types/openlayers": "^4.6.17",
     "aws-sdk": "^2.821.0",
     "axios": "^0.21.1",
