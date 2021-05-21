@@ -7,11 +7,7 @@ import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {IVpc} from "@aws-cdk/aws-ec2";
 import {add404Support, createDefaultPolicyDocument,} from "../../../common/api/rest_apis";
-import {
-    KEY_SCHEDULES_TOKEN_SECRETKEY,
-    KEY_SCHEDULES_URL_SECRETKEY,
-    KEY_SECRET_ID
-} from "./lambda/get-schedules/env_keys";
+import {VoyagePlanEnvKeys} from "./keys";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 
 export function create(
@@ -51,9 +47,7 @@ function createVtsProxyHandler(
     props: VoyagePlanGatewayProps
 ) {
     const env: any = {};
-    env[KEY_SECRET_ID] = props.secretId;
-    env[KEY_SCHEDULES_TOKEN_SECRETKEY] = props.schedulesAccessTokenSecretKey;
-    env[KEY_SCHEDULES_URL_SECRETKEY] = props.schedulesUrlSecretKey;
+    env[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
     const functionName = 'VPGW-Get-Schedules';
     // ATTENTION!
     // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).

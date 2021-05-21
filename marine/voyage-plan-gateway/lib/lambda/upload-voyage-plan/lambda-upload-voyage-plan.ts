@@ -2,7 +2,7 @@ import * as util from 'util';
 import * as xml2js from 'xml2js';
 import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../../common/api/errors";
 import {withSecret} from "../../../../../common/secrets/secret";
-import {KEY_SECRET_ID} from "./env_keys";
+import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
 import {RtzVoyagePlan} from "../../../../../common/rtz/voyageplan";
 
@@ -23,7 +23,7 @@ export interface UploadVoyagePlanEvent {
     readonly voyagePlan: string
 }
 
-const secretId = process.env[KEY_SECRET_ID] as string;
+const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
 export function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any
