@@ -155,7 +155,7 @@ export class Session {
         return await this.sendMessage(command);
     }
 
-    async getFrameFromStream(videoId: string): Promise<string> {
+    async getFrameFromStream(videoId: string): Promise<string|null> {
         const streamUrl = this.videoUrl + videoId;
 
         console.info("posting to " + streamUrl);
@@ -175,7 +175,7 @@ export class Session {
 
         // if no data, return empty
         if(dataSize == 0) {
-            return '';
+            return null;
         }
 
         // else remove skip header and return jpeg base64-encoded
