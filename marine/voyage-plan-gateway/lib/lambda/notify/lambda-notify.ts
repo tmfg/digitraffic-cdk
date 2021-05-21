@@ -55,12 +55,10 @@ export function handlerFn(sns: SNS): (e: NotifyEvent) => Promise<any> {
         }
 
         // trigger a Lambda invocation per message
-        for (let i = 0; i < event.MessageWaiting; i++) {
-            await sns.publish({
-                TopicArn: topicArn,
-                Message: ''
-            }).promise();
-        }
+        await sns.publish({
+            TopicArn: topicArn,
+            Message: ''
+        }).promise();
 
         return {
             statusCode: '204'

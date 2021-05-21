@@ -1,39 +1,30 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../../common/api/errors";
-import {withSecret} from "../../../../../common/secrets/secret";
+import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "digitraffic-common/api/errors";
+import {withSecret} from "digitraffic-common/secrets/secret";
 import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
-import {RtzVoyagePlan} from "../../../../../common/rtz/voyageplan";
-
-/**
- * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
- * https://www.seatrafficmanagement.info/developers-forum/vis/
- */
-
-export interface UploadVoyagePlanEvent {
-    /**
-     * Endpoint URL for delivery acknowledgement
-     */
-    readonly deliveryAckEndpoint?: string
-
-    /**
-     * The route in RTZ format
-     */
-    readonly voyagePlan: string
-}
+import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
+import {SNSEvent} from "aws-lambda";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
 export function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any
-): (event: UploadVoyagePlanEvent) => Promise<string> {
-    return async function(event: UploadVoyagePlanEvent): Promise<string> {
+): (event: SNSEvent) => Promise<string> {
+    return async function(event: SNSEvent): Promise<string> {
         return await doWithSecret(secretId, async () => {
+
+            if (event.Records.length > 1) {
+                console.error('method=vpgwUploadVoyagePlan More than one record received! count=%d',
+                    event.Records.length);
+            }
+
+            const voyagePlanText = event.Records[0].Sns.Message;
             let voyagePlan: RtzVoyagePlan;
             try {
                 const parseXml = util.promisify(xml2js.parseString);
-                voyagePlan = await parseXml(event.voyagePlan) as RtzVoyagePlan;
+                voyagePlan = await parseXml(voyagePlanText) as RtzVoyagePlan;
             } catch (error) {
                 console.error('method=uploadVoyagePlan XML parsing failed', error);
                 return Promise.reject(BAD_REQUEST_MESSAGE);
