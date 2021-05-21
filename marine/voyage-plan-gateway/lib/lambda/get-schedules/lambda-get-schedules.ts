@@ -1,20 +1,18 @@
 import axios from 'axios';
 import {withSecret} from "../../../../../common/secrets/secret";
-import {KEY_SCHEDULES_TOKEN_SECRETKEY, KEY_SCHEDULES_URL_SECRETKEY, KEY_SECRET_ID} from "./env_keys";
+import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
 
-const secretId = process.env[KEY_SECRET_ID] as string;
-const schedulesTokenSecretKey = process.env[KEY_SCHEDULES_TOKEN_SECRETKEY] as string;
-const schedulesUrlSecretKey = process.env[KEY_SCHEDULES_URL_SECRETKEY] as string;
+const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
 export async function handler(event: any): Promise<any> {
     return await withSecret(secretId, async (secret: any) => {
-        if (event.queryStringParameters.auth != secret[schedulesTokenSecretKey]) {
+        if (event.queryStringParameters.auth != secret[VoyagePlanSecretKeys.SCHEDULES_ACCESS_TOKEN]) {
             return {
                 statusCode: 403,
                 body: 'Denied'
             }
         }
-        let url = secret[schedulesUrlSecretKey];
+        let url = secret[VoyagePlanSecretKeys.SCHEDULES_URL];
         const calculated = event.queryStringParameters.calculated == 'true';
         if (calculated) {
             url += '/calculated';
