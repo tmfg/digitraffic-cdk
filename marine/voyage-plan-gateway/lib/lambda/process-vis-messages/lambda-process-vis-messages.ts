@@ -1,14 +1,14 @@
-import {SNS} from "aws-sdk";
+import {SNS, SQS} from "aws-sdk";
 import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
 import {withSecret} from "digitraffic-common/secrets/secret";
 import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 
-const topicArn = process.env[VoyagePlanEnvKeys.TOPIC_ARN] as string;
+const queueUrl = process.env[VoyagePlanEnvKeys.QUEUE_URL] as string;
 
 export function handlerFn(
-    sns: SNS,
+    sqs: SQS,
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any
 ): () => Promise<void> {
     return async function(): Promise<void> {
@@ -35,13 +35,13 @@ export function handlerFn(
                     callbackEndpoint: routeMessage.CallbackEndpoint,
                     message: routeMessage.stmMessage.message
                 };
-                await sns.publish({
-                    TopicArn: topicArn,
-                    Message: JSON.stringify(message)
+                await sqs.sendMessage({
+                    QueueUrl: queueUrl,
+                    MessageBody: JSON.stringify(message)
                 }).promise();
             }
         });
     };
 }
 
-export const handler = handlerFn(new SNS(), withSecret);
+export const handler = handlerFn(new SQS(), withSecret);
