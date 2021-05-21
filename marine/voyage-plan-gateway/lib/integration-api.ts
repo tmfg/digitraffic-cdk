@@ -1,12 +1,9 @@
 import {
-    EndpointType,
     GatewayResponse,
     LambdaIntegration,
-    MethodLoggingLevel,
     PassthroughBehavior,
     Resource,
     ResponseType,
-    RestApi
 } from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
@@ -16,12 +13,12 @@ import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {VoyagePlanEnvKeys} from "./keys";
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {IVpc} from "@aws-cdk/aws-ec2";
-import {add404Support, createDefaultPolicyDocument, createRestApi,} from "digitraffic-common/api/rest_apis";
+import {createRestApi,} from "digitraffic-common/api/rest_apis";
+import {Topic} from "@aws-cdk/aws-sns";
 
 export function create(
     secret: ISecret,
-    vpc: IVpc,
+    notifyTopic: Topic,
     props: VoyagePlanGatewayProps,
     stack: Construct) {
 
@@ -41,16 +38,17 @@ export function create(
     });
     createUsagePlan(integrationApi, 'VPGW CloudFront API Key', 'VPGW Faults CloudFront Usage Plan');
     const resource = integrationApi.root.addResource("vpgw")
-    createNotifyHandler(secret, stack, resource, props);
+    createNotifyHandler(secret, stack, notifyTopic, resource, props);
 }
 
 function createNotifyHandler(
     secret: ISecret,
     stack: Construct,
+    notifyTopic: Topic,
     api: Resource,
     props: VoyagePlanGatewayProps) {
 
-    const handler = createHandler(stack, props);
+    const handler = createHandler(stack, notifyTopic, props);
     secret.grantRead(handler);
     const resource = api.addResource("notify")
     createIntegrationResource(stack, secret, props, resource, handler);
@@ -81,17 +79,19 @@ function createIntegrationResource(
 
 function createHandler(
     stack: Construct,
+    notifyTopic: Topic,
     props: VoyagePlanGatewayProps,
 ): Function {
     const functionName = 'VPGW-Notify';
     const environment: any = {};
-    environment[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
+    environment[VoyagePlanEnvKeys.TOPIC_ARN] = notifyTopic.topicArn;
     const handler = new Function(stack, functionName, defaultLambdaConfiguration({
         functionName,
         code: new AssetCode('dist/lambda/notify'),
         handler: 'lambda-notify.handler',
         environment
     }));
+    notifyTopic.grantPublish(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     return handler;
 }
