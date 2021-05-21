@@ -18,9 +18,9 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
     }
 }
 
-export async function updateMetadataUpdated(cameraId: string, updated: Date): Promise<any> {
+export async function updateMetadataUpdated(cameraIds: string[], updated: Date): Promise<any> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        return await MetadataDB.updateCameraMetadata(db, cameraId, updated);
+        return await MetadataDB.updateCameraMetadata(db, cameraIds, updated);
     });
 }
 

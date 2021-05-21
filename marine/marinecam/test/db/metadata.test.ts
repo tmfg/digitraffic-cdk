@@ -63,7 +63,7 @@ describe('db-metadata', dbTestBase((db: IDatabase<any, any>) => {
     });
 
     test('updateMetadata-not found', async () => {
-        await updateCameraMetadata(db, 'nonexistent', new Date());
+        await updateCameraMetadata(db, ['nonexistent'], new Date());
     });
 
     test('updateMetadata', async () => {
@@ -76,7 +76,7 @@ describe('db-metadata', dbTestBase((db: IDatabase<any, any>) => {
 
         const newDate = new Date();
         newDate.setSeconds(0, 0);
-        await updateCameraMetadata(db, '1', newDate);
+        await updateCameraMetadata(db, ['1'], newDate);
 
         const cameras2 = await getAllCameras(db, [GROUP_SAIMAA]);
         expect(cameras2.length).toEqual(1);

@@ -23,8 +23,10 @@ export async function getAllCameras(db: IDatabase<any, any>, usersGroups: string
         }));
 }
 
-export async function updateCameraMetadata(db: IDatabase<any, any>, cameraId: string, updated: Date) {
-    return await db.none(PS_UPDATE_TIMESTAMP, [updated, cameraId]);
+export function updateCameraMetadata(db: IDatabase<any, any>, cameraIds: string[], updated: Date): Promise<any> {
+    return Promise.allSettled(cameraIds.map((cameraId: string) => {
+        return db.none(PS_UPDATE_TIMESTAMP, [updated, cameraId]);
+    }));
 }
 
 export async function getAllCameraIdsForGroup(db: IDatabase<any, any>, groupId: string): Promise<string[]> {

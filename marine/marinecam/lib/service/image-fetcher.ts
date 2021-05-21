@@ -12,18 +12,21 @@ export async function updateAllCameras(url: string, username: string, password: 
 }
 
 async function updateAllImages(cameraIds: string[], session: Session, bucketName: string): Promise<any> {
-    return await Promise.allSettled(cameraIds.map(async cameraId => {
+    const updatedCameras = [] as string[];
+
+    await Promise.allSettled(cameraIds.map(async cameraId => {
         const image = await getImageFromCamera(session, cameraId);
 
-        if(image != '') {
-            return await ImageStore.storeImage(cameraId, image, bucketName)
-                .then(() => MetadataService.updateMetadataUpdated(cameraId, new Date()));
+        if(!image) {
+            console.info("empty picture from camera " + cameraId);
+            return Promise.resolve();
+        } else {
+            updatedCameras.push(cameraId);
+            return await ImageStore.storeImage(cameraId, image, bucketName);
         }
-
-        console.info("empty picture from camera " + cameraId);
-
-        return Promise.resolve();
     }));
+
+    return await MetadataService.updateMetadataUpdated(updatedCameras, new Date());
 }
 
 async function loginToCameraServer(url: string, username: string, password: string, certificate: string): Promise<Session> {
@@ -34,7 +37,7 @@ async function loginToCameraServer(url: string, username: string, password: stri
     return session;
 }
 
-async function getImageFromCamera(session: Session, cameraId: string): Promise<string> {
+async function getImageFromCamera(session: Session, cameraId: string): Promise<string|null> {
     // to get image, we need to request stream, rewind stream to current time and then request on frame from the stream
     // of course close stream after
     const videoId = await session.requestStream(cameraId);
