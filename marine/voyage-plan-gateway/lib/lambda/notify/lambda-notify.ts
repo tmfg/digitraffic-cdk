@@ -3,6 +3,11 @@
  * https://www.seatrafficmanagement.info/developers-forum/vis/
  */
 
+import {SNS} from "aws-sdk";
+import {VoyagePlanEnvKeys} from "../../keys";
+
+const topicArn = process.env[VoyagePlanEnvKeys.TOPIC_ARN] as string;
+
 export enum NotificationType {
     MESSAGE_WAITING = 'MESSAGE_WAITING',
     UNAUTHORIZED_REQUEST = 'UNAUTHORIZED_REQUEST',
@@ -39,8 +44,28 @@ type NotifyEvent = {
     readonly Subject: string
 }
 
-export async function handler(event: NotifyEvent): Promise<{statusCode: string}> {
-    return {
-        statusCode: '204'
-    };
+export function handlerFn(sns: SNS): (e: NotifyEvent) => Promise<any> {
+    return async (event: NotifyEvent): Promise<{statusCode: string}> => {
+        if (event.MessageWaiting > 50) {
+            console.warn('method=vpgwVisNotify More than 50 messages waiting, processing messages anyway');
+        }
+        if (event.MessageWaiting > 100) {
+            console.error('method=vpgwVisNotify More than 100 messages waiting, not processing any more messages');
+            return Promise.reject('Too many messages waiting');
+        }
+
+        // trigger a Lambda invocation per message
+        for (let i = 0; i < event.MessageWaiting; i++) {
+            await sns.publish({
+                TopicArn: topicArn,
+                Message: ''
+            }).promise();
+        }
+
+        return {
+            statusCode: '204'
+        };
+    }
 }
+
+export const handler = handlerFn(new SNS());
