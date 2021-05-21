@@ -2,6 +2,9 @@ import {handlerFn} from '../../lib/lambda/upload-voyage-plan/lambda-upload-voyag
 import * as sinon from 'sinon';
 import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "../../../../common/api/errors";
 import moment from 'moment-timezone';
+import {SNSEvent} from "aws-lambda";
+import {SendFaultEvent} from "../../../aton-faults/lib/lambda/send-fault/lambda-send-fault";
+import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
 
 const sandbox = sinon.createSandbox();
 
@@ -12,17 +15,13 @@ describe('upload-voyage-plan', () => {
     afterEach(() => sandbox.restore());
 
     test('validation failure, some string', async () => {
-        const uploadEvent = {
-            voyagePlan: '<foo bar'
-        };
+        const uploadEvent: SNSEvent = createSnsEvent('<foo bar');
 
         await expect(handlerFn(secretFn)(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
     });
 
     test('validation success with correct voyage plan', async () => {
-        const uploadEvent = {
-            voyagePlan: voyagePlan()
-        };
+        const uploadEvent: SNSEvent = createSnsEvent(voyagePlan());
 
         await expect(handlerFn(secretFn)(uploadEvent)).resolves.toMatch(OK_MESSAGE);
     });
@@ -197,4 +196,31 @@ function voyagePlan() {
   </extensions>
 </route>
 `.trim();
+}
+
+function createSnsEvent(xml: string): SNSEvent {
+    const message: VisMessageWithCallbackEndpoint = {
+        callbackEndpoint: '',
+        message: xml
+    };
+    return {
+        Records: [{
+            EventSource: '',
+            EventSubscriptionArn: '',
+            EventVersion: '',
+            Sns: {
+                Message: JSON.stringify(message),
+                MessageAttributes: {},
+                MessageId: '',
+                Signature: '',
+                SignatureVersion: '',
+                SigningCertUrl: '',
+                Subject: '',
+                Timestamp: '',
+                TopicArn: '',
+                Type: '',
+                UnsubscribeUrl: ''
+            }
+        }]
+    };
 }

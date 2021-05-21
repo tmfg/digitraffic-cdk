@@ -6,6 +6,7 @@ import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {SNSEvent} from "aws-lambda";
+import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
@@ -20,11 +21,11 @@ export function handlerFn(
                     event.Records.length);
             }
 
-            const voyagePlanText = event.Records[0].Sns.Message;
+            const visMessage = JSON.parse(event.Records[0].Sns.Message) as VisMessageWithCallbackEndpoint;
             let voyagePlan: RtzVoyagePlan;
             try {
                 const parseXml = util.promisify(xml2js.parseString);
-                voyagePlan = await parseXml(voyagePlanText) as RtzVoyagePlan;
+                voyagePlan = await parseXml(visMessage.message) as RtzVoyagePlan;
             } catch (error) {
                 console.error('method=uploadVoyagePlan XML parsing failed', error);
                 return Promise.reject(BAD_REQUEST_MESSAGE);
