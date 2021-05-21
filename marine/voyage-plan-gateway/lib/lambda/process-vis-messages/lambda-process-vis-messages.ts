@@ -3,6 +3,9 @@ import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
 import {withSecret} from "digitraffic-common/secrets/secret";
 import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
+import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
+
+const topicArn = process.env[VoyagePlanEnvKeys.TOPIC_ARN] as string;
 
 export function handlerFn(
     sns: SNS,
@@ -19,13 +22,24 @@ export function handlerFn(
             // Do these contain failed authentications?
             const txtMessages = messages.message.filter(msg => msg.messageType == VisMessageType.TXT);
 
-            // The total amount of messages should always be one
-            const totalMessageAmount = routeMessages.concat(txtMessages).length > 1;
-            if (totalMessageAmount) {
-                console.warn('method=vpgwProcessVisMessages More than 1 message received count=%d', totalMessageAmount);
+            if (messages.remainingNumberOfMessages > 50) {
+                console.warn('method=vpgwProcessVisMessages More than 50 messages remain in queue count=%d',
+                    messages.remainingNumberOfMessages);
             }
 
-            txtMessages.forEach(msg => console.info('method=vpgwProcessVisMessages Received TXT message: %s', msg.stmMessage));
+            txtMessages.forEach(msg =>
+                console.info('method=vpgwProcessVisMessages Received TXT message: %s',msg.stmMessage));
+
+            for (const routeMessage of routeMessages) {
+                const message: VisMessageWithCallbackEndpoint = {
+                    callbackEndpoint: routeMessage.CallbackEndpoint,
+                    message: routeMessage.stmMessage.message
+                };
+                await sns.publish({
+                    TopicArn: topicArn,
+                    Message: JSON.stringify(message)
+                }).promise();
+            }
         });
     };
 }
