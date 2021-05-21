@@ -12,6 +12,11 @@ This is not an optimal solution but the CDK Constructs library is a constant sou
 
 One-off builds can also be run with ```yarn run build```
 
+## Creating a new project
+Copy a previous project as a base. Change the project name in package.json.   
+If the project is a new top-level project (such as marine/road),
+update the workspaces configuration in the top level package.json file.
+
 ## Adding dependencies
 For runtime dependencies:  
 ```yarn workspace <workspacename> add dependencyname```
