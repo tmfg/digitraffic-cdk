@@ -42,7 +42,7 @@ metadata[EventType.PPS] = {
     timeType: S211TimeType.Planned,
     stateCode: 'Pilotage_Confirmed'
 };
-metadata[EventType.PPS] = {
+metadata[EventType.RPS] = {
     timeType: S211TimeType.Requested,
     stateCode: 'Pilotage_Requested'
 };
