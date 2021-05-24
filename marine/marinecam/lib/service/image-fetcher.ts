@@ -19,7 +19,7 @@ async function updateAllImages(cameraIds: string[], session: Session, bucketName
 
         if(!image) {
             console.info("empty picture from camera " + cameraId);
-            return Promise.resolve();
+            return;
         } else {
             updatedCameras.push(cameraId);
             return await ImageStore.storeImage(cameraId, image, bucketName);
