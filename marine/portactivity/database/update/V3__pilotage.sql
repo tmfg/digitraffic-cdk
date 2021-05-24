@@ -1,4 +1,4 @@
-create table pilotage (
+create table if not exists pilotage (
     id          bigint constraint pilotage_pkey primary key,
     vessel_imo  integer,
     vessel_mmsi integer,
@@ -15,4 +15,18 @@ create table pilotage (
     end_berth   text
 );
 
-create unique index pilotage_updated_key on pilotage(schedule_updated, id);
+create unique index if not exists pilotage_updated_key on pilotage(schedule_updated, id);
+
+alter table port_call_timestamp drop constraint port_call_timestamp_type_check;
+alter table port_call_timestamp add constraint port_call_timestamp_type_check
+        check (event_type IN (
+            'ATA',
+            'ATB',
+            'ATD',
+            'ETA',
+            'ETD',
+            'RPS',
+            'PPS',
+            'APS',
+            'APC'
+        ));

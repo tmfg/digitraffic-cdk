@@ -20,10 +20,10 @@ export type Pilotage = {
             },
         },
     },
-    readonly vesselEta: string,
-    readonly pilotBoardingTime?: string,
-    readonly endTime: string,
-    readonly noticeGiven?: string,
+    readonly vesselEta: Date,
+    readonly pilotBoardingTime?: Date,
+    readonly endTime: Date,
+    readonly noticeGiven?: Date,
     readonly scheduleSource: string,
-    readonly scheduleUpdated: string
+    readonly scheduleUpdated: Date
 }

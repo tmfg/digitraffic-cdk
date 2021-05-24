@@ -79,12 +79,24 @@ function convertUpdatedTimestamps(timestamps: ApiTimestamp[], newAndUpdated: Pil
 }
 
 function createApiTimestamp(pilotage: Pilotage): any {
-    if(pilotage.state === 'ORDER') {
+    const pilotageStartTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime);
+
+    if(pilotage.state === 'ESTIMATE' || pilotage.state === 'NOTICE') {
         return {
             eventType: EventType.RPS,
-            eventTime: pilotage.endTime,
+            eventTime: pilotageStartTime
         };
-    } else if(pilotage.state == 'FINISHED') {
+    } else if(pilotage.state === 'ORDER') {
+        return {
+            eventType: EventType.PPS,
+            eventTime: pilotageStartTime
+        };
+    } else if(pilotage.state === 'ACTIVE') {
+        return {
+            eventType: EventType.APS,
+            eventTime: pilotageStartTime
+        }
+    } else if(pilotage.state === 'FINISHED') {
         return {
             eventType: EventType.APC,
             eventTime: pilotage.endTime
@@ -92,6 +104,14 @@ function createApiTimestamp(pilotage: Pilotage): any {
     }
 
     return null;
+}
+
+function getMaxDate(date1: Date, date2: Date | undefined): Date {
+    if(date2 && date2 > date1) {
+        return date2;
+    }
+
+    return date1;
 }
 
 function convertRemoved(timestamps: ApiTimestamp[], removed: number[]) {
@@ -135,12 +155,12 @@ function findRemoved(idMap: TimestampMap, pilotages: Pilotage[]): number[] {
 
 function convert(pilotage: Pilotage): ApiTimestamp {
     const eventType = getEventType(pilotage);
-    const eventTime = getEventTime(pilotage);
+    const eventTime = getEventTime(pilotage).toISOString();
 
     return {
         eventType,
         eventTime,
-        recordTime: pilotage.scheduleUpdated,
+        recordTime: pilotage.scheduleUpdated.toISOString(),
         source: 'PILOTWEB',
         ship: {
             mmsi: pilotage.vessel.mmsi,
@@ -157,7 +177,7 @@ function getEventType(pilotage: Pilotage): EventType {
     return pilotage.state == 'FINISHED' ? EventType.ATA : EventType.ETA;
 }
 
-function getEventTime(pilotage: Pilotage): string {
+function getEventTime(pilotage: Pilotage): Date {
     if(pilotage.pilotBoardingTime) {
         const etAsDate = new Date(pilotage.endTime);
         const ebtAsDate = new Date(pilotage.pilotBoardingTime);

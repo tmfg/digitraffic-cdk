@@ -24,14 +24,14 @@ export type DbPilotageTimestamp = {
 }
 
 export type TimestampMap = {
-    [key: number]: string
+    [key: number]: Date
 }
 
 export async function getTimestamps(db: IDatabase<any, any>): Promise<TimestampMap> {
     const timestamps = await db.manyOrNone(GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS) as DbPilotageTimestamp[];
     const idMap = {} as TimestampMap;
 
-    timestamps.forEach(ts => idMap[ts.id] = ts.schedule_updated.toISOString());
+    timestamps.forEach(ts => idMap[ts.id] = ts.schedule_updated);
 
     return idMap;
 }
