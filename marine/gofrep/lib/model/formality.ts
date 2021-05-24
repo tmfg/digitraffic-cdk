@@ -1,0 +1,2 @@
+export const FormalityResponse = `
+`.trim();
