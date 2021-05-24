@@ -7,7 +7,7 @@
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
-    "test": "jest --detectOpenHandles",
+    "test": "echo no tests in this project",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
