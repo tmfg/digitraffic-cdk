@@ -12,8 +12,8 @@ import {Language} from "../../../../common/model/language";
 
 export type FaultProps = {
     readonly id: number
-    readonly entry_timestamp: string
-    readonly fixed_timestamp: string
+    readonly entry_timestamp: Date
+    readonly fixed_timestamp: Date
     readonly type: string
     readonly domain: string
     readonly state: string

@@ -9,12 +9,17 @@ export function someNumber() {
 export function newFault(props?: {
      geometry?: {lat: number, lon: number},
      state?: FaultState,
-     fixedTimeStamp?: Date
+     entryTimestamp?: Date,
+     fixedTimestamp?: Date
 }): Fault {
+     const entryTimestamp = props?.entryTimestamp ?? new Date();
+     entryTimestamp.setMilliseconds(0);
+     const fixedTimestamp = props?.fixedTimestamp ?? new Date();
+     fixedTimestamp.setMilliseconds(0);
     return {
          id: someNumber(),
-         entry_timestamp: new Date(),
-         fixed_timestamp: props?.fixedTimeStamp ?? new Date(),
+         entry_timestamp: entryTimestamp,
+         fixed_timestamp: fixedTimestamp,
          domain: 'C_NA',
          state: props?.state ?? FaultState.Avoin,
          type: 'Rikkoutunut',

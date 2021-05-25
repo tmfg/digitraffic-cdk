@@ -116,7 +116,7 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
     });
 
     test('findAllFaults - fixed in hours', async () => {
-        const fault = newFault({ fixedTimeStamp: moment().add(3, 'hour').toDate() });
+        const fault = newFault({ fixedTimestamp: moment().add(3, 'hour').toDate() });
         await insert(db, [fault]);
 
         const faults = await findAll(db, Language.FI, 2, (f) => f);
