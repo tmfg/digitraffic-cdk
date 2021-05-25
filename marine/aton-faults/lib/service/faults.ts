@@ -6,9 +6,28 @@ import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "../../../../common/rtz/voyageplan";
 import moment from 'moment-timezone';
-import {Feature, GeoJsonProperties} from "geojson";
+import {Feature, FeatureCollection, GeoJsonProperties, GeometryObject} from "geojson";
 import {createFeatureCollection} from "../../../../common/api/geojson";
 import {Language} from "../../../../common/model/language";
+
+export type FaultProps = {
+    readonly id: number
+    readonly entry_timestamp: string
+    readonly fixed_timestamp: string
+    readonly type: string
+    readonly domain: string
+    readonly state: string
+    readonly fixed: boolean
+    readonly aton_id: string
+    readonly aton_name_fi: string
+    readonly aton_name_se: string
+    readonly aton_type: string
+    readonly fairway_number: number
+    readonly fairway_name_fi: number
+    readonly fairway_name_se: number
+    readonly area_number: number
+    readonly area_description: string
+}
 
 const ATON_DATA_TYPE = "ATON_FAULTS";
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
@@ -21,9 +40,9 @@ const PRODUCTION_AGENCY = {
 
 const NAME_OF_SERIES = 'Finnish ATON Faults';
 
-export async function findAllFaults(language: Language, fixedInHours: number): Promise<any> {
+export async function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
-        const features = await FaultsDB.findAllForJson(db, language, fixedInHours, convertFeature);
+        const features = await FaultsDB.findAll(db, language, fixedInHours, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
         return createFeatureCollection(features, lastUpdated);
@@ -74,8 +93,8 @@ export async function saveFaults(domain: string, newFaults: any[]) {
     })
 }
 
-function convertFeature(fault: any) {
-    const properties = <GeoJsonProperties>{
+function convertFeature(fault: any): Feature {
+    const properties: FaultProps = {
         id: fault.id,
         entry_timestamp: fault.entry_timestamp,
         fixed_timestamp: fault.fixed_timestamp,
@@ -97,10 +116,10 @@ function convertFeature(fault: any) {
     // convert geometry from db to geojson
     const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex")).toGeoJSON();
 
-    return <Feature>{
+    return {
         type: "Feature",
         properties: properties,
-        geometry: geometry
+        geometry: <GeometryObject> geometry
     };
 }
 

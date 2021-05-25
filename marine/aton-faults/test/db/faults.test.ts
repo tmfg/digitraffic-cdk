@@ -2,8 +2,12 @@ import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newFault} from "../testdata";
 import * as FaultsDb from '../../lib/db/faults';
+import {findAll} from '../../lib/db/faults';
 import {LineString, Point} from "wkx";
 import {FaultState} from "../../lib/model/fault";
+import {Language} from "digitraffic-common/model/language";
+import {getRandomNumber} from "digitraffic-common/test/testutils";
+import moment from 'moment';
 
 describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -94,6 +98,30 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const foundFault = await FaultsDb.getFaultById(db, fault.id + 1);
 
         await expect(foundFault).toBeNull()
+    });
+
+    test('findAllFaults - empty', async () => {
+        const faults = await findAll(db, Language.FI, 0, (f) => f);
+
+        await expect(faults.length).toBe(0);
+    });
+
+    test('findAllFaults - multiple', async () => {
+        const faults = Array.from({length: getRandomNumber(1, 10)}).map(() => newFault());
+        await insert(db, faults);
+
+        const foundFaults = await findAll(db, Language.FI, 10, (f) => f);
+
+        await expect(foundFaults.length).toBe(faults.length);
+    });
+
+    test('findAllFaults - fixed in hours', async () => {
+        const fault = newFault({ fixedTimeStamp: moment().add(3, 'hour').toDate() });
+        await insert(db, [fault]);
+
+        const faults = await findAll(db, Language.FI, 2, (f) => f);
+
+        await expect(faults.length).toBe(1);
     });
 
 }));

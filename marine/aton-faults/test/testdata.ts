@@ -8,12 +8,13 @@ export function someNumber() {
 
 export function newFault(props?: {
      geometry?: {lat: number, lon: number},
-     state?: FaultState
+     state?: FaultState,
+     fixedTimeStamp?: Date
 }): Fault {
     return {
          id: someNumber(),
          entry_timestamp: new Date(),
-         fixed_timestamp: new Date(),
+         fixed_timestamp: props?.fixedTimeStamp ?? new Date(),
          domain: 'C_NA',
          state: props?.state ?? FaultState.Avoin,
          type: 'Rikkoutunut',

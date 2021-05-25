@@ -11,9 +11,23 @@ const BUFFER_RADIUS_METERS = 27780;
 const langRex = /LANG/g;
 
 const ALL_FAULTS_JSON_SQL =
-    `select id, entry_timestamp, fixed_timestamp, aton_fault_type.name_LANG aton_fault_type, domain, aton_fault_state.name_LANG state, fixed,
-    aton_id, aton_name_fi, aton_name_se, aton_type.name_LANG aton_type,
-    fairway_number, fairway_name_fi, fairway_name_se, area.area_number, area.description_LANG area_description, geometry
+    `select id,
+            entry_timestamp,
+            fixed_timestamp,
+            aton_fault_type.name_LANG aton_fault_type,
+            domain,
+            aton_fault_state.name_LANG state,
+            fixed,
+            aton_id,
+            aton_name_fi,
+            aton_name_se,
+            aton_type.name_LANG aton_type,
+            fairway_number,
+            fairway_name_fi,
+            fairway_name_se,
+            area.area_number,
+            area.description_LANG area_description,
+            geometry
     from aton_fault, area, aton_fault_type, aton_fault_state, aton_type
     where aton_fault.area_number = area.area_number
     and (aton_fault.fixed_timestamp is null or aton_fault.fixed_timestamp >= $1)
@@ -140,7 +154,7 @@ export function updateFaults(db: IDatabase<any, any>, domain: string, faults: an
     });
 }
 
-export async function findAllForJson(db: IDatabase<any, any>, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
+export async function findAll(db: IDatabase<any, any>, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
     const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
     const ps = new PreparedStatement({
         name: 'get-all-faults',
