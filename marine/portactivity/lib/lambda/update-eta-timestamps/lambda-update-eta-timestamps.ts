@@ -50,7 +50,7 @@ export function handlerFn(
                     ships,
                     portAreaGeometries);
             } else {
-                console.log('No ships for ETA update');
+                console.log('No ships for ETA update    ');
             }
         });
     };

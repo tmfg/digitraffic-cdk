@@ -2,6 +2,7 @@ import {saveTimestamp} from "../../service/timestamps";
 import {validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
 import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {PortactivityEnvKeys} from "../../keys";
 const middy = require('@middy/core')
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
@@ -10,7 +11,7 @@ export function handlerFn(
 
     return async (event: SQSEvent) => {
         return Promise.allSettled(event.Records.map(r => {
-            return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
+            return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, (_: any): Promise<any> => {
                 const timestamp = JSON.parse(r.body);
 
                 if (!validateTimestamp(timestamp)) {

@@ -10,10 +10,19 @@ const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
 const UPSERT_PILOTAGES = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, vessel_name, start_code, start_berth, end_code, end_berth)
 values($(id), $(vesselImo), $(vesselMmsi), $(vesselEta), $(pilotBoardingTime), $(endTime), $(scheduleUpdated), $(scheduleSource), $(state), $(vesselName), $(routeStart), $(routeStartBerth), $(routeEnd), $(routeEndBerth))
 on conflict(id) do update set
+    vessel_imo = $(vesselImo),
+    vessel_mmsi = $(vesselMmsi),
+    vessel_eta = $(vesselEta),
     pilot_boarding_time = $(pilotBoardingTime),
     pilotage_end_time = $(endTime),
     schedule_updated = $(scheduleUpdated),
-    state = $(state)
+    schedule_source = $(scheduleSource),    
+    state = $(state),
+    vessel_name = $(vesselName),
+    start_code = $(routeStart), 
+    start_berth = $(routeStartBerth), 
+    end_code = $(routeEnd), 
+    end_berth = $(routeEndBerth)
 `;
 
 const DELETE_PILOTAGES = 'delete from pilotage where id in ($1:list)';
