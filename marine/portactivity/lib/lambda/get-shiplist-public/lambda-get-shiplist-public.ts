@@ -189,9 +189,13 @@ export async function handlerFn(
                 title: 'Type',
                 formatter: (e) => {
                     return timestampsToString(
-                        R.map(R.prop('event_type'), e.etas),
-                        R.map(R.prop('event_type'), e.atas),
-                        R.map(R.prop('event_type'), e.etds)
+                        R.map(R.prop('event_type'), e.eta),
+                        R.map(R.prop('event_type'), e.rps),
+                        R.map(R.prop('event_type'), e.pps),
+                        R.map(R.prop('event_type'), e.aps),
+                        R.map(R.prop('event_type'), e.apc),
+                        R.map(R.prop('event_type'), e.ata),
+                        R.map(R.prop('event_type'), e.etd)
                     );
                 }
             }, {
@@ -200,9 +204,13 @@ export async function handlerFn(
                 title: 'Time',
                 formatter: (e) => {
                     return timestampsToString(
-                        R.map(timeToString, e.etas),
-                        R.map(timeToString, e.atas),
-                        R.map(timeToString, e.etds)
+                        R.map(timeToString, e.eta),
+                        R.map(timeToString, e.rps),
+                        R.map(timeToString, e.pps),
+                        R.map(timeToString, e.aps),
+                        R.map(timeToString, e.apc),
+                        R.map(timeToString, e.ata),
+                        R.map(timeToString, e.etd)
                     )
                 }
             }, {
@@ -211,9 +219,13 @@ export async function handlerFn(
                 title: 'Source',
                 formatter: (e) => {
                     return timestampsToString(
-                        R.map(sourceToString, e.etas),
-                        R.map(sourceToString, e.atas),
-                        R.map(sourceToString, e.etds)
+                        R.map(sourceToString, e.eta),
+                        R.map(sourceToString, e.rps),
+                        R.map(sourceToString, e.pps),
+                        R.map(sourceToString, e.aps),
+                        R.map(sourceToString, e.apc),
+                        R.map(sourceToString, e.ata),
+                        R.map(sourceToString, e.etd)
                     )
                 }
             }],
@@ -224,9 +236,13 @@ export async function handlerFn(
             return {
                 name,
                 timestamps: {
-                    etas: R.filter(R.propEq('event_type', 'ETA'), subRows),
-                    atas: R.filter(R.propEq('event_type', 'ATA'), subRows),
-                    etds: R.filter(R.propEq('event_type', 'ETD'), subRows),
+                    eta: R.filter(R.propEq('event_type', 'ETA'), subRows),
+                    rps: R.filter(R.propEq('event_type', 'RPS'), subRows),
+                    pps: R.filter(R.propEq('event_type', 'RPS'), subRows),
+                    aps: R.filter(R.propEq('event_type', 'RPS'), subRows),
+                    apc: R.filter(R.propEq('event_type', 'RPS'), subRows),
+                    ata: R.filter(R.propEq('event_type', 'ATA'), subRows),
+                    etd: R.filter(R.propEq('event_type', 'ETD'), subRows),
                 }
             };
         }
