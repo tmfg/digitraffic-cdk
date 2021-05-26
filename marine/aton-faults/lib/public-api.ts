@@ -93,7 +93,7 @@ function createAnnotationsResource(
 
     addTags('GetFaults', BETA_TAGS, resources, stack);
     addQueryParameterDescription('language', 'Language: en, fi or se', resources, stack);
-    addQueryParameterDescription('fixed_in_hours', 'Show faults that were fixed at most this many hours ago', resources, stack);
+    addQueryParameterDescription('fixed_in_hours', 'Show faults that are unfixed or were fixed at most this many hours ago', resources, stack);
 
     return getFaultsLambda;
 }
