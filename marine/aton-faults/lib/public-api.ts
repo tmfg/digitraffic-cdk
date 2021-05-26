@@ -12,7 +12,7 @@ import {addServiceModel, addSimpleServiceModel, getModelReference} from "../../.
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {AtonProps} from "./app-props";
-import {addTags} from "../../../common/api/documentation";
+import {addQueryParameterDescription, addTags} from "../../../common/api/documentation";
 import {BETA_TAGS} from "../../../common/api/tags";
 import {MediaType} from "../../../common/api/mediatypes";
 import {KEY_SECRET_ID} from "./lambda/get-faults/lambda-get-faults";
@@ -92,6 +92,8 @@ function createAnnotationsResource(
     createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
 
     addTags('GetFaults', BETA_TAGS, resources, stack);
+    addQueryParameterDescription('language', 'Language: en, fi or se', resources, stack);
+    addQueryParameterDescription('fixed_in_hours', 'Show faults that were fixed at most this many hours ago', resources, stack);
 
     return getFaultsLambda;
 }
