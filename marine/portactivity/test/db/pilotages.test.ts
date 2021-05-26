@@ -16,7 +16,7 @@ describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =
         const timestampMap = await getTimestamps(db);
 
         expect(Object.keys(timestampMap).length).toBe(1);
-        expect(timestampMap[1]).toBe(now);
+        expect(timestampMap[1]).toStrictEqual(now);
 
         // update it to finished, so it should not show up
         await insertPilotage(db, 1, 'FINISHED', now);
@@ -43,9 +43,8 @@ describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =
         const timestampMap2 = await getTimestamps(db);
 
         expect(Object.keys(timestampMap2).length).toBe(1);
-        expect(timestampMap2[2]).toBe(now);
+        expect(timestampMap2[2]).toStrictEqual(now);
     });
-
 }));
 
 export function insertPilotage(db: pgPromise.IDatabase<any, any>, id: number, state: string, scheduleUpdated: Date): Promise<any> {
