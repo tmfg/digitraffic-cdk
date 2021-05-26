@@ -187,46 +187,22 @@ export async function handlerFn(
                 field: 'timestamps',
                 class: 'col-2',
                 title: 'Type',
-                formatter: (e) => {
-                    return timestampsToString(
-                        R.map(R.prop('event_type'), e.eta),
-                        R.map(R.prop('event_type'), e.pps),
-                        R.map(R.prop('event_type'), e.aps),
-                        R.map(R.prop('event_type'), e.rps),
-                        R.map(R.prop('event_type'), e.apc),
-                        R.map(R.prop('event_type'), e.ata),
-                        R.map(R.prop('event_type'), e.etd)
-                    );
+                formatter: (timestamps) => {
+                    return R.map(R.prop('event_type'), timestamps).join('<br/>');
                 }
             }, {
                 field: 'timestamps',
                 class: 'col-3',
                 title: 'Time',
-                formatter: (e) => {
-                    return timestampsToString(
-                        R.map(timeToString, e.eta),
-                        R.map(timeToString, e.pps),
-                        R.map(timeToString, e.aps),
-                        R.map(timeToString, e.rps),
-                        R.map(timeToString, e.apc),
-                        R.map(timeToString, e.ata),
-                        R.map(timeToString, e.etd)
-                    )
+                formatter: (timestamps) => {
+                    return R.map(timeToString, timestamps).join('<br/>');
                 }
             }, {
                 field: 'timestamps',
                 class: 'col-3',
                 title: 'Source',
-                formatter: (e) => {
-                    return timestampsToString(
-                        R.map(sourceToString, e.eta),
-                        R.map(sourceToString, e.pps),
-                        R.map(sourceToString, e.aps),
-                        R.map(sourceToString, e.rps),
-                        R.map(sourceToString, e.apc),
-                        R.map(sourceToString, e.ata),
-                        R.map(sourceToString, e.etd)
-                    )
+                formatter: (timestamps) => {
+                    return R.map(sourceToString, timestamps).join('<br/>');
                 }
             }],
             data: shipRows
@@ -235,34 +211,9 @@ export async function handlerFn(
         function toShipRow([name, subRows]) {
             return {
                 name,
-                timestamps: {
-                    eta: R.filter(R.propEq('event_type', 'ETA'), subRows),
-                    pps: R.filter(R.propEq('event_type', 'PPS'), subRows),
-                    aps: R.filter(R.propEq('event_type', 'APS'), subRows),
-                    rps: R.filter(R.propEq('event_type', 'RPS'), subRows),
-                    apc: R.filter(R.propEq('event_type', 'APC'), subRows),
-                    ata: R.filter(R.propEq('event_type', 'ATA'), subRows),
-                    etd: R.filter(R.propEq('event_type', 'ETD'), subRows),
-                }
+                timestamps: subRows
             };
         }
-
-        function timestampsToString(
-            eta,
-            pps,
-            aps,
-            rps,
-            apc,
-            ata,
-            etd) {
-            return eta.concat(pps)
-            .concat(aps)
-            .concat(rps)
-            .concat(apc)
-            .concat(ata)
-            .concat(etd).join('<br/>');
-        }
-    }
 
     function buildTimelist() {
         $('#aikalista-table').bootstrapTable({
