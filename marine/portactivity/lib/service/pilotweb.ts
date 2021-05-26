@@ -3,7 +3,7 @@ import * as PilotagesDAO from "../db/pilotages";
 import {TimestampMap} from "../db/pilotages";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
-import {inDatabase} from "digitraffic-cdk-common/postgres/database";
+import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
@@ -64,7 +64,7 @@ function convertUpdatedTimestamps(timestamps: ApiTimestamp[], newAndUpdated: Pil
             timestamps.push({...base, ...{
                     eventTime: p.endTime,
                     recordTime: p.scheduleUpdated,
-                    source: 'PILOTWEB',
+                    source: 'Pilotweb',
                     ship: {
                         mmsi: p.vessel.mmsi,
                         imo: p.vessel.imo
@@ -106,9 +106,14 @@ function createApiTimestamp(pilotage: Pilotage): any {
     return null;
 }
 
-function getMaxDate(date1: Date, date2: Date | undefined): Date {
-    if(date2 && date2 > date1) {
-        return date2;
+function getMaxDate(date1string: string, date2string: string | undefined): Date {
+    const date1 = new Date(date1string);
+
+    if(date2string) {
+        const date2 = new Date(date2string);
+        if(date2 > date1) {
+            return date2;
+        }
     }
 
     return date1;
@@ -122,9 +127,9 @@ function findNewAndUpdated(idMap: TimestampMap, pilotages: Pilotage[]): Pilotage
     const newAndUpdated = [] as Pilotage[];
 
     pilotages.forEach(p => {
-        const timestamp = idMap[p.id];
+        const timestamp = idMap[p.id] as Date;
         const finishedPilotage = !timestamp && p.state === 'FINISHED';
-        const updatedPilotage = timestamp !== p.scheduleUpdated;
+        const updatedPilotage = timestamp && timestamp.toISOString() !== p.scheduleUpdated;
 
         if(!finishedPilotage && updatedPilotage) {
             newAndUpdated.push(p);
@@ -155,12 +160,12 @@ function findRemoved(idMap: TimestampMap, pilotages: Pilotage[]): number[] {
 
 function convert(pilotage: Pilotage): ApiTimestamp {
     const eventType = getEventType(pilotage);
-    const eventTime = getEventTime(pilotage).toISOString();
+    const eventTime = getEventTime(pilotage);
 
     return {
         eventType,
         eventTime,
-        recordTime: pilotage.scheduleUpdated.toISOString(),
+        recordTime: pilotage.scheduleUpdated,
         source: 'PILOTWEB',
         ship: {
             mmsi: pilotage.vessel.mmsi,
@@ -177,7 +182,7 @@ function getEventType(pilotage: Pilotage): EventType {
     return pilotage.state == 'FINISHED' ? EventType.ATA : EventType.ETA;
 }
 
-function getEventTime(pilotage: Pilotage): Date {
+function getEventTime(pilotage: Pilotage): string {
     if(pilotage.pilotBoardingTime) {
         const etAsDate = new Date(pilotage.endTime);
         const ebtAsDate = new Date(pilotage.pilotBoardingTime);

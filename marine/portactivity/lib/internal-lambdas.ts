@@ -64,7 +64,7 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
     const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props,{
-        memorySize: 128,
+        memorySize: 256,
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
         handler: 'lambda-update-timestamps-from-pilotweb.handler',
