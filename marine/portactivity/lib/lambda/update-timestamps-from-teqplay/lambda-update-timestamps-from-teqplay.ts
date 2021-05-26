@@ -13,6 +13,6 @@ export const handler = async function () {
 
         console.info("sending %d messages", timestamps.length);
 
-        timestamps.forEach(ts => sendMessage(ts, sqsQueueUrl));
+        await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
     });
 }

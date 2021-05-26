@@ -49,26 +49,27 @@ export function create(
     }
 
     if(props.sources?.pilotweb) {
-        const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(secret, queueAndDLQ.queue, vpc, props, stack);
+        const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(secret, queueAndDLQ.queue, vpc, lambdaDbSg, props, stack);
         const pilotwebScheduler = createPilotwebScheduler(stack);
         pilotwebScheduler.addTarget(new LambdaFunction(updateTimestampsFromPilotwebLambda));
     }
 }
 
-function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
+function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue, vpc: IVpc,
+                                                  lambdaDbSg: ISecurityGroup,
+                                                  props: Props, stack: Stack): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
     const environment = {} as any;
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const lambda = new Function(stack, functionName, {
-        runtime: Runtime.NODEJS_12_X,
-        logRetention: RetentionDays.ONE_YEAR,
+    const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props,{
+        memorySize: 256,
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
         handler: 'lambda-update-timestamps-from-pilotweb.handler',
         environment
-    });
+    }));
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
@@ -212,9 +213,8 @@ function createUpdateETATimestampsLambda(
     props: Props,
     stack: Stack): Function {
 
-    const environment: any = {
-        SECRET_ID: props.secretId
-    };
+    const environment: any = {};
+    environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
     environment[KEY_ENDPOINT_CLIENT_ID] = props.etaProps.clientId;
     environment[KEY_ENDPOINT_CLIENT_SECRET] = props.etaProps.clientSecret;
     environment[KEY_ENDPOINT_AUDIENCE] = props.etaProps.audience;

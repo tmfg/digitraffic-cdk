@@ -1,23 +1,17 @@
 import moment from 'moment';
 
 export enum EventType {
-    APC = 'APC',
-    APS = 'APS',
     ATA = 'ATA',
     ATB = 'ATB',
     ATD = 'ATD',
     ETA = 'ETA',
     ETD = 'ETD',
+    // for pilotage
     RPS = 'RPS',
-    PPS = 'PPS'
+    PPS = 'PPS',
+    APS = 'APS',
+    APC = 'APC'
 }
-const eventTypes = [
-    EventType.ATA,
-    EventType.ATB,
-    EventType.ATD,
-    EventType.ETA,
-    EventType.ETD
-];
 
 export interface Ship {
     readonly mmsi?: number
@@ -46,7 +40,7 @@ export interface ApiTimestamp {
 }
 
 export function validateTimestamp(timestamp: ApiTimestamp): boolean {
-    if (!eventTypes.includes(timestamp.eventType)) {
+    if(!Object.values(EventType).includes(timestamp.eventType)) {
         console.warn('Invalid eventType for timestamp', timestamp);
         return false;
     }
