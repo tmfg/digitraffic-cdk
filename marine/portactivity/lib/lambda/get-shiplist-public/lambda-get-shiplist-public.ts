@@ -1,10 +1,10 @@
 import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/shiplist-public';
-import {inDatabase} from '../../../../../common/postgres/database';
+import {inDatabase} from 'digitraffic-common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';
 import * as R from 'ramda';
 import {getDisplayableNameForEventSource} from "../../event-sourceutil";
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 export const handler = async (event: any): Promise<any> => {
     return handlerFn(event, withDbSecret);
@@ -214,7 +214,8 @@ export async function handlerFn(
                 timestamps: subRows
             };
         }
-
+    }
+        
     function buildTimelist() {
         $('#aikalista-table').bootstrapTable({
             rowStyle: () => {
