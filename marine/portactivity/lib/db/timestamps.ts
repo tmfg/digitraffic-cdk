@@ -276,17 +276,36 @@ const SELECT_BY_PORTCALL_ID_AND_LOCODE = `
 `;
 
 const DELETE_BY_ID = `
-    DELETE
-    FROM port_call_timestamp
+    DELETE FROM port_call_timestamp
     WHERE id = $1
+`;
+
+const REMOVE_TIMESTAMPS_SQL = `
+    DELETE FROM port_call_timestamp
+    where ship_imo = $(vessel_imo)
+    and location_locode = $(start_code)
+    and event_time = $(pilotage_end_time)
+    returning id 
 `;
 
 export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
-        name:'update-timestamps',
-        text:INSERT_ESTIMATE_SQL
+        name: 'update-timestamps',
+        text: INSERT_ESTIMATE_SQL
     });
     return db.oneOrNone(ps, createUpdateValues(timestamp));
+}
+
+export async function removeTimestamps(db: IDatabase<any, any>, stamps: any[]): Promise<any> {
+    let total = 0;
+
+    await Promise.allSettled(stamps.map(s => {
+        return db.oneOrNone(REMOVE_TIMESTAMPS_SQL, s).then(s => {
+            if(s) total++;
+        })
+    }));
+
+    return total;
 }
 
 export function findByLocode(
@@ -294,8 +313,8 @@ export function findByLocode(
     locode: string
 ): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
-        name:'find-by-locode',
-        text:SELECT_BY_LOCODE,
+        name: 'find-by-locode',
+        text: SELECT_BY_LOCODE,
         values: [locode.toUpperCase()]
     });
     return db.tx(t => t.manyOrNone(ps));

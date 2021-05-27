@@ -17,6 +17,7 @@ export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => vo
 
 export async function truncate(db: IDatabase<any, any>): Promise<any> {
     return await db.tx(async t => {
+        await db.none('DELETE FROM pilotage');
         await db.none('DELETE FROM port_call_timestamp');
         await db.none('DELETE FROM public.vessel');
         await db.none('DELETE FROM public.port_area_details');

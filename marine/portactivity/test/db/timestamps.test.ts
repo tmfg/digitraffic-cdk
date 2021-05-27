@@ -7,6 +7,32 @@ import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EVENTSOURCE_VTS} from "../../lib/event-sourceutil";
 
 describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+    test('removeTimestamps - empty', async () => {
+        const removed = await TimestampsDb.removeTimestamps(db, []);
+
+        expect(removed).toEqual(0);
+    });
+
+    test('removeTimestamps - not found', async () => {
+        const removed = await TimestampsDb.removeTimestamps(db, [createTimestampToRemove(123, '123', new Date())]);
+
+        expect(removed).toEqual(0);
+    });
+
+    test('removeTimestamps - found 1', async () => {
+        const imo = 123;
+        const locode = 'FITST';
+        const eventTime = new Date();
+
+        await insert(db, [newTimestamp({ imo, locode, eventTime }), newTimestamp()]);
+
+        const notRemoved = await TimestampsDb.removeTimestamps(db, [createTimestampToRemove(imo, 'NOT_FOUND', eventTime)]);
+        expect(notRemoved).toEqual(0);
+
+        const removed = await TimestampsDb.removeTimestamps(db, [createTimestampToRemove(imo, locode, eventTime)]);
+        expect(removed).toEqual(1);
+    });
+
     /*
         FOUND
      */
@@ -369,4 +395,11 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
+    function createTimestampToRemove(vessel_imo: number, start_code: string, pilotage_end_time: Date): any {
+        return {
+            vessel_imo,
+            start_code,
+            pilotage_end_time
+        }
+    }
 }));

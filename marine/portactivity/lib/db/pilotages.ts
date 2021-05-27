@@ -1,13 +1,13 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {Pilotage} from "../model/pilotage";
 
-const GET_ACTIVE_PILOTAGE_TIMESTAMPS = 'select id, schedule_updated from pilotage where state != \'FINISHED\'';
+const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL = 'select id, schedule_updated from pilotage where state != \'FINISHED\'';
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
     name: 'get-active-pilotage-timestamps',
-    text: GET_ACTIVE_PILOTAGE_TIMESTAMPS
+    text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL
 });
 
-const UPSERT_PILOTAGES = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, vessel_name, start_code, start_berth, end_code, end_berth)
+const UPSERT_PILOTAGES_SQL = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, vessel_name, start_code, start_berth, end_code, end_berth)
 values($(id), $(vesselImo), $(vesselMmsi), $(vesselEta), $(pilotBoardingTime), $(endTime), $(scheduleUpdated), $(scheduleSource), $(state), $(vesselName), $(routeStart), $(routeStartBerth), $(routeEnd), $(routeEndBerth))
 on conflict(id) do update set
     vessel_imo = $(vesselImo),
@@ -25,7 +25,11 @@ on conflict(id) do update set
     end_berth = $(routeEndBerth)
 `;
 
-const DELETE_PILOTAGES = 'delete from pilotage where id in ($1:list)';
+const DELETE_PILOTAGES_SQL =`
+    delete from pilotage
+    where id in ($1:list) 
+    returning vessel_imo, start_code, pilotage_end_time
+`;
 
 export type DbPilotageTimestamp = {
     readonly id: number,
@@ -47,7 +51,7 @@ export async function getTimestamps(db: IDatabase<any, any>): Promise<TimestampM
 
 export async function updatePilotages(db: IDatabase<any, any>, pilotages: Pilotage[]): Promise<any> {
     if(pilotages && pilotages.length > 0) {
-        return await Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES, {
+        return await Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
             id: pilotage.id,
             vesselImo: pilotage.vessel.imo,
             vesselMmsi: pilotage.vessel.mmsi,
@@ -68,10 +72,10 @@ export async function updatePilotages(db: IDatabase<any, any>, pilotages: Pilota
     return Promise.resolve();
 }
 
-export async function deletePilotages(db: IDatabase<any, any>, pilotageIds: number[]): Promise<any> {
+export async function deletePilotages(db: IDatabase<any, any>, pilotageIds: number[]): Promise<any[]> {
     if(pilotageIds && pilotageIds.length > 0) {
-        return db.none(DELETE_PILOTAGES, [pilotageIds]);
+        return db.manyOrNone(DELETE_PILOTAGES_SQL, [pilotageIds]);
     }
 
-    return Promise.resolve();
+    return Promise.resolve([]);
 }

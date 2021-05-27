@@ -1,5 +1,6 @@
 import * as PilotwebAPI from "../api/pilotweb";
 import * as PilotagesDAO from "../db/pilotages";
+import * as TimestampDAO from '../db/timestamps';
 import {TimestampMap} from "../db/pilotages";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
@@ -13,50 +14,42 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
 
     console.log("method=PortActivity.GetMessages source=Pilotweb receivedCount=%d", pilotages.length);
 
-    const idMap = await inDatabase(async  (db: IDatabase<any, any>) => {
-        return await PilotagesDAO.getTimestamps(db);
+    let updated = [] as Pilotage[];
+    await inDatabase(async  (db: IDatabase<any, any>) => {
+        const idMap = await PilotagesDAO.getTimestamps(db);
+        const removed = await removeMissingPilotages(db, idMap, pilotages);
+        updated = await updateAllPilotages(db, idMap, pilotages);
+
+        console.info("timestamps to remove " + JSON.stringify(removed));
+
+        const timestampsRemoved = await TimestampDAO.removeTimestamps(db, removed);
+        console.log("removed " + timestampsRemoved);
     });
 
-    const removed = await removeMissingPilotages(idMap, pilotages);
-    const updated = await updateAllPilotages(idMap, pilotages);
-
-    return convertApiTimestamps(removed, updated);
+    return convertUpdatedTimestamps(updated);
 }
 
-async function updateAllPilotages(idMap: TimestampMap, pilotages: Pilotage[]): Promise<any> {
+async function updateAllPilotages(db: IDatabase<any, any>, idMap: TimestampMap, pilotages: Pilotage[]): Promise<Pilotage[]> {
     const newAndUpdated = findNewAndUpdated(idMap, pilotages);
 
     console.info("updatedCount=%d", newAndUpdated.length);
 
-    await inDatabase(async (db: IDatabase<any, any>) => {
-        return await PilotagesDAO.updatePilotages(db, newAndUpdated);
-    });
+    await PilotagesDAO.updatePilotages(db, newAndUpdated);
 
     return newAndUpdated;
 }
 
-async function removeMissingPilotages(idMap: TimestampMap, pilotages: Pilotage[]): Promise<any> {
-    const removed = findRemoved(idMap, pilotages);
+async function removeMissingPilotages(db: IDatabase<any, any>, idMap: TimestampMap, pilotages: Pilotage[]): Promise<any[]> {
+    const removedIds = findRemoved(idMap, pilotages);
 
-    console.info("deletedCount=%d", removed.length);
+    console.info("deletedCount=%d", removedIds.length);
 
-    await inDatabase(async (db: IDatabase<any, any>) => {
-        return await PilotagesDAO.deletePilotages(db, removed);
-    });
-
-    return removed;
+    return await PilotagesDAO.deletePilotages(db, removedIds);
 }
 
-function convertApiTimestamps(removed: number[], newAndUpdated: Pilotage[]): ApiTimestamp[] {
+function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
     const timestamps = [] as ApiTimestamp[];
 
-    convertUpdatedTimestamps(timestamps, newAndUpdated);
-    convertRemoved(timestamps, removed);
-
-    return timestamps;
-}
-
-function convertUpdatedTimestamps(timestamps: ApiTimestamp[], newAndUpdated: Pilotage[]) {
     newAndUpdated.forEach(p => {
         const base = createApiTimestamp(p);
 
@@ -76,6 +69,8 @@ function convertUpdatedTimestamps(timestamps: ApiTimestamp[], newAndUpdated: Pil
                 }});
         }
     });
+
+    return timestamps;
 }
 
 function createApiTimestamp(pilotage: Pilotage): any {

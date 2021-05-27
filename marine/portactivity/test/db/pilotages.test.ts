@@ -6,7 +6,7 @@ describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =
     test('getTimestamps - empty', async () => {
         const timestampMap = await getTimestamps(db);
 
-        expect(Object.keys(timestampMap).length).toBe(0);
+        expect(Object.keys(timestampMap)).toHaveLength(0);
     });
 
     test('getTimestamps - one', async () => {
@@ -15,7 +15,7 @@ describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =
 
         const timestampMap = await getTimestamps(db);
 
-        expect(Object.keys(timestampMap).length).toBe(1);
+        expect(Object.keys(timestampMap)).toHaveLength(1);
         expect(timestampMap[1]).toStrictEqual(now);
 
         // update it to finished, so it should not show up
@@ -23,11 +23,12 @@ describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =
 
         const timestampMap2 = await getTimestamps(db);
 
-        expect(Object.keys(timestampMap2).length).toBe(0);
+        expect(Object.keys(timestampMap2)).toHaveLength(0);
     });
 
     test('deletePilotages - none', async () => {
-        await deletePilotages(db, []);
+        const removed = await deletePilotages(db, []);
+        expect(removed).toHaveLength(0);
     });
 
     test('deletePilotages - one', async () => {
@@ -36,13 +37,14 @@ describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =
         await insertPilotage(db, 2, 'ACTIVE', now);
 
         const timestampMap = await getTimestamps(db);
-        expect(Object.keys(timestampMap).length).toBe(2);
+        expect(Object.keys(timestampMap)).toHaveLength(2);
 
         // delete one
-        await deletePilotages(db, [1]);
+        const deleted = await deletePilotages(db, [1]);
         const timestampMap2 = await getTimestamps(db);
 
-        expect(Object.keys(timestampMap2).length).toBe(1);
+        expect(deleted).toHaveLength(1);
+        expect(Object.keys(timestampMap2)).toHaveLength(1);
         expect(timestampMap2[2]).toStrictEqual(now);
     });
 }));

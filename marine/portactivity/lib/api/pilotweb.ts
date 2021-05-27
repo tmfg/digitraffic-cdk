@@ -33,8 +33,6 @@ export async function getMessages(host: string, authHeader: string): Promise<any
         }).end();
     });
 
-    console.info("request done!");
-
     return await promise;
 }
 
