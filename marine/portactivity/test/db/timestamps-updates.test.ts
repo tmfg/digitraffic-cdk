@@ -18,6 +18,8 @@ describe('db-timestamps - updates', dbTestBase((db: pgPromise.IDatabase<any, any
         expect(fetchedTimestamps.length).toBe(1);
         const e = fetchedTimestamps[0];
         expect(e.location_locode).toBe(timestamp.location.port);
+        expect(e.location_portarea).toBe(timestamp.location.portArea);
+        expect(e.location_from).toBe(timestamp.location.from);
         expect(e.event_source).toBe(timestamp.source);
         expect(moment(e.record_time).toISOString()).toBe(timestamp.recordTime);
         expect(moment(e.event_time).toISOString()).toBe(timestamp.eventTime);

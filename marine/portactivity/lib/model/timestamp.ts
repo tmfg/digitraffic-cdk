@@ -13,21 +13,22 @@ export enum EventType {
     APC = 'APC'
 }
 
-export interface Ship {
+export type Ship = {
     readonly mmsi?: number
     readonly imo?: number
 }
 
-export interface Location {
+export type Location = {
     readonly port: string
     readonly portArea?: string
+    readonly from?: string
     readonly terminal?: string
     readonly berth?: string
     readonly berthPosition?: string
     readonly shipSide?: string
 }
 
-export interface ApiTimestamp {
+export type ApiTimestamp = {
     readonly eventType: EventType
     readonly eventTime: string
     readonly eventTimeConfidenceLower?: string | null
@@ -90,6 +91,10 @@ export function validateTimestamp(timestamp: ApiTimestamp): boolean {
     }
     if (timestamp.location.port.length > 5) {
         console.warn('Locode too long', timestamp);
+        return false;
+    }
+    if (timestamp.location.from && timestamp.location.from.length > 5) {
+        console.warn('From locode too long', timestamp);
         return false;
     }
     if(timestamp.location.portArea && timestamp.location.portArea.length > 6) {

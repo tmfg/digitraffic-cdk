@@ -36,7 +36,8 @@ export function newTimestamp(props?: {
         },
         location: {
             port: props?.locode ?? someNumber().toString().slice(0,5),
-            portArea: props?.portArea ?? someNumber().toString().slice(0,5)
+            portArea: props?.portArea ?? someNumber().toString().slice(0,5),
+            from: someNumber().toString().slice(0,5)
         },
         portcallId: props?.portcallId ?? someNumber()
     };

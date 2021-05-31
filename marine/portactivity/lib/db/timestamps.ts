@@ -18,7 +18,8 @@ export interface DbTimestamp {
     readonly ship_mmsi: number
     readonly ship_imo: number
     readonly location_locode: string
-    readonly location_portarea: string
+    readonly location_portarea?: string
+    readonly location_from?: string
     readonly portcall_id?: number
 }
 
@@ -58,7 +59,8 @@ const INSERT_ESTIMATE_SQL = `
         ship_mmsi,
         ship_imo,
         portcall_id,
-        location_portarea
+        location_portarea,
+        location_from
         )
     VALUES (
            $1,
@@ -110,7 +112,8 @@ const INSERT_ESTIMATE_SQL = `
                 LIMIT 1
             )
            ),
-           $13
+           $13,
+           $14
     )
     ON CONFLICT(ship_mmsi, ship_imo, event_source, location_locode, event_type, event_time, record_time, portcall_id) DO NOTHING
         RETURNING ship_mmsi, ship_imo, location_locode
@@ -130,6 +133,7 @@ const SELECT_BY_LOCODE = `
         pe.ship_imo,            
         pe.location_locode,
         pe.location_portarea,
+        pe.location_from,
         pe.portcall_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
@@ -152,6 +156,7 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
         pe.ship_imo AS imo, 
         pe.location_locode AS locode,
         pe.location_portarea AS port_area_code,
+        pe.location_from,
         pe.portcall_id
     FROM port_call_timestamp pe
     JOIN public.port_call pc ON pc.port_call_id = pe.portcall_id
@@ -216,6 +221,7 @@ const SELECT_BY_MMSI = `
         pe.ship_imo,
         pe.location_locode,
         pe.location_portarea,
+        pe.location_from,
         pe.portcall_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
@@ -247,6 +253,7 @@ const SELECT_BY_IMO = `
         pe.ship_imo,
         pe.location_locode,
         pe.location_portarea,
+        pe.location_from,
         pe.portcall_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
@@ -409,7 +416,8 @@ export function createUpdateValues(e: ApiTimestamp): any[] {
         e.ship.mmsi && e.ship.mmsi != 0 ? e.ship.mmsi : undefined,  // ship_mmsi
         e.ship.imo && e.ship.imo != 0 ? e.ship.imo : undefined,  // ship_imo,
         e.portcallId,
-        e.location.portArea
+        e.location.portArea,
+        e.location.from
     ];
 }
 

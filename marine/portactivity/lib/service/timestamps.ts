@@ -84,7 +84,8 @@ export async function findAllTimestamps(
         },
         location: {
             port: e.location_locode,
-            portArea: e.location_portarea
+            portArea: e.location_portarea,
+            from: e.location_from
         },
         portcallId: e.portcall_id
     })));

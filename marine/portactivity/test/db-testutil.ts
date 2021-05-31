@@ -40,6 +40,8 @@ export function findAll(db: IDatabase<any, any>): Promise<DbTimestamp[]> {
             ship_mmsi,
             ship_imo,
             location_locode,
+            location_portarea,
+            location_from,
             portcall_id
         FROM port_call_timestamp`);
     });
@@ -62,7 +64,8 @@ export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
                     ship_mmsi,
                     ship_imo,
                     portcall_id,
-                    location_portarea)
+                    location_portarea,
+                    location_from)
                 VALUES(
                     $1,
                     $2,
@@ -76,7 +79,8 @@ export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
                     $10,
                     $11,
                     $12,
-                    $13
+                    $13,
+                    $14
                 )
             `, TimestampsDb.createUpdateValues(e));
         }));
