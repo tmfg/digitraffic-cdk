@@ -14,8 +14,6 @@ const s3 = new AWS.S3();
 
 const MAX_LINES_PER_MESSAGE = 6000;
 
-const VERSION_HEADERS = "EXT_VERSION";
-
 const COMPRESS_OPTIONS = {
     level: 8,
     memLevel: 9,

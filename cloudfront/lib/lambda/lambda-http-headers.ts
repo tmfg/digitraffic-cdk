@@ -1,7 +1,5 @@
 import {addCorsHeaders} from "../lambda-util";
 
-const VERSION_HEADERS = "EXT_VERSION";
-
 /*
     This is a edge lambda that should be run at cloudfront at viewer response event.
     It adds CORS headers to a response.

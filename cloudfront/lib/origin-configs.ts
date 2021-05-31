@@ -86,7 +86,7 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
         minTtl: Duration.seconds(0),
         maxTtl: Duration.seconds(b.cacheTtl ?? 60),
         defaultTtl: Duration.seconds(b.cacheTtl ?? 60),
-        forwardedValues: forwardedValues,
+        forwardedValues,
         lambdaFunctionAssociations: getLambdas(b, lambdaMap)
     };
 }

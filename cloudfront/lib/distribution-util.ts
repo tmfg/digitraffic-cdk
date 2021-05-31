@@ -29,12 +29,12 @@ export function createDistribution(stack: Stack, distributionProps: Props, origi
     return createDistributionWithS3Logging(stack, distributionProps, originConfigs, aliasConfig, role, cloudfrontProps, webAcl);
 }
 
-function createDistributionWithStreamingLogging(stack: Stack, distributionProps: Props, originConfigs: any[], aliasConfig: any, role: Role, webAcl: any, streamingConfig: any): CloudFrontWebDistribution {
+function createDistributionWithStreamingLogging(stack: Stack, distributionProps: Props, originConfigs: any[], aliasConfiguration: any, role: Role, webAcl: any, streamingConfig: any): CloudFrontWebDistribution {
     const env = distributionProps.environmentName;
 
     const distribution = new CloudFrontWebDistribution(stack, distributionProps.distributionName, {
-        originConfigs: originConfigs,
-        aliasConfiguration: aliasConfig,
+        originConfigs,
+        aliasConfiguration,
         webACLId: webAcl?.attrArn
     });
 
@@ -53,7 +53,7 @@ function addRealtimeLogging(stack: Stack, distribution: CloudFrontWebDistributio
     distributionCf.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.RealtimeLogConfigArn', streamingConfig.loggingConfig.ref);
 }
 
-function createDistributionWithS3Logging(stack: Stack, distributionProps: Props, originConfigs: any[], aliasConfig: any, role: Role, cloudfrontProps: CFProps, webAcl: any): CloudFrontWebDistribution {
+function createDistributionWithS3Logging(stack: Stack, distributionProps: Props, originConfigs: any[], aliasConfiguration: any, role: Role, cloudfrontProps: CFProps, webAcl: any): CloudFrontWebDistribution {
     const env = distributionProps.environmentName;
 
     const bucket = new Bucket(stack, `${env}-CF-logBucket`, {
@@ -69,8 +69,8 @@ function createDistributionWithS3Logging(stack: Stack, distributionProps: Props,
     bucket.grantRead(lambda);
 
     return new CloudFrontWebDistribution(stack, distributionProps.distributionName, {
-        originConfigs: originConfigs,
-        aliasConfiguration: aliasConfig,
+        originConfigs,
+        aliasConfiguration,
         loggingConfig: {
             bucket: bucket,
             prefix: 'logs'
