@@ -1,4 +1,5 @@
 import axios from "axios";
+import {generateHmacAuthorizationHeader} from "../service/authentication";
 
 export enum VisMessageType {
     RTZ = 'RTZ',
@@ -25,11 +26,11 @@ export type VisMessagesResponse = {
     readonly message: VisMessage[]
 }
 
-export async function getMessages(publicVisUrl: string, hmac: string): Promise<VisMessagesResponse> {
+export async function getMessages(publicVisUrl: string, appId: string, apiKey: string): Promise<VisMessagesResponse> {
     const resp = await axios.get(publicVisUrl, {
         headers: {
             Accept: 'application/json',
-            Authorization: 'HMAC GOES HERE'
+            Authorization: generateHmacAuthorizationHeader(publicVisUrl, appId, apiKey)
         }
     });
     return resp.data as VisMessagesResponse;

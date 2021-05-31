@@ -8,5 +8,6 @@ export enum VoyagePlanSecretKeys {
     SCHEDULES_ACCESS_TOKEN = 'vpgw.schedulesAccessToken',
     SCHEDULES_URL = 'vpgw.schedulesUrl',
     PUBLIC_VIS_URL = 'vpgw.publicVisUrl',
-    HMAC = 'vpgw.hmac'
+    APP_ID = 'vpgw.appid',
+    API_KEY = 'vpgw.apikey'
 }

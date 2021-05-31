@@ -15,8 +15,9 @@ export function handlerFn(
         return await doWithSecret(VoyagePlanEnvKeys.SECRET_ID, async (secret: any) => {
 
             const publicVisUrl = secret[VoyagePlanSecretKeys.PUBLIC_VIS_URL] as string;
-            const hmac = secret[VoyagePlanSecretKeys.HMAC];
-            const messages = await VisApi.getMessages(publicVisUrl, hmac);
+            const appId = secret[VoyagePlanSecretKeys.APP_ID];
+            const apiKey = secret[VoyagePlanSecretKeys.API_KEY];
+            const messages = await VisApi.getMessages(publicVisUrl, appId, apiKey);
 
             const routeMessages = messages.message.filter(msg => msg.messageType == VisMessageType.RTZ);
             // Do these contain failed authentications?
