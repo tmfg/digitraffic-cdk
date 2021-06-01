@@ -64,6 +64,7 @@ function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
                     },
                     location: {
                         port: p.route.end.code,
+                        from: p.route.start.code,
                         berth: p.route.end.berth?.code
                     }
                 }});
@@ -123,10 +124,10 @@ function findNewAndUpdated(idMap: TimestampMap, pilotages: Pilotage[]): Pilotage
 
     pilotages.forEach(p => {
         const timestamp = idMap[p.id] as Date;
-        const finishedPilotage = !timestamp && p.state === 'FINISHED';
         const updatedPilotage = timestamp && timestamp.toISOString() !== p.scheduleUpdated;
+        const newPilotage = !timestamp && p.state !== 'FINISHED';
 
-        if(!finishedPilotage && updatedPilotage) {
+        if(updatedPilotage || newPilotage) {
             newAndUpdated.push(p);
         }
     })
