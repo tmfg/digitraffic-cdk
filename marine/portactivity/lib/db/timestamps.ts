@@ -19,7 +19,7 @@ export interface DbTimestamp {
     readonly ship_imo: number
     readonly location_locode: string
     readonly location_portarea?: string
-    readonly location_from?: string
+    readonly location_from_locode?: string
     readonly portcall_id?: number
 }
 
@@ -60,7 +60,7 @@ const INSERT_ESTIMATE_SQL = `
         ship_imo,
         portcall_id,
         location_portarea,
-        location_from
+        location_from_locode
         )
     VALUES (
            $1,
@@ -133,7 +133,7 @@ const SELECT_BY_LOCODE = `
         pe.ship_imo,            
         pe.location_locode,
         pe.location_portarea,
-        pe.location_from,
+        pe.location_from_locode,
         pe.portcall_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
@@ -156,7 +156,7 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
         pe.ship_imo AS imo, 
         pe.location_locode AS locode,
         pe.location_portarea AS port_area_code,
-        pe.location_from,
+        pe.location_from_locode,
         pe.portcall_id
     FROM port_call_timestamp pe
     JOIN public.port_call pc ON pc.port_call_id = pe.portcall_id
@@ -221,7 +221,7 @@ const SELECT_BY_MMSI = `
         pe.ship_imo,
         pe.location_locode,
         pe.location_portarea,
-        pe.location_from,
+        pe.location_from_locode,
         pe.portcall_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
@@ -253,7 +253,7 @@ const SELECT_BY_IMO = `
         pe.ship_imo,
         pe.location_locode,
         pe.location_portarea,
-        pe.location_from,
+        pe.location_from_locode,
         pe.portcall_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =

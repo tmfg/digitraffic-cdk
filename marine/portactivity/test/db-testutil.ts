@@ -41,7 +41,7 @@ export function findAll(db: IDatabase<any, any>): Promise<DbTimestamp[]> {
             ship_imo,
             location_locode,
             location_portarea,
-            location_from,
+            location_from_locode,
             portcall_id
         FROM port_call_timestamp`);
     });
@@ -65,7 +65,7 @@ export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
                     ship_imo,
                     portcall_id,
                     location_portarea,
-                    location_from)
+                    location_from_locode)
                 VALUES(
                     $1,
                     $2,
