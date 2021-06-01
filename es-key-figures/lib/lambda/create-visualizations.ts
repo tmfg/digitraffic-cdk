@@ -168,21 +168,24 @@ const createDetailPage = async function (filter: string): Promise<string> {
 }
 
 const createIndex = async function (): Promise<string> {
-  const filter = '@transport_type:*'
-
-  const filters: { filter: string }[] = await query("select distinct filter from key_figures")
-  let roadFilterHtml = ''
+  const filters: { filter: string, filterValue: number }[] = await query("select distinct kf_outer.filter as filter, (select kf_inner.value from key_figures kf_inner where kf_inner.filter = kf_outer.filter and kf_inner.name = 'Http req' order by kf_inner.`from` desc limit 1) as filterValue from key_figures kf_outer")
+  let roadFilterHtml = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>'
   for (let row of filters.filter(s => s.filter.includes('transport_type:road'))) {
-    roadFilterHtml += `<li><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></li>`
+    roadFilterHtml += `<tr><td><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td></tr>`
   }
-  let railFilterHtml = ''
+  roadFilterHtml += '</table>'
+
+  let railFilterHtml = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>'
   for (let row of filters.filter(s => s.filter.includes('transport_type:rail'))) {
-    railFilterHtml += `<li><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></li>`
+    railFilterHtml += `<tr><td><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td></tr>`
   }
-  let marineFilterHtml = ''
+  railFilterHtml += '</table>'
+
+  let marineFilterHtml = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>'
   for (let row of filters.filter(s => s.filter.includes('transport_type:marine'))) {
-    marineFilterHtml += `<li><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></li>`
+    marineFilterHtml += `<tr><td><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td></tr>`
   }
+  marineFilterHtml += '</table>'
 
   const html = `
   <html>
@@ -228,13 +231,13 @@ const createIndex = async function (): Promise<string> {
     <script src="https://cdn.jsdelivr.net/npm/nvd3@1.8.6/build/nv.d3.min.js"></script>
     
     <script>
-  	  window.onload = function() {  	      	    
-        ${createGraph("requests", `Requests`, `{key:'Requests', values: [${(await query(`select value, \`from\` from key_figures where filter = '${filter}' and name = 'Http req' order by \`from\` asc`))
-    .map((s: { from: Date; value: number; }) => `[${s.from.getTime()}, ${Number(s.value)}]`)} ] }`)} 
-        ${createGraph("bytesOut", `Bytes out`, `{key:'Bytes out', values: [${(await query(`select value, \`from\` from key_figures where filter = '${filter}' and name = 'Bytes Out' order by \`from\` asc`))
-    .map((s: { from: Date; value: number; }) => `[${s.from.getTime()}, ${Number(s.value)}]`)} ] }`)}
-        ${createGraph("uniqueIPs", `Unique IPs`, `{key:'Unique IPs', values: [${(await query(`select value, \`from\` from key_figures where filter = '${filter}' and name = 'Unique IPs' order by \`from\` asc`))
-    .map((s: { from: Date; value: number; }) => `[${s.from.getTime()}, ${Number(s.value)}]`)} ] }`)}            
+  	  window.onload = function() {  	      	            
+        ${createGraph("requests", `Requests`, endDataToGraphData(await query(`select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Http req' order by \`from\` asc`))
+    .map(s => `{key:'${s.key}', values: [${s.values.map(o => `[${o[0].getTime()}, ${o[1]}]`)} ] }`))}            
+        ${createGraph("bytesOut", `Bytes out`, endDataToGraphData(await query(`select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Bytes Out' order by \`from\` asc`))
+    .map(s => `{key:'${s.key}', values: [${s.values.map(o => `[${o[0].getTime()}, ${o[1]}]`)} ] }`))}
+        ${createGraph("uniqueIPs", `Unique IPs`, endDataToGraphData(await query(`select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Unique IPs' order by \`from\` asc`))
+    .map(s => `{key:'${s.key}', values: [${s.values.map(o => `[${o[0].getTime()}, ${o[1]}]`)} ] }`))}                                    
         ${createGraph("roadEndpoints", `Road Requests`, endDataToGraphData(await query(`select * from key_figures where filter like '@transport_type:road AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`))
     .map(s => `{key:'${s.key}', values: [${s.values.map(o => `[${o[0].getTime()}, ${o[1]}]`)} ] }`))}         
         ${createGraph("railEndpoints", `Rail Requests`, endDataToGraphData(await query(`select * from key_figures where filter like '@transport_type:rail AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`))
@@ -253,9 +256,9 @@ const createIndex = async function (): Promise<string> {
       <div id="roadEndpoints" class="road-endpoints"><div><svg></svg></div></div>
       <div id="railEndpoints" class="rail-endpoints"><div><svg></svg></div></div>
       <div id="marineEndpoints" class="marine-endpoints"><div><svg></svg></div></div>      
-      <div class="road-links"><h1>Road details</h1><ul>${roadFilterHtml}</ul></div>
-      <div class="rail-links"><h1>Rail details</h1><ul>${railFilterHtml}</ul></div>
-      <div class="marine-links"><h1>Marine details</h1><ul>${marineFilterHtml}</ul></div>
+      <div class="road-links"><h1>Road details</h1>${roadFilterHtml}</div>
+      <div class="rail-links"><h1>Rail details</h1>${railFilterHtml}</div>
+      <div class="marine-links"><h1>Marine details</h1>${marineFilterHtml}</div>
   
   </div>
   <footer>

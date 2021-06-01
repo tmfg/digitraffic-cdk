@@ -95,7 +95,7 @@ export class EsKeyFiguresStack extends Stack {
     const collectEsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
 
     const rule = new Rule(this, 'CreateVisualizationsRule', {
-      schedule: Schedule.expression('cron(0 2 2 * ? *)')
+      schedule: Schedule.expression('cron(0 3 1 * ? *)')
     });
 
     const target = new LambdaFunction(collectEsKeyFiguresLambda);
