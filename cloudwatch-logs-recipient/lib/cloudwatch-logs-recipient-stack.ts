@@ -128,7 +128,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             code: new AssetCode('dist/lambda/', {exclude: ["app-*"]}),
             handler: 'lambda-kinesis-to-es.handler',
             runtime: Runtime.NODEJS_12_X,
-            timeout: Duration.seconds(10),
+            timeout: Duration.seconds(20),
             logRetention: RetentionDays.ONE_YEAR,
             environment: {
                 KNOWN_ACCOUNTS: JSON.stringify(props.accounts),

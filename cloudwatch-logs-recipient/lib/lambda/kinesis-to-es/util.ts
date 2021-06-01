@@ -11,6 +11,8 @@ export function getIndexName(appName: string, timestampFromEvent: any): string {
 }
 
 export function buildFromMessage(message: string): any {
+    if(skipElasticLogging(message)) return {};
+
     message = message.replace('[, ]', '[0.0,0.0]')
         .replace(/\"Infinity\"/g, "-1")
         .replace(/Infinity/gi, "-1")
@@ -32,10 +34,17 @@ export function buildFromMessage(message: string): any {
             return JSON.parse('{"log_line": "' + message.replace(/["']/g, "") + '"}');
         }
     } catch (e) {
+        console.info("error " + e);
         console.info("Error converting to json:" + message);
     }
 
     return {};
+}
+
+function skipElasticLogging(message: string): boolean {
+    if(message.includes("<?xml")) return true;
+
+    return false;
 }
 
 export function extractJson(message: string): any {
