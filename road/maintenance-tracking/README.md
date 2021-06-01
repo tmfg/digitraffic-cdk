@@ -3,6 +3,12 @@
 Maintenance tracking integration receives POST-request with tracking JSON, puts it in AWS SQS Queue and saves it to db from there. 
 Road application then reads saved data from the db and combines the contents of the messages for sharing it from the public API as trackings.
 
+## Run build
+
+    `yarn run build`
+    `yarn run all-watch`
+    `yarn run test`
+
 ## Deploy to AWS
 
 * Show changes
