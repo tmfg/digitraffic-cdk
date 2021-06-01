@@ -86,7 +86,7 @@ async function getETA(
     portAreaGeometry: ETADestination | null): Promise<ShipETA | null> {
 
     if (!portAreaGeometry) {
-        console.error(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} port area ${ship.port_area_code} not found!`);
+        console.warn(`method=getETA port area geometry for ship ${ship.imo} locode ${ship.locode} port area ${ship.port_area_code} not found!`);
         return Promise.resolve(null);
     }
 
