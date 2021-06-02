@@ -3,7 +3,10 @@ import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from
 import {inDatabase} from '../../../../common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiTimestamp} from '../model/timestamp';
-import {isPortnetTimestamp} from "../event-sourceutil";
+import {
+    isPortnetTimestamp,
+    mergeTimestamps,
+} from "../event-sourceutil";
 import {Port} from "./portareas";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
@@ -60,7 +63,7 @@ export async function findAllTimestamps(
     imo?: number
 ): Promise<ApiTimestamp[]> {
     const start = Date.now();
-    return await inDatabase(async (db: IDatabase<any, any>) => {
+    const timestamps: ApiTimestamp[] = await inDatabase(async (db: IDatabase<any, any>) => {
         if (locode) {
             return TimestampsDB.findByLocode(db, locode!!);
         } else if (mmsi && !imo) {
@@ -89,6 +92,7 @@ export async function findAllTimestamps(
         },
         portcallId: e.portcall_id
     })));
+    return mergeTimestamps(timestamps) as ApiTimestamp[];
 }
 
 export async function findETAShipsByLocode(

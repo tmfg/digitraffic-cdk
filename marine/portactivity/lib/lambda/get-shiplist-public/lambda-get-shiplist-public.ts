@@ -1,9 +1,9 @@
 import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/shiplist-public';
 import {inDatabase} from 'digitraffic-common/postgres/database';
 import {IDatabase} from 'pg-promise';
-import moment from 'moment-timezone';
+import moment, {Moment} from 'moment-timezone';
 import * as R from 'ramda';
-import {getDisplayableNameForEventSource} from "../../event-sourceutil";
+import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 export const handler = async (event: any): Promise<any> => {
@@ -23,11 +23,20 @@ export async function handlerFn(
             return Promise.resolve({statusCode: 400, body: 'Missing locode'});
         }
         return inDatabase(async (db: IDatabase<any, any>) => {
-            const shiplist: DbPublicShiplist[] =
+            const dbShiplist =
                 (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
-                    .map(e => Object.assign(e, {
-                        event_source: getDisplayableNameForEventSource(e.event_source)
+                    .map(ts => Object.assign(ts, {
+                        source: ts.event_source,
+                        eventTime: ts.event_time,
+                        portcallId: ts.portcall_id
                     }));
+            // don't overwrite source before merging as it utilizes source name in prioritizing
+            const shiplist = mergeTimestamps(dbShiplist).map(ts =>
+                Object.assign(ts, {
+                    source: getDisplayableNameForEventSource(ts.source)
+                })
+            );
+
             return {
                 statusCode: 200,
                 headers: {
@@ -237,7 +246,7 @@ export async function handlerFn(
                 title: 'Time',
                 formatter: timeToString
             }, {
-                field: 'event_source',
+                field: 'source',
                 class: 'col-3',
                 title: 'Source',
                 formatter: (source, obj) => {
@@ -256,14 +265,14 @@ export async function handlerFn(
         var eventTime = moment(typeof e === 'string' ? e : e.event_time).local();
         var timestring = eventTime.format("HH:mm");
         if (!isSameDate(moment(currentDate), eventTime)) {
-            timestring = eventTime.format("D.MM HH:mm")
+            timestring = eventTime.format("DD.MM HH:mm")
         }
         return timestring;
     }
 
 
     function sourceToString(e) {
-        var source = e.event_source == 'Portnet' ? 'PNET' : e.event_source;
+        var source = e.source === 'Portnet' ? 'PNET' : e.source;
         var hoursAgo = Math.floor((moment().valueOf() - moment(e.record_time).valueOf()) / 1000 / 60 / 60);
         return source + ' (-' + hoursAgo + ' h)';
     }
