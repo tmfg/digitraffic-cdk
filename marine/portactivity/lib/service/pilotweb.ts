@@ -56,7 +56,6 @@ function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
 
         if(base) {
             timestamps.push({...base, ...{
-                    eventTime: p.endTime,
                     recordTime: p.scheduleUpdated,
                     source: EVENTSOURCE_PILOTWEB,
                     ship: {
@@ -108,16 +107,13 @@ function getMaxDate(date1string: string, date2string: string | undefined): Date 
 
     if(date2string) {
         const date2 = new Date(date2string);
-        if(date2 > date1) {
+
+        if(date2.getTime() > date1.getTime()) {
             return date2;
         }
     }
 
     return date1;
-}
-
-function convertRemoved(timestamps: ApiTimestamp[], removed: number[]) {
-
 }
 
 function findNewAndUpdated(idMap: TimestampMap, pilotages: Pilotage[]): Pilotage[] {
@@ -153,39 +149,4 @@ function findRemoved(idMap: TimestampMap, pilotages: Pilotage[]): number[] {
     });
 
     return removed;
-}
-
-function convert(pilotage: Pilotage): ApiTimestamp {
-    const eventType = getEventType(pilotage);
-    const eventTime = getEventTime(pilotage);
-
-    return {
-        eventType,
-        eventTime,
-        recordTime: pilotage.scheduleUpdated,
-        source: 'PILOTWEB',
-        ship: {
-            mmsi: pilotage.vessel.mmsi,
-            imo: pilotage.vessel.imo
-        },
-        location: {
-            port: pilotage.route.end.code,
-            berth: pilotage.route.end.berth?.code,
-        }
-    }
-}
-
-function getEventType(pilotage: Pilotage): EventType {
-    return pilotage.state == 'FINISHED' ? EventType.ATA : EventType.ETA;
-}
-
-function getEventTime(pilotage: Pilotage): string {
-    if(pilotage.pilotBoardingTime) {
-        const etAsDate = new Date(pilotage.endTime);
-        const ebtAsDate = new Date(pilotage.pilotBoardingTime);
-
-        if(ebtAsDate > etAsDate) return pilotage.pilotBoardingTime;
-    }
-
-    return pilotage.endTime;
 }
