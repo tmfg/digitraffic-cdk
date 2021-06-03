@@ -13,15 +13,16 @@ export function handlerFn(
         return Promise.allSettled(event.Records.map(r => {
             return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, (_: any): Promise<any> => {
                 const timestamp = JSON.parse(r.body);
+                console.info('method=processTimestampQueue processing timestamp', timestamp);
 
                 if (!validateTimestamp(timestamp)) {
-                    return Promise.reject();
+                    return Promise.reject('method=processTimestampQueue timestamp did not pass validation');
                 }
                 try {
                     return saveTimestamp(timestamp);
                 } catch(err) {
                     console.error('method=processTimestampQueue error persisting timestamp', err);
-                    return Promise.reject();
+                    return Promise.reject(err);
                 }
             });
         })).then(async timestamps => {
