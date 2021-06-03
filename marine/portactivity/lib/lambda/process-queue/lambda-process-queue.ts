@@ -17,7 +17,12 @@ export function handlerFn(
                 if (!validateTimestamp(timestamp)) {
                     return Promise.reject();
                 }
-                return saveTimestamp(timestamp);
+                try {
+                    return saveTimestamp(timestamp);
+                } catch(err) {
+                    console.error('method=processTimestampQueue error persisting timestamp', err);
+                    return Promise.reject();
+                }
             });
         })).then(async timestamps => {
             const successful = timestamps.filter(processedSuccessfully);
@@ -28,9 +33,11 @@ export function handlerFn(
                     .map(s => (s as any).value)
                     .filter(s => s != null);
 
-                console.info("successful %d updates %d", successful.length, updates.length);
+                console.info("method=processTimestampQueue successful %d updates %d", successful.length, updates.length);
             }
             return timestamps;
+        }).catch(err => {
+            console.error('method=processTimestampQueue error persisting all', err);
         });
     };
 }
