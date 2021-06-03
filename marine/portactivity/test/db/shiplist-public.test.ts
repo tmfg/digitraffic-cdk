@@ -4,6 +4,7 @@ import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import {EventType} from "../../lib/model/timestamp";
 import {findByLocodePublicShiplist} from "../../lib/db/shiplist-public";
+import {EVENTSOURCE_PILOTWEB} from "../../lib/event-sourceutil";
 
 describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -81,6 +82,25 @@ describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         expect(foundTimestamps.length).toBe(2);
         expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
         expect(foundTimestamps[1].event_type).toBe(EventType.ETD);
+    });
+
+    test('findByLocodePublicShiplist - outgoing pilotages are included', async () => {
+        const destLocode = 'AA123';
+        const fromLocode = 'BB456';
+        const portcallId = 1;
+        const timestamp = newTimestamp({
+            eventType: EventType.ETA,
+            locode: destLocode,
+            from: fromLocode,
+            eventTime: new Date(),
+            source: EVENTSOURCE_PILOTWEB,
+            portcallId
+        });
+        await insert(db, [timestamp]);
+
+        const foundTimestamps = await findByLocodePublicShiplist(db, fromLocode);
+
+        expect(foundTimestamps.length).toBe(1);
     });
 
 }));

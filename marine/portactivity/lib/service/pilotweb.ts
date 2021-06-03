@@ -6,6 +6,7 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
+import {EVENTSOURCE_PILOTWEB} from "../event-sourceutil";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
     const message = await PilotwebAPI.getMessages(host, authHeader);
@@ -57,7 +58,7 @@ function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
             timestamps.push({...base, ...{
                     eventTime: p.endTime,
                     recordTime: p.scheduleUpdated,
-                    source: 'Pilotweb',
+                    source: EVENTSOURCE_PILOTWEB,
                     ship: {
                         mmsi: p.vessel.mmsi,
                         imo: p.vessel.imo

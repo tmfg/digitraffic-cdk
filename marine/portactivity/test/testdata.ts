@@ -10,6 +10,7 @@ export function newTimestamp(props?: {
     mmsi?: number,
     imo?: number,
     locode?: string,
+    from?: string,
     portArea?: string,
     eventTime?: Date
     eventType?: EventType
@@ -37,7 +38,7 @@ export function newTimestamp(props?: {
         location: {
             port: props?.locode ?? someNumber().toString().slice(0,5),
             portArea: props?.portArea ?? someNumber().toString().slice(0,5),
-            from: someNumber().toString().slice(0,5)
+            from: props?.from ?? someNumber().toString().slice(0,5)
         },
         portcallId: props?.portcallId ?? someNumber()
     };
