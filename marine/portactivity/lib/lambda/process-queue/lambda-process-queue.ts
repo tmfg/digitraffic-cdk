@@ -36,8 +36,6 @@ export function handlerFn(
                 console.info("method=processTimestampQueue successful %d updates %d", successful.length, updates.length);
             }
             return timestamps;
-        }).catch(err => {
-            console.error('method=processTimestampQueue error persisting all', err);
         });
     };
 }
