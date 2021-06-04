@@ -170,10 +170,13 @@ function parseHelsinkiTime(date: string|null): Date|null {
         return null;
     }
 
-    // incoming dates are in Finnish-time without timezone-info, this propably handles it correctly
-    // it also has no leading zeros in days, months or hours
-    const helsinkiDate = moment.tz(date, 'D.M.YYYY H:mm', 'Europe/Helsinki').toDate();
+    // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
+    const helsinkiDate = moment.tz(date, 'YYYY-MM-DD HH:mm:ss', 'Europe/Helsinki').toDate();
 
+    if(isNaN(helsinkiDate)) {
+        console.warn("received NaN date " + date);
+        return null;
+    }
 //    console.info("%s -> %s !", date, helsinkiDate);
 
     return helsinkiDate;

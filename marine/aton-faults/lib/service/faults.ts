@@ -6,7 +6,7 @@ import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "../../../../common/rtz/voyageplan";
 import moment from 'moment-timezone';
-import {Feature, FeatureCollection, GeoJsonProperties, GeometryObject} from "geojson";
+import {Feature, FeatureCollection, GeometryObject} from "geojson";
 import {createFeatureCollection} from "../../../../common/api/geojson";
 import {Language} from "../../../../common/model/language";
 
