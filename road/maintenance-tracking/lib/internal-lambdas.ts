@@ -123,5 +123,6 @@ function createLambdaRoleWithReadS3Policy(stack: Construct, sqsExtendedMessageBu
 
     lambdaRole.addToPolicy(s3PolicyStatement);
     lambdaRole.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"));
+    lambdaRole.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole"));
     return lambdaRole;
 }
