@@ -413,8 +413,8 @@ export function createUpdateValues(e: ApiTimestamp): any[] {
         e.source, // event_source
         moment(e.recordTime).toDate(), // record_time
         e.location.port, // location_locode
-        e.ship.mmsi && e.ship.mmsi != 0 ? e.ship.mmsi : undefined,  // ship_mmsi
-        e.ship.imo && e.ship.imo != 0 ? e.ship.imo : undefined,  // ship_imo,
+        e.ship.mmsi && e.ship.mmsi !== 0 ? e.ship.mmsi : undefined,  // ship_mmsi
+        e.ship.imo && e.ship.imo !== 0 ? e.ship.imo : undefined,  // ship_imo,
         e.portcallId,
         e.location.portArea,
         e.location.from

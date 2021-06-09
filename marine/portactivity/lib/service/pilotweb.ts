@@ -1,8 +1,9 @@
 import * as PilotwebAPI from "../api/pilotweb";
 import * as PilotagesDAO from "../db/pilotages";
 import * as TimestampDAO from '../db/timestamps';
+import * as LocationConverter from './location-converter';
 import {TimestampMap} from "../db/pilotages";
-import {ApiTimestamp, EventType} from "../model/timestamp";
+import {ApiTimestamp, EventType, Location} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
@@ -55,6 +56,8 @@ function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
         const base = createApiTimestamp(p);
 
         if(base) {
+            const location = LocationConverter.convertLocation(p.route);
+
             timestamps.push({...base, ...{
                     recordTime: p.scheduleUpdated,
                     source: EVENTSOURCE_PILOTWEB,
@@ -62,11 +65,7 @@ function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
                         mmsi: p.vessel.mmsi,
                         imo: p.vessel.imo
                     },
-                    location: {
-                        port: p.route.end.code,
-                        from: p.route.start.code,
-                        berth: p.route.end.berth?.code
-                    }
+                    location
                 }});
         }
     });
