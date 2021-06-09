@@ -5,15 +5,14 @@ import {withSecret} from "digitraffic-common/secrets/secret";
 import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
-import {SNSEvent} from "aws-lambda";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
 export function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any
-): (event: SNSEvent) => Promise<string> {
-    return async function(event: SNSEvent): Promise<string> {
+): (event: any) => Promise<string> {
+    return async function(event: any): Promise<string> {
         return await doWithSecret(secretId, async () => {
 
             if (event.Records.length > 1) {
@@ -21,7 +20,7 @@ export function handlerFn(
                     event.Records.length);
             }
 
-            const visMessage = JSON.parse(event.Records[0].Sns.Message) as VisMessageWithCallbackEndpoint;
+            const visMessage = JSON.parse(event.Records[0].body) as VisMessageWithCallbackEndpoint;
             let voyagePlan: RtzVoyagePlan;
             try {
                 const parseXml = util.promisify(xml2js.parseString);

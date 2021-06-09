@@ -4,6 +4,7 @@ import {withSecret} from "digitraffic-common/secrets/secret";
 import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
+const crypto = require('crypto');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 const queueUrl = process.env[VoyagePlanEnvKeys.QUEUE_URL] as string;
@@ -44,7 +45,8 @@ export function handlerFn(
                 await sqs.sendMessage({
                     QueueUrl: queueUrl,
                     MessageBody: JSON.stringify(message),
-                    MessageGroupId
+                    MessageGroupId,
+                    MessageDeduplicationId: createRtzHash(routeMessage.stmMessage.message)
                 }).promise();
             }
         });
@@ -52,3 +54,7 @@ export function handlerFn(
 }
 
 export const handler = handlerFn(new SQS(), withSecret);
+
+function createRtzHash(rtz: string): string {
+    return crypto.createHash("sha256").update(rtz).digest("hex");
+}
