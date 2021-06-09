@@ -61,6 +61,7 @@ function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
             timestamps.push({...base, ...{
                     recordTime: p.scheduleUpdated,
                     source: EVENTSOURCE_PILOTWEB,
+                    sourceId: p.id.toString(),
                     ship: {
                         mmsi: p.vessel.mmsi,
                         imo: p.vessel.imo
@@ -74,22 +75,22 @@ function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
 }
 
 function createApiTimestamp(pilotage: Pilotage): any {
-    const pilotageStartTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime);
+    const eventTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime);
 
     if(pilotage.state === 'ESTIMATE' || pilotage.state === 'NOTICE') {
         return {
             eventType: EventType.RPS,
-            eventTime: pilotageStartTime
+            eventTime
         };
     } else if(pilotage.state === 'ORDER') {
         return {
             eventType: EventType.PPS,
-            eventTime: pilotageStartTime
+            eventTime
         };
     } else if(pilotage.state === 'ACTIVE') {
         return {
             eventType: EventType.APS,
-            eventTime: pilotageStartTime
+            eventTime
         }
     } else if(pilotage.state === 'FINISHED') {
         return {
