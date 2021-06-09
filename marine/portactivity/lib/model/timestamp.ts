@@ -38,6 +38,7 @@ export type ApiTimestamp = {
     readonly ship: Ship
     readonly location: Location
     readonly portcallId?: number | null
+    readonly sourceId?: string | null
 }
 
 export function validateTimestamp(timestamp: ApiTimestamp): boolean {
@@ -53,11 +54,11 @@ export function validateTimestamp(timestamp: ApiTimestamp): boolean {
         console.warn('Invalid eventTime for timestamp', timestamp);
         return false;
     }
-    if (timestamp.eventTimeConfidenceLower != null && timestamp.eventTimeConfidenceLower != moment.duration(timestamp.eventTimeConfidenceLower).toISOString()) {
+    if (timestamp.eventTimeConfidenceLower != null && timestamp.eventTimeConfidenceLower !== moment.duration(timestamp.eventTimeConfidenceLower).toISOString()) {
         console.warn('Invalid eventTimeConfidenceLower for timestamp', timestamp);
         return false;
     }
-    if (timestamp.eventTimeConfidenceUpper != null && timestamp.eventTimeConfidenceUpper != moment.duration(timestamp.eventTimeConfidenceUpper).toISOString()) {
+    if (timestamp.eventTimeConfidenceUpper != null && timestamp.eventTimeConfidenceUpper !== moment.duration(timestamp.eventTimeConfidenceUpper).toISOString()) {
         console.warn('Invalid eventTimeConfidenceUpper for timestamp', timestamp);
         return false;
     }
