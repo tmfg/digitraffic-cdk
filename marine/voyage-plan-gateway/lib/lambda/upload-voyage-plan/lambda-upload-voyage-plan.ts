@@ -1,6 +1,5 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {BAD_REQUEST_MESSAGE, OK_MESSAGE} from "digitraffic-common/api/errors";
 import {withSecret} from "digitraffic-common/secrets/secret";
 import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
@@ -27,24 +26,23 @@ export function handlerFn(
                 voyagePlan = await parseXml(visMessage.message) as RtzVoyagePlan;
             } catch (error) {
                 console.error('method=uploadVoyagePlan XML parsing failed', error);
-                return Promise.reject(BAD_REQUEST_MESSAGE);
+                return Promise.reject('XML parsing failed');
             }
 
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {
                 console.error('method=uploadVoyagePlan XML structure validation failed', structureValidationErrors);
-                return Promise.reject(BAD_REQUEST_MESSAGE);
+                return Promise.reject('XML structure validation failed');
             }
 
             const contentValidationErrors = VoyagePlansService.validateContent(voyagePlan);
             if (contentValidationErrors.length) {
                 console.error('method=uploadVoyagePlan XML content validation failed', contentValidationErrors);
-                return Promise.reject(BAD_REQUEST_MESSAGE);
+                return Promise.reject('XML content was not valid');
             }
 
-            // TODO ack
             // do nothing currently
-            return JSON.stringify({message: OK_MESSAGE});
+            return Promise.resolve();
         });
     };
 }
