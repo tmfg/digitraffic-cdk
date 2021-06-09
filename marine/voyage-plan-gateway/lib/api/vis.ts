@@ -26,11 +26,12 @@ export type VisMessagesResponse = {
     readonly message: VisMessage[]
 }
 
-export async function getMessages(publicVisUrl: string, appId: string, apiKey: string): Promise<VisMessagesResponse> {
-    const resp = await axios.get(publicVisUrl, {
+export async function getMessages(privateVisUrl: string, appId: string, apiKey: string): Promise<VisMessagesResponse> {
+    const fullUrl = `${privateVisUrl}/getMessage`;
+    const resp = await axios.get(fullUrl, {
         headers: {
             Accept: 'application/json',
-            Authorization: generateHmacAuthorizationHeader(publicVisUrl, appId, apiKey)
+            Authorization: generateHmacAuthorizationHeader(fullUrl, appId, apiKey)
         }
     });
     return resp.data as VisMessagesResponse;
