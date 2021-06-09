@@ -4,79 +4,79 @@ export const FormalityResponse = `
     <MrsName>GOFREP</MrsName>
     <AreaCoveredByMrs></AreaCoveredByMrs>
     <Iso28005Payload>
-        <?xml version="1.0" encoding="utf-16"?>
-        <EPCMessage xmlns="http://www.iso.org/28005-2">
-            <EPCMessageHeader xmlns="">
-                <SentTime>0001-01-01T00:00:00</SentTime>
-                <MessageType>ACK</MessageType>
-            </EPCMessageHeader>
-            <EPCRequestBody xmlns="">
-                <Agent>
-                    <Company />
-                    <ContactNumbers>
-                        <BusinessTelephone />
-                    </ContactNumbers>
-                    <Person />
-                </Agent>
-                <AirDraught>1</AirDraught>
-                <Beam>1</Beam>
-                <Company>
-                    <Contact>
-                        <Company />
-                        <ContactNumbers>
-                            <BusinessTelephone />
-                        </ContactNumbers>
-                        <Person />
-                    </Contact>
-                </Company>
-                <DeadWeight>1</DeadWeight>
-                <GeneralRemark />
-                <GrossTonnage>1</GrossTonnage>
-                <LengthOverall>1</LengthOverall>
-                <NetTonnage>1</NetTonnage>
-                <PersonsOnboard>
-                    <NumberOfPersonsOnboard>1</NumberOfPersonsOnboard>
-                </PersonsOnboard>
-                <PortOfArrival>
-                    <ArrivalTime>
-                        <DateTime>2021-06-07T10:17:29.5062208+02:00</DateTime>
-                        <TimeType>Estimated</TimeType>
-                    </ArrivalTime>
-                    <Location>
-                        <Name />
-                        <UNLoCode />
-                    </Location>
-                </PortOfArrival>
-                <ReportingEvent>
-                    <ArrivalTime>
-                        <DateTime>2021-06-07T10:17:29.5062208+02:00</DateTime>
-                        <TimeType>Actual</TimeType>
-                    </ArrivalTime>
-                    <Location>
-                        <Position>
-                            <Latitude>1</Latitude>
-                            <Longitude>1</Longitude>
-                        </Position>
-                    </Location>
-                </ReportingEvent>
-                <ShipDefects />
-                <ShipID>
-                    <CallSign />
-                    <MMSINumber />
-                    <ShipName />
-                    <RegistrationPort>
-                        <CountryCode>AD</CountryCode>
-                    </RegistrationPort>
-                </ShipID>
-                <ShipStatus>
-                    <Course>1</Course>
-                    <PresentDraught>1</PresentDraught>
-                    <Speed>1</Speed>
-                </ShipStatus>
-                <ShipType>50</ShipType>
-                <WayPointList />
-            </EPCRequestBody>
-        </EPCMessage>
+        <![CDATA[<?xml version="1.0" encoding="utf-16"?>
+        <EPCMessage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iso.org/28005-2">
+          <EPCMessageHeader xmlns="">
+            <SentTime>0001-01-01T00:00:00</SentTime>
+            <MessageType>ACK</MessageType>
+          </EPCMessageHeader>
+          <EPCRequestBody xmlns="">
+            <Agent>
+              <Company />
+              <ContactNumbers>
+                <BusinessTelephone />
+              </ContactNumbers>
+              <Person />
+            </Agent>
+            <AirDraught>1</AirDraught>
+            <Beam>1</Beam>
+            <Company>
+              <Contact>
+                <Company />
+                <ContactNumbers>
+                  <BusinessTelephone />
+                </ContactNumbers>
+                <Person />
+              </Contact>
+            </Company>
+            <DeadWeight>1</DeadWeight>
+            <GeneralRemark />
+            <GrossTonnage>1</GrossTonnage>
+            <LengthOverall>1</LengthOverall>
+            <NetTonnage>1</NetTonnage>
+            <PersonsOnboard>
+              <NumberOfPersonsOnboard>1</NumberOfPersonsOnboard>
+            </PersonsOnboard>
+            <PortOfArrival>
+              <ArrivalTime>
+                <DateTime>2021-06-08T12:48:20.7729775+02:00</DateTime>
+                <TimeType>Estimated</TimeType>
+              </ArrivalTime>
+              <Location>
+                <Name />
+                <UNLoCode />
+              </Location>
+            </PortOfArrival>
+            <ReportingEvent>
+              <ArrivalTime>
+                <DateTime>2021-06-08T12:48:20.7729775+02:00</DateTime>
+                <TimeType>Actual</TimeType>
+              </ArrivalTime>
+              <Location>
+                <Position>
+                  <Latitude>1</Latitude>
+                  <Longitude>1</Longitude>
+                </Position>
+              </Location>
+            </ReportingEvent>
+            <ShipDefects />
+            <ShipID>
+              <CallSign />
+              <MMSINumber />
+              <ShipName />
+              <RegistrationPort>
+                <CountryCode>AD</CountryCode>
+              </RegistrationPort>
+            </ShipID>
+            <ShipStatus>
+              <Course>1</Course>
+              <PresentDraught>1</PresentDraught>
+              <Speed>1</Speed>
+            </ShipStatus>
+            <ShipType>50</ShipType>
+            <WayPointList />
+          </EPCRequestBody>
+        </EPCMessage>]]>
     </Iso28005Payload>
     <AcceptedDesignators>
         <MrsDesignator>
