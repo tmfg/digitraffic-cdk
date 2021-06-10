@@ -10,18 +10,20 @@ const GROUP_SEPARATOR=',';
 export const handler = async (event: any) : Promise<any> => {
     const usersGroups = getUserGroups(event.groups);
 
-    if(usersGroups.length == 0) {
+    if(usersGroups.length === 0) {
         return {};
     }
 
-    return await withDbSecret(secretId, async () => {
-        return await MetadataService.listAllCameras(usersGroups);
+    return withDbSecret(secretId, async () => {
+        return MetadataService.listAllCameras(usersGroups);
     });
 }
 
 // eventGroups is in form [group1, group2...]
 function getUserGroups(eventGroups: string): string[] {
-    if(!eventGroups) return [];
+    if(!eventGroups) {
+        return [];
+    }
 
     const withoutBraces = eventGroups.substring(1, eventGroups.length - 1);
 

@@ -17,7 +17,9 @@ export const handler = async function (event: any, context: any, callback: any) 
 }
 
 function parseAuthentication(authorizationHeader: string, callback: any): [string, string] {
-    if(!authorizationHeader) return callback('Unauthorized');
+    if(!authorizationHeader) {
+        return callback('Unauthorized');
+    }
 
     const encodedCreds = authorizationHeader.split(' ')[1];
     const plainCreds = Buffer.from(encodedCreds, 'base64').toString().split(':');

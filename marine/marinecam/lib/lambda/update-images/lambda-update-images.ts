@@ -23,7 +23,7 @@ export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => 
 
         console.info("updating images from " + imageServerUrl);
 
-        return await ImageFetcher.updateAllCameras(imageServerUrl, imageServerUsername, imageServerPassword, bucketName, imageServerCertificate);
+        return ImageFetcher.updateAllCameras(imageServerUrl, imageServerUsername, imageServerPassword, bucketName, imageServerCertificate);
     };
 }
 

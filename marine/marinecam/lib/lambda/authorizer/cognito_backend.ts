@@ -39,7 +39,7 @@ export async function loginUser(username: string, password: string): Promise<any
                 },
 
                 newPasswordRequired: async (userAttributes: any, requiredAttributes: any) => {
-                    return await changeUserPassword(cognitoUser, password, userAttributes);
+                    return changeUserPassword(cognitoUser, password, userAttributes);
                 }
             });
         } catch(error) {
