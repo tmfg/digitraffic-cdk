@@ -57,7 +57,7 @@ export function handlerFn(sns: SNS): (e: NotifyEvent) => Promise<any> {
         // trigger a Lambda invocation per message
         await sns.publish({
             TopicArn: topicArn,
-            Message: ''
+            Message: 'EMPTY' // a non-empty message is needed
         }).promise();
 
         return {

@@ -25,8 +25,7 @@ export function create(
     const integrationApi = createRestApi(
         stack,
         'VPGW-Integration',
-        'VPGW integration API',
-        props.allowFromIpAddresses);
+        'VPGW integration API');
     // set response for missing auth token to 501 as desired by API registrar
     new GatewayResponse(stack, 'MissingAuthenticationTokenResponse', {
         restApi: integrationApi,
@@ -66,7 +65,7 @@ function createIntegrationResource(
         integrationResponses: [
             { statusCode: '204' }
         ],
-        passthroughBehavior: PassthroughBehavior.NEVER
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH // because of proxy type integration
     });
 
     resource.addMethod("POST", integration, {
