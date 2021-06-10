@@ -59,7 +59,7 @@ export class CloudfrontCdkStack extends Stack {
     }
 
     createLambdaMap(lProps: CFLambdaProps | undefined): any {
-        let lambdaMap: any = {};
+        const lambdaMap: any = {};
 
         if(lProps != undefined) {
             const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
@@ -88,7 +88,7 @@ export class CloudfrontCdkStack extends Stack {
             }
 
             // handle ip restrictions
-            if (lProps.lambdaParameters && lProps.lambdaParameters.ipRestrictions)
+            if (lProps.lambdaParameters && lProps.lambdaParameters.ipRestrictions) {
                 for (const key of Object.keys(lProps.lambdaParameters.ipRestrictions)) {
                     const restriction = lProps.lambdaParameters.ipRestrictions[key];
 
@@ -96,6 +96,7 @@ export class CloudfrontCdkStack extends Stack {
 
                     lambdaMap[`IP_${key}`] = createIpRestriction(this, edgeLambdaRole, key, restriction);
                 }
+            }
         }
 
         return lambdaMap;
