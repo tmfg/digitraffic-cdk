@@ -8,10 +8,16 @@ import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
+export interface SnsEvent {
+    readonly Records: {
+       readonly body: string
+    }[]
+}
+
 export function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any
-): (event: any) => Promise<string> {
-    return async function(event: any): Promise<string> {
+): (event: SnsEvent) => Promise<string> {
+    return async function(event: SnsEvent): Promise<string> {
         return await doWithSecret(secretId, async () => {
 
             if (event.Records.length > 1) {
