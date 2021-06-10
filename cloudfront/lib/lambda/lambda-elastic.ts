@@ -45,7 +45,7 @@ async function handleS3Object(s3: any, params: any): Promise<any[]> {
     });
 
     return new Promise((resolve, reject) => {
-        let lines = [] as any[];
+        const lines = [] as any[];
 
         readStream.on('line', (l: string) => handleLine(l, lines));
         readStream.on('close', () => {
