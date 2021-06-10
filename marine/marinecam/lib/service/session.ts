@@ -38,7 +38,7 @@ export class Session {
     // this is received after successful connect and must be used in every command after that
     connectionId: string;
 
-    constructor(url: string, acceptSelfSignedCertificate: boolean = false, certificate?: string) {
+    constructor(url: string, acceptSelfSignedCertificate = false, certificate?: string) {
         this.communicationUrl = url + COMMUNICATION_URL_PART;
         this.videoUrl = url + VIDEO_URL_PART;
         this.sequenceId = 1;
@@ -60,17 +60,18 @@ export class Session {
     }
 
     async post(url: string, xml: string, configuration?: any): Promise<any> {
-        return await axios.post(url, xml, {...configuration, ...{ httpsAgent: agent, timeout: 3000 }});
+        return axios.post(url, xml, {...configuration, ...{ httpsAgent: agent, timeout: 3000 }});
     }
 
     async sendMessage(command: Command) {
-        const xml = command.createXml(this.sequenceId++, this.connectionId);
+        const xml = command.createXml(this.sequenceId, this.connectionId);
+        this.sequenceId++;
 
 //        console.info("sending:" + xml);
 
         const resp = await this.post(this.communicationUrl, xml);
 
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             throw Error("sendMessage failed " + JSON.stringify(resp));
         }
 
@@ -93,11 +94,11 @@ export class Session {
             .addInputParameters('Username', username)
             .addInputParameters('Password', password);
 
-        return await this.sendMessage(command);
+        return this.sendMessage(command);
     }
 
     async getAllViewsAndCameras(): Promise<Camera[]> {
-        return await this.sendMessage(new GetAllCamerasCommand());
+        return this.sendMessage(new GetAllCamerasCommand());
     }
 
     async getThumbnail(cameraId: string): Promise<string> {
@@ -107,7 +108,7 @@ export class Session {
             .addInputParameters('DestHeight', DEST_HEIGHT)
             .addInputParameters('ComprLevel', COMPR_LEVEL);
 
-        return await this.sendMessage(command);
+        return this.sendMessage(command);
     }
 
     async getThumbnailByTime(cameraId: string): Promise<string> {
@@ -118,7 +119,7 @@ export class Session {
             .addInputParameters('DestHeight', DEST_HEIGHT)
             .addInputParameters('ComprLevel', COMPR_LEVEL);
 
-        return await this.sendMessage(command);
+        return this.sendMessage(command);
     }
 
     async requestStream(cameraId: string) {
@@ -136,7 +137,7 @@ export class Session {
             .addInputParameters('ResizeAvailable', 'Yes')
             .addInputParameters('Blocking', 'Yes')
 
-        return await this.sendMessage(command);
+        return this.sendMessage(command);
     }
 
     async setStreamTime(videoId: string) {
@@ -144,7 +145,7 @@ export class Session {
             .addInputParameters('VideoId', videoId)
             .addInputParameters('Time', Date.now().toString());
 
-        return await this.sendMessage(command);
+        return this.sendMessage(command);
     }
 
     async setStreamSpeed(videoId: string) {
@@ -152,7 +153,7 @@ export class Session {
             .addInputParameters('VideoId', videoId)
             .addInputParameters('Speed', '1.0');
 
-        return await this.sendMessage(command);
+        return this.sendMessage(command);
     }
 
     async getFrameFromStream(videoId: string): Promise<string|null> {
@@ -162,19 +163,13 @@ export class Session {
 
         const response = await this.post(streamUrl, '', {responseType: 'arraybuffer'});
 
-//        console.info("response " + response);
-//        console.info("response " + JSON.stringify(response.data));
-
         // format is uuid(16) timestamp(8) datasize(4) headersize(2) headerExtension(2)...
         const buffer = Buffer.from(response.data);
         const dataSize = buffer.readUInt32LE(16 + 8 + 4);
         const headerSize = buffer.readUInt16LE(16 + 8 + 4 + 4);
 
-//        console.info("datasize " + dataSize);
-//        console.info("headersize " + headerSize);
-
         // if no data, return empty
-        if(dataSize == 0) {
+        if(dataSize === 0) {
             return null;
         }
 
@@ -186,6 +181,6 @@ export class Session {
         const command = new CloseStreamCommand()
             .addInputParameters('VideoId', videoId);
 
-        return await this.sendMessage(command);
+        return this.sendMessage(command);
     }
 }

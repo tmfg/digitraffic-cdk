@@ -9,7 +9,7 @@ export async function storeImage(cameraId: string, image: string, bucketName: st
     console.info("storing image %s to s3 with size %d", cameraId, image.length);
 
     // for local testing
-    if(bucketName == '') {
+    if(bucketName === '') {
         const fs = require('fs');
 
         console.info("storing image %s locally!", cameraId);
@@ -21,7 +21,7 @@ export async function storeImage(cameraId: string, image: string, bucketName: st
 
         const buffer = Buffer.from(image, BASE64);
 
-        return await uploadToS3(bucketName, buffer, keyName);
+        return uploadToS3(bucketName, buffer, keyName);
     }
 }
 

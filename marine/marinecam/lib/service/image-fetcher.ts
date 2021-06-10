@@ -4,11 +4,11 @@ import * as MetadataService from './metadata';
 
 export const CAMERA_GROUP_ID = 'Saimaa';
 
-export async function updateAllCameras(url: string, username: string, password: string, bucketName: string, certificate: string) {
+export async function updateAllCameras(url: string, username: string, password: string, bucketName: string, certificate: string): Promise<any> {
     const cameraIds = await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
     const session = await loginToCameraServer(url, username, password, certificate);
 
-    return await updateAllImages(cameraIds, session, bucketName);
+    return updateAllImages(cameraIds, session, bucketName);
 }
 
 async function updateAllImages(cameraIds: string[], session: Session, bucketName: string): Promise<any> {
@@ -19,14 +19,13 @@ async function updateAllImages(cameraIds: string[], session: Session, bucketName
 
         if(!image) {
             console.info("empty picture from camera " + cameraId);
-            return;
         } else {
             updatedCameras.push(cameraId);
-            return await ImageStore.storeImage(cameraId, image, bucketName);
+            return ImageStore.storeImage(cameraId, image, bucketName);
         }
     }));
 
-    return await MetadataService.updateMetadataUpdated(updatedCameras, new Date());
+    return MetadataService.updateMetadataUpdated(updatedCameras, new Date());
 }
 
 async function loginToCameraServer(url: string, username: string, password: string, certificate: string): Promise<Session> {

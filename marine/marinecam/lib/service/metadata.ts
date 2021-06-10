@@ -11,7 +11,7 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
 
     try {
         return await inDatabase(async (db: IDatabase<any, any>) => {
-            return await MetadataDB.getAllCameras(db, usersGroups);
+            return MetadataDB.getAllCameras(db, usersGroups);
         });
     } finally {
         console.info("method=listAllCameras tookMs=%d", (Date.now() - start));
@@ -19,13 +19,13 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
 }
 
 export async function updateMetadataUpdated(cameraIds: string[], updated: Date): Promise<any> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
-        return await MetadataDB.updateCameraMetadata(db, cameraIds, updated);
+    return inDatabase(async (db: IDatabase<any,any>) => {
+        return MetadataDB.updateCameraMetadata(db, cameraIds, updated);
     });
 }
 
 export async function getAllCameraIdsForGroup(groupId: string): Promise<string[]> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
-        return await MetadataDB.getAllCameraIdsForGroup(db, groupId);
+    return inDatabase(async (db: IDatabase<any,any>) => {
+        return MetadataDB.getAllCameraIdsForGroup(db, groupId);
     });
 }
