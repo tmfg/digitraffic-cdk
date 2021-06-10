@@ -25,7 +25,7 @@ export class Command {
     createInputParameters(): string {
         let inputs = '';
 
-        for(let [key,value] of Object.entries(this.inputParameters)) {
+        for(const [key,value] of Object.entries(this.inputParameters)) {
             inputs+= `<Param Name="${key}" Value="${value}"/>`;
         }
 
@@ -79,7 +79,8 @@ export class GetAllCamerasCommand extends Command {
     }
 
     getResult(response: any): Camera[] {
-        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
+        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_ITEMS][0]
+            [FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
 
         const info = cameras.map((c: any) => {
             return {
@@ -129,7 +130,7 @@ export class RequestStreamCommand extends Command {
     getResult(response: any): any {
         const output = response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0].Param as any[];
 
-        const videoId = output.find(o => o.$.Name == 'VideoId');
+        const videoId = output.find(o => o.$.Name === 'VideoId');
 
         return videoId?.$?.Value || "";
     }

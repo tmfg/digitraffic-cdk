@@ -37,9 +37,11 @@
   "dependencies": {
     "axios": "^0.21.1",
     "@aws-cdk/core": "1.107.0",
+    "@aws-cdk/aws-apigateway": "1.107.0",
     "@aws-cdk/aws-cognito": "1.107.0",
     "@aws-cdk/aws-events": "1.107.0",
     "@aws-cdk/aws-events-targets": "1.107.0",
+    "@aws-cdk/aws-iam": "1.107.0",
     "@aws-cdk/aws-lambda": "1.107.0",
     "@aws-cdk/aws-s3": "1.107.0",
     "@aws-cdk/aws-secretsmanager": "1.107.0",

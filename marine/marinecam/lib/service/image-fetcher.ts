@@ -23,6 +23,8 @@ async function updateAllImages(cameraIds: string[], session: Session, bucketName
             updatedCameras.push(cameraId);
             return ImageStore.storeImage(cameraId, image, bucketName);
         }
+
+        return Promise.resolve();
     }));
 
     return MetadataService.updateMetadataUpdated(updatedCameras, new Date());
