@@ -18,7 +18,7 @@ function initMap() {
     pilotwebToPortnetLocodeMap['FIKAK'] = 'FIKAS';
 
     pilotwebToPortnetLocodeMap['FIMAN'] = 'FIPOR';
-    pilotwebToPortnetLocodeMap['FIHTK'] = 'FIPOR';
+    pilotwebToPortnetLocodeMap['FITHK'] = 'FIPOR';
 
     pilotwebToPortnetLocodeMap['FIHEP'] = 'FIUKI';
     pilotwebToPortnetLocodeMap['FIKMR'] = 'FIUKI';
