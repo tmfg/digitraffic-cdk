@@ -33,10 +33,10 @@ export function handlerFn(
         return withDbSecretFn(process.env.SECRET_ID as string, async (secret: any): Promise<any> => {
 
             const endpointClientId = secret[PortactivitySecretKeys.ETAS_CLIENT_ID] as string;
-            const endpointClientSecret = secret[PortactivitySecretKeys.ETAS_CLIENT_ID] as string;
-            const endpointClientAudience = secret[PortactivitySecretKeys.ETAS_CLIENT_ID] as string;
-            const endpointAuthUrl = secret[PortactivitySecretKeys.ETAS_CLIENT_ID] as string;
-            const endpointUrl = secret[PortactivitySecretKeys.ETAS_CLIENT_ID] as string;
+            const endpointClientSecret = secret[PortactivitySecretKeys.ETAS_CLIENT_SECRET] as string;
+            const endpointClientAudience = secret[PortactivitySecretKeys.ETAS_AUDIENCE] as string;
+            const endpointAuthUrl = secret[PortactivitySecretKeys.ETAS_AUTH_URL] as string;
+            const endpointUrl = secret[PortactivitySecretKeys.ETAS_URL] as string;
 
             const ships = await findETAShipsByLocode(locodes, portAreaGeometries);
 
