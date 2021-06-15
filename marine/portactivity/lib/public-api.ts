@@ -17,7 +17,7 @@ import {createSubscription} from '../../../common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse,} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
-import {dbLambdaConfiguration, defaultLambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
 import {Props} from "./app-props";
 import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
 import {createUsagePlan} from "../../../common/stack/usage-plans";

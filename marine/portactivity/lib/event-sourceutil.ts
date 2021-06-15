@@ -1,4 +1,4 @@
-import {ApiTimestamp, EventType} from "./model/timestamp";
+import {ApiTimestamp} from "./model/timestamp";
 import * as R from "ramda";
 import moment, {Moment} from "moment-timezone";
 

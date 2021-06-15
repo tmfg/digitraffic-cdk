@@ -8,8 +8,10 @@ const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
     text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL
 });
 
-const UPSERT_PILOTAGES_SQL = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, vessel_name, start_code, start_berth, end_code, end_berth)
-values($(id), $(vesselImo), $(vesselMmsi), $(vesselEta), $(pilotBoardingTime), $(endTime), $(scheduleUpdated), $(scheduleSource), $(state), $(vesselName), $(routeStart), $(routeStartBerth), $(routeEnd), $(routeEndBerth))
+const UPSERT_PILOTAGES_SQL = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, 
+    vessel_name, start_code, start_berth, end_code, end_berth)
+values($(id), $(vesselImo), $(vesselMmsi), $(vesselEta), $(pilotBoardingTime), $(endTime), $(scheduleUpdated), $(scheduleSource), $(state), $(vesselName), $(routeStart), 
+    $(routeStartBerth), $(routeEnd), $(routeEndBerth))
 on conflict(id) do update set
     vessel_imo = $(vesselImo),
     vessel_mmsi = $(vesselMmsi),
@@ -97,7 +99,7 @@ export async function getTimestamps(db: IDatabase<any, any>): Promise<TimestampM
 
 export async function updatePilotages(db: IDatabase<any, any>, pilotages: Pilotage[]): Promise<any> {
     if(pilotages && pilotages.length > 0) {
-        return await Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
+        return Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
             id: pilotage.id,
             vesselImo: pilotage.vessel.imo,
             vesselMmsi: pilotage.vessel.mmsi,

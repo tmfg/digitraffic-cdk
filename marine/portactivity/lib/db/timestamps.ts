@@ -206,7 +206,8 @@ function SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT(
               pe.portcall_id IN ($1:list) AND
               pe.event_type = 'ETA' AND
               pe.event_source = 'VTS' AND
-              pe.event_time < NOW() + ((CASE WHEN thresholds.threshold IS NOT NULL THEN thresholds.threshold ELSE ${DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} END) || ' MINUTE')::INTERVAL
+              pe.event_time < NOW() + ((CASE WHEN thresholds.threshold IS NOT NULL THEN thresholds.threshold 
+                ELSE ${DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} END) || ' MINUTE')::INTERVAL
     `;
 }
 
