@@ -13,14 +13,6 @@ export interface Props {
     readonly logsDestinationArn: string
     readonly sqsProcessLambdaConcurrentExecutions: number
     readonly secretId: string
-    readonly etaProps: {
-        readonly clientId: string
-        readonly clientSecret: string
-        readonly audience: string
-        readonly authUrl: string
-        readonly endpointUrl: string
-        readonly timestampSource: string
-    },
     readonly sources?: {
         readonly teqplay?: boolean,
         readonly pilotweb?: boolean,

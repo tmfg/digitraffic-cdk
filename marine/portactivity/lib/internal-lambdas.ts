@@ -13,14 +13,6 @@ import {QueueAndDLQ} from "./sqs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
-import {
-    KEY_ENDPOINT_AUDIENCE,
-    KEY_ENDPOINT_AUTH_URL,
-    KEY_ENDPOINT_CLIENT_ID,
-    KEY_ENDPOINT_CLIENT_SECRET,
-    KEY_ENDPOINT_URL,
-    KEY_ESTIMATE_SOURCE
-} from "./lambda/update-eta-timestamps/lambda-update-eta-timestamps";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {PortactivityEnvKeys} from "./keys";
 
@@ -215,12 +207,6 @@ function createUpdateETATimestampsLambda(
 
     const environment: any = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
-    environment[KEY_ENDPOINT_CLIENT_ID] = props.etaProps.clientId;
-    environment[KEY_ENDPOINT_CLIENT_SECRET] = props.etaProps.clientSecret;
-    environment[KEY_ENDPOINT_AUDIENCE] = props.etaProps.audience;
-    environment[KEY_ENDPOINT_AUTH_URL] = props.etaProps.authUrl;
-    environment[KEY_ENDPOINT_URL] = props.etaProps.endpointUrl;
-    environment[KEY_ESTIMATE_SOURCE] = props.etaProps.timestampSource;
 
     const functionName = 'PortActivity-UpdateETATimestamps';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {

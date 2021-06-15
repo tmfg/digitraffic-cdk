@@ -17,7 +17,7 @@ let cachedSecret: any;
 
 const missingSecretErrorText = 'Missing or empty secretId';
 
-export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T): Promise<T> {
+export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, expectedKeys?: string[]): Promise<T> {
     if (!secretId) {
         console.error(missingSecretErrorText);
         return Promise.reject(missingSecretErrorText);
@@ -30,6 +30,9 @@ export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T):
         });
     }
     try {
+        if (expectedKeys?.length) {
+            checkExpectedSecretKeys(expectedKeys, cachedSecret);
+        }
         return await fn(cachedSecret);
     } catch (error) {
         console.error('method=withDbSecret Caught an error, refreshing secret', error);
@@ -40,4 +43,10 @@ export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T):
         });
         return fn(cachedSecret);
     }
+}
+
+function checkExpectedSecretKeys(keys: string[], secret: any) {
+    const missingKeys = keys.filter(key => !secret.hasOwnProperty(key));
+    console.error(`method=checkExpectedSecretKeys secret didn't contain the key(s) ${missingKeys}`);
+    throw new Error('Expected keys were not found');
 }
