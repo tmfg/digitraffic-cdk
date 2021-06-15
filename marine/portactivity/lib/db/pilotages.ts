@@ -1,3 +1,4 @@
+import { Location } from "lib/model/timestamp";
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {Pilotage} from "../model/pilotage";
 
@@ -27,8 +28,29 @@ on conflict(id) do update set
 
 const DELETE_PILOTAGES_SQL =`
     delete from pilotage
-    where id in ($1:list) 
-    returning vessel_imo, start_code, pilotage_end_time
+    where id in ($1:list)
+    returning id
+`;
+
+const FIND_PORTCALL_SQL = `
+    SELECT pc.port_call_id
+    FROM public.port_call pc
+    WHERE
+        (
+            pc.mmsi = COALESCE(
+                    $1,
+                    (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE imo = $2),
+                    (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE imo_lloyds = $2)
+            )
+            OR
+            pc.imo_lloyds = COALESCE(
+                    $2,
+                    (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE mmsi = $1),
+                    (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $1)
+            )
+        ) AND
+        pc.port_to_visit = $3::CHARACTER VARYING(5)
+        LIMIT 1
 `;
 
 export type DbPilotageTimestamp = {
@@ -38,6 +60,30 @@ export type DbPilotageTimestamp = {
 
 export type TimestampMap = {
     [key: number]: Date
+}
+
+export async function findPortCallId(db: IDatabase<any, any>, pilotage: Pilotage, location: Location): Promise<number|null> {
+    const p1 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.port]);
+    const p2 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.from]);
+
+    if(p1 && p2 && location.port !== location.from) {
+        console.info("portcalls found for both %s and %s", location.port, location.from);
+        return p2.port_call_id;
+    }
+
+    if(!p1 && !p2) {
+        console.info("no portcalls found for %s or %s", location.port, location.from);
+    }
+
+    if(p1) {
+        return p1.port_call_id;
+    }
+
+    if(p2) {
+        return p2.port_call_id;
+    }
+
+    return null;
 }
 
 export async function getTimestamps(db: IDatabase<any, any>): Promise<TimestampMap> {

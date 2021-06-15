@@ -65,7 +65,8 @@ export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
                     ship_imo,
                     portcall_id,
                     location_portarea,
-                    location_from_locode)
+                    location_from_locode,
+                    source_id)
                 VALUES(
                     $1,
                     $2,
@@ -80,7 +81,8 @@ export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
                     $11,
                     $12,
                     $13,
-                    $14
+                    $14,
+                    $15
                 )
             `, TimestampsDb.createUpdateValues(e));
         }));

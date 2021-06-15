@@ -25,5 +25,6 @@ export type Pilotage = {
     readonly endTime: string,
     readonly noticeGiven?: string,
     readonly scheduleSource: string,
-    readonly scheduleUpdated: string
+    readonly scheduleUpdated: string,
+    readonly portcallId?: number
 }

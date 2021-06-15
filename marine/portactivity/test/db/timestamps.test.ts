@@ -6,31 +6,41 @@ import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EVENTSOURCE_VTS} from "../../lib/event-sourceutil";
 
+const EVENT_SOURCE = 'TEST';
+
 describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('removeTimestamps - empty', async () => {
-        const removed = await TimestampsDb.removeTimestamps(db, []);
+        const removed = await TimestampsDb.removeTimestamps(db, EVENT_SOURCE, []);
 
-        expect(removed).toEqual(0);
+        expect(removed).toHaveLength(0);
     });
 
     test('removeTimestamps - not found', async () => {
-        const removed = await TimestampsDb.removeTimestamps(db, [createTimestampToRemove(123, '123', new Date())]);
+        const removed = await TimestampsDb.removeTimestamps(db, EVENT_SOURCE, ["123"]);
 
-        expect(removed).toEqual(0);
+        expect(removed).toHaveLength(0);
     });
 
     test('removeTimestamps - found 1', async () => {
         const imo = 123;
         const locode = 'FITST';
         const eventTime = new Date();
+        const source = EVENT_SOURCE;
+        const sourceId = "1";
 
-        await insert(db, [newTimestamp({ imo, locode, eventTime }), newTimestamp()]);
+        await insert(db, [newTimestamp({ imo, locode, eventTime, source, sourceId }), newTimestamp()]);
 
-        const notRemoved = await TimestampsDb.removeTimestamps(db, [createTimestampToRemove(imo, 'NOT_FOUND', eventTime)]);
-        expect(notRemoved).toEqual(0);
+        // wrong id
+        const notRemoved = await TimestampsDb.removeTimestamps(db, EVENT_SOURCE, ["2"]);
+        expect(notRemoved).toHaveLength(0);
 
-        const removed = await TimestampsDb.removeTimestamps(db, [createTimestampToRemove(imo, locode, eventTime)]);
-        expect(removed).toEqual(1);
+        // wrong source
+        const notRemoved2 = await TimestampsDb.removeTimestamps(db, 'WRONG_SOURCE', ["1"]);
+        expect(notRemoved2).toHaveLength(0);
+
+        // correct id and source
+        const removed = await TimestampsDb.removeTimestamps(db, EVENT_SOURCE, ["1"]);
+        expect(removed).toHaveLength(1);
     });
 
     /*
@@ -393,13 +403,5 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             insertPortCall(t, newPortCall(timestamp));
             insertPortAreaDetails(t, newPortAreaDetails(timestamp));
         });
-    }
-
-    function createTimestampToRemove(vessel_imo: number, start_code: string, pilotage_end_time: Date): any {
-        return {
-            vessel_imo,
-            start_code,
-            pilotage_end_time
-        }
     }
 }));

@@ -54,7 +54,7 @@ function convertPilotwebCodeToPortnetLocode(code: string): string {
     const newCode = pilotwebToPortnetLocodeMap[code];
 
     if(newCode) {
-        console.info("converting " + code + " to " + newCode);
+//        console.info("converting " + code + " to " + newCode);
 
         return newCode;
     }

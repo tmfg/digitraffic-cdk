@@ -20,7 +20,8 @@ export interface DbTimestamp {
     readonly location_locode: string
     readonly location_portarea?: string
     readonly location_from_locode?: string
-    readonly portcall_id?: number
+    readonly portcall_id?: number,
+    readonly source_id?: string
 }
 
 export interface DbETAShip {
@@ -60,7 +61,8 @@ const INSERT_ESTIMATE_SQL = `
         ship_imo,
         portcall_id,
         location_portarea,
-        location_from_locode
+        location_from_locode,
+        source_id
         )
     VALUES (
            $1,
@@ -113,7 +115,8 @@ const INSERT_ESTIMATE_SQL = `
             )
            ),
            $13,
-           $14
+           $14,
+           $15
     )
     ON CONFLICT(ship_mmsi, ship_imo, event_source, location_locode, event_type, event_time, record_time, portcall_id) DO NOTHING
         RETURNING ship_mmsi, ship_imo, location_locode
@@ -134,7 +137,8 @@ const SELECT_BY_LOCODE = `
         pe.location_locode,
         pe.location_portarea,
         pe.location_from_locode,
-        pe.portcall_id
+        pe.portcall_id,
+        pe.source_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
           (
@@ -222,7 +226,8 @@ const SELECT_BY_MMSI = `
         pe.location_locode,
         pe.location_portarea,
         pe.location_from_locode,
-        pe.portcall_id
+        pe.portcall_id,
+        pe.source_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
           (
@@ -254,7 +259,8 @@ const SELECT_BY_IMO = `
         pe.location_locode,
         pe.location_portarea,
         pe.location_from_locode,
-        pe.portcall_id
+        pe.portcall_id,
+        pe.source_id
     FROM port_call_timestamp pe
     WHERE pe.record_time =
           (
@@ -289,10 +295,10 @@ const DELETE_BY_ID = `
 
 const REMOVE_TIMESTAMPS_SQL = `
     DELETE FROM port_call_timestamp
-    where ship_imo = $(vessel_imo)
-    and location_locode = $(start_code)
-    and event_time = $(pilotage_end_time)
-    returning id 
+    where 
+        event_source = $1 AND 
+        source_id in ($2:list)
+    returning id
 `;
 
 export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
@@ -303,16 +309,13 @@ export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp
     return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
-export async function removeTimestamps(db: IDatabase<any, any>, stamps: any[]): Promise<any> {
-    let total = 0;
+export async function removeTimestamps(db: IDatabase<any, any>, source: string, sourceIds: string[]): Promise<number[]> {
+    if(sourceIds.length > 0) {
+        return db.manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
+            .then(array => array.map(object => object.id));
+    }
 
-    await Promise.allSettled(stamps.map(s => {
-        return db.oneOrNone(REMOVE_TIMESTAMPS_SQL, s).then(s => {
-            if(s) total++;
-        })
-    }));
-
-    return total;
+    return Promise.resolve([]);
 }
 
 export function findByLocode(
@@ -417,7 +420,8 @@ export function createUpdateValues(e: ApiTimestamp): any[] {
         e.ship.imo && e.ship.imo !== 0 ? e.ship.imo : undefined,  // ship_imo,
         e.portcallId,
         e.location.portArea,
-        e.location.from
+        e.location.from,
+        e.sourceId              // source_id
     ];
 }
 

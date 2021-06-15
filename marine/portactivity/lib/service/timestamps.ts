@@ -81,6 +81,7 @@ export async function findAllTimestamps(
         eventTimeConfidenceLower: e.event_time_confidence_lower,
         eventTimeConfidenceUpper: e.event_time_confidence_upper,
         source: e.event_source,
+        sourceId: e.source_id,
         ship: {
             mmsi: e.ship_mmsi,
             imo: e.ship_imo

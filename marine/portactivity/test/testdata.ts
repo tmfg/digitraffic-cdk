@@ -17,6 +17,7 @@ export function newTimestamp(props?: {
     eventTimeConfidenceLower?: string | null
     eventTimeConfidenceUpper?: string | null
     source?: string,
+    sourceId?: string,
     portcallId?: number
 }): ApiTimestamp {
     // round off millis
@@ -24,11 +25,13 @@ export function newTimestamp(props?: {
     eventTime.setMilliseconds(0);
     const recordTime = new Date();
     recordTime.setMilliseconds(0);
+
     return {
         eventType: props?.eventType ?? EventType.ATB,
         eventTime: moment(eventTime).toISOString(),
         recordTime: moment(recordTime).toISOString(),
         source: props?.source ?? someNumber().toString(),
+        sourceId: props?.sourceId ?? someNumber().toString(),
         eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? null,
         eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? null,
         ship: {
@@ -41,7 +44,7 @@ export function newTimestamp(props?: {
             from: props?.from ?? someNumber().toString().slice(0,5)
         },
         portcallId: props?.portcallId ?? someNumber()
-    };
+    } as any;
 }
 
 export function newVessel(timestamp: ApiTimestamp): Vessel {

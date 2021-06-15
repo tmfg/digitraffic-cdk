@@ -17,18 +17,26 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
     console.log("method=PortActivity.GetMessages source=Pilotweb receivedCount=%d", pilotages.length);
 
     let updated = [] as Pilotage[];
-    await inDatabase(async  (db: IDatabase<any, any>) => {
+    return await inDatabase(async (db: IDatabase<any, any>) => {
         const idMap = await PilotagesDAO.getTimestamps(db);
-        const removed = await removeMissingPilotages(db, idMap, pilotages);
+        const pilotageIds = await removeMissingPilotages(db, idMap, pilotages);
         updated = await updateAllPilotages(db, idMap, pilotages);
 
-        console.info("timestamps to remove " + JSON.stringify(removed));
+        console.info("timestamps to remove " + JSON.stringify(pilotageIds));
 
-        const timestampsRemoved = await TimestampDAO.removeTimestamps(db, removed);
-        console.log("removed " + timestampsRemoved);
+        await removeTimestamps(db, pilotageIds);
+
+        return convertUpdatedTimestamps(db, updated);
     });
+}
 
-    return convertUpdatedTimestamps(updated);
+async function removeTimestamps(db: IDatabase<any, any>, pilotageIds: number[]) {
+    if (pilotageIds && pilotageIds.length > 0) {
+        const sourceIds = pilotageIds.map(id => id.toString());
+
+        const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EVENTSOURCE_PILOTWEB, sourceIds);
+        console.log("removed " + timestampsRemoved);
+    }
 }
 
 async function updateAllPilotages(db: IDatabase<any, any>, idMap: TimestampMap, pilotages: Pilotage[]): Promise<Pilotage[]> {
@@ -41,35 +49,45 @@ async function updateAllPilotages(db: IDatabase<any, any>, idMap: TimestampMap, 
     return newAndUpdated;
 }
 
-async function removeMissingPilotages(db: IDatabase<any, any>, idMap: TimestampMap, pilotages: Pilotage[]): Promise<any[]> {
+async function removeMissingPilotages(db: IDatabase<any, any>, idMap: TimestampMap, pilotages: Pilotage[]): Promise<number[]> {
     const removedIds = findRemoved(idMap, pilotages);
 
     console.info("deletedCount=%d", removedIds.length);
 
-    return await PilotagesDAO.deletePilotages(db, removedIds);
+    await PilotagesDAO.deletePilotages(db, removedIds);
+
+    return removedIds;
 }
 
-function convertUpdatedTimestamps(newAndUpdated: Pilotage[]): ApiTimestamp[] {
+async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: Pilotage[]): Promise<ApiTimestamp[]> {
     const timestamps = [] as ApiTimestamp[];
 
-    newAndUpdated.forEach(p => {
+    await Promise.allSettled(newAndUpdated.map(async p => {
         const base = createApiTimestamp(p);
 
         if(base) {
             const location = LocationConverter.convertLocation(p.route);
+            const portcallId = await PilotagesDAO.findPortCallId(db, p, location);
 
-            timestamps.push({...base, ...{
-                    recordTime: p.scheduleUpdated,
-                    source: EVENTSOURCE_PILOTWEB,
-                    sourceId: p.id.toString(),
-                    ship: {
-                        mmsi: p.vessel.mmsi,
-                        imo: p.vessel.imo
-                    },
-                    location
-                }});
+            if (portcallId) {
+                timestamps.push({
+                    ...base, ...{
+                        recordTime: p.scheduleUpdated,
+                        source: EVENTSOURCE_PILOTWEB,
+                        sourceId: p.id.toString(),
+                        ship: {
+                            mmsi: p.vessel.mmsi,
+                            imo: p.vessel.imo
+                        },
+                        location,
+                        portcallId
+                    }
+                });
+            }
         }
-    });
+
+        return Promise.resolve();
+    }));
 
     return timestamps;
 }
