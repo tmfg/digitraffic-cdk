@@ -47,6 +47,8 @@ export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, 
 
 function checkExpectedSecretKeys(keys: string[], secret: any) {
     const missingKeys = keys.filter(key => !secret.hasOwnProperty(key));
-    console.error(`method=checkExpectedSecretKeys secret didn't contain the key(s) ${missingKeys}`);
-    throw new Error('Expected keys were not found');
+    if (missingKeys.length) {
+        console.error(`method=checkExpectedSecretKeys secret didn't contain the key(s) ${missingKeys}`);
+        throw new Error('Expected keys were not found');
+    }
 }
