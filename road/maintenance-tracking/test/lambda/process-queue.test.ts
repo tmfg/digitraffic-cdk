@@ -3,8 +3,8 @@ const QUEUE = 'MaintenanceTrackingQueue.fifo';
 process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 import * as pgPromise from "pg-promise";
-import {dbTestBase, findAllObservations, truncate} from "../db-testutil";
-import {cloneObservationsWithoutJson, handlerFn} from "../../lib/lambda/process-queue/lambda-process-queue";
+import {dbTestBase, findAllObservations} from "../db-testutil";
+import * as LambdaProcessQueue from "../../lib/lambda/process-queue/lambda-process-queue";
 import {SQSRecord} from "aws-lambda";
 import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
 import * as sinon from 'sinon';
@@ -20,7 +20,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('no records', async () => {
         const sns : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sns, 'transformLambdaRecords').returns([]);
-        await handlerFn(sns)({ Records: [] });
+        await LambdaProcessQueue.handlerFn(sns)({ Records: [] });
         expect(transformLambdaRecordsStub.calledWith([])).toBe(true);
     });
 
@@ -32,7 +32,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([recordFromS3]);
-        await handlerFn(sqsClient)({
+        await LambdaProcessQueue.handlerFn(sqsClient)({
             Records: [recordNoJson]
         });
 
@@ -66,7 +66,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3, record2FromS3]);
 
-        await handlerFn(sqsClient)({
+        await LambdaProcessQueue.handlerFn(sqsClient)({
             Records: [record1NoJson, record2NoJson]
         });
 
@@ -92,7 +92,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3]);
 
-        await handlerFn(sqsClient)({
+        await LambdaProcessQueue.handlerFn(sqsClient)({
             Records: [record1NoJson]
         });
 
@@ -116,7 +116,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const sqsClient : any = createSQSExtClient("bucket-name");
         const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([invalidRecordFromS3, validRecordFromS3]);
 
-        await handlerFn(sqsClient)({
+        await LambdaProcessQueue.handlerFn(sqsClient)({
             Records: [invalidRecordNoJson, validRecordNoJson]
         });
 
@@ -133,12 +133,38 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(transformLambdaRecordsStub.calledWith([invalidRecordNoJson, validRecordNoJson])).toBe(true);
     });
 
+    test('invalid record missing sending system', async () => {
+
+        const validJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const trackingJson = JSON.parse(validJson);
+        trackingJson.otsikko.lahettaja.jarjestelma = null;
+        const invalidJson = JSON.stringify(trackingJson);
+        const record : SQSRecord = createRecord(invalidJson);
+
+        const sqsClient : any = createSQSExtClient("bucket-name");
+        const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record]);
+
+        await LambdaProcessQueue.handlerFn(sqsClient)({
+            Records: [record]
+        });
+
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(3);
+
+        for (const entry of allObservations) {
+            expect(entry.sendingSystem).toEqual('UNKNOWN');
+        }
+
+        expect(transformLambdaRecordsStub.calledWith([record])).toBe(true);
+    });
+
+
     test('remove json from DbObservationData', async () => {
         const json = '{ "a" : "b" }';
         const data : DbObservationData[] = createDbObservationData();
         expect(data[0].json).toEqual(json);
         expect(data[1].json).toEqual(json);
-        const clones = cloneObservationsWithoutJson(data);
+        const clones = LambdaProcessQueue.cloneObservationsWithoutJson(data);
         const removed = '{...REMOVED...}';
         expect(clones[0].json).toEqual(removed);
         expect(clones[1].json).toEqual(removed);

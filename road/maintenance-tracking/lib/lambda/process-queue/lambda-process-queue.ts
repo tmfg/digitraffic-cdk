@@ -4,7 +4,7 @@ import * as SqsExt from "../../sqs-ext";
 import {SQSEvent} from "aws-lambda";
 import {SQSRecord} from "aws-lambda/trigger/sqs";
 import moment from 'moment-timezone';
-import {RECEIPT_HANDLE_SEPARATOR, SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../constants";
+import {RECEIPT_HANDLE_SEPARATOR, SQS_BUCKET_NAME} from "../constants";
 import {DbObservationData} from "../../db/maintenance-tracking";
 import * as R from 'ramda';
 
@@ -40,7 +40,10 @@ export function handlerFn(sqsClient : any) { // typeof SQSExt
 
                 const trackingJson = JSON.parse(jsonString);
                 const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
-                const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma
+                if (!trackingJson.otsikko.lahettaja.jarjestelma) {
+                    console.error(`method=processMaintenanceTrackingQueue observations sendingSystem is empty using UNKNOWN s3Key=%s`, s3Key);
+                }
+                const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma ?? 'UNKNOWN';
                 const observationDatas: DbObservationData[] =
                     trackingJson.havainnot.map(( havainto: Havainto ) => {
                         return convertToDbObservationData(havainto, sendingTime, sendingSystem, s3Uri);
