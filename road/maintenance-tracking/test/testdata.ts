@@ -100,6 +100,14 @@ export function getTrackingJsonWith3Observations(id: string, tyokoneId?: string)
     return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(new RegExp(ID_PLACEHOLDER, 'g'), id).replace(new RegExp(TK_PLACEHOLDER, 'g'), '123456789');
 }
 
+export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(id: string, tyokoneId?: string): string {
+    const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
+    const trackingJson = JSON.parse(validJson);
+    trackingJson.otsikko.lahettaja.jarjestelma = null;
+    delete trackingJson.otsikko.lahettaja.jarjestelma;
+    return JSON.stringify(trackingJson);
+}
+
 export function assertObservationData(srcObservations: DbObservationData[], results: DbObservationData[]) {
     results.forEach((resultObservation) => {
         // @ts-ignore remove id field that is not in scr data

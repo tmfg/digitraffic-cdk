@@ -6,7 +6,7 @@ import * as pgPromise from "pg-promise";
 import {dbTestBase, findAllObservations} from "../db-testutil";
 import * as LambdaProcessQueue from "../../lib/lambda/process-queue/lambda-process-queue";
 import {SQSRecord} from "aws-lambda";
-import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
+import {getRandompId, getTrackingJsonWith3Observations, getTrackingJsonWith3ObservationsAndMissingSendingSystem} from "../testdata";
 import * as sinon from 'sinon';
 import {createSQSExtClient} from "../../lib/sqs-ext";
 import moment from 'moment-timezone';
@@ -135,10 +135,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('invalid record missing sending system', async () => {
 
-        const validJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-        const trackingJson = JSON.parse(validJson);
-        trackingJson.otsikko.lahettaja.jarjestelma = null;
-        const invalidJson = JSON.stringify(trackingJson);
+        const invalidJson = getTrackingJsonWith3ObservationsAndMissingSendingSystem(getRandompId(), getRandompId());
         const record : SQSRecord = createRecord(invalidJson);
 
         const sqsClient : any = createSQSExtClient("bucket-name");
