@@ -22,7 +22,7 @@ async function createEtaOAuthToken(
             audience: endpointApiAudience,
             grant_type: 'client_credentials'
         });
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             console.error(`method=createEtaOAuthToken returned status=${resp.status}`);
             return Promise.reject();
         }
@@ -100,18 +100,18 @@ async function getETA(
             'Authorization': `Bearer ${token}`,
             'Accept': 'application/json'
         },
-        validateStatus: (status) => status == 200 || status == 204 || status == 404
+        validateStatus: (status) => status === 200 || status === 204 || status === 404
     });
-    if (resp.status == 204) {
+    if (resp.status === 204) {
         console.log(`method=getETAs status=${resp.status} ship ${ship.imo} had speed lower than 0,2 knots or was at_anchor/moored/aground`);
         return Promise.resolve(null);
-    } else if (resp.status == 404) {
+    } else if (resp.status === 404) {
         console.log(`method=getETAs status=${resp.status} ship ${ship.imo} has not reported a position for more than 2 hours`);
         return Promise.resolve(null);
-    } else if (resp.status == 400) {
+    } else if (resp.status === 400) {
         console.error(`method=getETAs status=${resp.status} bad request`);
         return Promise.reject();
-    } else if (resp.status != 200) {
+    } else if (resp.status !== 200) {
         console.error(`method=getETAs status=${resp.status}`);
         return Promise.reject();
     }
@@ -138,12 +138,12 @@ export function getPortAreaGeometryForShip(
     portAreaGeometries: Port[],
     ship: DbETAShip): ETADestination | null {
 
-    const portByLocode = portAreaGeometries.find(g => g.locode == ship.locode);
+    const portByLocode = portAreaGeometries.find(g => g.locode === ship.locode);
     if (!portByLocode) {
         return null;
     }
 
-    const area = portByLocode.areas.find(a => a.portAreaCode == ship.port_area_code)
+    const area = portByLocode.areas.find(a => a.portAreaCode === ship.port_area_code)
     if (area) {
         console.log(`
             method=getETA

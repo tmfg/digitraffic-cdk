@@ -3,7 +3,7 @@ import {Location} from "../model/timestamp";
 let pilotwebToPortnetLocodeMap: {[key: string]: string} = {};
 
 function needInit(): boolean {
-    return Object.keys(pilotwebToPortnetLocodeMap).length == 0;
+    return Object.keys(pilotwebToPortnetLocodeMap).length === 0;
 }
 
 function initMap() {

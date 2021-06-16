@@ -7,7 +7,7 @@ const PILOTAGES_PATH = "/digitraffic/pilotages/active";
 export async function getMessages(host: string, authHeader: string): Promise<any> {
     let content = '';
 
-    const promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         https.request({
             host: host,
             path: PILOTAGES_PATH,
@@ -32,8 +32,6 @@ export async function getMessages(host: string, authHeader: string): Promise<any
             });
         }).end();
     });
-
-    return await promise;
 }
 
 export async function getMessagesOld(host: string, authHeader: string): Promise<any> {

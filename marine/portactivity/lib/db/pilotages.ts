@@ -1,4 +1,4 @@
-import { Location } from "lib/model/timestamp";
+import {Location} from "../model/timestamp";
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {Pilotage} from "../model/pilotage";
 

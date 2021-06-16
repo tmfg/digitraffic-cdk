@@ -27,7 +27,7 @@ const eventSourcePriorities = new Map<string, number>([
 ]);
 
 export function isPortnetTimestamp(timestamp: ApiTimestamp) {
-    return timestamp.source == EventSource.PORTNET;
+    return timestamp.source === EventSource.PORTNET;
 }
 
 export function getDisplayableNameForEventSource(eventSource: string): string {
@@ -83,19 +83,17 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
     let needToSort = false;
 
     for (const portcallTimestamps of byPortcallId) {
-        const vts_a = portcallTimestamps.filter(t => vtsASources.includes(t.source));
-        if (vts_a.length > 1) {
-
+        const vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source));
+        if (vtsAStamps.length > 1) {
             // build an average timestamp and discard the rest
             // use the source with the highest priority
-            ret = ret.filter(t => !vts_a.includes(t));
-            const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source)!), vts_a))!;
+            ret = ret.filter(t => !vtsAStamps.includes(t));
+            const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source)!), vtsAStamps))!;
             ret.push({ ...highestPriority, ...{
-                eventTime: momentAverage(vts_a.map(ts => moment(ts.eventTime)))
+                eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime)))
             }});
             needToSort = true;
         }
-
     }
 
     // re-sort as timestamp places can change after merging

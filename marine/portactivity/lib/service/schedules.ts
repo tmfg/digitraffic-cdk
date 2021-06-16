@@ -23,7 +23,7 @@ export function filterTimestamps(timestamps: ApiTimestamp[]) {
     return timestamps
         .filter(ts => locodes[ts.location.port] != null)
         .filter(ts =>
-            ts.eventType == EventType.ETD ? moment(ts.eventTime) >= moment().subtract(5, 'minutes') : true);
+            ts.eventType === EventType.ETD ? moment(ts.eventTime) >= moment().subtract(5, 'minutes') : true);
 }
 
 export function schedulesToTimestamps(resp: SchedulesResponse, calculated: boolean): ApiTimestamp[] {
