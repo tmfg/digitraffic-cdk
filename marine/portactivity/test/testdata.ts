@@ -44,7 +44,7 @@ export function newTimestamp(props?: {
             from: props?.from ?? someNumber().toString().slice(0,5)
         },
         portcallId: props?.portcallId ?? someNumber()
-    } as any;
+    };
 }
 
 export function newVessel(timestamp: ApiTimestamp): Vessel {

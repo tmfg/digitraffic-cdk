@@ -11,16 +11,14 @@ import {EventSource} from "../model/eventsource";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
     const message = await PilotwebAPI.getMessages(host, authHeader);
-
     const pilotages = JSON.parse(message) as Pilotage[];
 
     console.log("method=PortActivity.GetMessages source=Pilotweb receivedCount=%d", pilotages.length);
 
-    let updated = [] as Pilotage[];
     return await inDatabase(async (db: IDatabase<any, any>) => {
         const idMap = await PilotagesDAO.getTimestamps(db);
         const pilotageIds = await removeMissingPilotages(db, idMap, pilotages);
-        updated = await updateAllPilotages(db, idMap, pilotages);
+        const updated = await updateAllPilotages(db, idMap, pilotages);
 
         console.info("timestamps to remove " + JSON.stringify(pilotageIds));
 
@@ -60,9 +58,7 @@ async function removeMissingPilotages(db: IDatabase<any, any>, idMap: TimestampM
 }
 
 async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: Pilotage[]): Promise<ApiTimestamp[]> {
-    const timestamps = [] as ApiTimestamp[];
-
-    await Promise.allSettled(newAndUpdated.map(async p => {
+    return await Promise.all(newAndUpdated.map(async p => {
         const base = createApiTimestamp(p);
 
         if(base) {
@@ -70,7 +66,7 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
             const portcallId = await PilotagesDAO.findPortCallId(db, p, location);
 
             if (portcallId) {
-                timestamps.push({
+                return {
                     ...base, ...{
                         recordTime: p.scheduleUpdated,
                         source: EventSource.PILOTWEB,
@@ -82,14 +78,12 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
                         location,
                         portcallId
                     }
-                });
+                };
             }
+
+            return null;
         }
-
-        return Promise.resolve();
-    }));
-
-    return timestamps;
+    }).filter(x => x));
 }
 
 function createApiTimestamp(pilotage: Pilotage): any {

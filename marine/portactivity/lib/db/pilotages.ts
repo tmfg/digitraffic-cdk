@@ -75,13 +75,9 @@ export async function findPortCallId(db: IDatabase<any, any>, pilotage: Pilotage
 
     if(!p1 && !p2) {
         console.info("no portcalls found for %s or %s", location.port, location.from);
-    }
-
-    if(p1) {
+    } else if(p1) {
         return p1.port_call_id;
-    }
-
-    if(p2) {
+    } else if(p2) {
         return p2.port_call_id;
     }
 
