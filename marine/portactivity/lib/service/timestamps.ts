@@ -74,7 +74,8 @@ async function removeOldTimestamps(
 export async function findAllTimestamps(
     locode?: string,
     mmsi?: number,
-    imo?: number
+    imo?: number,
+    source?: string
 ): Promise<ApiTimestamp[]> {
     const start = Date.now();
     const timestamps: ApiTimestamp[] = await inDatabase(async (db: IDatabase<any, any>) => {
@@ -84,8 +85,11 @@ export async function findAllTimestamps(
             return TimestampsDB.findByMmsi(db, mmsi!!);
         } else if (imo) {
             return TimestampsDB.findByImo(db, imo!!);
+        } else if (source) {
+            return TimestampsDB.findBySource(db, source!!);
         }
-        throw new Error('No locode, mmsi or imo given');
+        console.warn('method=findAllTimestamps no locode, mmsi, imo or source given');
+        return [];
     }).finally(() => {
         console.info('method=findAllTimestamps tookMs=%d', (Date.now() - start));
     }).then((timestamps: DbTimestamp[]) => timestamps.map(e => ({

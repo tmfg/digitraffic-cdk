@@ -249,6 +249,39 @@ const SELECT_BY_IMO = `
     ORDER by pe.event_time
 `;
 
+const SELECT_BY_SOURCE = `
+    SELECT DISTINCT
+        pe.event_type,
+        pe.event_time,
+        pe.event_time_confidence_lower,
+        pe.event_time_confidence_lower_diff,
+        pe.event_time_confidence_upper,
+        pe.event_time_confidence_upper_diff,
+        pe.event_source,
+        pe.record_time,
+        pe.ship_mmsi,
+        pe.ship_imo,
+        pe.location_locode,
+        pe.location_portarea,
+        pe.location_from_locode,
+        pe.portcall_id,
+        pe.source_id
+    FROM port_call_timestamp pe
+    WHERE pe.record_time =
+          (
+              SELECT MAX(px.record_time) FROM port_call_timestamp px
+              WHERE px.event_type = pe.event_type AND
+                  px.location_locode = pe.location_locode AND
+                  px.ship_mmsi = pe.ship_mmsi AND
+                  px.event_source = pe.event_source AND
+                  px.portcall_id = pe.portcall_id
+          ) AND
+        pe.event_time > ${TIMESTAMPS_BEFORE} AND
+        pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
+        pe.event_source = $1
+    ORDER by pe.event_time
+`;
+
 const SELECT_BY_PORTCALL_ID_AND_LOCODE = `
     SELECT
     id,
@@ -348,6 +381,18 @@ export function findByImo(
         name: 'find-by-imo',
         text: SELECT_BY_IMO,
         values: [imo]
+    });
+    return db.tx(t => t.manyOrNone(ps));
+}
+
+export function findBySource(
+    db: IDatabase<any, any>,
+    source: string,
+): Promise<DbTimestamp[]> {
+    const ps = new PreparedStatement({
+        name: 'find-by-source',
+        text: SELECT_BY_SOURCE,
+        values: [source]
     });
     return db.tx(t => t.manyOrNone(ps));
 }

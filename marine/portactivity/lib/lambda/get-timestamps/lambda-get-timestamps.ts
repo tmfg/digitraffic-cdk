@@ -1,5 +1,5 @@
-import {findAllTimestamps} from "../../service/timestamps";
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import * as TimestampsService from "../../service/timestamps";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 export const handler = async (event: GetTimeStampsEvent): Promise<any> => {
     return handlerFn(event, withDbSecret);
@@ -13,12 +13,13 @@ export async function handlerFn(
         if (!event.locode && !event.mmsi && !event.imo) {
             return Promise.reject('Bad request');
         }
-        return findAllTimestamps(event.locode, event.mmsi, event.imo);
+        return TimestampsService.findAllTimestamps(event.locode, event.mmsi, event.imo, event.source);
     });
 }
 
-interface GetTimeStampsEvent {
-    locode?: string,
-    mmsi?: number,
-    imo?: number
+type GetTimeStampsEvent = {
+    readonly locode?: string
+    readonly mmsi?: number
+    readonly imo?: number
+    readonly source?: string
 }
