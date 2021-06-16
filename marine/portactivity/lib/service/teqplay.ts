@@ -1,7 +1,7 @@
 import * as TeqplayAPI from "../api/teqplay";
 import {Event} from "../model/teqplay-event";
 import {ApiTimestamp, EventType, Ship} from "../model/timestamp";
-import {EVENTSOURCE_TEQPLAY} from "../event-sourceutil";
+import {EventSource} from "../model/eventsource";
 
 const VALID_EVENT_TYPES = ['berth.eta.vessel'];
 
@@ -28,7 +28,7 @@ function convertToApiTimestamp(event: Event): ApiTimestamp {
         eventType: eventType,
         eventTime: event.eventTime,
         recordTime: event.recordTime,
-        source: EVENTSOURCE_TEQPLAY,
+        source: EventSource.TEQPLAY,
         ship: ship,
         location: {
             port: 'FIHEL',

@@ -1,40 +1,33 @@
 import {ApiTimestamp} from "./model/timestamp";
 import * as R from "ramda";
 import moment, {Moment} from "moment-timezone";
-
-export const EVENTSOURCE_VTS = "VTS";
-export const EVENTSOURCE_PORTNET = "Portnet";
-export const EVENTSOURCE_PORT_HANKO = "Port HKO";
-export const EVENTSOURCE_TEQPLAY = "Teqplay";
-export const EVENTSOURCE_SCHEDULES_VTS_CONTROL = 'SCHEDULES_VTS_CONTROLLED';
-export const EVENTSOURCE_SCHEDULES_CALCULATED = 'SCHEDULES_CALCULATED';
-export const EVENTSOURCE_PILOTWEB = 'Pilotweb';
-
-const DEFAULT_PRIORITY = -1;
+import {EventSource} from "./model/eventsource";
 
 export const VTS_A = 'VTS A';
 export const VTS_O = 'VTS O';
 
+const DEFAULT_PRIORITY = -1;
+
 export const eventSourceMap = new Map<string, string>([
-    [EVENTSOURCE_PORTNET, "PNET"],
-    [EVENTSOURCE_VTS, VTS_A],
-    [EVENTSOURCE_PORT_HANKO, EVENTSOURCE_PORT_HANKO],
-    [EVENTSOURCE_TEQPLAY, VTS_A],
-    [EVENTSOURCE_SCHEDULES_VTS_CONTROL, VTS_O],
-    [EVENTSOURCE_SCHEDULES_CALCULATED, VTS_A]
+    [EventSource.PORTNET, "PNET"],
+    [EventSource.VTS, VTS_A],
+    [EventSource.PORT_HANKO, EventSource.PORT_HANKO],
+    [EventSource.TEQPLAY, VTS_A],
+    [EventSource.SCHEDULES_VTS_CONTROL, VTS_O],
+    [EventSource.SCHEDULES_CALCULATED, VTS_A]
 ]);
 
 const eventSourcePriorities = new Map<string, number>([
-    [EVENTSOURCE_PORTNET, 10],
-    [EVENTSOURCE_VTS, 80],
-    [EVENTSOURCE_TEQPLAY, 85],
-    [EVENTSOURCE_SCHEDULES_CALCULATED, 90],
-    [EVENTSOURCE_SCHEDULES_VTS_CONTROL, 95],
-    [EVENTSOURCE_PORT_HANKO, 100]
+    [EventSource.PORTNET, 10],
+    [EventSource.VTS, 80],
+    [EventSource.TEQPLAY, 85],
+    [EventSource.SCHEDULES_CALCULATED, 90],
+    [EventSource.SCHEDULES_VTS_CONTROL, 95],
+    [EventSource.PORT_HANKO, 100]
 ]);
 
 export function isPortnetTimestamp(timestamp: ApiTimestamp) {
-    return timestamp.source == EVENTSOURCE_PORTNET;
+    return timestamp.source == EventSource.PORTNET;
 }
 
 export function getDisplayableNameForEventSource(eventSource: string): string {

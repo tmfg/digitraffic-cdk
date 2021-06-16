@@ -1,11 +1,11 @@
 import * as SchedulesService from "../../lib/service/schedules";
 import {SchedulesResponse} from "../../lib/api/schedules";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
-import {EVENTSOURCE_SCHEDULES_CALCULATED, EVENTSOURCE_SCHEDULES_VTS_CONTROL} from "../../lib/event-sourceutil";
 import {newTimestamp} from "../testdata";
 import moment from 'moment-timezone';
 import {getRandomNumber} from "../../../../common/test/testutils";
 import {getPortAreaGeometries} from "../../lib/service/portareas";
+import {EventSource} from "../../lib/model/eventsource";
 
 const uuid = '123123123';
 const vesselName = 'TEST';
@@ -124,5 +124,5 @@ function verifyStructure(ts: ApiTimestamp, eventType: EventType.ETA | EventType.
     expect(ts.eventType).toBe(eventType);
     expect(ts.eventTime).toBe(eventType == EventType.ETA ? etaEventTime : etdEventTime);
     expect(ts.recordTime).toBe(eventType == EventType.ETA ? etaTimestamp : etdTimestamp);
-    expect(ts.source).toBe(calculated ? EVENTSOURCE_SCHEDULES_CALCULATED : EVENTSOURCE_SCHEDULES_VTS_CONTROL)
+    expect(ts.source).toBe(calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL)
 }

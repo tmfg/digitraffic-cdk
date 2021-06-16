@@ -4,7 +4,7 @@ import {dbTestBase, insert, insertPortAreaDetails, insertPortCall,} from "../db-
 import {newPortAreaDetails, newPortCall, newTimestamp} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
-import {EVENTSOURCE_VTS} from "../../lib/event-sourceutil";
+import {EventSource} from "../../lib/model/eventsource";
 
 const EVENT_SOURCE = 'TEST';
 
@@ -354,7 +354,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const ts = newTimestamp({
             portcallId: 1,
             eventType: EventType.ETA,
-            source: EVENTSOURCE_VTS,
+            source: EventSource.VTS,
             eventTime
         });
         await insert(db, [ts]);
@@ -379,7 +379,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const ts = newTimestamp({
             portcallId: 1,
             eventType: EventType.ETA,
-            source: EVENTSOURCE_VTS,
+            source: EventSource.VTS,
             eventTime
         });
         await insert(db, [ts]);

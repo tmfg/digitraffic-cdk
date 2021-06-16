@@ -4,7 +4,7 @@ import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import {EventType} from "../../lib/model/timestamp";
 import {findByLocodePublicShiplist} from "../../lib/db/shiplist-public";
-import {EVENTSOURCE_PILOTWEB} from "../../lib/event-sourceutil";
+import {EventSource} from "../../lib/model/eventsource";
 
 describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -15,7 +15,7 @@ describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
             eventType: EventType.ETA,
             locode,
             eventTime: new Date(),
-            source: 'Portnet',
+            source: EventSource.PORTNET,
             portcallId
         });
         const timestamp2 = newTimestamp({
@@ -93,7 +93,7 @@ describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
             locode: destLocode,
             from: fromLocode,
             eventTime: new Date(),
-            source: EVENTSOURCE_PILOTWEB,
+            source: EventSource.PILOTWEB,
             portcallId
         });
         await insert(db, [timestamp]);

@@ -1,10 +1,10 @@
 import * as SchedulesApi from "../api/schedules";
 import {Destination, SchedulesResponse, Timestamp, Vessel} from "../api/schedules";
 import {ApiTimestamp, EventType} from "../model/timestamp";
-import {EVENTSOURCE_SCHEDULES_CALCULATED, EVENTSOURCE_SCHEDULES_VTS_CONTROL} from "../event-sourceutil";
 import {getPortAreaGeometries} from "./portareas";
 import * as R from 'ramda';
 import moment from 'moment-timezone';
+import {EventSource} from "../model/eventsource";
 
 // persist only locodes for specific ports
 const locodes = R.groupBy(R.prop('locode'), getPortAreaGeometries());
@@ -57,7 +57,7 @@ function toTimestamp(
         eventType,
         eventTime: ts.$.time,
         recordTime: ts.$.uts,
-        source: calculated ? EVENTSOURCE_SCHEDULES_CALCULATED : EVENTSOURCE_SCHEDULES_VTS_CONTROL,
+        source: calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL,
         ship: {
             mmsi: Number(vessel.$.mmsi),
             imo: Number(vessel.$.imo)

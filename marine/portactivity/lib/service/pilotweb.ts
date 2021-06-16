@@ -7,7 +7,7 @@ import {ApiTimestamp, EventType, Location} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
-import {EVENTSOURCE_PILOTWEB} from "../event-sourceutil";
+import {EventSource} from "../model/eventsource";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
     const message = await PilotwebAPI.getMessages(host, authHeader);
@@ -34,7 +34,7 @@ async function removeTimestamps(db: IDatabase<any, any>, pilotageIds: number[]) 
     if (pilotageIds && pilotageIds.length > 0) {
         const sourceIds = pilotageIds.map(id => id.toString());
 
-        const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EVENTSOURCE_PILOTWEB, sourceIds);
+        const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EventSource.PILOTWEB, sourceIds);
         console.log("removed " + timestampsRemoved);
     }
 }
@@ -73,7 +73,7 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
                 timestamps.push({
                     ...base, ...{
                         recordTime: p.scheduleUpdated,
-                        source: EVENTSOURCE_PILOTWEB,
+                        source: EventSource.PILOTWEB,
                         sourceId: p.id.toString(),
                         ship: {
                             mmsi: p.vessel.mmsi,

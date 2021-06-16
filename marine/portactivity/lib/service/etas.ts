@@ -3,7 +3,7 @@ import {getETAs, ShipETA} from '../api/etas';
 import {ApiTimestamp, EventType, validateTimestamp} from '../model/timestamp';
 import {saveTimestamps} from './timestamps';
 import {Port} from './portareas';
-import {EVENTSOURCE_VTS} from "../event-sourceutil";
+import {EventSource} from "../model/eventsource";
 
 export async function updateETATimestamps(
     endpointClientId: string,
@@ -22,7 +22,7 @@ export async function updateETATimestamps(
         ships,
         portAreaGeometries);
 
-    const etaToTimestampWithSource = etaToTimestamp(EVENTSOURCE_VTS);
+    const etaToTimestampWithSource = etaToTimestamp(EventSource.VTS);
     const timestamps: ApiTimestamp[] = etas
         .map(etaToTimestampWithSource)
         .filter(validateTimestamp);

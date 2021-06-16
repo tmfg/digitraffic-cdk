@@ -1,6 +1,6 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {EventType} from "../model/timestamp";
-import {EVENTSOURCE_PILOTWEB} from "../event-sourceutil";
+import {EventSource} from "../model/eventsource";
 
 export interface DbPublicShiplist {
     readonly event_type: EventType
@@ -40,7 +40,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
         THEN NOT EXISTS(SELECT px.id FROM port_call_timestamp px WHERE px.portcall_id = pe.portcall_id AND px.event_type = 'ATA')
         ELSE TRUE
         END AND
-        (pe.location_locode = $1 OR (pe.location_from_locode = $1 AND pe.event_source = '${EVENTSOURCE_PILOTWEB}'))
+        (pe.location_locode = $1 OR (pe.location_from_locode = $1 AND pe.event_source = '${EventSource.PILOTWEB}'))
     ORDER BY pe.event_time
 `;
 
