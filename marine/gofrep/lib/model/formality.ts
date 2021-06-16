@@ -2,7 +2,7 @@ export const FormalityResponse = `
 <MrsReportingFormality>
     <ReportingObligation>Required</ReportingObligation>
     <MrsName>GOFREP</MrsName>
-    <AreaCoveredByMrs></AreaCoveredByMrs>
+    <AreaCoveredByMrs>POLYGON((21.5 59.166667,22.5 59.555,22.501667 59.723333,22.836667 59.740833,22.836667 59.675,23.371667 59.675,23.55 59.7,24.725 59.925,25.033333 59.97,25.741667 59.991667,25.716667 60.093333,26.65 60.171667,26.765 60.201667,27.293333 60.2,26.816667 60.148333,26.5 60.083333,26.5 59.95,25.857667 59.904667,25.763167 59.888833,25.665 59.880667,25.179333 59.840167,25.1145 59.832833,24.596 59.775,24.523833 59.765167,24.480167 59.740333,24.363 59.740333,24.2995 59.730833,22.746667 59.500167,22.563333 59.466833,22.413333 59.4085,21.865333 59.1915,21.707333 59.1265,21.668 59.098,21.5 59.166667))</AreaCoveredByMrs>
     <Iso28005Payload>
         <![CDATA[<?xml version="1.0" encoding="utf-16"?>
         <EPCMessage xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.iso.org/28005-2">
