@@ -8,15 +8,29 @@ import {
     mergeTimestamps,
 } from "../event-sourceutil";
 import {Port} from "./portareas";
+import moment from 'moment-timezone';
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean
 }
 
-export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTimestamp> {
+export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTimestamp | null> {
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(async t => {
-            return doSaveTimestamp(t, timestamp);
+
+            const portcallId = timestamp.portcallId ?? (await TimestampsDB.findPortcallId(db,
+                timestamp.location.port,
+                timestamp.eventType,
+                moment(timestamp.eventTime).toDate(),
+                timestamp.ship.mmsi,
+                timestamp.ship.imo));
+
+            if (!portcallId) {
+                console.warn(`method=saveTimestamp portcall id for timestamp %s not found`, JSON.stringify(timestamp));
+                return null;
+            }
+
+            return doSaveTimestamp(t, { ...timestamp, ...{ portcallId }});
         });
     });
 }

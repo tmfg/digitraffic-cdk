@@ -6,6 +6,7 @@ import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 
 describe('db-timestamps - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+
     test('updateTimestamp - properties', async () => {
         const timestamp = newTimestamp({
             eventTimeConfidenceLower: 'PT1H',
@@ -109,14 +110,12 @@ describe('db-timestamps - updates', dbTestBase((db: pgPromise.IDatabase<any, any
         expect((await findAll(db))[0].portcall_id).toBe(portcallId);
     });
 
-    test('portcall id - deduced by nearest time', async () => {
+    test('findPortcallId - by nearest time', async () => {
         const eventTime = moment();
         const timestamp = newTimestamp({
             eventType: EventType.ETA,
             eventTime: eventTime.toDate()
         });
-        // @ts-ignore
-        timestamp.portcallId = null; // set to null to trigger automatic guessing of portcallid
         const portAreaDetails = await generatePortCalls(timestamp);
         const nearestTimestamp = // sort by nearest time
             portAreaDetails.sort((a, b) => {
@@ -125,9 +124,32 @@ describe('db-timestamps - updates', dbTestBase((db: pgPromise.IDatabase<any, any
                 return aDiff - bDiff;
             })[0];
 
-        await TimestampsDb.updateTimestamp(db, timestamp);
+        const portcallId = await TimestampsDb.findPortcallId(db,
+            timestamp.location.port,
+            timestamp.eventType,
+            moment(timestamp.eventTime).toDate(),
+            timestamp.ship.mmsi,
+            timestamp.ship.imo);
 
-        expect((await findAll(db))[0].portcall_id).toBe(nearestTimestamp.port_call_id);
+        expect(portcallId).toBe(nearestTimestamp.port_call_id);
+    });
+
+    test('findPortcallId - not found', async () => {
+        const eventTime = moment();
+        const timestamp = newTimestamp({
+            eventType: EventType.ETA,
+            eventTime: eventTime.toDate()
+        });
+        await generatePortCalls(timestamp);
+
+        const portcallId = await TimestampsDb.findPortcallId(db,
+            'NOT_FOUND',
+            timestamp.eventType,
+            moment(timestamp.eventTime).toDate(),
+            123,
+            456);
+
+        expect(portcallId).toBeNull();
     });
 
     async function generatePortCalls(timestamp: ApiTimestamp): Promise<PortAreaDetails[]> {

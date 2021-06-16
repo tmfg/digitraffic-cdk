@@ -9,6 +9,7 @@ import {newTimestamp} from "../testdata";
 const NOOP_WITH_SECRET = (secretId: string, fn: (secret: any) => Promise<void>) => fn({});
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+
     test('no records', async () => {
         await handlerFn(NOOP_WITH_SECRET);
     });
@@ -22,6 +23,19 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const allTimestamps = await findAll(db);
         expect(allTimestamps.length).toBe(1);
+    });
+
+    test('missing portcall id does not throw error', async () => {
+        const timestamp = newTimestamp();
+        // @ts-ignore
+        delete timestamp.portcallId;
+
+        await handlerFn(NOOP_WITH_SECRET)({
+            Records: [createRecord(timestamp)]
+        });
+
+        const allTimestamps = await findAll(db);
+        expect(allTimestamps.length).toBe(0);
     });
 
     test('single invalid record', async () => {
@@ -45,8 +59,8 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)]
         });
 
-        expect(promises.find(p => p.status == 'fulfilled')).toBeDefined();
-        expect(promises.find(p => p.status == 'rejected')).toBeDefined();
+        expect(promises.find((p: any) => p.status == 'fulfilled')).toBeDefined();
+        expect(promises.find((p: any) => p.status == 'rejected')).toBeDefined();
     });
 
 }));

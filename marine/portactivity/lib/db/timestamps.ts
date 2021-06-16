@@ -84,36 +84,7 @@ const INSERT_ESTIMATE_SQL = `
                (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE mmsi = $10),
                (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $10)
            ),
-           COALESCE(
-            $12,
-            (
-                SELECT pc.port_call_id
-                FROM public.port_call pc
-                JOIN public.port_area_details pac ON pac.port_call_id = pc.port_call_id
-                WHERE
-                    (
-                        pc.mmsi = COALESCE(
-                                $10,
-                                (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE imo = $11),
-                                (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE imo_lloyds = $11)
-                        )
-                        OR
-                        pc.imo_lloyds = COALESCE(
-                                $11,
-                                (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE mmsi = $10),
-                                (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $10)
-                        )
-                    ) AND
-                    pc.port_to_visit = $9::CHARACTER VARYING(5)
-                ORDER BY
-                    CASE
-                        WHEN $1 = 'ETA' THEN ABS(EXTRACT(EPOCH FROM pac.eta - $2))
-                        WHEN $1 = 'ATA' THEN ABS(EXTRACT(EPOCH FROM pac.ata - $2))
-                        WHEN $1 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $2))
-                        END
-                LIMIT 1
-            )
-           ),
+           $12,
            $13,
            $14,
            $15
@@ -302,6 +273,32 @@ const REMOVE_TIMESTAMPS_SQL = `
     returning id
 `;
 
+const FIND_PORTCALL_ID_SQL = `
+    SELECT pc.port_call_id
+    FROM public.port_call pc
+    JOIN public.port_area_details pac ON pac.port_call_id = pc.port_call_id
+    WHERE (
+        pc.mmsi = COALESCE(
+            $1,
+            (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE imo = $2),
+            (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE imo_lloyds = $2)
+        )
+        OR
+        pc.imo_lloyds = COALESCE(
+            $2,
+            (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE mmsi = $1),
+            (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $1)
+        )
+    ) AND pc.port_to_visit = $3::CHARACTER VARYING(5)
+    ORDER BY
+        CASE
+        WHEN $4 = 'ETA' THEN ABS(EXTRACT(EPOCH FROM pac.eta - $5))
+        WHEN $4 = 'ATA' THEN ABS(EXTRACT(EPOCH FROM pac.ata - $5))
+        WHEN $4 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $5))
+        END
+    LIMIT 1
+`;
+
 export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: 'update-timestamps',
@@ -404,6 +401,26 @@ export function deleteById(
         values: [id]
     });
     return db.none(ps);
+}
+
+export async function findPortcallId(
+    db: IDatabase<any, any>,
+    locode: string,
+    eventType: EventType,
+    eventTime: Date,
+    mmsi?: number,
+    imo?: number,
+): Promise<number | null> {
+    const ps = new PreparedStatement({
+        name: 'find-portcall-id',
+        text: FIND_PORTCALL_ID_SQL,
+        values: [mmsi, imo, locode, eventType, eventTime]
+    });
+    const ret = await db.oneOrNone(ps);
+    if (ret) {
+        return ret.port_call_id;
+    }
+    return null;
 }
 
 export function createUpdateValues(e: ApiTimestamp): any[] {

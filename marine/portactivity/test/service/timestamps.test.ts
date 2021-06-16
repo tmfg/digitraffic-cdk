@@ -62,7 +62,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         await TimestampsService.saveTimestamp(olderTimestamp);
         const ret = await TimestampsService.saveTimestamp(newerTimestamp);
 
-        expect(ret.locodeChanged).toBe(false);
+        expect(ret?.locodeChanged).toBe(false);
         expect((await findAll(db)).length).toBe(2);
     });
 
@@ -73,7 +73,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         await TimestampsService.saveTimestamp(olderTimestamp);
         const ret = await TimestampsService.saveTimestamp(newerTimestamp);
 
-        expect(ret.locodeChanged).toBe(true);
+        expect(ret?.locodeChanged).toBe(true);
         expect((await TimestampsService.findAllTimestamps(olderTimestamp.location.port)).length).toBe(0);
         expect((await TimestampsService.findAllTimestamps(newerTimestamp.location.port)).length).toBe(1);
     });
