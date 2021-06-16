@@ -103,8 +103,11 @@ export function getTrackingJsonWith3Observations(id: string, tyokoneId?: string)
 export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(id: string, tyokoneId?: string): string {
     const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
     const trackingJson = JSON.parse(validJson);
-    trackingJson.otsikko.lahettaja.jarjestelma = null;
-    delete trackingJson.otsikko.lahettaja.jarjestelma;
+    if ( Math.round(Math.random()) > 0 ) { // -> rounds to 0 or 1
+        trackingJson.otsikko.lahettaja.jarjestelma = null;
+    } else {
+        delete trackingJson.otsikko.lahettaja.jarjestelma;
+    }
     return JSON.stringify(trackingJson);
 }
 
