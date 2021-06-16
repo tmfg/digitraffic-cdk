@@ -58,7 +58,7 @@ async function removeMissingPilotages(db: IDatabase<any, any>, idMap: PilotagesD
 }
 
 async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: Pilotage[]): Promise<ApiTimestamp[]> {
-    return Promise.all(newAndUpdated.map(async p => {
+    return (await Promise.all(newAndUpdated.map(async p => {
         const base = createApiTimestamp(p);
 
         if(base) {
@@ -83,7 +83,7 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
 
             return null;
         }
-    }).filter(x => x));
+    }))).filter(x => x != null);
 }
 
 function createApiTimestamp(pilotage: Pilotage): any {
