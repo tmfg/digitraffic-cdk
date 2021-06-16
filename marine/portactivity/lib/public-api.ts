@@ -86,13 +86,15 @@ function createTimestampsResource(
         requestParameters: {
             'integration.request.querystring.locode': 'method.request.querystring.locode',
             'integration.request.querystring.mmsi': 'method.request.querystring.mmsi',
-            'integration.request.querystring.imo': 'method.request.querystring.imo'
+            'integration.request.querystring.imo': 'method.request.querystring.imo',
+            'integration.request.querystring.source': 'method.request.querystring.source',
         },
         requestTemplates: {
             'application/json': JSON.stringify({
                 locode: "$util.escapeJavaScript($input.params('locode'))",
                 mmsi: "$util.escapeJavaScript($input.params('mmsi'))",
-                imo: "$util.escapeJavaScript($input.params('imo'))"
+                imo: "$util.escapeJavaScript($input.params('imo'))",
+                source: "$util.escapeJavaScript($input.params('source'))"
             })
         }
     });
@@ -103,7 +105,8 @@ function createTimestampsResource(
         requestParameters: {
             'method.request.querystring.locode': false,
             'method.request.querystring.mmsi': false,
-            'method.request.querystring.imo': false
+            'method.request.querystring.imo': false,
+            'method.request.querystring.source': false
         },
         requestValidator: validator,
         methodResponses: [
