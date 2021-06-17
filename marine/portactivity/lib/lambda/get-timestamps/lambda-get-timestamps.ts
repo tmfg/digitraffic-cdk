@@ -10,7 +10,7 @@ export async function handlerFn(
     withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>) => Promise<any>): Promise<any> {
 
     return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
-        if (!event.locode && !event.mmsi && !event.imo) {
+        if (!event.locode && !event.mmsi && !event.imo && !event.source) {
             return Promise.reject('Bad request');
         }
         return TimestampsService.findAllTimestamps(event.locode, event.mmsi, event.imo, event.source);
