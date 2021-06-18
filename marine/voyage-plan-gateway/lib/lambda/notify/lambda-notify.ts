@@ -15,6 +15,10 @@ export enum NotificationType {
     ERROR_MESSAGE = 'ERROR_MESSAGE'
 }
 
+type NotifyEventWrapper = {
+    readonly body: string
+}
+
 type NotifyEvent = {
     // Notification body, optional
     readonly Body?: string
@@ -44,8 +48,10 @@ type NotifyEvent = {
     readonly Subject: string
 }
 
-export function handlerFn(sns: SNS): (e: NotifyEvent) => Promise<any> {
-    return async (event: NotifyEvent): Promise<{statusCode: string}> => {
+export function handlerFn(sns: SNS): (e: NotifyEventWrapper) => Promise<any> {
+    return async (wrapper: NotifyEventWrapper): Promise<{statusCode: string}> => {
+        const event: NotifyEvent = JSON.parse(wrapper.body);
+
         if (event.MessageWaiting > 50) {
             console.warn('method=vpgwVisNotify More than 50 messages waiting, processing messages anyway');
         }

@@ -71,7 +71,7 @@ function createIntegrationResource(
     resource.addMethod("POST", integration, {
         apiKeyRequired: true,
         methodResponses: [
-            { statusCode: '200' }
+            { statusCode: '204' }
         ]
     });
 }
