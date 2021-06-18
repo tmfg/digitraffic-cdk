@@ -62,9 +62,7 @@ function handleRecord(record: KinesisStreamRecord): string {
         return "";
     }
 
-    const logLine = transform(awslogsData);
-
-    return logLine;
+    return transform(awslogsData);
 }
 
 function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkData: string) {
@@ -98,7 +96,7 @@ export function post(body: string, callback: any) {
 
     console.log("sending POST to es unCompressedSize=%d", body.length);
 
-    if(body.length == 0) {
+    if(body.length === 0) {
         return;
     }
 
@@ -110,10 +108,10 @@ export function post(body: string, callback: any) {
     req.body = body;
     req.headers["Content-Type"] = "application/json";
 
-    let signer = new AWS.Signers.V4(req, "es");
+    const signer = new AWS.Signers.V4(req, "es");
     signer.addAuthorization(creds, new Date());
 
-    let send = new AWS.NodeHttpClient();
+    const send = new AWS.NodeHttpClient();
     send.handleRequest(
         req,
         null,
@@ -125,7 +123,6 @@ export function post(body: string, callback: any) {
             response.on("end", function(chunk: any) {
                 const parsedValues = parseESReturnValue(response, respBody);
 
-//                console.log("Response: " + respBody);
                 callback(parsedValues.error, parsedValues.success, response.statusCode, parsedValues.failedItems);
             });
         },
@@ -136,13 +133,13 @@ export function post(body: string, callback: any) {
     );
 }
 
-export function transform(payload: CloudWatchLogsDecodedData, filterIds: string[] = []): string {
+export function transform(payload: CloudWatchLogsDecodedData, idsToFilter: string[] = []): string {
     let bulkRequestBody = "";
 
-    payload.logEvents.filter((e: any) => !filterIds.includes(e.id)).forEach((logEvent: any) => {
-        if (isLambdaLifecycleEvent(logEvent.message)) {
-            return;
-        }
+    payload.logEvents
+        .filter((e: any) => !idsToFilter.includes(e.id))
+        .filter((e: any) => !isLambdaLifecycleEvent(e))
+        .forEach((logEvent: any) => {
 
         const app = getAppFromSenderAccount(payload.owner, knownAccounts);
         const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
@@ -150,7 +147,7 @@ export function transform(payload: CloudWatchLogsDecodedData, filterIds: string[
 
         const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
 
-        let source = buildSource(logEvent.message, logEvent.extractedFields) as any;
+        const source = buildSource(logEvent.message, logEvent.extractedFields) as any;
         source["@id"] = logEvent.id;
         source["@timestamp"] = new Date(1 * logEvent.timestamp).toISOString();
         source["level"] = messageParts[2];
@@ -160,7 +157,7 @@ export function transform(payload: CloudWatchLogsDecodedData, filterIds: string[
         source["fields"] = {app: appName};
         source["@transport_type"] = app;
 
-        let action = { index: { _id: logEvent.id, _index: null } } as any;
+        const action = { index: { _id: logEvent.id, _index: null } } as any;
         action.index._index = getIndexName(appName, logEvent.timestamp);
         action.index._type = 'doc';
 
@@ -186,11 +183,11 @@ export function buildSource(message: string, extractedFields: CloudWatchLogsLogE
         .replace(/\f/g, "\\f");
 
     if (extractedFields) {
-        let source = new Array() as any;
+        const source = new Array() as any;
 
-        for (let key in extractedFields) {
+        for (const key in extractedFields) {
             if (extractedFields.hasOwnProperty(key) && extractedFields[key]) {
-                let value = extractedFields[key];
+                const value = extractedFields[key];
 
                 if (isNumeric(value)) {
                     source[key] = 1 * (value as any);

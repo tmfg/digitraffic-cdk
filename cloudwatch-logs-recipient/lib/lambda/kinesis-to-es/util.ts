@@ -11,7 +11,9 @@ export function getIndexName(appName: string, timestampFromEvent: any): string {
 }
 
 export function buildFromMessage(message: string): any {
-    if(skipElasticLogging(message)) return {};
+    if(skipElasticLogging(message)) {
+        return {};
+    }
 
     message = message.replace('[, ]', '[0.0,0.0]')
         .replace(/\"Infinity\"/g, "-1")
@@ -42,14 +44,14 @@ export function buildFromMessage(message: string): any {
 }
 
 function skipElasticLogging(message: string): boolean {
-    if(message.includes("<?xml")) return true;
-
-    return false;
+    return message.includes("<?xml") || message.startsWith("DEBUG");
 }
 
 export function extractJson(message: string): any {
     const jsonStart = message.indexOf("{");
-    if (jsonStart < 0) return null;
+    if (jsonStart < 0) {
+        return null;
+    }
     const jsonSubString = message.substring(jsonStart);
     return isValidJson(jsonSubString) ? jsonSubString : null;
 }
@@ -99,7 +101,9 @@ export function filterIds(body: string, ids: string[]): string {
 
 function containsIds(line: string, ids: string[]): boolean {
     for(const id of ids) {
-        if(line.indexOf(id) != -1) return true;
+        if(line.indexOf(id) != -1) {
+            return true;
+        }
     }
 
     return false;
