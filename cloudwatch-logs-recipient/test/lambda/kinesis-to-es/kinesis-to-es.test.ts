@@ -70,7 +70,7 @@ describe('kinesis-to-es', () => {
             logEvents: [logEvent]
         };
 
-        const transformed = transform(data);
+        const transformed = transform(data, {});
 
         expect(transformed).toBe('{"index":{"_id":"some-id","_index":"someapp-someenv-lambda-1970.01","_type":"doc"}}\n' +
             '{"log_line":"\\bmessage\\b","@id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","@log_group":"","@app":"someapp-someenv-lambda","fields":{"app":"someapp-someenv-lambda"},"@transport_type":"someapp"}\n');

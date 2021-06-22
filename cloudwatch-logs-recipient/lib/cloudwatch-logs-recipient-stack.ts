@@ -1,11 +1,10 @@
 ///<reference path="../lib/app-props.d.ts"/>
-import {Stack, StackProps, Construct}  from '@aws-cdk/core';
+import {Stack, StackProps, Construct, Duration}  from '@aws-cdk/core';
 import {Role, ServicePrincipal, PolicyStatement} from '@aws-cdk/aws-iam';
 import {CrossAccountDestination, CfnDestination, RetentionDays} from '@aws-cdk/aws-logs';
 import {Stream} from '@aws-cdk/aws-kinesis';
 import {Function, FunctionProps, AssetCode, Runtime, StartingPosition} from '@aws-cdk/aws-lambda';
 import {KinesisEventSource} from '@aws-cdk/aws-lambda-event-sources';
-import {Duration} from "@aws-cdk/core";
 import {Topic} from '@aws-cdk/aws-sns';
 import {EmailSubscription} from '@aws-cdk/aws-sns-subscriptions';
 

@@ -8,7 +8,7 @@ export class AppLogsSubscriptionStack extends Stack {
         super(scope, id, props);
 
         const kinesisStream = Stream.fromStreamArn(this, 'kinesis-stream', appProps.destinationArn);
-        const kinesisDestination = new KinesisDestination(kinesisStream);;
+        const kinesisDestination = new KinesisDestination(kinesisStream);
 
         appProps.logGroupNames.forEach(name => this.createSubscriptions(scope, kinesisDestination, name));
     }

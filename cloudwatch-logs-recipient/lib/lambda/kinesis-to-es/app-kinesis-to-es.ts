@@ -120,8 +120,11 @@ function transform(payload: CloudWatchLogsDecodedData, statistics: any): string 
         action.index._index = indexName;
 
         // update statistics
-        if(!statistics[indexName]) statistics[indexName] = 1;
-        else statistics[indexName] = statistics[indexName] + 1;
+        if(!statistics[indexName]) {
+            statistics[indexName] = 1;
+        } else {
+            statistics[indexName] = statistics[indexName] + 1;
+        }
 
         bulkRequestBody += [
             JSON.stringify(action),

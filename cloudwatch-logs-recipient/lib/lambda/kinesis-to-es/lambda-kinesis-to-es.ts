@@ -30,24 +30,32 @@ const region = endpointParts[2];
 const MAX_BODY_SIZE = 1000000;
 
 export const handler = (event: KinesisStreamEvent, context: Context, callback: any): void => {
-    let batchBody = "";
+    const statistics = {};
 
-    event.Records.forEach((record: KinesisStreamRecord) => {
-        const recordBody = handleRecord(record);
-        batchBody += recordBody;
+    try {
+        let batchBody = "";
 
-        if (batchBody.length > MAX_BODY_SIZE) {
+        event.Records.forEach((record: KinesisStreamRecord) => {
+            const recordBody = handleRecord(record, statistics);
+            batchBody += recordBody;
+
+            if (batchBody.length > MAX_BODY_SIZE) {
+                postToElastic(context, true, batchBody);
+                batchBody = "";
+            }
+        });
+
+        if (batchBody.length > 0) {
             postToElastic(context, true, batchBody);
-            batchBody = "";
         }
-    });
-
-    if (batchBody.length > 0) {
-        postToElastic(context, true, batchBody);
+    } catch (e) {
+        console.log('ERROR ', e);
+    } finally {
+        console.log("statistics " + JSON.stringify(statistics));
     }
 };
 
-function handleRecord(record: KinesisStreamRecord): string {
+function handleRecord(record: KinesisStreamRecord, statistics: any): string {
     const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
@@ -62,7 +70,7 @@ function handleRecord(record: KinesisStreamRecord): string {
         return "";
     }
 
-    return transform(awslogsData);
+    return transform(awslogsData, statistics);
 }
 
 function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkData: string) {
@@ -133,12 +141,12 @@ export function post(body: string, callback: any) {
     );
 }
 
-export function transform(payload: CloudWatchLogsDecodedData, idsToFilter: string[] = []): string {
+export function transform(payload: CloudWatchLogsDecodedData, statistics: any, idsToFilter: string[] = []): string {
     let bulkRequestBody = "";
 
     payload.logEvents
         .filter((e: any) => !idsToFilter.includes(e.id))
-        .filter((e: any) => !isLambdaLifecycleEvent(e))
+        .filter((e: any) => !isLambdaLifecycleEvent(e.message))
         .forEach((logEvent: any) => {
 
         const app = getAppFromSenderAccount(payload.owner, knownAccounts);
@@ -160,6 +168,13 @@ export function transform(payload: CloudWatchLogsDecodedData, idsToFilter: strin
         const action = { index: { _id: logEvent.id, _index: null } } as any;
         action.index._index = getIndexName(appName, logEvent.timestamp);
         action.index._type = 'doc';
+
+        // update statistics
+        if(!statistics[payload.logGroup]) {
+            statistics[payload.logGroup] = 1;
+        } else {
+            statistics[payload.logGroup] = statistics[payload.logGroup] + 1;
+        }
 
         bulkRequestBody +=
             [JSON.stringify(action), JSON.stringify(source)].join("\n") + "\n";
