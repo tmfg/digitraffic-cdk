@@ -142,44 +142,39 @@ export function post(body: string, callback: any) {
 }
 
 export function transform(payload: CloudWatchLogsDecodedData, statistics: any, idsToFilter: string[] = []): string {
-    let bulkRequestBody = "";
-
-    payload.logEvents
+    return payload.logEvents
         .filter((e: any) => !idsToFilter.includes(e.id))
         .filter((e: any) => !isLambdaLifecycleEvent(e.message))
-        .forEach((logEvent: any) => {
+        .map((logEvent: any) => {
+            const app = getAppFromSenderAccount(payload.owner, knownAccounts);
+            const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
+            const appName = `${app}-${env}-lambda`;
 
-        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
-        const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
-        const appName = `${app}-${env}-lambda`;
+            const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
 
-        const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
+            const source = buildSource(logEvent.message, logEvent.extractedFields);
+            source["@id"] = logEvent.id;
+            source["@timestamp"] = new Date(1 * logEvent.timestamp).toISOString();
+            source["level"] = messageParts[2];
+            source["message"] = messageParts[3];
+            source["@log_group"] = payload.logGroup;
+            source["@app"] = appName;
+            source["fields"] = {app: appName};
+            source["@transport_type"] = app;
 
-        const source = buildSource(logEvent.message, logEvent.extractedFields) as any;
-        source["@id"] = logEvent.id;
-        source["@timestamp"] = new Date(1 * logEvent.timestamp).toISOString();
-        source["level"] = messageParts[2];
-        source["message"] = messageParts[3];
-        source["@log_group"] = payload.logGroup;
-        source["@app"] = appName;
-        source["fields"] = {app: appName};
-        source["@transport_type"] = app;
+            const action = { index: { _id: logEvent.id, _index: null } } as any;
+            action.index._index = getIndexName(appName, logEvent.timestamp);
+            action.index._type = 'doc';
 
-        const action = { index: { _id: logEvent.id, _index: null } } as any;
-        action.index._index = getIndexName(appName, logEvent.timestamp);
-        action.index._type = 'doc';
+            // update statistics
+            if(!statistics[payload.logGroup]) {
+                statistics[payload.logGroup] = 1;
+            } else {
+                statistics[payload.logGroup] = statistics[payload.logGroup] + 1;
+            }
 
-        // update statistics
-        if(!statistics[payload.logGroup]) {
-            statistics[payload.logGroup] = 1;
-        } else {
-            statistics[payload.logGroup] = statistics[payload.logGroup] + 1;
-        }
-
-        bulkRequestBody +=
-            [JSON.stringify(action), JSON.stringify(source)].join("\n") + "\n";
-    });
-    return bulkRequestBody;
+            return [JSON.stringify(action), JSON.stringify(source)].join("\n");
+        }).join("\n") + "\n"; // must end with new-line
 }
 
 export function isLambdaLifecycleEvent(message: string) {
