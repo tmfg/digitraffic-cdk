@@ -36,7 +36,9 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "1.107.0",
+    "@aws-cdk/aws-ecs": "1.107.0",
     "@aws-cdk/aws-events-targets": "1.107.0",
+    "@aws-cdk/aws-lambda": "1.107.0",
     "@aws-cdk/core": "1.107.0",
     "axios": "^0.21.1",
     "pg-native": "3.0.0",

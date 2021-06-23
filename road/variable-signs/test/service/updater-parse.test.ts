@@ -1,14 +1,14 @@
-import {parseDatex} from "../../lib/service/variable-sign-updater";
+import {parseSituations} from "../../lib/service/variable-sign-updater";
 
 describe('updater-parse-tests', () => {
     test('parse_empty', () => {
-        const situations = parseDatex("");
+        const situations = parseSituations("");
 
         expect(situations.length).toEqual(0);
     });
 
     test('parse_1', () => {
-        const situations = parseDatex(TEST_DATEX2);
+        const situations = parseSituations(TEST_DATEX2);
 
         expect(situations.length).toEqual(2);
         expect(situations[0].id).toEqual('KRM043951');
@@ -16,7 +16,7 @@ describe('updater-parse-tests', () => {
     });
 
     test('parse_2', () => {
-        const situations = parseDatex(TEST_DATEX2_2);
+        const situations = parseSituations(TEST_DATEX2_2);
 
         expect(situations.length).toEqual(2);
         expect(situations[0].id).toEqual('KRM01');

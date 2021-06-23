@@ -25,7 +25,7 @@ const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 `;
 
 export async function findActiveSignsDatex2(): Promise<any> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
+    return inDatabase(async (db: IDatabase<any,any>) => {
         const datex2 : string[] = (await DatexDB.findAll(db)).map(d => d.datex2);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.VS_DATEX2);
 

@@ -16,14 +16,14 @@ import {
     RESPONSE_400_BAD_REQUEST
 } from "../../../common/api/responses";
 import {createSubscription} from "../../../common/stack/subscription";
-import {addQueryParameterDescription, addTags, addTagsAndSummary} from "../../../common/api/documentation";
-import {BETA_TAGS, DATA_V1_TAGS} from "../../../common/api/tags";
+import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
+import {DATA_V1_TAGS} from "../../../common/api/tags";
 import {MessageModel} from "../../../common/api/response";
 import {createRestApi} from "../../../common/api/rest_apis";
 import {MediaType} from "../../../common/api/mediatypes";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
-    const publicApi = createRestApi(stack, 'VariableSigns-public', 'Variable Signs public API', undefined);
+    const publicApi = createRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');
 
     createUsagePlan(publicApi, 'VariableSigns Api Key', 'VariableSigns Usage Plan');
 

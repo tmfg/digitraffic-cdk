@@ -31,5 +31,5 @@ export function saveDatex2(db: IDatabase<any, any>, situations: Situation[], tim
 }
 
 export async function findAll(db: IDatabase<any, any>): Promise<any[]> {
-    return await db.any(FIND_ALL_PS);
+    return db.any(FIND_ALL_PS);
 }

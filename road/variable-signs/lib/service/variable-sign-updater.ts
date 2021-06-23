@@ -2,7 +2,6 @@ import * as DeviceDB from "../db/datex2";
 import * as LastUpdatedDB from "../../../../common/db/last-updated";
 import {inDatabase} from "../../../../common/postgres/database";
 import {IDatabase} from "pg-promise";
-import {DataType} from "../../../../common/db/last-updated";
 
 const REG_PAYLOAD = /\<payloadPublication/g;
 
@@ -27,13 +26,13 @@ export async function updateDatex2(datex2: string): Promise<any> {
         return {statusCode: 400}
     }
 
-    const situations = parseDatex(datex2);
+    const situations = parseSituations(datex2);
 
     await inDatabase(async (db: IDatabase<any,any>) => {
-        return await db.tx((tx: any) => {
+        return db.tx((tx: any) => {
             return tx.batch([
                 ...DeviceDB.saveDatex2(tx, situations, timestamp),
-                LastUpdatedDB.updateLastUpdated(tx, DataType.VS_DATEX2, timestamp)
+                LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp)
             ]);
         })
     }).then(() => {
@@ -44,13 +43,7 @@ export async function updateDatex2(datex2: string): Promise<any> {
     return {statusCode: 200};
 }
 
-export function parseDatex(datex2: string): Situation[] {
-    const situations: Situation[] = parseSituations(datex2);
-
-    return situations;
-}
-
-function parseSituations(datex2: string): Situation[] {
+export function parseSituations(datex2: string): Situation[] {
     const situations: Situation[] = [];
     let index = 0;
 
@@ -59,7 +52,7 @@ function parseSituations(datex2: string): Situation[] {
     while(true) {
         const sitIndex = datex2.indexOf(DATEX2_SITUATION_TAG_START, index)
 
-        if(sitIndex == -1) {
+        if(sitIndex === -1) {
             break;
         }
 
@@ -100,7 +93,7 @@ function validate(datex2: string): boolean {
     }
 
     const ppCount = occurrences(datex2, REG_PAYLOAD);
-    if(ppCount != 1) {
+    if(ppCount !== 1) {
         console.error('%d payloadPublications', ppCount);
         return false;
     }

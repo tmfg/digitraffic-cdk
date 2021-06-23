@@ -22,14 +22,19 @@ function validate(text: string): string {
 }
 
 function checkSize(text: string) {
-    if (text.length < 1) error("No content");
-    if (text.length > MAX_LENGTH) error("Max length is " + MAX_LENGTH);
+    if (text.length < 1) {
+        error("No content");
+    } else if (text.length > MAX_LENGTH) {
+        error("Max length is " + MAX_LENGTH);
+    }
 }
 
 function checkUnderlines(text: string) {
     const count = text.split('_').length - 1;
 
-    if(count > 1) error("Text can only contain 1 _");
+    if(count > 1) {
+        error("Text can only contain 1 _");
+    }
 }
 
 // text can be enclosed in brackets, but no more brackets can be used
@@ -42,13 +47,18 @@ function checkAndRemoveBrackets(text: string): string {
 
     if(firstChar === '[') {
         // ok, last char must be ]
-        if(lastChar !== ']') error("Text must be in form of [text] or text");
-        if(count1 > 1 || count2 > 1) error("Text must be in form of [text] or text");
+        if(lastChar !== ']') {
+            error("Text must be in form of [text] or text");
+        } else if(count1 > 1 || count2 > 1) {
+            error("Text must be in form of [text] or text");
+        }
 
         return text.substring(1, text.length - 1);
     }
 
-    if(count1 > 0 || count2 > 0) error("Text must be in form of [text] or text");
+    if(count1 > 0 || count2 > 0) {
+        error("Text must be in form of [text] or text");
+    }
 
     return text;
 }
@@ -79,14 +89,12 @@ function creteSvg(symbolList: Symbol[]): string {
 
 // convert given string-list to list of symbols, add end if needed
 function convertToSymbols(symbols: Symbols): Symbol[] {
-//    console.info("symbols " + symbols);
-
     const symbolList = symbols.symbols.map(s => findSymbol(symbols.symbolType, s));
 
-//    console.info("first type " + JSON.stringify(symbolList[0]));
-
     // and end symbol, if first symbol is starting borders
-    if(symbolList[0].startsBorders()) symbolList.push(findSymbol(symbols.symbolType, 'END'));
+    if(symbolList[0].startsBorders()) {
+        symbolList.push(findSymbol(symbols.symbolType, 'END'));
+    }
 
     return symbolList;
 }
@@ -97,19 +105,21 @@ function convertToSymbols(symbols: Symbols): Symbol[] {
 function findUsedSymbolTexts(text: string): Symbols {
     const singleSymbol = findSingleSymbol(text);
 
-    if(singleSymbol) return {
-        symbolType: SymbolType.SINGLE,
-        symbols: [singleSymbol]
+    if(singleSymbol) {
+        return {
+            symbolType: SymbolType.SINGLE,
+            symbols: [singleSymbol]
+        }
     }
 
     let index = 0;
-    let symbolList = [] as string[];
+    const symbolList = [] as string[];
     let symbolType = SymbolType.NORMAL;
 
     while(index < text.length) {
         const mark = text.indexOf('_', index);
         let symbol;
-        if(mark != -1) {
+        if(mark !== -1) {
             const symbolText = text.substring(index, mark + 1);
             symbolType = getSymbolType(symbolText.toUpperCase());
             symbol = getSymbol(symbolText.toUpperCase());
@@ -122,11 +132,9 @@ function findUsedSymbolTexts(text: string): Symbols {
         }
 
         if(isValidSymbol(symbolType, symbol)) {
-//            console.info("adding symbol " + symbol);
-
             symbolList.push(symbol);
         } else {
-            throw error("invalid symbol " + symbol + " for " + symbolType);
+            throw error(`invalid symbol ${symbol} for ${symbolType}`);
         }
     }
 
@@ -139,8 +147,11 @@ function findUsedSymbolTexts(text: string): Symbols {
 const BEGIN_SYMBOLS = [InputSymbols.ROAD.toString(), InputSymbols.DETOUR.toString(), InputSymbols.DIVERSION.toString()];
 
 function getSymbol(text: string): string {
-    if(text === InputSymbols.RAMP) return "RAMPPI_BEGIN";
-    if(BEGIN_SYMBOLS.includes(text)) return "BEGIN";
+    if(text === InputSymbols.RAMP) {
+        return "RAMPPI_BEGIN";
+    } else if(BEGIN_SYMBOLS.includes(text)) {
+        return "BEGIN";
+    }
 
     return text;
 }

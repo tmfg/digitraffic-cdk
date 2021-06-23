@@ -176,12 +176,18 @@ addSingle('ARROW_BOTTOM_RIGHT', 32, `<rect x="4.9" y="11.9" transform="matrix(0.
    <polygon points="24.5,16 24.5,24.5 16,24.5"/>`, 'NUOLI_OIKEAALAS');
 
 export function getSymbolType(first: string): SymbolType {
-    if(first === InputSymbols.ROAD) return SymbolType.ROAD;
-    if(first === InputSymbols.DETOUR) return SymbolType.DETOUR;
-    if(first === InputSymbols.DIVERSION) return SymbolType.DIVERSION;
-    if(first === InputSymbols.RAMP) return SymbolType.ROAD;
-
-    return SymbolType.NORMAL;
+    switch(first) {
+        case InputSymbols.ROAD:
+            return SymbolType.ROAD;
+        case InputSymbols.DETOUR:
+            return SymbolType.DETOUR;
+        case InputSymbols.DIVERSION:
+            return SymbolType.DIVERSION;
+        case InputSymbols.RAMP:
+            return SymbolType.ROAD;
+        default:
+            return SymbolType.NORMAL;
+    };
 }
 
 // put all versions of symbol to cache with correct borders:
@@ -190,8 +196,8 @@ export function getSymbolType(first: string): SymbolType {
 // VARATIE_ID       symbol with varatie borders
 // DIVERSION_ID     symbol with diversion borders
 function addSymbol(name: string, width: number, svg: string, id: string = name) {
-    const tie_svg = svg + `\n<rect y="1" width="${width}" height="2"/>\n<rect y="29" width="${width}" height="2"/>`;
-    const varatie_svg = svg + `\n<rect y="1" width="2" height="2"/>
+    const tieSvg = svg + `\n<rect y="1" width="${width}" height="2"/>\n<rect y="29" width="${width}" height="2"/>`;
+    const varatieSvg = svg + `\n<rect y="1" width="2" height="2"/>
     <rect x="5.6" y="1" width="4.8" height="2"/>
     <rect x="14" y="1" width="2" height="2"/>
     <rect y="29" width="2" height="2"/>
@@ -199,13 +205,13 @@ function addSymbol(name: string, width: number, svg: string, id: string = name) 
     <rect x="14" y="29" width="2" height="2"/>`;
 
     // alphabets are widers, need different svg for varareitti
-    const varareitti_svg = svg + (width == 16 ? '\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>'
+    const varareittiSvg = svg + (width == 16 ? '\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>'
         : '<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-16,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>');
 
     SYMBOL_CACHE[id] = new Symbol(width, svg, name, SymbolType.NORMAL);
-    SYMBOL_CACHE[SymbolType.ROAD + id] = new Symbol(width, tie_svg, name, SymbolType.ROAD);
-    SYMBOL_CACHE[SymbolType.DETOUR + id] = new Symbol(width, varatie_svg, name, SymbolType.DETOUR);
-    SYMBOL_CACHE[SymbolType.DIVERSION + id] = new Symbol(width, varareitti_svg, name, SymbolType.DIVERSION);
+    SYMBOL_CACHE[SymbolType.ROAD + id] = new Symbol(width, tieSvg, name, SymbolType.ROAD);
+    SYMBOL_CACHE[SymbolType.DETOUR + id] = new Symbol(width, varatieSvg, name, SymbolType.DETOUR);
+    SYMBOL_CACHE[SymbolType.DIVERSION + id] = new Symbol(width, varareittiSvg, name, SymbolType.DIVERSION);
 }
 
 function addSingle(name: string, width: number, svg: string, id: string = name) {
