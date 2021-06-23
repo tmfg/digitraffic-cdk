@@ -7,7 +7,7 @@ export async function getSchedulesTimestamps(url: string, calculated: boolean): 
     const fullUrl = calculated ? url + '/calculated' : url;
     const resp = await axios.get(fullUrl);
     const parse = util.promisify(xml2js.parseString);
-    console.info('method=getSchedulesTimestamp stookMs=%d', (Date.now() - start));
+    console.info('method=getSchedulesTimestamp tookMs=%d', (Date.now() - start));
     return await parse(resp.data) as SchedulesResponse;
 }
 

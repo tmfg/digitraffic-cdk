@@ -1,4 +1,4 @@
-import {withSecret} from "../../../../../common/secrets/secret";
+import {withSecret} from "digitraffic-common/secrets/secret";
 import {sendMessage} from "../../service/queue-service";
 import * as SchedulesService from "../../service/schedules";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
@@ -15,6 +15,6 @@ export const handler = async function () {
 
         console.info("method=updateTimestampsFromSchedules count=%d", timestamps.length);
 
-        timestamps.forEach(ts => sendMessage(ts, sqsQueueUrl));
+        await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
     });
 }
