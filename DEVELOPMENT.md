@@ -18,6 +18,9 @@ If the project is a new top-level project (such as marine/road),
 update the workspaces configuration in the top level package.json file.
 
 ## Adding dependencies
+
+```<workspacename>``` is the ```name``` in ```package.json``` -file.
+
 For runtime dependencies:  
 ```yarn workspace <workspacename> add dependencyname```
 For development dependencies:  
