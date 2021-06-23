@@ -1,11 +1,3 @@
-export const EVENTSOURCE_VTS = "VTS";
-export const EVENTSOURCE_PORTNET = "Portnet";
-export const EVENTSOURCE_PORT_HANKO = "Port HKO";
-export const EVENTSOURCE_TEQPLAY = "Teqplay";
-export const EVENTSOURCE_SCHEDULES_VTS_CONTROL = 'SCHEDULES_VTS_CONTROLLED';
-export const EVENTSOURCE_SCHEDULES_CALCULATED = 'SCHEDULES_CALCULATED';
-export const EVENTSOURCE_PILOTWEB = 'Pilotweb';
-
 export enum EventSource {
     VTS = 'VTS',
     PORTNET = 'Portnet',

@@ -2,11 +2,12 @@ import {IDatabase, PreparedStatement} from "pg-promise";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, Port} from "../service/portareas";
 import moment from "moment";
+import {EventSource} from "../model/eventsource";
 
 export const TIMESTAMPS_BEFORE = `CURRENT_DATE - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
 
-export interface DbTimestamp {
+export type DbTimestamp = {
     readonly event_type: EventType
     readonly event_time: Date
     readonly event_time_confidence_lower?: string
@@ -24,25 +25,25 @@ export interface DbTimestamp {
     readonly source_id?: string
 }
 
-export interface DbETAShip {
+export type DbETAShip = {
     readonly imo: number
     readonly locode: string
     readonly port_area_code?: string
     readonly portcall_id: number
 }
 
-export interface DbUpdatedTimestamp {
+export type DbUpdatedTimestamp = {
     readonly ship_mmsi: number
     readonly ship_imo: number
     readonly location_locode: string
 }
 
-export interface DbTimestampIdAndLocode {
+export type DbTimestampIdAndLocode = {
     readonly id: number
     readonly locode: string
 }
 
-export interface DbImo {
+export type DbImo = {
     readonly imo: number
 }
 
@@ -120,9 +121,13 @@ const SELECT_BY_LOCODE = `
                   px.event_source = pe.event_source AND
                   px.portcall_id = pe.portcall_id
           ) AND
-          pe.event_time > ${TIMESTAMPS_BEFORE} AND
-          pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
-          pe.location_locode = $1
+    pe.event_time > ${TIMESTAMPS_BEFORE} AND
+    pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
+    CASE WHEN pe.event_source = '${EventSource.PILOTWEB}' THEN
+        pe.location_locode = $1 OR pe.location_from_locode = $1
+    ELSE
+        pe.location_locode = $1
+    END
     ORDER by pe.event_time
 `;
 

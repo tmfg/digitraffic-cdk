@@ -180,9 +180,30 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundTimestamp.length).toBe(2);
     });
 
-    /*
-        FIND ETA SHIPS
-    */
+    test('findByLocode - from not used when timestamp is not Pilotweb', async () => {
+        const locode = 'AA123';
+        const from = 'BB456';
+        const timestamp = Object.assign(newTimestamp({ locode, from, source: EventSource.PORTNET }), {
+            recordTime: moment().toISOString() // avoid filtering
+        });
+        await insert(db, [timestamp]);
+
+        const foundTimestamp = await TimestampsDb.findByLocode(db, from);
+        expect(foundTimestamp.length).toBe(0);
+    });
+
+    test('findByLocode - from is used when timestamp is Pilotweb', async () => {
+        const locode = 'AA123';
+        const from = 'BB456';
+        const timestamp = Object.assign(newTimestamp({ locode, from, source: EventSource.PILOTWEB }), {
+            recordTime: moment().toISOString() // avoid filtering
+        });
+        await insert(db, [timestamp]);
+
+        const foundTimestamp = await TimestampsDb.findByLocode(db, from);
+        expect(foundTimestamp.length).toBe(1);
+    });
+
     test('findPortnetETAsByLocodes - 1 h in future is found', async () => {
         const locode = 'AA123';
         const eventTime = moment().add(1, 'hours').toDate();
