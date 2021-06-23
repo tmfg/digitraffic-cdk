@@ -1,4 +1,4 @@
-import apigateway = require('@aws-cdk/aws-apigateway');
+import {RestApi, Model, JsonSchema, JsonSchemaType, RequestValidator} from '@aws-cdk/aws-apigateway';
 import {ModelWithReference} from "./model-with-reference";
 
 /**
@@ -16,7 +16,7 @@ export function getModelReference(modelId: string, restApiId: string) {
  * https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-method-request-validation.html
  * @param api REST API
  */
-export function addDefaultValidator(api: apigateway.RestApi): apigateway.RequestValidator {
+export function addDefaultValidator(api: RestApi): RequestValidator {
     return api.addRequestValidator('DefaultValidator', {
         validateRequestParameters: true,
         validateRequestBody: true
@@ -31,21 +31,20 @@ export function addDefaultValidator(api: apigateway.RestApi): apigateway.Request
  * @param schema JSON Schema
  * @return ModelWithReference A model object with a reference to an API Gateway model object.
  */
-export function addServiceModel(name:string, api: apigateway.RestApi,
-                                schema: apigateway.JsonSchema): ModelWithReference {
-    const mwr = api.addModel(name, {
+export function addServiceModel(modelName: string, api: RestApi, schema: JsonSchema): ModelWithReference {
+    const mwr = api.addModel(modelName, {
         contentType: 'application/json',
-        modelName: name,
-        schema: schema
+        modelName,
+        schema
     }) as ModelWithReference;
     mwr.modelReference = getModelReference(mwr.modelId, api.restApiId);
     return mwr;
 }
 
-export function addSimpleServiceModel(name:string, api: apigateway.RestApi, contentType: string = 'application/xml'): any {
-    return api.addModel(name, {
-        contentType: contentType,
-        modelName: name,
+export function addSimpleServiceModel(modelName: string, api: RestApi, contentType = 'application/xml'): any {
+    return api.addModel(modelName, {
+        contentType,
+        modelName,
         schema: {}
     });
 }
@@ -56,9 +55,9 @@ export function addSimpleServiceModel(name:string, api: apigateway.RestApi, cont
  * @param model
  * @param api
  */
-export function createArraySchema(model: apigateway.Model, api: apigateway.RestApi): any {
+export function createArraySchema(model: Model, api: RestApi): any {
     return {
-        type: apigateway.JsonSchemaType.ARRAY,
+        type: JsonSchemaType.ARRAY,
         items: {
             ref: getModelReference(model.modelId, api.restApiId)
         }

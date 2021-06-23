@@ -1,4 +1,4 @@
-import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
+import {FeatureCollection,Feature} from "geojson";
 
 /**
  * Create a FeatureCollection from a list of features with a 'last updated' property
@@ -6,9 +6,9 @@ import {FeatureCollection,Feature,GeoJsonProperties} from "geojson";
  * @param lastUpdated Last updated date
  */
 export function createFeatureCollection(features: Feature[], lastUpdated: Date | null): FeatureCollection {
-    return <FeatureCollection> {
+    return {
         type: "FeatureCollection",
         lastUpdated: lastUpdated,
         features: features
-    }
+    } as FeatureCollection;
 }

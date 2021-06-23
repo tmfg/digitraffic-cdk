@@ -1,5 +1,5 @@
 import {Aws, Construct} from "@aws-cdk/core";
-import {AwsIntegration, Model, PassthroughBehavior, RequestValidator, Resource} from "@aws-cdk/aws-apigateway";
+import {AwsIntegration, PassthroughBehavior, RequestValidator, Resource} from "@aws-cdk/aws-apigateway";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {IModel} from "@aws-cdk/aws-apigateway/lib/model";

@@ -1,6 +1,5 @@
-import {RestApi, MethodLoggingLevel, GatewayResponse, ResponseType} from '@aws-cdk/aws-apigateway';
+import {RestApi, MethodLoggingLevel, GatewayResponse, ResponseType, EndpointType} from '@aws-cdk/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
-import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct} from "@aws-cdk/core";
 
 /**

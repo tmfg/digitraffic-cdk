@@ -33,7 +33,7 @@ export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, 
         if (expectedKeys?.length) {
             checkExpectedSecretKeys(expectedKeys, cachedSecret);
         }
-        return await fn(cachedSecret);
+        return fn(cachedSecret);
     } catch (error) {
         console.error('method=withDbSecret Caught an error, refreshing secret', error);
         // try to refetch secret in case it has changed

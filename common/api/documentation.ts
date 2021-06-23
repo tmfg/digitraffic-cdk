@@ -1,5 +1,5 @@
 import {Construct} from "@aws-cdk/core";
-import {CfnDocumentationPart, Resource, RestApi} from "@aws-cdk/aws-apigateway";
+import {CfnDocumentationPart, Resource} from "@aws-cdk/aws-apigateway";
 
 // Documentation parts are objects that describe an API Gateway API or parts of an API
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-documenting-api.html

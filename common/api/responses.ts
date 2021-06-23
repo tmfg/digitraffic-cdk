@@ -64,8 +64,8 @@ export function methodResponse(status: string, contentType: MediaType, model: an
 
 }
 
-export function corsMethod(methodResponse: MethodResponse): MethodResponse {
-    return {...methodResponse, ...{
+export function corsMethod(response: MethodResponse): MethodResponse {
+    return {...response, ...{
         responseParameters: {
             'method.response.header.Access-Control-Allow-Origin': true
         }
@@ -106,8 +106,12 @@ export function defaultIntegration(
 }
 
 export function getResponse(response: any, options?: IntegrationOptions): any {
-    if(options?.xml) response = {...response, ...RESPONSE_XML};
-    if(!options?.disableCors) response = {...response, ...RESPONSE_CORS_INTEGRATION};
+    if(options?.xml) {
+        response = {...response, ...RESPONSE_XML};
+    }
+    if(!options?.disableCors) {
+        response = {...response, ...RESPONSE_CORS_INTEGRATION};
+    }
 
     return response;
 }
