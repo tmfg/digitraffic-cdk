@@ -14,7 +14,7 @@ export function handlerFn(
             return Promise.allSettled(event.Records.map(r => {
 
                 const timestamp = JSON.parse(r.body);
-                console.info('method=processTimestampQueue processing timestamp', timestamp);
+                console.info('DEBUG method=processTimestampQueue processing timestamp', timestamp);
 
                 if (!validateTimestamp(timestamp)) {
                     return Promise.reject('method=processTimestampQueue timestamp did not pass validation');
