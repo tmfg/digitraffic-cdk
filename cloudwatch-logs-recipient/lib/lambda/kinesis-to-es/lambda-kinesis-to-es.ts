@@ -181,7 +181,7 @@ export function isLambdaLifecycleEvent(message: string) {
     return message.startsWith('START RequestId') || message.startsWith('END RequestId') || message.startsWith('REPORT RequestId');
 }
 
-export function buildSource(message: string, extractedFields: CloudWatchLogsLogEventExtractedFields | undefined): any {
+export function buildSource(message: string, extractedFields: any): any {
     message = message.replace("[, ]", "[0.0,0.0]")
         .replace(/\n/g, "\\n")
         .replace(/\'/g, "\\'")
@@ -193,30 +193,34 @@ export function buildSource(message: string, extractedFields: CloudWatchLogsLogE
         .replace(/\f/g, "\\f");
 
     if (extractedFields) {
-        const source = new Array() as any;
-
-        for (const key in extractedFields) {
-            if (extractedFields.hasOwnProperty(key) && extractedFields[key]) {
-                const value = extractedFields[key];
-
-                if (isNumeric(value)) {
-                    source[key] = 1 * (value as any);
-                    continue;
-                }
-
-                if (value) {
-                    const jsonSubString = extractJson(value);
-                    if (jsonSubString !== null) {
-                        source["$" + key] = JSON.parse(jsonSubString);
-                    }
-                }
-
-                source[key] = value;
-            }
-        }
-        source.message = message;
-        return source;
+        return buildFromExtractedFields(message, extractedFields);
     }
 
     return buildFromMessage(message);
+}
+
+function buildFromExtractedFields(message: string, extractedFields: any[]): any {
+    const source = {} as any;
+
+    for (const key in extractedFields) {
+        if (extractedFields.hasOwnProperty(key) && extractedFields[key]) {
+            const value = extractedFields[key];
+
+            if (isNumeric(value)) {
+                source[key] = 1 * value;
+                continue;
+            }
+
+            if (value) {
+                const jsonSubString = extractJson(value);
+                if (jsonSubString !== null) {
+                    source["$" + key] = JSON.parse(jsonSubString);
+                }
+            }
+
+            source[key] = value;
+        }
+    }
+    source.message = message;
+    return source;
 }

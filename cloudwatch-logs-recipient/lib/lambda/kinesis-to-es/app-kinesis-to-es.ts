@@ -66,9 +66,7 @@ function handleRecord(record: KinesisStreamRecord, statistics: any): string {
         return "";
     }
 
-    const logLine = transform(awslogsData, statistics);
-
-    return logLine;
+    return transform(awslogsData, statistics);
 }
 
 function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkData: string) {
@@ -76,7 +74,6 @@ function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkD
     post(elasticsearchBulkData, (error: any, success: any, statusCode: any, failedItems: any) => {
         if (error) {
             console.log('Error: ' + JSON.stringify(error, null, 2));
-//                console.log("Bulkdata: " + elasticsearchBulkData);
 
             if (failedItems && failedItems.length > 0) {
                 notifyFailedItems(failedItems);
@@ -135,8 +132,11 @@ function transform(payload: CloudWatchLogsDecodedData, statistics: any): string 
 }
 
 function getAppName(logGroup: string, app: string): string {
-    if(logGroup.includes('amazonmq')) return `${app}-mqtt`;
-    if(logGroup.includes('nginx')) return 'dt-nginx';
+    if(logGroup.includes('amazonmq')) {
+        return `${app}-mqtt`;
+    } else if(logGroup.includes('nginx')) {
+        return 'dt-nginx';
+    }
 
     return logGroup;
 }
@@ -183,7 +183,7 @@ function post(body: string, callback: any) {
 
     console.log("sending POST to es unCompressedSize=%d", body.length);
 
-    if(body.length == 0) {
+    if(body.length === 0) {
         return;
     }
 
@@ -261,10 +261,10 @@ function buildRequest(body: string): any {
     return request;
 }
 
-function hmac(key: string, str: string, encoding: string = ''): string {
+function hmac(key: string, str: string, encoding = ''): string {
     return crypto.createHmac('sha256', key).update(str, 'utf8').digest(encoding);
 }
 
-function hash(str: string, encoding: string = ''): string {
+function hash(str: string, encoding = ''): string {
     return crypto.createHash('sha256').update(str, 'utf8').digest(encoding);
 }

@@ -101,7 +101,7 @@ export function filterIds(body: string, ids: string[]): string {
 
 function containsIds(line: string, ids: string[]): boolean {
     for(const id of ids) {
-        if(line.indexOf(id) != -1) {
+        if(line.indexOf(id) !== -1) {
             return true;
         }
     }
