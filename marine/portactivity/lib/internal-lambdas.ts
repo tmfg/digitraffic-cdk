@@ -177,7 +177,7 @@ function createETAScheduler(stack: Stack): Rule {
     const ruleName = 'PortActivity-ETAScheduler'
     return new Rule(stack, ruleName, {
         ruleName,
-        schedule: Schedule.expression('cron(*/15 * * * ? *)') // every 15 minutes
+        schedule: Schedule.expression('cron(*/10 * * * ? *)') // every 10 minutes
     });
 }
 
@@ -193,7 +193,7 @@ function createPilotwebScheduler(stack: Stack): Rule {
     const ruleName = 'PortActivity-PilotwebScheduler'
     return new Rule(stack, ruleName, {
         ruleName,
-        schedule: Schedule.expression('cron(*/15 * * * ? *)') // every 15 minutes
+        schedule: Schedule.expression('cron(*/1 * * * ? *)') // every minute
     });
 }
 
