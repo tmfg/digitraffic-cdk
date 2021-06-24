@@ -19,12 +19,7 @@ export function handlerFn(
                 if (!validateTimestamp(timestamp)) {
                     return Promise.reject('method=processTimestampQueue timestamp did not pass validation');
                 }
-                try {
-                    return saveTimestamp(timestamp);
-                } catch (err) {
-                    console.error('method=processTimestampQueue error persisting timestamp', err);
-                    return Promise.reject(err);
-                }
+                return saveTimestamp(timestamp);
             })).then(async timestamps => {
                 const successful = timestamps.filter(processedSuccessfully);
                 if (successful.length) {
