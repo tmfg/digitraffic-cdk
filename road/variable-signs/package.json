@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@aws-cdk/aws-apigateway": "1.107.0",
+    "@aws-cdk/aws-ec2": "1.107.0",
     "@aws-cdk/aws-ecs": "1.107.0",
     "@aws-cdk/aws-events-targets": "1.107.0",
     "@aws-cdk/aws-lambda": "1.107.0",

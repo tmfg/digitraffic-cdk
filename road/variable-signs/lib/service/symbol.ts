@@ -187,7 +187,7 @@ export function getSymbolType(first: string): SymbolType {
             return SymbolType.ROAD;
         default:
             return SymbolType.NORMAL;
-    };
+    }
 }
 
 // put all versions of symbol to cache with correct borders:
@@ -205,7 +205,7 @@ function addSymbol(name: string, width: number, svg: string, id: string = name) 
     <rect x="14" y="29" width="2" height="2"/>`;
 
     // alphabets are widers, need different svg for varareitti
-    const varareittiSvg = svg + (width == 16 ? '\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>'
+    const varareittiSvg = svg + (width === 16 ? '\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>'
         : '<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-16,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>');
 
     SYMBOL_CACHE[id] = new Symbol(width, svg, name, SymbolType.NORMAL);

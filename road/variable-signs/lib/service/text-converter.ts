@@ -3,6 +3,11 @@ import {getSymbolType} from "../../lib/service/symbol";
 
 const MAX_LENGTH = 30;
 
+const ERROR_TEXT_SYNTAX = "Text must be in form of [text] or text";
+const ERROR_NO_CONTENT = "No content";
+const ERROR_MAX_LENGTH = `Max length is ${MAX_LENGTH}`;
+const ERROR_ONE_UNDERSCORE = "Text can only contain 1 _";
+
 function error(errorText: string) {
     throw new Error("ERROR:" + errorText);
 }
@@ -23,9 +28,9 @@ function validate(text: string): string {
 
 function checkSize(text: string) {
     if (text.length < 1) {
-        error("No content");
+        error(ERROR_NO_CONTENT);
     } else if (text.length > MAX_LENGTH) {
-        error("Max length is " + MAX_LENGTH);
+        error(ERROR_MAX_LENGTH);
     }
 }
 
@@ -33,7 +38,7 @@ function checkUnderlines(text: string) {
     const count = text.split('_').length - 1;
 
     if(count > 1) {
-        error("Text can only contain 1 _");
+        error(ERROR_ONE_UNDERSCORE);
     }
 }
 
@@ -48,16 +53,16 @@ function checkAndRemoveBrackets(text: string): string {
     if(firstChar === '[') {
         // ok, last char must be ]
         if(lastChar !== ']') {
-            error("Text must be in form of [text] or text");
+            error(ERROR_TEXT_SYNTAX);
         } else if(count1 > 1 || count2 > 1) {
-            error("Text must be in form of [text] or text");
+            error(ERROR_TEXT_SYNTAX);
         }
 
         return text.substring(1, text.length - 1);
     }
 
     if(count1 > 0 || count2 > 0) {
-        error("Text must be in form of [text] or text");
+        error(ERROR_TEXT_SYNTAX);
     }
 
     return text;
