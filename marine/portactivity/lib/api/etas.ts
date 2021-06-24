@@ -60,7 +60,7 @@ export async function getETAs(
 
     console.log("shipcount %d filtered %d", ships.length, filtered.length);
 
-    const etas = await Promise.all(await filtered.map( ship =>
+    const etas = await Promise.all(filtered.map( ship =>
         getETA(endpointUrl,
             token.access_token,
             ship,

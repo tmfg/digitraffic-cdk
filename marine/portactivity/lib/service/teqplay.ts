@@ -41,15 +41,18 @@ function convertToApiTimestamp(event: Event): ApiTimestamp {
 function convertShip(event: Event): Ship {
     const ship = {} as any;
 
-    if(event.ship.imo) ship.imo = +event.ship.imo;
-    if(event.ship.mmsi) ship.mmsi = +event.ship.mmsi;
+    if(event.ship.imo) {
+        ship.imo = +event.ship.imo;
+    }
+    if(event.ship.mmsi) {
+        ship.mmsi = +event.ship.mmsi;
+    }
 
     return ship;
 }
 
 function convertPortcallId(event: Event): number|null {
-    if(event.portcallId) return +event.portcallId;
-    return null;
+    return event.portcallId? +event.portcallId : null;
 }
 
 function convertEventType(event: Event): EventType {
