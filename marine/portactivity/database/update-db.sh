@@ -3,10 +3,13 @@
 ENVIRONMENT=${1:-dev}
 COMMAND=${2:-migrate}
 
+docker build \
+-t portactivity-db-updater \
+. \
+--build-arg ENVIRONMENT=$ENVIRONMENT
+
 docker run --rm \
 --name portactivity-db-updater \
--v $(pwd)/conf/$ENVIRONMENT:/flyway/conf \
--v $(pwd)/update:/flyway/sql \
 --network=dnet1 \
-flyway/flyway \
+portactivity-db-updater \
 $COMMAND
