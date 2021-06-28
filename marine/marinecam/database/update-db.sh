@@ -1,11 +1,15 @@
 #!/usr/bin/env sh
 
 ENVIRONMENT=${1:-dev}
+COMMAND=${2:-migrate}
+
+docker build \
+-t portactivity-db-updater \
+. \
+--build-arg ENVIRONMENT=$ENVIRONMENT
 
 docker run --rm \
---name marinecam-db-updater \
--v $(pwd)/conf/$ENVIRONMENT:/flyway/conf \
--v $(pwd)/update:/flyway/sql \
+--name portactivity-db-updater \
 --network=dnet1 \
-flyway/flyway \
-migrate
+portactivity-db-updater \
+$COMMAND
