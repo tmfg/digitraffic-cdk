@@ -155,7 +155,7 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
           pe.event_source = 'Portnet' AND
           pe.location_locode IN ($1:list) AND
           pad.ata IS NULL AND
-          pc.port_call_timestamp > CURRENT_DATE - INTERVAL '1 DAY'
+          pc.port_call_timestamp > CURRENT_DATE - INTERVAL '3 DAYS'
 `;
 
 // This method builds a query dynamically which is not optimal, instead a proper lookup table should be used.

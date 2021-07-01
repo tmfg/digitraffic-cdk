@@ -28,6 +28,7 @@ async function createEtaOAuthToken(
         }
         return Promise.resolve(resp.data);
     } catch (error) {
+        console.error(`error ${error} from ${endpointAuthUrl}`);
         console.error('method=createEtaOAuthToken login failed');
         return Promise.reject();
     } finally {
