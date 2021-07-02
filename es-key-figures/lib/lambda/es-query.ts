@@ -11,7 +11,7 @@ export async function fetchDataFromEs(
   path: string): Promise<any> {
   return new Promise(resolve => {
     const creds = new AWS.EnvironmentCredentials("AWS")
-    let req = new AWS.HttpRequest(endpoint);
+    const req = new AWS.HttpRequest(endpoint);
     const index = 'dt-nginx-*';
 
     req.method = "POST";
@@ -21,10 +21,10 @@ export async function fetchDataFromEs(
     req.headers["Content-Type"] = "application/json";
     req.body = query;
 
-    let signer = new AWS.Signers.V4(req, "es");
+    const signer = new AWS.Signers.V4(req, "es");
     signer.addAuthorization(creds, new Date());
 
-    let send = new AWS.NodeHttpClient();
+    const send = new AWS.NodeHttpClient();
 
     send.handleRequest(
       req,

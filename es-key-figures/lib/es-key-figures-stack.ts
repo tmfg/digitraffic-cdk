@@ -140,7 +140,7 @@ export class EsKeyFiguresStack extends Stack {
       })
     );
 
-    let functionName = 'CollectEsKeyFigures';
+    const functionName = 'CollectEsKeyFigures';
     const lambdaConf = {
       role: lambdaRole,
       functionName: functionName,

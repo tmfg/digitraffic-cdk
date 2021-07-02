@@ -37,15 +37,15 @@ export interface KeyFigureResult extends KeyFigure {
 
 async function postToSlack(kibanaResults: KeyFigureResult[][]) {
   const slackKibanaResults: Set<KeyFigureResult[]> = new Set()
-  for (let kibanaResult of kibanaResults) {
-    for (let keyFigureResult of kibanaResult) {
+  for (const kibanaResult of kibanaResults) {
+    for (const keyFigureResult of kibanaResult) {
       if (filtersToPostToSlack.has(keyFigureResult.filter)) {
         slackKibanaResults.add(kibanaResult)
       }
     }
   }
 
-  for (let kibanaResult of slackKibanaResults) {
+  for (const kibanaResult of slackKibanaResults) {
     const options = {
       text: createSlackMessage(kibanaResult),
     };
@@ -56,10 +56,10 @@ async function postToSlack(kibanaResults: KeyFigureResult[][]) {
 
 function createSlackMessage(keyFigureResults: KeyFigureResult[]) {
   let slack_message: string = `\`${keyFigureResults[0].filter}\` aikavälillä: ${start.toISOString()} - ${end.toISOString()} \`\`\``;
-  for (let result of keyFigureResults) {
+  for (const result of keyFigureResults) {
     if (result['type'] === 'field_agg') {
       slack_message += `\n${result.name}\n`
-      for (let key of Object.keys(result.value)) {
+      for (const key of Object.keys(result.value)) {
         slack_message += formatSlackLine(key, numberFormatter(result.value[key], 1))
       }
     } else {
@@ -73,7 +73,7 @@ function createSlackMessage(keyFigureResults: KeyFigureResult[]) {
 }
 
 function numberFormatter(num: number, digits: number) {
-  var si = [
+  const si = [
     {value: 1, symbol: ""},
     {value: 1E3, symbol: "k"},
     {value: 1E6, symbol: "M"},
@@ -82,8 +82,8 @@ function numberFormatter(num: number, digits: number) {
     {value: 1E15, symbol: "P"},
     {value: 1E18, symbol: "E"}
   ];
-  var rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
-  var i;
+  const rx = /\.0+$|(\.[0-9]*[1-9])0+$/;
+  let i;
   for (i = si.length - 1; i > 0; i--) {
     if (num >= si[i].value) {
       break;
@@ -93,14 +93,15 @@ function numberFormatter(num: number, digits: number) {
 }
 
 function formatSlackLine(key: string, value: string): string {
-  let truncatedKey = truncate(key, 60);
-  let truncatedValue = truncate("" + value, 20);
+  const truncatedKey = truncate(key, 60);
+  const truncatedValue = truncate("" + value, 20);
+
   return truncatedKey + " ".repeat(80 - truncatedKey.length - truncatedValue.length + 1) + truncatedValue + '\n'
 }
 
 function truncate(str: string, n: number): string {
   return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
-};
+}
 
 export const handler = async (): Promise<boolean> => {
   const apiPaths = await getApiPaths();
@@ -142,7 +143,7 @@ async function getKibanaResult(keyFigures: KeyFigure[], start: Date, end: Date, 
     } else if (keyFigure.type === 'field_agg') {
       const keyFigureResponse = await fetchDataFromEs(endpoint, query, '_search?size=0');
       const value: { [key: string]: any } = {};
-      for (let bucket of keyFigureResponse.aggregations.agg.buckets) {
+      for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
         value[bucket.key.split('"').join('').split("'").join('').split("\\").join("")] = bucket.doc_count; // remove illegal characters
       }
       keyFigureResult.value = value
@@ -159,13 +160,13 @@ async function getKibanaResult(keyFigures: KeyFigure[], start: Date, end: Date, 
 async function getKibanaResults(keyFigures: KeyFigure[], apiPaths: { transportType: string; paths: Set<string> }[]): Promise<KeyFigureResult[][]> {
   const kibanaResults = []
 
-  for (let apiPath of apiPaths) {
+  for (const apiPath of apiPaths) {
     console.info(`Running: ${apiPath.transportType}`);
     kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType}`));
   }
 
-  for (let apiPath of apiPaths) {
-    for (let path of apiPath.paths) {
+  for (const apiPath of apiPaths) {
+    for (const path of apiPath.paths) {
       console.info(`Running: ${path}`);
       kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType} AND @fields.request_uri:\\\"${path}\\\"`));
     }
@@ -183,8 +184,8 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
       await query('CREATE INDEX filter_name_date ON key_figures (`filter`, `name`, `from`, `to`);')
     }
 
-    for (let kibanaResult of kibanaResults) {
-      for (let result of kibanaResult) {
+    for (const kibanaResult of kibanaResults) {
+      for (const result of kibanaResult) {
         const sqlInsert = `INSERT INTO \`key_figures\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`) VALUES ('${start.toISOString().substr(0, 10)}', '${end.toISOString().substr(0, 10)}', '${result.query}', '${JSON.stringify(result.value)}','${result.name}', '${result.filter}');`;
         await query(sqlInsert)
       }
@@ -286,7 +287,7 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
   const paths = resp.data.paths;
 
   const output = new Set<string>()
-  for (let pathsKey in paths) {
+  for (const pathsKey in paths) {
     const splitResult = pathsKey.split("{");
     output.add(splitResult[0].endsWith("/") ? splitResult[0] : splitResult[0] + "/");
   }
