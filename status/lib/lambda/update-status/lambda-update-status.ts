@@ -2,6 +2,7 @@ import axios from 'axios';
 import {EndpointProtocol, MonitoredApp, MonitoredEndpoint} from '../../app-props';
 import {SecretsManager} from 'aws-sdk';
 import {UpdateStatusSecret} from "../../secret";
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 interface AppEndpoints {
     readonly app: string
@@ -26,7 +27,7 @@ async function getAppEndpoints(app: MonitoredApp): Promise<AppEndpoints> {
             'accept-encoding': 'gzip'
         }
     });
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to fetch contacts');
     }
     console.log('..done');
@@ -50,7 +51,7 @@ async function getStatuspageComponents(statuspagePageId: string, statuspageApiKe
             Authorization: `OAuth ${statuspageApiKey}`
         }
     });
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to get Statuspage components');
     }
     console.log('..done');
@@ -75,10 +76,10 @@ async function createStatuspageComponent(
     }, {
         headers: {
             Authorization: `OAuth ${statuspageApiKey}`,
-            'Content-type': 'application/json'
+            'Content-type': MediaType.APPLICATION_JSON
         }
     });
-    if (r.status != 201) {
+    if (r.status !== 201) {
         throw new Error('Unable to create Statuspage component');
     }
     console.log('..done')
@@ -88,7 +89,7 @@ async function createStatuspageComponent(
 async function getNodepingContacts(nodepingToken: string, subaccountId: string) {
     console.log('Fetching NodePing contacts with token');
     const r = await axios.get(`${NODEPING_API}/contacts?token=${nodepingToken}&customerid=${subaccountId}`);
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to fetch contacts');
     }
     console.log('..done');
@@ -117,7 +118,7 @@ async function createNodepingContact(
             data: {'component[status]': '{if success}operational{else}major_outage{/if}'}
         }]
     });
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to create contact');
     }
     console.log('..done');
@@ -126,7 +127,7 @@ async function createNodepingContact(
 async function getNodepingChecks(nodepingToken: string, subaccountId: string) {
     console.log('Fetching NodePing checks')
     const r = await axios.get(`${NODEPING_API}/checks?token=${nodepingToken}&customerid=${subaccountId}`);
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to fetch checks');
     }
     console.log('..done');
@@ -150,7 +151,7 @@ async function createNodepingCheck(
         customerid: subaccountId,
         token: nodepingToken,
         label: endpoint,
-        type: extraData?.protocol == EndpointProtocol.WebSocket ? 'WEBSOCKET' : 'HTTPADV',
+        type: extraData?.protocol === EndpointProtocol.WebSocket ? 'WEBSOCKET' : 'HTTPADV',
         target: extraData?.url ?? `https://${app}.digitraffic.fi${endpoint}`,
         interval: 5,
         threshold: 30,
@@ -162,14 +163,14 @@ async function createNodepingCheck(
     };
     if (extraData?.sendData) {
         data.postdata = extraData.sendData;
-        data.sendheaders['content-type'] = 'application/json';
+        data.sendheaders['content-type'] = MediaType.APPLICATION_JSON;
     }
     const r = await axios.post(`${NODEPING_API}/checks`, data, {
         headers: {
-            'Content-type': 'application/json'
+            'Content-type': MediaType.APPLICATION_JSON
         }
     });
-    if (r.status != 200 || r.data.error) {
+    if (r.status !== 200 || r.data.error) {
         throw new Error('Unable to create check');
     }
     console.log('..done');
@@ -263,7 +264,7 @@ export const handler = async (): Promise<any> => {
 
     const endpoints: AppEndpoints[] = await Promise.all(apps.map(getAppEndpoints));
 
-    for (let endpoint of endpoints) {
+    for (const endpoint of endpoints) {
         await updateComponentsAndChecks(endpoint, secret);
     }
 }
