@@ -46,7 +46,7 @@ function createRealtimeLoggingRole(stack: Stack, appName: string, kinesis: Strea
 }
 
 
-function createKinesisStream(stack: Stack, appName: String): Stream {
+function createKinesisStream(stack: Stack, appName: string): Stream {
     const streamName = `CloudfrontToElasticStream-${appName}`;
 
     //TODO need to create SNS topic for us-east-1

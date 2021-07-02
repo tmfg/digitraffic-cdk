@@ -55,5 +55,4 @@ function isAcceptGzipHeaderPresent(request: any): boolean {
     const acceptHeaderValue = acceptHeader[0];
 
     return acceptHeaderValue != null && acceptHeaderValue.value != null && acceptHeaderValue.value.indexOf('gzip') > -1;
-
 }

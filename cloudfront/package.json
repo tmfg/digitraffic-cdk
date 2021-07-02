@@ -29,15 +29,17 @@
     "aws-sdk": "^2.821.0"
   },
   "dependencies": {
-    "@aws-cdk/aws-logs": "1.107.0",
+    "@aws-cdk/aws-apigateway": "1.107.0",
+    "@aws-cdk/aws-cloudfront": "1.107.0",
+    "@aws-cdk/aws-iam": "1.107.0",
+    "@aws-cdk/aws-kinesis": "1.107.0",
     "@aws-cdk/aws-lambda": "1.107.0",
     "@aws-cdk/aws-lambda-event-sources": "1.107.0",
-    "@aws-cdk/aws-sqs": "1.107.0",
-    "@aws-cdk/aws-kinesis": "1.107.0",
-    "@aws-cdk/aws-apigateway": "1.107.0",
-    "@aws-cdk/aws-wafv2": "1.107.0",
+    "@aws-cdk/aws-logs": "1.107.0",
+    "@aws-cdk/aws-s3": "1.107.0",
     "@aws-cdk/aws-s3-notifications": "1.107.0",
-    "@aws-cdk/aws-cloudfront": "1.107.0",
+    "@aws-cdk/aws-sqs": "1.107.0",
+    "@aws-cdk/aws-wafv2": "1.107.0",
     "@aws-cdk/core": "1.107.0",
     "source-map-support": "^0.5.19",
     "p-limit": "3.0.2"

@@ -21,7 +21,7 @@ export function createWebAcl(stack: Stack, environment: string, rules: AclRuleTy
 }
 
 function createRule(rule: AclRuleType): any {
-    if(rule == AclRuleType.AWSCommonRuleSet) {
+    if(rule === AclRuleType.AWSCommonRuleSet) {
         return {
             name: "AWS-AWSManagedRulesCommonRuleSet",
             priority: 0,
@@ -41,7 +41,7 @@ function createRule(rule: AclRuleType): any {
                 metricName: "AWS-AWSManagedRulesCommonRuleSet"
             }
         }
-    } else if(rule == AclRuleType.AWSReputationList) {
+    } else if(rule === AclRuleType.AWSReputationList) {
         return {
             name: "AWS-AWSManagedRulesAmazonIpReputationList",
             priority: 1,
@@ -60,7 +60,7 @@ function createRule(rule: AclRuleType): any {
                 metricName: "AWS-AWSManagedRulesAmazonIpReputationList"
             }
         }
-    } else if(rule == AclRuleType.AWSKnownBadInputs) {
+    } else if(rule === AclRuleType.AWSKnownBadInputs) {
         return {
             name: "AWS-AWSManagedRulesKnownBadInputsRuleSet",
             priority: 2,
@@ -79,7 +79,7 @@ function createRule(rule: AclRuleType): any {
                 metricName: "AWS-AWSManagedRulesKnownBadInputsRuleSet"
             }
         }
-    } else if(rule == AclRuleType.ThrottleRule) {
+    } else if(rule === AclRuleType.ThrottleRule) {
         return {
             name: "ThrottleRule",
             priority: 3,
@@ -100,4 +100,3 @@ function createRule(rule: AclRuleType): any {
 
     throw new TypeError();
 }
-

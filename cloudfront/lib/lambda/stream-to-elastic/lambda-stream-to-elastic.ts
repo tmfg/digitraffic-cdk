@@ -81,7 +81,7 @@ async function transformRecord(record: KinesisStreamRecord): Promise<any> {
 
     const logLineData = cloudfrontRealtimeLogData.trim().split('\t');
 
-    return await convertFieldNamesAndFormats(logLineData);
+    return convertFieldNamesAndFormats(logLineData);
 }
 
 function createIndexName(): string {
@@ -99,7 +99,7 @@ export const handler = async (event: KinesisStreamEvent, context: Context, callb
 //        console.log('using action ' + JSON.stringify(action));
 
         const recordTransformPromises = event.Records.map(
-            async (record: KinesisStreamRecord) => await transformRecord(record));
+            async (record: KinesisStreamRecord) => transformRecord(record));
 
         const data = await Promise.all(recordTransformPromises);
         const returnValue = await sendMessageToEs(createBulkMessage(action, data));
@@ -115,11 +115,7 @@ export const handler = async (event: KinesisStreamEvent, context: Context, callb
 
 function createBulkMessage(action: any, lines: any[]): string {
     let message = "";
-
-//    if(lines.length > 0) {
-//        console.log("first line " + JSON.stringify(lines[0]));
-//    }
-
+    
     lines.forEach(line => {
         message+= JSON.stringify(action) + '\n';
         message+= JSON.stringify(line) + '\n';

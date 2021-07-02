@@ -18,7 +18,9 @@ export class CloudfrontCdkStack extends Stack {
 
         const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
-        const streamingConfig = cloudfrontProps.elasticProps.streamingProps ? createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps): null;
+        const streamingConfig = cloudfrontProps.elasticProps.streamingProps
+            ? createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps)
+            : null;
 
         cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps));
     }
@@ -61,7 +63,7 @@ export class CloudfrontCdkStack extends Stack {
     createLambdaMap(lProps: CFLambdaProps | undefined): any {
         const lambdaMap: any = {};
 
-        if(lProps != undefined) {
+        if(lProps !== undefined) {
             const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
                 assumedBy: new CompositePrincipal(
                     new ServicePrincipal("lambda.amazonaws.com"),

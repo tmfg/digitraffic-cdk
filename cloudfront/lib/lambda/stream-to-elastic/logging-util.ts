@@ -28,7 +28,7 @@ export function findHeaderValue(headerName: string, allHeaders: string): string|
        if(values[0].toUpperCase() === headerName.toUpperCase()) {
            return unescape(values[1]);
        }
-    };
+    }
 
     return null;
 }

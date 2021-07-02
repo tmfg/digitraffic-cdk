@@ -5,12 +5,10 @@ import {
     SourceConfiguration,
     Behavior,
     CloudFrontAllowedMethods,
-    CfnDistribution,
     LambdaEdgeEventType
 } from '@aws-cdk/aws-cloudfront';
 import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from '@aws-cdk/aws-s3';
-import ForwardedValuesProperty = CfnDistribution.ForwardedValuesProperty;
 
 export function createOriginConfig(stack: Stack, domain: CFDomain,
                                    oai: OriginAccessIdentity|null,
@@ -50,7 +48,7 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
 }
 
 function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
-    if (domain.apiKey != undefined) {
+    if (domain.apiKey !== undefined) {
         return {
             'x-api-key': domain.apiKey
         } as { [key: string] : string };
@@ -63,7 +61,7 @@ function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any):
     return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
-function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBehavior: boolean = false): Behavior {
+function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBehavior = false): Behavior {
 //    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
 
     const forwardedValues = {
@@ -104,5 +102,5 @@ function getLambdas(b: CFBehavior, lambdaMap: any) {
         });
     }
 
-    return lambdas.length == 0 ? undefined : lambdas;
+    return lambdas.length === 0 ? undefined : lambdas;
 }
