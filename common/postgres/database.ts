@@ -37,7 +37,7 @@ export function initDbConnection(
 export async function inTransaction (
     fn: (db: ITask<any>) => any): Promise<any> {
 
-    return await inDatabase(db => db.tx((t: ITask<any>) => fn(t)));
+    return inDatabase(db => db.tx((t: ITask<any>) => fn(t)));
 }
 
 export async function inDatabase(

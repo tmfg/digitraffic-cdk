@@ -4,21 +4,19 @@ export interface Location {
 }
 
 export function createGeometry(location: Location): string {
-//    console.info("location:" + JSON.stringify(location));
-
-    if(location.type == 'LineString') {
+    if(location.type === 'LineString') {
         const coordinates = linestring(location.coordinates);
 
         return `LINESTRING(${coordinates})`;
-    } else if(location.type == 'Point') {
+    } else if(location.type === 'Point') {
         const coordinates = coordinatePair(location.coordinates);
 
         return `POINT(${coordinates})`;
-    } else if(location.type == 'Polygon') {
+    } else if(location.type === 'Polygon') {
         const coordinates = polygon(location.coordinates);
 
         return `POLYGON(${coordinates})`;
-    } else if(location.type == 'MultiPolygon') {
+    } else if(location.type === 'MultiPolygon') {
         const coordinates = multiPolygon(location.coordinates);
 
         return `MULTIPOLYGON(${coordinates})`;
