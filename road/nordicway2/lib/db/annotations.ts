@@ -42,7 +42,7 @@ function getTypeFromTags(tags: string[]|null) {
     const first = tags[0];
 
     // somethingIrrelevant:TYPE
-    if(first.indexOf(':') > 0) {
+    if(first.includes(':')) {
         return first.split(":", 2)[1];
     }
 
@@ -51,8 +51,8 @@ function getTypeFromTags(tags: string[]|null) {
 }
 
 export async function findActive(db: IDatabase<any, any>, author: string|null, type: string|null): Promise<any[]> {
+    const values = [];
     let sql = FIND_ACTIVE_SQL;
-    let values = [];
     let name = 'find-active-annotations';
     let index = 1;
 
@@ -73,7 +73,7 @@ export async function findActive(db: IDatabase<any, any>, author: string|null, t
         values: values
     });
 
-    return await db.manyOrNone(ps);
+    return db.manyOrNone(ps);
 }
 
 export async function findAll(db: IDatabase<any, any>): Promise<any[]> {
@@ -82,5 +82,5 @@ export async function findAll(db: IDatabase<any, any>): Promise<any[]> {
         text: FIND_ALL_SQL
     });
 
-    return await db.manyOrNone(ps);
+    return db.manyOrNone(ps);
 }

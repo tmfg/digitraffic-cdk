@@ -10,7 +10,7 @@ import {Geometry} from "wkx";
 import {IDatabase} from "pg-promise";
 
 export async function findAllAnnotations(): Promise<FeatureCollection> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
+    return inDatabase(async (db: IDatabase<any,any>) => {
         const annotations = await AnnotationsDB.findAll(db).then(convertFeatures);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS);
 
@@ -19,7 +19,7 @@ export async function findAllAnnotations(): Promise<FeatureCollection> {
 }
 
 export async function findActiveAnnotations(author: string|null, type: string|null): Promise<FeatureCollection> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
+    return inDatabase(async (db: IDatabase<any,any>) => {
         const annotations = await AnnotationsDB.findActive(db, author, type).then(convertFeatures);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS);
 
@@ -29,7 +29,7 @@ export async function findActiveAnnotations(author: string|null, type: string|nu
 
 function convertFeatures(aa: any[]) {
     return aa.map(a => {
-        const properties = <GeoJsonProperties>{
+        const properties = {
             id: a.id,
             author: a.author,
             createdAt: a.created_at,
@@ -37,16 +37,16 @@ function convertFeatures(aa: any[]) {
             recordedAt: a.recorded_at,
             expiresAt: a.expires_at,
             type: a.type
-        };
+        } as GeoJsonProperties;
 
         // convert geometry from db to geojson
         const geometry = Geometry.parse(Buffer.from(a.location, "hex")).toGeoJSON();
 
-        return <Feature>{
+        return {
             type: "Feature",
             properties: properties,
             geometry: geometry
-        };
+        } as Feature;
     })
 }
 
@@ -56,7 +56,7 @@ function validate(annotation: Annotation) {
 
 export async function saveAnnotations(annotations: Annotation[], timeStampTo: Date) {
     const start = Date.now();
-    let validated: any[] = [];
+    const validated: any[] = [];
 
     annotations.forEach(a => {
         if(validate(a)) {
@@ -67,7 +67,7 @@ export async function saveAnnotations(annotations: Annotation[], timeStampTo: Da
     })
 
     await inDatabase(async (db: IDatabase<any,any>) => {
-        return await db.tx((t: any) => {
+        return db.tx((t: any) => {
             const promises = [
                 ...AnnotationsDB.updateAnnotations(db, validated),
                 LastUpdatedDB.updateLastUpdated(db, LastUpdatedDB.DataType.NW2_ANNOTATIONS, timeStampTo)

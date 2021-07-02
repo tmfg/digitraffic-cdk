@@ -1,7 +1,6 @@
 import * as AWSx from "aws-sdk";
 const AWS = AWSx as any;
 
-
 export async function fetchAndParseDataFromEs(
     endpoint: AWS.Endpoint,
     region: string,
@@ -24,7 +23,7 @@ export async function fetchDataFromEs(
     toISOString: string): Promise<any> {
     return new Promise((resolve, reject) => {
         const creds = new AWS.EnvironmentCredentials("AWS")
-        let req = new AWS.HttpRequest(endpoint);
+        const req = new AWS.HttpRequest(endpoint);
         const query = getQuery(fromISOString, toISOString);
 
         req.method = "POST";
@@ -33,9 +32,9 @@ export async function fetchDataFromEs(
         req.headers["Host"] = endpoint.host;
         req.headers["Content-Type"] = "application/json";
         req.body = query;
-        let signer = new AWS.Signers.V4(req, "es");
+        const signer = new AWS.Signers.V4(req, "es");
         signer.addAuthorization(creds, new Date());
-        let send = new AWS.NodeHttpClient();
+        const send = new AWS.NodeHttpClient();
         console.log(`method=fetchDataFromEs `, JSON.stringify(req));
         send.handleRequest(
             req,
