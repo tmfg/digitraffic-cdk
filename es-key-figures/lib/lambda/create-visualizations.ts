@@ -169,20 +169,22 @@ const createDetailPage = async function (filter: string): Promise<string> {
 
 const createIndex = async function (): Promise<string> {
   const filters: { filter: string, filterValue: number }[] = await query("select distinct kf_outer.filter as filter, (select kf_inner.value from key_figures kf_inner where kf_inner.filter = kf_outer.filter and kf_inner.name = 'Http req' order by kf_inner.`from` desc limit 1) as filterValue from key_figures kf_outer")
-  let roadFilterHtml = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>'
-  for (let row of filters.filter(s => s.filter.includes('transport_type:road'))) {
+  const filterHeader = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>'
+
+  let roadFilterHtml = filterHeader;
+  for (const row of filters.filter(s => s.filter.includes('transport_type:road'))) {
     roadFilterHtml += `<tr><td><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td></tr>`
   }
   roadFilterHtml += '</table>'
 
-  let railFilterHtml = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>'
-  for (let row of filters.filter(s => s.filter.includes('transport_type:rail'))) {
+  let railFilterHtml = filterHeader;
+  for (const row of filters.filter(s => s.filter.includes('transport_type:rail'))) {
     railFilterHtml += `<tr><td><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td></tr>`
   }
   railFilterHtml += '</table>'
 
-  let marineFilterHtml = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>'
-  for (let row of filters.filter(s => s.filter.includes('transport_type:marine'))) {
+  let marineFilterHtml = filterHeader;
+  for (const row of filters.filter(s => s.filter.includes('transport_type:marine'))) {
     marineFilterHtml += `<tr><td><a href="${base64encodeFilter(row.filter)}.html">${friendlyFilterString(row.filter)}</a></td><td>${row.filterValue.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}</td></tr>`
   }
   marineFilterHtml += '</table>'
@@ -283,10 +285,10 @@ export const handler = async () => {
   const filters: { filter: string }[] = await query("select distinct filter from key_figures")
   console.log(filters)
 
-  let bucketName = 'eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw';
+  const bucketName = 'eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw';
   uploadToS3(bucketName, await createIndex(), `index.html`, undefined, 'text/html')
 
-  for (let row of filters) {
+  for (const row of filters) {
     const filter = row.filter
     console.log(`Processing: ${filter}`)
     uploadToS3(bucketName, await createDetailPage(filter), `${base64encodeFilter(filter)}.html`, undefined, 'text/html')

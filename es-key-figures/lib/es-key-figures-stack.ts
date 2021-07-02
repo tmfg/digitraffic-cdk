@@ -73,7 +73,7 @@ export class EsKeyFiguresStack extends Stack {
       })
     );
 
-    let functionName = 'CreateVisualizations';
+    const functionName = 'CreateVisualizations';
     const lambdaConf = {
       role: lambdaRole,
       functionName: functionName,
