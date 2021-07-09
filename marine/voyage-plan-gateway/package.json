@@ -15,7 +15,7 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "1.107.0",
+    "@aws-cdk/assert": "1.111.0",
     "@types/aws-lambda": "^8.10.75",
     "@types/jest": "^26.0.22",
     "@types/jsts": "^0.17.5",
@@ -36,13 +36,13 @@
     "@types/crypto-js": "^4.0.1"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "1.107.0",
-    "@aws-cdk/aws-certificatemanager": "1.107.0",
-    "@aws-cdk/aws-ec2": "1.107.0",
-    "@aws-cdk/aws-events-targets": "1.107.0",
-    "@aws-cdk/aws-lambda": "1.107.0",
-    "@aws-cdk/core": "1.107.0",
-    "@aws-cdk/aws-sqs": "1.107.0",
+    "@aws-cdk/aws-apigateway": "1.111.0",
+    "@aws-cdk/aws-certificatemanager": "1.111.0",
+    "@aws-cdk/aws-ec2": "1.111.0",
+    "@aws-cdk/aws-events-targets": "1.111.0",
+    "@aws-cdk/aws-lambda": "1.111.0",
+    "@aws-cdk/core": "1.111.0",
+    "@aws-cdk/aws-sqs": "1.111.0",
     "@types/openlayers": "^4.6.17",
     "aws-sdk": "^2.821.0",
     "axios": "^0.21.1",
