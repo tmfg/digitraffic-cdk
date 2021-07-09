@@ -5,9 +5,9 @@ Road application then reads saved data from the db and combines the contents of 
 
 ## Run build
 
-    `yarn run build`
-    `yarn run all-watch`
-    `yarn run test`
+    yarn run build
+    yarn run all-watch
+    yarn run test
 
 ## Deploy to AWS
 
