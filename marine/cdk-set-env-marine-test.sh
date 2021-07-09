@@ -5,6 +5,6 @@
 
 # Set test env
 set -v
-export AWS_PROFILE=digitraffic-marine-test
+export AWS_PROFILE=fintraffic-digitraffic-marine-tst
 export AWS_DEFAULT_REGION=eu-west-1
 set +v

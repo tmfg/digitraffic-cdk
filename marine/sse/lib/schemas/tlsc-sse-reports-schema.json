@@ -1,0 +1,203 @@
+{
+    "definitions": {},
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "urn:fi.digitraffic.tlsc.sse.reports",
+    "type": "object",
+    "title": "The SSE Report Root Schema",
+    "additionalProperties": false,
+    "required": [
+        "SSE_Reports"
+    ],
+    "properties": {
+        "SSE_Reports": {
+            "$id": "#/properties/SSE_Reports",
+            "type": "array",
+            "title": "The Sse_reports Schema",
+            "items": {
+                "$id": "#/properties/SSE_Reports/items",
+                "type": "object",
+                "title": "The Items Schema",
+                "required": [
+                    "Site",
+                    "SSE_Fields"
+                ],
+                "properties": {
+                    "Site": {
+                        "$id": "#/properties/SSE_Reports/items/properties/Site",
+                        "type": "object",
+                        "title": "The Site Schema",
+                        "additionalProperties": true,
+                        "required": [
+                            "SiteName",
+                            "SiteNumber",
+                            "SiteType"
+                        ],
+                        "properties": {
+                            "SiteName": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Site/properties/SiteName",
+                                "type": "string",
+                                "title": "The Sitename Schema",
+                                "examples": [
+                                    "Kipsi"
+                                ],
+                                "pattern": "^(.*)$"
+                            },
+                            "SiteNumber": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Site/properties/SiteNumber",
+                                "type": "integer",
+                                "title": "The Sitenumber Schema",
+                                "examples": [
+                                    12345
+                                ]
+                            },
+                            "SiteType": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Site/properties/SiteType",
+                                "type": "string",
+                                "enum": [
+                                    "FIXED",
+                                    "FLOATING"
+                                ],
+                                "title": "The SiteType Schema",
+                                "examples": [
+                                    "FIXED", "FLOATING"
+                                ]
+                            }
+                        }
+                    },
+                    "SSE_Fields": {
+                        "$id": "#/properties/SSE_Reports/items/properties/SSE_Fields",
+                        "type": "object",
+                        "title": "The Sse_fields Schema",
+                        "additionalProperties": true,
+                        "required": [
+                            "Last_Update",
+                            "SeaState",
+                            "Trend",
+                            "WindWaveDir",
+                            "Confidence"
+                        ],
+                        "properties": {
+                            "Last_Update": {
+                                "$id": "#/properties/SSE_Reports/items/properties/SSE_Fields/properties/Last_Update",
+                                "type": "string",
+                                "title": "The Last_update Schema",
+                                "examples": [
+                                    "2019-03-29T15:01:30+03:00"
+                                ],
+                                "format": "date-time"
+                            },
+                            "SeaState": {
+                                "$id": "#/properties/SSE_Reports/items/properties/SSE_Fields/properties/SeaState",
+                                "type": "string",
+                                "enum": [
+                                    "CALM",
+                                    "LIGHT",
+                                    "MODERATE",
+                                    "BREEZE",
+                                    "GALE",
+                                    "STORM"
+                                ],
+                                "title": "The Seastate Schema",
+                                "examples": [
+                                    "CALM", "LIGHT", "MODERATE", "BREEZE", "GALE", "STORM"
+                                ]
+                            },
+                            "Trend": {
+                                "$id": "#/properties/SSE_Reports/items/properties/SSE_Fields/properties/Trend",
+                                "type": "string",
+                                "enum": [
+                                    "UNKNOWN",
+                                    "NO_CHANGE",
+                                    "ASCENDING",
+                                    "DESCENDING"
+                                ],
+                                "title": "The Trend Schema",
+                                "examples": [
+                                    "UNKNOWN", "NO_CHANGE", "ASCENDING", "DESCENDING"
+                                ]
+                            },
+                            "WindWaveDir": {
+                                "$id": "#/properties/SSE_Reports/items/properties/SSE_Fields/properties/WindWaveDir",
+                                "type": "integer",
+                                "title": "The Windwavedir Schema",
+                                "examples": [
+                                    90
+                                ],
+                                "multipleOf": 1,
+                                "minimum": 0,
+                                "maximum": 359
+                            },
+                            "Confidence": {
+                                "$id": "#/properties/SSE_Reports/items/properties/SSE_Fields/properties/Confidence",
+                                "type": "string",
+                                "enum": [
+                                    "POOR",
+                                    "MODERATE",
+                                    "GOOD"
+                                ],
+                                "title": "The Confidence Schema",
+                                "examples": [
+                                    "POOR", "MODERATE", "GOOD"
+                                ]
+                            }
+                        }
+                    },
+                    "Extra_Fields": {
+                        "$id": "#/properties/SSE_Reports/items/properties/Extra_Fields",
+                        "type": "object",
+                        "title": "The Extra_fields Schema",
+                        "additionalProperties": true,
+                        "properties": {
+                            "Temperature": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Extra_Fields/properties/Temperature",
+                                "type": "integer",
+                                "title": "The Temperature Schema",
+                                "examples": [
+                                    12
+                                ]
+                            },
+                            "Heel_Angle": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Extra_Fields/properties/Heel_Angle",
+                                "type": "number",
+                                "title": "The Heel_angle Schema",
+                                "default": 0.0,
+                                "examples": [
+                                    2.5
+                                ]
+                            },
+                            "Light_Status": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Extra_Fields/properties/Light_Status",
+                                "type": "string",
+                                "enum": [
+                                    "ON",
+                                    "OFF",
+                                    "ON_D"
+                                ],
+                                "title": "The Light_status Schema",
+                                "examples": [
+                                    "ON", "OFF", "ON_D"
+                                ]
+                            },
+                            "Coord_Latitude": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Extra_Fields/properties/Coord_Latitude",
+                                "type": "number",
+                                "title": "The Coord_latitude Schema",
+                                "examples": [
+                                    12.12345
+                                ]
+                            },
+                            "Coord_Longitude": {
+                                "$id": "#/properties/SSE_Reports/items/properties/Extra_Fields/properties/Coord_Longitude",
+                                "type": "number",
+                                "title": "The Coord_longitude Schema",
+                                "examples": [
+                                    33.12345
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
