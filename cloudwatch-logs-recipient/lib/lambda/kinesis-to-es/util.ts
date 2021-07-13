@@ -31,7 +31,15 @@ export function buildFromMessage(message: string): any {
     try {
         const jsonSubString = extractJson(message);
         if (jsonSubString !== null) {
-            return JSON.parse(jsonSubString);
+            const parsedJson = JSON.parse(jsonSubString);
+            // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
+            if ( parsedJson.hasOwnProperty('@fields') && parsedJson['@fields'].hasOwnProperty('upstream_response_time') && parsedJson['@fields'].upstream_response_time ) {
+                const sum = parsedJson['@fields'].upstream_response_time.split(":").reduce((prev: any, next: any)=>prev+(+next),0).toFixed(3);
+                if (sum && !isNaN(+sum)) {
+                    parsedJson['@fields'].upstream_response_time = sum.toString();
+                }
+            }
+            return parsedJson;
         } else {
             return JSON.parse('{"log_line": "' + message.replace(/["']/g, "") + '"}');
         }

@@ -141,7 +141,7 @@ function getAppName(logGroup: string, app: string): string {
     return logGroup;
 }
 
-function buildSource(message: string, extractedFields: any[]): any {
+export function buildSource(message: string, extractedFields?: any[]): any {
     if (extractedFields) {
         return buildFromExtractedFields(extractedFields);
     }
