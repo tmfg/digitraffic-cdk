@@ -1,6 +1,7 @@
 import {DbSseReport} from "../lib/db/sse-db";
 import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
 import {IDatabase} from "pg-promise";
+import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
     return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
@@ -39,15 +40,8 @@ export function findAllSseReports(db: IDatabase<any, any>): Promise<DbSseReport[
     });
 }
 
-//
-// export function createObservationsDbDatas(jsonString : string) : DbObservationData[] {
-//     // Parse JSON to get sending time
-//     const trackingJson = JSON.parse(jsonString);
-//     const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
-//     const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma
-//     const observationDatas: DbObservationData[] =
-//         trackingJson.havainnot.map(( havainto: Havainto ) => {
-//             return convertToDbObservationData(havainto, sendingTime, sendingSystem, "https://s3Uri.com");
-//         });
-//     return observationDatas;
-// }
+export function getUpdatedTimestamp(db: IDatabase<any, any>, datatype: string): Promise<Date | null> {
+    return db.tx(t => {
+        return LastUpdatedDB.getUpdatedTimestamp(t, datatype);
+    });
+}

@@ -1,7 +1,10 @@
 import * as SseSchema from "../generated/tlsc-sse-reports-schema";
-import {DbSseReport, insertSseReportData, updateLatestSiteToFalse} from "../db/sse-db";
+import * as SseDb from "../db/sse-db";
 import {inDatabase} from '../../../../common/postgres/database';
 import {IDatabase} from "pg-promise";
+import * as LastUpdatedDB from "../../../../common/db/last-updated";
+
+export const SSE_DATA_DATA_TYPE = "SSE_DATA";
 
 export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<number> {
     return await inDatabase(async (db: IDatabase<any,any>) => {
@@ -10,8 +13,9 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
                 const dbSseSseReport = convertToDbSseReport(report);
                 return await db.tx(async t => {
                     return t.batch([
-                        updateLatestSiteToFalse(t, dbSseSseReport.siteNumber),
-                        insertSseReportData(t, dbSseSseReport)
+                        SseDb.updateLatestSiteToFalse(t, dbSseSseReport.siteNumber),
+                        SseDb.insertSseReportData(t, dbSseSseReport),
+                        LastUpdatedDB.updateUpdatedTimestamp(t, SSE_DATA_DATA_TYPE, new Date())
                     ]);
                 }).then(function (result) {
                     console.info(`method=saveSseData Done`);
@@ -27,7 +31,7 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
     });
 }
 
-export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : DbSseReport {
+export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseDb.DbSseReport {
 
     if (!sseReport.Extra_Fields?.Coord_Latitude) {
         throw new Error('Missing Coord_Latitude');
@@ -35,7 +39,7 @@ export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : DbSs
         throw new Error('Missing Coord_Latitude');
     }
 
-    const data: DbSseReport = {
+    const data: SseDb.DbSseReport = {
         siteNumber: sseReport.Site.SiteNumber,
         siteName: sseReport.Site.SiteName,
         siteType: sseReport.Site.SiteType,

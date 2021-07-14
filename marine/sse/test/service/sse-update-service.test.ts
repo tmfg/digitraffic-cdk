@@ -8,12 +8,16 @@ import * as Testdata from "../testdata";
 describe('sse-update-service-test', DbTestutil.dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('save report', async () => {
+        const start = new Date();
         const sseReport: SSESchema.TheSSEReportRootSchema = Testdata.createSampleData([Testdata.site1, Testdata.site2]);
         const savedCount = await SseUpdateService.saveSseData(sseReport);
         expect(savedCount).toBe(2);
 
         const sseReportsFromDb: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
         expect(sseReportsFromDb.length).toBe(2);
+        const lastUpdated = await DbTestutil.getUpdatedTimestamp(db, SseUpdateService.SSE_DATA_DATA_TYPE);
+        const end = new Date();
+        expect(start <= lastUpdated! && lastUpdated! <= end).toBe(true);
     });
 
     test('replace latest report', async () => {
