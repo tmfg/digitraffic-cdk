@@ -1,5 +1,3 @@
-import {TheSseReportsSchema} from "sse-sea-state-estimate/lib/generated/tlsc-sse-reports-schema";
-
 const accountNumber = '123456789012';
 const app = 'someapp';
 const env = 'someenv';
