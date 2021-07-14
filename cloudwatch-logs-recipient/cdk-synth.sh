@@ -2,18 +2,13 @@
 
 ENV=${1:-"NONE"}
 
-#CloudfrontRoadTest
-#CloudfrontRoadProd
-#CloudfrontMarineTest
-#CloudfrontMarineProd
-
-echo "Diff CloudFront for $ENV"
+echo "Diff CloudWatchLogsRecipient for $ENV"
 
 case "$ENV" in
-  ("road-test"):
+  ("status-test"):
     cdk synth CloudWatchLogsRecipientTest --no-staging > template-status-test.yaml
   ;;
-  ("road-prod"):
+  ("status-prod"):
     cdk synth CloudWatchLogsRecipientPRod --no-staging > template-status-prod.yaml
   ;;
   (*) echo "Allowed parameter values are 'status-test', 'status-prod'" ;;

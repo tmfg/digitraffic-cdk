@@ -2,12 +2,7 @@
 
 ENV=${1:-"NONE"}
 
-#CloudfrontRoadTest
-#CloudfrontRoadProd
-#CloudfrontMarineTest
-#CloudfrontMarineProd
-
-echo "Install CloudFront for $ENV"
+echo "Install CloudWatchLogsRecipient for $ENV"
 
 case "$ENV" in
   ("status-test"):

@@ -2,11 +2,6 @@
 
 ENV=${1:-"NONE"}
 
-#CloudfrontRoadTest
-#CloudfrontRoadProd
-#CloudfrontMarineTest
-#CloudfrontMarineProd
-
 echo "Diff CloudWatchLogsRecipient for $ENV"
 
 case "$ENV" in
