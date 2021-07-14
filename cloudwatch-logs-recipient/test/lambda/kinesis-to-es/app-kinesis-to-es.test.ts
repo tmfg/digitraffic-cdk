@@ -42,6 +42,6 @@ describe('app-kinesis-to-es', () => {
 
     test('buildSource undefined fields', () => {
         const source = buildSource('{ }', undefined);
-        expect(source["@fields"].upstream_response_time).toBe(undefined);
+        expect(source["@fields"]).toBe(undefined);
     });
 });
