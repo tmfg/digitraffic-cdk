@@ -1,7 +1,7 @@
 import moment from 'moment';
 import * as pgPromise from "pg-promise";
-import {dbTestBase, insert, insertPortAreaDetails, insertPortCall,} from "../db-testutil";
-import {newPortAreaDetails, newPortCall, newTimestamp} from "../testdata";
+import {dbTestBase, insert, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
+import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
@@ -326,6 +326,56 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         }]);
 
         expect(ships.length).toBe(0);
+    });
+
+    test('findMmsiByImo - not found', async () => {
+        const mmsi = await TimestampsDb.findMmsiByImo(db, 0);
+
+        expect(mmsi).toBeNull();
+    });
+
+    test('findMmsiByImo - found with AIS', async () => {
+        const timestamp = newTimestamp({imo: 1, mmsi: 2});
+        const vessel = newVessel(timestamp);
+        await insertVessel(db, vessel);
+
+        const mmsi = await db.tx(t => TimestampsDb.findMmsiByImo(t, vessel.imo));
+
+        expect(mmsi).toEqual(vessel.mmsi);
+    });
+
+    test('findMmsiByImo - found with portcall', async () => {
+        const timestamp = newTimestamp({imo: 1, mmsi: 2});
+        await createPortcall(timestamp);
+
+        const mmsi = await db.tx(t => TimestampsDb.findMmsiByImo(t, timestamp.ship.imo!));
+
+        expect(mmsi).toEqual(timestamp.ship.mmsi);
+    });
+
+    test('findImoByMmsi - not found', async () => {
+        const imo = await TimestampsDb.findImoByMmsi(db, 0);
+
+        expect(imo).toBeNull();
+    });
+
+    test('findImoByMmsi - found with AIS', async () => {
+        const timestamp = newTimestamp({imo: 1, mmsi: 2});
+        const vessel = newVessel(timestamp);
+        await insertVessel(db, vessel);
+
+        const imo = await db.tx(t => TimestampsDb.findImoByMmsi(t, vessel.mmsi));
+
+        expect(imo).toEqual(vessel.imo);
+    });
+
+    test('findImoByMmsi - found with portcall', async () => {
+        const timestamp = newTimestamp({imo: 1, mmsi: 2});
+        await createPortcall(timestamp);
+
+        const imo = await db.tx(t => TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi!));
+
+        expect(imo).toEqual(timestamp.ship.imo);
     });
 
     async function createPortcall(timestamp: ApiTimestamp) {

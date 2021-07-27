@@ -93,4 +93,24 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(ret[1]?.ship_imo).toBe(timestamp2.ship.imo);
     });
 
+    test('saveTimestamp - no imo returns null', async () => {
+        const timestamp = newTimestamp();
+        // @ts-ignore
+        delete timestamp.ship['imo'];
+
+        const ret = await TimestampsService.saveTimestamp(timestamp);
+
+        expect(ret).toBeNull();
+    });
+
+    test('saveTimestamp - no mmsi returns null', async () => {
+        const timestamp = newTimestamp();
+        // @ts-ignore
+        delete timestamp.ship['mmsi'];
+
+        const ret = await TimestampsService.saveTimestamp(timestamp);
+
+        expect(ret).toBeNull();
+    });
+
 }));

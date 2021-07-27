@@ -75,16 +75,8 @@ const INSERT_ESTIMATE_SQL = `
            $7,
            $8,
            $9,
-           COALESCE(
-               $10,
-               (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE imo = $11),
-               (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE imo_lloyds = $11)
-           ),
-           COALESCE(
-               $11,
-               (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE mmsi = $10),
-               (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $10)
-           ),
+           $10,
+           $11,
            $12,
            $13,
            $14,
@@ -337,6 +329,20 @@ const FIND_PORTCALL_ID_SQL = `
     LIMIT 1
 `;
 
+const FIND_MMSI_BY_IMO_SQL = `
+    SELECT COALESCE(
+        (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE imo = $1),
+        (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE imo_lloyds = $1)
+    ) AS mmsi
+`.trim();
+
+const FIND_IMO_BY_MMSI_SQL = `
+    SELECT COALESCE(
+        (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE mmsi = $1),
+        (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) AS imo FROM public.port_call WHERE mmsi = $1)
+    ) AS imo
+`.trim();
+
 export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: 'update-timestamps',
@@ -469,6 +475,22 @@ export async function findPortcallId(
     const ret = await db.oneOrNone(ps);
     if (ret) {
         return ret.port_call_id;
+    }
+    return null;
+}
+
+export async function findMmsiByImo(db: IDatabase<any, any>, imo: number): Promise<number | null> {
+    const mmsi = await db.oneOrNone(FIND_MMSI_BY_IMO_SQL, [imo]);
+    if (mmsi) {
+        return mmsi.mmsi as number;
+    }
+    return null;
+}
+
+export async function findImoByMmsi(db: IDatabase<any, any>, mmsi: number): Promise<number | null> {
+    const imo = await db.oneOrNone(FIND_IMO_BY_MMSI_SQL, [mmsi]);
+    if (imo) {
+        return imo.imo as number;
     }
     return null;
 }

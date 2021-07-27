@@ -30,6 +30,20 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
                 return null;
             }
 
+            // mmsi should exist in this case
+            let imo = timestamp.ship.imo ?? (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi!));
+            if (!imo) {
+                console.warn(`method=saveTimestamp imo for timestamp %s not found`, JSON.stringify(timestamp));
+                return null;
+            }
+
+            // imo should exist in this case
+            let mmsi = timestamp.ship.mmsi ?? (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo!));
+            if (!mmsi) {
+                console.warn(`method=saveTimestamp mmsi for timestamp %s not found`, JSON.stringify(timestamp));
+                return null;
+            }
+
             return doSaveTimestamp(t, { ...timestamp, ...{ portcallId }});
         });
     });
