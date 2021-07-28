@@ -93,20 +93,24 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(ret[1]?.ship_imo).toBe(timestamp2.ship.imo);
     });
 
-    test('saveTimestamp - no imo', async () => {
+    test('saveTimestamp - no IMO not saved', async () => {
         const timestamp = newTimestamp();
         // @ts-ignore
         delete timestamp.ship['imo'];
 
-        await expect(() => TimestampsService.saveTimestamp(timestamp)).rejects.toBe('IMO not found');
+        const ret = await TimestampsService.saveTimestamp(timestamp);
+
+        expect(ret).toBeUndefined();
     });
 
-    test('saveTimestamp - no mmsi', async () => {
+    test('saveTimestamp - no MMSI not saved', async () => {
         const timestamp = newTimestamp();
         // @ts-ignore
         delete timestamp.ship['mmsi'];
 
-        await expect(() => TimestampsService.saveTimestamp(timestamp)).rejects.toBe('MMSI not found');
+        const ret = await TimestampsService.saveTimestamp(timestamp);
+
+        expect(ret).toBeUndefined();
     });
 
     test('saveTimestamp - imo from vessel', async () => {

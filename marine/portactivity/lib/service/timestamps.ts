@@ -27,21 +27,24 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
 
             if (!portcallId) {
                 console.warn(`method=saveTimestamp portcall id not found for timestamp %s`, JSON.stringify(timestamp));
-                return Promise.reject('Portcall id not found');
+                // resolve so this gets removed from the queue
+                return Promise.resolve();
             }
 
             // mmsi should exist in this case
             let imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi!));
             if (!imo) {
                 console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
-                return Promise.reject('IMO not found');
+                // resolve so this gets removed from the queue
+                return Promise.resolve();
             }
 
             // imo should exist in this case
             let mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo!));
             if (!mmsi) {
                 console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
-                return Promise.reject('MMSI not found');
+                // resolve so this gets removed from the queue
+                return Promise.resolve();
             }
 
             const ship: Ship = {

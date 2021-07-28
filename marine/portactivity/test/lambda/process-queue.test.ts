@@ -28,7 +28,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('missing portcall id does not throw error', async () => {
         const timestamp = newTimestamp();
         // @ts-ignore
-        delete timestamp.portcallId;
+        delete timestamp['portcallId'];
 
         await handlerFn(NOOP_WITH_SECRET)({
             Records: [createRecord(timestamp)]
@@ -50,7 +50,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(allTimestamps.length).toBe(0);
     });
 
-    test('valid & invalid record', async () => {
+    test('both valid & invalid records return fulfilled promises', async () => {
         const validTimestamp = newTimestamp();
         const invalidTimestamp = newTimestamp();
         delete (invalidTimestamp as any).eventType;
@@ -59,8 +59,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)]
         });
 
-        expect(promises.find((p: any) => p.status == 'fulfilled')).toBeDefined();
-        expect(promises.find((p: any) => p.status == 'rejected')).toBeDefined();
+        expect(promises.filter((p: any) => p.status == 'fulfilled')).toHaveLength(2);
     });
 
 }));

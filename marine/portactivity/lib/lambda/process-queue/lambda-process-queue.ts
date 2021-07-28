@@ -17,17 +17,19 @@ export function handlerFn(
                 console.info('DEBUG method=processTimestampQueue processing timestamp', timestamp);
 
                 if (!validateTimestamp(timestamp)) {
-                    return Promise.reject('method=processTimestampQueue timestamp did not pass validation');
+                    console.warn('DEBUG method=processTimestampQueue timestamp did not pass validation')
+                    // resolve so this gets removed from the queue
+                    return Promise.resolve();
                 }
                 const saveTimestampPromise = saveTimestamp(timestamp);
                 saveTimestampPromise.then(value => {
                     if (value) {
                         console.log('DEBUG method=processTimestampQueue update successful');
                     } else {
-                        console.log('DEBUG method=processTimestampQueue update conflict');
+                        console.log('DEBUG method=processTimestampQueue update conflict or failure');
                     }
-                }).catch(() => {
-                    console.log('DEBUG method=processTimestampQueue update failed');
+                }).catch((error) => {
+                    console.error('method=processTimestampQueue update failed', error);
                 });
                 return saveTimestampPromise;
             }));
