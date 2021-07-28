@@ -2,7 +2,7 @@ import * as TimestampsDB from '../db/timestamps'
 import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps'
 import {inDatabase} from '../../../../common/postgres/database';
 import {IDatabase} from 'pg-promise';
-import {ApiTimestamp} from '../model/timestamp';
+import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
     isPortnetTimestamp,
     mergeTimestamps,
@@ -18,7 +18,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
     return await inDatabase(async (db: IDatabase<any, any>) => {
         return await db.tx(async t => {
 
-            const portcallId = timestamp.portcallId ?? (await TimestampsDB.findPortcallId(db,
+            const portcallId = timestamp.portcallId || (await TimestampsDB.findPortcallId(db,
                 timestamp.location.port,
                 timestamp.eventType,
                 moment(timestamp.eventTime).toDate(),
@@ -26,25 +26,30 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
                 timestamp.ship.imo));
 
             if (!portcallId) {
-                console.warn(`method=saveTimestamp portcall id for timestamp %s not found`, JSON.stringify(timestamp));
-                return null;
+                console.warn(`method=saveTimestamp portcall id not found for timestamp %s`, JSON.stringify(timestamp));
+                return Promise.reject('Portcall id not found');
             }
 
             // mmsi should exist in this case
-            let imo = timestamp.ship.imo ?? (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi!));
+            let imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi!));
             if (!imo) {
-                console.warn(`method=saveTimestamp imo for timestamp %s not found`, JSON.stringify(timestamp));
-                return null;
+                console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
+                return Promise.reject('IMO not found');
             }
 
             // imo should exist in this case
-            let mmsi = timestamp.ship.mmsi ?? (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo!));
+            let mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo!));
             if (!mmsi) {
-                console.warn(`method=saveTimestamp mmsi for timestamp %s not found`, JSON.stringify(timestamp));
-                return null;
+                console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
+                return Promise.reject('MMSI not found');
             }
 
-            return doSaveTimestamp(t, { ...timestamp, ...{ portcallId }});
+            const ship: Ship = {
+                imo,
+                mmsi
+            };
+
+            return doSaveTimestamp(t, { ...timestamp, ...{ portcallId, ship }});
         });
     });
 }

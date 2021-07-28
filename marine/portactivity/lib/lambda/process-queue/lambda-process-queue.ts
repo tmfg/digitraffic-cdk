@@ -19,26 +19,20 @@ export function handlerFn(
                 if (!validateTimestamp(timestamp)) {
                     return Promise.reject('method=processTimestampQueue timestamp did not pass validation');
                 }
-                return saveTimestamp(timestamp);
-            })).then(async timestamps => {
-                const successful = timestamps.filter(processedSuccessfully);
-                if (successful.length) {
-                    // fulfilled promises have a 'value' property
-                    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise/allSettled
-                    const updates = successful
-                        .map(s => (s as any).value)
-                        .filter(s => s != null);
-
-                    console.info("method=processTimestampQueue successful %d updates %d", successful.length, updates.length);
-                }
-                return timestamps;
-            });
+                const saveTimestampPromise = saveTimestamp(timestamp);
+                saveTimestampPromise.then(value => {
+                    if (value) {
+                        console.log('DEBUG method=processTimestampQueue update successful');
+                    } else {
+                        console.log('DEBUG method=processTimestampQueue update conflict');
+                    }
+                }).catch(() => {
+                    console.log('DEBUG method=processTimestampQueue update failed');
+                });
+                return saveTimestampPromise;
+            }));
         });
     };
-}
-
-function processedSuccessfully(p: PromiseSettledResult<any>) {
-    return p.status === 'fulfilled';
 }
 
 export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());

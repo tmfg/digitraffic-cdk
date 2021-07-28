@@ -1,6 +1,6 @@
-import {dbTestBase, findAll, insert} from "../db-testutil";
+import {dbTestBase, findAll, insert, insertVessel} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {newTimestamp} from "../testdata";
+import {newTimestamp, newVessel} from "../testdata";
 import moment from 'moment-timezone';
 import * as TimestampsService from "../../lib/service/timestamps";
 
@@ -93,24 +93,48 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(ret[1]?.ship_imo).toBe(timestamp2.ship.imo);
     });
 
-    test('saveTimestamp - no imo returns null', async () => {
+    test('saveTimestamp - no imo', async () => {
         const timestamp = newTimestamp();
+        // @ts-ignore
+        delete timestamp.ship['imo'];
+
+        await expect(() => TimestampsService.saveTimestamp(timestamp)).rejects.toBe('IMO not found');
+    });
+
+    test('saveTimestamp - no mmsi', async () => {
+        const timestamp = newTimestamp();
+        // @ts-ignore
+        delete timestamp.ship['mmsi'];
+
+        await expect(() => TimestampsService.saveTimestamp(timestamp)).rejects.toBe('MMSI not found');
+    });
+
+    test('saveTimestamp - imo from vessel', async () => {
+        const timestamp = newTimestamp();
+        const vessel = newVessel(timestamp);
+        await insertVessel(db, vessel);
         // @ts-ignore
         delete timestamp.ship['imo'];
 
         const ret = await TimestampsService.saveTimestamp(timestamp);
 
-        expect(ret).toBeNull();
+        expect(ret?.location_locode).toBe(timestamp.location.port);
+        expect(ret?.ship_mmsi).toBe(vessel.mmsi);
+        expect(ret?.ship_imo).toBe(vessel.imo);
     });
 
-    test('saveTimestamp - no mmsi returns null', async () => {
+    test('saveTimestamp - mmsi from vessel', async () => {
         const timestamp = newTimestamp();
+        const vessel = newVessel(timestamp);
+        await insertVessel(db, vessel);
         // @ts-ignore
         delete timestamp.ship['mmsi'];
 
         const ret = await TimestampsService.saveTimestamp(timestamp);
 
-        expect(ret).toBeNull();
+        expect(ret?.location_locode).toBe(timestamp.location.port);
+        expect(ret?.ship_mmsi).toBe(vessel.mmsi);
+        expect(ret?.ship_imo).toBe(vessel.imo);
     });
 
 }));
