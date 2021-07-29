@@ -57,10 +57,4 @@ export function handlerFn(
     };
 }
 
-function checkSecretKey(key: string) {
-    if (!key) {
-
-    }
-}
-
 export const handler = handlerFn(withDbSecret, updateETATimestamps);

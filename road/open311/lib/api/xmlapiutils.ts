@@ -17,7 +17,7 @@ export async function getXml<T>(
             password: endpointPass
         }
     });
-    if (resp.status != 200) {
+    if (resp.status !== 200) {
         console.error(`method=getXml query to ${path} failed status ${resp.status}`);
         throw Error(`Query to ${path} failed`);
     }

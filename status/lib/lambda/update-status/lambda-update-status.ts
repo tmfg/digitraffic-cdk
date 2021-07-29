@@ -239,7 +239,7 @@ async function updateComponentsAndChecks(
         if (!contact) {
             throw new Error(`Contact for ${missingCheck} not found`);
         }
-        const correspondingExtraEndpoint = appEndpoints.extraEndpoints.find(e => e.name == missingCheck);
+        const correspondingExtraEndpoint = appEndpoints.extraEndpoints.find(e => e.name === missingCheck);
         await createNodepingCheck(missingCheck,
             secret.nodePingToken,
             secret.nodepingSubAccountId,

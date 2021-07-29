@@ -24,7 +24,7 @@ async function getAnnotationsFromServer(timestampFrom: Date, timeStampTo: Date):
     try {
         const loginResponse = <LoginResponse> await AnnotationsApi.login(endpointUser, endpointPass, loginUrl);
 
-        if(loginResponse.status == "success") {
+        if(loginResponse.status === "success") {
             const newAnnotations = await AnnotationsApi.getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo, false);
             const updatedAnnotations = await AnnotationsApi.getAnnotations(loginResponse.data.userId, loginResponse.data.authToken, endpointUrl, timestampFrom, timeStampTo, true);
 

@@ -1,6 +1,6 @@
 import {Construct} from '@aws-cdk/core';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {RestApi, IntegrationResponse}  from '@aws-cdk/aws-apigateway'; // don't remove RestApi! won't work without!
+import {IntegrationResponse}  from '@aws-cdk/aws-apigateway'; // don't remove RestApi! won't work without!
 
 import {createRestApi} from "../../common/api/rest_apis";
 import {defaultLambdaConfiguration} from "../../common/stack/lambda-configs";
@@ -10,7 +10,6 @@ import {USER_MANAGEMENT_TAGS} from "../../common/api/tags";
 import {addDefaultValidator, addServiceModel} from "../../common/api/utils";
 import {LOGIN_SCHEMA, LOGIN_SUCCESSFUL_SCHEMA} from './model/login-schema';
 import {MessageModel} from "../../common/api/response";
-import {createSubscription} from "../../common/stack/subscription";
 import {MediaType} from "../../common/api/mediatypes";
 
 const RESPONSE_200_OK: IntegrationResponse = {
@@ -91,7 +90,6 @@ function createUserManagementResources(stack: Construct, publicApi: any, userMan
         ]
     });
 
-    //createSubscription(loginUserLambda, functionName, userManagementProps.logsDestinationArn, stack);
     addTags('Login', USER_MANAGEMENT_TAGS, loginResource, stack);
 
 }

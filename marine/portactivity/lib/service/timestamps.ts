@@ -114,7 +114,7 @@ export async function findAllTimestamps(
         return [];
     }).finally(() => {
         console.info('method=findAllTimestamps tookMs=%d', (Date.now() - start));
-    }).then((timestamps: DbTimestamp[]) => timestamps.map(e => ({
+    }).then((tss: DbTimestamp[]) => tss.map(e => ({
         eventType: e.event_type,
         eventTime: e.event_time.toISOString(),
         recordTime:e.record_time.toISOString(),

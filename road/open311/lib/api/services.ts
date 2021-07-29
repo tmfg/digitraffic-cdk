@@ -43,7 +43,7 @@ function responseToServices(response: ServicesResponse): Service[] {
         service_code: s.service_code[0],
         service_name: s.service_name[0],
         description: s.description[0],
-        metadata: s.metadata[0] == 'true',
+        metadata: s.metadata[0] === 'true',
         type: ServiceType[s.type[0] as ServiceType],
         keywords: s.keywords[0],
         group: s.group[0]

@@ -106,7 +106,7 @@ export function update(
 ): Promise<void> {
     return db.tx(t => {
         const queries: any[] = serviceRequests.map(serviceRequest => {
-            if (serviceRequest.status == ServiceRequestStatus.closed) {
+            if (serviceRequest.status === ServiceRequestStatus.closed) {
                 return t.none(DELETE_REQUEST_PS, [serviceRequest.service_request_id]);
             } else {
                 return t.none(UPSERT_REQUEST_PS, createEditObject(serviceRequest));
@@ -213,7 +213,7 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
 
     // DPO-1167 handle long/lat empty string
     // @ts-ignore
-    const editObjectWithLonLat = serviceRequest.long != '' && serviceRequest.lat != '' ? editObject : { ...serviceRequest, ...{
+    const editObjectWithLonLat = serviceRequest.long !== '' && serviceRequest.lat !== '' ? editObject : { ...serviceRequest, ...{
             long: null,
             lat: null
         }

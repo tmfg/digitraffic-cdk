@@ -27,7 +27,7 @@ async function getActiveStatusPageMaintenances(): Promise<StatuspageMaintenances
     const r = await axios.get(`${STATUSPAGE_URL}/api/v2/scheduled-maintenances/active.json`, {
         timeout: DEFAULT_TIMEOUT_MS
     });
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to get Statuspage maintenances');
     }
     return r.data as StatuspageMaintenances;
@@ -37,11 +37,11 @@ async function getEnabledNodePingChecks(nodepingToken: string, subaccountId: str
     const r = await axios.get(`${NODEPING_API}/checks?token=${nodepingToken}&customerid=${subaccountId}`, {
         timeout: DEFAULT_TIMEOUT_MS
     });
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to fetch checks');
     }
     const checks = Object.values(r.data) as NodePingCheck[];
-    return checks.filter(c => c.enable == 'active');
+    return checks.filter(c => c.enable === 'active');
 }
 
 async function setNodePingCheckStateToDisabled(disabled: boolean, nodepingToken: string, subaccountId: string) {
@@ -49,7 +49,7 @@ async function setNodePingCheckStateToDisabled(disabled: boolean, nodepingToken:
     const r = await axios.put(`${NODEPING_API}/checks?disableall=${disabled}&token=${nodepingToken}&customerid=${subaccountId}`, {
         timeout: DEFAULT_TIMEOUT_MS
     });
-    if (r.status != 200) {
+    if (r.status !== 200) {
         throw new Error('Unable to update checks');
     }
     console.log('..done');

@@ -12,7 +12,7 @@ export const handler = async (
     const obj = JSON.parse(event.body);
     const serviceRequests: ServiceRequestWithExtensionsDto[] = Array.isArray(obj) ? obj as ServiceRequestWithExtensionsDto[] : [obj];
 
-    if (serviceRequests.length == 0) {
+    if (serviceRequests.length === 0) {
         return invalidRequest();
     }
 

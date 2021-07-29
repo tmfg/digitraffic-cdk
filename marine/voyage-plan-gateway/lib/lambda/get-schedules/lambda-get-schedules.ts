@@ -6,14 +6,14 @@ const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
 export async function handler(event: any): Promise<any> {
     return await withSecret(secretId, async (secret: any) => {
-        if (event.queryStringParameters.auth != secret[VoyagePlanSecretKeys.SCHEDULES_ACCESS_TOKEN]) {
+        if (event.queryStringParameters.auth !== secret[VoyagePlanSecretKeys.SCHEDULES_ACCESS_TOKEN]) {
             return {
                 statusCode: 403,
                 body: 'Denied'
             }
         }
         let url = secret[VoyagePlanSecretKeys.SCHEDULES_URL];
-        const calculated = event.queryStringParameters.calculated == 'true';
+        const calculated = event.queryStringParameters.calculated === 'true';
         if (calculated) {
             url += '/calculated';
         }

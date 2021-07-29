@@ -13,7 +13,7 @@ export async function getSubSubjects(
         endpointUrl,
         `/subsubjects?locale=${locale}`);
     return responseToSubjects(parsedSubSubjects)
-        .filter(s => s.locale == locale); // integration returns mixed locales
+        .filter(s => s.locale === locale); // integration returns mixed locales
 }
 
 interface SubSubjectsResponse {

@@ -31,6 +31,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "@aws-cdk/aws-events": "1.111.0",
     "@aws-cdk/aws-events-targets": "1.111.0",
     "@aws-cdk/aws-iam": "1.111.0",
     "@aws-cdk/aws-lambda": "1.111.0",

@@ -19,7 +19,7 @@ export class Nordicway2CdkStack extends Stack {
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', nw2Props.lambdaDbSgId);
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
-        const internalLambda = InternalLambdas.create(vpc, lambdaDbSg, nw2Props, this);
-        const publicLambda = PublicApi.create(vpc, lambdaDbSg, nw2Props, this);
+        InternalLambdas.create(vpc, lambdaDbSg, nw2Props, this);
+        PublicApi.create(vpc, lambdaDbSg, nw2Props, this);
     }
 }

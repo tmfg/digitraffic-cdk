@@ -23,9 +23,9 @@ export function handlerFn(
             const apiKey = secret[VoyagePlanSecretKeys.API_KEY];
             const messages = await VisApi.getMessages(privateVisUrl, appId, apiKey);
 
-            const routeMessages = messages.message.filter(msg => msg.messageType == VisMessageType.RTZ);
+            const routeMessages = messages.message.filter(msg => msg.messageType === VisMessageType.RTZ);
             // Do these contain failed authentications?
-            const txtMessages = messages.message.filter(msg => msg.messageType == VisMessageType.TXT);
+            const txtMessages = messages.message.filter(msg => msg.messageType === VisMessageType.TXT);
 
             console.info(`method=vpgwProcessVisMessages count=${messages.message.length}`);
 

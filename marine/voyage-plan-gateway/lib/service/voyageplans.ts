@@ -164,12 +164,12 @@ export function validateWaypointsContent(wps: RtzWaypoint[]): ValidationError[] 
     return validationErrors;
 }
 
-export function validateSchedulesContent(schedules: RtzSchedules[]): ValidationError[] {
+export function validateSchedulesContent(rtzSchedules: RtzSchedules[]): ValidationError[] {
     const validationErrors: ValidationError[] = [];
 
     const now = moment();
 
-    schedules.forEach(schedules => {
+    rtzSchedules.forEach(schedules => {
         schedules.schedule.forEach(sched => {
             sched.manual.forEach(s => {
                 s.scheduleElement.forEach(se => {

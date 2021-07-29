@@ -22,7 +22,7 @@ export async function login(
         }
     });
 
-    if (resp.status != 200) {
+    if (resp.status !== 200) {
         throw Error('Login failed: ' + resp.statusText);
     }
     return resp.data;
@@ -46,12 +46,11 @@ export async function getAnnotations(
         console.info("getting annotations from " + url);
         const resp = await getAnnotationsFromServer(url, userId, authToken);
 
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             throw Error('Fetching annotations failed: ' + resp.statusText);
         }
 
         console.info("data " + JSON.stringify(resp.data));
-//        console.info("headers " + JSON.stringify(resp.headers.link));
 
         // add all items from array to annotations-array
         annotations.push(...resp.data);
@@ -70,8 +69,6 @@ function getNextUrl(headers: any) {
     }
 
     const parsedHeaders = parse(headers.link);
-
-//    console.info("parsed " + JSON.stringify(parsedHeaders));
 
     if(parsedHeaders == null || parsedHeaders.cursornext == null) {
         return null;
