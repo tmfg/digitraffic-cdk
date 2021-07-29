@@ -20,6 +20,31 @@ export function add404Support(restApi: RestApi, stack: Construct) {
     });
 }
 
+/**
+ * Due to AWS API design API Gateway will always return 403 'Missing Authentication Token' for requests
+ * with a non-existent endpoint. This function converts this response to a custom one.
+ * Requests with an invalid or missing API key are not affected (still return 403 'Forbidden').
+ * @param returnCode
+ * @param message
+ * @param restApi RestApi
+ * @param stack Construct
+ */
+export function setReturnCodeForMissingAuthenticationToken(
+    returnCode: number,
+    message: string,
+    restApi: RestApi,
+    stack: Construct) {
+
+    new GatewayResponse(stack, `MissingAuthenticationTokenResponse-${restApi.restApiName}`, {
+        restApi,
+        type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
+        statusCode: `${returnCode}`,
+        templates: {
+            'application/json': `{"message": ${message}}`
+        }
+    });
+}
+
 export function createRestApi(stack: Construct, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined): RestApi {
     const policyDocument = allowFromIpAddresses == null ? createDefaultPolicyDocument() : createIpRestrictionPolicyDocument(allowFromIpAddresses);
     const restApi = new RestApi(stack, apiId, {

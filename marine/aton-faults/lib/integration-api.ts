@@ -4,7 +4,7 @@ import {Construct} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {createSubscription} from "../../../common/stack/subscription";
 import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createRestApi} from "../../../common/api/rest_apis";
+import {createRestApi, setReturnCodeForMissingAuthenticationToken} from "../../../common/api/rest_apis";
 import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "../../../common/stack/usage-plans";
 import {KEY_SECRET_ID, KEY_SEND_FAULT_SNS_TOPIC_ARN} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
@@ -27,15 +27,10 @@ export function create(
         stack,
         'ATON-Integration',
         'ATON Faults integration API');
+
     // set response for missing auth token to 501 as desired by API registrar
-    new GatewayResponse(stack, 'MissingAuthenticationTokenResponse', {
-        restApi: integrationApi,
-        type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
-        statusCode: '501',
-        templates: {
-            'application/json': 'Not implemented'
-        }
-    });
+    setReturnCodeForMissingAuthenticationToken(501, 'Not implemented', integrationApi, stack);
+
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
     createUploadVoyagePlanHandler(messageResponseModel, secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
