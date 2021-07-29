@@ -32,7 +32,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
             }
 
             // mmsi should exist in this case
-            let imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi!));
+            const imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi!));
             if (!imo) {
                 console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
                 // resolve so this gets removed from the queue
@@ -40,7 +40,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
             }
 
             // imo should exist in this case
-            let mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo!));
+            const mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo!));
             if (!mmsi) {
                 console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
                 // resolve so this gets removed from the queue
