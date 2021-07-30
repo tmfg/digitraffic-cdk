@@ -5,6 +5,10 @@ import {AreaTraffic} from "../model/areatraffic";
 
 export function getAreaTraffic(): Promise<AreaTraffic[]> {
     return inDatabase(async (db: IDatabase<any, any>) => {
-        return AreaTrafficDb.getAreaTraffic(db);
+        const areas: Promise<AreaTraffic[]> = AreaTrafficDb.getAreaTraffic(db).then(areas => areas.map(a => ({
+            areaId: a.id,
+            durationInMinutes: a.lighting_duration_min
+        })));
+        return areas;
     });
 }

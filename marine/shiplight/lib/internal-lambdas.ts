@@ -25,7 +25,7 @@ function createScheduler(stack: Stack): Rule {
     const ruleName = 'Shiplight-Scheduler'
     return new Rule(stack, ruleName, {
         ruleName,
-        schedule: Schedule.expression('cron(*/10 * * * ? *)') // every 10 minutes
+        schedule: Schedule.expression('cron(*/1 * * * ? *)') // every 1 minutes
     });
 }
 
