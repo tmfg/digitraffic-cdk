@@ -8,4 +8,5 @@ export interface UpdateStatusSecret {
     readonly statusPageRailComponentGroupId: string
     readonly nodePingContactIdSlack1: string
     readonly nodePingContactIdSlack2: string
+    readonly reportUrl: string
 }

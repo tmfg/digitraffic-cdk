@@ -10,7 +10,8 @@ export async function getNodePingAndStatuspageComponentStatuses(
     statuspageApi: StatuspageApi,
     nodePingApi: NodePingApi): Promise<string[]> {
 
-    const statuspageComponents = await statuspageApi.getStatuspageComponents();
+    const statuspageComponents = (await statuspageApi.getStatuspageComponents())
+        .filter(sc => sc.group_id != null); // skip component group components
     const nodePingChecks = await nodePingApi.getNodepingChecks();
 
     const statuspageCheckMap: {[label: string]: StatuspageComponent } = {};

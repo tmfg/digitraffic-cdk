@@ -37,7 +37,12 @@ describe('status service', () => {
         const statuspageApi = new StatuspageApi('', '');
         const nodePingApi = new NodePingApi('','');
         const componentName = 'test';
-        sinon.stub(statuspageApi, 'getStatuspageComponents').returns(Promise.resolve([{name: componentName, id: '', status: StatuspageComponentStatus.operational}]));
+        sinon.stub(statuspageApi, 'getStatuspageComponents').returns(Promise.resolve([{
+            name: componentName,
+            id: 'someid',
+            group_id: 'somegroupid',
+            status: StatuspageComponentStatus.operational
+        }]));
         sinon.stub(nodePingApi, 'getNodepingChecks').returns(Promise.resolve([]));
 
         const statuses = await StatusService.getNodePingAndStatuspageComponentStatuses(secret, statuspageApi, nodePingApi);
@@ -58,6 +63,7 @@ function emptySecret(): UpdateStatusSecret {
         nodepingSubAccountId: '',
         nodePingToken: '',
         nodePingContactIdSlack1: '',
-        nodePingContactIdSlack2: ''
+        nodePingContactIdSlack2: '',
+        reportUrl: ''
     };
 }

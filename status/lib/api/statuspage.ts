@@ -14,6 +14,7 @@ export enum StatuspageComponentStatus {
 export type StatuspageComponent = {
     readonly name: string
     readonly id: string
+    readonly group_id: string
     readonly status: StatuspageComponentStatus
 }
 
