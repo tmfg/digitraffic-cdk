@@ -12,7 +12,7 @@
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "echo no tests for this project"
+    "test": "jest --detectOpenHandles"
   },
   "devDependencies": {
     "@aws-cdk/assert": "1.111.0",
