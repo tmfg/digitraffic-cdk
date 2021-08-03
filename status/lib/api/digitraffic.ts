@@ -6,16 +6,16 @@ export class DigitrafficApi {
 
     async getAppEndpoints(app: MonitoredApp): Promise<AppEndpoints> {
         console.log('Fetching digitraffic endpoints')
-        const r = await axios.get(app.url, {
+        const resp = await axios.get(app.url, {
             headers: {
                 'accept-encoding': 'gzip'
             }
         });
-        if (r.status !== 200) {
+        if (resp.status !== 200) {
             throw new Error('Unable to fetch contacts');
         }
         console.log('..done');
-        const all = Object.keys(r.data.paths).filter(p => !p.includes('{'));
+        const all = Object.keys(resp.data.paths).filter(p => !p.includes('{'));
         const notBeta = all.filter((e) => !e.includes('beta'));
         const beta = all.filter((e) => e.includes('beta'));
         notBeta.sort();

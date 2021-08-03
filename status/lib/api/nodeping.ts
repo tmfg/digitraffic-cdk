@@ -26,12 +26,12 @@ export class NodePingApi {
 
     async getNodepingContacts () {
         console.log('Fetching NodePing contacts with token');
-        const r = await axios.get(`${NODEPING_API}/contacts?token=${this.token}&customerid=${this.subAccountId}`);
-        if (r.status !== 200) {
+        const resp = await axios.get(`${NODEPING_API}/contacts?token=${this.token}&customerid=${this.subAccountId}`);
+        if (resp.status !== 200) {
             throw new Error('Unable to fetch contacts');
         }
         console.log('..done');
-        return r.data;
+        return resp.data;
     }
 
     async createNodepingContact(
@@ -40,7 +40,7 @@ export class NodePingApi {
         statuspagePageId: string,
         statuspageComponentId: string) {
         console.log('Creating NodePing contact for endpoint', endpoint)
-        const r = await axios.post(`${NODEPING_API}/contacts`, {
+        const resp = await axios.post(`${NODEPING_API}/contacts`, {
             token: this.token,
             customerid: this.subAccountId,
             name: endpoint,
@@ -54,7 +54,7 @@ export class NodePingApi {
                 data: {'component[status]': '{if success}operational{else}major_outage{/if}'}
             }]
         });
-        if (r.status !== 200) {
+        if (resp.status !== 200) {
             throw new Error('Unable to create contact');
         }
         console.log('..done');
@@ -62,12 +62,12 @@ export class NodePingApi {
 
     async getNodepingChecks(): Promise<NodePingCheck[]> {
         console.log('Fetching NodePing checks')
-        const r = await axios.get(`${NODEPING_API}/checks?token=${this.token}&customerid=${this.subAccountId}`);
-        if (r.status !== 200) {
+        const resp = await axios.get(`${NODEPING_API}/checks?token=${this.token}&customerid=${this.subAccountId}`);
+        if (resp.status !== 200) {
             throw new Error('Unable to fetch checks');
         }
         console.log('..done');
-        return Object.values(r.data) as NodePingCheck[];
+        return Object.values(resp.data) as NodePingCheck[];
     }
 
     async createNodepingCheck(
@@ -99,12 +99,13 @@ export class NodePingApi {
             data.postdata = extraData.sendData;
             data.sendheaders['content-type'] = MediaType.APPLICATION_JSON;
         }
-        const r = await axios.post(`${NODEPING_API}/checks`, data, {
+        const resp = await axios.post(`${NODEPING_API}/checks`, data, {
             headers: {
                 'Content-type': MediaType.APPLICATION_JSON
             }
         });
-        if (r.status !== 200 || r.data.error) {
+        if (resp.status !== 200 || resp.data.error) {
+            console.error('method=createNodepingCheck Unable to create check', resp.data.error);
             throw new Error('Unable to create check');
         }
         console.log('..done');

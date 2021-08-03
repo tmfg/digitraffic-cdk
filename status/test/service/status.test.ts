@@ -6,50 +6,54 @@ import {StatuspageApi, StatuspageComponentStatus} from "../../lib/api/statuspage
 
 describe('status service', () => {
 
-    test('getNodePingAndStatuspageComponentStatuses - returns nothing', async () => {
-        const secret = emptySecret();
-        const statuspageApi = new StatuspageApi('', '');
-        const nodePingApi = new NodePingApi('','');
-        sinon.stub(statuspageApi, 'getStatuspageComponents').returns(Promise.resolve([]));
-        sinon.stub(nodePingApi, 'getNodepingChecks').returns(Promise.resolve([]));
+    function testGetNodePingAndStatuspageComponentStatuses(
+        name: string,
+        expectationFn: (statuses: string[]) => void,
+        returnFromStatuspage: any = [],
+        returnFromNodePing: any = []) {
 
-        const statuses = await StatusService.getNodePingAndStatuspageComponentStatuses(secret, statuspageApi, nodePingApi);
+        test(name, async () => {
+            const secret = emptySecret();
+            const statuspageApi = new StatuspageApi('', '');
+            const nodePingApi = new NodePingApi('','');
+            sinon.stub(statuspageApi, 'getStatuspageComponents').returns(Promise.resolve(returnFromStatuspage));
+            sinon.stub(nodePingApi, 'getNodepingChecks').returns(Promise.resolve(returnFromNodePing));
 
-        expect(statuses.length).toBe(0);
-    });
+            const statuses = await StatusService.getNodePingAndStatuspageComponentStatuses(secret, statuspageApi, nodePingApi);
 
-    test('getNodePingAndStatuspageComponentStatuses - missing Statuspage component', async () => {
-        const secret = emptySecret();
-        const statuspageApi = new StatuspageApi('', '');
-        const nodePingApi = new NodePingApi('','');
-        const checkName = 'test';
-        sinon.stub(statuspageApi, 'getStatuspageComponents').returns(Promise.resolve([]));
-        sinon.stub(nodePingApi, 'getNodepingChecks').returns(Promise.resolve([{label: checkName, state: NodePingCheckState.UP}]));
+            expectationFn(statuses);
+        });
+    }
 
-        const statuses = await StatusService.getNodePingAndStatuspageComponentStatuses(secret, statuspageApi, nodePingApi);
+    testGetNodePingAndStatuspageComponentStatuses('getNodePingAndStatuspageComponentStatuses - returns nothing',
+        (statuses: string[]) => expect(statuses.length).toBe(0));
 
-        expect(statuses.length).toBe(1);
-        expect(statuses[0]).toBe(`${checkName}: Statuspage component missing`);
-    });
+    testGetNodePingAndStatuspageComponentStatuses('getNodePingAndStatuspageComponentStatuses - missing Statuspage component',
+        (statuses: string[]) => {
+            expect(statuses.length).toBe(1);
+            expect(statuses[0]).toBe('test: Statuspage component missing');
+        }, [], [{label: 'test', state: NodePingCheckState.UP}]);
 
-    test('getNodePingAndStatuspageComponentStatuses - missing NodePing check', async () => {
-        const secret = emptySecret();
-        const statuspageApi = new StatuspageApi('', '');
-        const nodePingApi = new NodePingApi('','');
-        const componentName = 'test';
-        sinon.stub(statuspageApi, 'getStatuspageComponents').returns(Promise.resolve([{
-            name: componentName,
+    testGetNodePingAndStatuspageComponentStatuses('getNodePingAndStatuspageComponentStatuses - missing NodePing check',
+        (statuses: string[]) => {
+            expect(statuses.length).toBe(1);
+            expect(statuses[0]).toBe('testcomponent: NodePing check missing');
+        }, [{
+            name: 'testcomponent',
             id: 'someid',
             group_id: 'somegroupid',
             status: StatuspageComponentStatus.operational
-        }]));
-        sinon.stub(nodePingApi, 'getNodepingChecks').returns(Promise.resolve([]));
+        }], []);
 
-        const statuses = await StatusService.getNodePingAndStatuspageComponentStatuses(secret, statuspageApi, nodePingApi);
-
-        expect(statuses.length).toBe(1);
-        expect(statuses[0]).toBe(`${componentName}: NodePing check missing`);
-    });
+    testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - component groups don't create checks`,
+        (statuses: string[]) => {
+            expect(statuses.length).toBe(0);
+        }, [{
+            name: 'testcomponent',
+            id: 'someid',
+            group_id: null,
+            status: StatuspageComponentStatus.operational
+        }], []);
 
 });
 

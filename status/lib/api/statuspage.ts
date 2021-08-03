@@ -29,23 +29,23 @@ export class StatuspageApi {
 
     async getStatuspageComponents(): Promise<StatuspageComponent[]> {
         console.log('Fetching Statuspage components');
-        const r = await axios.get(`${STATUSPAGE_API}/${this.statuspagePageId}/components`, {
+        const resp = await axios.get(`${STATUSPAGE_API}/${this.statuspagePageId}/components`, {
             headers: {
                 Authorization: `OAuth ${this.statuspageApiKey}`
             }
         });
-        if (r.status !== 200) {
+        if (resp.status !== 200) {
             throw new Error('Unable to get Statuspage components');
         }
         console.log('..done');
-        return r.data;
+        return resp.data;
     }
 
     async createStatuspageComponent(
         endpoint: string,
         statuspageComponentGroupId: string) {
         console.log('Creating Statuspage component for endpoint', endpoint)
-        const r = await axios.post(`${STATUSPAGE_API}/${this.statuspagePageId}/components`, {
+        const resp = await axios.post(`${STATUSPAGE_API}/${this.statuspagePageId}/components`, {
             component: {
                 description: endpoint,
                 status: 'operational',
@@ -60,11 +60,11 @@ export class StatuspageApi {
                 'Content-type': MediaType.APPLICATION_JSON
             }
         });
-        if (r.status !== 201) {
+        if (resp.status !== 201) {
             throw new Error('Unable to create Statuspage component');
         }
         console.log('..done')
-        return r.data;
+        return resp.data;
     }
 
 }

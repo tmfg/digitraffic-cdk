@@ -24,8 +24,7 @@ export async function getNodePingAndStatuspageComponentStatuses(
         .map(npc => `${npc.label}: Statuspage component missing`);
     const missingNodePingChecks = statuspageComponents.filter(sc => !nodePingCheckMap.hasOwnProperty(sc.name))
         .map(sc => `${sc.name}: NodePing check missing`);
-
-    return missingStatuspageComponents.concat(missingNodePingChecks).concat(statuspageComponents.map(sc => {
+    const otherErrors = statuspageComponents.map(sc => {
         const nodePingCheck = nodePingCheckMap[sc.name];
         if (!nodePingCheck) {
             return null;
@@ -36,7 +35,9 @@ export async function getNodePingAndStatuspageComponentStatuses(
             return `${sc.name}: NodePing check is DOWN, Statuspage component is UP`;
         }
         return null;
-    }).filter((s): s is string => !!s));
+    }).filter((s): s is string => !!s);
+
+    return missingStatuspageComponents.concat(missingNodePingChecks).concat(otherErrors);
 }
 
 function getStatuspageComponentGroupId(appEndpoints: AppEndpoints, secret: UpdateStatusSecret): string {
