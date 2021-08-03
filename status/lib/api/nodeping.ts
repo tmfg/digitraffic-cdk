@@ -91,7 +91,7 @@ export class NodePingApi {
             threshold: 30,
             enabled: true,
             follow: true,
-            sendheaders: {'accept-encoding': 'gzip'},
+            sendheaders: {'accept-encoding': 'gzip', 'digitraffic-user': 'Digitraffic Status'},
             method: extraData?.sendData == null ? 'GET' : 'POST',
             notifications: [notification]
         };
