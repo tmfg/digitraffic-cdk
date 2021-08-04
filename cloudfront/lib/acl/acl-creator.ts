@@ -5,10 +5,26 @@ export enum AclRuleType {
     AWSCommonRuleSet, AWSReputationList, AWSKnownBadInputs, ThrottleWithDigitrafficUser, ThrottleWithoutDigitrafficUser
 }
 
-const BLOCK_429_ACTION : CfnWebACL.RuleActionProperty = {
+const THROTTLE_LIMIT_WITH_DIGITRAFFIC_USER = 1000;
+const THROTTLE_LIMIT_WITHOUT_DIGITRAFFIC_USER = 500;
+
+const RESPONSEKEY_WITH_DIGITRAFFIC_USER = 'DT_429_KEY_WITH_HEADER';
+const RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER = 'DT_429_KEY_WITHOUT_HEADER';
+
+const BLOCK_429_WITH_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
     block: {
         customResponse: {
-            responseCode: 429
+            responseCode: 429,
+            customResponseBodyKey: RESPONSEKEY_WITH_DIGITRAFFIC_USER
+        }
+    }
+};
+
+const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
+    block: {
+        customResponse: {
+            responseCode: 429,
+            customResponseBodyKey: RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER
         }
     }
 };
@@ -28,6 +44,16 @@ function createRuleProperty(name: string, priority: number, rule: any, overrideA
 export function createWebAcl(stack: Stack, environment: string, rules: AclRuleType[]): CfnWebACL {
     const generatedRules = rules.map(createRule);
 
+    let customResponseBodies: any = {};
+    customResponseBodies[RESPONSEKEY_WITH_DIGITRAFFIC_USER] = {
+        content: `Request rate is limited to ${THROTTLE_LIMIT_WITH_DIGITRAFFIC_USER} requests in a 5 minute window.`,
+        contentType: 'TEXT_PLAIN'
+    }
+    customResponseBodies[RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER] = {
+        content: `Request rate is limited to ${THROTTLE_LIMIT_WITHOUT_DIGITRAFFIC_USER} requests in a 5 minute window.`,
+        contentType: 'TEXT_PLAIN'
+    }
+
     return new CfnWebACL(stack, `DefaultWebAcl-${environment}`, {
         defaultAction: {allow: {}},
         scope: 'CLOUDFRONT',
@@ -36,7 +62,8 @@ export function createWebAcl(stack: Stack, environment: string, rules: AclRuleTy
             metricName: "WAF-Blocked",
             sampledRequestsEnabled: false,
         },
-        rules: generatedRules
+        rules: generatedRules,
+        customResponseBodies
     });
 }
 
@@ -71,13 +98,13 @@ function createRule(rule: AclRuleType): CfnWebACL.RuleProperty {
         });
     } else if(rule === AclRuleType.ThrottleWithDigitrafficUser) {
         return createRuleProperty("ThrottleRuleWithDigitrafficUser", 1, {
-            action: BLOCK_429_ACTION,
-            statement: createThrottleStatement(1000, true),
+            action: BLOCK_429_WITH_DIGITRAFFIC_ACTION,
+            statement: createThrottleStatement(THROTTLE_LIMIT_WITH_DIGITRAFFIC_USER, true),
         }, false);
     } else if(rule === AclRuleType.ThrottleWithoutDigitrafficUser) {
         return createRuleProperty("ThrottleRuleWithoutDigitrafficUser", 2, {
-            action: BLOCK_429_ACTION,
-            statement: createThrottleStatement(500, false)
+            action: BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION,
+            statement: createThrottleStatement(THROTTLE_LIMIT_WITHOUT_DIGITRAFFIC_USER, false)
         }, false);
     }
 
