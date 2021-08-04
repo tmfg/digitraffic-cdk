@@ -31,8 +31,8 @@ const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
 
 function createRuleProperty(name: string, priority: number, rule: any, overrideAction:boolean = true): CfnWebACL.RuleProperty {
     return {...{
-        name: name,
-        priority: priority,
+        name,
+        priority,
         visibilityConfig: {
             sampledRequestsEnabled: true,
             cloudWatchMetricsEnabled: true,
