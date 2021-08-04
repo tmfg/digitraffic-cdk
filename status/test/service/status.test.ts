@@ -55,6 +55,34 @@ describe('status service', () => {
             status: StatuspageComponentStatus.operational
         }], []);
 
+    testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - NodePing check UP, Statuspage check DOWN`,
+        (statuses: string[]) => {
+            expect(statuses.length).toBe(1);
+            expect(statuses[0]).toBe('testcomponent: NodePing check is UP, Statuspage component is DOWN');
+        }, [{
+            name: 'testcomponent',
+            id: 'someid',
+            group_id: 'somegroupid',
+            status: StatuspageComponentStatus.major_outage
+        }], [{
+            label: 'testcomponent',
+            state: NodePingCheckState.UP
+        }]);
+
+    testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - NodePing check DOWN, Statuspage check UP`,
+        (statuses: string[]) => {
+            expect(statuses.length).toBe(1);
+            expect(statuses[0]).toBe('testcomponent: NodePing check is DOWN, Statuspage component is UP');
+        }, [{
+            name: 'testcomponent',
+            id: 'someid',
+            group_id: 'somegroupid',
+            status: StatuspageComponentStatus.operational
+        }], [{
+            label: 'testcomponent',
+            state: NodePingCheckState.DOWN
+        }]);
+
 });
 
 function emptySecret(): UpdateStatusSecret {
