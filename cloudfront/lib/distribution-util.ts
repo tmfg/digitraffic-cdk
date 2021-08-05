@@ -18,7 +18,12 @@ function doCreateWebAcl(stack: Stack, props: Props): CfnWebACL | null {
     return null;
 }
 
-export function createDistribution(stack: Stack, distributionProps: Props, originConfigs: any[], role: Role, cloudfrontProps: CFProps, streamingConfig: any): CloudFrontWebDistribution {
+export function createDistribution(stack: Stack,
+                                   distributionProps: Props,
+                                   originConfigs: any[],
+                                   role: Role,
+                                   cloudfrontProps: CFProps,
+                                   streamingConfig: any): CloudFrontWebDistribution {
     const webAcl = doCreateWebAcl(stack, distributionProps);
     const aliasConfig = distributionProps.acmCertRef == null ? undefined: createAliasConfig(distributionProps.acmCertRef as string, distributionProps.aliasNames as string[]);
 
@@ -29,7 +34,13 @@ export function createDistribution(stack: Stack, distributionProps: Props, origi
     return createDistributionWithS3Logging(stack, distributionProps, originConfigs, aliasConfig, role, cloudfrontProps, webAcl);
 }
 
-function createDistributionWithStreamingLogging(stack: Stack, distributionProps: Props, originConfigs: any[], aliasConfiguration: any, role: Role, webAcl: any, streamingConfig: any): CloudFrontWebDistribution {
+function createDistributionWithStreamingLogging(stack: Stack,
+                                                distributionProps: Props,
+                                                originConfigs: any[],
+                                                aliasConfiguration: any,
+                                                role: Role,
+                                                webAcl: any,
+                                                streamingConfig: any): CloudFrontWebDistribution {
     const env = distributionProps.environmentName;
 
     const distribution = new CloudFrontWebDistribution(stack, distributionProps.distributionName, {
@@ -43,9 +54,9 @@ function createDistributionWithStreamingLogging(stack: Stack, distributionProps:
     return distribution;
 }
 
-function addRealtimeLogging(stack: Stack, distribution: CloudFrontWebDistribution, role:Role, env: String, streamingConfig: any, originCount: number) {
+function addRealtimeLogging(stack: Stack, distribution: CloudFrontWebDistribution, role:Role, env: string, streamingConfig: any, originCount: number) {
     const distributionCf = distribution.node.defaultChild as CfnResource;
-    
+
     for (let i = 1; i < originCount;i++) {
         distributionCf.addPropertyOverride(`DistributionConfig.CacheBehaviors.${i - 1}.RealtimeLogConfigArn`, streamingConfig.loggingConfig.ref);
     }
@@ -53,7 +64,13 @@ function addRealtimeLogging(stack: Stack, distribution: CloudFrontWebDistributio
     distributionCf.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.RealtimeLogConfigArn', streamingConfig.loggingConfig.ref);
 }
 
-function createDistributionWithS3Logging(stack: Stack, distributionProps: Props, originConfigs: any[], aliasConfiguration: any, role: Role, cloudfrontProps: CFProps, webAcl: any): CloudFrontWebDistribution {
+function createDistributionWithS3Logging(stack: Stack,
+                                         distributionProps: Props,
+                                         originConfigs: any[],
+                                         aliasConfiguration: any,
+                                         role: Role,
+                                         cloudfrontProps: CFProps,
+                                         webAcl: any): CloudFrontWebDistribution {
     const env = distributionProps.environmentName;
 
     const bucket = new Bucket(stack, `${env}-CF-logBucket`, {

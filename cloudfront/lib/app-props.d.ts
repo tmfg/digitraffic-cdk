@@ -1,6 +1,6 @@
 import {LambdaType} from "./lambda/lambda-creator";
-import {AclRuleType} from "./acl/acl-creator";
 import {LambdaEdgeEventType} from "@aws-cdk/aws-cloudfront";
+import {WafRules} from "./acl/waf-rules";
 
 export interface CFBehaviorLambda {
     lambdaType: LambdaType,
@@ -36,7 +36,7 @@ export interface Props {
     environmentName: string,
     aliasNames: string[] | null,
     acmCertRef: string | null,
-    aclRules?: AclRuleType[],
+    aclRules?: WafRules,
     domains: CFDomain[]
 }
 

@@ -94,8 +94,6 @@ export class CloudfrontCdkStack extends Stack {
                 for (const key of Object.keys(lProps.lambdaParameters.ipRestrictions)) {
                     const restriction = lProps.lambdaParameters.ipRestrictions[key];
 
-//                    console.info("creating ip restriction %s for %s", restriction, key);
-
                     lambdaMap[`IP_${key}`] = createIpRestriction(this, edgeLambdaRole, key, restriction);
                 }
             }
@@ -112,8 +110,6 @@ export class CloudfrontCdkStack extends Stack {
         // cdk does not support viewerPolicy as it should
         // so collect map of policies and force them into cloudformation
         const viewerPolicies = this.getViewerPolicies(distributionProps.domains);
-
-//        console.info('viewer policies %s for distribution %s', JSON.stringify(viewerPolicies), cloudfrontProps.distributionName);
 
         if(Object.keys(viewerPolicies).length > 0) {
             const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
@@ -136,8 +132,6 @@ export class CloudfrontCdkStack extends Stack {
         const policy = viewerPolicies[pathPattern];
 
         if(policy) {
-//            console.info('setting viewer policy %s for %s', policy, pathPattern);
-
             (behavior as any).viewerProtocolPolicy = policy;
         }
     }
