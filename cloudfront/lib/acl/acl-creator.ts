@@ -72,7 +72,7 @@ export function createWebAcl(stack: Stack, environment: string, rules: WafRules)
 }
 
 function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
-    let generatedRules: CfnWebACL.RuleProperty[] = [];
+    const generatedRules: CfnWebACL.RuleProperty[] = [];
 
     if(rules.awsCommonRules) {
         generatedRules.push(createRuleAWSCommonRuleSet());
