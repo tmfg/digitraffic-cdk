@@ -10,7 +10,7 @@
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
-    "test": "echo no tests for this project",
+    "test": "jest --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
@@ -53,7 +53,6 @@
     "moment-timezone": "^0.5.31",
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5",
-    "pg-query-stream": "4.0.0",
     "ramda": "0.27.1",
     "source-map-support": "^0.5.19",
     "uuid": "^8.3.1"
