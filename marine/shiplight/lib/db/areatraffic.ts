@@ -16,7 +16,7 @@ const GET_AREA_TRAFFIC_SQL = `
     FROM areatraffic at
     JOIN vessel_location vl ON ST_INTERSECTS(at.geometry, ST_MAKEPOINT(vl.x, vl.y))
     JOIN vessel v on vl.mmsi = v.mmsi 
-    WHERE TO_TIMESTAMP(vl.timestamp_ext / 1000) >= (NOW() - INTERVAL '5 MINUTE')
+    WHERE TO_TIMESTAMP(vl.timestamp_ext / 1000) >= (NOW() - INTERVAL '2 MINUTE')
     AND v.ship_type in ${VALID_SHIP_TYPES}
 `.trim();
 
