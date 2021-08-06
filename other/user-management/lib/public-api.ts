@@ -2,15 +2,15 @@ import {Construct} from '@aws-cdk/core';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {IntegrationResponse}  from '@aws-cdk/aws-apigateway'; // don't remove RestApi! won't work without!
 
-import {createRestApi} from "../../common/api/rest_apis";
-import {defaultLambdaConfiguration} from "../../common/stack/lambda-configs";
-import {defaultIntegration, methodResponse, RESPONSE_500_SERVER_ERROR} from "../../common/api/responses";
-import {addTags} from "../../common/api/documentation";
-import {USER_MANAGEMENT_TAGS} from "../../common/api/tags";
-import {addDefaultValidator, addServiceModel} from "../../common/api/utils";
+import {createRestApi} from "digitraffic-common/api/rest_apis";
+import {defaultLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {defaultIntegration, methodResponse, RESPONSE_500_SERVER_ERROR} from "digitraffic-common/api/responses";
+import {addTags} from "digitraffic-common/api/documentation";
+import {USER_MANAGEMENT_TAGS} from "digitraffic-common/api/tags";
+import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
 import {LOGIN_SCHEMA, LOGIN_SUCCESSFUL_SCHEMA} from './model/login-schema';
-import {MessageModel} from "../../common/api/response";
-import {MediaType} from "../../common/api/mediatypes";
+import {MessageModel} from "digitraffic-common/api/response";
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 const RESPONSE_200_OK: IntegrationResponse = {
     statusCode: '200',

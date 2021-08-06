@@ -11,13 +11,7 @@
     "marine/*",
     "road",
     "road/*",
-    "cloudfront",
-    "cloudwatch-logs-recipient",
-    "elasticsearch",
-    "es-key-figures",
-    "patchmanager",
-    "status",
-    "swagger-joiner",
-    "user-management"
+    "other",
+    "other/*"
   ]
 }

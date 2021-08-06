@@ -1,7 +1,7 @@
 import {Props} from "./app-props";
-import {createIpRestrictionPolicyDocument} from "../../common/api/rest_apis";
+import {createIpRestrictionPolicyDocument} from "digitraffic-common/api/rest_apis";
 import {EndpointType, LambdaIntegration, MethodLoggingLevel, Resource, RestApi} from "@aws-cdk/aws-apigateway";
-import {createSubscription} from "../../common/stack/subscription";
+import {createSubscription} from "digitraffic-common/stack/subscription";
 import {AssetCode, Function, Runtime} from "@aws-cdk/aws-lambda";
 import {Construct} from "@aws-cdk/core";
 import {KEY_APP} from "./lambda/mqtt-proxy-healthcheck/lambda-mqtt-proxy-healthcheck";

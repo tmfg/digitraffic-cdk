@@ -5,10 +5,10 @@ import {LambdaDestination} from '@aws-cdk/aws-s3-notifications';
 import {Role} from '@aws-cdk/aws-iam';
 import {CfnWebACL} from '@aws-cdk/aws-wafv2';
 
-import {createAliasConfig} from "../../common/stack/alias-configs";
+import {createAliasConfig} from "digitraffic-common/stack/alias-configs";
 import {createWriteToEsLambda} from "./lambda/lambda-creator";
 import {createWebAcl} from "./acl/acl-creator";
-import {CFProps, Props} from '../lib/app-props';
+import {CFProps, Props} from './app-props';
 
 function doCreateWebAcl(stack: Stack, props: Props): CfnWebACL | null {
     if(props.aclRules) {

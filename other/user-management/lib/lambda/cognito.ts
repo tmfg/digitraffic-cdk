@@ -1,4 +1,4 @@
-import {AUTHORIZATION_FAILED_MESSAGE} from "../../../common/api/errors";
+import {AUTHORIZATION_FAILED_MESSAGE} from "digitraffic-common/api/errors";
 
 const AmazonCognitoIdentity = require('amazon-cognito-identity-js');
 

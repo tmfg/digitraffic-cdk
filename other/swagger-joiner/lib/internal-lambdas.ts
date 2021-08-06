@@ -1,6 +1,6 @@
 import {AssetCode, Function, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration, Stack} from '@aws-cdk/core';
-import {createSubscription} from '../../common/stack/subscription';
+import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Props} from './app-props';
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";

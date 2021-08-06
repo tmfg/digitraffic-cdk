@@ -8,7 +8,6 @@
     "declaration": true,
     "strict": true,
     "noImplicitAny": true,
-    "resolveJsonModule": true,
     "strictNullChecks": true,
     "noImplicitThis": true,
     "alwaysStrict": true,
@@ -21,16 +20,10 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
     "typeRoots": [
-      "./node_modules/@types",
-      "../node_modules/@types"
-    ],
-    "moduleResolution": "node",
-    "preserveSymlinks": true,
-    "baseUrl": ".",
-    "declarationDir": "tsd"
+      "../../node_modules/@types"
+    ]
   },
   "exclude": [
-    "cdk.out",
-    "tsd"
+    "cdk.out"
   ]
 }

@@ -4,7 +4,7 @@ import {RetentionDays} from "@aws-cdk/aws-logs";
 import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
-import {createSubscription} from "../../common/stack/subscription";
+import {createSubscription} from "digitraffic-common/stack/subscription";
 import {Props} from "./app-props";
 
 
