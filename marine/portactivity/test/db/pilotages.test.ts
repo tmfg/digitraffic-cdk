@@ -1,8 +1,45 @@
 import * as pgPromise from "pg-promise";
 import {dbTestBase} from "../db-testutil";
-import {deletePilotages, getTimestamps, updatePilotages} from "../../lib/db/pilotages";
+import {deletePilotages, findPortCallId, getTimestamps, updatePilotages} from "../../lib/db/pilotages";
+import {Pilotage} from "../../lib/model/pilotage";
+import {Location} from "lib/model/timestamp";
 
 describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+    function createPilotage(): Pilotage {
+        return {
+            id: 1,
+            state: 'TEST',
+            vessel: {
+                name: 'test',
+                mmsi: 123
+            },
+            route: {
+                start: {
+                    code: 'ABC'
+                },
+                end: {
+                    code: 'DEF'
+                }
+            },
+            vesselEta: '',
+            endTime: '',
+            scheduleSource: 'test',
+            scheduleUpdated: ''
+        };
+    }
+
+    function createLocation(): Location {
+        return {
+            port: 'ABC'
+        };
+    }
+
+    test('findPortCallId - empty', async () => {
+        const pilotage = createPilotage();
+        const location = createLocation();
+        await findPortCallId(db, pilotage, location);
+    });
+
     test('getTimestamps - empty', async () => {
         const timestampMap = await getTimestamps(db);
 

@@ -50,8 +50,9 @@ const FIND_PORTCALL_SQL = `
                     (SELECT DISTINCT FIRST_VALUE(imo) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE mmsi = $1),
                     (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $1)
             )
-        ) AND
-        pc.port_to_visit = $3::CHARACTER VARYING(5)
+        )  
+        AND pc.port_to_visit = $3::CHARACTER VARYING(5)
+        AND pc.port_call_timestamp > (NOW() - INTERVAL '24 HOURS')
         LIMIT 1
 `;
 
