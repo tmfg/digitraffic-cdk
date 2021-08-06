@@ -14,20 +14,6 @@ export function createEpcMessageResponse(
     <MessageType>ACK</MessageType>
     <Version></Version>
   </EPCMessageHeader>
-  <EPCReceiptBody xmlns="">
-    <CurrentPortSecurityLevel>SL1</CurrentPortSecurityLevel>
-    <RequestErrorCode></RequestErrorCode>
-    <RequestProcessed>true</RequestProcessed>
-    <RequestStatus>Accepted</RequestStatus>
-    <EPCClearanceStatus>
-      <Authority></Authority>
-      <RequestStatus>
-        <Comment></Comment>
-        <Status>Accepted</Status>
-      </RequestStatus>
-      <UsesSW>true</UsesSW>
-    </EPCClearanceStatus>
-  </EPCReceiptBody>
 </EPCMessage>
 `.trim();
 }
