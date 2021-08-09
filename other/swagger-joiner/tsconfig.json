@@ -3,7 +3,7 @@
     "target":"ES2018",
     "module": "commonjs",
     "lib": ["es2018"],
-    "declaration": true,
+    "declaration": false,
     "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
@@ -23,8 +23,7 @@
     ],
     "moduleResolution": "node",
     "preserveSymlinks": true,
-    "baseUrl": ".",
-    "declarationDir": "tsd"
+    "baseUrl": "."
   },
   "exclude": ["cdk.out", "tsd"]
 }

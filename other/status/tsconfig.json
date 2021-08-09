@@ -3,7 +3,7 @@
     "target":"ES2018",
     "module": "commonjs",
     "lib": ["es2018"],
-    "declaration": true,
+    "declaration": false,
     "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
@@ -26,8 +26,7 @@
     "baseUrl": ".",
     "paths": {
       "digitraffic-lambda-postgres": ["node_modules/digitraffic-lambda-postgres"]
-    },
-    "declarationDir": "tsd"
+    }
   },
   "exclude": ["cdk.out", "tsd"]
 }

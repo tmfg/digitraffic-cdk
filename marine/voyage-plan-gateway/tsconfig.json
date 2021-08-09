@@ -6,7 +6,7 @@
       "es2020",
       "dom"
     ],
-    "declaration": true,
+    "declaration": false,
     "strict": true,
     "noImplicitAny": true,
     "resolveJsonModule": true,
@@ -28,8 +28,7 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "preserveSymlinks": true,
-    "baseUrl": ".",
-    "declarationDir": "tsd"
+    "baseUrl": "."
   },
   "exclude": ["cdk.out", "tsd"]
 }
