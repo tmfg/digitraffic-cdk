@@ -47,7 +47,7 @@
     "@aws-cdk/aws-logs": "1.117.0",
     "@aws-cdk/aws-secretsmanager": "1.117.0",
     "@aws-cdk/core": "1.117.0",
-    "@types/ramda": "0.27.1",
+    "@types/ramda": "0.27.44",
     "axios": "^0.21.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",

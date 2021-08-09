@@ -49,7 +49,7 @@
     "@aws-cdk/core": "1.117.0",
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",
-    "@types/ramda": "0.27.1",
+    "@types/ramda": "0.27.44",
     "ajv-cli": "^3.3.0",
     "aws-sqs-xl-messages": "^1.1.0",
     "dtsgenerator": "^3.3.1",

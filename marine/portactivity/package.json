@@ -55,7 +55,7 @@
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",
     "@types/amqplib": "^0.5.17",
-    "@types/ramda": "0.27.1",
+    "@types/ramda": "0.27.44",
     "amqplib": "^0.6.0",
     "axios": "^0.21.1",
     "cdk": "^1.117.0",
