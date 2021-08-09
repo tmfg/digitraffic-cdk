@@ -15,9 +15,9 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-cloudwatch": "1.111.0",
-    "@aws-cdk/aws-elasticsearch": "1.111.0",
-    "@aws-cdk/core": "1.111.0",
+    "@aws-cdk/aws-cloudwatch": "1.117.0",
+    "@aws-cdk/aws-elasticsearch": "1.117.0",
+    "@aws-cdk/core": "1.117.0",
     "source-map-support": "^0.5.19"
   }
 }

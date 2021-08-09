@@ -27,11 +27,11 @@
     "aws-sdk": "^2.821.0"
   },
   "dependencies": {
-    "@aws-cdk/core": "1.111.0",
-    "@aws-cdk/aws-apigateway": "1.111.0",
-    "@aws-cdk/aws-cognito": "1.111.0",
-    "@aws-cdk/aws-lambda": "1.111.0",
-    "@aws-cdk/aws-iam": "1.111.0",
+    "@aws-cdk/core": "1.117.0",
+    "@aws-cdk/aws-apigateway": "1.117.0",
+    "@aws-cdk/aws-cognito": "1.117.0",
+    "@aws-cdk/aws-lambda": "1.117.0",
+    "@aws-cdk/aws-iam": "1.117.0",
     "amazon-cognito-identity-js": "^4.6.0",
     "aws-sdk": "^2.821.0"
   },
