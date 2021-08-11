@@ -10,7 +10,7 @@ jest.setTimeout(30000);
 
 describe('faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
-    test('getFaultS124ById creates valid XML', async (done) => {
+    test('getFaultS124ById creates valid XML', async () => {
         const fault = newFault({
             geometry: {
                 lat: 60.285807,
@@ -26,7 +26,6 @@ describe('faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
                 throw err;
             }
             expect(result.valid).toBe(true);
-            done();
         });
     });
 
