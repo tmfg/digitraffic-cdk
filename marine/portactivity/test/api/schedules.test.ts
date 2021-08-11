@@ -3,7 +3,7 @@ import {TestHttpServer} from "../../../../common/test/httpserver";
 
 describe('api-schedules', () => {
 
-    test('getSchedulesTimestamps - in VTS control', async (done) => {
+    test('getSchedulesTimestamps - in VTS control', async () => {
         const port = 8089;
         const server = new TestHttpServer();
         server.listen(port, {
@@ -16,11 +16,10 @@ describe('api-schedules', () => {
             verifyXmlResponse(resp);
         } finally {
             server.close();
-            done();
         }
     });
 
-    test('getSchedulesTimestamps - calculated', async (done) => {
+    test('getSchedulesTimestamps - calculated', async () => {
         const port = 8090;
         const server = new TestHttpServer();
         server.listen(port, {
@@ -33,7 +32,6 @@ describe('api-schedules', () => {
             verifyXmlResponse(resp);
         } finally {
             server.close();
-            done();
         }
     });
 
