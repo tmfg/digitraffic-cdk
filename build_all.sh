@@ -3,4 +3,7 @@
 # exit on any error
 set -ex
 
-yarn workspaces run build
+yarn workspace digitraffic-common run build
+yarn workspace marine run build
+yarn workspace road run build
+yarn workspace other run build
