@@ -4,8 +4,8 @@ export type DbAreaTraffic = {
     readonly id: number
     readonly name: string
     readonly brighten_duration_min: number
-    readonly brighten_sent: Date
-    readonly brighten_end: Date
+    readonly brighten_sent?: Date
+    readonly brighten_end?: Date
 }
 
 const VALID_SHIP_TYPES = '(70)';
