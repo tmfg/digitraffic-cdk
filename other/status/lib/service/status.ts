@@ -92,9 +92,9 @@ async function updateComponentsAndChecksForApp(
         contacts = await nodePingApi.getNodepingContacts();
     }
 
-    const checks: string[] = (await nodePingApi.getNodepingChecks())
-        .map((check: any) => check.label);
-    const missingChecks = allEndpoints.filter(e => !checks.includes(e));
+    const checks = await nodePingApi.getNodepingChecks();
+    const checkNames = checks.map((check: any) => check.label);
+    const missingChecks = allEndpoints.filter(e => !checkNames.includes(e));
     console.log('Missing checks', missingChecks);
     for (const missingCheck of missingChecks) {
         const contact: any = Object.values(contacts).find((c: any) => c.name === missingCheck);
@@ -110,6 +110,15 @@ async function updateComponentsAndChecksForApp(
             ],
             appEndpoints.hostPart,
             correspondingExtraEndpoint);
+    }
+
+    await updateChecks(checks, nodePingApi);
+}
+
+export async function updateChecks(checks: NodePingCheck[], nodePingApi: NodePingApi) {
+    const updateableChecks = checks.filter(check => nodePingApi.checkNeedsUpdate(check));
+    for (const updateableCheck of updateableChecks) {
+        await nodePingApi.updateNodepingCheck(updateableCheck._id, updateableCheck.type);
     }
 }
 

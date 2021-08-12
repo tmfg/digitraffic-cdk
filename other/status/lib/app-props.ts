@@ -3,14 +3,14 @@ export enum EndpointProtocol {
     WebSocket
 }
 
-export interface MonitoredEndpoint {
+export type MonitoredEndpoint = {
     readonly name: string
     readonly url: string
     readonly protocol: EndpointProtocol
     readonly sendData?: any
 }
 
-export interface MonitoredApp {
+export type MonitoredApp = {
     readonly name: string
     readonly hostPart: string
     readonly url: string
@@ -18,10 +18,11 @@ export interface MonitoredApp {
     readonly excluded: string[]
 }
 
-export interface Props {
+export type Props = {
     readonly defaultLambdaDurationSeconds: number
     readonly logsDestinationArn: string
     readonly secretsManagerSecretArn: string
+    readonly nodePingTimeoutSeconds: number
     readonly monitoredApps: MonitoredApp[]
     readonly allowFromIpAddresses: string[]
     readonly statusPageUrl: string

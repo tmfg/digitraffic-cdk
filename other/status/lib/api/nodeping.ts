@@ -10,18 +10,29 @@ export enum NodePingCheckState {
 }
 
 export type NodePingCheck = {
+    readonly _id: string
     readonly label: string
+    readonly type: string
     readonly state: NodePingCheckState
+    readonly parameters: {
+        readonly threshold: number
+    }
 }
 
 export class NodePingApi {
 
     private readonly token: string;
     private readonly subAccountId: string;
+    public readonly checkTimeoutSeconds?: number
 
-    constructor(token: string, subAccountId: string) {
+    constructor(
+        token: string,
+        subAccountId: string,
+        checkTimeoutSeconds?: number) {
+
         this.token = token;
         this.subAccountId = subAccountId;
+        this.checkTimeoutSeconds = checkTimeoutSeconds;
     }
 
     async getNodepingContacts () {
@@ -88,7 +99,7 @@ export class NodePingApi {
             type: extraData?.protocol === EndpointProtocol.WebSocket ? 'WEBSOCKET' : 'HTTPADV',
             target: extraData?.url ?? `https://${app}.digitraffic.fi${endpoint}`,
             interval: 5,
-            threshold: 30,
+            threshold: this.checkTimeoutSeconds,
             enabled: true,
             follow: true,
             sendheaders: {'accept-encoding': 'gzip', 'digitraffic-user': 'Digitraffic Status'},
@@ -109,5 +120,34 @@ export class NodePingApi {
             throw new Error('Unable to create check');
         }
         console.log('..done');
+    }
+
+    async updateNodepingCheck(id: string, type: string) {
+        const data: any = {
+            customerid: this.subAccountId,
+            token: this.token,
+            id,
+            type,
+            threshold: this.checkTimeoutSeconds
+        };
+        console.info(`method=updateNodepingCheck Updating NodePing check id ${id}, properties ${data}`);
+        const resp = await axios.put(`${NODEPING_API}/checks`, data, {
+            headers: {
+                'Content-type': MediaType.APPLICATION_JSON
+            }
+        });
+        if (resp.status !== 200 || resp.data.error) {
+            console.error('method=updateNodepingCheck Unable to update check', resp.data.error);
+            throw new Error('Unable to update check');
+        }
+    }
+
+    checkNeedsUpdate(check: NodePingCheck): boolean {
+        let needsUpdate = false;
+        if (this.checkTimeoutSeconds && this.checkTimeoutSeconds != check.parameters.threshold) {
+            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} timeout ${check.parameters.threshold} lower than default ${this.checkTimeoutSeconds}`);
+            needsUpdate = true;
+        }
+        return needsUpdate;
     }
 }

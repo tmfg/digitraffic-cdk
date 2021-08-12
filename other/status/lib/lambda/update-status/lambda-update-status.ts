@@ -5,24 +5,30 @@ import {NodePingApi} from '../../api/nodeping';
 import {StatuspageApi} from '../../api/statuspage';
 import * as StatusService from '../../service/status';
 import {DigitrafficApi} from "../../api/digitraffic";
+import {StatusEnvKeys} from "../../keys";
 
 const smClient = new SecretsManager({
     region: process.env.AWS_REGION
 });
 
-const apps = JSON.parse(process.env.APPS as string) as MonitoredApp[];
+const secretId = process.env[StatusEnvKeys.SECRET_ID] as string;
+const apps = JSON.parse(process.env[StatusEnvKeys.APPS] as string) as MonitoredApp[];
+const checkTimeout = Number(process.env[StatusEnvKeys.CHECK_TIMEOUT_SECONDS]);
 
 export const handler = async (): Promise<any> => {
     const secretObj = await smClient.getSecretValue({
-        SecretId: process.env.SECRET_ARN as string
+        SecretId: secretId
     }).promise();
     if (!secretObj.SecretString) {
         throw new Error('No secret found!');
     }
+    if (!checkTimeout) {
+        throw new Error('Check timeout not set');
+    }
     const secret: UpdateStatusSecret = JSON.parse(secretObj.SecretString);
     const digitrafficApi = new DigitrafficApi();
     const statuspageApi = new StatuspageApi(secret.statuspagePageId, secret.statuspageApiKey);
-    const nodePingApi = new NodePingApi(secret.nodePingToken, secret.nodepingSubAccountId);
+    const nodePingApi = new NodePingApi(secret.nodePingToken, secret.nodepingSubAccountId, checkTimeout);
 
     await StatusService.updateComponentsAndChecks(apps, digitrafficApi, statuspageApi, nodePingApi, secret);
 }

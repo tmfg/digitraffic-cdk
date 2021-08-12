@@ -6,6 +6,7 @@ import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {Props} from "./app-props";
+import {StatusEnvKeys} from "./keys";
 
 
 export function create(stack: Construct, props: Props) {
@@ -17,6 +18,11 @@ export function create(stack: Construct, props: Props) {
 }
 
 function createUpdateStatusesLambda(secret: ISecret, stack: Construct, props: Props) {
+    const environment: any = {};
+    environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
+    environment[StatusEnvKeys.SECRET_ID] = props.secretsManagerSecretArn;
+    environment[StatusEnvKeys.CHECK_TIMEOUT_SECONDS] = String(props.nodePingTimeoutSeconds);
+
     const functionName = "Status-UpdateStatuses";
     const lambdaConf: FunctionProps = {
         functionName: functionName,
@@ -25,10 +31,7 @@ function createUpdateStatusesLambda(secret: ISecret, stack: Construct, props: Pr
         runtime: Runtime.NODEJS_12_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
-        environment: {
-            APPS: JSON.stringify(props.monitoredApps),
-            SECRET_ARN: props.secretsManagerSecretArn
-        },
+        environment,
         logRetention: RetentionDays.ONE_YEAR,
         reservedConcurrentExecutions: 1
     };
