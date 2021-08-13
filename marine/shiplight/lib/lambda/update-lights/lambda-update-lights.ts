@@ -11,7 +11,7 @@ export async function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any,
     updateLightsForAreaFn: (area: AreaTraffic, endpointUrl: string) => any
 ) {
-    return await doWithSecret(secretId, async (secret: ShiplightSecret) => {
+    return doWithSecret(secretId, async (secret: ShiplightSecret) => {
         const areas = await AreaTrafficService.getAreaTraffic();
 
         for (const area of areas) {
@@ -20,4 +20,6 @@ export async function handlerFn(
     });
 }
 
-export const handler = handlerFn(withSecret, updateLightsForArea);
+export const handler = async (): Promise<any> => {
+    return handlerFn(withSecret, updateLightsForArea);
+};
