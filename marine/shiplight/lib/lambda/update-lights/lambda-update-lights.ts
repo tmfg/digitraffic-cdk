@@ -7,7 +7,7 @@ import {AreaTraffic} from "../../model/areatraffic";
 
 const secretId = process.env[ShiplightEnvKeys.SECRET_ID] as string;
 
-async function handlerFn(
+export async function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any,
     updateLightsForAreaFn: (area: AreaTraffic, endpointUrl: string) => any
 ) {
