@@ -14,7 +14,13 @@ import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from '../../../common/stack/subscription';
-import {corsMethod, defaultIntegration, methodResponse,} from "../../../common/api/responses";
+import {
+    corsMethod,
+    defaultIntegration,
+    getResponse,
+    methodResponse, RESPONSE_200_OK,
+    RESPONSE_400_BAD_REQUEST, RESPONSE_500_SERVER_ERROR,
+} from "../../../common/api/responses";
 import {MessageModel} from "../../../common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
 import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
@@ -96,7 +102,12 @@ function createTimestampsResource(
                 imo: "$util.escapeJavaScript($input.params('imo'))",
                 source: "$util.escapeJavaScript($input.params('source'))"
             })
-        }
+        },
+        responses: [
+            getResponse(RESPONSE_200_OK),
+            getResponse(RESPONSE_400_BAD_REQUEST),
+            getResponse(RESPONSE_500_SERVER_ERROR)
+        ]
     });
 
     const timestampResource = resource.addResource('timestamps');
@@ -111,6 +122,7 @@ function createTimestampsResource(
         requestValidator: validator,
         methodResponses: [
             corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, timestampsJsonModel)),
+            corsMethod(methodResponse("400", MediaType.APPLICATION_JSON, errorResponseModel)),
             corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
         ]
     });
