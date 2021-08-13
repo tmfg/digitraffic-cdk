@@ -12,7 +12,7 @@ export async function handlerFn(
 
     return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
         if (!event.locode && !event.mmsi && !event.imo && !event.source) {
-            console.error(`method=handlerGetTimestamps bad request params=${JSON.stringify(event)}`);
+            console.warn(`method=handlerGetTimestamps bad request params=${JSON.stringify(event)}`);
             return Promise.reject(BAD_REQUEST_MESSAGE);
         }
         return TimestampsService.findAllTimestamps(event.locode, event.mmsi, event.imo, event.source);
