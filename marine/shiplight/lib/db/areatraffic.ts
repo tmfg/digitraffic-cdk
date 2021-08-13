@@ -8,7 +8,12 @@ export type DbAreaTraffic = {
     readonly brighten_end?: Date
 }
 
-const VALID_SHIP_TYPES = '(70)';
+export enum ShipTypes {
+    FISHING= 30,
+    CARGO = 70,
+}
+
+const VALID_SHIP_TYPES = `(${ShipTypes.CARGO})`;
 const SHIP_MOVING_INTERVAL = '2 MINUTE';
 
 const GET_AREA_TRAFFIC_SQL = `

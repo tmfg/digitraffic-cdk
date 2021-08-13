@@ -3,6 +3,7 @@ import {handlerFn} from "../../lib/lambda/update-lights/lambda-update-lights";
 import {dbTestBase} from "../../../bridge-lock-disruptions/test/db-testutil";
 import {insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
 import {withMockSecret} from "digitraffic-common/test/secret";
+import {ShipTypes} from "../../lib/db/areatraffic";
 
 const updateLights = jest.fn();
 
@@ -18,7 +19,7 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
         const areaId = 4;
 
         await insertAreaTraffic(db, areaId, 'testi1', duration, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
-        await insertVessel(db, 1, 70); // 70 will trigger
+        await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
         await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
 
         await handlerFn(withMockSecret, updateLights);

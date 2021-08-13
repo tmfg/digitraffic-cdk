@@ -8,13 +8,14 @@ const BRIGHTEN_OVERLAP_INTERVAL_MILLIS = 60 * 1000; // one minute
 
 export function getAreaTraffic(): Promise<AreaTraffic[]> {
     return inDatabase(async (db: IDatabase<any, any>) => {
-        const areas: Promise<AreaTraffic[]> = AreaTrafficDb.getAreaTraffic(db)
-            .then(areas => areas.filter(needToBrighten))
-            .then(areas => areas.map(a => ({
-                areaId: a.id,
-                durationInMinutes: a.brighten_duration_min
-            })));
-        return areas;
+        const areas = await AreaTrafficDb.getAreaTraffic(db);
+
+        return areas
+            .filter(needToBrighten)
+            .map(area => ({
+                areaId: area.id,
+                durationInMinutes: area.brighten_duration_min
+            }));
     });
 }
 

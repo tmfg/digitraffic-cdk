@@ -1,5 +1,6 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {IDatabase} from "pg-promise";
+import {ShipTypes} from "../lib/db/areatraffic";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
     return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
@@ -12,7 +13,7 @@ export async function insertAreaTraffic(db: IDatabase<any, any>, id: number, nam
     });
 }
 
-export async function insertVessel(db: IDatabase<any, any>, mmsi: number, ship_type: number): Promise<any> {
+export async function insertVessel(db: IDatabase<any, any>, mmsi: number, ship_type: ShipTypes): Promise<any> {
     return await db.tx(async t => {
         await db.none('INSERT INTO vessel(mmsi,timestamp,name,ship_type,reference_point_a,reference_point_b,reference_point_c,reference_point_d,pos_type,draught,imo,eta) ' +
             'values ($1, $2, $3, $4, 1,1,1,1,1,1,1,1)',
