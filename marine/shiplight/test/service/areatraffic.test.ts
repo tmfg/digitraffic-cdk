@@ -5,7 +5,7 @@ describe('db-areatraffic', () => {
     test('needToBrighten - never sent', async () => {
         const area = createArea(1, 10);
 
-        expect(needToBrighten(area)).toBeTruthy();
+        expect(needToBrighten(area)).toBe(true);
     });
 
     test('needToBrighten - ends in 1 hour', async () => {
@@ -14,7 +14,7 @@ describe('db-areatraffic', () => {
         end.setHours(end.getHours() + 1);
         const area = createArea(1, 10, sent, end);
 
-        expect(needToBrighten(area)).toBeFalsy();
+        expect(needToBrighten(area)).toBe(false);
     });
 
     test('needToBrighten - ended hour ago', async () => {
@@ -23,7 +23,7 @@ describe('db-areatraffic', () => {
         end.setHours(end.getHours() - 1);
         const area = createArea(1, 10, sent, end);
 
-        expect(needToBrighten(area)).toBeTruthy();
+        expect(needToBrighten(area)).toBe(true);
     });
 
     test('needToBrighten - ends in 30 seconds', async () => {
@@ -32,7 +32,7 @@ describe('db-areatraffic', () => {
         end.setSeconds(end.getSeconds() + 30);
         const area = createArea(1, 10, sent, end);
 
-        expect(needToBrighten(area)).toBeTruthy();
+        expect(needToBrighten(area)).toBe(true);
     });
 
     function createArea(id: number, brighten_duration_min: number, brighten_sent?: Date, brighten_end?: Date): DbAreaTraffic {
