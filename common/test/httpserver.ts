@@ -7,11 +7,23 @@ export class TestHttpServer {
     private server: http.Server;
     private debug: boolean;
 
-    listen(port: number, props: ListenProperties, debug: boolean = false) {
+    private messageStack: string[];
+
+    getCallCount(): number {
+        return this.messageStack.length;
+    }
+
+    getRequest(index: number): string {
+        return this.messageStack[index];
+    }
+
+    listen(port: number, props: ListenProperties, debug: boolean = false, statusCode = 200) {
         this.debug = debug;
+        this.messageStack = [];
         this.debuglog(`Starting test server on port ${port}`);
         this.server = http.createServer(((req, res) => {
             this.debuglog('Mapped urls: ');
+
             Object.keys(props).forEach(k => this.debuglog(k));
             this.debuglog('Received request to url ' + req.url + '..');
             const path = require('url').parse(req.url).pathname;
@@ -20,7 +32,7 @@ export class TestHttpServer {
                 this.debuglog('..url matched');
                 res.setHeader('Access-Control-Allow-Origin', '*');
                 res.setHeader('Access-Control-Allow-Headers', 'Authorization,X-User-Id,X-Auth-Token');
-                res.writeHead(200);
+                res.writeHead(statusCode);
 
                 let dataStr = '';
                 req.on('data', chunk => {
@@ -31,9 +43,11 @@ export class TestHttpServer {
 
                 req.on('end', () => {
                     // assume sent data is in JSON format
+                    this.messageStack[this.messageStack.length] = dataStr;
                     res.end(props[path](req.url, dataStr));
                 });
             } else {
+                this.messageStack[this.messageStack.length] = "NO MATCH";
                 this.debuglog('..no match');
             }
         }));

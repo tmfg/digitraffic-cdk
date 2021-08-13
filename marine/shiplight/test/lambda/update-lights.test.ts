@@ -1,17 +1,37 @@
 import {IDatabase} from "pg-promise";
 import {handlerFn} from "../../lib/lambda/update-lights/lambda-update-lights";
-import {dbTestBase} from "../../../bridge-lock-disruptions/test/db-testutil";
-import {insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
-import {withMockSecret} from "digitraffic-common/test/secret";
+import {dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
+import {createSecretFunction} from "digitraffic-common/test/secret";
 import {ShipTypes} from "../../lib/db/areatraffic";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {updateLightsForArea} from "../../lib/api/arealights";
+import {ShiplightSecretKeys} from "../../lib/keys";
 
-const updateLights = jest.fn();
+const PORT = 8089;
+const secret: any = {};
+secret[ShiplightSecretKeys.ENDPOINT_URL] = 'http://localhost:' + PORT;
+secret[ShiplightSecretKeys.API_KEY] = 'test-api-key';
 
 describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
-    test('no areas', async () => {
-        await handlerFn(withMockSecret, updateLights);
+    function createHttpServer(statusCode = 200): TestHttpServer {
+        const server = new TestHttpServer();
+        server.listen(PORT, {
+            "/": () => ""
+        }, false, statusCode);
 
-        expect(updateLights).toBeCalledTimes(0);
+        return server;
+    }
+
+    test('no areas', async () => {
+        const server = createHttpServer();
+
+        try {
+            await handlerFn(createSecretFunction(secret), updateLightsForArea);
+
+            expect(server.getCallCount()).toEqual(0);
+        } finally {
+            server.close();
+        }
     });
 
     test('one area', async () => {
@@ -22,10 +42,39 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
         await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
         await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
 
-        await handlerFn(withMockSecret, updateLights);
+        const server = createHttpServer();
 
-        expect(updateLights).toBeCalledTimes(1);
-        expect(updateLights.mock.calls[0][0].areaId).toEqual(areaId);
-        expect(updateLights.mock.calls[0][0].durationInMinutes).toEqual(duration);
+        try {
+            await handlerFn(createSecretFunction(secret), updateLightsForArea);
+
+            expect(server.getCallCount()).toEqual(1);
+            const request = JSON.parse(server.getRequest(0));
+            expect(request.areaId).toEqual(areaId);
+            expect(request.durationInMinutes).toEqual(duration);
+        } finally {
+            server.close();
+        }
     });
+
+    test('error', async () => {
+        const duration = 12;
+        const areaId = 4;
+
+        await insertAreaTraffic(db, areaId, 'testi1', duration, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
+        await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
+        await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
+
+        const server = createHttpServer(400);
+
+        try {
+            await handlerFn(createSecretFunction(secret), updateLightsForArea);
+            fail();
+        } catch(e) {
+            // expected
+            expect(server.getCallCount()).toEqual(1);
+        } finally {
+            server.close();
+        }
+    });
+
 }));

@@ -3,5 +3,6 @@ export enum ShiplightEnvKeys {
 }
 
 export enum ShiplightSecretKeys {
-    LIGHTING_API_KEY = "lighting.apikey"
+    API_KEY = "shiplight.apikey",
+    ENDPOINT_URL = "shipLight.endpointUrl"
 }
