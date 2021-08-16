@@ -16,7 +16,7 @@ export enum ShipTypes {
 const VALID_SHIP_TYPES = `(${ShipTypes.CARGO})`;
 const SHIP_MOVING_INTERVAL = '2 MINUTE';
 
-const GET_AREA_TRAFFIC_SQL = `
+const SQL_GET_AREA_TRAFFIC = `
     SELECT
         at.id,
         at.name,
@@ -30,10 +30,25 @@ const GET_AREA_TRAFFIC_SQL = `
     AND v.ship_type in ${VALID_SHIP_TYPES} 
 `.trim();
 
+const SQL_UPDATE_AREA_TRAFFIC_SENDTIME = `
+    UPDATE areatraffic
+    SET brighten_sent = NOW(),
+        brighten_end = (brighten_sent + (INTERVAL '1 MINUTE' * brighten_duration_min))
+        where id = $1 
+`.trim();
+
 export function getAreaTraffic(db: IDatabase<any, any>): Promise<DbAreaTraffic[]> {
     const ps = new PreparedStatement({
         name: 'get-area-traffic',
-        text: GET_AREA_TRAFFIC_SQL
+        text: SQL_GET_AREA_TRAFFIC
     });
     return db.manyOrNone(ps);
+}
+
+export function updateAreaTrafficSendTime(db: IDatabase<any, any>, areaId: number) {
+    const ps = new PreparedStatement({
+        name: 'update-area-traffic-sendtime',
+        text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME
+    });
+    return db.none(ps, [areaId]);
 }

@@ -4,6 +4,12 @@ import * as AreaTrafficDb from '../db/areatraffic';
 import {AreaTraffic} from "../model/areatraffic";
 import {DbAreaTraffic} from "../db/areatraffic";
 
+export async function updateAreaTrafficSendTime(areaId: number) {
+    return inDatabase(async (db: IDatabase<any, any>) => {
+        return AreaTrafficDb.updateAreaTrafficSendTime(db, areaId);
+    });
+}
+
 const BRIGHTEN_OVERLAP_INTERVAL_MILLIS = 60 * 1000; // one minute
 
 export function getAreaTraffic(): Promise<AreaTraffic[]> {
