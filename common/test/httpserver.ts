@@ -13,8 +13,8 @@ export class TestHttpServer {
         return this.messageStack.length;
     }
 
-    getRequest(index: number): string {
-        return this.messageStack[index];
+    getRequestBody(callNumber: number): string {
+        return this.messageStack[callNumber];
     }
 
     listen(port: number, props: ListenProperties, debug: boolean = false, statusCode = 200) {

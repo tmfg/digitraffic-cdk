@@ -50,7 +50,7 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
 
             await assertArea(db, areaId, true);
             expect(server.getCallCount()).toEqual(1);
-            const request = JSON.parse(server.getRequest(0));
+            const request = JSON.parse(server.getRequestBody(0));
             expect(request.areaId).toEqual(areaId);
             expect(request.durationInMinutes).toEqual(duration);
         } finally {
