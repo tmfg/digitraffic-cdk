@@ -1,3 +1,5 @@
+const nanValue = -1;
+
 export function getIndexName(appName: string, timestampFromEvent: any): string {
     const timestamp = new Date(1 * timestampFromEvent);
 
@@ -33,10 +35,16 @@ export function buildFromMessage(message: string): any {
         if (jsonSubString !== null) {
             const parsedJson = JSON.parse(jsonSubString);
             // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
-            if ( parsedJson.hasOwnProperty('@fields') && parsedJson['@fields'].hasOwnProperty('upstream_response_time') && parsedJson['@fields'].upstream_response_time ) {
-                const sum = parsedJson['@fields'].upstream_response_time.split(":").reduce((prev: any, next: any)=>prev+(+next),0).toFixed(3);
-                if (sum && !isNaN(+sum)) {
-                    parsedJson['@fields'].upstream_response_time = sum.toString();
+            if ( parsedJson.hasOwnProperty('@fields') && parsedJson['@fields'].hasOwnProperty('upstream_response_time') ) {
+                if ( parsedJson['@fields'].upstream_response_time ) {
+                    const sum = parsedJson['@fields'].upstream_response_time.split(":").reduce((prev: any, next: any) => prev + (+next), 0).toFixed(3);
+                    if (sum && !isNaN(+sum)) {
+                        parsedJson['@fields'].upstream_response_time = parseFloat(sum);
+                    } else {
+                        parsedJson['@fields'].upstream_response_time = nanValue;
+                    }
+                } else {
+                    parsedJson['@fields'].upstream_response_time = nanValue;
                 }
             }
             return parsedJson;
