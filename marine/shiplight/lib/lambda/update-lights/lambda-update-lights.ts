@@ -13,6 +13,8 @@ export async function handlerFn(
     return doWithSecret(secretId, async (secret: any) => {
         const areas = await AreaTrafficService.getAreaTraffic();
 
+        console.info("method=shiplightHandler count=%d", areas.length);
+
         for (const area of areas) {
             await updateLightsForAreaFn(area, secret[ShiplightSecretKeys.API_KEY], secret[ShiplightSecretKeys.ENDPOINT_URL]);
 

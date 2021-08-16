@@ -16,6 +16,8 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
     return inDatabase(async (db: IDatabase<any, any>) => {
         const areas = await AreaTrafficDb.getAreaTraffic(db);
 
+        console.info("method=getAreaTraffic count=%d", areas.length);
+
         return areas
             .filter(needToBrighten)
             .map(area => ({
