@@ -56,9 +56,8 @@ function parseUpstreamResponseTime(parsedJson: any) {
         const sum = parsedJson['@fields'].upstream_response_time.split(":").reduce((prev: any, next: any) => prev + (+next), 0).toFixed(3);
         if (sum && !isNaN(+sum)) {
             return parseFloat(sum);
-        } else {
-            return nanValue;
         }
+        return nanValue;
     }
     return nanValue;
 }
