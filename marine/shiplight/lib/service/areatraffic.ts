@@ -6,6 +6,7 @@ import {DbAreaTraffic} from "../db/areatraffic";
 
 export async function updateAreaTrafficSendTime(areaId: number) {
     return inDatabase(async (db: IDatabase<any, any>) => {
+        console.info("updating area %d", areaId);
         return AreaTrafficDb.updateAreaTrafficSendTime(db, areaId);
     });
 }

@@ -37,7 +37,7 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
     test('one area', async () => {
         const duration = 12;
         const areaId = 4;
-        await assertArea(db, areaId, false);
+        await assertArea(db, areaId);
 
         await insertAreaTraffic(db, areaId, 'testi1', duration, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
         await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
@@ -48,7 +48,7 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
         try {
             await handlerFn(createSecretFunction(secret), updateLightsForArea);
 
-            await assertArea(db, areaId, true);
+            await assertArea(db, areaId, duration);
             expect(server.getCallCount()).toEqual(1);
             const request = JSON.parse(server.getRequestBody(0));
             expect(request.areaId).toEqual(areaId);

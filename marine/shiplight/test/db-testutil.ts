@@ -6,22 +6,25 @@ export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
     return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
 }
 
-export async function assertArea(db: IDatabase<any, any>, id: number, sentTimeSet: boolean): Promise<Date> {
-    const sentTime = await db.tx(async t => {
+export async function assertArea(db: IDatabase<any, any>, id: number, duration?: number): Promise<Date> {
+    const area = await db.tx(async t => {
         return await t.oneOrNone('select brighten_sent,brighten_end from areatraffic where id = $1', [id]);
     });
 
-    if(sentTimeSet) {
-        expect(sentTime).toBeDefined();
-        expect(sentTime.brighten_sent).toBeDefined();
-        expect(sentTime.brighten_end).toBeDefined();
+    if(duration) {
+        expect(area).toBeDefined();
+        expect(area.brighten_sent).toBeDefined();
+        expect(area.brighten_end).toBeDefined();
+
+        const sent = new Date(area.brighten_sent);
+        const end = new Date(area.brighten_end);
+
+        expect(end.getTime() - sent.getTime()).toEqual(duration * 60 * 1000);
     } else {
-        expect(sentTime).toBeNull();
+        expect(area).toBeNull();
     }
 
-    console.info("sentTime " + JSON.stringify(sentTime));
-
-    return sentTime;
+    return area;
 }
 
 export async function insertAreaTraffic(db: IDatabase<any, any>, id: number, name: string, duration: number, geometry: string): Promise<any> {

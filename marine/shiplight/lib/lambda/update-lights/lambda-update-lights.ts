@@ -3,6 +3,7 @@ import {ShiplightEnvKeys, ShiplightSecretKeys} from "../../keys";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {AreaTraffic} from "../../model/areatraffic";
 import {updateLightsForArea} from "../../api/arealights";
+import {ShiplightSecret} from "../../model/shiplight-secret";
 
 const secretId = process.env[ShiplightEnvKeys.SECRET_ID] as string;
 
@@ -16,9 +17,12 @@ export async function handlerFn(
         console.info("method=shiplightHandler count=%d", areas.length);
 
         for (const area of areas) {
-            await updateLightsForAreaFn(area, secret[ShiplightSecretKeys.API_KEY], secret[ShiplightSecretKeys.ENDPOINT_URL]);
-
-            await AreaTrafficService.updateAreaTrafficSendTime(area.areaId);
+            try {
+                await updateLightsForAreaFn(area, secret[ShiplightSecretKeys.API_KEY], secret[ShiplightSecretKeys.ENDPOINT_URL]);
+                await AreaTrafficService.updateAreaTrafficSendTime(area.areaId);
+            } catch(e) {
+                console.log("update failed with " + JSON.stringify(e));
+            }
         }
     });
 }

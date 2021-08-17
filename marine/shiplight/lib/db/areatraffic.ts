@@ -33,8 +33,8 @@ const SQL_GET_AREA_TRAFFIC = `
 const SQL_UPDATE_AREA_TRAFFIC_SENDTIME = `
     UPDATE areatraffic
     SET brighten_sent = NOW(),
-        brighten_end = (brighten_sent + (INTERVAL '1 MINUTE' * brighten_duration_min))
-        where id = $1 
+        brighten_end = (NOW() + (INTERVAL '1 MINUTE' * brighten_duration_min))
+        where id = $1
 `.trim();
 
 export function getAreaTraffic(db: IDatabase<any, any>): Promise<DbAreaTraffic[]> {
