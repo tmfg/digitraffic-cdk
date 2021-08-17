@@ -34,18 +34,10 @@ export function buildFromMessage(message: string): any {
         const jsonSubString = extractJson(message);
         if (jsonSubString !== null) {
             const parsedJson = JSON.parse(jsonSubString);
+
             // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
             if ( parsedJson.hasOwnProperty('@fields') && parsedJson['@fields'].hasOwnProperty('upstream_response_time') ) {
-                if ( parsedJson['@fields'].upstream_response_time ) {
-                    const sum = parsedJson['@fields'].upstream_response_time.split(":").reduce((prev: any, next: any) => prev + (+next), 0).toFixed(3);
-                    if (sum && !isNaN(+sum)) {
-                        parsedJson['@fields'].upstream_response_time = parseFloat(sum);
-                    } else {
-                        parsedJson['@fields'].upstream_response_time = nanValue;
-                    }
-                } else {
-                    parsedJson['@fields'].upstream_response_time = nanValue;
-                }
+                parsedJson['@fields'].upstream_response_time = parseUpstreamResponseTime(parsedJson);
             }
             return parsedJson;
         } else {
@@ -57,6 +49,18 @@ export function buildFromMessage(message: string): any {
     }
 
     return {};
+}
+
+function parseUpstreamResponseTime(parsedJson: any) {
+    if ( parsedJson['@fields'].upstream_response_time ) {
+        const sum = parsedJson['@fields'].upstream_response_time.split(":").reduce((prev: any, next: any) => prev + (+next), 0).toFixed(3);
+        if (sum && !isNaN(+sum)) {
+            return parseFloat(sum);
+        } else {
+            return nanValue;
+        }
+    }
+    return nanValue;
 }
 
 function skipElasticLogging(message: string): boolean {
