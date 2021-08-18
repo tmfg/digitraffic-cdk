@@ -1,4 +1,4 @@
-import {TestHttpServer, ListenProperties} from "../../lib/test/httpserver";
+import {TestHttpServer, ListenProperties} from "../../test/httpserver";
 
 const http = require('http');
 
