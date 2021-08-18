@@ -66,6 +66,6 @@ export class TestHttpServer {
     }
 }
 
-interface ListenProperties {
+export interface ListenProperties {
     [key:string]: (url?: string, data?: string) => string;
 }
