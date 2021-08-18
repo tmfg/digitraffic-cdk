@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "digitraffic-common": ["common/lib"]
-    }
+    "baseUrl": "."
   }
 }
