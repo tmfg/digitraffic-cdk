@@ -25,7 +25,7 @@
     "preserveSymlinks": true,
     "baseUrl": ".",
     "paths": {
-      "digitraffic-lambda-postgres": ["node_modules/digitraffic-lambda-postgres"]
+      "digitraffic-common/*": ["../../common/lib/*"]
     }
   },
   "exclude": ["cdk.out", "tsd"]
