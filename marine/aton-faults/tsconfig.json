@@ -26,9 +26,6 @@
     "moduleResolution": "node",
     "preserveSymlinks": true,
     "baseUrl": ".",
-    "paths": {
-      "digitraffic-common/*": ["../../common/lib/*"]
-    }
   },
   "exclude": ["cdk.out", "tsd"]
 }
