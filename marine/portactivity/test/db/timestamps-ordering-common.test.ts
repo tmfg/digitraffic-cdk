@@ -2,7 +2,7 @@ import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
-import {shuffle} from "../../../../common/js/js-utils";
+import {shuffle} from "digitraffic-common/js/js-utils";
 import {DbTimestamp} from "../../lib/db/timestamps";
 
 describe('db-timestamps - ordering', dbTestBase((db: pgPromise.IDatabase<any, any>) => {

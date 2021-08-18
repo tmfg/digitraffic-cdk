@@ -1,6 +1,6 @@
 import {IDatabase} from "pg-promise";
 import {Fault} from "../lib/model/fault";
-import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
+import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
     return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');

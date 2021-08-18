@@ -7,8 +7,8 @@ import {Construct} from '@aws-cdk/core';
 import {Bucket} from "@aws-cdk/aws-s3";
 
 import {MobileServerProps} from "./app-props";
-import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
-import {createSubscription} from "../../../common/stack/subscription";
+import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {createSubscription} from "digitraffic-common/stack/subscription";
 import {MarinecamEnvKeys} from "./keys";
 
 export function create(

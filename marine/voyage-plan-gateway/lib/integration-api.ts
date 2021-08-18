@@ -7,9 +7,9 @@ import {
 } from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
-import {createSubscription} from "../../../common/stack/subscription";
-import {defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {createSubscription} from "digitraffic-common/stack/subscription";
+import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {VoyagePlanEnvKeys} from "./keys";
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";

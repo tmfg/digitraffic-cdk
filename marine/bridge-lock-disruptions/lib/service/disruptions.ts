@@ -1,12 +1,12 @@
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
+import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as DisruptionsDB from "../db/disruptions"
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
-import {createFeatureCollection} from "../../../../common/api/geojson";
+import {createFeatureCollection} from "digitraffic-common/api/geojson";
 import {Geometry} from "wkx";
 import {DbDisruption} from "../db/disruptions";
 

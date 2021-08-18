@@ -1,8 +1,8 @@
 import * as lambda from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct, Stack, Duration} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createSubscription} from '../../../common/stack/subscription';
+import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {AppProps} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
@@ -14,7 +14,7 @@ import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/a
 import * as cloudwatch from "@aws-cdk/aws-cloudwatch";
 import {Topic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
-import {getFullEnv} from "../../../common/stack/stack-util";
+import {getFullEnv} from "digitraffic-common/stack/stack-util";
 
 export function createProcessQueueAndDlqLambda(
     queueAndDLQ: QueueAndDLQ,

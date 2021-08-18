@@ -1,6 +1,6 @@
 import * as TimestampsDB from '../db/timestamps'
 import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps'
-import {inDatabase} from '../../../../common/postgres/database';
+import {inDatabase} from 'digitraffic-common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {

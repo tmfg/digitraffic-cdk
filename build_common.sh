@@ -3,4 +3,4 @@
 # exit on any error
 set -ex
 
-yarn workspace digitraffic-cdk-common run build
+yarn workspace digitraffic-common run build

@@ -1,8 +1,8 @@
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Stack} from '@aws-cdk/core';
-import {dbLambdaConfiguration, defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createSubscription} from '../../../common/stack/subscription';
+import {dbLambdaConfiguration, defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Props} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";

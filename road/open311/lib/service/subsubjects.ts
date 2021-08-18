@@ -1,6 +1,6 @@
 import {IDatabase} from "pg-promise";
 import * as SubSubjectsDb from '../db/subsubjects';
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {SubSubject} from "../model/subsubject";
 import {Locale} from "../model/locale";
 

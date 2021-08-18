@@ -1,5 +1,5 @@
 import {DbSseReport} from "../lib/db/sse-db";
-import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
+import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {IDatabase} from "pg-promise";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 

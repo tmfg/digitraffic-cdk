@@ -1,4 +1,4 @@
-import {LambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {Duration} from '@aws-cdk/core';
 
 export interface MobileServerProps extends LambdaConfiguration {

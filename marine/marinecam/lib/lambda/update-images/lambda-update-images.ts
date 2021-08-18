@@ -1,4 +1,4 @@
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as ImageFetcher from "../../service/image-fetcher";
 import {MarinecamEnvKeys, MarinecamSecretKeys} from "../../keys";
 

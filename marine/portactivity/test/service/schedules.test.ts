@@ -3,7 +3,7 @@ import {SchedulesResponse} from "../../lib/api/schedules";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";
 import moment from 'moment-timezone';
-import {getRandomNumber} from "../../../../common/test/testutils";
+import {getRandomNumber} from "digitraffic-common/test/testutils";
 import {getPortAreaGeometries} from "../../lib/service/portareas";
 import {EventSource} from "../../lib/model/eventsource";
 

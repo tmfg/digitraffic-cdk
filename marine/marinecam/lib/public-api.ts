@@ -18,13 +18,13 @@ import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Bucket} from "@aws-cdk/aws-s3";
 
-import {createUsagePlan} from "../../../common/stack/usage-plans";
-import {createResponses} from "../../../common/api/response";
-import {corsMethod, defaultIntegration, getResponse, methodResponse} from "../../../common/api/responses";
-import {MediaType} from "../../../common/api/mediatypes";
-import {addTagsAndSummary} from "../../../common/api/documentation";
-import {BETA_TAGS} from "../../../common/api/tags";
-import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {createResponses} from "digitraffic-common/api/response";
+import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digitraffic-common/api/responses";
+import {MediaType} from "digitraffic-common/api/mediatypes";
+import {addTagsAndSummary} from "digitraffic-common/api/documentation";
+import {BETA_TAGS} from "digitraffic-common/api/tags";
+import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
 
 export function create(

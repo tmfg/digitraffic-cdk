@@ -4,17 +4,17 @@ import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {default as DisruptionSchema} from './model/disruption-schema';
-import {createSubscription} from '../../../common/stack/subscription';
-import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
-import {MessageModel} from "../../../common/api/response";
-import {featureSchema, geojsonSchema} from "../../../common/model/geojson";
-import {addDefaultValidator, addServiceModel, getModelReference} from "../../../common/api/utils";
-import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
+import {MessageModel} from "digitraffic-common/api/response";
+import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
+import {addDefaultValidator, addServiceModel, getModelReference} from "digitraffic-common/api/utils";
+import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {Props} from "./app-props";
-import {addTags} from "../../../common/api/documentation";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {addTags} from "digitraffic-common/api/documentation";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {MediaType} from "../../../common/api/mediatypes";
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export function create(
     vpc: IVpc,

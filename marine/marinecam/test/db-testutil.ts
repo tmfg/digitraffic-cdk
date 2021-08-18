@@ -1,5 +1,5 @@
 import {IDatabase, ITask} from "pg-promise";
-import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
+import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
     return async () => {

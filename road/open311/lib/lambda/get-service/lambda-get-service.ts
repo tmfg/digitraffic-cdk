@@ -1,5 +1,5 @@
 import * as ServicesService from "../../service/services";
-import {NOT_FOUND_MESSAGE} from '../../../../../common/api/errors';
+import {NOT_FOUND_MESSAGE} from 'digitraffic-common/api/errors';
 
 export const handler = async (
     event: any

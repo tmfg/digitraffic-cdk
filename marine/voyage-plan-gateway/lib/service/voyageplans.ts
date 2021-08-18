@@ -1,4 +1,4 @@
-import {RtzSchedules, RtzVoyagePlan, RtzWaypoint} from "../../../../common/rtz/voyageplan";
+import {RtzSchedules, RtzVoyagePlan, RtzWaypoint} from "digitraffic-common/rtz/voyageplan";
 import * as jsts from 'jsts';
 import moment, {Moment} from 'moment-timezone';
 import GeometryFactory = jsts.geom.GeometryFactory;

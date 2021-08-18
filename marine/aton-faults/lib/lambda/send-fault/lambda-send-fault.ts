@@ -1,7 +1,7 @@
 import {SNSEvent} from "aws-lambda";
 import {getFaultS124ById} from "../../service/faults";
 import {sendFault} from "../../service/fault-sender";
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 let clientCertificate: string;
 let privateKey: string;

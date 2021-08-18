@@ -2,18 +2,18 @@ import {GatewayResponse, Model, PassthroughBehavior, Resource, ResponseType, Res
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {createSubscription} from "../../../common/stack/subscription";
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createRestApi, setReturnCodeForMissingAuthenticationToken} from "../../../common/api/rest_apis";
+import {createSubscription} from "digitraffic-common/stack/subscription";
+import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createRestApi, setReturnCodeForMissingAuthenticationToken} from "digitraffic-common/api/rest_apis";
 import {Topic} from "@aws-cdk/aws-sns";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {KEY_SECRET_ID, KEY_SEND_FAULT_SNS_TOPIC_ARN} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 import {AtonProps} from "./app-props";
-import {defaultIntegration, methodResponse} from "../../../common/api/responses";
+import {defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {MediaType} from "../../../common/api/mediatypes";
-import {MessageModel} from "../../../common/api/response";
-import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
+import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MessageModel} from "digitraffic-common/api/response";
+import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 
 export function create(
     secret: ISecret,

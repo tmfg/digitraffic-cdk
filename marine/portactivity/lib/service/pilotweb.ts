@@ -5,7 +5,7 @@ import * as LocationConverter from './location-converter';
 
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {EventSource} from "../model/eventsource";
 

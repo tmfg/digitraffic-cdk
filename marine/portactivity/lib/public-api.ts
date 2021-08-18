@@ -13,23 +13,23 @@ import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
-import {createSubscription} from '../../../common/stack/subscription';
+import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {
     corsMethod,
     defaultIntegration,
     getResponse,
     methodResponse, RESPONSE_200_OK,
     RESPONSE_400_BAD_REQUEST, RESPONSE_500_SERVER_ERROR,
-} from "../../../common/api/responses";
-import {MessageModel} from "../../../common/api/response";
-import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "../../../common/api/utils";
-import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
+} from "digitraffic-common/api/responses";
+import {MessageModel} from "digitraffic-common/api/response";
+import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/api/utils";
+import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {Props} from "./app-props";
-import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {MediaType} from "../../../common/api/mediatypes";
-import {add404Support} from "../../../common/api/rest_apis";
+import {MediaType} from "digitraffic-common/api/mediatypes";
+import {add404Support} from "digitraffic-common/api/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
 
 export function create(

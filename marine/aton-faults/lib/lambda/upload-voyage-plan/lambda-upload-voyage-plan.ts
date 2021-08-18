@@ -1,10 +1,10 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {RtzVoyagePlan} from "../../../../../common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import * as FaultsService from "../../service/faults";
 import {SNS} from "aws-sdk";
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
-import {BAD_REQUEST_MESSAGE} from "../../../../../common/api/errors";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
