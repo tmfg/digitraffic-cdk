@@ -20,7 +20,7 @@
     "aws-cdk": "1.117.0",
     "esbuild": "^0.8.36",
     "jest": "^27.0.6",
-    "parallelshell": "^3.0.2",
+    "parallelshell": "3.0.1",
     "sinon": "^11.1.2",
     "ts-jest": "^27.0.4",
     "ts-node": "^8.10.2",
