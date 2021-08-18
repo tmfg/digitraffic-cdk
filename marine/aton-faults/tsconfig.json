@@ -25,7 +25,10 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "preserveSymlinks": true,
-    "baseUrl": "."
+    "baseUrl": ".",
+    "paths": {
+      "digitraffic-common": ["common/lib"]
+    }
   },
   "exclude": ["cdk.out", "tsd"]
 }
