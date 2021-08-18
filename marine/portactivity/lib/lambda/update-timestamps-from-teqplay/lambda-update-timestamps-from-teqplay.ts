@@ -1,5 +1,5 @@
 import * as TeqplayService from '../../service/teqplay';
-import {withSecret} from "../../../../../common/secrets/secret";
+import {withSecret} from "digitraffic-common/secrets/secret";
 import {sendMessage} from "../../service/queue-service";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 

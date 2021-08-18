@@ -4,7 +4,7 @@ import {handlerFn, SendFaultEvent} from '../../lib/lambda/send-fault/lambda-send
 import {newFault} from "../testdata";
 import * as sinon from 'sinon';
 import {SNSEvent} from "aws-lambda";
-import {TestHttpServer} from "../../../../common/test/httpserver";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;

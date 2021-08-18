@@ -1,6 +1,6 @@
 import {IDatabase} from "pg-promise";
 import * as ServicesDb from '../db/services';
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {Service} from "../model/service";
 
 export async function findAll(): Promise<Service[]> {

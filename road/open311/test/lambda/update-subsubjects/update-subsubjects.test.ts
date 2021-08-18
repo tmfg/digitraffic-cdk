@@ -1,7 +1,7 @@
 import * as pgPromise from "pg-promise";
 import {handler} from '../../../lib/lambda/update-subsubjects/lambda-update-subsubjects';
 import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "../../../../../common/test/httpserver";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import * as SubSubjectsDb from "../../../lib/db/subsubjects";
 import {Locale} from "../../../lib/model/locale";
 

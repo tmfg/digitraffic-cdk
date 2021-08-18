@@ -3,8 +3,8 @@ import * as lambda from '@aws-cdk/aws-lambda';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {Construct, Duration} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createSubscription} from "../../../common/stack/subscription";
+import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createSubscription} from "digitraffic-common/stack/subscription";
 
 // returns lambda names for log group subscriptions
 export function create(

@@ -1,6 +1,6 @@
 import * as MaintenanceTrackingDB from "../db/maintenance-tracking"
 import {DbObservationData, Status} from "../db/maintenance-tracking"
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";
 import {Havainto} from "../lambda/process-queue/lambda-process-queue";

@@ -1,7 +1,7 @@
 import {getFaults} from "../../api/faults";
 import {saveFaults} from "../../service/faults";
 import {Integration} from "../../app-props";
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 export const KEY_SECRET_ID = 'SECRET_ID';
 export const KEY_INTEGRATIONS = 'INTEGRATIONS';

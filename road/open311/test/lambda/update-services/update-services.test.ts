@@ -1,7 +1,7 @@
 import * as pgPromise from "pg-promise";
 import {handler} from '../../../lib/lambda/update-services/lambda-update-services';
 import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "../../../../../common/test/httpserver";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import * as ServicesDb from "../../../lib/db/services";
 
 const SERVER_PORT = 8088;

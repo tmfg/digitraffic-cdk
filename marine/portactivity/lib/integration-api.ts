@@ -1,13 +1,13 @@
 import {Model, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
 import {Construct} from '@aws-cdk/core';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {LambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createRestApi} from '../../../common/api/rest_apis';
+import {LambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createRestApi} from 'digitraffic-common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
-import {attachQueueToApiGatewayResource} from "../../../common/api/sqs";
-import {addServiceModel, getModelReference} from "../../../common/api/utils";
+import {attachQueueToApiGatewayResource} from "digitraffic-common/api/sqs";
+import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import {createTimestampSchema, LocationSchema, ShipSchema} from "./model/timestamp-schema";
-import {addTagsAndSummary} from "../../../common/api/documentation";
+import {addTagsAndSummary} from "digitraffic-common/api/documentation";
 
 export function create(
     queue: Queue,

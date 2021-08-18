@@ -3,11 +3,11 @@ import {Construct, Stack, Duration} from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import * as lambda from '@aws-cdk/aws-lambda';
-import {defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createRestApi} from '../../../common/api/rest_apis';
+import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createRestApi} from 'digitraffic-common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
-import {addDefaultValidator, addServiceModel} from "../../../common/api/utils";
-import {getFullEnv} from "../../../common/stack/stack-util";
+import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
+import {getFullEnv} from "digitraffic-common/stack/stack-util";
 import * as cloudwatch from "@aws-cdk/aws-cloudwatch";
 import {Topic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
@@ -23,8 +23,8 @@ import {
     Tunniste,
     Viivageometriasijainti,
 } from "./model/maintenance-tracking-schema";
-import {createDefaultUsagePlan} from "../../../common/stack/usage-plans";
-import {createSubscription} from "../../../common/stack/subscription";
+import {createDefaultUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {createSubscription} from "digitraffic-common/stack/subscription";
 import {AppProps} from "./app-props";
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "./lambda/constants";

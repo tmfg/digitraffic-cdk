@@ -2,9 +2,9 @@ import {
     dbLambdaConfiguration,
     defaultLambdaConfiguration,
     LambdaConfiguration
-} from "../../../common/stack/lambda-configs";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
-import {addSimpleServiceModel} from "../../../common/api/utils";
+} from "digitraffic-common/stack/lambda-configs";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {addSimpleServiceModel} from "digitraffic-common/api/utils";
 import {Construct} from "@aws-cdk/core";
 import {RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
@@ -14,13 +14,13 @@ import {
     defaultIntegration, getResponse, methodResponse,
     RESPONSE_200_OK,
     RESPONSE_400_BAD_REQUEST
-} from "../../../common/api/responses";
-import {createSubscription} from "../../../common/stack/subscription";
-import {addQueryParameterDescription, addTagsAndSummary} from "../../../common/api/documentation";
-import {DATA_V1_TAGS} from "../../../common/api/tags";
-import {MessageModel} from "../../../common/api/response";
-import {createRestApi} from "../../../common/api/rest_apis";
-import {MediaType} from "../../../common/api/mediatypes";
+} from "digitraffic-common/api/responses";
+import {createSubscription} from "digitraffic-common/stack/subscription";
+import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
+import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
+import {MessageModel} from "digitraffic-common/api/response";
+import {createRestApi} from "digitraffic-common/api/rest_apis";
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
     const publicApi = createRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');

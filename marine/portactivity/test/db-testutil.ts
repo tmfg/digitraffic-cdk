@@ -3,7 +3,7 @@ import {ApiTimestamp} from "../lib/model/timestamp";
 import {DbTimestamp} from "../lib/db/timestamps";
 import * as TimestampsDb from '../lib/db/timestamps';
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
-import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
+import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
     return commonDbTestBase(fn, truncate, 'portactivity', 'portactivity', 'localhost:54321/marine');

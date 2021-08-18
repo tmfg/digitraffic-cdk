@@ -1,5 +1,5 @@
-import {inDatabase} from '../../../../common/postgres/database';
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
+import {inDatabase} from 'digitraffic-common/postgres/database';
+import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as DatexDB from "../db/datex2";
 import {IDatabase} from "pg-promise";
 

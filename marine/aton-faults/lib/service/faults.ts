@@ -1,14 +1,14 @@
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
+import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as FaultsDB from "../db/faults"
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
-import {RtzVoyagePlan} from "../../../../common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import moment from 'moment-timezone';
 import {Feature, FeatureCollection, GeometryObject} from "geojson";
-import {createFeatureCollection} from "../../../../common/api/geojson";
-import {Language} from "../../../../common/model/language";
+import {createFeatureCollection} from "digitraffic-common/api/geojson";
+import {Language} from "digitraffic-common/model/language";
 
 export type FaultProps = {
     readonly id: number

@@ -1,4 +1,4 @@
-import {Location} from "../../../../common/postgres/geometry";
+import {Location} from "digitraffic-common/postgres/geometry";
 
 export interface Annotation {
     _id: string,

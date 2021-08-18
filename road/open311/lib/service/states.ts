@@ -1,6 +1,6 @@
 import {IDatabase} from "pg-promise";
 import * as StatesDb from '../db/states';
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {ServiceRequestState} from "../model/service-request-state";
 import {Locale} from "../model/locale";
 

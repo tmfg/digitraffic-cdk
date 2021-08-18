@@ -1,14 +1,14 @@
 import {EndpointType, LambdaIntegration, MethodLoggingLevel, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
-import {createSubscription} from "../../../common/stack/subscription";
-import {defaultLambdaConfiguration} from '../../../common/stack/lambda-configs';
+import {createSubscription} from "digitraffic-common/stack/subscription";
+import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {IVpc} from "@aws-cdk/aws-ec2";
-import {add404Support, createDefaultPolicyDocument,} from "../../../common/api/rest_apis";
+import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
 import {VoyagePlanEnvKeys} from "./keys";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 
 export function create(
     secret: ISecret,

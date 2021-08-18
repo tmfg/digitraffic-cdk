@@ -3,18 +3,18 @@ import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aw
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
-import {dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {default as AnnotationSchema} from './model/annotation-schema';
-import {createSubscription} from '../../../common/stack/subscription';
-import {addServiceModel, getModelReference} from '../../../common/api/utils';
-import {MessageModel} from "../../../common/api/response";
-import {featureSchema, geojsonSchema} from "../../../common/model/geojson";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {addServiceModel, getModelReference} from 'digitraffic-common/api/utils';
+import {MessageModel} from "digitraffic-common/api/response";
+import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {NW2Props} from "./app-props";
-import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
-import {addTags} from "../../../common/api/documentation";
-import {BETA_TAGS} from "../../../common/api/tags";
-import {MediaType} from "../../../common/api/mediatypes";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
+import {addTags} from "digitraffic-common/api/documentation";
+import {BETA_TAGS} from "digitraffic-common/api/tags";
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export function create(
     vpc: IVpc,

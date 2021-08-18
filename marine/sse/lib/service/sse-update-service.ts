@@ -1,8 +1,8 @@
 import * as SseSchema from "../generated/tlsc-sse-reports-schema";
 import * as SseDb from "../db/sse-db";
-import {inDatabase} from '../../../../common/postgres/database';
+import {inDatabase} from 'digitraffic-common/postgres/database';
 import {IDatabase} from "pg-promise";
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
+import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 
 export const SSE_DATA_DATA_TYPE = "SSE_DATA";
 

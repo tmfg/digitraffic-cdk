@@ -1,6 +1,6 @@
-import {inDatabase} from '../../../../common/postgres/database';
-import {createFeatureCollection} from "../../../../common/api/geojson";
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
+import {inDatabase} from 'digitraffic-common/postgres/database';
+import {createFeatureCollection} from "digitraffic-common/api/geojson";
+import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 
 import * as AnnotationsDB from "../db/annotations";
 import {Annotation} from "../model/annotations";

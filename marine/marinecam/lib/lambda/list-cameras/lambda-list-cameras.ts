@@ -1,6 +1,6 @@
 import * as MetadataService from '../../service/metadata';
 
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {MarinecamEnvKeys} from "../../keys";
 
 const secretId = process.env[MarinecamEnvKeys.SECRET_ID] as string;
