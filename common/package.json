@@ -5,7 +5,8 @@
   "description": "",
   "scripts": {
     "build": "tsc",
-    "test": "echo no tests for this project"
+    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest"
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",

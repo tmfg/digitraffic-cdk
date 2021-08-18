@@ -1,8 +1,8 @@
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Stack} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {createSubscription} from '../../../common/stack/subscription';
+import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Props} from "./app-props";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
@@ -15,7 +15,7 @@ export function create(
     lambdaDbSg: ISecurityGroup,
     props: Props,
     stack: Stack) {
-    
+
     const updateLightsLambda = createUpdateLightsLambda(secret, vpc, lambdaDbSg, props, stack);
     const schedulingRule = createScheduler(stack);
     schedulingRule.addTarget(new LambdaFunction(updateLightsLambda));
