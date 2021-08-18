@@ -3,7 +3,7 @@
 This project contains CDK applications for the [Digitraffic](https://www.digitraffic.fi) project.
 
 Projects are categorized as:
-- projects in directory root are generic, e.g. swagger-joiner
+- projects under other are generic, e.g. swagger-joiner
 - projects under road or marine are related to a mode of transport, e.g. road/variable-signs
 
 ## Links
