@@ -1,4 +1,4 @@
-import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {LambdaConfiguration} from "digitraffic-common/lib/stack/lambda-configs";
 
 declare interface AtonProps extends LambdaConfiguration {
     readonly integrations: Integration[]
