@@ -11,6 +11,7 @@
     "marine/*",
     "road",
     "road/*",
+    "other",
     "other/*"
   ],
   "resolutions": {
