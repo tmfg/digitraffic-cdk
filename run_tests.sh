@@ -7,6 +7,7 @@ set -e
 
 if [ -z "$1" ]
 then
+  yarn workspace common run test
   yarn workspace other run test
 else
   yarn workspace $1 run test
