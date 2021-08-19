@@ -36,6 +36,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# Configured env script
+**/cdk-set-env.sh
+
 # build
 *.js
 !jest.config.js
