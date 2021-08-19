@@ -1,5 +1,8 @@
 import * as http from 'http';
 
+export const ERROR_NO_MATCH="NO MATCH";
+export const ERRORCODE_NOT_FOUND=404;
+
 /**
  * A mock HTTP server created for testing connections from a Lambda to an outside integration
  */
@@ -28,18 +31,18 @@ export class TestHttpServer {
             this.debuglog('Received request to url ' + req.url + '..');
             const path = require('url').parse(req.url).pathname;
 
+            let dataStr = '';
+            req.on('data', chunk => {
+                if (chunk) {
+                    dataStr += chunk;
+                }
+            })
+
             if (path in props) {
                 this.debuglog('..url matched');
                 res.setHeader('Access-Control-Allow-Origin', '*');
                 res.setHeader('Access-Control-Allow-Headers', 'Authorization,X-User-Id,X-Auth-Token');
                 res.writeHead(statusCode);
-
-                let dataStr = '';
-                req.on('data', chunk => {
-                    if (chunk) {
-                        dataStr += chunk;
-                    }
-                })
 
                 req.on('end', () => {
                     // assume sent data is in JSON format
@@ -47,12 +50,19 @@ export class TestHttpServer {
                     res.end(props[path](req.url, dataStr));
                 });
             } else {
-                this.messageStack[this.messageStack.length] = "NO MATCH";
-                this.debuglog('..no match');
+                this.debuglog('..no match for %' + path);
+                req.on('end', () => {
+                    // assume sent data is in JSON format
+                    this.messageStack[this.messageStack.length] = ERROR_NO_MATCH;
+                    res.writeHead(ERRORCODE_NOT_FOUND);
+                    res.end(ERROR_NO_MATCH);
+                });
             }
         }));
         this.server.listen(port);
     }
+
+
 
     close() {
         this.debuglog('Closing test server');
