@@ -25,5 +25,5 @@ export function getEnvType(stack: Stack): EnvType {
 }
 
 export function getFullEnv(stack: Stack): string {
-    return getAppType(stack).toString() + '-' + getEnvType(stack);
+    return `${getAppType(stack)}-${getEnvType(stack)}`;
 }
