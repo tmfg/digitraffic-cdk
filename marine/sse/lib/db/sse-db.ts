@@ -4,7 +4,7 @@ import {
     TheLightStatusSchema, TheSeastateSchema, TheSiteTypeSchema, TheTemperatureSchema, TheTrendSchema, TheWindwavedirSchema
 } from "../generated/tlsc-sse-reports-schema";
 
-export interface DbSseReport {
+export type DbSseReport = {
     readonly sseReportId?: bigint,
     readonly created? : Date,
     readonly latest? : boolean,
@@ -72,7 +72,7 @@ export function updateLatestSiteToFalse(db: IDatabase<any, any>, siteNumber: num
         name: 'update-sse-report-latest-site',
         text: UPDATE_LATEST_SITE_TO_FALSE_SQL
     });
-    return db.oneOrNone(ps, siteNumber);
+    return db.none(ps, siteNumber);
 }
 
 export function insertSseReportData(db: IDatabase<any, any>, sseData: DbSseReport): Promise<any> {
@@ -80,7 +80,7 @@ export function insertSseReportData(db: IDatabase<any, any>, sseData: DbSseRepor
         name: 'update-sse-report',
         text: INSERT_SSE_REPORT_SQL
     });
-    return db.oneOrNone(ps, createInsertValuesArray(sseData));
+    return db.none(ps, createInsertValuesArray(sseData));
 }
 
 

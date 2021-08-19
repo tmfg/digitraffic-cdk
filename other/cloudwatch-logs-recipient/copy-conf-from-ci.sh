@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #set -x
 
-SRC="../../digitraffic-ci/aws/cdk/cloudwatch-logs-recipient/cloudwatch-logs-recipient-app.ts"
+SRC="../../../digitraffic-ci/aws/cdk/other/cloudwatch-logs-recipient/cloudwatch-logs-recipient-app.ts"
 TARGET="bin/cloudwatch-logs-recipient-app.ts"
 
 mkdir -p bin

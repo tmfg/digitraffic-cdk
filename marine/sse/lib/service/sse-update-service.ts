@@ -7,11 +7,11 @@ import * as LastUpdatedDB from "../../../../common/db/last-updated";
 export const SSE_DATA_DATA_TYPE = "SSE_DATA";
 
 export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<number> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
+    return inDatabase(async (db: IDatabase<any,any>) => {
         return Promise.allSettled(sseReport.SSE_Reports.map(async (report: SseSchema.TheItemsSchema) => {
             try {
                 const dbSseSseReport = convertToDbSseReport(report);
-                return await db.tx(async t => {
+                return db.tx(async t => {
                     return t.batch([
                         SseDb.updateLatestSiteToFalse(t, dbSseSseReport.siteNumber),
                         SseDb.insertSseReportData(t, dbSseSseReport),
@@ -36,7 +36,7 @@ export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseD
     if (!sseReport.Extra_Fields?.Coord_Latitude) {
         throw new Error('Missing Coord_Latitude');
     } else if (!sseReport.Extra_Fields?.Coord_Longitude) {
-        throw new Error('Missing Coord_Latitude');
+        throw new Error('Missing Coord_Longitude');
     }
 
     const data: SseDb.DbSseReport = {
