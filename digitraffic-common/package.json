@@ -24,7 +24,7 @@
     "@aws-cdk/aws-sqs": "*",
     "@aws-cdk/core": "*",
     "@types/geojson": "^7946.0.7",
-    "aws-sdk": "^2.821.0",
+    "aws-sdk": "*",
     "pg-native": "*",
     "pg-promise": "*",
     "pg-query-stream": "4.0.0"

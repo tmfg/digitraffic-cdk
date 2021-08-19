@@ -46,6 +46,7 @@
     "@aws-cdk/aws-sqs": "1.119.0",
     "@aws-cdk/aws-wafv2": "1.119.0",
     "@aws-cdk/core": "1.119.0",
+    "aws-sdk": "2.971.0",
     "@types/aws-lambda": "8.10.82",
     "pg-native": "3.0.0",
     "pg-promise": "10.3.5"
