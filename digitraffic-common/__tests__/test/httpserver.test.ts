@@ -9,7 +9,7 @@ const DEFAULT_PROPS = {
     "/": () => ""
 };
 
-describe('db-areatraffic', () => {
+describe('TestHttpServer - test', () => {
     async function withServer(fn: ((server: TestHttpServer) => any), props: ListenProperties = DEFAULT_PROPS, statusCode = 200) {
         const server = new TestHttpServer();
 
