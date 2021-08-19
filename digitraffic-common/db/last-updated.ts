@@ -25,16 +25,16 @@ export function getUpdatedTimestamp(db: IDatabase<any, any>, datatype: string): 
     }, (x: { updated_time: any; } | null) => x?.updated_time);
 }
 
-export function updateUpdatedTimestamp(db: IDatabase<any, any>, datatype: string, date: Date, by: string = ''): Promise<null> {
+export function updateUpdatedTimestamp(db: IDatabase<any, any>, datatype: string, date: Date, by = ''): Promise<null> {
     return db.none(
 `insert into updated_timestamp(updated_name, updated_time, updated_by)
 values($(datatype), $(date), $(by))
 on conflict (updated_name)
 do update set updated_time = $(date), updated_by = $(by)`,
         {
-            date: date,
-            datatype: datatype,
-            by: by
+            date,
+            datatype,
+            by
         });
 }
 
