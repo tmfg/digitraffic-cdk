@@ -21,10 +21,7 @@
     "typeRoots": ["../../node_modules/@types"],
     "moduleResolution": "node",
     "preserveSymlinks": true,
-    "baseUrl": ".",
-    "paths": {
-      "digitraffic-common/*": ["../../common/lib/*"]
-    }
+    "baseUrl": "."
   },
   "exclude": ["cdk.out", "tsd"]
 }
