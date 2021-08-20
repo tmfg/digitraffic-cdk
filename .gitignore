@@ -38,6 +38,7 @@ typings/
 
 # Configured env script
 **/cdk-set-env.sh
+**/copy-app-config.sh
 
 # build
 *.js

@@ -13,7 +13,11 @@
     "pretest": "json2ts -i lib/schemas/ -o lib/generated/",
     "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "cdk-diff-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
+    "cdk-diff-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
+    "cdk-deploy-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
+    "cdk-deploy-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.75",
