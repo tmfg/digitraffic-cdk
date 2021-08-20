@@ -1,5 +1,5 @@
 import { Stack } from "@aws-cdk/core";
-import {getFullEnv} from "../../stack/stack-util";
+import * as StackUtil from "../../stack/stack-util";
 
 describe('stack-util tests', () => {
     function assertFullEnv(stackName: string, expected: string) {
@@ -7,7 +7,7 @@ describe('stack-util tests', () => {
             stackName
         });
 
-        const fullEnv = getFullEnv(stack);
+        const fullEnv = StackUtil.getFullEnv(stack);
 
         expect(fullEnv).toEqual(expected);
     }
