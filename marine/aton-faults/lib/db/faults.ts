@@ -1,8 +1,8 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
-import {createGeometry} from "../../../../common/postgres/geometry";
+import {createGeometry} from "digitraffic-common/postgres/geometry";
 import {LineString} from "wkx";
 import {Fault} from "../model/fault";
-import {Language} from "../../../../common/model/language";
+import {Language} from "digitraffic-common/model/language";
 const moment = require('moment-timezone');
 
 // 15 nautical miles

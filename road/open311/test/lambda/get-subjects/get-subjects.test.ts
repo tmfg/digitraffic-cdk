@@ -4,7 +4,7 @@ import * as SubjectsDb from "../../../lib/db/subjects";
 import {newSubject} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 import {Locale} from "../../../lib/model/locale";
-import {shuffle} from "../../../../../common/js/js-utils";
+import {shuffle} from "digitraffic-common/js/js-utils";
 
 describe('lambda-get-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 

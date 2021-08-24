@@ -1,6 +1,6 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {Annotation} from "../model/annotations";
-import {createGeometry} from "../../../../common/postgres/geometry";
+import {createGeometry} from "digitraffic-common/postgres/geometry";
 
 const FIND_ALL_SQL = "select id, author, created_at, recorded_at, updated_at, expires_at, type, location from nw2_annotation";
 const FIND_ACTIVE_SQL = `

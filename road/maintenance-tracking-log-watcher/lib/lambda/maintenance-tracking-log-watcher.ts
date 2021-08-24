@@ -1,5 +1,5 @@
 import * as AWSx from "aws-sdk";
-import {uploadToS3} from "../../../../common/stack/s3-utils";
+import {uploadToS3} from "digitraffic-common/stack/s3-utils";
 const AWS = AWSx as any;
 import moment from 'moment-timezone';
 import * as esService from "../service/es";

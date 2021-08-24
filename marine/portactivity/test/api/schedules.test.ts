@@ -1,5 +1,5 @@
 import {getSchedulesTimestamps, SchedulesResponse} from "../../lib/api/schedules";
-import {TestHttpServer} from "../../../../common/test/httpserver";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
 
 describe('api-schedules', () => {
 

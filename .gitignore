@@ -71,3 +71,5 @@ junit.xml
 /marine/bin/
 /road/bin/
 marine/shiplight/output
+common/output
+digitraffic-common/output

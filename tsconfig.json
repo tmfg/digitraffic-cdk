@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
-    "paths": {
-      "digitraffic-common": ["common"]
-    }
-  }
+    "target":"ES2018",
+    "module": "commonjs",
+    "lib": ["es2020"]
+  },
+  "exclude": ["cdk.out", "tsd"]
 }

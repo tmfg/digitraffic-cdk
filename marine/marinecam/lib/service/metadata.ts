@@ -1,4 +1,4 @@
-import {inDatabase} from "../../../../common/postgres/database";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import * as MetadataDB from "../db/metadata";
 
 import {IDatabase} from "pg-promise";

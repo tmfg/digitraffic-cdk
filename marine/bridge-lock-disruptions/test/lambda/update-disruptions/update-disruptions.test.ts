@@ -2,7 +2,7 @@ import * as pgPromise from "pg-promise";
 import {handlerFn} from '../../../lib/lambda/update-disruptions/lambda-update-disruptions';
 import {disruptionFeatures} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "../../../../../common/test/httpserver";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import * as DisruptionsDb from '../../../lib/db/disruptions';
 
 const SERVER_PORT = 8089;

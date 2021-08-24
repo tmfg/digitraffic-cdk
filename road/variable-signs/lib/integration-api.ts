@@ -2,10 +2,10 @@ import {RestApi,Resource, LambdaIntegration}  from '@aws-cdk/aws-apigateway';
 import {Function, AssetCode} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
-import {createSubscription} from "../../../common/stack/subscription";
-import {LambdaConfiguration, dbLambdaConfiguration} from "../../../common/stack/lambda-configs";
-import {createRestApi} from "../../../common/api/rest_apis";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {createSubscription} from "digitraffic-common/stack/subscription";
+import {LambdaConfiguration, dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {createRestApi} from "digitraffic-common/api/rest_apis";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 
 export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
     const integrationApi = createRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API', props.allowFromIpAddresses);

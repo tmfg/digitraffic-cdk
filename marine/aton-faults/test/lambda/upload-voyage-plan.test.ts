@@ -5,7 +5,7 @@ import {newFault} from "../testdata";
 import {SNS} from "aws-sdk";
 import * as sinon from 'sinon';
 import {SinonStub} from "sinon";
-import {BAD_REQUEST_MESSAGE} from "../../../../common/api/errors";
+import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 
 const sandbox = sinon.createSandbox();
 

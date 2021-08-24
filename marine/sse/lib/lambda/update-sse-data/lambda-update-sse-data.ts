@@ -1,5 +1,5 @@
 // import aws from 'aws-sdk';
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as SSE from "../../generated/tlsc-sse-reports-schema"
 import * as SseUpdateService from "../../service/sse-update-service"
 

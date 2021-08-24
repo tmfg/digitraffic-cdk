@@ -2,7 +2,7 @@ import {Stack, Construct, StackProps} from '@aws-cdk/core';
 import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
 import * as IntegrationApi from "./integration-api";
 import * as PublicApi from "./public-api";
-import {LambdaConfiguration} from "../../../common/stack/lambda-configs";
+import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 
 export class VariableSignsCdkStack extends Stack {
     constructor(scope: Construct, id: string, lambdaProps: LambdaConfiguration, props?: StackProps) {

@@ -1,6 +1,6 @@
 import * as DeviceDB from "../db/datex2";
-import * as LastUpdatedDB from "../../../../common/db/last-updated";
-import {inDatabase} from "../../../../common/postgres/database";
+import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
+import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 
 const REG_PAYLOAD = /\<payloadPublication/g;

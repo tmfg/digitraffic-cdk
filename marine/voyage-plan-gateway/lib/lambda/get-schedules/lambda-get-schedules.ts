@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {withSecret} from "../../../../../common/secrets/secret";
+import {withSecret} from "digitraffic-common/secrets/secret";
 import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;

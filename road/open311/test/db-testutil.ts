@@ -1,7 +1,7 @@
 import * as pgPromise from "pg-promise";
 import {ServiceRequest} from "../lib/model/service-request";
 import * as RequestsDb from "../lib/db/requests";
-import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
+import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {IDatabase} from "pg-promise";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {

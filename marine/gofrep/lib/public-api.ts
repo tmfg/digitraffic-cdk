@@ -8,8 +8,8 @@ import {
     RestApi
 } from '@aws-cdk/aws-apigateway';
 import {Construct} from "@aws-cdk/core";
-import {add404Support, createDefaultPolicyDocument,} from "../../../common/api/rest_apis";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
+import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {FormalityResponse} from "./model/formality";
 import {defaultLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {createSubscription} from "digitraffic-common/stack/subscription";

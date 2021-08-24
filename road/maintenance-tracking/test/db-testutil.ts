@@ -1,5 +1,5 @@
 import {DbObservationData} from "../lib/db/maintenance-tracking";
-import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
+import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";
 import {Havainto} from "../lib/lambda/process-queue/lambda-process-queue";

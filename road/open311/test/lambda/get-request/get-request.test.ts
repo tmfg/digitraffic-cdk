@@ -2,7 +2,7 @@ import * as pgPromise from "pg-promise";
 import {handler} from "../../../lib/lambda/get-request/lambda-get-request";
 import {newServiceRequest} from "../../testdata";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
-import {NOT_FOUND_MESSAGE} from "../../../../../common/api/errors";
+import {NOT_FOUND_MESSAGE} from "digitraffic-common/api/errors";
 
 describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 

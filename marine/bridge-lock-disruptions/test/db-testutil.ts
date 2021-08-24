@@ -1,6 +1,6 @@
 import {SpatialDisruption} from "../lib/model/disruption";
 import * as DisruptionsDb from '../lib/db/disruptions';
-import {dbTestBase as commonDbTestBase} from "../../../common/test/db-testutils";
+import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {IDatabase} from "pg-promise";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {

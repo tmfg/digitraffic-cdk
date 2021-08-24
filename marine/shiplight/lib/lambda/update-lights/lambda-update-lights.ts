@@ -3,7 +3,6 @@ import {ShiplightEnvKeys, ShiplightSecretKeys} from "../../keys";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {AreaTraffic} from "../../model/areatraffic";
 import {updateLightsForArea} from "../../api/arealights";
-import {ShiplightSecret} from "../../model/shiplight-secret";
 
 const secretId = process.env[ShiplightEnvKeys.SECRET_ID] as string;
 

@@ -3,9 +3,9 @@ import {handlerFn} from "../../lib/lambda/update-lights/lambda-update-lights";
 import {assertArea, dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
 import {createSecretFunction} from "digitraffic-common/test/secret";
 import {ShipTypes} from "../../lib/db/areatraffic";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {updateLightsForArea} from "../../lib/api/arealights";
 import {ShiplightSecretKeys} from "../../lib/keys";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
 
 const PORT = 8089;
 const secret: any = {};

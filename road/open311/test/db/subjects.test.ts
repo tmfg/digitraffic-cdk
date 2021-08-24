@@ -2,7 +2,7 @@ import * as pgPromise from "pg-promise";
 import * as SubjectsDb from "../../lib/db/subjects";
 import {newSubject} from "../testdata";
 import {dbTestBase} from "../db-testutil";
-import {shuffle} from "../../../../common/js/js-utils";
+import {shuffle} from "digitraffic-common/js/js-utils";
 import {Locale} from "../../lib/model/locale";
 
 describe('db-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) => {

@@ -4,16 +4,16 @@ import * as ec2 from '@aws-cdk/aws-ec2';
 import {EndpointType} from "@aws-cdk/aws-apigateway";
 import {Construct, Stack} from "@aws-cdk/core";
 
-import {createIpRestrictionPolicyDocument} from '../../../common/api/rest_apis';
-import {MessageModel} from '../../../common/api/response';
-import {addDefaultValidator, addServiceModel, createArraySchema} from '../../../common/api/utils';
-import {createSubscription} from "../../../common/stack/subscription";
-import {createUsagePlan} from "../../../common/stack/usage-plans";
-import {corsMethod, defaultIntegration, methodResponse} from "../../../common/api/responses";
-import {addTags} from "../../../common/api/documentation";
-import {DATA_V1_TAGS} from "../../../common/api/tags";
-import {dbLambdaConfiguration} from '../../../common/stack/lambda-configs';
-import {MediaType} from '../../../common/api/mediatypes';
+import {createIpRestrictionPolicyDocument} from 'digitraffic-common/api/rest_apis';
+import {MessageModel} from 'digitraffic-common/api/response';
+import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-common/api/utils';
+import {createSubscription} from "digitraffic-common/stack/subscription";
+import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
+import {addTags} from "digitraffic-common/api/documentation";
+import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
+import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {MediaType} from 'digitraffic-common/api/mediatypes';
 
 import {default as ServiceSchema} from './model/service-schema';
 import {default as RequestSchema} from './model/request-schema';

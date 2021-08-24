@@ -1,5 +1,5 @@
 import {fetchRemoteDisruptions, saveDisruptions} from "../../service/disruptions";
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 export const handler = async () : Promise <any> => {
     return handlerFn(withDbSecret);

@@ -1,4 +1,4 @@
-import {uploadToS3} from "../../../../../common/stack/s3-utils";
+import {uploadToS3} from "digitraffic-common/stack/s3-utils";
 
 export const BUCKET_NAME = 'BUCKET_NAME';
 const bucketName = process.env[BUCKET_NAME] as string;

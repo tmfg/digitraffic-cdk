@@ -1,6 +1,6 @@
 import {findAllFaults} from "../../service/faults";
-import {Language} from "../../../../../common/model/language";
-import {withDbSecret} from "../../../../../common/secrets/dbsecret";
+import {Language} from "digitraffic-common/model/language";
+import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 export const KEY_SECRET_ID = 'SECRET_ID'
 
