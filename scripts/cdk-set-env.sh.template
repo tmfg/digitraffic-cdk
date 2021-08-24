@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+
+# Update correct values and rename to cdk-set-env.sh
+# Execute in shell:
+# . cdk-set-env.sh <env>
+
+# Set env
+ENV=${1:-"NONE"}
+
+AWS_DEFAULT_REGION=<SET AWS REGION HERE>
+
+case "$ENV" in
+  ("road-test"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("road-prod"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("marine-test"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("marine-prod"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("status-test"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("status-prod"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  (*) echo "Allowed parameter values are 'road-test', 'road-prod, 'marine-test', 'marine-prod', 'status-test' and 'status-prod"
+  exit 1
+  ;;
+esac
+
+#set -v
+export AWS_PROFILE
+export AWS_DEFAULT_REGION
+env | grep AWS
+#set +v
