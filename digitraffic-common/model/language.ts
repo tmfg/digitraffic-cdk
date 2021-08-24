@@ -1,3 +1,3 @@
 export enum Language {
-    FI='fi', EN = 'en', SE = 'se'
+    FI = 'fi', EN = 'en', SE = 'se'
 }
