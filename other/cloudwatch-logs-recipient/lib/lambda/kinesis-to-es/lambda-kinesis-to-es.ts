@@ -45,7 +45,7 @@ export const handler = (event: KinesisStreamEvent, context: Context, callback: a
             }
         });
 
-        if (batchBody.length > 0) {
+        if (batchBody.trim().length > 0) { // trim here since transform() adds line breaks even to filtered records
             postToElastic(context, true, batchBody);
         }
     } catch (e) {
