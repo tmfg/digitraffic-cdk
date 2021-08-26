@@ -54,6 +54,7 @@ fi
 echo SCRIPT_DIR: ${SCRIPT_DIR}
 
 . ${SCRIPT_DIR}/cdk-set-env.sh ${ENV}
+env | grep AWS
 
 echo
 read -p "Are you sure you wanna run: cdk ${OPERATION} ${STACK}? " -n 1 -r

@@ -36,5 +36,5 @@ esac
 #set -v
 export AWS_PROFILE
 export AWS_DEFAULT_REGION
-env | grep AWS
+#env | grep AWS
 #set +v
