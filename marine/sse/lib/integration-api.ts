@@ -1,4 +1,4 @@
-import {Resource, RestApi} from '@aws-cdk/aws-apigateway';
+import {Resource, RestApi, IntegrationResponse} from '@aws-cdk/aws-apigateway';
 import {Construct, Duration, Stack} from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
@@ -13,12 +13,22 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 import * as SseSchema from "./model/sse-schema";
+import * as ApiResponseSchema from "./model/api-response-schema";
 import {createDefaultUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {AppProps} from "./app-props";
 import {KEY_SECRET_ID} from "./lambda/update-sse-data/lambda-update-sse-data";
 import apigateway = require('@aws-cdk/aws-apigateway');
-
+import {
+    corsMethod,
+    defaultIntegration,
+    getResponse,
+    methodResponse,
+    RESPONSE_200_OK,
+} from "digitraffic-common/api/responses";
+import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MessageModel} from "digitraffic-common/api/response";
+import {ERROR_MESSAGE, BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 
 export function createIntegrationApiAndHandlerLambda(
     secret: ISecret,
@@ -31,10 +41,12 @@ export function createIntegrationApiAndHandlerLambda(
         'SSE-Integration',
         'SSE Data Integration API');
 
-    addServiceModel("Sse", integrationApi, SseSchema.Sse);
+    const sseModel = addServiceModel("Sse", integrationApi, SseSchema.Sse);
+    const okResponseModel = addServiceModel("OkResponseModel", integrationApi, ApiResponseSchema.OkResponse);
+    const errorResponseModel = integrationApi.addModel('ErrorResponseModel', MessageModel);
 
     const apiResource = createUpdateSseApiGatewayResource(stack, integrationApi);
-    const updateSseDataLambda = createUpdateRequestHandlerLambda(apiResource, vpc, lambdaDbSg, props, stack);
+    const updateSseDataLambda = createUpdateRequestHandlerLambda(apiResource, sseModel, okResponseModel, errorResponseModel, vpc, lambdaDbSg, props, stack);
     secret.grantRead(updateSseDataLambda);
 
     createDefaultUsagePlan(integrationApi, 'SSE - Sea State Estimate Integration');
@@ -55,16 +67,19 @@ function createUpdateSseApiGatewayResource(
 
 function createUpdateRequestHandlerLambda(
     requests: apigateway.Resource,
+    sseRequestModel: any,
+    okResponseModel: any,
+    errorResponseModel: any,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     appProps: AppProps,
-    stack: Stack
-) {
+    stack: Stack): Lambda.Function {
+
     const lambdaFunctionName = 'SSE-UpdateSseData';
     const lambdaEnv: any = {};
     lambdaEnv[KEY_SECRET_ID] = appProps.secretId;
 
-    const updateRequestsHandler = new Lambda.Function(stack, lambdaFunctionName, dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {
+    const updateSseDataLambda = new Lambda.Function(stack, lambdaFunctionName, dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {
         functionName: lambdaFunctionName,
         code: new Lambda.AssetCode('dist/lambda'),
         handler: 'lambda-update-sse-data.handler',
@@ -72,13 +87,30 @@ function createUpdateRequestHandlerLambda(
         environment: lambdaEnv
     }));
 
-    requests.addMethod("POST", new apigateway.LambdaIntegration(updateRequestsHandler), {
-        apiKeyRequired: true,
+    const lambdaIntegration = defaultIntegration(updateSseDataLambda, {
+        responses: [
+            getResponse(RESPONSE_200_OK),
+            getResponse(RESPONSE_400_BAD_REQUEST),
+            getResponse(RESPONSE_500_SERVER_ERROR)
+        ]
     });
+
+    requests.addMethod("POST", lambdaIntegration, {
+        apiKeyRequired: true,
+        requestModels: {
+            "application/json": sseRequestModel
+        },
+        methodResponses: [
+            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, okResponseModel)),
+            corsMethod(methodResponse("400", MediaType.APPLICATION_JSON, errorResponseModel)),
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
+        ]
+    });
+
     // Create log subscription
-    createSubscription(updateRequestsHandler, lambdaFunctionName, appProps.logsDestinationArn, stack);
-    createAlarm(updateRequestsHandler, appProps.errorNotificationSnsTopicArn, stack);
-    return updateRequestsHandler;
+    createSubscription(updateSseDataLambda, lambdaFunctionName, appProps.logsDestinationArn, stack);
+    createAlarm(updateSseDataLambda, appProps.errorNotificationSnsTopicArn, stack);
+    return updateSseDataLambda;
 }
 
 function createAlarm(updateRequestHandlerLambda: Lambda.Function, errorNotificationSnsTopicArn: string, stack: Stack) {
@@ -107,4 +139,20 @@ function createAlarm(updateRequestHandlerLambda: Lambda.Function, errorNotificat
         datapointsToAlarm: 1,
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
     }).addAlarmAction(new SnsAction(throttleTopic));
+}
+
+const RESPONSE_400_BAD_REQUEST: IntegrationResponse = {
+    statusCode: '400',
+    selectionPattern: `.*${BAD_REQUEST_MESSAGE}.*`,
+    responseTemplates: {
+        "application/json": "{ \"message\" : \"Bad request. $util.parseJson($input.path('$.errorMessage')).errorMessage\" }"
+    }
+}
+
+const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
+    statusCode: '500',
+    selectionPattern: `.*${ERROR_MESSAGE}.*`,
+    responseTemplates: {
+        "application/json": "{ \"message\" : \"Internal server error. $util.parseJson($input.path('$.errorMessage')).errorMessage\" }"
+    }
 }
