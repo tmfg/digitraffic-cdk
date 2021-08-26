@@ -15,19 +15,3 @@ export const OkResponse: JsonSchema = {
         }
     }
 }
-
-export const ErrorResponse: JsonSchema = {
-    schema: JsonSchemaVersion.DRAFT7,
-    type: JsonSchemaType.OBJECT,
-    title: "Error Response Schema",
-    additionalProperties: false,
-    required: [
-        "message"
-    ],
-    properties: {
-        message: {
-            type: JsonSchemaType.STRING,
-            title: "Error message"
-        }
-    }
-}
