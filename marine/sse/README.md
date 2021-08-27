@@ -1,7 +1,7 @@
 # Digitraffic Road - Maintenance tracking integration
 
-Maintenance tracking integration receives POST-request with tracking JSON, puts it in AWS SQS Queue and saves it to db from there. 
-Road application then reads saved data from the db and combines the contents of the messages for sharing it from the public API as trackings.
+Sea State Estimation (SSE) integration receives POST-request with SSE JSON. Lambda read and saves individual sites data in db.
+Data is then readable from marine-web -application public api.
 
 ## Run build
 
@@ -12,11 +12,8 @@ Road application then reads saved data from the db and combines the contents of 
 ## Deploy to AWS
 
 * Show changes
-    * `./cdk-diff.sh test` or 
-    * `./cdk-diff.sh prod` 
+    * `yarn run cdk-diff-test` or 
+    * `yarn run cdk-diff-prod` 
 * Deploy
-    * `./cdk-deploy.sh test` or 
-    * `./cdk-deploy.sh prod`
-* Synthesize a CloudFormation template for local inspection (not required)
-    * `./cdk-synth.sh test` or
-    * `./cdk-synth.sh prod` 
+    * `yarn run cdk-deploy-test` or 
+    * `yarn run cdk-deploy-prod`

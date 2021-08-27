@@ -16,7 +16,7 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
         return withDbSecretFn(secretId,  async () : Promise<any> => {
             const start = Date.now();
             const sseJsonStr = JSON.stringify(sseJson);
-            console.info(`method=updateSseData ${sseJsonStr}`);
+            console.info(`DEBUG method=updateSseData ${sseJsonStr}`);
             if (!sseJson || !sseJson.SSE_Reports) {
                 console.error(`method=updateSseData Empty message content`);
                 return Promise.reject(errorJson(BAD_REQUEST_MESSAGE, "Empty message content."));
@@ -30,7 +30,8 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
                 console.info(`method=updateSseData sizeBytes=${messageSizeBytes} updatedCount=${count} of count=${sseJson.SSE_Reports.length} tookMs=${(end - start)}`);
                 return Promise.resolve({count: count})
             } catch (e) {
-                console.error(`method=updateSseData Error`, e);
+                const end = Date.now();
+                console.error(`method=updateSseData Error tookMs=${(end - start)}`, e);
                 return Promise.reject(errorJson(ERROR_MESSAGE, `Error while updating sse data: ${e.message}.`));
             }
         });
