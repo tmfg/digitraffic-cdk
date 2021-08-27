@@ -1,5 +1,7 @@
 const nanValue = -1;
 
+const SEPARATOR_LAMBDA_LOGS = '\\bt';
+
 export function getIndexName(appName: string, timestampFromEvent: any): string {
     const timestamp = new Date(1 * timestampFromEvent);
 
@@ -63,7 +65,26 @@ function parseUpstreamResponseTime(parsedJson: any) {
 }
 
 function skipElasticLogging(message: string): boolean {
-    return message.includes("<?xml") || message.startsWith("DEBUG");
+    return message.includes("<?xml") || isDebugLine(message);
+}
+
+function isDebugLine(message: string): boolean {
+    if(message.indexOf(SEPARATOR_LAMBDA_LOGS) == -1) {
+        // not lambda log, so no need to check any longer
+        return false;
+    }
+
+    if(message.length < 120) {
+        console.info("message length " + message.length);
+        return false;
+    }
+
+    // skip header part and then split by separator
+    const split = message.substring(109).split(SEPARATOR_LAMBDA_LOGS);
+
+    // split[0] LOG level
+    // split[1] first part of log line
+    return split.length > 1 && split[1].startsWith("DEBUG");
 }
 
 export function extractJson(message: string): any {
