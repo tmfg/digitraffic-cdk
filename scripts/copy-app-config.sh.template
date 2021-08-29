@@ -16,7 +16,7 @@ do
 done
 
 if [[ "${FOUND}"  != "true" ]] ;then
-    echo "Invalid operation parameter. Valid values are ${ENVS[@]/%/,}"
+    echo "Invalid operation parameter. Valid values are ${OPERATIONS[@]/%/,}"
     exit 1
 fi
 
@@ -49,62 +49,25 @@ esac
 echo "Preparing to copy ${SRC} to ${TARGET}"
 echo
 
+# Make sure bin dir exists
+mkdir -p bin
 if test -f "${TARGET}"; then
-    read -p "${TARGET} exist, do you wan to see diff? [Y/N] " yn
-    case $yn in
-        [Yy]* ) echo "diff:" && diff -U5 "${TARGET}" "${SRC}";;
-        [Nn]* ) ;;
-        * ) echo "Please answer yes or no.";;
-    esac
-fi
+  read -p "${TARGET} exist, do you wan to see diff? [Y/N] " -n 1 -r
+  echo    # move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+    set +e && echo "diff:" && diff -U5 "${TARGET}" "${SRC}" && set -e && echo
+  fi
 
-echo
-if test -f "${TARGET}"; then
-  read -p "Do you want to over write ${TARGET}? [Y/N] " yn
-  case $yn in
-      [Yy]* ) cp "${SRC}" "${TARGET}" && echo "File copied!" ;;
-      [Nn]* ) echo && echo "${TARGET}  UNTOUCHED";;
-      * ) echo "Please answer yes or no.";;
-  esac
+  read -p "Do you want to over write ${TARGET}? [Y/N] " -n 1 -r
+  echo    # move to a new line
+  if [[ $REPLY =~ ^[Yy]$ ]]
+  then
+     echo && cp "${SRC}" "${TARGET}" && echo "Copy ${SRC} -> ${TARGET} done" && echo
+  fi
 else
-  cp "${SRC}" "${TARGET}"
+  echo && cp "${SRC}" "${TARGET}" && echo "Copy ${SRC} -> ${TARGET} done" && echo
 fi
 
-
+set +e
 exit 0;
-
-
-
-
-
-
-
-# Try to find app properties .ts -file in bin dir of working dir
-EXECUTE_DIR=$(pwd)
-ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/bin/*-app.ts" )
-# Take first .ts file and assume it is the app config file
-APP_TS=${ALL_TS_FILES_IN_BIN[0]}
-echo Found app config: $APP_TS
-
-# Get line with the stack name and take that part with Gnu sed
-if [[ "$ENV" == *"test"* ]]; then
-  STACK=$(grep 'testStack.*new' ${APP_TS} | cut -d "'" -f2)
-  echo "Using testStack: ${STACK}"
-elif [[ "$ENV" == *"prod"* ]]; then
-  STACK=$(grep 'prodStack.*new' ${APP_TS} | cut -d "'" -f2)
-  echo "Using prodStack: ${STACK}"
-fi
-
-echo SCRIPT_DIR: ${SCRIPT_DIR}
-
-. ${SCRIPT_DIR}/cdk-set-env.sh ${ENV}
-
-echo
-read -p "Are you sure you wanna run: cdk ${OPERATION} ${STACK}? " -n 1 -r
-echo    # move to a new line
-if [[ $REPLY =~ ^[Yy]$ ]]
-then
-  cdk ${OPERATION} ${STACK}
-fi
-
-set +x

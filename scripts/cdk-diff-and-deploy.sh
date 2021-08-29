@@ -4,14 +4,17 @@ set -e # Fail on error
 # This script ties to do diff of deploy for cdk stack in given envifonment
 ENVS=(road-test road-prod marine-test marine-prod status-test status-prod)
 
-ENV=${1:-"NONE"}
+FULL_ENV=${1:-"NONE"}
 OPERATION=${2:-"NONE"}
 
 FOUND=false
 for value in "${ENVS[@]}"
 do
-  [[ "$ENV" = "$value" ]] && FOUND=true
+  [[ "$FULL_ENV" = "$value" ]] && FOUND=true
 done
+
+ENV_TYPE=$(echo $FULL_ENV | cut -d '-' -f1)
+ENV_ENV=$(echo $FULL_ENV | cut -d '-' -f2)
 
 if [[ "${FOUND}"  != "true" ]] ;then
     echo "Invalid first parameter. Valid values are ${ENVS[@]/%/,}"
@@ -42,18 +45,13 @@ ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/bin/*-app.ts" )
 APP_TS=${ALL_TS_FILES_IN_BIN[0]}
 echo Found app config: $APP_TS
 
-# Get line with the stack name and take that part with Gnu sed
-if [[ "$ENV" == *"test"* ]]; then
-  STACK=$(grep 'testStack.*new' ${APP_TS} | cut -d "'" -f2)
-  echo "Using testStack: ${STACK}"
-elif [[ "$ENV" == *"prod"* ]]; then
-  STACK=$(grep 'prodStack.*new' ${APP_TS} | cut -d "'" -f2)
-  echo "Using prodStack: ${STACK}"
-fi
+# Get stack name
+STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${ENV_TYPE}" |  grep -i "${ENV_ENV}" |  cut -d "'" -f2)
+echo "Using Stack: ${STACK}"
 
 echo SCRIPT_DIR: ${SCRIPT_DIR}
 
-. ${SCRIPT_DIR}/cdk-set-env.sh ${ENV}
+. ${SCRIPT_DIR}/cdk-set-env.sh ${FULL_ENV}
 env | grep AWS
 
 echo
