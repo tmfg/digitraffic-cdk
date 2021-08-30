@@ -17,7 +17,7 @@ const VALID_SHIP_TYPES = `(${ShipTypes.CARGO})`;
 const SHIP_MOVING_INTERVAL = '2 MINUTE';
 
 const SQL_GET_AREA_TRAFFIC = `
-    SELECT
+    SELECT DISTINCT
         at.id,
         at.name,
         at.brighten_duration_min,

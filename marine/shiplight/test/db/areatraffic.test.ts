@@ -19,6 +19,19 @@ describe('db-areatraffic', dbTestBase((db: IDatabase<any, any>) => {
         expect(traffic).toHaveLength(1);
     });
 
+    test('getAreaTraffic - two ships', async () => {
+        await insertAreaTraffic(db, 1, 'testi1', 10, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
+        await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
+        await insertVessel(db, 2, ShipTypes.CARGO); // CARGO will trigger
+        await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
+        await insertVesselLocation(db, 2, Date.now(), 1); // x = 1, in the polygon
+
+        const traffic = await getAreaTraffic(db);
+
+        // only return one area!
+        expect(traffic).toHaveLength(1);
+    });
+
     test('getAreaTraffic - wrong ship-type', async () => {
         await insertAreaTraffic(db, 1, 'testi1', 10, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
         await insertVessel(db, 1, ShipTypes.FISHING); // FISHING will not trigger
