@@ -1,6 +1,7 @@
 const nanValue = -1;
 
 const SEPARATOR_LAMBDA_LOGS = '\\bt';
+const HEADER_LENGTH = 109;
 
 export function getIndexName(appName: string, timestampFromEvent: any): string {
     const timestamp = new Date(1 * timestampFromEvent);
@@ -74,13 +75,14 @@ function isDebugLine(message: string): boolean {
         return false;
     }
 
-    if(message.length < 120) {
+    // header + LOG LEVEL + DEBUG
+    if(message.length < HEADER_LENGTH + 12) {
         console.info("message length " + message.length);
         return false;
     }
 
     // skip header part and then split by separator
-    const split = message.substring(109).split(SEPARATOR_LAMBDA_LOGS);
+    const split = message.substring(HEADER_LENGTH).split(SEPARATOR_LAMBDA_LOGS);
 
     // split[0] LOG level
     // split[1] first part of log line
