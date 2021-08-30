@@ -1,5 +1,5 @@
 import {RECEIPT_HANDLE_SEPARATOR, SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../lib/lambda/constants";
-const QUEUE = 'MaintenanceTrackingQueue.fifo';
+const QUEUE = 'MaintenanceTrackingQueue';
 process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 import * as pgPromise from "pg-promise";

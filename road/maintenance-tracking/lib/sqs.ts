@@ -7,12 +7,10 @@ import {Construct} from "@aws-cdk/core";
  * @param scope stack
  */
 export function createQueue(scope: Construct): QueueAndDLQ {
-    const queueName = 'MaintenanceTrackingQueue.fifo';
-    const dlqQueueName = 'MaintenanceTrackingQueue-DLQ.fifo'
+    const queueName = 'MaintenanceTrackingQueue';
+    const dlqQueueName = 'MaintenanceTrackingQueue-DLQ'
     const dlq = new Queue(scope, dlqQueueName, {
         queueName: dlqQueueName,
-        fifo: true,
-        contentBasedDeduplication: true,
         receiveMessageWaitTime: Duration.seconds(20),
         encryption: QueueEncryption.KMS_MANAGED
     });
@@ -28,14 +26,9 @@ export function createQueue(scope: Construct): QueueAndDLQ {
     // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-additional-fifo-queue-recommendations.html
     const queue = new Queue(scope, queueName, {
         queueName,
-        // fifo: true, // Default is false = Standard queues provide a loose-FIFO
-        fifo: true,
-        // Messages sent with identical message bodies that Amazon SQS must treat as unique. Required for fifo to have deduplication set up.
-        contentBasedDeduplication: true,
         // SQS long polling
         // https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html
         receiveMessageWaitTime: Duration.seconds(20),
-        // This is fifo and no parallel processing so this can be high
         visibilityTimeout: Duration.seconds(120),
         encryption: QueueEncryption.KMS_MANAGED, // NONE?
         deadLetterQueue: {

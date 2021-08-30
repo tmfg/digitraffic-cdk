@@ -51,8 +51,8 @@ function ok(): object {
 export function createSendParams(json: string) : SendMessageRequest {
     return {
         MessageBody: json,
-        MessageDeduplicationId: MaintenanceTrackingService.createMaintenanceTrackingMessageHash(json),  // Required for FIFO queues
-        MessageGroupId: "SameGroupAlways",  // Required for FIFO queues
+        // this is not used by non fifo queue, but it's easy to find duplicate messages with this
+        MessageDeduplicationId: MaintenanceTrackingService.createMaintenanceTrackingMessageHash(json),
         QueueUrl: sqsQueueUrl
     };
 
