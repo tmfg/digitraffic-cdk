@@ -37,18 +37,20 @@ const SQL_UPDATE_AREA_TRAFFIC_SENDTIME = `
         where id = $1
 `.trim();
 
+const PS_GET_AREA_TRAFFIC = new PreparedStatement({
+    name: 'get-area-traffic',
+    text: SQL_GET_AREA_TRAFFIC
+});
+
+const PS_UPDATE_AREA_TRAFFIC_SENDTIME = new PreparedStatement({
+    name: 'update-area-traffic-sendtime',
+    text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME
+});
+
 export function getAreaTraffic(db: IDatabase<any, any>): Promise<DbAreaTraffic[]> {
-    const ps = new PreparedStatement({
-        name: 'get-area-traffic',
-        text: SQL_GET_AREA_TRAFFIC
-    });
-    return db.manyOrNone(ps);
+    return db.manyOrNone(PS_GET_AREA_TRAFFIC);
 }
 
 export function updateAreaTrafficSendTime(db: IDatabase<any, any>, areaId: number) {
-    const ps = new PreparedStatement({
-        name: 'update-area-traffic-sendtime',
-        text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME
-    });
-    return db.none(ps, [areaId]);
+    return db.none(PS_UPDATE_AREA_TRAFFIC_SENDTIME, [areaId]);
 }
