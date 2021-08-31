@@ -23,8 +23,7 @@ describe('event-sourceutil', () => {
         const portcallId = 1;
         const timestamps = [
             newTimestamp({ source: EventSource.SCHEDULES_CALCULATED, portcallId }),
-            newTimestamp({ source: EventSource.TEQPLAY, portcallId }),
-            newTimestamp({ source: EventSource.VTS, portcallId })
+            newTimestamp({ source: EventSource.AWAKE_AI, portcallId }),
         ];
 
         const merged = mergeTimestamps(timestamps);
@@ -37,7 +36,7 @@ describe('event-sourceutil', () => {
         const timestamps = [
             newTimestamp({ source: EventSource.SCHEDULES_CALCULATED, portcallId }),
             newTimestamp({ source: EventSource.PORTNET, portcallId }),
-            newTimestamp({ source: EventSource.VTS, portcallId })
+            newTimestamp({ source: EventSource.AWAKE_AI, portcallId })
         ];
 
         const merged = mergeTimestamps(timestamps);
@@ -48,7 +47,7 @@ describe('event-sourceutil', () => {
     test('mergeTimestamps - timestamps are sorted after merge', () => {
         const portcallId = 1;
         const schedulesTimestamp = newTimestamp({ eventTime: new Date(1621623790702), source: EventSource.SCHEDULES_CALCULATED, portcallId });
-        const vtsTimestamp = newTimestamp({ eventTime: new Date(1620623590702), source: EventSource.VTS, portcallId });
+        const vtsTimestamp = newTimestamp({ eventTime: new Date(1620623590702), source: EventSource.AWAKE_AI, portcallId });
         const portnetTimestamp = newTimestamp({ eventTime: new Date(1622623690702), source: EventSource.PORTNET, portcallId });
         const vtsControlTimestamp = newTimestamp({ eventTime: new Date(1622623890702), source: EventSource.SCHEDULES_VTS_CONTROL, portcallId });
 
@@ -70,8 +69,8 @@ describe('event-sourceutil', () => {
     test('mergeTimestamps - picks highest priority source', () => {
         const portcallId = 1;
         const schedulesTimestamp = newTimestamp({ source: EventSource.SCHEDULES_CALCULATED, portcallId });
-        const teqplayTimestamp = newTimestamp({ source: EventSource.TEQPLAY, portcallId });
-        const vtsTimestamp = newTimestamp({ source: EventSource.VTS, portcallId });
+        const teqplayTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId });
+        const vtsTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId });
         const timestamps = [
             teqplayTimestamp,
             schedulesTimestamp,

@@ -10,17 +10,15 @@ const DEFAULT_PRIORITY = -1;
 
 export const eventSourceMap = new Map<string, string>([
     [EventSource.PORTNET, "PNET"],
-    [EventSource.VTS, VTS_A],
+    [EventSource.AWAKE_AI, VTS_A],
     [EventSource.PORT_HANKO, EventSource.PORT_HANKO],
-    [EventSource.TEQPLAY, VTS_A],
     [EventSource.SCHEDULES_VTS_CONTROL, VTS_O],
     [EventSource.SCHEDULES_CALCULATED, VTS_A]
 ]);
 
 const eventSourcePriorities = new Map<string, number>([
     [EventSource.PORTNET, 10],
-    [EventSource.VTS, 80],
-    [EventSource.TEQPLAY, 85],
+    [EventSource.AWAKE_AI, 80],
     [EventSource.SCHEDULES_CALCULATED, 90],
     [EventSource.SCHEDULES_VTS_CONTROL, 95],
     [EventSource.PORT_HANKO, 100]

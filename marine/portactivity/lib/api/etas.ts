@@ -190,7 +190,7 @@ export interface ShipETA {
     readonly locode: string
     readonly portArea?: string
     readonly mmsi: number
-    readonly imo: number
+    readonly imo?: number
     readonly eta: string
     readonly portcall_id: number
 }

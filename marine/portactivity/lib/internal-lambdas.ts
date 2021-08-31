@@ -28,17 +28,12 @@ export function create(
     createProcessQueueLambda(queueAndDLQ.queue, secret, vpc, lambdaDbSg, props, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 
-    const updateETATimestampsLambda = createUpdateETATimestampsLambda(secret, vpc, lambdaDbSg, props, stack);
+    const updateAwakeAiTimestampsLambda = createUpdateAwakeAiTimestampsLambda(secret, queueAndDLQ.queue, vpc, lambdaDbSg, props, stack);
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(secret, queueAndDLQ.queue, vpc, props, stack);
-    const updateETASchedulingRule = createETAScheduler(stack);
-    updateETASchedulingRule.addTarget(new LambdaFunction(updateETATimestampsLambda));
-    updateETASchedulingRule.addTarget(new LambdaFunction(updateScheduleTimestampsLambda));
 
-    if(props.sources?.teqplay) {
-        const updateTimestampsFromTeqplayLambda = createUpdateTimestampsFromTeqplayLambda(secret, queueAndDLQ.queue, vpc, props, stack);
-        const teqplayScheduler = createTeqplayScheduler(stack);
-        teqplayScheduler.addTarget(new LambdaFunction(updateTimestampsFromTeqplayLambda));
-    }
+    const updateETASchedulingRule = createETAScheduler(stack);
+    updateETASchedulingRule.addTarget(new LambdaFunction(updateAwakeAiTimestampsLambda));
+    updateETASchedulingRule.addTarget(new LambdaFunction(updateScheduleTimestampsLambda));
 
     if(props.sources?.pilotweb) {
         const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(secret, queueAndDLQ.queue, vpc, lambdaDbSg, props, stack);
@@ -51,40 +46,17 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
                                                   lambdaDbSg: ISecurityGroup,
                                                   props: Props, stack: Stack): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
-    const environment = {} as any;
+    const environment: {[key: string]: string} = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
     const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props,{
         memorySize: 256,
-        functionName: functionName,
+        functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
         handler: 'lambda-update-timestamps-from-pilotweb.handler',
         environment
     }));
-
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
-    queue.grantSendMessages(lambda);
-
-    secret.grantRead(lambda);
-
-    return lambda;
-}
-
-function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
-    const functionName = 'PortActivity-UpdateTimestampsFromTeqplay';
-    const environment = {} as any;
-    environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
-    environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
-
-    const lambda = new Function(stack, functionName, {
-        runtime: Runtime.NODEJS_12_X,
-        logRetention: RetentionDays.ONE_YEAR,
-        functionName: functionName,
-        code: new AssetCode('dist/lambda/update-timestamps-from-teqplay'),
-        handler: 'lambda-update-timestamps-from-teqplay.handler',
-        environment
-    });
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
@@ -99,12 +71,12 @@ function createUpdateTimestampsFromTeqplayLambda(secret: ISecret, queue: Queue, 
 // The reason for this is IP based restriction in another system's firewall.
 function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromSchedules';
-    const environment = {} as any;
+    const environment: {[key: string]: string} = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
     const lambda = new Function(stack, functionName, defaultLambdaConfiguration({
-        functionName: functionName,
+        functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-schedules'),
         handler: 'lambda-update-timestamps-from-schedules.handler',
         environment,
@@ -128,11 +100,11 @@ function createProcessQueueLambda(
     props: Props,
     stack: Stack) {
     const functionName = "PortActivity-ProcessTimestampQueue";
-    const environment = {} as any;
+    const environment: {[key: string]: string} = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
 
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: functionName,
+        functionName,
         memorySize: 128,
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
@@ -181,14 +153,6 @@ function createETAScheduler(stack: Stack): Rule {
     });
 }
 
-function createTeqplayScheduler(stack: Stack): Rule {
-    const ruleName = 'PortActivity-TeqplayScheduler'
-    return new Rule(stack, ruleName, {
-        ruleName,
-        schedule: Schedule.expression('cron(*/2 * * * ? *)') // every 15 minutes
-    });
-}
-
 function createPilotwebScheduler(stack: Stack): Rule {
     const ruleName = 'PortActivity-PilotwebScheduler'
     return new Rule(stack, ruleName, {
@@ -197,28 +161,33 @@ function createPilotwebScheduler(stack: Stack): Rule {
     });
 }
 
-
-function createUpdateETATimestampsLambda(
+function createUpdateAwakeAiTimestampsLambda(
     secret: ISecret,
+    queue: Queue,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: Props,
     stack: Stack): Function {
 
-    const environment: any = {};
+    const environment: {[key: string]: string} = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+    environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const functionName = 'PortActivity-UpdateETATimestamps';
+    const functionName = 'PortActivity-UpdateAwakeAiTimestamps';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: functionName,
-        memorySize: 256,
-        code: new AssetCode('dist/lambda/update-eta-timestamps'),
-        handler: 'lambda-update-eta-timestamps.handler',
+        functionName,
+        memorySize: 128,
+        code: new AssetCode('dist/lambda/update-awake-ai-timestamps'),
+        handler: 'lambda-update-awake-ai-timestamps.handler',
         environment,
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
     const lambda = new Function(stack, functionName, lambdaConf);
+
     secret.grantRead(lambda);
+    queue.grantSendMessages(lambda);
+
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+
     return lambda;
 }

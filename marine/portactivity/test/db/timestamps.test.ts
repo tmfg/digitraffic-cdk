@@ -284,7 +284,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const ts = newTimestamp({
             portcallId: 1,
             eventType: EventType.ETA,
-            source: EventSource.VTS,
+            source: EventSource.AWAKE_AI,
             eventTime
         });
         await insert(db, [ts]);
@@ -309,7 +309,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const ts = newTimestamp({
             portcallId: 1,
             eventType: EventType.ETA,
-            source: EventSource.VTS,
+            source: EventSource.AWAKE_AI,
             eventTime
         });
         await insert(db, [ts]);
