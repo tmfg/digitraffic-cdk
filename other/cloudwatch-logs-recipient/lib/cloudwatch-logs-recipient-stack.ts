@@ -19,18 +19,15 @@ export class CloudWatchLogsRecipientStack extends Stack {
 
         const writeLambdaLogsToKinesisRole = this.createWriteToKinesisStreamRole('CWLToKinesisRole', lambdaLogsToESStream.streamArn);
         const writeAppLogsToKinesisRole = this.createWriteToKinesisStreamRole('AppLogsToKinesisRole', appLogsTOEsStream.streamArn);
-
-        const lambdaLogsCrossAccountDestination = this.createCrossAccountDestination('CrossAccountDestination',
+        this.createCrossAccountDestination('CrossAccountDestination',
             lambdaLogsToESStream.streamArn,
             writeLambdaLogsToKinesisRole,
             cwlrProps.accounts.map(a => a.accountNumber));
-        const appLogsCrossAccountDestination =  this.createCrossAccountDestination('AppLogsCrossAccountDestination',
+        this.createCrossAccountDestination('AppLogsCrossAccountDestination',
             appLogsTOEsStream.streamArn,
             writeAppLogsToKinesisRole,
             cwlrProps.accounts.map(a => a.accountNumber));
-
         const emailSqsTopic = this.createEmailTopic(cwlrProps.errorEmail);
-        const accountsString = JSON.stringify(cwlrProps.accounts);
 
         const lambdaRole = this.createWriteToElasticLambdaRole(cwlrProps.elasticSearchDomainArn, [lambdaLogsToESStream.streamArn, appLogsTOEsStream.streamArn]);
         const lambdaLogsToESLambda = this.createWriteLambdaLogsToElasticLambda(lambdaRole, emailSqsTopic, cwlrProps);
