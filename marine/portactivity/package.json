@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "compile-canaries":  "rm -rf dist/nodejs && mkdir -p dist/nodejs/node_modules && cp ../../node_modules/digitraffic-common/canaries/*-code.js dist/nodejs/node_modules",
+    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
@@ -49,6 +51,7 @@
     "@aws-cdk/aws-secretsmanager": "*",
     "@aws-cdk/aws-sns": "*",
     "@aws-cdk/aws-sqs": "*",
+    "@aws-cdk/aws-synthetics": "*",
     "@aws-cdk/core": "*",
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",

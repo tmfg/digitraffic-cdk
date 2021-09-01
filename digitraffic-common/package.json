@@ -4,7 +4,7 @@
   "description": "",
   "scripts": {
     "build": "tsc",
-    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "lint": "eslint **/*.ts __tests__/**/*.ts --fix",
     "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest"
   },
   "devDependencies": {
@@ -22,6 +22,7 @@
     "@aws-cdk/aws-logs": "*",
     "@aws-cdk/aws-secretsmanager": "*",
     "@aws-cdk/aws-sqs": "*",
+    "@aws-cdk/aws-synthetics": "*",
     "@aws-cdk/core": "*",
     "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",

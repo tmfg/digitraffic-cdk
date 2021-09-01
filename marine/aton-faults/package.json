@@ -45,7 +45,6 @@
     "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",
     "axios": "^0.21.1",
-    "digitraffic-common": "*",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
     "parse-link-header": "^1.0.1",
