@@ -7,6 +7,11 @@ export class AwakeAiService {
 
     private readonly api: AwakeAiApi
 
+    readonly overriddenDestinations = [
+        'FIHEL',
+        'FIPOR'
+    ];
+
     constructor(api: AwakeAiApi) {
         this.api = api;
     }
@@ -34,8 +39,17 @@ export class AwakeAiService {
                     continue;
                 }
 
+                if (!this.destinationIsFinnish(eta.predictedDestination)) {
+                    console.warn(`method=updateAwakeAiTimestamps predicted locode was not finnish ${eta.predictedDestination}`);
+                    continue;
+                }
+
                 if (eta.predictedDestination != ship.locode) {
-                    console.warn(`method=updateAwakeAiTimestamps expected locode was ${ship.locode}, was ${eta.predictedDestination}, saving timestamp with predicted locode`);
+                    if (this.overriddenDestinations.includes(eta.predictedDestination)) {
+                        console.warn(`method=updateAwakeAiTimestamps overriding predicted locode ${eta.predictedDestination} with ${ship.locode} in override list`);
+                    } else {
+                        console.warn(`method=updateAwakeAiTimestamps expected locode was ${ship.locode}, was ${eta.predictedDestination}, saving timestamp with predicted locode`);
+                    }
                 }
 
                 if (!eta.timestamp) {
@@ -48,7 +62,7 @@ export class AwakeAiService {
                         imo: eta.imo
                     },
                     location: {
-                        port: eta.predictedDestination,
+                        port: this.normalizeDestination(ship.locode, eta.predictedDestination),
                         portArea: ship.port_area_code
                     },
                     source: EventSource.AWAKE_AI,
@@ -62,6 +76,14 @@ export class AwakeAiService {
             }
         }
         return ret;
+    }
+
+    normalizeDestination(expectedDestination: string, predictedDestination: string): string {
+        return this.overriddenDestinations.includes(expectedDestination) ? expectedDestination : predictedDestination;
+    }
+
+    destinationIsFinnish(locode: string): boolean {
+        return locode.toLowerCase().startsWith('fi');
     }
 
 }

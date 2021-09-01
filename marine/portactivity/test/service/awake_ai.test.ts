@@ -5,6 +5,7 @@ import {DbETAShip} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
 import exp from "constants";
+import {getRandomInteger} from "digitraffic-common/test/testutils";
 
 describe('service awake.ai', () => {
 
@@ -38,7 +39,7 @@ describe('service awake.ai', () => {
             imo: ship.imo,
             status: AwakeAiETAShipStatus.UNDER_WAY,
             predictedEta: new Date().toISOString(),
-            predictedDestination: ship.locode.split('').reverse().join('') // reverse locode to make not equal
+            predictedDestination: 'FIHEH'
         };
         sinon.stub(api, 'getETA').returns(Promise.resolve(returnedETA));
 
@@ -98,16 +99,54 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
+    test('getETA - port outside Finland', async () => {
+        const api = createApi();
+        const service = new AwakeAiService(api);
+        const ship = newDbETAShip();
+        sinon.stub(api, 'getETA').returns(Promise.resolve({
+            mmsi: 123456789,
+            imo: ship.imo,
+            status: AwakeAiETAShipStatus.UNDER_WAY,
+            predictedEta: new Date().toISOString(),
+            predictedDestination: 'EEMUG'
+        }));
+
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
+
+        expect(timestamps.length).toBe(0);
+    });
+
+    test('getETA - port locode override', async () => {
+        const api = createApi();
+        const service = new AwakeAiService(api);
+        const ship = newDbETAShip(service.overriddenDestinations[getRandomInteger(0, service.overriddenDestinations.length - 1)]);
+        sinon.stub(api, 'getETA').returns(Promise.resolve({
+            mmsi: 123456789,
+            imo: ship.imo,
+            status: AwakeAiETAShipStatus.UNDER_WAY,
+            predictedEta: new Date().toISOString(),
+            predictedDestination: 'FIKEK'
+        }));
+
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
+
+        expect(timestamps.length).toBe(1);
+        const expectedTimestamp = awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code);
+        // @ts-ignore
+        expectedTimestamp.location['port'] = ship.locode;
+        expectSingleTimeStampToMatch(timestamps, expectedTimestamp);
+    });
+
 });
 
 function createApi(): AwakeAiApi {
     return new AwakeAiApi('', '');
 }
 
-function newDbETAShip(): DbETAShip {
+function newDbETAShip(locode?: string): DbETAShip {
     return {
         imo: 1234567,
-        locode: 'FILOL',
+        locode: locode ?? 'FILOL',
         port_area_code: 'FOO',
         portcall_id: 123,
     };
