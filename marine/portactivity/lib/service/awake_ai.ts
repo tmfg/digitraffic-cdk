@@ -45,7 +45,7 @@ export class AwakeAiService {
                 }
 
                 if (eta.predictedDestination != ship.locode) {
-                    if (this.overriddenDestinations.includes(eta.predictedDestination)) {
+                    if (this.overriddenDestinations.includes(ship.locode)) {
                         console.warn(`method=updateAwakeAiTimestamps overriding predicted locode ${eta.predictedDestination} with ${ship.locode} in override list`);
                     } else {
                         console.warn(`method=updateAwakeAiTimestamps expected locode was ${ship.locode}, was ${eta.predictedDestination}, saving timestamp with predicted locode`);
