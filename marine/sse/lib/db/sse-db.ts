@@ -67,12 +67,13 @@ const INSERT_SSE_REPORT_SQL = `
     )
 `;
 
+const psUpdateLatestSite = new PreparedStatement({
+    name: 'update-sse-report-latest-site',
+    text: UPDATE_LATEST_SITE_TO_FALSE_SQL
+});
+
 export function updateLatestSiteToFalse(db: IDatabase<any, any>, siteNumber: number): Promise<any> {
-    const ps = new PreparedStatement({
-        name: 'update-sse-report-latest-site',
-        text: UPDATE_LATEST_SITE_TO_FALSE_SQL
-    });
-    return db.none(ps, siteNumber);
+    return db.none(psUpdateLatestSite, siteNumber);
 }
 
 export function insertSseReportData(db: IDatabase<any, any>, sseData: DbSseReport): Promise<any> {

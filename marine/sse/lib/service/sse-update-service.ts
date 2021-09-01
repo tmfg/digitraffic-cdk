@@ -6,7 +6,7 @@ import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 
 export const SSE_DATA_DATA_TYPE = "SSE_DATA";
 
-export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<number> {
+export function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<number> {
     return inDatabase(async (db: IDatabase<any,any>) => {
         return Promise.allSettled(sseReport.SSE_Reports.map(async (report: SseSchema.TheItemsSchema) => {
             try {
