@@ -1,5 +1,20 @@
 import axios from 'axios';
+import {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/api/mediatypes";
+
+export enum AwakeAiResponseType {
+    OK = 'OK',
+    SHIP_NOT_FOUND = 'SHIP_NOT_FOUND',
+    INVALID_SHIP_ID = 'INVALID_SHIP_ID',
+    SERVER_ERROR = 'SERVER_ERROR',
+    NO_RESPONSE = 'NO_RESPONSE',
+    UNKNOWN = 'UNKNOWN'
+}
+
+export type AwakeAiResponse = {
+    readonly type: AwakeAiResponseType
+    readonly eta?: AwakeAiETA
+}
 
 export enum AwakeAiETAShipStatus {
     UNDER_WAY = 'under_way',
@@ -27,12 +42,6 @@ export type AwakeAiETA = {
     readonly predictedTravelTime?: number
 }
 
-/*
-    Return codes:
-    200 - Ok
-    404 - Ship not found
-    422 - Invalid ship id
- */
 export class AwakeAiApi {
 
     private readonly url: string
@@ -43,13 +52,49 @@ export class AwakeAiApi {
         this.apiKey = apiKey;
     }
 
-    async getETA(imo: number): Promise<AwakeAiETA> {
-        const resp = await axios.get(`${this.url}/${imo}`, {
-            headers: {
-                'x-awake-access-token': this.apiKey,
-                Accept: MediaType.APPLICATION_JSON
+    async getETA(imo: number): Promise<AwakeAiResponse> {
+        try {
+            const resp = await axios.get(`${this.url}/${imo}`, {
+                headers: {
+                    'x-awake-access-token': this.apiKey,
+                    Accept: MediaType.APPLICATION_JSON
+                }
+            });
+            return {
+                type: AwakeAiResponseType.OK,
+                eta: resp.data
+            };
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                return this.handleAxiosError(error as AxiosError);
             }
-        });
-        return resp.data as AwakeAiETA;
+            throw error;
+        }
+    }
+
+    handleAxiosError(error: AxiosError): AwakeAiResponse {
+        if (!error.response) {
+            return {
+                type: AwakeAiResponseType.NO_RESPONSE
+            };
+        }
+        switch (error.response.status) {
+            case 404:
+                return {
+                    type: AwakeAiResponseType.SHIP_NOT_FOUND
+                }
+            case 422:
+                return {
+                    type: AwakeAiResponseType.INVALID_SHIP_ID
+                };
+            case 500:
+                return {
+                    type: AwakeAiResponseType.SERVER_ERROR
+                };
+            default:
+                return {
+                    type: AwakeAiResponseType.UNKNOWN
+                };
+        }
     }
 }
