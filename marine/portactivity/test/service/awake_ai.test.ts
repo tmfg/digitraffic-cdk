@@ -8,27 +8,6 @@ import {getRandomInteger} from "digitraffic-common/test/testutils";
 
 describe('service awake.ai', () => {
 
-    test('getETA - not-ok server responses', async () => {
-        const api = createApi();
-        const service = new AwakeAiService(api);
-        const ship = newDbETAShip();
-        const notOkReturnTypes = [
-            AwakeAiResponseType.SHIP_NOT_FOUND,
-            AwakeAiResponseType.INVALID_SHIP_ID,
-            AwakeAiResponseType.SERVER_ERROR,
-            AwakeAiResponseType.NO_RESPONSE,
-            AwakeAiResponseType.UNKNOWN
-        ];
-        const type = notOkReturnTypes[getRandomInteger(0, notOkReturnTypes.length - 1)];
-        sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type,
-        }));
-
-        const timestamps = await service.getAwakeAiTimestamps([ship]);
-
-        expect(timestamps.length).toBe(0);
-    });
-
     test('getETA - ship under way with prediction', async () => {
         const api = createApi();
         const service = new AwakeAiService(api);
