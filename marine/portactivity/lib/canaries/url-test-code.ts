@@ -5,8 +5,8 @@ const hostname = process.env.hostname as string;
 export const handler = async () => {
     const test = new UrlTestCode(hostname);
 
-    test.test("shiplist?locode=FIHKO");
-    test.test("shiplist?locode=FIHEL");
+    test.test("/shiplist?locode=FIHKO");
+    test.test("/shiplist?locode=FIHEL");
 
     return "Canary succesfull";
 };
