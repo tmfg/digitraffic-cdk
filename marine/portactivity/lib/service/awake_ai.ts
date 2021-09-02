@@ -35,8 +35,8 @@ export class AwakeAiService {
 
     getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
         return Promise.allSettled(ships.map(this.getAwakeAiTimestamp.bind(this)))
-            .then(promises =>
-                promises
+            .then(responses =>
+                responses
                     .map(p => valueOnFulfilled(p))
                     .filter((a): a is AwakeAiResponseAndShip => a != null)
                     .map(this.toTimeStamp.bind(this))
