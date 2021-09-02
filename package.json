@@ -2,16 +2,17 @@
   "name": "digitraffic-cdk",
   "version": "1.0.0",
   "main": "index.js",
+  "engines": {
+    "node": ">=12",
+    "yarn": ">1.2 <2"
+  },
   "repository": "git@github.com:tmfg/digitraffic-cdk.git",
   "author": "Digitraffic <digitraffic@fintraffic.fi>",
   "private": true,
   "workspaces": [
     "digitraffic-common",
-    "marine",
     "marine/*",
-    "road",
     "road/*",
-    "other",
     "other/*"
   ],
   "resolutions": {

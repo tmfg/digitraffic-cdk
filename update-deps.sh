@@ -5,4 +5,7 @@
 # exit on any error
 set -ex
 
+# regenerate lockfile to clear unused dependencies
+rm yarn.lock
+
 yarn upgrade
