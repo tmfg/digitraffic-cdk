@@ -3,10 +3,13 @@ import {DbTestCode} from "digitraffic-common/canaries/db-test-code";
 const secret = process.env.secret as string;
 
 export const handler = async () => {
-    const test = new DbTestCode(secret);
+    const suite = new DbTestCode(secret);
 
-    test.test("select count(*) from port_call_timestamp");
-    test.test("select count(*) from pilotage");
+    await suite.testMinimum("pilotages in last hour",
+        "select count(*) from pilotage where schedule_updated > (current_timestamp - interval '1 hour')");
 
-    return "Canary completed";
+    await suite.testMinimum("port_call_timestamps in last hour",
+        "  select count(*) from port_call_timestamp where record_time > (current_timestamp - interval '1 hour');");
+
+    return suite.resolve();
 };

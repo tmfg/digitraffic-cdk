@@ -1,12 +1,6 @@
+import {MediaType} from "../api/mediatypes";
+
 const synthetics = require('Synthetics');
-
-const checker = async (res: any) => {
-
-};
-
-const checkOptions = {
-
-};
 
 export class UrlTestCode {
     readonly requestOptions: any;
@@ -17,9 +11,17 @@ export class UrlTestCode {
             method: 'GET',
             protocol: 'https:',
             headers: {
-                "Digitraffic-User" : "AWS Canary"
+                "Digitraffic-User" : "AWS Canary",
+                "Accept-Encoding" : "gzip",
+                "Accept": [MediaType.TEXT_HTML, MediaType.APPLICATION_JSON].join(',')
             }
         } as any;
+
+        synthetics.getConfiguration()
+            .withIncludeRequestBody(true)
+            .withIncludeRequestHeaders(true)
+            .withIncludeResponseBody(true)
+            .withIncludeResponseHeaders(true);
     }
 
     async test(url: string): Promise<string> {
@@ -29,4 +31,8 @@ export class UrlTestCode {
 
         return await synthetics.executeHttpStep("Verify " + url, this.requestOptions);
     }
+
+    async resolve(): Promise<string> {
+        return "Canary succesfull";
+   }
 }

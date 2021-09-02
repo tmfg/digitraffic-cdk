@@ -3,10 +3,11 @@ import {UrlTestCode} from "digitraffic-common/canaries/url-test-code";
 const hostname = process.env.hostname as string;
 
 export const handler = async () => {
-    const test = new UrlTestCode(hostname);
+    const suite = new UrlTestCode(hostname);
 
-    test.test("/shiplist?locode=FIHKO");
-    test.test("/shiplist?locode=FIHEL");
+    await suite.test("/shiplist?locode=FIHKO");
+    await suite.test("/shiplist?locode=FIHEL");
+    await suite.test("/api/v1/metadata");
 
-    return "Canary succesfull";
+    return suite.resolve();
 };
