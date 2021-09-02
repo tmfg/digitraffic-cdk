@@ -1,28 +1,50 @@
 import * as sinon from 'sinon';
-import {AwakeAiApi, AwakeAiETA, AwakeAiETAShipStatus} from "../../lib/api/awake_ai";
+import {AwakeAiApi, AwakeAiETAShipStatus, AwakeAiResponseType} from "../../lib/api/awake_ai";
 import {AwakeAiService} from "../../lib/service/awake_ai";
 import {DbETAShip} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
-import exp from "constants";
 import {getRandomInteger} from "digitraffic-common/test/testutils";
 
 describe('service awake.ai', () => {
+
+    test('getETA - not-ok server responses', async () => {
+        const api = createApi();
+        const service = new AwakeAiService(api);
+        const ship = newDbETAShip();
+        const notOkReturnTypes = [
+            AwakeAiResponseType.SHIP_NOT_FOUND,
+            AwakeAiResponseType.INVALID_SHIP_ID,
+            AwakeAiResponseType.SERVER_ERROR,
+            AwakeAiResponseType.NO_RESPONSE,
+            AwakeAiResponseType.UNKNOWN
+        ];
+        const type = notOkReturnTypes[getRandomInteger(0, notOkReturnTypes.length - 1)];
+        sinon.stub(api, 'getETA').returns(Promise.resolve({
+            type,
+        }));
+
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
+
+        expect(timestamps.length).toBe(0);
+    });
 
     test('getETA - ship under way with prediction', async () => {
         const api = createApi();
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         const mmsi = 123456789;
-        const returnedETA: AwakeAiETA = {
-            mmsi,
-            imo: ship.imo,
-            status: AwakeAiETAShipStatus.UNDER_WAY,
-            predictedEta: new Date().toISOString(),
-            predictedDestination: ship.locode,
-            timestamp: new Date().toISOString()
-        };
-        sinon.stub(api, 'getETA').returns(Promise.resolve(returnedETA));
+        sinon.stub(api, 'getETA').returns(Promise.resolve({
+            type: AwakeAiResponseType.OK,
+            eta: {
+                mmsi,
+                imo: ship.imo,
+                status: AwakeAiETAShipStatus.UNDER_WAY,
+                predictedEta: new Date().toISOString(),
+                predictedDestination: ship.locode,
+                timestamp: new Date().toISOString()
+            }
+        }));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -34,14 +56,16 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         const mmsi = 123456789;
-        const returnedETA: AwakeAiETA = {
-            mmsi,
-            imo: ship.imo,
-            status: AwakeAiETAShipStatus.UNDER_WAY,
-            predictedEta: new Date().toISOString(),
-            predictedDestination: 'FIHEH'
-        };
-        sinon.stub(api, 'getETA').returns(Promise.resolve(returnedETA));
+        sinon.stub(api, 'getETA').returns(Promise.resolve({
+            type: AwakeAiResponseType.OK,
+            eta: {
+                mmsi,
+                imo: ship.imo,
+                status: AwakeAiETAShipStatus.UNDER_WAY,
+                predictedEta: new Date().toISOString(),
+                predictedDestination: 'FIHEH'
+            }
+        }));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
@@ -55,11 +79,14 @@ describe('service awake.ai', () => {
         const notUnderWayStatuses = [AwakeAiETAShipStatus.STOPPED, AwakeAiETAShipStatus.NOT_PREDICTABLE, AwakeAiETAShipStatus.VESSEL_DATA_NOT_UPDATED];
         const status = notUnderWayStatuses[Math.floor(Math.random() * 2) + 1]; // get random status
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            mmsi: 123456789,
-            imo: ship.imo,
-            status,
-            predictedEta: new Date().toISOString(),
-            predictedDestination: ship.locode
+            type: AwakeAiResponseType.OK,
+            eta: {
+                mmsi: 123456789,
+                imo: ship.imo,
+                status,
+                predictedEta: new Date().toISOString(),
+                predictedDestination: ship.locode
+            }
         }));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
@@ -72,10 +99,13 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            mmsi: 123456789,
-            imo: ship.imo,
-            status: AwakeAiETAShipStatus.UNDER_WAY,
-            predictedDestination: ship.locode
+            type: AwakeAiResponseType.OK,
+            eta: {
+                mmsi: 123456789,
+                imo: ship.imo,
+                status: AwakeAiETAShipStatus.UNDER_WAY,
+                predictedDestination: ship.locode
+            }
         }));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
@@ -88,10 +118,13 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            mmsi: 123456789,
-            imo: ship.imo,
-            status: AwakeAiETAShipStatus.UNDER_WAY,
-            predictedEta: new Date().toISOString()
+            type: AwakeAiResponseType.OK,
+            eta: {
+                mmsi: 123456789,
+                imo: ship.imo,
+                status: AwakeAiETAShipStatus.UNDER_WAY,
+                predictedEta: new Date().toISOString()
+            }
         }));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
@@ -104,11 +137,14 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            mmsi: 123456789,
-            imo: ship.imo,
-            status: AwakeAiETAShipStatus.UNDER_WAY,
-            predictedEta: new Date().toISOString(),
-            predictedDestination: 'EEMUG'
+            type: AwakeAiResponseType.OK,
+            eta: {
+                mmsi: 123456789,
+                imo: ship.imo,
+                status: AwakeAiETAShipStatus.UNDER_WAY,
+                predictedEta: new Date().toISOString(),
+                predictedDestination: 'EEMUG'
+            }
         }));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
@@ -121,11 +157,14 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip(service.overriddenDestinations[getRandomInteger(0, service.overriddenDestinations.length - 1)]);
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            mmsi: 123456789,
-            imo: ship.imo,
-            status: AwakeAiETAShipStatus.UNDER_WAY,
-            predictedEta: new Date().toISOString(),
-            predictedDestination: 'FIKEK'
+            type: AwakeAiResponseType.OK,
+            eta: {
+                mmsi: 123456789,
+                imo: ship.imo,
+                status: AwakeAiETAShipStatus.UNDER_WAY,
+                predictedEta: new Date().toISOString(),
+                predictedDestination: 'FIKEK'
+            }
         }));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
