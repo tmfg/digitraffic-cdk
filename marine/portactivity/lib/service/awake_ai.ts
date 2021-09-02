@@ -1,4 +1,4 @@
-import {AwakeAiApi, AwakeAiETA, AwakeAiETAShipStatus, AwakeAiResponse, AwakeAiResponseType} from "../api/awake_ai";
+import {AwakeAiApi, AwakeAiETA, AwakeAiETAShipStatus, AwakeAiResponse} from "../api/awake_ai";
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
