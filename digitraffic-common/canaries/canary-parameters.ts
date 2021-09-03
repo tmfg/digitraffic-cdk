@@ -1,8 +1,13 @@
 import {Duration} from "@aws-cdk/core";
 
-export interface CanaryParameters {
+export type CanaryParameters = {
     readonly name: string;
     readonly rate?: Duration;
     readonly secret?: string;
-    readonly alarm?: boolean;
+    readonly handler?: string;
+    readonly alarm?: {
+        readonly description?: string;
+        readonly evalutionPeriods?: number;
+        readonly threshold?: number;
+    }
 }
