@@ -19,7 +19,7 @@ export class UrlTestCanary extends Construct {
         environmentVariables.hostname = params.hostname;
 
         if(params.apikey) {
-            environmentVariables["apikey"] = params.apikey;
+            environmentVariables.apikey = params.apikey;
         }
 
         // the handler code is defined at the actual project using this

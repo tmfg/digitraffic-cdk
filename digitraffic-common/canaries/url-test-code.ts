@@ -41,7 +41,7 @@ export class UrlTestCode {
             path: url
         }};
 
-        return await synthetics.executeHttpStep("Verify " + url, requestOptions);
+        return synthetics.executeHttpStep("Verify " + url, requestOptions);
     }
 
     async expect403WithoutApiKey(url: string): Promise<string> {
@@ -52,7 +52,7 @@ export class UrlTestCode {
             headers: baseHeaders
         }};
 
-        return await synthetics.executeHttpStep("Verify " + url, requestOptions, validateStatusCodeFunction(403));
+        return synthetics.executeHttpStep("Verify " + url, requestOptions, validateStatusCodeFunction(403));
     }
 
     async resolve(): Promise<string> {
@@ -63,7 +63,7 @@ export class UrlTestCode {
 // Validate status code
 function validateStatusCodeFunction(statusCode: number) {
     return async (res: any) => {
-        return new Promise((resolve, reject) => {
+        return new Promise(resolve => {
             if (res.statusCode != statusCode) {
                 throw res.statusCode + ' ' + res.statusMessage;
             }

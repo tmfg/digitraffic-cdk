@@ -1,3 +1,1 @@
-export type LambdaEnvironment = {
-    [key: string]: string;
-}
+export type LambdaEnvironment = Record<string, string>;
