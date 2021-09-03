@@ -37,10 +37,14 @@ export class AwakeAiService {
         return Promise.allSettled(ships.map(this.getAwakeAiTimestamp.bind(this)))
             .then(responses =>
                 responses
-                    .map(p => valueOnFulfilled(p))
-                    .filter((a): a is AwakeAiResponseAndShip => a != null)
-                    .map(this.toTimeStamp.bind(this))
-                    .filter((ts): ts is ApiTimestamp => ts != null));
+                    .reduce<Array<ApiTimestamp>>((acc, result) => {
+                        const val = result.status === 'fulfilled' ? result.value : null;
+                        if (!val) {
+                            return acc;
+                        }
+                        const ts = this.toTimeStamp(val);
+                        return ts ? acc.concat([ts]) : acc;
+                    }, []));
     }
 
     private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiResponseAndShip> {
