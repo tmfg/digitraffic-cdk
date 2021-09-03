@@ -5,9 +5,9 @@ const hostname = process.env.hostname as string;
 export const handler = async () => {
     const suite = new UrlTestCode(hostname);
 
-    await suite.test("/shiplist?locode=FIHKO");
-    await suite.test("/shiplist?locode=FIHEL");
-    await suite.test("/api/v1/metadata");
+    await suite.expect200("/shiplist?locode=FIHKO");
+    await suite.expect200("/shiplist?locode=FIHEL");
+    await suite.expect200("/api/v1/metadata");
 
     return suite.resolve();
-};
+}

@@ -12,7 +12,7 @@ export class DbTestCode {
         this.errors = [];
      }
 
-    async testMinimum(testName: string, sql: string, minimum = 1): Promise<string> {
+    async expectRows(testName: string, sql: string, minimum = 1): Promise<string> {
         return withDbSecret(this.secret, async () => {
             return inDatabase(async (db: IDatabase<any>) => {
                 console.info("canary checking sql " + sql);

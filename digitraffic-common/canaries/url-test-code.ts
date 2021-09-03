@@ -2,19 +2,29 @@ import {MediaType} from "../api/mediatypes";
 
 const synthetics = require('Synthetics');
 
+const baseHeaders = {
+    "Digitraffic-User" : "AWS Canary",
+    "Accept-Encoding" : "gzip",
+    "Accept": [MediaType.TEXT_HTML, MediaType.APPLICATION_JSON].join(',')
+} as any;
+
+const API_KEY_HEADER = "x-api-key";
+
 export class UrlTestCode {
     readonly requestOptions: any;
 
-    constructor(hostname: string) {
+    constructor(hostname: string, apikey?: string) {
+        const headers = {...baseHeaders};
+
+        if(apikey) {
+            headers[API_KEY_HEADER] = apikey;
+        }
+
         this.requestOptions = {
             hostname,
             method: 'GET',
             protocol: 'https:',
-            headers: {
-                "Digitraffic-User" : "AWS Canary",
-                "Accept-Encoding" : "gzip",
-                "Accept": [MediaType.TEXT_HTML, MediaType.APPLICATION_JSON].join(',')
-            }
+            headers: headers
         } as any;
 
         synthetics.getConfiguration()
@@ -24,15 +34,41 @@ export class UrlTestCode {
             .withIncludeResponseHeaders(true);
     }
 
-    async test(url: string): Promise<string> {
+    async expect200(url: string): Promise<string> {
         console.info("canary checking url " + url);
 
-        this.requestOptions.path = url;
+        const requestOptions = {...this.requestOptions, ...{
+            path: url
+        }};
 
-        return await synthetics.executeHttpStep("Verify " + url, this.requestOptions);
+        return await synthetics.executeHttpStep("Verify " + url, requestOptions);
+    }
+
+    async expect403WithoutApiKey(url: string): Promise<string> {
+        console.info("canary checking url " + url);
+
+        const requestOptions = {...this.requestOptions, ...{
+            path: url,
+            headers: baseHeaders
+        }};
+
+        return await synthetics.executeHttpStep("Verify " + url, requestOptions, validateStatusCodeFunction(403));
     }
 
     async resolve(): Promise<string> {
         return "Canary succesfull";
    }
 }
+
+// Validate status code
+function validateStatusCodeFunction(statusCode: number) {
+    return async (res: any) => {
+        return new Promise((resolve, reject) => {
+            if (res.statusCode != statusCode) {
+                throw res.statusCode + ' ' + res.statusMessage;
+            }
+
+            resolve("OK");
+        });
+    };
+};

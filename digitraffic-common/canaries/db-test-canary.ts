@@ -1,6 +1,7 @@
 import {Construct, Duration} from "@aws-cdk/core";
 import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
+import {Alarm, ComparisonOperator} from "@aws-cdk/aws-cloudwatch";
 import {Role} from "@aws-cdk/aws-iam";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {CfnCanary} from "@aws-cdk/aws-synthetics";
@@ -16,7 +17,7 @@ export class DbTestCanary extends Construct {
                 params: CanaryParameters) {
         super(scope, params.name);
 
-        const canaryName = `${params.name}-db-canary`;
+        const canaryName = `${params.name}-db`;
         const environmentVariables = {} as any;
         environmentVariables.secret = params.secret;
 
@@ -45,6 +46,16 @@ export class DbTestCanary extends Construct {
             securityGroupIds: [lambdaDbSg.securityGroupId],
             subnetIds: subnetIds
         };
+
+        if(params.alarm ?? true) {
+            new Alarm(scope, `${params.name}-alarm`, {
+                //alarmDescription: 'Monitor portactivity public apis',
+                metric: canary.metricSuccessPercent(),
+                evaluationPeriods: 2,
+                threshold: 90,
+                comparisonOperator: ComparisonOperator.LESS_THAN_THRESHOLD,
+            });
+        }
 
         return canary;
     }

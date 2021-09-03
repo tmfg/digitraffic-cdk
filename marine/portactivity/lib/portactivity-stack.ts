@@ -2,9 +2,8 @@ import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {ISecurityGroup, IVpc, SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
 import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
-import * as PublicApi from './public-api';
-import * as Canaries from './canaries';
 import * as Sqs from './sqs';
+import {PublicApi} from "./public-api";
 import {Props} from './app-props';
 import {Bucket} from "@aws-cdk/aws-s3";
 import {
@@ -14,6 +13,7 @@ import {
     ProxyTarget
 } from "@aws-cdk/aws-rds";
 import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
+import {Canaries} from "./canaries";
 
 export class PortActivityStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -37,8 +37,9 @@ export class PortActivityStack extends Stack {
 
         InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
-        PublicApi.create(secret, vpc, lambdaDbSg, appProps, this);
-        Canaries.create(this, secret, vpc, lambdaDbSg, queueAndDLQ.dlq, appProps);
+
+        new PublicApi(secret, vpc, lambdaDbSg, appProps, this);
+        new Canaries(this, secret, vpc, lambdaDbSg, queueAndDLQ.dlq, "todo from config", appProps);
 
         new Bucket(this, 'DocumentationBucket', {
             bucketName: appProps.documentationBucketName

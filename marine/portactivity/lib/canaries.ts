@@ -10,25 +10,36 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {UrlTestCanary} from "digitraffic-common/canaries/url-test-canary";
 import {DbTestCanary} from "digitraffic-common/canaries/db-test-canary";
 
-export function create(stack: Construct,
-                       secret: ISecret,
-                       vpc: IVpc,
-                       lambdaDbSg: ISecurityGroup,
-                       dlq: Queue,
-                       appProps: Props) {
-    addDLQAlarm(stack, dlq, appProps);
+export class Canaries {
+    constructor(stack: Construct,
+                secret: ISecret,
+                vpc: IVpc,
+                lambdaDbSg: ISecurityGroup,
+                dlq: Queue,
+                apikey: string,
+                appProps: Props) {
+        addDLQAlarm(stack, dlq, appProps);
 
-    const role = createCanaryRole(stack);
+        const role = createCanaryRole(stack);
 
-    new UrlTestCanary(stack, role, {
-        name: 'shiplist',
-        hostname: "portactivity-test.digitraffic.fi"
-    });
+        new UrlTestCanary(stack, role, {
+            name: 'pa-public',
+            hostname: "portactivity-test.digitraffic.fi",
+            handler: 'public-test'
+        });
 
-    new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
-        name: 'db-test',
-        secret: appProps.secretId
-    });
+        new UrlTestCanary(stack, role, {
+            name: 'pa-private',
+            hostname: "portactivity-test.digitraffic.fi",
+            handler: "private-test",
+            apikey,
+        });
+
+        new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
+            name: 'portactivity',
+            secret: appProps.secretId
+        });
+    }
 }
 
 function createCanaryRole(stack: Construct) {
