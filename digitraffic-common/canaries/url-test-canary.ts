@@ -11,8 +11,8 @@ export interface TestParams extends CanaryParameters {
 }
 
 export class UrlTestCanary extends Construct {
-    constructor(scope: Construct, role: Role, params: TestParams) {
-        super(scope, params.name);
+    constructor(stack: Construct, role: Role, params: TestParams) {
+        super(stack, params.name);
 
         const canaryName = `${params.name}-url`;
         const environmentVariables: LambdaEnvironment = {};
@@ -23,7 +23,7 @@ export class UrlTestCanary extends Construct {
         }
 
         // the handler code is defined at the actual project using this
-        const canary = new Canary(scope, canaryName, {
+        const canary = new Canary(stack, canaryName, {
             runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_1,
             role,
             test: Test.custom({
@@ -38,7 +38,7 @@ export class UrlTestCanary extends Construct {
         canary.artifactsBucket.grantWrite(role);
 
         if(params.alarm ?? true) {
-            new CanaryAlarm(scope, canary, params);
+            new CanaryAlarm(stack, canary, params);
         }
 
         return canary;

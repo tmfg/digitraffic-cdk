@@ -25,7 +25,11 @@ export class Canaries {
         new UrlTestCanary(stack, role, {
             name: 'pa-public',
             hostname: "portactivity-test.digitraffic.fi",
-            handler: 'public-test'
+            handler: 'public-test',
+            alarm: {
+                alarmName: 'PortActivity-PublicAPI-Alarm',
+                topicArn: appProps.dlqNotificationTopicArn
+            }
         });
 
         new UrlTestCanary(stack, role, {
@@ -33,11 +37,20 @@ export class Canaries {
             hostname: "portactivity-test.digitraffic.fi",
             handler: "private-test",
             apikey,
+            alarm: {
+                alarmName: 'PortActivity-PrivateAPI-Alarm',
+                topicArn: appProps.dlqNotificationTopicArn
+            }
         });
 
         new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
             name: 'portactivity',
-            secret: appProps.secretId
+            secret: appProps.secretId,
+            alarm: {
+                alarmName: 'PortActivity-Db-Alarm',
+                topicArn: appProps.dlqNotificationTopicArn
+            }
+
         });
     }
 }
