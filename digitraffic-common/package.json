@@ -27,8 +27,7 @@
     "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",
     "pg-native": "*",
-    "pg-promise": "*",
-    "pg-query-stream": "4.0.0"
+    "pg-promise": "*"
   },
   "externals": [
     "aws-sdk"

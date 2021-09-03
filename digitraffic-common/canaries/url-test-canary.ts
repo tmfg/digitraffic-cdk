@@ -24,7 +24,7 @@ export class UrlTestCanary extends Construct {
 
         // the handler code is defined at the actual project using this
         const canary = new Canary(stack, canaryName, {
-            runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_1,
+            runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_2,
             role,
             test: Test.custom({
                 code: new AssetCode("dist"),
