@@ -31,7 +31,8 @@ export class UrlTestCode {
             .withIncludeRequestBody(true)
             .withIncludeRequestHeaders(true)
             .withIncludeResponseBody(true)
-            .withIncludeResponseHeaders(true);
+            .withIncludeResponseHeaders(true)
+            .disableRequestMetrics()
     }
 
     async expect200(url: string): Promise<string> {

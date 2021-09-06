@@ -2,6 +2,8 @@ import {withDbSecret} from "../secrets/dbsecret";
 import {inDatabase} from "../postgres/database";
 import {IDatabase} from "pg-promise";
 
+const synthetics = require('Synthetics');
+
 export class DbTestCode {
     readonly secret: string;
 
@@ -10,7 +12,10 @@ export class DbTestCode {
     constructor(secret: string) {
         this.secret = secret;
         this.errors = [];
-     }
+
+        synthetics.getConfiguration()
+            .disableRequestMetrics();
+    }
 
     async expectRows(testName: string, sql: string, minimum = 1): Promise<string> {
         return withDbSecret(this.secret, async () => {
@@ -37,6 +42,6 @@ export class DbTestCode {
             return Promise.resolve("Canary completed succesfully");
         }
 
-        return Promise.reject(this.errors);
+        throw Error(this.errors.join('\n'));
     }
 }
