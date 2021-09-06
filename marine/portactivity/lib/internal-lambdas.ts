@@ -179,6 +179,7 @@ function createUpdateAwakeAiTimestampsLambda(
         memorySize: 128,
         code: new AssetCode('dist/lambda/update-awake-ai-timestamps'),
         handler: 'lambda-update-awake-ai-timestamps.handler',
+        timeout: 30,
         environment,
         reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
     });
