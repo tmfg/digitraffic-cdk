@@ -289,16 +289,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [{
-            locode: ts.location.port,
-            default: null,
-            areas: [{
-                longitude: 0,
-                latitude: 0,
-                portAreaCode: ts.location.portArea,
-                shipApproachThresholdMinutes
-            }]
-        }]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [ts.location.port]);
 
         expect(ships.length).toBe(1);
     });
@@ -314,16 +305,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [{
-            locode: ts.location.port,
-            default: null,
-            areas: [{
-                longitude: 0,
-                latitude: 0,
-                portAreaCode: ts.location.portArea,
-                shipApproachThresholdMinutes
-            }]
-        }]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [ts.location.port]);
 
         expect(ships.length).toBe(0);
     });
