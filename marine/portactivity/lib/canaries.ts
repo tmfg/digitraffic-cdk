@@ -48,7 +48,7 @@ export class Canaries {
             new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
                 name: 'pa-night',
                 secret: appProps.secretId,
-                schedule: Schedule.expression("cron(0/15 6-22 * * * *)"),
+                schedule: Schedule.expression("cron(0/15 6-22 ? * MON-SUN *)"),
                 handler: 'db-night-test',
                 alarm: {
                     alarmName: 'PortActivity-Db-Night-Alarm',
