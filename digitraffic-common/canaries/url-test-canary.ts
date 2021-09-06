@@ -1,9 +1,9 @@
-import {Construct, Duration} from "@aws-cdk/core";
-import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics";
+import {Construct} from "@aws-cdk/core";
 import {CanaryParameters} from "./canary-parameters";
 import {Role} from "@aws-cdk/aws-iam";
 import {LambdaEnvironment} from "../model/lambda-environment";
 import {CanaryAlarm} from "./canary-alarm";
+import {createCanary} from "./canary";
 
 export interface TestParams extends CanaryParameters {
     readonly hostname: string;
@@ -23,17 +23,7 @@ export class UrlTestCanary extends Construct {
         }
 
         // the handler code is defined at the actual project using this
-        const canary = new Canary(stack, canaryName, {
-            runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_2,
-            role,
-            test: Test.custom({
-                code: new AssetCode("dist"),
-                handler: `${params.handler ?? 'url-test'}.handler`
-            }),
-            environmentVariables,
-            canaryName,
-            schedule: params.schedule ?? Schedule.rate(Duration.minutes(15))
-        });
+        const canary = createCanary(stack, canaryName, params.handler, role, environmentVariables, params.schedule);
 
         canary.artifactsBucket.grantWrite(role);
 

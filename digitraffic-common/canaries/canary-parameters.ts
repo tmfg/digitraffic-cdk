@@ -4,7 +4,7 @@ export type CanaryParameters = {
     readonly name: string;
     readonly schedule?: Schedule;
     readonly secret?: string;
-    readonly handler?: string;
+    readonly handler: string;
     readonly alarm?: {
         readonly alarmName?: string;
         readonly description?: string;

@@ -6,7 +6,6 @@
     "build": "tsc",
     "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
     "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node12",
-    "compile-canaries_old":  "rm -rf dist/nodejs && mkdir -p dist/nodejs/node_modules && cp ../../node_modules/digitraffic-common/canaries/*-code.js dist/nodejs/node_modules",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",

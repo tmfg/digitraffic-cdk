@@ -27,7 +27,7 @@ export class Canaries {
             new UrlTestCanary(stack, role, {
                 name: 'pa-public',
                 hostname: "portactivity-test.digitraffic.fi",
-                handler: 'public-test',
+                handler: 'public-api.handler',
                 alarm: {
                     alarmName: 'PortActivity-PublicAPI-Alarm',
                     topicArn: appProps.dlqNotificationTopicArn
@@ -37,7 +37,7 @@ export class Canaries {
             new UrlTestCanary(stack, role, {
                 name: 'pa-private',
                 hostname: "portactivity-test.digitraffic.fi",
-                handler: "private-test",
+                handler: "private-api.handler",
                 apikey,
                 alarm: {
                     alarmName: 'PortActivity-PrivateAPI-Alarm',
@@ -46,10 +46,10 @@ export class Canaries {
             });
 
             new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
-                name: 'pa-night',
+                name: 'pa-daytime',
                 secret: appProps.secretId,
                 schedule: Schedule.expression("cron(0/15 6-22 ? * MON-SUN *)"),
-                handler: 'db-night-test',
+                handler: 'daytime-db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Night-Alarm',
                     topicArn: appProps.dlqNotificationTopicArn
@@ -59,6 +59,7 @@ export class Canaries {
             new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
                 name: 'pa',
                 secret: appProps.secretId,
+                handler: 'db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Alarm',
                     topicArn: appProps.dlqNotificationTopicArn
