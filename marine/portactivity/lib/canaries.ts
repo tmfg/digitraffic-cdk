@@ -8,8 +8,8 @@ import {Schedule} from "@aws-cdk/aws-synthetics";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {UrlTestCanary} from "digitraffic-common/canaries/url-test-canary";
-import {DbTestCanary} from "digitraffic-common/canaries/db-test-canary";
+import {UrlCanary} from "digitraffic-common/canaries/url-canary";
+import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 
 export class Canaries {
     constructor(stack: Construct,
@@ -17,14 +17,14 @@ export class Canaries {
                 vpc: IVpc,
                 lambdaDbSg: ISecurityGroup,
                 dlq: Queue,
-                apikey: string,
+                apiKeyId: string,
                 appProps: Props) {
         addDLQAlarm(stack, dlq, appProps);
 
         if(appProps.enableCanaries) {
             const role = createCanaryRole(stack);
 
-            new UrlTestCanary(stack, role, {
+            new UrlCanary(stack, role, {
                 name: 'pa-public',
                 hostname: "portactivity-test.digitraffic.fi",
                 handler: 'public-api.handler',
@@ -34,18 +34,18 @@ export class Canaries {
                 }
             });
 
-            new UrlTestCanary(stack, role, {
+            new UrlCanary(stack, role, {
                 name: 'pa-private',
                 hostname: "portactivity-test.digitraffic.fi",
                 handler: "private-api.handler",
-                apikey,
+                apiKeyId,
                 alarm: {
                     alarmName: 'PortActivity-PrivateAPI-Alarm',
                     topicArn: appProps.dlqNotificationTopicArn
                 }
             });
 
-            new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
                 name: 'pa-daytime',
                 secret: appProps.secretId,
                 schedule: Schedule.expression("cron(0/15 6-22 ? * MON-SUN *)"),
@@ -56,7 +56,7 @@ export class Canaries {
                 }
             });
 
-            new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
                 name: 'pa',
                 secret: appProps.secretId,
                 handler: 'db.handler',

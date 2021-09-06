@@ -9,7 +9,7 @@ import {LambdaEnvironment} from "../model/lambda-environment";
 import {CanaryAlarm} from "./canary-alarm";
 import {createCanary} from "./canary";
 
-export class DbTestCanary extends Construct {
+export class DatabaseCanary extends Construct {
     constructor(scope: Construct,
                 secret: ISecret,
                 role: Role,

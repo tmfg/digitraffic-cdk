@@ -1,12 +1,12 @@
-import {DbTestCode} from "digitraffic-common/canaries/db-test-code";
+import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
 
 const secret = process.env.secret as string;
 
 export const handler = async () => {
-    const suite = new DbTestCode(secret);
+    const checker = new DatabaseChecker(secret);
 
-    await suite.expectRows("pilotages in last hour",
+    await checker.expectRows("pilotages in last hour",
         "select count(*) from pilotage where schedule_updated > (current_timestamp - interval '1 hour')");
 
-    return suite.resolve();
+    return checker.resolve();
 };

@@ -1,13 +1,17 @@
-import {UrlTestCode} from "digitraffic-common/canaries/url-test-code";
+import {UrlChecker} from "digitraffic-common/canaries/url-checker";
+import {getApiKeyFromAPIGateway} from "digitraffic-common/api/apikey";
+
+export const API_KEY_HEADER = "x-api-key";
 
 const hostname = process.env.hostname as string;
-const apikey = process.env.apikey as string;
+const apiKeyId = process.env.apiKeyId as string;
 
 export const handler = async () => {
-    const suite = new UrlTestCode(hostname, apikey as string);
+    const apiKey = await getApiKeyFromAPIGateway(apiKeyId);
+    const checker = new UrlChecker(hostname, apiKey.value);
 
-    await suite.expect200("/api/v1/timestamps?locode=FIHKO");
-    await suite.expect403WithoutApiKey("/api/v1/timestamps?locode=FIHKO");
+    await checker.expect200("/api/v1/timestamps?locode=FIHKO");
+    await checker.expect403WithoutApiKey("/api/v1/timestamps?locode=FIHKO");
 
-    return suite.resolve();
+    return checker.resolve();
 }

@@ -1,9 +1,7 @@
 import {Construct, Duration} from "@aws-cdk/core";
 import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics";
 import {LambdaEnvironment} from "../model/lambda-environment";
-import { Role } from "@aws-cdk/aws-iam";
-
-const fs = require('fs');
+import {Role} from "@aws-cdk/aws-iam";
 
 export function createCanary(scope: Construct, canaryName: string, handler: string, role: Role, environmentVariables: LambdaEnvironment, schedule?: Schedule): Canary {
 

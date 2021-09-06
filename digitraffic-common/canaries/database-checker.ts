@@ -4,7 +4,7 @@ import {IDatabase} from "pg-promise";
 
 const synthetics = require('Synthetics');
 
-export class DbTestCode {
+export class DatabaseChecker {
     readonly secret: string;
 
     readonly errors: string[];
@@ -15,6 +15,9 @@ export class DbTestCode {
 
         synthetics.getConfiguration()
             .disableRequestMetrics();
+
+        synthetics.getConfiguration()
+            .withFailedCanaryMetric(true);
     }
 
     async expectRows(testName: string, sql: string, minimum = 1): Promise<string> {

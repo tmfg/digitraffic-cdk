@@ -5,21 +5,21 @@ import {LambdaEnvironment} from "../model/lambda-environment";
 import {CanaryAlarm} from "./canary-alarm";
 import {createCanary} from "./canary";
 
-export interface TestParams extends CanaryParameters {
+export interface UrlCanaryParameters extends CanaryParameters {
     readonly hostname: string;
-    readonly apikey?: string;
+    readonly apiKeyId?: string;
 }
 
-export class UrlTestCanary extends Construct {
-    constructor(stack: Construct, role: Role, params: TestParams) {
+export class UrlCanary extends Construct {
+    constructor(stack: Construct, role: Role, params: UrlCanaryParameters) {
         super(stack, params.name);
 
         const canaryName = `${params.name}-url`;
         const environmentVariables: LambdaEnvironment = {};
         environmentVariables.hostname = params.hostname;
 
-        if(params.apikey) {
-            environmentVariables.apikey = params.apikey;
+        if(params.apiKeyId) {
+            environmentVariables.apiKeyId = params.apiKeyId;
         }
 
         // the handler code is defined at the actual project using this

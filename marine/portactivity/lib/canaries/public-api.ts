@@ -1,13 +1,13 @@
-import {UrlTestCode} from "digitraffic-common/canaries/url-test-code";
+import {UrlChecker} from "digitraffic-common/canaries/url-checker";
 
 const hostname = process.env.hostname as string;
 
 export const handler = async () => {
-    const suite = new UrlTestCode(hostname);
+    const checker = new UrlChecker(hostname);
 
-    await suite.expect200("/shiplist?locode=FIHKO");
-    await suite.expect200("/shiplist?locode=FIHEL");
-    await suite.expect200("/api/v1/metadata");
+    await checker.expect200("/shiplist?locode=FIHKO");
+    await checker.expect200("/shiplist?locode=FIHEL");
+    await checker.expect200("/api/v1/metadata");
 
-    return suite.resolve();
+    return checker.resolve();
 }

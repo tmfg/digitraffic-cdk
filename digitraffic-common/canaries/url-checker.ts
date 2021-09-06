@@ -10,14 +10,14 @@ const baseHeaders = {
 
 const API_KEY_HEADER = "x-api-key";
 
-export class UrlTestCode {
+export class UrlChecker {
     readonly requestOptions: any;
 
-    constructor(hostname: string, apikey?: string) {
+    constructor(hostname: string, apiKey?: string) {
         const headers = {...baseHeaders};
 
-        if(apikey) {
-            headers[API_KEY_HEADER] = apikey;
+        if(apiKey) {
+            headers[API_KEY_HEADER] = apiKey;
         }
 
         this.requestOptions = {
@@ -28,11 +28,14 @@ export class UrlTestCode {
         } as any;
 
         synthetics.getConfiguration()
-            .withIncludeRequestBody(true)
-            .withIncludeRequestHeaders(true)
-            .withIncludeResponseBody(true)
-            .withIncludeResponseHeaders(true)
-            .disableRequestMetrics()
+            .disableRequestMetrics();
+
+        synthetics.getConfiguration()
+            .withIncludeRequestBody(false)
+            .withIncludeRequestHeaders(false)
+            .withIncludeResponseBody(false)
+            .withIncludeResponseHeaders(false)
+            .withFailedCanaryMetric(true);
     }
 
     async expect200(url: string): Promise<string> {

@@ -38,8 +38,9 @@ export class PortActivityStack extends Stack {
         InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
 
-        new PublicApi(secret, vpc, lambdaDbSg, appProps, this);
-        new Canaries(this, secret, vpc, lambdaDbSg, queueAndDLQ.dlq, "todo from config", appProps);
+        const publicApi = new PublicApi(secret, vpc, lambdaDbSg, appProps, this);
+
+        new Canaries(this, secret, vpc, lambdaDbSg, queueAndDLQ.dlq, publicApi.apiKeyId, appProps);
 
         new Bucket(this, 'DocumentationBucket', {
             bucketName: appProps.documentationBucketName

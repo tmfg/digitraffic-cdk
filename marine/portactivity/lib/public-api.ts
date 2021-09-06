@@ -36,6 +36,7 @@ export class PublicApi {
     readonly stack: Construct;
     readonly props: Props;
     readonly secret: ISecret;
+    readonly apiKeyId: string;
 
     constructor(secret: ISecret,
                 vpc: IVpc,
@@ -48,7 +49,7 @@ export class PublicApi {
 
         const publicApi = this.createApi();
         add404Support(publicApi, stack);
-        createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan');
+        this.apiKeyId = createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan').keyId;
 
         const validator = addDefaultValidator(publicApi);
 
@@ -144,7 +145,7 @@ export class PublicApi {
         });
 
         const timestampResource = resource.addResource('timestamps');
-        timestampResource.addMethod("GET", getTimestampsIntegration, {
+        const method = timestampResource.addMethod("GET", getTimestampsIntegration, {
             apiKeyRequired: true,
             requestParameters: {
                 'method.request.querystring.locode': false,
@@ -159,6 +160,7 @@ export class PublicApi {
                 corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
             ]
         });
+        method.node
 
         createSubscription(getTimestampsLambda, functionName, this.props.logsDestinationArn, this.stack);
         addTagsAndSummary('GetTimestamps',
