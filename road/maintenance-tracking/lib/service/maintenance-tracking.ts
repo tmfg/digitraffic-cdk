@@ -1,5 +1,5 @@
-import * as MaintenanceTrackingDB from "../db/maintenance-tracking"
-import {DbObservationData, Status} from "../db/maintenance-tracking"
+import * as MaintenanceTrackingDB from "../db/maintenance-tracking-db"
+import {DbObservationData, Status} from "../db/maintenance-tracking-db"
 import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";

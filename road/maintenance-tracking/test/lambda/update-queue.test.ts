@@ -3,7 +3,6 @@ process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[SQS_QUEUE_URL] = 'https://aws-queue-123';
 import * as pgPromise from "pg-promise";
 import {dbTestBase} from "../db-testutil";
-import {createSendParams} from "../../lib/lambda/update-queue/lambda-update-queue";
 import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
 import * as sinon from 'sinon';
 

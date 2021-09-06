@@ -9,7 +9,7 @@ import {SQSRecord} from "aws-lambda";
 import {getRandompId, getTrackingJsonWith3Observations, getTrackingJsonWith3ObservationsAndMissingSendingSystem} from "../testdata";
 import * as sinon from 'sinon';
 import moment from 'moment-timezone';
-import {DbObservationData, Status} from "../../lib/db/maintenance-tracking";
+import {DbObservationData, Status} from "../../lib/db/maintenance-tracking-db";
 import {cloneRecordWithCamelAndPascal} from "../../lib/lambda/process-queue/lambda-process-queue";
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {

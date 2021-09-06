@@ -1,4 +1,4 @@
-import {DbObservationData} from "../lib/db/maintenance-tracking";
+import {DbObservationData} from "../lib/db/maintenance-tracking-db";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";

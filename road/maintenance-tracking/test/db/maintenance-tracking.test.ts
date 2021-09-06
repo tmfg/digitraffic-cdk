@@ -1,4 +1,4 @@
-import * as MaintenanceTrackingDB from "../../lib/db/maintenance-tracking";
+import * as MaintenanceTrackingDB from "../../lib/db/maintenance-tracking-db";
 import * as pgPromise from "pg-promise";
 import {createObservationsDbDatas, dbTestBase, findAllObservations} from "../db-testutil";
 import {assertObservationData, getRandompId, getTrackingJsonWith3Observations} from "../testdata";
