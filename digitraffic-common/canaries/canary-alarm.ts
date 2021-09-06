@@ -13,10 +13,10 @@ export class CanaryAlarm {
             const alarm = new Alarm(stack, alarmName, {
                 alarmName,
                 alarmDescription: params.alarm?.description ?? '',
-                metric: canary.metricSuccessPercent(),
-                evaluationPeriods: params.alarm?.evalutionPeriods ?? 2,
-                threshold: params.alarm?.threshold ?? 90,
-                comparisonOperator: ComparisonOperator.LESS_THAN_THRESHOLD,
+                metric: canary.metricFailed(),
+                evaluationPeriods: params.alarm?.evalutionPeriods ?? 1,
+                threshold: params.alarm?.threshold ?? 0,
+                comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
             });
 
             if(params.alarm?.topicArn) {

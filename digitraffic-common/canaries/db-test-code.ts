@@ -29,7 +29,7 @@ export class DbTestCode {
                 } else {
                     console.info("return value " + JSON.stringify(value));
 
-                    if(value.count <= minimum) {
+                    if(value.count < minimum) {
                         this.errors.push(`Test ${testName} count was ${value.count}, minimum is ${minimum}`);
                     }
                 }
