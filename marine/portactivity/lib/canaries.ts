@@ -4,6 +4,7 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Topic} from "@aws-cdk/aws-sns";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {Construct} from "@aws-cdk/core";
+import {Schedule} from "@aws-cdk/aws-synthetics";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
@@ -20,38 +21,50 @@ export class Canaries {
                 appProps: Props) {
         addDLQAlarm(stack, dlq, appProps);
 
-        const role = createCanaryRole(stack);
+        if(appProps.enableCanaries) {
+            const role = createCanaryRole(stack);
 
-        new UrlTestCanary(stack, role, {
-            name: 'pa-public',
-            hostname: "portactivity-test.digitraffic.fi",
-            handler: 'public-test',
-            alarm: {
-                alarmName: 'PortActivity-PublicAPI-Alarm',
-                topicArn: appProps.dlqNotificationTopicArn
-            }
-        });
+            new UrlTestCanary(stack, role, {
+                name: 'pa-public',
+                hostname: "portactivity-test.digitraffic.fi",
+                handler: 'public-test',
+                alarm: {
+                    alarmName: 'PortActivity-PublicAPI-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
 
-        new UrlTestCanary(stack, role, {
-            name: 'pa-private',
-            hostname: "portactivity-test.digitraffic.fi",
-            handler: "private-test",
-            apikey,
-            alarm: {
-                alarmName: 'PortActivity-PrivateAPI-Alarm',
-                topicArn: appProps.dlqNotificationTopicArn
-            }
-        });
+            new UrlTestCanary(stack, role, {
+                name: 'pa-private',
+                hostname: "portactivity-test.digitraffic.fi",
+                handler: "private-test",
+                apikey,
+                alarm: {
+                    alarmName: 'PortActivity-PrivateAPI-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
 
-        new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
-            name: 'portactivity',
-            secret: appProps.secretId,
-            alarm: {
-                alarmName: 'PortActivity-Db-Alarm',
-                topicArn: appProps.dlqNotificationTopicArn
-            }
+            new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
+                name: 'pa-night',
+                secret: appProps.secretId,
+                schedule: Schedule.expression("cron(0/15 6-22 * * * *)"),
+                handler: 'db-night-test',
+                alarm: {
+                    alarmName: 'PortActivity-Db-Night-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
 
-        });
+            new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
+                name: 'pa',
+                secret: appProps.secretId,
+                alarm: {
+                    alarmName: 'PortActivity-Db-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
+        }
     }
 }
 

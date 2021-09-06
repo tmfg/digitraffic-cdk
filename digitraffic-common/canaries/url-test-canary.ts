@@ -32,7 +32,7 @@ export class UrlTestCanary extends Construct {
             }),
             environmentVariables,
             canaryName,
-            schedule: Schedule.rate(params.rate ?? Duration.minutes(15))
+            schedule: params.schedule ?? Schedule.rate(Duration.minutes(15))
         });
 
         canary.artifactsBucket.grantWrite(role);

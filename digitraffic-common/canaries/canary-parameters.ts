@@ -1,8 +1,8 @@
-import {Duration} from "@aws-cdk/core";
+import {Schedule} from "@aws-cdk/aws-synthetics";
 
 export type CanaryParameters = {
     readonly name: string;
-    readonly rate?: Duration;
+    readonly schedule?: Schedule;
     readonly secret?: string;
     readonly handler?: string;
     readonly alarm?: {
