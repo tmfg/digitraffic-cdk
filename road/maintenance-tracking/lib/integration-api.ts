@@ -91,6 +91,7 @@ function createUpdateRequestHandlerLambda(
     stack: Stack
 ) {
     const lambdaFunctionName = 'MaintenanceTracking-UpdateQueue';
+
     const lambdaEnv: any = {};
     lambdaEnv[SQS_BUCKET_NAME] = appProps.sqsExtendedMessageBucketName;
     lambdaEnv[SQS_QUEUE_URL] = queue.queueUrl;
