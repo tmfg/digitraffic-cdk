@@ -48,6 +48,7 @@ export class AwakeAiService {
     }
 
     private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiResponseAndShip> {
+        console.info(`method=updateAwakeAiTimestamps fetching ETA for ship with IMO ${ship.imo}`)
         const response = await this.api.getETA(ship.imo);
         return {
             response,
