@@ -15,7 +15,7 @@ describe('upload-voyage-plan', () => {
     test('validation failure, some string', async () => {
         const uploadEvent = createSnsEvent('<foo bar');
 
-        await expect(handlerFn(secretFn, VtsApi)(uploadEvent)).rejects.toMatch('XML parsing failed');
+        await expect(handlerFn(secretFn, VtsApi)(uploadEvent)).resolves.toMatch('XML parsing failed');
     });
 
     test('validation success with correct voyage plan', async () => {

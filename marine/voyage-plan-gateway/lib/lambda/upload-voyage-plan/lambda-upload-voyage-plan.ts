@@ -21,6 +21,9 @@ type VoyagePlanSecrets = {
 
 let api: VtsApi
 
+/**
+ * XML parsing and validation errors do not throw an error. This is to remove invalid messages from the queue.
+ */
 export function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any,
     VtsApiClass: new (url: string) => VtsApi
@@ -39,19 +42,19 @@ export function handlerFn(
                 voyagePlan = await parseXml(visMessage.message) as RtzVoyagePlan;
             } catch (error) {
                 console.error('method=uploadVoyagePlan XML parsing failed', error);
-                return Promise.reject('XML parsing failed');
+                return Promise.resolve('XML parsing failed');
             }
 
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {
                 console.error('method=uploadVoyagePlan XML structure validation failed', structureValidationErrors);
-                return Promise.reject('XML structure validation failed');
+                return Promise.resolve('XML structure validation failed');
             }
 
             const contentValidationErrors = VoyagePlansService.validateContent(voyagePlan);
             if (contentValidationErrors.length) {
                 console.error('method=uploadVoyagePlan XML content validation failed', contentValidationErrors);
-                return Promise.reject('XML content was not valid');
+                return Promise.resolve('XML content was not valid');
             }
 
             if (!api) {
