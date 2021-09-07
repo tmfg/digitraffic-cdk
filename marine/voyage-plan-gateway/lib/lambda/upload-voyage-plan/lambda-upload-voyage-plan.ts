@@ -5,21 +5,28 @@ import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
+import {VtsApi} from "../../api/vts";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
-export interface SnsEvent {
+export type SnsEvent = {
     readonly Records: {
        readonly body: string
     }[]
 }
 
+type VoyagePlanSecrets = {
+    readonly 'vpgw.vtsUrl': string
+}
+
+let api: VtsApi
+
 export function handlerFn(
-    doWithSecret: (secretId: string, fn: (secret: any) => any) => any
+    doWithSecret: (secretId: string, fn: (secret: any) => any) => any,
+    VtsApiClass: new (url: string) => VtsApi
 ): (event: SnsEvent) => Promise<string> {
     return async function(event: SnsEvent): Promise<string> {
-        return await doWithSecret(secretId, async () => {
-
+        return await doWithSecret(secretId, async (secret: VoyagePlanSecrets) => {
             if (event.Records.length > 1) {
                 console.error('method=vpgwUploadVoyagePlan More than one record received! count=%d',
                     event.Records.length);
@@ -47,10 +54,14 @@ export function handlerFn(
                 return Promise.reject('XML content was not valid');
             }
 
-            // do nothing currently
-            return Promise.resolve();
+            if (!api) {
+                api = new VtsApiClass(secret["vpgw.vtsUrl"]);
+            }
+            await api.sendVoyagePlan(voyagePlan);
+
+            return Promise.resolve('Voyage plan sent');
         });
     };
 }
 
-export const handler = handlerFn(withSecret);
+export const handler = handlerFn(withSecret, VtsApi);

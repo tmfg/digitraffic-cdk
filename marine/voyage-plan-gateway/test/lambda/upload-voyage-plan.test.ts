@@ -2,25 +2,28 @@ import {handlerFn, SnsEvent} from '../../lib/lambda/upload-voyage-plan/lambda-up
 import * as sinon from 'sinon';
 import moment from 'moment-timezone';
 import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
+import {VtsApi} from "../../lib/api/vts";
 
 const sandbox = sinon.createSandbox();
 
 describe('upload-voyage-plan', () => {
 
-    const secretFn = async (secret: string, fn: any) => await fn(secret);
+    const secretFn = async (secret: string, fn: any) => await fn({});
 
     afterEach(() => sandbox.restore());
 
     test('validation failure, some string', async () => {
         const uploadEvent = createSnsEvent('<foo bar');
 
-        await expect(handlerFn(secretFn)(uploadEvent)).rejects.toMatch('XML parsing failed');
+        await expect(handlerFn(secretFn, VtsApi)(uploadEvent)).rejects.toMatch('XML parsing failed');
     });
 
     test('validation success with correct voyage plan', async () => {
+        sinon.stub(VtsApi.prototype, 'sendVoyagePlan').returns(Promise.resolve());
+
         const uploadEvent = createSnsEvent(voyagePlan());
 
-        await expect(handlerFn(secretFn)(uploadEvent)).resolves.not.toThrow();
+        await expect(handlerFn(secretFn, VtsApi)(uploadEvent)).resolves.not.toThrow();
     });
 
 });
