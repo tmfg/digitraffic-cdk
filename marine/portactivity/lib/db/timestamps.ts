@@ -115,11 +115,7 @@ const SELECT_BY_LOCODE = `
           ) AND
     pe.event_time > ${TIMESTAMPS_BEFORE} AND
     pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
-    CASE WHEN pe.event_source = '${EventSource.PILOTWEB}' THEN
-        pe.location_locode = $1 OR pe.location_from_locode = $1
-    ELSE
-        pe.location_locode = $1
-    END
+    (pe.location_locode = $1 OR (pe.location_from_locode = $1 AND pe.event_source = '${EventSource.PILOTWEB}'))
     ORDER by pe.event_time
 `;
 
