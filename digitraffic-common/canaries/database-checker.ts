@@ -4,6 +4,12 @@ import {IDatabase} from "pg-promise";
 
 const synthetics = require('Synthetics');
 
+export type DatabaseCheck = {
+    readonly name: string
+    readonly sql: string
+    readonly minRows: number
+}
+
 export class DatabaseChecker {
     readonly secret: string;
 
@@ -18,6 +24,31 @@ export class DatabaseChecker {
 
         synthetics.getConfiguration()
             .withFailedCanaryMetric(true);
+    }
+
+    async expect(checks: DatabaseCheck[]) {
+        if (!checks.length) {
+            throw new Error('No checks');
+        }
+        await withDbSecret(this.secret, async () => {
+            await inDatabase(async (db: IDatabase<any>) => {
+                for (const check of checks) {
+                    console.info("canary checking sql " + check.sql);
+
+                    const value = await db.oneOrNone(check.sql);
+
+                    if(!value) {
+                        this.errors.push(`Test ${check.name} returned no value`);
+                    } else {
+                        console.info("return value " + JSON.stringify(value));
+
+                        if(value.count < check.minRows) {
+                            this.errors.push(`Test ${check.name} count was ${value.count}, minimum is ${check.minRows}`);
+                        }
+                    }
+                }
+            });
+        });
     }
 
     async expectRows(testName: string, sql: string, minimum = 1): Promise<string> {
