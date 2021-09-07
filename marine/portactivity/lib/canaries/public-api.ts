@@ -9,5 +9,5 @@ export const handler = async () => {
     await checker.expect200("/shiplist?locode=FIHEL");
     await checker.expect200("/api/v1/metadata");
 
-    return checker.resolve();
+    return checker.done();
 }

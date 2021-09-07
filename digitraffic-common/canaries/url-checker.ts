@@ -59,7 +59,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep("Verify " + url, requestOptions, validateStatusCodeFunction(403));
     }
 
-    async resolve(): Promise<string> {
+    async done(): Promise<string> {
         return "Canary succesfull";
    }
 }

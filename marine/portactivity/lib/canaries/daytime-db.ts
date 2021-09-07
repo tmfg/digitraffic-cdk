@@ -8,5 +8,5 @@ export const handler = async () => {
     await checker.expectRows("port_call_timestamps in last hour",
         "  select count(*) from port_call_timestamp where record_time > (current_timestamp - interval '1 hour');");
 
-    return checker.resolve();
+    return checker.done();
 };

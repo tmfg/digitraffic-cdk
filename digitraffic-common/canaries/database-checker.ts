@@ -28,19 +28,17 @@ export class DatabaseChecker {
                 const value = await db.oneOrNone(sql);
 
                 if(!value) {
-                    this.errors.push(`Test ${testName} returned no value`);
+                    this.errors.push(`${testName}:No value!`);
                 } else {
-                    console.info("return value " + JSON.stringify(value));
-
                     if(value.count < minimum) {
-                        this.errors.push(`Test ${testName} count was ${value.count}, minimum is ${minimum}`);
+                        this.errors.push(`${testName}:${value.count} < ${minimum}`);
                     }
                 }
             });
         });
     }
 
-    async resolve(): Promise<any> {
+    done(): Promise<string> {
         if(this.errors.length == 0) {
             return Promise.resolve("Canary completed succesfully");
         }

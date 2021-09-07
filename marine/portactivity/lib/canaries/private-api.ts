@@ -13,5 +13,5 @@ export const handler = async () => {
     await checker.expect200("/api/v1/timestamps?locode=FIHKO");
     await checker.expect403WithoutApiKey("/api/v1/timestamps?locode=FIHKO");
 
-    return checker.resolve();
+    return checker.done();
 }

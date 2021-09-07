@@ -8,5 +8,5 @@ export const handler = async () => {
     await checker.expectRows("pilotages in last hour",
         "select count(*) from pilotage where schedule_updated > (current_timestamp - interval '1 hour')");
 
-    return checker.resolve();
+    return checker.done();
 };
