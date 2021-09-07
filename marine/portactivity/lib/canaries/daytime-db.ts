@@ -17,7 +17,7 @@ export const handler = async () => {
             sql: `
                 select count(*) from port_call_timestamp
                 where record_time > (current_timestamp - interval '1 hour') AND
-                      event_source = ${EventSource.AWAKE_AI}`,
+                      event_source = '${EventSource.AWAKE_AI}'`,
             minRows: 1
         }
     ]);
