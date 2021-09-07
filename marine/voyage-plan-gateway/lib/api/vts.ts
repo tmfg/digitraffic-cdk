@@ -11,6 +11,7 @@ export class VtsApi {
     }
 
     async sendVoyagePlan(voyagePlan: RtzVoyagePlan) {
+        const start = Date.now();
         const resp = await axios.post(this.url, voyagePlan, {
             headers: {
                 'Content-Type': MediaType.APPLICATION_XML
@@ -20,6 +21,7 @@ export class VtsApi {
             console.error(`method=uploadArea returned status=${resp.status}, status text: ${resp.statusText}`);
             throw new Error('Failed to send voyage plan to VTS');
         }
+        console.info(`method=sendVoyagePlan tookMs=${Date.now()-start}`);
     }
 
 }

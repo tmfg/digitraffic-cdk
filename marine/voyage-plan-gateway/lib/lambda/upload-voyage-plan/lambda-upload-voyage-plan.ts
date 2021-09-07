@@ -57,7 +57,10 @@ export function handlerFn(
             if (!api) {
                 api = new VtsApiClass(secret["vpgw.vtsUrl"]);
             }
+
+            console.info('method=uploadVoyagePlan about to upload voyage plan to VTS');
             await api.sendVoyagePlan(voyagePlan);
+            console.info('method=uploadVoyagePlan upload to VTS ok');
 
             return Promise.resolve('Voyage plan sent');
         });
