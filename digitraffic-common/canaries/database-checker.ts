@@ -70,7 +70,7 @@ export class DatabaseChecker {
     }
 
     done(): Promise<string> {
-        if(this.errors.length == 0) {
+        if(this.errors.length === 0) {
             return Promise.resolve("Canary completed succesfully");
         }
 

@@ -160,7 +160,6 @@ export class PublicApi {
                 corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
             ]
         });
-        method.node
 
         createSubscription(getTimestampsLambda, functionName, this.props.logsDestinationArn, this.stack);
         addTagsAndSummary('GetTimestamps',

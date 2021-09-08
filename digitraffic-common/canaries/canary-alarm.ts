@@ -23,6 +23,5 @@ export class CanaryAlarm {
                 alarm.addAlarmAction(new SnsAction(Topic.fromTopicArn(stack, `${alarmName}-action`, params.alarm.topicArn)));
             }
         }
-
     }
 }

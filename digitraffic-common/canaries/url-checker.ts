@@ -68,11 +68,11 @@ export class UrlChecker {
 function validateStatusCodeFunction(statusCode: number) {
     return async (res: any) => {
         return new Promise(resolve => {
-            if (res.statusCode != statusCode) {
-                throw res.statusCode + ' ' + res.statusMessage;
+            if (res.statusCode !== statusCode) {
+                throw new Error(`${res.statusCode} ${res.statusMessage}`);
             }
 
             resolve("OK");
         });
     };
-};
+}

@@ -59,7 +59,7 @@
     "@types/ramda": "0.27.44",
     "amqplib": "^0.8.0",
     "axios": "^0.21.1",
-    "cdk": "^1.117.0",
+    "digitraffic-common": "*",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
     "pg-native": "*",
