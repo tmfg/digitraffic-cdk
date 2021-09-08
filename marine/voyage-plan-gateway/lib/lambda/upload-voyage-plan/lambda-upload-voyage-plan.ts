@@ -62,7 +62,7 @@ export function handlerFn(
             }
 
             console.info('method=uploadVoyagePlan about to upload voyage plan to VTS');
-            await api.sendVoyagePlan(voyagePlan);
+            await api.sendVoyagePlan(visMessage.message);
             console.info('method=uploadVoyagePlan upload to VTS ok');
 
             return Promise.resolve('Voyage plan sent');

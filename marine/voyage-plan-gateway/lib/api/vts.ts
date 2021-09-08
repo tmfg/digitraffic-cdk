@@ -1,5 +1,4 @@
 import axios from "axios";
-import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export class VtsApi {
@@ -10,7 +9,7 @@ export class VtsApi {
         this.url = url;
     }
 
-    async sendVoyagePlan(voyagePlan: RtzVoyagePlan) {
+    async sendVoyagePlan(voyagePlan: string) {
         const start = Date.now();
         const resp = await axios.post(this.url, voyagePlan, {
             headers: {
