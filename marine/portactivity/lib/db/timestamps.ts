@@ -115,11 +115,7 @@ const SELECT_BY_LOCODE = `
           ) AND
     pe.event_time > ${TIMESTAMPS_BEFORE} AND
     pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
-    CASE WHEN pe.event_source = '${EventSource.PILOTWEB}' THEN
-        pe.location_locode = $1 OR pe.location_from_locode = $1
-    ELSE
-        pe.location_locode = $1
-    END
+    (pe.location_locode = $1 OR (pe.location_from_locode = $1 AND pe.event_source = '${EventSource.PILOTWEB}'))
     ORDER by pe.event_time
 `;
 
@@ -150,35 +146,24 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
           pc.port_call_timestamp > CURRENT_DATE - INTERVAL '3 DAYS'
 `;
 
-// This method builds a query dynamically which is not optimal, instead a proper lookup table should be used.
-// On the other hand this allows keeping all the configuration in code.
-function SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT(
-    portAreaThresholds: { locode: string; threshold: number | undefined; portArea: string | undefined }[]): string {
-    // fixed structure from SQL VALUES clause
-    const thresholdValues = portAreaThresholds.map( p => `('${p.locode}','${p.portArea}',${p.threshold ?? DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES})`).join(',');
-    return `
-        SELECT DISTINCT
-            pe.ship_imo AS imo
-        FROM port_call_timestamp pe
-        LEFT JOIN (VALUES ${thresholdValues}) AS thresholds(locode, portarea, threshold)
-            ON thresholds.locode = pe.location_locode AND thresholds.portarea = pe.location_portarea
-        WHERE pe.record_time =
-              (
-                  SELECT MAX(px.record_time) FROM port_call_timestamp px
-                  WHERE px.event_type = pe.event_type AND
-                      px.location_locode = pe.location_locode AND
-                      px.event_source = pe.event_source AND
-                      px.ship_mmsi = pe.ship_mmsi AND
-                      px.portcall_id = pe.portcall_id
-              ) AND
-              pe.portcall_id IN ($1:list) AND
-              pe.event_type = '${EventType.ETA}' AND
-              pe.event_source = '${EventSource.AWAKE_AI}' AND
-              pe.event_time < NOW() + ((CASE WHEN thresholds.threshold IS NOT NULL THEN thresholds.threshold 
-                ELSE ${DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} END) || ' MINUTE')::INTERVAL
-    `;
-}
-
+const SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT = `
+    SELECT DISTINCT
+        pe.ship_imo AS imo
+    FROM port_call_timestamp pe
+    WHERE pe.record_time =
+          (
+              SELECT MAX(px.record_time) FROM port_call_timestamp px
+              WHERE px.event_type = pe.event_type AND
+                  px.location_locode = pe.location_locode AND
+                  px.event_source = pe.event_source AND
+                  px.ship_mmsi = pe.ship_mmsi AND
+                  px.portcall_id = pe.portcall_id
+          ) AND
+          pe.portcall_id IN ($1:list) AND
+          pe.event_type = '${EventType.ETA}' AND
+          pe.event_source = '${EventSource.AWAKE_AI}' AND
+          pe.event_time < NOW() + (${DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} || ' MINUTE')::INTERVAL
+`.trim();
 
 const SELECT_BY_MMSI = `
     SELECT DISTINCT
@@ -421,15 +406,8 @@ export function findVtsShipImosTooCloseToPortByPortCallId(
     portcallIds: number[],
     ports: Port[]
 ): Promise<DbImo[]> {
-    const portAreasWithLocode =
-        ports.flatMap(p =>
-            p.areas.map(a => ({
-                locode: p.locode,
-                portArea: a.portAreaCode,
-                threshold: a.shipApproachThresholdMinutes
-            })));
     // Prepared statement use not possible due to dynamic IN-list
-    return db.tx(t => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT(portAreasWithLocode), [
+    return db.tx(t => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [
         portcallIds
     ]));
 }

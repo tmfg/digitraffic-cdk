@@ -4,31 +4,69 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Topic} from "@aws-cdk/aws-sns";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {Construct} from "@aws-cdk/core";
+import {Schedule} from "@aws-cdk/aws-synthetics";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {UrlTestCanary} from "digitraffic-common/canaries/url-test-canary";
-import {DbTestCanary} from "digitraffic-common/canaries/db-test-canary";
+import {UrlCanary} from "digitraffic-common/canaries/url-canary";
+import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 
-export function create(stack: Construct,
-                       secret: ISecret,
-                       vpc: IVpc,
-                       lambdaDbSg: ISecurityGroup,
-                       dlq: Queue,
-                       appProps: Props) {
-    addDLQAlarm(stack, dlq, appProps);
+export class Canaries {
+    constructor(stack: Construct,
+                secret: ISecret,
+                vpc: IVpc,
+                lambdaDbSg: ISecurityGroup,
+                dlq: Queue,
+                apiKeyId: string,
+                appProps: Props) {
+        addDLQAlarm(stack, dlq, appProps);
 
-    const role = createCanaryRole(stack);
+        if(appProps.enableCanaries) {
+            const role = createCanaryRole(stack);
 
-    new UrlTestCanary(stack, role, {
-        name: 'shiplist',
-        hostname: "portactivity-test.digitraffic.fi"
-    });
+            new UrlCanary(stack, role, {
+                name: 'pa-public',
+                hostname: "portactivity-test.digitraffic.fi",
+                handler: 'public-api.handler',
+                alarm: {
+                    alarmName: 'PortActivity-PublicAPI-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
 
-    new DbTestCanary(stack, secret, role, vpc, lambdaDbSg, {
-        name: 'db-test',
-        secret: appProps.secretId
-    });
+            new UrlCanary(stack, role, {
+                name: 'pa-private',
+                hostname: "portactivity-test.digitraffic.fi",
+                handler: "private-api.handler",
+                apiKeyId,
+                alarm: {
+                    alarmName: 'PortActivity-PrivateAPI-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
+
+            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
+                name: 'pa-daytime',
+                secret: appProps.secretId,
+                schedule: Schedule.expression("cron(0/15 6-22 ? * MON-SUN *)"),
+                handler: 'daytime-db.handler',
+                alarm: {
+                    alarmName: 'PortActivity-Db-Night-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
+
+            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
+                name: 'pa',
+                secret: appProps.secretId,
+                handler: 'db.handler',
+                alarm: {
+                    alarmName: 'PortActivity-Db-Alarm',
+                    topicArn: appProps.dlqNotificationTopicArn
+                }
+            });
+        }
+    }
 }
 
 function createCanaryRole(stack: Construct) {

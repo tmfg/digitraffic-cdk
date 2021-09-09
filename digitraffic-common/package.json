@@ -16,21 +16,24 @@
     "@aws-cdk/assets": "*",
     "@aws-cdk/aws-apigateway": "*",
     "@aws-cdk/aws-cloudfront": "*",
+    "@aws-cdk/aws-cloudwatch": "*",
+    "@aws-cdk/aws-cloudwatch-actions": "*",
     "@aws-cdk/aws-ec2": "*",
     "@aws-cdk/aws-iam": "*",
     "@aws-cdk/aws-lambda": "*",
     "@aws-cdk/aws-logs": "*",
     "@aws-cdk/aws-secretsmanager": "*",
+    "@aws-cdk/aws-sns": "*",
     "@aws-cdk/aws-sqs": "*",
     "@aws-cdk/aws-synthetics": "*",
     "@aws-cdk/core": "*",
     "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",
     "pg-native": "*",
-    "pg-promise": "*",
-    "pg-query-stream": "4.0.0"
+    "pg-promise": "*"
   },
   "externals": [
-    "aws-sdk"
+    "aws-sdk",
+    "Synthetics"
   ]
 }

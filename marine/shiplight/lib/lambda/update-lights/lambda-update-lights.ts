@@ -27,7 +27,7 @@ export async function handlerFn(
 }
 
 export const handler = async (): Promise<any> => {
-    return handlerFn(withDbSecret, updateLightsForArea);
+    return handlerFn(withDbSecret, updateLightsDebug);
 };
 
 async function updateLightsDebug(areaTraffic: AreaTraffic, apiKey: string, endpointUrl: string): Promise<any> {

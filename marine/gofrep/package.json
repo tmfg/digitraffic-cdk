@@ -35,8 +35,8 @@
     "@aws-cdk/core": "*",
     "aws-sdk": "*",
     "axios": "^0.21.1",
-    "moment": "^2.29.1",
-    "moment-timezone": "^0.5.31",
+    "moment": "*",
+    "moment-timezone": "*",
     "ramda": "0.27.1",
     "source-map-support": "^0.5.19",
     "xml2js": "^0.4.23"

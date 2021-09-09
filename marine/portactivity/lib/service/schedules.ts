@@ -1,13 +1,9 @@
 import * as SchedulesApi from "../api/schedules";
 import {Destination, SchedulesResponse, Timestamp, Vessel} from "../api/schedules";
 import {ApiTimestamp, EventType} from "../model/timestamp";
-import {getPortAreaGeometries} from "./portareas";
-import * as R from 'ramda';
+import {ports} from "./portareas";
 import moment from 'moment-timezone';
 import {EventSource} from "../model/eventsource";
-
-// persist only locodes for specific ports
-const locodes = R.groupBy(R.prop('locode'), getPortAreaGeometries());
 
 export async function getTimestampsUnderVtsControl(url: string): Promise<ApiTimestamp[]> {
     const resp = await SchedulesApi.getSchedulesTimestamps(url, false);
@@ -21,7 +17,7 @@ export async function getCalculatedTimestamps(url: string): Promise<ApiTimestamp
 
 export function filterTimestamps(timestamps: ApiTimestamp[]) {
     return timestamps
-        .filter(ts => locodes[ts.location.port] != null)
+        .filter(ts => ports.includes(ts.location.port))
         .filter(ts =>
             ts.eventType === EventType.ETD ? moment(ts.eventTime) >= moment().subtract(5, 'minutes') : true);
 }

@@ -136,15 +136,13 @@ export async function findAllTimestamps(
     return mergeTimestamps(timestamps) as ApiTimestamp[];
 }
 
-export async function findETAShipsByLocode(
-    locodes: string[],
-    ports: Port[]): Promise<DbETAShip[]> {
+export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
 
-    console.info("find for " + locodes);
+    console.info(`method=findETAShipsByLocode find for ${ports}`);
 
     const startFindPortnetETAsByLocodes = Date.now();
     const portnetShips = await inDatabase(async (db: IDatabase<any, any>) => {
-        return TimestampsDB.findPortnetETAsByLocodes(db, locodes);
+        return TimestampsDB.findPortnetETAsByLocodes(db, ports);
     }).finally(() => {
         console.info('method=findPortnetETAsByLocodes tookMs=%d', (Date.now() - startFindPortnetETAsByLocodes));
     }) as DbETAShip[];

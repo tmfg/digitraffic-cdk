@@ -13,6 +13,7 @@ export interface Props {
     readonly logsDestinationArn: string
     readonly sqsProcessLambdaConcurrentExecutions: number
     readonly secretId: string
+    readonly enableCanaries: boolean
     readonly sources?: {
         readonly teqplay?: boolean,
         readonly pilotweb?: boolean,

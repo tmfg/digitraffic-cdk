@@ -35,15 +35,20 @@ export class AwakeAiService {
 
     getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
         return Promise.allSettled(ships.map(this.getAwakeAiTimestamp.bind(this)))
-            .then(promises =>
-                promises
-                    .map(p => valueOnFulfilled(p))
-                    .filter((a): a is AwakeAiResponseAndShip => a != null)
-                    .map(this.toTimeStamp.bind(this))
-                    .filter((ts): ts is ApiTimestamp => ts != null));
+            .then(responses =>
+                responses
+                    .reduce<Array<ApiTimestamp>>((acc, result) => {
+                        const val = result.status === 'fulfilled' ? result.value : null;
+                        if (!val) {
+                            return acc;
+                        }
+                        const ts = this.toTimeStamp(val);
+                        return ts ? acc.concat([ts]) : acc;
+                    }, []));
     }
 
     private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiResponseAndShip> {
+        console.info(`method=updateAwakeAiTimestamps fetching ETA for ship with IMO ${ship.imo}`)
         const response = await this.api.getETA(ship.imo);
         return {
             response,

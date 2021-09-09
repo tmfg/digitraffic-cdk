@@ -39,8 +39,8 @@
     "@aws-cdk/aws-sns-subscriptions": "*",
     "@aws-cdk/core": "*",
     "@types/node-fetch": "^2.5.7",
-    "moment": "^2.29.1",
-    "moment-timezone": "^0.5.31",
+    "moment": "*",
+    "moment-timezone": "*",
     "source-map-support": "^0.5.19",
     "uuid": "^8.3.1"
   },

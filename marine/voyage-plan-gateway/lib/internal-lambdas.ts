@@ -1,6 +1,6 @@
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {IVpc} from '@aws-cdk/aws-ec2';
-import {Duration, Stack} from '@aws-cdk/core';
+import {Construct, Duration, Stack} from '@aws-cdk/core';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Topic} from "@aws-cdk/aws-sns";
@@ -8,8 +8,14 @@ import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {VoyagePlanGatewayProps} from "./app-props";
 import {VoyagePlanEnvKeys} from "./keys";
-import {Queue} from "@aws-cdk/aws-sqs";
+import {Queue, QueueEncryption} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
+import {Bucket} from "@aws-cdk/aws-s3";
+import {RetentionDays} from "@aws-cdk/aws-logs";
+import {PolicyStatement} from "@aws-cdk/aws-iam";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
+import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 
 export function create(
     secret: ISecret,
@@ -18,15 +24,33 @@ export function create(
     props: VoyagePlanGatewayProps,
     stack: Stack) {
 
+    const dlqBucket = new Bucket(stack, 'DLQBucket', {
+        bucketName: props.dlqBucketName
+    });
+
+    const dlqQueueName = 'VPGW-SendRouteDLQ.fifo';
+    const dlq = new Queue(stack, dlqQueueName, {
+        queueName: dlqQueueName,
+        receiveMessageWaitTime: Duration.seconds(20),
+        encryption: QueueEncryption.KMS_MANAGED,
+        fifo: true
+    });
+
     const sendRouteQueueName = 'VPGW-SendRouteQueue.fifo';
     const sendRouteQueue = new Queue(stack, sendRouteQueueName, {
         queueName: sendRouteQueueName,
         visibilityTimeout: Duration.seconds(60),
-        fifo: true // prevent sending route plans twice
+        fifo: true, // prevent sending route plans twice,
+        deadLetterQueue: {
+            maxReceiveCount: 3,
+            queue: dlq
+        }
     });
 
     createProcessVisMessagesLambda(secret, notifyTopic, sendRouteQueue, props, stack);
     createUploadVoyagePlanLambda(secret, sendRouteQueue, vpc, props, stack);
+    createProcessDLQLambda(dlqBucket, dlq, props, stack);
+    addDLQAlarm(dlq, props, stack);
 }
 
 function createProcessVisMessagesLambda(
@@ -79,4 +103,46 @@ function createUploadVoyagePlanLambda(
     secret.grantRead(lambda);
     lambda.addEventSource(new SqsEventSource(sendRouteQueue));
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+}
+
+function createProcessDLQLambda(
+    dlqBucket: Bucket,
+    dlq: Queue,
+    props: VoyagePlanGatewayProps,
+    stack: Stack) {
+
+    const lambdaEnv: LambdaEnvironment = {};
+    lambdaEnv[VoyagePlanEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
+    const functionName = "VPGW-ProcessDLQ";
+    const processDLQLambda = new Function(stack, functionName, {
+        runtime: Runtime.NODEJS_12_X,
+        logRetention: RetentionDays.ONE_YEAR,
+        functionName: functionName,
+        code: new AssetCode('dist/lambda/process-dlq'),
+        handler: 'lambda-process-dlq.handler',
+        environment: lambdaEnv,
+        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
+    });
+
+    processDLQLambda.addEventSource(new SqsEventSource(dlq));
+    createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
+
+    const statement = new PolicyStatement();
+    statement.addActions('s3:PutObject');
+    statement.addActions('s3:PutObjectAcl');
+    statement.addResources(dlqBucket.bucketArn + '/*');
+    processDLQLambda.addToRolePolicy(statement);
+}
+
+function addDLQAlarm(queue: Queue, appProps: VoyagePlanGatewayProps, stack: Construct) {
+    const alarmName = 'VPGW-DLQAlarm';
+    queue.metricNumberOfMessagesReceived({
+        period: appProps.dlqNotificationDuration
+    }).createAlarm(stack, alarmName, {
+        alarmName,
+        threshold: 0,
+        evaluationPeriods: 1,
+        treatMissingData: TreatMissingData.NOT_BREACHING,
+        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
+    }).addAlarmAction(new SnsAction(Topic.fromTopicArn(stack, 'Topic', appProps.dlqNotificationTopicArn)));
 }

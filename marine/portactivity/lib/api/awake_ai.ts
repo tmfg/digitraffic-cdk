@@ -66,13 +66,13 @@ export class AwakeAiApi {
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                return this.handleAxiosError(error as AxiosError);
+                return AwakeAiApi.handleError(error as AxiosError);
             }
             throw error;
         }
     }
 
-    handleAxiosError(error: AxiosError): AwakeAiResponse {
+    static handleError(error: { response?: { status: number } }): AwakeAiResponse {
         if (!error.response) {
             return {
                 type: AwakeAiResponseType.NO_RESPONSE

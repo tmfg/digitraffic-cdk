@@ -1,7 +1,15 @@
-import {Duration} from "@aws-cdk/core";
+import {Schedule} from "@aws-cdk/aws-synthetics";
 
-export interface CanaryParameters {
+export type CanaryParameters = {
     readonly name: string;
-    readonly rate?: Duration;
+    readonly schedule?: Schedule;
     readonly secret?: string;
+    readonly handler: string;
+    readonly alarm?: {
+        readonly alarmName?: string;
+        readonly description?: string;
+        readonly evalutionPeriods?: number;
+        readonly threshold?: number;
+        readonly topicArn?: string;
+    }
 }

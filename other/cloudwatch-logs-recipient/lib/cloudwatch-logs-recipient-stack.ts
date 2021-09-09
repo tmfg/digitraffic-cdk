@@ -126,6 +126,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             runtime: Runtime.NODEJS_12_X,
             timeout: Duration.seconds(20),
             logRetention: RetentionDays.ONE_YEAR,
+            memorySize: 256,
             environment: {
                 KNOWN_ACCOUNTS: JSON.stringify(props.accounts),
                 ES_ENDPOINT: props.elasticSearchEndpoint,

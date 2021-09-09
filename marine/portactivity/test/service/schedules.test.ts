@@ -4,7 +4,7 @@ import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";
 import moment from 'moment-timezone';
 import {getRandomNumber} from "digitraffic-common/test/testutils";
-import {getPortAreaGeometries} from "../../lib/service/portareas";
+import {ports} from "../../lib/service/portareas";
 import {EventSource} from "../../lib/model/eventsource";
 
 const uuid = '123123123';
@@ -12,7 +12,7 @@ const vesselName = 'TEST';
 const callsign = 'TEST_CALLSIGN';
 const mmsi = '123456789';
 const imo = '1234567';
-const locode = getPortAreaGeometries()[0].locode;
+const locode = ports[0];
 const destination = 'Foobar';
 const portfacility = `${locode}-1`;
 const etaEventTime = '2021-04-27T20:00:00Z';

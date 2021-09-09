@@ -32,215 +32,218 @@ import {MediaType} from "digitraffic-common/api/mediatypes";
 import {add404Support} from "digitraffic-common/api/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
 
-export function create(
-    secret: ISecret,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: Props,
-    stack: Construct) {
-    const publicApi = createApi(stack);
-    add404Support(publicApi, stack);
-    createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan');
+export class PublicApi {
+    readonly stack: Construct;
+    readonly props: Props;
+    readonly secret: ISecret;
+    readonly apiKeyId: string;
 
-    const validator = addDefaultValidator(publicApi);
+    constructor(secret: ISecret,
+                vpc: IVpc,
+                lambdaDbSg: ISecurityGroup,
+                props: Props,
+                stack: Construct) {
+        this.secret = secret;
+        this.props = props;
+        this.stack = stack;
 
-    const shipModel = addServiceModel("ShipModel", publicApi, ShipSchema);
-    const locationModel = addServiceModel("LocationModel", publicApi, LocationSchema);
-    const timestampModel = addServiceModel("TimestampModel",
-        publicApi,
-        createTimestampSchema(
-            getModelReference(shipModel.modelId, publicApi.restApiId),
-            getModelReference(locationModel.modelId, publicApi.restApiId)));
-    const timestampsModel = addServiceModel("TimestampsModel", publicApi, createArraySchema(timestampModel, publicApi));
-    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
+        const publicApi = this.createApi();
+        add404Support(publicApi, stack);
+        this.apiKeyId = createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan').keyId;
 
-    const resource = publicApi.root
-        .addResource("api")
-        .addResource("v1");
+        const validator = addDefaultValidator(publicApi);
 
-    createTimestampsResource(publicApi, secret, vpc, props, resource, lambdaDbSg, timestampsModel, errorResponseModel, validator, stack);
-    createShiplistResource(publicApi, secret, vpc, props, lambdaDbSg, stack);
-    createTimestampMetadataResource(publicApi, props, resource, stack);
-}
+        const shipModel = addServiceModel("ShipModel", publicApi, ShipSchema);
+        const locationModel = addServiceModel("LocationModel", publicApi, LocationSchema);
+        const timestampModel = addServiceModel("TimestampModel",
+            publicApi,
+            createTimestampSchema(
+                getModelReference(shipModel.modelId, publicApi.restApiId),
+                getModelReference(locationModel.modelId, publicApi.restApiId)));
+        const timestampsModel = addServiceModel("TimestampsModel", publicApi, createArraySchema(timestampModel, publicApi));
+        const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
-function createTimestampsResource(
-    publicApi: RestApi,
-    secret: ISecret,
-    vpc: IVpc,
-    props: Props,
-    resource: Resource,
-    lambdaDbSg: ISecurityGroup,
-    timestampsJsonModel: any,
-    errorResponseModel: any,
-    validator: RequestValidator,
-    stack: Construct): Function {
+        const resource = publicApi.root
+            .addResource("api")
+            .addResource("v1");
 
-    const functionName = 'PortActivity-GetTimestamps';
-    const assetCode = new AssetCode('dist/lambda/get-timestamps');
-    const getTimestampsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: functionName,
-        memorySize: 128,
-        code: assetCode,
-        handler: 'lambda-get-timestamps.handler',
-        readOnly: false,
-        environment: {
-            SECRET_ID: props.secretId
-        }
-    }));
-    secret.grantRead(getTimestampsLambda);
-    const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
-        requestParameters: {
-            'integration.request.querystring.locode': 'method.request.querystring.locode',
-            'integration.request.querystring.mmsi': 'method.request.querystring.mmsi',
-            'integration.request.querystring.imo': 'method.request.querystring.imo',
-            'integration.request.querystring.source': 'method.request.querystring.source',
-        },
-        requestTemplates: {
-            'application/json': JSON.stringify({
-                locode: "$util.escapeJavaScript($input.params('locode'))",
-                mmsi: "$util.escapeJavaScript($input.params('mmsi'))",
-                imo: "$util.escapeJavaScript($input.params('imo'))",
-                source: "$util.escapeJavaScript($input.params('source'))"
+        this.createTimestampsResource(vpc, lambdaDbSg, resource, timestampsModel, errorResponseModel, validator);
+        this.createShiplistResource(publicApi, vpc, lambdaDbSg);
+        this.createTimestampMetadataResource(publicApi, resource);
+    }
+
+    createApi(): RestApi {
+        return new RestApi(this.stack, 'PortActivity-public', {
+            deployOptions: {
+                loggingLevel: MethodLoggingLevel.ERROR,
+            },
+            description: 'PortActivity timestamps',
+            restApiName: 'PortActivity public API',
+            endpointTypes: [EndpointType.REGIONAL],
+            policy: new PolicyDocument({
+                statements: [
+                    new PolicyStatement({
+                        effect: Effect.ALLOW,
+                        actions: [
+                            "execute-api:Invoke"
+                        ],
+                        resources: [
+                            "*"
+                        ],
+                        principals: [
+                            new AnyPrincipal()
+                        ]
+                    })
+                ]
             })
-        },
-        responses: [
-            getResponse(RESPONSE_200_OK),
-            getResponse(RESPONSE_400_BAD_REQUEST),
-            getResponse(RESPONSE_500_SERVER_ERROR)
-        ]
-    });
+        });
+    }
 
-    const timestampResource = resource.addResource('timestamps');
-    timestampResource.addMethod("GET", getTimestampsIntegration, {
-        apiKeyRequired: true,
-        requestParameters: {
-            'method.request.querystring.locode': false,
-            'method.request.querystring.mmsi': false,
-            'method.request.querystring.imo': false,
-            'method.request.querystring.source': false
-        },
-        requestValidator: validator,
-        methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, timestampsJsonModel)),
-            corsMethod(methodResponse("400", MediaType.APPLICATION_JSON, errorResponseModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
-        ]
-    });
+    createTimestampsResource(
+        vpc: IVpc,
+        lambdaDbSg: ISecurityGroup,
+        resource: Resource,
+        timestampsJsonModel: any,
+        errorResponseModel: any,
+        validator: RequestValidator): Function {
 
-    createSubscription(getTimestampsLambda, functionName, props.logsDestinationArn, stack);
-    addTagsAndSummary('GetTimestamps',
-        ['timestamps'],
-        'Retrieves ship timestamps by ship or port',
-        timestampResource,
-        stack);
-    addQueryParameterDescription('locode', 'Port LOCODE', timestampResource, stack);
-    addQueryParameterDescription('mmsi', 'Ship MMSI', timestampResource, stack);
-    addQueryParameterDescription('imo', 'Ship IMO', timestampResource, stack);
+        const functionName = 'PortActivity-GetTimestamps';
+        const assetCode = new AssetCode('dist/lambda/get-timestamps');
+        const getTimestampsLambda = new Function(this.stack, functionName,
+            dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
+                functionName: functionName,
+                memorySize: 128,
+                code: assetCode,
+                handler: 'lambda-get-timestamps.handler',
+                readOnly: false,
+                environment: {
+                    SECRET_ID: this.props.secretId
+                }
+        }));
+        this.secret.grantRead(getTimestampsLambda);
 
-    return getTimestampsLambda;
-}
+        const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
+            requestParameters: {
+                'integration.request.querystring.locode': 'method.request.querystring.locode',
+                'integration.request.querystring.mmsi': 'method.request.querystring.mmsi',
+                'integration.request.querystring.imo': 'method.request.querystring.imo',
+                'integration.request.querystring.source': 'method.request.querystring.source',
+            },
+            requestTemplates: {
+                'application/json': JSON.stringify({
+                    locode: "$util.escapeJavaScript($input.params('locode'))",
+                    mmsi: "$util.escapeJavaScript($input.params('mmsi'))",
+                    imo: "$util.escapeJavaScript($input.params('imo'))",
+                    source: "$util.escapeJavaScript($input.params('source'))"
+                })
+            },
+            responses: [
+                getResponse(RESPONSE_200_OK),
+                getResponse(RESPONSE_400_BAD_REQUEST),
+                getResponse(RESPONSE_500_SERVER_ERROR)
+            ]
+        });
 
-function createShiplistResource(
-    publicApi: RestApi,
-    secret: ISecret,
-    vpc: IVpc,
-    props: Props,
-    lambdaDbSg: ISecurityGroup,
-    stack: Construct): Function {
+        const timestampResource = resource.addResource('timestamps');
+        const method = timestampResource.addMethod("GET", getTimestampsIntegration, {
+            apiKeyRequired: true,
+            requestParameters: {
+                'method.request.querystring.locode': false,
+                'method.request.querystring.mmsi': false,
+                'method.request.querystring.imo': false,
+                'method.request.querystring.source': false
+            },
+            requestValidator: validator,
+            methodResponses: [
+                corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, timestampsJsonModel)),
+                corsMethod(methodResponse("400", MediaType.APPLICATION_JSON, errorResponseModel)),
+                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
+            ]
+        });
 
-    const functionName = 'PortActivity-PublicShiplist';
+        createSubscription(getTimestampsLambda, functionName, this.props.logsDestinationArn, this.stack);
+        addTagsAndSummary('GetTimestamps',
+            ['timestamps'],
+            'Retrieves ship timestamps by ship or port',
+            timestampResource,
+            this.stack);
+        addQueryParameterDescription('locode', 'Port LOCODE', timestampResource, this.stack);
+        addQueryParameterDescription('mmsi', 'Ship MMSI', timestampResource, this.stack);
+        addQueryParameterDescription('imo', 'Ship IMO', timestampResource, this.stack);
 
-    const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
-    const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: functionName,
-        code: assetCode,
-        memorySize: 128,
-        handler: 'lambda-get-shiplist-public.handler',
-        readOnly: false,
-        environment: {
-            SECRET_ID: props.secretId
-        }
-    }));
-    secret.grantRead(lambda);
-    const integration = new LambdaIntegration(lambda, {
-        proxy: true
-    });
+        return getTimestampsLambda;
+    }
 
-    const shiplistResource = publicApi.root.addResource("shiplist");
-    shiplistResource.addMethod("GET", integration, {
-        apiKeyRequired: false
-    });
+    createShiplistResource(
+        publicApi: RestApi,
+        vpc: IVpc,
+        lambdaDbSg: ISecurityGroup): Function {
 
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
-    addTagsAndSummary('Shiplist',
-        ['shiplist'],
-        'Returns a list of ships as an HTML page',
-        shiplistResource,
-        stack);
+        const functionName = 'PortActivity-PublicShiplist';
 
-    return lambda;
-}
+        const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
+        const lambda = new Function(this.stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
+            functionName: functionName,
+            code: assetCode,
+            memorySize: 128,
+            handler: 'lambda-get-shiplist-public.handler',
+            readOnly: false,
+            environment: {
+                SECRET_ID: this.props.secretId
+            }
+        }));
+        this.secret.grantRead(lambda);
+        const integration = new LambdaIntegration(lambda, {
+            proxy: true
+        });
 
-function createTimestampMetadataResource(
-    publicApi: RestApi,
-    props: Props,
-    resource: Resource,
-    stack: Construct) {
+        const shiplistResource = publicApi.root.addResource("shiplist");
+        shiplistResource.addMethod("GET", integration, {
+            apiKeyRequired: false
+        });
 
-    const integration = new MockIntegration({
-        passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-        requestTemplates: {
-            'application/json': `{
+        createSubscription(lambda, functionName, this.props.logsDestinationArn, this.stack);
+        addTagsAndSummary('Shiplist',
+            ['shiplist'],
+            'Returns a list of ships as an HTML page',
+            shiplistResource,
+            this.stack);
+
+        return lambda;
+    }
+
+    createTimestampMetadataResource(
+        publicApi: RestApi,
+        resource: Resource) {
+
+        const integration = new MockIntegration({
+            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
+            requestTemplates: {
+                'application/json': `{
                 "statusCode": 200
             }`
-        },
-        integrationResponses: [{
-            statusCode: '200',
-            responseTemplates: {
-                'application/json': JSON.stringify(TimestampMetadata)
-            }
-        }]
-    });
+            },
+            integrationResponses: [{
+                statusCode: '200',
+                responseTemplates: {
+                    'application/json': JSON.stringify(TimestampMetadata)
+                }
+            }]
+        });
 
-    const metadataResource = resource.addResource('metadata');
+        const metadataResource = resource.addResource('metadata');
 
-    metadataResource.addMethod("GET", integration, {
-        apiKeyRequired: false,
-        methodResponses: [{
-            statusCode: '200'
-        }]
-    });
+        metadataResource.addMethod("GET", integration, {
+            apiKeyRequired: false,
+            methodResponses: [{
+                statusCode: '200'
+            }]
+        });
 
-    addTagsAndSummary('Timestamp metadata',
-        ['metadata'],
-        'Returns timestamp related metadata',
-        metadataResource,
-        stack);
-}
-
-function createApi(stack: Construct) {
-    return new RestApi(stack, 'PortActivity-public', {
-        deployOptions: {
-            loggingLevel: MethodLoggingLevel.ERROR,
-        },
-        description: 'PortActivity timestamps',
-        restApiName: 'PortActivity public API',
-        endpointTypes: [EndpointType.REGIONAL],
-        policy: new PolicyDocument({
-            statements: [
-                new PolicyStatement({
-                    effect: Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke"
-                    ],
-                    resources: [
-                        "*"
-                    ],
-                    principals: [
-                        new AnyPrincipal()
-                    ]
-                })
-            ]
-        })
-    });
+        addTagsAndSummary('Timestamp metadata',
+            ['metadata'],
+            'Returns timestamp related metadata',
+            metadataResource,
+            this.stack);
+    }
 }

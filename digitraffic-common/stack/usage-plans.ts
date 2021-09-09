@@ -1,4 +1,4 @@
-import {RestApi} from '@aws-cdk/aws-apigateway';
+import {IApiKey, RestApi} from '@aws-cdk/aws-apigateway';
 
 /**
  * TODO FIXME creates funny names for the api keys ie. Maintenance Tracking API Key will be Main-Main-RANDOMSTRING
@@ -8,7 +8,7 @@ import {RestApi} from '@aws-cdk/aws-apigateway';
  * @param apiKeyId Id for the API key, this is a surrogate id for CDK, not displayed anywhere
  * @param apiKeyName Name for the API key, this is displayed in the AWS Console
  */
-export function createUsagePlan(api: RestApi, apiKeyId: string, apiKeyName: string) {
+export function createUsagePlan(api: RestApi, apiKeyId: string, apiKeyName: string): IApiKey {
     const apiKey = api.addApiKey(apiKeyId);
     const plan = api.addUsagePlan(apiKeyName, {
         name: apiKeyName,
@@ -17,6 +17,8 @@ export function createUsagePlan(api: RestApi, apiKeyId: string, apiKeyName: stri
     plan.addApiStage({
         stage: api.deploymentStage
     });
+
+    return apiKey;
 }
 
 /**
