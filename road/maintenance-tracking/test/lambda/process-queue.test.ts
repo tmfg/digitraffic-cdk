@@ -1,7 +1,7 @@
-import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../lib/lambda/constants";
+import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
 const QUEUE = 'MaintenanceTrackingQueue';
-process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
-process.env[SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
+process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
+process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 process.env.AWS_REGION = 'aws-region';
 import { SqsConsumer } from 'sns-sqs-big-payload';
 import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
@@ -15,11 +15,12 @@ import moment from 'moment-timezone';
 import {DbObservationData, Status} from "../../lib/db/maintenance-tracking-db";
 
 function createSqsConsumerForTest() : SqsConsumer {
-    return SqsBigPayload.createSqsConsumer(`${process.env[SQS_QUEUE_URL]}`, `${process.env.AWS_REGION}`, 'processMaintenanceTrackingQueueTest');
+    return SqsBigPayload.createSqsConsumer(`${process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]}`, `${process.env.AWS_REGION}`, 'processMaintenanceTrackingQueueTest');
 }
 
-
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+
+    const secretFn = async (secret: string, fn: any) => await fn(secret);
 
     const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
@@ -44,7 +45,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const sqsConsumer: SqsConsumer = createSqsConsumerForTest();
         const transformLambdaRecordsStub = sandbox.stub(sqsConsumer, 'processMessage').returns(Promise.resolve());
 
-        await expect(LambdaProcessQueue.handlerFn(sqsConsumer)({ Records: [] } )).resolves.toMatchObject([]);
+        await expect(LambdaProcessQueue.handlerFn(sqsConsumer, secretFn)({ Records: [] } )).resolves.toMatchObject([]);
         expect(transformLambdaRecordsStub.calledWith({})).toBe(false);
     });
 
@@ -52,7 +53,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const json = getTrackingJsonWith3Observations(getRandompId(),getRandompId());
         const record : SQSRecord = createRecord(json);
 
-        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+        await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
             Records: [record]
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}]);
 
@@ -76,7 +77,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const json2 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const record2 : SQSRecord = createRecord(json2);
 
-        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+        await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
             Records: [record1, record2]
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);
 
@@ -96,7 +97,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const record : SQSRecord = createRecord(json);
 
-        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+        await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
             Records: [record]
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}]);
 
@@ -113,7 +114,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const validJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const validRecord : SQSRecord = createRecord(validJson);
 
-        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+        await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
             Records: [invalidRecord, validRecord]
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);;
 
@@ -133,7 +134,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const invalidJson = getTrackingJsonWith3ObservationsAndMissingSendingSystem(getRandompId(), getRandompId());
         const record : SQSRecord = createRecord(invalidJson);
 
-        await LambdaProcessQueue.handlerFn(sqsClient)({
+        await LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
             Records: [record]
         });
 
@@ -150,7 +151,7 @@ function createRecord(trackingJson = ''): SQSRecord {
     return {
         body: trackingJson,
         messageId: '',
-        receiptHandle: `s3://${process.env[SQS_BUCKET_NAME]}/${QUEUE}/${getRandompId()}`,
+        receiptHandle: `s3://${process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]}/${QUEUE}/${getRandompId()}`,
         messageAttributes: {},
         md5OfBody: '',
         attributes: {

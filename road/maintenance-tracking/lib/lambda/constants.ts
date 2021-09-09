@@ -1,2 +1,0 @@
-export const SQS_BUCKET_NAME = 'SQS_BUCKET_NAME';
-export const SQS_QUEUE_URL = 'SQS_QUEUE_URL';

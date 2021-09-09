@@ -5,10 +5,13 @@ import * as IntegrationApi from './integration-api';
 import * as Sqs from './sqs';
 import {AppProps} from './app-props'
 import {Bucket} from "@aws-cdk/aws-s3";
+import {Secret} from "@aws-cdk/aws-secretsmanager";
 
 export class MaintenanceTrackingStack extends Stack {
     constructor(scope: Construct, id: string, appProps: AppProps, props?: StackProps) {
         super(scope, id, props);
+
+        const secret = Secret.fromSecretNameV2(this, 'MaintenanceTrackingSecret', appProps.secretId);
 
         const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
             vpcId: appProps.vpcId,
@@ -21,12 +24,12 @@ export class MaintenanceTrackingStack extends Stack {
         const queueAndDLQ = Sqs.createQueue(this);
         // Create bucket with internal id DLQBucket, that is not going to AWS and must be unique
         const dlqBucket = new Bucket(this, 'DLQBucket', {
-            bucketName: appProps.dlqBucketName
+            bucketName: appProps.sqsDlqBucketName
         });
 
         // Create bucket for SQS-messages and delete old messages from bucket after 30 day
         const sqsExtendedMessageBucket = new Bucket(this, 'SqsExtendedMessageBucket', {
-            bucketName: appProps.sqsExtendedMessageBucketName,
+            bucketName: appProps.sqsMessageBucketName,
             lifecycleRules: [
                 {
                     enabled: true,
@@ -39,6 +42,6 @@ export class MaintenanceTrackingStack extends Stack {
         // InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
         IntegrationApi.createIntegrationApiAndHandlerLambda(queueAndDLQ.queue, vpc, lambdaDbSg, sqsExtendedMessageBucket.bucketArn, appProps, this);
 
-        InternalLambdas.createProcessQueueAndDlqLambda(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, sqsExtendedMessageBucket.bucketArn, appProps, this);
+        InternalLambdas.createProcessQueueAndDlqLambda(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, sqsExtendedMessageBucket.bucketArn, appProps, secret, this);
     }
 }

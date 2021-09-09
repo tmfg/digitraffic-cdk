@@ -1,9 +1,9 @@
 import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
 import { SqsProducer } from 'sns-sqs-big-payload';
-import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../constants";
 import * as SqsBigPayload from "../../service/sqs-big-payload"
-const sqsBucketName = process.env[SQS_BUCKET_NAME] as string;
-const sqsQueueUrl = process.env[SQS_QUEUE_URL] as string;
+import {MaintenanceTrackingEnvKeys} from "../../keys";
+const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] as string;
+const sqsQueueUrl = process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] as string;
 const region = process.env.AWS_REGION as string;
 
 const sqsProducerInstance : SqsProducer = SqsBigPayload.createSqsProducer(sqsQueueUrl, region, sqsBucketName);

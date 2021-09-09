@@ -1,6 +1,6 @@
-import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../lib/lambda/constants";
-process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
-process.env[SQS_QUEUE_URL] = 'https://aws-queue-123';
+import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
+process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
+process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = 'https://aws-queue-123';
 process.env.AWS_REGION = 'aws-region';
 import * as pgPromise from "pg-promise";
 import {dbTestBase} from "../db-testutil";
@@ -11,7 +11,9 @@ import * as LambdaUpdateQueue from "../../lib/lambda/update-queue/lambda-update-
 import { SqsProducer } from 'sns-sqs-big-payload';
 
 function createSqsProducerForTest() : SqsProducer {
-    return SqsBigPayload.createSqsProducer(`${process.env[SQS_QUEUE_URL]}`, `${process.env.AWS_REGION}`, `${process.env[SQS_BUCKET_NAME]}`);
+    return SqsBigPayload.createSqsProducer(`${process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]}`,
+                                    `${process.env.AWS_REGION}`,
+                             `${process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]}`);
 }
 
 describe('update-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
