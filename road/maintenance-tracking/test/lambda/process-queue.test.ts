@@ -2,6 +2,9 @@ import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../lib/lambda/constants";
 const QUEUE = 'MaintenanceTrackingQueue';
 process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
+process.env.AWS_REGION = 'aws-region';
+import { SqsConsumer } from 'sns-sqs-big-payload';
+import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAllObservations} from "../db-testutil";
 import * as LambdaProcessQueue from "../../lib/lambda/process-queue/lambda-process-queue";
@@ -10,12 +13,18 @@ import {getRandompId, getTrackingJsonWith3Observations, getTrackingJsonWith3Obse
 import * as sinon from 'sinon';
 import moment from 'moment-timezone';
 import {DbObservationData, Status} from "../../lib/db/maintenance-tracking-db";
-import {cloneRecordWithCamelAndPascal} from "../../lib/lambda/process-queue/lambda-process-queue";
+
+function createSqsConsumerForTest() : SqsConsumer {
+    return SqsBigPayload.createSqsConsumer(`${process.env[SQS_QUEUE_URL]}`, `${process.env.AWS_REGION}`, 'processMaintenanceTrackingQueueTest');
+}
+
 
 describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
+
+    const sqsClient : any = createSqsConsumerForTest();
 
     test('clone record', async () => {
         console.info("start");
@@ -31,154 +40,110 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(clone.Body).toEqual("test");
     });
 
-    // test('no records', async () => {
-    //     // const sns : any = createSQSExtClient("bucket-name");
-    //     const transformLambdaRecordsStub = sandbox.stub(sns, 'transformLambdaRecords').returns([]);
-    //     await LambdaProcessQueue.handlerFn(sns)({ Records: [] });
-    //     expect(transformLambdaRecordsStub.calledWith([])).toBe(true);
-    // });
-    //
-    // test('single valid record', async () => {
-    //     const json = getTrackingJsonWith3Observations(getRandompId(),getRandompId());
-    //     const recordFromS3 : SQSRecord = createRecord(json);
-    //     const recordNoJson : SQSRecord = cloneRecordWithoutJson(recordFromS3)
-    //
-    //     const sqsClient : any = createSQSExtClient("bucket-name");
-    //     const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([recordFromS3]);
-    //     await LambdaProcessQueue.handlerFn(sqsClient)({
-    //         Records: [recordNoJson]
-    //     });
-    //
-    //     const allObservations = await findAllObservations(db);
-    //     expect(allObservations.length).toBe(3);
-    //
-    //     let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
-    //     for(const obs of allObservations) {
-    //         console.info(JSON.stringify(obs));
-    //         const observationTime = moment(obs.observationTime).valueOf();
-    //         expect(observationTime).toBeGreaterThan(prevObservationTime);
-    //         prevObservationTime = observationTime;
-    //         console.info("epoc: ", observationTime);
-    //     }
-    //
-    //     expect(transformLambdaRecordsStub.calledWith([recordNoJson])).toBe(true);
-    // });
-    //
-    //
-    // test('two valid records', async () => {
-    //
-    //     // Create two records
-    //     const json1 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-    //     const record1FromS3 : SQSRecord = createRecord(json1);
-    //     const record1NoJson : SQSRecord = cloneRecordWithoutJson(record1FromS3);
-    //
-    //     const json2 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-    //     const record2FromS3 : SQSRecord = createRecord(json2);
-    //     const record2NoJson : SQSRecord = cloneRecordWithoutJson(record2FromS3);
-    //
-    //     const sqsClient : any = createSQSExtClient("bucket-name");
-    //     const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3, record2FromS3]);
-    //
-    //     await LambdaProcessQueue.handlerFn(sqsClient)({
-    //         Records: [record1NoJson, record2NoJson]
-    //     });
-    //
-    //     const allObservations = await findAllObservations(db);
-    //     expect(allObservations.length).toBe(6);
-    //
-    //     let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
-    //     for(const obs of allObservations) {
-    //         const observationTime = moment(obs.observationTime).valueOf();
-    //         expect(observationTime).toBeGreaterThanOrEqual(prevObservationTime);
-    //         prevObservationTime = observationTime;
-    //     }
-    //
-    //     expect(transformLambdaRecordsStub.calledWith([record1NoJson, record2NoJson])).toBe(true);
-    // });
-    //
-    // test('invalid record', async () => {
-    //
-    //     const json1 = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-    //     const record1FromS3 : SQSRecord = createRecord(json1);
-    //     const record1NoJson : SQSRecord = cloneRecordWithoutJson(record1FromS3);
-    //
-    //     const sqsClient : any = createSQSExtClient("bucket-name");
-    //     const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record1FromS3]);
-    //
-    //     await LambdaProcessQueue.handlerFn(sqsClient)({
-    //         Records: [record1NoJson]
-    //     });
-    //
-    //     const allObservations = await findAllObservations(db);
-    //     expect(allObservations.length).toBe(0);
-    //
-    //     expect(transformLambdaRecordsStub.calledWith([record1NoJson])).toBe(true);
-    // });
-    //
-    // test('invalid and valid record', async () => {
-    //
-    //     // Create two records
-    //     const invalidJson = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-    //     const invalidRecordFromS3 : SQSRecord = createRecord(invalidJson);
-    //     const invalidRecordNoJson : SQSRecord = cloneRecordWithoutJson(invalidRecordFromS3);
-    //
-    //     const validJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-    //     const validRecordFromS3 : SQSRecord = createRecord(validJson);
-    //     const validRecordNoJson : SQSRecord = cloneRecordWithoutJson(validRecordFromS3);
-    //
-    //     const sqsClient : any = createSQSExtClient("bucket-name");
-    //     const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([invalidRecordFromS3, validRecordFromS3]);
-    //
-    //     await LambdaProcessQueue.handlerFn(sqsClient)({
-    //         Records: [invalidRecordNoJson, validRecordNoJson]
-    //     });
-    //
-    //     const allObservations = await findAllObservations(db);
-    //     expect(allObservations.length).toBe(3);
-    //
-    //     let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
-    //     for(const obs of allObservations) {
-    //         const observationTime = moment(obs.observationTime).valueOf();
-    //         expect(observationTime).toBeGreaterThan(prevObservationTime);
-    //         prevObservationTime = observationTime;
-    //     }
-    //
-    //     expect(transformLambdaRecordsStub.calledWith([invalidRecordNoJson, validRecordNoJson])).toBe(true);
-    // });
-    //
-    // test('invalid record missing sending system', async () => {
-    //
-    //     const invalidJson = getTrackingJsonWith3ObservationsAndMissingSendingSystem(getRandompId(), getRandompId());
-    //     const record : SQSRecord = createRecord(invalidJson);
-    //
-    //     const sqsClient : any = createSQSExtClient("bucket-name");
-    //     const transformLambdaRecordsStub = sandbox.stub(sqsClient, 'transformLambdaRecords').returns([record]);
-    //
-    //     await LambdaProcessQueue.handlerFn(sqsClient)({
-    //         Records: [record]
-    //     });
-    //
-    //     const allObservations = await findAllObservations(db);
-    //     expect(allObservations.length).toBe(3);
-    //
-    //     for (const entry of allObservations) {
-    //         expect(entry.sendingSystem).toEqual('UNKNOWN');
-    //     }
-    //
-    //     expect(transformLambdaRecordsStub.calledWith([record])).toBe(true);
-    // });
-    //
-    //
-    // test('remove json from DbObservationData', async () => {
-    //     const json = '{ "a" : "b" }';
-    //     const data : DbObservationData[] = createDbObservationData();
-    //     expect(data[0].json).toEqual(json);
-    //     expect(data[1].json).toEqual(json);
-    //     const clones = LambdaProcessQueue.cloneObservationsWithoutJson(data);
-    //     const removed = '{...REMOVED...}';
-    //     expect(clones[0].json).toEqual(removed);
-    //     expect(clones[1].json).toEqual(removed);
-    // });
+    test('no records', async () => {
+        const sqsConsumer: SqsConsumer = createSqsConsumerForTest();
+        const transformLambdaRecordsStub = sandbox.stub(sqsConsumer, 'processMessage').returns(Promise.resolve());
+
+        await expect(LambdaProcessQueue.handlerFn(sqsConsumer)({ Records: [] } )).resolves.toMatchObject([]);
+        expect(transformLambdaRecordsStub.calledWith({})).toBe(false);
+    });
+
+    test('single valid record', async () => {
+        const json = getTrackingJsonWith3Observations(getRandompId(),getRandompId());
+        const record : SQSRecord = createRecord(json);
+
+        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+            Records: [record]
+        })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}]);
+
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(3);
+
+        let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
+        for(const obs of allObservations) {
+            console.info(JSON.stringify(obs));
+            const observationTime = moment(obs.observationTime).valueOf();
+            expect(observationTime).toBeGreaterThan(prevObservationTime);
+            prevObservationTime = observationTime;
+            console.info("epoc: ", observationTime);
+        }
+    });
+
+    test('two valid records', async () => {
+        // Create two records
+        const json1 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const record1 : SQSRecord = createRecord(json1);
+        const json2 = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const record2 : SQSRecord = createRecord(json2);
+
+        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+            Records: [record1, record2]
+        })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);
+
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(6);
+
+        let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
+        for(const obs of allObservations) {
+            const observationTime = moment(obs.observationTime).valueOf();
+            expect(observationTime).toBeGreaterThanOrEqual(prevObservationTime);
+            prevObservationTime = observationTime;
+        }
+    });
+
+    test('invalid record', async () => {
+
+        const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const record : SQSRecord = createRecord(json);
+
+        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+            Records: [record]
+        })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}]);
+
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(0);
+    });
+
+    test('invalid and valid record', async () => {
+
+        // Create two records
+        const invalidJson = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const invalidRecord : SQSRecord = createRecord(invalidJson);
+
+        const validJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const validRecord : SQSRecord = createRecord(validJson);
+
+        await expect(LambdaProcessQueue.handlerFn(sqsClient)({
+            Records: [invalidRecord, validRecord]
+        })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);;
+
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(3);
+
+        let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
+        for(const obs of allObservations) {
+            const observationTime = moment(obs.observationTime).valueOf();
+            expect(observationTime).toBeGreaterThan(prevObservationTime);
+            prevObservationTime = observationTime;
+        }
+    });
+
+    test('invalid record missing sending system', async () => {
+
+        const invalidJson = getTrackingJsonWith3ObservationsAndMissingSendingSystem(getRandompId(), getRandompId());
+        const record : SQSRecord = createRecord(invalidJson);
+
+        await LambdaProcessQueue.handlerFn(sqsClient)({
+            Records: [record]
+        });
+
+        const allObservations = await findAllObservations(db);
+        expect(allObservations.length).toBe(3);
+
+        for (const entry of allObservations) {
+            expect(entry.sendingSystem).toEqual('UNKNOWN');
+        }
+    });
 }));
 
 function createRecord(trackingJson = ''): SQSRecord {

@@ -1,49 +1,89 @@
 import * as MaintenanceTrackingDB from "../../lib/db/maintenance-tracking-db";
 import * as pgPromise from "pg-promise";
-import {createObservationsDbDatas, dbTestBase, findAllObservations} from "../db-testutil";
-import {assertObservationData, getRandompId, getTrackingJsonWith3Observations} from "../testdata";
+import * as DbTestutil from "../db-testutil";
+import * as TestData from "../testdata";
+import * as MaintenanceTrackingDb from "../../lib/db/maintenance-tracking-db";
 
-describe('db-maintenance-tracking - inserts', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-maintenance-tracking - inserts', DbTestutil.dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('insertMaintenanceTrackingData', async () => {
 
-        const maintenanceTrackingDataJson = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-        const createdObservations = createObservationsDbDatas(maintenanceTrackingDataJson);
+        const maintenanceTrackingDataJson = TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), TestData.getRandompId());
+        const createdObservations = DbTestutil.createObservationsDbDatas(maintenanceTrackingDataJson);
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations);
 
-        const fetchedObservations = await findAllObservations(db);
+        const fetchedObservations = await DbTestutil.findAllObservations(db);
         expect(fetchedObservations.length).toBe(3);
 
-        assertObservationData(createdObservations, fetchedObservations);
+        TestData.assertObservationData(createdObservations, fetchedObservations);
     });
 
     test('insertMaintenanceTrackingData multiple machines', async () => {
 
-        const maintenanceTrackingDataJson1 = getTrackingJsonWith3Observations(getRandompId(), '1');
-        const maintenanceTrackingDataJson2 = getTrackingJsonWith3Observations(getRandompId(), '2');
+        const maintenanceTrackingDataJson1 = TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), '1');
+        const maintenanceTrackingDataJson2 = TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), '2');
 
-        const createdObservations1 = createObservationsDbDatas(maintenanceTrackingDataJson1);
-        const createdObservations2 = createObservationsDbDatas(maintenanceTrackingDataJson2);
+        const createdObservations1 = DbTestutil.createObservationsDbDatas(maintenanceTrackingDataJson1);
+        const createdObservations2 = DbTestutil.createObservationsDbDatas(maintenanceTrackingDataJson2);
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations1);
         await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations2);
 
-        const fetchedObservations = await findAllObservations(db);
+        const fetchedObservations = await DbTestutil.findAllObservations(db);
         expect(fetchedObservations.length).toBe(6);
     });
 
     test('insertMaintenanceTrackingData with same hash should not be duplicated in db', async () => {
 
-        const json = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-        const observationData = createObservationsDbDatas(json);
+        const json = TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), TestData.getRandompId());
+        const observationData = DbTestutil.createObservationsDbDatas(json);
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationData);
-        const fetchedTrackings1 = await findAllObservations(db);
+        const fetchedTrackings1 = await DbTestutil.findAllObservations(db);
         expect(fetchedTrackings1.length).toBe(3);
 
         await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationData);
-        const fetchedTrackings2 = await findAllObservations(db);
+        const fetchedTrackings2 = await DbTestutil.findAllObservations(db);
         expect(fetchedTrackings2.length).toBe(3);
     });
+
+    test('remove json from DbObservationData', async () => {
+        const json = '{ "a" : "b" }';
+        const data : MaintenanceTrackingDb.DbObservationData[] = createDbObservationData();
+        expect(data[0].json).toEqual(json);
+        expect(data[1].json).toEqual(json);
+        const clones = MaintenanceTrackingDb.cloneObservationsWithoutJson(data);
+        const removed = '{...REMOVED...}';
+        expect(clones[0].json).toEqual(removed);
+        expect(clones[1].json).toEqual(removed);
+    });
 }));
+
+function createDbObservationData() : MaintenanceTrackingDb.DbObservationData[] {
+    return [
+        {
+            id: BigInt(1),
+            observationTime: new Date(),
+            sendingTime: new Date(),
+            json: '{ "a" : "b" }',
+            harjaWorkmachineId: 1,
+            harjaContractId: 1,
+            sendingSystem: 'System1',
+            status: MaintenanceTrackingDb.Status.UNHANDLED,
+            hash: 'abcd',
+            s3Uri: 'URL'
+        },{
+            id: BigInt(1),
+            observationTime: new Date(),
+            sendingTime: new Date(),
+            json: '{ "a" : "b" }',
+            harjaWorkmachineId: 1,
+            harjaContractId: 1,
+            sendingSystem: 'System1',
+            status: MaintenanceTrackingDb.Status.UNHANDLED,
+            hash: 'abcd',
+            s3Uri: 'URL'
+        }
+    ]
+}
