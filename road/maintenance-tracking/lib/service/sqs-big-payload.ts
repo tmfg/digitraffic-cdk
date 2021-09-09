@@ -9,28 +9,28 @@ export function createSqsProducer(sqsQueueUrl : string, region : string, sqsBuck
     return SqsProducer.create({
         queueUrl: sqsQueueUrl,
         region: region,
-        // to enable sending large payloads (>256KiB) though S3
+        // true = Enable big payload to be send wia S3. Limit is 256KB
+        // See https://aws.amazon.com/sqs/features/
         largePayloadThoughS3: true,
-        // Opt-in to enable compatibility with
-        // Amazon SQS Extended Client Java Library (and other compatible libraries).
-        // see https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-s3-messages.html
+        // If true, library uses compatibility mode with Amazon SQS Extended Client Library for Java
+        // See https://github.com/awslabs/amazon-sqs-java-extended-client-lib
         extendedLibraryCompatibility: false,
         s3Bucket: sqsBucketName
     });
 }
 
-// https://github.com/aspecto-io/sns-sqs-big-payload/blob/master/docs/usage-in-lambda.md
+// See https://github.com/aspecto-io/sns-sqs-big-payload/blob/master/docs/usage-in-lambda.md
 export function createSqsConsumer(sqsQueueUrl : string, region : string, logFunctionName : string) : SqsConsumer {
 
     return SqsConsumer.create({
         queueUrl: sqsQueueUrl,
         region: region,
         getPayloadFromS3: true,
-        // if you expect json payload - use `parsePayload` hook to parse it
+        // Parse JSON string payload to JSON object
         parsePayload: (raw) => {
             return JSON.parse(raw)
         },
-        // message handler, payload already parsed at this point to JSON object
+        // Callback to handle message. Payload is parsed JSON object
         handleMessage: async ({payload, message, s3PayloadMeta}) => {
             return handleMessage(payload, message, s3PayloadMeta, logFunctionName);
         }

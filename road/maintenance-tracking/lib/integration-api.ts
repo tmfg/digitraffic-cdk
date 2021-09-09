@@ -11,7 +11,7 @@ import {getFullEnv} from "digitraffic-common/stack/stack-util";
 import * as cloudwatch from "@aws-cdk/aws-cloudwatch";
 import {Topic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
-
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 import {
     createSchemaGeometriaSijainti,
@@ -91,7 +91,7 @@ function createUpdateRequestHandlerLambda(
 ) {
     const lambdaFunctionName = 'MaintenanceTracking-UpdateQueue';
 
-    const lambdaEnv: any = {};
+    const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = appProps.sqsMessageBucketName;
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
 

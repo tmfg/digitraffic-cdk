@@ -4,7 +4,6 @@ import { SqsConsumer } from 'sns-sqs-big-payload';
 import * as SqsBigPayload from "../../service/sqs-big-payload";
 import {MaintenanceTrackingEnvKeys} from "../../keys";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {UploadVoyagePlanEvent} from "aton-faults-cdk/lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 const middy = require('@middy/core')
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 

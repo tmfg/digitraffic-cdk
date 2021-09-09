@@ -16,6 +16,7 @@ import {Topic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {getFullEnv} from "digitraffic-common/stack/stack-util";
 import {MaintenanceTrackingEnvKeys} from "./keys";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 export function createProcessQueueAndDlqLambda(
     queueAndDLQ: QueueAndDLQ,
@@ -43,7 +44,7 @@ function createProcessQueueLambda(
     const role = createLambdaRoleWithReadS3Policy(stack, sqsExtendedMessageBucketArn);
     const functionName = "MaintenanceTracking-ProcessQueue";
 
-    const env: any = {};
+    const env: LambdaEnvironment = {};
     env[MaintenanceTrackingEnvKeys.SECRET_ID] = appProps.secretId;
     env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = appProps.sqsMessageBucketName;
     env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
