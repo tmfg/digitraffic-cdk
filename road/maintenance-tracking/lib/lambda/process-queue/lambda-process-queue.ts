@@ -39,16 +39,6 @@ export function handlerFn(sqsConsumer : SqsConsumer,
 
 export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn(sqsConsumerInstance, withDbSecret)).use(sqsPartialBatchFailureMiddleware());
 
-export interface Havainto {
-    readonly havainto: {
-        readonly tyokone: {
-            readonly id: number;
-        },
-        readonly urakkaid: number,
-        readonly havaintoaika: string;
-    }
-}
-
 export function cloneRecordWithCamelAndPascal(record: any) {
     const clone : any = {};
     for (const key in record) {

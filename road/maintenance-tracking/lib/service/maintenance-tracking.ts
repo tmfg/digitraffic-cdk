@@ -3,7 +3,7 @@ import {DbObservationData, Status} from "../db/maintenance-tracking-db"
 import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";
-import {Havainto} from "../lambda/process-queue/lambda-process-queue";
+import {Havainto} from "../model/models";
 
 const crypto = require('crypto');
 
