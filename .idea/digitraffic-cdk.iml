@@ -6,7 +6,6 @@
       <excludePattern pattern=".cache" />
       <excludePattern pattern="cdk.out" />
       <excludePattern pattern="dist" />
-      <excludePattern pattern="node_modules" />
       <excludePattern pattern="tsd" />
       <excludePattern pattern="tsd" />
       <excludePattern pattern="*.js" />
