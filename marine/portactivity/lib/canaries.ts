@@ -48,10 +48,10 @@ export class Canaries {
             new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
                 name: 'pa-daytime',
                 secret: appProps.secretId,
-                schedule: Schedule.expression("cron(0/15 6-22 ? * MON-SUN *)"),
+                schedule: Schedule.expression("cron(0/15 2-19 ? * MON-SUN *)"),
                 handler: 'daytime-db.handler',
                 alarm: {
-                    alarmName: 'PortActivity-Db-Night-Alarm',
+                    alarmName: 'PortActivity-Db-Day-Alarm',
                     topicArn: appProps.dlqNotificationTopicArn
                 }
             });
