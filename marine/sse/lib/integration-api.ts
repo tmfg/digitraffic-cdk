@@ -29,6 +29,7 @@ import {
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
 import {ERROR_MESSAGE, BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 export function createIntegrationApiAndHandlerLambda(
     secret: ISecret,
@@ -76,7 +77,7 @@ function createUpdateRequestHandlerLambda(
     stack: Stack): Lambda.Function {
 
     const lambdaFunctionName = 'SSE-UpdateSseData';
-    const lambdaEnv: any = {};
+    const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[KEY_SECRET_ID] = appProps.secretId;
 
     const updateSseDataLambda = new Lambda.Function(stack, lambdaFunctionName, dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {

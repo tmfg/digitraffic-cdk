@@ -89,7 +89,7 @@ function createProcessDLQLambda(
     dlq: Queue,
     props: AppProps,
     stack: Stack) {
-    const lambdaEnv: any = {};
+    const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME] = dlqBucket.bucketName;
     const functionName = "MaintenanceTracking-ProcessDLQ";
     const processDLQLambda = new lambda.Function(stack, functionName, {
