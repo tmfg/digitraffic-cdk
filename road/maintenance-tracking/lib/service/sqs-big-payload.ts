@@ -64,9 +64,8 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
 
     const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma ?? 'UNKNOWN';
     const observationDatas: MaintenanceTrackingDb.DbObservationData[] =
-        trackingJson.havainnot.map((havainto: Havainto) => {
-            return MaintenanceTrackingService.convertToDbObservationData(havainto, sendingTime, sendingSystem, s3Uri);
-        });
+        trackingJson.havainnot.map((havainto: Havainto) =>
+            MaintenanceTrackingService.convertToDbObservationData(havainto, sendingTime, sendingSystem, s3Uri));
 
     try {
         const start = Date.now();
