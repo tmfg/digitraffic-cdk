@@ -1,4 +1,4 @@
-export interface TyokoneenseurannanKirjaus {
+export type TyokoneenseurannanKirjaus = {
     readonly otsikko: {
         readonly lahettaja: {
             readonly jarjestelma: string;
@@ -8,7 +8,7 @@ export interface TyokoneenseurannanKirjaus {
     havainnot: Havainto[]
 }
 
-export interface Havainto {
+export type Havainto = {
     readonly havainto: {
         readonly tyokone: {
             readonly id: number;
