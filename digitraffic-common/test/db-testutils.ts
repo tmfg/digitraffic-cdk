@@ -1,5 +1,6 @@
 import {IDatabase,ITask} from "pg-promise";
 import {initDbConnection} from "../postgres/database";
+import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
     return async () => {
@@ -23,9 +24,10 @@ export function dbTestBase(
         });
 
         beforeAll(async () => {
-            process.env.DB_USER = dbUser;
-            process.env.DB_PASS = dbPass;
-            process.env.DB_URI = theDbUri;
+            process.env[DatabaseEnvironmentKeys.DB_USER] = dbUser;
+            process.env[DatabaseEnvironmentKeys.DB_PASS] = dbPass;
+            process.env[DatabaseEnvironmentKeys.DB_URI] = theDbUri;
+            process.env[DatabaseEnvironmentKeys.DB_RO_URI] = theDbUri;
             await truncateFn(db);
         });
 
