@@ -31,6 +31,9 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {add404Support} from "digitraffic-common/api/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {PortactivityEnvKeys} from "./keys";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 
 export class PublicApi {
     readonly stack: Construct;
@@ -109,6 +112,10 @@ export class PublicApi {
 
         const functionName = 'PortActivity-GetTimestamps';
         const assetCode = new AssetCode('dist/lambda/get-timestamps');
+        const environment: LambdaEnvironment = {};
+        environment[PortactivityEnvKeys.SECRET_ID] = this.props.secretId;
+        environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
+
         const getTimestampsLambda = new Function(this.stack, functionName,
             dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
                 functionName: functionName,
@@ -116,9 +123,7 @@ export class PublicApi {
                 code: assetCode,
                 handler: 'lambda-get-timestamps.handler',
                 readOnly: false,
-                environment: {
-                    SECRET_ID: this.props.secretId
-                }
+                environment
         }));
         this.secret.grantRead(getTimestampsLambda);
 
@@ -180,17 +185,18 @@ export class PublicApi {
         lambdaDbSg: ISecurityGroup): Function {
 
         const functionName = 'PortActivity-PublicShiplist';
-
         const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
+        const environment: LambdaEnvironment = {};
+        environment[PortactivityEnvKeys.SECRET_ID] = this.props.secretId;
+        environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
+
         const lambda = new Function(this.stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
             functionName: functionName,
             code: assetCode,
             memorySize: 128,
             handler: 'lambda-get-shiplist-public.handler',
             readOnly: false,
-            environment: {
-                SECRET_ID: this.props.secretId
-            }
+            environment
         }));
         this.secret.grantRead(lambda);
         const integration = new LambdaIntegration(lambda, {

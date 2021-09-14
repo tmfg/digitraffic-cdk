@@ -29,10 +29,13 @@ pgp.pg.types.setTypeParser(pgp.pg.types.builtins.NUMERIC, (value: string) => {
 export function initDbConnection(
     username: string,
     password: string,
+    applicationName: string,
     url: string,
     options?: object
 ): IDatabase<any, any> {
-    return pgp(`postgresql://${username}:${password}@${url}`, options);
+    const finalUrl = `postgresql://${username}:${password}@${url}?application_name=${applicationName}`;
+
+    return pgp(finalUrl, options);
 }
 
 export async function inTransaction (
@@ -57,6 +60,7 @@ async function doInDatabase(
     const db = initDbConnection(
         process.env[DatabaseEnvironmentKeys.DB_USER] as string,
         process.env[DatabaseEnvironmentKeys.DB_PASS] as string,
+        process.env[DatabaseEnvironmentKeys.DB_APPLICATION] || 'unknown-cdk-application',
         (readonly ? process.env[DatabaseEnvironmentKeys.DB_RO_URI] : process.env[DatabaseEnvironmentKeys.DB_URI]) as string
     );
     try {

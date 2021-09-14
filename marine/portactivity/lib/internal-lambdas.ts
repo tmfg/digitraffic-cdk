@@ -15,6 +15,8 @@ import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {PortactivityEnvKeys} from "./keys";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -46,9 +48,10 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
                                                   lambdaDbSg: ISecurityGroup,
                                                   props: Props, stack: Stack): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
-    const environment: {[key: string]: string} = {};
+    const environment: LambdaEnvironment = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
 
     const lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props,{
         memorySize: 256,
@@ -71,9 +74,10 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
 // The reason for this is IP based restriction in another system's firewall.
 function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, vpc: IVpc, props: Props, stack: Stack): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromSchedules';
-    const environment: {[key: string]: string} = {};
+    const environment: LambdaEnvironment = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
 
     const lambda = new Function(stack, functionName, defaultLambdaConfiguration({
         functionName,
@@ -100,8 +104,9 @@ function createProcessQueueLambda(
     props: Props,
     stack: Stack) {
     const functionName = "PortActivity-ProcessTimestampQueue";
-    const environment: {[key: string]: string} = {};
+    const environment: LambdaEnvironment = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
 
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName,
@@ -122,8 +127,9 @@ function createProcessDLQLambda(
     dlq: Queue,
     props: Props,
     stack: Stack) {
-    const lambdaEnv: any = {};
+    const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[BUCKET_NAME] = dlqBucket.bucketName;
+
     const functionName = "PortActivity-ProcessTimestampsDLQ";
     const processDLQLambda = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
@@ -169,9 +175,10 @@ function createUpdateAwakeAiTimestampsLambda(
     props: Props,
     stack: Stack): Function {
 
-    const environment: {[key: string]: string} = {};
+    const environment: LambdaEnvironment = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
 
     const functionName = 'PortActivity-UpdateAwakeAiTimestamps';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {

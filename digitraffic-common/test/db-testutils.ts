@@ -19,7 +19,7 @@ export function dbTestBase(
     console.log(`Test database URI: ${theDbUri}`);
 
     return () => {
-        const db: IDatabase<any, any> = initDbConnection(dbUser, dbPass, theDbUri, {
+        const db: IDatabase<any, any> = initDbConnection(dbUser, dbPass, 'test', theDbUri, {
             noWarnings: true // ignore duplicate connection warning for tests
         });
 
