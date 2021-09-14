@@ -1,13 +1,13 @@
 import * as lambda from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct, Stack, Duration} from '@aws-cdk/core';
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {AppProps} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
 import {Bucket} from "@aws-cdk/aws-s3";
-import {BUCKET_NAME} from "./lambda/process-dlq/lambda-process-dlq";
 import {RetentionDays} from '@aws-cdk/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
@@ -15,6 +15,8 @@ import * as cloudwatch from "@aws-cdk/aws-cloudwatch";
 import {Topic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {getFullEnv} from "digitraffic-common/stack/stack-util";
+import {MaintenanceTrackingEnvKeys} from "./keys";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 export function createProcessQueueAndDlqLambda(
     queueAndDLQ: QueueAndDLQ,
@@ -23,8 +25,9 @@ export function createProcessQueueAndDlqLambda(
     lambdaDbSg: ISecurityGroup,
     sqsExtendedMessageBucketArn: string,
     props: AppProps,
+    secret: ISecret,
     stack: Stack) {
-    createProcessQueueLambda(queueAndDLQ.queue, vpc, lambdaDbSg, dlqBucket.urlForObject(), sqsExtendedMessageBucketArn, props, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, vpc, lambdaDbSg, dlqBucket.urlForObject(), sqsExtendedMessageBucketArn, props, secret, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 }
 
@@ -35,21 +38,22 @@ function createProcessQueueLambda(
     dlqBucketUrl: string,
     sqsExtendedMessageBucketArn: string,
     appProps: AppProps,
+    secret: ISecret,
     stack: Stack) {
 
     const role = createLambdaRoleWithReadS3Policy(stack, sqsExtendedMessageBucketArn);
     const functionName = "MaintenanceTracking-ProcessQueue";
+
+    const env: LambdaEnvironment = {};
+    env[MaintenanceTrackingEnvKeys.SECRET_ID] = appProps.secretId;
+    env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = appProps.sqsMessageBucketName;
+    env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
+
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {
         functionName: functionName,
         code: new lambda.AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
-        environment: {
-            DB_USER: appProps.dbProps?.username,
-            DB_PASS: appProps.dbProps?.password,
-            DB_URI: appProps.dbProps?.uri,
-            SQS_BUCKET_NAME: appProps.sqsExtendedMessageBucketName,
-            SQS_QUEUE_URL: queue.queueUrl
-        },
+        environment: env,
         // reservedConcurrentExecutions: appProps.sqsProcessLambdaConcurrentExecutions,
         role: role,
         memorySize: 256
@@ -59,9 +63,9 @@ function createProcessQueueLambda(
     processQueueLambda.addEventSource(new SqsEventSource(queue, {
         batchSize: 1
     }));
-
+    secret.grantRead(processQueueLambda);
     createSubscription(processQueueLambda, functionName, appProps.logsDestinationArn, stack);
-    createAlarm(processQueueLambda, appProps.errorNotificationSnsTopicArn, appProps.dlqBucketName, stack);
+    createAlarm(processQueueLambda, appProps.errorNotificationSnsTopicArn, appProps.sqsDlqBucketName, stack);
 }
 
 function createAlarm(processQueueLambda: lambda.Function, errorNotificationSnsTopicArn: string, dlqBucketName: string, stack: Stack) {
@@ -85,8 +89,8 @@ function createProcessDLQLambda(
     dlq: Queue,
     props: AppProps,
     stack: Stack) {
-    const lambdaEnv: any = {};
-    lambdaEnv[BUCKET_NAME] = dlqBucket.bucketName;
+    const lambdaEnv: LambdaEnvironment = {};
+    lambdaEnv[MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME] = dlqBucket.bucketName;
     const functionName = "MaintenanceTracking-ProcessDLQ";
     const processDLQLambda = new lambda.Function(stack, functionName, {
         runtime: lambda.Runtime.NODEJS_12_X,

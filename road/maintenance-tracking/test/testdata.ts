@@ -1,4 +1,4 @@
-import {DbObservationData} from "../lib/db/maintenance-tracking";
+import {DbObservationData} from "../lib/db/maintenance-tracking-db";
 import {getRandomIntegerAsString} from "digitraffic-common/test/testutils";
 
 const ID_PLACEHOLDER = 'ID_PLACEHOLDER'

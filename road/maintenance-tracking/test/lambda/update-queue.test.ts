@@ -1,58 +1,58 @@
-import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "../../lib/lambda/constants";
-process.env[SQS_BUCKET_NAME] = 'sqs-bucket-name';
-process.env[SQS_QUEUE_URL] = 'https://aws-queue-123';
+import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
+process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
+process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = 'https://aws-queue-123';
+process.env.AWS_REGION = 'aws-region';
 import * as pgPromise from "pg-promise";
 import {dbTestBase} from "../db-testutil";
-import {createSendParams, handlerFn} from "../../lib/lambda/update-queue/lambda-update-queue";
+import * as SqsBigPayload from "../../lib/service/sqs-big-payload"
 import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
 import * as sinon from 'sinon';
-import {createSQSExtClient} from "../../lib/sqs-ext";
+import * as LambdaUpdateQueue from "../../lib/lambda/update-queue/lambda-update-queue";
+import { SqsProducer } from 'sns-sqs-big-payload';
+
+function createSqsProducerForTest() : SqsProducer {
+    return SqsBigPayload.createSqsProducer(`${process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]}`,
+                                    `${process.env.AWS_REGION}`,
+                             `${process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]}`);
+}
 
 describe('update-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     const sandbox = sinon.createSandbox();
     afterEach(() => sandbox.restore());
 
-    test('no records', async () => {
-        const sqsClient: any = createSQSExtClient("bucket-name");
-        const sendMessageStub = sandbox.stub(sqsClient, 'sendMessage').returns({promise: () => Promise.resolve()});
-        await expect(handlerFn(sqsClient)).rejects;
+    test('no records - should reject', async () => {
+        const sqsClient: SqsProducer = createSqsProducerForTest();
+        const sendMessageStub = sandbox.stub(sqsClient, 'sendJSON').returns(Promise.resolve());
+
+        await expect(() => LambdaUpdateQueue.handlerFn(sqsClient)({}))
+            .rejects.toMatchObject(LambdaUpdateQueue.invalidRequest("Empty message"));
+
         expect(sendMessageStub.notCalled).toBe(true);
     });
 
+
     test('single valid record', async () => {
-        const json = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const jsonString = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const sqsClient: SqsProducer = createSqsProducerForTest();
+        const sendMessageStub = sandbox.stub(sqsClient, 'sendJSON').returns(Promise.resolve());
 
-        const sqsClient: any = createSQSExtClient("bucket-name");
-        const sendMessageStub = sandbox.stub(sqsClient, 'sendMessage').returns({promise: () => Promise.resolve()});
+        await expect(LambdaUpdateQueue.handlerFn(sqsClient)({body: jsonString})).resolves.toMatchObject(LambdaUpdateQueue.ok());
 
-        await expect(
-            handlerFn(sqsClient)(
-                {
-                    body: json
-                }
-            )
-        ).resolves;
-
-        const params = createSendParams(json);
-        expect(sendMessageStub.calledWith(params)).toBe(true);
+        expect(sendMessageStub.calledWith(JSON.parse(jsonString))).toBe(true);
     });
 
     test('invalid record', async () => {
         const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
-        const sqsClient: any = createSQSExtClient("bucket-name");
-        const sendMessageStub = sandbox.stub(sqsClient, 'sendMessage').returns({promise: () => Promise.resolve()});
+        const sqsClient: SqsProducer = createSqsProducerForTest();
+        const sendMessageStub = sandbox.stub(sqsClient, 'sendJSON');
 
-        await expect(
-            handlerFn(sqsClient)(
+        await expect(() => LambdaUpdateQueue.handlerFn(sqsClient)(
                 {
                     body: json
                 }
-            )
-        ).rejects;
+            )).rejects.toMatchObject(LambdaUpdateQueue.invalidRequest("Error while sending message to SQS: SyntaxError: Unexpected token i in JSON at position 0"));
 
-        const params = createSendParams(json);
-        expect(sendMessageStub.calledWith(params)).toBe(true);
+        expect(sendMessageStub.notCalled).toBe(true);
     });
-
 }));

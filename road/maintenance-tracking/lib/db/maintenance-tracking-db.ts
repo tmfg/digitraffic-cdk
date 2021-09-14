@@ -1,4 +1,5 @@
 import {IDatabase} from "pg-promise";
+import * as R from 'ramda';
 
 export enum Status {
     UNHANDLED = 'UNHANDLED',
@@ -68,4 +69,8 @@ export function createInsertObservationValues(e: DbObservationData): any[] {
         e.hash,
         e.s3Uri
     ];
+}
+
+export function cloneObservationsWithoutJson(datas: DbObservationData[]) : DbObservationData[] {
+    return R.map(R.assoc('json', '{...REMOVED...}'), datas);
 }

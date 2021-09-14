@@ -11,7 +11,7 @@ import {getFullEnv} from "digitraffic-common/stack/stack-util";
 import * as cloudwatch from "@aws-cdk/aws-cloudwatch";
 import {Topic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
-
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 import {
     createSchemaGeometriaSijainti,
@@ -27,9 +27,8 @@ import {createDefaultUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {AppProps} from "./app-props";
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
-import {SQS_BUCKET_NAME, SQS_QUEUE_URL} from "./lambda/constants";
 import apigateway = require('@aws-cdk/aws-apigateway');
-
+import {MaintenanceTrackingEnvKeys} from "./keys";
 
 export function createIntegrationApiAndHandlerLambda(
     queue: Queue,
@@ -91,9 +90,10 @@ function createUpdateRequestHandlerLambda(
     stack: Stack
 ) {
     const lambdaFunctionName = 'MaintenanceTracking-UpdateQueue';
-    const lambdaEnv: any = {};
-    lambdaEnv[SQS_BUCKET_NAME] = appProps.sqsExtendedMessageBucketName;
-    lambdaEnv[SQS_QUEUE_URL] = queue.queueUrl;
+
+    const lambdaEnv: LambdaEnvironment = {};
+    lambdaEnv[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = appProps.sqsMessageBucketName;
+    lambdaEnv[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
 
     const lambdaRole = createLambdaRoleWithWriteToSqsAndS3Policy(stack, queue.queueArn, sqsExtendedMessageBucketArn);
     const updateRequestsHandler = new lambda.Function(stack, lambdaFunctionName, defaultLambdaConfiguration({
@@ -111,7 +111,7 @@ function createUpdateRequestHandlerLambda(
     });
     // Create log subscription
     createSubscription(updateRequestsHandler, lambdaFunctionName, appProps.logsDestinationArn, stack);
-    createAlarm(updateRequestsHandler, appProps.errorNotificationSnsTopicArn, appProps.dlqBucketName, stack);
+    createAlarm(updateRequestsHandler, appProps.errorNotificationSnsTopicArn, appProps.sqsDlqBucketName, stack);
 }
 
 function createLambdaRoleWithWriteToSqsAndS3Policy(stack: Construct, sqsArn: string, sqsExtendedMessageBucketArn: string) {

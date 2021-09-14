@@ -1,7 +1,6 @@
 import {uploadToS3} from "digitraffic-common/stack/s3-utils";
-
-export const BUCKET_NAME = 'BUCKET_NAME';
-const bucketName = process.env[BUCKET_NAME] as string;
+import {MaintenanceTrackingEnvKeys} from "../../keys";
+const bucketName = process.env[MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME] as string;
 
 export const handler = async (event: any): Promise<any> => {
     const iso = new Date().toISOString();
