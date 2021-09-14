@@ -36,6 +36,9 @@ export function handlerFn(
             }
 
             const visMessage = JSON.parse(event.Records[0].body) as VisMessageWithCallbackEndpoint;
+
+            console.info(`method=vpgwUploadVoyagePlan received RTZ ${visMessage.message}`);
+
             let voyagePlan: RtzVoyagePlan;
             try {
                 const parseXml = util.promisify(xml2js.parseString);
