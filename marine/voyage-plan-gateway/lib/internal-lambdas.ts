@@ -16,6 +16,8 @@ import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
+import {Rule, Schedule} from "@aws-cdk/aws-events";
+import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 
 export function create(
     secret: ISecret,
@@ -40,17 +42,29 @@ export function create(
     const sendRouteQueue = new Queue(stack, sendRouteQueueName, {
         queueName: sendRouteQueueName,
         visibilityTimeout: Duration.seconds(60),
-        fifo: true, // prevent sending route plans twice,
+        fifo: true, // prevent sending route plans twice
         deadLetterQueue: {
             maxReceiveCount: 3,
             queue: dlq
         }
     });
 
-    createProcessVisMessagesLambda(secret, notifyTopic, sendRouteQueue, props, stack);
+    const processVisMessagesLambda = createProcessVisMessagesLambda(secret, notifyTopic, sendRouteQueue, props, stack);
+    const scheduler = createProcessVisMessagesScheduler(stack);
+    scheduler.addTarget(new LambdaFunction(processVisMessagesLambda));
+
     createUploadVoyagePlanLambda(secret, sendRouteQueue, vpc, props, stack);
     createProcessDLQLambda(dlqBucket, dlq, props, stack);
+
     addDLQAlarm(dlq, props, stack);
+}
+
+function createProcessVisMessagesScheduler(stack: Stack): Rule {
+    const ruleName = 'VPGW-ProcessVisMessagesScheduler'
+    return new Rule(stack, ruleName, {
+        ruleName,
+        schedule: Schedule.expression('cron(*/1 * * * ? *)') // every 1 minutes
+    });
 }
 
 function createProcessVisMessagesLambda(
@@ -76,6 +90,8 @@ function createProcessVisMessagesLambda(
     notifyTopic.addSubscription(new LambdaSubscription(lambda));
     sendRouteQueue.grantSendMessages(lambda);
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+
+    return lambda;
 }
 
 // ATTENTION!
@@ -101,7 +117,9 @@ function createUploadVoyagePlanLambda(
     });
     const lambda = new Function(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
-    lambda.addEventSource(new SqsEventSource(sendRouteQueue));
+    lambda.addEventSource(new SqsEventSource(sendRouteQueue, {
+        batchSize: 1
+    }));
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
 

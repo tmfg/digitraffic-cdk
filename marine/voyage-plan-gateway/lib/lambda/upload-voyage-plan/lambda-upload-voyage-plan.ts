@@ -16,10 +16,10 @@ export type SnsEvent = {
 }
 
 type VoyagePlanSecrets = {
-    readonly 'vpgw.vtsUrl': string
+    readonly 'vpgw.vtsUrl'?: string
 }
 
-let api: VtsApi
+let api: VtsApi | null = null
 
 /**
  * XML parsing and validation errors do not throw an error. This is to remove invalid messages from the queue.
@@ -57,15 +57,19 @@ export function handlerFn(
                 return Promise.resolve('XML content was not valid');
             }
 
-            if (!api) {
+            if (!api && secret["vpgw.vtsUrl"]) {
                 api = new VtsApiClass(secret["vpgw.vtsUrl"]);
             }
 
-            console.info('method=uploadVoyagePlan about to upload voyage plan to VTS');
-            await api.sendVoyagePlan(visMessage.message);
-            console.info('method=uploadVoyagePlan upload to VTS ok');
+            if (api) {
+                console.info('method=uploadVoyagePlan about to upload voyage plan to VTS');
+                await api.sendVoyagePlan(visMessage.message);
+                console.info('method=uploadVoyagePlan upload to VTS ok');
+            } else {
+                console.info('method=uploadVoyagePlan No VTS API, voyage plan not sent')
+            }
 
-            return Promise.resolve('Voyage plan sent');
+            return Promise.resolve('Voyage plan processed');
         });
     };
 }

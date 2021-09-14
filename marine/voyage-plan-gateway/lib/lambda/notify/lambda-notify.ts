@@ -55,17 +55,14 @@ export function handlerFn(sns: SNS): (e: NotifyEventWrapper) => Promise<any> {
         if (event.MessageWaiting > 50) {
             console.warn('method=vpgwVisNotify More than 50 messages waiting, processing messages anyway');
         }
-        if (event.MessageWaiting > 100) {
-            console.error('method=vpgwVisNotify More than 100 messages waiting, not processing any more messages');
-            return Promise.reject('Too many messages waiting');
-        }
 
         // trigger a Lambda invocation per message
+        /*
         await sns.publish({
             TopicArn: topicArn,
             Message: 'EMPTY' // a non-empty message is needed
         }).promise();
-
+*/
         return {
             statusCode: '204'
         };
