@@ -1,5 +1,5 @@
 import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/shiplist-public';
-import {inDatabase} from 'digitraffic-common/postgres/database';
+import {inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import moment, {Moment} from 'moment-timezone';
 import * as R from 'ramda';
@@ -22,7 +22,7 @@ export async function handlerFn(
         if (!event.queryStringParameters.locode) {
             return Promise.resolve({statusCode: 400, body: 'Missing locode'});
         }
-        return inDatabase(async (db: IDatabase<any, any>) => {
+        return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
             const dbShiplist =
                 (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
                     .map(ts => Object.assign(ts, {

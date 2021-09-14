@@ -1,4 +1,5 @@
 import {IDatabase, ITask} from "pg-promise";
+import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 const pgp = require('pg-promise')();
 
 // convert numeric types to number instead of string
@@ -42,10 +43,21 @@ export async function inTransaction (
 
 export async function inDatabase(
     fn: (db: IDatabase<any, any>) => any): Promise<any> {
+    return doInDatabase(false, fn);
+}
+
+export async function inDatabaseReadonly(
+    fn: (db: IDatabase<any, any>) => any): Promise<any> {
+    return doInDatabase(true, fn);
+}
+
+async function doInDatabase(
+    readonly: boolean,
+    fn: (db: IDatabase<any, any>) => any): Promise<any> {
     const db = initDbConnection(
-        process.env.DB_USER as string,
-        process.env.DB_PASS as string,
-        process.env.DB_URI as string
+        process.env[DatabaseEnvironmentKeys.DB_USER] as string,
+        process.env[DatabaseEnvironmentKeys.DB_PASS] as string,
+        (readonly ? process.env[DatabaseEnvironmentKeys.DB_RO_URI] : process.env[DatabaseEnvironmentKeys.DB_URI]) as string
     );
     try {
         // deallocate all prepared statements to allow for connection pooling

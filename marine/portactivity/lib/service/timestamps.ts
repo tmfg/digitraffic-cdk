@@ -1,6 +1,6 @@
 import * as TimestampsDB from '../db/timestamps'
 import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps'
-import {inDatabase} from 'digitraffic-common/postgres/database';
+import {inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {IDatabase} from 'pg-promise';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
@@ -100,7 +100,7 @@ export async function findAllTimestamps(
     source?: string
 ): Promise<ApiTimestamp[]> {
     const start = Date.now();
-    const timestamps: ApiTimestamp[] = await inDatabase(async (db: IDatabase<any, any>) => {
+    const timestamps: ApiTimestamp[] = await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
         if (locode) {
             return TimestampsDB.findByLocode(db, locode!!);
         } else if (mmsi && !imo) {
@@ -137,11 +137,10 @@ export async function findAllTimestamps(
 }
 
 export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
-
     console.info(`method=findETAShipsByLocode find for ${ports}`);
 
     const startFindPortnetETAsByLocodes = Date.now();
-    const portnetShips = await inDatabase(async (db: IDatabase<any, any>) => {
+    const portnetShips = await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
         return TimestampsDB.findPortnetETAsByLocodes(db, ports);
     }).finally(() => {
         console.info('method=findPortnetETAsByLocodes tookMs=%d', (Date.now() - startFindPortnetETAsByLocodes));
@@ -149,7 +148,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
 
     if (portnetShips.length) {
         const startFindVtsShipsTooCloseToPort = Date.now();
-        return await inDatabase(async (db: IDatabase<any, any>) => {
+        return await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
             const shipsTooCloseToPortImos =
                 (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(
                     db,

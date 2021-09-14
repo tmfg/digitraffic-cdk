@@ -4,12 +4,21 @@ export interface DbSecret {
     readonly username: string
     readonly password: string
     readonly host: string
+    readonly ro_host: string;
+}
+
+export enum DatabaseEnvironmentKeys {
+    DB_USER = "DB_USER",
+    DB_PASS = "DB_PASS",
+    DB_URI = "DB_URI",
+    DB_RO_URI = "DB_RO_URI"
 }
 
 function setDbSecret(secret: DbSecret) {
-    process.env.DB_USER = secret.username;
-    process.env.DB_PASS = secret.password;
-    process.env.DB_URI = secret.host;
+    process.env[DatabaseEnvironmentKeys.DB_USER] = secret.username;
+    process.env[DatabaseEnvironmentKeys.DB_PASS] = secret.password;
+    process.env[DatabaseEnvironmentKeys.DB_URI] = secret.host;
+    process.env[DatabaseEnvironmentKeys.DB_RO_URI] = secret.ro_host;
 }
 
 // cached at Lambda container level
