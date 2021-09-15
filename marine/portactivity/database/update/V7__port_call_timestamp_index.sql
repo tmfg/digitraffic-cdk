@@ -1,0 +1,1 @@
+create index if not exists port_call_timestamp_portnet_eta_idx on port_call_timestamp(portcall_id, record_time, location_locode) where event_type = 'ETA' and event_source = 'Portnet';
