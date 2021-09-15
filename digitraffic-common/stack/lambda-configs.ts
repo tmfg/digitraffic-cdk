@@ -44,7 +44,7 @@ export function dbLambdaConfiguration(
         code: config.code,
         role: config.role,
         handler: config.handler,
-        timeout: Duration.seconds(props.defaultLambdaDurationSeconds || 60),
+        timeout: Duration.seconds(config.timeout || props.defaultLambdaDurationSeconds || 60),
         environment: config.environment || {
             DB_USER: props.dbProps?.username,
             DB_PASS: props.dbProps?.password,
