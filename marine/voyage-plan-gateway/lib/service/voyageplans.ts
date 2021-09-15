@@ -40,7 +40,6 @@ export enum ValidationError {
     // schedules
     MISSING_SCHEDULES = 'Missing route schedules',
     MISSING_SCHEDULE = 'Missing schedule element',
-    MISSING_MANUAL = 'Missing manual element',
     MISSING_SCHEDULE_ELEMENT = 'Missing scheduleElement element',
     NO_SCHEDULE_ELEMENT_ATTRIBUTES = 'No attributes in scheduleElement',
     NO_ETA_OR_ETD_ATTRIBUTES = 'No ETA or ETD attribute in scheduleElement',
@@ -115,25 +114,40 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
             return;
         }
         scheds.schedule.forEach(sched => {
-            if (!sched.manual || !sched.manual.length) {
-                validationErrors.push(ValidationError.MISSING_MANUAL);
-                return;
-            }
-            sched.manual.forEach(s => {
-                if (!s.scheduleElement || !s.scheduleElement.length) {
-                    validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
-                    return;
-                }
-                s.scheduleElement.forEach(se => {
-                    if (!se.$) {
-                        validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
+            if (sched.manual && sched.manual.length) {
+                sched.manual.forEach(s => {
+                    if (!s.scheduleElement || !s.scheduleElement.length) {
+                        validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
                     }
-                    if (!se.$.eta && !se.$.etd) {
-                        validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
-                    }
+                    s.scheduleElement.forEach(se => {
+                        if (!se.$) {
+                            validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
+                            return;
+                        }
+                        if (!se.$.eta && !se.$.etd) {
+                            validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
+                        }
+                    });
                 });
-            });
+            }
+            if (sched.calculated && sched.calculated.length) {
+                sched.calculated.forEach(s => {
+                    if (!s.scheduleElement || !s.scheduleElement.length) {
+                        validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
+                        return;
+                    }
+                    s.scheduleElement.forEach(se => {
+                        if (!se.$) {
+                            validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
+                            return;
+                        }
+                        if (!se.$.eta && !se.$.etd) {
+                            validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
+                        }
+                    });
+                });
+            }
         });
     });
 
@@ -171,7 +185,8 @@ export function validateSchedulesContent(rtzSchedules: RtzSchedules[]): Validati
 
     rtzSchedules.forEach(schedules => {
         schedules.schedule.forEach(sched => {
-            sched.manual.forEach(s => {
+            // TODO for calculated
+            sched.manual?.forEach(s => {
                 s.scheduleElement.forEach(se => {
                     if (se.$.eta) {
                         const eta = moment(se.$.eta);

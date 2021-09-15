@@ -31,7 +31,8 @@ export type RtzSchedule = {
 }
 
 export type RtzScheduleWrapper = {
-    readonly manual: RtzSchedule[]
+    readonly manual?: RtzSchedule[]
+    readonly calculated?: RtzSchedule[]
 }
 
 export type RtzSchedules = {
