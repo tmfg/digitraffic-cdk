@@ -157,17 +157,6 @@ describe('voyageplans service', () => {
         expect(validationErrors[0]).toBe(ValidationError.MISSING_SCHEDULE);
     });
 
-    test('validateSchedulesStructure - missing manual element', () => {
-        const validationErrors = VoyagePlansService.validateSchedulesStructure([{
-            schedule: [{
-                manual: randomBoolean() ? undefined! : []
-            }]
-        }]);
-
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_MANUAL);
-    });
-
     test('validateSchedulesStructure - missing scheduleElement element', () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure([{
             schedule: [{
@@ -244,27 +233,6 @@ describe('voyageplans service', () => {
         }]);
 
         expect(validationErrors.length).toBe(0);
-    });
-
-    test('validateSchedulesStructure - multiple errors', () => {
-        const validationErrors = VoyagePlansService.validateSchedulesStructure([{
-            schedule: [{
-                manual: [{
-                    scheduleElement: [{
-                        $: {
-                            eta: undefined,
-                            etd: undefined
-                        }
-                    }]
-                }]
-            }, {
-                manual: undefined!
-            }]
-        }]);
-
-        expect(validationErrors.length).toBe(2);
-        expect(validationErrors[0]).toBe(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
-        expect(validationErrors[1]).toBe(ValidationError.MISSING_MANUAL);
     });
 
     test('validateStructure - ok', () => {
