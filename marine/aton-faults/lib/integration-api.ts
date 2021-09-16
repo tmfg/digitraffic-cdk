@@ -1,4 +1,4 @@
-import {GatewayResponse, Model, PassthroughBehavior, Resource, ResponseType, RestApi} from '@aws-cdk/aws-apigateway';
+import {Model, PassthroughBehavior, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
@@ -7,13 +7,15 @@ import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createRestApi, setReturnCodeForMissingAuthenticationToken} from "digitraffic-common/api/rest_apis";
 import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {KEY_SECRET_ID, KEY_SEND_FAULT_SNS_TOPIC_ARN} from "./lambda/upload-voyage-plan/lambda-upload-voyage-plan";
 import {AtonProps} from "./app-props";
 import {defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {AtonEnvKeys} from "./keys";
 
 export function create(
     secret: ISecret,
@@ -29,7 +31,7 @@ export function create(
         'ATON Faults integration API');
 
     // set response for missing auth token to 501 as desired by API registrar
-    setReturnCodeForMissingAuthenticationToken(501, 'Not implemented', integrationApi, stack);
+    //setReturnCodeForMissingAuthenticationToken(501, 'Not implemented', integrationApi, stack);
 
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
@@ -106,9 +108,11 @@ function createHandler(
     props: AtonProps,
 ): Function {
     const functionName = 'ATON-UploadVoyagePlan';
-    const environment: any = {};
-    environment[KEY_SECRET_ID] = props.secretId;
-    environment[KEY_SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
+    const environment: LambdaEnvironment = {};
+    environment[AtonEnvKeys.SECRET_ID] = props.secretId;
+    environment[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'ATON';
+
     const handler = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName,
         code: new AssetCode('dist/lambda/upload-voyage-plan'),

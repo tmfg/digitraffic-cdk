@@ -1,6 +1,6 @@
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as FaultsDB from "../db/faults"
-import {inDatabase} from "digitraffic-common/postgres/database";
+import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
@@ -41,7 +41,7 @@ const PRODUCTION_AGENCY = {
 const NAME_OF_SERIES = 'Finnish ATON Faults';
 
 export async function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
-    return await inDatabase(async (db: IDatabase<any,any>) => {
+    return await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
         const features = await FaultsDB.findAll(db, language, fixedInHours, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
@@ -52,7 +52,7 @@ export async function findAllFaults(language: Language, fixedInHours: number): P
 export async function getFaultS124ById(faultId: number): Promise<string> {
     const start = Date.now();
 
-    const fault = await inDatabase(async (db: IDatabase<any,any>) => {
+    const fault = await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
         return await FaultsDB.getFaultById(db, faultId);
     });
 
@@ -69,7 +69,7 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
         new LineString(voyagePlan.route.waypoints
             .flatMap(w => w.waypoint.flatMap( wp => wp.position))
             .map(p => new Point(p.$.lon, p.$.lat)));
-    const faultIds = await inDatabase(async (db: IDatabase<any,any>) => {
+    const faultIds = await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
         return FaultsDB.findFaultIdsByRoute(db, voyageLineString);
     });
     console.info("method=findFaultIdsForVoyagePlan tookMs=%d count=%d", Date.now() - start, faultIds.length);

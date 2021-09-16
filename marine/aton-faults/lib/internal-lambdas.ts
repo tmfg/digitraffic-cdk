@@ -8,13 +8,10 @@ import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
-import {
-    KEY_SECRET_ID,
-    KEY_CLIENT_CERTIFICATE_SECRETKEY,
-    KEY_PRIVATE_KEY_SECRETKEY, KEY_CA_SECRETKEY
-} from "./lambda/send-fault/lambda-send-fault";
-import {KEY_SECRET_ID as KEY_SECRET_ID_AF, KEY_INTEGRATIONS} from "./lambda/update-faults/lambda-update-faults";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {AtonEnvKeys} from "./keys";
 
 export function create(
     secret: ISecret,
@@ -35,9 +32,11 @@ function createUpdateFaultsLambda(
     props: AtonProps,
     stack: Stack) {
 
-    const environment: any = {};
-    environment[KEY_SECRET_ID_AF] = props.secretId;
-    environment[KEY_INTEGRATIONS] = JSON.stringify(props.integrations);
+    const environment: LambdaEnvironment = {};
+    environment[AtonEnvKeys.SECRET_ID] = props.secretId;
+    environment[AtonEnvKeys.INTEGRATIONS] = JSON.stringify(props.integrations);
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'ATON';
+
     const functionName = "ATON-UpdateFaults";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         memorySize: 512,
@@ -64,11 +63,13 @@ function createSendFaultLambda(
     stack: Stack) {
 
     const functionName = "ATON-SendFault";
-    const environment = {} as any;
-    environment[KEY_SECRET_ID] = props.secretId;
-    environment[KEY_CLIENT_CERTIFICATE_SECRETKEY] = props.clientCertificateSecretKey;
-    environment[KEY_PRIVATE_KEY_SECRETKEY] = props.privateKeySecretKey;
-    environment[KEY_CA_SECRETKEY] = props.caSecretKey;
+    const environment: LambdaEnvironment = {};
+    environment[AtonEnvKeys.SECRET_ID] = props.secretId;
+    environment[AtonEnvKeys.CLIENT_CERTIFICATE_SECRETKEY] = props.clientCertificateSecretKey;
+    environment[AtonEnvKeys.PRIVATE_KEY_SECRETKEY] = props.privateKeySecretKey;
+    environment[AtonEnvKeys.CA_SECRETKEY] = props.caSecretKey;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'ATON';
+
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         memorySize: 256,
         functionName: functionName,

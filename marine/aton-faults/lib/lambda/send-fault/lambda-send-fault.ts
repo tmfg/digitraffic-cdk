@@ -2,20 +2,16 @@ import {SNSEvent} from "aws-lambda";
 import {getFaultS124ById} from "../../service/faults";
 import {sendFault} from "../../service/fault-sender";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {AtonEnvKeys} from "../../keys";
 
 let clientCertificate: string;
 let privateKey: string;
 let caCert: string;
 
-export const KEY_SECRET_ID = 'SECRET_ID'
-export const KEY_CA_SECRETKEY = 'CA_SECRETKEY'
-export const KEY_CLIENT_CERTIFICATE_SECRETKEY = 'CLIENT_CERTIFICATE_SECRETKEY'
-export const KEY_PRIVATE_KEY_SECRETKEY = 'PRIVATE_KEY_SECRETKEY'
-
-const secretId = process.env[KEY_SECRET_ID] as string;
-const caSecretKey = process.env[KEY_CA_SECRETKEY] as string;
-const clientCertificateSecretKey = process.env[KEY_CLIENT_CERTIFICATE_SECRETKEY] as string;
-const privateKeySecretKey = process.env[KEY_PRIVATE_KEY_SECRETKEY] as string;
+const secretId = process.env[AtonEnvKeys.SECRET_ID] as string;
+const caSecretKey = process.env[AtonEnvKeys.CA_SECRETKEY] as string;
+const clientCertificateSecretKey = process.env[AtonEnvKeys.CLIENT_CERTIFICATE_SECRETKEY] as string;
+const privateKeySecretKey = process.env[AtonEnvKeys.PRIVATE_KEY_SECRETKEY] as string;
 
 export interface SendFaultEvent {
     /**

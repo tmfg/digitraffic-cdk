@@ -2,12 +2,10 @@ import {getFaults} from "../../api/faults";
 import {saveFaults} from "../../service/faults";
 import {Integration} from "../../app-props";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {AtonEnvKeys} from "../../keys";
 
-export const KEY_SECRET_ID = 'SECRET_ID';
-export const KEY_INTEGRATIONS = 'INTEGRATIONS';
-
-const secretId = process.env[KEY_SECRET_ID] as string;
-const envValue = process.env[KEY_INTEGRATIONS] as string;
+const secretId = process.env[AtonEnvKeys.SECRET_ID] as string;
+const envValue = process.env[AtonEnvKeys.INTEGRATIONS] as string;
 const integrations = envValue ? JSON.parse(envValue) as Integration[] : [];
 
 export const handler = async () : Promise <any> => {

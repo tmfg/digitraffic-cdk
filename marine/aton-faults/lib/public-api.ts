@@ -8,15 +8,17 @@ import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
-import {addServiceModel, addSimpleServiceModel, getModelReference} from "digitraffic-common/api/utils";
+import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {AtonProps} from "./app-props";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/api/documentation";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
 import {MediaType} from "digitraffic-common/api/mediatypes";
-import {KEY_SECRET_ID} from "./lambda/get-faults/lambda-get-faults";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {AtonEnvKeys} from "./keys";
 
 export function create(
     secret: ISecret,
@@ -47,8 +49,10 @@ function createAnnotationsResource(
     const functionName = 'ATON-GetFaults';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const assetCode = new AssetCode('dist/lambda/get-faults');
-    const environment: any = {};
-    environment[KEY_SECRET_ID] = props.secretId;
+    const environment: LambdaEnvironment = {};
+    environment[AtonEnvKeys.SECRET_ID] = props.secretId;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'ATON';
+
     const getFaultsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         environment,
         functionName: functionName,

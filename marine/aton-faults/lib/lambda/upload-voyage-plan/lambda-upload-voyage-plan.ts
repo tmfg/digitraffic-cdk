@@ -5,6 +5,7 @@ import * as FaultsService from "../../service/faults";
 import {SNS} from "aws-sdk";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
+import {AtonEnvKeys} from "../../keys";
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
@@ -23,11 +24,8 @@ export interface UploadVoyagePlanEvent {
     readonly voyagePlan: string
 }
 
-export const KEY_SECRET_ID = 'SECRET_ID';
-export const KEY_SEND_FAULT_SNS_TOPIC_ARN = 'SEND_FAULT_SNS_TOPIC_ARN';
-
-const secretId = process.env[KEY_SECRET_ID] as string;
-const sendFaultSnsTopicArn = process.env[KEY_SEND_FAULT_SNS_TOPIC_ARN] as string;
+const secretId = process.env[AtonEnvKeys.SECRET_ID] as string;
+const sendFaultSnsTopicArn = process.env[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] as string;
 
 export function handlerFn(
     sns: SNS,
