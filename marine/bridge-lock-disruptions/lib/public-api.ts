@@ -16,6 +16,7 @@ import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 
 export function create(
     vpc: IVpc,
