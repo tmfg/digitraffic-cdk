@@ -1,7 +1,7 @@
-import {DbPublicShiplist, findByLocodePublicShiplist} from '../../db/shiplist-public';
-import {inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
+import {findByLocodePublicShiplist} from '../../db/shiplist-public';
+import {inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {IDatabase} from 'pg-promise';
-import moment, {Moment} from 'moment-timezone';
+import moment from 'moment-timezone';
 import * as R from 'ramda';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";

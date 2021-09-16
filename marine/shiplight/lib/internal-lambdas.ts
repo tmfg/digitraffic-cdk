@@ -8,6 +8,8 @@ import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {ShiplightEnvKeys} from "./keys";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 
 export function create(
     secret: ISecret,
@@ -36,8 +38,9 @@ function createUpdateLightsLambda(
     props: Props,
     stack: Stack): Function {
 
-    const environment: any = {};
+    const environment: LambdaEnvironment = {};
     environment[ShiplightEnvKeys.SECRET_ID] = props.secretId;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'Shiplight';
 
     const functionName = 'Shiplight-UpdateLights';
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {

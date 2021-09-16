@@ -10,6 +10,8 @@ import {MobileServerProps} from "./app-props";
 import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {MarinecamEnvKeys} from "./keys";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 
 export function create(
     secret: ISecret,
@@ -25,9 +27,10 @@ export function create(
 }
 
 function createUpdateImagesLambda(secret: ISecret, vpc: IVpc, lambdaDbSg: ISecurityGroup, props: MobileServerProps, stack: Construct, bucket: Bucket) {
-    const environment: any = {};
+    const environment: LambdaEnvironment = {};
     environment[MarinecamEnvKeys.SECRET_ID] = props.secretId;
     environment[MarinecamEnvKeys.BUCKET_NAME] = bucket.bucketName;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'Marinecam';
 
     const functionName = "Marinecam-UpdateImages";
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {

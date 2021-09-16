@@ -26,6 +26,8 @@ import {addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
 import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 
 export function create(
     secret: ISecret,
@@ -161,8 +163,9 @@ function createGetImageResource(resources: any, props: MobileServerProps, bucket
 
 function createListCamerasLambda(stack: Construct, vpc: IVpc, lambdaDbSg: ISecurityGroup, props: MobileServerProps): Function {
     const functionName = 'Marinecam-ListCameras';
-    const environment = {} as any;
+    const environment: LambdaEnvironment = {};
     environment[MarinecamEnvKeys.SECRET_ID] = props.secretId;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'Marinecam';
 
     return new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName,
@@ -175,7 +178,7 @@ function createListCamerasLambda(stack: Construct, vpc: IVpc, lambdaDbSg: ISecur
 
 function createLambdaAuthorizer(stack: Construct, userPool: UserPool, userPoolClient: UserPoolClient): RequestAuthorizer {
     const functionName = 'Marinecam-Authorizer';
-    const environment = {} as any;
+    const environment: LambdaEnvironment = {};
     environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;
     environment[MarinecamEnvKeys.POOLCLIENT_ID] = userPoolClient.userPoolClientId;
 

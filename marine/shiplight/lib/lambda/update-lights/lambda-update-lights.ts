@@ -13,14 +13,14 @@ export async function handlerFn(
     return doWithSecret(secretId, async (secret: any) => {
         const areas = await AreaTrafficService.getAreaTraffic();
 
-        console.info("method=shiplightHandler count=%d", areas.length);
-
         for (const area of areas) {
+            console.info("method=shiplightHandler sourceId=%d", area.areaId);
+
             try {
                 await updateLightsForAreaFn(area, secret[ShiplightSecretKeys.API_KEY], secret[ShiplightSecretKeys.ENDPOINT_URL]);
                 await AreaTrafficService.updateAreaTrafficSendTime(area.areaId);
             } catch(e) {
-                console.log("update failed with " + JSON.stringify(e));
+                console.log("method=shiplightHandler failed:" + JSON.stringify(e));
             }
         }
     });

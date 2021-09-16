@@ -1,5 +1,5 @@
 import {IDatabase} from "pg-promise";
-import {inDatabase} from "digitraffic-common/postgres/database";
+import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import * as AreaTrafficDb from '../db/areatraffic';
 import {AreaTraffic} from "../model/areatraffic";
 import {DbAreaTraffic} from "../db/areatraffic";
@@ -14,10 +14,12 @@ export async function updateAreaTrafficSendTime(areaId: number) {
 const BRIGHTEN_OVERLAP_INTERVAL_MILLIS = 60 * 1000; // one minute
 
 export function getAreaTraffic(): Promise<AreaTraffic[]> {
-    return inDatabase(async (db: IDatabase<any, any>) => {
+    return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
         const areas = await AreaTrafficDb.getAreaTraffic(db);
 
         console.info("method=getAreaTraffic count=%d", areas.length);
+
+        areas.forEach(area => console.info("method=getAreaTraffic sourceId=%d", area.id));
 
         return areas
             .filter(needToBrighten)
@@ -29,7 +31,7 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
 }
 
 export function needToBrighten(area: DbAreaTraffic): boolean {
-    // if lights have never been brightened or brighting has already ended(calculated with a bit of overlap)
+    // if lights have never been brightened or brightening has already ended(calculated with a bit of overlap)
     return area.brighten_end == null || isEndTimeBeforeNow(area.brighten_end.getTime());
 }
 
