@@ -15,6 +15,7 @@ import {addTags} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 export function create(
     vpc: IVpc,
@@ -48,14 +49,16 @@ function createDisruptionsResource(
     const functionName = 'BridgeLockDisruption-GetDisruptions';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const assetCode = new AssetCode('dist/lambda/get-disruptions');
+    const environment: LambdaEnvironment = {};
+    environment["SECRET_ID"] = props.secretId;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = "BridgeLockDisruption";
+
     const getDisruptionsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-disruptions.handler',
         readOnly: false,
-        environment: {
-            SECRET_ID: props.secretId
-        }
+        environment
     }));
 
     secret.grantRead(getDisruptionsLambda);

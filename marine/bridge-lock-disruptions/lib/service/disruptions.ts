@@ -1,6 +1,6 @@
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as DisruptionsDB from "../db/disruptions"
-import {inDatabase} from "digitraffic-common/postgres/database";
+import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
@@ -17,7 +17,7 @@ const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
 
 export async function findAllDisruptions(): Promise<FeatureCollection> {
     const start = Date.now();
-    return await inDatabase(async (db: IDatabase<any, any>) => {
+    return await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
         const disruptions = await DisruptionsDB.findAll(db);
         const disruptionsFeatures = disruptions.map(convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE);

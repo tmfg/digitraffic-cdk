@@ -7,6 +7,8 @@ import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Props} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 
 export function create(
     vpc: IVpc,
@@ -16,13 +18,15 @@ export function create(
     stack: Stack): Function {
 
     const functionName = "BridgeLockDisruption-UpdateDisruptions";
+    const environment: LambdaEnvironment = {};
+    environment["SECRET_ID"] = props.secretId;
+    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = "BridgeLockDisruption";
+
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-disruptions'),
         handler: 'lambda-update-disruptions.handler',
-        environment: {
-            SECRET_ID: props.secretId
-        }
+        environment
     });
 
     const updateDisruptionsLambda = new Function(stack, 'UpdateDisruptions', lambdaConf);
