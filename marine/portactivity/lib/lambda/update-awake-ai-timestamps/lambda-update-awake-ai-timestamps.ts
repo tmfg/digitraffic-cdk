@@ -1,6 +1,6 @@
 import {ports} from '../../service/portareas';
 import * as TimestampService from '../../service/timestamps';
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretOptions, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {AwakeAiService} from "../../service/awake_ai";
 import {AwakeAiApi} from "../../api/awake_ai";
@@ -16,7 +16,7 @@ let service: AwakeAiService;
 const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
 export function handlerFn(
-    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>, expectedKeys: string[]) => Promise<any>,
+    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>, options: SecretOptions) => Promise<any>,
     AwakeAiServiceClass: new (api: AwakeAiApi) => AwakeAiService
 ): () => Promise<any> {
 
@@ -37,7 +37,7 @@ export function handlerFn(
             console.info(`method=updateAwakeAiTimestampsLambda received timestamps for ${timestamps.length} ships`);
 
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
-        }, expectedKeys);
+        }, {expectedKeys});
     };
 }
 

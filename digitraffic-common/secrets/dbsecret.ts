@@ -1,4 +1,4 @@
-import {withSecret} from "./secret";
+import {withSecret, withSecretAndPrefix} from "./secret";
 
 export interface DbSecret {
     readonly username: string
@@ -27,21 +27,39 @@ let cachedSecret: any;
 
 const missingSecretErrorText = 'Missing or empty secretId';
 
-export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, expectedKeys?: string[]): Promise<T> {
+export type SecretOptions = {
+    readonly expectedKeys?: string[],
+    readonly prefix?: string
+}
+
+export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, options?: SecretOptions): Promise<T> {
     if (!secretId) {
         console.error(missingSecretErrorText);
         return Promise.reject(missingSecretErrorText);
     }
 
     if (!cachedSecret) {
-        await withSecret(secretId, (fetchedSecret: any) => {
-            setDbSecret(fetchedSecret);
-            cachedSecret = fetchedSecret;
-        });
+        // if prefix is given, first set db values and then fetch secret
+        if(options?.prefix) {
+            // first set db values
+            await withSecret(secretId, (fetchedSecret: any) => {
+                setDbSecret(fetchedSecret);
+            });
+
+            // then actual secret
+            await withSecretAndPrefix(secretId, options.prefix, (fetchedSecret: any) => {
+                cachedSecret = fetchedSecret;
+            });
+        } else {
+            await withSecret(secretId, (fetchedSecret: any) => {
+                setDbSecret(fetchedSecret);
+                cachedSecret = fetchedSecret;
+            });
+        }
     }
     try {
-        if (expectedKeys?.length) {
-            checkExpectedSecretKeys(expectedKeys, cachedSecret);
+        if (options?.expectedKeys?.length) {
+            checkExpectedSecretKeys(options.expectedKeys, cachedSecret);
         }
         return fn(cachedSecret);
     } catch (error) {
