@@ -5,6 +5,7 @@ import {newFault} from "../testdata";
 import * as sinon from 'sinon';
 import {SNSEvent} from "aws-lambda";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;
@@ -28,8 +29,8 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
                 faultId: fault.id,
                 callbackEndpoint: `http://localhost:${SERVER_PORT}/area`
             };
-            const withSecret = () => {
-            };
+            const withSecret: SecretFunction = (secretId: any, fn: any, options: any) => Promise.resolve({
+            });
             server.listen(SERVER_PORT, {
                 "/area": (url: string | undefined, data: string | undefined) => {
                     receivedData = data;

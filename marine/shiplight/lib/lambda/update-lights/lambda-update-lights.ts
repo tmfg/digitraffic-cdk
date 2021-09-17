@@ -1,6 +1,6 @@
 import * as AreaTrafficService from '../../service/areatraffic';
-import {ShiplightEnvKeys, ShiplightSecretKeys} from "../../keys";
-import {SecretOptions, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {ShiplightEnvKeys} from "../../keys";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {AreaTraffic} from "../../model/areatraffic";
 import {updateLightsForArea} from "../../api/arealights";
 
@@ -12,7 +12,7 @@ type ShiplightSecret = {
 }
 
 export async function handlerFn(
-    doWithSecret: (secretId: string, fn: (secret: any) => any, options: SecretOptions) => any,
+    doWithSecret: SecretFunction,
     updateLightsForAreaFn: (area: AreaTraffic, apiKey: string, endpointUrl: string) => any
 ) {
     return doWithSecret(secretId, async (secret: ShiplightSecret) => {
@@ -34,7 +34,7 @@ export async function handlerFn(
 }
 
 export const handler = async (): Promise<any> => {
-    return handlerFn(withDbSecret, updateLightsDebug);
+    return handlerFn(withDbSecret, updateLightsForArea);
 };
 
 async function updateLightsDebug(areaTraffic: AreaTraffic, apiKey: string, endpointUrl: string): Promise<any> {

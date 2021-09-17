@@ -1,7 +1,7 @@
 import {SNSEvent} from "aws-lambda";
 import {getFaultS124ById} from "../../service/faults";
 import {sendFault} from "../../service/fault-sender";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {AtonEnvKeys} from "../../keys";
 
 let clientCertificate: string;
@@ -9,9 +9,6 @@ let privateKey: string;
 let caCert: string;
 
 const secretId = process.env[AtonEnvKeys.SECRET_ID] as string;
-const caSecretKey = process.env[AtonEnvKeys.CA_SECRETKEY] as string;
-const clientCertificateSecretKey = process.env[AtonEnvKeys.CLIENT_CERTIFICATE_SECRETKEY] as string;
-const privateKeySecretKey = process.env[AtonEnvKeys.PRIVATE_KEY_SECRETKEY] as string;
 
 export interface SendFaultEvent {
     /**
@@ -25,17 +22,25 @@ export interface SendFaultEvent {
     readonly faultId: number
 }
 
+type AtonSecret = {
+    readonly certificate: string,
+    readonly privatekey: string,
+    readonly ca: string
+}
+
 /**
  * This handler should only receive and send a single fault
  */
-export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => any) => any) {
+export function handlerFn(doWithSecret: SecretFunction) {
     return async (event: SNSEvent): Promise<void> => {
         if (!clientCertificate || !privateKey) {
-            await doWithSecret(secretId, (secret: any) => {
+            await doWithSecret(secretId, (secret: AtonSecret) => {
                 // certificates are stored as base64 to prevent Secrets Manager from stripping line breaks
-                clientCertificate = decodeBase64(secret[clientCertificateSecretKey]);
-                privateKey = decodeBase64(secret[privateKeySecretKey]);
-                caCert = decodeBase64(secret[caSecretKey]);
+                clientCertificate = decodeBase64(secret.certificate);
+                privateKey = decodeBase64(secret.privatekey);
+                caCert = decodeBase64(secret.ca);
+            }, {
+                prefix: 'aton'
             });
         }
         const snsEvent = JSON.parse(event.Records[0].Sns.Message) as SendFaultEvent;

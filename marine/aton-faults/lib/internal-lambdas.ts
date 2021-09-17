@@ -65,9 +65,6 @@ function createSendFaultLambda(
     const functionName = "ATON-SendFault";
     const environment: LambdaEnvironment = {};
     environment[AtonEnvKeys.SECRET_ID] = props.secretId;
-    environment[AtonEnvKeys.CLIENT_CERTIFICATE_SECRETKEY] = props.clientCertificateSecretKey;
-    environment[AtonEnvKeys.PRIVATE_KEY_SECRETKEY] = props.privateKeySecretKey;
-    environment[AtonEnvKeys.CA_SECRETKEY] = props.caSecretKey;
     environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'ATON';
 
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {

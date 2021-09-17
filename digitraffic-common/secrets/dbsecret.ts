@@ -32,6 +32,8 @@ export type SecretOptions = {
     readonly prefix?: string
 }
 
+export type SecretFunction = (secretId: string, fn: (secret: any) => any, options: SecretOptions) => Promise<any>;
+
 export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, options?: SecretOptions): Promise<T> {
     if (!secretId) {
         console.error(missingSecretErrorText);
