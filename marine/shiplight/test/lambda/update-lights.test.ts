@@ -4,13 +4,14 @@ import {assertArea, dbTestBase, insertAreaTraffic, insertVessel, insertVesselLoc
 import {createSecretFunction} from "digitraffic-common/test/secret";
 import {ShipTypes} from "../../lib/db/areatraffic";
 import {updateLightsForArea} from "../../lib/api/arealights";
-import {ShiplightSecretKeys} from "../../lib/keys";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {ShiplightSecret} from "../../lib/model/shiplight-secret";
 
 const PORT = 8089;
-const secret: any = {};
-secret[ShiplightSecretKeys.ENDPOINT_URL] = 'http://localhost:' + PORT;
-secret[ShiplightSecretKeys.API_KEY] = 'test-api-key';
+const secret: ShiplightSecret = {
+    endpointUrl: 'http://localhost:' + PORT,
+    apiKey: 'test-api-key'
+};
 
 describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
     function createHttpServer(statusCode = 200): TestHttpServer {

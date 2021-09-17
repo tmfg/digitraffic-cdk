@@ -3,13 +3,9 @@ import {ShiplightEnvKeys} from "../../keys";
 import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {AreaTraffic} from "../../model/areatraffic";
 import {updateLightsForArea} from "../../api/arealights";
+import {ShiplightSecret} from "../../model/shiplight-secret";
 
 const secretId = process.env[ShiplightEnvKeys.SECRET_ID] as string;
-
-type ShiplightSecret = {
-    readonly apiKey: string,
-    readonly endpointUrl: string
-}
 
 export async function handlerFn(
     doWithSecret: SecretFunction,
