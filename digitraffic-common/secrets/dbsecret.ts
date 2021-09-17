@@ -34,6 +34,18 @@ export type SecretOptions = {
 
 export type SecretFunction = (secretId: string, fn: (secret: any) => any, options: SecretOptions) => Promise<any>;
 
+/**
+ * Run the given function with secret retrieved from Secrets Manager.  Also injects database-credentials into environment.
+ *
+ * You can also give the following options:
+ * expectedKeys: the list of keys the secret must include.  If not, an error will be thrown.
+ * prefix: a prefix that's included in retrieved secret's keys.  Only keys begining with the prefix will be included.
+ * The secret that is passed to the given function will not include the prefix in it's keys.
+ *
+ * @param secretId
+ * @param fn
+ * @param options
+ */
 export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, options?: SecretOptions): Promise<T> {
     if (!secretId) {
         console.error(missingSecretErrorText);

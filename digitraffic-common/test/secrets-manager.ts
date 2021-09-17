@@ -3,6 +3,12 @@ import * as sinon from "sinon";
 
 const secretValue = sinon.stub();
 
+/**
+ * Stub Secrets Manager for tests.  You must call this
+ * before you instantiate Secrets Manager(this might happen when you import the function that uses Secrets Manager).
+ *
+ * To mock the actual secret, call mockSecret()
+ */
 export function stubSecretsManager() {
     const smStub = {
         getSecretValue: secretValue
