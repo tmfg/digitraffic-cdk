@@ -311,6 +311,39 @@ describe('voyageplans service', () => {
                         ]
                     }
                 ]
+            }, {
+                waypoint: [
+                    {
+                        position: [
+                            {
+                                $: {
+                                    lon: 1,
+                                    lat: 2
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }]
+        );
+
+        expect(validationErrors.length).toBe(0);
+    });
+
+    test('validateWaypointsContent - one point inside, one point outside is OK', () => {
+        const validationErrors = VoyagePlansService.validateWaypointsContent([{
+                waypoint: [
+                    {
+                        position: [
+                            {
+                                $: {
+                                    lon: 19.71,
+                                    lat: 58.58
+                                }
+                            }
+                        ]
+                    }
+                ]
             }]
         );
 

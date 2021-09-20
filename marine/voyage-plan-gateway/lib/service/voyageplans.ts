@@ -1,7 +1,14 @@
-import {RtzSchedule, RtzSchedules, RtzVoyagePlan, RtzWaypoint} from "digitraffic-common/rtz/voyageplan";
+import {
+    RtzSchedule,
+    RtzSchedules,
+    RtzVoyagePlan,
+    RtzWaypoint,
+    RtzWaypointPosition
+} from "digitraffic-common/rtz/voyageplan";
 import * as jsts from 'jsts';
 import moment, {Moment} from 'moment-timezone';
 import GeometryFactory = jsts.geom.GeometryFactory;
+import Point = jsts.geom.Point;
 
 const gf = new GeometryFactory();
 
@@ -156,21 +163,21 @@ export function validateContent(voyagePlan: RtzVoyagePlan): ValidationError[] {
 
 export function validateWaypointsContent(wps: RtzWaypoint[]): ValidationError[] {
     const validationErrors: ValidationError[] = [];
-
-    wps.forEach(wp => {
-        wp.waypoint.forEach(w => {
-            w.position.forEach(pos => {
-                const lon = Number(pos.$.lon);
-                const lat = Number(pos.$.lat);
-                const point = gf.createPoint(new jsts.geom.Coordinate(lon, lat));
-                if (!SPATIAL_LIMITS.contains(point)) {
-                    validationErrors.push(ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS);
-                }
-            });
-        });
-    });
-
+    if (wps.length) {
+        if (!anyPointInsideSpatialLimits(wps[0].waypoint)) {
+            validationErrors.push(ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS);
+        }
+    }
     return validationErrors;
+}
+
+function anyPointInsideSpatialLimits(waypoint: RtzWaypointPosition[]): boolean {
+    const points: Point[] = waypoint.reduce((acc, curr) => {
+        const point = gf.createPoint(new jsts.geom.Coordinate(curr.position[0].$.lon, curr.position[0].$.lat));
+        return acc.concat([point]);
+    }, [] as Point[]);
+    const pointsInsideSpatialLimits = points.filter(p => SPATIAL_LIMITS.contains(p));
+    return pointsInsideSpatialLimits.length > 0;
 }
 
 export function validateSchedulesContent(rtzSchedules: RtzSchedules[]): ValidationError[] {
