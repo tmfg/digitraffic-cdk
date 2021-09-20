@@ -1,4 +1,4 @@
-import {RtzSchedules, RtzVoyagePlan, RtzWaypoint} from "digitraffic-common/rtz/voyageplan";
+import {RtzSchedule, RtzSchedules, RtzVoyagePlan, RtzWaypoint} from "digitraffic-common/rtz/voyageplan";
 import * as jsts from 'jsts';
 import moment, {Moment} from 'moment-timezone';
 import GeometryFactory = jsts.geom.GeometryFactory;
@@ -45,8 +45,7 @@ export enum ValidationError {
     NO_ETA_OR_ETD_ATTRIBUTES = 'No ETA or ETD attribute in scheduleElement',
 
     // schedules content
-    INVALID_ETA_TIMESTAMP = 'Invalid ETA timestamp',
-    INVALID_ETD_TIMESTAMP = 'Invalid ETD timestamp'
+    NO_FUTURE_TIMESTAMPS = 'No timestamps set in the future'
 }
 
 export function validateStructure(voyagePlan?: RtzVoyagePlan): ValidationError[] {
@@ -114,8 +113,8 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
             return;
         }
         scheds.schedule.forEach(sched => {
-            if (sched.manual && sched.manual.length) {
-                sched.manual.forEach(s => {
+            if (sched.calculated && sched.calculated.length) {
+                sched.calculated.forEach(s => {
                     if (!s.scheduleElement || !s.scheduleElement.length) {
                         validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
@@ -130,9 +129,8 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
                         }
                     });
                 });
-            }
-            if (sched.calculated && sched.calculated.length) {
-                sched.calculated.forEach(s => {
+            } else if (sched.manual && sched.manual.length) {
+                sched.manual.forEach(s => {
                     if (!s.scheduleElement || !s.scheduleElement.length) {
                         validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
@@ -141,9 +139,6 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
                         if (!se.$) {
                             validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                             return;
-                        }
-                        if (!se.$.eta && !se.$.etd) {
-                            validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
                         }
                     });
                 });
@@ -185,27 +180,30 @@ export function validateSchedulesContent(rtzSchedules: RtzSchedules[]): Validati
 
     rtzSchedules.forEach(schedules => {
         schedules.schedule.forEach(sched => {
-            // TODO for calculated
-            sched.manual?.forEach(s => {
-                s.scheduleElement.forEach(se => {
-                    if (se.$.eta) {
-                        const eta = moment(se.$.eta);
-                        if (!validateTimestamp(eta, now)) {
-                            validationErrors.push(ValidationError.INVALID_ETA_TIMESTAMP);
-                        }
-                    }
-                    if (se.$.etd) {
-                        const etd = moment(se.$.etd);
-                        if (!validateTimestamp(etd, now)) {
-                            validationErrors.push(ValidationError.INVALID_ETD_TIMESTAMP);
-                        }
-                    }
-                });
-            });
+            if (sched.calculated && sched.calculated.length) {
+                if (!anyTimestampInFuture(sched.calculated[0], now)) {
+                    validationErrors.push(ValidationError.NO_FUTURE_TIMESTAMPS);
+                }
+            }
         });
     });
 
     return validationErrors;
+}
+
+function anyTimestampInFuture(schedule: RtzSchedule, now: Moment): boolean {
+    const timestamps: Moment[] = schedule.scheduleElement.reduce((acc, curr) => {
+        const scheduleTimestamps: Moment[] = [];
+        if (curr.$.eta) {
+            scheduleTimestamps.push(moment(curr.$.eta));
+        }
+        if (curr.$.etd) {
+            scheduleTimestamps.push(moment(curr.$.etd));
+        }
+        return acc.concat(scheduleTimestamps);
+    }, [] as Moment[]);
+    const timestampsInFuture = timestamps.filter(ts => validateTimestamp(ts, now));
+    return timestampsInFuture.length > 0;
 }
 
 function validateTimestamp(timestamp: Moment, now: Moment): boolean {
