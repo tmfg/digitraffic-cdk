@@ -21,7 +21,7 @@ export const handler = async (event: any) : Promise <any> => {
 };
 
 function isNotSet(value: string): boolean {
-    return (value == null || value == undefined || value.length == 0);
+    return (value == null || value == undefined || value.length === 0);
 }
 
 function getFixed(fixed: string): number {

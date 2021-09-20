@@ -64,9 +64,9 @@ function createAnnotationsResource(
     secret.grantRead(getFaultsLambda);
 
     const apiResource = publicApi.root.addResource("api");
-    const betaResource = apiResource.addResource("beta");
-    const atonResource = betaResource.addResource("aton");
-    const resources = atonResource.addResource("faults");
+    const atonResource = apiResource.addResource("aton");
+    const v1Resource = atonResource.addResource("v1");
+    const resources = v1Resource.addResource("faults");
 
     const getFaultsIntegration = defaultIntegration(getFaultsLambda, {
         requestParameters: {
@@ -96,7 +96,7 @@ function createAnnotationsResource(
     createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
 
     addTags('GetFaults', BETA_TAGS, resources, stack);
-    addQueryParameterDescription('language', 'Language: en, fi or se', resources, stack);
+    addQueryParameterDescription('language', 'Language: en, fi or sv', resources, stack);
     addQueryParameterDescription('fixed_in_hours', 'Show faults that are unfixed or were fixed at most this many hours ago', resources, stack);
 
     return getFaultsLambda;

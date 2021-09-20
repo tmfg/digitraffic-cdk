@@ -26,11 +26,11 @@ export function insert(db: IDatabase<any, any>, faults: Fault[]) {
                     fixed,
                     aton_id,
                     aton_name_fi,
-                    aton_name_se,
+                    aton_name_sv,
                     aton_type_fi,
                     fairway_number,
                     fairway_name_fi,
-                    fairway_name_se,
+                    fairway_name_sv,
                     area_number,
                     geometry)
                 values(
@@ -61,11 +61,11 @@ export function insert(db: IDatabase<any, any>, faults: Fault[]) {
                 f.fixed,
                 f.aton_id,
                 f.aton_name_fi,
-                f.aton_name_se,
+                f.aton_name_sv,
                 f.aton_type_fi,
                 f.fairway_number,
                 f.fairway_name_fi,
-                f.fairway_name_se,
+                f.fairway_name_sv,
                 f.area_number,
                 f.geometry
             ]);

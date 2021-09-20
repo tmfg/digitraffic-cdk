@@ -3,6 +3,7 @@ import {createGeometry} from "digitraffic-common/postgres/geometry";
 import {LineString} from "wkx";
 import {Fault} from "../model/fault";
 import {Language} from "digitraffic-common/model/language";
+
 const moment = require('moment-timezone');
 
 // 15 nautical miles
@@ -20,11 +21,11 @@ const ALL_FAULTS_JSON_SQL =
             fixed,
             aton_id,
             aton_name_fi,
-            aton_name_se,
+            aton_name_sv,
             aton_type.name_LANG aton_type,
             fairway_number,
             fairway_name_fi,
-            fairway_name_se,
+            fairway_name_sv,
             area.area_number,
             area.description_LANG area_description,
             geometry
@@ -36,8 +37,8 @@ const ALL_FAULTS_JSON_SQL =
     and aton_fault.aton_type_fi = aton_type.name_fi`;
 
 const UPSERT_FAULTS_SQL =
-    `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_se, 
-    aton_type_fi, fairway_number, fairway_name_fi, fairway_name_se, area_number, geometry)
+    `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_sv, 
+    aton_type_fi, fairway_number, fairway_name_fi, fairway_name_sv, area_number, geometry)
     values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     on conflict(id)
     do update set
@@ -57,11 +58,11 @@ const GET_FAULT_BY_ID = `
         fixed,
         aton_id,
         aton_name_fi,
-        aton_name_se,
+        aton_name_sv,
         aton_type.name_en aton_type,
         fairway_number,
         fairway_name_fi,
-        fairway_name_se,
+        fairway_name_sv,
         area.area_number,
         area.description_en area_description,
         geometry

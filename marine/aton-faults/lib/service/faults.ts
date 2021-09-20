@@ -20,11 +20,11 @@ export type FaultProps = {
     readonly fixed: boolean
     readonly aton_id: string
     readonly aton_name_fi: string
-    readonly aton_name_se: string
+    readonly aton_name_sv: string
     readonly aton_type: string
     readonly fairway_number: number
     readonly fairway_name_fi: number
-    readonly fairway_name_se: number
+    readonly fairway_name_sv: number
     readonly area_number: number
     readonly area_description: string
 }
@@ -104,11 +104,11 @@ function convertFeature(fault: any): Feature {
         fixed: fault.fixed,
         aton_id: fault.aton_id,
         aton_name_fi: fault.aton_name_fi,
-        aton_name_se: fault.aton_name_se,
+        aton_name_sv: fault.aton_name_sv,
         aton_type: fault.aton_type,
         fairway_number: fault.fairway_number,
         fairway_name_fi: fault.fairway_name_fi,
-        fairway_name_se: fault.fairway_name_se,
+        fairway_name_sv: fault.fairway_name_sv,
         area_number: fault.area_number,
         area_description: fault.area_description
     };
