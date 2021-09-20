@@ -73,3 +73,5 @@ junit.xml
 marine/shiplight/output
 common/output
 digitraffic-common/output
+
+marine/sse/lib/generated/tlsc-sse-reports-schema.d.ts
