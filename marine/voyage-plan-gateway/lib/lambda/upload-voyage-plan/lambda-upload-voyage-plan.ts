@@ -44,19 +44,19 @@ export function handlerFn(
                 const parseXml = util.promisify(xml2js.parseString);
                 voyagePlan = await parseXml(visMessage.message) as RtzVoyagePlan;
             } catch (error) {
-                console.error('method=uploadVoyagePlan XML parsing failed', error);
+                console.warn('method=uploadVoyagePlan XML parsing failed', error);
                 return Promise.resolve('XML parsing failed');
             }
 
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {
-                console.error('method=uploadVoyagePlan XML structure validation failed', structureValidationErrors);
+                console.warn('method=uploadVoyagePlan XML structure validation failed', structureValidationErrors);
                 return Promise.resolve('XML structure validation failed');
             }
 
             const contentValidationErrors = VoyagePlansService.validateContent(voyagePlan);
             if (contentValidationErrors.length) {
-                console.error('method=uploadVoyagePlan XML content validation failed', contentValidationErrors);
+                console.warn('method=uploadVoyagePlan XML content validation failed', contentValidationErrors);
                 return Promise.resolve('XML content was not valid');
             }
 

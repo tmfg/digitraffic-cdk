@@ -130,7 +130,7 @@ export class NodePingApi {
             type,
             threshold: this.checkTimeoutSeconds
         };
-        console.info(`method=updateNodepingCheck Updating NodePing check id ${id}, properties ${data}`);
+        console.info(`method=updateNodepingCheck Updating NodePing check id ${id}, properties ${JSON.stringify(data)}`);
         const resp = await axios.put(`${NODEPING_API}/checks`, data, {
             headers: {
                 'Content-type': MediaType.APPLICATION_JSON

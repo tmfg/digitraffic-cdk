@@ -185,56 +185,6 @@ describe('voyageplans service', () => {
         expect(validationErrors[0]).toBe(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
     });
 
-    test('validateSchedulesStructure - missing both ETA & ETD', () => {
-        const validationErrors = VoyagePlansService.validateSchedulesStructure([{
-            schedule: [{
-                manual: [{
-                    scheduleElement: [{
-                        $: {
-                            eta: undefined,
-                            etd: undefined
-                        }
-                    }]
-                }]
-            }]
-        }]);
-
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
-    });
-
-    test('validateSchedulesStructure - just ETA is ok', () => {
-        const validationErrors = VoyagePlansService.validateSchedulesStructure([{
-            schedule: [{
-                manual: [{
-                    scheduleElement: [{
-                        $: {
-                            eta: new Date().toISOString()
-                        }
-                    }]
-                }]
-            }]
-        }]);
-
-        expect(validationErrors.length).toBe(0);
-    });
-
-    test('validateSchedulesStructure - just ETD is ok', () => {
-        const validationErrors = VoyagePlansService.validateSchedulesStructure([{
-            schedule: [{
-                manual: [{
-                    scheduleElement: [{
-                        $: {
-                            etd: new Date().toISOString()
-                        }
-                    }]
-                }]
-            }]
-        }]);
-
-        expect(validationErrors.length).toBe(0);
-    });
-
     test('validateStructure - ok', () => {
         const validationErrors = VoyagePlansService.validateStructure({
             route: {
@@ -367,17 +317,48 @@ describe('voyageplans service', () => {
         expect(validationErrors.length).toBe(0);
     });
 
-    test('validateSchedulesContent - malformed ETA', () => {
+    test('validateSchedulesContent - no calculated timestamps in the future', () => {
+        const validationErrors = VoyagePlansService.validateSchedulesContent([{
+               schedule: [
+                   {
+                       calculated: [
+                           {
+                               scheduleElement: [
+                                   {
+                                       $: {
+                                           eta: moment().subtract(5, 'minutes').toISOString()
+                                       }
+                                   }
+                               ]
+                           }
+                       ]
+                   }
+               ]
+            }]
+        );
+
+        expect(validationErrors.length).toBe(1);
+        expect(validationErrors[0]).toBe(ValidationError.NO_FUTURE_TIMESTAMPS);
+    });
+
+    test('validateSchedulesContent - 1 timestamp in past, 1 in future', () => {
         const validationErrors = VoyagePlansService.validateSchedulesContent([{
                 schedule: [
                     {
-                        manual: [
+                        calculated: [
                             {
-                                scheduleElement: [{
-                                    $: {
-                                        eta: 'asdfasdf'
+                                scheduleElement: [
+                                    {
+                                        $: {
+                                            eta: moment().subtract(5, 'minutes').toISOString()
+                                        }
+                                    },
+                                    {
+                                        $: {
+                                            etd: moment().add(1, 'hours').toISOString()
+                                        }
                                     }
-                                }]
+                                ]
                             }
                         ]
                     }
@@ -385,21 +366,28 @@ describe('voyageplans service', () => {
             }]
         );
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETA_TIMESTAMP);
+        expect(validationErrors.length).toBe(0);
     });
 
-    test('validateSchedulesContent - malformed ETD', () => {
+    test('validateSchedulesContent - manual timestamps are not validated', () => {
         const validationErrors = VoyagePlansService.validateSchedulesContent([{
                 schedule: [
                     {
                         manual: [
                             {
-                                scheduleElement: [{
-                                    $: {
-                                        etd: 'fdsafdsa'
+                                scheduleElement: [
+                                    {
+                                        $: {
+                                            eta: moment().subtract(5, 'days').toISOString()
+                                        }
+                                    },
+                                    {
+                                        $: {}
+                                    },
+                                    {
+                                        $: {}
                                     }
-                                }]
+                                ]
                             }
                         ]
                     }
@@ -407,52 +395,6 @@ describe('voyageplans service', () => {
             }]
         );
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETD_TIMESTAMP);
+        expect(validationErrors.length).toBe(0);
     });
-
-    test('validateSchedulesContent - ETA in past', () => {
-        const validationErrors = VoyagePlansService.validateSchedulesContent([{
-                schedule: [
-                    {
-                        manual: [
-                            {
-                                scheduleElement: [{
-                                    $: {
-                                        eta: moment().subtract(getRandomNumber(1, 1000), 'minutes').toISOString()
-                                    }
-                                }]
-                            }
-                        ]
-                    }
-                ]
-            }]
-        );
-
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETA_TIMESTAMP);
-    });
-
-    test('validateSchedulesContent - ETD in past', () => {
-        const validationErrors = VoyagePlansService.validateSchedulesContent([{
-                schedule: [
-                    {
-                        manual: [
-                            {
-                                scheduleElement: [{
-                                    $: {
-                                        etd: moment().subtract(getRandomNumber(1, 1000), 'minutes').toISOString()
-                                    }
-                                }]
-                            }
-                        ]
-                    }
-                ]
-            }]
-        );
-
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.INVALID_ETD_TIMESTAMP);
-    });
-
 });
