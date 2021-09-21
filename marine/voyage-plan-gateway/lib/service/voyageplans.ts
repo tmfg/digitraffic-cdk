@@ -173,8 +173,7 @@ function anyWayPointInsideSpatialLimits(rtzWaypoints: RtzWaypoint[]): boolean {
     const points = rtzWaypoints.flatMap(waypoints =>
         waypoints.waypoint.map(w =>
             gf.createPoint(new jsts.geom.Coordinate(Number(w.position[0].$.lon), Number(w.position[0].$.lat)))));
-    const pointsInsideSpatialLimits = points.filter(p => SPATIAL_LIMITS.contains(p));
-    return pointsInsideSpatialLimits.length > 0;
+    return points.some(p => SPATIAL_LIMITS.contains(p));
 }
 
 export function validateSchedulesContent(rtzSchedules: RtzSchedules[]): ValidationError[] {
@@ -206,8 +205,7 @@ function anyTimestampInFuture(schedule: RtzSchedule, now: Moment): boolean {
         }
         return acc.concat(scheduleTimestamps);
     }, [] as Moment[]);
-    const timestampsInFuture = timestamps.filter(ts => validateTimestamp(ts, now));
-    return timestampsInFuture.length > 0;
+    return timestamps.some(ts => validateTimestamp(ts, now));
 }
 
 function validateTimestamp(timestamp: Moment, now: Moment): boolean {
