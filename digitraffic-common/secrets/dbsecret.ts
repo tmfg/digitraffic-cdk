@@ -27,6 +27,14 @@ let cachedSecret: any;
 
 const missingSecretErrorText = 'Missing or empty secretId';
 
+/**
+ * You can give the following options for retrieving a secret:
+ *
+ * expectedKeys: the list of keys the secret must include.  If not, an error will be thrown.
+ * prefix: a prefix that's included in retrieved secret's keys.  Only keys begining with the prefix will be included.
+ * The secret that is passed to the given function will not include the prefix in it's keys.
+
+ */
 export type SecretOptions = {
     readonly expectedKeys?: string[],
     readonly prefix?: string
@@ -37,16 +45,13 @@ export type SecretFunction = (secretId: string, fn: (secret: any) => any, option
 /**
  * Run the given function with secret retrieved from Secrets Manager.  Also injects database-credentials into environment.
  *
- * You can also give the following options:
- * expectedKeys: the list of keys the secret must include.  If not, an error will be thrown.
- * prefix: a prefix that's included in retrieved secret's keys.  Only keys begining with the prefix will be included.
- * The secret that is passed to the given function will not include the prefix in it's keys.
+ * @see SecretOptions
  *
- * @param secretId
- * @param fn
- * @param options
+ * @param {string} secretId
+ * @param {function} fn
+ * @param {SecretOptions} options
  */
-export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, options?: SecretOptions): Promise<T> {
+export async function withDbSecret<T, H>(secretId: string, fn: (secret: H) => T, options?: SecretOptions): Promise<T> {
     if (!secretId) {
         console.error(missingSecretErrorText);
         return Promise.reject(missingSecretErrorText);
@@ -56,17 +61,17 @@ export async function withDbSecret<T>(secretId: string, fn: (secret: any) => T, 
         // if prefix is given, first set db values and then fetch secret
         if(options?.prefix) {
             // first set db values
-            await withSecret(secretId, (fetchedSecret: any) => {
+            await withSecret(secretId, (fetchedSecret: DbSecret) => {
                 setDbSecret(fetchedSecret);
             });
 
             // then actual secret
-            await withSecretAndPrefix(secretId, options.prefix, (fetchedSecret: any) => {
+            await withSecretAndPrefix(secretId, options.prefix, (fetchedSecret: H) => {
                 cachedSecret = fetchedSecret;
             });
         } else {
             await withSecret(secretId, (fetchedSecret: any) => {
-                setDbSecret(fetchedSecret);
+                setDbSecret(fetchedSecret as DbSecret);
                 cachedSecret = fetchedSecret;
             });
         }
