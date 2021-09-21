@@ -196,14 +196,9 @@ export function validateSchedulesContent(rtzSchedules: RtzSchedules[]): Validati
 
 function anyTimestampInFuture(schedule: RtzSchedule, now: Moment): boolean {
     const timestamps: Moment[] = schedule.scheduleElement.reduce((acc, curr) => {
-        const scheduleTimestamps: Moment[] = [];
-        if (curr.$.eta) {
-            scheduleTimestamps.push(moment(curr.$.eta));
-        }
-        if (curr.$.etd) {
-            scheduleTimestamps.push(moment(curr.$.etd));
-        }
-        return acc.concat(scheduleTimestamps);
+        const eta = curr.$.eta != null ? [moment(curr.$.eta)] : [];
+        const etd = curr.$.etd != null ? [moment(curr.$.etd)] : [];
+        return acc.concat(eta, etd);
     }, [] as Moment[]);
     return timestamps.some(ts => validateTimestamp(ts, now));
 }
