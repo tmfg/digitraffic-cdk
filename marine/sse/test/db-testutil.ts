@@ -10,12 +10,12 @@ export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
 export async function truncate(db: IDatabase<any, any>): Promise<null> {
     return db.tx(t => {
         return t.batch([
-            db.none('DELETE FROM sse_report'),
+            // db.none('DELETE FROM sse_report'),
         ]);
     });
 }
 
-export function findAllSseReports(db: IDatabase<any, any>): Promise<DbSseReport[]> {
+export function findAllSseReports(db: IDatabase<any, any>, siteId? :number): Promise<DbSseReport[]> {
     return db.tx(t => {
         return t.manyOrNone(`
             SELECT sse_report_id as "sseReportId",
@@ -35,6 +35,7 @@ export function findAllSseReports(db: IDatabase<any, any>): Promise<DbSseReport[
                    latitude      as "latitude",
                    site_type     as "siteType"
             FROM sse_report
+            ${(siteId? "WHERE site_number=" + siteId : "")}
             ORDER BY site_number, sse_report_id
         `);
     });

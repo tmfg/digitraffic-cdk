@@ -3,12 +3,13 @@ import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as SSE from "../../generated/tlsc-sse-reports-schema"
 import * as SseUpdateService from "../../service/sse-update-service"
 import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/api/errors";
+import {SseSaveResult} from "../../service/sse-update-service";
 
 export const KEY_SECRET_ID = 'SECRET_ID';
 
 const secretId = process.env[KEY_SECRET_ID] as string;
 
-export const handler: (apiGWRequest: any) => Promise<any> = handlerFn(withDbSecret);
+export const handler: (apiGWRequest: any) => Promise<SseSaveResult> = handlerFn(withDbSecret);
 
 export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) => Promise<void>) => Promise<any>) {
     return async (sseJson: SSE.TheSSEReportRootSchema): Promise<any> => {
@@ -24,11 +25,11 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
 
             try {
                 const messageSizeBytes = Buffer.byteLength(sseJsonStr);
-                const count = await SseUpdateService.saveSseData(sseJson);
+                const result = await SseUpdateService.saveSseData(sseJson);
 
                 const end = Date.now();
-                console.info(`method=updateSseData sizeBytes=${messageSizeBytes} updatedCount=${count} of count=${sseJson.SSE_Reports.length} tookMs=${(end - start)}`);
-                return Promise.resolve({count: count})
+                console.info(`method=updateSseData sizeBytes=${messageSizeBytes} updatedCount=${result.saved} and failedCount=${result.errors} of count=${sseJson.SSE_Reports.length} tookMs=${(end - start)}`);
+                return Promise.resolve(result);
             } catch (e) {
                 const end = Date.now();
                 console.error(`method=updateSseData Error tookMs=${(end - start)}`, e);

@@ -17,9 +17,9 @@ describe('update-sse-data-test', DbTestutil.dbTestBase((db: pgPromise.IDatabase<
     test('handle data post', async () => {
         const json = fs.readFileSync('test/data/example-sse-report.json', 'utf8');
         const data = JSON.parse(json);
-        const saveDataStub = sandbox.stub(SseUpdateService, 'saveSseData').returns(Promise.resolve(3));
+        const saveDataStub = sandbox.stub(SseUpdateService, 'saveSseData').returns(Promise.resolve({ saved: 3, errors: 0} ));
 
-        const retVal = { "count" : 3 };
+        const retVal = { saved: 3, errors: 0};
         await expect(
             LambdaUpdateSseData.handlerFn(NOOP_WITH_SECRET)(data)
         ).resolves.toStrictEqual(retVal);
