@@ -12,7 +12,7 @@ describe('sse-db-test', DbTestutil.dbTestBase((db: PgPromise.IDatabase<any, any>
 
         const allAfterInsert = await DbTestutil.findAllSseReports(db);
         expect(allAfterInsert.length).toBe(1);
-        expect(allAfterInsert[allAfterInsert.length-1].latest).toBe(true);
+        expect(allAfterInsert[0].latest).toBe(true);
     });
 
     test('update sse report latest status', async () => {
@@ -20,43 +20,40 @@ describe('sse-db-test', DbTestutil.dbTestBase((db: PgPromise.IDatabase<any, any>
         const siteNum1 = Testdata.site1.Site.SiteNumber;
         const siteNum2 = Testdata.site2.Site.SiteNumber;
         await updateLatestAndInsertData([Testdata.site1, Testdata.site2]);
-        const beforeUpdate: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
-        const site1ReportsBefore: SseDb.DbSseReport[] = beforeUpdate.filter(r => r.siteNumber === siteNum1);
-        const site2ReportsBefore : SseDb.DbSseReport[] = beforeUpdate.filter(r => r.siteNumber === siteNum2);
+        const allAfter1Update: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
+        const site1ReportsAfter1stUpdate: SseDb.DbSseReport[] = allAfter1Update.filter(r => r.siteNumber === siteNum1);
+        const site2ReportsAfter1stUpdate : SseDb.DbSseReport[] = allAfter1Update.filter(r => r.siteNumber === siteNum2);
 
         await updateLatestAndInsertData([Testdata.site1, Testdata.site2]);
 
-        // Expect to find first as false and second as true latest status
-        const afterUpdate: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
-        expect(afterUpdate.length).toBe(beforeUpdate.length+2);
-        const site1Reports: SseDb.DbSseReport[] = afterUpdate.filter(r => r.siteNumber === siteNum1);
-        const site2Reports: SseDb.DbSseReport[] = afterUpdate.filter(r => r.siteNumber === siteNum2);
-        expect(site1Reports.length).toBe(site1ReportsBefore.length + 1);
-        expect(site2Reports.length).toBe(site2ReportsBefore.length + 1);
+        // Expect to find first latest status as false and second latest status as true
+        const allAfter2ndUpdate: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
+        expect(allAfter2ndUpdate.length).toBe(4);
+        const site1ReportsAfter2ndUpdate: SseDb.DbSseReport[] = allAfter2ndUpdate.filter(r => r.siteNumber === siteNum1);
+        const site2Reports2ndUpdate: SseDb.DbSseReport[] = allAfter2ndUpdate.filter(r => r.siteNumber === siteNum2);
+        expect(site1ReportsAfter2ndUpdate.length).toBe(2);
+        expect(site2Reports2ndUpdate.length).toBe(2);
 
-        expect(site1Reports[site1Reports.length-1].latest).toBe(true);
-        expect(site2Reports[site2Reports.length-1].latest).toBe(true);
-
-        if (site1ReportsBefore.length > 0) {
-            expect(site1Reports[site1Reports.length-2].latest).toBe(false); // previous false
-        }
-        if (site2ReportsBefore.length > 0) {
-            expect(site2Reports[site2Reports.length-2].latest).toBe(false); // previous false
-        }
+        // Latest values must be true
+        expect(site1ReportsAfter2ndUpdate[1].latest).toBe(true);
+        expect(site2Reports2ndUpdate[1].latest).toBe(true);
+        // Previous values must be true
+        expect(site1ReportsAfter2ndUpdate[0].latest).toBe(false);
+        expect(site2Reports2ndUpdate[0].latest).toBe(false);
     });
 
     async function updateLatestAndInsertData(reports: TheItemsSchema[]) {
         // Update latest records to false
         await db.tx(t => {
-            const functions : Promise<any>[] = reports.map(report => SseDb.updateLatestSiteToFalse(t, report.Site.SiteNumber));
-            return t.batch(functions);
+            const promises : Promise<any>[] = reports.map(report => SseDb.updateLatestSiteToFalse(t, report.Site.SiteNumber));
+            return t.batch(promises);
         });
         // Insert new latest records
         await db.tx(t => {
-            const functions : Promise<any>[] = reports.map(report =>
+            const promises : Promise<any>[] = reports.map(report =>
                 SseDb.insertSseReportData(t, SseUpdateService.convertToDbSseReport(report))
             );
-            return t.batch(functions);
+            return t.batch(promises);
         });
     }
 
