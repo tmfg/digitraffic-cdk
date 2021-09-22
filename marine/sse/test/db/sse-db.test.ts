@@ -37,7 +37,7 @@ describe('sse-db-test', DbTestutil.dbTestBase((db: PgPromise.IDatabase<any, any>
         // Latest values must be true
         expect(site1ReportsAfter2ndUpdate[1].latest).toBe(true);
         expect(site2Reports2ndUpdate[1].latest).toBe(true);
-        // Previous values must be true
+        // Previous values must be false
         expect(site1ReportsAfter2ndUpdate[0].latest).toBe(false);
         expect(site2Reports2ndUpdate[0].latest).toBe(false);
     });
