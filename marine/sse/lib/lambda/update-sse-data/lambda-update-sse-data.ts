@@ -12,7 +12,7 @@ const secretId = process.env[KEY_SECRET_ID] as string;
 export const handler: (apiGWRequest: any) => Promise<SseSaveResult> = handlerFn(withDbSecret);
 
 export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) => Promise<void>) => Promise<any>) {
-    return async (sseJson: SSE.TheSSEReportRootSchema): Promise<any> => {
+    return async (sseJson: SSE.TheSSEReportRootSchema): Promise<SseSaveResult> => {
 
         return withDbSecretFn(secretId,  async () : Promise<any> => {
             const start = Date.now();
@@ -20,7 +20,7 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
             console.info(`DEBUG method=updateSseData ${sseJsonStr}`);
             if (!sseJson || !sseJson.SSE_Reports) {
                 console.error(`method=updateSseData Empty message content`);
-                return Promise.reject(errorJson(BAD_REQUEST_MESSAGE, "Empty message content."));
+                throw errorJson(BAD_REQUEST_MESSAGE, "Empty message content.");
             }
 
             try {
@@ -29,11 +29,11 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
 
                 const end = Date.now();
                 console.info(`method=updateSseData sizeBytes=${messageSizeBytes} updatedCount=${result.saved} and failedCount=${result.errors} of count=${sseJson.SSE_Reports.length} tookMs=${(end - start)}`);
-                return Promise.resolve(result);
+                return result;
             } catch (e) {
                 const end = Date.now();
                 console.error(`method=updateSseData Error tookMs=${(end - start)}`, e);
-                return Promise.reject(errorJson(ERROR_MESSAGE, `Error while updating sse data: ${e.message}.`));
+                throw errorJson(ERROR_MESSAGE, `Error while updating sse data: ${e.message}.`);
             }
         });
     }
