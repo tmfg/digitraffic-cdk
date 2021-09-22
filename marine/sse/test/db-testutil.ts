@@ -10,7 +10,7 @@ export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
 export async function truncate(db: IDatabase<any, any>): Promise<null> {
     return db.tx(t => {
         return t.batch([
-            // db.none('DELETE FROM sse_report'),
+            db.none('DELETE FROM sse_report'),
         ]);
     });
 }

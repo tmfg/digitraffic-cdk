@@ -8,11 +8,10 @@ import {TheItemsSchema} from "../../lib/generated/tlsc-sse-reports-schema";
 describe('sse-db-test', DbTestutil.dbTestBase((db: PgPromise.IDatabase<any, any>) => {
 
     test('insert sse report', async () => {
-        const beforeInsert = await DbTestutil.findAllSseReports(db);
         await updateLatestAndInsertData([Testdata.site1]);
 
         const allAfterInsert = await DbTestutil.findAllSseReports(db);
-        expect(allAfterInsert.length).toBe(beforeInsert.length + 1);
+        expect(allAfterInsert.length).toBe(1);
         expect(allAfterInsert[allAfterInsert.length-1].latest).toBe(true);
     });
 
