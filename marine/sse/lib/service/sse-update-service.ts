@@ -19,7 +19,7 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
         for (const report of sseReport.SSE_Reports) {
             try {
                 const dbSseSseReport = convertToDbSseReport(report);
-                await db.tx(async t => {
+                await db.tx(t => {
                     return t.batch([
                         SseDb.updateLatestSiteToFalse(t, dbSseSseReport.siteNumber),
                         SseDb.insertSseReportData(t, dbSseSseReport),
@@ -42,7 +42,7 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
             saved
         }
         console.info(`method=saveSseData result ${JSON.stringify(result)}`);
-        return Promise.resolve(result);
+        return result;
     }
 )};
 

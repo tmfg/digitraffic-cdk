@@ -22,7 +22,6 @@ describe('sse-update-service-test', DbTestutil.dbTestBase((db: pgPromise.IDataba
     });
 
     test('replace latest report', async () => {
-        const sseReportsFromDbBefore: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db, Testdata.site1.Site.SiteNumber);
         const sseReport: SSESchema.TheSSEReportRootSchema = Testdata.createSampleData([Testdata.site1]);
         sseReport.SSE_Reports[0].SSE_Fields.SeaState = "CALM";
         await SseUpdateService.saveSseData(sseReport);
@@ -30,12 +29,12 @@ describe('sse-update-service-test', DbTestutil.dbTestBase((db: pgPromise.IDataba
         await SseUpdateService.saveSseData(sseReport);
 
         const sseReportsFromDb: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db, Testdata.site1.Site.SiteNumber);
-        expect(sseReportsFromDb.length).toBe(sseReportsFromDbBefore.length + 2);
+        expect(sseReportsFromDb.length).toBe(2);
 
-        expect(sseReportsFromDb[sseReportsFromDb.length-2].latest).toBe(false);
-        expect(sseReportsFromDb[sseReportsFromDb.length-1].latest).toBe(true);
-        expect(sseReportsFromDb[sseReportsFromDb.length-2].seaState).toBe("CALM");
-        expect(sseReportsFromDb[sseReportsFromDb.length-1].seaState).toBe("BREEZE");
+        expect(sseReportsFromDb[0].latest).toBe(false);
+        expect(sseReportsFromDb[1].latest).toBe(true);
+        expect(sseReportsFromDb[0].seaState).toBe("CALM");
+        expect(sseReportsFromDb[1].seaState).toBe("BREEZE");
     });
 
     test('save multiple reports for same site', async () => {
