@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
+    "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
     "watch": "tsc -w",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "test": "jest --detectOpenHandles",

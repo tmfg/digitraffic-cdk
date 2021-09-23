@@ -21,9 +21,9 @@ describe('epcmessage service', () => {
     test('createEpcMessageResponse', () => {
         const epcMessage: EpcMessage = {
             EPCMessage: {
-                EPCMessageHeader: {
+                EPCMessageHeader: [{
                     ShipMessageId: '1'
-                }
+                }]
             }
         };
 

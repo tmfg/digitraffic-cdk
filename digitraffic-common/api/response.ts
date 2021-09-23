@@ -1,6 +1,7 @@
 import apigateway = require('@aws-cdk/aws-apigateway');
 import {MediaType} from "./mediatypes";
 
+export const INPUT_RAW = "$input.path('$')";
 export const BODY_FROM_INPUT_PATH = "$input.path('$').body";
 
 const messageSchema: apigateway.JsonSchema = {
