@@ -1,0 +1,42 @@
+import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {Stack} from "@aws-cdk/core";
+import {AppProps} from "./app-props";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {dbLambdaConfiguration, SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
+import * as lambda from "@aws-cdk/aws-lambda";
+import {createSubscription} from "digitraffic-common/stack/subscription";
+import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {CountingSitesEnvKeys} from "./keys";
+
+const APPLICATION_NAME = 'CountingSites';
+
+export class InternalLambdas {
+    constructor(stack: Stack, vpc: IVpc, lambdaDbSg: ISecurityGroup, appProps: AppProps, secret: ISecret) {
+        this.createUpdateMetadataLambdaForOulu(stack, vpc, lambdaDbSg, appProps, secret);
+    }
+
+    private createUpdateMetadataLambdaForOulu(stack: Stack, vpc: IVpc, lambdaDbSg: ISecurityGroup, appProps: AppProps, secret: ISecret) {
+        const functionName = APPLICATION_NAME + '-UpdateMetadata-Oulu';
+
+        const environment: LambdaEnvironment = {};
+        environment[SECRET_ID_KEY] = appProps.secretId;
+        environment[DatabaseEnvironmentKeys.DB_APPLICATION] = APPLICATION_NAME;
+        environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = 'Oulu';
+        environment[CountingSitesEnvKeys.DOMAIN_NAME] = 'cs.oulu';
+
+        const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {
+            functionName,
+            code: new lambda.AssetCode('dist/lambda/update-metadata'),
+            handler: 'update-metadata.handler',
+            environment,
+            memorySize: 128
+        });
+
+        const updateMetadataLambda = new lambda.Function(stack, functionName, lambdaConf);
+
+        secret.grantRead(updateMetadataLambda);
+
+        createSubscription(updateMetadataLambda, functionName, appProps.logsDestinationArn, stack);
+    }
+}
