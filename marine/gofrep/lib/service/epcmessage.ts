@@ -22,7 +22,7 @@ export function createEpcMessageResponse(epcMessage: EpcMessage, date: Date): st
 <EPCMessage xmlns="http://www.iso.org/28005-2">
   <EPCMessageHeader xmlns="">
     <SentTime>${dateStr}</SentTime>
-    <ShipMessageId>${epcMessage.EPCMessage.EPCMessageHeader[0].ShipMessageId}</ShipMessageId>
+    <ShipMessageId>${epcMessage.EPCMessage!.EPCMessageHeader![0].ShipMessageId}</ShipMessageId>
     <MessageType>ACK</MessageType>
     <Version></Version>
   </EPCMessageHeader>
