@@ -62,8 +62,6 @@ export class TestHttpServer {
         this.server.listen(port);
     }
 
-
-
     close() {
         this.debuglog('Closing test server');
         this.server.close();
