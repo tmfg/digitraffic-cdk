@@ -4,6 +4,8 @@ import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
 import {Role} from '@aws-cdk/aws-iam'
 
+export const SECRET_ID_KEY = "SECRET_ID";
+
 export interface LambdaConfiguration {
     vpcId: string;
     allowFromIpAddresses?: string[];

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "postbuild_no": "esbuild lib/lambda/**/*.ts  --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
+    "postbuild": "esbuild lib/lambda/**/*.ts  --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node12",
     "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
@@ -35,6 +35,7 @@
     "@aws-cdk/aws-ecs": "*",
     "@aws-cdk/aws-events-targets": "*",
     "@aws-cdk/aws-lambda": "*",
+    "@aws-cdk/aws-secretsmanager": "*",
     "@aws-cdk/core": "*",
     "axios": "^0.21.1",
     "pg-native": "*",
