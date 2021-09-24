@@ -1,6 +1,7 @@
+import {ClientEpcMessage} from "../model/clientepcmessage";
 import {EpcMessage} from "../model/epcmessage";
 
-export function isValidEpcMessage(epcMessage: EpcMessage): boolean {
+export function isValidEpcMessage(epcMessage: ClientEpcMessage): boolean {
     if (!epcMessage.EPCMessage) {
         console.error('method=isValidEpcMessage missing EPCMessage element');
         return false;
@@ -22,7 +23,7 @@ export function createEpcMessageResponse(epcMessage: EpcMessage, date: Date): st
 <EPCMessage xmlns="http://www.iso.org/28005-2">
   <EPCMessageHeader xmlns="">
     <SentTime>${dateStr}</SentTime>
-    <ShipMessageId>${epcMessage.EPCMessage!.EPCMessageHeader![0].ShipMessageId}</ShipMessageId>
+    <ShipMessageId>${epcMessage.EPCMessage.EPCMessageHeader[0].ShipMessageId}</ShipMessageId>
     <MessageType>ACK</MessageType>
     <Version></Version>
   </EPCMessageHeader>
