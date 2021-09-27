@@ -1,6 +1,6 @@
 import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {Stack} from "@aws-cdk/core";
+import {Duration, Stack} from "@aws-cdk/core";
 import {AppProps} from "./app-props";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {dbLambdaConfiguration, SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
@@ -8,6 +8,8 @@ import * as lambda from "@aws-cdk/aws-lambda";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 import {CountingSitesEnvKeys} from "./keys";
+import {Rule, Schedule} from "@aws-cdk/aws-events";
+import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 
 const APPLICATION_NAME = 'CountingSites';
 
@@ -22,8 +24,8 @@ export class InternalLambdas {
         const environment: LambdaEnvironment = {};
         environment[SECRET_ID_KEY] = appProps.secretId;
         environment[DatabaseEnvironmentKeys.DB_APPLICATION] = APPLICATION_NAME;
-        environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = 'Oulu';
-        environment[CountingSitesEnvKeys.DOMAIN_NAME] = 'cs.oulu';
+        environment[CountingSitesEnvKeys.DOMAIN_NAME] = 'Oulu';
+        environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = 'cs.oulu';
 
         const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {
             functionName,
@@ -36,6 +38,11 @@ export class InternalLambdas {
         const updateMetadataLambda = new lambda.Function(stack, functionName, lambdaConf);
 
         secret.grantRead(updateMetadataLambda);
+
+        const rule = new Rule(stack, 'Rule', {
+            schedule: Schedule.rate(Duration.minutes(10))
+        });
+        rule.addTarget(new LambdaFunction(updateMetadataLambda));
 
         createSubscription(updateMetadataLambda, functionName, appProps.logsDestinationArn, stack);
     }

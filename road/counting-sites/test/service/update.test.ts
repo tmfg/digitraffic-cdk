@@ -2,7 +2,7 @@ import {updateMetadataForDomain} from "../../lib/service/update";
 import {dbTestBase, insertCounter, insertDomain} from "../db-testutil";
 import {IDatabase} from "pg-promise";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
-import {findAllCounters} from "../../lib/db/sites";
+import {findAllCounters} from "../../lib/db/counter";
 import {URL_ALL_SITES} from "../../lib/api/eco-counter";
 
 const PORT = 8091;
