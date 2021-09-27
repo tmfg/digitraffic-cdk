@@ -47,14 +47,15 @@ export class NodePingApi {
 
     async createNodepingContact(
         endpoint: string,
+        app: string,
         statuspageApiKey: string,
         statuspagePageId: string,
         statuspageComponentId: string) {
-        console.log('Creating NodePing contact for endpoint', endpoint)
+        console.log('Creating NodePing contact for endpoint %s', endpoint)
         const resp = await axios.post(`${NODEPING_API}/contacts`, {
             token: this.token,
             customerid: this.subAccountId,
-            name: endpoint,
+            name: `${app} ${endpoint}`,
             newaddresses: [{
                 address: `https://api.statuspage.io/v1/pages/${statuspagePageId}/components/${statuspageComponentId}.json`,
                 type: 'webhook',
@@ -85,6 +86,7 @@ export class NodePingApi {
         endpoint: string,
         contactIds: string[],
         app: string,
+        appName: string,
         extraData?: MonitoredEndpoint) {
 
         console.log('Creating NodePing check for endpoint', endpoint);
@@ -95,7 +97,7 @@ export class NodePingApi {
         const data: any = {
             customerid: this.subAccountId,
             token: this.token,
-            label: endpoint,
+            label: endpoint.includes(appName) ? endpoint : `${appName} ${endpoint}`,
             type: extraData?.protocol === EndpointProtocol.WebSocket ? 'WEBSOCKET' : 'HTTPADV',
             target: extraData?.url ?? `https://${app}.digitraffic.fi${endpoint}`,
             interval: 5,

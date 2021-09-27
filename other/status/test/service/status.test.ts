@@ -84,6 +84,19 @@ describe('status service', () => {
             state: NodePingCheckState.DOWN
         }]);
 
+    testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - app name is stripped`,
+        (statuses: string[]) => {
+            expect(statuses.length).toBe(0);
+        }, [{
+            name: 'api/foo/bar',
+            id: 'someid',
+            group_id: 'somegroupid',
+            status: StatuspageComponentStatus.operational
+        }], [{
+            label: 'Road api/foo/bar',
+            state: NodePingCheckState.UP
+        }]);
+
     test('updateChecks - check is updated ', async () => {
         const nodePingApi = new NodePingApi('token','subAccountId', 30);
         const checks: NodePingCheck[] = [{
