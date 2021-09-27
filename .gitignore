@@ -49,6 +49,7 @@ template.yaml
 .cache/
 target/
 dist/
+coverage/
 
 # CDK asset staging directory
 .cdk.staging
