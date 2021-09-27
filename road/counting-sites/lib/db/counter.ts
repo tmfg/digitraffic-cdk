@@ -95,7 +95,7 @@ export function findAllCountersForDomain(db: IDatabase<any, any>, domain: string
 export function insertCounters(db: IDatabase<any, any>, domain: string, counters: ApiCounter[]): Promise<any> {
     return Promise.all(counters
         .map(c => db.none(PS_INSERT_COUNTER,
-            [c.id, domain, c.domain, c.name, `POINT(${c.longitude} ${c.latitude})`, c.user_type, c.interval, c.sens]))
+            [c.id, domain, c.domain, c.name, `POINT(${c.longitude} ${c.latitude})`, c.userType, c.interval, c.sens]))
     );
 }
 
