@@ -1,4 +1,5 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
+import {EventType} from "./timestamp";
 
 export const ShipSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
@@ -53,8 +54,8 @@ export function createTimestampSchema(shipReference: string, locationReference: 
         properties: {
             eventType: {
                 type: JsonSchemaType.STRING,
-                enum: ['ATB', 'ETA', 'ETD', 'ATA'],
-                description: 'Event type: ATB, ETA, ETD, ATA'
+                enum: Object.keys(EventType),
+                description: `Event type: ${Object.keys(EventType)}`
             },
             eventTime: {
                 type: JsonSchemaType.STRING,
