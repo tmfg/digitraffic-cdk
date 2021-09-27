@@ -1,13 +1,13 @@
-import * as DomainDB from "../db/sites";
+import * as CounterDb from "../db/counter";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import { IDatabase } from "pg-promise";
-import {DbCounter, DbDomain} from "../db/sites";
+import {DbCounter, DbDomain} from "../model/domain";
 
 export async function getMetadata(): Promise<any> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
-        const domains = await DomainDB.findAllDomains(db);
-        const counters = await DomainDB.findAllCounters(db);
+        const domains = await CounterDb.findAllDomains(db);
+        const counters = await CounterDb.findAllCounters(db);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.COUNTING_SITES);
 
         //console.info("domains " + JSON.stringify(domains));
@@ -19,7 +19,7 @@ export async function getMetadata(): Promise<any> {
 
 export async function getDataForSite(siteId: number): Promise<any> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
-        const data = await DomainDB.findAllData(db, siteId);
+        const data = await CounterDb.findAllData(db, siteId);
     });
 }
 

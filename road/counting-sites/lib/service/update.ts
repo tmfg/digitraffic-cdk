@@ -1,9 +1,15 @@
-import * as SitesDb from "../db/sites";
+import * as CounterDb from "../db/counter";
+import * as DataDb from "../db/data";
 import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {EcoCounterApi} from "../api/eco-counter";
+import {ApiCounter} from "../model/counter";
+import {DbCounter, DbDomain} from "../model/domain";
+import moment from "moment";
 
 export async function updateMetadataForDomain(domainName: string, apiKey: string, url: string) {
-    const countersInApi = await getAllCounters(apiKey, url); // site_id -> counter
+    const api = new EcoCounterApi(apiKey, url);
+
+    const countersInApi = await api.getAllCounters(); // site_id -> counter
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
     const [newCounters, removedCounters, updatedCounters] = compareCounters(countersInApi, countersInDb);
@@ -13,23 +19,49 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
     console.info(updatedCounters.length + " updated " + JSON.stringify(updatedCounters, null, 3));
 
     return inDatabase(async db => {
-        await SitesDb.insertCounters(db, domainName, newCounters);
-        await SitesDb.removeCounters(db, removedCounters);
-        await SitesDb.updateCounters(db, updatedCounters);
+        await CounterDb.insertCounters(db, domainName, newCounters);
+        await CounterDb.removeCounters(db, removedCounters);
+        await CounterDb.updateCounters(db, updatedCounters);
     });
 }
 
 export async function updateDataForDomain(domainName: string, apiKey: string, url: string) {
-    const domain = await getDomainFromDb(domainName);
+    const api = new EcoCounterApi(apiKey, url);
+    const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
+
+    return inDatabase(async db => {
+        return Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
+            if(isDataUpdateNeeded(counter)) {
+                // either last update timestamp + 1 day or ten days ago(for first time)
+                const fromStamp = counter.last_data_timestamp ? moment(counter.last_data_timestamp).add(1, 'days') : moment().subtract(10, 'days').startOf('day');
+                const endStamp = fromStamp.clone().add(1, 'days');
+
+                const data = await api.getDataForSite(counter.site_id, counter.interval, fromStamp.toDate(), endStamp.toDate());
+
+                //console.info("data " + JSON.stringify(data, null, 3));
+
+                await DataDb.insertData(db, counter.id, counter.interval, data);
+                return CounterDb.updateCounterTimestamp(db, counter.id, fromStamp.toDate());
+            }
+
+            console.info("no need to update " + counter.id);
+            return;
+        }))
+        }
+    );
 }
 
-export async function getDomainFromDb(domainName: string) {
+function isDataUpdateNeeded(counter: DbCounter): boolean {
+    return !counter.last_data_timestamp || moment(counter.last_data_timestamp).isBefore(moment().subtract(1, 'days'));
+}
+
+export async function getDomainFromDb(domainName: string): Promise<DbDomain> {
     return inDatabaseReadonly( db => {
-        return SitesDb.getDomain(db, domainName);
+        return CounterDb.getDomain(db, domainName);
     });
 }
 
-function compareCounters(countersInApi: any, countersInDb: any): [any[], any[], any[]] {
+function compareCounters(countersInApi: any, countersInDb: any): [ApiCounter[], DbCounter[], ApiCounter[]] {
     const newCounters = Object.keys(countersInApi)
         .filter(key => !(key in countersInDb))
         .map(key => countersInApi[key]);
@@ -45,26 +77,9 @@ function compareCounters(countersInApi: any, countersInDb: any): [any[], any[], 
     return [newCounters, removedCounters, updatedCounters];
 }
 
-async function getAllCounters(apiKey: string, url: string): Promise<any> {
-    const api = new EcoCounterApi(apiKey, url);
-    const sites = await api.getSites();
-    const entries: any = [];
-
-    sites.forEach((site: any) => {
-        // create entries [id, channel]
-        site.channels.forEach((c: any) => {
-            // override channel name with domain_name + channel_name
-            entries.push([c.id, {...c, ...{name: `${site.name} ${c.name}`}}]);
-        });
-    });
-
-    // and finally create object from entries with id as key ad counter as value
-    return Object.fromEntries(entries);
-}
-
 async function getAllCountersFromDb(domain: string) {
     const counters = await inDatabaseReadonly( db => {
-        return SitesDb.findAllCountersForDomain(db, domain);
+        return CounterDb.findAllCountersForDomain(db, domain);
     });
 
     return Object.fromEntries(counters

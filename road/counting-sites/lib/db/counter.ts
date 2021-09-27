@@ -1,5 +1,6 @@
 import {IDatabase, PreparedStatement } from "pg-promise";
-import {Geometry} from "wkx";
+import {DbCounter, DbDomain} from "../model/domain";
+import {ApiCounter} from "../model/counter";
 
 const SQL_ALL_DOMAINS =
     `select name, description, added_timestamp, removed_timestamp
@@ -15,11 +16,11 @@ const SQL_ALL_COUNTERS_FOR_DOMAIN =
 
 const SQL_INSERT_COUNTER =
     `insert into counting_site_counter(id, site_id, domain_name, site_domain, name, location, user_type_id, interval, direction, added_timestamp)
-    values (NEXTVAL('counting_site_counter_id_seq'), $1, $2, $3, $4, $5, $6, $7, $8, current_date)`;
+    values (NEXTVAL('counting_site_counter_id_seq'), $1, $2, $3, $4, $5, $6, $7, $8, now())`;
 
 const SQL_REMOVE_COUNTERS =
     `update counting_site_counter
-    set removed_timestamp = current_date
+    set removed_timestamp = now()
     where id in ($1:list)`;
 
 const SQL_UPDATE_COUNTER =
@@ -30,9 +31,14 @@ const SQL_UPDATE_COUNTER =
         direction=$4
     where id=$5`;
 
+const SQL_UPDATER_COUNTER_TIMESTAMP =
+    `update counting_site_counter
+    set last_data_timestamp=$1
+    where id=$2`;
+
 const SQL_FIND_DOMAIN =
     `select name, description, added_timestamp, removed_timestamp
-    from counting_site_domain where name = $1`;
+    from counting_site_domain where name=$1`;
 
 const PS_ALL_DOMAINS = new PreparedStatement({
     name: 'select-domains',
@@ -69,27 +75,10 @@ const PS_FIND_DOMAIN = new PreparedStatement({
     text: SQL_FIND_DOMAIN
 });
 
-export type DbDomain = {
-    readonly name: string,
-    readonly description: string,
-    readonly added_timestamp: Date,
-    readonly removed_timestamp?: Date
-}
-
-export type DbCounter = {
-    readonly id: number,
-    readonly site_id: number,
-    readonly domain_name: string,
-    readonly site_domain: string,
-    readonly name: string,
-    readonly location: Geometry,
-    readonly user_type_id: number,
-    readonly interval: number,
-    readonly direction: number,
-    readonly added_timestamp: Date,
-    readonly last_data_timestamp?: Date,
-    readonly removed_timestamp?: Date
-}
+const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
+    name: 'update-counter-timestamp',
+    text: SQL_UPDATER_COUNTER_TIMESTAMP
+});
 
 export function findAllDomains(db: IDatabase<any, any>): Promise<DbDomain[]> {
     return db.manyOrNone(PS_ALL_DOMAINS);
@@ -103,14 +92,14 @@ export function findAllCountersForDomain(db: IDatabase<any, any>, domain: string
     return db.manyOrNone(PS_ALL_COUNTERS_FOR_DOMAIN, [domain]);
 }
 
-export function insertCounters(db: IDatabase<any, any>, domain: string, counters: any[]): Promise<any> {
+export function insertCounters(db: IDatabase<any, any>, domain: string, counters: ApiCounter[]): Promise<any> {
     return Promise.all(counters
         .map(c => db.none(PS_INSERT_COUNTER,
             [c.id, domain, c.domain, c.name, `POINT(${c.longitude} ${c.latitude})`, c.user_type, c.interval, c.sens]))
     );
 }
 
-export function removeCounters(db: IDatabase<any, any>, counters: any[]): Promise<any> {
+export function removeCounters(db: IDatabase<any, any>, counters: DbCounter[]): Promise<any> {
     if(counters.length > 0) {
         return db.none(SQL_REMOVE_COUNTERS, [counters.map(c => c.id)]);
     }
@@ -118,10 +107,14 @@ export function removeCounters(db: IDatabase<any, any>, counters: any[]): Promis
     return Promise.resolve();
 }
 
-export function updateCounters(db: IDatabase<any, any>, counters: any[]): Promise<any> {
+export function updateCounters(db: IDatabase<any, any>, counters: ApiCounter[]): Promise<any> {
     return Promise.all(counters
         .map(c => db.none(PS_UPDATE_COUNTER, [c.domain, `POINT(${c.longitude} ${c.latitude})`,c.interval, c.sens, c.id]))
     );
+}
+
+export function updateCounterTimestamp(db: IDatabase<any, any>, counterId: number, timestamp: Date): Promise<any> {
+    return db.none(PS_UPDATE_COUNTER_TIMESTAMP, [timestamp, counterId]);
 }
 
 export function findAllData(db: IDatabase<any, any>, siteId: number): Promise<any> {
