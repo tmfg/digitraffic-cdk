@@ -4,7 +4,7 @@ export type ApiCounter = {
     readonly name: string,
     readonly latitude: number,
     readonly longitude: number,
-    readonly user_type: number;
+    readonly userType: number;
     readonly interval: number;
     readonly sens: number;
 }
