@@ -14,7 +14,7 @@ export type MonitoredFunctionProps = {
     /**
      *  Use to create alarms only for certain metrics
      */
-    includeAlarms?: MonitoredFunctionAlarm[]
+    readonly includeAlarms?: MonitoredFunctionAlarm[]
 }
 
 /**
