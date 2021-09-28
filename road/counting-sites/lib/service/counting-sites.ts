@@ -12,9 +12,6 @@ export async function getMetadata(): Promise<any> {
         const counters = await CounterDb.findAllCounters(db);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.COUNTING_SITES);
 
-        //console.info("domains " + JSON.stringify(domains));
-        //console.info("counters " + JSON.stringify(counters));
-
         return createResponse(domains, counters, lastUpdated);
     });
 }

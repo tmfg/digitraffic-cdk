@@ -30,13 +30,13 @@ export class EcoCounterApi {
             });
             if (resp.status !== 200) {
                 console.error(`method=${method} returned status=${resp.status}`);
-                return Promise.reject(resp);
+                return Promise.reject();
             }
             return resp.data;
         } catch (error) {
             console.error(`error from ${serverUrl}`);
             console.error(`method=${method} failed`);
-            return Promise.reject(error);
+            return Promise.reject();
         } finally {
             console.info(`method=${method} tookMs=${Date.now() - start}`)
         }

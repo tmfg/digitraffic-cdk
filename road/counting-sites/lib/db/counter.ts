@@ -36,10 +36,6 @@ const SQL_UPDATER_COUNTER_TIMESTAMP =
     set last_data_timestamp=$1
     where id=$2`;
 
-const SQL_FIND_DOMAIN =
-    `select name, description, added_timestamp, removed_timestamp
-    from counting_site_domain where name=$1`;
-
 const PS_ALL_DOMAINS = new PreparedStatement({
     name: 'select-domains',
     text: SQL_ALL_DOMAINS,
@@ -60,19 +56,9 @@ const PS_INSERT_COUNTER = new PreparedStatement({
    text: SQL_INSERT_COUNTER
 });
 
-const PS_REMOVE_COUNTERS = new PreparedStatement({
-    name: 'remove-counters',
-    text: SQL_REMOVE_COUNTERS
-});
-
 const PS_UPDATE_COUNTER = new PreparedStatement({
     name: 'update-counter',
     text: SQL_UPDATE_COUNTER
-});
-
-const PS_FIND_DOMAIN = new PreparedStatement({
-    name: 'find-domain',
-    text: SQL_FIND_DOMAIN
 });
 
 const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
@@ -115,8 +101,4 @@ export function updateCounters(db: IDatabase<any, any>, counters: ApiCounter[]):
 
 export function updateCounterTimestamp(db: IDatabase<any, any>, counterId: number, timestamp: Date): Promise<any> {
     return db.none(PS_UPDATE_COUNTER_TIMESTAMP, [timestamp, counterId]);
-}
-
-export function getDomain(db: IDatabase<any, any>, domainName: string): Promise<DbDomain|null> {
-    return db.oneOrNone(PS_FIND_DOMAIN, [domainName]);
 }
