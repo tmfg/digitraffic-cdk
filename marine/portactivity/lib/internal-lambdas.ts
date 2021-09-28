@@ -1,6 +1,6 @@
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {Stack} from '@aws-cdk/core';
+import {Duration, Stack} from '@aws-cdk/core';
 import {dbLambdaConfiguration, defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Props} from "./app-props";
@@ -17,6 +17,8 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {PortactivityEnvKeys} from "./keys";
 import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction"
+import {ITopic} from "@aws-cdk/aws-sns";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -24,11 +26,12 @@ export function create(
     secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
+    alarmTopic: ITopic,
     props: Props,
     stack: Stack) {
 
-    createProcessQueueLambda(queueAndDLQ.queue, secret, vpc, lambdaDbSg, props, stack);
-    createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, secret, vpc, lambdaDbSg, alarmTopic, props, stack);
+    createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, alarmTopic, props, stack);
 
     const updateAwakeAiTimestampsLambda = createUpdateAwakeAiTimestampsLambda(secret, queueAndDLQ.queue, vpc, lambdaDbSg, props, stack);
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(secret, queueAndDLQ.queue, vpc, props, stack);
@@ -101,6 +104,7 @@ function createProcessQueueLambda(
     secret: ISecret,
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
+    alarmTopic: ITopic,
     props: Props,
     stack: Stack) {
     const functionName = "PortActivity-ProcessTimestampQueue";
@@ -114,9 +118,9 @@ function createProcessQueueLambda(
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment,
-        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
+        reservedConcurrentExecutions: 6
     });
-    const processQueueLambda = new Function(stack, functionName, lambdaConf);
+    const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic);
     secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
     createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
@@ -125,21 +129,23 @@ function createProcessQueueLambda(
 function createProcessDLQLambda(
     dlqBucket: Bucket,
     dlq: Queue,
+    alarmTopic: ITopic,
     props: Props,
     stack: Stack) {
     const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[BUCKET_NAME] = dlqBucket.bucketName;
 
     const functionName = "PortActivity-ProcessTimestampsDLQ";
-    const processDLQLambda = new Function(stack, functionName, {
+    const processDLQLambda = new MonitoredFunction(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
         code: new AssetCode('dist/lambda/process-dlq'),
+        timeout: Duration.seconds(10),
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
-        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
-    });
+        reservedConcurrentExecutions: 1
+    }, alarmTopic);
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
@@ -188,7 +194,7 @@ function createUpdateAwakeAiTimestampsLambda(
         handler: 'lambda-update-awake-ai-timestamps.handler',
         timeout: 30,
         environment,
-        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
+        reservedConcurrentExecutions: 1
     });
     const lambda = new Function(stack, functionName, lambdaConf);
 

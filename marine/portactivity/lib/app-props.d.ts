@@ -5,17 +5,16 @@ export interface Props {
     readonly privateSubnetIds: string[]
     readonly availabilityZones: string[]
     readonly lambdaDbSgId: string
+    readonly alarmTopicArn: string
     readonly dlqBucketName: string
     readonly dlqNotificationTopicArn: string
     readonly dlqNotificationDuration: Duration
     readonly dbClusterIdentifier: string
     readonly defaultLambdaDurationSeconds: number
     readonly logsDestinationArn: string
-    readonly sqsProcessLambdaConcurrentExecutions: number
     readonly secretId: string
     readonly enableCanaries: boolean
     readonly sources?: {
-        readonly teqplay?: boolean,
         readonly pilotweb?: boolean,
     }
     readonly documentationBucketName: string

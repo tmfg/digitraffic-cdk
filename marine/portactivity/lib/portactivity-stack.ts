@@ -14,6 +14,7 @@ import {
 } from "@aws-cdk/aws-rds";
 import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
 import {Canaries} from "./canaries";
+import {Topic} from "@aws-cdk/aws-sns";
 
 export class PortActivityStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -28,6 +29,8 @@ export class PortActivityStack extends Stack {
         });
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
+        const alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', appProps.alarmTopicArn);
+
         this.createRdsProxy(secret, lambdaDbSg, vpc, appProps);
 
         const queueAndDLQ = Sqs.createQueue(this);
@@ -35,7 +38,7 @@ export class PortActivityStack extends Stack {
             bucketName: appProps.dlqBucketName
         });
 
-        InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, appProps, this);
+        InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, alarmTopic, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
 
         const publicApi = new PublicApi(secret, vpc, lambdaDbSg, appProps, this);
