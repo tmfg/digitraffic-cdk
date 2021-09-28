@@ -83,6 +83,20 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
         assertDataInDb(1, 1);
     });
 
+    test('updateDataForDomain - one counter and data, last update week ago', async () => {
+        await insertDomain(db, DOMAIN_NAME);
+        await insertCounter(db, 1, DOMAIN_NAME, 1);
+        await db.any('update counting_site_counter set last_data_timestamp=now() - interval \'7 days\'');
+
+        await withServerSiteData(1, RESPONSE_DATA, async (server: TestHttpServer) => {
+            await updateDataForDomain(DOMAIN_NAME, '', `http://localhost:${PORT}`);
+
+            expect(server.getCallCount()).toEqual(1);
+        });
+
+        assertDataInDb(1, 1);
+    });
+
     test('updateDataForDomain - one counter and data - no need to update', async () => {
         await insertDomain(db, DOMAIN_NAME);
         await insertCounter(db, 1, DOMAIN_NAME, 1);

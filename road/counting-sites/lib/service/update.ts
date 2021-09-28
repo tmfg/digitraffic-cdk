@@ -2,8 +2,7 @@ import * as CounterDb from "../db/counter";
 import * as DataDb from "../db/data";
 import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {EcoCounterApi} from "../api/eco-counter";
-import {ApiCounter} from "../model/counter";
-import {DbCounter, DbDomain} from "../model/domain";
+import {ApiCounter, DbCounter} from "../model/counter";
 import moment from "moment";
 
 export async function updateMetadataForDomain(domainName: string, apiKey: string, url: string) {

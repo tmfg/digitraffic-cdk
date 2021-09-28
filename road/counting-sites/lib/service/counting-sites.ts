@@ -3,7 +3,8 @@ import * as DataDb from "../db/data";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import { IDatabase } from "pg-promise";
-import {DbCounter, DbDomain} from "../model/domain";
+import {DbDomain} from "../model/domain";
+import {DbCounter} from "../model/counter";
 
 export async function getMetadata(): Promise<any> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {

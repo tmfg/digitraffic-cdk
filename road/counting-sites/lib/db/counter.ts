@@ -1,6 +1,6 @@
 import {IDatabase, PreparedStatement } from "pg-promise";
-import {DbCounter, DbDomain} from "../model/domain";
-import {ApiCounter} from "../model/counter";
+import {DbDomain} from "../model/domain";
+import {ApiCounter, DbCounter} from "../model/counter";
 
 const SQL_ALL_DOMAINS =
     `select name, description, added_timestamp, removed_timestamp

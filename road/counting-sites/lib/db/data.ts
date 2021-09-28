@@ -1,4 +1,5 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
+import {ApiData} from "../model/data";
 
 const SQL_INSERT_DATA =
     `insert into counting_site_data(id, counter_id, data_timestamp, count, status, interval)
@@ -9,7 +10,7 @@ const PS_INSERT_DATA = new PreparedStatement({
     text: SQL_INSERT_DATA
 })
 
-export async function insertData(db: IDatabase<any, any>, site_id: number, interval: number, data: any[]) {
+export async function insertData(db: IDatabase<any, any>, site_id: number, interval: number, data: ApiData[]) {
     return Promise.all(data.map(d => {
         db.none(PS_INSERT_DATA, [site_id, d.date, d.counts, d.status, interval]);
     }));

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {ApiCounter} from "../model/counter";
+import {ApiData} from "../model/data";
 
 export const URL_ALL_SITES = '/api/1.0/site';
 export const URL_SITE_DATA = '/api/1.0/data/site'
@@ -14,7 +15,7 @@ export class EcoCounterApi {
         this.endpointUrl = endpointUrl;
     }
 
-    async getFromServer(method: string, url: string): Promise<any> {
+    async getFromServer<T>(method: string, url: string): Promise<T> {
         const start = Date.now();
         const serverUrl = `${this.endpointUrl}${url}`;
 
@@ -31,13 +32,13 @@ export class EcoCounterApi {
                 console.error(`method=${method} returned status=${resp.status}`);
                 return Promise.reject(resp);
             }
-            return Promise.resolve(resp.data);
+            return resp.data;
         } catch (error) {
-            console.error(`error ${error} from ${serverUrl}`);
+            console.error(`error from ${serverUrl}`);
             console.error(`method=${method} failed`);
             return Promise.reject(error);
         } finally {
-            console.log(`method=${method} tookMs=${Date.now() - start}`)
+            console.info(`method=${method} tookMs=${Date.now() - start}`)
         }
     }
 
@@ -45,7 +46,7 @@ export class EcoCounterApi {
         return this.getFromServer('getSites', URL_ALL_SITES);
     }
 
-    async getDataForSite(siteId: number, interval: number, from: Date, to: Date): Promise<any> {
+    async getDataForSite(siteId: number, interval: number, from: Date, to: Date): Promise<ApiData[]> {
         const fromString = from.toISOString().substring(0, 19); // strip milliseconds
         const toString = to.toISOString().substring(0, 19);
         const intervalString = interval === 60 ? 'hour' : `${interval}m`;
