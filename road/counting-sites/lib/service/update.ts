@@ -38,7 +38,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
 
                 const data = await api.getDataForSite(counter.site_id, counter.interval, fromStamp.toDate(), endStamp.toDate());
 
-                //console.info("data " + JSON.stringify(data, null, 3));
+                console.info("method=updateDataForDomain counter=%d updatedCount=%d", counter.id, data.length);
 
                 await DataDb.insertData(db, counter.id, counter.interval, data);
                 return CounterDb.updateCounterTimestamp(db, counter.id, fromStamp.toDate());
@@ -52,7 +52,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
 }
 
 function isDataUpdateNeeded(counter: DbCounter): boolean {
-    return !counter.last_data_timestamp || moment(counter.last_data_timestamp).isBefore(moment().subtract(1, 'days'));
+    return !counter.last_data_timestamp || moment(counter.last_data_timestamp).isBefore(moment().subtract(2, 'days'));
 }
 
 export async function getDomainFromDb(domainName: string): Promise<DbDomain> {

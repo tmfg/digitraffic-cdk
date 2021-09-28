@@ -18,6 +18,6 @@ export const handler = async (event: any): Promise<any> => {
             prefix: domainPrefix
         });
     } finally {
-        console.info("method=updateData.%s tookMs=%d", domainName, (Date.now()-start));
+        console.info("method=updateMetadata.%s tookMs=%d", domainName, (Date.now()-start));
     }
 };
