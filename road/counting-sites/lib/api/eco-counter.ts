@@ -56,17 +56,10 @@ export class EcoCounterApi {
 
     async getAllCounters(): Promise<Record<string, [ApiCounter]>> {
         const sites = await this.getSites();
-        const entries: any = [];
 
-        sites.forEach((site: any) => {
-            // create entries [id, channel]
-            site.channels.forEach((c: any) => {
-                if(this.validate(c)) {
-                    // override channel name with domain_name + channel_name
-                    entries.push([c.id, {...c, ...{name: `${site.name} ${c.name}`}}]);
-                }
-            });
-        });
+        const entries = sites.flatMap((site: any) => site.channels
+            .filter(this.validate)
+            .map((c: any) => [c.id, {...c, ...{name: `${site.name} ${c.name}`}}]));
 
         // and finally create object from entries with id as key ad counter as value
         return Object.fromEntries(entries);
