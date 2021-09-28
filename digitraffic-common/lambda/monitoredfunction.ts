@@ -2,6 +2,7 @@ import {Function, FunctionProps} from '@aws-cdk/aws-lambda';
 import {Stack} from "@aws-cdk/core";
 import {ITopic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
+import {ComparisonOperator} from "@aws-cdk/aws-cloudwatch";
 
 export enum MonitoredFunctionAlarm {
     DURATION,
@@ -41,7 +42,8 @@ export class MonitoredFunction extends Function {
                 threshold: functionProps.timeout!.toMilliseconds(),
                 evaluationPeriods: 1,
                 datapointsToAlarm: 1,
-                statistic: 'sum'
+                statistic: 'max',
+                comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD
             }).addAlarmAction(new SnsAction(alarmSnsTopic));
         }
 
@@ -52,7 +54,8 @@ export class MonitoredFunction extends Function {
                 threshold: 1,
                 evaluationPeriods: 1,
                 datapointsToAlarm: 1,
-                statistic: 'average'
+                statistic: 'sum',
+                comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD
             }).addAlarmAction(new SnsAction(alarmSnsTopic));
         }
 
@@ -63,7 +66,8 @@ export class MonitoredFunction extends Function {
                 threshold: 0,
                 evaluationPeriods: 1,
                 datapointsToAlarm: 1,
-                statistic: 'sum'
+                statistic: 'sum',
+                comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
             }).addAlarmAction(new SnsAction(alarmSnsTopic));
         }
     }
