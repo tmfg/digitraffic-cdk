@@ -1,47 +1,71 @@
 import {Function, FunctionProps} from '@aws-cdk/aws-lambda';
-import {Construct} from "@aws-cdk/core";
+import {Stack} from "@aws-cdk/core";
 import {ITopic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 
+export enum MonitoredFunctionAlarm {
+    DURATION,
+    ERRORS,
+    THROTTLES
+}
+
+export type MonitoredFunctionProps = {
+    /**
+     *  Use to create alarms only for certain metrics
+     */
+    includeAlarms?: MonitoredFunctionAlarm[]
+}
+
+/**
+ * Creates a Lambda function that monitors default CloudWatch Lambda metrics with CloudWatch Alarms.
+ */
 export class MonitoredFunction extends Function {
 
     constructor(
-        scope: Construct,
+        scope: Stack,
         id: string,
-        props: FunctionProps,
-        alarmSnsTopic: ITopic) {
+        functionProps: FunctionProps,
+        alarmSnsTopic: ITopic,
+        props?: MonitoredFunctionProps) {
 
-        super(scope, id, props);
+        super(scope, id, functionProps);
 
-        if (!props.timeout) {
+        if (!functionProps.timeout) {
             throw new Error('Timeout needs to be explicitly set');
         }
-        this.metricDuration().createAlarm(scope, `${this.node.id}-Duration`, {
-            alarmName: `${this.functionName} duration alarm`,
-            alarmDescription: `${this.functionName} duration has exceeded ${props.timeout!.toSeconds()} seconds`,
-            threshold: props.timeout!.toMilliseconds(),
-            evaluationPeriods: 1,
-            datapointsToAlarm: 1
-        }).addAlarmAction(new SnsAction(alarmSnsTopic));
 
-        this.metricErrors().createAlarm(scope, `${this.node.id}-Errors`, {
-            alarmName: `${this.functionName} errors alarm`,
-            alarmDescription: `${this.functionName} invocations did not succeed`,
-            threshold: 1,
-            evaluationPeriods: 1,
-            datapointsToAlarm: 1
-        }).addAlarmAction(new SnsAction(alarmSnsTopic));
-
-        if (!props.reservedConcurrentExecutions) {
-            throw new Error('Reserved concurrent executions needs to be explicitly set');
+        if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.DURATION)) {
+            this.metricDuration().createAlarm(scope, `${this.node.id}-Duration`, {
+                alarmName: `${scope.stackName} ${this.functionName} duration alarm`,
+                alarmDescription: `${this.functionName} duration has exceeded ${functionProps.timeout!.toSeconds()} seconds`,
+                threshold: functionProps.timeout!.toMilliseconds(),
+                evaluationPeriods: 1,
+                datapointsToAlarm: 1,
+                statistic: 'sum'
+            }).addAlarmAction(new SnsAction(alarmSnsTopic));
         }
-        this.metricThrottles().createAlarm(scope, `${this.node.id}-Throttles`, {
-            alarmName: `${this.functionName} throttles alarm`,
-            alarmDescription: `${this.functionName} has throttled`,
-            threshold: props.reservedConcurrentExecutions!,
-            evaluationPeriods: 1,
-            datapointsToAlarm: 1
-        }).addAlarmAction(new SnsAction(alarmSnsTopic));
+
+        if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.ERRORS)) {
+            this.metricErrors().createAlarm(scope, `${this.node.id}-Errors`, {
+                alarmName: `${scope.stackName} ${this.functionName} errors alarm`,
+                alarmDescription: `${this.functionName} invocations did not succeed`,
+                threshold: 1,
+                evaluationPeriods: 1,
+                datapointsToAlarm: 1,
+                statistic: 'average'
+            }).addAlarmAction(new SnsAction(alarmSnsTopic));
+        }
+
+        if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.THROTTLES)) {
+            this.metricThrottles().createAlarm(scope, `${this.node.id}-Throttles`, {
+                alarmName: `${scope.stackName} ${this.functionName} throttles alarm`,
+                alarmDescription: `${this.functionName} has throttled`,
+                threshold: 0,
+                evaluationPeriods: 1,
+                datapointsToAlarm: 1,
+                statistic: 'sum'
+            }).addAlarmAction(new SnsAction(alarmSnsTopic));
+        }
     }
 
 }
