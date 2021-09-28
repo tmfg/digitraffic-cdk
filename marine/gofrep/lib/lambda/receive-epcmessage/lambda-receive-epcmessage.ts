@@ -16,12 +16,12 @@ export async function handler(event: {body: string}): Promise<string> {
     }
 
     console.info(`method=receiveEpcMessage received message: ${JSON.stringify(epcMessage)}`);
-    // TODO implement proxying to final destination
 
-    if (EpcMessageService.isValidEpcMessage(epcMessage)) {
-        return EpcMessageService.createEpcMessageResponse(epcMessage as EpcMessage, new Date());
-    } else {
+    if (!EpcMessageService.isValidEpcMessage(epcMessage)) {
         console.error('method=receiveEpcMessage XML validation failed');
         return Promise.reject(BAD_REQUEST_MESSAGE);
     }
+
+    // TODO implement proxying to final destination
+    return EpcMessageService.createEpcMessageResponse(epcMessage as EpcMessage, new Date());
 }
