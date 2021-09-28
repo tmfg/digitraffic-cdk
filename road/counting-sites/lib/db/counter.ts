@@ -117,10 +117,6 @@ export function updateCounterTimestamp(db: IDatabase<any, any>, counterId: numbe
     return db.none(PS_UPDATE_COUNTER_TIMESTAMP, [timestamp, counterId]);
 }
 
-export function findAllData(db: IDatabase<any, any>, siteId: number): Promise<any> {
-    return db.none('select * from counting_site_data where site_id = $1', [siteId]);
-}
-
 export function getDomain(db: IDatabase<any, any>, domainName: string): Promise<DbDomain|null> {
     return db.oneOrNone(PS_FIND_DOMAIN, [domainName]);
 }

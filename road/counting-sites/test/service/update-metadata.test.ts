@@ -1,5 +1,5 @@
 import {updateMetadataForDomain} from "../../lib/service/update";
-import {dbTestBase, insertCounter, insertDomain} from "../db-testutil";
+import {dbTestBase, insertCounter, insertDomain, withServer} from "../db-testutil";
 import {IDatabase} from "pg-promise";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {findAllCounters} from "../../lib/db/counter";
@@ -10,6 +10,7 @@ const PORT = 8091;
 const DOMAIN_NAME = 'TEST_DOMAIN';
 
 describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
+    const EMPTY_DATA = JSON.stringify([]);
 
     async function assertCountersInDb(expected: number, fn?: any) {
         const counters = await findAllCounters(db);
@@ -20,27 +21,15 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
         }
     }
 
-    async function withServer(response: string, fn: ((server: TestHttpServer) => any)) {
-        const server = new TestHttpServer();
-
-        const props: any = {};
-
-        props[URL_ALL_SITES] = () => response;
-
-        server.listen(PORT, props, false);
-
-        try {
-            await fn(server);
-        } finally {
-            server.close();
-        }
+    async function withServerAllSites(response: string, fn: ((server: TestHttpServer) => any)) {
+        return withServer(PORT, URL_ALL_SITES, response, fn);
     }
 
     test('updateMetadataForDomain - empty', async () => {
         await assertCountersInDb(0);
         await insertDomain(db, DOMAIN_NAME);
 
-        await withServer("[]", async (server: TestHttpServer) => {
+        await withServerAllSites(EMPTY_DATA, async (server: TestHttpServer) => {
             await updateMetadataForDomain(DOMAIN_NAME, '', `http://localhost:${PORT}`);
 
             expect(server.getCallCount()).toEqual(1);
@@ -69,7 +58,7 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
         await insertDomain(db, DOMAIN_NAME);
         await assertCountersInDb(0);
 
-        await withServer(RESPONSE_ONE_COUNTER, async (server: TestHttpServer) => {
+        await withServerAllSites(RESPONSE_ONE_COUNTER, async (server: TestHttpServer) => {
             await updateMetadataForDomain(DOMAIN_NAME, '', `http://localhost:${PORT}`);
 
             expect(server.getCallCount()).toEqual(1);
@@ -85,7 +74,7 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
         await insertCounter(db, 1, DOMAIN_NAME, 1);
         await assertCountersInDb(1);
 
-        await withServer(RESPONSE_ONE_COUNTER, async (server: TestHttpServer) => {
+        await withServerAllSites(RESPONSE_ONE_COUNTER, async (server: TestHttpServer) => {
             await updateMetadataForDomain(DOMAIN_NAME, '', `http://localhost:${PORT}`);
 
             expect(server.getCallCount()).toEqual(1);
@@ -99,7 +88,7 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
         await insertCounter(db, 1, DOMAIN_NAME, 1);
         await assertCountersInDb(1);
 
-        await withServer("[]", async (server: TestHttpServer) => {
+        await withServerAllSites(EMPTY_DATA, async (server: TestHttpServer) => {
             await updateMetadataForDomain(DOMAIN_NAME, '', `http://localhost:${PORT}`);
 
             expect(server.getCallCount()).toEqual(1);
@@ -109,5 +98,4 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
             expect(counters[0].removed_timestamp).not.toBeNull();
         });
     });
-
 }));

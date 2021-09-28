@@ -14,3 +14,7 @@ export async function insertData(db: IDatabase<any, any>, site_id: number, inter
         db.none(PS_INSERT_DATA, [site_id, d.date, d.counts, d.status, interval]);
     }));
 }
+
+export function findAllData(db: IDatabase<any, any>, counterId: number): Promise<any> {
+    return db.any('select * from counting_site_data where counter_id = $1', [counterId]);
+}

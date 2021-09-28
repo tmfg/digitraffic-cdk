@@ -1,4 +1,5 @@
 import * as CounterDb from "../db/counter";
+import * as DataDb from "../db/data";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import { IDatabase } from "pg-promise";
@@ -17,9 +18,9 @@ export async function getMetadata(): Promise<any> {
     });
 }
 
-export async function getDataForSite(siteId: number): Promise<any> {
+export async function getDataForCounter(counterId: number): Promise<any> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
-        const data = await CounterDb.findAllData(db, siteId);
+        return DataDb.findAllData(db, counterId);
     });
 }
 

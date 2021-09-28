@@ -1,6 +1,7 @@
 import {IDatabase} from "pg-promise";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {DataType} from "digitraffic-common/db/last-updated";
+import {TestHttpServer} from "digitraffic-common/test/httpserver";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
     return commonDbTestBase(fn, truncate, 'road', 'road', 'localhost:54322/road');
@@ -45,4 +46,20 @@ export function insertLastUpdated(db: IDatabase<any, any>, id: number, updated: 
                 values($1, $2, $3)                
             `, [id, DataType.COUNTING_SITES, updated]);
     });
+}
+
+export async function withServer(port: number, url: string, response: string, fn: ((server: TestHttpServer) => any)) {
+    const server = new TestHttpServer();
+
+    const props: any = {};
+
+    props[url] = () => response;
+
+    server.listen(port, props, false);
+
+    try {
+        await fn(server);
+    } finally {
+        server.close();
+    }
 }

@@ -52,13 +52,9 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
 }
 
 function isDataUpdateNeeded(counter: DbCounter): boolean {
-    return !counter.last_data_timestamp || moment(counter.last_data_timestamp).isBefore(moment().subtract(2, 'days'));
-}
+    console.info("comparing " + moment(counter.last_data_timestamp).toISOString() + " and " + moment().subtract(2, 'days').toISOString());
 
-export async function getDomainFromDb(domainName: string): Promise<DbDomain> {
-    return inDatabaseReadonly( db => {
-        return CounterDb.getDomain(db, domainName);
-    });
+    return !counter.last_data_timestamp || moment(counter.last_data_timestamp).isBefore(moment().subtract(2, 'days'));
 }
 
 function compareCounters(countersInApi: any, countersInDb: any): [ApiCounter[], DbCounter[], ApiCounter[]] {
