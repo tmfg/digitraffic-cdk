@@ -31,10 +31,11 @@ export class MonitoredFunction extends Function {
 
         super(scope, id, functionProps);
 
+        const alarmSnsAction = new SnsAction(alarmSnsTopic);
+
         if (!functionProps.timeout) {
             throw new Error('Timeout needs to be explicitly set');
         }
-
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.DURATION)) {
             this.metricDuration().createAlarm(scope, `${this.node.id}-Duration`, {
                 alarmName: `${scope.stackName} ${this.functionName} duration alarm`,
@@ -44,7 +45,7 @@ export class MonitoredFunction extends Function {
                 datapointsToAlarm: 1,
                 statistic: 'max',
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD
-            }).addAlarmAction(new SnsAction(alarmSnsTopic));
+            }).addAlarmAction(alarmSnsAction);
         }
 
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.ERRORS)) {
@@ -56,7 +57,7 @@ export class MonitoredFunction extends Function {
                 datapointsToAlarm: 1,
                 statistic: 'sum',
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD
-            }).addAlarmAction(new SnsAction(alarmSnsTopic));
+            }).addAlarmAction(alarmSnsAction);
         }
 
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.THROTTLES)) {
@@ -68,7 +69,7 @@ export class MonitoredFunction extends Function {
                 datapointsToAlarm: 1,
                 statistic: 'sum',
                 comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
-            }).addAlarmAction(new SnsAction(alarmSnsTopic));
+            }).addAlarmAction(alarmSnsAction);
         }
     }
 
