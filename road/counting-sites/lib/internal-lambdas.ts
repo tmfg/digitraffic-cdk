@@ -16,6 +16,7 @@ const APPLICATION_NAME = 'CountingSites';
 export class InternalLambdas {
     constructor(stack: Stack, vpc: IVpc, lambdaDbSg: ISecurityGroup, appProps: AppProps, secret: ISecret) {
         this.createUpdateMetadataLambdaForOulu(stack, vpc, lambdaDbSg, appProps, secret);
+        this.createUpdateDataLambdaForOulu(stack, vpc, lambdaDbSg, appProps, secret);
     }
 
     private createUpdateMetadataLambdaForOulu(stack: Stack, vpc: IVpc, lambdaDbSg: ISecurityGroup, appProps: AppProps, secret: ISecret) {
@@ -39,8 +40,37 @@ export class InternalLambdas {
 
         secret.grantRead(updateMetadataLambda);
 
-        const rule = new Rule(stack, 'Rule', {
+        const rule = new Rule(stack, 'RuleForMetadataUpdate', {
             schedule: Schedule.rate(Duration.minutes(10))
+        });
+        rule.addTarget(new LambdaFunction(updateMetadataLambda));
+
+        createSubscription(updateMetadataLambda, functionName, appProps.logsDestinationArn, stack);
+    }
+
+    private createUpdateDataLambdaForOulu(stack: Stack, vpc: IVpc, lambdaDbSg: ISecurityGroup, appProps: AppProps, secret: ISecret) {
+        const functionName = APPLICATION_NAME + '-UpdateData-Oulu';
+
+        const environment: LambdaEnvironment = {};
+        environment[SECRET_ID_KEY] = appProps.secretId;
+        environment[DatabaseEnvironmentKeys.DB_APPLICATION] = APPLICATION_NAME;
+        environment[CountingSitesEnvKeys.DOMAIN_NAME] = 'Oulu';
+        environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = 'cs.oulu';
+
+        const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {
+            functionName,
+            code: new lambda.AssetCode('dist/lambda/update-data'),
+            handler: 'update-data.handler',
+            environment,
+            memorySize: 256
+        });
+
+        const updateMetadataLambda = new lambda.Function(stack, functionName, lambdaConf);
+
+        secret.grantRead(updateMetadataLambda);
+
+        const rule = new Rule(stack, 'RuleForDataUpdate', {
+            schedule: Schedule.rate(Duration.hours(1))
         });
         rule.addTarget(new LambdaFunction(updateMetadataLambda));
 
