@@ -11,7 +11,7 @@ export class Canaries {
         if(appProps.enableCanaries) {
             const role = createCanaryRole(stack, 'counting-sites');
 
-            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, role, secret, vpc, lambdaDbSg, {
                 name: 'counting-sites',
                 secret: appProps.secretId,
                 schedule: Schedule.expression("cron(0/15 2-19 ? * MON-SUN *)"),

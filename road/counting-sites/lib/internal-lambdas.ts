@@ -16,10 +16,12 @@ import {ITopic, Topic} from "@aws-cdk/aws-sns";
 const APPLICATION_NAME = 'CountingSites';
 
 export class InternalLambdas {
-    readonly topic: ITopic;
+    readonly alarmTopic: ITopic;
+    readonly warningTopic: ITopic;
 
     constructor(stack: Stack, vpc: IVpc, lambdaDbSg: ISecurityGroup, appProps: AppProps, secret: ISecret) {
-        this.topic = Topic.fromTopicArn(stack, 'CountingSitesAlarmTopic', appProps.alarmTopicArn);
+        this.alarmTopic = Topic.fromTopicArn(stack, 'AlarmTopic', appProps.alarmTopicArn);
+        this.warningTopic = Topic.fromTopicArn(stack, 'WarningTopic', appProps.warningTopicArn);
 
         this.createUpdateMetadataLambdaForOulu(stack, vpc, lambdaDbSg, appProps, secret);
         this.createUpdateDataLambdaForOulu(stack, vpc, lambdaDbSg, appProps, secret);
@@ -43,7 +45,7 @@ export class InternalLambdas {
             memorySize: 128
         });
 
-        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, this.topic);
+        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, this.alarmTopic, this.warningTopic);
 
         secret.grantRead(updateMetadataLambda);
 
@@ -73,7 +75,7 @@ export class InternalLambdas {
             memorySize: 256
         });
 
-        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, this.topic);
+        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, this.alarmTopic, this.warningTopic);
 
         secret.grantRead(updateMetadataLambda);
 
