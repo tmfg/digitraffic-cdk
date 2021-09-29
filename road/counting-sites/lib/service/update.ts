@@ -5,7 +5,7 @@ import {EcoCounterApi} from "../api/eco-counter";
 import {ApiCounter, DbCounter} from "../model/counter";
 import moment from "moment";
 
-export async function updateMetadataForDomain(domainName: string, apiKey: string, url: string) {
+export async function updateMetadataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
     const api = new EcoCounterApi(apiKey, url);
 
     const countersInApi = await api.getAllCounters(); // site_id -> counter
@@ -17,18 +17,18 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
     console.info(removedCounters.length + " removed " + JSON.stringify(removedCounters, null, 3));
     console.info(updatedCounters.length + " updated " + JSON.stringify(updatedCounters, null, 3));
 
-    return inDatabase(async db => {
+    await inDatabase(async db => {
         await CounterDb.insertCounters(db, domainName, newCounters);
         await CounterDb.removeCounters(db, removedCounters);
         await CounterDb.updateCounters(db, updatedCounters);
     });
 }
 
-export async function updateDataForDomain(domainName: string, apiKey: string, url: string) {
+export async function updateDataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
     const api = new EcoCounterApi(apiKey, url);
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
-    return inDatabase(async db => {
+    await inDatabase(async db => {
         return Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
             if(isDataUpdateNeeded(counter)) {
                 // either last update timestamp + 1 day or ten days ago(for first time)

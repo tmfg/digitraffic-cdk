@@ -9,7 +9,6 @@ describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) =>
     test('get domains - empty', async () => {
         const metadata = await CountingSitesService.getMetadata();
 
-        expect(metadata).toBeDefined();
         expect(metadata.domains).toHaveLength(0);
         expect(metadata.lastUpdated).toBeUndefined();
     });
@@ -25,9 +24,6 @@ describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) =>
 
         const metadata = await CountingSitesService.getMetadata();
 
-        console.info("metadata " + JSON.stringify(metadata, null, 3));
-
-        expect(metadata).toBeDefined();
         expect(metadata.domains).toHaveLength(2);
         expect(metadata.domains[0].name).toEqual(DOMAIN1);
         expect(metadata.domains[1].name).toEqual(DOMAIN2);
