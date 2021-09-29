@@ -25,8 +25,8 @@ export class DatabaseCanary extends Construct {
         // the handler code is defined at the actual project using this
         const canary = createCanary(scope, canaryName, params.handler, role, environmentVariables, params.schedule);
 
-        secret.grantRead(canary.role);
         canary.artifactsBucket.grantWrite(role);
+        secret.grantRead(canary.role);
 
         // need to override vpc and security group, can't do this with cdk
         const cfnCanary = canary.node.defaultChild as CfnCanary;

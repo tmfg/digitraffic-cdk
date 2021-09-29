@@ -3,6 +3,7 @@ import {SecurityGroup, Vpc} from "@aws-cdk/aws-ec2";
 import {InternalLambdas} from "./internal-lambdas";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {AppProps} from "./app-props";
+import {Canaries} from "./canaries";
 
 export class CountingSitesCdkStack extends Stack {
     constructor(scope: Construct, id: string, appProps: AppProps, props?: StackProps) {
@@ -22,8 +23,8 @@ export class CountingSitesCdkStack extends Stack {
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
         new InternalLambdas(this, vpc, lambdaDbSg, appProps, secret);
-        //IntegrationApi.create(vpc, lambdaDbSg, lambdaProps, this);
         //PublicApi.create(vpc, lambdaDbSg, lambdaProps, this);
-    }
 
+        new Canaries(this, secret, vpc, lambdaDbSg, appProps);
+    }
 }
