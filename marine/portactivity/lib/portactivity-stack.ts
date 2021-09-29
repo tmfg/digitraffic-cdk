@@ -30,6 +30,7 @@ export class PortActivityStack extends Stack {
         const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
         const alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', appProps.alarmTopicArn);
+        const warningTopic = Topic.fromTopicArn(this, 'WarningTopic', appProps.warningTopicArn);
 
         this.createRdsProxy(secret, lambdaDbSg, vpc, appProps);
 
@@ -38,7 +39,7 @@ export class PortActivityStack extends Stack {
             bucketName: appProps.dlqBucketName
         });
 
-        InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, alarmTopic, appProps, this);
+        InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, alarmTopic, warningTopic, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
 
         const publicApi = new PublicApi(secret, vpc, lambdaDbSg, appProps, this);

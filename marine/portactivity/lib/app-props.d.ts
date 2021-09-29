@@ -6,6 +6,7 @@ export interface Props {
     readonly availabilityZones: string[]
     readonly lambdaDbSgId: string
     readonly alarmTopicArn: string
+    readonly warningTopicArn: string
     readonly dlqBucketName: string
     readonly dlqNotificationTopicArn: string
     readonly dlqNotificationDuration: Duration

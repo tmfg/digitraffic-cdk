@@ -7,7 +7,8 @@ import {ComparisonOperator} from "@aws-cdk/aws-cloudwatch";
 export enum MonitoredFunctionAlarm {
     DURATION,
     ERRORS,
-    THROTTLES
+    THROTTLES,
+    DURATION_WARNING
 }
 
 export type MonitoredFunctionProps = {
@@ -27,11 +28,13 @@ export class MonitoredFunction extends Function {
         id: string,
         functionProps: FunctionProps,
         alarmSnsTopic: ITopic,
+        warningSnsTopic: ITopic,
         props?: MonitoredFunctionProps) {
 
         super(scope, id, functionProps);
 
         const alarmSnsAction = new SnsAction(alarmSnsTopic);
+        const warningSnsAction = new SnsAction(warningSnsTopic);
 
         if (!functionProps.timeout) {
             throw new Error('Timeout needs to be explicitly set');
@@ -46,6 +49,17 @@ export class MonitoredFunction extends Function {
                 statistic: 'max',
                 comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD
             }).addAlarmAction(alarmSnsAction);
+        }
+        if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.DURATION_WARNING)) {
+            this.metricDuration().createAlarm(scope, `${this.node.id}-Duration-Warning`, {
+                alarmName: `${scope.stackName} ${this.functionName} duration warning`,
+                alarmDescription: `${this.functionName} duration is 85 % of max ${functionProps.timeout!.toSeconds()} seconds`,
+                threshold: functionProps.timeout!.toMilliseconds() * 0.85,
+                evaluationPeriods: 1,
+                datapointsToAlarm: 1,
+                statistic: 'max',
+                comparisonOperator: ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD
+            }).addAlarmAction(warningSnsAction);
         }
 
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.ERRORS)) {

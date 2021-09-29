@@ -27,11 +27,12 @@ export function create(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: Props,
     stack: Stack) {
 
-    createProcessQueueLambda(queueAndDLQ.queue, secret, vpc, lambdaDbSg, alarmTopic, props, stack);
-    createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, alarmTopic, props, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, secret, vpc, lambdaDbSg, alarmTopic, warningTopic, props, stack);
+    createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, alarmTopic, warningTopic, props, stack);
 
     const updateAwakeAiTimestampsLambda = createUpdateAwakeAiTimestampsLambda(secret, queueAndDLQ.queue, vpc, lambdaDbSg, props, stack);
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(secret, queueAndDLQ.queue, vpc, props, stack);
@@ -105,8 +106,10 @@ function createProcessQueueLambda(
     vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: Props,
     stack: Stack) {
+
     const functionName = "PortActivity-ProcessTimestampQueue";
     const environment: LambdaEnvironment = {};
     environment[PortactivityEnvKeys.SECRET_ID] = props.secretId;
@@ -120,7 +123,7 @@ function createProcessQueueLambda(
         environment,
         reservedConcurrentExecutions: 6
     });
-    const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic);
+    const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic);
     secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
     createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
@@ -130,11 +133,12 @@ function createProcessDLQLambda(
     dlqBucket: Bucket,
     dlq: Queue,
     alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: Props,
     stack: Stack) {
+
     const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[BUCKET_NAME] = dlqBucket.bucketName;
-
     const functionName = "PortActivity-ProcessTimestampsDLQ";
     const processDLQLambda = new MonitoredFunction(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
@@ -145,7 +149,7 @@ function createProcessDLQLambda(
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1
-    }, alarmTopic);
+    }, alarmTopic, warningTopic);
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
