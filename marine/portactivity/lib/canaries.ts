@@ -10,6 +10,7 @@ import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/a
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
+import {createCanaryRole} from "digitraffic-common/canaries/canary";
 
 export class Canaries {
     constructor(stack: Construct,
@@ -22,7 +23,7 @@ export class Canaries {
         addDLQAlarm(stack, dlq, appProps);
 
         if(appProps.enableCanaries) {
-            const role = createCanaryRole(stack);
+            const role = createCanaryRole(stack, 'portactivity');
 
             new UrlCanary(stack, role, {
                 name: 'pa-public',
@@ -67,31 +68,6 @@ export class Canaries {
             });
         }
     }
-}
-
-function createCanaryRole(stack: Construct) {
-    const role = new Role(stack, "canary-role", {
-        assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-        managedPolicies: [
-            ManagedPolicy.fromAwsManagedPolicyName("CloudWatchSyntheticsFullAccess")
-        ]
-    });
-
-    role.addToPolicy(new PolicyStatement({
-            actions: [
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:CreateLogGroup",
-                "logs:DescribeLogGroups",
-                "logs:DescribeLogStreams",
-                "cloudwatch:PutMetricData",
-                'ec2:CreateNetworkInterface', 'ec2:DescribeNetworkInterfaces', 'ec2:DeleteNetworkInterface'
-            ],
-            resources: ["*"]
-        })
-    );
-
-    return role;
 }
 
 function addDLQAlarm(stack: Construct, queue: Queue, appProps: Props) {

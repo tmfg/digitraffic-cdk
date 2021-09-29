@@ -1,5 +1,5 @@
 import {withDbSecret} from "../secrets/dbsecret";
-import {inDatabase} from "../postgres/database";
+import {inDatabase, inDatabaseReadonly} from "../postgres/database";
 import {IDatabase} from "pg-promise";
 
 const synthetics = require('Synthetics');
@@ -31,7 +31,7 @@ export class DatabaseChecker {
             throw new Error('No checks');
         }
         await withDbSecret(this.secret, async () => {
-            await inDatabase(async (db: IDatabase<any>) => {
+            await inDatabaseReadonly(async (db: IDatabase<any>) => {
                 for (const check of checks) {
                     console.info("canary checking sql " + check.sql);
 
@@ -53,7 +53,7 @@ export class DatabaseChecker {
 
     async expectRows(testName: string, sql: string, minimum = 1): Promise<string> {
         return withDbSecret(this.secret, async () => {
-            return inDatabase(async (db: IDatabase<any>) => {
+            return inDatabaseReadonly(async (db: IDatabase<any>) => {
                 console.info("canary checking sql " + sql);
 
                 const value = await db.oneOrNone(sql);
