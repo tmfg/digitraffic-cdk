@@ -46,7 +46,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, role, secret, vpc, lambdaDbSg, {
                 name: 'pa-daytime',
                 secret: appProps.secretId,
                 schedule: Schedule.expression("cron(0/15 2-19 ? * MON-SUN *)"),
@@ -57,7 +57,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, role, secret, vpc, lambdaDbSg, {
                 name: 'pa',
                 secret: appProps.secretId,
                 handler: 'db.handler',
