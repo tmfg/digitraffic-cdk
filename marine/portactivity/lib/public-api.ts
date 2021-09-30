@@ -138,7 +138,7 @@ export class PublicApi {
                 functionName: functionName,
                 memorySize: 128,
                 timeout: 10,
-                reservedConcurrentExecutions: 2,
+                reservedConcurrentExecutions: 4,
                 code: assetCode,
                 handler: 'lambda-get-timestamps.handler',
                 readOnly: false,
