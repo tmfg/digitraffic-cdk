@@ -12,6 +12,7 @@ import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 const APPLICATION_NAME = 'CountingSites';
 
@@ -45,7 +46,13 @@ export class InternalLambdas {
             memorySize: 128
         });
 
-        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, this.alarmTopic, this.warningTopic);
+        const updateMetadataLambda = new MonitoredFunction(
+            stack,
+            functionName,
+            lambdaConf,
+            this.alarmTopic,
+            this.warningTopic,
+            TrafficType.ROAD);
 
         secret.grantRead(updateMetadataLambda);
 
@@ -75,7 +82,13 @@ export class InternalLambdas {
             memorySize: 256
         });
 
-        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, this.alarmTopic, this.warningTopic);
+        const updateMetadataLambda = new MonitoredFunction(
+            stack,
+            functionName,
+            lambdaConf,
+            this.alarmTopic,
+            this.warningTopic,
+            TrafficType.ROAD);
 
         secret.grantRead(updateMetadataLambda);
 
