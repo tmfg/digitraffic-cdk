@@ -164,7 +164,7 @@ function createProcessQueueLambda(
         handler: 'lambda-process-queue.handler',
         environment,
         timeout: 10,
-        reservedConcurrentExecutions: 6
+        reservedConcurrentExecutions: 7
     });
     const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic);
     secret.grantRead(processQueueLambda);
