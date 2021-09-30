@@ -208,6 +208,8 @@ async function getApiPaths(): Promise<{ transportType: string, paths: Set<string
   railSwaggerPaths.add('/history/');
   railSwaggerPaths.add('/vuosisuunnitelmat');
 
+  roadSwaggerPaths.add("/*.JPG");
+
   return [
     {
       transportType: '*',
