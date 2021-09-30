@@ -11,12 +11,11 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 import {createCanaryRole} from "digitraffic-common/canaries/canary";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export class Canaries {
-    constructor(stack: Construct,
+    constructor(stack: DigitrafficStack,
                 secret: ISecret,
-                vpc: IVpc,
-                lambdaDbSg: ISecurityGroup,
                 dlq: Queue,
                 apiKeyId: string,
                 appProps: Props) {
@@ -46,7 +45,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, secret, lambdaDbSg, {
                 name: 'pa-daytime',
                 secret: appProps.secretId,
                 schedule: Schedule.expression("cron(0/15 2-19 ? * MON-SUN *)"),
@@ -57,7 +56,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, secret, role, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, secret, lambdaDbSg, {
                 name: 'pa',
                 secret: appProps.secretId,
                 handler: 'db.handler',

@@ -1,6 +1,24 @@
 import {RestApi, MethodLoggingLevel, GatewayResponse, ResponseType, EndpointType} from '@aws-cdk/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
 import {Construct} from "@aws-cdk/core";
+import {DigitrafficStack} from "../stack/stack";
+
+export class DigitrafficRestApi extends RestApi {
+    constructor(stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined) {
+        const policyDocument = allowFromIpAddresses == null ? createDefaultPolicyDocument() : createIpRestrictionPolicyDocument(allowFromIpAddresses);
+
+        super(stack, apiId, {
+            deployOptions: {
+                loggingLevel: MethodLoggingLevel.ERROR,
+            },
+            restApiName: apiName,
+            endpointTypes: [EndpointType.REGIONAL],
+            policy: policyDocument
+        });
+
+        add404Support(this, stack);
+    }
+}
 
 /**
  * Due to AWS API design API Gateway will always return 403 'Missing Authentication Token' for requests

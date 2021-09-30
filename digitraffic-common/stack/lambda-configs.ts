@@ -3,6 +3,8 @@ import {Duration} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
 import {Role} from '@aws-cdk/aws-iam'
+import {DigitrafficStack} from "./stack";
+import {LambdaEnvironment} from "../model/lambda-environment";
 
 export const SECRET_ID_KEY = "SECRET_ID";
 
@@ -24,6 +26,26 @@ declare interface DbProps {
     password: string;
     uri?: string;
     ro_uri?: string;
+}
+
+export function dbFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
+    return {
+        runtime: Runtime.NODEJS_14_X,
+        memorySize: config.memorySize || 128,
+        functionName: config.functionName,
+        code: config.code,
+        role: config.role,
+        handler: config.handler,
+        timeout: Duration.seconds(config.timeout || 60),
+        environment: config.environment,
+        logRetention: RetentionDays.ONE_YEAR,
+        vpc: stack.vpc,
+        vpcSubnets: {
+            subnets: stack.vpc.privateSubnets
+        },
+        securityGroup: stack.lambdaDbSg,
+        reservedConcurrentExecutions: config.reservedConcurrentExecutions
+    };
 }
 
 /**
