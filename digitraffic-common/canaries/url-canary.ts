@@ -2,8 +2,7 @@ import {Construct} from "@aws-cdk/core";
 import {CanaryParameters} from "./canary-parameters";
 import {Role} from "@aws-cdk/aws-iam";
 import {LambdaEnvironment} from "../model/lambda-environment";
-import {CanaryAlarm} from "./canary-alarm";
-import {createCanary, DigitrafficCanary} from "./canary";
+import {DigitrafficCanary} from "./canary";
 
 export interface UrlCanaryParameters extends CanaryParameters {
     readonly hostname: string;

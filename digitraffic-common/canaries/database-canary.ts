@@ -6,8 +6,7 @@ import {CfnCanary} from "@aws-cdk/aws-synthetics";
 
 import {CanaryParameters} from "./canary-parameters";
 import {LambdaEnvironment} from "../model/lambda-environment";
-import {CanaryAlarm} from "./canary-alarm";
-import {createCanary, DigitrafficCanary} from "./canary";
+import {DigitrafficCanary} from "./canary";
 
 export class DatabaseCanary extends DigitrafficCanary {
     constructor(scope: Construct,
