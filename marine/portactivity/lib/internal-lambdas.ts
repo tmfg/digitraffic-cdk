@@ -165,7 +165,7 @@ function createProcessQueueLambda(
         handler: 'lambda-process-queue.handler',
         environment,
         timeout: 10,
-        reservedConcurrentExecutions: 7
+        reservedConcurrentExecutions: 8
     });
     const processQueueLambda = new MonitoredFunction(
         stack,
