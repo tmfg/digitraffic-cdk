@@ -9,9 +9,9 @@ import {
     RestApi
 } from '@aws-cdk/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {AssetCode} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {Construct} from "@aws-cdk/core";
+import {Stack} from "@aws-cdk/core";
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {
@@ -34,18 +34,24 @@ import {TimestampMetadata} from './model/timestamp-metadata';
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {PortactivityEnvKeys} from "./keys";
 import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {ITopic} from "@aws-cdk/aws-sns";
 
 export class PublicApi {
-    readonly stack: Construct;
+    readonly stack: Stack;
     readonly props: Props;
     readonly secret: ISecret;
     readonly apiKeyId: string;
 
-    constructor(secret: ISecret,
-                vpc: IVpc,
-                lambdaDbSg: ISecurityGroup,
-                props: Props,
-                stack: Construct) {
+    constructor(
+        secret: ISecret,
+        vpc: IVpc,
+        lambdaDbSg: ISecurityGroup,
+        alarmTopic: ITopic,
+        warningTopic: ITopic,
+        props: Props,
+        stack: Stack) {
+
         this.secret = secret;
         this.props = props;
         this.stack = stack;
@@ -70,8 +76,16 @@ export class PublicApi {
             .addResource("api")
             .addResource("v1");
 
-        this.createTimestampsResource(vpc, lambdaDbSg, resource, timestampsModel, errorResponseModel, validator);
-        this.createShiplistResource(publicApi, vpc, lambdaDbSg);
+        this.createTimestampsResource(
+            vpc,
+            lambdaDbSg,
+            resource,
+            timestampsModel,
+            errorResponseModel,
+            validator,
+            alarmTopic,
+            warningTopic);
+        this.createShiplistResource(publicApi, vpc, lambdaDbSg, alarmTopic, warningTopic);
         this.createTimestampMetadataResource(publicApi, resource);
     }
 
@@ -108,7 +122,9 @@ export class PublicApi {
         resource: Resource,
         timestampsJsonModel: any,
         errorResponseModel: any,
-        validator: RequestValidator): Function {
+        validator: RequestValidator,
+        alarmTopic: ITopic,
+        warningTopic: ITopic) {
 
         const functionName = 'PortActivity-GetTimestamps';
         const assetCode = new AssetCode('dist/lambda/get-timestamps');
@@ -116,15 +132,17 @@ export class PublicApi {
         environment[PortactivityEnvKeys.SECRET_ID] = this.props.secretId;
         environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
 
-        const getTimestampsLambda = new Function(this.stack, functionName,
+        const getTimestampsLambda = new MonitoredFunction(this.stack, functionName,
             dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
                 functionName: functionName,
                 memorySize: 128,
+                timeout: 10,
+                reservedConcurrentExecutions: 2,
                 code: assetCode,
                 handler: 'lambda-get-timestamps.handler',
                 readOnly: false,
                 environment
-        }));
+        }), alarmTopic, warningTopic);
         this.secret.grantRead(getTimestampsLambda);
 
         const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
@@ -150,7 +168,7 @@ export class PublicApi {
         });
 
         const timestampResource = resource.addResource('timestamps');
-        const method = timestampResource.addMethod("GET", getTimestampsIntegration, {
+        timestampResource.addMethod("GET", getTimestampsIntegration, {
             apiKeyRequired: true,
             requestParameters: {
                 'method.request.querystring.locode': false,
@@ -182,7 +200,9 @@ export class PublicApi {
     createShiplistResource(
         publicApi: RestApi,
         vpc: IVpc,
-        lambdaDbSg: ISecurityGroup): Function {
+        lambdaDbSg: ISecurityGroup,
+        alarmTopic: ITopic,
+        warningTopic: ITopic) {
 
         const functionName = 'PortActivity-PublicShiplist';
         const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
@@ -190,14 +210,16 @@ export class PublicApi {
         environment[PortactivityEnvKeys.SECRET_ID] = this.props.secretId;
         environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
 
-        const lambda = new Function(this.stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
+        const lambda = new MonitoredFunction(this.stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
             functionName: functionName,
             code: assetCode,
             memorySize: 128,
+            timeout: 10,
             handler: 'lambda-get-shiplist-public.handler',
             readOnly: false,
+            reservedConcurrentExecutions: 1,
             environment
-        }));
+        }), alarmTopic, warningTopic);
         this.secret.grantRead(lambda);
         const integration = new LambdaIntegration(lambda, {
             proxy: true

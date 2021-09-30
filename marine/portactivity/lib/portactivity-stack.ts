@@ -42,7 +42,7 @@ export class PortActivityStack extends Stack {
         InternalLambdas.create(queueAndDLQ, dlqBucket, secret, vpc, lambdaDbSg, alarmTopic, warningTopic, appProps, this);
         IntegrationApi.create(queueAndDLQ.queue, vpc, lambdaDbSg, appProps, this);
 
-        const publicApi = new PublicApi(secret, vpc, lambdaDbSg, appProps, this);
+        const publicApi = new PublicApi(secret, vpc, lambdaDbSg, alarmTopic, warningTopic, appProps, this);
 
         new Canaries(this, secret, vpc, lambdaDbSg, queueAndDLQ.dlq, publicApi.apiKeyId, appProps);
 
