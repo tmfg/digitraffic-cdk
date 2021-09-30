@@ -1,4 +1,4 @@
-export enum App {
+export enum TrafficType {
     ROAD = 'Road',
     MARINE = 'Marine',
     RAIL = 'Rail'

@@ -19,6 +19,7 @@ import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction"
 import {ITopic} from "@aws-cdk/aws-sns";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -95,7 +96,7 @@ function createUpdateTimestampsFromPilotwebLambda(
         code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
         handler: 'lambda-update-timestamps-from-pilotweb.handler',
         environment
-    }), alarmTopic, warningTopic);
+    }), alarmTopic, warningTopic, TrafficType.MARINE);
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
@@ -132,7 +133,7 @@ function createUpdateTimestampsFromSchedules(
         environment,
         vpc,
         vpcSubnets: vpc.privateSubnets
-    }), alarmTopic, warningTopic);
+    }), alarmTopic, warningTopic, TrafficType.MARINE);
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
@@ -166,7 +167,13 @@ function createProcessQueueLambda(
         timeout: 10,
         reservedConcurrentExecutions: 7
     });
-    const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic);
+    const processQueueLambda = new MonitoredFunction(
+        stack,
+        functionName,
+        lambdaConf,
+        alarmTopic,
+        warningTopic,
+        TrafficType.MARINE);
     secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
     createSubscription(processQueueLambda, functionName, props.logsDestinationArn, stack);
@@ -192,7 +199,7 @@ function createProcessDLQLambda(
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1
-    }, alarmTopic, warningTopic);
+    }, alarmTopic, warningTopic, TrafficType.MARINE);
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
@@ -245,7 +252,7 @@ function createUpdateAwakeAiTimestampsLambda(
         environment,
         reservedConcurrentExecutions: 1
     });
-    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic);
+    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic, TrafficType.MARINE);
 
     secret.grantRead(lambda);
     queue.grantSendMessages(lambda);

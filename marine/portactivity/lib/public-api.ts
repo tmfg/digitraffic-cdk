@@ -36,6 +36,7 @@ import {PortactivityEnvKeys} from "./keys";
 import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {ITopic} from "@aws-cdk/aws-sns";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export class PublicApi {
     readonly stack: Stack;
@@ -142,7 +143,7 @@ export class PublicApi {
                 handler: 'lambda-get-timestamps.handler',
                 readOnly: false,
                 environment
-        }), alarmTopic, warningTopic);
+        }), alarmTopic, warningTopic, TrafficType.MARINE);
         this.secret.grantRead(getTimestampsLambda);
 
         const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
@@ -219,7 +220,7 @@ export class PublicApi {
             readOnly: false,
             reservedConcurrentExecutions: 1,
             environment
-        }), alarmTopic, warningTopic);
+        }), alarmTopic, warningTopic, TrafficType.MARINE);
         this.secret.grantRead(lambda);
         const integration = new LambdaIntegration(lambda, {
             proxy: true

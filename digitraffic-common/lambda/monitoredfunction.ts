@@ -3,6 +3,7 @@ import {Stack} from "@aws-cdk/core";
 import {ITopic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ComparisonOperator} from "@aws-cdk/aws-cloudwatch";
+import {TrafficType} from '../model/traffictype';
 
 export enum MonitoredFunctionAlarm {
     DURATION,
@@ -23,12 +24,22 @@ export type MonitoredFunctionProps = {
  */
 export class MonitoredFunction extends Function {
 
+    /**
+     * @param scope Stack
+     * @param id Lambda construct Id
+     * @param functionProps Lambda function properties
+     * @param alarmSnsTopic SNS topic for alarms
+     * @param warningSnsTopic SNS topic for warnings
+     * @param trafficType Traffic type, used for alarm names. Set to null if Lambda is not related to any traffic type.
+     * @param props Monitored function properties
+     */
     constructor(
         scope: Stack,
         id: string,
         functionProps: FunctionProps,
         alarmSnsTopic: ITopic,
         warningSnsTopic: ITopic,
+        trafficType: TrafficType | null,
         props?: MonitoredFunctionProps) {
 
         super(scope, id, functionProps);
@@ -41,7 +52,7 @@ export class MonitoredFunction extends Function {
         }
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.DURATION)) {
             this.metricDuration().createAlarm(scope, `${this.node.id}-Duration`, {
-                alarmName: `${scope.stackName} ${this.functionName} duration alarm`,
+                alarmName: `${trafficType ?? ''} ${scope.stackName} ${this.functionName} duration alarm`.trim(),
                 alarmDescription: `${this.functionName} duration has exceeded ${functionProps.timeout!.toSeconds()} seconds`,
                 threshold: functionProps.timeout!.toMilliseconds(),
                 evaluationPeriods: 1,
@@ -52,7 +63,7 @@ export class MonitoredFunction extends Function {
         }
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.DURATION_WARNING)) {
             this.metricDuration().createAlarm(scope, `${this.node.id}-Duration-Warning`, {
-                alarmName: `${scope.stackName} ${this.functionName} duration warning`,
+                alarmName: `${trafficType ?? ''} ${scope.stackName} ${this.functionName} duration warning`.trim(),
                 alarmDescription: `${this.functionName} duration is 85 % of max ${functionProps.timeout!.toSeconds()} seconds`,
                 threshold: functionProps.timeout!.toMilliseconds() * 0.85,
                 evaluationPeriods: 1,
@@ -64,7 +75,7 @@ export class MonitoredFunction extends Function {
 
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.ERRORS)) {
             this.metricErrors().createAlarm(scope, `${this.node.id}-Errors`, {
-                alarmName: `${scope.stackName} ${this.functionName} errors alarm`,
+                alarmName: `${trafficType ?? ''} ${scope.stackName} ${this.functionName} errors alarm`.trim(),
                 alarmDescription: `${this.functionName} invocations did not succeed`,
                 threshold: 1,
                 evaluationPeriods: 1,
@@ -76,7 +87,7 @@ export class MonitoredFunction extends Function {
 
         if (!props || props.includeAlarms?.includes(MonitoredFunctionAlarm.THROTTLES)) {
             this.metricThrottles().createAlarm(scope, `${this.node.id}-Throttles`, {
-                alarmName: `${scope.stackName} ${this.functionName} throttles alarm`,
+                alarmName: `${trafficType ?? ''} ${scope.stackName} ${this.functionName} throttles alarm`.trim(),
                 alarmDescription: `${this.functionName} has throttled`,
                 threshold: 0,
                 evaluationPeriods: 1,
