@@ -43,11 +43,11 @@ export type MonitoredFunctionProps = {
 export class MonitoredFunction extends Function {
 
     /**
-     * @param scope Stack
+     * Create new MonitoredFunction.  Use topics from given DigitrafficStack.
+     *
+     * @param stack DigitrafficStack
      * @param id Lambda construct Id
      * @param functionProps Lambda function properties
-     * @param alarmSnsTopic SNS topic for alarms
-     * @param warningSnsTopic SNS topic for warnings
      * @param trafficType Traffic type, used for alarm names. Set to null if Lambda is not related to any traffic type.
      * @param props Monitored function properties
      */
@@ -60,6 +60,15 @@ export class MonitoredFunction extends Function {
         return new MonitoredFunction(stack, id, functionProps, stack.alarmTopic, stack.warningTopic, trafficType, props);
     }
 
+    /**
+     * @param scope Stack
+     * @param id Lambda construct Id
+     * @param functionProps Lambda function properties
+     * @param alarmSnsTopic SNS topic for alarms
+     * @param warningSnsTopic SNS topic for warnings
+     * @param trafficType Traffic type, used for alarm names. Set to null if Lambda is not related to any traffic type.
+     * @param props Monitored function properties
+     */
     constructor(
         scope: Stack,
         id: string,
