@@ -9,17 +9,14 @@ import {IVpc} from "@aws-cdk/aws-ec2";
 import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
 import {VoyagePlanEnvKeys} from "./keys";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {ITopic} from "@aws-cdk/aws-sns";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {TrafficType} from "digitraffic-common/model/traffictype";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
     secret: ISecret,
-    vpc: IVpc,
-    alarmTopic: ITopic,
-    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
     const api = createRestApi(
         stack,
@@ -30,9 +27,6 @@ export function create(
     createUsagePlan(api, 'VPGW Public CloudFront API Key', 'VPGW Public CloudFront Usage Plan');
     createVtsProxyHandler(
         stack,
-        vpc,
-        alarmTopic,
-        warningTopic,
         resource,
         secret,
         props);
@@ -52,10 +46,7 @@ function createRestApi(stack: Stack, apiId: string, apiName: string): RestApi {
 }
 
 function createVtsProxyHandler(
-    stack: Stack,
-    vpc: IVpc,
-    alarmTopic: ITopic,
-    warningTopic: ITopic,
+    stack: DigitrafficStack,
     api: Resource,
     secret: ISecret,
     props: VoyagePlanGatewayProps) {
@@ -71,10 +62,10 @@ function createVtsProxyHandler(
         code: new AssetCode('dist/lambda/get-schedules'),
         handler: 'lambda-get-schedules.handler',
         environment: env,
-        vpc: vpc,
+        vpc: stack.vpc,
         timeout: 10,
         reservedConcurrentExecutions: 1
-    }), alarmTopic, warningTopic, TrafficType.MARINE);
+    }), TrafficType.MARINE);
     secret.grantRead(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     const integration = new LambdaIntegration(handler, {

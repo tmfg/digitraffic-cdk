@@ -1,9 +1,9 @@
 import {AssetCode, Runtime} from '@aws-cdk/aws-lambda';
 import {IVpc} from '@aws-cdk/aws-ec2';
-import {Construct, Duration, Stack} from '@aws-cdk/core';
+import {Duration, Stack} from '@aws-cdk/core';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
-import {ITopic, Topic} from "@aws-cdk/aws-sns";
+import {Topic} from "@aws-cdk/aws-sns";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {VoyagePlanGatewayProps} from "./app-props";
@@ -20,15 +20,13 @@ import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {TrafficType} from "digitraffic-common/model/traffictype";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
     secret: ISecret,
     notifyTopic: Topic,
-    vpc: IVpc,
-    alarmTopic: ITopic,
-    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
     const dlqBucket = new Bucket(stack, 'DLQBucket', {
         bucketName: props.dlqBucketName
@@ -57,8 +55,6 @@ export function create(
         secret,
         notifyTopic,
         sendRouteQueue,
-        alarmTopic,
-        warningTopic,
         props,
         stack);
     const scheduler = createProcessVisMessagesScheduler(stack);
@@ -67,20 +63,15 @@ export function create(
     createUploadVoyagePlanLambda(
         secret,
         sendRouteQueue,
-        vpc,
-        alarmTopic,
-        warningTopic,
         props,
         stack);
     createProcessDLQLambda(
         dlqBucket,
         dlq,
-        alarmTopic,
-        warningTopic,
         props,
         stack);
 
-    addDLQAlarm(dlq, warningTopic, props, stack);
+    addDLQAlarm(dlq, props, stack);
 }
 
 function createProcessVisMessagesScheduler(stack: Stack): Rule {
@@ -95,10 +86,8 @@ function createProcessVisMessagesLambda(
     secret: ISecret,
     notifyTopic: Topic,
     sendRouteQueue: Queue,
-    alarmTopic: ITopic,
-    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
     const functionName = "VPGW-ProcessVisMessages";
     const environment = {} as any;
@@ -113,7 +102,7 @@ function createProcessVisMessagesLambda(
         handler: 'lambda-process-vis-messages.handler',
         environment
     });
-    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic, TrafficType.MARINE);
+    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
     secret.grantRead(lambda);
     notifyTopic.addSubscription(new LambdaSubscription(lambda));
     sendRouteQueue.grantSendMessages(lambda);
@@ -128,11 +117,8 @@ function createProcessVisMessagesLambda(
 function createUploadVoyagePlanLambda(
     secret: ISecret,
     sendRouteQueue: Queue,
-    vpc: IVpc,
-    alarmTopic: ITopic,
-    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
     const functionName = "VPGW-UploadVoyagePlan";
     const environment = {} as any;
@@ -144,10 +130,10 @@ function createUploadVoyagePlanLambda(
         handler: 'lambda-upload-voyage-plan.handler',
         timeout: 10,
         reservedConcurrentExecutions: 1,
-        vpc: vpc,
+        vpc: stack.vpc,
         environment
     });
-    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic, TrafficType.MARINE);
+    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
     secret.grantRead(lambda);
     lambda.addEventSource(new SqsEventSource(sendRouteQueue, {
         batchSize: 1
@@ -158,10 +144,8 @@ function createUploadVoyagePlanLambda(
 function createProcessDLQLambda(
     dlqBucket: Bucket,
     dlq: Queue,
-    alarmTopic: ITopic,
-    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
     const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[VoyagePlanEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
@@ -175,7 +159,7 @@ function createProcessDLQLambda(
         environment: lambdaEnv,
         timeout: Duration.seconds(10),
         reservedConcurrentExecutions: 1
-    }, alarmTopic, warningTopic, TrafficType.MARINE);
+    }, TrafficType.MARINE);
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
@@ -189,9 +173,8 @@ function createProcessDLQLambda(
 
 function addDLQAlarm(
     queue: Queue,
-    warningTopic: ITopic,
     appProps: VoyagePlanGatewayProps,
-    stack: Construct) {
+    stack: DigitrafficStack) {
     
     const alarmName = 'VPGW-DLQAlarm';
     queue.metricNumberOfMessagesReceived({
@@ -202,5 +185,5 @@ function addDLQAlarm(
         evaluationPeriods: 1,
         treatMissingData: TreatMissingData.NOT_BREACHING,
         comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
-    }).addAlarmAction(new SnsAction(warningTopic));
+    }).addAlarmAction(new SnsAction(stack.warningTopic));
 }

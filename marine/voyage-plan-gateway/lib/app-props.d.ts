@@ -1,7 +1,7 @@
-import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {Duration} from "@aws-cdk/core";
+import {StackConfiguration} from "digitraffic-common/stack/stack";
 
-declare interface VoyagePlanGatewayProps extends LambdaConfiguration {
+declare interface VoyagePlanGatewayProps extends StackConfiguration {
     readonly secretId: string
     readonly dlqBucketName: string
     readonly dlqNotificationDuration: Duration
