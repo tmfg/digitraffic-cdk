@@ -34,7 +34,7 @@ export function insertCounter(db: IDatabase<any, any>, id: number, domainName: s
                 insert into counting_site_counter(id, site_id, domain_name, name, site_domain, location, user_type_id, "interval", direction, added_timestamp)
                 values(
                        $1, 1,
-                       $2, 'DOMAIN', 'nimi', 'POINT(10 10)',
+                       $2, 'name', 'DOMAIN', 'POINT(10 10)',
                        $3, 15, 1, current_date)                
             `, [id, domainName, userType]);
     });
