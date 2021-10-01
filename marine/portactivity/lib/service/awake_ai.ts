@@ -26,7 +26,8 @@ export class AwakeAiService {
 
     readonly overriddenDestinations = [
         'FIHEL',
-        'FIPOR'
+        'FIPOR',
+        'FIHKO'
     ];
 
     constructor(api: AwakeAiApi) {
