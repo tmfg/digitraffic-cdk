@@ -4,6 +4,7 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
 import {TrafficType} from '../model/traffictype';
+import {ITopic} from "@aws-cdk/aws-sns";
 
 /**
  * Allows customization of CloudWatch Alarm properties
@@ -50,23 +51,33 @@ export class MonitoredFunction extends Function {
      * @param trafficType Traffic type, used for alarm names. Set to null if Lambda is not related to any traffic type.
      * @param props Monitored function properties
      */
-    constructor(
+    static create(
         stack: DigitrafficStack,
         id: string,
         functionProps: FunctionProps,
         trafficType: TrafficType | null,
+        props?: MonitoredFunctionProps): MonitoredFunction {
+        return new MonitoredFunction(stack, id, functionProps, stack.alarmTopic, stack.warningTopic, trafficType, props);
+    }
+
+    constructor(
+        scope: Stack,
+        id: string,
+        functionProps: FunctionProps,
+        alarmSnsTopic: ITopic,
+        warningSnsTopic: ITopic,
+        trafficType: TrafficType | null,
         props?: MonitoredFunctionProps) {
+        super(scope, id, functionProps);
 
-        super(stack, id, functionProps);
-
-        const alarmSnsAction = new SnsAction(stack.alarmTopic);
-        const warningSnsAction = new SnsAction(stack.warningTopic);
+        const alarmSnsAction = new SnsAction(alarmSnsTopic);
+        const warningSnsAction = new SnsAction(warningSnsTopic);
 
         if (props?.durationAlarmProps?.create !== false) {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
-            this.createAlarm(stack,
+            this.createAlarm(scope,
                 this.metricDuration(),
                 'Duration',
                 'Duration alarm',
@@ -84,7 +95,7 @@ export class MonitoredFunction extends Function {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
-            this.createAlarm(stack,
+            this.createAlarm(scope,
                 this.metricDuration(),
                 'Duration-Warning',
                 'Duration warning',
@@ -100,7 +111,7 @@ export class MonitoredFunction extends Function {
         }
 
         if (props?.errorAlarmProps?.create !== false) {
-            this.createAlarm(stack,
+            this.createAlarm(scope,
                 this.metricErrors(),
                 'Errors',
                 'Errors alarm',
@@ -116,7 +127,7 @@ export class MonitoredFunction extends Function {
         }
 
         if (props?.throttleAlarmProps?.create !== false) {
-            this.createAlarm(stack,
+            this.createAlarm(scope,
                 this.metricThrottles(),
                 'Throttles',
                 'Throttles alarm',

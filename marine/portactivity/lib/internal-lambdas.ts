@@ -48,7 +48,7 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const lambda = new MonitoredFunction(stack, functionName, dbFunctionProps(stack, {
+    const lambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
         memorySize: 256,
         reservedConcurrentExecutions: 1,
         timeout: 10,
@@ -74,7 +74,7 @@ function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, stac
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const lambda = new MonitoredFunction(stack, functionName, defaultLambdaConfiguration({
+    const lambda = MonitoredFunction.create(stack, functionName, defaultLambdaConfiguration({
         functionName,
         timeout: 10,
         reservedConcurrentExecutions: 1,
@@ -111,7 +111,7 @@ function createProcessQueueLambda(
         reservedConcurrentExecutions: 8
     });
 
-    const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const processQueueLambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
 
     secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
@@ -127,7 +127,7 @@ function createProcessDLQLambda(
     lambdaEnv[BUCKET_NAME] = dlqBucket.bucketName;
 
     const functionName = "PortActivity-ProcessTimestampsDLQ";
-    const processDLQLambda = new MonitoredFunction(stack, functionName, {
+    const processDLQLambda = MonitoredFunction.create(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
@@ -178,7 +178,7 @@ function createUpdateAwakeAiTimestampsLambda(secret: ISecret, queue: Queue, stac
         environment,
         reservedConcurrentExecutions: 1
     });
-    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
 
     secret.grantRead(lambda);
     queue.grantSendMessages(lambda);

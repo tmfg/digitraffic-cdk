@@ -45,7 +45,7 @@ export class PublicApi {
             handler: 'get-metadata.handler',
         });
 
-        const lambda = new MonitoredFunction(stack, 'metadata-lambda', lambdaConf, TrafficType.ROAD);
+        const lambda = MonitoredFunction.create(stack, 'metadata-lambda', lambdaConf, TrafficType.ROAD);
         secret.grantRead(lambda);
 
         const metadataIntegration = defaultIntegration(lambda);

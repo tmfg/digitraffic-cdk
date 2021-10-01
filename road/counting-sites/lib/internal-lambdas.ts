@@ -32,7 +32,7 @@ export class InternalLambdas {
             environment,
         });
 
-        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.ROAD);
+        const updateMetadataLambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.ROAD);
 
         secret.grantRead(updateMetadataLambda);
 
@@ -59,7 +59,7 @@ export class InternalLambdas {
             memorySize: 256
         });
 
-        const updateMetadataLambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.ROAD);
+        const updateMetadataLambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.ROAD);
 
         secret.grantRead(updateMetadataLambda);
 
