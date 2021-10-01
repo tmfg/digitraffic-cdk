@@ -10,13 +10,14 @@ export type StackConfiguration = {
     readonly alarmTopicArn: string;
     readonly warningTopicArn: string;
     readonly enableCanaries: boolean;
+    readonly logsDestinationArn: string;
 
     readonly vpcId: string;
     readonly lambdaDbSgId: string;
     readonly privateSubnetIds: string[];
     readonly availabilityZones: string[];
 
-    readonly logsDestinationArn: string;
+    readonly stackProps: StackProps;
 }
 
 export class DigitrafficStack extends Stack {
@@ -27,8 +28,8 @@ export class DigitrafficStack extends Stack {
 
     readonly configuration: StackConfiguration;
 
-    constructor(scope: Construct, id: string, configuration: StackConfiguration, props?: StackProps) {
-        super(scope, id, props);
+    constructor(scope: Construct, id: string, configuration: StackConfiguration) {
+        super(scope, id, configuration.stackProps);
 
         this.configuration = configuration;
 
@@ -40,11 +41,11 @@ export class DigitrafficStack extends Stack {
             availabilityZones: configuration.availabilityZones
         });
 
-        this.alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', configuration.alarmTopicArn);
-        this.warningTopic = Topic.fromTopicArn(this, 'WarningTopic', configuration.warningTopicArn);
-
         // security group that allows Lambda database access
         this.lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', configuration.lambdaDbSgId);
+
+        this.alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', configuration.alarmTopicArn);
+        this.warningTopic = Topic.fromTopicArn(this, 'WarningTopic', configuration.warningTopicArn);
     }
 
     createDefaultLambdaEnvironment(dbApplication: string): LambdaEnvironment {

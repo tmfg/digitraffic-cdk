@@ -1,9 +1,10 @@
 import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
+import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
-const secret = process.env.secret as string;
+const secretId = process.env[SECRET_ID] as string;
 
 export const handler = async () => {
-    const checker = new DatabaseChecker(secret);
+    const checker = new DatabaseChecker(secretId);
 
     await checker.expect([{
         name: 'domains not empty',

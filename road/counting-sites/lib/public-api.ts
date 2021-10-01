@@ -37,7 +37,7 @@ export class PublicApi {
     }
 
     createMetadataEndpoint(stack: DigitrafficStack, secret: ISecret) {
-        const environment: LambdaEnvironment = stack.createDefaultLambdaEnvironment('CountingSites');
+        const environment = stack.createDefaultLambdaEnvironment('CountingSites');
 
         const lambdaConf = dbFunctionProps(stack, {
             environment,

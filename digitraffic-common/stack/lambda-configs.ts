@@ -30,7 +30,19 @@ declare interface DbProps {
 
 export function dbFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
     return {
-        runtime: Runtime.NODEJS_14_X,
+        ...lambdaFunctionProps(stack, config), ...{
+            vpc: stack.vpc,
+            vpcSubnets: {
+                subnets: stack.vpc.privateSubnets
+            },
+            securityGroup: stack.lambdaDbSg,
+        }
+    };
+}
+
+export function lambdaFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
+    return {
+        runtime: config.runtime || Runtime.NODEJS_12_X,
         memorySize: config.memorySize || 128,
         functionName: config.functionName,
         code: config.code,
@@ -39,12 +51,7 @@ export function dbFunctionProps(stack: DigitrafficStack, config: FunctionParamet
         timeout: Duration.seconds(config.timeout || 60),
         environment: config.environment,
         logRetention: RetentionDays.ONE_YEAR,
-        vpc: stack.vpc,
-        vpcSubnets: {
-            subnets: stack.vpc.privateSubnets
-        },
-        securityGroup: stack.lambdaDbSg,
-        reservedConcurrentExecutions: config.reservedConcurrentExecutions
+        reservedConcurrentExecutions: config.reservedConcurrentExecutions || 1
     };
 }
 
@@ -109,15 +116,16 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
 }
 
 interface FunctionParameters {
-    memorySize?: number,
+    memorySize?: number;
     timeout?: number;
-    functionName: string,
-    code: Code,
-    handler: string,
-    readOnly?: boolean,
-    environment?: any
+    functionName: string;
+    code: Code;
+    handler: string;
+    readOnly?: boolean;
+    environment?: any;
     reservedConcurrentExecutions?: number;
     role?: Role;
-    vpc?: IVpc
-    vpcSubnets?: any
+    vpc?: IVpc;
+    vpcSubnets?: any;
+    runtime?: Runtime;
 }

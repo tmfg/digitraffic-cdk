@@ -3,7 +3,6 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {CfnCanary} from "@aws-cdk/aws-synthetics";
 
 import {CanaryParameters} from "./canary-parameters";
-import {LambdaEnvironment} from "../model/lambda-environment";
 import {DigitrafficCanary} from "./canary";
 import {DigitrafficStack} from "../stack/stack";
 
@@ -13,8 +12,7 @@ export class DatabaseCanary extends DigitrafficCanary {
                 secret: ISecret,
                 params: CanaryParameters) {
         const canaryName = `${params.name}-db`;
-        const environmentVariables: LambdaEnvironment = {};
-        environmentVariables.secret = params.secret as string;
+        const environmentVariables = stack.createDefaultLambdaEnvironment(canaryName);
 
         // the handler code is defined at the actual project using this
         super(stack, canaryName, role, params, environmentVariables);
