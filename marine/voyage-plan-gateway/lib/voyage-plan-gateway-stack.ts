@@ -1,4 +1,4 @@
-import {Stack, Construct, StackProps} from '@aws-cdk/core';
+import {Construct, StackProps} from '@aws-cdk/core';
 import {Vpc} from '@aws-cdk/aws-ec2';
 import * as IntegrationApi from './integration-api';
 import * as InternalLambdas from './internal-lambdas';
@@ -6,21 +6,13 @@ import * as PublicApi from './public-api';
 import {VoyagePlanGatewayProps} from "./app-props";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {Topic} from "@aws-cdk/aws-sns";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export class VoyagePlanGatewayStack extends Stack {
-    constructor(scope: Construct, id: string, appProps: VoyagePlanGatewayProps, props?: StackProps) {
-        super(scope, id, props);
+export class VoyagePlanGatewayStack extends DigitrafficStack {
+    constructor(scope: Construct, id: string, appProps: VoyagePlanGatewayProps) {
+        super(scope, id, appProps);
 
         const secret = Secret.fromSecretNameV2(this, 'VPGWSecret', appProps.secretId);
-
-        const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
-            vpcId: appProps.vpcId,
-            privateSubnetIds: appProps.privateSubnetIds,
-            availabilityZones: appProps.availabilityZones
-        });
-
-        const alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', appProps.alarmTopicArn);
-        const warningTopic = Topic.fromTopicArn(this, 'WarningTopic', appProps.warningTopicArn);
 
         const notifyTopicName = 'VPGW-NotifyTopic';
         const notifyTopic = new Topic(this, notifyTopicName, {
@@ -28,8 +20,8 @@ export class VoyagePlanGatewayStack extends Stack {
             displayName: notifyTopicName
         });
 
-        IntegrationApi.create(secret, notifyTopic, alarmTopic, warningTopic, appProps, this);
-        InternalLambdas.create(secret, notifyTopic, vpc, alarmTopic, warningTopic, appProps, this);
-        PublicApi.create(secret, vpc, alarmTopic, warningTopic, appProps, this);
+        IntegrationApi.create(secret, notifyTopic, appProps, this);
+        InternalLambdas.create(secret, notifyTopic, appProps, this);
+        PublicApi.create(secret, appProps, this);
     }
 }
