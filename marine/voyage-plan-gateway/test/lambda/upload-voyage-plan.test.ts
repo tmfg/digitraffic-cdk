@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import moment from 'moment-timezone';
 import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
 import {VtsApi} from "../../lib/api/vts";
+const zlib = require('zlib');
 
 const sandbox = sinon.createSandbox();
 
@@ -205,7 +206,7 @@ function createSnsEvent(xml: string): SnsEvent {
     };
     return {
         Records: [{
-            body: JSON.stringify(message),
+            body: zlib.gzipSync(Buffer.from(JSON.stringify(message))).toString('base64'),
         }]
     };
 }
