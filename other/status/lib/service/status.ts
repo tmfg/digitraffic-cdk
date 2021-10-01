@@ -4,7 +4,7 @@ import {UpdateStatusSecret} from "../secret";
 import {AppEndpoints} from "../model/app-endpoints";
 import {MonitoredApp} from "../app-props";
 import {DigitrafficApi} from "../api/digitraffic";
-import {App} from "../model/app";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export async function getNodePingAndStatuspageComponentStatuses(
     secret: UpdateStatusSecret,
@@ -48,7 +48,7 @@ export async function getNodePingAndStatuspageComponentStatuses(
  * String is "Road MQTT" -> result is "Road MQTT"
  */
 function removeApp(str: string): string {
-    for (const app of [App.ROAD, App.MARINE, App.RAIL]) {
+    for (const app of [TrafficType.ROAD, TrafficType.MARINE, TrafficType.RAIL]) {
         if (str.startsWith(app) && str.includes('/')) {
             return str.replace(app, '').trim();
         }

@@ -103,8 +103,8 @@ function truncate(str: string, n: number): string {
   return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
 }
 
-export const handler = async (): Promise<boolean> => {
-  const apiPaths = await getApiPaths();
+export const handler = async (event: { TRANSPORT_TYPE: string; }): Promise<boolean> => {
+  const apiPaths = (await getApiPaths()).filter(s => s.transportType === event.TRANSPORT_TYPE);
 
   console.info(`ES: ${process.env.ES_ENDPOINT}, MySQL: ${process.env.MYSQL_ENDPOINT},  Range: ${start} -> ${end}, Paths: ${apiPaths.map(s => `${s.transportType}, ${Array.from(s.paths).join(', ')}`)}`)
 
@@ -201,13 +201,14 @@ async function getApiPaths(): Promise<{ transportType: string, paths: Set<string
   const roadSwaggerPaths = await getPaths('https://tie.digitraffic.fi/swagger/swagger-spec.json');
   const marineSwaggerPaths = await getPaths('https://meri.digitraffic.fi/swagger/swagger-spec.json');
 
-  railSwaggerPaths.add('/api/v1/graphql/');
   railSwaggerPaths.add('/api/v2/graphql/');
   railSwaggerPaths.add('/api/v1/trains/history');
   railSwaggerPaths.add('/infra-api/');
   railSwaggerPaths.add('/jeti-api/');
   railSwaggerPaths.add('/history/');
   railSwaggerPaths.add('/vuosisuunnitelmat');
+
+  roadSwaggerPaths.add("/*.JPG");
 
   return [
     {
@@ -253,17 +254,17 @@ function getKeyFigures(): KeyFigure[] {
     },
     {
       'name': 'Top 10 Referers',
-      'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_referrer.keyword", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
+      'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_referrer.keyword", "order": { "_count": "desc" }, "missing": "__missing__", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
       'type': 'field_agg'
     },
     {
       'name': 'Top 10 digitraffic-users',
-      'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_digitraffic_user.keyword", "size": 10} } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
+      'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_digitraffic_user.keyword", "order": { "_count": "desc" }, "missing": "__missing__", "size": 10} } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
       'type': 'field_agg'
     },
     {
       'name': 'Top 10 User Agents',
-      'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_user_agent.keyword", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
+      'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_user_agent.keyword", "order": { "_count": "desc" }, "missing": "__missing__", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
       'type': 'field_agg'
     },
     {

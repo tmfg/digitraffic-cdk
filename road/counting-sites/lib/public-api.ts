@@ -6,11 +6,10 @@ import {Model, Resource} from "@aws-cdk/aws-apigateway";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {AssetCode} from "@aws-cdk/aws-lambda";
 import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
-import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
-import {LambdaEnvironment, SECRET_ID} from "digitraffic-common/model/lambda-environment";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export class PublicApi {
     metadataResource: Resource;
@@ -46,7 +45,7 @@ export class PublicApi {
             handler: 'get-metadata.handler',
         });
 
-        const lambda = new MonitoredFunction(stack, 'metadata-lambda', lambdaConf, stack.alarmTopic, stack.warningTopic);
+        const lambda = new MonitoredFunction(stack, 'metadata-lambda', lambdaConf, TrafficType.ROAD);
         secret.grantRead(lambda);
 
         const metadataIntegration = defaultIntegration(lambda);

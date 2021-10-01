@@ -5,6 +5,7 @@ import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 const crypto = require('crypto');
+const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 const queueUrl = process.env[VoyagePlanEnvKeys.QUEUE_URL] as string;
@@ -42,9 +43,12 @@ export function handlerFn(
                     callbackEndpoint: routeMessage.CallbackEndpoint,
                     message: routeMessage.stmMessage.message
                 };
+                // gzip data to avoid SQS 256 KB limit
+                const gzippedMessage = zlib.gzipSync(Buffer.from(JSON.stringify(message), 'utf-8'));
                 await sqs.sendMessage({
                     QueueUrl: queueUrl,
-                    MessageBody: JSON.stringify(message),
+                    // SQS only allows character data so the message must also be base64 encoded
+                    MessageBody: gzippedMessage.toString('base64'),
                     MessageGroupId,
                     MessageDeduplicationId: createRtzHash(routeMessage.stmMessage.message)
                 }).promise();

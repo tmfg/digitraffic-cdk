@@ -1,5 +1,4 @@
 import {Construct} from '@aws-cdk/core';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
 import * as Sqs from './sqs';
@@ -57,5 +56,4 @@ export class PortActivityStack extends DigitrafficStack {
             requireTLS: false
         });
     }
-
 }

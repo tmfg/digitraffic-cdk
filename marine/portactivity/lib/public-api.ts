@@ -7,13 +7,14 @@ import {
     RestApi
 } from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
+import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {
     corsMethod,
     defaultIntegration,
-    getResponse,
-    methodResponse,
+    getResponse, methodResponse,
     RESPONSE_200_OK,
     RESPONSE_400_BAD_REQUEST,
     RESPONSE_500_SERVER_ERROR,
@@ -24,16 +25,17 @@ import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {MediaType} from "digitraffic-common/api/mediatypes";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
 import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export class PublicApi {
     readonly apiKeyId: string;
 
     constructor(stack: DigitrafficStack, secret: ISecret) {
         const publicApi = new DigitrafficRestApi(stack, 'PortActivity-public', 'PortActivity public API');
+
         this.apiKeyId = createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan').keyId;
 
         const validator = addDefaultValidator(publicApi);
@@ -102,7 +104,7 @@ export class PublicApi {
         });
 
         const timestampResource = resource.addResource('timestamps');
-        const method = timestampResource.addMethod("GET", getTimestampsIntegration, {
+        timestampResource.addMethod("GET", getTimestampsIntegration, {
             apiKeyRequired: true,
             requestParameters: {
                 'method.request.querystring.locode': false,
@@ -140,11 +142,13 @@ export class PublicApi {
             functionName: functionName,
             code: assetCode,
             memorySize: 128,
+            timeout: 10,
             handler: 'lambda-get-shiplist-public.handler',
             environment
         }));
 
         secret.grantRead(lambda);
+
         const integration = new LambdaIntegration(lambda, {
             proxy: true
         });

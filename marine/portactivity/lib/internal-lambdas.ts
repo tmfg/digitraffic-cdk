@@ -1,11 +1,6 @@
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration, Stack} from '@aws-cdk/core';
-import {
-    dbFunctionProps,
-    dbLambdaConfiguration,
-    defaultLambdaConfiguration,
-    lambdaFunctionProps
-} from 'digitraffic-common/stack/lambda-configs';
+import {dbFunctionProps, defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Props} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
@@ -20,8 +15,9 @@ import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {PortactivityEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction"
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -41,6 +37,7 @@ export function create(
 
     if((stack.configuration as Props).sources?.pilotweb) {
         const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(secret, queueAndDLQ.queue, stack);
+
         const pilotwebScheduler = createPilotwebScheduler(stack);
         pilotwebScheduler.addTarget(new LambdaFunction(updateTimestampsFromPilotwebLambda));
     }
@@ -51,13 +48,15 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const lambda = new Function(stack, functionName, dbFunctionProps(stack, {
+    const lambda = new MonitoredFunction(stack, functionName, dbFunctionProps(stack, {
         memorySize: 256,
+        reservedConcurrentExecutions: 1,
+        timeout: 10,
         functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
         handler: 'lambda-update-timestamps-from-pilotweb.handler',
         environment
-    }));
+    }), TrafficType.MARINE);
 
     createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
@@ -75,14 +74,16 @@ function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, stac
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const lambda = new Function(stack, functionName, defaultLambdaConfiguration({
+    const lambda = new MonitoredFunction(stack, functionName, defaultLambdaConfiguration({
         functionName,
+        timeout: 10,
+        reservedConcurrentExecutions: 1,
         code: new AssetCode('dist/lambda/update-timestamps-from-schedules'),
         handler: 'lambda-update-timestamps-from-schedules.handler',
         environment,
         vpc: stack.vpc,
         vpcSubnets: stack.vpc.privateSubnets
-    }));
+    }), TrafficType.MARINE);
 
     createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
@@ -106,10 +107,12 @@ function createProcessQueueLambda(
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment,
-        reservedConcurrentExecutions: 6
+        timeout: 10,
+        reservedConcurrentExecutions: 8
     });
 
-    const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf);
+    const processQueueLambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
+
     secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
     createSubscription(processQueueLambda, functionName, stack.configuration.logsDestinationArn, stack);
@@ -133,7 +136,7 @@ function createProcessDLQLambda(
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1
-    });
+    }, TrafficType.MARINE);
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, stack.configuration.logsDestinationArn, stack);
@@ -161,11 +164,7 @@ function createPilotwebScheduler(stack: Stack): Rule {
     });
 }
 
-function createUpdateAwakeAiTimestampsLambda(
-    secret: ISecret,
-    queue: Queue,
-    stack: DigitrafficStack): Function {
-
+function createUpdateAwakeAiTimestampsLambda(secret: ISecret, queue: Queue, stack: DigitrafficStack): Function {
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
@@ -179,7 +178,7 @@ function createUpdateAwakeAiTimestampsLambda(
         environment,
         reservedConcurrentExecutions: 1
     });
-    const lambda = new Function(stack, functionName, lambdaConf);
+    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
 
     secret.grantRead(lambda);
     queue.grantSendMessages(lambda);

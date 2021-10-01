@@ -6,6 +6,7 @@ import * as VoyagePlansService from '../../service/voyageplans';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 import {VtsApi} from "../../api/vts";
+const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
@@ -35,7 +36,10 @@ export function handlerFn(
                     event.Records.length);
             }
 
-            const visMessage = JSON.parse(event.Records[0].body) as VisMessageWithCallbackEndpoint;
+            // base64 decode message
+            const base64EventBody = Buffer.from(event.Records[0].body, 'base64');
+            const gunzippedEventBody = zlib.gunzipSync(base64EventBody);
+            const visMessage = JSON.parse(gunzippedEventBody.toString('utf-8')) as VisMessageWithCallbackEndpoint;
 
             console.info(`method=vpgwUploadVoyagePlan received RTZ ${visMessage.message}`);
 
