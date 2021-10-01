@@ -1,28 +1,25 @@
-import {Props} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Topic} from "@aws-cdk/aws-sns";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
-import {Construct} from "@aws-cdk/core";
 import {Schedule} from "@aws-cdk/aws-synthetics";
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 import {createCanaryRole} from "digitraffic-common/canaries/canary";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {Props} from "./app-props";
 
 export class Canaries {
-    constructor(stack: Construct,
+    constructor(stack: DigitrafficStack,
                 secret: ISecret,
-                vpc: IVpc,
-                lambdaDbSg: ISecurityGroup,
                 dlq: Queue,
-                apiKeyId: string,
-                appProps: Props) {
-        addDLQAlarm(stack, dlq, appProps);
+                apiKeyId: string) {
+        const props = stack.configuration as Props;
 
-        if(appProps.enableCanaries) {
+        addDLQAlarm(stack, dlq, props);
+
+        if(props.enableCanaries) {
             const role = createCanaryRole(stack, 'portactivity');
 
             new UrlCanary(stack, role, {
@@ -31,7 +28,7 @@ export class Canaries {
                 handler: 'public-api.handler',
                 alarm: {
                     alarmName: 'PortActivity-PublicAPI-Alarm',
-                    topicArn: appProps.dlqNotificationTopicArn
+                    topicArn: props.dlqNotificationTopicArn
                 }
             });
 
@@ -42,35 +39,35 @@ export class Canaries {
                 apiKeyId,
                 alarm: {
                     alarmName: 'PortActivity-PrivateAPI-Alarm',
-                    topicArn: appProps.dlqNotificationTopicArn
+                    topicArn: props.dlqNotificationTopicArn
                 }
             });
 
-            new DatabaseCanary(stack, role, secret, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, role, secret, {
                 name: 'pa-daytime',
-                secret: appProps.secretId,
+                secret: props.secretId,
                 schedule: Schedule.expression("cron(0/15 2-19 ? * MON-SUN *)"),
                 handler: 'daytime-db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Day-Alarm',
-                    topicArn: appProps.dlqNotificationTopicArn
+                    topicArn: props.dlqNotificationTopicArn
                 }
             });
 
-            new DatabaseCanary(stack, role, secret, vpc, lambdaDbSg, {
+            new DatabaseCanary(stack, role, secret, {
                 name: 'pa',
-                secret: appProps.secretId,
+                secret: props.secretId,
                 handler: 'db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Alarm',
-                    topicArn: appProps.dlqNotificationTopicArn
+                    topicArn: props.dlqNotificationTopicArn
                 }
             });
         }
     }
 }
 
-function addDLQAlarm(stack: Construct, queue: Queue, appProps: Props) {
+function addDLQAlarm(stack: DigitrafficStack, queue: Queue, appProps: Props) {
     const alarmName = 'PortActivity-TimestampsDLQAlarm';
     queue.metricNumberOfMessagesReceived({
         period: appProps.dlqNotificationDuration

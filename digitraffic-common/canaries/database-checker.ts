@@ -7,7 +7,7 @@ const synthetics = require('Synthetics');
 export type DatabaseCheck = {
     readonly name: string
     readonly sql: string
-    readonly minRows: number
+    readonly minCount?: number
 }
 
 export class DatabaseChecker {
@@ -42,8 +42,10 @@ export class DatabaseChecker {
                     } else {
                         console.info("return value " + JSON.stringify(value));
 
-                        if(value.count < check.minRows) {
-                            this.errors.push(`Test ${check.name} count was ${value.count}, minimum is ${check.minRows}`);
+                        if(value.count) {
+                            if (value.count < (check.minCount || 1)) {
+                                this.errors.push(`Test ${check.name} count was ${value.count}, minimum is ${check.minCount}`);
+                            }
                         }
                     }
                 }

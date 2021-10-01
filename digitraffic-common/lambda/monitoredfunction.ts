@@ -3,6 +3,7 @@ import {Stack} from "@aws-cdk/core";
 import {ITopic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
+import {DigitrafficStack} from "../stack/stack";
 import {TrafficType} from '../model/traffictype';
 
 /**
@@ -51,24 +52,22 @@ export class MonitoredFunction extends Function {
      * @param props Monitored function properties
      */
     constructor(
-        scope: Stack,
+        stack: DigitrafficStack,
         id: string,
         functionProps: FunctionProps,
-        alarmSnsTopic: ITopic,
-        warningSnsTopic: ITopic,
         trafficType: TrafficType | null,
         props?: MonitoredFunctionProps) {
 
-        super(scope, id, functionProps);
+        super(stack, id, functionProps);
 
-        const alarmSnsAction = new SnsAction(alarmSnsTopic);
-        const warningSnsAction = new SnsAction(warningSnsTopic);
+        const alarmSnsAction = new SnsAction(stack.alarmTopic);
+        const warningSnsAction = new SnsAction(stack.warningTopic);
 
         if (props?.durationAlarmProps?.create !== false) {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
-            this.createAlarm(scope,
+            this.createAlarm(stack,
                 this.metricDuration(),
                 'Duration',
                 'Duration alarm',
@@ -86,7 +85,7 @@ export class MonitoredFunction extends Function {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
-            this.createAlarm(scope,
+            this.createAlarm(stack,
                 this.metricDuration(),
                 'Duration-Warning',
                 'Duration warning',
@@ -102,7 +101,7 @@ export class MonitoredFunction extends Function {
         }
 
         if (props?.errorAlarmProps?.create !== false) {
-            this.createAlarm(scope,
+            this.createAlarm(stack,
                 this.metricErrors(),
                 'Errors',
                 'Errors alarm',
@@ -118,7 +117,7 @@ export class MonitoredFunction extends Function {
         }
 
         if (props?.throttleAlarmProps?.create !== false) {
-            this.createAlarm(scope,
+            this.createAlarm(stack,
                 this.metricThrottles(),
                 'Throttles',
                 'Throttles alarm',
@@ -135,7 +134,7 @@ export class MonitoredFunction extends Function {
     }
 
     private createAlarm(
-        scope: Stack,
+        stack: Stack,
         metric: Metric,
         alarmId: string,
         alarmName: string,
@@ -149,8 +148,8 @@ export class MonitoredFunction extends Function {
         comparisonOperator: ComparisonOperator,
         alarmProps?: MonitoredFunctionAlarmProps
     ) {
-        metric.createAlarm(scope, `${this.node.id}-${alarmId}`, {
-            alarmName: `${trafficType ?? ''} ${scope.stackName} ${this.functionName} ${alarmName}`.trim(),
+        metric.createAlarm(stack, `${this.node.id}-${alarmId}`, {
+            alarmName: `${trafficType ?? ''} ${stack.stackName} ${this.functionName} ${alarmName}`.trim(),
             alarmDescription,
             threshold: alarmProps?.threshold ?? threshold,
             evaluationPeriods: alarmProps?.evaluationPeriods ?? evaluationPeriods,
@@ -159,5 +158,4 @@ export class MonitoredFunction extends Function {
             comparisonOperator: alarmProps?.comparisonOperator ?? comparisonOperator
         }).addAlarmAction(alarmSnsAction);
     }
-
 }

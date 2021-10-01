@@ -1,64 +1,41 @@
 import {
-    EndpointType,
     LambdaIntegration,
-    MethodLoggingLevel,
     MockIntegration,
     PassthroughBehavior,
     RequestValidator,
     Resource,
     RestApi
 } from '@aws-cdk/aws-apigateway';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
-import {AssetCode} from '@aws-cdk/aws-lambda';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {Stack} from "@aws-cdk/core";
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {
     corsMethod,
     defaultIntegration,
-    getResponse,
-    methodResponse, RESPONSE_200_OK,
-    RESPONSE_400_BAD_REQUEST, RESPONSE_500_SERVER_ERROR,
+    getResponse, methodResponse,
+    RESPONSE_200_OK,
+    RESPONSE_400_BAD_REQUEST,
+    RESPONSE_500_SERVER_ERROR,
 } from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/api/utils";
-import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
-import {Props} from "./app-props";
+import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {add404Support} from "digitraffic-common/api/rest_apis";
+import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {PortactivityEnvKeys} from "./keys";
-import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {ITopic} from "@aws-cdk/aws-sns";
-import {TrafficType} from "digitraffic-common/model/traffictype";
+import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export class PublicApi {
-    readonly stack: Stack;
-    readonly props: Props;
-    readonly secret: ISecret;
     readonly apiKeyId: string;
 
-    constructor(
-        secret: ISecret,
-        vpc: IVpc,
-        lambdaDbSg: ISecurityGroup,
-        alarmTopic: ITopic,
-        warningTopic: ITopic,
-        props: Props,
-        stack: Stack) {
+    constructor(stack: DigitrafficStack, secret: ISecret) {
+        const publicApi = new DigitrafficRestApi(stack, 'PortActivity-public', 'PortActivity public API');
 
-        this.secret = secret;
-        this.props = props;
-        this.stack = stack;
-
-        const publicApi = this.createApi();
-        add404Support(publicApi, stack);
         this.apiKeyId = createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan').keyId;
 
         const validator = addDefaultValidator(publicApi);
@@ -77,79 +54,32 @@ export class PublicApi {
             .addResource("api")
             .addResource("v1");
 
-        this.createTimestampsResource(
-            vpc,
-            lambdaDbSg,
-            resource,
-            timestampsModel,
-            errorResponseModel,
-            validator,
-            alarmTopic,
-            warningTopic);
-        this.createShiplistResource(publicApi, vpc, lambdaDbSg, alarmTopic, warningTopic);
-        this.createTimestampMetadataResource(publicApi, resource);
-    }
-
-    createApi(): RestApi {
-        return new RestApi(this.stack, 'PortActivity-public', {
-            deployOptions: {
-                loggingLevel: MethodLoggingLevel.ERROR,
-            },
-            description: 'PortActivity timestamps',
-            restApiName: 'PortActivity public API',
-            endpointTypes: [EndpointType.REGIONAL],
-            policy: new PolicyDocument({
-                statements: [
-                    new PolicyStatement({
-                        effect: Effect.ALLOW,
-                        actions: [
-                            "execute-api:Invoke"
-                        ],
-                        resources: [
-                            "*"
-                        ],
-                        principals: [
-                            new AnyPrincipal()
-                        ]
-                    })
-                ]
-            })
-        });
+        this.createTimestampsResource(stack, resource, timestampsModel, errorResponseModel, validator, secret);
+        this.createShiplistResource(stack, publicApi, secret);
+        this.createTimestampMetadataResource(stack, publicApi, resource);
     }
 
     createTimestampsResource(
-        vpc: IVpc,
-        lambdaDbSg: ISecurityGroup,
+        stack: DigitrafficStack,
         resource: Resource,
         timestampsJsonModel: any,
         errorResponseModel: any,
         validator: RequestValidator,
-        alarmTopic: ITopic,
-        warningTopic: ITopic) {
+        secret: ISecret): Function {
 
         const functionName = 'PortActivity-GetTimestamps';
         const assetCode = new AssetCode('dist/lambda/get-timestamps');
-        const environment: LambdaEnvironment = {};
-        environment[PortactivityEnvKeys.SECRET_ID] = this.props.secretId;
-        environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
+        const environment = stack.createDefaultLambdaEnvironment('PortActivity');
 
-        const getTimestampsLambda = new MonitoredFunction(this.stack, functionName,
-            dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
-                functionName: functionName,
-                memorySize: 128,
-                timeout: 10,
-                reservedConcurrentExecutions: 4,
-                code: assetCode,
-                handler: 'lambda-get-timestamps.handler',
-                readOnly: false,
-                environment
-        }), alarmTopic, warningTopic, TrafficType.MARINE, {
-            errorAlarmProps: {
-                create: true,
-                threshold: 3
-            }
-        });
-        this.secret.grantRead(getTimestampsLambda);
+        const getTimestampsLambda = new Function(stack, functionName, dbFunctionProps(stack, {
+            functionName: functionName,
+            memorySize: 128,
+            code: assetCode,
+            handler: 'lambda-get-timestamps.handler',
+            environment
+        }));
+
+        secret.grantRead(getTimestampsLambda);
 
         const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
             requestParameters: {
@@ -190,43 +120,35 @@ export class PublicApi {
             ]
         });
 
-        createSubscription(getTimestampsLambda, functionName, this.props.logsDestinationArn, this.stack);
+        createSubscription(getTimestampsLambda, functionName, stack.configuration.logsDestinationArn, stack);
         addTagsAndSummary('GetTimestamps',
             ['timestamps'],
             'Retrieves ship timestamps by ship or port',
             timestampResource,
-            this.stack);
-        addQueryParameterDescription('locode', 'Port LOCODE', timestampResource, this.stack);
-        addQueryParameterDescription('mmsi', 'Ship MMSI', timestampResource, this.stack);
-        addQueryParameterDescription('imo', 'Ship IMO', timestampResource, this.stack);
+            stack);
+        addQueryParameterDescription('locode', 'Port LOCODE', timestampResource, stack);
+        addQueryParameterDescription('mmsi', 'Ship MMSI', timestampResource, stack);
+        addQueryParameterDescription('imo', 'Ship IMO', timestampResource, stack);
 
         return getTimestampsLambda;
     }
 
-    createShiplistResource(
-        publicApi: RestApi,
-        vpc: IVpc,
-        lambdaDbSg: ISecurityGroup,
-        alarmTopic: ITopic,
-        warningTopic: ITopic) {
-
+    createShiplistResource(stack: DigitrafficStack, publicApi: RestApi, secret: ISecret): Function {
         const functionName = 'PortActivity-PublicShiplist';
         const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
-        const environment: LambdaEnvironment = {};
-        environment[PortactivityEnvKeys.SECRET_ID] = this.props.secretId;
-        environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'PortActivity';
+        const environment = stack.createDefaultLambdaEnvironment('PortActivity');
 
-        const lambda = new MonitoredFunction(this.stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, this.props, {
+        const lambda = new Function(stack, functionName, dbFunctionProps(stack, {
             functionName: functionName,
             code: assetCode,
             memorySize: 128,
             timeout: 10,
             handler: 'lambda-get-shiplist-public.handler',
-            readOnly: false,
-            reservedConcurrentExecutions: 1,
             environment
-        }), alarmTopic, warningTopic, TrafficType.MARINE);
-        this.secret.grantRead(lambda);
+        }));
+
+        secret.grantRead(lambda);
+
         const integration = new LambdaIntegration(lambda, {
             proxy: true
         });
@@ -236,17 +158,18 @@ export class PublicApi {
             apiKeyRequired: false
         });
 
-        createSubscription(lambda, functionName, this.props.logsDestinationArn, this.stack);
+        createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
         addTagsAndSummary('Shiplist',
             ['shiplist'],
             'Returns a list of ships as an HTML page',
             shiplistResource,
-            this.stack);
+            stack);
 
         return lambda;
     }
 
     createTimestampMetadataResource(
+        stack: DigitrafficStack,
         publicApi: RestApi,
         resource: Resource) {
 
@@ -278,6 +201,6 @@ export class PublicApi {
             ['metadata'],
             'Returns timestamp related metadata',
             metadataResource,
-            this.stack);
+            stack);
     }
 }
