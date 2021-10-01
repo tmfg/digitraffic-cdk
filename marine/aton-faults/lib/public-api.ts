@@ -1,8 +1,5 @@
-import {EndpointType, MethodLoggingLevel, RestApi} from '@aws-cdk/aws-apigateway';
-import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
+import {Model, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {Construct} from "@aws-cdk/core";
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
@@ -10,23 +7,18 @@ import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
-import {AtonProps} from "./app-props";
+import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/api/documentation";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
-import {AtonEnvKeys} from "./keys";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
-export function create(
-    secret: ISecret,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: AtonProps,
-    stack: Construct): Function {
-    const publicApi = createApi(stack);
+export function create(stack: DigitrafficStack, secret: ISecret): Function {
+    const publicApi = new DigitrafficRestApi(stack, 'ATON-public', 'ATON public API');
 
     createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
 
@@ -34,32 +26,22 @@ export function create(
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
     const faultsModel = addServiceModel("FaultsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    return createAnnotationsResource(secret, publicApi, vpc, props, lambdaDbSg, faultsModel, stack)
+    return createAnnotationsResource(stack, secret, publicApi, faultsModel);
 }
 
-function createAnnotationsResource(
-    secret: ISecret,
-    publicApi: RestApi,
-    vpc: IVpc,
-    props: AtonProps,
-    lambdaDbSg: ISecurityGroup,
-    faultsJsonModel: any,
-    stack: Construct): Function {
-
+function createAnnotationsResource(stack: DigitrafficStack, secret: ISecret, publicApi: RestApi, faultsJsonModel: Model): Function {
     const functionName = 'ATON-GetFaults';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const assetCode = new AssetCode('dist/lambda/get-faults');
-    const environment: LambdaEnvironment = {};
-    environment[AtonEnvKeys.SECRET_ID] = props.secretId;
-    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'ATON';
+    const environment = stack.createDefaultLambdaEnvironment('ATON');
 
-    const getFaultsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const getFaultsLambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
         environment,
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-faults.handler',
         readOnly: true
-    }));
+    }), TrafficType.MARINE);
 
     secret.grantRead(getFaultsLambda);
 
@@ -93,37 +75,11 @@ function createAnnotationsResource(
         ]
     });
 
-    createSubscription(getFaultsLambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(getFaultsLambda, functionName, stack.configuration.logsDestinationArn, stack);
 
     addTags('GetFaults', BETA_TAGS, resources, stack);
     addQueryParameterDescription('language', 'Language: en, fi or sv', resources, stack);
     addQueryParameterDescription('fixed_in_hours', 'Show faults that are unfixed or were fixed at most this many hours ago', resources, stack);
 
     return getFaultsLambda;
-}
-
-function createApi(stack: Construct) {
-    return new RestApi(stack, 'ATON-public', {
-        deployOptions: {
-            loggingLevel: MethodLoggingLevel.ERROR,
-        },
-        restApiName: 'ATON public API',
-        endpointTypes: [EndpointType.REGIONAL],
-        policy: new PolicyDocument({
-            statements: [
-                new PolicyStatement({
-                    effect: Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke"
-                    ],
-                    resources: [
-                        "*"
-                    ],
-                    principals: [
-                        new AnyPrincipal()
-                    ]
-                })
-            ]
-        })
-    });
 }

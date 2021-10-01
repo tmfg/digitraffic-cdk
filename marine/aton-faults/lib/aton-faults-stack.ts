@@ -1,24 +1,17 @@
-import {Stack, Construct, StackProps} from '@aws-cdk/core';
-import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
+import {Construct} from '@aws-cdk/core';
 import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
 import * as PublicApi from './public-api';
 import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
+import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
 
-export class AtonFaultsStack extends Stack {
-    constructor(scope: Construct, id: string, atonFaultsProps: AtonProps, props?: StackProps) {
-        super(scope, id, props);
+export class AtonFaultsStack extends DigitrafficStack {
+    constructor(scope: Construct, id: string, configuration: AtonProps) {
+        super(scope, id, configuration);
 
-        const secret = Secret.fromSecretNameV2(this, 'AtonSecret', atonFaultsProps.secretId);
-
-        const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
-            vpcId: atonFaultsProps.vpcId,
-            privateSubnetIds: atonFaultsProps.privateSubnetIds,
-            availabilityZones: atonFaultsProps.availabilityZones
-        });
-        const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', atonFaultsProps.lambdaDbSgId);
+        const secret = Secret.fromSecretNameV2(this, 'AtonSecret', configuration.secretId);
 
         const sendFaultTopicName = 'ATON-SendFaultTopic';
         const sendFaultTopic = new Topic(this, sendFaultTopicName, {
@@ -26,8 +19,8 @@ export class AtonFaultsStack extends Stack {
             displayName: sendFaultTopicName
         });
 
-        IntegrationApi.create(secret, sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
-        InternalLambdas.create(secret, sendFaultTopic, vpc, lambdaDbSg, atonFaultsProps, this);
-        PublicApi.create(secret, vpc, lambdaDbSg, atonFaultsProps, this);
+        IntegrationApi.create(this, secret, sendFaultTopic);
+        InternalLambdas.create(this, secret, sendFaultTopic);
+        PublicApi.create(this, secret);
     }
 }

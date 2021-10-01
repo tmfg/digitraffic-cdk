@@ -1,32 +1,23 @@
 import {Model, PassthroughBehavior, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {createSubscription} from "digitraffic-common/stack/subscription";
-import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
-import {createRestApi, setReturnCodeForMissingAuthenticationToken} from "digitraffic-common/api/rest_apis";
+import {dbFunctionProps} from 'digitraffic-common/stack/lambda-configs';
+import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {AtonProps} from "./app-props";
 import {defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
 import {AtonEnvKeys} from "./keys";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
-export function create(
-    secret: ISecret,
-    sendFaultTopic: Topic,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: AtonProps,
-    stack: Construct) {
-
-    const integrationApi = createRestApi(
-        stack,
+export function create(stack: DigitrafficStack, secret: ISecret, sendFaultTopic: Topic) {
+    const integrationApi = new DigitrafficRestApi(stack,
         'ATON-Integration',
         'ATON Faults integration API');
 
@@ -35,20 +26,17 @@ export function create(
 
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
-    createUploadVoyagePlanHandler(messageResponseModel, secret, sendFaultTopic, stack, integrationApi, vpc, lambdaDbSg, props);
+    createUploadVoyagePlanHandler(stack, messageResponseModel, secret, sendFaultTopic, integrationApi);
 }
 
 function createUploadVoyagePlanHandler(
+    stack: DigitrafficStack,
     messageResponseModel: Model,
     secret: ISecret,
     sendFaultTopic: Topic,
-    stack: Construct,
-    integrationApi: RestApi,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: AtonProps) {
+    integrationApi: RestApi) {
 
-    const handler = createHandler(sendFaultTopic, stack, vpc, lambdaDbSg, props);
+    const handler = createHandler(stack, sendFaultTopic);
     secret.grantRead(handler);
     const resource = integrationApi.root.addResource("s124").addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
@@ -100,25 +88,18 @@ function createIntegrationResource(
         stack);
 }
 
-function createHandler(
-    sendFaultTopic: Topic,
-    stack: Construct,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: AtonProps,
-): Function {
+function createHandler(stack: DigitrafficStack, sendFaultTopic: Topic): Function {
     const functionName = 'ATON-UploadVoyagePlan';
-    const environment: LambdaEnvironment = {};
-    environment[AtonEnvKeys.SECRET_ID] = props.secretId;
+    const environment = stack.createDefaultLambdaEnvironment('ATON');
     environment[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
-    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'ATON';
 
-    const handler = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const handler = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
+        memorySize: 512,
         functionName,
         code: new AssetCode('dist/lambda/upload-voyage-plan'),
         handler: 'lambda-upload-voyage-plan.handler',
         environment
-    }));
-    createSubscription(handler, functionName, props.logsDestinationArn, stack);
+    }), TrafficType.MARINE);
+    createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
     return handler;
 }

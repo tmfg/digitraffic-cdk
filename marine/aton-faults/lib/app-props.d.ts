@@ -1,8 +1,7 @@
-import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {StackConfiguration} from "digitraffic-common/stack/stack";
 
-declare interface AtonProps extends LambdaConfiguration {
+declare interface AtonProps extends StackConfiguration {
     readonly integrations: Integration[]
-    readonly secretId: string
 }
 
 interface Integration {
