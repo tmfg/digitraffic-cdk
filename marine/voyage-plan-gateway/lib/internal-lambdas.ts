@@ -102,7 +102,7 @@ function createProcessVisMessagesLambda(
         handler: 'lambda-process-vis-messages.handler',
         environment
     });
-    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
     secret.grantRead(lambda);
     notifyTopic.addSubscription(new LambdaSubscription(lambda));
     sendRouteQueue.grantSendMessages(lambda);
@@ -133,7 +133,7 @@ function createUploadVoyagePlanLambda(
         vpc: stack.vpc,
         environment
     });
-    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
     secret.grantRead(lambda);
     lambda.addEventSource(new SqsEventSource(sendRouteQueue, {
         batchSize: 1
@@ -150,7 +150,7 @@ function createProcessDLQLambda(
     const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[VoyagePlanEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
     const functionName = "VPGW-ProcessDLQ";
-    const processDLQLambda = new MonitoredFunction(stack, functionName, {
+    const processDLQLambda = MonitoredFunction.create(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,

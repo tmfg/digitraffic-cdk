@@ -57,7 +57,7 @@ function createVtsProxyHandler(
     // ATTENTION!
     // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
     // The reason for this is IP based restriction in another system's firewall.
-    const handler = new MonitoredFunction(stack, functionName, defaultLambdaConfiguration({
+    const handler = MonitoredFunction.create(stack, functionName, defaultLambdaConfiguration({
         functionName,
         code: new AssetCode('dist/lambda/get-schedules'),
         handler: 'lambda-get-schedules.handler',

@@ -88,7 +88,7 @@ function createHandler(
     const functionName = 'VPGW-Notify';
     const environment: any = {};
     environment[VoyagePlanEnvKeys.TOPIC_ARN] = notifyTopic.topicArn;
-    const handler = new MonitoredFunction(stack, functionName, defaultLambdaConfiguration({
+    const handler = MonitoredFunction.create(stack, functionName, defaultLambdaConfiguration({
         functionName,
         code: new AssetCode('dist/lambda/notify'),
         handler: 'lambda-notify.handler',
