@@ -143,7 +143,12 @@ export class PublicApi {
                 handler: 'lambda-get-timestamps.handler',
                 readOnly: false,
                 environment
-        }), alarmTopic, warningTopic, TrafficType.MARINE);
+        }), alarmTopic, warningTopic, TrafficType.MARINE, {
+            errorAlarmProps: {
+                create: true,
+                threshold: 3
+            }
+        });
         this.secret.grantRead(getTimestampsLambda);
 
         const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
