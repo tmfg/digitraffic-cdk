@@ -19,14 +19,17 @@ export class VoyagePlanGatewayStack extends Stack {
             availabilityZones: appProps.availabilityZones
         });
 
+        const alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', appProps.alarmTopicArn);
+        const warningTopic = Topic.fromTopicArn(this, 'WarningTopic', appProps.warningTopicArn);
+
         const notifyTopicName = 'VPGW-NotifyTopic';
         const notifyTopic = new Topic(this, notifyTopicName, {
             topicName: notifyTopicName,
             displayName: notifyTopicName
         });
 
-        IntegrationApi.create(secret, notifyTopic, appProps, this);
-        InternalLambdas.create(secret, notifyTopic, vpc, appProps, this);
-        PublicApi.create(secret, vpc, appProps, this);
+        IntegrationApi.create(secret, notifyTopic, alarmTopic, warningTopic, appProps, this);
+        InternalLambdas.create(secret, notifyTopic, vpc, alarmTopic, warningTopic, appProps, this);
+        PublicApi.create(secret, vpc, alarmTopic, warningTopic, appProps, this);
     }
 }
