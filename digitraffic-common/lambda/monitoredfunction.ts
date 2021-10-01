@@ -1,6 +1,5 @@
 import {Function, FunctionProps} from '@aws-cdk/aws-lambda';
 import {Stack} from "@aws-cdk/core";
-import {ITopic} from "@aws-cdk/aws-sns";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
@@ -149,7 +148,7 @@ export class MonitoredFunction extends Function {
         alarmProps?: MonitoredFunctionAlarmProps
     ) {
         metric.createAlarm(stack, `${this.node.id}-${alarmId}`, {
-            alarmName: `${trafficType ?? ''} ${stack.stackName} ${this.functionName} ${alarmName}`.trim(),
+            alarmName: `${trafficType ?? ''} ${this.functionName} ${alarmName}`.trim(),
             alarmDescription,
             threshold: alarmProps?.threshold ?? threshold,
             evaluationPeriods: alarmProps?.evaluationPeriods ?? evaluationPeriods,
