@@ -6,7 +6,7 @@ import {
     ResponseType,
 } from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {Construct} from "@aws-cdk/core";
+import {Stack} from "@aws-cdk/core";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
@@ -14,13 +14,17 @@ import {VoyagePlanEnvKeys} from "./keys";
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {createRestApi,} from "digitraffic-common/api/rest_apis";
-import {Topic} from "@aws-cdk/aws-sns";
+import {ITopic, Topic} from "@aws-cdk/aws-sns";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
     secret: ISecret,
     notifyTopic: Topic,
+    alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
-    stack: Construct) {
+    stack: Stack) {
 
     const integrationApi = createRestApi(
         stack,
@@ -37,24 +41,26 @@ export function create(
     });
     createUsagePlan(integrationApi, 'VPGW CloudFront API Key', 'VPGW Faults CloudFront Usage Plan');
     const resource = integrationApi.root.addResource("vpgw")
-    createNotifyHandler(secret, stack, notifyTopic, resource, props);
+    createNotifyHandler(secret, stack, notifyTopic, alarmTopic, warningTopic, resource, props);
 }
 
 function createNotifyHandler(
     secret: ISecret,
-    stack: Construct,
+    stack: Stack,
     notifyTopic: Topic,
+    alarmTopic: ITopic,
+    warningTopic: ITopic,
     api: Resource,
     props: VoyagePlanGatewayProps) {
 
-    const handler = createHandler(stack, notifyTopic, props);
+    const handler = createHandler(stack, notifyTopic, alarmTopic, warningTopic, props);
     secret.grantRead(handler);
     const resource = api.addResource("notify")
     createIntegrationResource(stack, secret, props, resource, handler);
 }
 
 function createIntegrationResource(
-    stack: Construct,
+    stack: Stack,
     secret: ISecret,
     props: VoyagePlanGatewayProps,
     resource: Resource,
@@ -77,19 +83,24 @@ function createIntegrationResource(
 }
 
 function createHandler(
-    stack: Construct,
+    stack: Stack,
     notifyTopic: Topic,
+    alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
-): Function {
+) {
+
     const functionName = 'VPGW-Notify';
     const environment: any = {};
     environment[VoyagePlanEnvKeys.TOPIC_ARN] = notifyTopic.topicArn;
-    const handler = new Function(stack, functionName, defaultLambdaConfiguration({
+    const handler = new MonitoredFunction(stack, functionName, defaultLambdaConfiguration({
         functionName,
         code: new AssetCode('dist/lambda/notify'),
         handler: 'lambda-notify.handler',
+        timeout: 10,
+        reservedConcurrentExecutions: 1,
         environment
-    }));
+    }), alarmTopic, warningTopic, TrafficType.MARINE);
     notifyTopic.grantPublish(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     return handler;

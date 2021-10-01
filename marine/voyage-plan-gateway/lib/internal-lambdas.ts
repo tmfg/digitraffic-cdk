@@ -1,9 +1,9 @@
-import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
+import {AssetCode, Runtime} from '@aws-cdk/aws-lambda';
 import {IVpc} from '@aws-cdk/aws-ec2';
 import {Construct, Duration, Stack} from '@aws-cdk/core';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
-import {Topic} from "@aws-cdk/aws-sns";
+import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {VoyagePlanGatewayProps} from "./app-props";
@@ -18,11 +18,15 @@ import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
     secret: ISecret,
     notifyTopic: Topic,
     vpc: IVpc,
+    alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
     stack: Stack) {
 
@@ -49,14 +53,34 @@ export function create(
         }
     });
 
-    const processVisMessagesLambda = createProcessVisMessagesLambda(secret, notifyTopic, sendRouteQueue, props, stack);
+    const processVisMessagesLambda = createProcessVisMessagesLambda(
+        secret,
+        notifyTopic,
+        sendRouteQueue,
+        alarmTopic,
+        warningTopic,
+        props,
+        stack);
     const scheduler = createProcessVisMessagesScheduler(stack);
     scheduler.addTarget(new LambdaFunction(processVisMessagesLambda));
 
-    createUploadVoyagePlanLambda(secret, sendRouteQueue, vpc, props, stack);
-    createProcessDLQLambda(dlqBucket, dlq, props, stack);
+    createUploadVoyagePlanLambda(
+        secret,
+        sendRouteQueue,
+        vpc,
+        alarmTopic,
+        warningTopic,
+        props,
+        stack);
+    createProcessDLQLambda(
+        dlqBucket,
+        dlq,
+        alarmTopic,
+        warningTopic,
+        props,
+        stack);
 
-    addDLQAlarm(dlq, props, stack);
+    addDLQAlarm(dlq, warningTopic, props, stack);
 }
 
 function createProcessVisMessagesScheduler(stack: Stack): Rule {
@@ -71,6 +95,8 @@ function createProcessVisMessagesLambda(
     secret: ISecret,
     notifyTopic: Topic,
     sendRouteQueue: Queue,
+    alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
     stack: Stack) {
 
@@ -81,11 +107,13 @@ function createProcessVisMessagesLambda(
     const lambdaConf = defaultLambdaConfiguration({
         functionName: functionName,
         memorySize: 128,
+        timeout: 10,
+        reservedConcurrentExecutions: 2,
         code: new AssetCode('dist/lambda/process-vis-messages'),
         handler: 'lambda-process-vis-messages.handler',
         environment
     });
-    const lambda = new Function(stack, functionName, lambdaConf);
+    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic, TrafficType.MARINE);
     secret.grantRead(lambda);
     notifyTopic.addSubscription(new LambdaSubscription(lambda));
     sendRouteQueue.grantSendMessages(lambda);
@@ -101,6 +129,8 @@ function createUploadVoyagePlanLambda(
     secret: ISecret,
     sendRouteQueue: Queue,
     vpc: IVpc,
+    alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
     stack: Stack) {
 
@@ -112,10 +142,12 @@ function createUploadVoyagePlanLambda(
         memorySize: 128,
         code: new AssetCode('dist/lambda/upload-voyage-plan'),
         handler: 'lambda-upload-voyage-plan.handler',
+        timeout: 10,
+        reservedConcurrentExecutions: 1,
         vpc: vpc,
         environment
     });
-    const lambda = new Function(stack, functionName, lambdaConf);
+    const lambda = new MonitoredFunction(stack, functionName, lambdaConf, alarmTopic, warningTopic, TrafficType.MARINE);
     secret.grantRead(lambda);
     lambda.addEventSource(new SqsEventSource(sendRouteQueue, {
         batchSize: 1
@@ -126,21 +158,24 @@ function createUploadVoyagePlanLambda(
 function createProcessDLQLambda(
     dlqBucket: Bucket,
     dlq: Queue,
+    alarmTopic: ITopic,
+    warningTopic: ITopic,
     props: VoyagePlanGatewayProps,
     stack: Stack) {
 
     const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[VoyagePlanEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
     const functionName = "VPGW-ProcessDLQ";
-    const processDLQLambda = new Function(stack, functionName, {
+    const processDLQLambda = new MonitoredFunction(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
         code: new AssetCode('dist/lambda/process-dlq'),
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
-        reservedConcurrentExecutions: props.sqsProcessLambdaConcurrentExecutions
-    });
+        timeout: Duration.seconds(10),
+        reservedConcurrentExecutions: 1
+    }, alarmTopic, warningTopic, TrafficType.MARINE);
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);
@@ -152,7 +187,12 @@ function createProcessDLQLambda(
     processDLQLambda.addToRolePolicy(statement);
 }
 
-function addDLQAlarm(queue: Queue, appProps: VoyagePlanGatewayProps, stack: Construct) {
+function addDLQAlarm(
+    queue: Queue,
+    warningTopic: ITopic,
+    appProps: VoyagePlanGatewayProps,
+    stack: Construct) {
+    
     const alarmName = 'VPGW-DLQAlarm';
     queue.metricNumberOfMessagesReceived({
         period: appProps.dlqNotificationDuration
@@ -162,5 +202,5 @@ function addDLQAlarm(queue: Queue, appProps: VoyagePlanGatewayProps, stack: Cons
         evaluationPeriods: 1,
         treatMissingData: TreatMissingData.NOT_BREACHING,
         comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
-    }).addAlarmAction(new SnsAction(Topic.fromTopicArn(stack, 'Topic', appProps.dlqNotificationTopicArn)));
+    }).addAlarmAction(new SnsAction(warningTopic));
 }
