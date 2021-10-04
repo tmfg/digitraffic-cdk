@@ -47,7 +47,7 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
                 name: 'COUNTERNAME',
                 latitude: 10,
                 longitude: 10,
-                user_type: 1,
+                userType: 1,
                 interval: 15,
                 sens: 1
             }
