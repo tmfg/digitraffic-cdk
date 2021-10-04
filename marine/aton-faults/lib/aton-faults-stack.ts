@@ -6,6 +6,7 @@ import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
+import {Canaries} from "./canaries";
 
 export class AtonFaultsStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: AtonProps) {
@@ -22,5 +23,6 @@ export class AtonFaultsStack extends DigitrafficStack {
         IntegrationApi.create(this, secret, sendFaultTopic);
         InternalLambdas.create(this, secret, sendFaultTopic);
         PublicApi.create(this, secret);
+        new Canaries(this, secret);
     }
 }

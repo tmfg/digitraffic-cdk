@@ -29,29 +29,29 @@ export class DigitrafficCanary extends Canary {
     }
 }
 
-export function createCanaryRole(stack: Construct, canaryName: string): Role {
-    const role = new Role(stack, "canary-role-" + canaryName, {
-        assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-        managedPolicies: [
-            ManagedPolicy.fromAwsManagedPolicyName("CloudWatchSyntheticsFullAccess")
-        ]
-    });
+export class DigitrafficCanaryRole extends Role {
+    constructor(stack: Construct, canaryName: string) {
+        super(stack, 'canary-role-' + canaryName, {
+            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+            managedPolicies: [
+                ManagedPolicy.fromAwsManagedPolicyName("CloudWatchSyntheticsFullAccess")
+            ]
+        });
 
-    role.addToPolicy(new PolicyStatement({
-            actions: [
-                "logs:CreateLogStream",
-                "logs:PutLogEvents",
-                "logs:CreateLogGroup",
-                "logs:DescribeLogGroups",
-                "logs:DescribeLogStreams",
-                "cloudwatch:PutMetricData",
-                "ec2:CreateNetworkInterface",
-                "ec2:DescribeNetworkInterfaces",
-                "ec2:DeleteNetworkInterface"
-            ],
-            resources: ["*"]
-        })
-    );
-
-    return role;
+        this.addToPolicy(new PolicyStatement({
+                actions: [
+                    "logs:CreateLogStream",
+                    "logs:PutLogEvents",
+                    "logs:CreateLogGroup",
+                    "logs:DescribeLogGroups",
+                    "logs:DescribeLogStreams",
+                    "cloudwatch:PutMetricData",
+                    "ec2:CreateNetworkInterface",
+                    "ec2:DescribeNetworkInterfaces",
+                    "ec2:DeleteNetworkInterface"
+                ],
+                resources: ["*"]
+            })
+        );
+    }
 }

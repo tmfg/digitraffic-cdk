@@ -6,7 +6,7 @@ import {Schedule} from "@aws-cdk/aws-synthetics";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
-import {createCanaryRole} from "digitraffic-common/canaries/canary";
+import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {Props} from "./app-props";
 
@@ -20,7 +20,7 @@ export class Canaries {
         addDLQAlarm(stack, dlq, props);
 
         if(props.enableCanaries) {
-            const role = createCanaryRole(stack, 'portactivity');
+            const role = new DigitrafficCanaryRole(stack, 'portactivity');
 
             new UrlCanary(stack, role, {
                 name: 'pa-public',

@@ -1,5 +1,5 @@
 import {Model, RestApi} from '@aws-cdk/aws-apigateway';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {Architecture, AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
@@ -40,7 +40,8 @@ function createAnnotationsResource(stack: DigitrafficStack, secret: ISecret, pub
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-faults.handler',
-        readOnly: true
+        readOnly: true,
+        architecture: Architecture.ARM_64,
     }), TrafficType.MARINE);
 
     secret.grantRead(getFaultsLambda);

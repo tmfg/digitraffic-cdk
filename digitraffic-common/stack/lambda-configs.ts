@@ -1,4 +1,4 @@
-import {Code, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
+import {Architecture, Code, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
@@ -43,6 +43,7 @@ export function dbFunctionProps(stack: DigitrafficStack, config: FunctionParamet
 export function lambdaFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
     return {
         runtime: config.runtime || Runtime.NODEJS_12_X,
+        architectures: [config.architecture || Architecture.X86_64],
         memorySize: config.memorySize || 128,
         functionName: config.functionName,
         code: config.code,
@@ -128,4 +129,5 @@ interface FunctionParameters {
     vpc?: IVpc;
     vpcSubnets?: any;
     runtime?: Runtime;
+    architecture?: Architecture;
 }
