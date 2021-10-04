@@ -63,10 +63,14 @@ export class UrlChecker {
    }
 }
 
+export function jsonChecker(fn: any): any {
+    return responseChecker((body: string) => {
+        fn(JSON.parse(body), body);
+    })
+}
+
 export function responseChecker(fn: any): any {
     return async (res: any) => {
-        console.info("response headers " + JSON.stringify(res.headers, null, 2));
-
         if (res.statusCode < 200 || res.statusCode > 299) {
             throw res.statusCode + ' ' + res.statusMessage;
         }
