@@ -1,35 +1,31 @@
-import {Rule,Schedule} from '@aws-cdk/aws-events';
-import {Function,AssetCode} from '@aws-cdk/aws-lambda';
-import {IVpc,ISecurityGroup} from '@aws-cdk/aws-ec2';
+import {Rule, Schedule} from '@aws-cdk/aws-events';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
-import {Stack, Duration} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {Duration} from '@aws-cdk/core';
+import {dbFunctionProps} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
-import {Props} from "./app-props";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: Props,
     secret: ISecret,
-    stack: Stack): Function {
+    stack: DigitrafficStack): Function {
 
     const functionName = "BridgeLockDisruption-UpdateDisruptions";
-    const environment: LambdaEnvironment = {};
-    environment["SECRET_ID"] = props.secretId;
-    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = "BridgeLockDisruption";
+    const environment = stack.createDefaultLambdaEnvironment('BridgeLockDisruption');
 
-    const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const lambdaConf = dbFunctionProps(stack, {
         functionName: functionName,
         code: new AssetCode('dist/lambda/update-disruptions'),
         handler: 'lambda-update-disruptions.handler',
-        environment
+        environment,
+        timeout: 10,
+        reservedConcurrentExecutions: 1
     });
 
-    const updateDisruptionsLambda = new Function(stack, 'UpdateDisruptions', lambdaConf);
+    const updateDisruptionsLambda = MonitoredFunction.create(stack, 'UpdateDisruptions', lambdaConf, TrafficType.MARINE);
 
     secret.grantRead(updateDisruptionsLambda);
 
@@ -38,7 +34,7 @@ export function create(
     });
     rule.addTarget(new LambdaFunction(updateDisruptionsLambda));
 
-    createSubscription(updateDisruptionsLambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(updateDisruptionsLambda, functionName, stack.configuration.logsDestinationArn, stack);
 
     return updateDisruptionsLambda;
 }
