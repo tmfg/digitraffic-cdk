@@ -1,7 +1,6 @@
 import {EndpointType, MethodLoggingLevel, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Construct} from "@aws-cdk/core";
 import {default as DisruptionSchema} from './model/disruption-schema';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
@@ -9,22 +8,19 @@ import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common
 import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addDefaultValidator, addServiceModel, getModelReference} from "digitraffic-common/api/utils";
-import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
-import {Props} from "./app-props";
+import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addTags} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: Props,
     secret: ISecret,
-    stack: Construct) {
-    const publicApi = createApi(stack, props);
+    stack: DigitrafficStack) {
+    const publicApi = createApi(stack);
 
     createUsagePlan(publicApi, 'BridgeLock Api Key', 'BridgeLock Usage Plan');
 
@@ -34,33 +30,31 @@ export function create(
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId)));
     const disruptionsModel = addServiceModel("DisruptionsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    createDisruptionsResource(publicApi, vpc, props, lambdaDbSg, disruptionsModel, validator, secret, stack);
+    createDisruptionsResource(publicApi, disruptionsModel, validator, secret, stack);
 }
 
 function createDisruptionsResource(
     publicApi: RestApi,
-    vpc: IVpc,
-    props: Props,
-    lambdaDbSg: ISecurityGroup,
     disruptionsJsonModel: any,
     validator: RequestValidator,
     secret: ISecret,
-    stack: Construct): Function {
+    stack: DigitrafficStack): Function {
 
     const functionName = 'BridgeLockDisruption-GetDisruptions';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const assetCode = new AssetCode('dist/lambda/get-disruptions');
-    const environment: LambdaEnvironment = {};
-    environment["SECRET_ID"] = props.secretId;
-    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = "BridgeLockDisruption";
+    const environment = stack.createDefaultLambdaEnvironment('BridgeLockDisruption');
 
-    const getDisruptionsLambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const getDisruptionsLambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
         functionName: functionName,
         code: assetCode,
         handler: 'lambda-get-disruptions.handler',
         readOnly: false,
+        timeout: 60,
+        memorySize: 128,
+        reservedConcurrentExecutions: 1,
         environment
-    }));
+    }), TrafficType.MARINE);
 
     secret.grantRead(getDisruptionsLambda);
 
@@ -76,7 +70,7 @@ function createDisruptionsResource(
         ]
     });
 
-    createSubscription(getDisruptionsLambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(getDisruptionsLambda, functionName, stack.configuration.logsDestinationArn, stack);
     addTags('GetDisruptions', ['bridge-lock-disruptions'], resources, stack);
 
     return getDisruptionsLambda;
@@ -89,7 +83,7 @@ function createResourcePaths(publicApi: RestApi) {
     return bridgeLockResource.addResource("disruptions");
 }
 
-function createApi(stack: Construct, Props: Props) {
+function createApi(stack: Construct) {
     return new RestApi(stack, 'BridgeLockDisruption-public', {
         deployOptions: {
             loggingLevel: MethodLoggingLevel.ERROR,
