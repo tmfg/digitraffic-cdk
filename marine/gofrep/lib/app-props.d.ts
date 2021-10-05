@@ -1,5 +1,4 @@
-import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {StackConfiguration} from "digitraffic-common/stack/stack";
 
-declare interface GofrepProps extends LambdaConfiguration {
-    readonly secretId: string
+declare interface GofrepProps extends StackConfiguration {
 }
