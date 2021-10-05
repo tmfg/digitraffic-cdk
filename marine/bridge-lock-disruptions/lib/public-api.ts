@@ -50,6 +50,9 @@ function createDisruptionsResource(
         code: assetCode,
         handler: 'lambda-get-disruptions.handler',
         readOnly: false,
+        timeout: 60,
+        memorySize: 128,
+        reservedConcurrentExecutions: 1,
         environment
     }), TrafficType.MARINE);
 
