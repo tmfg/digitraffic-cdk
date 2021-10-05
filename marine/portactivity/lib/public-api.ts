@@ -7,14 +7,13 @@ import {
     RestApi
 } from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {
     corsMethod,
     defaultIntegration,
-    getResponse, methodResponse,
+    getResponse,
+    methodResponse,
     RESPONSE_200_OK,
     RESPONSE_400_BAD_REQUEST,
     RESPONSE_500_SERVER_ERROR,
@@ -29,6 +28,8 @@ import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
 import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
 import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -71,13 +72,20 @@ export class PublicApi {
         const assetCode = new AssetCode('dist/lambda/get-timestamps');
         const environment = stack.createDefaultLambdaEnvironment('PortActivity');
 
-        const getTimestampsLambda = new Function(stack, functionName, dbFunctionProps(stack, {
+        const getTimestampsLambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
             functionName: functionName,
             memorySize: 128,
             code: assetCode,
             handler: 'lambda-get-timestamps.handler',
+            timeout: 10,
+            reservedConcurrentExecutions: 4,
             environment
-        }));
+        }), TrafficType.MARINE, {
+            errorAlarmProps: {
+                create: true,
+                threshold: 3
+            }
+        });
 
         secret.grantRead(getTimestampsLambda);
 
@@ -138,14 +146,15 @@ export class PublicApi {
         const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
         const environment = stack.createDefaultLambdaEnvironment('PortActivity');
 
-        const lambda = new Function(stack, functionName, dbFunctionProps(stack, {
+        const lambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
             functionName: functionName,
             code: assetCode,
             memorySize: 128,
             timeout: 10,
+            reservedConcurrentExecutions: 1,
             handler: 'lambda-get-shiplist-public.handler',
             environment
-        }));
+        }), TrafficType.MARINE);
 
         secret.grantRead(lambda);
 
