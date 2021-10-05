@@ -102,7 +102,7 @@ function createApiTimestamp(pilotage: Pilotage): any {
     } else if(pilotage.state === 'ACTIVE') {
         return {
             eventType: EventType.APS,
-            eventTime
+            eventTime: pilotage.vesselEta
         }
     } else if(pilotage.state === 'FINISHED') {
         return {
