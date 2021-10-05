@@ -6,7 +6,7 @@ const secretId = process.env[SECRET_ID] as string;
 export const handler = async () => {
     const checker = new DatabaseChecker(secretId);
 
-    await checker.expect([{
+    return checker.expect([{
         name: 'domains not empty',
         sql: 'select count(*) from counting_site_domain'
     }, {
@@ -25,6 +25,4 @@ export const handler = async () => {
             select count(*) from data
             where sum > 0`
     }]);
-
-    return checker.done();
 };
