@@ -1,15 +1,16 @@
-import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
+import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, secret: ISecret) {
         if(stack.configuration.enableCanaries) {
-            const role = new DigitrafficCanaryRole(stack, 'counting-sites');
+            const urlRole = new DigitrafficCanaryRole(stack, 'aton-url');
+            const dbRole = new DigitrafficCanaryRole(stack, 'aton-db').withDatabaseAccess();
 
-            new UrlCanary(stack, role, {
+            new UrlCanary(stack, urlRole, {
                 name: 'aton-public',
                 hostname: "meri-test.digitraffic.fi",
                 handler: 'public-api.handler',
@@ -19,12 +20,12 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, role, secret, {
+            new DatabaseCanary(stack, dbRole, secret, {
                 name: 'aton',
                 secret: stack.configuration.secretId,
                 handler: 'db.handler',
                 alarm: {
-                    alarmName: 'Aton-Db-Alarm',
+                    alarmName: 'ATON-Db-Alarm',
                     topicArn: stack.configuration.warningTopicArn
                 }
             });

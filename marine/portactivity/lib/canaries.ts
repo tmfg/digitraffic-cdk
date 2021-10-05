@@ -6,9 +6,9 @@ import {Schedule} from "@aws-cdk/aws-synthetics";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
-import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {Props} from "./app-props";
+import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
 
 export class Canaries {
     constructor(stack: DigitrafficStack,
@@ -20,9 +20,10 @@ export class Canaries {
         addDLQAlarm(stack, dlq, props);
 
         if(props.enableCanaries) {
-            const role = new DigitrafficCanaryRole(stack, 'portactivity');
+            const urlRole = new DigitrafficCanaryRole(stack, 'portactivity-url');
+            const dbRole = new DigitrafficCanaryRole(stack, 'portactivity-db').withDatabaseAccess();
 
-            new UrlCanary(stack, role, {
+            new UrlCanary(stack, urlRole, {
                 name: 'pa-public',
                 hostname: "portactivity-test.digitraffic.fi",
                 handler: 'public-api.handler',
@@ -32,7 +33,7 @@ export class Canaries {
                 }
             });
 
-            new UrlCanary(stack, role, {
+            new UrlCanary(stack, urlRole, {
                 name: 'pa-private',
                 hostname: "portactivity-test.digitraffic.fi",
                 handler: "private-api.handler",
@@ -43,7 +44,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, role, secret, {
+            new DatabaseCanary(stack, dbRole, secret, {
                 name: 'pa-daytime',
                 secret: props.secretId,
                 schedule: Schedule.expression("cron(0/15 2-19 ? * MON-SUN *)"),
@@ -54,7 +55,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, role, secret, {
+            new DatabaseCanary(stack, urlRole, secret, {
                 name: 'pa',
                 secret: props.secretId,
                 handler: 'db.handler',

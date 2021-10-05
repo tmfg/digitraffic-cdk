@@ -1,7 +1,7 @@
 import {Construct, Duration} from "@aws-cdk/core";
 import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics";
 import {LambdaEnvironment} from "../model/lambda-environment";
-import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {ManagedPolicy, PolicyStatement, PolicyStatementProps, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
 import {CanaryAlarm} from "./canary-alarm";
 import {CanaryParameters} from "./canary-parameters";
 
@@ -26,32 +26,5 @@ export class DigitrafficCanary extends Canary {
         if(params.alarm ?? true) {
             new CanaryAlarm(scope, this, params);
         }
-    }
-}
-
-export class DigitrafficCanaryRole extends Role {
-    constructor(stack: Construct, canaryName: string) {
-        super(stack, 'canary-role-' + canaryName, {
-            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            managedPolicies: [
-                ManagedPolicy.fromAwsManagedPolicyName("CloudWatchSyntheticsFullAccess")
-            ]
-        });
-
-        this.addToPolicy(new PolicyStatement({
-                actions: [
-                    "logs:CreateLogStream",
-                    "logs:PutLogEvents",
-                    "logs:CreateLogGroup",
-                    "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams",
-                    "cloudwatch:PutMetricData",
-                    "ec2:CreateNetworkInterface",
-                    "ec2:DescribeNetworkInterfaces",
-                    "ec2:DeleteNetworkInterface"
-                ],
-                resources: ["*"]
-            })
-        );
     }
 }
