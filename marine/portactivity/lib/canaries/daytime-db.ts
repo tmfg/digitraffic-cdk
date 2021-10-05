@@ -7,7 +7,7 @@ const secretId = process.env[SECRET_ID] as string;
 export const handler = async () => {
     const checker = new DatabaseChecker(secretId);
 
-    await checker.expect([
+    return checker.expect([
         {
             name: 'port call timestamps in last hour',
             sql: "select count(*) from port_call_timestamp where record_time > (current_timestamp - interval '1 hour')"
@@ -20,6 +20,4 @@ export const handler = async () => {
                       event_source = '${EventSource.AWAKE_AI}'`
         }
     ]);
-
-    return checker.done();
 };

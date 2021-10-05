@@ -6,7 +6,7 @@ const secretId = process.env[SECRET_ID] as string;
 export const handler = async () => {
     const checker = new DatabaseChecker(secretId);
 
-    await checker.expect([{
+    return checker.expect([{
         name: 'states are not empty',
         sql: 'select count(*) from aton_fault_state'
     }, {
@@ -19,6 +19,4 @@ export const handler = async () => {
         name: 'aton_fault timestamps updated in last 24 hours',
         sql: 'select count(*) from aton_fault where entry_timestamp > now() - interval \'24 hours\''
     }]);
-
-    return checker.done();
 };

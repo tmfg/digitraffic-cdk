@@ -67,9 +67,7 @@ export class DatabaseChecker {
         if(hasErrors) {
             throw 'Failed';
         }
-    }
 
-    async done(): Promise<string> {
-        return "Canary succesfull";
+        return 'OK';
     }
 }
