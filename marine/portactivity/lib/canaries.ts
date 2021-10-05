@@ -28,7 +28,7 @@ export class Canaries {
                 handler: 'public-api.handler',
                 alarm: {
                     alarmName: 'PortActivity-PublicAPI-Alarm',
-                    topicArn: props.dlqNotificationTopicArn
+                    topicArn: props.warningTopicArn
                 }
             });
 
@@ -39,7 +39,7 @@ export class Canaries {
                 apiKeyId,
                 alarm: {
                     alarmName: 'PortActivity-PrivateAPI-Alarm',
-                    topicArn: props.dlqNotificationTopicArn
+                    topicArn: props.warningTopicArn
                 }
             });
 
@@ -50,7 +50,7 @@ export class Canaries {
                 handler: 'daytime-db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Day-Alarm',
-                    topicArn: props.dlqNotificationTopicArn
+                    topicArn: props.warningTopicArn
                 }
             });
 
@@ -60,7 +60,7 @@ export class Canaries {
                 handler: 'db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Alarm',
-                    topicArn: props.dlqNotificationTopicArn
+                    topicArn: props.warningTopicArn
                 }
             });
         }
@@ -77,5 +77,5 @@ function addDLQAlarm(stack: DigitrafficStack, queue: Queue, appProps: Props) {
         evaluationPeriods: 1,
         treatMissingData: TreatMissingData.NOT_BREACHING,
         comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
-    }).addAlarmAction(new SnsAction(Topic.fromTopicArn(stack, 'Topic', appProps.dlqNotificationTopicArn)));
+    }).addAlarmAction(new SnsAction(Topic.fromTopicArn(stack, 'Topic', appProps.warningTopicArn)));
 }
