@@ -1,6 +1,6 @@
 import {
-    EndpointType, IModel,
-    LambdaIntegration,
+    EndpointType,
+    IModel,
     MethodLoggingLevel,
     MockIntegration,
     PassthroughBehavior,
@@ -11,23 +11,24 @@ import {Construct} from "@aws-cdk/core";
 import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {FormalityResponse} from "./model/formality";
-import {defaultLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {createSubscription} from "digitraffic-common/stack/subscription";
-import {IVpc} from "@aws-cdk/aws-ec2";
-import {GofrepProps} from "./app-props";
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {AssetCode} from '@aws-cdk/aws-lambda';
 import {
-    defaultIntegration, getResponse,
-    methodResponse, RESPONSE_200_OK, RESPONSE_400_BAD_REQUEST, RESPONSE_500_SERVER_ERROR,
+    defaultIntegration,
+    getResponse,
+    methodResponse,
+    RESPONSE_400_BAD_REQUEST,
+    RESPONSE_500_SERVER_ERROR,
 } from "digitraffic-common/api/responses";
 import {addSimpleServiceModel} from "digitraffic-common/api/utils";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {createResponses, INPUT_RAW, MessageModel} from "digitraffic-common/api/response";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
-export function create(
-    stack: Construct,
-    vpc: IVpc,
-    props: GofrepProps) {
+export function create(stack: DigitrafficStack) {
 
     const api = createRestApi(
         stack,
@@ -38,7 +39,7 @@ export function create(
     const resource = api.root.addResource('mrs');
     createUsagePlan(api, 'GOFREP integration API Key', 'GOFREP integration Usage Plan');
     createMrsReportingFormalityResource(resource);
-    createReceiveMrsReportResource(stack, resource, xmlModel, messageModel, vpc, props);
+    createReceiveMrsReportResource(stack, resource, xmlModel, messageModel);
 }
 
 function createRestApi(stack: Construct, apiId: string, apiName: string): RestApi {
@@ -86,25 +87,25 @@ function createMrsReportingFormalityResource(resource: Resource) {
 }
 
 function createReceiveMrsReportResource(
-    stack: Construct,
+    stack: DigitrafficStack,
     resource: Resource,
     xmlModel: IModel,
-    messageModel: IModel,
-    vpc: IVpc,
-    props: GofrepProps) {
+    messageModel: IModel) {
 
     const metadataResource = resource.addResource('report');
     const functionName = 'GOFREP-ReceiveMRSReport';
     // ATTENTION!
     // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
     // The reason for this is IP based restriction in another system's firewall.
-    const handler = new Function(stack, functionName, defaultLambdaConfiguration({
+    const handler = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack,{
         functionName,
         code: new AssetCode('dist/lambda'),
         handler: 'lambda-receive-epcmessage.handler',
-        vpc: vpc
-    }));
-    createSubscription(handler, functionName, props.logsDestinationArn, stack);
+        timeout: 10,
+        memorySize: 128,
+        reservedConcurrentExecutions: 1
+    }), TrafficType.MARINE);
+    createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
 
     const integration = defaultIntegration(handler, {
         passthroughBehavior: PassthroughBehavior.NEVER,

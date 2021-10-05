@@ -1,24 +1,22 @@
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {Stack} from '@aws-cdk/core';
-import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {dbFunctionProps, dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
-import {Props} from "./app-props";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {ShiplightEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {TrafficType} from "digitraffic-common/model/traffictype";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 
 export function create(
     secret: ISecret,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: Props,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
-    const updateLightsLambda = createUpdateLightsLambda(secret, vpc, lambdaDbSg, props, stack);
+    const updateLightsLambda = createUpdateLightsLambda(secret, stack);
     const schedulingRule = createScheduler(stack);
     schedulingRule.addTarget(new LambdaFunction(updateLightsLambda));
 }
@@ -33,26 +31,22 @@ function createScheduler(stack: Stack): Rule {
 
 function createUpdateLightsLambda(
     secret: ISecret,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: Props,
-    stack: Stack): Function {
+    stack: DigitrafficStack): Function {
 
-    const environment: LambdaEnvironment = {};
-    environment[ShiplightEnvKeys.SECRET_ID] = props.secretId;
-    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'Shiplight';
+    const environment = stack.createDefaultLambdaEnvironment('Shiplight');
 
     const functionName = 'Shiplight-UpdateLights';
-    const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const lambdaConf = dbFunctionProps(stack, {
         functionName: functionName,
         memorySize: 128,
         code: new AssetCode('dist/lambda'),
         handler: 'lambda-update-lights.handler',
         environment,
+        timeout: 10,
         reservedConcurrentExecutions: 1
     });
-    const lambda = new Function(stack, functionName, lambdaConf);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
     secret.grantRead(lambda);
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
     return lambda;
 }

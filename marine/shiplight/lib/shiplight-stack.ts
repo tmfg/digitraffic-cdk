@@ -1,23 +1,16 @@
-import {Construct, Stack, StackProps} from '@aws-cdk/core';
-import {SecurityGroup, Vpc} from '@aws-cdk/aws-ec2';
+import {Construct} from '@aws-cdk/core';
 import * as InternalLambdas from './internal-lambdas';
-import {Props} from './app-props';
+import {ShiplightProps} from './app-props';
 import {Secret} from "@aws-cdk/aws-secretsmanager";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export class ShiplightStack extends Stack {
-    constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
-        super(scope, id, props);
+export class ShiplightStack extends DigitrafficStack {
+    constructor(scope: Construct, id: string, appProps: ShiplightProps) {
+        super(scope, id, appProps);
 
         const secret = Secret.fromSecretNameV2(this, 'ShiplightSecret', appProps.secretId);
 
-        const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
-            vpcId: appProps.vpcId,
-            privateSubnetIds: appProps.privateSubnetIds,
-            availabilityZones: appProps.availabilityZones
-        });
-        const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
-
-        InternalLambdas.create(secret, vpc, lambdaDbSg, appProps, this);
+        InternalLambdas.create(secret, this);
     }
 
 }
