@@ -1,15 +1,17 @@
 import { convertTextToSvg } from "../../service/text-converter";
 
-export const handler = async (event: any, context: any, callback: any): Promise<any> => {
+export const handler = async (event: any): Promise<any> => {
     const start = Date.now();
     const text = event["text"] as string;
 
     try {
-        const image = convertTextToSvg(text);
-
-        callback(null, {
-            body: image
-        });
+        return {
+            body: convertTextToSvg(text)
+        };
+    } catch(e) {
+        return {
+            error: e
+        };
     } finally {
         console.info("method=getSignImageLambda tookMs=%d", (Date.now()-start));
     }

@@ -7,9 +7,10 @@ const ERROR_TEXT_SYNTAX = "Text must be in form of [text] or text";
 const ERROR_NO_CONTENT = "No content";
 const ERROR_MAX_LENGTH = `Max length is ${MAX_LENGTH}`;
 const ERROR_ONE_UNDERSCORE = "Text can only contain 1 _";
+const ERROR_INVALID_SYMBOL = "Invalid symbol";
 
 function error(errorText: string) {
-    throw new Error("ERROR:" + errorText);
+    throw errorText;
 }
 
 export function convertTextToSvg(text: string): string {
@@ -139,7 +140,10 @@ function findUsedSymbolTexts(text: string): Symbols {
         if(isValidSymbol(symbolType, symbol)) {
             symbolList.push(symbol);
         } else {
-            throw error(`invalid symbol ${symbol} for ${symbolType}`);
+            if(symbolType === SymbolType.NORMAL) {
+                error(`${ERROR_INVALID_SYMBOL} ${symbol}`);
+            }
+            error(`${ERROR_INVALID_SYMBOL} ${symbol} for ${symbolType}`);
         }
     }
 

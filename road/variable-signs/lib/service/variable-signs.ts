@@ -1,4 +1,4 @@
-import {inDatabase} from 'digitraffic-common/postgres/database';
+import {inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as DatexDB from "../db/datex2";
 import {IDatabase} from "pg-promise";
@@ -25,7 +25,7 @@ const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 `;
 
 export async function findActiveSignsDatex2(): Promise<any> {
-    return inDatabase(async (db: IDatabase<any,any>) => {
+    return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
         const datex2 : string[] = (await DatexDB.findAll(db)).map(d => d.datex2);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.VS_DATEX2);
 

@@ -1,25 +1,25 @@
-import {RestApi,Resource, LambdaIntegration}  from '@aws-cdk/aws-apigateway';
-import {Function, AssetCode} from '@aws-cdk/aws-lambda';
-import {Construct} from "@aws-cdk/core";
-import {IVpc, ISecurityGroup} from '@aws-cdk/aws-ec2';
+import {LambdaIntegration, Resource, RestApi} from '@aws-cdk/aws-apigateway';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {createSubscription} from "digitraffic-common/stack/subscription";
-import {LambdaConfiguration, dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
-import {createRestApi} from "digitraffic-common/api/rest_apis";
+import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
-export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
-    const integrationApi = createRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API', props.allowFromIpAddresses);
-    createUpdateRequestHandler(stack, integrationApi, vpc, lambdaDbSg, props);
+export function create(stack: DigitrafficStack, secret: ISecret) {
+    const integrationApi = new DigitrafficRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API');
+    createUpdateRequestHandler(stack, integrationApi, secret);
     createUsagePlan(integrationApi, 'Integration API key', 'Integration Usage Plan');
 }
 
 function createUpdateRequestHandler (
-    stack: Construct,
+    stack: DigitrafficStack,
     integrationApi: RestApi,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: LambdaConfiguration) {
-    const updateDatexV1Handler = createUpdateDatexV1(stack, vpc, lambdaDbSg, props);
+    secret: ISecret) {
+    const updateDatexV1Handler = createUpdateDatexV1(stack, secret);
 
     const integrationV1Root = createIntegrationV1Root(integrationApi);
 
@@ -42,7 +42,6 @@ function createIntegrationResource(intergrationRoot: Resource, updateDatexV1Hand
     });
 }
 
-
 function createOldPathResource(integrationApi: RestApi, updateDatexV1Handler: Function) {
     const apiResource = integrationApi.root.addResource("api");
     const integrationResource = apiResource.addResource("integration");
@@ -54,20 +53,20 @@ function createOldPathResource(integrationApi: RestApi, updateDatexV1Handler: Fu
     });
 }
 
-function createUpdateDatexV1(
-    stack: Construct,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: LambdaConfiguration,
-): Function {
+function createUpdateDatexV1(stack: DigitrafficStack, secret: ISecret): Function {
     const updateDatex2Id = 'VS-UpdateDatex2';
-    const updateDatex2Handler = new Function(stack, updateDatex2Id, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const environment = stack.createDefaultLambdaEnvironment('VS');
+    const updateDatex2Handler = MonitoredFunction.create(stack, updateDatex2Id, dbFunctionProps(stack, {
         functionName: updateDatex2Id,
+        memorySize: 256,
+        environment,
         code: new AssetCode('dist/lambda/update-datex2'),
         handler: 'lambda-update-datex2.handler'
-    }));
+    }), TrafficType.ROAD);
 
-    createSubscription(updateDatex2Handler, updateDatex2Id, props.logsDestinationArn, stack);
+    secret.grantRead(updateDatex2Handler);
+
+    createSubscription(updateDatex2Handler, updateDatex2Id, stack.configuration.logsDestinationArn, stack);
 
     return updateDatex2Handler;
 }

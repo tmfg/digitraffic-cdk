@@ -1,57 +1,53 @@
-import {
-    dbLambdaConfiguration,
-    defaultLambdaConfiguration,
-    LambdaConfiguration
-} from "digitraffic-common/stack/lambda-configs";
+import {dbFunctionProps, lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {addSimpleServiceModel} from "digitraffic-common/api/utils";
-import {Construct} from "@aws-cdk/core";
 import {RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import {
     corsMethod,
-    defaultIntegration, getResponse, methodResponse,
+    defaultIntegration,
+    getResponse,
+    methodResponse,
     RESPONSE_200_OK,
-    RESPONSE_400_BAD_REQUEST
 } from "digitraffic-common/api/responses";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
-import {MessageModel} from "digitraffic-common/api/response";
-import {createRestApi} from "digitraffic-common/api/rest_apis";
+import {BadRequestResponseTemplate, MessageModel} from "digitraffic-common/api/response";
+import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {MediaType} from "digitraffic-common/api/mediatypes";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
-export function create(vpc: IVpc, lambdaDbSg: ISecurityGroup, props: LambdaConfiguration, stack: Construct) {
-    const publicApi = createRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');
+export function create(stack: DigitrafficStack, secret: ISecret) {
+    const publicApi = new DigitrafficRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');
 
     createUsagePlan(publicApi, 'VariableSigns Api Key', 'VariableSigns Usage Plan');
 
-    return createDatex2Resource(publicApi, vpc, props, lambdaDbSg, stack)
+    return createDatex2Resource(stack, publicApi, secret);
 }
 
-function createDatex2Resource(
-    publicApi: RestApi,
-    vpc: IVpc,
-    props: LambdaConfiguration,
-    lambdaDbSg: ISecurityGroup,
-    stack: Construct): Function {
-
+function createDatex2Resource(stack: DigitrafficStack, publicApi: RestApi, secret: ISecret): Function {
+    const environment = stack.createDefaultLambdaEnvironment('VS');
     const functionName = 'VS-GetDatex2';
-    const getDatex2Lambda = new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    const getDatex2Lambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
         functionName: functionName,
         code: new AssetCode('dist/lambda/get-datex2'),
         handler: 'lambda-get-datex2.handler',
-        readOnly: true
-    }));
+        memorySize: 256,
+        environment
+    }), TrafficType.ROAD);
 
     const imageFunctionName = 'VS-GetImage';
-    const getImageLambda = new Function(stack, imageFunctionName, defaultLambdaConfiguration({
+    const getImageLambda = MonitoredFunction.create(stack, imageFunctionName, lambdaFunctionProps(stack, {
         functionName: imageFunctionName,
         code: new AssetCode('dist/lambda/get-sign-image'),
-        handler: 'lambda-get-sign-image.handler',
-        readOnly: true
-    }));
+        handler: 'lambda-get-sign-image.handler'
+    }), TrafficType.ROAD);
+
+    secret.grantRead(getDatex2Lambda);
 
     const getDatex2Integration = defaultIntegration(getDatex2Lambda, {xml: true});
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
@@ -73,7 +69,7 @@ function createDatex2Resource(
         ]
     });
 
-    createSubscription(getDatex2Lambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(getDatex2Lambda, functionName, stack.configuration.logsDestinationArn, stack);
     addTagsAndSummary('GetDatex2', DATA_V1_TAGS, 'Return all variables signs as datex2', datex2Resource, stack);
 
     const getImageIntegration = defaultIntegration(getImageLambda, {
@@ -84,9 +80,20 @@ function createDatex2Resource(
         requestTemplates: {
             'application/json': JSON.stringify({text: "$util.escapeJavaScript($input.params('text'))"})
         },
-        responses: [
-            getResponse(RESPONSE_200_OK, {xml: true}),
-            getResponse(RESPONSE_400_BAD_REQUEST)
+        responses: [{
+            statusCode: '200',
+            responseTemplates: {
+                'image/svg+xml': `
+#set($inputRoot = $input.path('$'))
+#if ($inputRoot.error != '')
+$inputRoot.error
+#set ($context.responseOverride.status = 400)
+#set ($context.responseOverride.header.Content-Type = 'text/plain')
+#else
+$inputRoot.body
+#end`
+            }
+        }
         ]
     });
     imageResource.addMethod("GET", getImageIntegration, {
@@ -96,11 +103,12 @@ function createDatex2Resource(
         },
         methodResponses: [
             corsMethod(methodResponse("200", MediaType.IMAGE_SVG, svgModel)),
-            corsMethod(methodResponse("400", MediaType.APPLICATION_JSON, errorResponseModel))
+            corsMethod(methodResponse("400", MediaType.TEXT_PLAIN, errorResponseModel))
+
         ]
     });
 
-    createSubscription(getImageLambda, imageFunctionName, props.logsDestinationArn, stack);
+    createSubscription(getImageLambda, imageFunctionName, stack.configuration.logsDestinationArn, stack);
     addTagsAndSummary('GetImage', DATA_V1_TAGS, 'Generate svg-image from given text', imageResource, stack);
     addQueryParameterDescription('text', 'formatted [text] from variable sign textrows, without the brackets', imageResource, stack);
 
