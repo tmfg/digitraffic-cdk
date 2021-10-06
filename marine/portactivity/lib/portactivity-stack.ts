@@ -4,7 +4,7 @@ import * as IntegrationApi from './integration-api';
 import * as Sqs from './sqs';
 import {PublicApi} from "./public-api";
 import {Props} from './app-props';
-import {Bucket} from "@aws-cdk/aws-s3";
+import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget} from "@aws-cdk/aws-rds";
 import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
 import {Canaries} from "./canaries";
@@ -20,7 +20,8 @@ export class PortActivityStack extends DigitrafficStack {
 
         const queueAndDLQ = Sqs.createQueue(this);
         const dlqBucket = new Bucket(this, 'DLQBucket', {
-            bucketName: appProps.dlqBucketName
+            bucketName: appProps.dlqBucketName,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
         InternalLambdas.create(queueAndDLQ, dlqBucket, secret, this);
@@ -31,7 +32,8 @@ export class PortActivityStack extends DigitrafficStack {
         new Canaries(this, secret, queueAndDLQ.dlq, publicApi.apiKeyId);
 
         new Bucket(this, 'DocumentationBucket', {
-            bucketName: appProps.documentationBucketName
+            bucketName: appProps.documentationBucketName,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
     }
 
