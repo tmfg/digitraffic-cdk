@@ -83,8 +83,8 @@ function createDatex2Resource(stack: DigitrafficStack, publicApi: RestApi, secre
         responses: [{
             statusCode: '200',
             responseTemplates: {
-                'image/svg+xml': `
-#set($inputRoot = $input.path('$'))
+                'image/svg+xml':
+`#set($inputRoot = $input.path('$'))
 #if ($inputRoot.error != '')
 $inputRoot.error
 #set ($context.responseOverride.status = 400)
