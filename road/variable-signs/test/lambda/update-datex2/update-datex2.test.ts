@@ -1,8 +1,9 @@
 import * as pgPromise from "pg-promise"
-import {handler} from "../../../lib/lambda/update-datex2/lambda-update-datex2"
+import {handler, handlerFn} from "../../../lib/lambda/update-datex2/lambda-update-datex2"
 import {dbTestBase} from "../../db-testutil"
 import {readFileSync} from 'fs'
 import * as VariableSignsService from '../../../lib/service/variable-signs'
+import {createSecretFunction} from "../../../../../digitraffic-common/test/secret";
 
 describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('update_valid_datex2', async () => {
@@ -40,7 +41,7 @@ describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) =
 
 async function updateFile(filename: string, expectedStatusCode: number): Promise<any> {
     const request = getRequest(filename);
-    const response = await handler(request);
+    const response = await handlerFn(createSecretFunction({}), request);
 
     expect(response.statusCode).toBe(expectedStatusCode);
 
