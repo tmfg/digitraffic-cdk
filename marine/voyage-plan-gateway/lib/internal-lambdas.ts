@@ -10,7 +10,7 @@ import {VoyagePlanGatewayProps} from "./app-props";
 import {VoyagePlanEnvKeys} from "./keys";
 import {Queue, QueueEncryption} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
-import {Bucket} from "@aws-cdk/aws-s3";
+import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
@@ -29,7 +29,8 @@ export function create(
     stack: DigitrafficStack) {
 
     const dlqBucket = new Bucket(stack, 'DLQBucket', {
-        bucketName: props.dlqBucketName
+        bucketName: props.dlqBucketName,
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
     });
 
     const dlqQueueName = 'VPGW-SendRouteDLQ.fifo';
