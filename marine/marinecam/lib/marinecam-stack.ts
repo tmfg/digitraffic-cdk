@@ -1,31 +1,23 @@
-import {Stack, Construct, StackProps} from '@aws-cdk/core';
-import {Vpc, SecurityGroup} from '@aws-cdk/aws-ec2';
+import {Construct} from '@aws-cdk/core';
 import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {MobileServerProps} from './app-props';
 import * as InternalLambas from './internal-lambdas';
 import * as PublicApi from './public-api';
 import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export class MarinecamStack extends Stack {
-    constructor(scope: Construct, id: string, appProps: MobileServerProps, props?: StackProps) {
-        super(scope, id, props);
+export class MarinecamStack extends DigitrafficStack {
+    constructor(scope: Construct, id: string, configuration: MobileServerProps) {
+        super(scope, id, configuration);
 
-        const secret = Secret.fromSecretNameV2(this, 'MobileServiceSecret', appProps.secretId);
+        const secret = Secret.fromSecretNameV2(this, 'MobileServiceSecret', configuration.secretId);
 
-        const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
-            vpcId: appProps.vpcId,
-            privateSubnetIds: appProps.privateSubnetIds,
-            availabilityZones: appProps.availabilityZones
-        });
-
-        const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
-
-        const bucket = createImageBucket(this, appProps);
+        const bucket = createImageBucket(this, configuration);
         const [userPool, userPoolClient] = createUserPool(this);
 
-        InternalLambas.create(secret, vpc, lambdaDbSg, appProps, bucket, this);
-        PublicApi.create(secret, vpc, lambdaDbSg, appProps, bucket, userPool, userPoolClient, this);
+        InternalLambas.create(this, secret, bucket);
+        PublicApi.create(this, secret, bucket, userPool, userPoolClient);
     }
 }
 

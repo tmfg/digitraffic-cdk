@@ -1,7 +1,5 @@
-import {Construct, Duration} from '@aws-cdk/core';
+import {Construct} from '@aws-cdk/core';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
-import {MobileServerProps} from "./app-props";
 import {
     AwsIntegration,
     ContentHandling,
@@ -10,11 +8,10 @@ import {
     MethodLoggingLevel,
     Model,
     RequestAuthorizer,
-    RestApi,
-    ResponseType
+    RestApi
 } from '@aws-cdk/aws-apigateway';
 import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
-import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
+import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Bucket} from "@aws-cdk/aws-s3";
 
@@ -24,38 +21,36 @@ import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digit
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
-import {dbLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {dbFunctionProps, lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {add401Support, DigitrafficRestApi} from "../../../digitraffic-common/api/rest_apis";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
+    stack: DigitrafficStack,
     secret: ISecret,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: MobileServerProps,
     bucket: Bucket,
     userPool: UserPool,
-    userPoolClient: UserPoolClient,
-    stack: Construct) {
+    userPoolClient: UserPoolClient) {
 
-    const marinecamApi = createApi(stack);
-
-    marinecamApi.addGatewayResponse('authentication-failed', {
-        type: ResponseType.UNAUTHORIZED,
-        statusCode: "401",
-        responseHeaders: {
-            'WWW-Authenticate': "'Basic'"
-        }
+    const marinecamApi = new DigitrafficRestApi(stack, 'Marinecam-restricted', 'Marinecam restricted API', undefined, {
+        binaryMediaTypes: [
+            MediaType.IMAGE_JPEG
+        ]
     });
+
+    add401Support(marinecamApi, stack);
 
     createUsagePlan(marinecamApi, 'Marinecam Api Key', 'Marinecam Usage Plan');
 
     const authorizer = createLambdaAuthorizer(stack, userPool, userPoolClient);
     const resources = createResourceTree(marinecamApi);
 
-    createGetImageResource(resources, props, bucket, authorizer, stack);
-    createListCamerasResource(resources, secret, vpc, lambdaDbSg, props, authorizer, stack);
+    createGetImageResource(stack, resources, bucket, authorizer);
+    createListCamerasResource(stack, resources, secret, authorizer);
 }
 
 function createResourceTree(marinecamApi: RestApi): any {
@@ -72,9 +67,11 @@ function createResourceTree(marinecamApi: RestApi): any {
     }
 }
 
-function createListCamerasResource(resources: any, secret: ISecret, vpc: IVpc, lambdaDbSg: ISecurityGroup,
-                                   props: MobileServerProps, authorizer: RequestAuthorizer, stack: Construct) {
-    const listCamerasLambda = createListCamerasLambda(stack, vpc, lambdaDbSg, props);
+function createListCamerasResource(stack: DigitrafficStack,
+                                   resources: any,
+                                   secret: ISecret,
+                                   authorizer: RequestAuthorizer) {
+    const listCamerasLambda = createListCamerasLambda(stack);
 
     const listCamerasIntegration = defaultIntegration(listCamerasLambda, {
         requestTemplates: {
@@ -98,7 +95,10 @@ function createListCamerasResource(resources: any, secret: ISecret, vpc: IVpc, l
     addTagsAndSummary('List Cameras', BETA_TAGS, 'List all camera metadata', resources.metadataResource, stack);
 }
 
-function createGetImageResource(resources: any, props: MobileServerProps, bucket: Bucket, authorizer: RequestAuthorizer, stack: Construct) {
+function createGetImageResource(stack: DigitrafficStack,
+                                resources: any,
+                                bucket: Bucket,
+                                authorizer: RequestAuthorizer) {
     const readImageRole = new Role(stack, "role", {
         assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
         path: "/service-role/"
@@ -161,36 +161,37 @@ function createGetImageResource(resources: any, props: MobileServerProps, bucket
     addTagsAndSummary('GetImage', BETA_TAGS, 'Return image', resources.imageResource, stack);
 }
 
-function createListCamerasLambda(stack: Construct, vpc: IVpc, lambdaDbSg: ISecurityGroup, props: MobileServerProps): Function {
+function createListCamerasLambda(stack: DigitrafficStack): Function {
     const functionName = 'Marinecam-ListCameras';
-    const environment: LambdaEnvironment = {};
-    environment[MarinecamEnvKeys.SECRET_ID] = props.secretId;
-    environment[DatabaseEnvironmentKeys.DB_APPLICATION] = 'Marinecam';
+    const environment = stack.createDefaultLambdaEnvironment('Marinecam');
 
-    return new Function(stack, functionName, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+    return MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
         functionName,
         environment,
+        reservedConcurrentExecutions: 1,
         timeout: 10,
         code: new AssetCode('dist/lambda/list-cameras'),
         handler: 'lambda-list-cameras.handler'
-    }));
+    }), TrafficType.MARINE);
 }
 
-function createLambdaAuthorizer(stack: Construct, userPool: UserPool, userPoolClient: UserPoolClient): RequestAuthorizer {
+function createLambdaAuthorizer(stack: DigitrafficStack,
+                                userPool: UserPool,
+                                userPoolClient: UserPoolClient): RequestAuthorizer {
     const functionName = 'Marinecam-Authorizer';
     const environment: LambdaEnvironment = {};
     environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;
     environment[MarinecamEnvKeys.POOLCLIENT_ID] = userPoolClient.userPoolClientId;
 
-    const authFunction = new Function(stack, functionName, {
+    const authFunction = MonitoredFunction.create(stack, functionName, lambdaFunctionProps(stack, {
         functionName,
         environment,
+        reservedConcurrentExecutions: 1,
         memorySize: 512,
-        timeout: Duration.seconds(10),
-        runtime: Runtime.NODEJS_12_X,
+        timeout: 10,
         code: new AssetCode('dist/lambda/authorizer'),
         handler: 'lambda-authorizer.handler'
-    });
+    }), TrafficType.MARINE);
 
     return new RequestAuthorizer(stack, 'images-authorizer', {
         handler: authFunction,
@@ -198,34 +199,4 @@ function createLambdaAuthorizer(stack: Construct, userPool: UserPool, userPoolCl
             IdentitySource.header('Authorization')
         ]
     });
-}
-
-function createApi(stack: Construct): RestApi {
-    return new RestApi(stack, 'Marinecam-restricted', {
-        binaryMediaTypes: [
-          MediaType.IMAGE_JPEG
-        ],
-        deployOptions: {
-            loggingLevel: MethodLoggingLevel.ERROR,
-        },
-        restApiName: 'Marinecam restricted API',
-        endpointTypes: [EndpointType.REGIONAL],
-        policy: new PolicyDocument({
-            statements: [
-                new PolicyStatement({
-                    effect: Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke"
-                    ],
-                    resources: [
-                        "*"
-                    ],
-                    principals: [
-                        new AnyPrincipal()
-                    ]
-                })
-            ]
-        })
-    });
-
 }

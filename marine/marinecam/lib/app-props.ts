@@ -1,8 +1,7 @@
-import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
 import {Duration} from '@aws-cdk/core';
+import {StackConfiguration} from "digitraffic-common/stack/stack";
 
-export interface MobileServerProps extends LambdaConfiguration {
-    readonly secretId: string;
+export interface MobileServerProps extends StackConfiguration {
     readonly env: string;
     readonly updateFrequency: Duration;
 }

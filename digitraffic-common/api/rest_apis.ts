@@ -4,17 +4,24 @@ import {Construct} from "@aws-cdk/core";
 import {DigitrafficStack} from "../stack/stack";
 
 export class DigitrafficRestApi extends RestApi {
-    constructor(stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined) {
+    constructor(stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined, config?: any) {
         const policyDocument = allowFromIpAddresses == null ? createDefaultPolicyDocument() : createIpRestrictionPolicyDocument(allowFromIpAddresses);
 
-        super(stack, apiId, {
+        let apiConfig = {
             deployOptions: {
                 loggingLevel: MethodLoggingLevel.ERROR,
             },
             restApiName: apiName,
             endpointTypes: [EndpointType.REGIONAL],
             policy: policyDocument
-        });
+        };
+
+        // override with given extra config
+        if(config) {
+            apiConfig = {...apiConfig, ...config};
+        }
+
+        super(stack, apiId, apiConfig);
 
         add404Support(this, stack);
     }
@@ -34,6 +41,17 @@ export function add404Support(restApi: RestApi, stack: Construct) {
         statusCode: '404',
         templates: {
             'application/json': '{"message": "Not found"}'
+        }
+    });
+}
+
+export function add401Support(restApi: RestApi, stack: Construct) {
+    new GatewayResponse(stack, `AuthenticationFailedResponse-${restApi.restApiName}`, {
+        restApi,
+        type: ResponseType.UNAUTHORIZED,
+        statusCode: "401",
+        responseHeaders: {
+            'WWW-Authenticate': "'Basic'"
         }
     });
 }
