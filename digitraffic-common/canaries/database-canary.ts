@@ -12,7 +12,7 @@ export class DatabaseCanary extends DigitrafficCanary {
                 secret: ISecret,
                 params: CanaryParameters) {
         const canaryName = `${params.name}-db`;
-        const environmentVariables = stack.createDefaultLambdaEnvironment(canaryName);
+        const environmentVariables = stack.createDefaultLambdaEnvironment(`Synthetics-${canaryName}`);
 
         // the handler code is defined at the actual project using this
         super(stack, canaryName, role, params, environmentVariables);
