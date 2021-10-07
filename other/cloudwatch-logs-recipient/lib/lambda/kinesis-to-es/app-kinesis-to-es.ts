@@ -98,10 +98,11 @@ function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkD
 function transform(payload: CloudWatchLogsDecodedData, statistics: any): string {
     let bulkRequestBody = '';
 
+    const app = getAppFromSenderAccount(payload.owner, knownAccounts);
+    const appName = getAppName(payload.logGroup, app);
+
     payload.logEvents.forEach((logEvent: any) => {
         const source = buildSource(logEvent.message, logEvent.extractedFields);
-        const app = getAppFromSenderAccount(payload.owner, knownAccounts);
-        const appName = getAppName(payload.logGroup, app);
 
         source['@id'] = logEvent.id;
         source['@timestamp'] = new Date(1 * logEvent.timestamp).toISOString();
@@ -146,7 +147,7 @@ export function buildSource(message: string, extractedFields?: any[]): any {
         return buildFromExtractedFields(extractedFields);
     }
 
-    return buildFromMessage(message);
+    return buildFromMessage(message, true);
 }
 
 function buildFromExtractedFields(extractedFields: any[]): any {

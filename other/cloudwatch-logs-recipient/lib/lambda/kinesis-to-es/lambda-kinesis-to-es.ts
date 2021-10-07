@@ -7,7 +7,6 @@ import {
 } from "aws-lambda";
 
 import * as AWSx from "aws-sdk";
-import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
 import {
     buildFromMessage,
     extractJson, filterIds, getFailedIds,
@@ -142,14 +141,14 @@ export function post(body: string, callback: any) {
 }
 
 export function transform(payload: CloudWatchLogsDecodedData, statistics: any, idsToFilter: string[] = []): string {
+    const app = getAppFromSenderAccount(payload.owner, knownAccounts);
+    const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
+    const appName = `${app}-${env}-lambda`;
+
     return payload.logEvents
         .filter((e: any) => !idsToFilter.includes(e.id))
         .filter((e: any) => !isLambdaLifecycleEvent(e.message))
         .map((logEvent: any) => {
-            const app = getAppFromSenderAccount(payload.owner, knownAccounts);
-            const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
-            const appName = `${app}-${env}-lambda`;
-
             const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
 
             const source = buildSource(logEvent.message, logEvent.extractedFields);
@@ -196,7 +195,7 @@ export function buildSource(message: string, extractedFields: any): any {
         return buildFromExtractedFields(message, extractedFields);
     }
 
-    return buildFromMessage(message);
+    return buildFromMessage(message, false);
 }
 
 function buildFromExtractedFields(message: string, extractedFields: any[]): any {

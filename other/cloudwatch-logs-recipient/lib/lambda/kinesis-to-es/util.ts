@@ -15,7 +15,7 @@ export function getIndexName(appName: string, timestampFromEvent: any): string {
     return `${appName}-${timePart}`;
 }
 
-export function buildFromMessage(message: string): any {
+export function buildFromMessage(message: string, enableJsonParse: boolean): any {
     if(skipElasticLogging(message)) {
         return {};
     }
@@ -33,18 +33,21 @@ export function buildFromMessage(message: string): any {
         .replace(/\\b/g, "\\b")
         .replace(/\\f/g, "\\f");
 
-    try {
-        const jsonSubString = extractJson(message);
-        if (jsonSubString !== null) {
-            const parsedJson = JSON.parse(jsonSubString);
+    let parsedMessage = '';
 
-            // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
-            if ( parsedJson.hasOwnProperty('@fields') && parsedJson['@fields'].hasOwnProperty('upstream_response_time') ) {
-                parsedJson['@fields'].upstream_response_time = parseUpstreamResponseTime(parsedJson);
+    try {
+        if(enableJsonParse) {
+            const parsedJson = parseJson(message);
+
+            if(parsedJson) {
+                return parsedJson;
             }
-            return parsedJson;
-        } else {
-            return JSON.parse('{"log_line": "' + message.replace(/["']/g, "") + '"}');
+        }
+
+        parsedMessage = message.replace(/["']/g, "");
+
+        return {
+            "log_line": message
         }
     } catch (e) {
         console.info("error " + e);
@@ -52,6 +55,22 @@ export function buildFromMessage(message: string): any {
     }
 
     return {};
+}
+
+function parseJson(message: string): any {
+    const jsonSubString = extractJson(message);
+    if (jsonSubString !== null) {
+        const parsedJson = JSON.parse(jsonSubString);
+
+        // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
+        if (parsedJson.hasOwnProperty('@fields') && parsedJson['@fields'].hasOwnProperty('upstream_response_time')) {
+            parsedJson['@fields'].upstream_response_time = parseUpstreamResponseTime(parsedJson);
+        }
+
+        return parsedJson;
+    }
+
+    return null;
 }
 
 function parseUpstreamResponseTime(parsedJson: any) {
@@ -94,6 +113,7 @@ export function extractJson(message: string): any {
     if (jsonStart < 0) {
         return null;
     }
+
     const jsonSubString = message.substring(jsonStart);
     return isValidJson(jsonSubString) ? jsonSubString : null;
 }
