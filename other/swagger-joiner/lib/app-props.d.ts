@@ -11,8 +11,6 @@ export interface Props {
     readonly bucketName: string;
     // S3 VPC endpoint id
     readonly s3VpcEndpointId?: string;
-    // S3 website, s3VpcEndpointId is ignored if true
-    readonly s3Website: boolean
     // Canonical User ID if the Swagger bucket is served through CloudFront
     readonly cloudFrontCanonicalUser?: string
     // Move generated files into a directory, instead of the bucket root

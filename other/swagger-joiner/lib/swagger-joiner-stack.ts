@@ -1,7 +1,7 @@
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {Props} from './app-props';
 import * as InternalLambdas from './internal-lambdas'
-import {Bucket, HttpMethods} from "@aws-cdk/aws-s3";
+import {BlockPublicAccess, Bucket, HttpMethods} from "@aws-cdk/aws-s3";
 import {CanonicalUserPrincipal, Effect, PolicyStatement} from "@aws-cdk/aws-iam";
 
 export class SwaggerJoinerStack extends Stack {
@@ -15,15 +15,14 @@ export class SwaggerJoinerStack extends Stack {
     private createBucket(swaggerJoinerProps: Props) {
         const bucket = new Bucket(this, 'SwaggerBucket', {
             bucketName: swaggerJoinerProps.bucketName,
-            publicReadAccess: swaggerJoinerProps.s3Website,
-            websiteIndexDocument: swaggerJoinerProps.s3Website ? 'index.html' : undefined,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             cors: [{
                 allowedOrigins: ['*'],
                 allowedMethods: [HttpMethods.GET]
             }]
         });
 
-        if (!swaggerJoinerProps.s3Website && swaggerJoinerProps.s3VpcEndpointId) {
+        if (swaggerJoinerProps.s3VpcEndpointId) {
             const getObjectStatement = new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: ['s3:GetObject'],
