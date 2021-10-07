@@ -8,6 +8,11 @@ import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehav
 import {Function} from '@aws-cdk/aws-lambda';
 import {MediaType} from './mediatypes';
 
+/**
+ * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
+ * It will always return the body and status, but if status in something else than 200 OK the content-type
+ * will be overridden to text/plain. (it's assumed, that lambda will return error text)
+ */
 export const RESPONSE_DEFAULT_LAMBDA = `#set($inputRoot = $input.path('$'))
 $inputRoot.body
 #if ($inputRoot.status != 200)

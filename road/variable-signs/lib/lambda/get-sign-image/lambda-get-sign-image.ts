@@ -1,4 +1,4 @@
-import {convertTextToSvg} from "../../service/text-converter";
+import * as TextConverterService from "../../service/text-converter";
 import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
 import {InputError} from "digitraffic-common/error/input-error";
 
@@ -7,7 +7,7 @@ export const handler = async (event: any): Promise<any> => {
     const text = event["text"] as string;
 
     try {
-        return LambdaResponse.ok(convertTextToSvg(text));
+        return LambdaResponse.ok(TextConverterService.convertTextToSvg(text));
     } catch(e) {
         // bad user input -> 400
         if(e instanceof InputError) {

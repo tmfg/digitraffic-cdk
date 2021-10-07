@@ -7,7 +7,7 @@ const MAX_LENGTH = 30;
 const ERROR_TEXT_SYNTAX = "Text must be in form of [text] or text";
 const ERROR_NO_CONTENT = "No content";
 const ERROR_MAX_LENGTH = `Max length is ${MAX_LENGTH}`;
-const ERROR_ONE_UNDERSCORE = "Text can only contain 1 _";
+const ERROR_ONE_UNDERSCORE = "Text can only contain one underscore(_)";
 const ERROR_INVALID_SYMBOL = "Invalid symbol";
 
 function error(errorText: string) {
