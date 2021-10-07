@@ -3,23 +3,18 @@ import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {addSimpleServiceModel} from "digitraffic-common/api/utils";
 import {RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {
-    corsMethod,
-    defaultIntegration,
-    getResponse,
-    methodResponse,
-    RESPONSE_200_OK,
-} from "digitraffic-common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse,} from "digitraffic-common/api/responses";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
-import {BadRequestResponseTemplate, MessageModel} from "digitraffic-common/api/response";
+import {MessageModel} from "digitraffic-common/api/response";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {TrafficType} from "digitraffic-common/model/traffictype";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
 
 export function create(stack: DigitrafficStack, secret: ISecret) {
     const publicApi = new DigitrafficRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');
@@ -80,21 +75,7 @@ function createDatex2Resource(stack: DigitrafficStack, publicApi: RestApi, secre
         requestTemplates: {
             'application/json': JSON.stringify({text: "$util.escapeJavaScript($input.params('text'))"})
         },
-        responses: [{
-            statusCode: '200',
-            responseTemplates: {
-                'image/svg+xml':
-`#set($inputRoot = $input.path('$'))
-#if ($inputRoot.error != '')
-$inputRoot.error
-#set ($context.responseOverride.status = 400)
-#set ($context.responseOverride.header.Content-Type = 'text/plain')
-#else
-$inputRoot.body
-#end`
-            }
-        }
-        ]
+        responses: [DigitrafficIntegrationResponse.ok(MediaType.IMAGE_SVG)]
     });
     imageResource.addMethod("GET", getImageIntegration, {
         apiKeyRequired: true,

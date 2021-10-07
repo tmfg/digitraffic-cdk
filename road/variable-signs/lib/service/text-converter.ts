@@ -1,5 +1,6 @@
 import {findSymbol, InputSymbols, isValidSymbol, Symbol, SymbolType} from "./symbol";
 import {getSymbolType} from "../../lib/service/symbol";
+import {InputError} from "digitraffic-common/error/input-error";
 
 const MAX_LENGTH = 30;
 
@@ -10,7 +11,7 @@ const ERROR_ONE_UNDERSCORE = "Text can only contain 1 _";
 const ERROR_INVALID_SYMBOL = "Invalid symbol";
 
 function error(errorText: string) {
-    throw errorText;
+    throw new InputError(errorText);
 }
 
 export function convertTextToSvg(text: string): string {

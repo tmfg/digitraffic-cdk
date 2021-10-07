@@ -1,17 +1,21 @@
-import { convertTextToSvg } from "../../service/text-converter";
+import {convertTextToSvg} from "../../service/text-converter";
+import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
+import {InputError} from "digitraffic-common/error/input-error";
 
 export const handler = async (event: any): Promise<any> => {
     const start = Date.now();
     const text = event["text"] as string;
 
     try {
-        return {
-            body: convertTextToSvg(text)
-        };
+        return LambdaResponse.ok(convertTextToSvg(text));
     } catch(e) {
-        return {
-            error: e
-        };
+        // bad user input -> 400
+        if(e instanceof InputError) {
+            return LambdaResponse.bad_request(e.message);
+        }
+
+        // other errors -> 500
+        return LambdaResponse.internal_error(e);
     } finally {
         console.info("method=getSignImageLambda tookMs=%d", (Date.now()-start));
     }

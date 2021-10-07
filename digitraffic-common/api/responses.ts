@@ -8,6 +8,14 @@ import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehav
 import {Function} from '@aws-cdk/aws-lambda';
 import {MediaType} from './mediatypes';
 
+export const RESPONSE_DEFAULT_LAMBDA = `#set($inputRoot = $input.path('$'))
+$inputRoot.body
+#if ($inputRoot.status != 200)
+#set ($context.responseOverride.status = $inputRoot.status)
+#set ($context.responseOverride.header.Content-Type = 'text/plain')
+#else
+#end`;
+
 export const RESPONSE_401_UNAUTHORIZED: IntegrationResponse = {
     statusCode: '401',
     selectionPattern: AUTHORIZATION_FAILED_MESSAGE
