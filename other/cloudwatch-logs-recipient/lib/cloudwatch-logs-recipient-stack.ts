@@ -3,10 +3,11 @@ import {Stack, StackProps, Construct, Duration}  from '@aws-cdk/core';
 import {Role, ServicePrincipal, PolicyStatement} from '@aws-cdk/aws-iam';
 import {CrossAccountDestination, CfnDestination, RetentionDays} from '@aws-cdk/aws-logs';
 import {Stream} from '@aws-cdk/aws-kinesis';
-import {Function, FunctionProps, AssetCode, Runtime, StartingPosition} from '@aws-cdk/aws-lambda';
+import {Function, FunctionProps, AssetCode, Runtime, StartingPosition, Architecture} from '@aws-cdk/aws-lambda';
 import {KinesisEventSource} from '@aws-cdk/aws-lambda-event-sources';
-import {Topic} from '@aws-cdk/aws-sns';
+import {ITopic, Topic} from '@aws-cdk/aws-sns';
 import {EmailSubscription} from '@aws-cdk/aws-sns-subscriptions';
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 
 export class CloudWatchLogsRecipientStack extends Stack {
     constructor(scope: Construct, id: string, cwlrProps: Props, props?: StackProps) {
@@ -27,11 +28,14 @@ export class CloudWatchLogsRecipientStack extends Stack {
             appLogsTOEsStream.streamArn,
             writeAppLogsToKinesisRole,
             cwlrProps.accounts.map(a => a.accountNumber));
+
         const emailSqsTopic = this.createEmailTopic(cwlrProps.errorEmail);
+        const alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', cwlrProps.alarmTopicArn);
+        const warningTopic = Topic.fromTopicArn(this, 'WarningTopic', cwlrProps.warningTopicArn);
 
         const lambdaRole = this.createWriteToElasticLambdaRole(cwlrProps.elasticSearchDomainArn, [lambdaLogsToESStream.streamArn, appLogsTOEsStream.streamArn]);
-        const lambdaLogsToESLambda = this.createWriteLambdaLogsToElasticLambda(lambdaRole, emailSqsTopic, cwlrProps);
-        const appLogsToESLambda = this.createWriteAppLogsToElasticLambda(lambdaRole, emailSqsTopic, cwlrProps);
+        const lambdaLogsToESLambda = this.createWriteLambdaLogsToElasticLambda(lambdaRole, emailSqsTopic, warningTopic, alarmTopic, cwlrProps);
+        const appLogsToESLambda = this.createWriteAppLogsToElasticLambda(lambdaRole, emailSqsTopic, warningTopic, alarmTopic, cwlrProps);
 
         emailSqsTopic.grantPublish(appLogsToESLambda);
 
@@ -116,11 +120,16 @@ export class CloudWatchLogsRecipientStack extends Stack {
         return cloudWatchLogsToKinesisRole;
     }
 
-    createWriteLambdaLogsToElasticLambda(lambdaRole: Role, topic: Topic, props: Props): Function {
+    createWriteLambdaLogsToElasticLambda(lambdaRole: Role,
+                                         topic: ITopic,
+                                         warningTopic: ITopic,
+                                         alarmTopic: ITopic,
+                                         props: Props): Function {
         const kinesisToESId = 'KinesisToES';
         const lambdaConf = {
             role: lambdaRole,
             functionName: kinesisToESId,
+            architectures: [Architecture.ARM_64],
             code: new AssetCode('dist/lambda/', {exclude: ["app-*"]}),
             handler: 'lambda-kinesis-to-es.handler',
             runtime: Runtime.NODEJS_12_X,
@@ -134,15 +143,21 @@ export class CloudWatchLogsRecipientStack extends Stack {
             }
         } as FunctionProps;
 
-        return new Function(this, kinesisToESId, {...lambdaConf, ...props.lambdaConfig});
+        return new MonitoredFunction(this, kinesisToESId, {...lambdaConf, ...props.lambdaConfig},
+            alarmTopic, warningTopic, null);
     }
 
-    createWriteAppLogsToElasticLambda(lambdaRole: Role, topic: Topic, props: Props): Function {
+    createWriteAppLogsToElasticLambda(lambdaRole: Role,
+                                      topic: ITopic,
+                                      warningTopic: ITopic,
+                                      alarmTopic: ITopic,
+                                      props: Props): Function {
         const kinesisToESId = 'AppLogs-KinesisToES';
         const lambdaConf = {
             role: lambdaRole,
             memorySize: 256,
             functionName: kinesisToESId,
+            architectures: [Architecture.ARM_64],
             code: new AssetCode('dist/lambda/', {exclude: ["lambda-*"]}),
             handler: 'app-kinesis-to-es.handler',
             runtime: Runtime.NODEJS_12_X,
@@ -155,7 +170,8 @@ export class CloudWatchLogsRecipientStack extends Stack {
             }
         } as FunctionProps;
 
-        return new Function(this, kinesisToESId, {...lambdaConf, ...props.lambdaConfig});
+        return new MonitoredFunction(this, kinesisToESId, {...lambdaConf, ...props.lambdaConfig},
+            alarmTopic, warningTopic, null);
     }
 
     createWriteToElasticLambdaRole(elasticSearchDomainArn: string, streamArns: string[]): Role {

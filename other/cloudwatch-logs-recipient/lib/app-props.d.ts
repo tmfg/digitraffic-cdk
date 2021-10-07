@@ -1,9 +1,11 @@
 interface Props {
-    readonly accounts: Account[];
-    readonly elasticSearchEndpoint: string;
-    readonly elasticSearchDomainArn: string;
-    readonly errorEmail: string,
+    readonly accounts: Account[]
+    readonly elasticSearchEndpoint: string
+    readonly elasticSearchDomainArn: string
+    readonly errorEmail: string
     readonly lambdaConfig?: any
+    readonly warningTopicArn: string
+    readonly alarmTopicArn: string
 }
 
 interface Account {
