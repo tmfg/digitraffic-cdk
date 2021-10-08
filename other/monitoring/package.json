@@ -20,6 +20,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
+    "@aws-cdk/aws-events": "*",
     "@aws-cdk/aws-iam": "*",
     "@aws-cdk/aws-kinesis": "*",
     "@aws-cdk/aws-lambda": "*",

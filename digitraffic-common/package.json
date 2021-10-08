@@ -19,6 +19,8 @@
     "@aws-cdk/aws-cloudwatch": "*",
     "@aws-cdk/aws-cloudwatch-actions": "*",
     "@aws-cdk/aws-ec2": "*",
+    "@aws-cdk/aws-events": "*",
+    "@aws-cdk/aws-events-targets": "*",
     "@aws-cdk/aws-iam": "*",
     "@aws-cdk/aws-lambda": "*",
     "@aws-cdk/aws-logs": "*",
