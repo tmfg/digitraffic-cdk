@@ -13,16 +13,10 @@
   },
   "devDependencies": {
     "@aws-cdk/assert": "*",
-    "@types/jest": "^26.0.22",
     "@types/node": "^14.14.27",
-    "@types/sinon": "^10.0.0",
     "aws-cdk": "1.117.0",
     "esbuild": "^0.8.36",
-    "jest": "^27.0.6",
-    "jest-junit": "^12.0.0",
     "parallelshell": "3.0.1",
-    "sinon": "^11.1.2",
-    "ts-jest": "^27.0.4",
     "ts-node": "^8.10.2",
     "typescript": "^4.1.3"
   },
