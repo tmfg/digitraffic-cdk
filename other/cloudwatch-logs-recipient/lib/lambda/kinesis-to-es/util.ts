@@ -1,8 +1,5 @@
 const nanValue = -1;
 
-const SEPARATOR_LAMBDA_LOGS = '\\bt';
-const HEADER_LENGTH = 109;
-
 export function getIndexName(appName: string, timestampFromEvent: any): string {
     const timestamp = new Date(1 * timestampFromEvent);
 
@@ -20,20 +17,10 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
         return {};
     }
 
-    message = message.replace('[, ]', '[0.0,0.0]')
+    const log_line = message.replace('[, ]', '[0.0,0.0]')
         .replace(/\"Infinity\"/g, "-1")
         .replace(/Infinity/gi, "-1")
-        .replace(/\"null\"/gi, "null")
-        .replace(/\\n/g, "\\n")
-        .replace(/\\'/g, "\\'")
-        .replace(/\\"/g, '\\"')
-        .replace(/\\&/g, "\\&")
-        .replace(/\\r/g, "\\r")
-        .replace(/\\t/g, "\\t")
-        .replace(/\\b/g, "\\b")
-        .replace(/\\f/g, "\\f");
-
-    let parsedMessage = '';
+        .replace(/\"null\"/gi, "null");
 
     try {
         if(enableJsonParse) {
@@ -44,14 +31,12 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
             }
         }
 
-        parsedMessage = message.replace(/["']/g, "");
-
         return {
-            "log_line": message
+            log_line
         }
     } catch (e) {
         console.info("error " + e);
-        console.info("Error converting to json:" + message);
+        console.error("Error converting to json:" + message);
     }
 
     return {};
@@ -85,27 +70,7 @@ function parseUpstreamResponseTime(parsedJson: any) {
 }
 
 function skipElasticLogging(message: string): boolean {
-    return message.includes("<?xml") || isDebugLine(message);
-}
-
-function isDebugLine(message: string): boolean {
-    if(message.indexOf(SEPARATOR_LAMBDA_LOGS) == -1) {
-        // not lambda log, so no need to check any longer
-        return false;
-    }
-
-    // header + LOG LEVEL + DEBUG
-    if(message.length < HEADER_LENGTH + 12) {
-        console.info("message length " + message.length);
-        return false;
-    }
-
-    // skip header part and then split by separator
-    const split = message.substring(HEADER_LENGTH).split(SEPARATOR_LAMBDA_LOGS);
-
-    // split[0] LOG level
-    // split[1] first part of log line
-    return split.length > 1 && split[1].startsWith("DEBUG");
+    return message.includes("<?xml");
 }
 
 export function extractJson(message: string): any {

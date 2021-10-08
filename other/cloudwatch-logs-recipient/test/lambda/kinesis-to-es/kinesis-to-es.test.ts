@@ -17,6 +17,8 @@ import {
 } from '../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es';
 import {getAppFromSenderAccount, getEnvFromSenderAccount} from "../../../lib/lambda/kinesis-to-es/accounts";
 
+const TEST_LOGLINE = '2021-10-08T05:41:10.271Z\tec182986-d87f-5ce8-8ad8-705f04503e55\tINFO\tlogline';
+
 describe('kinesis-to-es', () => {
 
     test('isLambdaLifecycleEvent true', () => {
@@ -50,8 +52,8 @@ describe('kinesis-to-es', () => {
     });
 
     test('buildSource', () => {
-        const source = buildSource('message', undefined);
-        expect(source.log_line).toBe('\bmessage\b');
+        const source = buildSource(TEST_LOGLINE, undefined);
+        expect(source.log_line).toBe(TEST_LOGLINE);
     });
 
     test('transform', () => {
@@ -73,7 +75,7 @@ describe('kinesis-to-es', () => {
         const transformed = transform(data, {});
 
         expect(transformed).toBe('{"index":{"_id":"some-id","_index":"someapp-someenv-lambda-1970.01","_type":"doc"}}\n' +
-            '{"log_line":"\\bmessage\\b","@id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","@log_group":"","@app":"someapp-someenv-lambda","fields":{"app":"someapp-someenv-lambda"},"@transport_type":"someapp"}\n');
+            '{"log_line":"message","@id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","@log_group":"","@app":"someapp-someenv-lambda","fields":{"app":"someapp-someenv-lambda"},"@transport_type":"someapp"}\n');
     });
 
 });

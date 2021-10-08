@@ -8,7 +8,6 @@ import {
 
 import * as AWSx from "aws-sdk";
 import {
-    buildFromMessage,
     extractJson, filterIds, getFailedIds,
     getIndexName, isControlMessage,
     isNumeric, parseESReturnValue
@@ -27,6 +26,7 @@ const esEndpoint = new AWS.Endpoint(endpoint);
 const region = endpointParts[2];
 
 const MAX_BODY_SIZE = 1000000;
+const SEPARATOR_LAMBDA_LOGS = '\t';
 
 export const handler = (event: KinesisStreamEvent, context: Context, callback: any): void => {
     const statistics = {};
@@ -148,8 +148,9 @@ export function transform(payload: CloudWatchLogsDecodedData, statistics: any, i
     return payload.logEvents
         .filter((e: any) => !idsToFilter.includes(e.id))
         .filter((e: any) => !isLambdaLifecycleEvent(e.message))
+        .filter((e: any) => !isDebugLine(e.message))
         .map((logEvent: any) => {
-            const messageParts = logEvent.message.split("\t"); // timestamp, id, level, message
+            const messageParts = logEvent.message.split(SEPARATOR_LAMBDA_LOGS); // timestamp, id, level, message
 
             const source = buildSource(logEvent.message, logEvent.extractedFields);
             source["@id"] = logEvent.id;
@@ -161,12 +162,12 @@ export function transform(payload: CloudWatchLogsDecodedData, statistics: any, i
             source["fields"] = {app: appName};
             source["@transport_type"] = app;
 
-            const action = { index: { _id: logEvent.id, _index: null } } as any;
+            const action = {index: {_id: logEvent.id, _index: null}} as any;
             action.index._index = getIndexName(appName, logEvent.timestamp);
             action.index._type = 'doc';
 
             // update statistics
-            if(!statistics[payload.logGroup]) {
+            if (!statistics[payload.logGroup]) {
                 statistics[payload.logGroup] = 1;
             } else {
                 statistics[payload.logGroup] = statistics[payload.logGroup] + 1;
@@ -181,21 +182,36 @@ export function isLambdaLifecycleEvent(message: string) {
 }
 
 export function buildSource(message: string, extractedFields: any): any {
-    message = message.replace("[, ]", "[0.0,0.0]")
-        .replace(/\n/g, "\\n")
-        .replace(/\'/g, "\\'")
-        .replace(/\"/g, '\\"')
-        .replace(/\&/g, "\\&")
-        .replace(/\r/g, "\\r")
-        .replace(/\t/g, "\\t")
-        .replace(/\b/g, "\\b")
-        .replace(/\f/g, "\\f");
+    message = message.replace("[, ]", "[0.0,0.0]");
 
     if (extractedFields) {
         return buildFromExtractedFields(message, extractedFields);
     }
 
-    return buildFromMessage(message, false);
+    return buildFromMessage(message);
+}
+
+function buildFromMessage(message: string): any {
+    const log_line = message.replace('[, ]', '[0.0,0.0]')
+        .replace(/\"Infinity\"/g, "-1")
+        .replace(/Infinity/gi, "-1")
+        .replace(/\"null\"/gi, "null");
+
+    return {
+        log_line
+    }
+}
+
+function isDebugLine(logline: string): boolean {
+    // split by separator
+    const split = logline.split(SEPARATOR_LAMBDA_LOGS);
+
+    // split[0] timestamp
+    // split[1] id
+    // split[2] LOG level
+    // split[3] log line
+
+    return split.length > 3 && split[3].startsWith("DEBUG");
 }
 
 function buildFromExtractedFields(message: string, extractedFields: any[]): any {
