@@ -30,7 +30,7 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
                 const end = Date.now();
                 console.info(`method=updateSseData sizeBytes=${messageSizeBytes} updatedCount=${result.saved} and failedCount=${result.errors} of count=${sseJson.SSE_Reports.length} tookMs=${(end - start)}`);
                 return result;
-            } catch (e) {
+            } catch (e: any) {
                 const end = Date.now();
                 console.error(`method=updateSseData Error tookMs=${(end - start)}`, e);
                 throw errorJson(ERROR_MESSAGE, `Error while updating sse data: ${e.message}.`);

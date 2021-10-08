@@ -50,7 +50,7 @@
     "aws-sdk": "*",
     "axios": "^0.21.1",
     "crypto-js": "^4.0.0",
-    "jsts": "^2.6.1",
+    "jsts": "2.6.2",
     "moment": "*",
     "moment-timezone": "*",
     "ramda": "0.27.1",

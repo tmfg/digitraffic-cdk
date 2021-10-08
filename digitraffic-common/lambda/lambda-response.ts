@@ -10,8 +10,8 @@ export class LambdaResponse {
         return this.create(400, body);
     }
 
-    static internal_error(body: string): LambdaResponse {
-        return this.create(500, body);
+    static internal_error(): LambdaResponse {
+        return this.create(500, 'Internal error');
     }
 
     static create(status: number, body: string): LambdaResponse {

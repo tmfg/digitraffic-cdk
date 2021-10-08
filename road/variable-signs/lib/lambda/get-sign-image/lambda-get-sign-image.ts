@@ -15,7 +15,7 @@ export const handler = async (event: any): Promise<any> => {
         }
 
         // other errors -> 500
-        return LambdaResponse.internal_error(e);
+        return LambdaResponse.internal_error();
     } finally {
         console.info("method=getSignImageLambda tookMs=%d", (Date.now()-start));
     }

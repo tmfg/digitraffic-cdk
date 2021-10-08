@@ -6,6 +6,6 @@
 set -ex
 
 # regenerate lockfile to clear unused dependencies
-rm yarn.lock
+rm -f yarn.lock
 
-yarn upgrade
+yarn install
