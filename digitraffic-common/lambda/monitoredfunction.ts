@@ -168,7 +168,7 @@ export class MonitoredFunction extends Function {
         alarmProps?: MonitoredFunctionAlarmProps
     ) {
         metric.createAlarm(stack, `${this.node.id}-${alarmId}`, {
-            alarmName: `${trafficType ?? ''} ${this.functionName} ${alarmName}`.trim(),
+            alarmName: `${trafficType ?? ''} ${stack.stackName} ${this.functionName} ${alarmName}`.trim(),
             alarmDescription,
             threshold: alarmProps?.threshold ?? threshold,
             evaluationPeriods: alarmProps?.evaluationPeriods ?? evaluationPeriods,
