@@ -36,6 +36,17 @@ function initMap() {
     pilotwebToPortnetLocodeMap['FIKHA'] = 'FIKTK';
     pilotwebToPortnetLocodeMap['FIKMU'] = 'FIKTK';
     pilotwebToPortnetLocodeMap['FIHMN'] = 'FIKTK';
+
+    pilotwebToPortnetLocodeMap['FITRY'] = 'FITOR';
+
+    pilotwebToPortnetLocodeMap['FIKAU'] = 'FILPP';
+    pilotwebToPortnetLocodeMap['FILPM'] = 'FILPP';
+    pilotwebToPortnetLocodeMap['FIMES'] = 'FILPP';
+    pilotwebToPortnetLocodeMap['FIMUS'] = 'FILPP';
+
+    pilotwebToPortnetLocodeMap['FILPP'] = 'FINUI';
+
+    pilotwebToPortnetLocodeMap['FIVRA'] = 'FIVRK';
 }
 
 export function convertLocation(route: any): Location {
