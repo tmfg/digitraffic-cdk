@@ -40,7 +40,7 @@ export type SecretOptions = {
     readonly prefix?: string
 }
 
-export type SecretFunction = (secretId: string, fn: (secret: any) => any, options: SecretOptions) => Promise<any>;
+export type SecretFunction = (secretId: string, fn: (secret: any) => any, options?: SecretOptions) => Promise<any>;
 
 /**
  * Run the given function with secret retrieved from Secrets Manager.  Also injects database-credentials into environment.

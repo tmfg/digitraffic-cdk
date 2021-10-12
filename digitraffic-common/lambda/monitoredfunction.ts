@@ -27,7 +27,6 @@ export type MonitoredFunctionAlarmProps = {
 }
 
 export type MonitoredFunctionProps = {
-
     readonly durationAlarmProps?: MonitoredFunctionAlarmProps
 
     readonly durationWarningProps?: MonitoredFunctionAlarmProps
@@ -41,6 +40,21 @@ export type MonitoredFunctionProps = {
  * Creates a Lambda function that monitors default CloudWatch Lambda metrics with CloudWatch Alarms.
  */
 export class MonitoredFunction extends Function {
+    /** disable all alarms */
+    public static readonly DISABLE_ALARMS: MonitoredFunctionProps = {
+        durationAlarmProps: {
+            create: false
+        },
+        durationWarningProps: {
+            create: false
+        },
+        errorAlarmProps: {
+          create: false
+        },
+        throttleAlarmProps: {
+            create: false
+        }
+    }
 
     /**
      * Create new MonitoredFunction.  Use topics from given DigitrafficStack.
@@ -57,6 +71,12 @@ export class MonitoredFunction extends Function {
         functionProps: FunctionProps,
         trafficType: TrafficType | null,
         props?: MonitoredFunctionProps): MonitoredFunction {
+
+        if(props === MonitoredFunction.DISABLE_ALARMS && stack.stackName.includes('Prod')) {
+            console.error(`Function ${functionProps.functionName} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`);
+            throw 'ABORT!';
+        }
+
         return new MonitoredFunction(stack, id, functionProps, stack.alarmTopic, stack.warningTopic, trafficType, props);
     }
 
