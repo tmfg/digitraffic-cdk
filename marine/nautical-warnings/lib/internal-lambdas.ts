@@ -26,7 +26,7 @@ function createUpdateNauticalWarningsLambda(stack: DigitrafficStack, secret: ISe
         environment
     });
 
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE, MonitoredFunction.DISABLE_ALARMS);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
     secret.grantRead(lambda);
     createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
 

@@ -6,17 +6,17 @@ const secretId = process.env[SECRET_ID] as string;
 export const handler = async () => {
     const checker = new DatabaseChecker(secretId);
 
-    return checker.expect([{
-        name: 'states are not empty',
-        sql: 'select count(*) from aton_fault_state'
-    }, {
-        name: 'fault types are not empty',
-        sql: 'select count(*) from aton_fault_type'
-    }, {
-        name: 'types are not empty',
-        sql: 'select count(*) from aton_type'
-    }, {
-        name: 'aton_fault timestamps updated in last 24 hours',
-        sql: 'select count(*) from aton_fault where entry_timestamp > now() - interval \'24 hours\''
-    }]);
+    checker.notEmpty('states are not empty',
+        'from aton_fault_state');
+
+    checker.notEmpty('fault types are not empty',
+        'select count(*) from aton_fault_type');
+
+    checker.notEmpty('types are not empty',
+        'select count(*) from aton_type');
+
+    checker.notEmpty('aton_fault timestamps updated in last 24 hours',
+        'select count(*) from aton_fault where entry_timestamp > now() - interval \'24 hours\'');
+
+    return checker.expect();
 };

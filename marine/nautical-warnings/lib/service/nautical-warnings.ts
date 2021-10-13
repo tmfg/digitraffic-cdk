@@ -3,8 +3,8 @@ import * as NauticalWarningsDAO from "../db/nautical-warnings";
 import {inDatabase, inDatabaseReadonly} from "../../../../digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 
-const CACHE_KEY_ACTIVE = 'nautical-warnings-active';
-const CACHE_KEY_ARCHIVED = 'nautical-warnings-archived';
+export const CACHE_KEY_ACTIVE = 'nautical-warnings-active';
+export const CACHE_KEY_ARCHIVED = 'nautical-warnings-archived';
 
 export function getActiveWarnings() {
     return inDatabaseReadonly(async (db: IDatabase<any, any>) => {

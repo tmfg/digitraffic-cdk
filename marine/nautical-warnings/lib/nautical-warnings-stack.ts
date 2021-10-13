@@ -4,6 +4,7 @@ import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {NauticalWarningConfiguration} from "./app-props";
 import {InternalLambdas} from "./internal-lambdas";
 import {PublicApi} from "./public-api";
+import {Canaries} from "./canaries";
 
 export class NauticalWarningsStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: NauticalWarningConfiguration) {
@@ -13,5 +14,6 @@ export class NauticalWarningsStack extends DigitrafficStack {
 
         new InternalLambdas(this, secret);
         new PublicApi(this, secret);
+        new Canaries(this, secret);
     }
 }
