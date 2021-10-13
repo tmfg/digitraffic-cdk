@@ -20,7 +20,7 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
         const pilotageIds = await removeMissingPilotages(db, idMap, pilotages);
         const updated = await updateAllPilotages(db, idMap, pilotages);
 
-        console.info("timestamps to remove " + JSON.stringify(pilotageIds));
+        console.info("DEBUG timestamps to remove " + JSON.stringify(pilotageIds));
 
         await removeTimestamps(db, pilotageIds);
 
@@ -33,7 +33,7 @@ async function removeTimestamps(db: IDatabase<any, any>, pilotageIds: number[]) 
         const sourceIds = pilotageIds.map(id => id.toString());
 
         const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EventSource.PILOTWEB, sourceIds);
-        console.log("removed " + timestampsRemoved);
+        console.log("DEBUG removed " + timestampsRemoved);
     }
 }
 
@@ -63,7 +63,7 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
 
         if(base) {
             const location = LocationConverter.convertLocation(p.route);
-            const portcallId = await PilotagesDAO.findPortCallId(db, p, location);
+            const portcallId = p.portnetPortCallId;
 
             if (portcallId) {
                 return {
@@ -80,6 +80,8 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
                     }
                 };
             }
+
+            console.info("skipping pilotage %d, missing portcallId", p.id);
 
             return null;
         }
