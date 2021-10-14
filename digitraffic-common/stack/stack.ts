@@ -4,6 +4,12 @@ import {ISecurityGroup} from "@aws-cdk/aws-ec2/lib/security-group";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {LambdaEnvironment, SECRET_ID} from "../model/lambda-environment";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
+import {StringParameter} from "@aws-cdk/aws-ssm";
+
+const SSM_ROOT = '/digitraffic'
+
+export const SSM_KEY_WARNING_TOPIC = `${SSM_ROOT}/warning-topic`;
+export const SSM_KEY_ALARM_TOPIC = `${SSM_ROOT}/alarm-topic`;
 
 export type StackConfiguration = {
     readonly secretId: string;
@@ -44,8 +50,11 @@ export class DigitrafficStack extends Stack {
         // security group that allows Lambda database access
         this.lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', configuration.lambdaDbSgId);
 
-        this.alarmTopic = Topic.fromTopicArn(this, 'AlarmTopic', configuration.alarmTopicArn);
-        this.warningTopic = Topic.fromTopicArn(this, 'WarningTopic', configuration.warningTopicArn);
+        this.alarmTopic = Topic.fromTopicArn(this,
+            'AlarmTopic',
+            StringParameter.fromStringParameterName(this, 'AlarmTopicParam', SSM_KEY_ALARM_TOPIC).stringValue);
+        this.warningTopic = Topic.fromTopicArn(this, 'WarningTopic',
+            StringParameter.fromStringParameterName(this, 'WarningTopicParam', SSM_KEY_WARNING_TOPIC).stringValue);
     }
 
     createDefaultLambdaEnvironment(dbApplication: string): LambdaEnvironment {

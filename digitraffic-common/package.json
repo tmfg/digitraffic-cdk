@@ -27,6 +27,7 @@
     "@aws-cdk/aws-secretsmanager": "*",
     "@aws-cdk/aws-sns": "*",
     "@aws-cdk/aws-sqs": "*",
+    "@aws-cdk/aws-ssm": "*",
     "@aws-cdk/aws-synthetics": "*",
     "@aws-cdk/core": "*",
     "@types/geojson": "^7946.0.7",
