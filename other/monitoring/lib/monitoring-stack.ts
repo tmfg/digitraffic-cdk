@@ -25,7 +25,7 @@ export class MonitoringStack extends Stack {
             stringValue: warningsTopic.topicArn
         });
 
-        new DigitrafficSecurityRule(this, alarmsTopic);
+        //new DigitrafficSecurityRule(this, alarmsTopic);
     }
 
     createTopic(topicName: string, email: string): Topic {
