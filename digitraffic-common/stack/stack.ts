@@ -8,8 +8,9 @@ import {StringParameter} from "@aws-cdk/aws-ssm";
 
 const SSM_ROOT = '/digitraffic'
 
-export const SSM_KEY_WARNING_TOPIC = `${SSM_ROOT}/warning-topic`;
-export const SSM_KEY_ALARM_TOPIC = `${SSM_ROOT}/alarm-topic`;
+const MONITORING_ROOT = '/monitoring';
+export const SSM_KEY_WARNING_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/warning-topic`;
+export const SSM_KEY_ALARM_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/alarm-topic`;
 
 export type StackConfiguration = {
     readonly secretId: string;
