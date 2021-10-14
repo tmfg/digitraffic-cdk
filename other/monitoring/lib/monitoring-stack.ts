@@ -10,8 +10,8 @@ export class MonitoringStack extends Stack {
     constructor(scope: Construct, id: string, configuration: MonitoringConfiguration, props?: StackProps) {
         super(scope, id, props);
 
-        const alarmsTopic = this.createTopic('digitraffic-alarms', configuration.alarmTopicEmail);
-        const warningsTopic = this.createTopic('digitraffic-warnings', configuration.warningTopicEmail);
+        const alarmsTopic = this.createTopic('digitraffic-monitoring-alarms', configuration.alarmTopicEmail);
+        const warningsTopic = this.createTopic('digitraffic-monitoring-warnings', configuration.warningTopicEmail);
 
         new StringParameter(this, 'AlarmsParam', {
             description: 'Alarms topic ARN',
