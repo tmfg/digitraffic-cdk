@@ -15,5 +15,5 @@ export function updateCache(db: IDatabase<any, any>, cacheKey: string, value: an
 }
 
 export function getValueFromCache(db: IDatabase<any, any>, cacheKey: string): Promise<string> {
-    return db.oneOrNone(SQL_GET_CACHE_VALUE, [cacheKey]).then(value => value?.content ?? '');
+    return db.oneOrNone(SQL_GET_CACHE_VALUE, [cacheKey]).then(value => value?.content ?? null);
 }
