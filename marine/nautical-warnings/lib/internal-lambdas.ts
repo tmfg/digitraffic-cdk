@@ -2,7 +2,7 @@ import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
-import {Architecture, AssetCode, Function} from "@aws-cdk/aws-lambda";
+import {AssetCode, Function} from "@aws-cdk/aws-lambda";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {TrafficType} from "digitraffic-common/model/traffictype";
 import {createSubscription} from "digitraffic-common/stack/subscription";
@@ -19,7 +19,6 @@ function createUpdateNauticalWarningsLambda(stack: DigitrafficStack, secret: ISe
     const functionName = 'NauticalWarnings-UpdateNauticalWarnings';
     const lambdaConf = dbFunctionProps(stack, {
         functionName: functionName,
-        architecture: Architecture.ARM_64,
         memorySize: 128,
         code: new AssetCode('dist/lambda/update-nautical-warnings'),
         handler: 'update-nautical-warnings.handler',

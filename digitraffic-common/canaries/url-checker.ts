@@ -1,4 +1,5 @@
 import {MediaType} from "../api/mediatypes";
+import {getApiKeyFromAPIGateway} from "../api/apikey";
 
 const synthetics = require('Synthetics');
 const zlib = require('zlib');
@@ -19,7 +20,7 @@ export class UrlChecker {
     constructor(hostname: string, apiKey?: string) {
         const headers = {...baseHeaders};
 
-        if(apiKey) {
+        if (apiKey) {
             headers[API_KEY_HEADER] = apiKey;
         }
 
@@ -39,6 +40,12 @@ export class UrlChecker {
             .withIncludeResponseBody(false)
             .withIncludeResponseHeaders(false)
             .withFailedCanaryMetric(true);
+    }
+
+    static async create(hostname: string, apiKeyId: string) {
+        const apiKey = await getApiKeyFromAPIGateway(apiKeyId);
+
+        return new UrlChecker(hostname, apiKey.value);
     }
 
     async expect200(url: string, callback?: any): Promise<any> {

@@ -13,7 +13,7 @@ export class NauticalWarningsStack extends DigitrafficStack {
         const secret = Secret.fromSecretNameV2(this, 'NauticalWarningSecret', configuration.secretId);
 
         new InternalLambdas(this, secret);
-        new PublicApi(this, secret);
-        new Canaries(this, secret);
+        const publicApi = new PublicApi(this, secret);
+        new Canaries(this, secret, publicApi);
     }
 }

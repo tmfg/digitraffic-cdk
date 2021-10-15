@@ -25,6 +25,10 @@ export class DigitrafficRestApi extends RestApi {
 
         add404Support(this, stack);
     }
+
+    hostname(): string {
+        return `${this.restApiId}.execute-api.eu-west-1.amazonaws.com`;
+    }
 }
 
 /**

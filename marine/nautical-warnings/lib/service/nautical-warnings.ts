@@ -2,9 +2,12 @@ import {NauticalWarningsApi} from "../api/nautical-warnings";
 import * as NauticalWarningsDAO from "../db/nautical-warnings";
 import {inDatabase, inDatabaseReadonly} from "../../../../digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
+import moment from "moment-timezone";
 
 export const CACHE_KEY_ACTIVE = 'nautical-warnings-active';
 export const CACHE_KEY_ARCHIVED = 'nautical-warnings-archived';
+
+const gjv = require("geojson-validation");
 
 export function getActiveWarnings() {
     return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
@@ -27,9 +30,79 @@ export async function updateNauticalWarnings(url: string): Promise<any> {
     console.info("DEBUG archived " + JSON.stringify(archived, null, 2));
 
     return inDatabase(async (db: IDatabase<any, any>) => {
-        return db.tx((tx: any) => {
-            NauticalWarningsDAO.updateCache(tx, CACHE_KEY_ARCHIVED, archived);
-            NauticalWarningsDAO.updateCache(tx, CACHE_KEY_ACTIVE, active);
+        return db.tx(tx => {
+            return Promise.allSettled([
+                validateAndUpdate(tx, CACHE_KEY_ACTIVE, active),
+                validateAndUpdate(tx, CACHE_KEY_ARCHIVED, archived)
+            ]);
         });
     });
+}
+
+async function validateAndUpdate(tx: IDatabase<any, any>, cacheKey: string, value: any) {
+    if(gjv.isFeatureCollection(value, true)) {
+        return NauticalWarningsDAO.updateCache(tx, cacheKey, convert(value));
+    } else {
+        console.info("DEBUG " + JSON.stringify(value, null, 2));
+        console.error("invalid geojson for " + cacheKey);
+    }
+}
+
+function convert(original: any): any {
+    original.features.forEach((f: any) => {
+        f.properties = convertProperties(f.properties);
+    });
+
+    return original;
+}
+
+const DATE_FORMAT_1 = 'DD.MM.YYYY HH:mm';
+const DATE_FORMAT_2 = 'YYYY-MM-DD HH:mm:ss';
+
+function convertProperties(o: any): any {
+    return {
+        id: o.ID,
+        areasFi: o.ALUEET_FI,
+        areasSv: o.ALUEET_SV,
+        areasEn: o.ALUEET_EN,
+        number: o.NUMERO,
+        locationFi: o.SIJAINTI_FI,
+        locationSv: o.SIJAINTI_SV,
+        locationEn: o.SIJAINTI_EN,
+        contentsFi: o.SISALTO_FI,
+        contentsSv: o.SISALTO_SV,
+        contentsEn: o.SISALTO_EN,
+        creationTime: convertDate(o.PAIVAYS, DATE_FORMAT_1),
+        typeFi: o.TYYPPI_FI,
+        typeSv: o.TYYPPI_SV,
+        typeEn: o.TYYPPI_EN,
+        validityStartTime: convertDate(o.VOIMASSA_ALKAA, DATE_FORMAT_2),
+        validityEndTime: convertDate(o.VOIMASSA_PAATTYY, DATE_FORMAT_2),
+        tooltip: o.VALITTUKOHDE_TOOLTIP,
+        virtualNavaids: convertBoolean(o.VIRTUAALINENTURVALAITE),
+        navtex: convertBoolean(o.NAVTEX),
+        navaidInfo: o.TURVALAITE_TXT,
+        fairwayInfo: o.VAYLAALUE_TXT,
+        navigationLineInfo: o.NAVIGOINTILINJA_TXT,
+        publishingTime: convertDate(o.ANTOPAIVA, DATE_FORMAT_1),
+        notificator: o.TIEDOKSIANTAJA
+    };
+}
+
+function convertBoolean(value: number): boolean {
+    return value === 0 ? false : true;
+}
+
+function convertDate(value: string, format: string): string | null {
+    if(!value) {
+        return null;
+    }
+
+    const converted = moment.tz(value, format, 'Europe/Helsinki');
+
+    if(!converted.isValid()) {
+        console.info(value + " was not valid with " + format);
+    }
+
+    return converted.format();
 }
