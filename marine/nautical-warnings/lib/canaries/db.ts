@@ -6,7 +6,7 @@ const secretId = process.env[SECRET_ID] as string;
 
 export const handler = async () => {
     const checker = new DatabaseChecker(secretId);
-``
+
     checker.one('active cache is not empty',
         `select count(*) from cached_json where cache_id = '${CACHE_KEY_ACTIVE}'`);
 
