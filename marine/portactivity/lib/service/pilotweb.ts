@@ -3,7 +3,7 @@ import * as PilotagesDAO from "../db/pilotages";
 import * as TimestampDAO from '../db/timestamps';
 import * as LocationConverter from './location-converter';
 
-import {ApiTimestamp, EventType} from "../model/timestamp";
+import {ApiTimestamp, EventType, Location} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
 import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
@@ -63,7 +63,7 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
 
         if(base) {
             const location = LocationConverter.convertLocation(p.route);
-            const portcallId = p.portnetPortCallId;
+            const portcallId = await getPortCallId(db, p, location);
 
             if (portcallId) {
                 return {
@@ -86,6 +86,16 @@ async function convertUpdatedTimestamps(db: IDatabase<any, any>, newAndUpdated: 
             return null;
         }
     }))).filter(x => x != null);
+}
+
+async function getPortCallId(db: IDatabase<any, any>, p: Pilotage, location: Location): Promise<number | null> {
+    if(p.portnetPortCallId) {
+        return p.portnetPortCallId;
+    }
+
+    console.info("no portcallid from pilotage %d", p.id);
+
+    return await PilotagesDAO.findPortCallId(db, p, location);
 }
 
 function createApiTimestamp(pilotage: Pilotage): any {

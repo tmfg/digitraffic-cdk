@@ -29,7 +29,7 @@ export class PortActivityStack extends DigitrafficStack {
 
         const publicApi = new PublicApi(this, secret);
 
-        new Canaries(this, secret, queueAndDLQ.dlq, publicApi.apiKeyId);
+        new Canaries(this, secret, queueAndDLQ.dlq, publicApi);
 
         new Bucket(this, 'DocumentationBucket', {
             bucketName: appProps.documentationBucketName,

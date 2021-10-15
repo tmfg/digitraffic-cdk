@@ -33,31 +33,32 @@ import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export class PublicApi {
     readonly apiKeyId: string;
+    readonly publicApi: DigitrafficRestApi;
 
     constructor(stack: DigitrafficStack, secret: ISecret) {
-        const publicApi = new DigitrafficRestApi(stack, 'PortActivity-public', 'PortActivity public API');
+        this.publicApi = new DigitrafficRestApi(stack, 'PortActivity-public', 'PortActivity public API');
 
-        this.apiKeyId = createUsagePlan(publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan').keyId;
+        this.apiKeyId = createUsagePlan(this.publicApi, 'PortActivity timestamps Api Key', 'PortActivity timestamps Usage Plan').keyId;
 
-        const validator = addDefaultValidator(publicApi);
+        const validator = addDefaultValidator(this.publicApi);
 
-        const shipModel = addServiceModel("ShipModel", publicApi, ShipSchema);
-        const locationModel = addServiceModel("LocationModel", publicApi, LocationSchema);
+        const shipModel = addServiceModel("ShipModel", this.publicApi, ShipSchema);
+        const locationModel = addServiceModel("LocationModel", this.publicApi, LocationSchema);
         const timestampModel = addServiceModel("TimestampModel",
-            publicApi,
+            this.publicApi,
             createTimestampSchema(
-                getModelReference(shipModel.modelId, publicApi.restApiId),
-                getModelReference(locationModel.modelId, publicApi.restApiId)));
-        const timestampsModel = addServiceModel("TimestampsModel", publicApi, createArraySchema(timestampModel, publicApi));
-        const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
+                getModelReference(shipModel.modelId, this.publicApi.restApiId),
+                getModelReference(locationModel.modelId, this.publicApi.restApiId)));
+        const timestampsModel = addServiceModel("TimestampsModel", this.publicApi, createArraySchema(timestampModel, this.publicApi));
+        const errorResponseModel = this.publicApi.addModel('MessageResponseModel', MessageModel);
 
-        const resource = publicApi.root
+        const resource = this.publicApi.root
             .addResource("api")
             .addResource("v1");
 
         this.createTimestampsResource(stack, resource, timestampsModel, errorResponseModel, validator, secret);
-        this.createShiplistResource(stack, publicApi, secret);
-        this.createTimestampMetadataResource(stack, publicApi, resource);
+        this.createShiplistResource(stack, this.publicApi, secret);
+        this.createTimestampMetadataResource(stack, this.publicApi, resource);
     }
 
     createTimestampsResource(

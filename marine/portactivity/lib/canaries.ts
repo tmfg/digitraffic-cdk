@@ -9,12 +9,13 @@ import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {Props} from "./app-props";
 import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
+import {PublicApi} from "./public-api";
 
 export class Canaries {
     constructor(stack: DigitrafficStack,
                 secret: ISecret,
                 dlq: Queue,
-                apiKeyId: string) {
+                publicApi: PublicApi) {
         const props = stack.configuration as Props;
 
         addDLQAlarm(stack, dlq, props);
@@ -25,7 +26,7 @@ export class Canaries {
 
             new UrlCanary(stack, urlRole, {
                 name: 'pa-public',
-                hostname: "portactivity-test.digitraffic.fi",
+                hostname: publicApi.publicApi.hostname(),
                 handler: 'public-api.handler',
                 alarm: {
                     alarmName: 'PortActivity-PublicAPI-Alarm',
@@ -35,9 +36,9 @@ export class Canaries {
 
             new UrlCanary(stack, urlRole, {
                 name: 'pa-private',
-                hostname: "portactivity-test.digitraffic.fi",
+                hostname: publicApi.publicApi.hostname(),
                 handler: "private-api.handler",
-                apiKeyId,
+                apiKeyId: publicApi.apiKeyId,
                 alarm: {
                     alarmName: 'PortActivity-PrivateAPI-Alarm',
                     topicArn: props.warningTopicArn
