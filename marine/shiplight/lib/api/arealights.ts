@@ -23,7 +23,7 @@ export class AreaLightsApi {
             });
             if (resp.status !== 200) {
                 console.error(`method=updateLightsForArea returned status=${resp.status}`);
-                return Promise.reject(resp);
+                return Promise.reject();
             }
             return Promise.resolve(resp.data);
         } catch (error) {
