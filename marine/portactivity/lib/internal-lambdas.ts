@@ -1,7 +1,7 @@
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration, Stack} from '@aws-cdk/core';
 import {dbFunctionProps, defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
-import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {Props} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
@@ -50,13 +50,12 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
 
     const lambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
         memorySize: 256,
-        reservedConcurrentExecutions: 1,
         timeout: 10,
         functionName,
         code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
         handler: 'lambda-update-timestamps-from-pilotweb.handler',
         environment
-    }), TrafficType.MARINE);
+    }));
 
     createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
     queue.grantSendMessages(lambda);
@@ -77,17 +76,16 @@ function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, stac
     const lambda = MonitoredFunction.create(stack, functionName, defaultLambdaConfiguration({
         functionName,
         timeout: 10,
-        reservedConcurrentExecutions: 1,
         code: new AssetCode('dist/lambda/update-timestamps-from-schedules'),
         handler: 'lambda-update-timestamps-from-schedules.handler',
         environment,
         vpc: stack.vpc,
         vpcSubnets: stack.vpc.privateSubnets
-    }), TrafficType.MARINE);
+    }));
 
-    createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
+    new DigitrafficLogSubscriptions(stack, lambda);
+
     queue.grantSendMessages(lambda);
-
     secret.grantRead(lambda);
 
     return lambda;
@@ -103,7 +101,6 @@ function createProcessQueueLambda(
 
     const lambdaConf = dbFunctionProps(stack, {
         functionName,
-        memorySize: 128,
         code: new AssetCode('dist/lambda/process-queue'),
         handler: 'lambda-process-queue.handler',
         environment,
@@ -111,11 +108,12 @@ function createProcessQueueLambda(
         reservedConcurrentExecutions: 8
     });
 
-    const processQueueLambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const processQueueLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
     secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
-    createSubscription(processQueueLambda, functionName, stack.configuration.logsDestinationArn, stack);
+
+    new DigitrafficLogSubscriptions(stack, processQueueLambda);
 }
 
 function createProcessDLQLambda(
@@ -123,8 +121,8 @@ function createProcessDLQLambda(
     dlq: Queue,
     stack: DigitrafficStack) {
 
-    const lambdaEnv: LambdaEnvironment = {};
-    lambdaEnv[BUCKET_NAME] = dlqBucket.bucketName;
+    const environment: LambdaEnvironment = {};
+    environment[BUCKET_NAME] = dlqBucket.bucketName;
 
     const functionName = "PortActivity-ProcessTimestampsDLQ";
     const processDLQLambda = MonitoredFunction.create(stack, functionName, {
@@ -134,9 +132,8 @@ function createProcessDLQLambda(
         code: new AssetCode('dist/lambda/process-dlq'),
         timeout: Duration.seconds(10),
         handler: 'lambda-process-dlq.handler',
-        environment: lambdaEnv,
-        reservedConcurrentExecutions: 1
-    }, TrafficType.MARINE);
+        environment,
+    });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, stack.configuration.logsDestinationArn, stack);
@@ -171,19 +168,17 @@ function createUpdateAwakeAiTimestampsLambda(secret: ISecret, queue: Queue, stac
     const functionName = 'PortActivity-UpdateAwakeAiTimestamps';
     const lambdaConf = dbFunctionProps(stack, {
         functionName,
-        memorySize: 128,
         code: new AssetCode('dist/lambda/update-awake-ai-timestamps'),
         handler: 'lambda-update-awake-ai-timestamps.handler',
         timeout: 30,
-        environment,
-        reservedConcurrentExecutions: 1
+        environment
     });
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
     secret.grantRead(lambda);
     queue.grantSendMessages(lambda);
 
-    createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
+    new DigitrafficLogSubscriptions(stack, lambda);
 
     return lambda;
 }

@@ -21,12 +21,10 @@ export function create(
         code: new AssetCode('dist/lambda/update-disruptions'),
         handler: 'lambda-update-disruptions.handler',
         environment,
-        memorySize: 128,
         timeout: 10,
-        reservedConcurrentExecutions: 1
     });
 
-    const updateDisruptionsLambda = MonitoredFunction.create(stack, 'UpdateDisruptions', lambdaConf, TrafficType.MARINE);
+    const updateDisruptionsLambda = MonitoredFunction.create(stack, 'UpdateDisruptions', lambdaConf);
 
     secret.grantRead(updateDisruptionsLambda);
 

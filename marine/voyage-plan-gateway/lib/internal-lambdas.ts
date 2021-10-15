@@ -2,7 +2,7 @@ import {AssetCode, Runtime} from '@aws-cdk/aws-lambda';
 import {IVpc} from '@aws-cdk/aws-ec2';
 import {Duration, Stack} from '@aws-cdk/core';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
-import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {Topic} from "@aws-cdk/aws-sns";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
@@ -103,7 +103,7 @@ function createProcessVisMessagesLambda(
         handler: 'lambda-process-vis-messages.handler',
         environment
     });
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
     notifyTopic.addSubscription(new LambdaSubscription(lambda));
     sendRouteQueue.grantSendMessages(lambda);
@@ -126,20 +126,19 @@ function createUploadVoyagePlanLambda(
     environment[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
     const lambdaConf = defaultLambdaConfiguration({
         functionName: functionName,
-        memorySize: 128,
         code: new AssetCode('dist/lambda/upload-voyage-plan'),
         handler: 'lambda-upload-voyage-plan.handler',
         timeout: 10,
-        reservedConcurrentExecutions: 1,
         vpc: stack.vpc,
         environment
     });
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
     lambda.addEventSource(new SqsEventSource(sendRouteQueue, {
         batchSize: 1
     }));
-    createSubscription(lambda, functionName, props.logsDestinationArn, stack);
+
+    new DigitrafficLogSubscriptions(stack, lambda);
 }
 
 function createProcessDLQLambda(
@@ -159,8 +158,7 @@ function createProcessDLQLambda(
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
         timeout: Duration.seconds(10),
-        reservedConcurrentExecutions: 1
-    }, TrafficType.MARINE);
+    });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
     createSubscription(processDLQLambda, functionName, props.logsDestinationArn, stack);

@@ -63,9 +63,8 @@ function createVtsProxyHandler(
         handler: 'lambda-get-schedules.handler',
         environment: env,
         vpc: stack.vpc,
-        timeout: 10,
-        reservedConcurrentExecutions: 1
-    }), TrafficType.MARINE);
+        timeout: 10
+    }));
     secret.grantRead(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     const integration = new LambdaIntegration(handler, {

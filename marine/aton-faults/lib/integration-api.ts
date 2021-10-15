@@ -1,8 +1,8 @@
 import {Model, PassthroughBehavior, Resource, RestApi} from '@aws-cdk/aws-apigateway';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
-import {createSubscription} from "digitraffic-common/stack/subscription";
-import {dbFunctionProps} from 'digitraffic-common/stack/lambda-configs';
+import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
+import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
@@ -14,7 +14,6 @@ import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-commo
 import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(stack: DigitrafficStack, secret: ISecret, sendFaultTopic: Topic) {
     const integrationApi = new DigitrafficRestApi(stack,
@@ -93,13 +92,11 @@ function createHandler(stack: DigitrafficStack, sendFaultTopic: Topic): Function
     const environment = stack.createDefaultLambdaEnvironment('ATON');
     environment[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
 
-    const handler = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
+    const handler = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, 'ATON-UploadVoyagePlan', 'upload-voyage-plan', {
         memorySize: 512,
-        functionName,
-        code: new AssetCode('dist/lambda/upload-voyage-plan'),
-        handler: 'lambda-upload-voyage-plan.handler',
-        environment
-    }), TrafficType.MARINE);
-    createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
+    }));
+
+    new DigitrafficLogSubscriptions(stack, handler);
+
     return handler;
 }

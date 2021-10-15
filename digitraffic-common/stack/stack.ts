@@ -5,6 +5,7 @@ import {ITopic, Topic} from "@aws-cdk/aws-sns";
 import {LambdaEnvironment, SECRET_ID} from "../model/lambda-environment";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 import {StringParameter} from "@aws-cdk/aws-ssm";
+import {TrafficType} from "../model/traffictype";
 
 const SSM_ROOT = '/digitraffic'
 
@@ -24,6 +25,7 @@ export type StackConfiguration = {
     readonly privateSubnetIds: string[];
     readonly availabilityZones: string[];
 
+    readonly trafficType: TrafficType;
     readonly stackProps: StackProps;
 }
 

@@ -103,8 +103,7 @@ function createReceiveMrsReportResource(
         handler: 'lambda-receive-epcmessage.handler',
         timeout: 10,
         memorySize: 128,
-        reservedConcurrentExecutions: 1
-    }), TrafficType.MARINE);
+    }));
     createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
 
     const integration = defaultIntegration(handler, {

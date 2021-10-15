@@ -1,6 +1,6 @@
 import {dbTestBase, insert} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {handlerFn, SendFaultEvent} from '../../lib/lambda/send-fault/lambda-send-fault';
+import {handlerFn, SendFaultEvent} from '../../lib/lambda/send-fault/send-fault';
 import {newFault} from "../testdata";
 import * as sinon from 'sinon';
 import {SNSEvent} from "aws-lambda";

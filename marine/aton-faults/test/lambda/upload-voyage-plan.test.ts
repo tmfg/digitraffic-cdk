@@ -1,6 +1,6 @@
 import {dbTestBase, insert} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {handlerFn, UploadVoyagePlanEvent} from '../../lib/lambda/upload-voyage-plan/lambda-upload-voyage-plan';
+import {handlerFn, UploadVoyagePlanEvent} from '../../lib/lambda/upload-voyage-plan/upload-voyage-plan';
 import {newFault} from "../testdata";
 import {SNS} from "aws-sdk";
 import * as sinon from 'sinon';

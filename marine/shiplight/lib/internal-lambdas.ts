@@ -1,6 +1,6 @@
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {dbFunctionProps} from 'digitraffic-common/stack/lambda-configs';
-import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {TrafficType} from "digitraffic-common/model/traffictype";
@@ -23,15 +23,15 @@ function createUpdateLightsLambda(
     const functionName = 'Shiplight-UpdateLights';
     const lambdaConf = dbFunctionProps(stack, {
         functionName: functionName,
-        memorySize: 128,
         code: new AssetCode('dist/lambda'),
         handler: 'lambda-update-lights.handler',
         environment,
-        timeout: 10,
-        reservedConcurrentExecutions: 1
+        timeout: 10
     });
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
-    createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
+
+    new DigitrafficLogSubscriptions(stack, lambda);
+
     return lambda;
 }

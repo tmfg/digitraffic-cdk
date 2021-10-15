@@ -1,18 +1,15 @@
-import {Construct} from '@aws-cdk/core';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {
     AwsIntegration,
     ContentHandling,
-    EndpointType,
     IdentitySource,
-    MethodLoggingLevel,
     Model,
     RequestAuthorizer,
     RestApi
 } from '@aws-cdk/aws-apigateway';
 import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
+import {Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Bucket} from "@aws-cdk/aws-s3";
 
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
@@ -27,7 +24,6 @@ import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {add401Support, DigitrafficRestApi} from "../../../digitraffic-common/api/rest_apis";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
     stack: DigitrafficStack,
@@ -168,11 +164,10 @@ function createListCamerasLambda(stack: DigitrafficStack): Function {
     return MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
         functionName,
         environment,
-        reservedConcurrentExecutions: 1,
         timeout: 10,
         code: new AssetCode('dist/lambda/list-cameras'),
         handler: 'lambda-list-cameras.handler'
-    }), TrafficType.MARINE);
+    }));
 }
 
 function createLambdaAuthorizer(stack: DigitrafficStack,
@@ -186,12 +181,10 @@ function createLambdaAuthorizer(stack: DigitrafficStack,
     const authFunction = MonitoredFunction.create(stack, functionName, lambdaFunctionProps(stack, {
         functionName,
         environment,
-        reservedConcurrentExecutions: 1,
-        memorySize: 512,
         timeout: 10,
         code: new AssetCode('dist/lambda/authorizer'),
         handler: 'lambda-authorizer.handler'
-    }), TrafficType.MARINE);
+    }));
 
     return new RequestAuthorizer(stack, 'images-authorizer', {
         handler: authFunction,

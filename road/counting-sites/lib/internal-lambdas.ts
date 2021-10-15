@@ -2,13 +2,15 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {Duration} from "@aws-cdk/core";
 import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import * as lambda from "@aws-cdk/aws-lambda";
-import {createSubscription} from "digitraffic-common/stack/subscription";
+import {createSubscription, DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {CountingSitesEnvKeys} from "./keys";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {TrafficType} from "digitraffic-common/model/traffictype";
+import {Architecture} from "@aws-cdk/aws-lambda";
+import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 
 const APPLICATION_NAME = 'CountingSites';
 
@@ -32,16 +34,11 @@ export class InternalLambdas {
             environment,
         });
 
-        const updateMetadataLambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.ROAD);
-
+        const updateMetadataLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
         secret.grantRead(updateMetadataLambda);
+        new DigitrafficLogSubscriptions(stack, updateMetadataLambda);
 
-        const rule = new Rule(stack, 'RuleForMetadataUpdate', {
-            schedule: Schedule.rate(Duration.hours(1))
-        });
-        rule.addTarget(new LambdaFunction(updateMetadataLambda));
-
-        createSubscription(updateMetadataLambda, functionName, stack.configuration.logsDestinationArn, stack);
+        Scheduler.everyHour(stack, 'RuleForMetadataUpdate', updateMetadataLambda);
     }
 
     private createUpdateDataLambdaForOulu(stack: DigitrafficStack, secret: ISecret) {
@@ -59,15 +56,10 @@ export class InternalLambdas {
             memorySize: 256
         });
 
-        const updateMetadataLambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.ROAD);
-
+        const updateMetadataLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
         secret.grantRead(updateMetadataLambda);
+        new DigitrafficLogSubscriptions(stack, updateMetadataLambda);
 
-        const rule = new Rule(stack, 'RuleForDataUpdate', {
-            schedule: Schedule.rate(Duration.hours(1))
-        });
-        rule.addTarget(new LambdaFunction(updateMetadataLambda));
-
-        createSubscription(updateMetadataLambda, functionName, stack.configuration.logsDestinationArn, stack);
+        Scheduler.everyHour(stack, 'RuleForDataUpdate', updateMetadataLambda);
     }
 }

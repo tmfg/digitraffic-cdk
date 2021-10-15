@@ -1,5 +1,6 @@
 export enum TrafficType {
     ROAD = 'Road',
     MARINE = 'Marine',
-    RAIL = 'Rail'
+    RAIL = 'Rail',
+    OTHER = 'Other'
 }

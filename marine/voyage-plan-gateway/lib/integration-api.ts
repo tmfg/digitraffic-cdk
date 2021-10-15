@@ -95,7 +95,7 @@ function createHandler(
         timeout: 10,
         reservedConcurrentExecutions: 1,
         environment
-    }), TrafficType.MARINE);
+    }));
     notifyTopic.grantPublish(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     return handler;

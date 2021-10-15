@@ -8,7 +8,7 @@ import {
 } from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
-import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {
     corsMethod,
     defaultIntegration,
@@ -75,13 +75,12 @@ export class PublicApi {
 
         const getTimestampsLambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
             functionName: functionName,
-            memorySize: 128,
             code: assetCode,
             handler: 'lambda-get-timestamps.handler',
             timeout: 10,
             reservedConcurrentExecutions: 4,
             environment
-        }), TrafficType.MARINE, {
+        }), {
             errorAlarmProps: {
                 create: true,
                 threshold: 3
@@ -150,12 +149,10 @@ export class PublicApi {
         const lambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
             functionName: functionName,
             code: assetCode,
-            memorySize: 128,
             timeout: 10,
-            reservedConcurrentExecutions: 1,
             handler: 'lambda-get-shiplist-public.handler',
             environment
-        }), TrafficType.MARINE);
+        }));
 
         secret.grantRead(lambda);
 
@@ -168,7 +165,8 @@ export class PublicApi {
             apiKeyRequired: false
         });
 
-        createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
+        new DigitrafficLogSubscriptions(stack, lambda);
+
         addTagsAndSummary('Shiplist',
             ['shiplist'],
             'Returns a list of ships as an HTML page',

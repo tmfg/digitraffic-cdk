@@ -1,6 +1,6 @@
 import {LambdaIntegration, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {createSubscription} from "digitraffic-common/stack/subscription";
+import {createSubscription, DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
@@ -62,11 +62,11 @@ function createUpdateDatexV1(stack: DigitrafficStack, secret: ISecret): Function
         environment,
         code: new AssetCode('dist/lambda/update-datex2'),
         handler: 'lambda-update-datex2.handler'
-    }), TrafficType.ROAD);
+    }));
 
     secret.grantRead(updateDatex2Handler);
 
-    createSubscription(updateDatex2Handler, updateDatex2Id, stack.configuration.logsDestinationArn, stack);
+    new DigitrafficLogSubscriptions(stack, updateDatex2Handler);
 
     return updateDatex2Handler;
 }

@@ -4,11 +4,10 @@ import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {Bucket} from "@aws-cdk/aws-s3";
 import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
-import {createSubscription} from "digitraffic-common/stack/subscription";
+import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {MarinecamEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 import {MobileServerProps} from "./app-props";
 
 export function create(
@@ -36,14 +35,15 @@ function createUpdateImagesLambda(stack: DigitrafficStack,
         handler: 'lambda-update-images.handler',
         environment
     });
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, TrafficType.MARINE);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
 
     const rule = new Rule(stack, 'Rule', {
         schedule: Schedule.rate((stack.configuration as MobileServerProps).updateFrequency)
     });
     rule.addTarget(new LambdaFunction(lambda));
-    createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
+
+    new DigitrafficLogSubscriptions(stack, lambda);
 
     return lambda;
 }

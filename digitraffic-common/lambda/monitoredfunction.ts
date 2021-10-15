@@ -1,10 +1,12 @@
-import {Function, FunctionProps} from '@aws-cdk/aws-lambda';
+import {AssetCode, Function, FunctionProps} from '@aws-cdk/aws-lambda';
 import {Stack} from "@aws-cdk/core";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
 import {TrafficType} from '../model/traffictype';
 import {ITopic} from "@aws-cdk/aws-sns";
+import {LambdaEnvironment} from "../model/lambda-environment";
+import {dbFunctionProps} from "../stack/lambda-configs";
 
 /**
  * Allows customization of CloudWatch Alarm properties
@@ -40,6 +42,8 @@ export type MonitoredFunctionProps = {
  * Creates a Lambda function that monitors default CloudWatch Lambda metrics with CloudWatch Alarms.
  */
 export class MonitoredFunction extends Function {
+    readonly givenName: string;
+
     /** disable all alarms */
     public static readonly DISABLE_ALARMS: MonitoredFunctionProps = {
         durationAlarmProps: {
@@ -69,15 +73,14 @@ export class MonitoredFunction extends Function {
         stack: DigitrafficStack,
         id: string,
         functionProps: FunctionProps,
-        trafficType: TrafficType | null,
         props?: MonitoredFunctionProps): MonitoredFunction {
 
-        if(props === MonitoredFunction.DISABLE_ALARMS && stack.stackName.includes('Prod')) {
+        if(props == MonitoredFunction.DISABLE_ALARMS && stack.stackName.includes('Prod')) {
             console.error(`Function ${functionProps.functionName} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`);
             throw 'ABORT!';
         }
 
-        return new MonitoredFunction(stack, id, functionProps, stack.alarmTopic, stack.warningTopic, trafficType, props);
+        return new MonitoredFunction(stack, id, functionProps, stack.alarmTopic, stack.warningTopic, stack.configuration.trafficType, props);
     }
 
     /**
@@ -98,6 +101,8 @@ export class MonitoredFunction extends Function {
         trafficType: TrafficType | null,
         props?: MonitoredFunctionProps) {
         super(scope, id, functionProps);
+
+        this.givenName = functionProps.functionName as string;
 
         const alarmSnsAction = new SnsAction(alarmSnsTopic);
         const warningSnsAction = new SnsAction(warningSnsTopic);

@@ -4,16 +4,16 @@ import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {MessageModel} from "digitraffic-common/api/response";
 import {Model, Resource} from "@aws-cdk/aws-apigateway";
-import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
-import {AssetCode} from "@aws-cdk/aws-lambda";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
-import {createSubscription} from "digitraffic-common/stack/subscription";
+import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import nauticalWarningProperties from "./model/nautical-warnings-schema";
+import {addTags} from "digitraffic-common/api/documentation";
+import {BETA_TAGS} from "digitraffic-common/api/tags";
+import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -46,29 +46,17 @@ export class PublicApi {
 
     createEndpoint(stack: DigitrafficStack, secret: ISecret) {
         const environment = stack.createDefaultLambdaEnvironment('NauticalWarnings');
-        const functionNameActive = 'NauticalWarnings-GetActive';
-        const functionNameArchived = 'NauticalWarnings-GetArchived';
 
-        const lambdaConfActive = dbFunctionProps(stack, {
-            environment,
-            functionName: functionNameActive,
-            code: new AssetCode('dist/lambda/get-warnings'),
-            handler: 'get-active.handler',
-        });
-        const lambdaConfArchived = dbFunctionProps(stack, {
-            environment,
-            functionName: functionNameArchived,
-            code: new AssetCode('dist/lambda/get-warnings'),
-            handler: 'get-archived.handler',
-        });
+        const lambdaConfActive = databaseFunctionProps(stack, environment, 'NauticalWarnings-GetActive', 'get-active');
+        const lambdaConfArchived = databaseFunctionProps(stack, environment, 'NauticalWarnings-GetArchived', 'get-archived');
 
-        const lambdaActive = MonitoredFunction.create(stack, 'active-lambda', lambdaConfActive, TrafficType.MARINE);
-        const lambdaArchived = MonitoredFunction.create(stack, 'archive-lambda', lambdaConfArchived, TrafficType.MARINE);
+        const lambdaActive = MonitoredFunction.create(stack, 'active-lambda', lambdaConfActive);
+        const lambdaArchived = MonitoredFunction.create(stack, 'archive-lambda', lambdaConfArchived);
+
         secret.grantRead(lambdaActive);
         secret.grantRead(lambdaArchived);
 
-        createSubscription(lambdaActive, functionNameActive, stack.configuration.logsDestinationArn, stack);
-        createSubscription(lambdaArchived, functionNameArchived, stack.configuration.logsDestinationArn, stack);
+        new DigitrafficLogSubscriptions(stack, lambdaActive, lambdaArchived);
 
         const activeIntegration = defaultIntegration(lambdaActive);
         const archivedIntegration = defaultIntegration(lambdaArchived);
@@ -89,5 +77,7 @@ export class PublicApi {
             ]
         });
 
+        addTags('GetActiveNauticalWarnings', BETA_TAGS, this.activeResource, stack);
+        addTags('GetArchivedNauticalWarnings', BETA_TAGS, this.archivedResource, stack);
     }
 }

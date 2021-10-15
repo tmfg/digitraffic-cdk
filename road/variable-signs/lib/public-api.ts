@@ -33,14 +33,14 @@ function createDatex2Resource(stack: DigitrafficStack, publicApi: RestApi, secre
         handler: 'lambda-get-datex2.handler',
         memorySize: 256,
         environment
-    }), TrafficType.ROAD);
+    }));
 
     const imageFunctionName = 'VS-GetImage';
     const getImageLambda = MonitoredFunction.create(stack, imageFunctionName, lambdaFunctionProps(stack, {
         functionName: imageFunctionName,
         code: new AssetCode('dist/lambda/get-sign-image'),
         handler: 'lambda-get-sign-image.handler'
-    }), TrafficType.ROAD);
+    }));
 
     secret.grantRead(getDatex2Lambda);
 

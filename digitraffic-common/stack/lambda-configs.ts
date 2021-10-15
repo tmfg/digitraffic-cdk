@@ -1,4 +1,4 @@
-import {Architecture, Code, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
+import {Architecture, AssetCode, Code, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration} from "@aws-cdk/core";
 import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
 import {RetentionDays} from '@aws-cdk/aws-logs';
@@ -40,15 +40,36 @@ export function dbFunctionProps(stack: DigitrafficStack, config: FunctionParamet
     };
 }
 
+export function databaseFunctionProps(stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters): FunctionProps {
+    return {
+        runtime: config?.runtime || Runtime.NODEJS_12_X,
+        architectures: [config?.architecture || Architecture.ARM_64],
+        memorySize: config?.memorySize || 128,
+        functionName: lambdaName,
+        role: config?.role,
+        timeout: Duration.seconds(config?.timeout || 60),
+        logRetention: RetentionDays.ONE_YEAR,
+        reservedConcurrentExecutions: config?.reservedConcurrentExecutions || 1,
+        vpc: stack.vpc,
+        environment,
+        code: new AssetCode(`dist/lambda/${simpleLambdaName}`),
+        handler: `${simpleLambdaName}.handler`,
+        vpcSubnets: {
+            subnets: stack.vpc.privateSubnets
+        },
+        securityGroup: stack.lambdaDbSg,
+    };
+}
+
 export function lambdaFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
     return {
         runtime: config.runtime || Runtime.NODEJS_12_X,
         architectures: [config.architecture || Architecture.ARM_64],
         memorySize: config.memorySize || 128,
         functionName: config.functionName,
-        code: config.code,
+        code: config.code as Code,
         role: config.role,
-        handler: config.handler,
+        handler: config.handler as string,
         timeout: Duration.seconds(config.timeout || 60),
         environment: config.environment,
         logRetention: RetentionDays.ONE_YEAR,
@@ -73,9 +94,9 @@ export function dbLambdaConfiguration(
         runtime: props.runtime || Runtime.NODEJS_12_X,
         memorySize: props.memorySize || config.memorySize || 1024,
         functionName: config.functionName,
-        code: config.code,
+        code: config.code as Code,
         role: config.role,
-        handler: config.handler,
+        handler: config.handler as string,
         timeout: Duration.seconds(config.timeout || props.defaultLambdaDurationSeconds || 60),
         environment: config.environment || {
             DB_USER: props.dbProps?.username,
@@ -97,11 +118,11 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
         runtime: Runtime.NODEJS_12_X,
         memorySize: config.memorySize ?? 1024,
         functionName: config.functionName,
-        handler: config.handler,
+        handler: config.handler as string,
         environment: config.environment ?? {},
         logRetention: RetentionDays.ONE_YEAR,
         reservedConcurrentExecutions: config.reservedConcurrentExecutions,
-        code: config.code,
+        code: config.code as Code,
         role: config.role,
         timeout: Duration.seconds(config.timeout || 60)
     };
@@ -119,9 +140,9 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
 interface FunctionParameters {
     memorySize?: number;
     timeout?: number;
-    functionName: string;
-    code: Code;
-    handler: string;
+    functionName?: string;
+    code?: Code;
+    handler?: string;
     readOnly?: boolean;
     environment?: any;
     reservedConcurrentExecutions?: number;
