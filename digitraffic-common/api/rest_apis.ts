@@ -27,7 +27,7 @@ export class DigitrafficRestApi extends RestApi {
     }
 
     hostname(): string {
-        return `${this.restApiId}.execute-api.eu-west-1.amazonaws.com`;
+        return `${this.restApiId}.execute-api.${(this.stack as DigitrafficStack).region}.amazonaws.com`;
     }
 }
 

@@ -12,6 +12,7 @@ abstract class DatabaseCheck {
     protected constructor(name: string, sql: string) {
         this.name = name;
         this.sql = sql;
+        this.failed = false;
     }
 
     abstract check(value: any): any;
