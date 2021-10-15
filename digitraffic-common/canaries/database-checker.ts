@@ -25,7 +25,7 @@ class CountDatabaseCheck extends DatabaseCheck {
         super(name, sql);
 
         if(!minCount && !maxCount) {
-            throw 'no max or min given!';
+            throw new Error('no max or min given!');
         }
 
         this.minCount = minCount;

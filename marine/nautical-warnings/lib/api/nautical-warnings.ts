@@ -7,21 +7,21 @@ const LAYER_ARCHIVED = 'merivaroitus_arkistoitu_dt';
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay});
 
 export class NauticalWarningsApi {
-    readonly baseUrl: string;
+    private readonly baseUrl: string;
 
     constructor(baseUrl: string) {
         this.baseUrl = baseUrl;
     }
 
-    async getActiveWarnings() {
-        return this.getWarnings(LAYER_ACTIVE)
+    getActiveWarnings(): Promise<any> {
+        return this.getWarnings(LAYER_ACTIVE);
     }
 
-    async getArchivedWarnings() {
+    getArchivedWarnings():Promise<any> {
         return this.getWarnings(LAYER_ARCHIVED);
     }
 
-    async getWarnings(layer: string) {
+    private async getWarnings(layer: string): Promise<string> {
         const start = Date.now();
         const url = `${this.baseUrl}?crs=EPSG:4326&layer=${layer}`;
 

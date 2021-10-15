@@ -43,7 +43,7 @@ export function dbFunctionProps(stack: DigitrafficStack, config: FunctionParamet
 export function lambdaFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
     return {
         runtime: config.runtime || Runtime.NODEJS_12_X,
-        architectures: [config.architecture || Architecture.X86_64],
+        architectures: [config.architecture || Architecture.ARM_64],
         memorySize: config.memorySize || 128,
         functionName: config.functionName,
         code: config.code,
