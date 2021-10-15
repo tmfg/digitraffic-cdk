@@ -6,6 +6,7 @@ import * as VoyagePlansService from '../../service/voyageplans';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 import {VtsApi} from "../../api/vts";
+import {SlackApi} from "../../api/slack";
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
@@ -18,16 +19,20 @@ export type SnsEvent = {
 
 type VoyagePlanSecrets = {
     readonly 'vpgw.vtsUrl'?: string
+    readonly 'vpgw.slackUrl'?: string
 }
 
 let api: VtsApi | null = null
+
+let slackApi: SlackApi | null = null;
 
 /**
  * XML parsing and validation errors do not throw an error. This is to remove invalid messages from the queue.
  */
 export function handlerFn(
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any,
-    VtsApiClass: new (url: string) => VtsApi
+    VtsApiClass: new (url: string) => VtsApi,
+    SlackApiClass: new (url: string) => SlackApi
 ): (event: SnsEvent) => Promise<string> {
     return async function(event: SnsEvent): Promise<string> {
         return await doWithSecret(secretId, async (secret: VoyagePlanSecrets) => {
@@ -51,6 +56,11 @@ export function handlerFn(
                 console.warn('method=uploadVoyagePlan XML parsing failed', error);
                 return Promise.resolve('XML parsing failed');
             }
+
+            if (!slackApi && secret["vpgw.slackUrl"]) {
+                slackApi = new SlackApiClass(secret["vpgw.slackUrl"]);
+            }
+            slackApi?.notify(visMessage.message);
 
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {
@@ -81,4 +91,4 @@ export function handlerFn(
     };
 }
 
-export const handler = handlerFn(withSecret, VtsApi);
+export const handler = handlerFn(withSecret, VtsApi, SlackApi);
