@@ -3,6 +3,7 @@ import * as sinon from 'sinon';
 import moment from 'moment-timezone';
 import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
 import {VtsApi} from "../../lib/api/vts";
+import {SlackApi} from "../../lib/api/slack";
 const zlib = require('zlib');
 
 const sandbox = sinon.createSandbox();
@@ -16,7 +17,7 @@ describe('upload-voyage-plan', () => {
     test('validation failure, some string', async () => {
         const uploadEvent = createSnsEvent('<foo bar');
 
-        await expect(handlerFn(secretFn, VtsApi)(uploadEvent)).resolves.toMatch('XML parsing failed');
+        await expect(handlerFn(secretFn, VtsApi, SlackApi)(uploadEvent)).resolves.toMatch('XML parsing failed');
     });
 
     test('validation success with correct voyage plan', async () => {
@@ -24,7 +25,7 @@ describe('upload-voyage-plan', () => {
 
         const uploadEvent = createSnsEvent(voyagePlan());
 
-        await expect(handlerFn(secretFn, VtsApi)(uploadEvent)).resolves.not.toThrow();
+        await expect(handlerFn(secretFn, VtsApi, SlackApi)(uploadEvent)).resolves.not.toThrow();
     });
 
 });

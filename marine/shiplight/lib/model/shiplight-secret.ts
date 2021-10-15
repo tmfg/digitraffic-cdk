@@ -1,4 +1,6 @@
 export type ShiplightSecret = {
-    readonly apiKey: string,
-    readonly endpointUrl: string
+    readonly lightsControlApiKey: string,
+    readonly lightsControlEndpointUrl: string
+    readonly visibilityApiKey: string
+    readonly visibilityEndpointUrl: string
 }
