@@ -1,9 +1,8 @@
 import {Rule, Schedule} from '@aws-cdk/aws-events';
-import {AssetCode} from '@aws-cdk/aws-lambda';
 import {LambdaFunction} from '@aws-cdk/aws-events-targets';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {Bucket} from "@aws-cdk/aws-s3";
-import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {MarinecamEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
@@ -27,14 +26,7 @@ function createUpdateImagesLambda(stack: DigitrafficStack,
     environment[MarinecamEnvKeys.BUCKET_NAME] = bucket.bucketName;
 
     const functionName = "Marinecam-UpdateImages";
-    const lambdaConf = dbFunctionProps(stack, {
-        memorySize: 128,
-        functionName: functionName,
-        reservedConcurrentExecutions: 1,
-        code: new AssetCode('dist/lambda/update-images'),
-        handler: 'lambda-update-images.handler',
-        environment
-    });
+    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-images');
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
 

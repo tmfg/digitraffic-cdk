@@ -18,12 +18,13 @@ import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digit
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
-import {dbFunctionProps, lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {databaseFunctionProps, lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {add401Support, DigitrafficRestApi} from "../../../digitraffic-common/api/rest_apis";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 
 export function create(
     stack: DigitrafficStack,
@@ -87,6 +88,7 @@ function createListCamerasResource(stack: DigitrafficStack,
     });
 
     secret.grantRead(listCamerasLambda);
+    new DigitrafficLogSubscriptions(stack, listCamerasLambda);
 
     addTagsAndSummary('List Cameras', BETA_TAGS, 'List all camera metadata', resources.metadataResource, stack);
 }
@@ -157,16 +159,12 @@ function createGetImageResource(stack: DigitrafficStack,
     addTagsAndSummary('GetImage', BETA_TAGS, 'Return image', resources.imageResource, stack);
 }
 
-function createListCamerasLambda(stack: DigitrafficStack): Function {
+function createListCamerasLambda(stack: DigitrafficStack): MonitoredFunction {
     const functionName = 'Marinecam-ListCameras';
     const environment = stack.createDefaultLambdaEnvironment('Marinecam');
 
-    return MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
-        functionName,
-        environment,
+    return MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'list-cameras', {
         timeout: 10,
-        code: new AssetCode('dist/lambda/list-cameras'),
-        handler: 'lambda-list-cameras.handler'
     }));
 }
 
@@ -178,12 +176,8 @@ function createLambdaAuthorizer(stack: DigitrafficStack,
     environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;
     environment[MarinecamEnvKeys.POOLCLIENT_ID] = userPoolClient.userPoolClientId;
 
-    const authFunction = MonitoredFunction.create(stack, functionName, lambdaFunctionProps(stack, {
-        functionName,
-        environment,
+    const authFunction = MonitoredFunction.create(stack, functionName, lambdaFunctionProps(stack, environment, functionName, 'authorizer', {
         timeout: 10,
-        code: new AssetCode('dist/lambda/authorizer'),
-        handler: 'lambda-authorizer.handler'
     }));
 
     return new RequestAuthorizer(stack, 'images-authorizer', {
