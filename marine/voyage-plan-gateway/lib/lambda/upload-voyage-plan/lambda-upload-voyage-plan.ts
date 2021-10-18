@@ -60,7 +60,7 @@ export function handlerFn(
             if (!slackApi && secret["vpgw.slackUrl"]) {
                 slackApi = new SlackApiClass(secret["vpgw.slackUrl"]);
             }
-            slackApi?.notify(visMessage.message);
+            await slackApi?.notify(visMessage.message);
 
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {

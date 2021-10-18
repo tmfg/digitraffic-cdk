@@ -128,6 +128,7 @@ function createUploadVoyagePlanLambda(
         functionName: functionName,
         code: new AssetCode('dist/lambda/upload-voyage-plan'),
         handler: 'lambda-upload-voyage-plan.handler',
+        reservedConcurrentExecutions: 3,
         timeout: 10,
         vpc: stack.vpc,
         environment

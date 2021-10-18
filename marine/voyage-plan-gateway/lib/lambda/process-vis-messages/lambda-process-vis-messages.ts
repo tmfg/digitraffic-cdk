@@ -39,6 +39,7 @@ export function handlerFn(
                 console.info('method=vpgwProcessVisMessages Received TXT message: %s',msg.stmMessage));
 
             for (const routeMessage of routeMessages) {
+                console.info('method=vpgwProcessVisMessages Processing RTZ message %s', routeMessage.stmMessage.message);
                 const message: VisMessageWithCallbackEndpoint = {
                     callbackEndpoint: routeMessage.CallbackEndpoint,
                     message: routeMessage.stmMessage.message

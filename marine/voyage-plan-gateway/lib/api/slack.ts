@@ -10,6 +10,7 @@ export class SlackApi {
 
     async notify(text: string) {
         try {
+            console.info('method=notify Notifying Slack')
             await axios.post(this.url, {
                 text
             });
