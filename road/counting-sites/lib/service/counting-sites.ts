@@ -5,6 +5,7 @@ import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import { IDatabase } from "pg-promise";
 import {DbDomain} from "../model/domain";
 import {DbCounter} from "../model/counter";
+import {DbData} from "../model/data";
 
 export async function getMetadata(): Promise<any> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
@@ -16,7 +17,7 @@ export async function getMetadata(): Promise<any> {
     });
 }
 
-export async function getDataForCounter(counterId: number): Promise<any> {
+export async function getDataForCounter(counterId: number): Promise<DbData[]> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
         return DataDb.findAllData(db, counterId);
     });

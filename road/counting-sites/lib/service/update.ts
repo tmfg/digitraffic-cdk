@@ -13,9 +13,9 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
 
     const [newCounters, removedCounters, updatedCounters] = compareCounters(countersInApi, countersInDb);
 
-    console.info(newCounters.length + " new " + JSON.stringify(newCounters, null, 3));
-    console.info(removedCounters.length + " removed " + JSON.stringify(removedCounters, null, 3));
-    console.info(updatedCounters.length + " updated " + JSON.stringify(updatedCounters, null, 3));
+//    console.info(newCounters.length + " new " + JSON.stringify(newCounters, null, 3));
+//    console.info(removedCounters.length + " removed " + JSON.stringify(removedCounters, null, 3));
+//    console.info(updatedCounters.length + " updated " + JSON.stringify(updatedCounters, null, 3));
 
     await inDatabase(async db => {
         await CounterDb.insertCounters(db, domainName, newCounters);
@@ -32,7 +32,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
         return Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
             if(isDataUpdateNeeded(counter)) {
                 // either last update timestamp + 1 day or ten days ago(for first time)
-                const fromStamp = counter.last_data_timestamp ? moment(counter.last_data_timestamp).add(1, 'days') : moment().subtract(10, 'days').startOf('day');
+                const fromStamp = counter.last_data_timestamp ? moment(counter.last_data_timestamp) : moment().subtract(10, 'days').startOf('day');
                 const endStamp = fromStamp.clone().add(1, 'days');
 
                 const data = await api.getDataForSite(counter.site_id, counter.interval, fromStamp.toDate(), endStamp.toDate());
@@ -40,7 +40,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
                 console.info("method=updateDataForDomain counter=%d updatedCount=%d", counter.id, data.length);
 
                 await DataDb.insertData(db, counter.id, counter.interval, data);
-                return CounterDb.updateCounterTimestamp(db, counter.id, fromStamp.toDate());
+                return CounterDb.updateCounterTimestamp(db, counter.id, endStamp.toDate());
             }
 
             console.info("no need to update " + counter.id);
