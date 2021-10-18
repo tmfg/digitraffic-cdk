@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise"
-import {handler, handlerFn} from "../../../lib/lambda/update-datex2/lambda-update-datex2"
+import {handlerFn} from "../../../lib/lambda/update-datex2/update-datex2"
 import {dbTestBase} from "../../db-testutil"
 import {readFileSync} from 'fs'
 import * as VariableSignsService from '../../../lib/service/variable-signs'
