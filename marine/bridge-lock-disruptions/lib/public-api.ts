@@ -3,12 +3,12 @@ import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aw
 import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {default as DisruptionSchema} from './model/disruption-schema';
-import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addDefaultValidator, addServiceModel, getModelReference} from "digitraffic-common/api/utils";
-import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {databaseFunctionProps, dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addTags} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
@@ -42,15 +42,10 @@ function createDisruptionsResource(
 
     const functionName = 'BridgeLockDisruption-GetDisruptions';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
-    const assetCode = new AssetCode('dist/lambda/get-disruptions');
     const environment = stack.createDefaultLambdaEnvironment('BridgeLockDisruption');
 
-    const getDisruptionsLambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
-        functionName: functionName,
-        code: assetCode,
-        handler: 'lambda-get-disruptions.handler',
+    const getDisruptionsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-disruptions', {
         timeout: 60,
-        environment
     }));
 
     secret.grantRead(getDisruptionsLambda);
@@ -67,7 +62,8 @@ function createDisruptionsResource(
         ]
     });
 
-    createSubscription(getDisruptionsLambda, functionName, stack.configuration.logsDestinationArn, stack);
+    new DigitrafficLogSubscriptions(stack, getDisruptionsLambda);
+
     addTags('GetDisruptions', ['bridge-lock-disruptions'], resources, stack);
 
     return getDisruptionsLambda;

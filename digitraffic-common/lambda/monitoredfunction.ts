@@ -1,12 +1,10 @@
-import {AssetCode, Function, FunctionProps} from '@aws-cdk/aws-lambda';
+import {Function, FunctionProps} from '@aws-cdk/aws-lambda';
 import {Stack} from "@aws-cdk/core";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
 import {TrafficType} from '../model/traffictype';
 import {ITopic} from "@aws-cdk/aws-sns";
-import {LambdaEnvironment} from "../model/lambda-environment";
-import {dbFunctionProps} from "../stack/lambda-configs";
 
 /**
  * Allows customization of CloudWatch Alarm properties

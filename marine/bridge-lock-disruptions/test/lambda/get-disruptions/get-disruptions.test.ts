@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {handlerFn} from '../../../lib/lambda/get-disruptions/lambda-get-disruptions';
+import {handlerFn} from '../../../lib/lambda/get-disruptions/get-disruptions';
 import {newDisruption} from "../../testdata";
 import {dbTestBase, insertDisruption} from "../../db-testutil";
 

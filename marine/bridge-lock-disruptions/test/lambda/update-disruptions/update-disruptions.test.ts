@@ -1,5 +1,5 @@
 import * as pgPromise from "pg-promise";
-import {handlerFn} from '../../../lib/lambda/update-disruptions/lambda-update-disruptions';
+import {handlerFn} from '../../../lib/lambda/update-disruptions/update-disruptions';
 import {disruptionFeatures} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";

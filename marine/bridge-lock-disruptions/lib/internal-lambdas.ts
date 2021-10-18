@@ -1,13 +1,10 @@
-import {Rule, Schedule} from '@aws-cdk/aws-events';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {LambdaFunction} from '@aws-cdk/aws-events-targets';
-import {Duration} from '@aws-cdk/core';
-import {dbFunctionProps} from 'digitraffic-common/stack/lambda-configs';
-import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {Function} from '@aws-cdk/aws-lambda';
+import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
+import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {TrafficType} from "digitraffic-common/model/traffictype";
+import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 
 export function create(
     secret: ISecret,
@@ -16,11 +13,7 @@ export function create(
     const functionName = "BridgeLockDisruption-UpdateDisruptions";
     const environment = stack.createDefaultLambdaEnvironment('BridgeLockDisruption');
 
-    const lambdaConf = dbFunctionProps(stack, {
-        functionName: functionName,
-        code: new AssetCode('dist/lambda/update-disruptions'),
-        handler: 'lambda-update-disruptions.handler',
-        environment,
+    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-disruptions', {
         timeout: 10,
     });
 
@@ -28,12 +21,9 @@ export function create(
 
     secret.grantRead(updateDisruptionsLambda);
 
-    const rule = new Rule(stack, 'Rule', {
-        schedule: Schedule.rate(Duration.minutes(10))
-    });
-    rule.addTarget(new LambdaFunction(updateDisruptionsLambda));
+    Scheduler.everyMinutes(stack, 'UpdateDisruptionsRule', 10, updateDisruptionsLambda);
 
-    createSubscription(updateDisruptionsLambda, functionName, stack.configuration.logsDestinationArn, stack);
+    new DigitrafficLogSubscriptions(stack, updateDisruptionsLambda);
 
     return updateDisruptionsLambda;
 }
