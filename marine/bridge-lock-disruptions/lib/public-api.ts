@@ -1,21 +1,20 @@
 import {EndpointType, MethodLoggingLevel, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from '@aws-cdk/aws-iam';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
 import {default as DisruptionSchema} from './model/disruption-schema';
-import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
+import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addDefaultValidator, addServiceModel, getModelReference} from "digitraffic-common/api/utils";
-import {databaseFunctionProps, dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addTags} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
     secret: ISecret,

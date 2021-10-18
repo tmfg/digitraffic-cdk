@@ -11,9 +11,8 @@ import {Construct} from "@aws-cdk/core";
 import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {FormalityResponse} from "./model/formality";
-import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {createSubscription} from "digitraffic-common/stack/subscription";
-import {AssetCode} from '@aws-cdk/aws-lambda';
 import {
     defaultIntegration,
     getResponse,
@@ -26,7 +25,6 @@ import {MediaType} from "digitraffic-common/api/mediatypes";
 import {createResponses, INPUT_RAW, MessageModel} from "digitraffic-common/api/response";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(stack: DigitrafficStack) {
 
@@ -97,12 +95,9 @@ function createReceiveMrsReportResource(
     // ATTENTION!
     // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
     // The reason for this is IP based restriction in another system's firewall.
-    const handler = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack,{
-        functionName,
-        code: new AssetCode('dist/lambda'),
-        handler: 'lambda-receive-epcmessage.handler',
-        timeout: 10,
-        memorySize: 128,
+    const handler = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack,{}, functionName, 'receive-epcmessage', {
+        singleLambda: true,
+        timeout: 10
     }));
     createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
 

@@ -28,19 +28,17 @@ declare interface DbProps {
     ro_uri?: string;
 }
 
-export function dbFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
-    return {
-        ...lambdaFunctionProps(stack, config), ...{
-            vpc: stack.vpc,
-            vpcSubnets: {
-                subnets: stack.vpc.privateSubnets
-            },
-            securityGroup: stack.lambdaDbSg,
-        }
-    };
+export function databaseFunctionProps(stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters): FunctionProps {
+    return {...lambdaFunctionProps(stack, environment, lambdaName, simpleLambdaName, config), ...{
+        vpc: stack.vpc,
+        vpcSubnets: {
+            subnets: stack.vpc.privateSubnets
+        },
+        securityGroup: stack.lambdaDbSg,
+    }};
 }
 
-export function databaseFunctionProps(stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters): FunctionProps {
+export function lambdaFunctionProps(stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters): FunctionProps {
     return {
         runtime: config?.runtime || Runtime.NODEJS_12_X,
         architectures: [config?.architecture || Architecture.ARM_64],
@@ -50,31 +48,16 @@ export function databaseFunctionProps(stack: DigitrafficStack, environment: Lamb
         timeout: Duration.seconds(config?.timeout || 60),
         logRetention: RetentionDays.ONE_YEAR,
         reservedConcurrentExecutions: config?.reservedConcurrentExecutions || 1,
-        vpc: stack.vpc,
-        environment,
-        code: new AssetCode(`dist/lambda/${simpleLambdaName}`),
+        code: getAssetCode(simpleLambdaName, config),
         handler: `${simpleLambdaName}.handler`,
-        vpcSubnets: {
-            subnets: stack.vpc.privateSubnets
-        },
-        securityGroup: stack.lambdaDbSg,
+        environment
     };
 }
 
-export function lambdaFunctionProps(stack: DigitrafficStack, config: FunctionParameters): FunctionProps {
-    return {
-        runtime: config.runtime || Runtime.NODEJS_12_X,
-        architectures: [config.architecture || Architecture.ARM_64],
-        memorySize: config.memorySize || 128,
-        functionName: config.functionName,
-        code: config.code as Code,
-        role: config.role,
-        handler: config.handler as string,
-        timeout: Duration.seconds(config.timeout || 60),
-        environment: config.environment,
-        logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: config.reservedConcurrentExecutions || 1
-    };
+function getAssetCode(simpleLambdaName: string, config?: FunctionParameters): AssetCode {
+    const lambdaPath = config?.singleLambda ? `dist/lambda/` : `dist/lambda/${simpleLambdaName}`;
+
+    return new AssetCode(lambdaPath);
 }
 
 /**
@@ -151,4 +134,5 @@ interface FunctionParameters {
     vpcSubnets?: any;
     runtime?: Runtime;
     architecture?: Architecture;
+    singleLambda?: boolean;
 }
