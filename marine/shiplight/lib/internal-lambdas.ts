@@ -1,9 +1,8 @@
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {dbFunctionProps} from 'digitraffic-common/stack/lambda-configs';
-import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
+import {Function} from '@aws-cdk/aws-lambda';
+import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
+import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 
@@ -21,11 +20,8 @@ function createUpdateLightsLambda(
     const environment = stack.createDefaultLambdaEnvironment('Shiplight');
 
     const functionName = 'Shiplight-UpdateLights';
-    const lambdaConf = dbFunctionProps(stack, {
-        functionName: functionName,
-        code: new AssetCode('dist/lambda'),
-        handler: 'lambda-update-lights.handler',
-        environment,
+    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-lights', {
+        singleLambda: true,
         timeout: 10
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
