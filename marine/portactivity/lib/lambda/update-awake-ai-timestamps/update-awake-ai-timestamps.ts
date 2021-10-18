@@ -3,7 +3,7 @@ import * as TimestampService from '../../service/timestamps';
 import {SecretOptions, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {AwakeAiService} from "../../service/awake_ai";
-import {AwakeAiApi} from "../../api/awake_ai";
+import {AwakeAiETAApi} from "../../api/awake_ai_eta";
 import {sendMessage} from "../../service/queue-service";
 
 type UpdateAwakeAiTimestampsSecret = {
@@ -17,7 +17,7 @@ const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as s
 
 export function handlerFn(
     withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>, options: SecretOptions) => Promise<any>,
-    AwakeAiServiceClass: new (api: AwakeAiApi) => AwakeAiService
+    AwakeAiServiceClass: new (api: AwakeAiETAApi) => AwakeAiService
 ): () => Promise<any> {
 
     return () => {
@@ -28,7 +28,7 @@ export function handlerFn(
 
         return withDbSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<any> => {
             if (!service) {
-                service = new AwakeAiServiceClass(new AwakeAiApi(secret["awake.url"], secret["awake.auth"]));
+                service = new AwakeAiServiceClass(new AwakeAiETAApi(secret["awake.url"], secret["awake.auth"]));
             }
             const ships = await TimestampService.findETAShipsByLocode(ports);
 

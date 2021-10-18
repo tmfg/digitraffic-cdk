@@ -1,5 +1,5 @@
 import * as sinon from 'sinon';
-import {AwakeAiApi, AwakeAiETAShipStatus, AwakeAiResponseType} from "../../lib/api/awake_ai";
+import {AwakeAiETAApi, AwakeAiETAShipStatus, AwakeAiETAResponseType} from "../../lib/api/awake_ai_eta";
 import {AwakeAiService} from "../../lib/service/awake_ai";
 import {DbETAShip} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
@@ -14,7 +14,7 @@ describe('service awake.ai', () => {
         const ship = newDbETAShip();
         const mmsi = 123456789;
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiResponseType.OK,
+            type: AwakeAiETAResponseType.OK,
             eta: {
                 mmsi,
                 imo: ship.imo,
@@ -36,7 +36,7 @@ describe('service awake.ai', () => {
         const ship = newDbETAShip();
         const mmsi = 123456789;
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiResponseType.OK,
+            type: AwakeAiETAResponseType.OK,
             eta: {
                 mmsi,
                 imo: ship.imo,
@@ -58,7 +58,7 @@ describe('service awake.ai', () => {
         const notUnderWayStatuses = [AwakeAiETAShipStatus.STOPPED, AwakeAiETAShipStatus.NOT_PREDICTABLE, AwakeAiETAShipStatus.VESSEL_DATA_NOT_UPDATED];
         const status = notUnderWayStatuses[Math.floor(Math.random() * 2) + 1]; // get random status
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiResponseType.OK,
+            type: AwakeAiETAResponseType.OK,
             eta: {
                 mmsi: 123456789,
                 imo: ship.imo,
@@ -78,7 +78,7 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiResponseType.OK,
+            type: AwakeAiETAResponseType.OK,
             eta: {
                 mmsi: 123456789,
                 imo: ship.imo,
@@ -97,7 +97,7 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiResponseType.OK,
+            type: AwakeAiETAResponseType.OK,
             eta: {
                 mmsi: 123456789,
                 imo: ship.imo,
@@ -116,7 +116,7 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiResponseType.OK,
+            type: AwakeAiETAResponseType.OK,
             eta: {
                 mmsi: 123456789,
                 imo: ship.imo,
@@ -136,7 +136,7 @@ describe('service awake.ai', () => {
         const service = new AwakeAiService(api);
         const ship = newDbETAShip(service.overriddenDestinations[getRandomInteger(0, service.overriddenDestinations.length - 1)]);
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiResponseType.OK,
+            type: AwakeAiETAResponseType.OK,
             eta: {
                 mmsi: 123456789,
                 imo: ship.imo,
@@ -157,8 +157,8 @@ describe('service awake.ai', () => {
 
 });
 
-function createApi(): AwakeAiApi {
-    return new AwakeAiApi('', '');
+function createApi(): AwakeAiETAApi {
+    return new AwakeAiETAApi('', '');
 }
 
 function newDbETAShip(locode?: string): DbETAShip {

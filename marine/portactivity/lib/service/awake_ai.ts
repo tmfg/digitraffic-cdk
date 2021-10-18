@@ -1,11 +1,11 @@
-import {AwakeAiApi, AwakeAiETA, AwakeAiETAShipStatus, AwakeAiResponse} from "../api/awake_ai";
+import {AwakeAiETAApi, AwakeAiETA, AwakeAiETAShipStatus, AwakeAiETAResponse} from "../api/awake_ai_eta";
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 import {valueOnFulfilled} from "digitraffic-common/promise/promise";
 
-type AwakeAiResponseAndShip = {
-    readonly response: AwakeAiResponse
+type AwakeAiETAResponseAndShip = {
+    readonly response: AwakeAiETAResponse
     readonly ship: DbETAShip
 }
 
@@ -22,7 +22,7 @@ enum AwakeDataState {
 
 export class AwakeAiService {
 
-    private readonly api: AwakeAiApi
+    private readonly api: AwakeAiETAApi
 
     readonly overriddenDestinations = [
         'FIHEL',
@@ -30,7 +30,7 @@ export class AwakeAiService {
         'FIHKO'
     ];
 
-    constructor(api: AwakeAiApi) {
+    constructor(api: AwakeAiETAApi) {
         this.api = api;
     }
 
@@ -48,7 +48,7 @@ export class AwakeAiService {
                     }, []));
     }
 
-    private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiResponseAndShip> {
+    private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiETAResponseAndShip> {
         console.info(`method=updateAwakeAiTimestamps fetching ETA for ship with IMO ${ship.imo}`)
         const response = await this.api.getETA(ship.imo);
         return {
@@ -57,7 +57,7 @@ export class AwakeAiService {
         };
     }
 
-    private toTimeStamp(resp: AwakeAiResponseAndShip): ApiTimestamp | null {
+    private toTimeStamp(resp: AwakeAiETAResponseAndShip): ApiTimestamp | null {
         if (!resp.response.eta) {
             console.warn(`method=updateAwakeAiTimestamps no ETA received, state=${resp.response.type}`)
             return null;
