@@ -6,7 +6,7 @@ type AreaVisibilityWrapper = {
 
 export class AreaVisibilityService {
 
-    private api: AreaVisibilityApi;
+    private readonly api: AreaVisibilityApi;
 
     constructor(api: AreaVisibilityApi) {
         this.api = api;
