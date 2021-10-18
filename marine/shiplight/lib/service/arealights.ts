@@ -3,7 +3,7 @@ import {AreaTraffic} from "../model/areatraffic";
 
 export class AreaLightsService {
 
-    private api: AreaLightsApi;
+    private readonly api: AreaLightsApi;
 
     constructor(api: AreaLightsApi) {
         this.api = api;
