@@ -6,9 +6,9 @@ import {
     Resource,
     RestApi
 } from '@aws-cdk/aws-apigateway';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
+import {Function} from '@aws-cdk/aws-lambda';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
-import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
+import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {
     corsMethod,
     defaultIntegration,
@@ -20,7 +20,7 @@ import {
 } from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/api/utils";
-import {dbFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
@@ -29,7 +29,6 @@ import {TimestampMetadata} from './model/timestamp-metadata';
 import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -70,16 +69,11 @@ export class PublicApi {
         secret: ISecret): Function {
 
         const functionName = 'PortActivity-GetTimestamps';
-        const assetCode = new AssetCode('dist/lambda/get-timestamps');
         const environment = stack.createDefaultLambdaEnvironment('PortActivity');
 
-        const getTimestampsLambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
-            functionName: functionName,
-            code: assetCode,
-            handler: 'lambda-get-timestamps.handler',
+        const getTimestampsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-timestamps', {
             timeout: 10,
             reservedConcurrentExecutions: 4,
-            environment
         }), {
             errorAlarmProps: {
                 create: true,
@@ -88,6 +82,7 @@ export class PublicApi {
         });
 
         secret.grantRead(getTimestampsLambda);
+        new DigitrafficLogSubscriptions(stack, getTimestampsLambda);
 
         const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
             requestParameters: {
@@ -128,7 +123,6 @@ export class PublicApi {
             ]
         });
 
-        createSubscription(getTimestampsLambda, functionName, stack.configuration.logsDestinationArn, stack);
         addTagsAndSummary('GetTimestamps',
             ['timestamps'],
             'Retrieves ship timestamps by ship or port',
@@ -143,15 +137,10 @@ export class PublicApi {
 
     createShiplistResource(stack: DigitrafficStack, publicApi: RestApi, secret: ISecret): Function {
         const functionName = 'PortActivity-PublicShiplist';
-        const assetCode = new AssetCode('dist/lambda/get-shiplist-public');
         const environment = stack.createDefaultLambdaEnvironment('PortActivity');
 
-        const lambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
-            functionName: functionName,
-            code: assetCode,
+        const lambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-shiplist-public', {
             timeout: 10,
-            handler: 'lambda-get-shiplist-public.handler',
-            environment
         }));
 
         secret.grantRead(lambda);

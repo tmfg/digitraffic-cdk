@@ -1,6 +1,6 @@
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll} from "../db-testutil";
-import {handlerFn} from "../../lib/lambda/process-queue/lambda-process-queue";
+import {handlerFn} from "../../lib/lambda/process-queue/process-queue";
 import {SQSRecord} from "aws-lambda";
 import {ApiTimestamp} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";

@@ -1,6 +1,6 @@
 import {AssetCode, Function, Runtime} from '@aws-cdk/aws-lambda';
 import {Duration, Stack} from '@aws-cdk/core';
-import {dbFunctionProps, defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {databaseFunctionProps, defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {Props} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";
@@ -17,7 +17,6 @@ import {PortactivityEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -48,18 +47,13 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const lambda = MonitoredFunction.create(stack, functionName, dbFunctionProps(stack, {
+    const lambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'update-timestamps-from-pilotweb', {
         memorySize: 256,
         timeout: 10,
-        functionName,
-        code: new AssetCode('dist/lambda/update-timestamps-from-pilotweb'),
-        handler: 'lambda-update-timestamps-from-pilotweb.handler',
-        environment
     }));
 
-    createSubscription(lambda, functionName, stack.configuration.logsDestinationArn, stack);
+    new DigitrafficLogSubscriptions(stack, lambda);
     queue.grantSendMessages(lambda);
-
     secret.grantRead(lambda);
 
     return lambda;
@@ -99,11 +93,7 @@ function createProcessQueueLambda(
     const functionName = "PortActivity-ProcessTimestampQueue";
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
 
-    const lambdaConf = dbFunctionProps(stack, {
-        functionName,
-        code: new AssetCode('dist/lambda/process-queue'),
-        handler: 'lambda-process-queue.handler',
-        environment,
+    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'process-queue', {
         timeout: 10,
         reservedConcurrentExecutions: 8
     });
@@ -166,12 +156,8 @@ function createUpdateAwakeAiTimestampsLambda(secret: ISecret, queue: Queue, stac
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
     const functionName = 'PortActivity-UpdateAwakeAiTimestamps';
-    const lambdaConf = dbFunctionProps(stack, {
-        functionName,
-        code: new AssetCode('dist/lambda/update-awake-ai-timestamps'),
-        handler: 'lambda-update-awake-ai-timestamps.handler',
+    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-awake-ai-timestamps', {
         timeout: 30,
-        environment
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
