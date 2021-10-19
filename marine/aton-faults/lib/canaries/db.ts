@@ -7,7 +7,7 @@ export const handler = async () => {
     const checker = new DatabaseChecker(secretId);
 
     checker.notEmpty('states are not empty',
-        'from aton_fault_state');
+        'select couhnt(*) from aton_fault_state');
 
     checker.notEmpty('fault types are not empty',
         'select count(*) from aton_fault_type');
