@@ -73,7 +73,7 @@ export class PublicApi {
 
         const getTimestampsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-timestamps', {
             timeout: 10,
-            reservedConcurrentExecutions: 4,
+            reservedConcurrentExecutions: 6,
         }), {
             errorAlarmProps: {
                 create: true,
