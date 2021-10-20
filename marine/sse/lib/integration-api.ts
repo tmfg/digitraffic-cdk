@@ -3,7 +3,7 @@ import {Construct, Duration, Stack} from '@aws-cdk/core';
 import * as ec2 from '@aws-cdk/aws-ec2';
 import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
 import * as Lambda from '@aws-cdk/aws-lambda';
-import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {databaseFunctionProps, dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createRestApi} from 'digitraffic-common/api/rest_apis';
 import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
 import {getFullEnv} from "digitraffic-common/stack/stack-util";
@@ -31,13 +31,12 @@ import {MessageModel} from "digitraffic-common/api/response";
 import {ERROR_MESSAGE, BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {DatabaseEnvironmentKeys} from "digitraffic-common/secrets/dbsecret";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 
 export function createIntegrationApiAndHandlerLambda(
     secret: ISecret,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
-    props: AppProps,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
     const integrationApi: RestApi = createRestApi(stack,
         'SSE-Integration',
@@ -48,7 +47,7 @@ export function createIntegrationApiAndHandlerLambda(
     const errorResponseModel = integrationApi.addModel('ErrorResponseModel', MessageModel);
 
     const apiResource = createUpdateSseApiGatewayResource(stack, integrationApi);
-    const updateSseDataLambda = createUpdateRequestHandlerLambda(apiResource, sseModel, okResponseModel, errorResponseModel, vpc, lambdaDbSg, props, stack);
+    const updateSseDataLambda = createUpdateRequestHandlerLambda(apiResource, sseModel, okResponseModel, errorResponseModel, stack);
     secret.grantRead(updateSseDataLambda);
 
     createDefaultUsagePlan(integrationApi, 'SSE - Sea State Estimate Integration');
@@ -72,23 +71,23 @@ function createUpdateRequestHandlerLambda(
     sseRequestModel: any,
     okResponseModel: any,
     errorResponseModel: any,
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
-    appProps: AppProps,
-    stack: Stack): Lambda.Function {
+    stack: DigitrafficStack): Lambda.Function {
 
     const lambdaFunctionName = 'SSE-UpdateSseData';
-    const lambdaEnv: LambdaEnvironment = {};
-    lambdaEnv[KEY_SECRET_ID] = appProps.secretId;
-    lambdaEnv[DatabaseEnvironmentKeys.DB_APPLICATION] = 'SSE';
+    const environment = stack.createDefaultLambdaEnvironment('SSE');
 
-    const updateSseDataLambda = new Lambda.Function(stack, lambdaFunctionName, dbLambdaConfiguration(vpc, lambdaDbSg, appProps, {
-        functionName: lambdaFunctionName,
-        code: new Lambda.AssetCode('dist/lambda'),
-        handler: 'lambda-update-sse-data.handler',
-        memorySize: appProps.memorySize,
-        environment: lambdaEnv
-    }));
+    const updateSseDataLambda = MonitoredFunction.create(
+        stack,
+        lambdaFunctionName,
+        databaseFunctionProps(
+            stack,
+            environment,
+            lambdaFunctionName,
+            'lambda-update-sse-data', {
+                singleLambda: true,
+                reservedConcurrentExecutions: 10,
+                memorySize: 256
+            }));
 
     const lambdaIntegration = defaultIntegration(updateSseDataLambda, {
         responses: [
@@ -111,37 +110,8 @@ function createUpdateRequestHandlerLambda(
     });
 
     // Create log subscription
-    createSubscription(updateSseDataLambda, lambdaFunctionName, appProps.logsDestinationArn, stack);
-    createAlarm(updateSseDataLambda, appProps.errorNotificationSnsTopicArn, stack);
+    createSubscription(updateSseDataLambda, lambdaFunctionName, stack.configuration.logsDestinationArn, stack);
     return updateSseDataLambda;
-}
-
-function createAlarm(updateRequestHandlerLambda: Lambda.Function, errorNotificationSnsTopicArn: string, stack: Stack) {
-
-    const fullEnv = getFullEnv(stack);
-    // Raise an alarm if we have more than 1 errors in last day
-    const topic = Topic.fromTopicArn(stack, 'SSE-UpdateSseData-Alarm-ErrorTopic', errorNotificationSnsTopicArn)
-    new cloudwatch.Alarm(stack, "SSE-UpdateSseData-Alarm-Error", {
-        alarmName: updateRequestHandlerLambda.functionName + '-ErrorAlert-' + fullEnv,
-        alarmDescription: `Environment: ${fullEnv}. Error in handling of incoming Sea State Estimate (SSE) data.`,
-        metric: updateRequestHandlerLambda.metricErrors().with({period: Duration.minutes(3)}),
-        threshold: 1,
-        evaluationPeriods: 1,
-        datapointsToAlarm: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
-    }).addAlarmAction(new SnsAction(topic));
-
-    // Raise alarm if there is more than 1 throttle in last day
-    const throttleTopic = Topic.fromTopicArn(stack, 'SSE-UpdateData-Alarm-UpdateData-ThrottleTopic', errorNotificationSnsTopicArn)
-    new cloudwatch.Alarm(stack, "SSE-UpdateData-Alarm-UpdateData-Throttle", {
-        alarmName: updateRequestHandlerLambda.functionName + '-ThrottleAlert-' + fullEnv,
-        alarmDescription: `Environment: ${fullEnv}. Lambda throttles while handling incoming Sea State Estimate (SSE) data`,
-        metric: updateRequestHandlerLambda.metricThrottles().with({period: Duration.hours(1)}),
-        threshold: 1,
-        evaluationPeriods: 1,
-        datapointsToAlarm: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
-    }).addAlarmAction(new SnsAction(throttleTopic));
 }
 
 const RESPONSE_400_BAD_REQUEST: IntegrationResponse = {

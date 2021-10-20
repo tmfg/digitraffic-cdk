@@ -1,7 +1,3 @@
-import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {StackConfiguration} from "digitraffic-common/stack/stack";
 
-export interface AppProps extends LambdaConfiguration {
-    /** Topic to send errors in message handling **/
-    errorNotificationSnsTopicArn:string;
-    secretId:string
-}
+export interface AppProps extends StackConfiguration {}
