@@ -20,11 +20,13 @@ import {
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
     bucket: Bucket,
-    props: Props, stack: Stack
-) {
+    props: Props,
+    stack: DigitrafficStack) {
 
     createUpdateSwaggerDescriptionsLambda(bucket, props, stack);
     createUpdateApiDocumentationLambda(props, stack);
@@ -32,8 +34,8 @@ export function create(
 
 function createUpdateApiDocumentationLambda(
     props: Props,
-    stack: Stack
-) {
+    stack: DigitrafficStack) {
+
     const functionName = `${stack.stackName}-UpdateApiDocumentation`;
 
     const lambdaEnv: any = {};
@@ -46,10 +48,11 @@ function createUpdateApiDocumentationLambda(
         code: new AssetCode('dist/lambda/update-api-documentation'),
         handler: 'lambda-update-api-documentation.handler',
         runtime: Runtime.NODEJS_12_X,
-        environment: lambdaEnv
+        environment: lambdaEnv,
+        timeout: Duration.seconds(10)
     };
 
-    const updateDocsLambda = new Function(stack, functionName, lambdaConf);
+    const updateDocsLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
     const statement = new PolicyStatement();
     statement.addActions('apigateway:GET', 'apigateway:POST', 'apigateway:PUT', 'apigateway:PATCH');
@@ -63,8 +66,8 @@ function createUpdateApiDocumentationLambda(
 function createUpdateSwaggerDescriptionsLambda(
     bucket: Bucket,
     props: Props,
-    stack: Stack
-) {
+    stack: DigitrafficStack) {
+
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
 
     const lambdaEnv: any = {};
@@ -98,10 +101,11 @@ function createUpdateSwaggerDescriptionsLambda(
         handler: 'lambda-update-swagger.handler',
         runtime: Runtime.NODEJS_12_X,
         memorySize: 192,
-        environment: lambdaEnv
+        environment: lambdaEnv,
+        timeout: Duration.seconds(10)
     };
 
-    const updateSwaggerLambda = new Function(stack, functionName, lambdaConf);
+    const updateSwaggerLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
     const statement = new PolicyStatement();
     statement.addActions('apigateway:GET');

@@ -1,4 +1,6 @@
-export interface Props {
+import {StackConfiguration} from "digitraffic-common/stack/stack";
+
+export interface Props extends StackConfiguration {
     // Digitraffic application URL
     readonly appUrl?: string;
     // Digitraffic beta application URL

@@ -1,12 +1,13 @@
-import {Construct, Stack, StackProps} from '@aws-cdk/core';
+import {Construct, StackProps} from '@aws-cdk/core';
 import {Props} from './app-props';
 import * as InternalLambdas from './internal-lambdas'
 import {BlockPublicAccess, Bucket, HttpMethods} from "@aws-cdk/aws-s3";
 import {CanonicalUserPrincipal, Effect, PolicyStatement} from "@aws-cdk/aws-iam";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export class SwaggerJoinerStack extends Stack {
-    constructor(scope: Construct, id: string, swaggerJoinerProps: Props, props?: StackProps) {
-        super(scope, id, props);
+export class SwaggerJoinerStack extends DigitrafficStack {
+    constructor(scope: Construct, id: string, swaggerJoinerProps: Props) {
+        super(scope, id, swaggerJoinerProps);
 
         const bucket = this.createBucket(swaggerJoinerProps);
         InternalLambdas.create(bucket, swaggerJoinerProps, this);
