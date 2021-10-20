@@ -144,7 +144,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
         } as FunctionProps;
 
         return new MonitoredFunction(this, kinesisToESId, {...lambdaConf, ...props.lambdaConfig},
-            alarmTopic, warningTopic, null);
+            alarmTopic, warningTopic, true, null);
     }
 
     createWriteAppLogsToElasticLambda(lambdaRole: Role,
@@ -171,7 +171,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
         } as FunctionProps;
 
         return new MonitoredFunction(this, kinesisToESId, {...lambdaConf, ...props.lambdaConfig},
-            alarmTopic, warningTopic, null);
+            alarmTopic, warningTopic, true, null);
     }
 
     createWriteToElasticLambdaRole(elasticSearchDomainArn: string, streamArns: string[]): Role {

@@ -26,6 +26,7 @@ export type StackConfiguration = {
     readonly availabilityZones: string[];
 
     readonly trafficType: TrafficType;
+    readonly production: boolean
     readonly stackProps: StackProps;
 }
 

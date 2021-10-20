@@ -64,7 +64,6 @@ export class MonitoredFunction extends Function {
      * @param stack DigitrafficStack
      * @param id Lambda construct Id
      * @param functionProps Lambda function properties
-     * @param trafficType Traffic type, used for alarm names. Set to null if Lambda is not related to any traffic type.
      * @param props Monitored function properties
      */
     static create(
@@ -73,12 +72,19 @@ export class MonitoredFunction extends Function {
         functionProps: FunctionProps,
         props?: MonitoredFunctionProps): MonitoredFunction {
 
-        if(props == MonitoredFunction.DISABLE_ALARMS && stack.stackName.includes('Prod')) {
+        if(props == MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
             console.error(`Function ${functionProps.functionName} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`);
             throw 'ABORT!';
         }
 
-        return new MonitoredFunction(stack, id, functionProps, stack.alarmTopic, stack.warningTopic, stack.configuration.trafficType, props);
+        return new MonitoredFunction(stack,
+            id,
+            functionProps,
+            stack.alarmTopic,
+            stack.warningTopic,
+            stack.configuration.production,
+            stack.configuration.trafficType,
+            props);
     }
 
     /**
@@ -87,6 +93,7 @@ export class MonitoredFunction extends Function {
      * @param functionProps Lambda function properties
      * @param alarmSnsTopic SNS topic for alarms
      * @param warningSnsTopic SNS topic for warnings
+     * @param production Is the stack a production stack, used for determining the alarm topic
      * @param trafficType Traffic type, used for alarm names. Set to null if Lambda is not related to any traffic type.
      * @param props Monitored function properties
      */
@@ -96,6 +103,7 @@ export class MonitoredFunction extends Function {
         functionProps: FunctionProps,
         alarmSnsTopic: ITopic,
         warningSnsTopic: ITopic,
+        production: boolean,
         trafficType: TrafficType | null,
         props?: MonitoredFunctionProps) {
         super(scope, id, functionProps);
@@ -115,7 +123,7 @@ export class MonitoredFunction extends Function {
                 'Duration alarm',
                 `Duration has exceeded ${functionProps.timeout!.toSeconds()} seconds`,
                 trafficType,
-                alarmSnsAction,
+                this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
                 functionProps.timeout!.toMilliseconds(),
                 1,
                 1,
@@ -149,7 +157,7 @@ export class MonitoredFunction extends Function {
                 'Errors alarm',
                 'Invocations did not succeed',
                 trafficType,
-                alarmSnsAction,
+                this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
                 1,
                 1,
                 1,
@@ -165,7 +173,7 @@ export class MonitoredFunction extends Function {
                 'Throttles alarm',
                 'Has throttled',
                 trafficType,
-                alarmSnsAction,
+                this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
                 0,
                 1,
                 1,
@@ -199,5 +207,13 @@ export class MonitoredFunction extends Function {
             statistic: alarmProps?.statistic ?? statistic,
             comparisonOperator: alarmProps?.comparisonOperator ?? comparisonOperator
         }).addAlarmAction(alarmSnsAction);
+    }
+
+    private getAlarmActionForEnv(
+        alarmAction: SnsAction,
+        warningAction: SnsAction,
+        production: boolean): SnsAction {
+
+        return production ? alarmAction : warningAction;
     }
 }
