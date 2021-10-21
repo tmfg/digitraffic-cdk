@@ -114,6 +114,10 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
     }
 
     schedules.forEach(scheds => {
+        if (!scheds) {
+            console.warn('method=validateSchedulesStructure Empty schedule element');
+            return;
+        }
         if (!scheds.schedule || !scheds.schedule.length) {
             validationErrors.push(ValidationError.MISSING_SCHEDULE);
             return;
@@ -188,6 +192,10 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
     const now = moment();
 
     rtzSchedules.forEach(schedules => {
+        if (!schedules) {
+            console.warn('method=validateSchedulesContent Empty schedule element');
+            return;
+        }
         schedules.schedule.forEach(sched => {
             if (sched.calculated && sched.calculated.length) {
                 if (!anyTimestampInFuture(sched.calculated[0], now)) {
