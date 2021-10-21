@@ -23,7 +23,9 @@ describe('secret - test', () => {
         mockSecret(null);
 
         await expect(async () => {
-            await withSecret(SECRET_ID, () => {});
+            await withSecret(SECRET_ID, () => {
+                return; // do nothing
+            });
         }).rejects.toThrowError("No secret found!");
     });
 

@@ -90,7 +90,7 @@ export function responseChecker(fn: any): any {
 
 async function getResponseBody(response: any): Promise<string> {
     const body: Buffer = await new Promise(async (resolve: any) => {
-        let buffers: Buffer[] = [];
+        const buffers: Buffer[] = [];
 
         response.on('data', (data: any) => {
             buffers.push(data);
