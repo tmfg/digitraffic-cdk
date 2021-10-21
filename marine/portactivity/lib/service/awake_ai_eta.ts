@@ -2,7 +2,6 @@ import {AwakeAiETAApi, AwakeAiETA, AwakeAiETAShipStatus, AwakeAiETAResponse} fro
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
-import {valueOnFulfilled} from "digitraffic-common/promise/promise";
 
 type AwakeAiETAResponseAndShip = {
     readonly response: AwakeAiETAResponse
@@ -20,7 +19,7 @@ enum AwakeDataState {
     NO_ETA_TIMESTAMP = 'NO_ETA_TIMESTAMP',
 }
 
-export class AwakeAiService {
+export class AwakeAiETAService {
 
     private readonly api: AwakeAiETAApi
 

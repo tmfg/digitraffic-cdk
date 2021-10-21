@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import {AwakeAiETAApi, AwakeAiETAShipStatus, AwakeAiETAResponseType} from "../../lib/api/awake_ai_eta";
-import {AwakeAiService} from "../../lib/service/awake_ai";
+import {AwakeAiETAService} from "../../lib/service/awake_ai_eta";
 import {DbETAShip} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
@@ -10,7 +10,7 @@ describe('service awake.ai', () => {
 
     test('getETA - ship under way with prediction', async () => {
         const api = createApi();
-        const service = new AwakeAiService(api);
+        const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         const mmsi = 123456789;
         sinon.stub(api, 'getETA').returns(Promise.resolve({
@@ -32,7 +32,7 @@ describe('service awake.ai', () => {
 
     test('getETA - predicted locode differs', async () => {
         const api = createApi();
-        const service = new AwakeAiService(api);
+        const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         const mmsi = 123456789;
         sinon.stub(api, 'getETA').returns(Promise.resolve({
@@ -53,7 +53,7 @@ describe('service awake.ai', () => {
 
     test('getETA - ship not under way', async () => {
         const api = createApi();
-        const service = new AwakeAiService(api);
+        const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         const notUnderWayStatuses = [AwakeAiETAShipStatus.STOPPED, AwakeAiETAShipStatus.NOT_PREDICTABLE, AwakeAiETAShipStatus.VESSEL_DATA_NOT_UPDATED];
         const status = notUnderWayStatuses[Math.floor(Math.random() * 2) + 1]; // get random status
@@ -75,7 +75,7 @@ describe('service awake.ai', () => {
 
     test('getETA - no predicted ETA', async () => {
         const api = createApi();
-        const service = new AwakeAiService(api);
+        const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
             type: AwakeAiETAResponseType.OK,
@@ -94,7 +94,7 @@ describe('service awake.ai', () => {
 
     test('getETA - no predicted destination', async () => {
         const api = createApi();
-        const service = new AwakeAiService(api);
+        const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
             type: AwakeAiETAResponseType.OK,
@@ -113,7 +113,7 @@ describe('service awake.ai', () => {
 
     test('getETA - port outside Finland', async () => {
         const api = createApi();
-        const service = new AwakeAiService(api);
+        const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
             type: AwakeAiETAResponseType.OK,
@@ -133,7 +133,7 @@ describe('service awake.ai', () => {
 
     test('getETA - port locode override', async () => {
         const api = createApi();
-        const service = new AwakeAiService(api);
+        const service = new AwakeAiETAService(api);
         const ship = newDbETAShip(service.overriddenDestinations[getRandomInteger(0, service.overriddenDestinations.length - 1)]);
         sinon.stub(api, 'getETA').returns(Promise.resolve({
             type: AwakeAiETAResponseType.OK,

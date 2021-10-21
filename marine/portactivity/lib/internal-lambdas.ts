@@ -16,7 +16,7 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {PortactivityEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
     queueAndDLQ: QueueAndDLQ,
@@ -27,7 +27,7 @@ export function create(
     createProcessQueueLambda(queueAndDLQ.queue, secret, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stack);
 
-    const updateAwakeAiTimestampsLambda = createUpdateAwakeAiTimestampsLambda(secret, queueAndDLQ.queue, stack);
+    const updateAwakeAiTimestampsLambda = createUpdateAwakeAiETATimestampsLambda(secret, queueAndDLQ.queue, stack);
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(secret, queueAndDLQ.queue, stack);
 
     const updateETASchedulingRule = createETAScheduler(stack);
@@ -151,12 +151,12 @@ function createPilotwebScheduler(stack: Stack): Rule {
     });
 }
 
-function createUpdateAwakeAiTimestampsLambda(secret: ISecret, queue: Queue, stack: DigitrafficStack): Function {
+function createUpdateAwakeAiETATimestampsLambda(secret: ISecret, queue: Queue, stack: DigitrafficStack): Function {
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const functionName = 'PortActivity-UpdateAwakeAiTimestamps';
-    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-awake-ai-timestamps', {
+    const functionName = 'PortActivity-UpdateAwakeAiETATimestamps';
+    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-awake-ai-eta-timestamps', {
         timeout: 30,
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
