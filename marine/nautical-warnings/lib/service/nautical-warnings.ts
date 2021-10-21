@@ -15,7 +15,7 @@ export function getActiveWarnings() {
 
 export function getArchivedWarnings() {
     return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
-        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
+        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED);
     });
 }
 
