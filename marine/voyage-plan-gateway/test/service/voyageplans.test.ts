@@ -141,11 +141,10 @@ describe('voyageplans service', () => {
         expect(validationErrors.length).toBe(0);
     });
 
-    test('validateSchedulesStructure - no schedules', () => {
+    test('validateSchedulesStructure - no schedules passes validation', () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure(randomBoolean() ? [] : undefined);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_SCHEDULES);
+        expect(validationErrors.length).toBe(0);
     });
 
     test('validateSchedulesStructure - missing schedule element', () => {

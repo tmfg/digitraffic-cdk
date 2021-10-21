@@ -109,7 +109,8 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
     const validationErrors: ValidationError[] = [];
 
     if (!schedules || !schedules.length) {
-        return [ValidationError.MISSING_SCHEDULES];
+        console.warn('method=validateSchedulesStructure No schedules element');
+        return [];
     }
 
     schedules.forEach(scheds => {
@@ -176,7 +177,12 @@ function anyWayPointInsideSpatialLimits(rtzWaypoints: RtzWaypoint[]): boolean {
     return points.some(p => SPATIAL_LIMITS.contains(p));
 }
 
-export function validateSchedulesContent(rtzSchedules: RtzSchedules[]): ValidationError[] {
+export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): ValidationError[] {
+    if (!rtzSchedules) {
+        console.warn('method=validateSchedulesContent No schedules element');
+        return [];
+    }
+
     const validationErrors: ValidationError[] = [];
 
     const now = moment();
