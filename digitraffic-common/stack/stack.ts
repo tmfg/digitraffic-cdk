@@ -8,8 +8,9 @@ import {StringParameter} from "@aws-cdk/aws-ssm";
 import {TrafficType} from "../model/traffictype";
 
 const SSM_ROOT = '/digitraffic'
-
+export const SOLUTION_KEY = 'Solution';
 const MONITORING_ROOT = '/monitoring';
+
 export const SSM_KEY_WARNING_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/warning-topic`;
 export const SSM_KEY_ALARM_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/alarm-topic`;
 
@@ -26,7 +27,7 @@ export type StackConfiguration = {
     readonly availabilityZones: string[];
 
     readonly trafficType: TrafficType;
-    readonly production: boolean
+    readonly production: boolean;
     readonly stackProps: StackProps;
 }
 
