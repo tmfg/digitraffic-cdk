@@ -73,8 +73,7 @@ export class MonitoredFunction extends Function {
         props?: MonitoredFunctionProps): MonitoredFunction {
 
         if(props == MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
-            console.error(`Function ${functionProps.functionName} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`);
-            throw 'ABORT!';
+            throw new Error(`Function ${functionProps.functionName} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`);
         }
 
         return new MonitoredFunction(stack,
