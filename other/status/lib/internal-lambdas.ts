@@ -1,5 +1,5 @@
-import {Construct, Duration} from "@aws-cdk/core";
-import {AssetCode, Function, FunctionProps, Runtime} from "@aws-cdk/aws-lambda";
+import {Duration, Stack} from "@aws-cdk/core";
+import {AssetCode, FunctionProps, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
 import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
@@ -7,17 +7,25 @@ import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {Props} from "./app-props";
 import {StatusEnvKeys} from "./keys";
+import {ITopic} from "@aws-cdk/aws-sns";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {TrafficType} from "digitraffic-common/model/traffictype";
 
 
-export function create(stack: Construct, props: Props) {
+export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props) {
     const secret = Secret.fromSecretCompleteArn(stack, 'Secret', props.secretsManagerSecretArn);
-
-    createUpdateStatusesLambda(secret, stack, props);
-    createHandleMaintenanceLambda(secret, stack, props);
-    createCheckComponentStatesLambda(secret, stack, props);
+    createUpdateStatusesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
+    createHandleMaintenanceLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
+    createCheckComponentStatesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
 }
 
-function createUpdateStatusesLambda(secret: ISecret, stack: Construct, props: Props) {
+function createUpdateStatusesLambda(
+    secret: ISecret,
+    alarmSnsTopic: ITopic,
+    warningSnsTopic: ITopic,
+    stack: Stack,
+    props: Props) {
+    
     const environment: any = {};
     environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
     environment[StatusEnvKeys.SECRET_ID] = props.secretsManagerSecretArn;
@@ -36,7 +44,14 @@ function createUpdateStatusesLambda(secret: ISecret, stack: Construct, props: Pr
         reservedConcurrentExecutions: 1
     };
 
-    const lambda = new Function(stack, 'UpdateStatuses', lambdaConf);
+    const lambda = new MonitoredFunction(
+        stack,
+        'UpdateStatuses',
+        lambdaConf,
+        alarmSnsTopic,
+        warningSnsTopic,
+        true,
+        TrafficType.OTHER);
 
     secret.grantRead(lambda);
 
@@ -48,7 +63,13 @@ function createUpdateStatusesLambda(secret: ISecret, stack: Construct, props: Pr
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
 
-function createHandleMaintenanceLambda(secret: ISecret, stack: Construct, props: Props) {
+function createHandleMaintenanceLambda(
+    secret: ISecret,
+    alarmSnsTopic: ITopic,
+    warningSnsTopic: ITopic,
+    stack: Stack,
+    props: Props) {
+    
     const functionName = "Status-HandleMaintenance";
     const lambdaConf: FunctionProps = {
         functionName: functionName,
@@ -65,7 +86,14 @@ function createHandleMaintenanceLambda(secret: ISecret, stack: Construct, props:
         reservedConcurrentExecutions: 1
     };
 
-    const lambda = new Function(stack, 'HandleMaintenance', lambdaConf);
+    const lambda = new MonitoredFunction(
+        stack,
+        'HandleMaintenance',
+        lambdaConf,
+        alarmSnsTopic,
+        warningSnsTopic,
+        true,
+        TrafficType.OTHER);
 
     secret.grantRead(lambda);
 
@@ -78,7 +106,13 @@ function createHandleMaintenanceLambda(secret: ISecret, stack: Construct, props:
 }
 
 
-function createCheckComponentStatesLambda(secret: ISecret, stack: Construct, props: Props) {
+function createCheckComponentStatesLambda(
+    secret: ISecret,
+    alarmSnsTopic: ITopic,
+    warningSnsTopic: ITopic,
+    stack: Stack,
+    props: Props) {
+    
     const functionName = "Status-CheckComponentStates";
     const lambdaConf: FunctionProps = {
         functionName: functionName,
@@ -95,7 +129,14 @@ function createCheckComponentStatesLambda(secret: ISecret, stack: Construct, pro
         reservedConcurrentExecutions: 1
     };
 
-    const lambda = new Function(stack, 'CheckComponentStates', lambdaConf);
+    const lambda = new MonitoredFunction(
+        stack,
+        'CheckComponentStates',
+        lambdaConf,
+        alarmSnsTopic,
+        warningSnsTopic,
+        true,
+        TrafficType.OTHER);
 
     secret.grantRead(lambda);
 

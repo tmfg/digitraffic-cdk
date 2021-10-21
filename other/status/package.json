@@ -33,6 +33,7 @@
     "@aws-cdk/aws-lambda": "*",
     "@aws-cdk/aws-logs": "*",
     "@aws-cdk/aws-secretsmanager": "*",
+    "@aws-cdk/aws-sns": "*",
     "@aws-cdk/core": "*",
     "@types/paho-mqtt": "^1.0.4",
     "aws-sdk": "*",
