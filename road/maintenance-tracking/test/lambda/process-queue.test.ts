@@ -7,7 +7,7 @@ import { SqsConsumer } from 'sns-sqs-big-payload';
 import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
 import * as pgPromise from "pg-promise";
 import {dbTestBase, findAllObservations} from "../db-testutil";
-import * as LambdaProcessQueue from "../../lib/lambda/process-queue/lambda-process-queue";
+import * as LambdaProcessQueue from "../../lib/lambda/process-queue/process-queue";
 import {SQSRecord} from "aws-lambda";
 import {getRandompId, getTrackingJsonWith3Observations, getTrackingJsonWith3ObservationsAndMissingSendingSystem} from "../testdata";
 import * as sinon from 'sinon';

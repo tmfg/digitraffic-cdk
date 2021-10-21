@@ -1,16 +1,11 @@
 import {Resource, RestApi} from '@aws-cdk/aws-apigateway';
-import {Construct, Stack, Duration} from '@aws-cdk/core';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
+import {Construct} from '@aws-cdk/core';
 import * as lambda from '@aws-cdk/aws-lambda';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createRestApi} from 'digitraffic-common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
 import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
-import {getFullEnv} from "digitraffic-common/stack/stack-util";
-import * as cloudwatch from "@aws-cdk/aws-cloudwatch";
-import {Topic} from "@aws-cdk/aws-sns";
-import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
+import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 
 import {
@@ -27,16 +22,15 @@ import {createDefaultUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {AppProps} from "./app-props";
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
-import apigateway = require('@aws-cdk/aws-apigateway');
 import {MaintenanceTrackingEnvKeys} from "./keys";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import apigateway = require('@aws-cdk/aws-apigateway');
 
 export function createIntegrationApiAndHandlerLambda(
     queue: Queue,
-    vpc: IVpc,
-    lambdaDbSg: ISecurityGroup,
     sqsExtendedMessageBucketArn: string,
     props: AppProps,
-    stack: Stack) {
+    stack: DigitrafficStack) {
 
     const integrationApi = createRestApi(stack,
         'MaintenanceTracking-Integration',
@@ -45,7 +39,7 @@ export function createIntegrationApiAndHandlerLambda(
     addServiceModelToIntegrationApi(integrationApi);
 
     const apiResource = createUpdateMaintenanceTrackingApiGatewayResource(stack, integrationApi);
-    createUpdateRequestHandlerLambda(apiResource, vpc, lambdaDbSg, queue, sqsExtendedMessageBucketArn, props, stack);
+    createUpdateRequestHandlerLambda(apiResource, queue, sqsExtendedMessageBucketArn, props, stack);
     createDefaultUsagePlan(integrationApi, 'Maintenance Tracking Integration');
 }
 
@@ -82,12 +76,10 @@ function createUpdateMaintenanceTrackingApiGatewayResource(
 
 function createUpdateRequestHandlerLambda(
     requests: apigateway.Resource,
-    vpc: ec2.IVpc,
-    lambdaDbSg: ec2.ISecurityGroup,
     queue : Queue,
     sqsExtendedMessageBucketArn: string,
     appProps: AppProps,
-    stack: Stack
+    stack: DigitrafficStack
 ) {
     const lambdaFunctionName = 'MaintenanceTracking-UpdateQueue';
 
@@ -96,11 +88,12 @@ function createUpdateRequestHandlerLambda(
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
 
     const lambdaRole = createLambdaRoleWithWriteToSqsAndS3Policy(stack, queue.queueArn, sqsExtendedMessageBucketArn);
-    const updateRequestsHandler = new lambda.Function(stack, lambdaFunctionName, defaultLambdaConfiguration({
+    const updateRequestsHandler = MonitoredFunction.create(stack, lambdaFunctionName, defaultLambdaConfiguration({
         functionName: lambdaFunctionName,
         code: new lambda.AssetCode('dist/lambda/update-queue'),
         handler: 'lambda-update-queue.handler',
-        // reservedConcurrentExecutions: appProps.sqsProcessLambdaConcurrentExecutions,
+        reservedConcurrentExecutions: 100,
+        timeout: 60,
         environment: lambdaEnv,
         role: lambdaRole,
         memorySize: 256
@@ -111,7 +104,6 @@ function createUpdateRequestHandlerLambda(
     });
     // Create log subscription
     createSubscription(updateRequestsHandler, lambdaFunctionName, appProps.logsDestinationArn, stack);
-    createAlarm(updateRequestsHandler, appProps.errorNotificationSnsTopicArn, appProps.sqsDlqBucketName, stack);
 }
 
 function createLambdaRoleWithWriteToSqsAndS3Policy(stack: Construct, sqsArn: string, sqsExtendedMessageBucketArn: string) {
@@ -134,32 +126,4 @@ function createLambdaRoleWithWriteToSqsAndS3Policy(stack: Construct, sqsArn: str
     lambdaRole.addToPolicy(s3PolicyStatement);
 
     return lambdaRole;
-}
-
-function createAlarm(updateRequestHandlerLambda: lambda.Function, errorNotificationSnsTopicArn: string, dlqBucketName: string, stack: Stack) {
-
-    const fullEnv = getFullEnv(stack);
-    // Raise an alarm if we have more than 1 errors in last day
-    const topic = Topic.fromTopicArn(stack, 'MaintenanceTrackingAlarmUpdateSqsErrorTopic', errorNotificationSnsTopicArn)
-    new cloudwatch.Alarm(stack, "MaintenanceTrackingAlarmUpdateSqs", {
-        alarmName: updateRequestHandlerLambda.functionName + '-ErrorAlert-' + fullEnv,
-        alarmDescription: `Environment: ${fullEnv}. Error in handling of incoming maintenance tracking messages from HARJA.`,
-        metric: updateRequestHandlerLambda.metricErrors().with({ period: Duration.days(1) }),
-        threshold: 1,
-        evaluationPeriods: 1,
-        datapointsToAlarm: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
-    }).addAlarmAction(new SnsAction(topic));
-
-    // Raise alarm if there is more than 1 throttle in last day
-    const throttleTopic = Topic.fromTopicArn(stack, 'MaintenanceTrackingAlarmUpdateSqsThrottleTopic', errorNotificationSnsTopicArn)
-    new cloudwatch.Alarm(stack, "MaintenanceTrackingAlarmUpdateThrottle", {
-        alarmName: updateRequestHandlerLambda.functionName + '-ThrottleAlert-' + fullEnv,
-        alarmDescription: `Environment: ${fullEnv}. Lambda throttles while handling incoming maintenance tracking messages from HARJA`,
-        metric: updateRequestHandlerLambda.metricThrottles().with({ period: Duration.days(1) }),
-        threshold: 1,
-        evaluationPeriods: 1,
-        datapointsToAlarm: 1,
-        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING
-    }).addAlarmAction(new SnsAction(throttleTopic));
 }

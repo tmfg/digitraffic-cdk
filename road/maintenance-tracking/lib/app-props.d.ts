@@ -1,10 +1,6 @@
-import {LambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {StackConfiguration} from "digitraffic-common/stack/stack";
 
-declare interface AppProps extends LambdaConfiguration {
-    readonly secretId: string,
-    readonly sqsDlqBucketName: string;
-    readonly sqsMessageBucketName: string;
-    readonly sqsProcessLambdaConcurrentExecutions: number;
-    /** Topic to send errors in message handling **/
-    readonly errorNotificationSnsTopicArn: string;
+declare interface AppProps extends StackConfiguration {
+    readonly sqsDlqBucketName: string
+    readonly sqsMessageBucketName: string
 }

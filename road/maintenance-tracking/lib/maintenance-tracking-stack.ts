@@ -6,20 +6,13 @@ import * as Sqs from './sqs';
 import {AppProps} from './app-props'
 import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {Secret} from "@aws-cdk/aws-secretsmanager";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export class MaintenanceTrackingStack extends Stack {
-    constructor(scope: Construct, id: string, appProps: AppProps, props?: StackProps) {
-        super(scope, id, props);
+export class MaintenanceTrackingStack extends DigitrafficStack {
+    constructor(scope: Construct, id: string, appProps: AppProps) {
+        super(scope, id, appProps);
 
         const secret = Secret.fromSecretNameV2(this, 'MaintenanceTrackingSecret', appProps.secretId);
-
-        const vpc = Vpc.fromVpcAttributes(this, 'vpc', {
-            vpcId: appProps.vpcId,
-            privateSubnetIds: appProps.privateSubnetIds,
-            availabilityZones: appProps.availabilityZones
-        });
-        // security group that allows Lambda database access
-        const lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', appProps.lambdaDbSgId);
 
         const queueAndDLQ = Sqs.createQueue(this);
         // Create bucket with internal id DLQBucket, that is not going to AWS and must be unique
@@ -42,8 +35,8 @@ export class MaintenanceTrackingStack extends Stack {
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
         // InternalLambdas.create(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, appProps, this);
-        IntegrationApi.createIntegrationApiAndHandlerLambda(queueAndDLQ.queue, vpc, lambdaDbSg, sqsExtendedMessageBucket.bucketArn, appProps, this);
+        IntegrationApi.createIntegrationApiAndHandlerLambda(queueAndDLQ.queue, sqsExtendedMessageBucket.bucketArn, appProps, this);
 
-        InternalLambdas.createProcessQueueAndDlqLambda(queueAndDLQ, dlqBucket, vpc, lambdaDbSg, sqsExtendedMessageBucket.bucketArn, appProps, secret, this);
+        InternalLambdas.createProcessQueueAndDlqLambda(queueAndDLQ, dlqBucket, sqsExtendedMessageBucket.bucketArn, appProps, secret, this);
     }
 }
