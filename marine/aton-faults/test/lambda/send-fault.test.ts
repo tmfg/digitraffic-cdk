@@ -1,11 +1,12 @@
 import {dbTestBase, insert} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {handlerFn, SendFaultEvent} from '../../lib/lambda/send-fault/send-fault';
+import {handlerFn} from '../../lib/lambda/send-fault/send-fault';
 import {newFault} from "../testdata";
 import * as sinon from 'sinon';
 import {SNSEvent} from "aws-lambda";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
+import {SendFaultEvent} from "../../lib/model/upload-voyageplan-event";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;

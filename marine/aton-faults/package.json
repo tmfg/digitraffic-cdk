@@ -11,7 +11,7 @@
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node12",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
-    "test": "jest --detectOpenHandles",
+    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
@@ -44,6 +44,8 @@
     "@aws-cdk/aws-sns": "*",
     "@aws-cdk/aws-sns-subscriptions": "*",
     "@aws-cdk/core": "*",
+    "@turf/turf": "6.5.0",
+    "@turf/boolean-intersects": "6.5.0",
     "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",
     "axios": "^0.21.1",

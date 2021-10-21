@@ -1,11 +1,11 @@
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as FaultsDB from "../db/faults"
+import * as S124Converter from "./s124-converter";
 import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
-import moment from 'moment-timezone';
 import {Feature, FeatureCollection, GeometryObject} from "geojson";
 import {createFeatureCollection} from "digitraffic-common/api/geojson";
 import {Language} from "digitraffic-common/model/language";
@@ -30,15 +30,6 @@ export type FaultProps = {
 }
 
 const ATON_DATA_TYPE = "ATON_FAULTS";
-const YEAR_MONTH_DAY = "YYYY-MM-DD";
-const HOUR_MINUTE_SECOND = "HH:MM:SSZ";
-
-const PRODUCTION_AGENCY = {
-    'language' : 'fin',
-    'text' : 'Finnish Transport Infrastructure Agency'
-};
-
-const NAME_OF_SERIES = 'Finnish ATON Faults';
 
 export async function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
     return await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
@@ -57,7 +48,7 @@ export async function getFaultS124ById(faultId: number): Promise<string> {
     });
 
     try {
-        return new Builder().buildObject(createXml(fault));
+        return new Builder().buildObject(S124Converter.convertFault(fault));
     } finally {
         console.info("method=getFaultS124ById tookMs=%d", Date.now() - start);
     }
@@ -120,122 +111,6 @@ function convertFeature(fault: any): Feature {
         type: "Feature",
         properties: properties,
         geometry: <GeometryObject> geometry
-    };
-}
-
-function createXml(fault: any) {
-    const faultId = -fault.id;
-    const year = fault.entry_timestamp.getFullYear() - 2000;
-
-    const id = `FI.${faultId}.${year}`;
-    const urn = `urn:mrn:s124:NW.${id}.P`;
-
-    return {
-        'S124:DataSet': {
-            '$': {
-                'xmlns:S124' : "http://www.iho.int/S124/gml/1.0",
-                'xsi:schemaLocation' : 'http://www.iho.int/S124/gml/1.0 ../../schemas/0.5/S124.xsd',
-                'xmlns:xsi' : "http://www.w3.org/2001/XMLSchema-instance",
-                'xmlns:gml' : "http://www.opengis.net/gml/3.2",
-                'xmlns:S100' : "http://www.iho.int/s100gml/1.0",
-                'xmlns:xlink' : "http://www.w3.org/1999/xlink",
-                'gml:id' : id
-            },
-            'gml:boundedBy': {
-                'gml:Envelope': {
-                    '$': {
-                        'srsName': 'EPSG:4326'
-                    },
-                    'gml:lowerCorner': createCoordinatePair(fault.geometry),
-                    'gml:upperCorner': createCoordinatePair(fault.geometry)
-                }
-            },
-            imember: {
-                'S124:S124_NWPreamble': {
-                    '$': {
-                        'gml:id' : `PR.${id}`
-                    },
-                    id: urn,
-                    messageSeriesIdentifier : createMessageSeriesIdentifier(faultId, year),
-                    sourceDate: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
-                    generalArea: 'Baltic sea',
-                    locality : {
-                        text: fault.fairway_name_fi
-                    },
-                    title:  {
-                        text : `${fault.aton_type} ${fault.aton_name_fi} Nr. ${fault.aton_id}, ${fault.state}`
-                    },
-                    fixedDateRange : createFixedDateRange(fault),
-                    theWarningPart: {
-                        '$': {
-                            'xlink:href': `NW.${id}.1`
-                        }
-                    }
-                }
-            },
-            member: {
-                'S124:S124_NavigationalWarningPart': {
-                    '$': {
-                        'gml:id' : `NW.${id}.1`
-                    },
-                    id: `urn:mrn:s124:NW.${id}.1`,
-                    geometry: createGeometryElement(fault, id),
-                    header: {
-                        '$': {
-                            'owns': 'true'
-                        }
-                    }
-                }
-            }
-        }
-    };
-}
-
-function createFixedDateRange(fault: any) {
-    if(fault.fixed_timestamp) {
-        return {
-            dateStart: {
-                date: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY)
-            },
-            dateEnd: {
-                date: moment(fault.fixed_timestamp).format(YEAR_MONTH_DAY)
-            }
-        }
-    }
-
-    return {
-        timeOfDayStart: moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND),
-        dateStart: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY) ,
-    }
-}
-
-function createGeometryElement(fault: any, id: string) {
-    return {
-        'S100:pointProperty' : {
-            'S100:Point' : {
-                '$' : {
-                    'gml:id' : `s.NW.${id}.1`
-                },
-                'gml:pos': createCoordinatePair(fault.geometry)
-            }
-        }
-    }
-}
-
-function createCoordinatePair(geometry: any) {
-    const g = Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as any;
-
-    return`${g.coordinates[0]} ${g.coordinates[1]}`;
-}
-
-function createMessageSeriesIdentifier(faultId: any, year: number) {
-    return {
-        NameOfSeries: NAME_OF_SERIES,
-        typeOfWarning : 'local',
-        warningNumber : faultId,
-        year,
-        productionAgency : PRODUCTION_AGENCY,
-        country: 'FI'
     };
 }
 

@@ -21,8 +21,13 @@ describe('faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const faultS124 = await getFaultS124ById(fault.id);
 
-        xsdValidator.validateXML(faultS124, 'test/service/S124.xsd', (err, result) => {
+        console.info(faultS124);
+
+        await xsdValidator.validateXML(faultS124, 'test/service/S124.xsd', (err, result) => {
+            expect(err).toBeFalsy();
             if (err) {
+                console.info(faultS124);
+
                 throw err;
             }
             expect(result.valid).toBe(true);
@@ -46,7 +51,7 @@ describe('faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(props.fairway_number).toBe(fault.fairway_number);
         expect(props.state).toBe(fault.state);
         expect(props.type).toBe(fault.type);
-        expect(props.aton_type).toBe(fault.aton_type_fi);
+        expect(props.aton_type).toBe(fault.aton_type);
     });
 
 }));

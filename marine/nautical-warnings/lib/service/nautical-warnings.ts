@@ -1,23 +1,21 @@
 import {NauticalWarningsApi} from "../api/nautical-warnings";
-import * as NauticalWarningsDAO from "../db/nautical-warnings";
+import * as CachedDao from "digitraffic-common/db/cached";
 import {inDatabase, inDatabaseReadonly} from "../../../../digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";
-
-export const CACHE_KEY_ACTIVE = 'nautical-warnings-active';
-export const CACHE_KEY_ARCHIVED = 'nautical-warnings-archived';
+import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
 
 const gjv = require("geojson-validation");
 
 export function getActiveWarnings() {
     return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
-        return NauticalWarningsDAO.getValueFromCache(db, CACHE_KEY_ACTIVE);
+        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
     });
 }
 
 export function getArchivedWarnings() {
     return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
-        return NauticalWarningsDAO.getValueFromCache(db, CACHE_KEY_ARCHIVED);
+        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
     });
 }
 
@@ -32,16 +30,16 @@ export async function updateNauticalWarnings(url: string): Promise<any> {
     return inDatabase(async (db: IDatabase<any, any>) => {
         return db.tx(tx => {
             return Promise.allSettled([
-                validateAndUpdate(tx, CACHE_KEY_ACTIVE, active),
-                validateAndUpdate(tx, CACHE_KEY_ARCHIVED, archived)
+                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active),
+                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived)
             ]);
         });
     });
 }
 
-async function validateAndUpdate(tx: IDatabase<any, any>, cacheKey: string, value: any) {
+async function validateAndUpdate(tx: IDatabase<any, any>, cacheKey: JSON_CACHE_KEY, value: any) {
     if(gjv.isFeatureCollection(value, true)) {
-        return NauticalWarningsDAO.updateCache(tx, cacheKey, convert(value));
+        return CachedDao.updateCachedJson(tx, cacheKey, convert(value));
     } else {
         console.info("DEBUG " + JSON.stringify(value, null, 2));
         console.error("invalid geojson for " + cacheKey);

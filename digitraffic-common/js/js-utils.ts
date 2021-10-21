@@ -8,3 +8,11 @@ export function shuffle(array: any[]): any[] {
     newArray.sort((x) => 0.5 - Math.random())
     return newArray
 }
+
+/**
+ * Decode given string from base64 to ascii
+ * @param str string
+ */
+export function decodeBase64(str: string) {
+    return Buffer.from(str, 'base64').toString('ascii');
+}

@@ -1,32 +1,17 @@
 import {SNSEvent} from "aws-lambda";
 import {getFaultS124ById} from "../../service/faults";
-import {sendFault} from "../../service/fault-sender";
+import {sendFault} from "../../service/vis-sender";
 import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {AtonEnvKeys} from "../../keys";
+import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {SendFaultEvent} from "../../model/upload-voyageplan-event";
+import {AtonSecret} from "../../model/secret";
+import {decodeBase64} from "digitraffic-common/js/js-utils";
 
 let clientCertificate: string;
 let privateKey: string;
 let caCert: string;
 
-const secretId = process.env[AtonEnvKeys.SECRET_ID] as string;
-
-export interface SendFaultEvent {
-    /**
-     * Endpoint URL for callback
-     */
-    readonly callbackEndpoint: string
-
-    /**
-     * Fault id
-     */
-    readonly faultId: number
-}
-
-type AtonSecret = {
-    readonly certificate: string,
-    readonly privatekey: string,
-    readonly ca: string
-}
+const secretId = process.env[SECRET_ID] as string;
 
 /**
  * This handler should only receive and send a single fault
@@ -51,10 +36,6 @@ export function handlerFn(doWithSecret: SecretFunction) {
             console.warn('Fault with id %d was not found', snsEvent.faultId);
         }
     };
-}
-
-function decodeBase64(str: string) {
-    return new Buffer(str, 'base64').toString('ascii');
 }
 
 export const handler = handlerFn(withDbSecret);

@@ -10,10 +10,15 @@ const SQL_GET_CACHE_VALUE =
     `select content, last_updated from cached_json
     where cache_id = $1`;
 
-export function updateCache(db: IDatabase<any, any>, cacheKey: string, value: any): Promise<any> {
+export enum JSON_CACHE_KEY {
+    NAUTICAL_WARNINGS_ACTIVE = 'nautical-warnings-active',
+    NAUTICAL_WARNINGS_ARCHIVED = 'nautical-warnings-archived'
+}
+
+export function updateCachedJson(db: IDatabase<any, any>, cacheKey: JSON_CACHE_KEY, value: any): Promise<any> {
     return db.none(SQL_UPDATE_CACHE_VALUE, [cacheKey, value]);
 }
 
-export function getValueFromCache(db: IDatabase<any, any>, cacheKey: string): Promise<any> {
+export function getJsonFromCache(db: IDatabase<any, any>, cacheKey: JSON_CACHE_KEY): Promise<any> {
     return db.oneOrNone(SQL_GET_CACHE_VALUE, [cacheKey]).then(value => value?.content ?? null);
 }

@@ -33,8 +33,7 @@ function createAnnotationsResource(stack: DigitrafficStack, secret: ISecret, pub
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const environment = stack.createDefaultLambdaEnvironment('ATON');
 
-    databaseFunctionProps(stack, environment, 'ATON-GetFaults', 'get-faults')
-    const getFaultsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, 'ATON-GetFaults', 'get-faults'));
+    const getFaultsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-faults'));
 
     secret.grantRead(getFaultsLambda);
     new DigitrafficLogSubscriptions(stack, getFaultsLambda);
