@@ -11,10 +11,10 @@ import {AreaLightsApi} from "../../lib/api/arealights";
 import {AreaLightsService} from "../../lib/service/arealights";
 
 const secret: ShiplightSecret = {
-    lightsControlEndpointUrl: '',
-    lightsControlApiKey: '',
-    visibilityEndpointUrl: '',
-    visibilityApiKey: ''
+    lightsControlEndpointUrl: 'test',
+    lightsControlApiKey: 'test',
+    visibilityEndpointUrl: 'test',
+    visibilityApiKey: 'test'
 };
 
 describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
