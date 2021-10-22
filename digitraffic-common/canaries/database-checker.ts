@@ -49,6 +49,9 @@ class CountDatabaseCheck extends DatabaseCheck {
                 }
             } else {
                 this.failed = true;
+
+                console.info("received " + JSON.stringify(value));
+
                 throw 'no count available';
             }
         }
