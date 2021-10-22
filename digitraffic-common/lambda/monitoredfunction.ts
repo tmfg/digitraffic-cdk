@@ -5,6 +5,9 @@ import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
 import {TrafficType} from '../model/traffictype';
 import {ITopic} from "@aws-cdk/aws-sns";
+import {LambdaEnvironment} from "../model/lambda-environment";
+import {databaseFunctionProps, FunctionParameters, MonitoredFunctionParameters} from "../stack/lambda-configs";
+import {pascalCase} from "change-case";
 
 /**
  * Allows customization of CloudWatch Alarm properties
@@ -84,6 +87,27 @@ export class MonitoredFunction extends Function {
             stack.configuration.production,
             stack.configuration.trafficType,
             props);
+    }
+
+    /**
+     * Create new MonitoredFunction.  Use topics from given DigitrafficStack.  Generate names from given name and configuration shortName.
+     *
+     * For example, shortName FOO and given name update-things will create function FOO-UpdateThings and use code from lambda/update-things/update-things.ts method handler.
+     *
+     * @param stack DigitrafficStack
+     * @param name param-case name
+     * @param environment Lambda environment
+     * @param functionParameters Lambda function parameters
+     */
+    static createV2(
+        stack: DigitrafficStack,
+        name: string,
+        environment: LambdaEnvironment,
+        functionParameters?: MonitoredFunctionParameters): MonitoredFunction {
+        const functionName = functionParameters?.functionName || `${stack.configuration.shortName}-${pascalCase(name)}`;
+        const functionProps = databaseFunctionProps(stack, environment, functionName, name, functionParameters);
+
+        return MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
     }
 
     /**

@@ -7,7 +7,6 @@ import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
@@ -15,7 +14,7 @@ import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 
-export function create(stack: DigitrafficStack, secret: ISecret, sendFaultTopic: Topic) {
+export function create(stack: DigitrafficStack, sendFaultTopic: Topic) {
     const integrationApi = new DigitrafficRestApi(stack,
         'ATON-Integration',
         'ATON Faults integration API');
@@ -25,18 +24,19 @@ export function create(stack: DigitrafficStack, secret: ISecret, sendFaultTopic:
 
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
-    createUploadVoyagePlanHandler(stack, messageResponseModel, secret, sendFaultTopic, integrationApi);
+    createUploadVoyagePlanHandler(stack, messageResponseModel, sendFaultTopic, integrationApi);
 }
 
 function createUploadVoyagePlanHandler(
     stack: DigitrafficStack,
     messageResponseModel: Model,
-    secret: ISecret,
     sendFaultTopic: Topic,
     integrationApi: RestApi) {
 
     const handler = createHandler(stack, sendFaultTopic);
-    secret.grantRead(handler);
+    stack.grantSecret(handler);
+    new DigitrafficLogSubscriptions(stack, handler);
+
     const resource = integrationApi.root.addResource("s124").addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
     sendFaultTopic.grantPublish(handler);
@@ -87,16 +87,11 @@ function createIntegrationResource(
         stack);
 }
 
-function createHandler(stack: DigitrafficStack, sendFaultTopic: Topic): Function {
-    const functionName = 'ATON-UploadVoyagePlan';
-    const environment = stack.createDefaultLambdaEnvironment('ATON');
+function createHandler(stack: DigitrafficStack, sendFaultTopic: Topic): MonitoredFunction {
+    const environment = stack.createLambdaEnvironment();
     environment[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
 
-    const handler = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, 'ATON-UploadVoyagePlan', 'upload-voyage-plan', {
-        memorySize: 512,
-    }));
-
-    new DigitrafficLogSubscriptions(stack, handler);
-
-    return handler;
+    return MonitoredFunction.createV2(stack, 'upload-voyage-plan', environment, {
+        memorySize: 512
+    });
 }

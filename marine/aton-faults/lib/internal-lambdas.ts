@@ -1,46 +1,38 @@
-import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
 import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {AtonProps} from "./app-props";
 import {Topic} from "@aws-cdk/aws-sns";
 import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 
-export function create(stack: DigitrafficStack, secret: ISecret, sendFaultTopic: Topic) {
-    createUpdateFaultsLambda(stack, secret);
-    createSendFaultLambda(stack, secret, sendFaultTopic);
+export function create(stack: DigitrafficStack, sendFaultTopic: Topic) {
+    const updateFaultsLambda = createUpdateFaultsLambda(stack);
+    const sendFaultLambda = createSendFaultLambda(stack);
+
+    Scheduler.everyMinutes(stack, 'Rule', 10, updateFaultsLambda);
+    sendFaultTopic.addSubscription(new LambdaSubscription(sendFaultLambda));
+
+    stack.grantSecret(updateFaultsLambda, sendFaultLambda);
+
+    new DigitrafficLogSubscriptions(stack, updateFaultsLambda, sendFaultLambda);
 }
 
-function createUpdateFaultsLambda(stack: DigitrafficStack, secret: ISecret) {
-    const environment = stack.createDefaultLambdaEnvironment('ATON');
+function createUpdateFaultsLambda(stack: DigitrafficStack): MonitoredFunction {
+    const environment = stack.createLambdaEnvironment();
     environment[AtonEnvKeys.INTEGRATIONS] = JSON.stringify((stack.configuration as AtonProps).integrations);
 
-    const lambdaConf = databaseFunctionProps(stack, environment, 'ATON-UpdateFaults', 'update-faults', {
+    return MonitoredFunction.createV2(stack, 'update-faults', environment, {
+        functionName: 'UpdateFaults',
         memorySize: 512
     });
-
-    const lambda = MonitoredFunction.create(stack, 'UpdateFaults', lambdaConf);
-    secret.grantRead(lambda);
-
-    Scheduler.everyMinutes(stack, 'Rule', 10, lambda);
-
-    new DigitrafficLogSubscriptions(stack, lambda);
 }
 
-function createSendFaultLambda(stack: DigitrafficStack, secret: ISecret, sendFaultTopic: Topic) {
-    const functionName = "ATON-SendFault";
-    const environment = stack.createDefaultLambdaEnvironment('ATON');
+function createSendFaultLambda(stack: DigitrafficStack): MonitoredFunction {
+    const environment = stack.createLambdaEnvironment();
 
-    const lambdaConf = databaseFunctionProps(stack, environment, 'ATON-SendFault', 'send-fault', {
+    return MonitoredFunction.createV2(stack, 'send-fault', environment, {
         memorySize: 512
     });
-
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
-    secret.grantRead(lambda);
-    sendFaultTopic.addSubscription(new LambdaSubscription(lambda));
-
-    new DigitrafficLogSubscriptions(stack, lambda);
 }

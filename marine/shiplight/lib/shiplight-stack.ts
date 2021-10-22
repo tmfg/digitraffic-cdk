@@ -8,9 +8,6 @@ export class ShiplightStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: ShiplightProps) {
         super(scope, id, appProps);
 
-        const secret = Secret.fromSecretNameV2(this, 'ShiplightSecret', appProps.secretId);
-
-        InternalLambdas.create(secret, this);
+        InternalLambdas.create(this);
     }
-
 }

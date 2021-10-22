@@ -1,5 +1,5 @@
 import {IDatabase} from "pg-promise";
-import {handlerFn} from "../../lib/lambda/update-lights/lambda-update-lights";
+import {handlerFn} from "../../lib/lambda/update-lights/update-lights";
 import {assertArea, dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
 import {createSecretFunction} from "digitraffic-common/test/secret";
 import {ShipTypes} from "../../lib/db/areatraffic";

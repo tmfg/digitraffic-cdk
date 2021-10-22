@@ -11,12 +11,11 @@ import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/api/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
 import {MediaType} from "digitraffic-common/api/mediatypes";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 
-export function create(stack: DigitrafficStack, secret: ISecret): Function {
+export function create(stack: DigitrafficStack): Function {
     const publicApi = new DigitrafficRestApi(stack, 'ATON-public', 'ATON public API');
 
     createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
@@ -25,17 +24,17 @@ export function create(stack: DigitrafficStack, secret: ISecret): Function {
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
     const faultsModel = addServiceModel("FaultsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    return createAnnotationsResource(stack, secret, publicApi, faultsModel);
+    return createAnnotationsResource(stack, publicApi, faultsModel);
 }
 
-function createAnnotationsResource(stack: DigitrafficStack, secret: ISecret, publicApi: RestApi, faultsJsonModel: Model): Function {
+function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, faultsJsonModel: Model): Function {
     const functionName = 'ATON-GetFaults';
     const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
-    const environment = stack.createDefaultLambdaEnvironment('ATON');
+    const environment = stack.createLambdaEnvironment();
 
     const getFaultsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-faults'));
 
-    secret.grantRead(getFaultsLambda);
+    stack.secret.grantRead(getFaultsLambda);
     new DigitrafficLogSubscriptions(stack, getFaultsLambda);
 
     const apiResource = publicApi.root.addResource("api");

@@ -5,7 +5,7 @@ import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret"
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 import {SendFaultEvent} from "../../model/upload-voyageplan-event";
 import {AtonSecret} from "../../model/secret";
-import {decodeBase64} from "digitraffic-common/js/js-utils";
+import {decodeBase64ToAscii} from "digitraffic-common/js/js-utils";
 
 let clientCertificate: string;
 let privateKey: string;
@@ -21,9 +21,9 @@ export function handlerFn(doWithSecret: SecretFunction) {
         if (!clientCertificate || !privateKey) {
             await doWithSecret(secretId, (secret: AtonSecret) => {
                 // certificates are stored as base64 to prevent Secrets Manager from stripping line breaks
-                clientCertificate = decodeBase64(secret.certificate);
-                privateKey = decodeBase64(secret.privatekey);
-                caCert = decodeBase64(secret.ca);
+                clientCertificate = decodeBase64ToAscii(secret.certificate);
+                privateKey = decodeBase64ToAscii(secret.privatekey);
+                caCert = decodeBase64ToAscii(secret.ca);
             }, {
                 prefix: 'aton'
             });

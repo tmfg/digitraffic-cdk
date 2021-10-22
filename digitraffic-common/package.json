@@ -32,6 +32,8 @@
     "@aws-cdk/core": "*",
     "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",
+    "change-case": "4.1.2",
+    "digitraffic-common": "*",
     "pg-native": "*",
     "pg-promise": "*"
   },

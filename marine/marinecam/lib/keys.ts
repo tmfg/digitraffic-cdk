@@ -1,5 +1,4 @@
 export enum MarinecamEnvKeys {
-    SECRET_ID = "SECRET_ID",
     BUCKET_NAME = "BUCKET_NAME",
     USERPOOL_ID = "USERPOOL_ID",
     POOLCLIENT_ID = "POOLCLIENT_ID"

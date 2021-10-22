@@ -6,7 +6,7 @@ import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {PublicApi} from "./public-api";
 
 export class Canaries {
-    constructor(stack: DigitrafficStack, secret: ISecret, publicApi: PublicApi) {
+    constructor(stack: DigitrafficStack, publicApi: PublicApi) {
         if(stack.configuration.enableCanaries) {
             const urlRole = new DigitrafficCanaryRole(stack, 'nw-url');
             const dbRole = new DigitrafficCanaryRole(stack, 'nw-db').withDatabaseAccess();
@@ -22,7 +22,7 @@ export class Canaries {
                 apiKeyId: publicApi.apiKeyId
             });
 
-            new DatabaseCanary(stack, dbRole, secret, {
+            new DatabaseCanary(stack, dbRole, stack.secret, {
                 name: 'nw-db',
                 secret: stack.configuration.secretId,
                 handler: 'db.handler',

@@ -1,11 +1,10 @@
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
 
 export class Canaries {
-    constructor(stack: DigitrafficStack, secret: ISecret) {
+    constructor(stack: DigitrafficStack) {
         if(stack.configuration.enableCanaries) {
             const urlRole = new DigitrafficCanaryRole(stack, 'aton-url');
             const dbRole = new DigitrafficCanaryRole(stack, 'aton-db').withDatabaseAccess();
@@ -20,7 +19,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, dbRole, secret, {
+            new DatabaseCanary(stack, dbRole, stack.secret, {
                 name: 'aton',
                 secret: stack.configuration.secretId,
                 handler: 'db.handler',

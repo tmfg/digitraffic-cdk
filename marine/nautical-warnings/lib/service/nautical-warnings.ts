@@ -1,6 +1,6 @@
 import {NauticalWarningsApi} from "../api/nautical-warnings";
 import * as CachedDao from "digitraffic-common/db/cached";
-import {inDatabase, inDatabaseReadonly} from "../../../../digitraffic-common/postgres/database";
+import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";

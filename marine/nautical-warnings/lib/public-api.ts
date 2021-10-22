@@ -23,12 +23,12 @@ export class PublicApi {
     geojsonModel: Model;
     errorModel: Model;
 
-    constructor(stack: DigitrafficStack, secret: ISecret) {
+    constructor(stack: DigitrafficStack) {
         this.publicApi = new DigitrafficRestApi(stack, 'NauticalWarnings-public', 'NauticalWarnings Public API');
         this.apiKeyId = createUsagePlan(this.publicApi, 'NauticalWarnings Api Key', 'NauticalWarnings Usage Plan').keyId;
 
         this.createResources(this.publicApi);
-        this.createEndpoint(stack, secret);
+        this.createEndpoint(stack);
     }
 
     createResources(publicApi: DigitrafficRestApi) {
@@ -44,18 +44,13 @@ export class PublicApi {
         this.errorModel = publicApi.addModel('ErrorResponseModel', MessageModel);
     }
 
-    createEndpoint(stack: DigitrafficStack, secret: ISecret) {
-        const environment = stack.createDefaultLambdaEnvironment('NauticalWarnings');
+    createEndpoint(stack: DigitrafficStack) {
+        const environment = stack.createLambdaEnvironment();
 
-        const lambdaConfActive = databaseFunctionProps(stack, environment, 'NauticalWarnings-GetActive', 'get-active');
-        const lambdaConfArchived = databaseFunctionProps(stack, environment, 'NauticalWarnings-GetArchived', 'get-archived');
+        const lambdaActive = MonitoredFunction.createV2(stack, 'get-active', environment);
+        const lambdaArchived = MonitoredFunction.createV2(stack, 'get-archived', environment);
 
-        const lambdaActive = MonitoredFunction.create(stack, 'active-lambda', lambdaConfActive);
-        const lambdaArchived = MonitoredFunction.create(stack, 'archive-lambda', lambdaConfArchived);
-
-        secret.grantRead(lambdaActive);
-        secret.grantRead(lambdaArchived);
-
+        stack.grantSecret(lambdaActive, lambdaArchived);
         new DigitrafficLogSubscriptions(stack, lambdaActive, lambdaArchived);
 
         const activeIntegration = defaultIntegration(lambdaActive);

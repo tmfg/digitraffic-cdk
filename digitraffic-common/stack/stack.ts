@@ -6,6 +6,9 @@ import {LambdaEnvironment, SECRET_ID} from "../model/lambda-environment";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 import {StringParameter} from "@aws-cdk/aws-ssm";
 import {TrafficType} from "../model/traffictype";
+import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
+import {MonitoredFunction} from "../lambda/monitoredfunction";
+import {Function} from "@aws-cdk/aws-lambda";
 
 const SSM_ROOT = '/digitraffic'
 export const SOLUTION_KEY = 'Solution';
@@ -15,6 +18,7 @@ export const SSM_KEY_WARNING_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/warning-topi
 export const SSM_KEY_ALARM_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/alarm-topic`;
 
 export type StackConfiguration = {
+    readonly shortName?: string;
     readonly secretId: string;
     readonly alarmTopicArn: string;
     readonly warningTopicArn: string;
@@ -36,6 +40,7 @@ export class DigitrafficStack extends Stack {
     readonly lambdaDbSg: ISecurityGroup;
     readonly alarmTopic: ITopic;
     readonly warningTopic: ITopic;
+    readonly secret: ISecret;
 
     readonly configuration: StackConfiguration;
 
@@ -43,6 +48,8 @@ export class DigitrafficStack extends Stack {
         super(scope, id, configuration.stackProps);
 
         this.configuration = configuration;
+
+        this.secret = Secret.fromSecretNameV2(this, 'Secret', configuration.secretId);
 
         // VPC reference construction requires vpcId and availability zones
         // private subnets are used in Lambda configuration
@@ -62,11 +69,19 @@ export class DigitrafficStack extends Stack {
             StringParameter.fromStringParameterName(this, 'WarningTopicParam', SSM_KEY_WARNING_TOPIC).stringValue);
     }
 
+    createLambdaEnvironment(): LambdaEnvironment {
+        return this.createDefaultLambdaEnvironment(this.configuration.shortName as string);
+    }
+
     createDefaultLambdaEnvironment(dbApplication: string): LambdaEnvironment {
         const environment: LambdaEnvironment = {};
         environment[SECRET_ID] = this.configuration.secretId;
         environment[DatabaseEnvironmentKeys.DB_APPLICATION] = dbApplication;
 
         return environment;
+    }
+
+    grantSecret(...lambdas: Function[]) {
+        lambdas.forEach((l: Function) => this.secret.grantRead(l));
     }
 }

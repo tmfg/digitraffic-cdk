@@ -18,7 +18,6 @@ export async function handlerFn(
     AreaLightsServiceClass: new (api: AreaLightsApi) => AreaLightsService) {
 
     return doWithSecret(secretId, async (secret: ShiplightSecret) => {
-
         if (!visibilityApi) {
             visibilityApi = new AreaVisibilityApi(secret.visibilityEndpointUrl, secret.visibilityApiKey);
         }
@@ -35,7 +34,8 @@ export async function handlerFn(
             console.info("method=shiplightHandler sourceId=%d", area.areaId);
 
             try {
-                const visibility = await visibilityService.getVisibilityForAreaInMetres(area.areaId);
+                // todo better handling of unset secrets
+                const visibility = secret.visibilityEndpointUrl ? await visibilityService.getVisibilityForAreaInMetres(area.areaId) : {visibilityInMetres: -1};
                 await lightsService.updateLightsForArea({ ...area, ...{
                     visibilityInMetres: visibility.visibilityInMetres
                 }});

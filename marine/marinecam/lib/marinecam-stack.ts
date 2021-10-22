@@ -11,13 +11,11 @@ export class MarinecamStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: MobileServerProps) {
         super(scope, id, configuration);
 
-        const secret = Secret.fromSecretNameV2(this, 'MobileServiceSecret', configuration.secretId);
-
         const bucket = createImageBucket(this, configuration);
         const [userPool, userPoolClient] = createUserPool(this);
 
-        InternalLambas.create(this, secret, bucket);
-        PublicApi.create(this, secret, bucket, userPool, userPoolClient);
+        InternalLambas.create(this, bucket);
+        PublicApi.create(this, bucket, userPool, userPoolClient);
     }
 }
 
@@ -40,7 +38,7 @@ function createUserPool(stack: Construct): [UserPool, UserPoolClient] {
 
 function createImageBucket(stack: Construct, props: MobileServerProps): Bucket {
     return new Bucket(stack, 'MarinecamBucket', {
-        bucketName: `dt-marinecam-${props.env}`,
+        bucketName: `dt-marinecam-${props.production ? 'prod' : 'test'}`,
         versioned: false,
         publicReadAccess: false,
         blockPublicAccess: BlockPublicAccess.BLOCK_ALL

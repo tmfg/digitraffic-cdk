@@ -7,18 +7,16 @@ import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 
 export class InternalLambdas {
-    constructor(stack: DigitrafficStack, secret: ISecret,) {
-        Scheduler.everyMinutes(stack, 'NauticalWarnings-Scheduler', 10, createUpdateNauticalWarningsLambda(stack, secret));
+    constructor(stack: DigitrafficStack) {
+        Scheduler.everyMinutes(stack, 'NauticalWarnings-Scheduler', 10, createUpdateNauticalWarningsLambda(stack));
     }
 }
 
-function createUpdateNauticalWarningsLambda(stack: DigitrafficStack, secret: ISecret): Function {
-    const environment = stack.createDefaultLambdaEnvironment('NauticalWarnings');
+function createUpdateNauticalWarningsLambda(stack: DigitrafficStack): Function {
+    const environment = stack.createLambdaEnvironment();
+    const lambda = MonitoredFunction.createV2(stack, 'update-nautical-warnings', environment);
 
-    const lambdaConf = databaseFunctionProps(stack, environment, 'NauticalWarnings-UpdateNauticalWarnings', 'update-nautical-warnings');
-    const lambda = MonitoredFunction.create(stack, 'NauticalWarnings-UpdateNauticalWarnings', lambdaConf);
-
-    secret.grantRead(lambda);
+    stack.grantSecret(lambda);
     new DigitrafficLogSubscriptions(stack, lambda);
 
     return lambda;

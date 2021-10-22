@@ -1,4 +1,3 @@
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {
     AwsIntegration,
     ContentHandling,
@@ -8,7 +7,6 @@ import {
     RestApi
 } from '@aws-cdk/aws-apigateway';
 import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
 import {Role, ServicePrincipal} from '@aws-cdk/aws-iam';
 import {Bucket} from "@aws-cdk/aws-s3";
 
@@ -18,17 +16,16 @@ import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digit
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
-import {databaseFunctionProps, lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {add401Support, DigitrafficRestApi} from "../../../digitraffic-common/api/rest_apis";
+import {add401Support, DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 
 export function create(
     stack: DigitrafficStack,
-    secret: ISecret,
     bucket: Bucket,
     userPool: UserPool,
     userPoolClient: UserPoolClient) {
@@ -47,7 +44,7 @@ export function create(
     const resources = createResourceTree(marinecamApi);
 
     createGetImageResource(stack, resources, bucket, authorizer);
-    createListCamerasResource(stack, resources, secret, authorizer);
+    createListCamerasResource(stack, resources, authorizer);
 }
 
 function createResourceTree(marinecamApi: RestApi): any {
@@ -66,7 +63,6 @@ function createResourceTree(marinecamApi: RestApi): any {
 
 function createListCamerasResource(stack: DigitrafficStack,
                                    resources: any,
-                                   secret: ISecret,
                                    authorizer: RequestAuthorizer) {
     const listCamerasLambda = createListCamerasLambda(stack);
 
@@ -87,7 +83,7 @@ function createListCamerasResource(stack: DigitrafficStack,
         ]
     });
 
-    secret.grantRead(listCamerasLambda);
+    stack.grantSecret(listCamerasLambda);
     new DigitrafficLogSubscriptions(stack, listCamerasLambda);
 
     addTagsAndSummary('List Cameras', BETA_TAGS, 'List all camera metadata', resources.metadataResource, stack);
@@ -160,12 +156,11 @@ function createGetImageResource(stack: DigitrafficStack,
 }
 
 function createListCamerasLambda(stack: DigitrafficStack): MonitoredFunction {
-    const functionName = 'Marinecam-ListCameras';
-    const environment = stack.createDefaultLambdaEnvironment('Marinecam');
+    const environment = stack.createLambdaEnvironment();
 
-    return MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'list-cameras', {
-        timeout: 10,
-    }));
+    return MonitoredFunction.createV2(stack, 'list-cameras', environment, {
+        timeout: 10
+    });
 }
 
 function createLambdaAuthorizer(stack: DigitrafficStack,

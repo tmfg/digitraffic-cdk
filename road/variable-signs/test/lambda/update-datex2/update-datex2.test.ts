@@ -3,7 +3,7 @@ import {handlerFn} from "../../../lib/lambda/update-datex2/update-datex2"
 import {dbTestBase} from "../../db-testutil"
 import {readFileSync} from 'fs'
 import * as VariableSignsService from '../../../lib/service/variable-signs'
-import {createSecretFunction} from "../../../../../digitraffic-common/test/secret";
+import {createSecretFunction} from "digitraffic-common/test/secret";
 
 describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
     test('update_valid_datex2', async () => {

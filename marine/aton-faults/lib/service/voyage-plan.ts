@@ -5,7 +5,7 @@ import * as S124Converter from "./s124-converter";
 import {SNS} from "aws-sdk";
 import {Builder} from "xml2js";
 import {AtonSecret} from "../model/secret";
-import {decodeBase64} from "digitraffic-common/js/js-utils";
+import {decodeBase64ToAscii} from "digitraffic-common/js/js-utils";
 import {sendWarnings} from "./vis-sender";
 
 export class VoyagePlanService {
@@ -58,9 +58,9 @@ export class VoyagePlanService {
         console.info("DEBUG should send " + xml);
 
         if (this.secret?.certificate) {
-            const clientCertificate = decodeBase64(this.secret.certificate);
-            const privateKey = decodeBase64(this.secret.privatekey);
-            const caCert = decodeBase64(this.secret.ca);
+            const clientCertificate = decodeBase64ToAscii(this.secret.certificate);
+            const privateKey = decodeBase64ToAscii(this.secret.privatekey);
+            const caCert = decodeBase64ToAscii(this.secret.ca);
 
             await sendWarnings(xml, this.callbackEndpoint, caCert, clientCertificate, privateKey);
         } else {

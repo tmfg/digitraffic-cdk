@@ -6,15 +6,13 @@ import {PublicApi} from "./public-api";
 import {Props} from './app-props';
 import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget} from "@aws-cdk/aws-rds";
-import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {Canaries} from "./canaries";
-import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export class PortActivityStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: Props) {
         super(scope, id, appProps);
-
-        const secret = Secret.fromSecretNameV2(this, 'PortActivitySecret', appProps.secretId);
 
         this.createRdsProxy(secret, appProps);
 
@@ -24,7 +22,7 @@ export class PortActivityStack extends DigitrafficStack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
-        InternalLambdas.create(queueAndDLQ, dlqBucket, secret, this);
+        InternalLambdas.create(this, queueAndDLQ, dlqBucket);
         IntegrationApi.create(queueAndDLQ.queue, this);
 
         const publicApi = new PublicApi(this, secret);

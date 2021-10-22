@@ -5,6 +5,7 @@ import {RetentionDays} from '@aws-cdk/aws-logs';
 import {Role} from '@aws-cdk/aws-iam'
 import {DigitrafficStack} from "./stack";
 import {LambdaEnvironment} from "../model/lambda-environment";
+import {MonitoredFunctionAlarmProps} from "../lambda/monitoredfunction";
 
 export const SECRET_ID_KEY = "SECRET_ID";
 
@@ -120,7 +121,7 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
     return props;
 }
 
-interface FunctionParameters {
+export interface FunctionParameters {
     memorySize?: number;
     timeout?: number;
     functionName?: string;
@@ -135,4 +136,20 @@ interface FunctionParameters {
     runtime?: Runtime;
     architecture?: Architecture;
     singleLambda?: boolean;
+}
+
+export type MonitoredFunctionParameters = {
+    readonly memorySize?: number;
+    readonly timeout?: number;
+    readonly functionName?: string;
+    readonly reservedConcurrentExecutions?: number;
+    readonly role?: Role;
+    readonly runtime?: Runtime;
+    readonly architecture?: Architecture;
+    readonly singleLambda?: boolean;
+
+    readonly durationAlarmProps?: MonitoredFunctionAlarmProps
+    readonly durationWarningProps?: MonitoredFunctionAlarmProps
+    readonly errorAlarmProps?: MonitoredFunctionAlarmProps
+    readonly throttleAlarmProps?: MonitoredFunctionAlarmProps
 }

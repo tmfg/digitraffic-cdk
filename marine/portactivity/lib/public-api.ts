@@ -26,7 +26,7 @@ import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
-import {DigitrafficStack} from "../../../digitraffic-common/stack/stack";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 

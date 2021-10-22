@@ -1,9 +1,9 @@
 import * as MetadataService from '../../service/metadata';
 
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {MarinecamEnvKeys} from "../../keys";
+import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
-const secretId = process.env[MarinecamEnvKeys.SECRET_ID] as string;
+const secretId = process.env[SECRET_ID] as string;
 
 const GROUP_SEPARATOR=',';
 

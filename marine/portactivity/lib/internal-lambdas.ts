@@ -12,37 +12,35 @@ import {QueueAndDLQ} from "./sqs";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {PortactivityEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
+    stack: DigitrafficStack,
     queueAndDLQ: QueueAndDLQ,
-    dlqBucket: Bucket,
-    secret: ISecret,
-    stack: DigitrafficStack) {
+    dlqBucket: Bucket) {
 
-    createProcessQueueLambda(queueAndDLQ.queue, secret, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stack);
 
-    const updateAwakeAiTimestampsLambda = createUpdateAwakeAiETATimestampsLambda(secret, queueAndDLQ.queue, stack);
-    const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(secret, queueAndDLQ.queue, stack);
+    const updateAwakeAiTimestampsLambda = createUpdateAwakeAiTimestampsLambda(stack, queueAndDLQ.queue);
+    const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(stack, queueAndDLQ.queue);
 
     const updateETASchedulingRule = createETAScheduler(stack);
     updateETASchedulingRule.addTarget(new LambdaFunction(updateAwakeAiTimestampsLambda));
     updateETASchedulingRule.addTarget(new LambdaFunction(updateScheduleTimestampsLambda));
 
     if((stack.configuration as Props).sources?.pilotweb) {
-        const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(secret, queueAndDLQ.queue, stack);
+        const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(stack, queueAndDLQ.queue);
 
         const pilotwebScheduler = createPilotwebScheduler(stack);
         pilotwebScheduler.addTarget(new LambdaFunction(updateTimestampsFromPilotwebLambda));
     }
 }
 
-function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue, stack: DigitrafficStack): Function {
+function createUpdateTimestampsFromPilotwebLambda(stack: DigitrafficStack, queue: Queue): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromPilotweb';
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
@@ -54,7 +52,7 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
 
     new DigitrafficLogSubscriptions(stack, lambda);
     queue.grantSendMessages(lambda);
-    secret.grantRead(lambda);
+    stack.secret.grantRead(lambda);
 
     return lambda;
 }
@@ -62,7 +60,7 @@ function createUpdateTimestampsFromPilotwebLambda(secret: ISecret, queue: Queue,
 // ATTENTION!
 // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
 // The reason for this is IP based restriction in another system's firewall.
-function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, stack: DigitrafficStack): Function {
+function createUpdateTimestampsFromSchedules(stack: DigitrafficStack, queue: Queue): Function {
     const functionName = 'PortActivity-UpdateTimestampsFromSchedules';
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
@@ -80,14 +78,13 @@ function createUpdateTimestampsFromSchedules(secret: ISecret, queue: Queue, stac
     new DigitrafficLogSubscriptions(stack, lambda);
 
     queue.grantSendMessages(lambda);
-    secret.grantRead(lambda);
+    stack.secret.grantRead(lambda);
 
     return lambda;
 }
 
 function createProcessQueueLambda(
     queue: Queue,
-    secret: ISecret,
     stack: DigitrafficStack) {
 
     const functionName = "PortActivity-ProcessTimestampQueue";
@@ -100,7 +97,7 @@ function createProcessQueueLambda(
 
     const processQueueLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
-    secret.grantRead(processQueueLambda);
+    stack.secret.grantRead(processQueueLambda);
     processQueueLambda.addEventSource(new SqsEventSource(queue));
 
     new DigitrafficLogSubscriptions(stack, processQueueLambda);
@@ -151,7 +148,7 @@ function createPilotwebScheduler(stack: Stack): Rule {
     });
 }
 
-function createUpdateAwakeAiETATimestampsLambda(secret: ISecret, queue: Queue, stack: DigitrafficStack): Function {
+function createUpdateAwakeAiTimestampsLambda(stack: DigitrafficStack, queue: Queue): Function {
     const environment = stack.createDefaultLambdaEnvironment('PortActivity');
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
@@ -161,7 +158,7 @@ function createUpdateAwakeAiETATimestampsLambda(secret: ISecret, queue: Queue, s
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
-    secret.grantRead(lambda);
+    stack.secret.grantRead(lambda);
     queue.grantSendMessages(lambda);
 
     new DigitrafficLogSubscriptions(stack, lambda);
