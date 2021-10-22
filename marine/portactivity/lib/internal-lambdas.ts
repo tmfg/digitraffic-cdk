@@ -172,7 +172,11 @@ function createUpdateAwakeAiATXTimestampsLambda(stack: DigitrafficStack, queue: 
     const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-awake-ai-atx-timestamps', {
         timeout: 30,
     });
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, {
+        durationWarningProps: {
+            create: false // this Lambda always executes close to the maximum duration
+        }
+    });
 
     queue.grantSendMessages(lambda);
 
