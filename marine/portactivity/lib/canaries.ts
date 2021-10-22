@@ -13,7 +13,6 @@ import {PublicApi} from "./public-api";
 
 export class Canaries {
     constructor(stack: DigitrafficStack,
-                secret: ISecret,
                 dlq: Queue,
                 publicApi: PublicApi) {
         const props = stack.configuration as Props;
@@ -45,7 +44,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, dbRole, secret, {
+            new DatabaseCanary(stack, dbRole, stack.secret, {
                 name: 'pa-daytime',
                 secret: props.secretId,
                 schedule: Schedule.expression("cron(0/15 2-19 ? * MON-SUN *)"),
@@ -56,7 +55,7 @@ export class Canaries {
                 }
             });
 
-            new DatabaseCanary(stack, urlRole, secret, {
+            new DatabaseCanary(stack, urlRole, stack.secret, {
                 name: 'pa',
                 secret: props.secretId,
                 handler: 'db.handler',

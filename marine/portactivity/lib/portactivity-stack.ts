@@ -14,7 +14,7 @@ export class PortActivityStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: Props) {
         super(scope, id, appProps);
 
-        this.createRdsProxy(secret, appProps);
+        this.createRdsProxy(this.secret, appProps);
 
         const queueAndDLQ = Sqs.createQueue(this);
         const dlqBucket = new Bucket(this, 'DLQBucket', {
@@ -25,9 +25,9 @@ export class PortActivityStack extends DigitrafficStack {
         InternalLambdas.create(this, queueAndDLQ, dlqBucket);
         IntegrationApi.create(queueAndDLQ.queue, this);
 
-        const publicApi = new PublicApi(this, secret);
+        const publicApi = new PublicApi(this);
 
-        new Canaries(this, secret, queueAndDLQ.dlq, publicApi);
+        new Canaries(this, queueAndDLQ.dlq, publicApi);
 
         new Bucket(this, 'DocumentationBucket', {
             bucketName: appProps.documentationBucketName,
