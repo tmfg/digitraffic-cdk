@@ -136,7 +136,7 @@ function createATXScheduler(stack: Stack): Rule {
     const ruleName = 'PortActivity-ATXScheduler'
     return new Rule(stack, ruleName, {
         ruleName,
-        schedule: Schedule.expression('cron(*/1 * * * ? *)') // every 1 minutes
+        schedule: Schedule.expression('cron(*/5 * * * ? *)') // every 5 minutes
     });
 }
 
