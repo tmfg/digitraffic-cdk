@@ -24,19 +24,22 @@ export function create(
     const cpqLambda = createProcessQueueLambda(queueAndDLQ.queue, stack);
     const dlqLambda = createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stack);
 
-    const updateAwakeAiTimestampsLambda = createUpdateAwakeAiTimestampsLambda(stack, queueAndDLQ.queue);
+    const updateAwakeAiETATimestampsLambda = createUpdateAwakeAiETATimestampsLambda(stack, queueAndDLQ.queue);
+    const updateAwakeAiATXTimestampsLambda = createUpdateAwakeAiATXTimestampsLambda(stack, queueAndDLQ.queue);
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(stack, queueAndDLQ.queue);
     const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(stack, queueAndDLQ.queue);
 
-    stack.grantSecret(cpqLambda, updateAwakeAiTimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda);
-    new DigitrafficLogSubscriptions(stack, cpqLambda, updateAwakeAiTimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda);
+    stack.grantSecret(cpqLambda, updateAwakeAiETATimestampsLambda, updateAwakeAiATXTimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda);
+    new DigitrafficLogSubscriptions(stack, cpqLambda, updateAwakeAiETATimestampsLambda, updateAwakeAiATXTimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda);
 
     // create schedulers
     const updateETASchedulingRule = createETAScheduler(stack);
+    const updateATXSchedulingRule = createATXScheduler(stack);
     const pilotwebScheduler = createPilotwebScheduler(stack);
 
-    updateETASchedulingRule.addTarget(new LambdaFunction(updateAwakeAiTimestampsLambda));
+    updateETASchedulingRule.addTarget(new LambdaFunction(updateAwakeAiETATimestampsLambda));
     updateETASchedulingRule.addTarget(new LambdaFunction(updateScheduleTimestampsLambda));
+    updateATXSchedulingRule.addTarget(new LambdaFunction(updateAwakeAiATXTimestampsLambda));
     pilotwebScheduler.addTarget(new LambdaFunction(updateTimestampsFromPilotwebLambda));
 }
 
@@ -129,6 +132,14 @@ function createETAScheduler(stack: Stack): Rule {
     });
 }
 
+function createATXScheduler(stack: Stack): Rule {
+    const ruleName = 'PortActivity-ATXScheduler'
+    return new Rule(stack, ruleName, {
+        ruleName,
+        schedule: Schedule.expression('cron(*/1 * * * ? *)') // every 1 minutes
+    });
+}
+
 function createPilotwebScheduler(stack: Stack): Rule {
     const ruleName = 'PortActivity-PilotwebScheduler'
     return new Rule(stack, ruleName, {
@@ -137,12 +148,28 @@ function createPilotwebScheduler(stack: Stack): Rule {
     });
 }
 
-function createUpdateAwakeAiTimestampsLambda(stack: DigitrafficStack, queue: Queue): MonitoredFunction {
+function createUpdateAwakeAiETATimestampsLambda(stack: DigitrafficStack, queue: Queue): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
     const functionName = 'PortActivity-UpdateAwakeAiETATimestamps';
     const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-awake-ai-eta-timestamps', {
+        timeout: 30,
+    });
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
+
+    queue.grantSendMessages(lambda);
+
+    return lambda;
+}
+
+
+function createUpdateAwakeAiATXTimestampsLambda(stack: DigitrafficStack, queue: Queue): MonitoredFunction {
+    const environment = stack.createDefaultLambdaEnvironment('PortActivity');
+    environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
+
+    const functionName = 'PortActivity-UpdateAwakeAiATXTimestamps';
+    const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-awake-ai-atx-timestamps', {
         timeout: 30,
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);

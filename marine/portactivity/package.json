@@ -57,6 +57,7 @@
     "@middy/sqs-partial-batch-failure": "^1.2.0",
     "@types/amqplib": "^0.8.1",
     "@types/ramda": "0.27.44",
+    "@types/ws": "^8.2.0",
     "amqplib": "^0.8.0",
     "axios": "^0.21.1",
     "digitraffic-common": "*",
