@@ -1,4 +1,3 @@
-import {databaseFunctionProps, lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {addSimpleServiceModel} from "digitraffic-common/api/utils";
 import {RestApi} from '@aws-cdk/aws-apigateway';
@@ -12,29 +11,28 @@ import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
 
-export function create(stack: DigitrafficStack, secret: ISecret) {
+export function create(stack: DigitrafficStack) {
     const publicApi = new DigitrafficRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');
 
     createUsagePlan(publicApi, 'VariableSigns Api Key', 'VariableSigns Usage Plan');
 
-    return createDatex2Resource(stack, publicApi, secret);
+    return createDatex2Resource(stack, publicApi);
 }
 
-function createDatex2Resource(stack: DigitrafficStack, publicApi: RestApi, secret: ISecret): Function {
-    const environment = stack.createDefaultLambdaEnvironment('VS');
-    const functionName = 'VS-GetDatex2';
+function createDatex2Resource(stack: DigitrafficStack, publicApi: RestApi): Function {
+    const environment = stack.createLambdaEnvironment();
 
-    const getDatex2Lambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-datex2', {
-        memorySize: 256,
-    }));
+    const getDatex2Lambda = MonitoredFunction.createV2(stack, 'get-datex2', environment, {
+        reservedConcurrentExecutions: 3
+    })
 
-    const imageFunctionName = 'VS-GetImage';
-    const getImageLambda = MonitoredFunction.create(stack, imageFunctionName, lambdaFunctionProps(stack, {}, imageFunctionName, 'get-sign-image'));
+    const getImageLambda = MonitoredFunction.createV2(stack, 'get-sign-image', {}, {
+        reservedConcurrentExecutions: 3
+    });
 
-    secret.grantRead(getDatex2Lambda);
+    stack.grantSecret(getDatex2Lambda, getImageLambda);
     new DigitrafficLogSubscriptions(stack, getDatex2Lambda, getImageLambda);
 
     const getDatex2Integration = defaultIntegration(getDatex2Lambda, {xml: true});

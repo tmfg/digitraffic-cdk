@@ -1,24 +1,21 @@
 import {LambdaIntegration, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {Function} from '@aws-cdk/aws-lambda';
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
-import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
-export function create(stack: DigitrafficStack, secret: ISecret) {
+export function create(stack: DigitrafficStack) {
     const integrationApi = new DigitrafficRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API');
-    createUpdateRequestHandler(stack, integrationApi, secret);
+    createUpdateRequestHandler(stack, integrationApi);
     createUsagePlan(integrationApi, 'Integration API key', 'Integration Usage Plan');
 }
 
 function createUpdateRequestHandler (
     stack: DigitrafficStack,
-    integrationApi: RestApi,
-    secret: ISecret) {
-    const updateDatexV1Handler = createUpdateDatexV1(stack, secret);
+    integrationApi: RestApi) {
+    const updateDatexV1Handler = createUpdateDatexV1(stack);
     const integrationV1Root = createIntegrationV1Root(integrationApi);
 
     createIntegrationResource(integrationV1Root, updateDatexV1Handler);
@@ -30,7 +27,6 @@ function createIntegrationV1Root(integrationApi: RestApi) {
     return vsResource.addResource("v1");
 }
 
-
 function createIntegrationResource(intergrationRoot: Resource, updateDatexV1Handler: Function) {
     const updateDatex2Resource = intergrationRoot.addResource("update-datex2");
 
@@ -39,14 +35,13 @@ function createIntegrationResource(intergrationRoot: Resource, updateDatexV1Hand
     });
 }
 
-function createUpdateDatexV1(stack: DigitrafficStack, secret: ISecret): Function {
-    const functionName = 'VS-UpdateDatex2';
-    const environment = stack.createDefaultLambdaEnvironment('VS');
-    const updateDatex2Handler = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'update-datex2', {
-        memorySize: 256,
-    }));
+function createUpdateDatexV1(stack: DigitrafficStack): Function {
+    const environment = stack.createLambdaEnvironment();
+    const updateDatex2Handler = MonitoredFunction.createV2(stack, 'update-datex2', environment, {
+        memorySize: 256
+    })
 
-    secret.grantRead(updateDatex2Handler);
+    stack.grantSecret(updateDatex2Handler);
 
     new DigitrafficLogSubscriptions(stack, updateDatex2Handler);
 
