@@ -27,8 +27,8 @@ export class RdsMonitoring {
             this.createAlarm('DB-CPU-ALARM', cluster.metricCPUUtilization(), cpuLimit);
             this.createAlarm('DB-WriteIOPS-ALARM', cluster.metric('WriteIOPS'), writeIOPSLimit);
             this.createAlarm('DB-ReadIOPS-ALARM', cluster.metric('ReadIOPS'), readIOPSLimit);
-            this.createAlarm('DB-Deadlocks-ALARM', cluster.metricDeadlocks());
             this.createAlarm('DB-FreeMemory-ALARM', cluster.metricFreeableMemory(), freeMemoryLimit, ComparisonOperator.LESS_THAN_THRESHOLD);
+            this.createAlarm('DB-Deadlocks-ALARM', cluster.metricDeadlocks());
         }
     }
 
@@ -39,9 +39,9 @@ export class RdsMonitoring {
             evaluationPeriods: 5,
             threshold,
             comparisonOperator,
+            datapointsToAlarm: 2
         });
 
         alarm.addAlarmAction(new SnsAction(this.alarmsTopic));
     }
-
 }
