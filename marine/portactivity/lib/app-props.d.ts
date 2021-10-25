@@ -6,4 +6,5 @@ export interface Props extends StackConfiguration {
     readonly dlqNotificationDuration: Duration
     readonly dbClusterIdentifier: string
     readonly documentationBucketName: string
+    readonly awakeATx: boolean
 }

@@ -1,6 +1,25 @@
 import moment from "moment";
 import {ApiTimestamp, EventType} from "../lib/model/timestamp";
+import {AwakeAiATXEventType, AwakeAIATXTimestampMessage, AwakeATXZoneEventType} from "../lib/api/awake_ai_atx";
 const { v4: uuidv4 } = require('uuid');
+
+export function newAwakeATXMessage(zoneEventType?: AwakeATXZoneEventType): AwakeAIATXTimestampMessage {
+    return {
+        eventType: 'zone-event',
+        eventTimestamp: new Date().toISOString(),
+        mmsi: 123456789,
+        imo: 1234567,
+        zoneId: 'foo',
+        eventId: 'bar',
+        msgType: AwakeAiATXEventType.EVENT,
+        shipName: 'someship',
+        locodes: ['FILOL'],
+        location: [53.2, 40.3],
+        zoneName: 'somezone',
+        zoneEventType: zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
+        zoneType: 'pbp'
+    };
+}
 
 export function someNumber(): number {
     return 1 + Math.floor(Math.random() * 999999);

@@ -5,6 +5,7 @@ import {sendMessage} from "../../service/queue-service";
 import {AwakeAiATXService} from "../../service/awake_ai_atx";
 import {AwakeAiATXApi} from "../../api/awake_ai_atx";
 import {Context} from "aws-lambda";
+const WebSocket = require('ws');
 
 type UpdateAwakeAiATXTimestampsSecret = {
     readonly "awake.atxurl": string
@@ -28,12 +29,13 @@ export function handlerFn(
 
         return withDbSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiATXTimestampsSecret): Promise<any> => {
             if (!service) {
-                service = new AwakeAiATXServiceClass(new AwakeAiATXApi(secret["awake.atxurl"], secret["awake.atxauth"]));
+                service = new AwakeAiATXServiceClass(
+                    new AwakeAiATXApi(secret["awake.atxurl"], secret["awake.atxauth"], WebSocket));
             }
 
             // allow 1000 ms for SQS sends, this is a completely made up number
             const timestamps = await service.getATXs(ports, context.getRemainingTimeInMillis() - 1000);
-            console.info('method=updateAwakeAiTimestampsLambda Received %d timestamps', timestamps.length);
+            console.info('method=updateAwakeAiTimestampsLambda count=%d', timestamps.length);
 
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
         }, {expectedKeys});

@@ -1,10 +1,10 @@
-const WebSocket = require('ws');
+import {WebSocket} from "ws";
 
 type AwakeAiATXMessage = {
     msgType: AwakeAiATXEventType
 }
 
-enum AwakeAiATXEventType {
+export enum AwakeAiATXEventType {
     SUBSCRIPTION_STATUS = 'subscription-status',
     EVENT = 'event'
 }
@@ -21,7 +21,7 @@ export type AwakeAISubscriptionMessage = AwakeAiATXMessage & {
     readonly subscriptionId: string
 }
 
-export type AwakeAIATXMessage = AwakeAiATXMessage & {
+export type AwakeAIATXTimestampMessage = AwakeAiATXMessage & {
     /**
      * Possible value 'zone-event'
      */
@@ -83,7 +83,7 @@ export type AwakeAIATXMessage = AwakeAiATXMessage & {
     readonly locodes: string[]
 }
 
-const SUBSCRIPTION_MESSAGE = {
+export const SUBSCRIPTION_MESSAGE = {
     msgType: 'subscribe',
     parameters: [{
         eventType: 'zone-event',
@@ -95,29 +95,31 @@ export class AwakeAiATXApi {
 
     private readonly url: string
     private readonly apiKey: string
+    private readonly WebSocketClass: new (url: string) => WebSocket
     private subscriptionId: string
 
-    constructor(url: string, apiKey: string) {
+    constructor(url: string, apiKey: string, WebSocketClass: new (url: string) => WebSocket) {
         this.url = url;
         this.apiKey = apiKey;
+        this.WebSocketClass = WebSocketClass;
     }
 
-    async getATXs(timeoutMillis: number): Promise<AwakeAIATXMessage[]> {
-        const webSocket = new WebSocket(this.url + this.apiKey);
+    async getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
+        const webSocket = new this.WebSocketClass(this.url + this.apiKey);
 
         webSocket.on('open', () => {
-            const startMessage = this.subscriptionId ? this.createResumeMessage() : SUBSCRIPTION_MESSAGE;
+            const startMessage = this.subscriptionId ? AwakeAiATXApi.createResumeMessage(this.subscriptionId) : SUBSCRIPTION_MESSAGE;
             webSocket.send(JSON.stringify(startMessage));
         });
 
-        const atxs: AwakeAIATXMessage[] = [];
+        const atxs: AwakeAIATXTimestampMessage[] = [];
 
         webSocket.on('message', (messageRaw: string) => {
             const message: AwakeAiATXMessage = JSON.parse(messageRaw);
             if (message.msgType === AwakeAiATXEventType.SUBSCRIPTION_STATUS) {
                 this.subscriptionId = (message as AwakeAISubscriptionMessage).subscriptionId;
             } else if (message.msgType === AwakeAiATXEventType.EVENT) {
-                atxs.push(message as AwakeAIATXMessage);
+                atxs.push(message as AwakeAIATXTimestampMessage);
             } else {
                 console.warn('method=getATXs Unknown message received %s', JSON.stringify(message));
             }
@@ -131,11 +133,11 @@ export class AwakeAiATXApi {
         });
     }
 
-    private createResumeMessage() {
+    static createResumeMessage(subscriptionId: string) {
         console.info('method=createResumeMessage Existing session found')
         return {
             msgType: 'subscribe',
-            resume: this.subscriptionId
+            resume: subscriptionId
         };
     }
 }
