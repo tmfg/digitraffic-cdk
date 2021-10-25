@@ -14,7 +14,7 @@ describe('api-awake-ai-atx', () => {
         WebSocket.mockClear();
     });
 
-    test('getATXs - no existing session', async () => {
+    test('getATXs - no existing session subscribes to zone events', async () => {
         const sendMock = jest.fn();
         WebSocket.mockImplementation(() => ({
             on: (event: string, callback: () => any) => {
@@ -32,7 +32,7 @@ describe('api-awake-ai-atx', () => {
         expect(sendMock.mock.calls[0][0]).toEqual(JSON.stringify(SUBSCRIPTION_MESSAGE));
     });
 
-    test('getATXs - existing session', async () => {
+    test('getATXs - existing session resumes with subscription id', async () => {
         const sendMock = jest.fn();
         const subscriptionId = 'foo';
         WebSocket.mockImplementation(() => ({
