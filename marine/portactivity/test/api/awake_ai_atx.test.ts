@@ -79,4 +79,18 @@ describe('api-awake-ai-atx', () => {
         expect(atxs[0]).toMatchObject(atxMessage);
     });
 
+    test('getATXs - error handling', async () => {
+        const sendMock = jest.fn();
+        WebSocket.mockImplementation(() => ({
+            on: () => {
+                throw new Error('test error');
+            },
+            send: sendMock,
+            close: () => {}
+        }));
+        const api = new AwakeAiATXApi('', '', WebSocket);
+
+        await expect(async () => api.getATXs(10)).rejects.toThrow();
+    });
+
 });
