@@ -20,7 +20,6 @@ import {
 } from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/api/utils";
-import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
@@ -135,7 +134,8 @@ export class PublicApi {
 
         const lambda = MonitoredFunction.createV2(stack, 'get-shiplist-public', environment, {
             functionName: 'PortActivity-PublicShiplist',
-            timeout: 10
+            timeout: 10,
+            reservedConcurrentExecutions: 6
         })
 
         stack.grantSecret(lambda);
