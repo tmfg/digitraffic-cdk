@@ -1,4 +1,4 @@
-import {jsonChecker, mustContain, responseChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
+import {jsonChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
 import assert from "assert";
 
 const hostname = process.env.hostname as string;

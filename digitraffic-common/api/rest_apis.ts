@@ -2,8 +2,11 @@ import {RestApi, MethodLoggingLevel, GatewayResponse, ResponseType, EndpointType
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
 import {Construct} from "@aws-cdk/core";
 import {DigitrafficStack} from "../stack/stack";
+import {createUsagePlan} from "../stack/usage-plans";
 
 export class DigitrafficRestApi extends RestApi {
+    readonly apiKeyIds: string[];
+
     constructor(stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined, config?: any) {
         const policyDocument = allowFromIpAddresses == null ? createDefaultPolicyDocument() : createIpRestrictionPolicyDocument(allowFromIpAddresses);
 
@@ -23,11 +26,21 @@ export class DigitrafficRestApi extends RestApi {
 
         super(stack, apiId, apiConfig);
 
+        this.apiKeyIds = [];
+
         add404Support(this, stack);
     }
 
     hostname(): string {
         return `${this.restApiId}.execute-api.${(this.stack as DigitrafficStack).region}.amazonaws.com`;
+    }
+
+    createUsagePlan(apiKeyId: string, apiKeyName: string): string {
+        const newKeyId = createUsagePlan(this, apiKeyId, apiKeyName).keyId;
+
+        this.apiKeyIds.push(newKeyId);
+
+        return newKeyId;
     }
 }
 

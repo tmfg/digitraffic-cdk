@@ -1,5 +1,4 @@
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {MessageModel} from "digitraffic-common/api/response";
@@ -13,7 +12,6 @@ import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import nauticalWarningProperties from "./model/nautical-warnings-schema";
 import {addTags} from "digitraffic-common/api/documentation";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
-import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 
 export class PublicApi {
     readonly apiKeyId: string;
