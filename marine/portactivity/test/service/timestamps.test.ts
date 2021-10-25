@@ -1,8 +1,10 @@
-import {dbTestBase, findAll, insert, insertVessel} from "../db-testutil";
+import {dbTestBase, findAll, insert, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {newTimestamp, newVessel} from "../testdata";
+import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import moment from 'moment-timezone';
 import * as TimestampsService from "../../lib/service/timestamps";
+import {EventType} from "../../lib/model/timestamp";
+import {EventSource} from "../../lib/model/eventsource";
 
 describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -139,6 +141,59 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(ret?.location_locode).toBe(timestamp.location.port);
         expect(ret?.ship_mmsi).toBe(vessel.mmsi);
         expect(ret?.ship_imo).toBe(vessel.imo);
+    });
+
+    test('findETAShipsByLocode - no duplicate ETAs', async () => {
+        const locode = 'FILOL';
+        const imo = 123456;
+        const eta1 = newTimestamp({
+            imo,
+            locode,
+            eventType: EventType.ETA,
+            eventTime: moment().add(1, 'hours').toDate(),
+            source: EventSource.PORTNET
+        });
+        const eta2 = newTimestamp({
+            imo,
+            locode,
+            eventType: EventType.ETA,
+            eventTime: moment().add(2, 'hours').toDate(),
+            source: EventSource.PORTNET
+        });
+        await insertPortCall(db, newPortCall(eta1));
+        await insertPortCall(db, newPortCall(eta2));
+        await insertPortAreaDetails(db, newPortAreaDetails(eta1));
+        await insertPortAreaDetails(db, newPortAreaDetails(eta2));
+        await insert(db, [eta1, eta2]);
+
+        const ships = await TimestampsService.findETAShipsByLocode([locode]);
+
+        expect(ships.length).toBe(1);
+    });
+
+    test('findETAShipsByLocode - two ETAs', async () => {
+        const locode = 'FILOL';
+        const eta1 = newTimestamp({
+            locode,
+            eventType: EventType.ETA,
+            eventTime: moment().add(1, 'hours').toDate(),
+            source: EventSource.PORTNET
+        });
+        const eta2 = newTimestamp({
+            locode,
+            eventType: EventType.ETA,
+            eventTime: moment().add(2, 'hours').toDate(),
+            source: EventSource.PORTNET
+        });
+        await insertPortCall(db, newPortCall(eta1));
+        await insertPortCall(db, newPortCall(eta2));
+        await insertPortAreaDetails(db, newPortAreaDetails(eta1));
+        await insertPortAreaDetails(db, newPortAreaDetails(eta2));
+        await insert(db, [eta1, eta2]);
+
+        const ships = await TimestampsService.findETAShipsByLocode([locode]);
+
+        expect(ships.length).toBe(2);
     });
 
 }));

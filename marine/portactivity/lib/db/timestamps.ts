@@ -30,6 +30,7 @@ export type DbETAShip = {
     readonly locode: string
     readonly port_area_code?: string
     readonly portcall_id: number
+    readonly eta?: string
 }
 
 export type DbUpdatedTimestamp = {
@@ -125,7 +126,8 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
         pe.location_locode AS locode,
         pe.location_portarea AS port_area_code,
         pe.location_from_locode,
-        pe.portcall_id
+        pe.portcall_id,
+        pad.eta
     FROM port_call_timestamp pe
     JOIN public.port_call pc ON pc.port_call_id = pe.portcall_id
     JOIN public.port_area_details pad on pad.port_call_id = pe.portcall_id
