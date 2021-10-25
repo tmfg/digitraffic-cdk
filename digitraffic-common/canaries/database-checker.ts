@@ -38,7 +38,7 @@ class CountDatabaseCheck extends DatabaseCheck {
             this.failed = true;
             throw 'no return value';
         } else {
-            if (value.count) {
+            if ('count' in value) {
                 if(this.minCount && value.count < this.minCount) {
                     this.failed = true;
                     throw `count was ${value.count}, minimum is ${this.minCount}`;

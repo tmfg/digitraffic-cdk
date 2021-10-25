@@ -5,6 +5,8 @@ import {CfnCanary} from "@aws-cdk/aws-synthetics";
 import {CanaryParameters} from "./canary-parameters";
 import {DigitrafficCanary} from "./canary";
 import {DigitrafficStack} from "../stack/stack";
+import {Schedule} from "@aws-cdk/aws-events";
+import {Duration} from "@aws-cdk/core";
 
 export class DatabaseCanary extends DigitrafficCanary {
     constructor(stack: DigitrafficStack,
@@ -30,5 +32,13 @@ export class DatabaseCanary extends DigitrafficCanary {
             securityGroupIds: [stack.lambdaDbSg.securityGroupId],
             subnetIds: subnetIds
         };
+    }
+
+    static create(stack: DigitrafficStack, role: Role, params: any): DatabaseCanary {
+        return new DatabaseCanary(stack, role, stack.secret, {...{
+            secret: stack.configuration.secretId,
+            schedule: Schedule.rate(Duration.hours(1)),
+            handler: `${params.name}.handler`
+        }, ...params});
     }
 }

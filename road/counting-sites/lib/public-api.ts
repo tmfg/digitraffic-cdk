@@ -1,16 +1,15 @@
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {Model, Resource} from "@aws-cdk/aws-apigateway";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 
 export class PublicApi {
+    publicApi: DigitrafficRestApi;
     metadataResource: Resource;
     dataResource: Resource;
 
@@ -18,14 +17,13 @@ export class PublicApi {
     metadataResponseModel: Model;
     dataResponseModel: Model;
 
-    constructor(stack: DigitrafficStack, secret: ISecret) {
-        const publicApi = new DigitrafficRestApi(stack, 'CountingSites-public', 'Counting Sites Public API');
+    constructor(stack: DigitrafficStack) {
+        this.publicApi = new DigitrafficRestApi(stack, 'CountingSites-public', 'Counting Sites Public API');
+        this.publicApi.createUsagePlan('CS Api Key', 'CS Usage Plan');
 
-        createUsagePlan(publicApi, 'CS Api Key', 'CS Usage Plan');
-
-        this.createResources(publicApi);
-        this.createMetadataEndpoint(stack, secret);
-        this.createDataEndpoint(stack, secret);
+        this.createResources(this.publicApi);
+        this.createMetadataEndpoint(stack);
+        this.createDataEndpoint(stack);
     }
 
     createResources(publicApi: DigitrafficRestApi) {
@@ -41,13 +39,13 @@ export class PublicApi {
 //        this.dataResponseModel = publicApi.addModel('DataResponseModel', MessageModel);
     }
 
-    createMetadataEndpoint(stack: DigitrafficStack, secret: ISecret) {
-        const environment = stack.createDefaultLambdaEnvironment('CountingSites');
+    createMetadataEndpoint(stack: DigitrafficStack) {
+        const environment = stack.createLambdaEnvironment();
+        const lambda = MonitoredFunction.createV2(stack, 'get-metadata', environment, {
+  //          functionName: 'metadata-lambda'
+        });
 
-        const lambdaConf = databaseFunctionProps(stack, environment, 'CountingSites-GetMetadata', 'get-metadata');
-        const lambda = MonitoredFunction.create(stack, 'metadata-lambda', lambdaConf);
-        secret.grantRead(lambda);
-
+        stack.grantSecret(lambda);
         new DigitrafficLogSubscriptions(stack, lambda);
 
         const metadataIntegration = defaultIntegration(lambda);
@@ -61,13 +59,13 @@ export class PublicApi {
         });
     }
 
-    createDataEndpoint(stack: DigitrafficStack, secret: ISecret) {
-        const environment = stack.createDefaultLambdaEnvironment('CountingSites');
+    createDataEndpoint(stack: DigitrafficStack) {
+        const environment = stack.createLambdaEnvironment();
+        const lambda = MonitoredFunction.createV2(stack, 'get-data', environment, {
+//            functionName: 'data-lambda'
+        });
 
-        const lambdaConf = databaseFunctionProps(stack, environment, 'CountingSites-GetData', 'get-data');
-        const lambda = MonitoredFunction.create(stack, 'data-lambda', lambdaConf);
-        secret.grantRead(lambda);
-
+        stack.grantSecret(lambda);
         new DigitrafficLogSubscriptions(stack, lambda);
 
         const dataIntegration = defaultIntegration(lambda, {

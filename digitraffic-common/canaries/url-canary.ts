@@ -3,6 +3,8 @@ import {CanaryParameters} from "./canary-parameters";
 import {Role} from "@aws-cdk/aws-iam";
 import {LambdaEnvironment} from "../model/lambda-environment";
 import {DigitrafficCanary} from "./canary";
+import {DigitrafficStack} from "../stack/stack";
+import {DigitrafficRestApi} from "../api/rest_apis";
 
 export interface UrlCanaryParameters extends CanaryParameters {
     readonly hostname: string;
@@ -21,5 +23,18 @@ export class UrlCanary extends DigitrafficCanary {
 
         // the handler code is defined at the actual project using this
         super(stack, canaryName, role, params, environmentVariables);
+    }
+
+    static create(stack: DigitrafficStack, role: Role, publicApi: DigitrafficRestApi, params: any): UrlCanary {
+        const defaultParameters: any = {
+            handler: `${params.name}.handler`,
+            hostname: publicApi.hostname()
+        };
+
+        if(publicApi.apiKeyIds.length > 0) {
+            defaultParameters.apiKeyId = publicApi.apiKeyIds[0]; // always use first api key
+        }
+
+        return new UrlCanary(stack, role, {...defaultParameters, ...params});
     }
 }

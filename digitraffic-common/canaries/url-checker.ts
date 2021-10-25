@@ -66,14 +66,14 @@ export class UrlChecker {
     }
 
     async done(): Promise<string> {
-        return "Canary succesfull";
+        return "Canary successful";
    }
 }
 
 export function jsonChecker(fn: any): any {
     return responseChecker((body: string) => {
         fn(JSON.parse(body), body);
-    })
+    });
 }
 
 export function responseChecker(fn: any): any {
