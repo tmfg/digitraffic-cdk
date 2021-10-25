@@ -309,6 +309,7 @@ const FIND_PORTCALL_ID_SQL = `
         CASE
         WHEN $4 = 'ETA' THEN ABS(EXTRACT(EPOCH FROM pac.eta - $5))
         WHEN $4 = 'ATA' THEN ABS(EXTRACT(EPOCH FROM pac.ata - $5))
+        WHEN $4 = 'ATD' THEN ABS(EXTRACT(EPOCH FROM pac.atd - $5))
         WHEN $4 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $5))
         END
     LIMIT 1

@@ -39,7 +39,7 @@ export class AwakeAiATXService {
                         eventType,
                         eventTime: atx.eventTimestamp,
                         source: EventSource.AWAKE_AI,
-                        recordTime: moment().toISOString(),
+                        recordTime: atx.eventTimestamp,
                         ship: {
                             imo: atx.imo,
                             mmsi: atx.mmsi
@@ -49,6 +49,8 @@ export class AwakeAiATXService {
                         },
                         portcallId
                     });
+                } else {
+                    console.warn('method=getATXs no portcall found for %s IMO', atx.zoneEventType, atx.imo);
                 }
             }
 
