@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import moment from 'moment-timezone';
 import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
 import {VtsApi} from "../../lib/api/vts";
-import {SlackApi} from "../../lib/api/slack";
+import {SlackApi} from "digitraffic-common/slack/slack-api";
 const zlib = require('zlib');
 
 const sandbox = sinon.createSandbox();

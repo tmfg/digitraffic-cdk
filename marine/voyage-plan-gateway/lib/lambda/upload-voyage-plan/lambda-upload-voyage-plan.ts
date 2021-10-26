@@ -6,7 +6,7 @@ import * as VoyagePlansService from '../../service/voyageplans';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 import {VtsApi} from "../../api/vts";
-import {SlackApi} from "../../api/slack";
+import {SlackApi} from "digitraffic-common/slack/slack-api";
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;

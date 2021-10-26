@@ -1,6 +1,9 @@
 import axios from 'axios';
 import {SecretsManager} from 'aws-sdk';
 import {UpdateStatusSecret} from "../../secret";
+import {SlackApi} from "digitraffic-common/slack/slack-api";
+
+let api: SlackApi;
 
 const NODEPING_API = 'https://api.nodeping.com/api/1';
 const STATUSPAGE_URL = process.env.STATUSPAGE_URL as string;
@@ -45,14 +48,13 @@ async function getEnabledNodePingChecks(nodepingToken: string, subaccountId: str
 }
 
 async function setNodePingCheckStateToDisabled(disabled: boolean, nodepingToken: string, subaccountId: string) {
-    console.log(`Setting NodePing checks disabled state to ${disabled}`);
+    console.info(`method=setNodePingCheckStateToDisabled Setting NodePing checks disabled state to ${disabled}`);
     const r = await axios.put(`${NODEPING_API}/checks?disableall=${disabled}&token=${nodepingToken}&customerid=${subaccountId}`, {
         timeout: DEFAULT_TIMEOUT_MS
     });
     if (r.status !== 200) {
         throw new Error('Unable to update checks');
     }
-    console.log('..done');
 }
 
 async function enableNodePingChecks(nodepingToken: string, subaccountId: string) {
@@ -69,13 +71,15 @@ async function handleMaintenance(secret: UpdateStatusSecret) {
 
     if (activeMaintenances.scheduled_maintenances.length) {
         if (enabledNodePingChecks.length) {
-            console.log('Active maintenances found, disabling NodePing checks');
+            console.info('method=handleMaintenance Active maintenances found, disabling NodePing checks');
             await disableNodePingChecks(secret.nodePingToken, secret.nodepingSubAccountId);
+            await api.notify('NodePing checks disabled, maintenance has started!')
         }
     } else {
         if (!enabledNodePingChecks.length) {
-            console.log('No active maintenances found, enabling disabled NodePing checks');
+            console.info('method=handleMaintenance No active maintenances found, enabling disabled NodePing checks');
             await enableNodePingChecks(secret.nodePingToken, secret.nodepingSubAccountId);
+            await api.notify('NodePing checks enabled, maintenance has ended!')
         }
     }
 }
@@ -88,6 +92,10 @@ export const handler = async (): Promise<any> => {
         throw new Error('No secret found!');
     }
     const secret: UpdateStatusSecret = JSON.parse(secretObj.SecretString);
+
+    if (!api) {
+        api = new SlackApi(secret.reportUrl);
+    }
 
     await handleMaintenance(secret);
 }
