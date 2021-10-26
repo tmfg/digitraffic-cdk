@@ -125,7 +125,11 @@ export class AwakeAiATXApi {
             }
         });
 
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
+            webSocket.on('error', (error) => {
+                console.error('method=getATXs error', error);
+                reject('Error');
+            });
             setTimeout(() => {
                 webSocket.close();
                 resolve(atxs);

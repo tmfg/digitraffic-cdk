@@ -109,7 +109,6 @@ describe('timestamp model', () => {
         const timestamp = newTimestamp();
 
         delete (timestamp.location as any).port;
-        console.log(timestamp)
 
         expect(validateTimestamp(timestamp)).toBe(false);
     });

@@ -9,6 +9,7 @@ import {
 } from "../event-sourceutil";
 import {Port} from "./portareas";
 import moment from 'moment-timezone';
+import * as R from 'ramda';
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean
@@ -86,7 +87,7 @@ async function removeOldTimestamps(
             timestamp.location.port
         );
         if (timestampsAnotherLocode.length) {
-            console.log(`method=doSaveTimestamp deleting timestamps with changed locode,timestamp ids: ${timestampsAnotherLocode.map(e => e.id)}`);
+            console.info(`method=doSaveTimestamp deleting timestamps with changed locode,timestamp ids: ${timestampsAnotherLocode.map(e => e.id)}`);
             await tx.batch(timestampsAnotherLocode.map(e => TimestampsDB.deleteById(tx, e.id)));
         }
     }
@@ -146,19 +147,33 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
         console.info('method=findPortnetETAsByLocodes tookMs=%d', (Date.now() - startFindPortnetETAsByLocodes));
     }) as DbETAShip[];
 
-    if (portnetShips.length) {
+    // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
+    const shipsByImoAndLocode = portnetShips.reduce((acc: {[imoAndLocode: string]: DbETAShip[]}, curr) => {
+        const imoAndLocode = curr.imo + curr.locode;
+        const imoAndLocodeShips = acc[imoAndLocode] ?? [];
+        imoAndLocodeShips.push(curr);
+        const ret: {[imoAndLocode: string]: DbETAShip[]} = {};
+        ret[imoAndLocode] = imoAndLocodeShips;
+        return {...acc, ...ret};
+    }, {});
+    const newestShips = Object.values(shipsByImoAndLocode).flatMap((ships) =>
+        R.head(R.sortBy((ship: DbETAShip) => moment(ship.eta).toDate(), ships)) as DbETAShip);
+    console.info('method=findPortnetETAsByLocodes ships count before newest ETA filtering %d, after newest ETA filtering %d',
+        portnetShips.length, newestShips.length);
+
+    if (newestShips.length) {
         const startFindVtsShipsTooCloseToPort = Date.now();
         return await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
             const shipsTooCloseToPortImos =
                 (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(
                     db,
-                    portnetShips.map(s => s.portcall_id),
+                    newestShips.map(s => s.portcall_id),
                     ports))
                 .map(s => s.imo);
-            console.log('method=findETAShipsByLocode Ships too close to port', shipsTooCloseToPortImos);
-            const filteredShips = portnetShips.filter(s => shipsTooCloseToPortImos.includes(s.imo));
-            console.log('method=findETAShipsByLocode Did not fetch ETA for ships too close to port', filteredShips);
-            return portnetShips.filter(s => !shipsTooCloseToPortImos.includes(s.imo));
+            console.info('method=findETAShipsByLocode Ships too close to port', shipsTooCloseToPortImos);
+            const filteredShips = newestShips.filter(s => shipsTooCloseToPortImos.includes(s.imo));
+            console.info('method=findETAShipsByLocode Did not fetch ETA for ships too close to port', filteredShips);
+            return newestShips.filter(s => !shipsTooCloseToPortImos.includes(s.imo));
         }).finally(() => {
             console.info('method=startFindVtsShipsTooCloseToPort tookMs=%d', (Date.now() - startFindVtsShipsTooCloseToPort));
         }) as DbETAShip[];
