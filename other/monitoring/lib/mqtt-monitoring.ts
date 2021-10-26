@@ -15,11 +15,11 @@ export class MqttMonitoring {
         mqttConfigurations.forEach((mqtt: MQTTConfiguration) => {
             const cpuLimit = mqtt.cpuLimit ?? 60;
             const heapLimit = mqtt.heapLimit ?? 80;
-            const networkLimit = mqtt.networkLimit ?? 50 * 1000*1000; // 50 MB
+            const networkLimit = mqtt.networkLimit ?? 50 * 1024*1024; // 50 MiB
 
             this.createAlarmForMetric('CPU', mqtt.brokerName, 'CpuUtilization', cpuLimit);
             this.createAlarmForMetric('Heap', mqtt.brokerName, 'HeapUsage', heapLimit);
-            this.createAlarmForMetric('Network', mqtt.brokerName, 'NetworkOut', networkLimit, ComparisonOperator.GREATER_THAN_THRESHOLD);
+            this.createAlarmForMetric('Network', mqtt.brokerName, 'NetworkOut', networkLimit);
         });
     }
 
@@ -32,7 +32,7 @@ export class MqttMonitoring {
             }
         });
 
-        const alarmName = `MQTT-${this.stack.stackName}-${name}`;
+        const alarmName = `MQTT-${this.stack.stackName}-${brokerName}-${name}`;
 
         const alarm = new Alarm(this.stack, alarmName, {
             alarmName,
