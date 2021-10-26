@@ -12,9 +12,9 @@ export type MonitoringConfiguration = {
 
 export type DBConfiguration = {
     readonly dbClusterIdentifier: string;
-    readonly cpuLimit?: number;
-    readonly writeIOPSLimit?: number;
-    readonly readIOPSLimit?: number;
+    readonly cpuLimit: number;
+    readonly writeIOPSLimit: number;
+    readonly readIOPSLimit: number;
 }
 
 export type MQTTConfiguration = {

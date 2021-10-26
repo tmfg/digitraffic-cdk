@@ -17,13 +17,13 @@ export class MqttMonitoring {
             const heapLimit = mqtt.heapLimit ?? 80;
             const networkLimit = mqtt.networkLimit ?? 50 * 1000*1000; // 50 MB
 
-            this.createAlarmForMetric('MQTT-CPU-ALARM', mqtt.brokerName, 'CpuUtilization', cpuLimit);
-            this.createAlarmForMetric('MQTT-Heap-ALARM', mqtt.brokerName, 'HeapUsage', heapLimit);
-            this.createAlarmForMetric('MQTT-NetworkALARM', mqtt.brokerName, 'NetworkOut', networkLimit, ComparisonOperator.GREATER_THAN_THRESHOLD);
+            this.createAlarmForMetric('CPU', mqtt.brokerName, 'CpuUtilization', cpuLimit);
+            this.createAlarmForMetric('Heap', mqtt.brokerName, 'HeapUsage', heapLimit);
+            this.createAlarmForMetric('Network', mqtt.brokerName, 'NetworkOut', networkLimit, ComparisonOperator.GREATER_THAN_THRESHOLD);
         });
     }
 
-    createAlarmForMetric(alarmName: string, brokerName: string, metricName: string, threshold: number, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD) {
+    createAlarmForMetric(name: string, brokerName: string, metricName: string, threshold: number, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD) {
         const metric = new Metric({
             namespace: 'AWS/AmazonMQ',
             metricName,
@@ -31,6 +31,8 @@ export class MqttMonitoring {
                 Broker: brokerName
             }
         });
+
+        const alarmName = `MQTT-${this.stack.stackName}-${name}`;
 
         const alarm = new Alarm(this.stack, alarmName, {
             alarmName,

@@ -19,20 +19,22 @@ export class RdsMonitoring {
                 engine: DatabaseClusterEngine.AURORA_POSTGRESQL
             });
 
-            const cpuLimit = configuration.db.cpuLimit || 60;
-            const writeIOPSLimit = configuration.db.writeIOPSLimit || 1000;
-            const readIOPSLimit = configuration.db.readIOPSLimit || 100;
-            const freeMemoryLimit = 100 * 1024*1024; // 100 * MB
+            const cpuLimit = configuration.db.cpuLimit;
+            const writeIOPSLimit = configuration.db.writeIOPSLimit;
+            const readIOPSLimit = configuration.db.readIOPSLimit;
+            const freeMemoryLimit = 200 * 1024*1024; // 200 * MiB
 
-            this.createAlarm('DB-CPU-ALARM', cluster.metricCPUUtilization(), cpuLimit);
-            this.createAlarm('DB-WriteIOPS-ALARM', cluster.metric('WriteIOPS'), writeIOPSLimit);
-            this.createAlarm('DB-ReadIOPS-ALARM', cluster.metric('ReadIOPS'), readIOPSLimit);
-            this.createAlarm('DB-FreeMemory-ALARM', cluster.metricFreeableMemory(), freeMemoryLimit, ComparisonOperator.LESS_THAN_THRESHOLD);
-            this.createAlarm('DB-Deadlocks-ALARM', cluster.metricDeadlocks());
+            this.createAlarm('CPU', cluster.metricCPUUtilization(), cpuLimit);
+            this.createAlarm('WriteIOPS', cluster.metric('WriteIOPS'), writeIOPSLimit);
+            this.createAlarm('ReadIOPS', cluster.metric('ReadIOPS'), readIOPSLimit);
+            this.createAlarm('FreeMemory', cluster.metricFreeableMemory(), freeMemoryLimit, ComparisonOperator.LESS_THAN_THRESHOLD);
+            this.createAlarm('Deadlocks', cluster.metricDeadlocks());
         }
     }
 
-    createAlarm(alarmName: string, metric: Metric, threshold = 1, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD) {
+    createAlarm(name: string, metric: Metric, threshold = 1, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD) {
+        const alarmName = `DB-${this.stack.stackName}-${name}`;
+
         const alarm = new Alarm(this.stack, alarmName, {
             alarmName,
             metric,
