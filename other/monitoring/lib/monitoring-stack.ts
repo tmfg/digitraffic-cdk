@@ -1,4 +1,4 @@
-import {Construct, Stack, StackProps} from '@aws-cdk/core';
+import {Construct, Stack} from '@aws-cdk/core';
 import {Topic} from '@aws-cdk/aws-sns';
 import {EmailSubscription} from '@aws-cdk/aws-sns-subscriptions';
 import {MonitoringConfiguration} from "./app-props";
@@ -28,8 +28,17 @@ export class MonitoringStack extends Stack {
             stringValue: warningsTopic.topicArn
         });
 
-        new RdsMonitoring(this, alarmsTopic, configuration);
-        new MqttMonitoring(this, alarmsTopic, configuration);
+        this.createMonitorings(alarmsTopic, configuration);
+    }
+
+    createMonitorings(alarmsTopic: Topic, configuration: MonitoringConfiguration) {
+        if(configuration.db) {
+            new RdsMonitoring(this, alarmsTopic, configuration.db);
+        }
+
+        if(configuration.mqtt) {
+            new MqttMonitoring(this, alarmsTopic, configuration.mqtt);
+        }
 
         //new DigitrafficSecurityRule(this, alarmsTopic);
     }

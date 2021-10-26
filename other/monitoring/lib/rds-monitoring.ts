@@ -1,4 +1,4 @@
-import {MonitoringConfiguration} from "./app-props";
+import {DBConfiguration} from "./app-props";
 import {Stack} from "@aws-cdk/core";
 import {DatabaseCluster, DatabaseClusterEngine} from "@aws-cdk/aws-rds";
 import {Topic} from "@aws-cdk/aws-sns";
@@ -9,27 +9,25 @@ export class RdsMonitoring {
     private readonly stack: Stack;
     private readonly alarmsTopic: Topic;
 
-    constructor(stack: Stack, alarmsTopic: Topic, configuration: MonitoringConfiguration) {
+    constructor(stack: Stack, alarmsTopic: Topic, dbConfiguration: DBConfiguration) {
         this.stack = stack;
         this.alarmsTopic = alarmsTopic;
 
-        if(configuration.db) {
-            const cluster = DatabaseCluster.fromDatabaseClusterAttributes(stack, 'DbCluster', {
-                clusterIdentifier: configuration.db.dbClusterIdentifier,
-                engine: DatabaseClusterEngine.AURORA_POSTGRESQL
-            });
+        const cluster = DatabaseCluster.fromDatabaseClusterAttributes(stack, 'DbCluster', {
+            clusterIdentifier: dbConfiguration.dbClusterIdentifier,
+            engine: DatabaseClusterEngine.AURORA_POSTGRESQL
+        });
 
-            const cpuLimit = configuration.db.cpuLimit;
-            const writeIOPSLimit = configuration.db.writeIOPSLimit;
-            const readIOPSLimit = configuration.db.readIOPSLimit;
-            const freeMemoryLimit = 200 * 1024*1024; // 200 * MiB
+        const cpuLimit = dbConfiguration.cpuLimit;
+        const writeIOPSLimit = dbConfiguration.writeIOPSLimit;
+        const readIOPSLimit = dbConfiguration.readIOPSLimit;
+        const freeMemoryLimit = 200 * 1024 * 1024; // 200 * MiB
 
-            this.createAlarm('CPU', cluster.metricCPUUtilization(), cpuLimit);
-            this.createAlarm('WriteIOPS', cluster.metric('WriteIOPS'), writeIOPSLimit);
-            this.createAlarm('ReadIOPS', cluster.metric('ReadIOPS'), readIOPSLimit);
-            this.createAlarm('FreeMemory', cluster.metricFreeableMemory(), freeMemoryLimit, ComparisonOperator.LESS_THAN_THRESHOLD);
-            this.createAlarm('Deadlocks', cluster.metricDeadlocks());
-        }
+        this.createAlarm('CPU', cluster.metricCPUUtilization(), cpuLimit);
+        this.createAlarm('WriteIOPS', cluster.metric('WriteIOPS'), writeIOPSLimit);
+        this.createAlarm('ReadIOPS', cluster.metric('ReadIOPS'), readIOPSLimit);
+        this.createAlarm('FreeMemory', cluster.metricFreeableMemory(), freeMemoryLimit, ComparisonOperator.LESS_THAN_THRESHOLD);
+        this.createAlarm('Deadlocks', cluster.metricDeadlocks());
     }
 
     createAlarm(name: string, metric: Metric, threshold = 1, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD) {
