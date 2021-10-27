@@ -8,8 +8,8 @@ import {Context} from "aws-lambda";
 const WebSocket = require('ws');
 
 type UpdateAwakeAiATXTimestampsSecret = {
-    readonly "awake.atxurl": string
-    readonly "awake.atxauth": string
+    readonly atxurl: string
+    readonly atxauth: string
 }
 
 let service: AwakeAiATXService;
@@ -30,7 +30,7 @@ export function handlerFn(
         return withDbSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiATXTimestampsSecret): Promise<any> => {
             if (!service) {
                 service = new AwakeAiATXServiceClass(
-                    new AwakeAiATXApi(secret["awake.atxurl"], secret["awake.atxauth"], WebSocket));
+                    new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket));
             }
 
             // allow 1000 ms for SQS sends, this is a completely made up number
@@ -38,7 +38,7 @@ export function handlerFn(
             console.info('method=updateAwakeAiTimestampsLambda count=%d', timestamps.length);
 
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
-        }, {expectedKeys});
+        }, {expectedKeys, prefix: 'awake'});
     };
 }
 
