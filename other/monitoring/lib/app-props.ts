@@ -15,6 +15,8 @@ export type DBConfiguration = {
     readonly cpuLimit: number;
     readonly writeIOPSLimit: number;
     readonly readIOPSLimit: number;
+    readonly volumeWriteIOPSLimit: number;
+    readonly volumeReadIOPSLimit: number;
 }
 
 export type MQTTConfiguration = {

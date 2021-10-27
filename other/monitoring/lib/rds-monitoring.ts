@@ -4,6 +4,7 @@ import {DatabaseCluster, DatabaseClusterEngine} from "@aws-cdk/aws-rds";
 import {Topic} from "@aws-cdk/aws-sns";
 import {Alarm, ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
+import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 
 export class RdsMonitoring {
     private readonly stack: Stack;
@@ -19,14 +20,18 @@ export class RdsMonitoring {
         });
 
         const cpuLimit = dbConfiguration.cpuLimit;
+        const freeMemoryLimit = 200 * 1024 * 1024; // 200 * MiB
         const writeIOPSLimit = dbConfiguration.writeIOPSLimit;
         const readIOPSLimit = dbConfiguration.readIOPSLimit;
-        const freeMemoryLimit = 200 * 1024 * 1024; // 200 * MiB
+        const volumeWriteIOPSLimit = dbConfiguration.volumeWriteIOPSLimit;
+        const volumeReadIOPSLimit = dbConfiguration.volumeReadIOPSLimit;
 
         this.createAlarm('CPU', cluster.metricCPUUtilization(), cpuLimit);
+        this.createAlarm('FreeMemory', cluster.metricFreeableMemory(), freeMemoryLimit, ComparisonOperator.LESS_THAN_THRESHOLD);
         this.createAlarm('WriteIOPS', cluster.metric('WriteIOPS'), writeIOPSLimit);
         this.createAlarm('ReadIOPS', cluster.metric('ReadIOPS'), readIOPSLimit);
-        this.createAlarm('FreeMemory', cluster.metricFreeableMemory(), freeMemoryLimit, ComparisonOperator.LESS_THAN_THRESHOLD);
+        this.createAlarm('VolumeWriteIOPS', cluster.metricVolumeWriteIOPs(), volumeWriteIOPSLimit);
+        this.createAlarm('VolumeReadIOPS', cluster.metricVolumeReadIOPs(), volumeReadIOPSLimit);
         this.createAlarm('Deadlocks', cluster.metricDeadlocks());
     }
 
