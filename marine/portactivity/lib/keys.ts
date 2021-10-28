@@ -14,5 +14,7 @@ export enum PortactivitySecretKeys {
     ETAS_CLIENT_SECRET = "etas.client_secret",
     ETAS_AUDIENCE = "etas.audience",
     AWAKE_URL = "awake.url",
-    AWAKE_AUTH = "awake.auth"
+    AWAKE_AUTH = "awake.auth",
+    AWAKE_ATX_URL = "atxurl",
+    AWAKE_ATX_AUTH = "atxauth",
 }

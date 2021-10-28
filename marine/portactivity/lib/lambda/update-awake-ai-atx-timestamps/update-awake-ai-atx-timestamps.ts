@@ -22,8 +22,8 @@ export function handlerFn(
 
     return (event: object, context: Context) => {
         const expectedKeys = [
-            PortactivitySecretKeys.AWAKE_URL,
-            PortactivitySecretKeys.AWAKE_AUTH
+            PortactivitySecretKeys.AWAKE_ATX_URL,
+            PortactivitySecretKeys.AWAKE_ATX_AUTH
         ];
 
         return withDbSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiATXTimestampsSecret): Promise<any> => {
