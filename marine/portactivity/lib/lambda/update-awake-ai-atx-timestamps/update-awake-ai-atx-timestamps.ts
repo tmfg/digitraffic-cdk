@@ -1,4 +1,3 @@
-import {ports} from '../../service/portareas';
 import {SecretOptions, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {sendMessage} from "../../service/queue-service";
@@ -34,7 +33,7 @@ export function handlerFn(
             }
 
             // allow 1000 ms for SQS sends, this is a completely made up number
-            const timestamps = await service.getATXs(ports, context.getRemainingTimeInMillis() - 1000);
+            const timestamps = await service.getATXs(context.getRemainingTimeInMillis() - 1000);
             console.info('method=updateAwakeAiTimestampsLambda count=%d', timestamps.length);
 
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));

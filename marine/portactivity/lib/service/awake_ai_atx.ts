@@ -1,7 +1,6 @@
-import {AwakeAiATXApi, AwakeATXZoneEventType} from "../api/awake_ai_atx";
+import {AwakeAiATXApi, AwakeAiATXZoneType, AwakeATXZoneEventType} from "../api/awake_ai_atx";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import * as TimestampDAO from '../db/timestamps';
-import {Port} from "./portareas";
 import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import moment from 'moment-timezone';
@@ -15,13 +14,17 @@ export class AwakeAiATXService {
         this.api = api;
     }
 
-    async getATXs(ports: Port[], timeoutMillis: number): Promise<ApiTimestamp[]> {
+    async getATXs(timeoutMillis: number): Promise<ApiTimestamp[]> {
         const atxs = await this.api.getATXs(timeoutMillis);
         return inDatabase(async (db: IDatabase<any, any>) => {
-            const promises = atxs.filter(atx => atx.locodes.some(locode => ports.includes(locode)))
+            const promises = atxs
+                .filter(atx => atx.zoneType === AwakeAiATXZoneType.BERTH)
                 .map(async (atx) => {
                     // pick the first supported LOCODE
-                    const port =  atx.locodes.find(locode => ports.includes(locode))!;
+                    if (atx.locodes.length > 1) {
+                        console.warn('method=getATXs More than one locode for timestamp! IMO %s locodes %s', atx.imo, atx.locodes);
+                    }
+                    const port =  atx.locodes[0];
                     const eventType = atx.zoneEventType == AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD;
                     const eventTime = moment(atx.eventTimestamp).toDate();
                     const portcallId = await TimestampDAO.findPortcallId(db,

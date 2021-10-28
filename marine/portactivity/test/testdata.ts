@@ -1,9 +1,18 @@
 import moment from "moment";
 import {ApiTimestamp, EventType} from "../lib/model/timestamp";
-import {AwakeAiATXEventType, AwakeAIATXTimestampMessage, AwakeATXZoneEventType} from "../lib/api/awake_ai_atx";
+import {
+    AwakeAiATXEventType,
+    AwakeAIATXTimestampMessage,
+    AwakeAiATXZoneType,
+    AwakeATXZoneEventType
+} from "../lib/api/awake_ai_atx";
+
 const { v4: uuidv4 } = require('uuid');
 
-export function newAwakeATXMessage(zoneEventType?: AwakeATXZoneEventType): AwakeAIATXTimestampMessage {
+export function newAwakeATXMessage(options?: {
+    zoneEventType?: AwakeATXZoneEventType,
+    zoneType?: AwakeAiATXZoneType
+}): AwakeAIATXTimestampMessage {
     return {
         eventType: 'zone-event',
         eventTimestamp: new Date().toISOString(),
@@ -16,8 +25,8 @@ export function newAwakeATXMessage(zoneEventType?: AwakeATXZoneEventType): Awake
         locodes: ['FILOL'],
         location: [53.2, 40.3],
         zoneName: 'somezone',
-        zoneEventType: zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
-        zoneType: 'pbp'
+        zoneEventType: options?.zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
+        zoneType: options?.zoneType ?? AwakeAiATXZoneType.BERTH
     };
 }
 

@@ -21,6 +21,14 @@ export type AwakeAISubscriptionMessage = AwakeAiATXMessage & {
     readonly subscriptionId: string
 }
 
+export enum AwakeAiATXZoneType {
+    VTS_AREA = 'vts',
+    PILOT_BOARDING_AREA = 'pbp',
+    PORT_AREA = 'portarea',
+    BERTH = 'berth',
+    ANCHORAGE = 'anchorage'
+}
+
 export type AwakeAIATXTimestampMessage = AwakeAiATXMessage & {
     /**
      * Possible value 'zone-event'
@@ -63,9 +71,9 @@ export type AwakeAIATXTimestampMessage = AwakeAiATXMessage & {
     readonly zoneId: string
 
     /**
-     * Possible value 'pbp'
+     * Type of zone for arrival/departure
      */
-    readonly zoneType: string
+    readonly zoneType: AwakeAiATXZoneType
 
     /**
      * Event type: arrival or departure
