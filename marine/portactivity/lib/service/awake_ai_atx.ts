@@ -23,6 +23,8 @@ export class AwakeAiATXService {
                     // pick the first supported LOCODE
                     if (atx.locodes.length > 1) {
                         console.warn('method=getATXs More than one locode for timestamp! IMO %s locodes %s', atx.imo, atx.locodes);
+                    } else if (!atx.locodes.length) {
+                        console.error('method=getATXs No locode for timestamp! IMO %s', atx.imo);
                     }
                     const port =  atx.locodes[0];
                     const eventType = atx.zoneEventType == AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD;
