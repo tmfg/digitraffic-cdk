@@ -1,12 +1,9 @@
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import * as FaultsService from "./faults";
 import * as WarningsService from "./warnings";
-import * as S124Converter from "./s124-converter";
 import {SNS} from "aws-sdk";
-import {Builder} from "xml2js";
 import {AtonSecret} from "../model/secret";
-import {decodeBase64ToAscii} from "digitraffic-common/js/js-utils";
-import {sendWarnings} from "./vis-sender";
+import {S124Type, SendS124Event} from "../model/upload-voyageplan-event";
 
 export class VoyagePlanService {
     private readonly sns: SNS;
@@ -31,11 +28,12 @@ export class VoyagePlanService {
 
         console.info("sending %d faults", faultIds.length);
 
-        for (const faultId of faultIds) {
-            await this.sendSns(this.sendFaultsSnsTopicArn, JSON.stringify({
-                faultId,
+        for (const id of faultIds) {
+            await this.sendSns(this.sendFaultsSnsTopicArn, {
+                type: S124Type.FAULT,
+                id,
                 callbackEndpoint: this.callbackEndpoint
-            }));
+            });
         }
 
         return Promise.resolve('');
@@ -44,33 +42,22 @@ export class VoyagePlanService {
     private async sendWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<any> {
         const warnings = await WarningsService.findWarningsForVoyagePlan(voyagePlan);
 
-        console.info("DEBUG warnings " + JSON.stringify(warnings, null, 2));
+        if(warnings && warnings.features) {
+            console.info("sending %d warnings", warnings?.features?.length);
 
-        if(warnings && warnings.features?.length > 0) {
-            const s124 = S124Converter.convertWarnings(warnings.features);
-            const xml = new Builder().buildObject(s124);
-
-            await this.sendWarnings(xml);
+            for (const feature of warnings?.features) {
+                await this.sendSns(this.sendFaultsSnsTopicArn, {
+                    type: S124Type.WARNING,
+                    id: feature.properties.id,
+                    callbackEndpoint: this.callbackEndpoint
+                });
+            }
         }
     }
 
-    private async sendWarnings(xml: string): Promise<any> {
-        console.info("DEBUG should send " + xml);
-
-        if (this.secret?.certificate) {
-            const clientCertificate = decodeBase64ToAscii(this.secret.certificate);
-            const privateKey = decodeBase64ToAscii(this.secret.privatekey);
-            const caCert = decodeBase64ToAscii(this.secret.ca);
-
-            await sendWarnings(xml, this.callbackEndpoint, caCert, clientCertificate, privateKey);
-        } else {
-            console.info("skipping sending, no certificate found");
-        }
-    }
-
-    private sendSns(TopicArn: string, Message: string): Promise<any> {
+    private sendSns(TopicArn: string, event: SendS124Event): Promise<any> {
         return this.sns.publish({
-            Message,
+            Message: JSON.stringify(event),
             TopicArn
         }).promise();
     }

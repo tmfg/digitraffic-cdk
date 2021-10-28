@@ -20,7 +20,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         const fault1 = newFaultWithGeometry(60.285807, 27.321659);
         const fault2 = newFaultWithGeometry(60.285817, 27.321660);
 
-        await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
+//        await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
         await insert(db, [fault1, fault2]);
         const uploadEvent: UploadVoyagePlanEvent = {
             voyagePlan,
@@ -30,7 +30,21 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
 
         await handlerFn(sns, secretFn)(uploadEvent);
 
-        expect(snsPublishStub.calledTwice).toBe(true);
+        expect(snsPublishStub.callCount).toBe(2);
+    });
+
+    test('publishes to SNS per warning id', async () => {
+        await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
+
+        const uploadEvent: UploadVoyagePlanEvent = {
+            voyagePlan,
+            callbackEndpoint: 'some-endpoint'
+        };
+        const [sns, snsPublishStub] = makeSnsPublishStub();
+
+        await handlerFn(sns, secretFn)(uploadEvent);
+
+        expect(snsPublishStub.callCount).toBe(2);
     });
 
     test('no publish with no callback endpoint', async () => {

@@ -7,7 +7,6 @@ import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/api/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
 import {MediaType} from "digitraffic-common/api/mediatypes";
@@ -28,19 +27,20 @@ export function create(stack: DigitrafficStack): Function {
 }
 
 function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, faultsJsonModel: Model): Function {
-    const functionName = 'ATON-GetFaults';
-    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const environment = stack.createLambdaEnvironment();
+    const getFaultsLambda = MonitoredFunction.createV2(stack, 'get-faults', environment, {
+        reservedConcurrentExecutions: 3
+    });
 
-    const getFaultsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack, environment, functionName, 'get-faults'));
-
-    stack.secret.grantRead(getFaultsLambda);
+    stack.grantSecret(getFaultsLambda);
     new DigitrafficLogSubscriptions(stack, getFaultsLambda);
 
     const apiResource = publicApi.root.addResource("api");
     const atonResource = apiResource.addResource("aton");
     const v1Resource = atonResource.addResource("v1");
     const resources = v1Resource.addResource("faults");
+
+    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
     const getFaultsIntegration = defaultIntegration(getFaultsLambda, {
         requestParameters: {

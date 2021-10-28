@@ -27,3 +27,15 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
     return warnings;
 }
 
+export async function findWarning(id: number): Promise<any> {
+    const warnings = await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
+    });
+
+    if(!warnings) {
+        return {};
+    }
+
+    return warnings.features.find((f: any) => f.properties.id === id);
+}
+

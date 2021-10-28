@@ -47,6 +47,8 @@ function initMap() {
     pilotwebToPortnetLocodeMap['FILPP'] = 'FINUI';
 
     pilotwebToPortnetLocodeMap['FIVRA'] = 'FIVRK';
+
+    // TODO: FIEUR -> FIEJO
 }
 
 export function convertLocation(route: any): Location {

@@ -38,16 +38,17 @@ function createId(id: any, year: number): string {
     return `FI.${id}.${year}`;
 }
 
-function createUrn(id: string): string {
-    return `urn:mrn:s124:NW.${id}.P`;
+function createUrn(domain: string, id: string): string {
+    return `urn:mrn:s124:${domain}.${id}.P`;
 }
 
 export function convertFault(fault: Fault): any {
     const faultId = -fault.id;
     const year = fault.entry_timestamp.getFullYear() - 2000;
 
+    const domain = 'AF';
     const id = createId(faultId, year);
-    const urn = createUrn(id);
+    const urn = createUrn(domain, id);
 
     const root: any = createDataSet(id);
     const dataSet = root[NODE_S124_DATASET];
@@ -72,7 +73,7 @@ export function convertFault(fault: Fault): any {
             fixedDateRange : createFixedDateRangeForFault(fault),
                 theWarningPart: {
                 '$': {
-                    'xlink:href': `NW.${id}.1`
+                    'xlink:href': `${domain}.${id}.1`
                 }
             }
         }
@@ -81,10 +82,10 @@ export function convertFault(fault: Fault): any {
     dataSet[NODE_MEMBER] = {
         'S124:S124_NavigationalWarningPart': {
             '$': {
-                'gml:id' : `NW.${id}.1`
+                'gml:id' : `${domain}.${id}.1`
             },
-            id: `urn:mrn:s124:NW.${id}.1`,
-                geometry: createPointProperty(createCoordinatePair(fault.geometry), id),
+            id: `urn:mrn:s124:${domain}.${id}.1`,
+                geometry: createPointProperty(createCoordinatePair(fault.geometry), domain, id),
                 header: {
                 '$': {
                     'owns': 'true'
@@ -96,69 +97,62 @@ export function convertFault(fault: Fault): any {
     return root;
 }
 
-export function convertWarnings(warnings: any[]): any {
-    const root = createDataSet('id');
-    const dataSet = root[NODE_S124_DATASET];
+export function convertWarning(warning: any): any {
+    const p = warning.properties;
+    const year = moment(p.creationTime).year() - 2000;
+    const warningId = `${p.id}`;
+    const id = createId(warningId, year);
+    const domain = 'NW';
+    const urn = createUrn(domain, id);
 
-    const imembers: any[] = [];
-    const members: any[] = [];
+    const root = createDataSet(id);
+    const dataSet = root[NODE_S124_DATASET];
 
     dataSet[NODE_BOUNDED_BY] = createBoundedBy('17.0000 55.0000', '32.0000 75.0000');
 
-    warnings.forEach(warning => {
-        const p = warning.properties;
-        const year = moment(p.creationTime).year() - 2000;
-        const warningId = `NW${p.id}`;
-        const id = createId(warningId, year);
-        const urn = createUrn(id);
-
 //        console.info("properties " + JSON.stringify(p));
 
-        imembers.push({
-            'S124:S124_NWPreamble': {
+    dataSet[NODE_IMEMBER] = {
+        'S124:S124_NWPreamble': {
+            '$': {
+                'gml:id': `PR.${id}`
+            },
+            id: urn,
+            messageSeriesIdentifier: createMessageSeriesIdentifier(NAME_OF_SERIES_NAUTICAL_WARNINGS, warningId, year),
+            sourceDate: moment(p.creationTime).format(YEAR_MONTH_DAY),
+            generalArea: 'Baltic sea',
+            locality: {
+                text: p.areasEn
+            },
+            title: {
+                text: `${p.typeEn}`
+            },
+            fixedDateRange: createFixedDateRangeForWarning(p),
+            theWarningPart: {
                 '$': {
-                    'gml:id': `PR.${id}`
-                },
-                id: urn,
-                messageSeriesIdentifier: createMessageSeriesIdentifier(NAME_OF_SERIES_NAUTICAL_WARNINGS, warningId, year),
-                sourceDate: moment(p.creationTime).format(YEAR_MONTH_DAY),
-                generalArea: 'Baltic sea',
-                locality: {
-                    text: p.areasEn
-                },
-                title: {
-                    text: `${p.typeEn}`
-                },
-                fixedDateRange: createFixedDateRangeForWarning(p),
-                theWarningPart: {
-                    '$': {
-                        'xlink:href': `NW.${id}.1`
-                    }
+                    'xlink:href': `${domain}.${id}.1`
                 }
             }
-        });
+        }
+    };
 
-        members.push({
-            'S124:S124_NavigationalWarningPart': {
+    dataSet[NODE_MEMBER] = {
+        'S124:S124_NavigationalWarningPart': {
+            '$': {
+                'gml:id': `${domain}.${id}.1`
+            },
+            id: `urn:mrn:s124:${domain}.${id}.1`,
+            geometry: createGeometryForWarning(warning.geometry, domain, id),
+            Subject: {
+                text: `${p.contentsEn}`
+            },
+            header: {
                 '$': {
-                    'gml:id': `NW.${id}.1`
-                },
-                id: `urn:mrn:s124:NW.${id}.1`,
-            geometry: createGeometryForWarning(warning.geometry, id),
-                Subject: {
-                    text: `${p.contentsEn}`
-                },
-                header: {
-                    '$': {
-                        'owns': 'true'
-                    }
+                    'owns': 'true'
                 }
             }
-        });
-    });
-
-    dataSet[NODE_MEMBER] = members;
-    dataSet[NODE_IMEMBER] = imembers;
+        }
+    };
 
     return root;
 }
@@ -221,21 +215,21 @@ function createFixedDateRangeForFault(fault: any) {
     }
 }
 
-function createGeometryForWarning(geometry: any, id: string) {
+function createGeometryForWarning(geometry: any, domain: string, id: string) {
     if(geometry.type === 'Point') {
-        return createPointProperty(`${geometry.coordinates[0]} ${geometry.coordinates[1]}`, id);
+        return createPointProperty(`${geometry.coordinates[0]} ${geometry.coordinates[1]}`, domain, id);
     }
 
     console.info("not supported geometry type " + geometry.type);
     return {};
 }
 
-function createPointProperty(geometry: any, id: string) {
+function createPointProperty(geometry: any, domain: string, id: string) {
     return {
         'S100:pointProperty' : {
             'S100:Point' : {
                 '$' : {
-                    'gml:id' : `s.NW.${id}.1`
+                    'gml:id' : `s.${domain}.${id}.1`
                 },
                 'gml:pos': geometry
             }

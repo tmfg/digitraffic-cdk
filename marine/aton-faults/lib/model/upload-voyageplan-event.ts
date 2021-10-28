@@ -10,14 +10,20 @@ export type UploadVoyagePlanEvent = {
     readonly voyagePlan: string
 }
 
-export type SendFaultEvent = {
+export enum S124Type {
+    WARNING, FAULT
+}
+
+export type SendS124Event = {
     /**
      * Endpoint URL for callback
      */
     readonly callbackEndpoint: string
 
+    readonly type: S124Type;
+
     /**
-     * Fault id
+     * Fault/Warning id
      */
-    readonly faultId: number
+    readonly id: number
 }

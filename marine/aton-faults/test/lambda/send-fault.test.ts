@@ -1,12 +1,12 @@
 import {dbTestBase, insert} from "../db-testutil";
 import * as pgPromise from "pg-promise";
-import {handlerFn} from '../../lib/lambda/send-fault/send-fault';
+import {handlerFn} from '../../lib/lambda/send-s124/send-s124';
 import {newFault} from "../testdata";
 import * as sinon from 'sinon';
 import {SNSEvent} from "aws-lambda";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
-import {SendFaultEvent} from "../../lib/model/upload-voyageplan-event";
+import {S124Type, SendS124Event} from "../../lib/model/upload-voyageplan-event";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;
@@ -26,8 +26,9 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
                 }
             });
             await insert(db, [fault]);
-            const snsFaultEvent: SendFaultEvent = {
-                faultId: fault.id,
+            const snsFaultEvent: SendS124Event = {
+                type: S124Type.FAULT,
+                id: fault.id,
                 callbackEndpoint: `http://localhost:${SERVER_PORT}/area`
             };
             const withSecret: SecretFunction = (secretId: any, fn: any, options: any) => Promise.resolve({
@@ -51,7 +52,7 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
 }));
 
-function createSnsEvent(sendFaultEvent: SendFaultEvent): SNSEvent {
+function createSnsEvent(sendFaultEvent: SendS124Event): SNSEvent {
     return {
         Records: [{
             EventSource: '',

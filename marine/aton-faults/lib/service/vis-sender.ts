@@ -12,14 +12,16 @@ export async function sendFault(
     console.info(`method=sendFault tookMs=%d`, Date.now() - start);
 }
 
-export async function sendWarnings(
-    warningsS124: string,
+export async function sendWarning(
+    warningS124: string,
     url: string,
     ca: string,
     clientCertificate: string,
     privateKey: string): Promise<any> {
 
+    console.info("DEBUG sending warning/n" + warningS124);
+
     const start = Date.now();
-    await VisApi.uploadArea(warningsS124, url, ca, clientCertificate, privateKey);
-    console.info(`method=sendWarnings tookMs=%d`, Date.now() - start);
+    await VisApi.uploadArea(warningS124, url, ca, clientCertificate, privateKey);
+    console.info(`method=sendWarning tookMs=%d`, Date.now() - start);
 }
