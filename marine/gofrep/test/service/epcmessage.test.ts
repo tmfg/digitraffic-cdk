@@ -18,7 +18,7 @@ describe('epcmessage service', () => {
         expect(resp).toMatchObject({
             EPCMessageHeader: {
                 SentTime: dateStr,
-                MessageType: 'ACK',
+                MessageType: 0,
                 Version: ''
             }
         });
