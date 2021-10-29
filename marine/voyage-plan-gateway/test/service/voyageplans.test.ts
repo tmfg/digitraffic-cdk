@@ -147,16 +147,15 @@ describe('voyageplans service', () => {
         expect(validationErrors.length).toBe(0);
     });
 
-    test('validateSchedulesStructure - missing schedule element', () => {
+    test('validateSchedulesStructure - missing schedule element passes validation', () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure([{
             schedule: randomBoolean() ? undefined! : []
         }]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_SCHEDULE);
+        expect(validationErrors.length).toBe(0);
     });
 
-    test('validateSchedulesStructure - missing scheduleElement element', () => {
+    test('validateSchedulesStructure - missing scheduleElement element passes validation', () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure([{
             schedule: [{
                 manual: [{
@@ -165,11 +164,10 @@ describe('voyageplans service', () => {
             }]
         }]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.MISSING_SCHEDULE_ELEMENT);
+        expect(validationErrors.length).toBe(0);
     });
 
-    test('validateSchedulesStructure - missing scheduleElement attributes', () => {
+    test('validateSchedulesStructure - missing scheduleElement attributes passes validation', () => {
         const validationErrors = VoyagePlansService.validateSchedulesStructure([{
             schedule: [{
                 manual: [{
@@ -180,8 +178,7 @@ describe('voyageplans service', () => {
             }]
         }]);
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
+        expect(validationErrors.length).toBe(0);
     });
 
     test('validateStructure - ok', () => {
