@@ -34,21 +34,20 @@ function createDataSet(id: string): any {
     };
 }
 
-function createId(id: any, year: number): string {
-    return `FI.${id}.${year}`;
+function createId(domain: string, id: number, year: number): string {
+    return `FI.${domain}.${id}.${year}`;
 }
 
-function createUrn(domain: string, id: string): string {
-    return `urn:mrn:s124:${domain}.${id}.P`;
+function createUrn(id: string): string {
+    return `urn:mrn:s124:${id}.P`;
 }
 
 export function convertFault(fault: Fault): any {
     const faultId = -fault.id;
     const year = fault.entry_timestamp.getFullYear() - 2000;
 
-    const domain = 'AF';
-    const id = createId(faultId, year);
-    const urn = createUrn(domain, id);
+    const id = createId('AF', faultId, year);
+    const urn = createUrn(id);
 
     const root: any = createDataSet(id);
     const dataSet = root[NODE_S124_DATASET];
@@ -61,10 +60,10 @@ export function convertFault(fault: Fault): any {
                 'gml:id' : `PR.${id}`
             },
             id: urn,
-                messageSeriesIdentifier : createMessageSeriesIdentifier(NAME_OF_SERIES_ATON_FAULTS, faultId, year),
-                sourceDate: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
-                generalArea: 'Baltic sea',
-                locality : {
+            messageSeriesIdentifier : createMessageSeriesIdentifier(NAME_OF_SERIES_ATON_FAULTS, faultId, year),
+            sourceDate: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
+            generalArea: 'Baltic sea',
+            locality : {
                 text: fault.fairway_name_fi
             },
             title:  {
@@ -73,7 +72,7 @@ export function convertFault(fault: Fault): any {
             fixedDateRange : createFixedDateRangeForFault(fault),
                 theWarningPart: {
                 '$': {
-                    'xlink:href': `${domain}.${id}.1`
+                    'xlink:href': `${id}.1`
                 }
             }
         }
@@ -82,10 +81,10 @@ export function convertFault(fault: Fault): any {
     dataSet[NODE_MEMBER] = {
         'S124:S124_NavigationalWarningPart': {
             '$': {
-                'gml:id' : `${domain}.${id}.1`
+                'gml:id' : `${id}.1`
             },
-            id: `urn:mrn:s124:${domain}.${id}.1`,
-                geometry: createPointProperty(createCoordinatePair(fault.geometry), domain, id),
+            id: `urn:mrn:s124:${id}.1`,
+                geometry: createPointProperty(createCoordinatePair(fault.geometry), id),
                 header: {
                 '$': {
                     'owns': 'true'
@@ -100,10 +99,9 @@ export function convertFault(fault: Fault): any {
 export function convertWarning(warning: any): any {
     const p = warning.properties;
     const year = moment(p.creationTime).year() - 2000;
-    const warningId = `${p.id}`;
-    const id = createId(warningId, year);
-    const domain = 'NW';
-    const urn = createUrn(domain, id);
+    const warningId = p.id;
+    const id = createId('NW', warningId, year);
+    const urn = createUrn(id);
 
     const root = createDataSet(id);
     const dataSet = root[NODE_S124_DATASET];
@@ -130,7 +128,7 @@ export function convertWarning(warning: any): any {
             fixedDateRange: createFixedDateRangeForWarning(p),
             theWarningPart: {
                 '$': {
-                    'xlink:href': `${domain}.${id}.1`
+                    'xlink:href': `${id}.1`
                 }
             }
         }
@@ -139,10 +137,10 @@ export function convertWarning(warning: any): any {
     dataSet[NODE_MEMBER] = {
         'S124:S124_NavigationalWarningPart': {
             '$': {
-                'gml:id': `${domain}.${id}.1`
+                'gml:id': `${id}.1`
             },
-            id: `urn:mrn:s124:${domain}.${id}.1`,
-            geometry: createGeometryForWarning(warning.geometry, domain, id),
+            id: `urn:mrn:s124:${id}.1`,
+            geometry: createGeometryForWarning(warning.geometry, id),
             Subject: {
                 text: `${p.contentsEn}`
             },
@@ -215,21 +213,21 @@ function createFixedDateRangeForFault(fault: any) {
     }
 }
 
-function createGeometryForWarning(geometry: any, domain: string, id: string) {
+function createGeometryForWarning(geometry: any, id: string) {
     if(geometry.type === 'Point') {
-        return createPointProperty(`${geometry.coordinates[0]} ${geometry.coordinates[1]}`, domain, id);
+        return createPointProperty(`${geometry.coordinates[0]} ${geometry.coordinates[1]}`, id);
     }
 
     console.info("not supported geometry type " + geometry.type);
     return {};
 }
 
-function createPointProperty(geometry: any, domain: string, id: string) {
+function createPointProperty(geometry: any, id: string) {
     return {
         'S100:pointProperty' : {
             'S100:Point' : {
                 '$' : {
-                    'gml:id' : `s.${domain}.${id}.1`
+                    'gml:id' : `P.${id}.1`
                 },
                 'gml:pos': geometry
             }
