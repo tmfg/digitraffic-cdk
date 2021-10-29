@@ -1,8 +1,7 @@
 export type EpcMessageResponse = {
-    EPCMessageHeader: {
-        SentTime: string
-        ShipMessageId: string
-        MessageType: string
-        Version: string
+    readonly EPCMessageHeader: {
+        readonly SentTime: string
+        readonly MessageType: string
+        readonly Version: string
     }
 }

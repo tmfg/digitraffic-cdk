@@ -6,7 +6,6 @@ export function createEpcMessageResponse(epcMessage: EpcMessage, date: Date): Ep
     return {
         EPCMessageHeader: {
             SentTime: dateStr,
-            ShipMessageId: epcMessage.EPCMessageHeader.ShipMessageId,
             MessageType: 'ACK',
             Version: ''
         }
