@@ -60,17 +60,18 @@ export function handlerFn(
             if (!slackApi && secret["vpgw.slackUrl"]) {
                 slackApi = new SlackApiClass(secret["vpgw.slackUrl"]);
             }
-            await slackApi?.notify(visMessage.message);
 
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {
                 console.warn('method=uploadVoyagePlan XML structure validation failed', structureValidationErrors);
+                await slackApi?.notify('Failed validation, invalid structure :' + visMessage.message);
                 return Promise.resolve('XML structure validation failed');
             }
 
             const contentValidationErrors = VoyagePlansService.validateContent(voyagePlan);
             if (contentValidationErrors.length) {
                 console.warn('method=uploadVoyagePlan XML content validation failed', contentValidationErrors);
+                await slackApi?.notify('Failed validation, invalid content :' + visMessage.message);
                 return Promise.resolve('XML content was not valid');
             }
 
@@ -80,6 +81,7 @@ export function handlerFn(
 
             if (api) {
                 console.info('method=uploadVoyagePlan about to upload voyage plan to VTS');
+                await slackApi?.notify('Passed validation :' + visMessage.message);
                 await api.sendVoyagePlan(visMessage.message);
                 console.info('method=uploadVoyagePlan upload to VTS ok');
             } else {

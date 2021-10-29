@@ -44,31 +44,6 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
 
         await assertArea(db, areaId, durationInMinutes);
         expect(getVisibilityForAreaStub.calledWith(sinon.match.string)).toBe(true); // exact area id format not known here
-        expect(updateLightsForAreaStub.calledWith({
-            areaId,
-            visibilityInMetres,
-            durationInMinutes
-        })).toBe(true);
-    });
-
-    test('update lights with null visibility on visibility API error', async () => {
-        const durationInMinutes = 12;
-        const areaId = 4;
-        sinon.stub(AreaVisibilityApi.prototype, 'getVisibilityForArea').throws(new Error());
-        const updateLightsForAreaStub =
-            sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve());
-        await insertAreaTraffic(db, areaId, 'testi1', durationInMinutes, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
-        await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
-        await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
-
-        await handlerFn(createSecretFunction(secret), AreaVisibilityService, AreaLightsService);
-
-        await assertArea(db, areaId, durationInMinutes);
-        expect(updateLightsForAreaStub.calledWith({
-            areaId,
-            visibilityInMetres: null,
-            durationInMinutes
-        })).toBe(true);
     });
 
 }));

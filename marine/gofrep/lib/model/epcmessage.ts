@@ -1,7 +1,5 @@
 export type EpcMessage = {
-    readonly EPCMessage: {
-        readonly EPCMessageHeader: [{
-            readonly ShipMessageId: string
-        }]
+    readonly EPCMessageHeader: {
+        readonly ShipMessageId: string
     }
 }
