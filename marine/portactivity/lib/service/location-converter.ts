@@ -48,7 +48,8 @@ function initMap() {
 
     pilotwebToPortnetLocodeMap['FIVRA'] = 'FIVRK';
 
-    // TODO: FIEUR -> FIEJO
+    pilotwebToPortnetLocodeMap['FIEUR'] = 'FIEJO';
+    pilotwebToPortnetLocodeMap['FIOLK'] = 'FIEJO';
 }
 
 export function convertLocation(route: any): Location {
