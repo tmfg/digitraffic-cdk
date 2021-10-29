@@ -34,7 +34,6 @@ export async function handlerFn(
             console.info("method=shiplightHandler sourceId=%d", area.areaId);
 
             try {
-                // todo better handling of unset secrets
                 const visibility = secret.visibilityEndpointUrl ? await visibilityService.getVisibilityForAreaInMetres(area.areaId) : {visibilityInMetres: -1};
                 await lightsService.updateLightsForArea({ ...area, ...{
                     visibilityInMetres: visibility.visibilityInMetres

@@ -39,8 +39,7 @@
     "moment": "*",
     "moment-timezone": "*",
     "ramda": "0.27.1",
-    "source-map-support": "^0.5.19",
-    "xml2js": "^0.4.23"
+    "source-map-support": "^0.5.19"
   },
   "externals": [
     "aws-sdk"

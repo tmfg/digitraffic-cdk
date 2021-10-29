@@ -14,6 +14,11 @@ export class AreaLightsService {
      * @param areaTraffic
      */
     async updateLightsForArea(areaTraffic: AreaTraffic): Promise<void> {
-        await this.api.updateLightsForArea(areaTraffic);
+        console.info('method=updateLightsForArea area %d, duration %d, visibility %d',
+            areaTraffic.areaId,
+            areaTraffic.durationInMinutes,
+            areaTraffic.visibilityInMetres);
+        // TODO disabled as API doesn't yet exist
+        //await this.api.updateLightsForArea(areaTraffic);
     }
 }

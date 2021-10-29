@@ -10,7 +10,7 @@ import {
 import {Construct} from "@aws-cdk/core";
 import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {FormalityResponse} from "./model/formality";
+import {FormalityResponseJson} from "./model/formality";
 import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {
@@ -20,11 +20,13 @@ import {
     RESPONSE_400_BAD_REQUEST,
     RESPONSE_500_SERVER_ERROR,
 } from "digitraffic-common/api/responses";
-import {addSimpleServiceModel} from "digitraffic-common/api/utils";
+import {addServiceModel, addSimpleServiceModel} from "digitraffic-common/api/utils";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {createResponses, INPUT_RAW, MessageModel} from "digitraffic-common/api/response";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {EpcMessageSchema} from "./model/epcmessage_schema";
+import {TimestampMetadata} from "portactivity/lib/model/timestamp-metadata";
 
 export function create(stack: DigitrafficStack) {
 
@@ -32,12 +34,13 @@ export function create(stack: DigitrafficStack) {
         stack,
         'GOFREP-Public',
         'GOFREP public API');
-    const xmlModel = addSimpleServiceModel('XmlModel', api);
+
+    const epcModel = addServiceModel("EPCModel", api, EpcMessageSchema);
     const messageModel = api.addModel('MessageResponseModel', MessageModel);
     const resource = api.root.addResource('mrs');
     createUsagePlan(api, 'GOFREP integration API Key', 'GOFREP integration Usage Plan');
     createMrsReportingFormalityResource(resource);
-    createReceiveMrsReportResource(stack, resource, xmlModel, messageModel);
+    createReceiveMrsReportResource(stack, resource, epcModel, messageModel);
 }
 
 function createRestApi(stack: Construct, apiId: string, apiName: string): RestApi {
@@ -64,12 +67,7 @@ function createMrsReportingFormalityResource(resource: Resource) {
         integrationResponses: [{
             statusCode: '200',
             responseTemplates: {
-                // application/json is the default mapping if no content-type is passed in the request
-                // override the response content-type to application/xml in the response
-                'application/json': `
-                    #set($context.responseOverride.header.Content-Type = "application/xml")
-                    ${FormalityResponse}
-                `.trim()
+                'application/json': JSON.stringify(FormalityResponseJson)
             }
         }]
     });
