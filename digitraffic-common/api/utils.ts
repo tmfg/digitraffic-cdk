@@ -41,6 +41,13 @@ export function addServiceModel(modelName: string, api: RestApi, schema: JsonSch
     return mwr;
 }
 
+/**
+ * Add an empty JSON schema model to an API Gateway API.
+ * Usable for example if the incoming data is in XML format but some template transformation is necessary.
+ * @param modelName
+ * @param api
+ * @param contentType
+ */
 export function addSimpleServiceModel(modelName: string, api: RestApi, contentType = 'application/xml'): any {
     return api.addModel(modelName, {
         contentType,
