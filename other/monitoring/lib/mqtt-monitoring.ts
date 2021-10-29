@@ -14,7 +14,7 @@ export class MqttMonitoring {
 
         mqttConfigurations.forEach((mqtt: MQTTConfiguration) => {
             const cpuLimit = mqtt.cpuLimit ?? 60;
-            const heapLimit = mqtt.heapLimit ?? 80;
+            const heapLimit = mqtt.heapLimit ?? 85;
             const networkLimit = mqtt.networkLimit ?? 50 * 1024*1024; // 50 MiB
 
             this.createAlarmForMetric('CPU', mqtt.brokerName, 'CpuUtilization', cpuLimit);
