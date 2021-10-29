@@ -201,10 +201,12 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
             console.warn('method=validateSchedulesContent Empty schedule element');
             return;
         }
-        schedules.schedule.forEach(sched => {
-            if (sched.calculated && sched.calculated.length) {
+        schedules.schedule?.forEach(sched => {
+            if (sched?.calculated && sched?.calculated.length) {
                 if (!anyTimestampInFuture(sched.calculated[0], now)) {
-                    validationErrors.push(ValidationError.NO_FUTURE_TIMESTAMPS);
+                    //validationErrors.push(ValidationError.NO_FUTURE_TIMESTAMPS);
+                    console.warn('method=validateSchedulesContent No timestamps set in future');
+                    return;
                 }
             }
         });

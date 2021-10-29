@@ -346,7 +346,7 @@ describe('voyageplans service', () => {
         expect(validationErrors.length).toBe(0);
     });
 
-    test('validateSchedulesContent - no calculated timestamps in the future', () => {
+    test('validateSchedulesContent - no calculated timestamps in the future passes validation', () => {
         const validationErrors = VoyagePlansService.validateSchedulesContent([{
                schedule: [
                    {
@@ -366,8 +366,7 @@ describe('voyageplans service', () => {
             }]
         );
 
-        expect(validationErrors.length).toBe(1);
-        expect(validationErrors[0]).toBe(ValidationError.NO_FUTURE_TIMESTAMPS);
+        expect(validationErrors.length).toBe(0);
     });
 
     test('validateSchedulesContent - 1 timestamp in past, 1 in future', () => {
