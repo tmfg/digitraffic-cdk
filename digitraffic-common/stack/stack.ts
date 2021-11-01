@@ -1,4 +1,4 @@
-import {Construct, Stack, StackProps} from "@aws-cdk/core";
+import {Aspects, Construct, Stack, StackProps} from "@aws-cdk/core";
 import {IVpc, SecurityGroup, Vpc} from "@aws-cdk/aws-ec2";
 import {ISecurityGroup} from "@aws-cdk/aws-ec2/lib/security-group";
 import {ITopic, Topic} from "@aws-cdk/aws-sns";
@@ -7,8 +7,8 @@ import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 import {StringParameter} from "@aws-cdk/aws-ssm";
 import {TrafficType} from "../model/traffictype";
 import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
-import {MonitoredFunction} from "../lambda/monitoredfunction";
 import {Function} from "@aws-cdk/aws-lambda";
+import {StackAspect} from "./stack-aspect";
 
 const SSM_ROOT = '/digitraffic'
 export const SOLUTION_KEY = 'Solution';
@@ -67,6 +67,12 @@ export class DigitrafficStack extends Stack {
             StringParameter.fromStringParameterName(this, 'AlarmTopicParam', SSM_KEY_ALARM_TOPIC).stringValue);
         this.warningTopic = Topic.fromTopicArn(this, 'WarningTopic',
             StringParameter.fromStringParameterName(this, 'WarningTopicParam', SSM_KEY_WARNING_TOPIC).stringValue);
+
+        this.addAspects();
+    }
+
+    addAspects() {
+        Aspects.of(this).add(new StackAspect(this));
     }
 
     createLambdaEnvironment(): LambdaEnvironment {
