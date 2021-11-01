@@ -24,7 +24,6 @@ function createUpdateFaultsLambda(stack: DigitrafficStack): MonitoredFunction {
     environment[AtonEnvKeys.INTEGRATIONS] = JSON.stringify((stack.configuration as AtonProps).integrations);
 
     return MonitoredFunction.createV2(stack, 'update-faults', environment, {
-        functionName: 'UpdateFaults',
         memorySize: 512
     });
 }

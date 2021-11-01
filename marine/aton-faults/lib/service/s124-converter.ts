@@ -1,6 +1,7 @@
 import moment from "moment-timezone";
 import {Geometry} from "wkx";
 import {Fault} from "../model/fault";
+import {Feature} from "geojson";
 
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
 const HOUR_MINUTE_SECOND = "HH:MM:SSZ";
@@ -96,8 +97,8 @@ export function convertFault(fault: Fault): any {
     return root;
 }
 
-export function convertWarning(warning: any): any {
-    const p = warning.properties;
+export function convertWarning(warning: Feature): any {
+    const p = warning.properties as any;
     const year = moment(p.creationTime).year() - 2000;
     const warningId = p.id;
     const id = createId('NW', warningId, year);

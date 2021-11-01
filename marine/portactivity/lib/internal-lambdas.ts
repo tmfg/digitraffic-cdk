@@ -77,6 +77,7 @@ function createUpdateTimestampsFromSchedules(stack: DigitrafficStack, queue: Que
         code: new AssetCode('dist/lambda/update-timestamps-from-schedules'),
         handler: 'lambda-update-timestamps-from-schedules.handler',
         environment,
+        reservedConcurrentExecutions: 1,
         vpc: stack.vpc,
         vpcSubnets: stack.vpc.privateSubnets
     }));
@@ -116,6 +117,8 @@ function createProcessDLQLambda(
         code: new AssetCode('dist/lambda/process-dlq'),
         timeout: Duration.seconds(10),
         handler: 'lambda-process-dlq.handler',
+        reservedConcurrentExecutions: 3,
+        memorySize: 128,
         environment,
     });
 
