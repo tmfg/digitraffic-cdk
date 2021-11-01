@@ -93,15 +93,25 @@ export class EsKeyFiguresStack extends Stack {
         SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook
       }
     };
-    const rule = new Rule(this, 'CreateVisualizationsRule', {
+    const rule = new Rule(this, 'collect *', {
       schedule: Schedule.expression('cron(0 3 1 * ? *)')
     });
+    rule.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "*"})}));
 
-    const collectEsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
-    rule.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "*"})}));
-    rule.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road"})}));
-    rule.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "rail"})}));
-    rule.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "marine"})}));
+    const rule1 = new Rule(this, 'collect road', {
+      schedule: Schedule.expression('cron(15 3 1 * ? *)')
+    });
+    rule1.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road"})}));
+
+    const rule2 = new Rule(this, 'collect rail', {
+      schedule: Schedule.expression('cron(30 3 1 * ? *)')
+    });
+    rule2.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "rail"})}));
+
+    const rule3 = new Rule(this, 'collect marine', {
+      schedule: Schedule.expression('cron(45 3 1 * ? *)')
+    });
+    rule3.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "marine"})}));
   }
 
   private createCollectEsKeyFiguresLambda(esKeyFiguresProps: Props, vpc: Vpc, serverlessCluster: ServerlessCluster) {
