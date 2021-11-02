@@ -35,7 +35,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
                   END
           ) AND
         pe.event_time > NOW() - INTERVAL '3 HOURS' AND
-        pe.event_time < CURRENT_DATE + INTERVAL '3 DAYS' AND
+        pe.event_time < NOW() + INTERVAL '3 DAYS' AND
         CASE WHEN pe.event_type = 'ETA'
         THEN NOT EXISTS(SELECT px.id FROM port_call_timestamp px WHERE px.portcall_id = pe.portcall_id AND px.event_type = 'ATA')
         ELSE TRUE

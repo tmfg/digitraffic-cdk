@@ -57,10 +57,28 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
+    function testFoundInFuture(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+        test(`${description} - found 71 h in the future`, async () => {
+            const timestamp = Object.assign(newTimestamp(), {
+                recordTime: moment().toISOString(), // avoid filtering,
+                eventTime: moment().add(71, 'hours')
+            });
+            await insert(db, [timestamp]);
+
+            const foundTimestamp = await fn(db, timestamp);
+            expect(foundTimestamp.length).toBe(1);
+        });
+    }
+
     testFound('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!));
     testFound('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!));
     testFound('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
     testFound('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+
+    testFoundInFuture('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!));
+    testFoundInFuture('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!));
+    testFoundInFuture('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testFoundInFuture('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
     function testNotFound(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - not found`, async () => {
@@ -204,9 +222,9 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(foundTimestamp.length).toBe(1);
     });
 
-    test('findPortnetETAsByLocodes - 1 h in future is found', async () => {
+    test('findPortnetETAsByLocodes - 23 h in future is found', async () => {
         const locode = 'AA123';
-        const eventTime = moment().add(1, 'hours').toDate();
+        const eventTime = moment().add(23, 'hours').toDate();
         const timestamp = newTimestamp({eventType: EventType.ETA, locode, eventTime, source: 'Portnet'});
         await insert(db, [timestamp]);
         await createPortcall(timestamp);

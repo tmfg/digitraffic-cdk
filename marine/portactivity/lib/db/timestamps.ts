@@ -4,8 +4,8 @@ import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, Port} from "../service/portarea
 import moment from "moment";
 import {EventSource} from "../model/eventsource";
 
-export const TIMESTAMPS_BEFORE = `CURRENT_DATE - INTERVAL '12 HOURS'`;
-export const TIMESTAMPS_IN_THE_FUTURE = `CURRENT_DATE + INTERVAL '3 DAYS'`;
+export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
+export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
 
 export type DbTimestamp = {
     readonly event_type: EventType
@@ -140,12 +140,12 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.portcall_id = pe.portcall_id
           ) AND
-          pe.event_time < CURRENT_DATE + INTERVAL '1 DAY' AND
+          pe.event_time < NOW() + INTERVAL '1 DAY' AND
           pe.event_type = 'ETA' AND
           pe.event_source = 'Portnet' AND
           pe.location_locode IN ($1:list) AND
           pad.ata IS NULL AND
-          pc.port_call_timestamp > CURRENT_DATE - INTERVAL '3 DAYS'
+          pc.port_call_timestamp > NOW() - INTERVAL '3 DAYS'
 `;
 
 const SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT = `
