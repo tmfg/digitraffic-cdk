@@ -8,7 +8,7 @@ import {StringParameter} from "@aws-cdk/aws-ssm";
 import {TrafficType} from "../model/traffictype";
 import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
 import {Function} from "@aws-cdk/aws-lambda";
-import {StackAspect} from "./stack-aspect";
+import {StackCheckingAspect} from "./stack-checking-aspect";
 
 const SSM_ROOT = '/digitraffic'
 export const SOLUTION_KEY = 'Solution';
@@ -72,7 +72,7 @@ export class DigitrafficStack extends Stack {
     }
 
     addAspects() {
-        Aspects.of(this).add(new StackAspect(this));
+        Aspects.of(this).add(StackCheckingAspect.create(this));
     }
 
     createLambdaEnvironment(): LambdaEnvironment {

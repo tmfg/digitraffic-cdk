@@ -1,4 +1,4 @@
-import {Construct, Stack} from '@aws-cdk/core';
+import {Aspects, Construct, Stack} from '@aws-cdk/core';
 import {Topic} from '@aws-cdk/aws-sns';
 import {EmailSubscription} from '@aws-cdk/aws-sns-subscriptions';
 import {MonitoringConfiguration} from "./app-props";
@@ -6,6 +6,7 @@ import {StringParameter} from "@aws-cdk/aws-ssm";
 import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "digitraffic-common/stack/stack";
 import {RdsMonitoring} from "./rds-monitoring";
 import {MqttMonitoring} from "./mqtt-monitoring";
+import {StackCheckingAspect} from "digitraffic-common/stack/stack-checking-aspect";
 
 export class MonitoringStack extends Stack {
     constructor(scope: Construct, id: string, configuration: MonitoringConfiguration) {
@@ -29,6 +30,8 @@ export class MonitoringStack extends Stack {
         });
 
         this.createMonitorings(alarmsTopic, configuration);
+
+        Aspects.of(this).add(new StackCheckingAspect());
     }
 
     createMonitorings(alarmsTopic: Topic, configuration: MonitoringConfiguration) {

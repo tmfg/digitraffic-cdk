@@ -6,16 +6,19 @@ import {DigitrafficStack, SOLUTION_KEY, StackConfiguration} from "./stack";
 const MAX_CONCURRENCY_LIMIT = 100;
 const NODE_RUNTIME = Runtime.NODEJS_12_X.name;
 
-export class StackAspect implements IAspect {
-    private readonly configuration: StackConfiguration;
+export class StackCheckingAspect implements IAspect {
+    private readonly configuration?: StackConfiguration;
 
-    constructor(stack: DigitrafficStack) {
-        this.configuration = stack.configuration;
+    constructor(configuration?: StackConfiguration) {
+        this.configuration = configuration;
     }
 
+    static create(stack: DigitrafficStack) {
+        return new StackCheckingAspect(stack.configuration);
+    }
 
     public visit(node: IConstruct): void {
-//        console.info("visiting class " + node.constructor.name);
+        console.info("visiting class " + node.constructor.name);
 
         this.checkStack(node);
         this.checkFunction(node);
@@ -27,11 +30,11 @@ export class StackAspect implements IAspect {
         if(node instanceof DigitrafficStack) {
             const s = node as DigitrafficStack;
 
-            if((s.stackName.includes('Test') || s.stackName.includes('Tst')) && s.configuration.production) {
+            if((s.stackName.includes('Test') || s.stackName.includes('Tst')) && s.configuration?.production) {
                 Annotations.of(node).addError("Production is set for Test-stack");
             }
 
-            if((s.stackName.includes('Prod') || s.stackName.includes('Prd')) && !s.configuration.production) {
+            if((s.stackName.includes('Prod') || s.stackName.includes('Prd')) && !s.configuration?.production) {
                 Annotations.of(node).addError("Production is not set for Production-stack");
             }
         }
@@ -59,7 +62,7 @@ export class StackAspect implements IAspect {
                 Annotations.of(node).addError('wrong runtime ' + f.runtime);
             }
 
-            if(this.configuration.shortName && f.functionName && f.functionName.indexOf(this.configuration.shortName) != 0) {
+            if(this.configuration?.shortName && f.functionName && f.functionName.indexOf(this.configuration.shortName) != 0) {
                 Annotations.of(node).addWarning('Function name does not begin with ' + this.configuration.shortName);
             }
         }
