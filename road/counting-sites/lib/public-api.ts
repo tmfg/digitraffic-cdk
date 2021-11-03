@@ -7,6 +7,8 @@ import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
+import {BETA_TAGS} from "digitraffic-common/api/tags";
+import {addTagsAndSummary} from "digitraffic-common/api/documentation";
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
@@ -24,6 +26,13 @@ export class PublicApi {
         this.createResources(this.publicApi);
         this.createMetadataEndpoint(stack);
         this.createDataEndpoint(stack);
+        this.createDocumentation(stack);
+    }
+
+    createDocumentation(stack: DigitrafficStack) {
+        addTagsAndSummary('GetMetadata', BETA_TAGS, 'Return all metadata', this.metadataResource, stack);
+        addTagsAndSummary('GetData', BETA_TAGS, 'Return all data', this.dataResource, stack);
+
     }
 
     createResources(publicApi: DigitrafficRestApi) {
