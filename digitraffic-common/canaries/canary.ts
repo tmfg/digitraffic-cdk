@@ -8,7 +8,7 @@ import {CanaryParameters} from "./canary-parameters";
 export class DigitrafficCanary extends Canary {
     constructor(scope: Construct, canaryName: string, role: Role, params: CanaryParameters, environmentVariables: LambdaEnvironment) {
         super(scope, canaryName, {
-            runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_2,
+            runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_3,
             role,
             test: Test.custom({
                 code: new AssetCode("dist", {

@@ -41,4 +41,17 @@ export class DatabaseCanary extends DigitrafficCanary {
             handler: `${params.name}.handler`
         }, ...params});
     }
+
+    static createV2(stack: DigitrafficStack, role: Role, name: string, params: any = {}): DatabaseCanary {
+        return new DatabaseCanary(stack, role, stack.secret, {...{
+                secret: stack.configuration.secretId,
+                schedule: Schedule.rate(Duration.hours(1)),
+                handler: `${name}-db.handler`,
+                name,
+                alarm: {
+                    alarmName: `${stack.configuration.shortName}-DB-Alarm`,
+                    topicArn: stack.configuration.alarmTopicArn
+                }
+            }, ...params});
+    }
 }
