@@ -16,5 +16,6 @@ export const ports: Port[] = [
     'FIEJO',
     'FITOR',
     'FILPP',
-    'FIVRK'
+    'FIVRK',
+    'FIJOE'
 ];
