@@ -24,19 +24,16 @@ import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
-    bucket: Bucket,
-    props: Props,
-    stack: DigitrafficStack) {
+    stack: DigitrafficStack,
+    bucket: Bucket) {
 
-    createUpdateSwaggerDescriptionsLambda(bucket, props, stack);
-    createUpdateApiDocumentationLambda(props, stack);
+    createUpdateSwaggerDescriptionsLambda(stack, bucket);
+    createUpdateApiDocumentationLambda(stack);
 }
 
-function createUpdateApiDocumentationLambda(
-    props: Props,
-    stack: DigitrafficStack) {
-
+function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
     const functionName = `${stack.stackName}-UpdateApiDocumentation`;
+    const props = stack.configuration as Props;
 
     const lambdaEnv: any = {};
     lambdaEnv[KEY_REGION] = stack.region;
@@ -49,6 +46,8 @@ function createUpdateApiDocumentationLambda(
         handler: 'lambda-update-api-documentation.handler',
         runtime: Runtime.NODEJS_12_X,
         environment: lambdaEnv,
+        reservedConcurrentExecutions: 1,
+        memorySize: 128,
         timeout: Duration.seconds(10)
     };
 
@@ -63,12 +62,9 @@ function createUpdateApiDocumentationLambda(
     createSubscription(updateDocsLambda, functionName, props.logsDestinationArn, stack);
 }
 
-function createUpdateSwaggerDescriptionsLambda(
-    bucket: Bucket,
-    props: Props,
-    stack: DigitrafficStack) {
-
+function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: Bucket) {
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
+    const props = stack.configuration as Props;
 
     const lambdaEnv: any = {};
     lambdaEnv[KEY_BUCKET_NAME] = bucket.bucketName;
@@ -101,6 +97,7 @@ function createUpdateSwaggerDescriptionsLambda(
         handler: 'lambda-update-swagger.handler',
         runtime: Runtime.NODEJS_12_X,
         memorySize: 192,
+        reservedConcurrentExecutions: 1,
         environment: lambdaEnv,
         timeout: Duration.seconds(10)
     };

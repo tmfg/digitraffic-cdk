@@ -9,13 +9,15 @@ export class SwaggerJoinerStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, swaggerJoinerProps: Props) {
         super(scope, id, swaggerJoinerProps);
 
-        const bucket = this.createBucket(swaggerJoinerProps);
-        InternalLambdas.create(bucket, swaggerJoinerProps, this);
+        const bucket = this.createBucket();
+        InternalLambdas.create(this, bucket);
     }
 
-    private createBucket(swaggerJoinerProps: Props) {
+    private createBucket() {
+        const props = this.configuration as Props;
+
         const bucket = new Bucket(this, 'SwaggerBucket', {
-            bucketName: swaggerJoinerProps.bucketName,
+            bucketName: props.bucketName,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             cors: [{
                 allowedOrigins: ['*'],
@@ -23,13 +25,13 @@ export class SwaggerJoinerStack extends DigitrafficStack {
             }]
         });
 
-        if (swaggerJoinerProps.s3VpcEndpointId) {
+        if (props.s3VpcEndpointId) {
             const getObjectStatement = new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: ['s3:GetObject'],
                 conditions: {
                     StringEquals: {
-                        'aws:sourceVpce': swaggerJoinerProps.s3VpcEndpointId
+                        'aws:sourceVpce': props.s3VpcEndpointId
                     }
                 },
                 resources: [`${bucket.bucketArn}/*`]
@@ -37,12 +39,12 @@ export class SwaggerJoinerStack extends DigitrafficStack {
             getObjectStatement.addAnyPrincipal();
             bucket.addToResourcePolicy(getObjectStatement);
         }
-        if (swaggerJoinerProps.cloudFrontCanonicalUser) {
+        if (props.cloudFrontCanonicalUser) {
             bucket.addToResourcePolicy(new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: ['s3:GetObject'],
                 principals: [
-                    new CanonicalUserPrincipal(swaggerJoinerProps.cloudFrontCanonicalUser)
+                    new CanonicalUserPrincipal(props.cloudFrontCanonicalUser)
                 ],
                 resources: [`${bucket.bucketArn}/*`]
             }));
