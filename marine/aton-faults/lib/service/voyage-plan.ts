@@ -43,9 +43,9 @@ export class VoyagePlanService {
         const warnings = await WarningsService.findWarningsForVoyagePlan(voyagePlan);
 
         if(warnings && warnings.features) {
-            console.info("sending %d warnings", warnings?.features?.length);
+            console.info("sending %d warnings", warnings.features.length);
 
-            for (const feature of warnings?.features) {
+            for (const feature of warnings.features) {
                 await this.sendSns(this.sendFaultsSnsTopicArn, {
                     type: S124Type.WARNING,
                     id: feature.properties.id,

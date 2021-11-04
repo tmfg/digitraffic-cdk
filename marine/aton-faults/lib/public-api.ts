@@ -62,7 +62,7 @@ function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, 
             'method.request.querystring.fixed_in_hours': false
         },
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, faultsJsonModel)),
+            corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, faultsJsonModel)),
             corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
         ]
     });

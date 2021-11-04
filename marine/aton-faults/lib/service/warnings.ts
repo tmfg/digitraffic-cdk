@@ -4,9 +4,9 @@ import {IDatabase} from "pg-promise";
 import * as CachedDao from "digitraffic-common/db/cached";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
 import * as turf from "@turf/turf";
-import {Feature, GeoJSON} from "geojson";
+import {Feature} from "geojson";
 
-const MAX_DISTANCE_KM = 50;
+const MAX_DISTANCE_NM = 15;
 
 export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<any> {
     const warnings = await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
@@ -23,7 +23,9 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
             .map(p => [p.$.lon, p.$.lat]));
 
     // filter out warnings not in the route
-    warnings.features = warnings.features.filter((f: any) => !turf.booleanDisjoint(turf.buffer(f.geometry, MAX_DISTANCE_KM), voyageLineString));
+    warnings.features = warnings.features.filter((f: any) => !turf.booleanDisjoint(turf.buffer(f.geometry, MAX_DISTANCE_NM, {
+        units: 'nauticalmiles'
+    }), voyageLineString));
 
     return warnings;
 }
