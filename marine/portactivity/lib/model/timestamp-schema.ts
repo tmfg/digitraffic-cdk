@@ -28,11 +28,11 @@ export const LocationSchema: JsonSchema = {
             description: 'Port LOCODE'
         },
         portArea: {
-            type: JsonSchemaType.STRING,
+            type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
             description: 'Port area LOCODE'
         },
         from: {
-            type: JsonSchemaType.STRING,
+            type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
             description: 'Previous port area LOCODE'
         },
     }
