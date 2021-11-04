@@ -15,7 +15,7 @@ const API_KEY_HEADER = "x-api-key";
 const OK_RESOLUTION = "OK";
 
 export class UrlChecker {
-    readonly requestOptions: any;
+    private readonly requestOptions: any;
 
     constructor(hostname: string, apiKey?: string) {
         const headers = {...baseHeaders};
@@ -53,7 +53,15 @@ export class UrlChecker {
             path: url
         }};
 
-        await synthetics.executeHttpStep("Verify " + url, requestOptions, callback);
+        await synthetics.executeHttpStep("Verify 200 for " + url, requestOptions, callback);
+    }
+
+    async expect404(url: string): Promise<any> {
+        const requestOptions = {...this.requestOptions, ...{
+                path: url
+            }};
+
+        await synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeFunction(404, MediaType.TEXT_PLAIN));
     }
 
     async expect403WithoutApiKey(url: string): Promise<any> {
@@ -62,7 +70,7 @@ export class UrlChecker {
             headers: baseHeaders
         }};
 
-        await synthetics.executeHttpStep("Verify " + url, requestOptions, validateStatusCodeFunction(403));
+        await synthetics.executeHttpStep("Verify 403 for " + url, requestOptions, validateStatusCodeFunction(403, MediaType.TEXT_PLAIN));
     }
 
     async done(): Promise<string> {
@@ -122,14 +130,69 @@ export function mustContain(body: string, text: string) {
 }
 
 // Validate status code
-function validateStatusCodeFunction(statusCode: number) {
+function validateStatusCodeFunction(statusCode: number, contentType: string) {
     return async (res: any) => {
         return new Promise(resolve => {
             if (res.statusCode !== statusCode) {
                 throw `${res.statusCode} ${res.statusMessage}`;
             }
 
+            if(res.headers['content-type'] !== contentType) {
+                throw 'Wrong content-type ' + res.headers['content-type'];
+            }
+
             resolve(OK_RESOLUTION);
         });
     };
+}
+
+export class ResponseChecker {
+    private readonly contentType;
+    private checkCors = true;
+
+    constructor(contentType: string) {
+        this.contentType = contentType;
+    }
+
+    static forJson() {
+        return new ResponseChecker(MediaType.APPLICATION_JSON);
+    }
+
+    static forGeojson() {
+        return new ResponseChecker(MediaType.APPLICATION_GEOJSON);
+    }
+
+    noCors(): ResponseChecker {
+        this.checkCors = false;
+
+        return this;
+    }
+
+    checkJson(fn: any): any {
+        return this.responseChecker((body: string) => {
+            fn(JSON.parse(body), body);
+        });
+    }
+
+    responseChecker(fn: any): any {
+        return async (res: any) => {
+            if (res.statusCode < 200 || res.statusCode > 299) {
+                throw res.statusCode + ' ' + res.statusMessage;
+            }
+
+            console.info("response headers " + JSON.stringify(res.headers));
+
+            if(this.checkCors && !res.headers['access-control-allow-origin']) {
+                throw 'CORS missing';
+            }
+
+            if(res.headers['content-type'] !== this.contentType) {
+                throw 'Wrong content-type ' + res.headers['content-type'];
+            }
+
+            const body = await getResponseBody(res);
+
+            fn(body);
+        };
+    }
 }

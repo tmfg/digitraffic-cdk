@@ -1,18 +1,35 @@
-import {IDatabase, PreparedStatement } from "pg-promise";
-import {DbDomain} from "../model/domain";
+import {IDatabase, PreparedStatement} from "pg-promise";
 import {ApiCounter, DbCounter} from "../model/counter";
-
-const SQL_ALL_DOMAINS =
-    `select name, description, added_timestamp, removed_timestamp
-    from counting_site_domain order by name`;
+import {FeatureCollection} from "geojson";
 
 const SQL_ALL_COUNTERS =
-    `select id, site_id, domain_name, site_domain, name, location, user_type_id, interval, direction, added_timestamp, last_data_timestamp, removed_timestamp
-    from counting_site_counter order by id`;
+    `select id, site_id, domain_name, site_domain, name, ST_Y(location::geometry) as lat, ST_Y(location::geometry) as lon, user_type_id, interval, direction, added_timestamp, last_data_timestamp, removed_timestamp
+    from counting_site_counter
+    where domain_name = $1
+    order by id`;
 
 const SQL_ALL_COUNTERS_FOR_DOMAIN =
-    `select id, site_id, domain_name, site_domain, name, location, user_type_id, interval, direction, added_timestamp, last_data_timestamp, removed_timestamp
-    from counting_site_counter where domain_name = $1 order by id`;
+    `SELECT json_build_object(
+                    'type', 'FeatureCollection',
+                    'features', json_agg(
+                            json_build_object(
+                                    'type', 'Feature',
+                                    'geometry', ST_AsGeoJSON(location::geometry)::json,
+                                    'properties', json_build_object(
+                                            'id', id,
+                                            'name', name,
+                                            'site_id', site_id,
+                                            'user_type', user_type_id,
+                                            'interval', interval,
+                                            'direction', direction,
+                                            'last_data_timestamp', last_data_timestamp,
+                                            'removed_timestamp', removed_timestamp
+                                        )
+                                )
+                        )
+                ) as collection
+     FROM counting_site_counter
+     where domain_name = $1`;
 
 const SQL_INSERT_COUNTER =
     `insert into counting_site_counter(id, site_id, domain_name, site_domain, name, location, user_type_id, interval, direction, added_timestamp)
@@ -36,17 +53,12 @@ const SQL_UPDATER_COUNTER_TIMESTAMP =
     set last_data_timestamp=$1
     where id=$2`;
 
-const PS_ALL_DOMAINS = new PreparedStatement({
-    name: 'select-domains',
-    text: SQL_ALL_DOMAINS,
-});
-
 const PS_ALL_COUNTERS = new PreparedStatement({
     name: 'select-counters',
     text: SQL_ALL_COUNTERS,
 });
 
-const PS_ALL_COUNTERS_FOR_DOMAIN = new PreparedStatement({
+const PS_ALL_COUNTERS_FOR_DOMAIN_FEATURE_COLLECTION = new PreparedStatement({
     name: 'select-counters-for-domain',
     text: SQL_ALL_COUNTERS_FOR_DOMAIN,
 });
@@ -66,16 +78,12 @@ const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
     text: SQL_UPDATER_COUNTER_TIMESTAMP
 });
 
-export function findAllDomains(db: IDatabase<any, any>): Promise<DbDomain[]> {
-    return db.manyOrNone(PS_ALL_DOMAINS);
+export function findAllCountersForDomain(db: IDatabase<any, any>, domain: string): Promise<FeatureCollection> {
+    return db.one(PS_ALL_COUNTERS_FOR_DOMAIN_FEATURE_COLLECTION, [domain]).then(r => r.collection);
 }
 
-export function findAllCounters(db: IDatabase<any, any>): Promise<DbCounter[]> {
-    return db.manyOrNone(PS_ALL_COUNTERS);
-}
-
-export function findAllCountersForDomain(db: IDatabase<any, any>, domain: string): Promise<DbCounter[]> {
-    return db.manyOrNone(PS_ALL_COUNTERS_FOR_DOMAIN, [domain]);
+export function findAllCountersForUpdateForDomain(db: IDatabase<any, any>, domain: string): Promise<any> {
+    return db.manyOrNone(PS_ALL_COUNTERS, [domain]);
 }
 
 export function insertCounters(db: IDatabase<any, any>, domain: string, counters: ApiCounter[]): Promise<any> {

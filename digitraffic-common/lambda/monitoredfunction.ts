@@ -6,8 +6,9 @@ import {DigitrafficStack} from "../stack/stack";
 import {TrafficType} from '../model/traffictype';
 import {ITopic} from "@aws-cdk/aws-sns";
 import {LambdaEnvironment} from "../model/lambda-environment";
-import {databaseFunctionProps, FunctionParameters, MonitoredFunctionParameters} from "../stack/lambda-configs";
+import {databaseFunctionProps, MonitoredFunctionParameters} from "../stack/lambda-configs";
 import {pascalCase} from "change-case";
+import {DigitrafficLogSubscriptions} from "../stack/subscription";
 
 /**
  * Allows customization of CloudWatch Alarm properties
@@ -238,5 +239,38 @@ export class MonitoredFunction extends Function {
         production: boolean): SnsAction {
 
         return production ? alarmAction : warningAction;
+    }
+}
+
+export class MonitoredDBFunction {
+    /**
+     * Create new MonitoredDBFunction.  Use topics from given DigitrafficStack.  Generate names from given name and configuration shortName.
+     * Grant secret and create log subscription.
+     *
+     * For example, shortName FOO and given name update-things will create function FOO-UpdateThings and use code from lambda/update-things/update-things.ts method handler.
+     *
+     * If you don't need to pass any extra arguments to lambda-environment, you can leave environment out and this function will create the
+     * default Lambda Environment with SECRET_ID and DB_APPLICATION.
+     *
+     * @param stack DigitrafficStack
+     * @param name param-case name
+     * @param environment Lambda environment
+     * @param functionParameters Lambda function parameters
+     */
+    static create(
+        stack: DigitrafficStack,
+        name: string,
+        environment?: LambdaEnvironment,
+        functionParameters?: MonitoredFunctionParameters): MonitoredFunction {
+        const functionName = functionParameters?.functionName || `${stack.configuration.shortName}-${pascalCase(name)}`;
+        const env = environment ? environment : stack.createLambdaEnvironment();
+        const functionProps = databaseFunctionProps(stack, env, functionName, name, functionParameters);
+
+        const mf = MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
+
+        stack.grantSecret(mf);
+        new DigitrafficLogSubscriptions(stack, mf);
+
+        return mf;
     }
 }

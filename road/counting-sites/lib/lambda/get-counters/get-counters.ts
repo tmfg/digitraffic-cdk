@@ -8,19 +8,20 @@ const secretId = process.env[SECRET_ID_KEY] as string;
 export const handler = async (event: any): Promise<any> => {
     return await withDbSecret(secretId, async (): Promise<any> => {
         const start = Date.now();
-        const counterId = event.id;
+        const domain = event.domain;
 
         try {
-            const data = await CountingSitesService.getDataForCounter(counterId);
+            const featureCollection = await CountingSitesService.getCountersForDomain(domain);
 
-            if(data.length === 0) {
+            if(featureCollection.features) {
+                return LambdaResponse.ok(JSON.stringify(featureCollection, null, 3));
+            } else {
                 return LambdaResponse.not_found();
             }
-            return LambdaResponse.ok(data);
         } catch(e) {
             return LambdaResponse.internal_error();
         } finally {
-            console.info("method=CountingSites.GetData tookMs=%d", (Date.now() - start))
+            console.info("method=CountingSites.GetCounters tookMs=%d", (Date.now() - start))
         }
     });
 };

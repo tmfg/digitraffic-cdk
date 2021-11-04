@@ -1,19 +1,20 @@
 import * as CounterDb from "../db/counter";
 import * as DataDb from "../db/data";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
+import * as MetadataDB from "../db/metadata";
 import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import { IDatabase } from "pg-promise";
+import {IDatabase} from "pg-promise";
 import {DbDomain} from "../model/domain";
-import {DbCounter} from "../model/counter";
 import {DbData} from "../model/data";
+import {FeatureCollection} from "geojson";
 
 export async function getMetadata(): Promise<any> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
-        const domains = await CounterDb.findAllDomains(db);
-        const counters = await CounterDb.findAllCounters(db);
+        const domains = await MetadataDB.findAllDomains(db);
+        const userTypes = await MetadataDB.findAllUserTypes(db);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.COUNTING_SITES);
 
-        return createResponse(domains, counters, lastUpdated);
+        return createResponse(domains, userTypes, lastUpdated);
     });
 }
 
@@ -23,24 +24,16 @@ export async function getDataForCounter(counterId: number): Promise<DbData[]> {
     });
 }
 
-function createResponse(dbDomains: DbDomain[], dbCounters: DbCounter[], lastUpdated: Date|null): any {
-    const countersMap: {[key: string]: any[]} = {};
-
-    dbCounters.forEach((c: DbCounter) => {
-        if(!(c.domain_name in countersMap)) {
-            countersMap[c.domain_name] = [];
-        }
-        countersMap[c.domain_name].push(c);
+export async function getCountersForDomain(domain: string): Promise<FeatureCollection> {
+    return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+        return CounterDb.findAllCountersForDomain(db, domain);
     });
+}
 
-    const domains = dbDomains.map((d: DbDomain) => ({
-        ...d, ...{
-            counters: countersMap[d.name]
-        }
-    }));
-
+function createResponse(domains: DbDomain[], userTypes: any[], lastUpdated: Date|null): any {
     return {
         lastUpdated,
-        domains
+        domains,
+        userTypes
     }
 }

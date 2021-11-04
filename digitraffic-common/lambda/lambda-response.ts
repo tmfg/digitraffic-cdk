@@ -2,7 +2,7 @@ export class LambdaResponse {
     readonly status: number;
     readonly body: string;
 
-    static ok(body: string): LambdaResponse {
+    static ok(body: any): LambdaResponse {
         return this.create(200, body);
     }
 
@@ -10,11 +10,15 @@ export class LambdaResponse {
         return this.create(400, body);
     }
 
+    static not_found(): LambdaResponse {
+        return this.create(404, 'Not found');
+    }
+
     static internal_error(): LambdaResponse {
         return this.create(500, 'Internal error');
     }
 
-    static create(status: number, body: string): LambdaResponse {
+    static create(status: number, body: any): LambdaResponse {
         return { status, body };
     }
 }

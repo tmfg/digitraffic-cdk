@@ -14,12 +14,12 @@ const SQL_GET_DATA =
 const PS_INSERT_DATA = new PreparedStatement({
     name: 'insert-data',
     text: SQL_INSERT_DATA
-})
+});
 
 const PS_GET_DATA = new PreparedStatement({
     name: 'get-data',
     text: SQL_GET_DATA
-})
+});
 
 export async function insertData(db: IDatabase<any, any>, site_id: number, interval: number, data: ApiData[]) {
     return Promise.all(data.map(d => {

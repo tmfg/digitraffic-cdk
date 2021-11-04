@@ -18,8 +18,9 @@ $inputRoot.body
 #if ($inputRoot.status != 200)
 #set ($context.responseOverride.status = $inputRoot.status)
 #set ($context.responseOverride.header.Content-Type = 'text/plain')
-#else
-#end`;
+#end
+#set ($context.responseOverride.header.Access-Control-Allow-Origin = '*')
+`;
 
 export const RESPONSE_401_UNAUTHORIZED: IntegrationResponse = {
     statusCode: '401',

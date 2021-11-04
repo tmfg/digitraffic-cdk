@@ -27,8 +27,7 @@ describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) =>
         expect(metadata.domains).toHaveLength(2);
         expect(metadata.domains[0].name).toEqual(DOMAIN1);
         expect(metadata.domains[1].name).toEqual(DOMAIN2);
-        expect(metadata.domains[0].counters).toHaveLength(1);
-        expect(metadata.domains[1].counters).toBeUndefined();
         expect(metadata.lastUpdated).toEqual(now);
+        expect(metadata.userTypes).toHaveLength(11);
     });
 }));

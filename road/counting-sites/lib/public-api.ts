@@ -1,18 +1,18 @@
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {Model, Resource} from "@aws-cdk/aws-apigateway";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredDBFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
-import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {BETA_TAGS} from "digitraffic-common/api/tags";
-import {addTagsAndSummary} from "digitraffic-common/api/documentation";
+import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
     metadataResource: Resource;
+    countersListResource: Resource;
     dataResource: Resource;
 
     errorResponseModel: Model;
@@ -24,24 +24,34 @@ export class PublicApi {
         this.publicApi.createUsagePlan('CS Api Key', 'CS Usage Plan');
 
         this.createResources(this.publicApi);
+
         this.createMetadataEndpoint(stack);
         this.createDataEndpoint(stack);
+        this.createCountersEndpoint(stack);
+
         this.createDocumentation(stack);
     }
 
     createDocumentation(stack: DigitrafficStack) {
         addTagsAndSummary('GetMetadata', BETA_TAGS, 'Return all metadata', this.metadataResource, stack);
-        addTagsAndSummary('GetData', BETA_TAGS, 'Return all data', this.dataResource, stack);
 
+        addTagsAndSummary('GetCounters', BETA_TAGS, 'Return all counters for domain', this.countersListResource, stack);
+        addQueryParameterDescription('domain', 'Domain', this.countersListResource, stack);
+
+        addTagsAndSummary('GetData', BETA_TAGS, 'Return all data', this.dataResource, stack);
+        addQueryParameterDescription('id', 'Site-id', this.dataResource, stack);
     }
 
     createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
-        const csResource = apiResource.addResource("counting-sites");
+        const csResource = apiResource.addResource("counters");
         const betaResource = csResource.addResource("beta");
         const valuesResource = betaResource.addResource("values");
+        const countersResource = betaResource.addResource("counters");
+
         this.metadataResource = betaResource.addResource("metadata");
         this.dataResource = valuesResource.addResource("{id}");
+        this.countersListResource = countersResource.addResource("{domain}");
 
 //        this.errorResponseModel = publicApi.addModel('ErrorResponseModel', MessageModel);
         this.metadataResponseModel = publicApi.addModel('MetadataResponseModel', MessageModel);
@@ -49,13 +59,7 @@ export class PublicApi {
     }
 
     createMetadataEndpoint(stack: DigitrafficStack) {
-        const environment = stack.createLambdaEnvironment();
-        const lambda = MonitoredFunction.createV2(stack, 'get-metadata', environment, {
-  //          functionName: 'metadata-lambda'
-        });
-
-        stack.grantSecret(lambda);
-        new DigitrafficLogSubscriptions(stack, lambda);
+        const lambda = MonitoredDBFunction.create(stack, 'get-metadata');
 
         const metadataIntegration = defaultIntegration(lambda);
 
@@ -68,14 +72,33 @@ export class PublicApi {
         });
     }
 
-    createDataEndpoint(stack: DigitrafficStack) {
-        const environment = stack.createLambdaEnvironment();
-        const lambda = MonitoredFunction.createV2(stack, 'get-data', environment, {
-//            functionName: 'data-lambda'
+    createCountersEndpoint(stack: DigitrafficStack) {
+        const lambda = MonitoredDBFunction.create(stack, 'get-counters');
+
+        const countersIntegration = defaultIntegration(lambda, {
+            requestParameters: {
+                'integration.request.path.domain': 'method.request.path.domain'
+            },
+            requestTemplates: {
+                'application/json': JSON.stringify({domain: "$util.escapeJavaScript($input.params('domain'))"})
+            },
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)]
         });
 
-        stack.grantSecret(lambda);
-        new DigitrafficLogSubscriptions(stack, lambda);
+        this.countersListResource.addMethod("GET", countersIntegration, {
+            apiKeyRequired: false,
+            requestParameters: {
+                'method.request.path.domain': true
+            },
+            methodResponses: [
+                corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.metadataResponseModel)),
+                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel))
+            ]
+        })
+    }
+
+    createDataEndpoint(stack: DigitrafficStack) {
+        const lambda = MonitoredDBFunction.create(stack, 'get-data');
 
         const dataIntegration = defaultIntegration(lambda, {
             requestParameters: {
@@ -84,6 +107,7 @@ export class PublicApi {
             requestTemplates: {
                 'application/json': JSON.stringify({id: "$util.escapeJavaScript($input.params('id'))"})
             },
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)]
         });
 
         this.dataResource.addMethod("GET", dataIntegration, {

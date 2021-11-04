@@ -4,6 +4,7 @@ import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/databa
 import {EcoCounterApi} from "../api/eco-counter";
 import {ApiCounter, DbCounter} from "../model/counter";
 import moment from "moment";
+import {findAllCountersForUpdateForDomain} from "../db/counter";
 
 export async function updateMetadataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
     const api = new EcoCounterApi(apiKey, url);
@@ -74,7 +75,7 @@ function compareCounters(countersInApi: any, countersInDb: any): [ApiCounter[], 
 
 async function getAllCountersFromDb(domain: string) {
     const counters = await inDatabaseReadonly( db => {
-        return CounterDb.findAllCountersForDomain(db, domain);
+        return CounterDb.findAllCountersForUpdateForDomain(db, domain);
     });
 
     return Object.fromEntries(counters

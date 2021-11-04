@@ -48,7 +48,7 @@ export function lambdaFunctionProps(stack: DigitrafficStack, environment: Lambda
         role: config?.role,
         timeout: Duration.seconds(config?.timeout || 60),
         logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: config?.reservedConcurrentExecutions || 1,
+        reservedConcurrentExecutions: config?.reservedConcurrentExecutions || 2,
         code: getAssetCode(simpleLambdaName, config),
         handler: `${simpleLambdaName}.handler`,
         environment

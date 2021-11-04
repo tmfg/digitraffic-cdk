@@ -18,7 +18,7 @@ export class StackCheckingAspect implements IAspect {
     }
 
     public visit(node: IConstruct): void {
-        console.info("visiting class " + node.constructor.name);
+        //console.info("visiting class " + node.constructor.name);
 
         this.checkStack(node);
         this.checkFunction(node);
