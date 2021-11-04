@@ -9,11 +9,7 @@ export const handler = async (): Promise<any> => {
         const start = Date.now();
 
         try {
-            const metadata = await CountingSitesService.getMetadata();
-
-            console.info("metadata " + JSON.stringify(metadata, null, 3));
-
-            return metadata;
+            return CountingSitesService.getMetadata();
         } finally {
             console.info("method=CountingSites.GetMetadata tookMs=%d", (Date.now() - start))
         }

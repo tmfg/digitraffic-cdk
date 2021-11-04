@@ -8,8 +8,10 @@ describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) =>
 
     test('get domains - empty', async () => {
         const metadata = await CountingSitesService.getMetadata();
-
+        
         expect(metadata.domains).toHaveLength(0);
+        expect(Object.keys(metadata.userTypes)).toHaveLength(11);
+        expect(Object.keys(metadata.directions)).toHaveLength(3);
         expect(metadata.lastUpdated).toBeUndefined();
     });
 
@@ -28,6 +30,6 @@ describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) =>
         expect(metadata.domains[0].name).toEqual(DOMAIN1);
         expect(metadata.domains[1].name).toEqual(DOMAIN2);
         expect(metadata.lastUpdated).toEqual(now);
-        expect(metadata.userTypes).toHaveLength(11);
+        expect(Object.keys(metadata.userTypes)).toHaveLength(11);
     });
 }));

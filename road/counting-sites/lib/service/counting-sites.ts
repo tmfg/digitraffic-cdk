@@ -34,6 +34,11 @@ function createResponse(domains: DbDomain[], userTypes: any[], lastUpdated: Date
     return {
         lastUpdated,
         domains,
-        userTypes
+        userTypes,
+        directions: {
+            "1": "in",
+            "2": "out",
+            "5": "no direction"
+        }
     }
 }

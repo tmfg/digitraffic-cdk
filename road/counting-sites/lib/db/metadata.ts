@@ -18,8 +18,8 @@ const PS_ALL_DOMAINS = new PreparedStatement({
     text: SQL_ALL_DOMAINS,
 });
 
-export function findAllUserTypes(db: IDatabase<any, any>): Promise<DbCounter[]> {
-    return db.manyOrNone(PS_ALL_USER_TYPES);
+export function findAllUserTypes(db: IDatabase<any, any>): Promise<any> {
+    return db.manyOrNone(PS_ALL_USER_TYPES).then(results => Object.fromEntries(results.map(r => [r.id, r.name])));
 }
 
 export function findAllDomains(db: IDatabase<any, any>): Promise<DbDomain[]> {
