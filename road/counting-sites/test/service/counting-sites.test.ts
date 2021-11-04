@@ -8,7 +8,7 @@ describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) =>
 
     test('get domains - empty', async () => {
         const metadata = await CountingSitesService.getMetadata();
-        
+
         expect(metadata.domains).toHaveLength(0);
         expect(Object.keys(metadata.userTypes)).toHaveLength(11);
         expect(Object.keys(metadata.directions)).toHaveLength(3);

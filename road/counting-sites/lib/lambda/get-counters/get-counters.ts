@@ -5,8 +5,8 @@ import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
 
 const secretId = process.env[SECRET_ID_KEY] as string;
 
-export const handler = async (event: any): Promise<any> => {
-    return await withDbSecret(secretId, async (): Promise<any> => {
+export const handler = async (event: any): Promise<LambdaResponse> => {
+    return await withDbSecret(secretId, async (): Promise<LambdaResponse> => {
         const start = Date.now();
         const domain = event.domain;
 
