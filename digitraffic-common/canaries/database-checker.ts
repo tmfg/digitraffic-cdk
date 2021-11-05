@@ -25,7 +25,7 @@ class CountDatabaseCheck extends DatabaseCheck {
     constructor(name: string, sql: string, minCount: number|null, maxCount: number|null) {
         super(name, sql);
 
-        if(!minCount && !maxCount) {
+        if(minCount == null && maxCount == null) {
             throw new Error('no max or min given!');
         }
 
@@ -82,6 +82,12 @@ export class DatabaseChecker {
 
     one(name: string, sql: string) {
         this.checks.push(new CountDatabaseCheck(name, sql, 1, 1));
+
+        return this;
+    }
+
+    empty(name: string, sql: string) {
+        this.checks.push(new CountDatabaseCheck(name, sql, null, 0));
 
         return this;
     }
