@@ -2,11 +2,7 @@ import {AwakeAiETAApi, AwakeAiETA, AwakeAiETAShipStatus, AwakeAiETAResponse} fro
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
-
-type AwakeAiETAResponseAndShip = {
-    readonly response: AwakeAiETAResponse
-    readonly ship: DbETAShip
-}
+import {NullablePromiseResult} from "digitraffic-common/promise/promise";
 
 enum AwakeDataState {
     OK = 'OK',
@@ -33,35 +29,18 @@ export class AwakeAiETAService {
         this.api = api;
     }
 
-    getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
-        return Promise.allSettled(ships.map(this.getAwakeAiTimestamp.bind(this)))
-            .then(responses =>
-                responses
-                    .reduce<Array<ApiTimestamp>>((acc, result) => {
-                        const val = result.status === 'fulfilled' ? result.value : null;
-                        if (!val) {
-                            return acc;
-                        }
-                        const ts = this.toTimeStamp(val);
-                        return ts ? acc.concat([ts]) : acc;
-                    }, []));
-    }
-
-    private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiETAResponseAndShip> {
+    async getAwakeAiTimestamp(ship: DbETAShip): Promise<NullablePromiseResult<ApiTimestamp>> {
         console.info(`method=updateAwakeAiTimestamps fetching ETA for ship with IMO ${ship.imo}`)
-        const response = await this.api.getETA(ship.imo);
-        return {
-            response,
-            ship
-        };
+        const resp = await this.api.getETA.bind(this.api)(ship.imo);
+        return { value: this.toTimeStamp(resp, ship) };
     }
 
-    private toTimeStamp(resp: AwakeAiETAResponseAndShip): ApiTimestamp | null {
-        if (!resp.response.eta) {
-            console.warn(`method=updateAwakeAiTimestamps no ETA received, state=${resp.response.type}`)
+    private toTimeStamp(resp: AwakeAiETAResponse, ship: DbETAShip): ApiTimestamp | null {
+        if (!resp.eta) {
+            console.warn(`method=updateAwakeAiTimestamps no ETA received, state=${resp.type}`)
             return null;
         }
-        return this.handleETA(resp.response.eta, resp.ship);
+        return this.handleETA(resp.eta, ship);
     }
 
     private handleETA(eta: AwakeAiETA, ship: DbETAShip): ApiTimestamp | null {
