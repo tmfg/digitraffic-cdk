@@ -20,6 +20,8 @@ If you extend your stack from DigitrafficStack you get many benefits:
 * Stack validation with StackCheckingAspect
 * Easier configuration with StackConfiguration
 
+If you do not need those things, you should not use DigitrafficStack.
+
 ### StackConfiguration
 Some commonly used parameters is predefined configuration.  You can write configuration for your
 environments once and use across cdk-projects.
@@ -35,3 +37,13 @@ You can use StackCheckingAspect for any stack, DigitrafficStack does it automati
 ```
 Aspects.of(this).add(StackCheckingAspect.create(this));
 ```
+
+### MonitoredFunction
+MonitoredFunction extends Function with alarms on memory usage and timeouts.
+
+If you need database access in your Function, you can use MonitoredDBFunction. Creating a Function with it is this easy:
+```
+const lambda = MonitoredDBFunction.create(stack, 'get-metadata');
+```
+
+See the documentation for more information.
