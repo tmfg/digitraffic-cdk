@@ -1,5 +1,6 @@
 import {MediaType} from "../api/mediatypes";
 import {getApiKeyFromAPIGateway} from "../api/apikey";
+import {constants} from "http2";
 
 const synthetics = require('Synthetics');
 const zlib = require('zlib');
@@ -61,7 +62,7 @@ export class UrlChecker {
                 path: url
             }};
 
-        await synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeFunction(404, MediaType.TEXT_PLAIN));
+        await synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
     async expect403WithoutApiKey(url: string): Promise<any> {
@@ -70,7 +71,7 @@ export class UrlChecker {
             headers: baseHeaders
         }};
 
-        await synthetics.executeHttpStep("Verify 403 for " + url, requestOptions, validateStatusCodeFunction(403, MediaType.TEXT_PLAIN));
+        await synthetics.executeHttpStep("Verify 403 for " + url, requestOptions, validateStatusCodeAndContentType(403, MediaType.TEXT_PLAIN));
     }
 
     async done(): Promise<string> {
@@ -109,7 +110,7 @@ async function getResponseBody(response: any): Promise<string> {
         });
     });
 
-    if(response.headers["content-encoding"] === 'gzip') {
+    if(response.headers[constants.HTTP2_HEADER_CONTENT_ENCODING] === 'gzip') {
         try {
             return zlib.gunzipSync(body).toString();
         } catch(e) {
@@ -129,16 +130,20 @@ export function mustContain(body: string, text: string) {
     }
 }
 
-// Validate status code
-function validateStatusCodeFunction(statusCode: number, contentType: string) {
+/**
+ * Returns function, that validates that the status code and content-type from response are the given values
+ * @param statusCode
+ * @param contentType
+ */
+function validateStatusCodeAndContentType(statusCode: number, contentType: MediaType) {
     return async (res: any) => {
         return new Promise(resolve => {
             if (res.statusCode !== statusCode) {
                 throw `${res.statusCode} ${res.statusMessage}`;
             }
 
-            if(res.headers['content-type'] !== contentType) {
-                throw 'Wrong content-type ' + res.headers['content-type'];
+            if(res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== contentType) {
+                throw 'Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE];
             }
 
             resolve(OK_RESOLUTION);
@@ -180,14 +185,13 @@ export class ResponseChecker {
                 throw res.statusCode + ' ' + res.statusMessage;
             }
 
-            console.info("response headers " + JSON.stringify(res.headers));
 
-            if(this.checkCors && !res.headers['access-control-allow-origin']) {
+            if(this.checkCors && !res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
                 throw 'CORS missing';
             }
 
-            if(res.headers['content-type'] !== this.contentType) {
-                throw 'Wrong content-type ' + res.headers['content-type'];
+            if(res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== this.contentType) {
+                throw 'Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE];
             }
 
             const body = await getResponseBody(res);

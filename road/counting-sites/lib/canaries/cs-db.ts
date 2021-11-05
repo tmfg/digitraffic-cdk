@@ -1,5 +1,6 @@
 import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {DataType} from "digitraffic-common/db/last-updated";
 
 const secretId = process.env[SECRET_ID] as string;
 
@@ -22,6 +23,12 @@ export const handler = async () => {
             ) 
             select count(*) from data
             where sum > 0`);
+
+    checker.notEmpty('metadata updated in last 2 hours',
+        `select count(*) from data_updated where data_type = '${DataType.COUNTING_SITES_METADATA_CHECK}' and updated < now() - interval '2 hours'`);
+
+    checker.notEmpty('data updated in last 2 hours',
+        `select count(*) from data_updated where data_type = '${DataType.COUNTING_SITES_DATA}' and updated < now() - interval '2 hours'`);
 
     return checker.expect();
 };

@@ -4,7 +4,8 @@ import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/databa
 import {EcoCounterApi} from "../api/eco-counter";
 import {ApiCounter, DbCounter} from "../model/counter";
 import moment from "moment";
-import {findAllCountersForUpdateForDomain} from "../db/counter";
+import * as LastUpdatedDb from "digitraffic-common/db/last-updated";
+import {DataType} from "digitraffic-common/db/last-updated";
 
 export async function updateMetadataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
     const api = new EcoCounterApi(apiKey, url);
@@ -19,9 +20,16 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
 //    console.info(updatedCounters.length + " updated " + JSON.stringify(updatedCounters, null, 3));
 
     await inDatabase(async db => {
+        const updatedTimestamp = new Date();
+
         await CounterDb.insertCounters(db, domainName, newCounters);
         await CounterDb.removeCounters(db, removedCounters);
         await CounterDb.updateCounters(db, updatedCounters);
+
+        if(newCounters.length > 0 || removedCounters.length > 0 || updatedCounters.length > 0) {
+            await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_METADATA, updatedTimestamp);
+        }
+        await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_METADATA_CHECK, updatedTimestamp);
     });
 }
 
@@ -30,7 +38,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
     await inDatabase(async db => {
-        return Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
+        await Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
             if(isDataUpdateNeeded(counter)) {
                 // either last update timestamp + 1 day or ten days ago(for first time)
                 const fromStamp = counter.last_data_timestamp ? moment(counter.last_data_timestamp) : moment().subtract(10, 'days').startOf('day');
@@ -46,9 +54,10 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
 
             console.info("no need to update " + counter.id);
             return;
-        }))
-        }
-    );
+        }));
+
+        return await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_DATA, new Date());
+    });
 }
 
 function isDataUpdateNeeded(counter: DbCounter): boolean {

@@ -12,7 +12,6 @@ export const handler = async () => {
 
     await checker.expect200("/prod/api/counters/beta/metadata", rc.checkJson((json: any) => {
         assert.ok(json.domains.length === 1);
-        assert.ok(json.userTypes.length === 11);
     }));
 
     await checker.expect200("/prod/api/counters/beta/values/4", rc.checkJson((json: any) => {

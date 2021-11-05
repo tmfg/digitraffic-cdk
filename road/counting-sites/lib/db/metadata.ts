@@ -1,5 +1,4 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
-import {DbCounter} from "../model/counter";
 import {DbDomain} from "../model/domain";
 
 const SQL_ALL_USER_TYPES = "select id, name from counting_site_user_type";

@@ -9,7 +9,7 @@ const SQL_ALL_COUNTERS =
     order by id`;
 
 const SQL_ALL_COUNTERS_FOR_DOMAIN =
-    `SELECT json_build_object(
+    `select json_build_object(
                     'type', 'FeatureCollection',
                     'features', json_agg(
                             json_build_object(
@@ -18,17 +18,17 @@ const SQL_ALL_COUNTERS_FOR_DOMAIN =
                                     'properties', json_build_object(
                                             'id', id,
                                             'name', name,
-                                            'site_id', site_id,
-                                            'user_type', user_type_id,
+                                            'siteId', site_id,
+                                            'userType', user_type_id,
                                             'interval', interval,
                                             'direction', direction,
-                                            'last_data_timestamp', last_data_timestamp,
-                                            'removed_timestamp', removed_timestamp
+                                            'lastDataTimestamp', last_data_timestamp,
+                                            'removedTimestamp', removed_timestamp
                                         )
                                 )
                         )
                 ) as collection
-     FROM counting_site_counter
+     from counting_site_counter
      where domain_name = $1`;
 
 const SQL_INSERT_COUNTER =

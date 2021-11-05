@@ -12,7 +12,7 @@ export async function getMetadata(): Promise<any> {
     return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
         const domains = await MetadataDB.findAllDomains(db);
         const userTypes = await MetadataDB.findAllUserTypes(db);
-        const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.COUNTING_SITES);
+        const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.COUNTING_SITES_DATA);
 
         return createResponse(domains, userTypes, lastUpdated);
     });

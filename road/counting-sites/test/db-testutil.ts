@@ -44,7 +44,7 @@ export function insertLastUpdated(db: IDatabase<any, any>, id: number, updated: 
         return t.none(`
                 insert into data_updated(id, data_type, updated)
                 values($1, $2, $3)                
-            `, [id, DataType.COUNTING_SITES, updated]);
+            `, [id, DataType.COUNTING_SITES_DATA, updated]);
     });
 }
 

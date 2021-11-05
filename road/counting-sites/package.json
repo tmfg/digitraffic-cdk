@@ -40,6 +40,7 @@
     "@aws-cdk/aws-secretsmanager": "*",
     "@aws-cdk/core": "*",
     "axios": "^0.21.1",
+    "digitraffic-common": "*",
     "geojson-validation": "^1.0.2",
     "pg-native": "*",
     "pg-promise": "*"
