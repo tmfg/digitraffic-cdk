@@ -25,10 +25,10 @@ export const handler = async () => {
             where sum > 0`);
 
     checker.notEmpty('metadata updated in last 2 hours',
-        `select count(*) from data_updated where data_type = '${DataType.COUNTING_SITES_METADATA_CHECK}' and updated < now() - interval '2 hours'`);
+        `select count(*) from data_updated where data_type = '${DataType.COUNTING_SITES_METADATA_CHECK}' and updated > now() - interval '2 hours'`);
 
     checker.notEmpty('data updated in last 2 hours',
-        `select count(*) from data_updated where data_type = '${DataType.COUNTING_SITES_DATA}' and updated < now() - interval '2 hours'`);
+        `select count(*) from data_updated where data_type = '${DataType.COUNTING_SITES_DATA}' and updated > now() - interval '2 hours'`);
 
     return checker.expect();
 };

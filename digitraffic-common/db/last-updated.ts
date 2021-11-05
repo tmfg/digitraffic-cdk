@@ -1,7 +1,6 @@
 import {IDatabase} from "pg-promise";
 
 export enum DataType {
-    NW2_ANNOTATIONS="NW2_ANNOTATIONS",
     VS_DATEX2="VS_DATEX2",
     COUNTING_SITES_DATA="COUNTING_SITES_DATA",
     COUNTING_SITES_METADATA="COUNTING_SITES_METADATA",
@@ -14,12 +13,12 @@ export function getLastUpdated(db: IDatabase<any, any>, datatype: DataType): Pro
     }, (x: { updated: any; } | null) => x?.updated);
 }
 
-export function updateLastUpdated(db: IDatabase<any, any>, datatype: DataType, date: Date): Promise<null> {
-    return db.none("update data_updated set updated=$(date) where data_type=$(datatype)",
-        {
-            date: date,
-            datatype: datatype
-        });
+export function updateLastUpdated(db: IDatabase<any, any>, datatype: DataType, updated: Date): Promise<null> {
+    return db.none(`insert into data_updated(id, data_type, updated)
+values(nextval('seq_data_updated'), $(datatype), $(updated))
+on conflict (data_type)
+do update set updated = $(updated)`,
+        { updated, datatype });
 }
 
 export function getUpdatedTimestamp(db: IDatabase<any, any>, datatype: string): Promise<Date | null> {
@@ -34,10 +33,6 @@ export function updateUpdatedTimestamp(db: IDatabase<any, any>, datatype: string
 values($(datatype), $(date), $(by))
 on conflict (updated_name)
 do update set updated_time = $(date), updated_by = $(by)`,
-        {
-            date,
-            datatype,
-            by
-        });
+        { date, datatype, by });
 }
 

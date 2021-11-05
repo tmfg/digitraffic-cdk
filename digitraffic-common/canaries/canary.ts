@@ -21,6 +21,7 @@ export class DigitrafficCanary extends Canary {
             schedule: params.schedule ?? Schedule.rate(Duration.minutes(15))
         });
 
+        this.node.addDependency(role);
         this.artifactsBucket.grantWrite(role);
 
         if(params.alarm ?? true) {
