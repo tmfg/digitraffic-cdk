@@ -3,7 +3,9 @@ import {IDatabase} from "pg-promise";
 export enum DataType {
     NW2_ANNOTATIONS="NW2_ANNOTATIONS",
     VS_DATEX2="VS_DATEX2",
-    COUNTING_SITES="COUNTING_SITES"
+    COUNTING_SITES_DATA="COUNTING_SITES_DATA",
+    COUNTING_SITES_METADATA="COUNTING_SITES_METADATA",
+    COUNTING_SITES_METADATA_CHECK="COUNTING_SITES_METADATA_CHECK"
 }
 
 export function getLastUpdated(db: IDatabase<any, any>, datatype: DataType): Promise<Date | null> {
