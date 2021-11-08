@@ -32,14 +32,13 @@ export function handlerFn(sns: SNS, doWithSecret: SecretFunction): (event: Uploa
                 return Promise.reject(BAD_REQUEST_MESSAGE);
             }
 
-            // no need to send faults
+            //send faults to given callback endpoint, if present
             if (!event.callbackEndpoint) {
                 console.info("no callback given!");
-                return;
+            } else {
+                const vpService = new VoyagePlanService(sns, event.callbackEndpoint, sendFaultSnsTopicArn, secret);
+                return vpService.handleVoyagePlan(voyagePlan);
             }
-
-            const vpService = new VoyagePlanService(sns, event.callbackEndpoint, sendFaultSnsTopicArn, secret);
-            return vpService.handleVoyagePlan(voyagePlan);
         }, {
             prefix: 'aton'
         });
