@@ -2,7 +2,7 @@ import {ports} from '../../service/portareas';
 import * as TimestampService from '../../service/timestamps';
 import {PortactivityEnvKeys} from "../../keys";
 import {SNS} from "aws-sdk";
-import {SecretOptions, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as SNSUtil from 'digitraffic-common/sns/sns';
 import * as R from 'ramda';
 
@@ -10,7 +10,7 @@ const publishTopic = process.env[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] as strin
 const CHUNK_SIZE = 5;
 
 export function handlerFn(
-    withSecretFn: (secretId: string, fn: (_: any) => Promise<void>, options: SecretOptions) => Promise<any>,
+    withSecretFn: SecretFunction,
     sns: SNS) {
     return () => {
         return withSecretFn(process.env.SECRET_ID as string, async (): Promise<any> => {
