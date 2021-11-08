@@ -17,13 +17,13 @@ let service: AwakeAiETAService;
 const queueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
 export function handlerFn(
-    withSecretFn: (secretId: string, fn: (_: any) => Promise<void>, options: SecretOptions) => Promise<any>,
+    withSecretFn: (secretId: string, fn: (_: any) => Promise<void>, options: SecretOptions) => Promise<void>,
     AwakeAiETAServiceClass: new (api: AwakeAiETAApi) => AwakeAiETAService,
 ): (event: SNSEvent) => Promise<any> {
 
     return (event: SNSEvent) => {
         // always a single event, guaranteed by SNS
-        const ship = JSON.parse(event.Records[0].Sns.Message) as DbETAShip;
+        const ships = JSON.parse(event.Records[0].Sns.Message) as DbETAShip[];
 
         const expectedKeys = [
             PortactivitySecretKeys.AWAKE_URL,
@@ -34,11 +34,11 @@ export function handlerFn(
             if (!service) {
                 service = new AwakeAiETAServiceClass(new AwakeAiETAApi(secret["awake.url"], secret["awake.auth"]));
             }
-            const timestamp = await service.getAwakeAiTimestamp(ship);
-            if (!timestamp) {
-                throw new Error(`No ETA received for ship IMO: ${ship.imo}`);
-            }
-            await sendMessage(timestamp, queueUrl);
+            console.info(`method=updateAwakeAiTimestampsLambda fetching timestamps for ${ships.length} ships`);
+            const timestamps = await service.getAwakeAiTimestamps(ships);
+            console.info(`method=updateAwakeAiTimestampsLambda received timestamps for ${timestamps.length} ships`);
+
+            await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
         }, {expectedKeys});
     };
 }

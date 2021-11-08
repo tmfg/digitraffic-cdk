@@ -25,9 +25,9 @@ describe('service awake.ai', () => {
             }
         }));
 
-        const timestamp = await service.getAwakeAiTimestamp(ship);
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamp.value).toMatchObject(awakeTimestampFromTimestamp(timestamp.value!, ship.port_area_code));
+        expectSingleTimeStampToMatch(timestamps, awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code));
     });
 
     test('getETA - predicted locode differs', async () => {
@@ -46,9 +46,9 @@ describe('service awake.ai', () => {
             }
         }));
 
-        const timestamp = await service.getAwakeAiTimestamp(ship);
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamp.value).toMatchObject(awakeTimestampFromTimestamp(timestamp.value!, ship.port_area_code));
+        expectSingleTimeStampToMatch(timestamps, awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code));
     });
 
     test('getETA - ship not under way', async () => {
@@ -68,9 +68,9 @@ describe('service awake.ai', () => {
             }
         }));
 
-        const timestamp = await service.getAwakeAiTimestamp(ship);
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamp.value).toBeNull();
+        expect(timestamps.length).toBe(0);
     });
 
     test('getETA - no predicted ETA', async () => {
@@ -87,9 +87,9 @@ describe('service awake.ai', () => {
             }
         }));
 
-        const timestamp = await service.getAwakeAiTimestamp(ship);
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamp.value).toBeNull();
+        expect(timestamps.length).toBe(0);
     });
 
     test('getETA - no predicted destination', async () => {
@@ -106,9 +106,9 @@ describe('service awake.ai', () => {
             }
         }));
 
-        const timestamp = await service.getAwakeAiTimestamp(ship);
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamp.value).toBeNull();
+        expect(timestamps.length).toBe(0);
     });
 
     test('getETA - port outside Finland', async () => {
@@ -126,9 +126,9 @@ describe('service awake.ai', () => {
             }
         }));
 
-        const timestamp = await service.getAwakeAiTimestamp(ship);
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamp.value).toBeNull();
+        expect(timestamps.length).toBe(0);
     });
 
     test('getETA - port locode override', async () => {
@@ -146,12 +146,13 @@ describe('service awake.ai', () => {
             }
         }));
 
-        const timestamp = await service.getAwakeAiTimestamp(ship);
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        const expectedTimestamp = awakeTimestampFromTimestamp(timestamp.value!, ship.port_area_code);
+        expect(timestamps.length).toBe(1);
+        const expectedTimestamp = awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code);
         // @ts-ignore
         expectedTimestamp.location['port'] = ship.locode;
-        expect(timestamp.value).toMatchObject(expectedTimestamp);
+        expectSingleTimeStampToMatch(timestamps, expectedTimestamp);
     });
 
 });
@@ -178,4 +179,9 @@ function awakeTimestampFromTimestamp(timestamp: ApiTimestamp, portArea?: string)
         eventTime: timestamp.eventTime,
         recordTime: timestamp.recordTime
     };
+}
+
+function expectSingleTimeStampToMatch(timestamps: ApiTimestamp[], expectedTimestamp: ApiTimestamp) {
+    expect(timestamps.length).toBe(1);
+    expect(timestamps[0]).toMatchObject(expectedTimestamp);
 }
