@@ -1,24 +1,31 @@
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 
 export async function getFaults(endpointUrl: string): Promise<any[]> {
-    const resp = await getFaultsFromServer(endpointUrl);
+    try {
+        const resp = await getFaultsFromServer(endpointUrl);
 
-    if (resp.status != 200) {
-        console.error('Fetching faults failed: ' + resp.statusText);
+        if (resp.status === 200) {
+            return resp.data.features;
+        }
 
-        return [];
+        console.error('Fetching faults failed: %s', resp.statusText);
+
+        return resp.data.features;
+    } catch(err: any) {
+        console.error("fetching failed with %d", err.status);
+        console.error(err.message);
     }
 
-//    console.info("got resp " + JSON.stringify(resp.data));
-    return resp.data.features;
+    return [];
 }
 
-export async function getFaultsFromServer(url: string) {
+export async function getFaultsFromServer(url: string): Promise<AxiosResponse> {
     const start = Date.now();
 
     console.info("getFaultsFromServer: getting faults from " + url);
 
     return await axios.get(url, {
+        timeout: 10000,
         headers: {
             'Accept': 'application/json'
         }
