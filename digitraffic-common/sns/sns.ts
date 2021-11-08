@@ -15,10 +15,12 @@ export async function snsPublish(message: string, topicArn: string, sns: SNS) {
     };
     try {
         await sns.publish(publishParams).promise();
+    } catch (error) {
+        console.error('method=snsPublish error, retrying', error);
         try {
             await sns.publish(publishParams).promise();
-        } finally {}
-    } catch (error) {
-        console.error('method=snsPublish error', error);
+        } catch (error) {
+            console.error('method=snsPublish error after retry', error);
+        }
     }
 }
