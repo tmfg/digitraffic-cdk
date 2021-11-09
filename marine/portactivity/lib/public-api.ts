@@ -27,6 +27,7 @@ import {TimestampMetadata} from './model/timestamp-metadata';
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -94,9 +95,8 @@ export class PublicApi {
                 })
             },
             responses: [
-                getResponse(RESPONSE_200_OK),
-                getResponse(RESPONSE_400_BAD_REQUEST),
-                getResponse(RESPONSE_500_SERVER_ERROR)
+                DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
+                DigitrafficIntegrationResponse.badRequest()
             ]
         });
 
@@ -112,8 +112,9 @@ export class PublicApi {
             requestValidator: validator,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, timestampsJsonModel)),
-                corsMethod(methodResponse("400", MediaType.APPLICATION_JSON, errorResponseModel)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
+                {
+                    statusCode: '400'
+                }
             ]
         });
 
