@@ -30,13 +30,15 @@ export function handlerFn(
         // always a single event, guaranteed by SNS
         const ships = JSON.parse(event.Records[0].Sns.Message) as DbETAShip[];
 
+        console.debug('DEBUG method=updateAwakeAiTimestampsLambdaHandler received ships %s', JSON.stringify(ships));
+
         return withSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<any> => {
             if (!service) {
                 service = new AwakeAiETAServiceClass(new AwakeAiETAApi(secret["awake.url"], secret["awake.auth"]));
             }
-            console.info(`method=updateAwakeAiTimestampsLambda fetching timestamps for ${ships.length} ships`);
+            console.info(`method=updateAwakeAiTimestampsLambdaHandler fetching timestamps for ${ships.length} ships`);
             const timestamps = await service.getAwakeAiTimestamps(ships);
-            console.info(`method=updateAwakeAiTimestampsLambda received timestamps for ${timestamps.length} ships`);
+            console.info(`method=updateAwakeAiTimestampsLambdaHandler received timestamps for ${timestamps.length} ships`);
 
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
         }, {expectedKeys});

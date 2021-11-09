@@ -18,6 +18,7 @@ import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {Props} from './app-props';
 import {Topic} from "@aws-cdk/aws-sns";
+import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 
 export function create(
     stack: DigitrafficStack,
@@ -40,13 +41,18 @@ export function create(
     stack.grantSecret(cpqLambda, triggerAwakeAiETATimestampsLambda, updateAwakeAiETATimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda);
     new DigitrafficLogSubscriptions(stack, cpqLambda, triggerAwakeAiETATimestampsLambda, updateAwakeAiETATimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda);
 
-    // create schedulers
-    const updateETASchedulingRule = createETAScheduler(stack);
-    const pilotwebScheduler = createPilotwebScheduler(stack);
-
-    updateETASchedulingRule.addTarget(new LambdaFunction(triggerAwakeAiETATimestampsLambda));
-    updateETASchedulingRule.addTarget(new LambdaFunction(updateScheduleTimestampsLambda));
-    pilotwebScheduler.addTarget(new LambdaFunction(updateTimestampsFromPilotwebLambda));
+    Scheduler.everyMinutes(stack,
+        'PortActivity-UpdateAwakeETAScheduler',
+        1,
+        triggerAwakeAiETATimestampsLambda);
+    Scheduler.everyMinutes(stack,
+        'PortActivity-UpdateSchedulesScheduler',
+        10,
+        updateScheduleTimestampsLambda);
+    Scheduler.everyMinutes(stack,
+        'PortActivity-PilotwebScheduler',
+        1,
+        updateTimestampsFromPilotwebLambda);
 
     if ((stack.configuration as Props).awakeATx) {
         const updateAwakeAiATXTimestampsLambda = createUpdateAwakeAiATXTimestampsLambda(stack, queueAndDLQ.queue);
@@ -156,27 +162,11 @@ function createProcessDLQLambda(
     return processDLQLambda;
 }
 
-function createETAScheduler(stack: Stack): Rule {
-    const ruleName = 'PortActivity-ETAScheduler'
-    return new Rule(stack, ruleName, {
-        ruleName,
-        schedule: Schedule.expression('cron(*/10 * * * ? *)') // every 10 minutes
-    });
-}
-
 function createATXScheduler(stack: Stack): Rule {
-    const ruleName = 'PortActivity-ATXScheduler'
+    const ruleName = 'PortActivity-ATXScheduler';
     return new Rule(stack, ruleName, {
         ruleName,
         schedule: Schedule.expression('cron(*/10 * * * ? *)') // every 10 minutes
-    });
-}
-
-function createPilotwebScheduler(stack: Stack): Rule {
-    const ruleName = 'PortActivity-PilotwebScheduler'
-    return new Rule(stack, ruleName, {
-        ruleName,
-        schedule: Schedule.expression('cron(*/1 * * * ? *)') // every minute
     });
 }
 

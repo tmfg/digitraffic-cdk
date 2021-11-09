@@ -7,7 +7,7 @@ import * as SNSUtil from 'digitraffic-common/sns/sns';
 import * as R from 'ramda';
 
 const publishTopic = process.env[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] as string;
-const CHUNK_SIZE = 5;
+const CHUNK_SIZE = 10;
 
 export function handlerFn(
     withSecretFn: SecretFunction,
@@ -15,16 +15,11 @@ export function handlerFn(
     return () => {
         return withSecretFn(process.env.SECRET_ID as string, async (): Promise<any> => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
+            console.info('method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for %d ships',
+                ships.length);
 
             for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {
-
-                for (const ship of chunk) {
-                    console.info('method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for ship IMOs %d, LOCODE %s, port call',
-                        ship.imo,
-                        ship.locode,
-                        ship.portcall_id);
-                }
-
+                console.debug('DEBUG method=triggerAwakeAiETATimestampsUpdateHandler sending ETA update requests %s', JSON.stringify(chunk));
                 await SNSUtil.snsPublish(JSON.stringify(chunk), publishTopic, sns);
             }
         }, {});
