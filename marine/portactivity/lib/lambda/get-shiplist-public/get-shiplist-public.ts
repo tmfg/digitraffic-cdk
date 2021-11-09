@@ -5,6 +5,7 @@ import moment from 'moment-timezone';
 import * as R from 'ramda';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import * as IdUtils from 'digitraffic-common/marine/id_utils';
 
 export const handler = async (event: any): Promise<any> => {
     return handlerFn(event, withDbSecret);
@@ -20,8 +21,12 @@ export async function handlerFn(
 
     return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
         if (!event.queryStringParameters.locode) {
-            return Promise.resolve({statusCode: 400, body: 'Missing locode'});
+            return Promise.resolve({statusCode: 400, body: 'Missing LOCODE'});
         }
+        if (!IdUtils.isValidLOCODE(event.queryStringParameters.locode)) {
+            return Promise.resolve({statusCode: 400, body: 'Invalid LOCODE'});
+        }
+
         return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
             const dbShiplist =
                 (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
