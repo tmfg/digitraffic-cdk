@@ -65,13 +65,15 @@ export class UrlChecker {
         await synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
-    async expect403WithoutApiKey(url: string): Promise<any> {
+    async expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<any> {
         const requestOptions = {...this.requestOptions, ...{
             path: url,
             headers: baseHeaders
         }};
 
-        await synthetics.executeHttpStep("Verify 403 for " + url, requestOptions, validateStatusCodeAndContentType(403, MediaType.TEXT_PLAIN));
+        await synthetics.executeHttpStep("Verify 403 for " + url,
+            requestOptions,
+            validateStatusCodeAndContentType(403, mediaType ?? MediaType.TEXT_PLAIN));
     }
 
     async done(): Promise<string> {
