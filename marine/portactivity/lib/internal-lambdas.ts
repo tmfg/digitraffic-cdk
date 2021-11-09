@@ -116,7 +116,7 @@ function createProcessQueueLambda(
     const environment = stack.createLambdaEnvironment();
     const processQueueLambda = MonitoredFunction.createV2(stack, 'process-queue', environment, {
         timeout: 10,
-        reservedConcurrentExecutions: 8
+        reservedConcurrentExecutions: 10
     });
 
     processQueueLambda.addEventSource(new SqsEventSource(queue));
