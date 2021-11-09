@@ -19,7 +19,6 @@ export function handlerFn(
                 ships.length);
 
             for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {
-                console.debug('DEBUG method=triggerAwakeAiETATimestampsUpdateHandler sending ETA update requests %s', JSON.stringify(chunk));
                 await SNSUtil.snsPublish(JSON.stringify(chunk), publishTopic, sns);
             }
         }, {});
