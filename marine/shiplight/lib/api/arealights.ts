@@ -1,7 +1,42 @@
 import axios from 'axios';
-import {AxiosError} from 'axios';
-import {MediaType} from "digitraffic-common/api/mediatypes";
 import {AreaTraffic} from "../model/areatraffic";
+
+export enum AreaLightsBrightenCommand {
+    NOMINAL = 'Nominal',
+    LOW = 'Low',
+    MEDIUM = 'Medium',
+    MAX = 'Max'
+}
+
+export type AreaLightsBrightenRequest = {
+
+    /**
+     * Route id
+     */
+    readonly routeId: number
+
+    /**
+     * Level of brightness
+     */
+    readonly command: AreaLightsBrightenCommand
+
+    /**
+     * Time to set the brighness on in minutes
+     */
+    readonly time: number
+}
+
+export type AreaLightsBrightenResponse = {
+    /**
+     * ATON numbers for successful lights set commands
+     */
+    readonly LightsSetSentSuccessfully: number[]
+
+    /**
+     * ATON numbers for failed lights set commands
+     */
+    readonly LightsSetSentFailed: number
+}
 
 export class AreaLightsApi {
 
@@ -13,10 +48,10 @@ export class AreaLightsApi {
         this.apiKey = apiKey;
     }
 
-    async updateLightsForArea(areaTraffic: AreaTraffic): Promise<void> {
+    async updateLightsForArea(request: AreaLightsBrightenRequest): Promise<AreaLightsBrightenResponse> {
         const start = Date.now();
         try {
-            const resp = await axios.post(this.url, areaTraffic, {
+            const resp = await axios.post(this.url, request, {
                 headers: {
                     'api-key': this.apiKey
                 }
