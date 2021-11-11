@@ -4,24 +4,37 @@ import {IDatabase} from 'pg-promise';
 import moment from 'moment-timezone';
 import * as R from 'ramda';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import * as IdUtils from 'digitraffic-common/marine/id_utils';
+import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export const handler = async (event: any): Promise<any> => {
     return handlerFn(event, withDbSecret);
 };
 
+function badRequest(message: string): Promise<object> {
+    return Promise.resolve({
+        statusCode: 400,
+        body: message,
+        headers: {
+            'content-type': MediaType.TEXT_PLAIN
+        }
+    });
+}
+
 export async function handlerFn(
     event: any,
-    withDbSecretFn: (
-        secretId: string,
-        fn: (_: any) => Promise<void>
-    ) => Promise<any>
+    withDbSecretFn: SecretFunction
 ): Promise<any> {
 
     return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
         if (!event.queryStringParameters.locode) {
-            return Promise.resolve({statusCode: 400, body: 'Missing locode'});
+            return badRequest('Missing LOCODE');
         }
+        if (!IdUtils.isValidLOCODE(event.queryStringParameters.locode)) {
+            return badRequest('Invalid LOCODE');
+        }
+
         return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
             const dbShiplist =
                 (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))

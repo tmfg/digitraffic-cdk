@@ -34,9 +34,7 @@ export function handlerFn(
             if (!service) {
                 service = new AwakeAiETAServiceClass(new AwakeAiETAApi(secret["awake.url"], secret["awake.auth"]));
             }
-            console.info(`method=updateAwakeAiTimestampsLambda fetching timestamps for ${ships.length} ships`);
             const timestamps = await service.getAwakeAiTimestamps(ships);
-            console.info(`method=updateAwakeAiTimestampsLambda received timestamps for ${timestamps.length} ships`);
 
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
         }, {expectedKeys});

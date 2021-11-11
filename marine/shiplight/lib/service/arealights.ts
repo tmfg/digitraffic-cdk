@@ -1,4 +1,4 @@
-import {AreaLightsApi} from "../api/arealights";
+import {AreaLightsApi, AreaLightsBrightenCommand} from "../api/arealights";
 import {AreaTraffic} from "../model/areatraffic";
 
 export class AreaLightsService {
@@ -18,7 +18,12 @@ export class AreaLightsService {
             areaTraffic.areaId,
             areaTraffic.durationInMinutes,
             areaTraffic.visibilityInMetres);
-        // TODO disabled as API doesn't yet exist
-        //await this.api.updateLightsForArea(areaTraffic);
+        /* API not yet available
+        await this.api.updateLightsForArea({
+            routeId: areaTraffic.areaId,
+            command: AreaLightsBrightenCommand.MAX,
+            time: areaTraffic.durationInMinutes
+        });
+         */
     }
 }

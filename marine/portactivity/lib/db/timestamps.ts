@@ -140,7 +140,7 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.portcall_id = pe.portcall_id
           ) AND
-          pe.event_time < NOW() + INTERVAL '1 DAY' AND
+          pe.event_time < NOW() + INTERVAL '84 HOUR' AND
           pe.event_type = 'ETA' AND
           pe.event_source = 'Portnet' AND
           pe.location_locode IN ($1:list) AND
