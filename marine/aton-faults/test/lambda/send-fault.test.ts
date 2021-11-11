@@ -7,6 +7,7 @@ import {SNSEvent} from "aws-lambda";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
 import {S124Type, SendS124Event} from "../../lib/model/upload-voyageplan-event";
+import {createSecretFunction} from "digitraffic-common/test/secret";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;
@@ -31,8 +32,7 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
                 id: fault.id,
                 callbackEndpoint: `http://localhost:${SERVER_PORT}/area`
             };
-            const withSecret: SecretFunction = (secretId: any, fn: any, options: any) => Promise.resolve({
-            });
+            const withSecret: SecretFunction = createSecretFunction({});
             server.listen(SERVER_PORT, {
                 "/area": (url: string | undefined, data: string | undefined) => {
                     receivedData = data;

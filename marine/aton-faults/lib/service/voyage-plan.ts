@@ -9,13 +9,11 @@ export class VoyagePlanService {
     private readonly sns: SNS;
     private readonly callbackEndpoint: string;
     private readonly sendFaultsSnsTopicArn: string;
-    private readonly secret: AtonSecret;
 
-    constructor(sns: SNS, callbackEndpoint: string, sendFaultsSnsTopicArn: string, secret: AtonSecret) {
+    constructor(sns: SNS, callbackEndpoint: string, sendFaultsSnsTopicArn: string) {
         this.sns = sns;
         this.callbackEndpoint = callbackEndpoint;
         this.sendFaultsSnsTopicArn = sendFaultsSnsTopicArn;
-        this.secret = secret;
     }
 
     async handleVoyagePlan(voyagePlan: RtzVoyagePlan) {

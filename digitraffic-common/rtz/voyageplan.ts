@@ -39,7 +39,15 @@ export type RtzSchedules = {
     readonly schedule: RtzScheduleWrapper[]
 }
 
+export type RtzRouteInfo = {
+    readonly $: {
+        readonly vesselMMSI: string
+        readonly vesselIMO: string
+    }
+}
+
 export type RtzRoute = {
+    readonly routeInfo: RtzRouteInfo[]
     readonly waypoints: RtzWaypoint[]
     readonly schedules: RtzSchedules[]
 }

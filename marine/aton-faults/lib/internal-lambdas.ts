@@ -32,6 +32,6 @@ function createSendFaultLambda(stack: DigitrafficStack): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
 
     return MonitoredFunction.createV2(stack, 'send-s124', environment, {
-        memorySize: 512
+        reservedConcurrentExecutions: 40
     });
 }

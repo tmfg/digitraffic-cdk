@@ -189,7 +189,9 @@ function createFixedDateRangeForWarning(p: any) {
     if(p.validityEndTime) {
         return {
             timeOfDayStart: moment(vst).format(HOUR_MINUTE_SECOND),
-            dateStart: moment(vst).format(YEAR_MONTH_DAY),
+            dateStart: {
+                date: moment(vst).format(YEAR_MONTH_DAY)
+            },
         }
     }
 
@@ -210,7 +212,9 @@ function createFixedDateRangeForFault(fault: any) {
 
     return {
         timeOfDayStart: moment(fault.entry_timestamp).format(HOUR_MINUTE_SECOND),
-        dateStart: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY) ,
+        dateStart: {
+            date: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY)
+        }
     }
 }
 

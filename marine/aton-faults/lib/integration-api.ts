@@ -1,6 +1,13 @@
-import {Model, PassthroughBehavior, Resource, RestApi} from '@aws-cdk/aws-apigateway';
+import {
+    IdentitySource,
+    Model,
+    PassthroughBehavior,
+    RequestAuthorizer,
+    Resource,
+    RestApi
+} from '@aws-cdk/aws-apigateway';
 import {Function} from '@aws-cdk/aws-lambda';
-import {Construct} from "@aws-cdk/core";
+import {Construct, Duration} from "@aws-cdk/core";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {Topic} from "@aws-cdk/aws-sns";
@@ -12,6 +19,10 @@ import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-commo
 import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
+import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {MarinecamEnvKeys} from "marinecam/lib/keys";
+import {lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
 
 export function create(stack: DigitrafficStack, sendFaultTopic: Topic) {
     const integrationApi = new DigitrafficRestApi(stack,
@@ -36,10 +47,28 @@ function createUploadVoyagePlanHandler(
     stack.grantSecret(handler);
     new DigitrafficLogSubscriptions(stack, handler);
 
+//    const authorizer = createLambdaAuthorizer(stack);
+
     const resource = integrationApi.root.addResource("s124").addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
     sendFaultTopic.grantPublish(handler);
 }
+
+function createLambdaAuthorizer(stack: DigitrafficStack): RequestAuthorizer {
+    const functionName = 'ATON-Authorizer';
+    const environment: LambdaEnvironment = {};
+
+    const authFunction = MonitoredFunction.create(stack, functionName, lambdaFunctionProps(stack, environment, functionName, 'authorizer', {
+        timeout: 10,
+    }));
+
+    return new RequestAuthorizer(stack, 'voyageplan-authorizer', {
+        handler: authFunction,
+        resultsCacheTtl: Duration.minutes(0),
+        identitySources: []
+    });
+}
+
 
 function createIntegrationResource(
     stack: Construct,
@@ -91,6 +120,6 @@ function createHandler(stack: DigitrafficStack, sendFaultTopic: Topic): Monitore
     environment[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
 
     return MonitoredFunction.createV2(stack, 'upload-voyage-plan', environment, {
-        memorySize: 512
+        memorySize: 256
     });
 }

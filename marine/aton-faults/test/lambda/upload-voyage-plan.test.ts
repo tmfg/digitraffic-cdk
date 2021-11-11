@@ -7,12 +7,13 @@ import * as sinon from 'sinon';
 import {SinonStub} from "sinon";
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 import {UploadVoyagePlanEvent} from "../../lib/model/upload-voyageplan-event";
+import {createSecretFunction} from "../../../../digitraffic-common/test/secret";
 
 const sandbox = sinon.createSandbox();
 
 describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
-    const secretFn = async (secret: string, fn: any) => {await fn(secret)};
+    const secretFn = createSecretFunction({});
 
     afterEach(() => sandbox.restore());
 
@@ -45,18 +46,6 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         await handlerFn(sns, secretFn)(uploadEvent);
 
         expect(snsPublishStub.callCount).toBe(2);
-    });
-
-    test('no publish with no callback endpoint', async () => {
-        await insertFault(db);
-        const uploadEvent: UploadVoyagePlanEvent = {
-            voyagePlan
-        };
-        const [sns, snsPublishStub] = makeSnsPublishStub();
-
-        await handlerFn(sns, secretFn)(uploadEvent);
-
-        expect(snsPublishStub.notCalled).toBe(true);
     });
 
     test('failed route parsing', async () => {
