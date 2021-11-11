@@ -18,7 +18,7 @@ export type AwakeAiVoyageResponse = {
 }
 
 export enum AwakeAiVoyageShipStatus {
-    UNDER_WAY = 'under_way',
+    UNDER_WAY = 'underway',
     STOPPED = 'stopped',
     NOT_PREDICTABLE = 'not_predictable',
     VESSEL_DATA_NOT_UPDATED = 'vessel_data_not_updated'

@@ -150,6 +150,8 @@ export class AwakeAiETAService {
             return null;
         }
 
+        console.info('method=isValidSchedule schedule was valid');
+
         return etaPrediction;
     }
 

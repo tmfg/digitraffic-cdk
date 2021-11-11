@@ -8,8 +8,8 @@ import {DbETAShip} from "../../db/timestamps";
 import {sendMessage} from "../../service/queue-service";
 
 type UpdateAwakeAiTimestampsSecret = {
-    readonly 'awake.url': string
-    readonly 'awake.auth': string
+    readonly 'awake.voyagesurl': string
+    readonly 'awake.voyagesauth': string
 }
 
 let service: AwakeAiETAService;
@@ -32,7 +32,7 @@ export function handlerFn(
 
         return withSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<any> => {
             if (!service) {
-                service = new AwakeAiETAServiceClass(new AwakeAiVoyagesApi(secret["awake.url"], secret["awake.auth"]));
+                service = new AwakeAiETAServiceClass(new AwakeAiVoyagesApi(secret["awake.voyagesurl"], secret["awake.voyagesauth"]));
             }
             const timestamps = await service.getAwakeAiTimestamps(ships);
 
