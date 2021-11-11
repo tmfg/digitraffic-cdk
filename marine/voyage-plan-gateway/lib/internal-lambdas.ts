@@ -1,5 +1,4 @@
 import {AssetCode, Runtime} from '@aws-cdk/aws-lambda';
-import {IVpc} from '@aws-cdk/aws-ec2';
 import {Duration, Stack} from '@aws-cdk/core';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
@@ -19,7 +18,6 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Rule, Schedule} from "@aws-cdk/aws-events";
 import {LambdaFunction} from "@aws-cdk/aws-events-targets";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
@@ -27,6 +25,11 @@ export function create(
     notifyTopic: Topic,
     props: VoyagePlanGatewayProps,
     stack: DigitrafficStack) {
+
+    const rtzBucket = new Bucket(stack, 'RTZStorageBucket', {
+        bucketName: props.rtzStorageBucketName,
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+    });
 
     const dlqBucket = new Bucket(stack, 'DLQBucket', {
         bucketName: props.dlqBucketName,
@@ -64,6 +67,7 @@ export function create(
     createUploadVoyagePlanLambda(
         secret,
         sendRouteQueue,
+        rtzBucket,
         props,
         stack);
     createProcessDLQLambda(
@@ -118,12 +122,16 @@ function createProcessVisMessagesLambda(
 function createUploadVoyagePlanLambda(
     secret: ISecret,
     sendRouteQueue: Queue,
+    rtzBucket: Bucket,
     props: VoyagePlanGatewayProps,
     stack: DigitrafficStack) {
 
     const functionName = "VPGW-UploadVoyagePlan";
+
     const environment = {} as any;
     environment[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
+    environment[VoyagePlanEnvKeys.BUCKET_NAME] = rtzBucket.bucketName;
+
     const lambdaConf = defaultLambdaConfiguration({
         functionName: functionName,
         code: new AssetCode('dist/lambda/upload-voyage-plan'),

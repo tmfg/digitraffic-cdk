@@ -11,6 +11,7 @@ import {RtzStorageApi} from "../../api/rtzstorage";
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
+const bucketName = process.env[VoyagePlanEnvKeys.BUCKET_NAME] as string;
 
 export type SnsEvent = {
     readonly Records: {
@@ -21,7 +22,6 @@ export type SnsEvent = {
 type VoyagePlanSecrets = {
     readonly 'vpgw.vtsUrl'?: string
     readonly 'vpgw.slackUrl'?: string
-    readonly 'vpgw.bucketName': string
 }
 
 let api: VtsApi | null = null
@@ -60,7 +60,7 @@ export function handlerFn(
             }
 
             if (!rtzStorageApi) {
-                rtzStorageApi = new RtzStorageApi(secret["vpgw.bucketName"]);
+                rtzStorageApi = new RtzStorageApi(bucketName);
             }
 
             if (!slackApi && secret["vpgw.slackUrl"]) {
