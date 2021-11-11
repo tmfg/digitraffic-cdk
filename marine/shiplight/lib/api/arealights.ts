@@ -35,7 +35,7 @@ export type AreaLightsBrightenResponse = {
     /**
      * ATON numbers for failed lights set commands
      */
-    readonly LightsSetSentFailed: number
+    readonly LightsSetSentFailed: number[]
 }
 
 export class AreaLightsApi {

@@ -35,7 +35,10 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
                 visibilityInMetres
             }));
         const updateLightsForAreaStub =
-            sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve());
+            sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve({
+                LightsSetSentFailed: [],
+                LightsSetSentSuccessfully: []
+            }));
         await insertAreaTraffic(db, areaId, 'testi1', durationInMinutes, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
         await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
         await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
