@@ -184,6 +184,7 @@ describe('voyageplans service', () => {
     test('validateStructure - ok', () => {
         const validationErrors = VoyagePlansService.validateStructure({
             route: {
+                routeInfo: [],
                 waypoints: [{
                     waypoint: [
                         {
