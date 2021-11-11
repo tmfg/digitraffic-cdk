@@ -3,15 +3,15 @@ import {ApiTimestamp, EventType} from "../lib/model/timestamp";
 import {
     AwakeAiATXEventType,
     AwakeAIATXTimestampMessage,
-    AwakeAiATXZoneType,
     AwakeATXZoneEventType
 } from "../lib/api/awake_ai_atx";
+import {AwakeAiZoneType} from "../lib/api/awake_common";
 
 const { v4: uuidv4 } = require('uuid');
 
 export function newAwakeATXMessage(options?: {
     zoneEventType?: AwakeATXZoneEventType,
-    zoneType?: AwakeAiATXZoneType
+    zoneType?: AwakeAiZoneType
 }): AwakeAIATXTimestampMessage {
     return {
         eventType: 'zone-event',
@@ -26,7 +26,7 @@ export function newAwakeATXMessage(options?: {
         location: [53.2, 40.3],
         zoneName: 'somezone',
         zoneEventType: options?.zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
-        zoneType: options?.zoneType ?? AwakeAiATXZoneType.BERTH
+        zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH
     };
 }
 

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/api/mediatypes";
+import {AwakeAiZoneType} from "./awake_common";
 
 export enum AwakeAiETAResponseType {
     OK = 'OK',
@@ -11,38 +12,74 @@ export enum AwakeAiETAResponseType {
     UNKNOWN = 'UNKNOWN'
 }
 
-export type AwakeAiETAResponse = {
+export type AwakeAiVoyageResponse = {
     readonly type: AwakeAiETAResponseType
-    readonly eta?: AwakeAiETA
+    readonly schedule?: AwakeAiVoyageShipVoyageSchedule
 }
 
-export enum AwakeAiETAShipStatus {
+export enum AwakeAiVoyageShipStatus {
     UNDER_WAY = 'under_way',
     STOPPED = 'stopped',
     NOT_PREDICTABLE = 'not_predictable',
     VESSEL_DATA_NOT_UPDATED = 'vessel_data_not_updated'
 }
 
-export type AwakeAiETA = {
-    readonly mmsi: number
-    readonly imo?: number
-    readonly shipName?: string,
-    readonly status: AwakeAiETAShipStatus
-
-    // ISO 8601
-    readonly timestamp?: string,
-
-    // locode
-    readonly predictedDestination?: string,
-
-    // ISO 8601
-    readonly predictedEta?: string,
-
-    // seconds
-    readonly predictedTravelTime?: number
+export enum AwakeAiVoyagePredictability {
+    PREDICTABLE = 'predictable',
+    NOT_PREDICTABLE = 'not-predictable',
+    SHIP_DATA_NOT_UPDATED = 'ship-data-not-updated'
 }
 
-export class AwakeAiETAApi {
+export enum AwakeAiVoyagePredictionType {
+    ETA = 'eta',
+    TRAVEL_TIME = 'travel-time',
+    DESTINATION = 'destination'
+}
+
+export type AwakeAiVoyagePrediction = {
+
+    readonly predictionType: AwakeAiVoyagePredictionType
+
+    // ISO 8601
+    readonly recordTime: string
+
+    readonly locode: string
+}
+
+export type AwakeAiVoyageEtaPrediction = AwakeAiVoyagePrediction & {
+
+    readonly zoneType: AwakeAiZoneType
+
+    // ISO 8601
+    readonly arrivalTime: string
+}
+
+export type AwakeAiVoyagePredictedVoyage = {
+
+    readonly voyageStatus: AwakeAiVoyageShipStatus
+
+    /**
+     * Voyage sequence number, 0 for current voyage.
+     */
+    readonly sequenceNo: number
+
+    readonly predictions: AwakeAiVoyagePrediction[]
+}
+
+export type AwakeAiVoyageShipVoyageSchedule = {
+
+    readonly ship: {
+        readonly mmsi: number
+        readonly imo?: number
+        readonly shipName?: string,
+    }
+
+    readonly predictability: AwakeAiVoyagePredictability
+
+    readonly predictedVoyages: AwakeAiVoyagePredictedVoyage[]
+}
+
+export class AwakeAiVoyagesApi {
 
     private readonly url: string
     private readonly apiKey: string
@@ -52,27 +89,27 @@ export class AwakeAiETAApi {
         this.apiKey = apiKey;
     }
 
-    async getETA(imo: number): Promise<AwakeAiETAResponse> {
+    async getETA(imo: number): Promise<AwakeAiVoyageResponse> {
         try {
             const resp = await axios.get(`${this.url}/${imo}`, {
                 headers: {
-                    'x-awake-access-token': this.apiKey,
+                    Authorization: this.apiKey,
                     Accept: MediaType.APPLICATION_JSON
                 }
             });
             return {
                 type: AwakeAiETAResponseType.OK,
-                eta: resp.data
+                schedule: resp.data
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                return AwakeAiETAApi.handleError(error as AxiosError);
+                return AwakeAiVoyagesApi.handleError(error as AxiosError);
             }
             throw error;
         }
     }
 
-    static handleError(error: { response?: { status: number } }): AwakeAiETAResponse {
+    static handleError(error: { response?: { status: number } }): AwakeAiVoyageResponse {
         if (!error.response) {
             return {
                 type: AwakeAiETAResponseType.NO_RESPONSE
