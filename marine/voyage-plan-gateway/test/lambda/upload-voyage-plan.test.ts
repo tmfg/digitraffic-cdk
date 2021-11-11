@@ -4,6 +4,7 @@ import moment from 'moment-timezone';
 import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
 import {VtsApi} from "../../lib/api/vts";
 import {SlackApi} from "digitraffic-common/slack/slack-api";
+import {RtzStorageApi} from "../../lib/api/rtzstorage";
 const zlib = require('zlib');
 
 const sandbox = sinon.createSandbox();
@@ -22,6 +23,7 @@ describe('upload-voyage-plan', () => {
 
     test('validation success with correct voyage plan', async () => {
         sinon.stub(VtsApi.prototype, 'sendVoyagePlan').returns(Promise.resolve());
+        sinon.stub(RtzStorageApi.prototype, 'storeVoyagePlan').returns(Promise.resolve());
 
         const uploadEvent = createSnsEvent(voyagePlan());
 

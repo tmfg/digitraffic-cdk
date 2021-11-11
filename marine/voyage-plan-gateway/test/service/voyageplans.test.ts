@@ -1,5 +1,5 @@
 import * as VoyagePlansService from '../../lib/service/voyageplans';
-import {getRandomNumber, randomBoolean} from "digitraffic-common/test/testutils";
+import {randomBoolean} from "digitraffic-common/test/testutils";
 import moment from 'moment-timezone';
 import {ValidationError} from "../../lib/service/voyageplans";
 
@@ -184,6 +184,7 @@ describe('voyageplans service', () => {
     test('validateStructure - ok', () => {
         const validationErrors = VoyagePlansService.validateStructure({
             route: {
+                routeInfo: [],
                 waypoints: [{
                     waypoint: [
                         {

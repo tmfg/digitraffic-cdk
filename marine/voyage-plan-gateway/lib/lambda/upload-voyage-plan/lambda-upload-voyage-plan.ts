@@ -7,9 +7,11 @@ import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 import {VtsApi} from "../../api/vts";
 import {SlackApi} from "digitraffic-common/slack/slack-api";
+import {RtzStorageApi} from "../../api/rtzstorage";
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
+const bucketName = process.env[VoyagePlanEnvKeys.BUCKET_NAME] as string;
 
 export type SnsEvent = {
     readonly Records: {
@@ -23,8 +25,8 @@ type VoyagePlanSecrets = {
 }
 
 let api: VtsApi | null = null
-
 let slackApi: SlackApi | null = null;
+let rtzStorageApi: RtzStorageApi | null = null;
 
 /**
  * XML parsing and validation errors do not throw an error. This is to remove invalid messages from the queue.
@@ -57,6 +59,10 @@ export function handlerFn(
                 return Promise.resolve('XML parsing failed');
             }
 
+            if (!rtzStorageApi) {
+                rtzStorageApi = new RtzStorageApi(bucketName);
+            }
+
             if (!slackApi && secret["vpgw.slackUrl"]) {
                 slackApi = new SlackApiClass(secret["vpgw.slackUrl"]);
             }
@@ -64,6 +70,7 @@ export function handlerFn(
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {
                 console.warn('method=uploadVoyagePlan XML structure validation failed', structureValidationErrors);
+                await rtzStorageApi.storeVoyagePlan(visMessage.message, false);
                 await slackApi?.notify('Failed validation, invalid structure :' + visMessage.message);
                 return Promise.resolve('XML structure validation failed');
             }
@@ -71,9 +78,12 @@ export function handlerFn(
             const contentValidationErrors = VoyagePlansService.validateContent(voyagePlan);
             if (contentValidationErrors.length) {
                 console.warn('method=uploadVoyagePlan XML content validation failed', contentValidationErrors);
+                await rtzStorageApi.storeVoyagePlan(visMessage.message, false);
                 await slackApi?.notify('Failed validation, invalid content :' + visMessage.message);
                 return Promise.resolve('XML content was not valid');
             }
+
+            await rtzStorageApi.storeVoyagePlan(visMessage.message, true);
 
             if (!api && secret["vpgw.vtsUrl"]) {
                 api = new VtsApiClass(secret["vpgw.vtsUrl"]);

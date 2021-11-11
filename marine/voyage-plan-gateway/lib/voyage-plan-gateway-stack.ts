@@ -1,5 +1,4 @@
-import {Construct, StackProps} from '@aws-cdk/core';
-import {Vpc} from '@aws-cdk/aws-ec2';
+import {Construct} from '@aws-cdk/core';
 import * as IntegrationApi from './integration-api';
 import * as InternalLambdas from './internal-lambdas';
 import * as PublicApi from './public-api';
