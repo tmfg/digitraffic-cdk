@@ -33,11 +33,13 @@ export class VisService {
         }
     }
 
-    async queryMrsForImo(imo: string): Promise<any> {
+    async queryCallBackForImo(imo: string): Promise<any> {
         const start = Date.now();
 
         try {
-            return VisApi.query(imo, this.serviceRegistryUrl, this.ca, this.clientCertificate, this.privateKey);
+            const callback = await VisApi.query(imo, this.serviceRegistryUrl);
+
+            return callback;
         } finally {
             console.info(`method=queryMrsForImo tookMs=%d`, Date.now() - start);
         }

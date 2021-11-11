@@ -21,6 +21,7 @@ export async function postDocument(
                 'Content-Type': 'text/xml;charset=utf-8'
             }
         });
+
         if (resp.status != 200) {
             console.error(`method=postDocument returned status=${resp.status}, status text: ${resp.statusText}`);
             return Promise.reject();
@@ -33,23 +34,12 @@ export async function postDocument(
     }
 }
 
-export async function query(imo: string,
-                            url: string,
-                            ca: string,
-                            clientCertificate: string,
-                            privateKey: string): Promise<any> {
+export async function query(imo: string, url: string): Promise<any> {
     const queryUrl = `${url}/api/_search/serviceInstance?query=imo:${imo}`;
     console.info(`method=query url=${queryUrl}`);
 
-    // try-catch so axios won't log keys/certs
     try {
-        const resp = await axios.get(queryUrl, {
-            /*httpsAgent: new Agent({
-                ca,
-                cert: clientCertificate,
-                key: privateKey
-            })*/
-        });
+        const resp = await axios.get(queryUrl);
         if (resp.status != 200) {
             console.error(`method=query returned status=${resp.status}, status text: ${resp.statusText}`);
             return Promise.reject();
@@ -59,15 +49,19 @@ export async function query(imo: string,
 
         const instanceList = resp.data;
 
-        if(instanceList && instanceList.length == 1) {
+        if(!instanceList) {
+            console.info("empty instanceList!");
+            return null;
+        } else if(instanceList.length == 1) {
             return instanceList[0].endpointUri;
         }
+
+        console.info("instancelist length %d!", instanceList.length);
 
         return null;
     } catch (error: any) {
         // can't log error without exposing keys/certs
         console.error('method=query unexpected error');
-        console.error(error);
         return Promise.reject();
     }
 

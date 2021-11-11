@@ -40,14 +40,15 @@ export async function findAllFaults(language: Language, fixedInHours: number): P
     });
 }
 
-export async function getFaultS124ById(faultId: number): Promise<string> {
+export async function getFaultS124ById(db: IDatabase<any, any>, faultId: number): Promise<string|null> {
     const start = Date.now();
-
-    const fault = await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
-        return await FaultsDB.getFaultById(db, faultId);
-    });
+    const fault = await FaultsDB.getFaultById(db, faultId);
 
     try {
+        if(!fault) {
+            return null;
+        }
+
         return new Builder().buildObject(S124Converter.convertFault(fault));
     } finally {
         console.info("method=getFaultS124ById tookMs=%d", Date.now() - start);

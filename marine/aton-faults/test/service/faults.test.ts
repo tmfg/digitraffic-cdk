@@ -19,7 +19,11 @@ describe('faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [fault]);
 
-        const faultS124 = await getFaultS124ById(fault.id);
+        const faultS124 = await getFaultS124ById(db, fault.id);
+
+        if(!faultS124) {
+            throw 'empty';
+        }
 
         console.info(faultS124);
 

@@ -23,8 +23,9 @@ import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {MarinecamEnvKeys} from "marinecam/lib/keys";
 import {lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {Queue, QueueProps} from "@aws-cdk/aws-sqs";
 
-export function create(stack: DigitrafficStack, sendFaultTopic: Topic) {
+export function create(stack: DigitrafficStack, s124Queue: Queue) {
     const integrationApi = new DigitrafficRestApi(stack,
         'ATON-Integration',
         'ATON Faults integration API');
@@ -34,16 +35,17 @@ export function create(stack: DigitrafficStack, sendFaultTopic: Topic) {
 
     createUsagePlan(integrationApi, 'ATON Faults CloudFront API Key', 'ATON Faults CloudFront Usage Plan');
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
-    createUploadVoyagePlanHandler(stack, messageResponseModel, sendFaultTopic, integrationApi);
+    createUploadVoyagePlanHandler(stack, messageResponseModel, s124Queue, integrationApi);
 }
 
 function createUploadVoyagePlanHandler(
     stack: DigitrafficStack,
     messageResponseModel: Model,
-    sendFaultTopic: Topic,
+    s124Queue: Queue,
     integrationApi: RestApi) {
 
-    const handler = createHandler(stack, sendFaultTopic);
+    const handler = createHandler(stack, s124Queue);
+
     stack.grantSecret(handler);
     new DigitrafficLogSubscriptions(stack, handler);
 
@@ -51,24 +53,8 @@ function createUploadVoyagePlanHandler(
 
     const resource = integrationApi.root.addResource("s124").addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
-    sendFaultTopic.grantPublish(handler);
+    s124Queue.grantSendMessages(handler);
 }
-
-function createLambdaAuthorizer(stack: DigitrafficStack): RequestAuthorizer {
-    const functionName = 'ATON-Authorizer';
-    const environment: LambdaEnvironment = {};
-
-    const authFunction = MonitoredFunction.create(stack, functionName, lambdaFunctionProps(stack, environment, functionName, 'authorizer', {
-        timeout: 10,
-    }));
-
-    return new RequestAuthorizer(stack, 'voyageplan-authorizer', {
-        handler: authFunction,
-        resultsCacheTtl: Duration.minutes(0),
-        identitySources: []
-    });
-}
-
 
 function createIntegrationResource(
     stack: Construct,
@@ -115,9 +101,9 @@ function createIntegrationResource(
         stack);
 }
 
-function createHandler(stack: DigitrafficStack, sendFaultTopic: Topic): MonitoredFunction {
+function createHandler(stack: DigitrafficStack, s124Queue: Queue): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
-    environment[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] = sendFaultTopic.topicArn;
+    environment[AtonEnvKeys.SEND_S124_QUEUE_URL] = s124Queue.queueUrl;
 
     return MonitoredFunction.createV2(stack, 'upload-voyage-plan', environment, {
         memorySize: 256

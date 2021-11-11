@@ -1,22 +1,27 @@
 import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {AtonProps} from "./app-props";
-import {Topic} from "@aws-cdk/aws-sns";
-import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
 import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {Scheduler} from "digitraffic-common/scheduler/scheduler";
+import {Queue} from "@aws-cdk/aws-sqs";
+import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
+import {Duration} from "@aws-cdk/core";
 
-export function create(stack: DigitrafficStack, sendFaultTopic: Topic) {
+export function create(stack: DigitrafficStack, s124Queue: Queue) {
     const updateFaultsLambda = createUpdateFaultsLambda(stack);
-    const sendFaultLambda = createSendFaultLambda(stack);
+    const sendS124Lambda = createSendS124Lambda(stack);
 
     Scheduler.everyMinutes(stack, 'Rule', 10, updateFaultsLambda);
-    sendFaultTopic.addSubscription(new LambdaSubscription(sendFaultLambda));
 
-    stack.grantSecret(updateFaultsLambda, sendFaultLambda);
+    sendS124Lambda.addEventSource(new SqsEventSource(s124Queue, {
+        batchSize: 8,
+        maxBatchingWindow: Duration.seconds(5)
+    }));
 
-    new DigitrafficLogSubscriptions(stack, updateFaultsLambda, sendFaultLambda);
+    stack.grantSecret(updateFaultsLambda, sendS124Lambda);
+
+    new DigitrafficLogSubscriptions(stack, updateFaultsLambda, sendS124Lambda);
 }
 
 function createUpdateFaultsLambda(stack: DigitrafficStack): MonitoredFunction {
@@ -28,10 +33,12 @@ function createUpdateFaultsLambda(stack: DigitrafficStack): MonitoredFunction {
     });
 }
 
-function createSendFaultLambda(stack: DigitrafficStack): MonitoredFunction {
+function createSendS124Lambda(stack: DigitrafficStack): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
 
     return MonitoredFunction.createV2(stack, 'send-s124', environment, {
-        reservedConcurrentExecutions: 40
+        memorySize: 256,
+        reservedConcurrentExecutions: 10,
+        timeout: 40
     });
 }

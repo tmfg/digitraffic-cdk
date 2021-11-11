@@ -1,7 +1,7 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
-import {SNS} from "aws-sdk";
+import {SQS} from "aws-sdk";
 import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 import {AtonEnvKeys} from "../../keys";
@@ -18,11 +18,11 @@ import {VisService} from "../../service/vis";
  */
 
 const secretId = process.env[SECRET_ID] as string;
-const sendFaultSnsTopicArn = process.env[AtonEnvKeys.SEND_FAULT_SNS_TOPIC_ARN] as string;
+const sendS124QueueUrl = process.env[AtonEnvKeys.SEND_S124_QUEUE_URL] as string;
 
 let visService: VisService;
 
-export function handlerFn(sns: SNS, doWithSecret: SecretFunction): (event: UploadVoyagePlanEvent) => Promise<void> {
+export function handlerFn(sqs: SQS, doWithSecret: SecretFunction): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function(event: UploadVoyagePlanEvent): Promise<void> {
         if(!visService) {
             await doWithSecret(secretId, async (secret: AtonSecret) => {
@@ -51,7 +51,7 @@ export function handlerFn(sns: SNS, doWithSecret: SecretFunction): (event: Uploa
         if (!endpoint) {
             console.info("no endpoint url!");
         } else {
-            const vpService = new VoyagePlanService(sns, endpoint, sendFaultSnsTopicArn);
+            const vpService = new VoyagePlanService(sqs, endpoint, sendS124QueueUrl);
             return vpService.handleVoyagePlan(voyagePlan);
         }
     }
@@ -75,7 +75,7 @@ async function getEndpointUrl(event: UploadVoyagePlanEvent, voyagePlan: RtzVoyag
     console.info("DEBUG routeInfo " + JSON.stringify(voyagePlan.route.routeInfo, null, 2));
 
     try {
-        const url = await visService.queryMrsForImo(voyagePlan.route.routeInfo[0].$.vesselIMO);
+        const url = await visService.queryCallBackForImo(voyagePlan.route.routeInfo[0].$.vesselIMO);
 
         return `${url}/area`;
     } catch(e) {
@@ -83,4 +83,4 @@ async function getEndpointUrl(event: UploadVoyagePlanEvent, voyagePlan: RtzVoyag
     }
 }
 
-export const handler = handlerFn(new SNS(), withDbSecret);
+export const handler = handlerFn(new SQS(), withDbSecret);

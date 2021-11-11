@@ -2,7 +2,7 @@ import {dbTestBase, insert, insertActiveWarnings, TEST_ACTIVE_WARNINGS_VALID} fr
 import * as pgPromise from "pg-promise";
 import {handlerFn} from '../../lib/lambda/upload-voyage-plan/upload-voyage-plan';
 import {newFaultWithGeometry, voyagePlan} from "../testdata";
-import {SNS} from "aws-sdk";
+import {SQS} from "aws-sdk";
 import * as sinon from 'sinon';
 import {SinonStub} from "sinon";
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
@@ -27,11 +27,11 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
             voyagePlan,
             callbackEndpoint: 'some-endpoint'
         };
-        const [sns, snsPublishStub] = makeSnsPublishStub();
+        const [sqs, sendSbtu] = makeSqsStub();
 
-        await handlerFn(sns, secretFn)(uploadEvent);
+        await handlerFn(sqs, secretFn)(uploadEvent);
 
-        expect(snsPublishStub.callCount).toBe(2);
+        expect(sendSbtu.callCount).toBe(2);
     });
 
     test('publishes to SNS per warning id', async () => {
@@ -41,21 +41,21 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
             voyagePlan,
             callbackEndpoint: 'some-endpoint'
         };
-        const [sns, snsPublishStub] = makeSnsPublishStub();
+        const [sqs, sendStub] = makeSqsStub();
 
-        await handlerFn(sns, secretFn)(uploadEvent);
+        await handlerFn(sqs, secretFn)(uploadEvent);
 
-        expect(snsPublishStub.callCount).toBe(2);
+        expect(sendStub.callCount).toBe(2);
     });
 
     test('failed route parsing', async () => {
         const uploadEvent: UploadVoyagePlanEvent = {
             voyagePlan: 'asdfasdf'
         };
-        const [sns] = makeSnsPublishStub();
+        const [sqs] = makeSqsStub();
         const ackStub = sandbox.stub().returns(Promise.resolve());
 
-        await expect(handlerFn(sns, secretFn)(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
+        await expect(handlerFn(sqs, secretFn)(uploadEvent)).rejects.toMatch(BAD_REQUEST_MESSAGE);
 
         expect(ackStub.notCalled).toBe(true);
     });
@@ -67,9 +67,9 @@ async function insertFault(db: pgPromise.IDatabase<any, any>) {
     await insert(db, [fault]);
 }
 
-function makeSnsPublishStub(): [SNS, SinonStub] {
-    const sns = new SNS();
-    const publishStub = sandbox.stub().returns(Promise.resolve());
-    sandbox.stub(sns, 'publish').returns({promise: publishStub} as any);
-    return [sns, publishStub];
+function makeSqsStub(): [SQS, SinonStub] {
+    const sqs = new SQS();
+    const sendStub = sandbox.stub().returns(Promise.resolve());
+    sandbox.stub(sqs, 'sendMessage').returns({promise: sendStub} as any);
+    return [sqs, sendStub];
 }

@@ -1,19 +1,18 @@
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import * as FaultsService from "./faults";
 import * as WarningsService from "./warnings";
-import {SNS} from "aws-sdk";
-import {AtonSecret} from "../model/secret";
+import {SQS} from "aws-sdk";
 import {S124Type, SendS124Event} from "../model/upload-voyageplan-event";
 
 export class VoyagePlanService {
-    private readonly sns: SNS;
+    private readonly sqs: SQS;
     private readonly callbackEndpoint: string;
-    private readonly sendFaultsSnsTopicArn: string;
+    private readonly sendS124QueueUrl: string;
 
-    constructor(sns: SNS, callbackEndpoint: string, sendFaultsSnsTopicArn: string) {
-        this.sns = sns;
+    constructor(sqs: SQS, callbackEndpoint: string, sendS124QueueUrl: string) {
+        this.sqs = sqs;
         this.callbackEndpoint = callbackEndpoint;
-        this.sendFaultsSnsTopicArn = sendFaultsSnsTopicArn;
+        this.sendS124QueueUrl = sendS124QueueUrl;
     }
 
     async handleVoyagePlan(voyagePlan: RtzVoyagePlan) {
@@ -27,7 +26,7 @@ export class VoyagePlanService {
         console.info("sending %d faults", faultIds.length);
 
         for (const id of faultIds) {
-            await this.sendSns(this.sendFaultsSnsTopicArn, {
+            await this.sendSqs(this.sendS124QueueUrl, {
                 type: S124Type.FAULT,
                 id,
                 callbackEndpoint: this.callbackEndpoint
@@ -44,7 +43,7 @@ export class VoyagePlanService {
             console.info("sending %d warnings", warnings.features.length);
 
             for (const feature of warnings.features) {
-                await this.sendSns(this.sendFaultsSnsTopicArn, {
+                await this.sendSqs(this.sendS124QueueUrl, {
                     type: S124Type.WARNING,
                     id: feature.properties.id,
                     callbackEndpoint: this.callbackEndpoint
@@ -53,10 +52,10 @@ export class VoyagePlanService {
         }
     }
 
-    private sendSns(TopicArn: string, event: SendS124Event): Promise<any> {
-        return this.sns.publish({
-            Message: JSON.stringify(event),
-            TopicArn
+    private sendSqs(QueueUrl: string, event: SendS124Event): Promise<any> {
+        return this.sqs.sendMessage({
+            MessageBody: JSON.stringify(event),
+            QueueUrl
         }).promise();
     }
 }

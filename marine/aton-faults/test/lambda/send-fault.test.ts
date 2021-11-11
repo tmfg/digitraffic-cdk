@@ -3,7 +3,7 @@ import * as pgPromise from "pg-promise";
 import {handlerFn} from '../../lib/lambda/send-s124/send-s124';
 import {newFault} from "../testdata";
 import * as sinon from 'sinon';
-import {SNSEvent} from "aws-lambda";
+import {SQSEvent} from "aws-lambda";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
 import {S124Type, SendS124Event} from "../../lib/model/upload-voyageplan-event";
@@ -27,7 +27,7 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
                 }
             });
             await insert(db, [fault]);
-            const snsFaultEvent: SendS124Event = {
+            const s124Event: SendS124Event = {
                 type: S124Type.FAULT,
                 id: fault.id,
                 callbackEndpoint: `http://localhost:${SERVER_PORT}/area`
@@ -40,7 +40,7 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
                 }
             });
 
-            await handlerFn(withSecret)(createSnsEvent(snsFaultEvent));
+            await handlerFn(withSecret)(createSqsEvent(s124Event));
 
             // TODO better assertion
             expect(receivedData).toContain('S124:DataSet');
@@ -49,28 +49,12 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         }
 
     });
-
 }));
 
-function createSnsEvent(sendFaultEvent: SendS124Event): SNSEvent {
+function createSqsEvent(sendFaultEvent: SendS124Event): SQSEvent {
     return {
         Records: [{
-            EventSource: '',
-            EventSubscriptionArn: '',
-            EventVersion: '',
-            Sns: {
-                Message: JSON.stringify(sendFaultEvent),
-                MessageAttributes: {},
-                MessageId: '',
-                Signature: '',
-                SignatureVersion: '',
-                SigningCertUrl: '',
-                Subject: '',
-                Timestamp: '',
-                TopicArn: '',
-                Type: '',
-                UnsubscribeUrl: ''
-            }
+            body: JSON.stringify(sendFaultEvent),
         }]
-    };
+    } as SQSEvent;
 }
