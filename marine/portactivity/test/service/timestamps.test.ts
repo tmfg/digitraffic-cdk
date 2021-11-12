@@ -3,8 +3,9 @@ import * as pgPromise from "pg-promise";
 import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import moment from 'moment-timezone';
 import * as TimestampsService from "../../lib/service/timestamps";
-import {EventType} from "../../lib/model/timestamp";
+import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
+import * as R from "ramda";
 
 describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -96,9 +97,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     test('saveTimestamp - no IMO not saved', async () => {
-        const timestamp = newTimestamp();
-        // @ts-ignore
-        delete timestamp.ship['imo'];
+        const timestamp = R.dissocPath(["ship", "imo"], newTimestamp()) as ApiTimestamp;
 
         const ret = await TimestampsService.saveTimestamp(timestamp);
 
@@ -106,9 +105,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     });
 
     test('saveTimestamp - no MMSI not saved', async () => {
-        const timestamp = newTimestamp();
-        // @ts-ignore
-        delete timestamp.ship['mmsi'];
+        const timestamp = R.dissocPath(["ship", "mmsi"], newTimestamp()) as ApiTimestamp;
 
         const ret = await TimestampsService.saveTimestamp(timestamp);
 
@@ -119,12 +116,12 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp();
         const vessel = newVessel(timestamp);
         await insertVessel(db, vessel);
-        // @ts-ignore
-        delete timestamp.ship['imo'];
 
-        const ret = await TimestampsService.saveTimestamp(timestamp);
+        const timestamp2 = R.dissocPath(["ship", "imo"], newTimestamp()) as ApiTimestamp;
 
-        expect(ret?.location_locode).toBe(timestamp.location.port);
+        const ret = await TimestampsService.saveTimestamp(timestamp2);
+
+        expect(ret?.location_locode).toBe(timestamp2.location.port);
         expect(ret?.ship_mmsi).toBe(vessel.mmsi);
         expect(ret?.ship_imo).toBe(vessel.imo);
     });
@@ -133,10 +130,10 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp();
         const vessel = newVessel(timestamp);
         await insertVessel(db, vessel);
-        // @ts-ignore
-        delete timestamp.ship['mmsi'];
 
-        const ret = await TimestampsService.saveTimestamp(timestamp);
+        const timestamp2 = R.dissocPath(["ship", "mmsi"], newTimestamp()) as ApiTimestamp;
+
+        const ret = await TimestampsService.saveTimestamp(timestamp2);
 
         expect(ret?.location_locode).toBe(timestamp.location.port);
         expect(ret?.ship_mmsi).toBe(vessel.mmsi);

@@ -28,13 +28,13 @@ describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) =
         await updateFile('valid_datex2.xml', 200);
 
         const datex2 = (await VariableSignsService.findActiveSignsDatex2()).body;
-        expect(datex2).toMatch(/\<overallStartTime\>2020-02-19T14:45:02.013Z<\/overallStartTime>/);
+        expect(datex2).toMatch(/<overallStartTime>2020-02-19T14:45:02.013Z<\/overallStartTime>/);
 
         // and then update
         await updateFile('valid_datex2_updated.xml', 200);
 
         const datex2_2 = (await VariableSignsService.findActiveSignsDatex2()).body;
-        expect(datex2_2).toMatch(/\<overallStartTime\>2020-02-20T14:45:02.013Z<\/overallStartTime>/);
+        expect(datex2_2).toMatch(/<overallStartTime>2020-02-20T14:45:02.013Z<\/overallStartTime>/);
 
     });
 }));

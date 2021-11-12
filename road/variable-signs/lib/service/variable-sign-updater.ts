@@ -3,7 +3,7 @@ import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 
-const REG_PAYLOAD = /\<payloadPublication/g;
+const REG_PAYLOAD = /<payloadPublication/g;
 
 const DATEX2_SITUATION_TAG_START = '<situation ';
 const DATEX2_SITUATION_TAG_END = '</situation>';

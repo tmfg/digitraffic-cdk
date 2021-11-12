@@ -103,13 +103,13 @@ export async function findAllTimestamps(
     const start = Date.now();
     const timestamps: ApiTimestamp[] = await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
         if (locode) {
-            return TimestampsDB.findByLocode(db, locode!!);
+            return TimestampsDB.findByLocode(db, locode);
         } else if (mmsi && !imo) {
-            return TimestampsDB.findByMmsi(db, mmsi!!);
+            return TimestampsDB.findByMmsi(db, mmsi);
         } else if (imo) {
-            return TimestampsDB.findByImo(db, imo!!);
+            return TimestampsDB.findByImo(db, imo);
         } else if (source) {
-            return TimestampsDB.findBySource(db, source!!);
+            return TimestampsDB.findBySource(db, source);
         }
         console.warn('method=findAllTimestamps no locode, mmsi, imo or source given');
         return [];

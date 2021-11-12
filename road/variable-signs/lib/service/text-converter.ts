@@ -1,5 +1,5 @@
-import {findSymbol, InputSymbols, isValidSymbol, Symbol, SymbolType} from "./symbol";
-import {getSymbolType} from "../../lib/service/symbol";
+import {findSymbol, InputSymbols, isValidSymbol, TextSymbol, SymbolType} from "./textSymbol";
+import {getSymbolType} from "./textSymbol";
 import {InputError} from "digitraffic-common/error/input-error";
 
 const MAX_LENGTH = 30;
@@ -78,7 +78,7 @@ function convert(text: string): string {
 }
 
 // create svg from symbols
-function creteSvg(symbolList: Symbol[]): string {
+function creteSvg(symbolList: TextSymbol[]): string {
     // first introduce symbols in svg, only once each
     const symbolsText = Array.from(new Set(symbolList).values()).map((s) => s.getSvg()).join('\n');
 
@@ -86,7 +86,7 @@ function creteSvg(symbolList: Symbol[]): string {
     let width= 0;
 
     // then use introduced symbols
-    symbolList.forEach((symbol: Symbol) => {
+    symbolList.forEach((symbol: TextSymbol) => {
         useText+= `<use href="#${symbol.name}" x="${width}" y="0" width="${symbol.width}" height="32"/>\n`;
         width+= symbol.width;
     });
@@ -95,7 +95,7 @@ function creteSvg(symbolList: Symbol[]): string {
 }
 
 // convert given string-list to list of symbols, add end if needed
-function convertToSymbols(symbols: Symbols): Symbol[] {
+function convertToSymbols(symbols: Symbols): TextSymbol[] {
     const symbolList = symbols.symbols.map(s => findSymbol(symbols.symbolType, s));
 
     // and end symbol, if first symbol is starting borders

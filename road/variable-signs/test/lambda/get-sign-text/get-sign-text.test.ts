@@ -90,7 +90,7 @@ describe('text-converter-tests', () => {
         if(elements) expectElements(svg, elements);
     }
 
-    function expectError(text: string, errorText: string = "") {
+    function expectError(text: string, errorText = "") {
         expect(() => convertTextToSvg(text)).toThrow(errorText);
     }   
 

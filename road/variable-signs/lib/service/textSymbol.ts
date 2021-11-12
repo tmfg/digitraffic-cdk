@@ -17,7 +17,7 @@ export enum InputSymbols {
     RAMP = "RAMPPI_"
 }
 
-export class Symbol {
+export class TextSymbol {
     public width: number;
     public svg: string;
     public name: string;
@@ -208,21 +208,21 @@ function addSymbol(name: string, width: number, svg: string, id: string = name) 
     const varareittiSvg = svg + (width === 16 ? '\n<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-12,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>'
         : '<path d="M1.006,3h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4,0h2V1h-2Zm4-2V3h2V1Zm-16,30h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Zm4,0h2V29h-2Z"/>');
 
-    SYMBOL_CACHE[id] = new Symbol(width, svg, name, SymbolType.NORMAL);
-    SYMBOL_CACHE[SymbolType.ROAD + id] = new Symbol(width, tieSvg, name, SymbolType.ROAD);
-    SYMBOL_CACHE[SymbolType.DETOUR + id] = new Symbol(width, varatieSvg, name, SymbolType.DETOUR);
-    SYMBOL_CACHE[SymbolType.DIVERSION + id] = new Symbol(width, varareittiSvg, name, SymbolType.DIVERSION);
+    SYMBOL_CACHE[id] = new TextSymbol(width, svg, name, SymbolType.NORMAL);
+    SYMBOL_CACHE[SymbolType.ROAD + id] = new TextSymbol(width, tieSvg, name, SymbolType.ROAD);
+    SYMBOL_CACHE[SymbolType.DETOUR + id] = new TextSymbol(width, varatieSvg, name, SymbolType.DETOUR);
+    SYMBOL_CACHE[SymbolType.DIVERSION + id] = new TextSymbol(width, varareittiSvg, name, SymbolType.DIVERSION);
 }
 
 function addSingle(name: string, width: number, svg: string, id: string = name) {
-    SYMBOL_CACHE[SymbolType.SINGLE + id] = new Symbol(width, svg, name, SymbolType.SINGLE);
+    SYMBOL_CACHE[SymbolType.SINGLE + id] = new TextSymbol(width, svg, name, SymbolType.SINGLE);
 }
 
 function addEnd(name: string, width: number, svg: string, id: string, symbolType: SymbolType) {
-    SYMBOL_CACHE[id] = new Symbol(width, svg, name, symbolType);
+    SYMBOL_CACHE[id] = new TextSymbol(width, svg, name, symbolType);
 }
 
-export function findSymbol(symbolType: SymbolType, name: string): Symbol {
+export function findSymbol(symbolType: SymbolType, name: string): TextSymbol {
     const symbolKey = symbolType + name.toUpperCase();
 
     return SYMBOL_CACHE[symbolKey];

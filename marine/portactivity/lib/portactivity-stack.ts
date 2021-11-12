@@ -43,8 +43,7 @@ export class PortActivityStack extends DigitrafficStack {
 
         // CDK tries to allow connections between proxy and cluster
         // this does not work on cluster references
-        // @ts-ignore
-        cluster.connections.allowDefaultPortFrom = () => {};
+        cluster.connections.allowDefaultPortFrom = () => { /* nothing */ };
 
         const dbProxyName = 'PortActivityRDSProxy';
         new DatabaseProxy(this, dbProxyName, {
