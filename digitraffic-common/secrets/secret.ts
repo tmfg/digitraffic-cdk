@@ -10,7 +10,7 @@ export async function withSecret<T>(secretId: string, fn: (secret: T) => any): P
     return fn(await getSecret(secretId));
 }
 
-export async function getSecret<T>(secretId: string, prefix:string = ''): Promise<T> {
+export async function getSecret<T>(secretId: string, prefix = ''): Promise<T> {
     const secretObj = await smClient.getSecretValue({
         SecretId: secretId
     }).promise();

@@ -111,9 +111,7 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
         timeout: Duration.seconds(config.timeout || 60)
     };
     if (config.vpc) {
-        // @ts-ignore
         props.vpc = config.vpc;
-        // @ts-ignore
         props.vpcSubnets = {
             subnets: config.vpc?.privateSubnets
         };

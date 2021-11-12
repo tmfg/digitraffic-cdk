@@ -1,16 +1,8 @@
-import {
-    IdentitySource,
-    Model,
-    PassthroughBehavior,
-    RequestAuthorizer,
-    Resource,
-    RestApi
-} from '@aws-cdk/aws-apigateway';
+import {Model, PassthroughBehavior, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {Function} from '@aws-cdk/aws-lambda';
-import {Construct, Duration} from "@aws-cdk/core";
+import {Construct} from "@aws-cdk/core";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {Topic} from "@aws-cdk/aws-sns";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MediaType} from "digitraffic-common/api/mediatypes";
@@ -19,11 +11,7 @@ import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-commo
 import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {MarinecamEnvKeys} from "marinecam/lib/keys";
-import {lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
-import {Queue, QueueProps} from "@aws-cdk/aws-sqs";
+import {Queue} from "@aws-cdk/aws-sqs";
 
 export function create(stack: DigitrafficStack, s124Queue: Queue) {
     const integrationApi = new DigitrafficRestApi(stack,

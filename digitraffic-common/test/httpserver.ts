@@ -20,7 +20,7 @@ export class TestHttpServer {
         return this.messageStack[callNumber];
     }
 
-    listen(port: number, props: ListenProperties, debug: boolean = false, statusCode = 200) {
+    listen(port: number, props: ListenProperties, debug= false, statusCode = 200) {
         this.debug = debug;
         this.messageStack = [];
         this.debuglog(`Starting test server on port ${port}`);

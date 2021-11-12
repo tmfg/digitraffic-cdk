@@ -12,7 +12,7 @@ const SECRET_EMPTY = {};
 
 stubSecretsManager();
 
-import {getSecret, withSecret, withSecretAndPrefix} from "../../secrets/secret";
+import {withSecret, withSecretAndPrefix} from "../../secrets/secret";
 
 describe('secret - test', () => {
     afterEach(() => {

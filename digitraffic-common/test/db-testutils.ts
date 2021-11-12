@@ -2,11 +2,12 @@ import {IDatabase,ITask} from "pg-promise";
 import {initDbConnection} from "../postgres/database";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 
+/*
 export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
     return async () => {
         await db.tx(async (t: any) => await fn(t));
     };
-}
+}*/
 
 export function dbTestBase(
     fn: (db: IDatabase<any, any>) => void,
@@ -40,7 +41,6 @@ export function dbTestBase(
             await truncateFn(db);
         });
 
-        // @ts-ignore
         fn(db);
     };
 }
