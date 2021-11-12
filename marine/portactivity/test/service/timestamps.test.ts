@@ -117,8 +117,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const vessel = newVessel(timestamp);
         await insertVessel(db, vessel);
 
-        const timestamp2 = R.dissocPath(["ship", "imo"], newTimestamp()) as ApiTimestamp;
-
+        const timestamp2 = R.dissocPath(["ship", "imo"], timestamp) as ApiTimestamp;
         const ret = await TimestampsService.saveTimestamp(timestamp2);
 
         expect(ret?.location_locode).toBe(timestamp2.location.port);
@@ -131,8 +130,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const vessel = newVessel(timestamp);
         await insertVessel(db, vessel);
 
-        const timestamp2 = R.dissocPath(["ship", "mmsi"], newTimestamp()) as ApiTimestamp;
-
+        const timestamp2 = R.dissocPath(["ship", "mmsi"], timestamp) as ApiTimestamp;
         const ret = await TimestampsService.saveTimestamp(timestamp2);
 
         expect(ret?.location_locode).toBe(timestamp.location.port);
