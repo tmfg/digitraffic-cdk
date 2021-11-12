@@ -1,11 +1,11 @@
-import core = require('@aws-cdk/core');
+import {Stack, App, StackProps} from '@aws-cdk/core';
 import {CfnDomain} from "@aws-cdk/aws-elasticsearch";
 
-export class ElasticsearchStack extends core.Stack {
-    constructor(scope: core.App, id: string, elasticsearchProps: Props, props?: core.StackProps,) {
+export class ElasticsearchStack extends Stack {
+    constructor(scope: App, id: string, elasticsearchProps: Props, props?: StackProps,) {
         super(scope, id, props);
 
-        const esVersion: string = '7.9';
+        const esVersion = '7.9';
         const esId = 'dt-elasticsearch';
         const domainName = 'dt-elasticsearch-domain';
 

@@ -70,7 +70,7 @@ function handleLine(line: string, lines: any[]) {
 }
 
 function createEsMessages(lines: any[]): string[] {
-    const messages = new Array();
+    const messages = [];
     const indexName = createIndexName();
     const action = { index: { _index: indexName, _type: 'doc' } } as any;
 
