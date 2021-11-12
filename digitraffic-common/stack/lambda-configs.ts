@@ -111,10 +111,12 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
         timeout: Duration.seconds(config.timeout || 60)
     };
     if (config.vpc) {
-        props.vpc = config.vpc;
-        props.vpcSubnets = {
-            subnets: config.vpc?.privateSubnets
-        };
+        return {...props, ...{
+            vpc: config.vpc,
+            vpcSubnets: {
+                subnets: config.vpc?.privateSubnets
+            }
+        }};
     }
     return props;
 }

@@ -100,17 +100,7 @@ export function responseChecker(fn: any): any {
 }
 
 async function getResponseBody(response: any): Promise<string> {
-    const body: Buffer = await new Promise(async (resolve: any) => {
-        const buffers: Buffer[] = [];
-
-        response.on('data', (data: any) => {
-            buffers.push(data);
-        });
-
-        response.on('end', () => {
-            resolve(Buffer.concat(buffers));
-        });
-    });
+    const body = await getBodyFromResponse(response);
 
     if(response.headers[constants.HTTP2_HEADER_CONTENT_ENCODING] === 'gzip') {
         try {
@@ -121,6 +111,20 @@ async function getResponseBody(response: any): Promise<string> {
     }
 
     return body.toString();
+}
+
+function getBodyFromResponse(response: any): Promise<string> {
+    return new Promise((resolve: any) => {
+        const buffers: Buffer[] = [];
+
+        response.on('data', (data: any) => {
+            buffers.push(data);
+        });
+
+        response.on('end', () => {
+            resolve(Buffer.concat(buffers));
+        });
+    });
 }
 
 export function mustContain(body: string, text: string) {

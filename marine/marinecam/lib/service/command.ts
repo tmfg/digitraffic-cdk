@@ -79,8 +79,7 @@ export class GetAllCamerasCommand extends Command {
     }
 
     getResult(response: any): Camera[] {
-        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_ITEMS][0]
-            [FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
+        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
 
         const info = cameras.map((c: any) => {
             return {
