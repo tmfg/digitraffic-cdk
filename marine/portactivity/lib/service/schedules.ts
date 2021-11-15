@@ -11,8 +11,12 @@ export async function getTimestampsUnderVtsControl(url: string): Promise<ApiTime
 }
 
 export async function getCalculatedTimestamps(url: string): Promise<ApiTimestamp[]> {
-    const resp = await SchedulesApi.getSchedulesTimestamps(url, true);
-    return filterTimestamps(schedulesToTimestamps(resp, true));
+    //const resp = await SchedulesApi.getSchedulesTimestamps(url, true);
+    //return filterTimestamps(schedulesToTimestamps(resp, true));
+
+    // XXX temporarily disabled due to bad data
+
+    return [];
 }
 
 export function filterTimestamps(timestamps: ApiTimestamp[]) {
