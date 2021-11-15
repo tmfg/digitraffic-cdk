@@ -3,7 +3,6 @@ import * as sinon from 'sinon';
 import {
     AwakeAiATXApi,
     AwakeAIATXTimestampMessage,
-    AwakeAiATXZoneType,
     AwakeATXZoneEventType
 } from "../../lib/api/awake_ai_atx";
 import {AwakeAiATXService} from "../../lib/service/awake_ai_atx";
@@ -13,6 +12,7 @@ import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {randomBoolean} from "digitraffic-common/test/testutils";
 import {EventSource} from "../../lib/model/eventsource";
 import {shuffle} from "digitraffic-common/js/js-utils";
+import {AwakeAiZoneType} from "../../lib/api/awake_common";
 const ws = require('ws');
 
 describe('service Awake.AI ATx', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
@@ -57,7 +57,7 @@ describe('service Awake.AI ATx', dbTestBase((db: pgPromise.IDatabase<any, any>) 
     });
 
     test('getATXs - ATx with portcall - other than berth events are filtered', async () => {
-        const otherThanBerth = shuffle(Object.values(AwakeAiATXZoneType).filter(zone => zone !== AwakeAiATXZoneType.BERTH));
+        const otherThanBerth = shuffle(Object.values(AwakeAiZoneType).filter(zone => zone !== AwakeAiZoneType.BERTH));
         const atxMessage = newAwakeATXMessage({zoneType: otherThanBerth[0]});
         const portcallId = 1;
         await createPortcall(atxMessage, portcallId);

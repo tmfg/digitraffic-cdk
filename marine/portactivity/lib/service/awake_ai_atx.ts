@@ -1,10 +1,11 @@
-import {AwakeAiATXApi, AwakeAiATXZoneType, AwakeATXZoneEventType} from "../api/awake_ai_atx";
+import {AwakeAiATXApi, AwakeATXZoneEventType} from "../api/awake_ai_atx";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import * as TimestampDAO from '../db/timestamps';
 import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import moment from 'moment-timezone';
 import {EventSource} from "../model/eventsource";
+import {AwakeAiZoneType} from "../api/awake_common";
 
 export class AwakeAiATXService {
 
@@ -18,7 +19,7 @@ export class AwakeAiATXService {
         const atxs = await this.api.getATXs(timeoutMillis);
         return inDatabase(async (db: IDatabase<any, any>) => {
             const promises = atxs
-                .filter(atx => atx.zoneType === AwakeAiATXZoneType.BERTH)
+                .filter(atx => atx.zoneType === AwakeAiZoneType.BERTH)
                 .map(async (atx) => {
                     // pick the first supported LOCODE
                     if (atx.locodes.length > 1) {
