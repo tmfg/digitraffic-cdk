@@ -1,4 +1,4 @@
-const SYMBOL_CACHE = {} as any;
+const SYMBOL_CACHE = {} as Record<string, TextSymbol>;
 
 // these will be used in ids
 export enum SymbolType {
@@ -229,5 +229,5 @@ export function findSymbol(symbolType: SymbolType, name: string): TextSymbol {
 }
 
 export function isValidSymbol(symbolType: SymbolType, symbol: string): boolean {
-    return SYMBOL_CACHE[symbolType + symbol.toUpperCase()];
+    return (symbolType + symbol.toUpperCase()) in SYMBOL_CACHE;
 }

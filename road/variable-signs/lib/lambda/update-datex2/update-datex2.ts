@@ -1,14 +1,19 @@
 import {updateDatex2} from "../../service/variable-sign-updater";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
+import {GenericSecret} from "digitraffic-common/secrets/secret";
 
 const secretId = process.env[SECRET_ID_KEY] as string;
 
-export const handler = async (event: any) : Promise <any> => {
+export type StatusCodeValue = {
+    readonly statusCode: number;
+}
+
+export const handler = async (event: any) : Promise<StatusCodeValue> => {
     return handlerFn(withDbSecret, event);
 };
 
-export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) => Promise<void>) => Promise<any>, event: any): Promise<any> {
+export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: GenericSecret) => Promise<StatusCodeValue>) => Promise<any>, event: any): Promise<StatusCodeValue> {
     return withDbSecretFn(secretId, async () => {
         const datex2 = event.body;
 

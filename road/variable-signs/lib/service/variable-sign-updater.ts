@@ -2,6 +2,7 @@ import * as DeviceDB from "../db/datex2";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import {inDatabase} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
+import {StatusCodeValue} from "../lambda/update-datex2/update-datex2";
 
 const REG_PAYLOAD = /<payloadPublication/g;
 
@@ -18,7 +19,7 @@ export interface Situation {
     readonly effect_date: Date
 }
 
-export async function updateDatex2(datex2: string): Promise<any> {
+export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
     const start = Date.now();
     const timestamp = new Date(start);
 
@@ -28,39 +29,39 @@ export async function updateDatex2(datex2: string): Promise<any> {
 
     const situations = parseSituations(datex2);
 
-    await inDatabase(async (db: IDatabase<any,any>) => {
-        return db.tx((tx: any) => {
-            return tx.batch([
-                ...DeviceDB.saveDatex2(tx, situations, timestamp),
-                LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp)
-            ]);
-        })
-    }).then(() => {
-        const end = Date.now();
-        console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (end-start));
-    })
+    try {
+        await inDatabase(async (db: IDatabase<any, any>) => {
+            return db.tx((tx: any) => {
+                return tx.batch([
+                    ...DeviceDB.saveDatex2(tx, situations, timestamp),
+                    LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp)
+                ]);
+            })
+        });
 
-    return {statusCode: 200};
+        return {statusCode: 200};
+    } finally {
+        console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (Date.now() - start));
+    }
 }
 
 export function parseSituations(datex2: string): Situation[] {
     const situations: Situation[] = [];
     let index = 0;
+    let sitIndex = 0;
 
     // go through the document and find all situation-blocks
     // add them to the list and return them
-    while(true) {
-        const sitIndex = datex2.indexOf(DATEX2_SITUATION_TAG_START, index)
+    do {
+        sitIndex = datex2.indexOf(DATEX2_SITUATION_TAG_START, index);
 
-        if(sitIndex === -1) {
-            break;
+        if (sitIndex !== -1) {
+            const sitEndIndex = datex2.indexOf(DATEX2_SITUATION_TAG_END, sitIndex + DATEX2_SITUATION_TAG_START.length);
+            index = sitEndIndex;
+
+            situations.push(parseSituation(datex2.substr(sitIndex, sitEndIndex - sitIndex + DATEX2_SITUATION_TAG_END.length)));
         }
-
-        const sitEndIndex = datex2.indexOf(DATEX2_SITUATION_TAG_END, sitIndex + DATEX2_SITUATION_TAG_START.length);
-        index = sitEndIndex;
-
-        situations.push(parseSituation(datex2.substr(sitIndex, sitEndIndex - sitIndex + DATEX2_SITUATION_TAG_END.length)));
-    }
+    } while(sitIndex !== -1)
 
     return situations;
 }
@@ -101,6 +102,6 @@ function validate(datex2: string): boolean {
     return true;
 }
 
-function occurrences(string: string, regexp: any): number {
+function occurrences(string: string, regexp: RegExp): number {
     return (string.match(regexp)||[]).length;
 }
