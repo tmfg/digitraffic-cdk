@@ -1,6 +1,6 @@
 FROM node:12-alpine
 
-RUN apk add --no-cache npm && npm install -g eslint
+RUN apk add --no-cache npm && npm install -g eslint @typescript-eslint/eslint-plugin
 
 WORKDIR /data
 
