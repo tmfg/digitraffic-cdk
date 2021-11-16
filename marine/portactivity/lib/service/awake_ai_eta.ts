@@ -123,7 +123,7 @@ export class AwakeAiETAService {
         // we are only interested in the current voyage (ETA) for now
         const eta = schedule.predictedVoyages[0];
 
-        if (eta.voyageStatus != AwakeAiVoyageShipStatus.UNDER_WAY) {
+        if (eta.voyageStatus !== AwakeAiVoyageShipStatus.UNDER_WAY) {
             console.warn(`method=isValidSchedule state=${AwakeDataState.SHIP_NOT_UNDER_WAY} actual ship status ${eta.voyageStatus} `);
             return null;
         }
@@ -161,7 +161,7 @@ export class AwakeAiETAService {
     }
 
     private static destinationIsFinnish(locode: string): boolean {
-        return !!locode && locode.toLowerCase().startsWith('fi');
+        return locode != null && locode.toLowerCase().startsWith('fi');
     }
 
 }
