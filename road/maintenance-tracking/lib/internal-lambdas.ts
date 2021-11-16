@@ -1,7 +1,7 @@
 import * as lambda from '@aws-cdk/aws-lambda';
 import {Construct, Duration} from '@aws-cdk/core';
 import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {databaseFunctionProps, dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
+import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {AppProps} from "./app-props";
 import {Queue} from "@aws-cdk/aws-sqs";

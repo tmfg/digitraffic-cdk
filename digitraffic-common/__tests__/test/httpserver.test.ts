@@ -1,4 +1,5 @@
 import {TestHttpServer, ListenProperties, ERROR_NO_MATCH, ERRORCODE_NOT_FOUND} from "../../test/httpserver";
+import {IncomingMessage} from "http";
 
 const http = require('http');
 
@@ -10,7 +11,7 @@ const DEFAULT_PROPS = {
 };
 
 describe('TestHttpServer - test', () => {
-    async function withServer(fn: ((server: TestHttpServer) => any), props: ListenProperties = DEFAULT_PROPS, statusCode = 200) {
+    async function withServer(fn: ((server: TestHttpServer) => void), props: ListenProperties = DEFAULT_PROPS, statusCode = 200) {
         const server = new TestHttpServer();
 
         server.listen(PORT, props, false, statusCode);
@@ -22,15 +23,15 @@ describe('TestHttpServer - test', () => {
         }
     }
 
-    async function sendGetRequest(path = DEFAULT_PATH): Promise<any> {
+    async function sendGetRequest(path = DEFAULT_PATH): Promise<IncomingMessage> {
         return await sendRequest("GET", path);
     }
 
-    async function sendPostRequest(path = DEFAULT_PATH, body: string): Promise<any> {
+    async function sendPostRequest(path = DEFAULT_PATH, body: string): Promise<IncomingMessage> {
         return await sendRequest("POST", path, body);
     }
 
-    async function sendRequest(method: string, path: string, body?: string) {
+    async function sendRequest(method: string, path: string, body?: string): Promise<IncomingMessage> {
         let content = "";
 
         return await new Promise((resolve, reject) => {

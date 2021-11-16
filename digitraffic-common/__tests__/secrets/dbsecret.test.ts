@@ -12,7 +12,7 @@ const SECRET_EMPTY = {};
 
 stubSecretsManager();
 
-import {withSecret, withSecretAndPrefix} from "../../secrets/secret";
+import {GenericSecret, withSecret, withSecretAndPrefix} from "../../secrets/secret";
 
 describe('secret - test', () => {
     afterEach(() => {
@@ -32,7 +32,7 @@ describe('secret - test', () => {
     test('getSecret - empty secret', async () => {
         mockSecret(SECRET_EMPTY);
 
-        await withSecret(SECRET_ID, (secret: any) => {
+        await withSecret(SECRET_ID, (secret: GenericSecret) => {
             expect(secret).toEqual(SECRET_EMPTY);
         });
     });
@@ -40,7 +40,7 @@ describe('secret - test', () => {
     test('getSecret - no prefix', async () => {
         mockSecret(SECRET_WITH_PREFIX);
 
-        await withSecret(SECRET_ID, (secret: any) => {
+        await withSecret(SECRET_ID, (secret: GenericSecret) => {
             expect(secret).toEqual(SECRET_WITH_PREFIX);
         });
     });
@@ -48,7 +48,7 @@ describe('secret - test', () => {
     test('getSecret - with prefix', async () => {
         mockSecret(SECRET_WITH_PREFIX);
 
-        await withSecretAndPrefix(SECRET_ID, 'prefix', (secret: any) => {
+        await withSecretAndPrefix(SECRET_ID, 'prefix', (secret: GenericSecret) => {
             expect(secret).toEqual({
                 value: "value",
                 name: "name"
