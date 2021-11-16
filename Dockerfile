@@ -1,8 +1,8 @@
 FROM node:12-alpine
 
-RUN apk add --no-cache npm && npm install eslint
-RUN npm install --save-dev @typescript-eslint/eslint-plugin@latest @typescript-eslint/parser@latest
+RUN apk add --no-cache npm
+RUN npm install global --production eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser
 
 WORKDIR /data
 
-CMD ["eslint", ".", "--ext", ".ts"]
+CMD ["/node_modules/eslint/bin/eslint.js", ".", "--ext", ".ts"]
