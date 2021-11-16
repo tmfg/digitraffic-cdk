@@ -16,19 +16,23 @@ describe('IdUtils tests', () => {
     });
 
     test('isValidIMO - successful checksum - ship TRANSMAR', () => {
-        expect(IdUtils.isValidIMO(9167332)).toBe(true)
+        expect(IdUtils.isValidIMO(9167332)).toBe(true);
     });
 
     test('isValidIMO - successful checksum - ship ANNIKA B', () => {
-        expect(IdUtils.isValidIMO(9213715)).toBe(true)
+        expect(IdUtils.isValidIMO(9213715)).toBe(true);
     });
 
     test('isValidIMO - successful checksum - ship X PRESS ELBE', () => {
-        expect(IdUtils.isValidIMO(9483669)).toBe(true)
+        expect(IdUtils.isValidIMO(9483669)).toBe(true);
     });
 
     test('isValidIMO - successful checksum - ship SILVERFORS', () => {
-        expect(IdUtils.isValidIMO(8322765)).toBe(true)
+        expect(IdUtils.isValidIMO(8322765)).toBe(true);
+    });
+
+    test('isValidIMO - invalid checksum', () => {
+        expect(IdUtils.isValidIMO(8322766)).toBe(false);
     });
 
     test('isValidIMO - fail with number smaller than 1000000', () => {

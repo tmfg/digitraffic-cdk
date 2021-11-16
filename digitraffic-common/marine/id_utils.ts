@@ -4,15 +4,15 @@ export function isValidIMO(imo: number): boolean {
 
 function imoChecksumIsValid(imo: number): boolean {
     const imoStr = imo.toString();
-    const imoChar1 = Number(imoStr[0]);
-    const imoChar2 = Number(imoStr[1]);
-    const imoChar3 = Number(imoStr[2]);
-    const imoChar4 = Number(imoStr[3]);
-    const imoChar5 = Number(imoStr[4]);
-    const imoChar6 = Number(imoStr[5]);
+    const imoDigit1 = Number(imoStr[0]);
+    const imoDigit2 = Number(imoStr[1]);
+    const imoDigit3 = Number(imoStr[2]);
+    const imoDigit4 = Number(imoStr[3]);
+    const imoDigit5 = Number(imoStr[4]);
+    const imoDigit6 = Number(imoStr[5]);
     const checkDigit = Number(imoStr[6]);
-    const checkCalculation = ((imoChar1 * 7) + (imoChar2 * 6) + (imoChar3 * 5) + (imoChar4 * 4) + (imoChar5 * 3) + (imoChar6 * 2)).toString();
-    const checkResult = Number(checkCalculation[checkCalculation.length - 1]) === checkDigit;
+    const checkCalculation = Number(((imoDigit1 * 7) + (imoDigit2 * 6) + (imoDigit3 * 5) + (imoDigit4 * 4) + (imoDigit5 * 3) + (imoDigit6 * 2)));
+    const checkResult = checkCalculation % 10 === checkDigit;
     if (!checkResult) {
         console.warn('method=imoChecksumIsValid IMO checksum failed %d', imo);
     }
