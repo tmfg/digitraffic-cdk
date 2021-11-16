@@ -12,3 +12,13 @@ Projects are categorized as:
 - [Conventions](https://github.com/tmfg/digitraffic-cdk/blob/master/CONVENTIONS.md)
 
 Digitraffic is operated by [Fintraffic](https://www.fintraffic.fi)
+
+## ESLint
+
+ESLint-configuration can be found in _.eslintrc.json_.  A Dockerfile is added to enable running eslint in docker:
+```
+docker build -t eslint .
+docker run -v $(pwd):/data eslint
+```
+
+Output of eslint in docker is written to file _eslint.html_. 
