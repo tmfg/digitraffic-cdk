@@ -62,6 +62,7 @@ export function handlerFn(
             if (!rtzStorageApi) {
                 rtzStorageApi = new RtzStorageApi(bucketName);
             }
+            await rtzStorageApi.storeVoyagePlan(visMessage.message);
 
             if (!slackApi && secret["vpgw.slackUrl"]) {
                 slackApi = new SlackApiClass(secret["vpgw.slackUrl"]);
@@ -70,7 +71,6 @@ export function handlerFn(
             const structureValidationErrors = VoyagePlansService.validateStructure(voyagePlan);
             if (structureValidationErrors.length) {
                 console.warn('method=uploadVoyagePlan XML structure validation failed', structureValidationErrors);
-                await rtzStorageApi.storeVoyagePlan(visMessage.message, false);
                 await slackApi?.notify('Failed validation, invalid structure :' + visMessage.message);
                 return Promise.resolve('XML structure validation failed');
             }
@@ -78,12 +78,9 @@ export function handlerFn(
             const contentValidationErrors = VoyagePlansService.validateContent(voyagePlan);
             if (contentValidationErrors.length) {
                 console.warn('method=uploadVoyagePlan XML content validation failed', contentValidationErrors);
-                await rtzStorageApi.storeVoyagePlan(visMessage.message, false);
                 await slackApi?.notify('Failed validation, invalid content :' + visMessage.message);
                 return Promise.resolve('XML content was not valid');
             }
-
-            await rtzStorageApi.storeVoyagePlan(visMessage.message, true);
 
             if (!api && secret["vpgw.vtsUrl"]) {
                 api = new VtsApiClass(secret["vpgw.vtsUrl"]);
