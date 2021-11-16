@@ -15,8 +15,20 @@ describe('IdUtils tests', () => {
         expect(IdUtils.isValidLOCODE('FIAA1')).toBe(false);
     });
 
-    test('isValidIMO - success', () => {
-        expect(IdUtils.isValidIMO(9198977)).toBe(true);
+    test('isValidIMO - successful checksum - ship TRANSMAR', () => {
+        expect(IdUtils.isValidIMO(9167332)).toBe(true)
+    });
+
+    test('isValidIMO - successful checksum - ship ANNIKA B', () => {
+        expect(IdUtils.isValidIMO(9213715)).toBe(true)
+    });
+
+    test('isValidIMO - successful checksum - ship X PRESS ELBE', () => {
+        expect(IdUtils.isValidIMO(9483669)).toBe(true)
+    });
+
+    test('isValidIMO - successful checksum - ship SILVERFORS', () => {
+        expect(IdUtils.isValidIMO(8322765)).toBe(true)
     });
 
     test('isValidIMO - fail with number smaller than 1000000', () => {
