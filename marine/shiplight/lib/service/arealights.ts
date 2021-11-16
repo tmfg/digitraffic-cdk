@@ -18,12 +18,10 @@ export class AreaLightsService {
             areaTraffic.areaId,
             areaTraffic.durationInMinutes,
             areaTraffic.visibilityInMetres);
-        /* API not yet available
         await this.api.updateLightsForArea({
             routeId: areaTraffic.areaId,
             command: AreaLightsBrightenCommand.MAX,
             time: areaTraffic.durationInMinutes
         });
-         */
     }
 }
