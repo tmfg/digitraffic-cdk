@@ -5,4 +5,4 @@ RUN npm install global --production eslint typescript @typescript-eslint/eslint-
 
 WORKDIR /data
 
-CMD ["/node_modules/eslint/bin/eslint.js", ".", "--format", "junit", "--ext", ".ts", "-o", "/data/output.xml"]
+CMD ["/node_modules/eslint/bin/eslint.js", ".", "--format", "html", "--ext", ".ts", "-o", "/data/eslint.html"]
