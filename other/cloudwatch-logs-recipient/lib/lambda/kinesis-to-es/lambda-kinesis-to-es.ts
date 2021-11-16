@@ -21,14 +21,14 @@ const knownAccounts: Account[] = JSON.parse(process.env.KNOWN_ACCOUNTS as string
 const creds = new AWS.EnvironmentCredentials("AWS");
 
 const endpoint = process.env.ES_ENDPOINT as string;
-const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws\.com$/) as string[];
+const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.com$/) as string[];
 const esEndpoint = new AWS.Endpoint(endpoint);
 const region = endpointParts[2];
 
 const MAX_BODY_SIZE = 1000000;
 const SEPARATOR_LAMBDA_LOGS = '\t';
 
-export const handler = (event: KinesisStreamEvent, context: Context, callback: any): void => {
+export const handler = (event: KinesisStreamEvent, context: Context): void => {
     const statistics = {};
 
     try {
@@ -193,9 +193,9 @@ export function buildSource(message: string, extractedFields: any): any {
 
 function buildFromMessage(message: string): any {
     const log_line = message.replace('[, ]', '[0.0,0.0]')
-        .replace(/\"Infinity\"/g, "-1")
+        .replace(/"Infinity"/g, "-1")
         .replace(/Infinity/gi, "-1")
-        .replace(/\"null\"/gi, "null");
+        .replace(/"null"/gi, "null");
 
     return {
         log_line
@@ -218,7 +218,7 @@ function buildFromExtractedFields(message: string, extractedFields: any[]): any 
     const source = {} as any;
 
     for (const key in extractedFields) {
-        if (extractedFields.hasOwnProperty(key) && extractedFields[key]) {
+        if (extractedFields[key]) {
             const value = extractedFields[key];
 
             if (isNumeric(value)) {

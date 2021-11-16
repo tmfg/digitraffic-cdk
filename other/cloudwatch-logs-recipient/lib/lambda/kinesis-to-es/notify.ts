@@ -10,7 +10,7 @@ export function notifyFailedItems(failedItems: any[]) {
     sns.publish({
         TopicArn: topicArn,
         Message: JSON.stringify(failedItems)
-    }, (err: any, data: any) => {
+    }, (err: any) => {
         if(err) {
             console.info("publish failed " + err);
         }

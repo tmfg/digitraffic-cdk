@@ -19,7 +19,7 @@ import {notifyFailedItems} from "./notify";
 const endpoint = process.env.ES_ENDPOINT as string;
 const knownAccounts = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
 
-const endpointParts = endpoint.match(/^([^\.]+)\.?([^\.]*)\.?([^\.]*)\.amazonaws\.com$/) as string[];
+const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.com$/) as string[];
 const region = endpointParts[2];
 const service = endpointParts[3];
 
@@ -154,7 +154,7 @@ function buildFromExtractedFields(extractedFields: any[]): any {
     const source = {} as any;
 
     for (const key in extractedFields) {
-        if (extractedFields.hasOwnProperty(key) && extractedFields[key]) {
+        if (extractedFields[key]) {
             const value = extractedFields[key];
 
             if (isNumeric(value)) {
@@ -205,7 +205,7 @@ function post(body: string, callback: any) {
 }
 
 function buildRequest(body: string): any {
-    const datetime = (new Date()).toISOString().replace(/[:\-]|\.\d{3}/g, '');
+    const datetime = (new Date()).toISOString().replace(/[:-]|\.\d{3}/g, '');
     const date = datetime.substr(0, 8);
     const kDate = hmac('AWS4' + process.env.AWS_SECRET_ACCESS_KEY, date);
     const kRegion = hmac(kDate, region);

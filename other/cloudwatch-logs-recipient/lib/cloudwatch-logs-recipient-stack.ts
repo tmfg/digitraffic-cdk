@@ -1,4 +1,3 @@
-///<reference path="../lib/app-props.d.ts"/>
 import {Stack, StackProps, Construct, Duration}  from '@aws-cdk/core';
 import {Role, ServicePrincipal, PolicyStatement} from '@aws-cdk/aws-iam';
 import {CrossAccountDestination, CfnDestination, RetentionDays} from '@aws-cdk/aws-logs';
