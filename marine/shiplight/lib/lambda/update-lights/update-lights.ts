@@ -34,7 +34,7 @@ export async function handlerFn(
             console.info("method=shiplightHandler sourceId=%d", area.areaId);
 
             try {
-                const visibility = secret.visibilityEndpointUrl ? await visibilityService.getVisibilityForAreaInMetres(area.areaId) : {visibilityInMetres: -1};
+                const visibility = await visibilityService.getVisibilityForAreaInMetres(area.areaId);
                 await lightsService.updateLightsForArea({ ...area, ...{
                     visibilityInMetres: visibility.visibilityInMetres
                 }});
