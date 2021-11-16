@@ -1,7 +1,7 @@
 FROM node:12-alpine
 
 RUN apk add --no-cache npm
-RUN npm install global --production eslint @typescript-eslint/eslint-plugin @typescript-eslint/parser
+RUN npm install global --production eslint typescript @typescript-eslint/eslint-plugin @typescript-eslint/parser
 
 WORKDIR /data
 
