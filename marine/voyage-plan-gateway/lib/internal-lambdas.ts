@@ -146,6 +146,7 @@ function createUploadVoyagePlanLambda(
     lambda.addEventSource(new SqsEventSource(sendRouteQueue, {
         batchSize: 1
     }));
+    rtzBucket.grantPut(lambda);
 
     new DigitrafficLogSubscriptions(stack, lambda);
 }
@@ -167,6 +168,8 @@ function createProcessDLQLambda(
         handler: 'lambda-process-dlq.handler',
         environment: lambdaEnv,
         timeout: Duration.seconds(10),
+        reservedConcurrentExecutions: 1,
+        memorySize: 128
     });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
