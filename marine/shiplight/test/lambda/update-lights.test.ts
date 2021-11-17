@@ -28,11 +28,11 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
     test('update lights with visibility', async () => {
         const durationInMinutes = 12;
         const areaId = 4;
-        const visibilityInMetres = 1000;
+        const visibilityInMeters = 1000;
         const getVisibilityForAreaStub =
             sinon.stub(AreaVisibilityApi.prototype, 'getVisibilityForArea').returns(Promise.resolve({
                 lastUpdated: new Date().toISOString(),
-                visibilityInMetres
+                visibilityInMeters
             }));
         const updateLightsForAreaStub =
             sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve({

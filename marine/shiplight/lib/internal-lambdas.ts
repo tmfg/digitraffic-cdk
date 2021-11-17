@@ -17,6 +17,6 @@ function createUpdateLightsLambda(stack: DigitrafficStack): MonitoredFunction {
 
     return MonitoredFunction.createV2(stack, 'update-lights', environment, {
       singleLambda: true,
-      timeout: 10
+      timeout: 30
     });
 }

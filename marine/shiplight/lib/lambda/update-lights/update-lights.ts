@@ -36,7 +36,7 @@ export async function handlerFn(
             try {
                 const visibility = await visibilityService.getVisibilityForAreaInMetres(area.areaId);
                 await lightsService.updateLightsForArea({ ...area, ...{
-                    visibilityInMetres: visibility.visibilityInMetres
+                    visibilityInMeters: visibility.visibilityInMeters
                 }});
                 await AreaTrafficService.updateAreaTrafficSendTime(area.areaId);
             } catch (e) {

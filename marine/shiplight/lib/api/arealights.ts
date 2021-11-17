@@ -53,13 +53,14 @@ export class AreaLightsApi {
         try {
             const resp = await axios.post(this.url, request, {
                 headers: {
-                    'api-key': this.apiKey
+                    'x-api-key': this.apiKey
                 }
             });
             if (resp.status !== 200) {
                 console.error(`method=updateLightsForArea returned status=${resp.status}`);
                 return Promise.reject();
             }
+            console.error('method=updateLightsForArea successful');
             return Promise.resolve(resp.data);
         } catch (error) {
             console.error('method=updateLightsForArea failed');
