@@ -13,7 +13,7 @@ const PS_UPDATE_TIMESTAMP = new PreparedStatement({
     text: 'update camera set last_updated = $1 where id = $2'
 });
 
-export async function getAllCameras(db: IDatabase<any, any>, usersGroups: string[]): Promise<Camera[]> {
+export async function getAllCameras(db: IDatabase<unknown>, usersGroups: string[]): Promise<Camera[]> {
     // Prepared statement use not possible due to dynamic IN-list
     return (await db.manyOrNone(SQL_LIST_CAMERAS, [usersGroups])).map((x: any) => ({
             id: x.id,
@@ -23,12 +23,12 @@ export async function getAllCameras(db: IDatabase<any, any>, usersGroups: string
         }));
 }
 
-export function updateCameraMetadata(db: IDatabase<any, any>, cameraIds: string[], updated: Date): Promise<any> {
+export function updateCameraMetadata(db: IDatabase<unknown>, cameraIds: string[], updated: Date): Promise<PromiseSettledResult<null>[]> {
     return Promise.allSettled(cameraIds.map((cameraId: string) => {
         return db.none(PS_UPDATE_TIMESTAMP, [updated, cameraId]);
     }));
 }
 
-export async function getAllCameraIdsForGroup(db: IDatabase<any, any>, groupId: string): Promise<string[]> {
+export async function getAllCameraIdsForGroup(db: IDatabase<unknown>, groupId: string): Promise<string[]> {
     return (await db.manyOrNone(PS_CAMERA_IDS, [groupId])).map((x: any) => x.id);
 }

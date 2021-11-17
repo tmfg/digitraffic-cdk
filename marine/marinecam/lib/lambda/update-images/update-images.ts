@@ -2,6 +2,7 @@ import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as ImageFetcher from "../../service/image-fetcher";
 import {MarinecamEnvKeys, MarinecamSecretKeys} from "../../keys";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {GenericSecret} from "digitraffic-common/secrets/secret";
 
 const secretId = process.env[SECRET_ID] as string;
 const bucketName = process.env[MarinecamEnvKeys.BUCKET_NAME] as string;
@@ -11,7 +12,7 @@ let imageServerUsername: string;
 let imageServerPassword: string;
 let imageServerCertificate: string;
 
-export function handlerFn(doWithSecret: (secretId: string, fn: (secret: any) => any) => any) {
+export function handlerFn(doWithSecret: (secretId: string, fn: (secret: GenericSecret) => void) => void) {
     return async (): Promise<void> => {
         if(!imageServerUrl) {
             await doWithSecret(secretId, (secret: any) => {

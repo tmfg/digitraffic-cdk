@@ -1,5 +1,4 @@
 import {Construct} from '@aws-cdk/core';
-import {Secret} from "@aws-cdk/aws-secretsmanager";
 import {MobileServerProps} from './app-props';
 import * as InternalLambas from './internal-lambdas';
 import * as PublicApi from './public-api';

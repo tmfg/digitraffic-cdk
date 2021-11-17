@@ -2,16 +2,17 @@ import * as MetadataService from '../../service/metadata';
 
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {Camera} from "../../model/camera";
 
 const secretId = process.env[SECRET_ID] as string;
 
 const GROUP_SEPARATOR=',';
 
-export const handler = async (event: any) : Promise<any> => {
+export const handler = async (event: any) : Promise<Camera[]> => {
     const usersGroups = getUserGroups(event.groups);
 
     if(usersGroups.length === 0) {
-        return {};
+        return [];
     }
 
     return withDbSecret(secretId, async () => {
