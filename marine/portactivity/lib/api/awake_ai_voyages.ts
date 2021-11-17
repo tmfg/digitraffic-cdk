@@ -90,6 +90,7 @@ export class AwakeAiVoyagesApi {
     }
 
     async getETA(imo: number): Promise<AwakeAiVoyageResponse> {
+        const start = Date.now();
         try {
             const resp = await axios.get(`${this.url}/${imo}`, {
                 headers: {
@@ -106,6 +107,8 @@ export class AwakeAiVoyagesApi {
                 return AwakeAiVoyagesApi.handleError(error as AxiosError);
             }
             throw error;
+        } finally {
+            console.log(`method=getETA tookMs=${Date.now() - start}`)
         }
     }
 

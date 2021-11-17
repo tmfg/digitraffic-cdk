@@ -36,7 +36,10 @@ export function handlerFn(
             }
             const timestamps = await service.getAwakeAiTimestamps(ships);
 
+            const start = Date.now();
+            console.info('method=updateAwakeAiETATimestampsHandler Sending timestamps to queue..');
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
+            console.info('method=updateAwakeAiETATimestampsHandler ..done in tookMs=%d', Date.now()-start);
         }, {expectedKeys});
     };
 }
