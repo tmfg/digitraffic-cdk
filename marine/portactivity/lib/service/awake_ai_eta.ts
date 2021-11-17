@@ -128,15 +128,11 @@ export class AwakeAiETAService {
             return null;
         }
 
-        const etaPrediction = eta.predictions.find(p => p.predictionType == AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction | undefined;
+        const etaPredictions = eta.predictions.filter(p => p.predictionType == AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction[]
+        const etaPrediction = etaPredictions.find(p => p.zoneType === AwakeAiZoneType.BERTH);
 
         if (!etaPrediction) {
             console.warn(`method=isValidSchedule state=${AwakeDataState.NO_PREDICTED_ETA} no prediction of type ETA found`);
-            return null;
-        }
-
-        if (etaPrediction.zoneType !== AwakeAiZoneType.BERTH) {
-            // this is normal, no need to log warning here
             return null;
         }
 

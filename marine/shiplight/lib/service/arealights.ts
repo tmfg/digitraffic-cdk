@@ -14,13 +14,15 @@ export class AreaLightsService {
      * @param areaTraffic
      */
     async updateLightsForArea(areaTraffic: AreaTraffic): Promise<void> {
+        // TODO hardcoded areaId for testing
+        const areaId = 10; // areaTraffic.areaId
         console.info('method=updateLightsForArea area %d, duration %d, visibility %d',
-            areaTraffic.areaId,
+            areaId,
             areaTraffic.durationInMinutes,
-            areaTraffic.visibilityInMetres);
+            areaTraffic.visibilityInMeters);
         await this.api.updateLightsForArea({
-            routeId: areaTraffic.areaId,
-            command: AreaLightsBrightenCommand.MAX,
+            routeId: areaId,
+            command: AreaLightsBrightenCommand.NOMINAL, // TODO should be max but is not supported for testing
             time: areaTraffic.durationInMinutes
         });
     }

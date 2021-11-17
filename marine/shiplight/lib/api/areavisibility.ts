@@ -3,11 +3,14 @@ import {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export type AreaVisibilityResponse = {
-    /**
-     * UTC string
-     */
-    readonly lastUpdated: string
-    readonly visibilityInMetres: number
+    // ISO 8601
+    readonly lastUpdated?: string
+
+    // ISO 8601
+    // for backwards compatibility
+    readonly 'lastUpdated:'?: string
+
+    readonly visibilityInMeters: number
 }
 
 export class AreaVisibilityApi {
