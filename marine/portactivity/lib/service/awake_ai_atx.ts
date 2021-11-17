@@ -1,8 +1,7 @@
 import {AwakeAiATXApi, AwakeATXZoneEventType} from "../api/awake_ai_atx";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import * as TimestampDAO from '../db/timestamps';
-import {inDatabase} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
+import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
 import moment from 'moment-timezone';
 import {EventSource} from "../model/eventsource";
 import {AwakeAiZoneType} from "../api/awake_common";
@@ -17,7 +16,7 @@ export class AwakeAiATXService {
 
     async getATXs(timeoutMillis: number): Promise<ApiTimestamp[]> {
         const atxs = await this.api.getATXs(timeoutMillis);
-        return inDatabase(async (db: IDatabase<any, any>) => {
+        return inDatabase(async (db: DTDatabase) => {
             const promises = atxs
                 .filter(atx => atx.zoneType === AwakeAiZoneType.BERTH)
                 .map(async (atx) => {

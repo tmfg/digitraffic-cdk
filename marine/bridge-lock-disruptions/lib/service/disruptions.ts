@@ -1,6 +1,6 @@
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as DisruptionsDB from "../db/disruptions"
-import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
@@ -17,7 +17,7 @@ const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
 
 export async function findAllDisruptions(): Promise<FeatureCollection> {
     const start = Date.now();
-    return await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+    return await inDatabaseReadonly(async (db: DTDatabase) => {
         const disruptions = await DisruptionsDB.findAll(db);
         const disruptionsFeatures = disruptions.map(convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE);
@@ -29,15 +29,15 @@ export async function findAllDisruptions(): Promise<FeatureCollection> {
 
 export async function saveDisruptions(disruptions: SpatialDisruption[]) {
     const start = Date.now();
-    await inDatabase(async (db: IDatabase<any, any>) => {
+    await inDatabase(async (db: DTDatabase) => {
         await DisruptionsDB.deleteAllButDisruptions(db, disruptions.map(d => d.Id));
         return await db.tx(t => {
-            return t.batch(
+            return t.batch([
                 DisruptionsDB.updateDisruptions(db, disruptions),
                 LastUpdatedDB.updateUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE, new Date(start))
-            );
+            ]);
         });
-    }).then(a => {
+    }).then((a: any) => {
         const end = Date.now();
         console.info("method=saveDisruptions updatedCount=%d tookMs=%d", a.length, (end - start));
     });

@@ -15,6 +15,8 @@ pgp.pg.types.setTypeParser(pgp.pg.types.builtins.NUMERIC, (value: string) => {
     return parseFloat(value);
 });
 
+export type DTDatabase = IDatabase<unknown>;
+
 /**
  * Creates a non-pooling database connection primarily used by Lambdas.
  *
@@ -32,7 +34,7 @@ export function initDbConnection(
     applicationName: string,
     url: string,
     options?: object
-): IDatabase<any, any> {
+): DTDatabase {
     const finalUrl = `postgresql://${username}:${password}@${url}?application_name=${applicationName}`;
 
     return pgp(finalUrl, options);
@@ -45,18 +47,18 @@ export async function inTransaction (
 }
 
 export async function inDatabase(
-    fn: (db: IDatabase<any, any>) => any): Promise<any> {
+    fn: (db: DTDatabase) => any): Promise<any> {
     return doInDatabase(false, fn);
 }
 
 export async function inDatabaseReadonly(
-    fn: (db: IDatabase<any, any>) => any): Promise<any> {
+    fn: (db: DTDatabase) => any): Promise<any> {
     return doInDatabase(true, fn);
 }
 
 async function doInDatabase(
     readonly: boolean,
-    fn: (db: IDatabase<any, any>) => any): Promise<any> {
+    fn: (db: DTDatabase) => any): Promise<any> {
     const db = initDbConnection(
         process.env[DatabaseEnvironmentKeys.DB_USER] as string,
         process.env[DatabaseEnvironmentKeys.DB_PASS] as string,

@@ -1,7 +1,6 @@
-import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import * as MetadataDB from "../db/metadata";
 
-import {IDatabase} from "pg-promise";
 import {Camera} from "../model/camera";
 
 export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
@@ -10,7 +9,7 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
     const start = Date.now();
 
     try {
-        return await inDatabaseReadonly(async (db: IDatabase<unknown>) => {
+        return await inDatabaseReadonly(async (db: DTDatabase) => {
             return MetadataDB.getAllCameras(db, usersGroups);
         });
     } finally {
@@ -18,14 +17,14 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
     }
 }
 
-export async function updateMetadataUpdated(cameraIds: string[], updated: Date): Promise<any> {
-    return inDatabase(async (db: IDatabase<unknown>) => {
+export async function updateMetadataUpdated(cameraIds: string[], updated: Date): Promise<PromiseSettledResult<null>[]> {
+    return inDatabase(async (db: DTDatabase) => {
         return MetadataDB.updateCameraMetadata(db, cameraIds, updated);
     });
 }
 
 export async function getAllCameraIdsForGroup(groupId: string): Promise<string[]> {
-    return inDatabaseReadonly(async (db: IDatabase<unknown>) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         return MetadataDB.getAllCameraIdsForGroup(db, groupId);
     });
 }

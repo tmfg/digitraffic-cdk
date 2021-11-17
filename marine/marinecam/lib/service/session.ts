@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosResponse} from 'axios';
 import * as https from "https";
 import util from "util";
 import {parseString} from "xml2js";
@@ -59,11 +59,11 @@ export class Session {
         }
     }
 
-    async post(url: string, xml: string, configuration?: any): Promise<any> {
+    async post(url: string, xml: string, configuration?: any): Promise<AxiosResponse<any>> {
         return axios.post(url, xml, {...configuration, ...{ httpsAgent: agent, timeout: 3000 }});
     }
 
-    async sendMessage(command: Command) {
+    async sendMessage(command: Command): Promise<any> {
         const xml = command.createXml(this.sequenceId, this.connectionId);
         this.sequenceId++;
 
@@ -122,7 +122,7 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async requestStream(cameraId: string) {
+    async requestStream(cameraId: string): Promise<string> {
         const command = new RequestStreamCommand()
             .addInputParameters('CameraId', cameraId)
             .addInputParameters('DestWidth', DEST_WIDTH)
@@ -140,7 +140,7 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async setStreamTime(videoId: string) {
+    async setStreamTime(videoId: string): Promise<void> {
         const command = new ChangeStreamCommand()
             .addInputParameters('VideoId', videoId)
             .addInputParameters('Time', Date.now().toString());
@@ -148,7 +148,7 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async setStreamSpeed(videoId: string) {
+    async setStreamSpeed(videoId: string): Promise<unknown> {
         const command = new ChangeStreamCommand()
             .addInputParameters('VideoId', videoId)
             .addInputParameters('Speed', '1.0');
@@ -177,7 +177,7 @@ export class Session {
         return buffer.slice(headerSize).toString('base64');
     }
 
-    async closeStream(videoId: string) {
+    async closeStream(videoId: string): Promise<void> {
         const command = new CloseStreamCommand()
             .addInputParameters('VideoId', videoId);
 

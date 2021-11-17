@@ -4,7 +4,7 @@ import * as MetadataService from './metadata';
 
 export const CAMERA_GROUP_ID = 'Saimaa';
 
-export async function updateAllCameras(url: string, username: string, password: string, bucketName: string, certificate: string): Promise<any> {
+export async function updateAllCameras(url: string, username: string, password: string, bucketName: string, certificate: string): Promise<void> {
     const cameraIds = await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
     const session = await loginToCameraServer(url, username, password, certificate);
 

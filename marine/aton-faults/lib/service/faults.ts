@@ -1,7 +1,7 @@
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as FaultsDB from "../db/faults"
 import * as S124Converter from "./s124-converter";
-import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
@@ -72,14 +72,14 @@ export async function saveFaults(domain: string, newFaults: any[]) {
     const start = Date.now();
     const validated = newFaults.filter(validate);
 
-    await inDatabase(async (db: IDatabase<any,any>) => {
+    await inDatabase(async (db: DTDatabase) => {
         return await db.tx(t => {
             return t.batch([
                 ...FaultsDB.updateFaults(db, domain, validated),
                 LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start))
             ]);
         });
-    }).then(a => {
+    }).then((a: any) => {
         const end = Date.now();
         console.info("method=saveFaults receivedCount=%d updatedCount=%d tookMs=%d", newFaults.length, a.length - 1, (end - start));
     })
