@@ -33,7 +33,7 @@ export async function saveDisruptions(disruptions: SpatialDisruption[]) {
         await DisruptionsDB.deleteAllButDisruptions(db, disruptions.map(d => d.Id));
         return await db.tx(t => {
             return t.batch([
-                DisruptionsDB.updateDisruptions(db, disruptions),
+                ...DisruptionsDB.updateDisruptions(db, disruptions),
                 LastUpdatedDB.updateUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE, new Date(start))
             ]);
         });
