@@ -148,15 +148,14 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
     }) as DbETAShip[];
 
     // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
-    const shipsByImoAndLocode = portnetShips.reduce((acc: {[imoAndLocode: string]: DbETAShip[]}, curr) => {
-        const imoAndLocode = curr.imo + curr.locode;
-        const imoAndLocodeShips = acc[imoAndLocode] ?? [];
-        imoAndLocodeShips.push(curr);
-        const ret: {[imoAndLocode: string]: DbETAShip[]} = {};
-        ret[imoAndLocode] = imoAndLocodeShips;
+    const shipsByImoAnd = portnetShips.reduce((acc: {[imo: number]: DbETAShip[]}, curr) => {
+        const imoShips = acc[curr.imo] ?? [];
+        imoShips.push(curr);
+        const ret: {[imo: number]: DbETAShip[]} = {};
+        ret[curr.imo] = imoShips;
         return {...acc, ...ret};
     }, {});
-    const newestShips = Object.values(shipsByImoAndLocode).flatMap((ships) =>
+    const newestShips = Object.values(shipsByImoAnd).flatMap((ships) =>
         R.head(R.sortBy((ship: DbETAShip) => moment(ship.eta).toDate(), ships)) as DbETAShip);
     console.info('method=findPortnetETAsByLocodes ships count before newest ETA filtering %d, after newest ETA filtering %d',
         portnetShips.length, newestShips.length);

@@ -138,7 +138,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(ret?.ship_imo).toBe(vessel.imo);
     });
 
-    test('findETAShipsByLocode - no duplicate ETAs', async () => {
+    test('findETAShipsByLocode - same port later in day - just one ETA', async () => {
         const locode = 'FILOL';
         const imo = 123456;
         const eta1 = newTimestamp({
@@ -166,15 +166,47 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(ships.length).toBe(1);
     });
 
-    test('findETAShipsByLocode - two ETAs', async () => {
+    test('findETAShipsByLocode - different port later in day - just ETA closest to NOW', async () => {
+        const locode1 = 'FILOL';
+        const locode2 = 'FIKEK';
+        const imo = 123456;
+        const eta1 = newTimestamp({
+            imo,
+            locode: locode1,
+            eventType: EventType.ETA,
+            eventTime: moment().add(1, 'hours').toDate(),
+            source: EventSource.PORTNET
+        });
+        const eta2 = newTimestamp({
+            imo,
+            locode: locode2,
+            eventType: EventType.ETA,
+            eventTime: moment().add(2, 'hours').toDate(),
+            source: EventSource.PORTNET
+        });
+        await insertPortCall(db, newPortCall(eta1));
+        await insertPortCall(db, newPortCall(eta2));
+        await insertPortAreaDetails(db, newPortAreaDetails(eta1));
+        await insertPortAreaDetails(db, newPortAreaDetails(eta2));
+        await insert(db, [eta1, eta2]);
+
+        const ships = await TimestampsService.findETAShipsByLocode([locode1, locode2]);
+
+        expect(ships.length).toBe(1);
+        expect(ships[0].locode).toBe(locode1);
+    });
+
+    test('findETAShipsByLocode - different ship - two ETAs', async () => {
         const locode = 'FILOL';
         const eta1 = newTimestamp({
+            imo: 123456,
             locode,
             eventType: EventType.ETA,
             eventTime: moment().add(1, 'hours').toDate(),
             source: EventSource.PORTNET
         });
         const eta2 = newTimestamp({
+            imo: 654321,
             locode,
             eventType: EventType.ETA,
             eventTime: moment().add(2, 'hours').toDate(),
