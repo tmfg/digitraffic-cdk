@@ -23,6 +23,7 @@
     "@aws-cdk/aws-events-targets": "*",
     "@aws-cdk/aws-iam": "*",
     "@aws-cdk/aws-lambda": "*",
+    "@aws-cdk/aws-lambda-event-sources": "*",
     "@aws-cdk/aws-logs": "*",
     "@aws-cdk/aws-secretsmanager": "*",
     "@aws-cdk/aws-sns": "*",

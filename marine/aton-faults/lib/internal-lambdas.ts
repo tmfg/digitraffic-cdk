@@ -37,8 +37,8 @@ function createSendS124Lambda(stack: DigitrafficStack): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
 
     return MonitoredFunction.createV2(stack, 'send-s124', environment, {
-        memorySize: 256,
-        reservedConcurrentExecutions: 10,
-        timeout: 40
+        memorySize: 128,
+        reservedConcurrentExecutions: 15,
+        timeout: 60
     });
 }

@@ -6,16 +6,14 @@ import {Canaries} from "./canaries";
 import {AtonProps} from "./app-props";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficSqsQueue} from "digitraffic-common/queue/sqs";
-import {QueueEncryption} from "@aws-cdk/aws-sqs";
 
 export class AtonFaultsStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: AtonProps) {
         super(scope, id, configuration);
 
-        const s124Queue = new DigitrafficSqsQueue(this, 'SendS124Queue', {
+        const s124Queue = DigitrafficSqsQueue.create(this, 'SendS124', {
             receiveMessageWaitTime: Duration.seconds(5),
-            visibilityTimeout: Duration.seconds(60),
-            encryption: QueueEncryption.KMS_MANAGED
+            visibilityTimeout: Duration.seconds(60)
         });
 
         IntegrationApi.create(this, s124Queue);
