@@ -22,8 +22,8 @@ export class AreaLightsService {
             areaTraffic.visibilityInMeters);
         await this.api.updateLightsForArea({
             routeId: areaId,
-            command: AreaLightsBrightenCommand.NOMINAL, // TODO should be max but is not supported for testing
-            time: areaTraffic.durationInMinutes
+            command: AreaLightsBrightenCommand.MAX, // no need for other levels for now
+            tempTime: areaTraffic.durationInMinutes
         });
     }
 }

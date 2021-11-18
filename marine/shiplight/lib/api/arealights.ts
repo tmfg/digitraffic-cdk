@@ -21,9 +21,9 @@ export type AreaLightsBrightenRequest = {
     readonly command: AreaLightsBrightenCommand
 
     /**
-     * Time to set the brighness on in minutes
+     * Time to set the brightness on in minutes
      */
-    readonly time: number
+    readonly tempTime: number
 }
 
 export type AreaLightsBrightenResponse = {
