@@ -17,6 +17,8 @@ pgp.pg.types.setTypeParser(pgp.pg.types.builtins.NUMERIC, (value: string) => {
 
 export type DTDatabase = IDatabase<unknown>;
 
+export type DTTransaction = ITask<unknown>
+
 /**
  * Creates a non-pooling database connection primarily used by Lambdas.
  *
