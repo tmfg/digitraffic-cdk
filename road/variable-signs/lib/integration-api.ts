@@ -4,7 +4,7 @@ import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 
 export function create(stack: DigitrafficStack) {
     const integrationApi = new DigitrafficRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API');
@@ -36,14 +36,7 @@ function createIntegrationResource(intergrationRoot: Resource, updateDatexV1Hand
 }
 
 function createUpdateDatexV1(stack: DigitrafficStack): Function {
-    const environment = stack.createLambdaEnvironment();
-    const updateDatex2Handler = MonitoredFunction.createV2(stack, 'update-datex2', environment, {
+    return MonitoredDBFunction.create(stack, 'update-datex2', undefined, {
         memorySize: 256
-    })
-
-    stack.grantSecret(updateDatex2Handler);
-
-    new DigitrafficLogSubscriptions(stack, updateDatex2Handler);
-
-    return updateDatex2Handler;
+    });
 }

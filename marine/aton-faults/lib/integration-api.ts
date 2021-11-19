@@ -10,7 +10,7 @@ import {MessageModel} from "digitraffic-common/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {Queue} from "@aws-cdk/aws-sqs";
 
 export function create(stack: DigitrafficStack, s124Queue: Queue) {
@@ -33,11 +33,6 @@ function createUploadVoyagePlanHandler(
     integrationApi: RestApi) {
 
     const handler = createHandler(stack, s124Queue);
-
-    stack.grantSecret(handler);
-    new DigitrafficLogSubscriptions(stack, handler);
-
-//    const authorizer = createLambdaAuthorizer(stack);
 
     const resource = integrationApi.root.addResource("s124").addResource("voyagePlans")
     createIntegrationResource(stack, messageResponseModel, resource, handler);
@@ -93,7 +88,7 @@ function createHandler(stack: DigitrafficStack, s124Queue: Queue): MonitoredFunc
     const environment = stack.createLambdaEnvironment();
     environment[AtonEnvKeys.SEND_S124_QUEUE_URL] = s124Queue.queueUrl;
 
-    return MonitoredFunction.createV2(stack, 'upload-voyage-plan', environment, {
+    return MonitoredDBFunction.create(stack, 'upload-voyage-plan', environment, {
         memorySize: 256
     });
 }

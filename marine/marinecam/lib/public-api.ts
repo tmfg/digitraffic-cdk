@@ -21,7 +21,7 @@ import {MarinecamEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {add401Support, DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 
 export function create(
@@ -82,9 +82,6 @@ function createListCamerasResource(stack: DigitrafficStack,
             corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.ERROR_MODEL))
         ]
     });
-
-    stack.grantSecret(listCamerasLambda);
-    new DigitrafficLogSubscriptions(stack, listCamerasLambda);
 
     addTagsAndSummary('List Cameras', BETA_TAGS, 'List all camera metadata', resources.metadataResource, stack);
 }
@@ -156,9 +153,7 @@ function createGetImageResource(stack: DigitrafficStack,
 }
 
 function createListCamerasLambda(stack: DigitrafficStack): MonitoredFunction {
-    const environment = stack.createLambdaEnvironment();
-
-    return MonitoredFunction.createV2(stack, 'list-cameras', environment, {
+    return MonitoredDBFunction.createV2(stack, 'list-cameras', undefined, {
         timeout: 10
     });
 }

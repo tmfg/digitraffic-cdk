@@ -12,7 +12,7 @@ import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 
 export function create(stack: DigitrafficStack): Function {
     const publicApi = new DigitrafficRestApi(stack, 'ATON-public', 'ATON public API');
@@ -27,13 +27,9 @@ export function create(stack: DigitrafficStack): Function {
 }
 
 function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, faultsJsonModel: Model): Function {
-    const environment = stack.createLambdaEnvironment();
-    const getFaultsLambda = MonitoredFunction.createV2(stack, 'get-faults', environment, {
+    const getFaultsLambda = MonitoredDBFunction.create(stack, 'get-faults', undefined, {
         reservedConcurrentExecutions: 3
     });
-
-    stack.grantSecret(getFaultsLambda);
-    new DigitrafficLogSubscriptions(stack, getFaultsLambda);
 
     const apiResource = publicApi.root.addResource("api");
     const atonResource = apiResource.addResource("aton");

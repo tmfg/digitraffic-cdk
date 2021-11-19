@@ -3,7 +3,7 @@ import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
 import {Function} from "@aws-cdk/aws-lambda";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 
 export class InternalLambdas {
@@ -13,12 +13,6 @@ export class InternalLambdas {
 }
 
 function createUpdateNauticalWarningsLambda(stack: DigitrafficStack): Function {
-    const environment = stack.createLambdaEnvironment();
-    const lambda = MonitoredFunction.createV2(stack, 'update-nautical-warnings', environment);
-
-    stack.grantSecret(lambda);
-    new DigitrafficLogSubscriptions(stack, lambda);
-
-    return lambda;
+    return MonitoredDBFunction.create(stack, 'update-nautical-warnings');
 }
 
