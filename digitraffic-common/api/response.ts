@@ -37,8 +37,8 @@ export const XmlResponseTemplate = createResponses(MediaType.APPLICATION_XML, BO
 export const SvgResponseTemplate = createResponses(MediaType.IMAGE_SVG, BODY_FROM_INPUT_PATH);
 export const InternalServerErrorResponseTemplate = createResponses(MediaType.APPLICATION_JSON, InternalServerErrorResponse);
 
-export function createResponses(key: MediaType, value: any): any {
-    const map: {[key: string]: any} = {};
+export function createResponses<T>(key: MediaType, value: T): Record<string, T> {
+    const map: Record<string, T> = {};
 
     map[key] = value;
 

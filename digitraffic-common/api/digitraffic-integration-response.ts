@@ -13,7 +13,7 @@ export abstract class DigitrafficIntegrationResponse {
     }
 
     static create(statusCode: string, mediaType: MediaType): IntegrationResponse {
-        const responseTemplates: any = {};
+        const responseTemplates: Record<string, string> = {};
         responseTemplates[mediaType] = RESPONSE_DEFAULT_LAMBDA;
 
         return {

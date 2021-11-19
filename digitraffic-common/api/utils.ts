@@ -48,7 +48,7 @@ export function addServiceModel(modelName: string, api: RestApi, schema: JsonSch
  * @param api
  * @param contentType
  */
-export function addSimpleServiceModel(modelName: string, api: RestApi, contentType = 'application/xml'): any {
+export function addSimpleServiceModel(modelName: string, api: RestApi, contentType = 'application/xml'): Model {
     return api.addModel(modelName, {
         contentType,
         modelName,
@@ -62,7 +62,7 @@ export function addSimpleServiceModel(modelName: string, api: RestApi, contentTy
  * @param model
  * @param api
  */
-export function createArraySchema(model: Model, api: RestApi): any {
+export function createArraySchema(model: Model, api: RestApi): JsonSchema {
     return {
         type: JsonSchemaType.ARRAY,
         items: {

@@ -1,7 +1,6 @@
 import {TestHttpServer, ListenProperties, ERROR_NO_MATCH, ERRORCODE_NOT_FOUND} from "../../test/httpserver";
 import {IncomingMessage} from "http";
-
-const http = require('http');
+import http = require('http');
 
 const DEFAULT_PATH = "/";
 const PORT = 8091;
@@ -38,11 +37,10 @@ describe('TestHttpServer - test', () => {
             const request = http.request({
                 path,
                 port: PORT,
-                body,
                 method
-            }, (response: any) => {
+            }, (response: IncomingMessage) => {
                 //another chunk of data has been received, so append it to `str`
-                response.on('data', (chunk: any) => {
+                response.on('data', (chunk: string) => {
                     content += chunk;
                 });
 
@@ -51,7 +49,7 @@ describe('TestHttpServer - test', () => {
                     resolve(response);
                 });
 
-                response.on('error', (error: any) => {
+                response.on('error', (error: Error) => {
                     reject(error);
                 });
             });

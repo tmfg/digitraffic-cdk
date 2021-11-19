@@ -7,6 +7,7 @@ import {
 import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehavior} from "@aws-cdk/aws-apigateway";
 import {Function} from '@aws-cdk/aws-lambda';
 import {MediaType} from './mediatypes';
+import {IModel} from "@aws-cdk/aws-apigateway/lib/model";
 
 /**
  * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
@@ -69,7 +70,7 @@ export const TEMPLATE_COGNITO_GROUPS = {
         "username": "$context.authorizer.claims['cognito:username']"
     })};
 
-export function methodResponse(status: string, contentType: MediaType, model: any, parameters?: any): MethodResponse {
+export function methodResponse(status: string, contentType: MediaType, model: IModel, parameters?: Record<string, boolean>): MethodResponse {
     return  {
         statusCode: status,
         responseModels: createResponses(contentType, model),
@@ -119,7 +120,7 @@ export function defaultIntegration(
     });
 }
 
-export function getResponse(response: any, options?: IntegrationOptions): any {
+export function getResponse(response: IntegrationResponse, options?: IntegrationOptions): IntegrationResponse {
     if(options?.xml) {
         response = {...response, ...RESPONSE_XML};
     }

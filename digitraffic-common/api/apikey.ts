@@ -1,7 +1,7 @@
-import AWS = require('aws-sdk');
+import {APIGateway} from "aws-sdk";
 
-export async function getApiKeyFromAPIGateway(keyId: string): Promise<any> {
-    const agw = new AWS.APIGateway();
+export async function getApiKeyFromAPIGateway(keyId: string): Promise<APIGateway.Types.ApiKey> {
+    const agw = new APIGateway();
     return agw.getApiKey({
         apiKey: keyId,
         includeValue: true
