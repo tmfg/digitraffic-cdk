@@ -1,5 +1,6 @@
 import {newAwakeATXMessage} from "../testdata";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const WebSocket = require('ws');
 jest.mock('ws');
 import {
@@ -7,6 +8,7 @@ import {
     AwakeAiATXEventType,
     SUBSCRIPTION_MESSAGE
 } from "../../lib/api/awake_ai_atx";
+import {NO_OP} from "digitraffic-common/functions/functions";
 
 describe('api-awake-ai-atx', () => {
 
@@ -17,13 +19,13 @@ describe('api-awake-ai-atx', () => {
     test('getATXs - no existing session subscribes to zone events', async () => {
         const sendMock = jest.fn();
         WebSocket.mockImplementation(() => ({
-            on: (event: string, callback: () => any) => {
+            on: (event: string, callback: () => void) => {
                 if (event === 'open') {
                     callback();
                 }
             },
             send: sendMock,
-            close: () => {}
+            close: NO_OP
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
@@ -36,7 +38,7 @@ describe('api-awake-ai-atx', () => {
         const sendMock = jest.fn();
         const subscriptionId = 'foo';
         WebSocket.mockImplementation(() => ({
-            on: (event: string, callback: (any?: any) => any) => {
+            on: (event: string, callback: (str?: string) => void) => {
                 if (event === 'open') {
                     callback();
                 } else if (event === 'message') {
@@ -47,7 +49,7 @@ describe('api-awake-ai-atx', () => {
                 }
             },
             send: sendMock,
-            close: () => {}
+            close: NO_OP
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
@@ -61,7 +63,7 @@ describe('api-awake-ai-atx', () => {
         const atxMessage = newAwakeATXMessage();
         const sendMock = jest.fn();
         WebSocket.mockImplementation(() => ({
-            on: (event: string, callback: (any?: any) => any) => {
+            on: (event: string, callback: (str?: string) => void) => {
                 if (event === 'open') {
                     callback();
                 } else if (event === 'message') {
@@ -69,7 +71,7 @@ describe('api-awake-ai-atx', () => {
                 }
             },
             send: sendMock,
-            close: () => {}
+            close: NO_OP
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
@@ -86,7 +88,7 @@ describe('api-awake-ai-atx', () => {
                 throw new Error('test error');
             },
             send: sendMock,
-            close: () => {}
+            close: NO_OP
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 

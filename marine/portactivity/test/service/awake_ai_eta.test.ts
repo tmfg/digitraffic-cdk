@@ -83,8 +83,8 @@ describe('service awake.ai', () => {
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-        // @ts-ignore
-        response.schedule['predictedVoyages'] = [];
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (response.schedule as any).predictedVoyages = [];
         sinon.stub(api, 'getETA').returns(Promise.resolve(response));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
@@ -143,8 +143,8 @@ describe('service awake.ai', () => {
 
             expect(timestamps.length).toBe(1);
             const expectedTimestamp = awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code);
-            // @ts-ignore
-            expectedTimestamp.location['port'] = ship.locode;
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (expectedTimestamp.location as any).port = ship.locode;
             expectSingleTimeStampToMatch(timestamps, expectedTimestamp);
         });
 
