@@ -5,8 +5,12 @@ import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 
 const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
-export const handler = async function () {
-    return withSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: any) => {
+type SchedulesSecret = {
+    readonly "schedules.url": string
+}
+
+export const handler = async function (): Promise<void> {
+    return withSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: SchedulesSecret) => {
         const schedulesUrl = secret[PortactivitySecretKeys.SCHEDULES_URL];
 
         const vtsControlTimestamps = await SchedulesService.getTimestampsUnderVtsControl(schedulesUrl);

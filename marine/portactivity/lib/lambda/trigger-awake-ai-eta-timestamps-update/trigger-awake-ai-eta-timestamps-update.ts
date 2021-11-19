@@ -13,7 +13,7 @@ export function handlerFn(
     withSecretFn: SecretFunction,
     sns: SNS) {
     return () => {
-        return withSecretFn(process.env.SECRET_ID as string, async (): Promise<any> => {
+        return withSecretFn(process.env.SECRET_ID as string, async (): Promise<void> => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
             console.info('method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for %d ships',
                 ships.length);

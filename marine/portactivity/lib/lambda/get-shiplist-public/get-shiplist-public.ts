@@ -1,11 +1,11 @@
 import {findByLocodePublicShiplist} from '../../db/shiplist-public';
 import {inDatabaseReadonly} from 'digitraffic-common/postgres/database';
-import {IDatabase} from 'pg-promise';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
 import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 export const handler = async (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
     return handlerFn(event, withDbSecret);
@@ -34,7 +34,7 @@ export async function handlerFn(
             return badRequest('Invalid LOCODE');
         }
 
-        return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+        return inDatabaseReadonly(async (db: DTDatabase) => {
             const dbShiplist =
                 (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
                     .map(ts => Object.assign(ts, {

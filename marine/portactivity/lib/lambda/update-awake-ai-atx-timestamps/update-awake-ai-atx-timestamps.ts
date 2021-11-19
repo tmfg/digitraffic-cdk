@@ -1,10 +1,10 @@
-import {SecretOptions, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {sendMessage} from "../../service/queue-service";
 import {AwakeAiATXService} from "../../service/awake_ai_atx";
 import {AwakeAiATXApi} from "../../api/awake_ai_atx";
 import {Context} from "aws-lambda";
-const WebSocket = require('ws');
+import WebSocket from "ws";
 
 type UpdateAwakeAiATXTimestampsSecret = {
     readonly atxurl: string
@@ -16,17 +16,17 @@ let service: AwakeAiATXService;
 const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
 export function handlerFn(
-    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>, options: SecretOptions) => Promise<any>,
+    withDbSecretFn: SecretFunction,
     AwakeAiATXServiceClass: new (api: AwakeAiATXApi) => AwakeAiATXService
-): (event: object, context: Context) => Promise<any> {
+): (event: unknown, context: Context) => Promise<void> {
 
-    return (event: object, context: Context) => {
+    return (event: unknown, context: Context) => {
         const expectedKeys = [
             PortactivitySecretKeys.AWAKE_ATX_URL,
             PortactivitySecretKeys.AWAKE_ATX_AUTH
         ];
 
-        return withDbSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiATXTimestampsSecret): Promise<any> => {
+        return withDbSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiATXTimestampsSecret): Promise<void> => {
             if (!service) {
                 service = new AwakeAiATXServiceClass(
                     new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket));

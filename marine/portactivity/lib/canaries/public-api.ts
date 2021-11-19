@@ -2,7 +2,7 @@ import {UrlChecker} from "digitraffic-common/canaries/url-checker";
 
 const hostname = process.env.hostname as string;
 
-export const handler = async () => {
+export const handler = async (): Promise<string> => {
     const checker = new UrlChecker(hostname);
 
     await checker.expect200("/prod/shiplist?locode=FIHKO");

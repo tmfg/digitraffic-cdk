@@ -24,13 +24,13 @@ const expectedKeys = [
 export function handlerFn(
     withSecretFn: SecretFunction,
     AwakeAiETAServiceClass: new (api: AwakeAiVoyagesApi) => AwakeAiETAService,
-): (event: SNSEvent) => Promise<any> {
+): (event: SNSEvent) => Promise<void> {
 
     return (event: SNSEvent) => {
         // always a single event, guaranteed by SNS
         const ships = JSON.parse(event.Records[0].Sns.Message) as DbETAShip[];
 
-        return withSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<any> => {
+        return withSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<void> => {
             if (!service) {
                 service = new AwakeAiETAServiceClass(new AwakeAiVoyagesApi(secret["awake.voyagesurl"], secret["awake.voyagesauth"]));
             }

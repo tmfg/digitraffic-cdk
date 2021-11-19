@@ -1,6 +1,7 @@
 import {Location} from "../model/timestamp";
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {Pilotage} from "../model/pilotage";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL = 'select id, schedule_updated from pilotage where state != \'FINISHED\'';
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
@@ -65,7 +66,7 @@ export type TimestampMap = {
     [key: number]: Date
 }
 
-export async function findPortCallId(db: IDatabase<any, any>, pilotage: Pilotage, location: Location): Promise<number|null> {
+export async function findPortCallId(db: DTDatabase, pilotage: Pilotage, location: Location): Promise<number|null> {
     const p1 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.port]);
     const p2 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.from]);
 
@@ -85,7 +86,7 @@ export async function findPortCallId(db: IDatabase<any, any>, pilotage: Pilotage
     return null;
 }
 
-export async function getTimestamps(db: IDatabase<any, any>): Promise<TimestampMap> {
+export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
     const timestamps = await db.manyOrNone(GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS) as DbPilotageTimestamp[];
     const idMap = {} as TimestampMap;
 
@@ -94,7 +95,7 @@ export async function getTimestamps(db: IDatabase<any, any>): Promise<TimestampM
     return idMap;
 }
 
-export async function updatePilotages(db: IDatabase<any, any>, pilotages: Pilotage[]): Promise<any> {
+export async function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<unknown> {
     if(pilotages && pilotages.length > 0) {
         return Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
             id: pilotage.id,
@@ -117,7 +118,7 @@ export async function updatePilotages(db: IDatabase<any, any>, pilotages: Pilota
     return Promise.resolve();
 }
 
-export async function deletePilotages(db: IDatabase<any, any>, pilotageIds: number[]): Promise<any[]> {
+export async function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<void[]> {
     if(pilotageIds && pilotageIds.length > 0) {
         return db.manyOrNone(DELETE_PILOTAGES_SQL, [pilotageIds]);
     }

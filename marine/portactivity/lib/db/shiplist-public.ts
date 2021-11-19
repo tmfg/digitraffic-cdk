@@ -1,6 +1,7 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 export interface DbPublicShiplist {
     readonly event_type: EventType
@@ -45,7 +46,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
 `;
 
 export function findByLocodePublicShiplist(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     locode: string
 ): Promise<DbPublicShiplist[]> {
     const ps = new PreparedStatement({

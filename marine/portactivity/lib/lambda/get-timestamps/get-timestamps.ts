@@ -1,18 +1,18 @@
 import * as TimestampsService from "../../service/timestamps";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
-import {ApiTimestamp} from "../../model/timestamp";
 
-export const handler = async (event: GetTimeStampsEvent): Promise<any> => {
+export const handler = async (event: GetTimeStampsEvent): Promise<LambdaResponse> => {
     return handlerFn(event, withDbSecret);
 };
 
 export function handlerFn(
     event: GetTimeStampsEvent,
-    withDbSecretFn: (secretId: string, fn: (_: object) => Promise<LambdaResponse | ApiTimestamp[]>) => Promise<any>) {
+    withDbSecretFn: SecretFunction,
+): Promise<LambdaResponse> {
 
-    return withDbSecretFn(process.env.SECRET_ID as string, async (_: any) => {
+    return withDbSecretFn(process.env.SECRET_ID as string, async () => {
         if (!event.locode && !event.mmsi && !event.imo && !event.source) {
             console.warn('method=getTimeStampsHandler no request params');
             return LambdaResponse.bad_request('Need LOCODE, MMSI or IMO');
