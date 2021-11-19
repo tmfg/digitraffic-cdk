@@ -101,7 +101,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const ret = await TimestampsService.saveTimestamp(timestamp);
 
-        expect(ret).toBeUndefined();
+        expect(ret).toBeNull();
     });
 
     test('saveTimestamp - no MMSI not saved', async () => {
@@ -109,7 +109,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         const ret = await TimestampsService.saveTimestamp(timestamp);
 
-        expect(ret).toBeUndefined();
+        expect(ret).toBeNull();
     });
 
     test('saveTimestamp - imo from vessel', async () => {
