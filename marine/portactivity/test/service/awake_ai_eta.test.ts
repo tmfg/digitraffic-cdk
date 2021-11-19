@@ -6,7 +6,7 @@ import {
     AwakeAiVoyagePredictionType,
     AwakeAiVoyageResponse,
     AwakeAiVoyagesApi,
-    AwakeAiVoyageShipStatus
+    AwakeAiVoyageShipStatus,
 } from "../../lib/api/awake_ai_voyages";
 import {AwakeAiETAService} from "../../lib/service/awake_ai_eta";
 import {DbETAShip} from "../../lib/db/timestamps";
@@ -97,8 +97,8 @@ describe('service awake.ai', () => {
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-        // @ts-ignore
-        response.schedule?.predictedVoyages[0]['predictions'] = [];
+        /* eslint-disable @typescript-eslint/no-explicit-any */
+        (response.schedule as any).predictedVoyages[0]['predictions'] = [];
         sinon.stub(api, 'getETA').returns(Promise.resolve(response));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
@@ -111,8 +111,8 @@ describe('service awake.ai', () => {
             const service = new AwakeAiETAService(api);
             const ship = newDbETAShip();
             const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-            // @ts-ignore
-            delete response.schedule?.predictedVoyages[0].predictions[0]['locode'];
+            /* eslint-disable @typescript-eslint/no-explicit-any */
+            delete (response.schedule as any).predictedVoyages[0].predictions[0]['locode'];
             sinon.stub(api, 'getETA').returns(Promise.resolve(response));
 
             const timestamps = await service.getAwakeAiTimestamps([ship]);

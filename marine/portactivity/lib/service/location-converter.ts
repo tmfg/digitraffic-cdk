@@ -1,4 +1,5 @@
 import {Location} from "../model/timestamp";
+import {PilotageRoute} from "../model/pilotage";
 
 let pilotwebToPortnetLocodeMap: {[key: string]: string} = {};
 
@@ -52,7 +53,7 @@ function initMap() {
     pilotwebToPortnetLocodeMap['FIOLK'] = 'FIEJO';
 }
 
-export function convertLocation(route: any): Location {
+export function convertLocation(route: PilotageRoute): Location {
     return {
         port: convertPilotwebCodeToPortnetLocode(route.end.code),
         from: convertPilotwebCodeToPortnetLocode(route.start.code),

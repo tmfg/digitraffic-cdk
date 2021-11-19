@@ -1,4 +1,9 @@
-import {getSchedulesTimestamps, SchedulesResponse} from "../../lib/api/schedules";
+import {
+    getSchedulesTimestamps,
+    SchedulesResponse,
+    ScheduleTimetable,
+    Timestamp
+} from "../../lib/api/schedules";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 
 describe('api-schedules', () => {
@@ -43,10 +48,10 @@ function verifyXmlResponse(resp: SchedulesResponse) {
     expect(s[0].$.UUID).toBe(uuid);
 
     expect(s[0].timetable.length).toBe(1);
-    const tt = s[0].timetable[0];
+    const tt = s[0].timetable[0] as ScheduleTimetable
 
-    expect(tt.eta!!.length).toBe(1);
-    const eta = tt.eta!![0];
+    expect(tt.eta?.length).toBe(1);
+    const eta = (tt.eta as Timestamp[])[0];
     expect(eta.$.time).toBe(etaEventTime);
     expect(eta.$.uts).toBe(etaTimestamp);
 

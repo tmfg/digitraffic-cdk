@@ -1,12 +1,12 @@
 import moment from 'moment';
-import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import {EventType} from "../../lib/model/timestamp";
 import {findByLocodePublicShiplist} from "../../lib/db/shiplist-public";
 import {EventSource} from "../../lib/model/eventsource";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('db-shiplist-public', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
 
     test('findByLocodePublicShiplist - ETA not returned if ATA exists', async () => {
         const locode = 'AA123';

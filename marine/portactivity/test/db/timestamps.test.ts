@@ -92,8 +92,8 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
-    testNotFound('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!! + 1));
-    testNotFound('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!! - 1));
+    testNotFound('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi! + 1));
+    testNotFound('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo! - 1));
     testNotFound('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port + 'asdf'));
     testNotFound('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.source + 'asdf'));
 
@@ -307,7 +307,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [ts.location.port]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
 
         expect(ships.length).toBe(1);
     });
@@ -323,7 +323,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!], [ts.location.port]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
 
         expect(ships.length).toBe(0);
     });

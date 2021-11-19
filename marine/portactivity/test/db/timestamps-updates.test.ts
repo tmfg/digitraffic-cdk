@@ -1,11 +1,11 @@
 import moment from 'moment';
-import * as pgPromise from "pg-promise";
 import {dbTestBase, findAll, insertPortAreaDetails, insertPortCall} from "../db-testutil";
 import {newTimestamp, newPortAreaDetails, newPortCall, PortAreaDetails, PortCall} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('db-timestamps - updates', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
 
     test('updateTimestamp - properties', async () => {
         const timestamp = newTimestamp({

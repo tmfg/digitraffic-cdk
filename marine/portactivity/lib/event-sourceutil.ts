@@ -6,8 +6,6 @@ import {EventSource} from "./model/eventsource";
 export const VTS_A = 'VTS A';
 export const VTS_O = 'VTS O';
 
-const DEFAULT_PRIORITY = -1;
-
 export const eventSourceMap = new Map<string, string>([
     [EventSource.PORTNET, "PNET"],
     [EventSource.AWAKE_AI, VTS_A],
@@ -31,28 +29,6 @@ export function isPortnetTimestamp(timestamp: ApiTimestamp): boolean {
 export function getDisplayableNameForEventSource(eventSource: string): string {
     return eventSourceMap.get(eventSource) || eventSource;
 }
-
-export function selectBestTimestamp(timestamp: any): any {
-    const bestTimestamp = {} as any;
-
-    for(const sourceName of Object.keys(timestamp)) {
-        const timestampTime = timestamp[sourceName];
-        const timestampPriority = getPriority(sourceName);
-
-        if(typeof bestTimestamp.priority === 'undefined' || bestTimestamp.priority < timestampPriority) {
-            bestTimestamp.source = sourceName;
-            bestTimestamp.priority = timestampPriority;
-            bestTimestamp.time = timestampTime;
-        }
-    }
-
-    return bestTimestamp;
-}
-
-function getPriority(eventSource: string) {
-    return eventSourcePriorities.get(eventSource) || DEFAULT_PRIORITY;
-}
-
 
 const vtsASources: string[] = [];
 for (const entry of eventSourceMap.entries()) {

@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {ApiTimestamp, EventType} from "../model/timestamp";
-import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, Port} from "../service/portareas";
+import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../service/portareas";
 import moment from "moment";
 import {EventSource} from "../model/eventsource";
 import {DTDatabase} from "digitraffic-common/postgres/database";
@@ -407,8 +407,7 @@ export function findPortnetETAsByLocodes(
 
 export function findVtsShipImosTooCloseToPortByPortCallId(
     db: DTDatabase,
-    portcallIds: number[],
-    ports: Port[]
+    portcallIds: number[]
 ): Promise<DbImo[]> {
     // Prepared statement use not possible due to dynamic IN-list
     return db.tx(t => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [
@@ -477,7 +476,7 @@ export async function findImoByMmsi(db: DTDatabase, mmsi: number): Promise<numbe
     return null;
 }
 
-export function createUpdateValues(e: ApiTimestamp): any[] {
+export function createUpdateValues(e: ApiTimestamp): unknown[] {
     return [
         e.eventType, // event_type
         moment(e.eventTime).toDate(), // event_time

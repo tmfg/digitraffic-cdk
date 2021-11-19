@@ -1,10 +1,10 @@
-import * as pgPromise from "pg-promise";
 import {dbTestBase} from "../db-testutil";
 import {deletePilotages, findPortCallId, getTimestamps, updatePilotages} from "../../lib/db/pilotages";
 import {Pilotage} from "../../lib/model/pilotage";
 import {Location} from "lib/model/timestamp";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-pilotages-public', dbTestBase((db: DTDatabase) => {
     function createPilotage(): Pilotage {
         return {
             id: 1,
@@ -86,7 +86,7 @@ describe('db-pilotages-public', dbTestBase((db: pgPromise.IDatabase<any, any>) =
     });
 }));
 
-export function insertPilotage(db: pgPromise.IDatabase<any, any>, id: number, state: string, scheduleUpdated: Date): Promise<any> {
+export function insertPilotage(db: DTDatabase, id: number, state: string, scheduleUpdated: Date): Promise<unknown> {
     return updatePilotages(db, [{
         id,
         vessel: {

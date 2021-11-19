@@ -10,6 +10,7 @@ export async function getTimestampsUnderVtsControl(url: string): Promise<ApiTime
     return filterTimestamps(schedulesToTimestamps(resp, false));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function getCalculatedTimestamps(url: string): Promise<ApiTimestamp[]> {
     //const resp = await SchedulesApi.getSchedulesTimestamps(url, true);
     //return filterTimestamps(schedulesToTimestamps(resp, true));

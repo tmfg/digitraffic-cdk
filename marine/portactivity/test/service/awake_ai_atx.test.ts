@@ -7,15 +7,16 @@ import {
 } from "../../lib/api/awake_ai_atx";
 import {AwakeAiATXService} from "../../lib/service/awake_ai_atx";
 import {dbTestBase, insertPortAreaDetails, insertPortCall} from "../db-testutil";
-import * as pgPromise from "pg-promise";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {randomBoolean} from "digitraffic-common/test/testutils";
 import {EventSource} from "../../lib/model/eventsource";
 import {shuffle} from "digitraffic-common/js/js-utils";
 import {AwakeAiZoneType} from "../../lib/api/awake_common";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const ws = require('ws');
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('service Awake.AI ATx', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
 
     test('getATXs - no portcall found for ATx', async () => {
         const atxMessage = newAwakeATXMessage();

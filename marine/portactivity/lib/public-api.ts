@@ -9,15 +9,7 @@ import {
 import {Function} from '@aws-cdk/aws-lambda';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
-import {
-    corsMethod,
-    defaultIntegration,
-    getResponse,
-    methodResponse,
-    RESPONSE_200_OK,
-    RESPONSE_400_BAD_REQUEST,
-    RESPONSE_500_SERVER_ERROR,
-} from "digitraffic-common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse,} from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/api/utils";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
@@ -28,6 +20,7 @@ import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
+import {IModel} from "@aws-cdk/aws-apigateway/lib/model";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -62,8 +55,8 @@ export class PublicApi {
     createTimestampsResource(
         stack: DigitrafficStack,
         resource: Resource,
-        timestampsJsonModel: any,
-        errorResponseModel: any,
+        timestampsJsonModel: IModel,
+        errorResponseModel: IModel,
         validator: RequestValidator): Function {
         const environment = stack.createLambdaEnvironment();
 

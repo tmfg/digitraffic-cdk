@@ -1,21 +1,22 @@
-import {IDatabase, ITask} from "pg-promise";
+import {ITask} from "pg-promise";
 import {ApiTimestamp} from "../lib/model/timestamp";
 import {DbTimestamp} from "../lib/db/timestamps";
 import * as TimestampsDb from '../lib/db/timestamps';
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
+import {DTDatabase, DTTransaction} from "digitraffic-common/postgres/database";
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+export function dbTestBase(fn: (db: DTDatabase) => any) {
     return commonDbTestBase(fn, truncate, 'portactivity', 'portactivity', 'localhost:54321/marine');
 }
 
-export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
+export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: ITask<any>) => void) {
     return async () => {
         await db.tx(async (t: any) => await fn(t));
     };
 }
 
-export async function truncate(db: IDatabase<any, any>): Promise<any> {
+export async function truncate(db: DTDatabase | DTTransaction): Promise<any> {
     return await db.tx(async t => {
         await db.none('DELETE FROM pilotage');
         await db.none('DELETE FROM port_call_timestamp');
@@ -25,7 +26,7 @@ export async function truncate(db: IDatabase<any, any>): Promise<any> {
     });
 }
 
-export function findAll(db: IDatabase<any, any>): Promise<DbTimestamp[]> {
+export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> {
     return db.tx(t => {
        return t.manyOrNone(`
         SELECT
@@ -47,7 +48,7 @@ export function findAll(db: IDatabase<any, any>): Promise<DbTimestamp[]> {
     });
 }
 
-export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
+export function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[]) {
     return db.tx(t => {
         return t.batch(timestamps.map(e => {
             return t.none(`
@@ -89,7 +90,7 @@ export function insert(db: IDatabase<any, any>, timestamps: ApiTimestamp[]) {
     });
 }
 
-export function insertVessel(db: IDatabase<any, any>, vessel: Vessel) {
+export function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel) {
     return db.tx(t => {
         db.none(`
             INSERT INTO public.vessel(
@@ -127,7 +128,7 @@ export function insertVessel(db: IDatabase<any, any>, vessel: Vessel) {
     });
 }
 
-export function insertPortAreaDetails(db: IDatabase<any, any>, p: PortAreaDetails): Promise<any> {
+export function insertPortAreaDetails(db: DTTransaction | DTDatabase, p: PortAreaDetails): Promise<any> {
     return db.none(`
         INSERT INTO public.port_area_details(
             port_area_details_id,
@@ -141,7 +142,7 @@ export function insertPortAreaDetails(db: IDatabase<any, any>, p: PortAreaDetail
     `, p);
 }
 
-export function insertPortCall(db: IDatabase<any, any>, p: PortCall): Promise<any> {
+export function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall): Promise<any> {
     return db.none(`
         INSERT INTO public.port_call(
             port_call_id,

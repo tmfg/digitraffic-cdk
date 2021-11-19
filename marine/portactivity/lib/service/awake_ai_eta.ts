@@ -98,7 +98,7 @@ export class AwakeAiETAService {
             },
             location: {
                 port: this.normalizeDestination(ship.locode,
-                    eta.locode!), // validated to be not null
+                    eta.locode as string), // validated to be not null
                 portArea: ship.port_area_code
             },
             source: EventSource.AWAKE_AI,

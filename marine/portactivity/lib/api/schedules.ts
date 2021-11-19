@@ -37,16 +37,18 @@ export interface Vessel {
     }
 }
 
+export interface ScheduleTimetable {
+    readonly destination: Destination[]
+    readonly eta?: Timestamp[]
+    readonly etd?: Timestamp[]
+}
+
 export interface Schedule {
     readonly $: {
         readonly UUID: string
     }
     readonly vessel: Vessel[]
-    readonly timetable: [{
-        readonly destination: Destination[]
-        readonly eta?: Timestamp[]
-        readonly etd?: Timestamp[]
-    }]
+    readonly timetable: ScheduleTimetable[]
 }
 
 export interface SchedulesResponse {

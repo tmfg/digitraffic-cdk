@@ -91,6 +91,7 @@ describe('schedules', () => {
 function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean): SchedulesResponse {
     return {
         schedules: {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             schedule: Array.from({length: schedules}).map(_ => ({
                 $: { UUID: uuid },
                 timetable: [{

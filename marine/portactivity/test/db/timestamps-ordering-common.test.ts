@@ -1,32 +1,32 @@
-import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
 import {shuffle} from "digitraffic-common/js/js-utils";
 import {DbTimestamp} from "../../lib/db/timestamps";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('db-timestamps - ordering', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
 
     const locode = 'BB456';
     generateOrderingTest(
         'locode',
         {locode},
         () => locode,
-        (identifier: any) => TimestampsDb.findByLocode(db, identifier as string));
+        (identifier: string | number) => TimestampsDb.findByLocode(db, identifier as string));
 
     const mmsi = 123;
     generateOrderingTest(
         'mmsi',
         {mmsi},
         () => mmsi,
-        (identifier: any) => TimestampsDb.findByMmsi(db, identifier as number));
+        (identifier: string | number) => TimestampsDb.findByMmsi(db, identifier as number));
 
     const imo = 123;
     generateOrderingTest(
         'imo',
         {imo},
         () => imo,
-        (identifier: any) => TimestampsDb.findByImo(db, identifier as number));
+        (identifier: string | number) => TimestampsDb.findByImo(db, identifier as number));
 
     /**
      * Generates common ordering tests for locode, mmsi, imo.
@@ -39,8 +39,8 @@ describe('db-timestamps - ordering', dbTestBase((db: pgPromise.IDatabase<any, an
     function generateOrderingTest(
         idPropText: string,
         idProp: { mmsi?: number, imo?: number, locode?: string },
-        getIdProp: () => any,
-        fetchMethod: (identifier: any) => Promise<DbTimestamp[]>) {
+        getIdProp: () => number | string,
+        fetchMethod: (identifier: string | number) => Promise<DbTimestamp[]>) {
 
         const testMmsi = 123;
         const testLocode = 'AA123';

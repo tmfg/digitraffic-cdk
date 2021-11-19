@@ -31,7 +31,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
             }
 
             // mmsi should exist in this case
-            const imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi!));
+            const imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi as number));
             if (!imo) {
                 console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
                 // resolve so this gets removed from the queue
@@ -39,7 +39,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
             }
 
             // imo should exist in this case
-            const mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo!));
+            const mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo as number));
             if (!mmsi) {
                 console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
                 // resolve so this gets removed from the queue
@@ -81,7 +81,7 @@ async function removeOldTimestamps(
     if (isPortnetTimestamp(timestamp)) {
         timestampsAnotherLocode = await TimestampsDB.findPortnetTimestampsForAnotherLocode(
             tx,
-            timestamp.portcallId!,
+            timestamp.portcallId as number,
             timestamp.location.port
         );
         if (timestampsAnotherLocode.length) {
@@ -158,8 +158,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
             const shipsTooCloseToPortImos =
                 (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(
                     db,
-                    newestShips.map(s => s.portcall_id),
-                    ports))
+                    newestShips.map(s => s.portcall_id)))
                 .map(s => s.imo);
             console.info('method=findETAShipsByLocode Ships too close to port', shipsTooCloseToPortImos);
             const filteredShips = newestShips.filter(s => shipsTooCloseToPortImos.includes(s.imo));
