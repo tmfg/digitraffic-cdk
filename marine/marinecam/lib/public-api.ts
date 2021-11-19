@@ -153,7 +153,7 @@ function createGetImageResource(stack: DigitrafficStack,
 }
 
 function createListCamerasLambda(stack: DigitrafficStack): MonitoredFunction {
-    return MonitoredDBFunction.createV2(stack, 'list-cameras', undefined, {
+    return MonitoredDBFunction.create(stack, 'list-cameras', undefined, {
         timeout: 10
     });
 }
