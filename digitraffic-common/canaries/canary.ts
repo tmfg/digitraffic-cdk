@@ -1,7 +1,7 @@
 import {Construct, Duration} from "@aws-cdk/core";
 import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics";
 import {LambdaEnvironment} from "../model/lambda-environment";
-import {ManagedPolicy, PolicyStatement, PolicyStatementProps, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {Role} from "@aws-cdk/aws-iam";
 import {CanaryAlarm} from "./canary-alarm";
 import {CanaryParameters} from "./canary-parameters";
 

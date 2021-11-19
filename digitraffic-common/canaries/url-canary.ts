@@ -25,7 +25,7 @@ export class UrlCanary extends DigitrafficCanary {
         super(stack, canaryName, role, params, environmentVariables);
     }
 
-    static create(stack: DigitrafficStack, role: Role, publicApi: DigitrafficRestApi, params: any): UrlCanary {
+    static create(stack: DigitrafficStack, role: Role, publicApi: DigitrafficRestApi, params: Partial<UrlCanaryParameters>): UrlCanary {
         const defaultParameters: any = {
             handler: `${params.name}.handler`,
             hostname: publicApi.hostname()

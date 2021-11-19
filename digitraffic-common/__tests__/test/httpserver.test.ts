@@ -31,18 +31,12 @@ describe('TestHttpServer - test', () => {
     }
 
     async function sendRequest(method: string, path: string, body?: string): Promise<IncomingMessage> {
-        let content = "";
-
         return await new Promise((resolve, reject) => {
             const request = http.request({
                 path,
                 port: PORT,
                 method
             }, (response: IncomingMessage) => {
-                //another chunk of data has been received, so append it to `str`
-                response.on('data', (chunk: string) => {
-                    content += chunk;
-                });
 
                 //the whole response has been received, so we just print it out here
                 response.on('end', () => {

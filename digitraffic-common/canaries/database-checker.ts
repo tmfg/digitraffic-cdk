@@ -1,6 +1,5 @@
 import {withDbSecret} from "../secrets/dbsecret";
-import {inDatabase, inDatabaseReadonly} from "../postgres/database";
-import {IDatabase} from "pg-promise";
+import {DTDatabase, inDatabaseReadonly} from "../postgres/database";
 
 const synthetics = require('Synthetics');
 
@@ -15,7 +14,7 @@ abstract class DatabaseCheck {
         this.failed = false;
     }
 
-    abstract check(value: any): any;
+    abstract check(value: any): void;
 }
 
 class CountDatabaseCheck extends DatabaseCheck {
@@ -33,7 +32,7 @@ class CountDatabaseCheck extends DatabaseCheck {
         this.maxCount = maxCount;
     }
 
-    check(value: any): any {
+    check(value: any) {
         if (!value) {
             this.failed = true;
             throw 'no return value';
@@ -104,7 +103,7 @@ export class DatabaseChecker {
         }
 
         await withDbSecret(this.secret, async () => {
-            await inDatabaseReadonly(async (db: IDatabase<any>) => {
+            await inDatabaseReadonly(async (db: DTDatabase) => {
                 for (const check of this.checks) {
                     console.info("canary checking sql " + check.sql);
 

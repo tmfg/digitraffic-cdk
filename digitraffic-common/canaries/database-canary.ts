@@ -34,7 +34,7 @@ export class DatabaseCanary extends DigitrafficCanary {
         };
     }
 
-    static create(stack: DigitrafficStack, role: Role, params: any): DatabaseCanary {
+    static create(stack: DigitrafficStack, role: Role, params: CanaryParameters): DatabaseCanary {
         return new DatabaseCanary(stack, role, stack.secret, {...{
             secret: stack.configuration.secretId,
             schedule: Schedule.rate(Duration.hours(1)),
@@ -42,7 +42,7 @@ export class DatabaseCanary extends DigitrafficCanary {
         }, ...params});
     }
 
-    static createV2(stack: DigitrafficStack, role: Role, name: string, params: any = {}): DatabaseCanary {
+    static createV2(stack: DigitrafficStack, role: Role, name: string, params: Partial<CanaryParameters> = {}): DatabaseCanary {
         return new DatabaseCanary(stack, role, stack.secret, {...{
                 secret: stack.configuration.secretId,
                 schedule: Schedule.rate(Duration.hours(1)),

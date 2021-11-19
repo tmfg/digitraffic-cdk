@@ -3,13 +3,13 @@ import {getApiKeyFromAPIGateway} from "../api/apikey";
 import {constants} from "http2";
 
 const synthetics = require('Synthetics');
-const zlib = require('zlib');
+import zlib = require('zlib');
 
 const baseHeaders = {
     "Digitraffic-User" : "AWS Canary",
     "Accept-Encoding" : "gzip",
     "Accept": [MediaType.TEXT_HTML, MediaType.APPLICATION_JSON].join(',')
-} as any;
+} as Record<string, string>;
 
 const API_KEY_HEADER = "x-api-key";
 

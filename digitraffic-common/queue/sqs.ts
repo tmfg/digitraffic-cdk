@@ -1,14 +1,12 @@
-import {DeadLetterQueue, Queue, QueueEncryption, QueueProps} from "@aws-cdk/aws-sqs";
+import {Queue, QueueEncryption, QueueProps} from "@aws-cdk/aws-sqs";
 import {Construct, Duration} from "@aws-cdk/core";
 import {DigitrafficStack} from "../stack/stack";
 import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {MonitoredFunction} from "../lambda/monitoredfunction";
 import {PolicyStatement} from "@aws-cdk/aws-iam";
-import {AssetCode, InlineCode, Runtime} from "@aws-cdk/aws-lambda";
+import {InlineCode, Runtime} from "@aws-cdk/aws-lambda";
 import {RetentionDays} from "@aws-cdk/aws-logs";
-import {LambdaEnvironment} from "../model/lambda-environment";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
-import {VoyagePlanGatewayProps} from "voyage-plan-gateway/lib/app-props";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 
@@ -48,7 +46,7 @@ export class DigitrafficDLQueue {
             encryption: QueueEncryption.KMS_MANAGED,
         });
 
-        const dlqBucket = new Bucket(stack, `${dlqName}-DLQBucket`, {
+        const dlqBucket = new Bucket(stack, `${dlqName}-Bucket`, {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
