@@ -1,10 +1,8 @@
-import axios from "axios";
-
-const https = require('https');
+import * as https from 'https'
 
 const PILOTAGES_PATH = "/digitraffic/pilotages/active";
 
-export async function getMessages(host: string, authHeader: string): Promise<any> {
+export async function getMessages(host: string, authHeader: string): Promise<string> {
     let content = '';
 
     return new Promise((resolve, reject) => {
@@ -16,9 +14,9 @@ export async function getMessages(host: string, authHeader: string): Promise<any
                 'Authorization': `Basic ${authHeader}`,
                 'Content-Type': 'text/plain'
             }
-        }, (response: any) => {
+        }, (response) => {
             //another chunk of data has been received, so append it to `str`
-            response.on('data', (chunk: any) => {
+            response.on('data', (chunk) => {
                 content += chunk;
             });
 
@@ -27,29 +25,9 @@ export async function getMessages(host: string, authHeader: string): Promise<any
                 resolve(content);
             });
 
-            response.on('error', (error: any) => {
+            response.on('error', (error) => {
                 reject(error);
             });
         }).end();
     });
-}
-
-export async function getMessagesOld(host: string, authHeader: string): Promise<any> {
-    const url = `https://${host}${PILOTAGES_PATH}`;
-
-    const response = await axios.get(url, {
-        headers: {
-            'Authorization': `Basic ${authHeader}`,
-            'Content-Type': 'text/plain'
-        },
-        validateStatus: (status) => {
-            console.info("validateStatus " + status);
-
-            return true;
-        }
-    });
-
-    console.info("response " + JSON.stringify(response));
-
-    return JSON.parse(response.data);
 }

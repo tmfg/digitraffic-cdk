@@ -1,18 +1,17 @@
 import {findByLocodePublicShiplist} from '../../db/shiplist-public';
 import {inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {IDatabase} from 'pg-promise';
-import moment from 'moment-timezone';
-import * as R from 'ramda';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
 import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {MediaType} from "digitraffic-common/api/mediatypes";
+import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
 
-export const handler = async (event: any): Promise<any> => {
+export const handler = async (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
     return handlerFn(event, withDbSecret);
 };
 
-function badRequest(message: string): Promise<object> {
+function badRequest(message: string): Promise<ProxyLambdaResponse> {
     return Promise.resolve({
         statusCode: 400,
         body: message,
@@ -23,11 +22,11 @@ function badRequest(message: string): Promise<object> {
 }
 
 export async function handlerFn(
-    event: any,
+    event: ProxyLambdaRequest,
     withDbSecretFn: SecretFunction
-): Promise<any> {
+): Promise<ProxyLambdaResponse> {
 
-    return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
+    return withDbSecretFn(process.env.SECRET_ID as string, (): Promise<ProxyLambdaResponse> => {
         if (!event.queryStringParameters.locode) {
             return badRequest('Missing LOCODE');
         }

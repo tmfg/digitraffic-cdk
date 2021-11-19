@@ -3,7 +3,6 @@ import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {Topic} from "@aws-cdk/aws-sns";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {Schedule} from "@aws-cdk/aws-synthetics";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";

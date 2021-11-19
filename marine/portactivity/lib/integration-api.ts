@@ -1,8 +1,6 @@
 import {Model, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
 import {Construct} from '@aws-cdk/core';
-import {ISecurityGroup, IVpc} from '@aws-cdk/aws-ec2';
-import {LambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
-import {createRestApi, DigitrafficRestApi} from 'digitraffic-common/api/rest_apis';
+import {DigitrafficRestApi} from 'digitraffic-common/api/rest_apis';
 import {Queue} from '@aws-cdk/aws-sqs';
 import {attachQueueToApiGatewayResource} from "digitraffic-common/api/sqs";
 import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
@@ -12,8 +10,9 @@ import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export function create(
     queue: Queue,
-    stack: DigitrafficStack)
-{
+    stack: DigitrafficStack
+): void {
+
     const integrationApi = new DigitrafficRestApi(stack,
         'PortActivity-Integration',
         'Port Activity integration API');

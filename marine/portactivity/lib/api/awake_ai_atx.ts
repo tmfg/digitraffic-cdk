@@ -138,7 +138,7 @@ export class AwakeAiATXApi {
         });
     }
 
-    static createResumeMessage(subscriptionId: string) {
+    static createResumeMessage(subscriptionId: string): { msgType: string, resume: string } {
         console.info('method=createResumeMessage Existing session found')
         return {
             msgType: 'subscribe',

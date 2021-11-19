@@ -24,7 +24,7 @@ const eventSourcePriorities = new Map<string, number>([
     [EventSource.PORT_HANKO, 100]
 ]);
 
-export function isPortnetTimestamp(timestamp: ApiTimestamp) {
+export function isPortnetTimestamp(timestamp: ApiTimestamp): boolean {
     return timestamp.source === EventSource.PORTNET;
 }
 
@@ -76,7 +76,7 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
     let ret: MergeableTimestamp[] = timestamps;
 
     // group by portcall id
-    const byPortcallId: MergeableTimestamp[][] = R.compose(R.values, R.groupBy((ts: MergeableTimestamp) => ts.portcallId!.toString()))(timestamps);
+    const byPortcallId: MergeableTimestamp[][] = R.compose(R.values, R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString()))(timestamps);
 
     let needToSort = false;
 
@@ -86,7 +86,7 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
             // build an average timestamp and discard the rest
             // use the source with the highest priority
             ret = ret.filter(t => !vtsAStamps.includes(t));
-            const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source)!), vtsAStamps))!;
+            const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source) as number), vtsAStamps)) as MergeableTimestamp;
             ret.push({ ...highestPriority, ...{
                 eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime)))
             }});
