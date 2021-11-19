@@ -3,6 +3,7 @@ import {createGeometry} from "digitraffic-common/postgres/geometry";
 import {LineString} from "wkx";
 import {Fault} from "../model/fault";
 import {Language} from "digitraffic-common/model/language";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const moment = require('moment-timezone');
 
@@ -110,7 +111,7 @@ const PS_FAULT_IDS_BY_AREA = new PreparedStatement({
     text: FAULT_IDS_BY_AREA
 });
 
-export function getFaultById(db: IDatabase<any, any>, faultId: number): Promise<Fault | null> {
+export function getFaultById(db: DTDatabase, faultId: number): Promise<Fault | null> {
     return db.oneOrNone(PS_FAULT_BY_ID, [faultId]);
 }
 
@@ -118,14 +119,14 @@ interface DbFaultId {
     readonly id: string
 }
 
-export async function findFaultIdsByRoute(db: IDatabase<any, any>, route: LineString): Promise<number[]> {
+export async function findFaultIdsByRoute(db: DTDatabase, route: LineString): Promise<number[]> {
     const ids = db.tx(t => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()))
     // bigints are returned as string by pg-promise since they could overflow
     // however these are plain integers
     return ids.then((result: DbFaultId[]) => result.map(r => Number(r.id)));
 }
 
-export function updateFaults(db: IDatabase<any, any>, domain: string, faults: any[]): Promise<any>[] {
+export function updateFaults(db: DTDatabase, domain: string, faults: any[]): Promise<any>[] {
     const ps = new PreparedStatement({
         name: 'update-faults',
         text: UPSERT_FAULTS_SQL,
@@ -155,7 +156,7 @@ export function updateFaults(db: IDatabase<any, any>, domain: string, faults: an
     });
 }
 
-export async function findAll(db: IDatabase<any, any>, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
+export async function findAll(db: DTDatabase, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
     const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
     const ps = new PreparedStatement({
         name: 'get-all-faults',

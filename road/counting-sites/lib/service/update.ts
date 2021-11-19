@@ -1,6 +1,6 @@
 import * as CounterDb from "../db/counter";
 import * as DataDb from "../db/data";
-import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {EcoCounterApi} from "../api/eco-counter";
 import {ApiCounter, DbCounter} from "../model/counter";
 import moment from "moment";
@@ -37,7 +37,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
     const api = new EcoCounterApi(apiKey, url);
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
-    await inDatabase(async db => {
+    await inDatabase(async (db: DTDatabase) => {
         await Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
             if(isDataUpdateNeeded(counter)) {
                 // either last update timestamp + 1 day or ten days ago(for first time)
@@ -83,9 +83,9 @@ function compareCounters(countersInApi: any, countersInDb: any): [ApiCounter[], 
 }
 
 async function getAllCountersFromDb(domain: string) {
-    const counters = await inDatabaseReadonly( db => {
+    const counters = await inDatabaseReadonly( (db: DTDatabase) => {
         return CounterDb.findAllCountersForUpdateForDomain(db, domain);
-    });
+    }) as any[];
 
     return Object.fromEntries(counters
         .map((c: any) => [c.site_id as string, c])

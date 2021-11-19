@@ -1,7 +1,6 @@
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as DisruptionsDB from "../db/disruptions"
 import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
 import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import * as DisruptionsApi from '../api/disruptions';

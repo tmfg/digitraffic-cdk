@@ -1,17 +1,16 @@
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
-import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
+import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import * as CachedDao from "digitraffic-common/db/cached";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
 import * as turf from "@turf/turf";
-import {Feature} from "geojson";
+import {Feature, FeatureCollection, GeoJSON} from "geojson";
 
 const MAX_DISTANCE_NM = 15;
 
 export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<any> {
-    const warnings = await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+    const warnings = await inDatabaseReadonly(async (db: DTDatabase) => {
         return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
-    });
+    }) as FeatureCollection;
 
     if(!warnings) {
         return {};
@@ -36,11 +35,11 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
  * The warnings are cached in database, so we get all active warnings then filter the one with given id
  * @param id
  */
-export async function findWarning(db: IDatabase<any, any>, id: number): Promise<Feature|null> {
-    const warnings = await CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
+export async function findWarning(db: DTDatabase, id: number): Promise<Feature|undefined> {
+    const warnings = await CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE) as FeatureCollection;
 
     if(!warnings) {
-        return null;
+        return undefined;
     }
 
     return warnings.features.find((f: any) => f.properties.id === id);

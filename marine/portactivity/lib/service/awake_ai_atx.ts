@@ -1,4 +1,4 @@
-import {AwakeAiATXApi, AwakeATXZoneEventType} from "../api/awake_ai_atx";
+import {AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType} from "../api/awake_ai_atx";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import * as TimestampDAO from '../db/timestamps';
 import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
@@ -19,7 +19,7 @@ export class AwakeAiATXService {
         return inDatabase(async (db: DTDatabase) => {
             const promises = atxs
                 .filter(atx => atx.zoneType === AwakeAiZoneType.BERTH)
-                .map(async (atx) => {
+                .map(async (atx: AwakeAIATXTimestampMessage) => {
                     // pick the first supported LOCODE
                     if (atx.locodes.length > 1) {
                         console.warn('method=getATXs More than one locode for timestamp! IMO %s locodes %s', atx.imo, atx.locodes);
@@ -38,30 +38,26 @@ export class AwakeAiATXService {
 
                     if (portcallId) {
                         return {
-                            timestamp: {
-                                eventType,
-                                eventTime: atx.eventTimestamp,
-                                source: EventSource.AWAKE_AI,
-                                recordTime: atx.eventTimestamp,
-                                ship: {
-                                    imo: atx.imo,
-                                    mmsi: atx.mmsi
-                                },
-                                location: {
-                                    port
-                                },
-                                portcallId
-                            }
-                        };
+                            eventType,
+                            eventTime: atx.eventTimestamp,
+                            recordTime: atx.eventTimestamp,
+                            source: EventSource.AWAKE_AI,
+                            ship: {
+                                imo: atx.imo,
+                                mmsi: atx.mmsi
+                            },
+                            location: {
+                                port
+                            },
+                            portcallId
+                        } as ApiTimestamp;
                     } else {
                         console.warn('method=getATXs no portcall found for %s IMO', atx.zoneEventType, atx.imo);
-                        return {
-                            timestamp: null
-                        };
+                        return null;
                     }
                 });
             return Promise.all(promises)
-                .then(atxs => atxs.filter(atx => !!atx.timestamp).map(atx => atx.timestamp));
+                .then(timestamps => timestamps.filter(timestamp => timestamp != null).map(timestamp => timestamp as ApiTimestamp));
         });
     }
 }

@@ -1,7 +1,6 @@
 import * as TimestampsDB from '../db/timestamps'
 import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps'
-import {inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
-import {IDatabase} from 'pg-promise';
+import {DTDatabase, inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
     isPortnetTimestamp,
@@ -16,9 +15,8 @@ export interface UpdatedTimestamp extends DbUpdatedTimestamp {
 }
 
 export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTimestamp | null> {
-    return await inDatabase(async (db: IDatabase<any, any>) => {
-        return await db.tx(async t => {
-
+    return inDatabase(async (db: DTDatabase) => {
+        return db.tx(async t => {
             const portcallId = timestamp.portcallId || (await TimestampsDB.findPortcallId(db,
                 timestamp.location.port,
                 timestamp.eventType,
@@ -29,7 +27,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
             if (!portcallId) {
                 console.warn(`method=saveTimestamp portcall id not found for timestamp %s`, JSON.stringify(timestamp));
                 // resolve so this gets removed from the queue
-                return Promise.resolve();
+                return null;
             }
 
             // mmsi should exist in this case
@@ -37,7 +35,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
             if (!imo) {
                 console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
                 // resolve so this gets removed from the queue
-                return Promise.resolve();
+                return null;
             }
 
             // imo should exist in this case
@@ -45,7 +43,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
             if (!mmsi) {
                 console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
                 // resolve so this gets removed from the queue
-                return Promise.resolve();
+                return null;
             }
 
             const ship: Ship = {
@@ -59,7 +57,7 @@ export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTim
 }
 
 export async function saveTimestamps(timestamps: ApiTimestamp[]): Promise<Array<DbUpdatedTimestamp | null>> {
-    return await inDatabase(async (db: IDatabase<any, any>) => {
+    return await inDatabase(async (db: DTDatabase) => {
         return await db.tx(t => t.batch(
             timestamps.map(timestamp => doSaveTimestamp(t, timestamp))
         ));
@@ -72,7 +70,7 @@ async function doSaveTimestamp(
 ): Promise<UpdatedTimestamp | null> {
     const removedTimestamps = await removeOldTimestamps(tx, timestamp);
     const updatedTimestamp = await TimestampsDB.updateTimestamp(tx, timestamp);
-    return updatedTimestamp ? { ...updatedTimestamp, locodeChanged: removedTimestamps.length > 0 } : null
+    return updatedTimestamp ? { ...updatedTimestamp, locodeChanged: removedTimestamps.length > 0 } : null;
 }
 
 async function removeOldTimestamps(
@@ -101,7 +99,7 @@ export async function findAllTimestamps(
     source?: string
 ): Promise<ApiTimestamp[]> {
     const start = Date.now();
-    const timestamps: ApiTimestamp[] = await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+    const timestamps: ApiTimestamp[] = await inDatabaseReadonly(async (db: DTDatabase) => {
         if (locode) {
             return TimestampsDB.findByLocode(db, locode);
         } else if (mmsi && !imo) {
@@ -141,7 +139,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
     console.info(`method=findETAShipsByLocode find for ${ports}`);
 
     const startFindPortnetETAsByLocodes = Date.now();
-    const portnetShips = await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+    const portnetShips = await inDatabaseReadonly(async (db: DTDatabase) => {
         return TimestampsDB.findPortnetETAsByLocodes(db, ports);
     }).finally(() => {
         console.info('method=findPortnetETAsByLocodes tookMs=%d', (Date.now() - startFindPortnetETAsByLocodes));
@@ -162,7 +160,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
 
     if (newestShips.length) {
         const startFindVtsShipsTooCloseToPort = Date.now();
-        return await inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+        return await inDatabaseReadonly(async (db: DTDatabase) => {
             const shipsTooCloseToPortImos =
                 (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(
                     db,

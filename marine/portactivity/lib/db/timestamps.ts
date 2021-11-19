@@ -1,8 +1,9 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES, Port} from "../service/portareas";
 import moment from "moment";
 import {EventSource} from "../model/eventsource";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
@@ -331,7 +332,7 @@ const FIND_IMO_BY_MMSI_SQL = `
     ) AS imo
 `.trim();
 
-export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
+export function updateTimestamp(db: DTDatabase, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: 'update-timestamps',
         text: INSERT_ESTIMATE_SQL
@@ -339,7 +340,7 @@ export function updateTimestamp(db: IDatabase<any, any>, timestamp: ApiTimestamp
     return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
-export async function removeTimestamps(db: IDatabase<any, any>, source: string, sourceIds: string[]): Promise<number[]> {
+export async function removeTimestamps(db: DTDatabase, source: string, sourceIds: string[]): Promise<number[]> {
     if(sourceIds.length > 0) {
         return db.manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
             .then(array => array.map(object => object.id));
@@ -349,7 +350,7 @@ export async function removeTimestamps(db: IDatabase<any, any>, source: string, 
 }
 
 export function findByLocode(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     locode: string
 ): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
@@ -361,7 +362,7 @@ export function findByLocode(
 }
 
 export function findByMmsi(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     mmsi: number,
 ): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
@@ -373,7 +374,7 @@ export function findByMmsi(
 }
 
 export function findByImo(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     imo: number,
 ): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
@@ -385,7 +386,7 @@ export function findByImo(
 }
 
 export function findBySource(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     source: string,
 ): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
@@ -397,7 +398,7 @@ export function findBySource(
 }
 
 export function findPortnetETAsByLocodes(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     locodes: string[]
 ): Promise<DbETAShip[]> {
     // Prepared statement use not possible due to dynamic IN-list
@@ -405,7 +406,7 @@ export function findPortnetETAsByLocodes(
 }
 
 export function findVtsShipImosTooCloseToPortByPortCallId(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     portcallIds: number[],
     ports: Port[]
 ): Promise<DbImo[]> {
@@ -416,7 +417,7 @@ export function findVtsShipImosTooCloseToPortByPortCallId(
 }
 
 export function findPortnetTimestampsForAnotherLocode(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     portcallId: number,
     locode: string
 ): Promise<DbTimestampIdAndLocode[]> {
@@ -429,7 +430,7 @@ export function findPortnetTimestampsForAnotherLocode(
 }
 
 export function deleteById(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     id: number
 ): Promise<null> {
     const ps = new PreparedStatement({
@@ -441,7 +442,7 @@ export function deleteById(
 }
 
 export async function findPortcallId(
-    db: IDatabase<any, any>,
+    db: DTDatabase,
     locode: string,
     eventType: EventType,
     eventTime: Date,
@@ -460,7 +461,7 @@ export async function findPortcallId(
     return null;
 }
 
-export async function findMmsiByImo(db: IDatabase<any, any>, imo: number): Promise<number | null> {
+export async function findMmsiByImo(db: DTDatabase, imo: number): Promise<number | null> {
     const mmsi = await db.oneOrNone(FIND_MMSI_BY_IMO_SQL, [imo]);
     if (mmsi) {
         return mmsi.mmsi as number;
@@ -468,7 +469,7 @@ export async function findMmsiByImo(db: IDatabase<any, any>, imo: number): Promi
     return null;
 }
 
-export async function findImoByMmsi(db: IDatabase<any, any>, mmsi: number): Promise<number | null> {
+export async function findImoByMmsi(db: DTDatabase, mmsi: number): Promise<number | null> {
     const imo = await db.oneOrNone(FIND_IMO_BY_MMSI_SQL, [mmsi]);
     if (imo) {
         return imo.imo as number;

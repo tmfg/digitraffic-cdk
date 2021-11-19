@@ -1,11 +1,10 @@
-import {IDatabase} from "pg-promise";
 import * as SubjectsDb from '../db/subjects';
-import {inDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
 import {Subject} from "../model/subject";
 import {Locale} from "../model/locale";
 
 export async function findAll(locale: Locale): Promise<Subject[]> {
-    return inDatabase(async (db: IDatabase<any, any>) => {
+    return inDatabase(async (db: DTDatabase) => {
         return await SubjectsDb.findAll(locale, db);
     });
 }
@@ -14,7 +13,7 @@ export async function update(
     subjects: Subject[]
 ): Promise<void> {
     const start = Date.now();
-    return inDatabase(async (db: IDatabase<any, any>) => {
+    return inDatabase(async (db: DTDatabase) => {
         return await SubjectsDb.update(subjects, db);
     }).then(a => {
         const end = Date.now();

@@ -1,11 +1,10 @@
-import {IDatabase} from "pg-promise";
-import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import * as AreaTrafficDb from '../db/areatraffic';
+import {DbAreaTraffic} from '../db/areatraffic';
 import {AreaTraffic} from "../model/areatraffic";
-import {DbAreaTraffic} from "../db/areatraffic";
 
 export async function updateAreaTrafficSendTime(areaId: number) {
-    return inDatabase(async (db: IDatabase<any, any>) => {
+    return inDatabase(async (db: DTDatabase) => {
         console.info("updating area %d", areaId);
         return AreaTrafficDb.updateAreaTrafficSendTime(db, areaId);
     });
@@ -14,7 +13,7 @@ export async function updateAreaTrafficSendTime(areaId: number) {
 const BRIGHTEN_OVERLAP_INTERVAL_MILLIS = 60 * 1000; // one minute
 
 export function getAreaTraffic(): Promise<AreaTraffic[]> {
-    return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         const areas = await AreaTrafficDb.getAreaTraffic(db);
 
         console.info("method=getAreaTraffic count=%d", areas.length);
@@ -25,7 +24,8 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
             .filter(needToBrighten)
             .map(area => ({
                 areaId: area.id,
-                durationInMinutes: area.brighten_duration_min
+                durationInMinutes: area.brighten_duration_min,
+                visibilityInMeters: null
             }));
     });
 }

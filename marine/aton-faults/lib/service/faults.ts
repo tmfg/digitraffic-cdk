@@ -61,7 +61,7 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
         new LineString(voyagePlan.route.waypoints
             .flatMap(w => w.waypoint.flatMap( wp => wp.position))
             .map(p => new Point(p.$.lon, p.$.lat)));
-    const faultIds = await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+    const faultIds = await inDatabaseReadonly(async (db: DTDatabase) => {
         return FaultsDB.findFaultIdsByRoute(db, voyageLineString);
     });
     console.info("method=findFaultIdsForVoyagePlan tookMs=%d count=%d", Date.now() - start, faultIds.length);

@@ -1,4 +1,5 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
+import {DTDatabase} from "../postgres/database";
 
 const SQL_UPDATE_CACHE_VALUE =
     `insert into cached_json(cache_id, content, last_updated)
@@ -25,10 +26,10 @@ export enum JSON_CACHE_KEY {
     NAUTICAL_WARNINGS_ARCHIVED = 'nautical-warnings-archived'
 }
 
-export function updateCachedJson(db: IDatabase<any, any>, cacheKey: JSON_CACHE_KEY, value: any): Promise<any> {
+export function updateCachedJson(db: DTDatabase, cacheKey: JSON_CACHE_KEY, value: any): Promise<null> {
     return db.none(PS_UPDATE_CACHE_VALUE, [cacheKey, value]);
 }
 
-export function getJsonFromCache(db: IDatabase<any, any>, cacheKey: JSON_CACHE_KEY): Promise<any> {
+export function getJsonFromCache<T>(db: DTDatabase, cacheKey: JSON_CACHE_KEY): Promise<T | null> {
     return db.oneOrNone(PS_GET_CACHE_VALUE, [cacheKey]).then(value => value?.content ?? null);
 }

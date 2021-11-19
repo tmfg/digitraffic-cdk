@@ -1,6 +1,7 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {ServiceRequestState} from "../model/service-request-state";
 import {Locale} from "../model/locale";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const DELETE_STATES_PS = new PreparedStatement({
     name: 'delete-states',
@@ -19,14 +20,15 @@ const SELECT_STATES_PS = new PreparedStatement({
 
 export function findAll(
     locale: Locale,
-    db: IDatabase<any, any>): Promise<ServiceRequestState[]> {
+    db: DTDatabase
+): Promise<ServiceRequestState[]> {
     return db.manyOrNone(SELECT_STATES_PS, [locale]);
 }
 
 export function update(
     states: ServiceRequestState[],
-    db: IDatabase<any, any>
-): Promise<void> {
+    db: DTDatabase
+): Promise<any[]> {
     return db.tx(t => {
         t.none(DELETE_STATES_PS);
         const queries: any[] = states.map(state => {

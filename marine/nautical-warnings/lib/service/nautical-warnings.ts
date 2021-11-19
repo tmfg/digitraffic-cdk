@@ -1,20 +1,19 @@
 import {NauticalWarningsApi} from "../api/nautical-warnings";
 import * as CachedDao from "digitraffic-common/db/cached";
-import {inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
-import moment from "moment-timezone";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import moment from "moment-timezone";
 
 const gjv = require("geojson-validation");
 
 export function getActiveWarnings() {
-    return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
     });
 }
 
 export function getArchivedWarnings() {
-    return inDatabaseReadonly(async (db: IDatabase<any, any>) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED);
     });
 }
@@ -27,23 +26,25 @@ export async function updateNauticalWarnings(url: string): Promise<any> {
     console.info("DEBUG active " + JSON.stringify(active, null, 2));
     console.info("DEBUG archived " + JSON.stringify(archived, null, 2));
 
-    return inDatabase(async (db: IDatabase<any, any>) => {
+    return inDatabase(async (db: DTDatabase) => {
         return db.tx(tx => {
             return Promise.allSettled([
-                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active),
-                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived)
+                validateAndUpdate(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active),
+                validateAndUpdate(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived)
             ]);
         });
     });
 }
 
-async function validateAndUpdate(tx: IDatabase<any, any>, cacheKey: JSON_CACHE_KEY, value: any) {
+async function validateAndUpdate(tx: DTDatabase, cacheKey: JSON_CACHE_KEY, value: any): Promise<null> {
     if(gjv.isFeatureCollection(value, true)) {
         return CachedDao.updateCachedJson(tx, cacheKey, convert(value));
     } else {
         console.info("DEBUG " + JSON.stringify(value, null, 2));
         console.error("invalid geojson for " + cacheKey);
     }
+
+    return null;
 }
 
 function convert(original: any): any {

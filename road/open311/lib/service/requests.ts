@@ -1,17 +1,11 @@
-import {IDatabase} from "pg-promise";
-import {
-    findAll as dbFindAll,
-    find as dbFind,
-    doDelete as dbDelete,
-    update as dbUpdate
-} from '../db/requests';
+import {doDelete as dbDelete, find as dbFind, findAll as dbFindAll, update as dbUpdate} from '../db/requests';
 import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
-import {inDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
 
 export async function findAll(
     extensions: Boolean
 ): Promise<ServiceRequest[]> {
-    return await inDatabase(async (db: IDatabase<any, any>) => {
+    return await inDatabase(async (db: DTDatabase) => {
         const requests = await dbFindAll(db);
         if (!extensions) {
             return requests.map(r => toServiceRequest(r));
@@ -25,7 +19,7 @@ export async function find(
     serviceRequestId: string,
     extensions: boolean
 ): Promise<ServiceRequest | null> {
-    return await inDatabase(async (db: IDatabase<any, any>) => {
+    return await inDatabase(async (db: DTDatabase) => {
         const r =  await dbFind(serviceRequestId, db);
         if (!r) {
             return null;
@@ -36,8 +30,8 @@ export async function find(
 
 export async function doDelete(
     serviceRequestId: string
-): Promise<void> {
-    return await inDatabase(async (db: IDatabase<any, any>) => {
+): Promise<null> {
+    return await inDatabase(async (db: DTDatabase) => {
         return await dbDelete(serviceRequestId, db);
     });
 }
@@ -46,7 +40,7 @@ export async function update(
     requests: ServiceRequestWithExtensions[]
 ): Promise<void> {
     const start = Date.now();
-    return await inDatabase(async (db: IDatabase<any, any>) => {
+    return await inDatabase(async (db: DTDatabase) => {
         return await dbUpdate(requests, db);
     }).then(a => {
         const end = Date.now();

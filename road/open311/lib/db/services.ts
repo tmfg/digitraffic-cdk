@@ -1,5 +1,6 @@
 import {Service} from "../model/service";
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const DELETE_SERVICES_PS = new PreparedStatement({
     name: 'delete-service',
@@ -61,8 +62,8 @@ interface ServiceServiceCode {
 
 export function update(
     services: Service[],
-    db: IDatabase<any, any>
-): Promise<void> {
+    db: DTDatabase
+): Promise<any[]> {
     return db.tx(t => {
         t.none(DELETE_SERVICES_PS);
         const queries: any[] = services.map(service => {
@@ -72,17 +73,17 @@ export function update(
     });
 }
 
-export function findAllServiceCodes(db: IDatabase<any, any>): Promise<ServiceServiceCode[]> {
+export function findAllServiceCodes(db: DTDatabase): Promise<ServiceServiceCode[]> {
     return db.manyOrNone(SELECT_SERVICE_CODES_PS);
 }
 
-export function findAll(db: IDatabase<any, any>): Promise<Service[]> {
+export function findAll(db: DTDatabase): Promise<Service[]> {
     return db.manyOrNone(SELECT_SERVICES_PS).then(requests => requests.map(r => toService(r)));
 }
 
 export function find(
     service_request_id: string,
-    db: IDatabase<any, any>
+    db: DTDatabase
 ): Promise<Service | null > {
     return db.oneOrNone(SELECT_SERVICE_BY_CODE_PS, [service_request_id]).then(r => r == null ? null : toService(r));
 }

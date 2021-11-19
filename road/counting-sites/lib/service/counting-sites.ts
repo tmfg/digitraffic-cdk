@@ -2,14 +2,13 @@ import * as CounterDb from "../db/counter";
 import * as DataDb from "../db/data";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as MetadataDB from "../db/metadata";
-import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
+import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {DbDomain} from "../model/domain";
 import {DbData} from "../model/data";
 import {FeatureCollection} from "geojson";
 
 export async function getMetadata(): Promise<any> {
-    return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         const domains = await MetadataDB.findAllDomains(db);
         const userTypes = await MetadataDB.findAllUserTypes(db);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.COUNTING_SITES_DATA);
@@ -19,13 +18,13 @@ export async function getMetadata(): Promise<any> {
 }
 
 export async function getDataForCounter(counterId: number): Promise<DbData[]> {
-    return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         return DataDb.findAllData(db, counterId);
     });
 }
 
 export async function getCountersForDomain(domain: string): Promise<FeatureCollection> {
-    return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         return CounterDb.findAllCountersForDomain(db, domain);
     });
 }

@@ -1,6 +1,7 @@
 import {IDatabase, PreparedStatement} from "pg-promise";
 import {ApiCounter, DbCounter} from "../model/counter";
 import {FeatureCollection} from "geojson";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const SQL_ALL_COUNTERS =
     `select id, site_id, domain_name, site_domain, name, ST_Y(location::geometry) as lat, ST_Y(location::geometry) as lon, user_type_id, interval, direction, added_timestamp, last_data_timestamp, removed_timestamp
@@ -78,35 +79,35 @@ const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
     text: SQL_UPDATER_COUNTER_TIMESTAMP
 });
 
-export function findAllCountersForDomain(db: IDatabase<any, any>, domain: string): Promise<FeatureCollection> {
+export function findAllCountersForDomain(db: DTDatabase, domain: string): Promise<FeatureCollection> {
     return db.one(PS_ALL_COUNTERS_FOR_DOMAIN_FEATURE_COLLECTION, [domain]).then(r => r.collection);
 }
 
-export function findAllCountersForUpdateForDomain(db: IDatabase<any, any>, domain: string): Promise<any> {
+export function findAllCountersForUpdateForDomain(db: DTDatabase, domain: string): Promise<any[]> {
     return db.manyOrNone(PS_ALL_COUNTERS, [domain]);
 }
 
-export function insertCounters(db: IDatabase<any, any>, domain: string, counters: ApiCounter[]): Promise<any> {
+export function insertCounters(db: DTDatabase, domain: string, counters: ApiCounter[]): Promise<any> {
     return Promise.all(counters
         .map(c => db.none(PS_INSERT_COUNTER,
             [c.id, domain, c.domain, c.name, `POINT(${c.longitude} ${c.latitude})`, c.userType, c.interval, c.sens]))
     );
 }
 
-export function removeCounters(db: IDatabase<any, any>, counters: DbCounter[]): Promise<any> {
+export function removeCounters(db: DTDatabase, counters: DbCounter[]): Promise<null> {
     if(counters.length > 0) {
         return db.none(SQL_REMOVE_COUNTERS, [counters.map(c => c.id)]);
     }
 
-    return Promise.resolve();
+    return Promise.resolve(null);
 }
 
-export function updateCounters(db: IDatabase<any, any>, counters: ApiCounter[]): Promise<any> {
+export function updateCounters(db: DTDatabase, counters: ApiCounter[]): Promise<any> {
     return Promise.all(counters
         .map(c => db.none(PS_UPDATE_COUNTER, [c.domain, `POINT(${c.longitude} ${c.latitude})`,c.interval, c.sens, c.id]))
     );
 }
 
-export function updateCounterTimestamp(db: IDatabase<any, any>, counterId: number, timestamp: Date): Promise<any> {
+export function updateCounterTimestamp(db: DTDatabase, counterId: number, timestamp: Date): Promise<null> {
     return db.none(PS_UPDATE_COUNTER_TIMESTAMP, [timestamp, counterId]);
 }

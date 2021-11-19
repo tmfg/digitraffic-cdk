@@ -1,5 +1,6 @@
 import {ServiceRequestStatus, ServiceRequestWithExtensions} from "../model/service-request";
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const DELETE_REQUEST_PS = new PreparedStatement({
     name: 'delete-request-by-id',
@@ -84,13 +85,13 @@ const UPSERT_REQUEST_PS = new PreparedStatement({
         subsubject_id = $25`
 });
 
-export function findAll(db: IDatabase<any, any>): Promise<ServiceRequestWithExtensions[]> {
+export function findAll(db: DTDatabase): Promise<ServiceRequestWithExtensions[]> {
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`).then(requests => requests.map(r => toServiceRequest(r)));
 }
 
 export function find(
     service_request_id: string,
-    db: IDatabase<any, any>
+    db: DTDatabase
 ): Promise<ServiceRequestWithExtensions | null > {
     const ps = new PreparedStatement({
         name: 'find-service-request-by-id',
@@ -102,8 +103,8 @@ export function find(
 
 export function update(
     serviceRequests: ServiceRequestWithExtensions[],
-    db: IDatabase<any, any>
-): Promise<void> {
+    db: DTDatabase
+): Promise<any[]> {
     return db.tx(t => {
         const queries: any[] = serviceRequests.map(serviceRequest => {
             if (serviceRequest.status === ServiceRequestStatus.closed) {
@@ -118,8 +119,8 @@ export function update(
 
 export function doDelete(
     serviceRequestId: string,
-    db: IDatabase<any, any>
-) {
+    db: DTDatabase
+): Promise<null> {
     return db.tx(t => {
         return t.none('DELETE FROM open311_service_request WHERE service_request_id = $1', serviceRequestId);
     });

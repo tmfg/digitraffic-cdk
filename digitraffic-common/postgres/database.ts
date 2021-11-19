@@ -40,25 +40,30 @@ export function initDbConnection(
     return pgp(finalUrl, options);
 }
 
-export async function inTransaction (
-    fn: (db: ITask<any>) => any): Promise<any> {
+export function inTransaction (
+        fn: (db: ITask<any>) => any
+    ): Promise<any> {
 
     return inDatabase(db => db.tx((t: ITask<any>) => fn(t)));
 }
 
-export async function inDatabase(
-    fn: (db: DTDatabase) => any): Promise<any> {
+export function inDatabase<T>(
+        fn: (db: DTDatabase) => Promise<T>
+    ): Promise<T> {
     return doInDatabase(false, fn);
 }
 
-export async function inDatabaseReadonly(
-    fn: (db: DTDatabase) => any): Promise<any> {
+export function inDatabaseReadonly<T>(
+        fn: (db: DTDatabase) => Promise<T>,
+    ): Promise<T> {
+
     return doInDatabase(true, fn);
 }
 
-async function doInDatabase(
-    readonly: boolean,
-    fn: (db: DTDatabase) => any): Promise<any> {
+async function doInDatabase<T>(
+        readonly: boolean,
+        fn: (db: DTDatabase) => Promise<T>
+    ): Promise<T> {
     const db = initDbConnection(
         process.env[DatabaseEnvironmentKeys.DB_USER] as string,
         process.env[DatabaseEnvironmentKeys.DB_PASS] as string,
