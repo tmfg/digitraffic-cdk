@@ -1,7 +1,7 @@
 import {APIGateway, config as AWSConfig} from "aws-sdk";
-import {compose, head, sort, prop, map, isEmpty} from "ramda";
+import * as R from "ramda";
 import {createDocumentationVersion, getDocumentationVersion} from "../../apigw-utils";
-import {ListOfDocumentationVersion} from "aws-sdk/clients/apigateway";
+import {DocumentationVersion, ListOfDocumentationVersion} from "aws-sdk/clients/apigateway";
 
 export const KEY_APIGW_IDS = 'APIGW_IDS';
 export const KEY_REGION = 'REGION';
@@ -22,10 +22,12 @@ export const handler = async (): Promise<any> => {
         ));
 };
 
-export function getLatestVersion(versions: ListOfDocumentationVersion) {
-    if (isEmpty(versions)) {
+export function getLatestVersion(versions: ListOfDocumentationVersion): number {
+    if (!versions.length) {
         return 0;
     }
-    // @ts-ignore compiler can't handle this
-    return compose(head, sort((a,b)=>b-a), map(compose(parseInt, prop('version'))))(versions) as number;
+
+    const versionNumbers = versions.map(v => Number(v.version));
+    const versionNumbersDesc = R.sort((a: number, b: number) => b-a, versionNumbers);
+    return versionNumbersDesc[0];
 }
