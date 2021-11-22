@@ -1,7 +1,7 @@
 import {APIGateway, config as AWSConfig} from "aws-sdk";
 import * as R from "ramda";
 import {createDocumentationVersion, getDocumentationVersion} from "../../apigw-utils";
-import {DocumentationVersion, ListOfDocumentationVersion} from "aws-sdk/clients/apigateway";
+import {ListOfDocumentationVersion} from "aws-sdk/clients/apigateway";
 
 export const KEY_APIGW_IDS = 'APIGW_IDS';
 export const KEY_REGION = 'REGION';

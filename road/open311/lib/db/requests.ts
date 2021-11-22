@@ -213,6 +213,7 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
     }, ...serviceRequest};
 
     // DPO-1167 handle long/lat empty string
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const editObjectWithLonLat = serviceRequest.long !== '' && serviceRequest.lat !== '' ? editObject : { ...serviceRequest, ...{
             long: null,

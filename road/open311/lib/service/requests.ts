@@ -3,7 +3,7 @@ import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensio
 import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
 
 export async function findAll(
-    extensions: Boolean
+    extensions: boolean
 ): Promise<ServiceRequest[]> {
     return await inDatabase(async (db: DTDatabase) => {
         const requests = await dbFindAll(db);

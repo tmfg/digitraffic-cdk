@@ -1,10 +1,10 @@
-import * as pgPromise from "pg-promise";
 import * as RequestsDb from "../../lib/db/requests";
 import {newServiceRequest} from "../testdata";
 import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestStatus} from "../../lib/model/service-request";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('db-requests', dbTestBase((db: DTDatabase) => {
 
     test('findAll', async () => {
         const serviceRequests = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
@@ -112,10 +112,10 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         await insertServiceRequest(db, [serviceRequest]);
 
         const updatingServiceRequest = Object.assign({}, serviceRequest);
-        // @ts-ignore
-        delete updatingServiceRequest.long;
-        // @ts-ignore
-        delete updatingServiceRequest.lat;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (updatingServiceRequest as any).long;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (updatingServiceRequest as any).lat;
 
         await RequestsDb.update([updatingServiceRequest], db);
     });
@@ -125,7 +125,9 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         await insertServiceRequest(db, [serviceRequest]);
 
         const updatingServiceRequest = Object.assign({}, serviceRequest);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (updatingServiceRequest as any).long = '';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (updatingServiceRequest as any).lat = '';
 
         await RequestsDb.update([updatingServiceRequest], db);
@@ -148,17 +150,19 @@ describe('db-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test("Insert - null geometry doesn't fail", async () => {
         const serviceRequest = newServiceRequest();
-        // @ts-ignore
-        delete serviceRequest.long;
-        // @ts-ignore
-        delete serviceRequest.lat;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (serviceRequest as any).long;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        delete (serviceRequest as any).lat;
 
         await RequestsDb.update([serviceRequest], db);
     });
 
     test("insert - invalid geometry is not saved", async () => {
         const serviceRequest = newServiceRequest();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (serviceRequest as any).long = '';
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (serviceRequest as any).lat = '';
 
         await RequestsDb.update([serviceRequest], db);

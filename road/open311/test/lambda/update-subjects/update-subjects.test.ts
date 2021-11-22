@@ -17,8 +17,7 @@ describe('update-subjects', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const server = new TestHttpServer();
         server.listen(SERVER_PORT, {
             "/subjects": (url) => {
-                // @ts-ignore
-                const locale = url.match(/\/.+=(.+)/)[1];
+                const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                 return fakeSubjects(locale);
             }
         });

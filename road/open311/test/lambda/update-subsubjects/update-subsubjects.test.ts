@@ -1,9 +1,9 @@
-import * as pgPromise from "pg-promise";
 import {handler} from '../../../lib/lambda/update-subsubjects/lambda-update-subsubjects';
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import * as SubSubjectsDb from "../../../lib/db/subsubjects";
 import {Locale} from "../../../lib/model/locale";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const SERVER_PORT = 8091;
 
@@ -11,14 +11,13 @@ process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
 
-describe('update-subsubjects', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('update-subsubjects', dbTestBase((db: DTDatabase) => {
 
     test('update', async () => {
         const server = new TestHttpServer();
         server.listen(SERVER_PORT, {
             "/subsubjects": (url) => {
-                // @ts-ignore
-                const locale = url.match(/\/.+=(.+)/)[1];
+                const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                 return fakeSubSubjects(locale);
             }
         });
