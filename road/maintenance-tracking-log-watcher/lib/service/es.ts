@@ -94,7 +94,7 @@ export function getQuery(fromISOString: string, toISOString: string) {
  */
 export function parseDataToString(resultJsonObj : any): string {
 
-    if (!resultJsonObj.hasOwnProperty('hits') || !resultJsonObj.hits.hasOwnProperty('hits')) {
+    if (!('hits' in resultJsonObj) || !('hits' in resultJsonObj.hits)) {
         return "";
     }
     const hits = resultJsonObj.hits.hits;
