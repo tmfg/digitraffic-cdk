@@ -22,9 +22,9 @@ export async function getNodePingAndStatuspageComponentStatuses(
     nodePingChecks.forEach(npc => nodePingCheckMap[removeApp(npc.label)] = npc);
 
     const missingStatuspageComponents = nodePingChecks
-        .filter(npc => !statuspageCheckMap.hasOwnProperty(removeApp(npc.label)))
+        .filter(npc => !(removeApp(npc.label) in statuspageCheckMap))
         .map(npc => `${npc.label}: Statuspage component missing`);
-    const missingNodePingChecks = statuspageComponents.filter(sc => !nodePingCheckMap.hasOwnProperty(sc.name))
+    const missingNodePingChecks = statuspageComponents.filter(sc => !(sc.name in nodePingCheckMap))
         .map(sc => `${sc.name}: NodePing check missing`);
     const otherErrors = statuspageComponents.map(sc => {
         const nodePingCheck = nodePingCheckMap[sc.name];

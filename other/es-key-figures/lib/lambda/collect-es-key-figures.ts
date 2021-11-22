@@ -55,7 +55,7 @@ async function postToSlack(kibanaResults: KeyFigureResult[][]) {
 }
 
 function createSlackMessage(keyFigureResults: KeyFigureResult[]) {
-  let slack_message: string = `\`${keyFigureResults[0].filter}\` aikavälillä: ${start.toISOString()} - ${end.toISOString()} \`\`\``;
+  let slack_message = `\`${keyFigureResults[0].filter}\` aikavälillä: ${start.toISOString()} - ${end.toISOString()} \`\`\``;
   for (const result of keyFigureResults) {
     if (result['type'] === 'field_agg') {
       slack_message += `\n${result.name}\n`
@@ -168,7 +168,7 @@ async function getKibanaResults(keyFigures: KeyFigure[], apiPaths: { transportTy
   for (const apiPath of apiPaths) {
     for (const path of apiPath.paths) {
       console.info(`Running: ${path}`);
-      kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType} AND @fields.request_uri:\\\"${path}\\\"`));
+      kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType} AND @fields.request_uri:\\"${path}\\"`));
     }
   }
 
@@ -234,22 +234,22 @@ function getKeyFigures(): KeyFigure[] {
   const keyFigures = [
     {
       'name': 'Http req',
-      'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe\/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
+      'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
       'type': 'count'
     },
     {
       'name': 'Http req 200',
-      'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:* AND @fields.status:200","analyze_wildcard":true,"time_zone":"Europe\/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
+      'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:* AND @fields.status:200","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
       'type': 'count'
     },
     {
       'name': 'Bytes out',
-      'query': '{"aggs":{"agg":{"sum":{"field":"@fields.body_bytes_sent"}}},"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe\/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
+      'query': '{"aggs":{"agg":{"sum":{"field":"@fields.body_bytes_sent"}}},"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
       'type': 'agg'
     },
     {
       'name': 'Unique IPs',
-      'query': '{"aggs":{"agg":{"cardinality":{"field":"@fields.remote_addr.keyword"}}},"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe\/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
+      'query': '{"aggs":{"agg":{"cardinality":{"field":"@fields.remote_addr.keyword"}}},"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
       'type': 'agg'
     },
     {

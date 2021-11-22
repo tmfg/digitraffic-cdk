@@ -1,7 +1,7 @@
 import {APIGateway} from "aws-sdk";
 
 export function exportSwaggerApi(apiId: string) {
-    var params = {
+    const params = {
         exportType: 'swagger',
         restApiId: apiId,
         stageName: 'prod'

@@ -116,7 +116,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
         await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
             Records: [invalidRecord, validRecord]
-        })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);;
+        })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);
 
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(3);

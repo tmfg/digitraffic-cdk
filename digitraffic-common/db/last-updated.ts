@@ -1,4 +1,5 @@
 import {DTDatabase} from "../postgres/database";
+import {DTTransaction} from "digitraffic-common/postgres/database";
 
 export enum DataType {
     VS_DATEX2="VS_DATEX2",
@@ -27,7 +28,7 @@ export function getUpdatedTimestamp(db: DTDatabase, datatype: string): Promise<D
     }, (x: { updated_time: any; } | null) => x?.updated_time);
 }
 
-export function updateUpdatedTimestamp(db: DTDatabase, datatype: string, date: Date, by = ''): Promise<null> {
+export function updateUpdatedTimestamp(db: DTDatabase | DTTransaction, datatype: string, date: Date, by = ''): Promise<null> {
     return db.none(
 `insert into updated_timestamp(updated_name, updated_time, updated_by)
 values($(datatype), $(date), $(by))

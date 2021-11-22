@@ -41,7 +41,7 @@ export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn(sqsConsume
 export function cloneRecordWithCamelAndPascal(record: any) {
     const clone : any = {};
     for (const key in record) {
-        if (record.hasOwnProperty(key)) {
+        if (key in record) {
             clone[key.charAt(0).toUpperCase() + key.substring(1)] = record[key];
             clone[key.charAt(0).toLowerCase() + key.substring(1)] = record[key];
         }

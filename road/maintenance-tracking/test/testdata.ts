@@ -1,5 +1,6 @@
 import {DbObservationData} from "../lib/db/maintenance-tracking-db";
 import {getRandomIntegerAsString} from "digitraffic-common/test/testutils";
+import * as R from 'ramda';
 
 const ID_PLACEHOLDER = 'ID_PLACEHOLDER'
 const TK_PLACEHOLDER = 'TK_PLACEHOLDER'
@@ -113,14 +114,13 @@ export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(id: stri
 
 export function assertObservationData(srcObservations: DbObservationData[], results: DbObservationData[]) {
     results.forEach((resultObservation) => {
-        // @ts-ignore remove id field that is not in scr data
-        delete resultObservation.id;
+        const resultObservationWithoutId = R.dissoc('id', resultObservation);
 
-        const foundSrcObservations = srcObservations.filter(o => o.observationTime.getTime() === resultObservation.observationTime.getTime());
+        const foundSrcObservations = srcObservations.filter(o => o.observationTime.getTime() === resultObservationWithoutId.observationTime.getTime());
         expect(foundSrcObservations.length).toBe(1);
 
         const srcObservation = foundSrcObservations[0];
-        expect(resultObservation).toEqual(srcObservation);
+        expect(resultObservationWithoutId).toEqual(srcObservation);
     });
 }
 
