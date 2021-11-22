@@ -1,4 +1,3 @@
-import {IDatabase} from "pg-promise";
 import {handlerFn} from "../../lib/lambda/update-lights/update-lights";
 import {assertArea, dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
 import {createSecretFunction} from "digitraffic-common/test/secret";
@@ -7,8 +6,9 @@ import {ShiplightSecret} from "../../lib/model/shiplight-secret";
 import * as sinon from "sinon";
 import {AreaVisibilityService} from "../../lib/service/areavisibility";
 import {AreaVisibilityApi} from "../../lib/api/areavisibility";
-import {AreaLightsApi} from "../../lib/api/arealights";
+import {AreaLightsApi, AreaLightsBrightenCommand} from "../../lib/api/arealights";
 import {AreaLightsService} from "../../lib/service/arealights";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const secret: ShiplightSecret = {
     lightsControlEndpointUrl: 'test',
@@ -17,7 +17,7 @@ const secret: ShiplightSecret = {
     visibilityApiKey: 'test'
 };
 
-describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
+describe('update-lights', dbTestBase((db: DTDatabase) => {
 
     afterEach(() => sinon.verifyAndRestore());
 
@@ -47,6 +47,11 @@ describe('update-lights', dbTestBase((db: IDatabase<any, any>) => {
 
         await assertArea(db, areaId, durationInMinutes);
         expect(getVisibilityForAreaStub.calledWith(sinon.match.string)).toBe(true); // exact area id format not known here
+        expect(updateLightsForAreaStub.calledWith(sinon.match({
+            routeId: 10,
+            command: AreaLightsBrightenCommand.MAX,
+            tempTime: 12
+        }))).toBe(true);
     });
 
 }));
