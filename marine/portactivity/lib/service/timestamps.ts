@@ -14,45 +14,43 @@ export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean
 }
 
-export async function saveTimestamp(timestamp: ApiTimestamp): Promise<UpdatedTimestamp | null> {
-    return inDatabase(async (db: DTDatabase) => {
-        return db.tx(async t => {
-            const portcallId = timestamp.portcallId || (await TimestampsDB.findPortcallId(db,
-                timestamp.location.port,
-                timestamp.eventType,
-                moment(timestamp.eventTime).toDate(),
-                timestamp.ship.mmsi,
-                timestamp.ship.imo));
+export async function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<UpdatedTimestamp | null> {
+    return db.tx(async t => {
+        const portcallId = timestamp.portcallId || (await TimestampsDB.findPortcallId(db,
+            timestamp.location.port,
+            timestamp.eventType,
+            moment(timestamp.eventTime).toDate(),
+            timestamp.ship.mmsi,
+            timestamp.ship.imo));
 
-            if (!portcallId) {
-                console.warn(`method=saveTimestamp portcall id not found for timestamp %s`, JSON.stringify(timestamp));
-                // resolve so this gets removed from the queue
-                return null;
-            }
+        if (!portcallId) {
+            console.warn(`method=saveTimestamp portcall id not found for timestamp %s`, JSON.stringify(timestamp));
+            // resolve so this gets removed from the queue
+            return null;
+        }
 
-            // mmsi should exist in this case
-            const imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi as number));
-            if (!imo) {
-                console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
-                // resolve so this gets removed from the queue
-                return null;
-            }
+        // mmsi should exist in this case
+        const imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi as number));
+        if (!imo) {
+            console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
+            // resolve so this gets removed from the queue
+            return null;
+        }
 
-            // imo should exist in this case
-            const mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo as number));
-            if (!mmsi) {
-                console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
-                // resolve so this gets removed from the queue
-                return null;
-            }
+        // imo should exist in this case
+        const mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo as number));
+        if (!mmsi) {
+            console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
+            // resolve so this gets removed from the queue
+            return null;
+        }
 
-            const ship: Ship = {
-                imo,
-                mmsi
-            };
+        const ship: Ship = {
+            imo,
+            mmsi
+        };
 
-            return doSaveTimestamp(t, { ...timestamp, ...{ portcallId, ship }});
-        });
+        return doSaveTimestamp(t, { ...timestamp, ...{ portcallId, ship }});
     });
 }
 
