@@ -3,7 +3,7 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../service/portareas";
 import moment from "moment";
 import {EventSource} from "../model/eventsource";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase, DTTransaction} from "digitraffic-common/postgres/database";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
@@ -460,7 +460,7 @@ export async function findPortcallId(
     return null;
 }
 
-export async function findMmsiByImo(db: DTDatabase, imo: number): Promise<number | null> {
+export async function findMmsiByImo(db: DTDatabase | DTTransaction, imo: number): Promise<number | null> {
     const mmsi = await db.oneOrNone(FIND_MMSI_BY_IMO_SQL, [imo]);
     if (mmsi) {
         return mmsi.mmsi as number;
@@ -468,7 +468,7 @@ export async function findMmsiByImo(db: DTDatabase, imo: number): Promise<number
     return null;
 }
 
-export async function findImoByMmsi(db: DTDatabase, mmsi: number): Promise<number | null> {
+export async function findImoByMmsi(db: DTDatabase | DTTransaction, mmsi: number): Promise<number | null> {
     const imo = await db.oneOrNone(FIND_IMO_BY_MMSI_SQL, [mmsi]);
     if (imo) {
         return imo.imo as number;

@@ -77,7 +77,7 @@ export function newTimestamp(props?: {
 
 export function newVessel(timestamp: ApiTimestamp): Vessel {
     return {
-        mmsi: timestamp.ship.mmsi!,
+        mmsi: timestamp.ship.mmsi as number,
         timestamp: new Date().getMilliseconds(),
         name: uuidv4(),
         ship_type: 1,
@@ -87,7 +87,7 @@ export function newVessel(timestamp: ApiTimestamp): Vessel {
         reference_point_d: 1,
         pos_type: 1,
         draught: 1,
-        imo: timestamp.ship.imo!,
+        imo: timestamp.ship.imo as number,
         eta: 1,
         call_sign: 'a',
         destination: 'b'
@@ -103,14 +103,14 @@ export function newPortAreaDetails(
 
     return {
         port_area_details_id: Math.floor(Math.random() * 10000),
-        port_call_id: props?.portcallId ?? timestamp.portcallId!,
+        port_call_id: props?.portcallId ?? timestamp.portcallId as number,
         eta: props?.eta?.toISOString()
     };
 }
 
 export function newPortCall(timestamp: ApiTimestamp, portcallId?: number): PortCall {
     return {
-        port_call_id: portcallId ?? timestamp.portcallId!,
+        port_call_id: portcallId ?? timestamp.portcallId as number,
         radio_call_sign: 'a',
         radio_call_sign_type: 'fake',
         vessel_name: uuidv4(),
