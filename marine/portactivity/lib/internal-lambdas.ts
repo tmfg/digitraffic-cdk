@@ -181,7 +181,7 @@ function createUpdateAwakeAiETATimestampsLambda(
     const functionName = 'PortActivity-UpdateAwakeAiETATimestamps';
     const lambdaConf = databaseFunctionProps(stack, environment, functionName, 'update-awake-ai-eta-timestamps', {
         timeout: 30,
-        reservedConcurrentExecutions: 10
+        reservedConcurrentExecutions: 14
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
 
