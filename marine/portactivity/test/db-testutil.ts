@@ -1,4 +1,3 @@
-import {ITask} from "pg-promise";
 import {ApiTimestamp} from "../lib/model/timestamp";
 import {DbTimestamp} from "../lib/db/timestamps";
 import * as TimestampsDb from '../lib/db/timestamps';
@@ -6,23 +5,23 @@ import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {DTDatabase, DTTransaction} from "digitraffic-common/postgres/database";
 
-export function dbTestBase(fn: (db: DTDatabase) => any) {
+export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(fn, truncate, 'portactivity', 'portactivity', 'localhost:54321/marine');
 }
 
-export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: ITask<any>) => void) {
-    return async () => {
-        await db.tx(async (t: any) => await fn(t));
+export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: DTTransaction) => void) {
+    return async (): Promise<void> => {
+        await db.tx(async (t: DTTransaction) => { await fn(t) });
     };
 }
 
-export async function truncate(db: DTDatabase | DTTransaction): Promise<any> {
-    return await db.tx(async t => {
-        await db.none('DELETE FROM pilotage');
-        await db.none('DELETE FROM port_call_timestamp');
-        await db.none('DELETE FROM public.vessel');
-        await db.none('DELETE FROM public.port_area_details');
-        await db.none('DELETE FROM public.port_call');
+export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
+    await db.tx(async t => {
+        await t.none('DELETE FROM pilotage');
+        await t.none('DELETE FROM port_call_timestamp');
+        await t.none('DELETE FROM public.vessel');
+        await t.none('DELETE FROM public.port_area_details');
+        await t.none('DELETE FROM public.port_call');
     });
 }
 
@@ -48,8 +47,8 @@ export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> 
     });
 }
 
-export function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[]) {
-    return db.tx(t => {
+export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[]): Promise<void> {
+    await db.tx(t => {
         return t.batch(timestamps.map(e => {
             return t.none(`
                 INSERT INTO port_call_timestamp(
@@ -90,9 +89,9 @@ export function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[
     });
 }
 
-export function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel) {
-    return db.tx(t => {
-        db.none(`
+export async function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel): Promise<void> {
+    await db.tx(t => {
+        t.none(`
             INSERT INTO public.vessel(
                 mmsi,
                 timestamp,
@@ -128,8 +127,8 @@ export function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel) {
     });
 }
 
-export function insertPortAreaDetails(db: DTTransaction | DTDatabase, p: PortAreaDetails): Promise<any> {
-    return db.none(`
+export async function insertPortAreaDetails(db: DTTransaction | DTDatabase, p: PortAreaDetails): Promise<void> {
+    await db.none(`
         INSERT INTO public.port_area_details(
             port_area_details_id,
             port_call_id,
@@ -142,8 +141,8 @@ export function insertPortAreaDetails(db: DTTransaction | DTDatabase, p: PortAre
     `, p);
 }
 
-export function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall): Promise<any> {
-    return db.none(`
+export async function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall): Promise<void> {
+    await db.none(`
         INSERT INTO public.port_call(
             port_call_id,
             radio_call_sign,

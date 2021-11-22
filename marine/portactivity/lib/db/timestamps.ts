@@ -332,7 +332,7 @@ const FIND_IMO_BY_MMSI_SQL = `
     ) AS imo
 `.trim();
 
-export function updateTimestamp(db: DTDatabase, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
+export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: 'update-timestamps',
         text: INSERT_ESTIMATE_SQL
@@ -340,7 +340,7 @@ export function updateTimestamp(db: DTDatabase, timestamp: ApiTimestamp): Promis
     return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
-export async function removeTimestamps(db: DTDatabase, source: string, sourceIds: string[]): Promise<number[]> {
+export async function removeTimestamps(db: DTDatabase | DTTransaction, source: string, sourceIds: string[]): Promise<number[]> {
     if(sourceIds.length > 0) {
         return db.manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
             .then(array => array.map(object => object.id));
@@ -416,7 +416,7 @@ export function findVtsShipImosTooCloseToPortByPortCallId(
 }
 
 export function findPortnetTimestampsForAnotherLocode(
-    db: DTDatabase,
+    db: DTDatabase | DTTransaction,
     portcallId: number,
     locode: string
 ): Promise<DbTimestampIdAndLocode[]> {
@@ -429,7 +429,7 @@ export function findPortnetTimestampsForAnotherLocode(
 }
 
 export function deleteById(
-    db: DTDatabase,
+    db: DTDatabase | DTTransaction,
     id: number
 ): Promise<null> {
     const ps = new PreparedStatement({

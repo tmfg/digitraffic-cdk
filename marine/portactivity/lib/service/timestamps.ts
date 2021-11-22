@@ -1,6 +1,6 @@
 import * as TimestampsDB from '../db/timestamps'
 import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps'
-import {DTDatabase, inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
+import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
     isPortnetTimestamp,
@@ -65,7 +65,7 @@ export async function saveTimestamps(timestamps: ApiTimestamp[]): Promise<Array<
 }
 
 async function doSaveTimestamp(
-    tx: any,
+    tx: DTTransaction,
     timestamp: ApiTimestamp
 ): Promise<UpdatedTimestamp | null> {
     const removedTimestamps = await removeOldTimestamps(tx, timestamp);
@@ -74,7 +74,7 @@ async function doSaveTimestamp(
 }
 
 async function removeOldTimestamps(
-    tx: any,
+    tx: DTTransaction,
     timestamp: ApiTimestamp
 ): Promise<DbTimestampIdAndLocode[]> {
     let timestampsAnotherLocode: DbTimestampIdAndLocode[] = [];

@@ -1,17 +1,20 @@
 import {saveTimestamp} from "../../service/timestamps";
 import {validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {PortactivityEnvKeys} from "../../keys";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const middy = require('@middy/core')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
 export function handlerFn(
-    withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>) => Promise<any>) {
+    withDbSecretFn: SecretFunction
+): (event: SQSEvent) => Promise<PromiseSettledResult<unknown>[]> {
 
-    return async (event: SQSEvent) => {
-        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, (_: any): Promise<any> => {
-            return Promise.allSettled(event.Records.map(r => {
+    return async (event: SQSEvent): Promise<PromiseSettledResult<unknown>[]> => {
+        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (): Promise<PromiseSettledResult<unknown>[]> => {
+            return await Promise.allSettled(event.Records.map(r => {
 
                 const timestamp = JSON.parse(r.body);
                 console.info('DEBUG method=processTimestampQueue processing timestamp', timestamp);
@@ -37,4 +40,4 @@ export function handlerFn(
     };
 }
 
-export const handler: (e: SQSEvent) => Promise<any> = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());
+export const handler: (e: SQSEvent) => Promise<PromiseSettledResult<unknown>> = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());
