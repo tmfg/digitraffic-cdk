@@ -1,45 +1,42 @@
-export interface Location {
-    type: string,
-    coordinates: any
-}
+import {Geometry, Position} from "geojson";
 
-export function createGeometry(location: Location): string {
-    if(location.type === 'LineString') {
-        const coordinates = linestring(location.coordinates);
+export function createGeometry(geometry: Geometry): string {
+    if(geometry.type === 'LineString') {
+        const coordinates = linestring(geometry.coordinates);
 
         return `LINESTRING(${coordinates})`;
-    } else if(location.type === 'Point') {
-        const coordinates = coordinatePair(location.coordinates);
+    } else if(geometry.type === 'Point') {
+        const coordinates = coordinatePair(geometry.coordinates);
 
         return `POINT(${coordinates})`;
-    } else if(location.type === 'Polygon') {
-        const coordinates = polygon(location.coordinates);
+    } else if(geometry.type === 'Polygon') {
+        const coordinates = polygon(geometry.coordinates);
 
         return `POLYGON(${coordinates})`;
-    } else if(location.type === 'MultiPolygon') {
-        const coordinates = multiPolygon(location.coordinates);
+    } else if(geometry.type === 'MultiPolygon') {
+        const coordinates = multiPolygon(geometry.coordinates);
 
         return `MULTIPOLYGON(${coordinates})`;
     }
 
-    console.error("unsupported locationType=%s", location.type);
+    console.error("unsupported locationType=%s", geometry.type);
     return "POLYGON EMPTY";
 }
 
-function linestring(coordinates: any): string {
-    return coordinates.map((c: any) =>  coordinatePair(c)).join(',');
+function linestring(coordinates: Position[]): string {
+    return coordinates.map((c: Position) =>  coordinatePair(c)).join(',');
 }
 
-function polygon(coordinates: any):string {
-    const list = coordinates.map((c: any) => linestring(c)).join(',');
+function polygon(coordinates: Position[][]):string {
+    const list = coordinates.map((c: Position[]) => linestring(c)).join(',');
     return `(${list})`;
 }
 
-function multiPolygon(coordinates: any):string {
-    const list = coordinates.map((c: any) => polygon(c)).join(',');
+function multiPolygon(coordinates: Position[][][]):string {
+    const list = coordinates.map((c: Position[][]) => polygon(c)).join(',');
     return `(${list})`;
 }
 
-function coordinatePair(coordinate: [number, number, number]): string {
+function coordinatePair(coordinate: Position): string {
     return `${coordinate[0]} ${coordinate[1]}`;
 }

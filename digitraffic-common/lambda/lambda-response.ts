@@ -1,8 +1,8 @@
 export class LambdaResponse {
     readonly status: number;
-    readonly body: string;
+    readonly body: any;
 
-    static ok(body: any): LambdaResponse {
+    static ok<T>(body: T): LambdaResponse {
         return this.create(200, body);
     }
 
@@ -18,7 +18,7 @@ export class LambdaResponse {
         return this.create(500, 'Internal error');
     }
 
-    static create(status: number, body: any): LambdaResponse {
+    static create<T>(status: number, body: T): LambdaResponse {
         return { status, body };
     }
 }

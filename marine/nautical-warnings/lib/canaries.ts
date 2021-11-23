@@ -1,5 +1,4 @@
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
 import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";

@@ -42,11 +42,11 @@ export function initDbConnection(
     return pgp(finalUrl, options);
 }
 
-export function inTransaction (
-        fn: (db: ITask<any>) => any
-    ): Promise<any> {
+export function inTransaction<T> (
+        fn: (db: DTTransaction) => Promise<T>
+    ): Promise<T> {
 
-    return inDatabase(db => db.tx((t: ITask<any>) => fn(t)));
+    return inDatabase(db => db.tx((t: DTTransaction) => fn(t)));
 }
 
 export function inDatabase<T>(

@@ -4,19 +4,21 @@ import {constants} from "http2";
 
 const synthetics = require('Synthetics');
 import zlib = require('zlib');
+import {IncomingMessage, RequestOptions} from "http";
 
 const baseHeaders = {
-    "Digitraffic-User" : "AWS Canary",
+    "Digitraffic-User" : "Digitraffic/AWS Canary",
     "Accept-Encoding" : "gzip",
-    "Accept": [MediaType.TEXT_HTML, MediaType.APPLICATION_JSON].join(',')
+    "Accept": "*/*"
 } as Record<string, string>;
 
 const API_KEY_HEADER = "x-api-key";
-
 const OK_RESOLUTION = "OK";
 
+type CheckerFunction = (Res: IncomingMessage) => void;
+
 export class UrlChecker {
-    private readonly requestOptions: any;
+    private readonly requestOptions: RequestOptions;
 
     constructor(hostname: string, apiKey?: string) {
         const headers = {...baseHeaders};
@@ -29,8 +31,8 @@ export class UrlChecker {
             hostname,
             method: 'GET',
             protocol: 'https:',
-            headers: headers
-        } as any;
+            headers,
+        };
 
         synthetics.getConfiguration()
             .disableRequestMetrics();
@@ -54,7 +56,7 @@ export class UrlChecker {
             path: url
         }};
 
-        await synthetics.executeHttpStep("Verify 200 for " + url, requestOptions, callback);
+        return synthetics.executeHttpStep("Verify 200 for " + url, requestOptions, callback);
     }
 
     async expect404(url: string): Promise<any> {
@@ -62,7 +64,7 @@ export class UrlChecker {
                 path: url
             }};
 
-        await synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
+        return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
     async expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<any> {
@@ -71,7 +73,7 @@ export class UrlChecker {
             headers: baseHeaders
         }};
 
-        await synthetics.executeHttpStep("Verify 403 for " + url,
+        return synthetics.executeHttpStep("Verify 403 for " + url,
             requestOptions,
             validateStatusCodeAndContentType(403, mediaType ?? MediaType.TEXT_PLAIN));
     }
@@ -88,7 +90,11 @@ export function jsonChecker(fn: any): any {
 }
 
 export function responseChecker(fn: any): any {
-    return async (res: any) => {
+    return async (res: IncomingMessage) => {
+        if(!res.statusCode) {
+            throw 'statusCode missing';
+        }
+
         if (res.statusCode < 200 || res.statusCode > 299) {
             throw res.statusCode + ' ' + res.statusMessage;
         }
@@ -99,7 +105,7 @@ export function responseChecker(fn: any): any {
     };
 }
 
-async function getResponseBody(response: any): Promise<string> {
+async function getResponseBody(response: IncomingMessage): Promise<string> {
     const body = await getBodyFromResponse(response);
 
     if(response.headers[constants.HTTP2_HEADER_CONTENT_ENCODING] === 'gzip') {
@@ -113,7 +119,7 @@ async function getResponseBody(response: any): Promise<string> {
     return body.toString();
 }
 
-function getBodyFromResponse(response: any): Promise<string> {
+function getBodyFromResponse(response: IncomingMessage): Promise<string> {
     return new Promise((resolve: any) => {
         const buffers: Buffer[] = [];
 
@@ -141,8 +147,8 @@ export function mustContain(body: string, text: string) {
  * @param statusCode
  * @param contentType
  */
-function validateStatusCodeAndContentType(statusCode: number, contentType: MediaType) {
-    return async (res: any) => {
+function validateStatusCodeAndContentType(statusCode: number, contentType: MediaType): (Res: IncomingMessage) => Promise<void> {
+    return async (res: IncomingMessage) => {
         return new Promise(resolve => {
             if (res.statusCode !== statusCode) {
                 throw `${res.statusCode} ${res.statusMessage}`;
@@ -152,7 +158,7 @@ function validateStatusCodeAndContentType(statusCode: number, contentType: Media
                 throw 'Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE];
             }
 
-            resolve(OK_RESOLUTION);
+            resolve();
         });
     };
 }
@@ -165,12 +171,16 @@ export class ResponseChecker {
         this.contentType = contentType;
     }
 
-    static forJson() {
+    static forJson(): ResponseChecker {
         return new ResponseChecker(MediaType.APPLICATION_JSON);
     }
 
-    static forGeojson() {
+    static forGeojson(): ResponseChecker {
         return new ResponseChecker(MediaType.APPLICATION_GEOJSON);
+    }
+
+    static forJpeg(): ResponseChecker {
+        return new ResponseChecker(MediaType.IMAGE_JPEG);
     }
 
     noCors(): ResponseChecker {
@@ -179,18 +189,27 @@ export class ResponseChecker {
         return this;
     }
 
-    checkJson(fn: any): any {
+    check(): CheckerFunction {
+        return this.responseChecker(() => {
+            // no need to do anything
+        });
+    }
+
+    checkJson<T>(fn: (json: T, body: string) => void): CheckerFunction {
         return this.responseChecker((body: string) => {
             fn(JSON.parse(body), body);
         });
     }
 
-    responseChecker(fn: any): any {
-        return async (res: any) => {
+    responseChecker(fn: (body: string) => void): CheckerFunction {
+        return async (res: IncomingMessage): Promise<void> => {
+            if (!res.statusCode) {
+                throw 'statusCode missing';
+            }
+
             if (res.statusCode < 200 || res.statusCode > 299) {
                 throw res.statusCode + ' ' + res.statusMessage;
             }
-
 
             if(this.checkCors && !res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
                 throw 'CORS missing';
