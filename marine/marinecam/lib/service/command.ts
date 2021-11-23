@@ -9,7 +9,7 @@ const FIELD_ITEMS = "Items";
 
 export class Command {
     readonly name: string;
-    readonly inputParameters: any;
+    readonly inputParameters: Record<string, string>;
 
     constructor(name: string) {
         this.inputParameters = {};
@@ -126,7 +126,7 @@ export class RequestStreamCommand extends Command {
         super('RequestStream');
     }
 
-    getResult(response: any): any {
+    getResult(response: any): string {
         const output = response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0].Param as any[];
 
         const videoId = output.find(o => o.$.Name === 'VideoId');

@@ -9,8 +9,8 @@ import {RetentionDays} from "@aws-cdk/aws-logs";
 import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
 import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
-import {S3} from "aws-sdk";
 import {ManagedUpload} from "aws-sdk/clients/s3";
+import {S3} from "aws-sdk";
 
 /**
  * Construct for creating SQS-queues.
@@ -93,9 +93,10 @@ function addDLQAlarm(stack: DigitrafficStack, dlqName: string, dlq: Queue) {
 
 function getDlqCode(bucketName: string): InlineCode {
     const functionBody = DLQ_LAMBDA_CODE
-        .replace('_bucketName_',bucketName)
+        .replace("__bucketName__", bucketName)
         .replace("__upload__", uploadToS3.toString())
-        .replace("__doUpload__", doUpload.toString());
+        .replace("__doUpload__", doUpload.toString())
+        .replace("__handler__", createHandler().toString().substr(23)); // remove function handler() from signature
 
     return new InlineCode(functionBody);
 }
@@ -121,15 +122,25 @@ function doUpload(s3: S3, Bucket: string, Body: string, Key: string): Promise<Ma
     }).promise();
 }
 
+// bucketName is unused, will be overridden in the actual lambda code below
+const bucketName = '';
+
+function createHandler(): (event: any) => Promise<unknown[]> {
+    return function handler(event: any): Promise<unknown[]> {
+        const AWS = require('aws-sdk');
+
+        const millis = new Date().getTime();
+        return Promise.all(event.Records.map((e: any, idx: number) =>
+            uploadToS3(new AWS.S3(), bucketName, e.body, `dlq-${millis}-${idx}.json`)
+        ));
+    }
+}
+
 const DLQ_LAMBDA_CODE = `const AWS = require('aws-sdk');
+const bucketName = "__bucketName__";
 
 __upload__
 __doUpload__
 
-exports.handler = async (event) => {
-    const millis = new Date().getTime();
-    return Promise.all(event.Records.map((e, idx) =>
-        uploadToS3(new AWS.S3(), '_bucketName_', e.body, \`dlq-$\{millis\}-$\{idx\}.json\`)
-    ));
-};
+exports.handler = async (event) => __handler__
 `;

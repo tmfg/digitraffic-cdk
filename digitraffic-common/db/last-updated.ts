@@ -7,10 +7,14 @@ export enum DataType {
     COUNTING_SITES_METADATA_CHECK="COUNTING_SITES_METADATA_CHECK"
 }
 
+type UpdatedTimestamp = {
+    updated: Date
+} | null;
+
 export function getLastUpdated(db: DTDatabase, datatype: DataType): Promise<Date | null> {
     return db.oneOrNone("select updated from data_updated where data_type=$(datatype)", {
         datatype: datatype
-    }, (x: { updated: any; } | null) => x?.updated);
+    }, (x: UpdatedTimestamp) => x?.updated || null);
 }
 
 export function updateLastUpdated(db: DTDatabase, datatype: DataType, updated: Date): Promise<null> {
@@ -22,9 +26,9 @@ do update set updated = $(updated)`,
 }
 
 export function getUpdatedTimestamp(db: DTDatabase, datatype: string): Promise<Date | null> {
-    return db.oneOrNone("select updated_time from updated_timestamp where updated_name=$(datatype)", {
+    return db.oneOrNone("select updated_time as updated from updated_timestamp where updated_name=$(datatype)", {
         datatype: datatype
-    }, (x: { updated_time: any; } | null) => x?.updated_time);
+    }, (x: UpdatedTimestamp) => x?.updated || null);
 }
 
 export function updateUpdatedTimestamp(db: DTDatabase, datatype: string, date: Date, by = ''): Promise<null> {

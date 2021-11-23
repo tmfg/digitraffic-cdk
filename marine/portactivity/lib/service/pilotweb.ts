@@ -58,7 +58,7 @@ async function removeMissingPilotages(db: DTDatabase, idMap: PilotagesDAO.Timest
 }
 
 async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[]): Promise<ApiTimestamp[]> {
-    return (await Promise.all(newAndUpdated.map(async p => {
+    return (await Promise.all(newAndUpdated.map(async (p: Pilotage): Promise<ApiTimestamp | null> => {
         const base = createApiTimestamp(p);
 
         if(base) {
@@ -78,14 +78,13 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
                         location,
                         portcallId
                     }
-                };
+                } as ApiTimestamp;
             }
 
             console.info("skipping pilotage %d, missing portcallId", p.id);
-
-            return null;
         }
-    }))).filter(x => x != null);
+        return null;
+    }))).filter(x => x != null) as ApiTimestamp[];
 }
 
 async function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | null> {
@@ -98,8 +97,8 @@ async function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): P
     return await PilotagesDAO.findPortCallId(db, p, location);
 }
 
-function createApiTimestamp(pilotage: Pilotage): any {
-    const eventTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime);
+function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | null {
+    const eventTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime).toISOString();
 
     if(pilotage.state === 'ESTIMATE' || pilotage.state === 'NOTICE') {
         return {

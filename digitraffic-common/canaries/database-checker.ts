@@ -17,6 +17,10 @@ abstract class DatabaseCheck {
     abstract check(value: any): void;
 }
 
+type CountResponse = {
+    count: number;
+}
+
 class CountDatabaseCheck extends DatabaseCheck {
     readonly minCount: number|null;
     readonly maxCount: number|null;
@@ -32,7 +36,7 @@ class CountDatabaseCheck extends DatabaseCheck {
         this.maxCount = maxCount;
     }
 
-    check(value: any) {
+    check(value: CountResponse) {
         if (!value) {
             this.failed = true;
             throw 'no return value';

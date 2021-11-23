@@ -1,4 +1,4 @@
-import axios, {AxiosResponse} from 'axios';
+import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as https from "https";
 import util from "util";
 import {parseString} from "xml2js";
@@ -59,7 +59,7 @@ export class Session {
         }
     }
 
-    async post(url: string, xml: string, configuration?: any): Promise<AxiosResponse<any>> {
+    async post(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
         return axios.post(url, xml, {...configuration, ...{ httpsAgent: agent, timeout: 3000 }});
     }
 
