@@ -5,10 +5,6 @@ export type AreaVisibilityResponse = {
     // ISO 8601
     readonly lastUpdated?: string
 
-    // ISO 8601
-    // for backwards compatibility
-    readonly 'lastUpdated:'?: string
-
     readonly visibilityInMeters: number
 }
 

@@ -23,8 +23,7 @@ export class AreaVisibilityService {
     async getVisibilityForAreaInMetres(areaId: number): Promise<AreaVisibilityWrapper> {
         try {
             const resp = await this.api.getVisibilityForArea('vaylavisi139');
-            const lastUpdated = resp.lastUpdated ?? resp["lastUpdated:"];
-            console.info(`method=getVisibilityForAreaInMetres areaId: ${areaId} visibility: ${resp.visibilityInMeters} lastUpdated: ${lastUpdated}`);
+            console.info(`method=getVisibilityForAreaInMetres areaId: ${areaId} visibility: ${resp.visibilityInMeters} lastUpdated: ${resp.lastUpdated}`);
             return { visibilityInMeters: resp.visibilityInMeters };
         } catch (error) {
             // error logged at API level
