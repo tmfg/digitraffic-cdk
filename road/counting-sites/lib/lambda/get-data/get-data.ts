@@ -18,6 +18,8 @@ export const handler = async (event: any): Promise<LambdaResponse> => {
             }
             return LambdaResponse.ok(data);
         } catch(e) {
+            console.info("error " + e);
+
             return LambdaResponse.internal_error();
         } finally {
             console.info("method=CountingSites.GetData tookMs=%d", (Date.now() - start))

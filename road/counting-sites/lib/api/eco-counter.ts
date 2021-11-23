@@ -54,14 +54,14 @@ export class EcoCounterApi {
         return this.getFromServer('getDataForSite', `${URL_SITE_DATA}/${siteId}?begin=${fromString}&end=${toString}&step=${intervalString}`);
     }
 
-    async getAllCounters(): Promise<Record<string, [ApiCounter]>> {
+    async getAllCounters(): Promise<Record<string, ApiCounter>> {
         const sites = await this.getSites();
 
         const entries = sites.flatMap((site: any) => site.channels
             .filter(this.validate)
             .map((c: any) => [c.id, {...c, ...{name: `${site.name} ${c.name}`}}]));
 
-        // and finally create object from entries with id as key ad counter as value
+        // and finally create object from entries with id as key and counter as value
         return Object.fromEntries(entries);
     }
 

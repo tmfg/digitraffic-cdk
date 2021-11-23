@@ -83,11 +83,11 @@ export function findAllCountersForDomain(db: DTDatabase, domain: string): Promis
     return db.one(PS_ALL_COUNTERS_FOR_DOMAIN_FEATURE_COLLECTION, [domain]).then(r => r.collection);
 }
 
-export function findAllCountersForUpdateForDomain(db: DTDatabase, domain: string): Promise<any[]> {
+export function findAllCountersForUpdateForDomain(db: DTDatabase, domain: string): Promise<DbCounter[]> {
     return db.manyOrNone(PS_ALL_COUNTERS, [domain]);
 }
 
-export function insertCounters(db: DTDatabase, domain: string, counters: ApiCounter[]): Promise<any> {
+export function insertCounters(db: DTDatabase, domain: string, counters: ApiCounter[]): Promise<null[]> {
     return Promise.all(counters
         .map(c => db.none(PS_INSERT_COUNTER,
             [c.id, domain, c.domain, c.name, `POINT(${c.longitude} ${c.latitude})`, c.userType, c.interval, c.sens]))
@@ -102,7 +102,7 @@ export function removeCounters(db: DTDatabase, counters: DbCounter[]): Promise<n
     return Promise.resolve(null);
 }
 
-export function updateCounters(db: DTDatabase, counters: ApiCounter[]): Promise<any> {
+export function updateCounters(db: DTDatabase, counters: ApiCounter[]): Promise<null[]> {
     return Promise.all(counters
         .map(c => db.none(PS_UPDATE_COUNTER, [c.domain, `POINT(${c.longitude} ${c.latitude})`,c.interval, c.sens, c.id]))
     );

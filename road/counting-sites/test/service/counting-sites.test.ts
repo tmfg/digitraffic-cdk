@@ -12,7 +12,7 @@ describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) =>
         expect(metadata.domains).toHaveLength(0);
         expect(Object.keys(metadata.userTypes)).toHaveLength(11);
         expect(Object.keys(metadata.directions)).toHaveLength(3);
-        expect(metadata.lastUpdated).toBeUndefined();
+        expect(metadata.lastUpdated).toBeNull();
     });
 
     test('get domains - two domains', async () => {

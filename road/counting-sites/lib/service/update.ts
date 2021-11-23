@@ -15,11 +15,7 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
 
     const [newCounters, removedCounters, updatedCounters] = compareCounters(countersInApi, countersInDb);
 
-//    console.info(newCounters.length + " new " + JSON.stringify(newCounters, null, 3));
-//    console.info(removedCounters.length + " removed " + JSON.stringify(removedCounters, null, 3));
-//    console.info(updatedCounters.length + " updated " + JSON.stringify(updatedCounters, null, 3));
-
-    await inDatabase(async db => {
+    return inDatabase(async db => {
         const updatedTimestamp = new Date();
 
         await CounterDb.insertCounters(db, domainName, newCounters);
@@ -33,11 +29,11 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
     });
 }
 
-export async function updateDataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
+export async function updateDataForDomain(domainName: string, apiKey: string, url: string): Promise<null> {
     const api = new EcoCounterApi(apiKey, url);
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
-    await inDatabase(async (db: DTDatabase) => {
+    return inDatabase(async (db: DTDatabase) => {
         await Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
             if(isDataUpdateNeeded(counter)) {
                 // either last update timestamp + 1 day or ten days ago(for first time)
@@ -66,7 +62,7 @@ function isDataUpdateNeeded(counter: DbCounter): boolean {
     return !counter.last_data_timestamp || moment(counter.last_data_timestamp).isBefore(moment().subtract(2, 'days'));
 }
 
-function compareCounters(countersInApi: any, countersInDb: any): [ApiCounter[], DbCounter[], ApiCounter[]] {
+function compareCounters(countersInApi: Record<string, ApiCounter>, countersInDb: Record<string, DbCounter>): [ApiCounter[], DbCounter[], ApiCounter[]] {
     const newCounters = Object.keys(countersInApi)
         .filter(key => !(key in countersInDb))
         .map(key => countersInApi[key]);
@@ -82,10 +78,10 @@ function compareCounters(countersInApi: any, countersInDb: any): [ApiCounter[], 
     return [newCounters, removedCounters, updatedCounters];
 }
 
-async function getAllCountersFromDb(domain: string) {
+async function getAllCountersFromDb(domain: string): Promise<Record<string, DbCounter>> {
     const counters = await inDatabaseReadonly( (db: DTDatabase) => {
         return CounterDb.findAllCountersForUpdateForDomain(db, domain);
-    }) as any[];
+    }) as DbCounter[];
 
     return Object.fromEntries(counters
         .map((c: any) => [c.site_id as string, c])
