@@ -7,7 +7,7 @@ const PS_CAMERA_IDS = new PreparedStatement({
     text: 'select id from camera where camera_group_id = $1'
 });
 
-const SQL_LIST_CAMERAS = "select id, name, camera_group_id, last_updated  from camera where camera_group_id in ($1:list)";
+const SQL_LIST_CAMERAS = "select id, name, camera_group_id, last_updated from camera where camera_group_id in ($1:list)";
 
 const PS_UPDATE_TIMESTAMP = new PreparedStatement({
     name: 'update-timestamp',

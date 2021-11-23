@@ -1,10 +1,11 @@
 import {Construct} from '@aws-cdk/core';
 import {MobileServerProps} from './app-props';
 import * as InternalLambas from './internal-lambdas';
-import * as PublicApi from './public-api';
 import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
 import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {PrivateApi} from "./private-api";
+import {Canaries} from "./canaries";
 
 export class MarinecamStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: MobileServerProps) {
@@ -14,7 +15,9 @@ export class MarinecamStack extends DigitrafficStack {
         const [userPool, userPoolClient] = createUserPool(this);
 
         InternalLambas.create(this, bucket);
-        PublicApi.create(this, bucket, userPool, userPoolClient);
+        const privateApi = new PrivateApi(this, bucket, userPool, userPoolClient);
+
+        new Canaries(this, privateApi.publicApi);
     }
 }
 
