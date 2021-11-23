@@ -1,6 +1,7 @@
 import {ResponseChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
 import assert from "assert";
 import {MediaType} from "digitraffic-common/api/mediatypes";
+import {Camera} from "../model/camera";
 
 const hostname = process.env.hostname as string;
 const apiKeyId = process.env.apiKeyId as string;
@@ -13,7 +14,7 @@ export const handler = async () => {
     const jsonChecker = ResponseChecker.forJson();
     const imageChecker = ResponseChecker.forJpeg();
 
-    await checker.expect200(METADATA_URL, jsonChecker.checkJson((json: any[]) => {
+    await checker.expect200(METADATA_URL, jsonChecker.checkJson((json: Camera[]) => {
         assert.ok(json.length > 1);
         assert.ok(json[0].id !== null);
     }));

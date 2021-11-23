@@ -9,7 +9,7 @@ const secretId = process.env[SECRET_ID] as string;
 
 export const handler = async () : Promise<LambdaResponse> => {
     try {
-        const cameras = await withDbSecret(secretId, async (): Promise<Camera[]> => {
+        const cameras = withDbSecret(secretId, async (): Promise<Camera[]> => {
             return MetadataService.listAllCameras(['Saimaa']);
         });
 
