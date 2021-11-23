@@ -1,9 +1,9 @@
-import * as pgPromise from "pg-promise";
 import {handler} from '../../../lib/lambda/update-states/lambda-update-states';
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import * as StatesDb from "../../../lib/db/states";
 import {Locale} from "../../../lib/model/locale";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const SERVER_PORT = 8089;
 
@@ -11,14 +11,13 @@ process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
 
-describe('update-states', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('update-states', dbTestBase((db: DTDatabase) => {
 
     test('update', async () => {
         const server = new TestHttpServer();
         server.listen(SERVER_PORT, {
             "/states": (url) => {
-                // @ts-ignore
-                const locale = url.match(/\/.+=(.+)/)[1];
+                const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                 return fakeStates(locale);
             }
         });

@@ -15,7 +15,7 @@ let lightsApi: AreaLightsApi
 export async function handlerFn(
     doWithSecret: SecretFunction,
     AreaVisibilityServiceClass: new (api: AreaVisibilityApi) => AreaVisibilityService,
-    AreaLightsServiceClass: new (api: AreaLightsApi) => AreaLightsService) {
+    AreaLightsServiceClass: new (api: AreaLightsApi) => AreaLightsService): Promise<void> {
 
     return doWithSecret(secretId, async (secret: ShiplightSecret) => {
         if (!visibilityApi) {
@@ -48,7 +48,7 @@ export async function handlerFn(
     });
 }
 
-export const handler = async (): Promise<any> => {
+export const handler = async (): Promise<void> => {
     return handlerFn(withDbSecret, AreaVisibilityService, AreaLightsService);
 };
 

@@ -1,8 +1,8 @@
-import {IDatabase} from "pg-promise";
+import {DTDatabase} from "digitraffic-common/postgres/database"
 import {dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
 import {getAreaTraffic, ShipTypes} from "../../lib/db/areatraffic";
 
-describe('db-areatraffic', dbTestBase((db: IDatabase<any, any>) => {
+describe('db-areatraffic', dbTestBase((db: DTDatabase) => {
     test('getAreaTraffic - empty', async () => {
         const traffic = await getAreaTraffic(db);
 

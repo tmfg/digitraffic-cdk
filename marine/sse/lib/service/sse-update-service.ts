@@ -1,7 +1,6 @@
 import * as SseSchema from "../generated/tlsc-sse-reports-schema";
 import * as SseDb from "../db/sse-db";
-import {inDatabase} from 'digitraffic-common/postgres/database';
-import {IDatabase} from "pg-promise";
+import {DTDatabase, inDatabase} from 'digitraffic-common/postgres/database';
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 
 export const SSE_DATA_DATA_TYPE = "SSE_DATA";
@@ -12,7 +11,7 @@ export type SseSaveResult = {
 }
 
 export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<SseSaveResult> {
-    return inDatabase(async (db: IDatabase<any,any>) => {
+    return inDatabase(async (db: DTDatabase) => {
         let saved = 0;
         let errors = 0;
 
@@ -25,7 +24,7 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
                         SseDb.insertSseReportData(t, dbSseSseReport),
                         LastUpdatedDB.updateUpdatedTimestamp(t, SSE_DATA_DATA_TYPE, new Date())
                     ]);
-                }).then(function (result) {
+                }).then(() => {
                     saved++;
                     console.info('method=saveSseData succeed');
                 }).catch((error) => {
@@ -35,7 +34,7 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
             } catch (e) {
                 console.error(`method=saveSseData Error while handling record`, e);
                 errors++;
-            };
+            }
         }
         const result : SseSaveResult = {
             errors,
@@ -44,7 +43,7 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
         console.info(`method=saveSseData result ${JSON.stringify(result)}`);
         return result;
     }
-)};
+)}
 
 export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseDb.DbSseReport {
 

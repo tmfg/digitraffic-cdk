@@ -47,7 +47,7 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
         "Location": "https://<bucket>.s3.eu-west-1.amazonaws.com/abcdefg-hijklmn.json"
     }
     */
-    let s3Uri: string = '–';
+    let s3Uri = '–';
     if (s3PayloadMeta) {
         console.info(`method=${logFunctionName} big-payload s3PayloadMeta: ${JSON.stringify(s3PayloadMeta)}`);
         s3Uri = s3PayloadMeta.Location;

@@ -18,9 +18,9 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
     }
 
     const log_line = message.replace('[, ]', '[0.0,0.0]')
-        .replace(/\"Infinity\"/g, "-1")
+        .replace(/"Infinity"/gi, "-1")
         .replace(/Infinity/gi, "-1")
-        .replace(/\"null\"/gi, "null");
+        .replace(/"null"/gi, "null");
 
     try {
         if(enableJsonParse) {
@@ -48,7 +48,7 @@ function parseJson(message: string): any {
         const parsedJson = JSON.parse(jsonSubString);
 
         // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
-        if (parsedJson.hasOwnProperty('@fields') && parsedJson['@fields'].hasOwnProperty('upstream_response_time')) {
+        if ('@fields' in parsedJson && 'upstream_response_time' in parsedJson['@fields']) {
             parsedJson['@fields'].upstream_response_time = parseUpstreamResponseTime(parsedJson);
         }
 

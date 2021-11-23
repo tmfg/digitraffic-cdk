@@ -42,7 +42,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('saveTimestamp - no conflict returns updated', async () => {
         const timestamp = newTimestamp();
 
-        const ret = await TimestampsService.saveTimestamp(timestamp);
+        const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
         expect(ret?.location_locode).toBe(timestamp.location.port);
         expect(ret?.ship_mmsi).toBe(timestamp.ship.mmsi);
@@ -52,8 +52,8 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('saveTimestamp - conflict returns undefined', async () => {
         const timestamp = newTimestamp();
 
-        await TimestampsService.saveTimestamp(timestamp);
-        const ret = await TimestampsService.saveTimestamp(timestamp);
+        await TimestampsService.saveTimestamp(timestamp, db);
+        const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
         expect(ret).toBeNull();
     });
@@ -62,8 +62,8 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const olderTimestamp = newTimestamp({locode: 'FIRAU', source: 'Portnet'});
         const newerTimestamp = { ...olderTimestamp, eventTime: moment(olderTimestamp.eventTime).add(1,'hours').toISOString() };
 
-        await TimestampsService.saveTimestamp(olderTimestamp);
-        const ret = await TimestampsService.saveTimestamp(newerTimestamp);
+        await TimestampsService.saveTimestamp(olderTimestamp, db);
+        const ret = await TimestampsService.saveTimestamp(newerTimestamp, db);
 
         expect(ret?.locodeChanged).toBe(false);
         expect((await findAll(db)).length).toBe(2);
@@ -73,8 +73,8 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const olderTimestamp = newTimestamp({locode: 'FIHKO', source: 'Portnet'});
         const newerTimestamp = { ...olderTimestamp, location: { port: 'FIRAU' } };
 
-        await TimestampsService.saveTimestamp(olderTimestamp);
-        const ret = await TimestampsService.saveTimestamp(newerTimestamp);
+        await TimestampsService.saveTimestamp(olderTimestamp, db);
+        const ret = await TimestampsService.saveTimestamp(newerTimestamp, db);
 
         expect(ret?.locodeChanged).toBe(true);
         expect((await TimestampsService.findAllTimestamps(olderTimestamp.location.port)).length).toBe(0);
@@ -99,7 +99,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('saveTimestamp - no IMO not saved', async () => {
         const timestamp = R.dissocPath(["ship", "imo"], newTimestamp()) as ApiTimestamp;
 
-        const ret = await TimestampsService.saveTimestamp(timestamp);
+        const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
         expect(ret).toBeNull();
     });
@@ -107,7 +107,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
     test('saveTimestamp - no MMSI not saved', async () => {
         const timestamp = R.dissocPath(["ship", "mmsi"], newTimestamp()) as ApiTimestamp;
 
-        const ret = await TimestampsService.saveTimestamp(timestamp);
+        const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
         expect(ret).toBeNull();
     });
@@ -118,7 +118,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         await insertVessel(db, vessel);
 
         const timestamp2 = R.dissocPath(["ship", "imo"], timestamp) as ApiTimestamp;
-        const ret = await TimestampsService.saveTimestamp(timestamp2);
+        const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
         expect(ret?.location_locode).toBe(timestamp2.location.port);
         expect(ret?.ship_mmsi).toBe(vessel.mmsi);
@@ -131,7 +131,7 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         await insertVessel(db, vessel);
 
         const timestamp2 = R.dissocPath(["ship", "mmsi"], timestamp) as ApiTimestamp;
-        const ret = await TimestampsService.saveTimestamp(timestamp2);
+        const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
         expect(ret?.location_locode).toBe(timestamp.location.port);
         expect(ret?.ship_mmsi).toBe(vessel.mmsi);

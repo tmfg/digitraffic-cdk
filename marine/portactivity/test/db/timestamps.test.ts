@@ -1,15 +1,15 @@
 import moment from 'moment';
-import * as pgPromise from "pg-promise";
 import {dbTestBase, insert, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
 import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
 import {DbTimestamp} from "../../lib/db/timestamps";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const EVENT_SOURCE = 'TEST';
 
-describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-timestamps', dbTestBase((db: DTDatabase) => {
 
     test('removeTimestamps - empty', async () => {
         const removed = await TimestampsDb.removeTimestamps(db, EVENT_SOURCE, []);
@@ -45,7 +45,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(removed).toHaveLength(1);
     });
 
-    function testFound(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testFound(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - found`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 recordTime: moment().toISOString() // avoid filtering
@@ -57,7 +57,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
-    function testFoundInFuture(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testFoundInFuture(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - found 71 h in the future`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 recordTime: moment().toISOString(), // avoid filtering,
@@ -70,17 +70,17 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
-    testFound('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!));
-    testFound('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!));
-    testFound('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testFound('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testFound('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testFound('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testFound('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testFound('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    testFoundInFuture('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!));
-    testFoundInFuture('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!));
-    testFoundInFuture('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testFoundInFuture('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testFoundInFuture('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testFoundInFuture('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testFoundInFuture('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testFoundInFuture('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    function testNotFound(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testNotFound(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - not found`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 recordTime: moment().toISOString() // avoid filtering
@@ -92,13 +92,13 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
-    testNotFound('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi! + 1));
-    testNotFound('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo! - 1));
-    testNotFound('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port + 'asdf'));
-    testNotFound('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.source + 'asdf'));
+    testNotFound('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number + 1));
+    testNotFound('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number - 1));
+    testNotFound('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port + 'asdf'));
+    testNotFound('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.source + 'asdf'));
 
 
-    function testNewest(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testNewest(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - multiple - only newest`, async () => {
             const timestamp = newTimestamp();
             const timestamp2Date = new Date();
@@ -117,12 +117,12 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
-    testNewest('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!));
-    testNewest('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!));
-    testNewest('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testNewest('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testNewest('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testNewest('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testNewest('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testNewest('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    function testTooOld(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testTooOld(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - too old`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 eventTime: moment().subtract('13', 'days').toISOString() // enable filtering
@@ -134,12 +134,12 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
-    testTooOld('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!));
-    testTooOld('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!));
-    testTooOld('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testTooOld('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testTooOld('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testTooOld('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testTooOld('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testTooOld('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    function testTooFarInTheFuture(description: string, fn: (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testTooFarInTheFuture(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - too far in the future`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 eventTime: moment().add('4', 'days').toISOString() // enable filtering
@@ -151,10 +151,10 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
     }
 
-    testTooFarInTheFuture('findByMmsi', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi!));
-    testTooFarInTheFuture('findByImo', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo!));
-    testTooFarInTheFuture('findByLocode', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testTooFarInTheFuture('findBySource', (db: pgPromise.IDatabase<any, any>, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testTooFarInTheFuture('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testTooFarInTheFuture('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testTooFarInTheFuture('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testTooFarInTheFuture('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
     test('findByMmsi - two sources', async () => {
         const mmsi = 123;
@@ -307,7 +307,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId as number]);
 
         expect(ships.length).toBe(1);
     });
@@ -323,7 +323,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId!]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId as number]);
 
         expect(ships.length).toBe(0);
     });
@@ -348,7 +348,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp({imo: 1, mmsi: 2});
         await createPortcall(timestamp);
 
-        const mmsi = await db.tx(t => TimestampsDb.findMmsiByImo(t, timestamp.ship.imo!));
+        const mmsi = await db.tx(t => TimestampsDb.findMmsiByImo(t, timestamp.ship.imo as number));
 
         expect(mmsi).toEqual(timestamp.ship.mmsi);
     });
@@ -373,7 +373,7 @@ describe('db-timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const timestamp = newTimestamp({imo: 1, mmsi: 2});
         await createPortcall(timestamp);
 
-        const imo = await db.tx(t => TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi!));
+        const imo = await db.tx(t => TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi as number));
 
         expect(imo).toEqual(timestamp.ship.imo);
     });

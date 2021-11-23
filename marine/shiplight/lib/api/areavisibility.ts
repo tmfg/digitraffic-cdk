@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export type AreaVisibilityResponse = {

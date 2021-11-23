@@ -1,10 +1,10 @@
-import * as pgPromise from "pg-promise";
 import * as RequestsService from "../../lib/service/requests";
 import {newServiceRequest} from "../testdata";
 import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestWithExtensions} from "../../lib/model/service-request";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('requests-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('requests-service', dbTestBase((db: DTDatabase) => {
 
     test('toServiceRequest', async () => {
         const originalSr = newServiceRequest();
@@ -55,6 +55,7 @@ describe('requests-service', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
 }));
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addNestedExtensionProps(r: any) {
     r.extended_attributes = {
         status_id: r.status_id,
@@ -69,20 +70,20 @@ function addNestedExtensionProps(r: any) {
 }
 
 function deleteExtensionProps(r: ServiceRequestWithExtensions) {
-    // @ts-ignore
-    delete r.status_id;
-    // @ts-ignore
-    delete r.vendor_status;
-    // @ts-ignore
-    delete r.title;
-    // @ts-ignore
-    delete r.service_object_id;
-    // @ts-ignore
-    delete r.service_object_type;
-    // @ts-ignore
-    delete r.media_urls;
-    // @ts-ignore
-    delete r.subject_id;
-    // @ts-ignore
-    delete r.subSubject_id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).status_id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).vendor_status;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).title;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).service_object_id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).service_object_type;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).media_urls;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).subject_id;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    delete (r as any).subSubject_id;
 }

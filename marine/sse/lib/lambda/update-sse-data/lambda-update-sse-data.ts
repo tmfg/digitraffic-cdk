@@ -39,7 +39,7 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
     }
 }
 
-function errorJson(errorMessage : String, detailedMessage : String) : String {
+function errorJson(errorMessage : string, detailedMessage : string) : string {
     return JSON.stringify({
         "error" : errorMessage,
         "errorMessage" : detailedMessage

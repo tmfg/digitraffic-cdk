@@ -1,4 +1,5 @@
 import {Client} from 'paho-mqtt';
+import {ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
 
 export const KEY_APP = 'KEY_APP';
 
@@ -8,9 +9,11 @@ const APP = process.env[KEY_APP] as string;
  * Paho MQTT requires a browser environment to run. Fake the required parts.
  */
 function fakeBrowserHack() {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     global.WebSocket = require('ws');
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     global.localStorage = {
         store: {},
@@ -24,11 +27,12 @@ function fakeBrowserHack() {
             delete this.store[key]
         }
     }
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     global.window = global
 }
 
-export async function handler() {
+export async function handler(): Promise<ProxyLambdaResponse> {
     fakeBrowserHack();
 
     const client = new Client(`${APP}.digitraffic.fi`, 61619, 'hc-proxy');

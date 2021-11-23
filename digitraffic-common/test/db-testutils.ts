@@ -14,7 +14,7 @@ export function dbTestBase(
     truncateFn: (db: IDatabase<any, any>) => any,
     dbUser: string,
     dbPass: string,
-    dbUri: string) {
+    dbUri: string): () => void {
 
     const theDbUri = process.env.DB_URI ?? dbUri;
     console.log(`Test database URI: ${theDbUri}`);

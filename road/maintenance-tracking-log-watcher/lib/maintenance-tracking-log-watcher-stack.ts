@@ -1,4 +1,3 @@
-///<reference path="../lib/app-props.d.ts"/>
 import {Construct, Stack, StackProps} from '@aws-cdk/core';
 import {Function,AssetCode} from '@aws-cdk/aws-lambda';
 import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam'

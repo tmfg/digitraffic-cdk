@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {AreaTraffic} from "../model/areatraffic";
 
 export enum AreaLightsBrightenCommand {
     NOMINAL = 'Nominal',
