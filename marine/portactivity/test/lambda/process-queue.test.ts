@@ -57,6 +57,8 @@ describe('process-queue', dbTestBase((db: DTDatabase) => {
         });
 
         expect(promises.filter((p: PromiseSettledResult<unknown>) => p.status == 'fulfilled')).toHaveLength(2);
+        const allTimestamps = await findAll(db);
+        expect(allTimestamps.length).toBe(1);
     });
 
 }));
