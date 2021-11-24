@@ -1,5 +1,5 @@
 import {IDatabase,ITask} from "pg-promise";
-import {initDbConnection} from "../postgres/database";
+import {DTDatabase, initDbConnection} from "../postgres/database";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 
 /*
@@ -10,8 +10,8 @@ export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => vo
 }*/
 
 export function dbTestBase(
-    fn: (db: IDatabase<any, any>) => void,
-    truncateFn: (db: IDatabase<any, any>) => any,
+    fn: (db: DTDatabase) => void,
+    truncateFn: (db: DTDatabase) => void,
     dbUser: string,
     dbPass: string,
     dbUri: string): () => void {
