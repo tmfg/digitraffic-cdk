@@ -8,7 +8,7 @@ const secretId = process.env[SECRET_ID_KEY] as string;
 const domainName = process.env[CountingSitesEnvKeys.DOMAIN_NAME] as string;
 const domainPrefix = process.env[CountingSitesEnvKeys.DOMAIN_PREFIX] as string;
 
-export const handler = async (event: any): Promise<any> => {
+export const handler = async (): Promise<void> => {
     const start = Date.now();
 
     try {

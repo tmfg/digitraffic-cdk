@@ -1,4 +1,4 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {ApiCounter, DbCounter} from "../model/counter";
 import {FeatureCollection} from "geojson";
 import {DTDatabase} from "digitraffic-common/postgres/database";

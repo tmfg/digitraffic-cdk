@@ -6,8 +6,10 @@ import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/databa
 import {DbDomain} from "../model/domain";
 import {DbData} from "../model/data";
 import {FeatureCollection} from "geojson";
+import {DbUserType} from "../model/usertype";
+import {MetadataResponse} from "../model/metadata";
 
-export async function getMetadata(): Promise<any> {
+export async function getMetadata(): Promise<MetadataResponse> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
         const domains = await MetadataDB.findAllDomains(db);
         const userTypes = await MetadataDB.findAllUserTypes(db);
@@ -29,7 +31,7 @@ export async function getCountersForDomain(domain: string): Promise<FeatureColle
     });
 }
 
-function createResponse(domains: DbDomain[], userTypes: any[], lastUpdated: Date|null): any {
+function createResponse(domains: DbDomain[], userTypes: DbUserType[], lastUpdated: Date|null): MetadataResponse {
     return {
         lastUpdated,
         domains,

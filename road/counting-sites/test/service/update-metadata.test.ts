@@ -1,15 +1,16 @@
 import {updateMetadataForDomain} from "../../lib/service/update";
 import {dbTestBase, insertCounter, insertDomain, withServer} from "../db-testutil";
-import {IDatabase} from "pg-promise";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {findAllCountersForUpdateForDomain} from "../../lib/db/counter";
 import {URL_ALL_SITES} from "../../lib/api/eco-counter";
+import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DbCounter} from "../../lib/model/counter";
 
 const PORT = 8091;
 
 const DOMAIN_NAME = 'TEST_DOMAIN';
 
-describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
+describe('update tests', dbTestBase((db: DTDatabase) => {
     const EMPTY_DATA = JSON.stringify([]);
 
     async function assertCountersInDb(domain: string, expected: number, fn?: any) {
@@ -21,7 +22,7 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
         }
     }
 
-    async function withServerAllSites(response: string, fn: ((server: TestHttpServer) => any)) {
+    async function withServerAllSites(response: string, fn: ((server: TestHttpServer) => void)) {
         return withServer(PORT, URL_ALL_SITES, response, fn);
     }
 
@@ -96,7 +97,7 @@ describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
             expect(server.getCallCount()).toEqual(1);
         });
 
-        await assertCountersInDb(DOMAIN_NAME, 1, (counters: any[]) => {
+        await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
             expect(counters[0].removed_timestamp).not.toBeNull();
         });
     });

@@ -1,13 +1,13 @@
-import {IDatabase} from "pg-promise";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {DataType} from "digitraffic-common/db/last-updated";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(fn, truncate, 'road', 'road', 'localhost:54322/road');
 }
 
-async function truncate(db: IDatabase<any, any>): Promise<any> {
+async function truncate(db: DTDatabase): Promise<void> {
     return await db.tx(async t => {
         await t.none('DELETE FROM counting_site_data');
         await t.none('DELETE FROM counting_site_counter');
@@ -16,7 +16,7 @@ async function truncate(db: IDatabase<any, any>): Promise<any> {
     });
 }
 
-export function insertDomain(db: IDatabase<any, any>, domainName: string) {
+export function insertDomain(db: DTDatabase, domainName: string): Promise<null> {
     return db.tx(t => {
             return t.none(`
                 insert into counting_site_domain("name", description, added_timestamp)
@@ -28,7 +28,7 @@ export function insertDomain(db: IDatabase<any, any>, domainName: string) {
     });
 }
 
-export function insertCounter(db: IDatabase<any, any>, id: number, domainName: string, userType: number) {
+export function insertCounter(db: DTDatabase, id: number, domainName: string, userType: number): Promise<null> {
     return db.tx(t => {
         return t.none(`
                 insert into counting_site_counter(id, site_id, domain_name, name, site_domain, location, user_type_id, "interval", direction, added_timestamp)
@@ -39,7 +39,7 @@ export function insertCounter(db: IDatabase<any, any>, id: number, domainName: s
             `, [id, domainName, userType]);
     });
 }
-export function insertLastUpdated(db: IDatabase<any, any>, id: number, updated: Date) {
+export function insertLastUpdated(db: DTDatabase, id: number, updated: Date): Promise<null> {
     return db.tx(t => {
         return t.none(`
                 insert into data_updated(id, data_type, updated)
@@ -48,7 +48,7 @@ export function insertLastUpdated(db: IDatabase<any, any>, id: number, updated: 
     });
 }
 
-export async function withServer(port: number, url: string, response: string, fn: ((server: TestHttpServer) => any)) {
+export async function withServer(port: number, url: string, response: string, fn: ((server: TestHttpServer) => void)): Promise<void> {
     const server = new TestHttpServer();
 
     const props: any = {};

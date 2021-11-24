@@ -1,8 +1,8 @@
 import {dbTestBase, insertCounter, insertDomain, insertLastUpdated} from "../db-testutil";
-import {IDatabase} from "pg-promise";
 import * as CountingSitesService from "../../lib/service/counting-sites";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('counting-sites service tests', dbTestBase((db: IDatabase<any, any>) => {
+describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
     const DOMAIN1 = 'DOMAIN1';
     const DOMAIN2 = 'DOMAIN2';
 

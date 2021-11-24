@@ -1,5 +1,7 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {DbDomain} from "../model/domain";
+import {DbUserType} from "../model/usertype";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const SQL_ALL_USER_TYPES = "select id, name from counting_site_user_type";
 
@@ -17,10 +19,10 @@ const PS_ALL_DOMAINS = new PreparedStatement({
     text: SQL_ALL_DOMAINS,
 });
 
-export function findAllUserTypes(db: IDatabase<any, any>): Promise<any> {
+export function findAllUserTypes(db: DTDatabase): Promise<DbUserType[]> {
     return db.manyOrNone(PS_ALL_USER_TYPES).then(results => Object.fromEntries(results.map(r => [r.id, r.name])));
 }
 
-export function findAllDomains(db: IDatabase<any, any>): Promise<DbDomain[]> {
+export function findAllDomains(db: DTDatabase): Promise<DbDomain[]> {
     return db.manyOrNone(PS_ALL_DOMAINS);
 }

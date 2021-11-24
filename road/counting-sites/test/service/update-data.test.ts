@@ -1,15 +1,15 @@
 import {EcoCounterApi} from "../../lib/api/eco-counter";
 import {updateDataForDomain} from "../../lib/service/update";
 import {dbTestBase, insertCounter, insertDomain} from "../db-testutil";
-import {IDatabase} from "pg-promise";
 import {findAllData} from "../../lib/db/data";
 
 import * as sinon from 'sinon';
 import {ApiData} from "../../lib/model/data";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const DOMAIN_NAME = 'TEST_DOMAIN';
 
-describe('update tests', dbTestBase((db: IDatabase<any, any>) => {
+describe('update tests', dbTestBase((db: DTDatabase) => {
     const EMPTY_DATA:any[] = [];
 
     afterEach(() => {
