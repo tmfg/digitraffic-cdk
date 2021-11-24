@@ -1,5 +1,6 @@
-import {AreaLightsApi, AreaLightsBrightenCommand} from "../api/arealights";
+import {AreaLightsApi} from "../api/arealights";
 import {AreaTraffic} from "../model/areatraffic";
+import {retry} from "digitraffic-common/promise/promise";
 
 export class AreaLightsService {
 
@@ -20,10 +21,16 @@ export class AreaLightsService {
             areaId,
             areaTraffic.durationInMinutes,
             areaTraffic.visibilityInMeters);
-        await this.api.updateLightsForArea({
-            routeId: areaId,
-            command: AreaLightsBrightenCommand.MAX, // no need for other levels for now
-            tempTime: areaTraffic.durationInMinutes
-        });
+
+        await retry(async () => {
+            const response = await this.api.updateLightsForArea({
+                routeId: areaId,
+                visibility: areaTraffic.visibilityInMeters,
+                time: areaTraffic.durationInMinutes
+            });
+            if (response.LightsSetSentFailed.length) {
+                console.error('method=updateLightsForArea LightsSetSentFailed: %s', response.LightsSetSentFailed.join(', '));
+            }
+        }, 2, false);
     }
 }

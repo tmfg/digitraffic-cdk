@@ -1,11 +1,4 @@
-import axios from 'axios';
-
-export enum AreaLightsBrightenCommand {
-    NOMINAL = 'Nominal',
-    LOW = 'Low',
-    MEDIUM = 'Medium',
-    MAX = 'Max'
-}
+import axios from 'axios'
 
 export type AreaLightsBrightenRequest = {
 
@@ -15,14 +8,14 @@ export type AreaLightsBrightenRequest = {
     readonly routeId: number
 
     /**
-     * Level of brightness
+     * Visibility in metres
      */
-    readonly command: AreaLightsBrightenCommand
+    readonly visibility: number | null
 
     /**
      * Time to set the brightness on in minutes
      */
-    readonly tempTime: number
+    readonly time: number
 }
 
 export type AreaLightsBrightenResponse = {
