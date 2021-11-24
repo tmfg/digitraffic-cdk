@@ -1,4 +1,3 @@
-import {IDatabase} from "pg-promise";
 import {DbFault} from "../lib/model/fault";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
@@ -10,16 +9,18 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
 }
 
-async function truncate(db: DTDatabase): Promise<void> {
-    return await db.tx(async t => {
-        await t.none('DELETE FROM aton_fault');
-        await t.none('DELETE FROM cached_json');
+async function truncate(db: DTDatabase): Promise<void[]> {
+    return await db.tx(t => {
+        return t.batch([
+            t.none('DELETE FROM aton_fault'),
+            t.none('DELETE FROM cached_json')
+        ]);
     });
 }
 
-export function insert(db: DTDatabase, faults: DbFault[]): Promise<any[]> {
+export function insert(db: DTDatabase, faults: DbFault[]): Promise<void[]> {
     return db.tx(t => {
-        return t.batch(faults.map(f => {
+        return t.batch(faults.map((f: DbFault): Promise<null> => {
             return t.none(`
                 insert into aton_fault(id,
                                        entry_timestamp,
@@ -75,7 +76,7 @@ export function insert(db: DTDatabase, faults: DbFault[]): Promise<any[]> {
     });
 }
 
-export async function insertActiveWarnings(db: DTDatabase, value: any): Promise<null> {
+export async function insertActiveWarnings<T>(db: DTDatabase, value: T): Promise<null> {
     return db.none('insert into cached_json(cache_id, content, last_updated) values ($1, $2, now())',
         [JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, value]);
 }

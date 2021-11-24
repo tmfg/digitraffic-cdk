@@ -13,7 +13,7 @@ export class VisService {
         this.serviceRegistryUrl = serviceRegistryUrl;
     }
 
-    async sendFault(faultS124: string, url: string): Promise<any> {
+    async sendFault(faultS124: string, url: string): Promise<void> {
         const start = Date.now();
 
         try {

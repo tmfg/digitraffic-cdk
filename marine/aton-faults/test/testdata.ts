@@ -21,7 +21,7 @@ export function newFault(props?: {
      const fixedTimestamp = props?.fixedTimestamp ?? new Date();
      fixedTimestamp.setMilliseconds(0);
     return {
-         id: -someNumber(), // id's in real system are negative for some obscure reason
+         id: -someNumber(), // ids in real system are negative for some obscure reason
          entry_timestamp: entryTimestamp,
          fixed_timestamp: fixedTimestamp,
          domain: 'C_NA',

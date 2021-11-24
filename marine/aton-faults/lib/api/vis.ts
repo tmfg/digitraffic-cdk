@@ -45,7 +45,7 @@ export async function query(imo: string, url: string): Promise<string | null> {
             return Promise.reject();
         }
 
-        console.info("DEBUG " + JSON.stringify(resp.data, null, 2));
+//        console.info("DEBUG " + JSON.stringify(resp.data, null, 2));
 
         const instanceList = resp.data;
 

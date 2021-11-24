@@ -35,13 +35,13 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
  * The warnings are cached in database, so we get all active warnings then filter the one with given id
  * @param id
  */
-export async function findWarning(db: DTDatabase, id: number): Promise<Feature|undefined> {
+export async function findWarning(db: DTDatabase, id: number): Promise<Feature|null> {
     const warnings = await CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE) as FeatureCollection;
 
     if(!warnings) {
-        return undefined;
+        return null;
     }
 
-    return warnings.features.find((f: any) => f.properties.id === id);
+    return warnings.features.find((f: any) => f.properties.id === id) || null;
 }
 

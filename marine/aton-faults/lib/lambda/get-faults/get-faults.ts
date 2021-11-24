@@ -2,10 +2,11 @@ import {findAllFaults} from "../../service/faults";
 import {Language} from "digitraffic-common/model/language";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
+import {FeatureCollection} from "geojson";
 
 const secretId = process.env[SECRET_ID_KEY] as string;
 
-export const handler = async (event: any) : Promise <any> => {
+export const handler = async (event: Record<string, string>) : Promise <FeatureCollection> => {
     return withDbSecret(secretId, async () => {
         const language = getLanguage(event['language']);
         const fixedInHours = getFixed(event['fixed_in_hours']);

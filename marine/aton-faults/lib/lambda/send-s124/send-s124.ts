@@ -8,8 +8,7 @@ import {S124Type, SendS124Event} from "../../model/upload-voyageplan-event";
 import {AtonSecret} from "../../model/secret";
 import {decodeBase64ToAscii} from "digitraffic-common/js/js-utils";
 import {SQSEvent} from "aws-lambda";
-import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
+import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 const middy = require('@middy/core')
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
@@ -21,7 +20,7 @@ const secretId = process.env[SECRET_ID] as string;
  * This handler should only receive and send a single S124-message
  */
 export function handlerFn(doWithSecret: SecretFunction) {
-    return async (event: SQSEvent): Promise<any> => {
+    return async (event: SQSEvent): Promise<void> => {
         if (!visService) {
             await doWithSecret(secretId, (secret: AtonSecret) => {
                 // certificates are stored as base64 to prevent Secrets Manager from stripping line breaks
@@ -35,7 +34,7 @@ export function handlerFn(doWithSecret: SecretFunction) {
             });
         }
 
-        return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+        await inDatabaseReadonly(async (db: DTDatabase) => {
             return Promise.allSettled(event.Records
                 .map(r => JSON.parse(r.body) as SendS124Event)
                 .map(event => handleEvent(db, event))
@@ -44,7 +43,7 @@ export function handlerFn(doWithSecret: SecretFunction) {
     };
 }
 
-    function decodeSecretValue(value: string) {
+    function decodeSecretValue(value: string): string {
         // for tests, no need to inject base64-stuff into secret
         if(!value) {
             return "";
@@ -53,28 +52,26 @@ export function handlerFn(doWithSecret: SecretFunction) {
         return decodeBase64ToAscii(value);
     }
 
-async function handleEvent(db: IDatabase<any, any>, event: SendS124Event): Promise<any> {
-    return new Promise(async (resolve: any, reject: any) => {
-        if (event.type === S124Type.FAULT) {
-            const faultS124 = await FaultsService.getFaultS124ById(db, event.id);
-            if (faultS124) {
-                resolve(visService.sendFault(faultS124, event.callbackEndpoint));
-            } else {
-                console.warn('Fault with id %d was not found', event.id);
+async function handleEvent(db: DTDatabase, event: SendS124Event): Promise<void> {
+    if (event.type === S124Type.FAULT) {
+        return FaultsService.getFaultS124ById(db, event.id).then(faultsS124 => {
+            if(faultsS124) {
+                return visService.sendFault(faultsS124, event.callbackEndpoint);
             }
-        } else if (event.type === S124Type.WARNING) {
-            const warning = await WarningsService.findWarning(db, event.id);
+
+            console.warn('Fault with id %d was not found', event.id);
+            return Promise.reject();
+        });
+    } else if (event.type === S124Type.WARNING) {
+        return WarningsService.findWarning(db, event.id).then(warning => {
             if (warning) {
                 const xml = S124Converter.convertWarning(warning);
-
-                resolve(visService.sendWarning(xml, event.callbackEndpoint));
-            } else {
-                console.warn('Warning with id %s was not found', event.id);
+                return visService.sendWarning(xml, event.callbackEndpoint)
             }
-        }
-
-        reject();
-    });
+            console.warn('Warning with id %s was not found', event.id);
+            return Promise.reject();
+        });
+    }
 }
 
 export const handler = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());

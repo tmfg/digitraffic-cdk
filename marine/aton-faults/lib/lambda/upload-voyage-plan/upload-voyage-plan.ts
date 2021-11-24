@@ -72,8 +72,6 @@ async function getEndpointUrl(event: UploadVoyagePlanEvent, voyagePlan: RtzVoyag
         return event.callbackEndpoint;
     }
 
-    console.info("DEBUG routeInfo " + JSON.stringify(voyagePlan.route.routeInfo, null, 2));
-
     try {
         const url = await visService.queryCallBackForImo(voyagePlan.route.routeInfo[0].$.vesselIMO);
 
