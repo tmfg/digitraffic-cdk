@@ -1,28 +1,46 @@
 import {Camera} from "../model/camera";
 
-const FIELD_COMMUNICATION = "Communication";
-const FIELD_COMMAND = "Command";
-const FIELD_THUMBNAIL = "Thumbnail";
-const FIELD_PARAM = "Param";
 const FIELD_ITEM = "Item";
 const FIELD_ITEMS = "Items";
 
-export class Command {
+export type CommandResponse = {
+    readonly Communication: {
+        readonly Command: ResponseCommand[]
+    }
+};
+
+type ResponseCommand = {
+    readonly Result: string;
+    readonly OutputParams: {
+        Param: ResponseParam[]
+    }[];
+    readonly Items: any[];
+    readonly Thumbnail?: string[];
+};
+
+type ResponseParam = {
+    "$": {
+        Name: string
+        Value: string
+    }
+};
+
+export abstract class Command<T> {
     readonly name: string;
     readonly inputParameters: Record<string, string>;
 
-    constructor(name: string) {
+    protected constructor(name: string) {
         this.inputParameters = {};
         this.name = name;
     }
 
-    addInputParameters(name: string, value: string): Command {
+    public addInputParameters(name: string, value: string): Command<T> {
         this.inputParameters[name] = value;
 
         return this;
     }
 
-    createInputParameters(): string {
+    public createInputParameters(): string {
         let inputs = '';
 
         for(const [key,value] of Object.entries(this.inputParameters)) {
@@ -32,7 +50,7 @@ export class Command {
         return `<InputParams>${inputs}</InputParams>`;
     }
 
-    createXml(sequenceId: number, connectionId: string|null): string {
+    public createXml(sequenceId: number, connectionId: string|null): string {
         const connection = connectionId == null ? '<ConnectionId/>' : `<ConnectionId>${connectionId}</ConnectionId>`;
 
         return `<?xml version="1.0" encoding="utf-8"?>
@@ -48,12 +66,10 @@ export class Command {
 `;
     }
 
-    getResult(result: any): any {
-        return result;
-    }
+    public abstract getResult(result: CommandResponse): T;
 
-    checkError(result: any) {
-        const resultCode = result[FIELD_COMMUNICATION][FIELD_COMMAND][0].Result;
+    public checkError(result: CommandResponse) {
+        const resultCode = result.Communication.Command[0].Result;
 
         if (resultCode === 'Error') {
             console.error("Command failed: " + JSON.stringify(result));
@@ -63,23 +79,29 @@ export class Command {
     }
 }
 
-export class ConnectCommand extends Command {
+class DefaultCommand extends Command<void> {
+    public getResult(result: CommandResponse): void {
+        // do nothing
+    }
+}
+
+export class ConnectCommand extends Command<string> {
     constructor() {
         super('Connect');
     }
 
-    getResult(response: any): any {
-        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0][FIELD_PARAM][0].$.Value;
+    public getResult(response: CommandResponse): string {
+        return response.Communication.Command[0].OutputParams[0].Param[0].$.Value;
     }
 }
 
-export class GetAllCamerasCommand extends Command {
+export class GetAllCamerasCommand extends Command<Camera[]> {
     constructor() {
         super('GetAllViewsAndCameras');
     }
 
-    getResult(response: any): Camera[] {
-        const cameras = response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
+    public getResult(response: CommandResponse): Camera[] {
+        const cameras = response.Communication.Command[0].Items[0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
 
         const info = cameras.map((c: any) => {
             return {
@@ -95,39 +117,39 @@ export class GetAllCamerasCommand extends Command {
     }
 }
 
-export class LoginCommand extends Command {
+export class LoginCommand extends DefaultCommand {
     constructor() {
         super('Login');
     }
 }
 
-export class GetThumbnailCommand extends Command {
+export class GetThumbnailCommand extends Command<string> {
     constructor() {
         super('GetThumbnail');
     }
 
-    getResult(response: any): any {
-        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_THUMBNAIL][0];
+    public getResult(response: CommandResponse): string {
+        return response.Communication.Command[0].Thumbnail![0];
     }
 }
 
-export class GetThumbnailByTimeCommand extends Command {
+export class GetThumbnailByTimeCommand extends Command<string> {
     constructor() {
         super('GetThumbnailByTime');
     }
 
-    getResult(response: any): any {
-        return response[FIELD_COMMUNICATION][FIELD_COMMAND][0][FIELD_THUMBNAIL][0];
+    public getResult(response: CommandResponse): string {
+        return response.Communication.Command[0].Thumbnail![0];
     }
 }
 
-export class RequestStreamCommand extends Command {
+export class RequestStreamCommand extends Command<string> {
     constructor() {
         super('RequestStream');
     }
 
-    getResult(response: any): string {
-        const output = response[FIELD_COMMUNICATION][FIELD_COMMAND][0].OutputParams[0].Param as any[];
+    public getResult(response: CommandResponse): string {
+        const output = response.Communication.Command[0].OutputParams[0].Param;
 
         const videoId = output.find(o => o.$.Name === 'VideoId');
 
@@ -135,13 +157,13 @@ export class RequestStreamCommand extends Command {
     }
 }
 
-export class ChangeStreamCommand extends Command {
+export class ChangeStreamCommand extends DefaultCommand {
     constructor() {
         super('ChangeStream');
     }
 }
 
-export class CloseStreamCommand extends Command {
+export class CloseStreamCommand extends DefaultCommand {
     constructor() {
         super('CloseStream');
     }

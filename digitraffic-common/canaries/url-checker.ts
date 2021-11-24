@@ -16,6 +16,7 @@ const API_KEY_HEADER = "x-api-key";
 const OK_RESOLUTION = "OK";
 
 type CheckerFunction = (Res: IncomingMessage) => void;
+type JsonCheckerFunction<T> = (json: T, body: String) => void;
 
 export class UrlChecker {
     private readonly requestOptions: RequestOptions;
@@ -45,13 +46,13 @@ export class UrlChecker {
             .withFailedCanaryMetric(true);
     }
 
-    static async create(hostname: string, apiKeyId: string) {
-        const apiKey = await getApiKeyFromAPIGateway(apiKeyId);
-
-        return new UrlChecker(hostname, apiKey.value);
+    static create(hostname: string, apiKeyId: string): Promise<UrlChecker> {
+        return getApiKeyFromAPIGateway(apiKeyId).then(apiKey => {
+            return new UrlChecker(hostname, apiKey.value);
+        });
     }
 
-    async expect200(url: string, callback?: any): Promise<any> {
+    async expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
             path: url
         }};
@@ -59,7 +60,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep("Verify 200 for " + url, requestOptions, callback);
     }
 
-    async expect404(url: string): Promise<any> {
+    async expect404(url: string): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
                 path: url
             }};
@@ -67,7 +68,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
-    async expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<any> {
+    async expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
             path: url,
             headers: baseHeaders
@@ -83,13 +84,13 @@ export class UrlChecker {
    }
 }
 
-export function jsonChecker(fn: any): any {
+export function jsonChecker<T>(fn: JsonCheckerFunction<T>): CheckerFunction {
     return responseChecker((body: string) => {
         fn(JSON.parse(body), body);
     });
 }
 
-export function responseChecker(fn: any): any {
+export function responseChecker(fn: (body: string) => void): CheckerFunction {
     return async (res: IncomingMessage) => {
         if(!res.statusCode) {
             throw 'statusCode missing';

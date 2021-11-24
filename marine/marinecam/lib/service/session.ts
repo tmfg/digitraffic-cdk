@@ -7,7 +7,7 @@ import {Camera} from "../model/camera";
 import {
     ChangeStreamCommand,
     CloseStreamCommand,
-    Command,
+    Command, CommandResponse,
     ConnectCommand,
     GetAllCamerasCommand, GetThumbnailByTimeCommand,
     GetThumbnailCommand,
@@ -59,11 +59,11 @@ export class Session {
         }
     }
 
-    async post(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<any>> {
+    async post(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse> {
         return axios.post(url, xml, {...configuration, ...{ httpsAgent: agent, timeout: 3000 }});
     }
 
-    async sendMessage(command: Command): Promise<any> {
+    async sendMessage<T>(command: Command<T>): Promise<T> {
         const xml = command.createXml(this.sequenceId, this.connectionId);
         this.sequenceId++;
 
@@ -75,7 +75,7 @@ export class Session {
             throw Error("sendMessage failed " + JSON.stringify(resp));
         }
 
-        const response = await parse(resp.data) as any;
+        const response = await parse(resp.data) as CommandResponse;
         command.checkError(response);
 
 //        console.info("response " + JSON.stringify(response, null, 2));
@@ -89,7 +89,7 @@ export class Session {
         return this.connectionId;
     }
 
-    async login(username: string, password: string): Promise<any> {
+    async login(username: string, password: string): Promise<void> {
         const command = new LoginCommand()
             .addInputParameters('Username', username)
             .addInputParameters('Password', password);

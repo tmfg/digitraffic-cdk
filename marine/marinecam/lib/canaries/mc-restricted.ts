@@ -14,9 +14,9 @@ export const handler = async () => {
     const jsonChecker = ResponseChecker.forJson();
     const imageChecker = ResponseChecker.forJpeg();
 
-    await checker.expect200(METADATA_URL, jsonChecker.checkJson((json: Camera[]) => {
-        assert.ok(json.length > 1);
-        assert.ok(json[0].id !== null);
+    await checker.expect200(METADATA_URL, jsonChecker.checkJson((cameras: Camera[]) => {
+        assert.ok(cameras.length > 1);
+        assert.ok(cameras[0].id !== null);
     }));
     await checker.expect403WithoutApiKey(METADATA_URL, MediaType.APPLICATION_JSON);
 
