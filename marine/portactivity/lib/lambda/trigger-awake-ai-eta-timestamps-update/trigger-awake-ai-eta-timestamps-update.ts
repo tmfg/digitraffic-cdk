@@ -15,7 +15,7 @@ export function handlerFn(
     return () => {
         return withSecretFn(process.env.SECRET_ID as string, async (): Promise<void> => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
-            console.info('method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for %d ships',
+            console.info('method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for count=%d ships',
                 ships.length);
 
             for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {
