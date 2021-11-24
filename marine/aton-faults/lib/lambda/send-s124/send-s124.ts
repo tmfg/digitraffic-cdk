@@ -9,6 +9,7 @@ import {AtonSecret} from "../../model/secret";
 import {decodeBase64ToAscii} from "digitraffic-common/js/js-utils";
 import {SQSEvent} from "aws-lambda";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {Builder} from "xml2js";
 const middy = require('@middy/core')
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
@@ -65,7 +66,7 @@ async function handleEvent(db: DTDatabase, event: SendS124Event): Promise<void> 
     } else if (event.type === S124Type.WARNING) {
         return WarningsService.findWarning(db, event.id).then(warning => {
             if (warning) {
-                const xml = S124Converter.convertWarning(warning);
+                const xml = new Builder().buildObject(S124Converter.convertWarning(warning));
                 return visService.sendWarning(xml, event.callbackEndpoint)
             }
             console.warn('Warning with id %s was not found', event.id);
