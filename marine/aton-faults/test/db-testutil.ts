@@ -9,7 +9,7 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
 }
 
-async function truncate(db: DTDatabase): Promise<void[]> {
+async function truncate(db: DTDatabase): Promise<null[]> {
     return await db.tx(t => {
         return t.batch([
             t.none('DELETE FROM aton_fault'),
@@ -18,7 +18,7 @@ async function truncate(db: DTDatabase): Promise<void[]> {
     });
 }
 
-export function insert(db: DTDatabase, faults: DbFault[]): Promise<void[]> {
+export function insert(db: DTDatabase, faults: DbFault[]): Promise<null[]> {
     return db.tx(t => {
         return t.batch(faults.map((f: DbFault): Promise<null> => {
             return t.none(`
