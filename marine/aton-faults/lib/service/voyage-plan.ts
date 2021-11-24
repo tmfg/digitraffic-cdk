@@ -1,8 +1,10 @@
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import * as FaultsService from "./faults";
 import * as WarningsService from "./warnings";
-import {SQS} from "aws-sdk";
+import {AWSError, SQS} from "aws-sdk";
 import {S124Type, SendS124Event} from "../model/upload-voyageplan-event";
+import {PromiseResult} from "aws-sdk/lib/request";
+import {SendMessageResult} from "aws-sdk/clients/sqs";
 
 export class VoyagePlanService {
     private readonly sqs: SQS;
@@ -20,7 +22,7 @@ export class VoyagePlanService {
         await this.sendWarningsForVoyagePlan(voyagePlan);
     }
 
-    private async sendFaultsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<any> {
+    private async sendFaultsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<void> {
         const faultIds = await FaultsService.findFaultIdsForVoyagePlan(voyagePlan);
 
         console.info("sending %d faults", faultIds.length);
@@ -33,10 +35,10 @@ export class VoyagePlanService {
             });
         }
 
-        return Promise.resolve('');
+        return Promise.resolve();
     }
 
-    private async sendWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<any> {
+    private async sendWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<void> {
         const warnings = await WarningsService.findWarningsForVoyagePlan(voyagePlan);
 
         if(warnings && warnings.features) {
@@ -45,14 +47,14 @@ export class VoyagePlanService {
             for (const feature of warnings.features) {
                 await this.sendSqs(this.sendS124QueueUrl, {
                     type: S124Type.WARNING,
-                    id: feature.properties.id,
+                    id: feature?.properties?.id,
                     callbackEndpoint: this.callbackEndpoint
                 });
             }
         }
     }
 
-    private sendSqs(QueueUrl: string, event: SendS124Event): Promise<any> {
+    private sendSqs(QueueUrl: string, event: SendS124Event): Promise<PromiseResult<SendMessageResult, AWSError>> {
         return this.sqs.sendMessage({
             MessageBody: JSON.stringify(event),
             QueueUrl

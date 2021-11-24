@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
-import {Geometry} from "wkx";
-import {Fault} from "../model/fault";
-import {Feature} from "geojson";
+import {DbFault} from "../model/fault";
+import {Feature, Geometry} from "geojson";
+import * as wkx from "wkx";
 
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
 const HOUR_MINUTE_SECOND = "HH:MM:SSZ";
@@ -43,7 +43,7 @@ function createUrn(id: string): string {
     return `urn:mrn:s124:${id}.P`;
 }
 
-export function convertFault(fault: Fault): any {
+export function convertFault(fault: DbFault): any {
     const faultId = -fault.id;
     const year = fault.entry_timestamp.getFullYear() - 2000;
 
@@ -198,7 +198,7 @@ function createFixedDateRangeForWarning(p: any) {
     return {};
 }
 
-function createFixedDateRangeForFault(fault: any) {
+function createFixedDateRangeForFault(fault: DbFault) {
     if(fault.fixed_timestamp) {
         return {
             dateStart: {
@@ -218,7 +218,7 @@ function createFixedDateRangeForFault(fault: any) {
     }
 }
 
-function createGeometryForWarning(geometry: any, id: string) {
+function createGeometryForWarning(geometry: Geometry, id: string) {
     if(geometry.type === 'Point') {
         return createPointProperty(`${geometry.coordinates[0]} ${geometry.coordinates[1]}`, id);
     }
@@ -227,7 +227,7 @@ function createGeometryForWarning(geometry: any, id: string) {
     return {};
 }
 
-function createPointProperty(geometry: any, id: string) {
+function createPointProperty(geometry: string, id: string) {
     return {
         'S100:pointProperty' : {
             'S100:Point' : {
@@ -240,17 +240,17 @@ function createPointProperty(geometry: any, id: string) {
     }
 }
 
-function createCoordinatePair(geometry: any) {
-    const g = Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as any;
+function createCoordinatePair(geometry: string) {
+    const g = wkx.Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as any;
 
     return `${g.coordinates[0]} ${g.coordinates[1]}`;
 }
 
-function createMessageSeriesIdentifier(NameOfSeries: string, warningNumber: any, year: number) {
+function createMessageSeriesIdentifier(NameOfSeries: string, warningNumber: number, year: number) {
     return {
         NameOfSeries,
         typeOfWarning : 'local',
-        warningNumber : warningNumber,
+        warningNumber,
         year,
         productionAgency : PRODUCTION_AGENCY,
         country: 'FI'

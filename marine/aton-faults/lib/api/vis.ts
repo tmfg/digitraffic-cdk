@@ -34,7 +34,7 @@ export async function postDocument(
     }
 }
 
-export async function query(imo: string, url: string): Promise<any> {
+export async function query(imo: string, url: string): Promise<string | null> {
     const queryUrl = `${url}/api/_search/serviceInstance?query=imo:${imo}`;
     console.info(`method=query url=${queryUrl}`);
 

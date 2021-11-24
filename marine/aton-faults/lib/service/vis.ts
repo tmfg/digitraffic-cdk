@@ -23,7 +23,7 @@ export class VisService {
         }
     }
 
-    async sendWarning(warningS124: string, url: string): Promise<any> {
+    async sendWarning(warningS124: string, url: string): Promise<void> {
         const start = Date.now();
 
         try {
@@ -33,7 +33,7 @@ export class VisService {
         }
     }
 
-    async queryCallBackForImo(imo: string): Promise<any> {
+    async queryCallBackForImo(imo: string): Promise<string | null> {
         const start = Date.now();
 
         try {

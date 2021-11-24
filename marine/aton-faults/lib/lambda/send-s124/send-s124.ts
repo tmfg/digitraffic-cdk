@@ -10,7 +10,6 @@ import {decodeBase64ToAscii} from "digitraffic-common/js/js-utils";
 import {SQSEvent} from "aws-lambda";
 import {inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {IDatabase} from "pg-promise";
-
 const middy = require('@middy/core')
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
@@ -55,25 +54,27 @@ export function handlerFn(doWithSecret: SecretFunction) {
     }
 
 async function handleEvent(db: IDatabase<any, any>, event: SendS124Event): Promise<any> {
-    if (event.type === S124Type.FAULT) {
-        const faultS124 = await FaultsService.getFaultS124ById(db, event.id);
-        if (faultS124) {
-            return await visService.sendFault(faultS124, event.callbackEndpoint);
-        } else {
-            console.warn('Fault with id %d was not found', event.id);
-        }
-    } else if (event.type === S124Type.WARNING) {
-        const warning = await WarningsService.findWarning(db, event.id);
-        if(warning) {
-            const xml = S124Converter.convertWarning(warning);
+    return new Promise(async (resolve: any, reject: any) => {
+        if (event.type === S124Type.FAULT) {
+            const faultS124 = await FaultsService.getFaultS124ById(db, event.id);
+            if (faultS124) {
+                resolve(visService.sendFault(faultS124, event.callbackEndpoint));
+            } else {
+                console.warn('Fault with id %d was not found', event.id);
+            }
+        } else if (event.type === S124Type.WARNING) {
+            const warning = await WarningsService.findWarning(db, event.id);
+            if (warning) {
+                const xml = S124Converter.convertWarning(warning);
 
-            return await visService.sendWarning(xml, event.callbackEndpoint);
-        } else {
-            console.warn('Warning with id %s was not found', event.id);
+                resolve(visService.sendWarning(xml, event.callbackEndpoint));
+            } else {
+                console.warn('Warning with id %s was not found', event.id);
+            }
         }
-    }
 
-    return Promise.reject();
+        reject();
+    });
 }
 
 export const handler = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());

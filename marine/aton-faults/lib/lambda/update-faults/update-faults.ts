@@ -9,12 +9,12 @@ const secretId = process.env[SECRET_ID] as string;
 const envValue = process.env[AtonEnvKeys.INTEGRATIONS] as string;
 const integrations = envValue ? JSON.parse(envValue) as Integration[] : [];
 
-export const handler = async () : Promise <any> => {
-    await updateAllFaults();
+export const handler = async () : Promise <void> => {
+    return updateAllFaults();
 };
 
-async function updateAllFaults(): Promise<any> {
-    await withDbSecret(secretId, async () => {
+async function updateAllFaults(): Promise<void> {
+    return withDbSecret(secretId, async () => {
         for(const i of integrations) {
             const newFaults = await getFaults(i.url);
             await saveFaults(i.domain, newFaults);

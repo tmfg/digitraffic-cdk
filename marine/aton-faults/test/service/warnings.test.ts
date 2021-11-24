@@ -21,7 +21,7 @@ describe('warnings-service', dbTestBase((db: IDatabase<any, any>) => {
 
     test('findWarningsForVoyagePlan - empty', async () => {
         const warnings = await findWarnings();
-        expect(warnings).toEqual({});
+        expect(warnings).toEqual(null);
     });
 
     test('findWarningsForVoyagePlan - one warning', async () => {
@@ -30,6 +30,6 @@ describe('warnings-service', dbTestBase((db: IDatabase<any, any>) => {
 
         const warnings = await findWarnings();
         // one feature is in the path
-        expect(warnings.features).toHaveLength(2);
+        expect(warnings?.features).toHaveLength(2);
     });
 }));

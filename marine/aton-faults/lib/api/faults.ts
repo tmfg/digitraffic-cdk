@@ -1,6 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
+import {Feature} from "geojson";
 
-export async function getFaults(endpointUrl: string): Promise<any[]> {
+export async function getFaults(endpointUrl: string): Promise<Feature[]> {
     try {
         const resp = await getFaultsFromServer(endpointUrl);
 

@@ -2,23 +2,23 @@ import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as FaultsDB from "../db/faults"
 import * as S124Converter from "./s124-converter";
 import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import {Feature, FeatureCollection, GeometryObject} from "geojson";
 import {createFeatureCollection} from "digitraffic-common/api/geojson";
 import {Language} from "digitraffic-common/model/language";
+import {DbFault} from "../model/fault";
 
 export type FaultProps = {
     readonly id: number
     readonly entry_timestamp: Date
-    readonly fixed_timestamp: Date
+    readonly fixed_timestamp: Date | null
     readonly type: string
     readonly domain: string
     readonly state: string
     readonly fixed: boolean
-    readonly aton_id: string
+    readonly aton_id: number
     readonly aton_name_fi: string
     readonly aton_name_sv: string
     readonly aton_type: string
@@ -32,7 +32,7 @@ export type FaultProps = {
 const ATON_DATA_TYPE = "ATON_FAULTS";
 
 export async function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
-    return await inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+    return await inDatabaseReadonly(async (db: DTDatabase) => {
         const features = await FaultsDB.findAll(db, language, fixedInHours, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
@@ -40,7 +40,7 @@ export async function findAllFaults(language: Language, fixedInHours: number): P
     });
 }
 
-export async function getFaultS124ById(db: IDatabase<any, any>, faultId: number): Promise<string|null> {
+export async function getFaultS124ById(db: DTDatabase, faultId: number): Promise<string|null> {
     const start = Date.now();
     const fault = await FaultsDB.getFaultById(db, faultId);
 
@@ -68,7 +68,7 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
     return faultIds;
 }
 
-export async function saveFaults(domain: string, newFaults: any[]) {
+export async function saveFaults(domain: string, newFaults: Feature[]) {
     const start = Date.now();
     const validated = newFaults.filter(validate);
 
@@ -85,7 +85,7 @@ export async function saveFaults(domain: string, newFaults: any[]) {
     })
 }
 
-function convertFeature(fault: any): Feature {
+function convertFeature(fault: DbFault): Feature {
     const properties: FaultProps = {
         id: fault.id,
         entry_timestamp: fault.entry_timestamp,
@@ -115,6 +115,6 @@ function convertFeature(fault: any): Feature {
     };
 }
 
-function validate(fault: any) {
-    return fault.properties.FAULT_TYPE !== 'Kirjattu';
+function validate(fault: Feature): boolean {
+    return fault.properties?.FAULT_TYPE !== 'Kirjattu';
 }

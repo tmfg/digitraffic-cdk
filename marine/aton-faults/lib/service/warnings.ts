@@ -3,17 +3,17 @@ import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/databa
 import * as CachedDao from "digitraffic-common/db/cached";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
 import * as turf from "@turf/turf";
-import {Feature, FeatureCollection, GeoJSON} from "geojson";
+import {Feature, FeatureCollection} from "geojson";
 
 const MAX_DISTANCE_NM = 15;
 
-export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<any> {
+export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<FeatureCollection|null> {
     const warnings = await inDatabaseReadonly(async (db: DTDatabase) => {
         return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
     }) as FeatureCollection;
 
     if(!warnings) {
-        return {};
+        return null;
     }
 
     const voyageLineString =

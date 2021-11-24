@@ -1,9 +1,10 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {createGeometry} from "digitraffic-common/postgres/geometry";
 import {LineString} from "wkx";
-import {Fault} from "../model/fault";
+import {DbFault} from "../model/fault";
 import {Language} from "digitraffic-common/model/language";
 import {DTDatabase} from "digitraffic-common/postgres/database";
+import {Feature} from "geojson";
 
 const moment = require('moment-timezone');
 
@@ -111,7 +112,7 @@ const PS_FAULT_IDS_BY_AREA = new PreparedStatement({
     text: FAULT_IDS_BY_AREA
 });
 
-export function getFaultById(db: DTDatabase, faultId: number): Promise<Fault | null> {
+export function getFaultById(db: DTDatabase, faultId: number): Promise<DbFault | null> {
     return db.oneOrNone(PS_FAULT_BY_ID, [faultId]);
 }
 
@@ -126,14 +127,14 @@ export async function findFaultIdsByRoute(db: DTDatabase, route: LineString): Pr
     return ids.then((result: DbFaultId[]) => result.map(r => Number(r.id)));
 }
 
-export function updateFaults(db: DTDatabase, domain: string, faults: any[]): Promise<any>[] {
+export function updateFaults(db: DTDatabase, domain: string, faults: Feature[]): Promise<null>[] {
     const ps = new PreparedStatement({
         name: 'update-faults',
         text: UPSERT_FAULTS_SQL,
     });
 
     return faults.map(f => {
-        const p = f.properties;
+        const p = f.properties as any;
 
         return db.none(ps, [
             p.ID,
@@ -156,30 +157,28 @@ export function updateFaults(db: DTDatabase, domain: string, faults: any[]): Pro
     });
 }
 
-export async function findAll(db: DTDatabase, language: Language, fixedInHours: number, conversion: (fault: any) => any) {
+export async function findAll<T>(db: DTDatabase, language: Language, fixedInHours: number, conversion: (fault: DbFault) => T): Promise<T[]> {
     const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
     const ps = new PreparedStatement({
         name: 'get-all-faults',
         text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString())
     })
 
-    return db.tx(t => t.manyOrNone(ps, [fixedLimit]))
+    return db.manyOrNone(ps, [fixedLimit])
         .then(faults => faults.map(conversion));
 }
 
 function parseHelsinkiTime(date: string|null): Date|null {
-    if(date == null) {
-        return null;
-    }
+    if(date != null) {
+        // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
+        const helsinkiDate = moment.tz(date, 'YYYY-MM-DD HH:mm:ss', 'Europe/Helsinki').toDate();
 
-    // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
-    const helsinkiDate = moment.tz(date, 'YYYY-MM-DD HH:mm:ss', 'Europe/Helsinki').toDate();
+        if(!isNaN(helsinkiDate)) {
+            return helsinkiDate;
+        }
 
-    if(isNaN(helsinkiDate)) {
         console.warn("received NaN date " + date);
-        return null;
     }
-//    console.info("%s -> %s !", date, helsinkiDate);
 
-    return helsinkiDate;
+    return null;
 }

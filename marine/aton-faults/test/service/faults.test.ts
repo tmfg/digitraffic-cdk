@@ -50,11 +50,11 @@ describe('faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         expect(props.area_number).toBe(fault.area_number);
         expect(props.aton_id).toBe(fault.aton_id);
         expect(props.domain).toBe(fault.domain);
-        expect(props.entry_timestamp.toISOString()).toBe(fault.entry_timestamp.toISOString());
-        expect(props.fixed_timestamp.toISOString()).toBe(fault.fixed_timestamp?.toISOString());
+        expect(props.entry_timestamp?.toISOString()).toBe(fault.entry_timestamp.toISOString());
+        expect(props.fixed_timestamp?.toISOString()).toBe(fault.fixed_timestamp?.toISOString());
         expect(props.fairway_number).toBe(fault.fairway_number);
         expect(props.state).toBe(fault.state);
-        expect(props.type).toBe(fault.type);
+        expect(props.type).toBe(fault.aton_fault_type);
         expect(props.aton_type).toBe(fault.aton_type);
     });
 
