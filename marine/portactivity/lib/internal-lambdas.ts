@@ -43,7 +43,7 @@ export function create(
 
     Scheduler.everyMinutes(stack,
         'PortActivity-UpdateAwakeETAScheduler',
-        1,
+        10,
         triggerAwakeAiETATimestampsLambda);
     Scheduler.everyMinutes(stack,
         'PortActivity-UpdateSchedulesScheduler',
