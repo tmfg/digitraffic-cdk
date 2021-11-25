@@ -61,7 +61,7 @@ export class AwakeAiETAService {
         const start = Date.now();
         console.info('method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d',
             ship.imo,
-            (Date.now() - start))
+            (Date.now() - start));
         const response = await retry(async () => this.api.getETA(ship.imo), 1, false);
         return {
             response,
@@ -71,7 +71,7 @@ export class AwakeAiETAService {
 
     private toTimeStamp(resp: AwakeAiETAResponseAndShip): ApiTimestamp | null {
         if (!resp.response.schedule) {
-            console.warn(`method=updateAwakeAiTimestamps no ETA received, state=${resp.response.type}`)
+            console.warn(`method=updateAwakeAiTimestamps no ETA received, state=${resp.response.type}`);
             return null;
         }
         return this.handleSchedule(resp.response.schedule, resp.ship);
