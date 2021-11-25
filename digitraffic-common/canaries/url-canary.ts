@@ -28,13 +28,15 @@ export class UrlCanary extends DigitrafficCanary {
     static create(stack: DigitrafficStack, role: Role, publicApi: DigitrafficRestApi, params: Partial<UrlCanaryParameters>): UrlCanary {
         const defaultParameters: any = {
             handler: `${params.name}.handler`,
-            hostname: publicApi.hostname()
+            hostname: publicApi.hostname(),
+            apiKeyId: this.getApiKey(publicApi),
         };
 
-        if(publicApi.apiKeyIds.length > 0) {
-            defaultParameters.apiKeyId = publicApi.apiKeyIds[0]; // always use first api key
-        }
-
         return new UrlCanary(stack, role, {...defaultParameters, ...params});
+    }
+
+    static getApiKey(publicApi: DigitrafficRestApi): string | undefined {
+        // always use first api key
+        return publicApi.apiKeyIds.length > 0 ? publicApi.apiKeyIds[0] : undefined;
     }
 }

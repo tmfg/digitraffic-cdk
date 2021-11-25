@@ -1,7 +1,6 @@
 import {Model, PassthroughBehavior, Resource, RestApi} from '@aws-cdk/aws-apigateway';
 import {Function} from '@aws-cdk/aws-lambda';
 import {Construct} from "@aws-cdk/core";
-import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {defaultIntegration, methodResponse} from "digitraffic-common/api/responses";

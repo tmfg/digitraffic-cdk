@@ -13,10 +13,9 @@ const baseHeaders = {
 } as Record<string, string>;
 
 const API_KEY_HEADER = "x-api-key";
-const OK_RESOLUTION = "OK";
 
 type CheckerFunction = (Res: IncomingMessage) => void;
-type JsonCheckerFunction<T> = (json: T, body: String) => void;
+type JsonCheckerFunction<T> = (json: T, body: string) => void;
 
 export class UrlChecker {
     private readonly requestOptions: RequestOptions;
@@ -121,15 +120,15 @@ async function getResponseBody(response: IncomingMessage): Promise<string> {
 }
 
 function getBodyFromResponse(response: IncomingMessage): Promise<string> {
-    return new Promise((resolve: any) => {
+    return new Promise((resolve: ((value: string) => void)) => {
         const buffers: Buffer[] = [];
 
-        response.on('data', (data: any) => {
+        response.on('data', (data: Buffer) => {
             buffers.push(data);
         });
 
         response.on('end', () => {
-            resolve(Buffer.concat(buffers));
+            resolve(Buffer.concat(buffers).toString());
         });
     });
 }
