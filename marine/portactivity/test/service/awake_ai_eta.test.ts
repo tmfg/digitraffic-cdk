@@ -148,6 +148,39 @@ describe('service awake.ai', () => {
             expectSingleTimeStampToMatch(timestamps, expectedTimestamp);
         });
 
+    test('getETA - retry', async () => {
+        const api = createApi();
+        const service = new AwakeAiETAService(api);
+        const ship = newDbETAShip();
+        const mmsi = 123456789;
+        const response = createVoyageResponse(ship.locode, ship.imo, mmsi);
+        const apiGetETAStub = sinon.stub(api, 'getETA');
+        apiGetETAStub.onFirstCall().returns(Promise.reject('error'));
+        apiGetETAStub.onSecondCall().returns(Promise.resolve(response));
+
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
+
+        expect(timestamps.length).toBe(1);
+        const expectedTimestamp = awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code);
+        expectSingleTimeStampToMatch(timestamps, expectedTimestamp);
+    });
+
+    test('getETA - retry fail', async () => {
+        const api = createApi();
+        const service = new AwakeAiETAService(api);
+        const ship = newDbETAShip();
+        const mmsi = 123456789;
+        const response = createVoyageResponse(ship.locode, ship.imo, mmsi);
+        const apiGetETAStub = sinon.stub(api, 'getETA');
+        apiGetETAStub.onFirstCall().returns(Promise.reject('error'));
+        apiGetETAStub.onSecondCall().returns(Promise.reject('error'));
+        apiGetETAStub.onThirdCall().returns(Promise.resolve(response));
+
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
+
+        expect(timestamps.length).toBe(0);
+    });
+
 });
 
 function createVoyageResponse(

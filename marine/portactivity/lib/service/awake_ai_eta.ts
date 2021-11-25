@@ -11,6 +11,7 @@ import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 import {AwakeAiZoneType} from "../api/awake_common";
+import {retry} from "../../../../digitraffic-common/promise/promise";
 
 type AwakeAiETAResponseAndShip = {
     readonly response: AwakeAiVoyageResponse
@@ -61,7 +62,11 @@ export class AwakeAiETAService {
         console.info('method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d',
             ship.imo,
             (Date.now() - start))
-        const response = await this.api.getETA(ship.imo);
+        const response = await retry<AwakeAiVoyageResponse>(async () => this.api.getETA(ship.imo), 1, false);
+        if (response == null) {
+            console.error('method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d');
+            throw new Error('Unable to fetch ETA');
+        }
         return {
             response,
             ship
