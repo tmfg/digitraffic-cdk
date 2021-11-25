@@ -1,10 +1,13 @@
 /**
  * Utility function for retrying async functions.
  * @param asyncFn Function
- * @param retries Amount of retries. If set to <= 0, no retries will be done.
- * @param logError If the promise rejects, should the error be logged?
+ * @param retries Amount of retries, default is 3. If set to <= 0, no retries will be done. Using NaN will throw an error.
+ * @param logError If the promise rejects, should the error be logged? Default is false.
  */
-export async function retry(asyncFn: () => Promise<void>, retries: number, logError: boolean): Promise<void> {
+export async function retry(asyncFn: () => Promise<void>, retries = 3, logError = false): Promise<void> {
+    if (isNaN(retries)) {
+        throw new Error('NaN is not supported');
+    }
     try {
         await asyncFn();
     } catch (error) {

@@ -3,7 +3,7 @@ import {getRandomInteger} from "../../test/testutils";
 
 describe('Promise utils tests', () => {
 
-    test('retry with no retries', async () => {
+    test('retry - no retries', async () => {
         const fn = jest.fn();
 
         await retry(fn, 0, false);
@@ -11,7 +11,7 @@ describe('Promise utils tests', () => {
         expect(fn.mock.calls.length).toBe(1);
     });
 
-    test('retry with n+1 retries', async () => {
+    test('retry - error with n+1 retries', async () => {
         const fn = jest.fn().mockRejectedValue('error');
         const retries = getRandomInteger(1, 10);
 
@@ -20,7 +20,7 @@ describe('Promise utils tests', () => {
         expect(fn.mock.calls.length).toBe(retries);
     });
 
-    test('no retry with n+1 retries', async () => {
+    test('retry - no error with n+1 retries', async () => {
         const fn = jest.fn();
         const retries = getRandomInteger(1, 10);
 
@@ -29,27 +29,17 @@ describe('Promise utils tests', () => {
         expect(fn.mock.calls.length).toBe(1);
     });
 
-    test('no retry - no error logging', async () => {
+    test('retry - errors with no error logging', async () => {
         const fn = jest.fn().mockRejectedValue('error');
         const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
 
-        await retry(fn, 0, false);
+        await retry(fn, getRandomInteger(0, 10), false);
 
         expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
         consoleErrorSpy.mockRestore();
     });
 
-    test('retry - no error logging', async () => {
-        const fn = jest.fn().mockRejectedValue('error');
-        const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
-
-        await retry(fn, getRandomInteger(1, 10), false);
-
-        expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
-        consoleErrorSpy.mockRestore();
-    });
-
-    test('no retry - error logging', async () => {
+    test('retry - no retries with error logging', async () => {
         const fn = jest.fn().mockRejectedValue('error');
         const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
 
@@ -59,7 +49,7 @@ describe('Promise utils tests', () => {
         consoleErrorSpy.mockRestore();
     });
 
-    test('retry - error logging', async () => {
+    test('retry - retries with error logging', async () => {
         const fn = jest.fn().mockRejectedValue('error');
         const retries = getRandomInteger(1, 10);
         const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
@@ -68,6 +58,22 @@ describe('Promise utils tests', () => {
 
         expect(consoleErrorSpy).toHaveBeenCalledTimes(retries);
         consoleErrorSpy.mockRestore();
+    });
+
+    test('retry - defaults', async () => {
+        const fn = jest.fn().mockRejectedValue('error');
+        const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
+
+        await retry(fn);
+
+        expect(fn.mock.calls.length).toBe(3);
+        expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+    });
+
+    test('retry - NaN throws error', async () => {
+        const fn = jest.fn().mockRejectedValue('aa');
+
+        await expect(() => retry(fn, NaN, false)).rejects.toThrow();
     });
 
 });

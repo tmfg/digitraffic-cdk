@@ -1,7 +1,7 @@
 import {needToBrighten} from "../../lib/service/areatraffic";
 import {DbAreaTraffic} from "../../lib/db/areatraffic";
 
-describe('db-areatraffic', () => {
+describe('areatraffic service', () => {
     test('needToBrighten - never sent', async () => {
         const area = createArea(1, 10);
 

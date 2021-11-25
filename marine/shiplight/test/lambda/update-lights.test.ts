@@ -6,7 +6,7 @@ import {ShiplightSecret} from "../../lib/model/shiplight-secret";
 import * as sinon from "sinon";
 import {AreaVisibilityService} from "../../lib/service/areavisibility";
 import {AreaVisibilityApi} from "../../lib/api/areavisibility";
-import {AreaLightsApi, AreaLightsBrightenCommand} from "../../lib/api/arealights";
+import {AreaLightsApi} from "../../lib/api/arealights";
 import {AreaLightsService} from "../../lib/service/arealights";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
@@ -29,16 +29,14 @@ describe('update-lights', dbTestBase((db: DTDatabase) => {
         const durationInMinutes = 12;
         const areaId = 4;
         const visibilityInMeters = 1000;
-        const getVisibilityForAreaStub =
-            sinon.stub(AreaVisibilityApi.prototype, 'getVisibilityForArea').returns(Promise.resolve({
-                lastUpdated: new Date().toISOString(),
-                visibilityInMeters
-            }));
-        const updateLightsForAreaStub =
-            sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve({
-                LightsSetSentFailed: [],
-                LightsSetSentSuccessfully: []
-            }));
+        sinon.stub(AreaVisibilityApi.prototype, 'getVisibilityForArea').returns(Promise.resolve({
+            lastUpdated: new Date().toISOString(),
+            visibilityInMeters
+        }));
+        sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve({
+            LightsSetSentFailed: [],
+            LightsSetSentSuccessfully: []
+        }));
         await insertAreaTraffic(db, areaId, 'testi1', durationInMinutes, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
         await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
         await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
@@ -46,12 +44,6 @@ describe('update-lights', dbTestBase((db: DTDatabase) => {
         await handlerFn(createSecretFunction(secret), AreaVisibilityService, AreaLightsService);
 
         await assertArea(db, areaId, durationInMinutes);
-        expect(getVisibilityForAreaStub.calledWith(sinon.match.string)).toBe(true); // exact area id format not known here
-        expect(updateLightsForAreaStub.calledWith(sinon.match({
-            routeId: 10,
-            command: AreaLightsBrightenCommand.MAX,
-            tempTime: 12
-        }))).toBe(true);
     });
 
 }));
