@@ -11,6 +11,7 @@ import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ManagedUpload} from "aws-sdk/clients/s3";
 import {S3} from "aws-sdk";
+import {SQSEvent, SQSHandler, SQSRecord} from "aws-lambda";
 
 /**
  * Construct for creating SQS-queues.
@@ -125,12 +126,12 @@ function doUpload(s3: S3, Bucket: string, Body: string, Key: string): Promise<Ma
 // bucketName is unused, will be overridden in the actual lambda code below
 const bucketName = '';
 
-function createHandler(): (event: any) => Promise<unknown[]> {
-    return function handler(event: any): Promise<unknown[]> {
+function createHandler(): SQSHandler {
+    return async function handler(event: SQSEvent): Promise<void> {
         const AWS = require('aws-sdk');
 
         const millis = new Date().getTime();
-        return Promise.all(event.Records.map((e: any, idx: number) =>
+        await Promise.all(event.Records.map((e: SQSRecord, idx: number) =>
             uploadToS3(new AWS.S3(), bucketName, e.body, `dlq-${millis}-${idx}.json`)
         ));
     }

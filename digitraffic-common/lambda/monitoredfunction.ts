@@ -1,5 +1,5 @@
 import {Function, FunctionProps} from '@aws-cdk/aws-lambda';
-import {Stack} from "@aws-cdk/core";
+import {Duration, Stack} from "@aws-cdk/core";
 import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
@@ -141,14 +141,15 @@ export class MonitoredFunction extends Function {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
+            const timeout = functionProps.timeout as Duration;
             this.createAlarm(scope,
                 this.metricDuration(),
                 'Duration',
                 'Duration alarm',
-                `Duration has exceeded ${functionProps.timeout!.toSeconds()} seconds`,
+                `Duration has exceeded ${timeout.toSeconds()} seconds`,
                 trafficType,
                 this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
-                functionProps.timeout!.toMilliseconds(),
+                timeout.toMilliseconds(),
                 1,
                 1,
                 'max',
@@ -159,14 +160,15 @@ export class MonitoredFunction extends Function {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
+            const timeout = functionProps.timeout as Duration;
             this.createAlarm(scope,
                 this.metricDuration(),
                 'Duration-Warning',
                 'Duration warning',
-                `Duration is 85 % of max ${functionProps.timeout!.toSeconds()} seconds`,
+                `Duration is 85 % of max ${timeout.toSeconds()} seconds`,
                 trafficType,
                 warningSnsAction,
-                functionProps.timeout!.toMilliseconds() * 0.85,
+                timeout.toMilliseconds() * 0.85,
                 1,
                 1,
                 'max',

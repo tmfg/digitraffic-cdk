@@ -1,4 +1,11 @@
-import {RestApi, MethodLoggingLevel, GatewayResponse, ResponseType, EndpointType} from '@aws-cdk/aws-apigateway';
+import {
+    RestApi,
+    MethodLoggingLevel,
+    GatewayResponse,
+    ResponseType,
+    EndpointType,
+    RestApiProps
+} from '@aws-cdk/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
 import {Construct} from "@aws-cdk/core";
 import {DigitrafficStack} from "../stack/stack";
@@ -7,22 +14,18 @@ import {createUsagePlan} from "../stack/usage-plans";
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];
 
-    constructor(stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined, config?: any) {
+    constructor(stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined, config?: Partial<RestApiProps>) {
         const policyDocument = allowFromIpAddresses == null ? createDefaultPolicyDocument() : createIpRestrictionPolicyDocument(allowFromIpAddresses);
 
-        let apiConfig = {
+        // override default config with given extra config
+        const apiConfig = {...{
             deployOptions: {
                 loggingLevel: MethodLoggingLevel.ERROR,
             },
             restApiName: apiName,
             endpointTypes: [EndpointType.REGIONAL],
             policy: policyDocument
-        };
-
-        // override with given extra config
-        if(config) {
-            apiConfig = {...apiConfig, ...config};
-        }
+        }, ...config};
 
         super(stack, apiId, apiConfig);
 
