@@ -152,8 +152,7 @@ describe('service awake.ai', () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
-        const mmsi = 123456789;
-        const response = createVoyageResponse(ship.locode, ship.imo, mmsi);
+        const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
         const apiGetETAStub = sinon.stub(api, 'getETA');
         apiGetETAStub.onFirstCall().returns(Promise.reject('error'));
         apiGetETAStub.onSecondCall().returns(Promise.resolve(response));
@@ -169,8 +168,7 @@ describe('service awake.ai', () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
-        const mmsi = 123456789;
-        const response = createVoyageResponse(ship.locode, ship.imo, mmsi);
+        const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
         const apiGetETAStub = sinon.stub(api, 'getETA');
         apiGetETAStub.onFirstCall().returns(Promise.reject('error'));
         apiGetETAStub.onSecondCall().returns(Promise.reject('error'));
