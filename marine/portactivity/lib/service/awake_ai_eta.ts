@@ -63,10 +63,6 @@ export class AwakeAiETAService {
             ship.imo,
             (Date.now() - start))
         const response = await retry(async () => this.api.getETA(ship.imo), 1, false);
-        if (response == null) {
-            console.error('method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d');
-            throw new Error('Unable to fetch ETA');
-        }
         return {
             response,
             ship
