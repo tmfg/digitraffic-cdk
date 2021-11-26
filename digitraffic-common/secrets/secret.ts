@@ -1,4 +1,5 @@
 import {SecretsManager} from 'aws-sdk';
+import {SecretToPromiseFunction} from "./dbsecret";
 
 const smClient = new SecretsManager({
     region: process.env.AWS_REGION
@@ -6,11 +7,11 @@ const smClient = new SecretsManager({
 
 export type GenericSecret = Record<string, string>;
 
-export async function withSecret<T>(secretId: string, fn: (secret: T) => any): Promise<void> {
+export async function withSecret<Secret, Response>(secretId: string, fn: SecretToPromiseFunction<Secret, Response>): Promise<Response> {
     return fn(await getSecret(secretId));
 }
 
-export async function getSecret<T>(secretId: string, prefix = ''): Promise<T> {
+export async function getSecret<Response>(secretId: string, prefix = ''): Promise<Response> {
     const secretObj = await smClient.getSecretValue({
         SecretId: secretId
     }).promise();
@@ -28,8 +29,8 @@ export async function getSecret<T>(secretId: string, prefix = ''): Promise<T> {
     return parseSecret(secret, `${prefix}.`);
 }
 
-function parseSecret<T>(secret: GenericSecret, prefix: string): T {
-    const parsed: any = {};
+function parseSecret<Secret>(secret: GenericSecret, prefix: string): Secret {
+    const parsed: Record<string, string> = {};
     const skip = prefix.length;
 
     for(const key in secret) {
@@ -38,9 +39,9 @@ function parseSecret<T>(secret: GenericSecret, prefix: string): T {
         }
     }
 
-    return parsed;
+    return parsed as unknown as Secret;
 }
 
-export async function withSecretAndPrefix<T>(secretId: string, prefix: string, fn: (secret: T) => any): Promise<void> {
+export async function withSecretAndPrefix<Secret, Response>(secretId: string, prefix: string, fn: SecretToPromiseFunction<Secret, Response>): Promise<Response> {
     return fn(await getSecret(secretId, prefix));
 }

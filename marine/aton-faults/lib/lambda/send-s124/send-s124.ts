@@ -20,10 +20,10 @@ const secretId = process.env[SECRET_ID] as string;
 /**
  * This handler should only receive and send a single S124-message
  */
-export function handlerFn(doWithSecret: SecretFunction) {
-    return async (event: SQSEvent): Promise<PromiseSettledResult<void>[]> => {
+export function handlerFn(doWithSecret: SecretFunction<AtonSecret>) {
+    return async (event: SQSEvent): Promise<void> => {
         if (!visService) {
-            await doWithSecret(secretId, (secret: AtonSecret) => {
+            await doWithSecret(secretId, async (secret: AtonSecret) => {
                 // certificates are stored as base64 to prevent Secrets Manager from stripping line breaks
 
                 const clientCertificate = decodeSecretValue(secret.certificate);
@@ -35,7 +35,7 @@ export function handlerFn(doWithSecret: SecretFunction) {
             });
         }
 
-        return await inDatabaseReadonly(async (db: DTDatabase) => {
+        await inDatabaseReadonly(async (db: DTDatabase) => {
             return Promise.allSettled(event.Records
                 .map(r => JSON.parse(r.body) as SendS124Event)
                 .map(event => handleEvent(db, event))

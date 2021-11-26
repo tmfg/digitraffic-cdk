@@ -1,20 +1,20 @@
 import {saveTimestamp} from "../../service/timestamps";
 import {validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
-import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {PortactivityEnvKeys} from "../../keys";
 import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
+
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const middy = require('@middy/core')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
 export function handlerFn(
-    withDbSecretFn: SecretFunction
-): (event: SQSEvent) => Promise<PromiseSettledResult<unknown>[]> {
-
-    return async (event: SQSEvent): Promise<PromiseSettledResult<unknown>[]> => {
-        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (): Promise<PromiseSettledResult<unknown>[]> => {
+    withDbSecretFn: EmptySecretFunction<PromiseSettledResult<any>[]>
+): (event: SQSEvent) => Promise<PromiseSettledResult<any>[]> {
+    return async (event: SQSEvent): Promise<PromiseSettledResult<any>[]> => {
+        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (): Promise<PromiseSettledResult<any>[]> => {
             return inDatabase(async (db: DTDatabase) => {
                 return await Promise.allSettled(event.Records.map(r => {
                     const timestamp = JSON.parse(r.body);

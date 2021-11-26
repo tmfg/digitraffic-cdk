@@ -22,7 +22,7 @@ const expectedKeys = [
 ];
 
 export function handlerFn(
-    withSecretFn: SecretFunction,
+    withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSecret, void>,
     AwakeAiETAServiceClass: new (api: AwakeAiVoyagesApi) => AwakeAiETAService,
 ): (event: SNSEvent) => Promise<void> {
 

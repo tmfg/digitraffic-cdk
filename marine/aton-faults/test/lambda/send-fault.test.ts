@@ -1,13 +1,13 @@
-import {dbTestBase, insert} from "../db-testutil";
+import {dbTestBase, insert, TEST_ATON_SECRET} from "../db-testutil";
 import * as pgPromise from "pg-promise";
 import {handlerFn} from '../../lib/lambda/send-s124/send-s124';
 import {newFault} from "../testdata";
 import * as sinon from 'sinon';
 import {SQSEvent} from "aws-lambda";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
-import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
 import {S124Type, SendS124Event} from "../../lib/model/upload-voyageplan-event";
 import {createSecretFunction} from "digitraffic-common/test/secret";
+import {AtonSecret} from "../../lib/model/secret";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;
@@ -32,7 +32,7 @@ describe('send-fault', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
                 id: fault.id,
                 callbackEndpoint: `http://localhost:${SERVER_PORT}/area`
             };
-            const withSecret: SecretFunction = createSecretFunction({});
+            const withSecret = createSecretFunction<AtonSecret, void>(TEST_ATON_SECRET);
             server.listen(SERVER_PORT, {
                 "/area": (url: string | undefined, data: string | undefined) => {
                     receivedData = data;

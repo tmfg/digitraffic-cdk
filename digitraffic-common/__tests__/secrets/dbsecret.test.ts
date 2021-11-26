@@ -23,7 +23,7 @@ describe('secret - test', () => {
         mockSecret(null);
 
         await expect(async () => {
-            await withSecret(SECRET_ID, () => {
+            await withSecret(SECRET_ID, async () => {
                 return; // do nothing
             });
         }).rejects.toThrowError("No secret found!");
@@ -32,7 +32,7 @@ describe('secret - test', () => {
     test('getSecret - empty secret', async () => {
         mockSecret(SECRET_EMPTY);
 
-        await withSecret(SECRET_ID, (secret: GenericSecret) => {
+        await withSecret(SECRET_ID, async (secret: GenericSecret) => {
             expect(secret).toEqual(SECRET_EMPTY);
         });
     });
@@ -40,7 +40,7 @@ describe('secret - test', () => {
     test('getSecret - no prefix', async () => {
         mockSecret(SECRET_WITH_PREFIX);
 
-        await withSecret(SECRET_ID, (secret: GenericSecret) => {
+        await withSecret(SECRET_ID, async (secret: GenericSecret) => {
             expect(secret).toEqual(SECRET_WITH_PREFIX);
         });
     });
@@ -48,7 +48,7 @@ describe('secret - test', () => {
     test('getSecret - with prefix', async () => {
         mockSecret(SECRET_WITH_PREFIX);
 
-        await withSecretAndPrefix(SECRET_ID, 'prefix', (secret: GenericSecret) => {
+        await withSecretAndPrefix(SECRET_ID, 'prefix', async (secret: GenericSecret) => {
             expect(secret).toEqual({
                 value: "value",
                 name: "name"

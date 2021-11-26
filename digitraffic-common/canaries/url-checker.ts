@@ -1,18 +1,18 @@
 import {MediaType} from "../api/mediatypes";
 import {getApiKeyFromAPIGateway} from "../api/apikey";
 import {constants} from "http2";
+import {IncomingMessage, RequestOptions} from "http";
 
 const synthetics = require('Synthetics');
 import zlib = require('zlib');
-import {IncomingMessage, RequestOptions} from "http";
+
+export const API_KEY_HEADER = "x-api-key";
 
 const baseHeaders = {
     "Digitraffic-User" : "Digitraffic/AWS Canary",
     "Accept-Encoding" : "gzip",
     "Accept": "*/*"
 } as Record<string, string>;
-
-const API_KEY_HEADER = "x-api-key";
 
 type CheckerFunction = (Res: IncomingMessage) => void;
 type JsonCheckerFunction<T> = (json: T, body: string) => void;
@@ -68,6 +68,10 @@ export class UrlChecker {
     }
 
     async expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
+        if(!this.requestOptions.headers || !this.requestOptions.headers[API_KEY_HEADER]) {
+            console.error("No api key defined");
+        }
+
         const requestOptions = {...this.requestOptions, ...{
             path: url,
             headers: baseHeaders
@@ -75,7 +79,7 @@ export class UrlChecker {
 
         return synthetics.executeHttpStep("Verify 403 for " + url,
             requestOptions,
-            validateStatusCodeAndContentType(403, mediaType ?? MediaType.TEXT_PLAIN));
+            validateStatusCodeAndContentType(403, mediaType ?? MediaType.APPLICATION_JSON));
     }
 
     async done(): Promise<string> {

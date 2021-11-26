@@ -1,6 +1,5 @@
 import {ResponseChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
 import assert from "assert";
-import {MediaType} from "digitraffic-common/api/mediatypes";
 import {Camera} from "../model/camera";
 
 const hostname = process.env.hostname as string;
@@ -18,10 +17,10 @@ export const handler = async () => {
         assert.ok(cameras.length > 1);
         assert.ok(cameras[0].id !== null);
     }));
-    await checker.expect403WithoutApiKey(METADATA_URL, MediaType.APPLICATION_JSON);
+    await checker.expect403WithoutApiKey(METADATA_URL);
 
     await checker.expect200(CAMERA_URL, imageChecker.check());
-    await checker.expect403WithoutApiKey(CAMERA_URL, MediaType.APPLICATION_JSON);
+    await checker.expect403WithoutApiKey(CAMERA_URL);
 
     return checker.done();
 }

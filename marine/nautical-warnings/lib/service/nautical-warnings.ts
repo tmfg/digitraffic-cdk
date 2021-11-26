@@ -18,7 +18,7 @@ export function getArchivedWarnings() {
     });
 }
 
-export async function updateNauticalWarnings(url: string): Promise<any> {
+export async function updateNauticalWarnings(url: string): Promise<void> {
     const api = new NauticalWarningsApi(url);
     const active = await api.getActiveWarnings();
     const archived = await api.getArchivedWarnings();
@@ -26,7 +26,7 @@ export async function updateNauticalWarnings(url: string): Promise<any> {
     console.info("DEBUG active " + JSON.stringify(active, null, 2));
     console.info("DEBUG archived " + JSON.stringify(archived, null, 2));
 
-    return inDatabase(async (db: DTDatabase) => {
+    await inDatabase(async (db: DTDatabase) => {
         return db.tx(tx => {
             return Promise.allSettled([
                 validateAndUpdate(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active),

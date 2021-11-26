@@ -1,4 +1,4 @@
-import {dbTestBase, insert, insertActiveWarnings, TEST_ACTIVE_WARNINGS_VALID} from "../db-testutil";
+import {dbTestBase, insert, insertActiveWarnings, TEST_ACTIVE_WARNINGS_VALID, TEST_ATON_SECRET} from "../db-testutil";
 import * as pgPromise from "pg-promise";
 import {handlerFn} from '../../lib/lambda/upload-voyage-plan/upload-voyage-plan';
 import {newFaultWithGeometry, voyagePlan} from "../testdata";
@@ -8,12 +8,12 @@ import {SinonStub} from "sinon";
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 import {UploadVoyagePlanEvent} from "../../lib/model/upload-voyageplan-event";
 import {createSecretFunction} from "../../../../digitraffic-common/test/secret";
+import {AtonSecret} from "../../lib/model/secret";
 
 const sandbox = sinon.createSandbox();
 
 describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
-
-    const secretFn = createSecretFunction({});
+    const secretFn = createSecretFunction<AtonSecret, void>(TEST_ATON_SECRET);
 
     afterEach(() => sandbox.restore());
 

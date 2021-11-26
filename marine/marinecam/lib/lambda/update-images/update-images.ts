@@ -1,4 +1,4 @@
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as ImageFetcher from "../../service/image-fetcher";
 import {MarinecamEnvKeys, MarinecamSecretKeys} from "../../keys";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
@@ -12,10 +12,10 @@ let imageServerUsername: string;
 let imageServerPassword: string;
 let imageServerCertificate: string;
 
-export function handlerFn(doWithSecret: (secretId: string, fn: (secret: GenericSecret) => void) => void) {
-    return async (): Promise<void> => {
+export function handlerFn(doWithSecret: SecretFunction<GenericSecret>) {
+    return async () => {
         if(!imageServerUrl) {
-            await doWithSecret(secretId, (secret: any) => {
+            await doWithSecret(secretId, async (secret: GenericSecret) => {
                 imageServerUrl = secret[MarinecamSecretKeys.IMAGE_SERVER_URL];
                 imageServerUsername = secret[MarinecamSecretKeys.IMAGE_SERVER_USERNAME];
                 imageServerPassword = secret[MarinecamSecretKeys.IMAGE_SERVER_PASSWORD];

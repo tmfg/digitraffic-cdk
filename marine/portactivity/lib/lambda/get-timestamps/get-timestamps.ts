@@ -1,5 +1,5 @@
 import * as TimestampsService from "../../service/timestamps";
-import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {DbSecret, EmptySecretFunction, SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
 
@@ -9,7 +9,7 @@ export const handler = async (event: GetTimeStampsEvent): Promise<LambdaResponse
 
 export function handlerFn(
     event: GetTimeStampsEvent,
-    withDbSecretFn: SecretFunction,
+    withDbSecretFn: EmptySecretFunction<LambdaResponse>,
 ): Promise<LambdaResponse> {
 
     return withDbSecretFn(process.env.SECRET_ID as string, async () => {

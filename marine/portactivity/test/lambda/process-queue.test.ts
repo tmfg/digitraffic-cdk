@@ -5,9 +5,10 @@ import {ApiTimestamp} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 import * as R from 'ramda';
+import {createEmptySecretFunction} from "digitraffic-common/test/secret";
 
 // empty sec usage function for tests
-const NOOP_WITH_SECRET = (secretId: string, fn: (secret: unknown) => Promise<void>) => fn({});
+const NOOP_WITH_SECRET = createEmptySecretFunction<PromiseSettledResult<any>[]>();
 
 describe('process-queue', dbTestBase((db: DTDatabase) => {
 

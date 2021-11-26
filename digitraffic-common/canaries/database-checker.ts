@@ -3,7 +3,7 @@ import {DTDatabase, inDatabaseReadonly} from "../postgres/database";
 
 const synthetics = require('Synthetics');
 
-abstract class DatabaseCheck {
+abstract class DatabaseCheck<T> {
     readonly name: string;
     readonly sql: string;
     failed: boolean;
@@ -14,14 +14,16 @@ abstract class DatabaseCheck {
         this.failed = false;
     }
 
-    abstract check(value: any): void;
+    abstract check(value: T): void;
 }
 
-type CountResponse = {
+class BaseResponse {};
+
+class CountResponse extends BaseResponse {
     count: number;
 }
 
-class CountDatabaseCheck extends DatabaseCheck {
+class CountDatabaseCheck extends DatabaseCheck<CountResponse> {
     readonly minCount: number|null;
     readonly maxCount: number|null;
 
@@ -70,7 +72,7 @@ const stepConfig = {
 
 export class DatabaseChecker {
     readonly secret: string;
-    checks: DatabaseCheck[];
+    checks: DatabaseCheck<BaseResponse>[];
 
     constructor(secret: string) {
         this.secret = secret;
@@ -120,7 +122,7 @@ export class DatabaseChecker {
             });
         });
 
-        if(this.checks.some((check: DatabaseCheck) => check.failed)) {
+        if(this.checks.some(check => check.failed)) {
             throw 'Failed';
         }
 

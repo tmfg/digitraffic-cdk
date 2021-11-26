@@ -13,7 +13,7 @@ let visibilityApi: AreaVisibilityApi;
 let lightsApi: AreaLightsApi
 
 export async function handlerFn(
-    doWithSecret: SecretFunction,
+    doWithSecret: SecretFunction<ShiplightSecret>,
     AreaVisibilityServiceClass: new (api: AreaVisibilityApi) => AreaVisibilityService,
     AreaLightsServiceClass: new (api: AreaLightsApi) => AreaLightsService): Promise<void> {
 

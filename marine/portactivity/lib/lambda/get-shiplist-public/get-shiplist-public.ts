@@ -1,11 +1,10 @@
 import {findByLocodePublicShiplist} from '../../db/shiplist-public';
-import {inDatabaseReadonly} from 'digitraffic-common/postgres/database';
+import {DTDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
-import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
-import {DTDatabase} from "digitraffic-common/postgres/database";
 
 export const handler = async (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
     return handlerFn(event, withDbSecret);
@@ -23,7 +22,7 @@ function badRequest(message: string): Promise<ProxyLambdaResponse> {
 
 export async function handlerFn(
     event: ProxyLambdaRequest,
-    withDbSecretFn: SecretFunction
+    withDbSecretFn: EmptySecretFunction<ProxyLambdaResponse>
 ): Promise<ProxyLambdaResponse> {
 
     return withDbSecretFn(process.env.SECRET_ID as string, (): Promise<ProxyLambdaResponse> => {
@@ -34,7 +33,7 @@ export async function handlerFn(
             return badRequest('Invalid LOCODE');
         }
 
-        return inDatabaseReadonly(async (db: DTDatabase) => {
+        return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
             const dbShiplist =
                 (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
                     .map(ts => Object.assign(ts, {

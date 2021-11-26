@@ -23,22 +23,21 @@ describe('TestHttpServer - test', () => {
     }
 
     async function sendGetRequest(path = DEFAULT_PATH): Promise<IncomingMessage> {
-        return await sendRequest("GET", path);
+        return sendRequest("GET", path);
     }
 
     async function sendPostRequest(path = DEFAULT_PATH, body: string): Promise<IncomingMessage> {
-        return await sendRequest("POST", path, body);
+        return sendRequest("POST", path, body);
     }
 
     async function sendRequest(method: string, path: string, body?: string): Promise<IncomingMessage> {
-        return await new Promise((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             const request = http.request({
                 path,
                 port: PORT,
                 method
             }, (response: IncomingMessage) => {
-                //another chunk of data has been received, so append it to `str`
-                response.on('data', (chunk: string) => {
+                response.on('data', () => {
                     // do nothing
                 });
 

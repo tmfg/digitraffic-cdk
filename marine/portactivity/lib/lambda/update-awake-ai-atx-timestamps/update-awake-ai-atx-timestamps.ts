@@ -16,7 +16,7 @@ let service: AwakeAiATXService;
 const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
 export function handlerFn(
-    withDbSecretFn: SecretFunction,
+    withDbSecretFn: SecretFunction<UpdateAwakeAiATXTimestampsSecret, void>,
     AwakeAiATXServiceClass: new (api: AwakeAiATXApi) => AwakeAiATXService
 ): (event: unknown, context: Context) => Promise<void> {
 

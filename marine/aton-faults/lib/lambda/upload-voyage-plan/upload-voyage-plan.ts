@@ -22,7 +22,7 @@ const sendS124QueueUrl = process.env[AtonEnvKeys.SEND_S124_QUEUE_URL] as string;
 
 let visService: VisService;
 
-export function handlerFn(sqs: SQS, doWithSecret: SecretFunction): (event: UploadVoyagePlanEvent) => Promise<void> {
+export function handlerFn(sqs: SQS, doWithSecret: SecretFunction<AtonSecret>): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function(event: UploadVoyagePlanEvent): Promise<void> {
         if(!visService) {
             await doWithSecret(secretId, async (secret: AtonSecret) => {
