@@ -3,7 +3,7 @@ import * as TimestampService from '../../service/timestamps';
 import {PortactivityEnvKeys} from "../../keys";
 import {SNS} from "aws-sdk";
 import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import * as SNSUtil from 'digitraffic-common/sns/sns';
+import * as SNSUtil from 'digitraffic-common/queue/sns';
 import * as R from 'ramda';
 
 const publishTopic = process.env[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] as string;

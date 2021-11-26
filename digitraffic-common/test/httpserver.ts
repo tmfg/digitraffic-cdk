@@ -1,4 +1,5 @@
-import * as http from 'http';
+import {Server, createServer} from 'http';
+import {URL} from "url";
 
 export const ERROR_NO_MATCH="NO MATCH";
 export const ERRORCODE_NOT_FOUND=404;
@@ -7,7 +8,7 @@ export const ERRORCODE_NOT_FOUND=404;
  * A mock HTTP server created for testing connections from a Lambda to an outside integration
  */
 export class TestHttpServer {
-    private server: http.Server;
+    private server: Server;
     private debug: boolean;
 
     private messageStack: string[];
@@ -24,12 +25,12 @@ export class TestHttpServer {
         this.debug = debug;
         this.messageStack = [];
         this.debuglog(`Starting test server on port ${port}`);
-        this.server = http.createServer(((req, res) => {
+        this.server = createServer(((req, res) => {
             this.debuglog('Mapped urls: ');
 
             Object.keys(props).forEach(k => this.debuglog(k));
             this.debuglog('Received request to url ' + req.url + '..');
-            const path = require('url').parse(req.url).pathname;
+            const path = req.url as string;
 
             let dataStr = '';
             req.on('data', chunk => {

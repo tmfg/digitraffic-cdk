@@ -1,4 +1,4 @@
-import {uploadToS3} from "../../../../digitraffic-common/stack/s3-utils";
+import {uploadToS3} from "digitraffic-common/stack/s3-utils";
 
 interface KeyFigure {
   filter: string

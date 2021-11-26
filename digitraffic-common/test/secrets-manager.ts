@@ -1,4 +1,4 @@
-const AWS = require('aws-sdk');
+import AWS = require('aws-sdk');
 import * as sinon from "sinon";
 
 const secretValue = sinon.stub();
@@ -17,7 +17,7 @@ export function stubSecretsManager() {
     sinon.stub(AWS, 'SecretsManager').returns(smStub);
 }
 
-export function mockSecret(secret: any) {
+export function mockSecret<Secret>(secret: Secret) {
     if(!secret) {
         secretValue.returns({
            promise: sinon.stub().returns({})

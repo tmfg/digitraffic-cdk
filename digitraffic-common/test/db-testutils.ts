@@ -1,4 +1,3 @@
-import {IDatabase,ITask} from "pg-promise";
 import {DTDatabase, initDbConnection} from "../postgres/database";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
 
@@ -20,7 +19,7 @@ export function dbTestBase(
     console.log(`Test database URI: ${theDbUri}`);
 
     return () => {
-        const db: IDatabase<any, any> = initDbConnection(dbUser, dbPass, 'test', theDbUri, {
+        const db: DTDatabase = initDbConnection(dbUser, dbPass, 'test', theDbUri, {
             noWarnings: true // ignore duplicate connection warning for tests
         });
 

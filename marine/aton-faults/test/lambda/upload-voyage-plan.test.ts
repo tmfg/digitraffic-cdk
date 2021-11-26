@@ -7,8 +7,8 @@ import * as sinon from 'sinon';
 import {SinonStub} from "sinon";
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 import {UploadVoyagePlanEvent} from "../../lib/model/upload-voyageplan-event";
-import {createSecretFunction} from "../../../../digitraffic-common/test/secret";
 import {AtonSecret} from "../../lib/model/secret";
+import {createSecretFunction} from "digitraffic-common/test/secret";
 
 const sandbox = sinon.createSandbox();
 

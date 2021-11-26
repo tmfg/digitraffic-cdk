@@ -1,8 +1,8 @@
 import {S3} from "aws-sdk";
 
-export async function uploadToS3(
+export async function uploadToS3<Body>(
     bucketName: string,
-    body: any,
+    body: Body,
     objectName: string,
     cannedAcl?: string,
     contentType?: string) {
@@ -20,10 +20,10 @@ export async function uploadToS3(
     }
 }
 
-function doUpload(
+function doUpload<Body>(
     s3: S3,
     bucketName: string,
-    body: any,
+    body: Body,
     filename: string,
     cannedAcl?: string,
     contentType?: string) {

@@ -3,6 +3,7 @@ import {getApiKeyFromAPIGateway} from "../api/apikey";
 import {constants} from "http2";
 import {IncomingMessage, RequestOptions} from "http";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
 import zlib = require('zlib');
 
@@ -51,7 +52,7 @@ export class UrlChecker {
         });
     }
 
-    async expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
+    expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
             path: url
         }};
@@ -59,7 +60,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep("Verify 200 for " + url, requestOptions, callback);
     }
 
-    async expect404(url: string): Promise<void> {
+    expect404(url: string): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
                 path: url
             }};
@@ -67,7 +68,7 @@ export class UrlChecker {
         return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
-    async expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
+    expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
         if(!this.requestOptions.headers || !this.requestOptions.headers[API_KEY_HEADER]) {
             console.error("No api key defined");
         }
@@ -82,7 +83,7 @@ export class UrlChecker {
             validateStatusCodeAndContentType(403, mediaType ?? MediaType.APPLICATION_JSON));
     }
 
-    async done(): Promise<string> {
+    done(): string {
         return "Canary successful";
    }
 }
@@ -152,7 +153,7 @@ export function mustContain(body: string, text: string) {
  * @param contentType
  */
 function validateStatusCodeAndContentType(statusCode: number, contentType: MediaType): (Res: IncomingMessage) => Promise<void> {
-    return async (res: IncomingMessage) => {
+    return (res: IncomingMessage) => {
         return new Promise(resolve => {
             if (res.statusCode !== statusCode) {
                 throw `${res.statusCode} ${res.statusMessage}`;

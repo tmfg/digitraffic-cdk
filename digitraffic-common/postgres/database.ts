@@ -1,5 +1,7 @@
 import {IDatabase, ITask} from "pg-promise";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const pgp = require('pg-promise')();
 
 // convert numeric types to number instead of string

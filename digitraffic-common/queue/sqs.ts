@@ -128,6 +128,7 @@ const bucketName = '';
 
 function createHandler(): SQSHandler {
     return async function handler(event: SQSEvent): Promise<void> {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const AWS = require('aws-sdk');
 
         const millis = new Date().getTime();

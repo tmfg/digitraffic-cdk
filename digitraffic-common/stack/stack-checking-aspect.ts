@@ -81,7 +81,7 @@ export class StackCheckingAspect implements IAspect {
     checkBucket(node: IConstruct) {
         if(node instanceof CfnBucket) {
             const b = node as CfnBucket;
-            const c = b.publicAccessBlockConfiguration as any;
+            const c = b.publicAccessBlockConfiguration as CfnBucket.PublicAccessBlockConfigurationProperty;
 
             if(c) {
                 if (!c.blockPublicAcls || !c.blockPublicPolicy || !c.ignorePublicAcls || !c.restrictPublicBuckets) {
