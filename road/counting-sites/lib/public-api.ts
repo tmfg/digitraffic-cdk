@@ -64,7 +64,7 @@ export class PublicApi {
         const metadataIntegration = defaultIntegration(lambda);
 
         this.metadataResource.addMethod("GET", metadataIntegration, {
-            apiKeyRequired: false,
+            apiKeyRequired: true,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
                 corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel))
@@ -86,7 +86,7 @@ export class PublicApi {
         });
 
         this.countersListResource.addMethod("GET", countersIntegration, {
-            apiKeyRequired: false,
+            apiKeyRequired: true,
             requestParameters: {
                 'method.request.path.domain': true
             },
@@ -111,7 +111,7 @@ export class PublicApi {
         });
 
         this.dataResource.addMethod("GET", dataIntegration, {
-            apiKeyRequired: false,
+            apiKeyRequired: true,
             requestParameters: {
                 'method.request.path.id': true
             },
