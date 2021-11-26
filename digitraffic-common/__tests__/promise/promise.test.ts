@@ -118,7 +118,7 @@ describe('Promise utils tests', () => {
 
     test('retry - use without mocks without retry', async () => {
         const val = 1;
-        const fn = async () => val;
+        const fn = () => Promise.resolve(val);
 
         const ret = await retry(fn);
 
@@ -128,12 +128,12 @@ describe('Promise utils tests', () => {
     test('retry - use without mocks with retry', async () => {
         let i = 0;
         const val = 1;
-        const fn = async () => {
+        const fn = () => {
             if (i < 3) {
                 i++;
                 throw new Error('not yet');
             }
-            return val;
+            return Promise.resolve(val);
         };
 
         const ret = await retry(fn);

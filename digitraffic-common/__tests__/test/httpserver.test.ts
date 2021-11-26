@@ -22,15 +22,15 @@ describe('TestHttpServer - test', () => {
         }
     }
 
-    async function sendGetRequest(path = DEFAULT_PATH): Promise<IncomingMessage> {
+    function sendGetRequest(path = DEFAULT_PATH): Promise<IncomingMessage> {
         return sendRequest("GET", path);
     }
 
-    async function sendPostRequest(path = DEFAULT_PATH, body: string): Promise<IncomingMessage> {
+    function sendPostRequest(path = DEFAULT_PATH, body: string): Promise<IncomingMessage> {
         return sendRequest("POST", path, body);
     }
 
-    async function sendRequest(method: string, path: string, body?: string): Promise<IncomingMessage> {
+    function sendRequest(method: string, path: string, body?: string): Promise<IncomingMessage> {
         return new Promise((resolve, reject) => {
             const request = http.request({
                 path,

@@ -1,6 +1,7 @@
 import {withDbSecret} from "../secrets/dbsecret";
 import {DTDatabase, inDatabaseReadonly} from "../postgres/database";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
 
 abstract class DatabaseCheck<T> {
@@ -17,7 +18,7 @@ abstract class DatabaseCheck<T> {
     abstract check(value: T): void;
 }
 
-class BaseResponse {};
+class BaseResponse {}
 
 class CountResponse extends BaseResponse {
     count: number;
