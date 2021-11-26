@@ -12,9 +12,9 @@ const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failu
 
 export function handlerFn(
     withDbSecretFn: EmptySecretFunction<PromiseSettledResult<any>[]>
-): (event: SQSEvent) => Promise<PromiseSettledResult<any>[]> {
-    return async (event: SQSEvent): Promise<PromiseSettledResult<any>[]> => {
-        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (): Promise<PromiseSettledResult<any>[]> => {
+) {
+    return async (event: SQSEvent) => {
+        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async () => {
             return inDatabase(async (db: DTDatabase) => {
                 return await Promise.allSettled(event.Records.map(r => {
                     const timestamp = JSON.parse(r.body);

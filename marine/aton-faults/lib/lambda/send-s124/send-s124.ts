@@ -25,24 +25,24 @@ const secretId = process.env[SECRET_ID] as string;
  */
 export function handlerFn(doWithSecret: SecretFunction<AtonSecret>) {
     return async (event: SQSEvent): Promise<void> => {
-        if (!visService) {
-            await doWithSecret(secretId, async (secret: AtonSecret) => {
+        await doWithSecret(secretId, async (secret: AtonSecret) => {
+            if (!visService) {
                 // certificates are stored as base64 to prevent Secrets Manager from stripping line breaks
 
                 const clientCertificate = decodeSecretValue(secret.certificate);
                 const privateKey = decodeSecretValue(secret.privatekey);
                 const caCert = decodeSecretValue(secret.ca);
                 visService = new VisService(caCert, clientCertificate, privateKey);
-            }, {
-                prefix: 'aton'
-            });
-        }
+            }
 
-        await inDatabaseReadonly(async (db: DTDatabase) => {
+        await inDatabaseReadonly((db: DTDatabase) => {
             return Promise.allSettled(event.Records
                 .map(r => JSON.parse(r.body) as SendS124Event)
                 .map(event => handleEvent(db, event))
             );
+        });
+    }, {
+            prefix: 'aton'
         });
     };
 }
@@ -56,7 +56,7 @@ export function handlerFn(doWithSecret: SecretFunction<AtonSecret>) {
         return decodeBase64ToAscii(value);
     }
 
-async function handleEvent(db: DTDatabase, event: SendS124Event): Promise<void> {
+function handleEvent(db: DTDatabase, event: SendS124Event): Promise<void> {
     if (event.type === S124Type.FAULT) {
         return FaultsService.getFaultS124ById(db, event.id).then(faultsS124 => {
             if(faultsS124) {

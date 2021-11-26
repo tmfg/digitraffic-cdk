@@ -6,7 +6,7 @@ import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
 
-export const handler = async (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
+export const handler = async (event: ProxyLambdaRequest) => {
     return handlerFn(event, withDbSecret);
 };
 
@@ -23,9 +23,8 @@ function badRequest(message: string): Promise<ProxyLambdaResponse> {
 export async function handlerFn(
     event: ProxyLambdaRequest,
     withDbSecretFn: EmptySecretFunction<ProxyLambdaResponse>
-): Promise<ProxyLambdaResponse> {
-
-    return withDbSecretFn(process.env.SECRET_ID as string, (): Promise<ProxyLambdaResponse> => {
+) {
+    return withDbSecretFn(process.env.SECRET_ID as string, () => {
         if (!event.queryStringParameters.locode) {
             return badRequest('Missing LOCODE');
         }

@@ -40,8 +40,8 @@ export type SecretOptions = {
     readonly prefix?: string
 }
 
-export type SecretToPromiseFunction<Secret, Response = void> = (secret: Secret) => Promise<Response>;
-export type SecretFunction<Secret, Response = void> = (secretId: string, fn: SecretToPromiseFunction<Secret, Response>, options?: SecretOptions) => Promise<Response>;
+export type SecretToPromiseFunction<Secret, Response = void> = (secret: Secret) => Promise<Response> | void;
+export type SecretFunction<Secret, Response = void> = (secretId: string, fn: SecretToPromiseFunction<Secret, Response>, options?: SecretOptions) => Promise<Response | void>;
 export type EmptySecretFunction<Response = void> = SecretFunction<DbSecret, Response>;
 
 /**
@@ -53,7 +53,7 @@ export type EmptySecretFunction<Response = void> = SecretFunction<DbSecret, Resp
  * @param {function} fn
  * @param {SecretOptions} options
  */
-export async function withDbSecret<Secret, Response>(secretId: string, fn: SecretToPromiseFunction<Secret, Response>, options?: SecretOptions): Promise<Response> {
+export async function withDbSecret<Secret, Response>(secretId: string, fn: SecretToPromiseFunction<Secret, Response>, options?: SecretOptions): Promise<Response | void> {
     if (!secretId) {
         console.error(missingSecretErrorText);
         return Promise.reject(missingSecretErrorText);
@@ -63,21 +63,18 @@ export async function withDbSecret<Secret, Response>(secretId: string, fn: Secre
         // if prefix is given, first set db values and then fetch secret
         if(options?.prefix) {
             // first set db values
-            await withSecret(secretId, (fetchedSecret: DbSecret): Promise<void> => {
+            await withSecret(secretId, (fetchedSecret: DbSecret) => {
                 setDbSecret(fetchedSecret);
-                return Promise.resolve();
             });
 
             // then actual secret
             await withSecretAndPrefix(secretId, options.prefix, (fetchedSecret: Secret) => {
                 cachedSecret = fetchedSecret;
-                return Promise.resolve();
             });
         } else {
             await withSecret(secretId, (fetchedSecret: DbSecret) => {
                 setDbSecret(fetchedSecret);
                 cachedSecret = fetchedSecret;
-                return Promise.resolve();
             });
         }
     }
@@ -92,7 +89,6 @@ export async function withDbSecret<Secret, Response>(secretId: string, fn: Secre
         await withSecret(secretId, (fetchedSecret: DbSecret) => {
             setDbSecret(fetchedSecret);
             cachedSecret = fetchedSecret;
-            return Promise.resolve();
         });
         return fn(cachedSecret);
     }

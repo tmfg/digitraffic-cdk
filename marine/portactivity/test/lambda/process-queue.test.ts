@@ -55,7 +55,7 @@ describe('process-queue', dbTestBase((db: DTDatabase) => {
 
         const promises = await handlerFn(NOOP_WITH_SECRET)({
             Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)]
-        });
+        }) as PromiseSettledResult<any>[];
 
         expect(promises.filter((p: PromiseSettledResult<unknown>) => p.status == 'fulfilled')).toHaveLength(2);
         const allTimestamps = await findAll(db);

@@ -2,9 +2,7 @@ import axios, {AxiosResponse} from 'axios';
 import {Feature} from "geojson";
 
 export async function getFaults(endpointUrl: string): Promise<Feature[]> {
-    try {
-        const resp = await getFaultsFromServer(endpointUrl);
-
+    return getFaultsFromServer(endpointUrl).then(resp => {
         if (resp.status === 200) {
             return resp.data.features;
         }
@@ -12,12 +10,12 @@ export async function getFaults(endpointUrl: string): Promise<Feature[]> {
         console.error('Fetching faults failed: %s', resp.statusText);
 
         return resp.data.features;
-    } catch(err: any) {
-        console.error("fetching failed with %d", err.status);
-        console.error(err.message);
-    }
+    }).catch(error => {
+        console.error("fetching failed with %d", error.status);
+        console.error(error.message);
 
-    return [];
+        return [];
+    });
 }
 
 export async function getFaultsFromServer(url: string): Promise<AxiosResponse> {
@@ -25,14 +23,14 @@ export async function getFaultsFromServer(url: string): Promise<AxiosResponse> {
 
     console.info("getFaultsFromServer: getting faults from " + url);
 
-    return await axios.get(url, {
+    return axios.get(url, {
         timeout: 10000,
         headers: {
             'Accept': 'application/json'
         }
-    }).then(a => {
+    }).then(response => {
         const end = Date.now();
-        console.info("method=getFaultsFromServer faultCount=%d tookMs=%d", a.data.features.length, (end-start));
-        return a;
+        console.info("method=getFaultsFromServer faultCount=%d tookMs=%d", response.data.features.length, (end-start));
+        return response;
     });
 }

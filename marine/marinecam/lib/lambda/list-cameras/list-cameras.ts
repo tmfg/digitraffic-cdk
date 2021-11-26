@@ -8,14 +8,14 @@ const secretId = process.env[SECRET_ID] as string;
 
 const GROUP_SEPARATOR=',';
 
-export const handler = async (event: any) : Promise<Camera[]> => {
+export const handler = (event: Record<string, string>) => {
     const usersGroups = getUserGroups(event.groups);
 
     if(usersGroups.length === 0) {
-        return [];
+        return Promise.resolve([] as Camera[]);
     }
 
-    return withDbSecret(secretId, async () => {
+    return withDbSecret(secretId, () => {
         return MetadataService.listAllCameras(usersGroups);
     });
 }

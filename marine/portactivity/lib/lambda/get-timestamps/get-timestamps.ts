@@ -3,14 +3,14 @@ import {DbSecret, EmptySecretFunction, SecretFunction, withDbSecret} from "digit
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
 
-export const handler = async (event: GetTimeStampsEvent): Promise<LambdaResponse> => {
+export const handler = async (event: GetTimeStampsEvent) => {
     return handlerFn(event, withDbSecret);
 };
 
 export function handlerFn(
     event: GetTimeStampsEvent,
     withDbSecretFn: EmptySecretFunction<LambdaResponse>,
-): Promise<LambdaResponse> {
+) {
 
     return withDbSecretFn(process.env.SECRET_ID as string, async () => {
         if (!event.locode && !event.mmsi && !event.imo && !event.source) {

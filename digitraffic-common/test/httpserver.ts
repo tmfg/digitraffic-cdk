@@ -1,5 +1,4 @@
 import {Server, createServer} from 'http';
-import {URL} from "url";
 
 export const ERROR_NO_MATCH="NO MATCH";
 export const ERRORCODE_NOT_FOUND=404;

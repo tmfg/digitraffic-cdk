@@ -4,9 +4,9 @@ import {LineString} from "wkx";
 import {DbFault} from "../model/fault";
 import {Language} from "digitraffic-common/model/language";
 import {DTDatabase} from "digitraffic-common/postgres/database";
-import {Feature} from "geojson";
+import {Feature, GeoJsonProperties} from "geojson";
 
-const moment = require('moment-timezone');
+import moment = require('moment-timezone');
 
 // 15 nautical miles
 const BUFFER_RADIUS_METERS = 27780;
@@ -120,7 +120,7 @@ interface DbFaultId {
     readonly id: string
 }
 
-export async function findFaultIdsByRoute(db: DTDatabase, route: LineString): Promise<number[]> {
+export function findFaultIdsByRoute(db: DTDatabase, route: LineString): Promise<number[]> {
     const ids = db.tx(t => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()))
     // bigints are returned as string by pg-promise since they could overflow
     // however these are plain integers
@@ -134,7 +134,7 @@ export function updateFaults(db: DTDatabase, domain: string, faults: Feature[]):
     });
 
     return faults.map(f => {
-        const p = f.properties as any;
+        const p = f.properties as NonNullable<GeoJsonProperties>;
 
         return db.none(ps, [
             p.ID,
@@ -157,7 +157,7 @@ export function updateFaults(db: DTDatabase, domain: string, faults: Feature[]):
     });
 }
 
-export async function findAll<T>(db: DTDatabase, language: Language, fixedInHours: number, conversion: (fault: DbFault) => T): Promise<T[]> {
+export function findAll<T>(db: DTDatabase, language: Language, fixedInHours: number, conversion: (fault: DbFault) => T): Promise<T[]> {
     const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
     const ps = new PreparedStatement({
         name: 'get-all-faults',
@@ -171,13 +171,7 @@ export async function findAll<T>(db: DTDatabase, language: Language, fixedInHour
 function parseHelsinkiTime(date: string|null): Date|null {
     if(date != null) {
         // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
-        const helsinkiDate = moment.tz(date, 'YYYY-MM-DD HH:mm:ss', 'Europe/Helsinki').toDate();
-
-        if(!isNaN(helsinkiDate)) {
-            return helsinkiDate;
-        }
-
-        console.warn("received NaN date " + date);
+        return moment.tz(date, 'YYYY-MM-DD HH:mm:ss', 'Europe/Helsinki').toDate();
     }
 
     return null;

@@ -5,8 +5,8 @@ import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
 
 const secretId = process.env[SECRET_ID_KEY] as string;
 
-export const handler = async (event: any): Promise<LambdaResponse> => {
-    return withDbSecret(secretId, async (): Promise<LambdaResponse> => {
+export const handler = async (event: any) => {
+    return withDbSecret(secretId, async () => {
         const start = Date.now();
         const counterId = event.id;
 

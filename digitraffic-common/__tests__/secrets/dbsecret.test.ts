@@ -24,7 +24,7 @@ describe('secret - test', () => {
 
         await expect(async () => {
             await withSecret(SECRET_ID, () => {
-                return Promise.resolve();
+                // do nothing
             });
         }).rejects.toThrowError("No secret found!");
     });
@@ -34,7 +34,6 @@ describe('secret - test', () => {
 
         await withSecret(SECRET_ID,  (secret: GenericSecret) => {
             expect(secret).toEqual(SECRET_EMPTY);
-            return Promise.resolve();
         });
     });
 
@@ -43,7 +42,6 @@ describe('secret - test', () => {
 
         await withSecret(SECRET_ID,  (secret: GenericSecret) => {
             expect(secret).toEqual(SECRET_WITH_PREFIX);
-            return Promise.resolve();
         });
     });
 
@@ -55,7 +53,6 @@ describe('secret - test', () => {
                 value: "value",
                 name: "name"
             });
-            return Promise.resolve();
         });
            
     });

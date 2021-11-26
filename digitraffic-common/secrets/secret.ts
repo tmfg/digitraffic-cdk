@@ -7,7 +7,7 @@ const smClient = new SecretsManager({
 
 export type GenericSecret = Record<string, string>;
 
-export async function withSecret<Secret, Response>(secretId: string, fn: SecretToPromiseFunction<Secret, Response>): Promise<Response> {
+export async function withSecret<Secret, Response>(secretId: string, fn: SecretToPromiseFunction<Secret, Response>): Promise<Response | void> {
     return fn(await getSecret(secretId));
 }
 
@@ -42,6 +42,6 @@ function parseSecret<Secret>(secret: GenericSecret, prefix: string): Secret {
     return parsed as unknown as Secret;
 }
 
-export async function withSecretAndPrefix<Secret, Response>(secretId: string, prefix: string, fn: SecretToPromiseFunction<Secret, Response>): Promise<Response> {
+export async function withSecretAndPrefix<Secret, Response>(secretId: string, prefix: string, fn: SecretToPromiseFunction<Secret, Response>): Promise<Response | void> {
     return fn(await getSecret(secretId, prefix));
 }

@@ -25,7 +25,7 @@ let visService: VisService;
 export function handlerFn(sqs: SQS, doWithSecret: SecretFunction<AtonSecret>): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function(event: UploadVoyagePlanEvent): Promise<void> {
         if(!visService) {
-            await doWithSecret(secretId, async (secret: AtonSecret) => {
+            await doWithSecret(secretId, (secret: AtonSecret) => {
                 const clientCertificate = decodeSecretValue(secret.certificate);
                 const privateKey = decodeSecretValue(secret.privatekey);
                 const caCert = decodeSecretValue(secret.ca);
