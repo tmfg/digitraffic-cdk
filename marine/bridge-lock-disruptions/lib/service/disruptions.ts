@@ -9,6 +9,7 @@ import {createFeatureCollection} from "digitraffic-common/api/geojson";
 import {Geometry} from "wkx";
 import {DbDisruption} from "../db/disruptions";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const GeoJsonValidator = require('geojson-validation');
 
 export const DISRUPTIONS_DATE_FORMAT = 'D.M.YYYY H:mm';

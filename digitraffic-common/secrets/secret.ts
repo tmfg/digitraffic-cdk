@@ -11,7 +11,7 @@ export async function withSecret<Secret, Response>(secretId: string, fn: SecretT
     return fn(await getSecret(secretId));
 }
 
-export async function getSecret<Response>(secretId: string, prefix = ''): Promise<Response> {
+export async function getSecret<Secret>(secretId: string, prefix = ''): Promise<Secret> {
     const secretObj = await smClient.getSecretValue({
         SecretId: secretId
     }).promise();
@@ -30,7 +30,7 @@ export async function getSecret<Response>(secretId: string, prefix = ''): Promis
 }
 
 function parseSecret<Secret>(secret: GenericSecret, prefix: string): Secret {
-    const parsed: Record<string, string> = {};
+    const parsed: GenericSecret = {};
     const skip = prefix.length;
 
     for(const key in secret) {

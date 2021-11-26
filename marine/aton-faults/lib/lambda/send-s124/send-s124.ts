@@ -10,7 +10,10 @@ import {decodeBase64ToAscii} from "digitraffic-common/js/js-utils";
 import {SQSEvent} from "aws-lambda";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {Builder} from "xml2js";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const middy = require('@middy/core')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
 let visService: VisService;

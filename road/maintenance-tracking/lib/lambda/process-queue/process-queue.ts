@@ -4,7 +4,10 @@ import { SqsConsumer } from 'sns-sqs-big-payload';
 import * as SqsBigPayload from "../../service/sqs-big-payload";
 import {MaintenanceTrackingEnvKeys} from "../../keys";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const middy = require('@middy/core')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
 
 const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] as string;

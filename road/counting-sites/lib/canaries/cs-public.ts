@@ -1,10 +1,11 @@
-import {ResponseChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
 import assert from "assert";
-
-const GeoJsonValidator = require('geojson-validation');
 import {FeatureCollection} from "geojson";
-import {MetadataResponse} from "../model/metadata";
+import {ResponseChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
 import {ENV_API_KEY, ENV_HOSTNAME} from "digitraffic-common/canaries/url-canary";
+import {MetadataResponse} from "../model/metadata";
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const GeoJsonValidator = require('geojson-validation');
 
 const hostname = process.env[ENV_HOSTNAME] as string;
 const apiKeyId = process.env[ENV_API_KEY] as string;
