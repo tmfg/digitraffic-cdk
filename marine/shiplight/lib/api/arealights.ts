@@ -50,7 +50,7 @@ export class AreaLightsApi {
             });
             if (resp.status !== 200) {
                 console.error(`method=updateLightsForArea returned status=${resp.status}`);
-                return Promise.reject();
+                return Promise.reject(`API returned status ${resp.status}`);
             }
             console.error('method=updateLightsForArea successful');
             return Promise.resolve(resp.data);

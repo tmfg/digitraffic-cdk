@@ -4,7 +4,7 @@ import * as PublicApi from './public-api';
 import * as InternalLambdas from './internal-lambdas';
 import * as ec2 from "@aws-cdk/aws-ec2";
 
-export class Open311CdkStack extends cdk.Stack {
+export class Open311Stack extends cdk.Stack {
     constructor(scope: cdk.Construct, id: string, open311Props: Props, props?: cdk.StackProps) {
         super(scope, id, props);
 

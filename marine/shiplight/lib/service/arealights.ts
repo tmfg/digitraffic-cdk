@@ -31,6 +31,6 @@ export class AreaLightsService {
             if (response.LightsSetSentFailed.length) {
                 console.error('method=updateLightsForArea LightsSetSentFailed: %s', response.LightsSetSentFailed.join(', '));
             }
-        }, 2, false);
+        }, 2, true);
     }
 }
