@@ -14,7 +14,7 @@ export function create(stack: DigitrafficStack, s124Queue: Queue) {
     Scheduler.everyMinutes(stack, 'Rule', 10, updateFaultsLambda);
 
     sendS124Lambda.addEventSource(new SqsEventSource(s124Queue, {
-        batchSize: 8,
+        batchSize: 6,
         maxBatchingWindow: Duration.seconds(5)
     }));
 }
@@ -30,7 +30,7 @@ function createUpdateFaultsLambda(stack: DigitrafficStack): MonitoredFunction {
 
 function createSendS124Lambda(stack: DigitrafficStack): MonitoredFunction {
     return MonitoredDBFunction.create(stack, 'send-s124', undefined, {
-        memorySize: 128,
+        memorySize: 256,
         reservedConcurrentExecutions: 15,
         timeout: 60
     });
