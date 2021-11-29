@@ -17,6 +17,7 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
+        "@typescript-eslint/no-explicit-any": "error",
         "require-await": "warn",
         "require-atomic-updates": "warn",
         "no-return-await": "warn",
