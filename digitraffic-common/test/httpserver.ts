@@ -29,7 +29,7 @@ export class TestHttpServer {
 
             Object.keys(props).forEach(k => this.debuglog(k));
             this.debuglog('Received request to url ' + req.url + '..');
-            const path = req.url as string;
+            const path = require('url').parse(req.url).pathname;
 
             let dataStr = '';
             req.on('data', chunk => {
