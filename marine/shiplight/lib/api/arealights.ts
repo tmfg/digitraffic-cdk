@@ -52,7 +52,7 @@ export class AreaLightsApi {
                 console.error(`method=updateLightsForArea returned status=${resp.status}`);
                 return Promise.reject(`API returned status ${resp.status}`);
             }
-            console.error('method=updateLightsForArea successful');
+            console.info('method=updateLightsForArea successful');
             return Promise.resolve(resp.data);
         } catch (error) {
             console.error('method=updateLightsForArea failed');
