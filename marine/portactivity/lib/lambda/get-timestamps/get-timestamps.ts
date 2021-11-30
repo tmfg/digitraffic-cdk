@@ -1,7 +1,8 @@
 import * as TimestampsService from "../../service/timestamps";
-import {DbSecret, EmptySecretFunction, SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
+import {ApiTimestamp} from "../../model/timestamp";
 
 export const handler = async (event: GetTimeStampsEvent) => {
     return handlerFn(event, withDbSecret);
@@ -9,9 +10,8 @@ export const handler = async (event: GetTimeStampsEvent) => {
 
 export function handlerFn(
     event: GetTimeStampsEvent,
-    withDbSecretFn: EmptySecretFunction<LambdaResponse>,
+    withDbSecretFn: EmptySecretFunction<LambdaResponse<string | ApiTimestamp[]>>,
 ) {
-
     return withDbSecretFn(process.env.SECRET_ID as string, async () => {
         if (!event.locode && !event.mmsi && !event.imo && !event.source) {
             console.warn('method=getTimeStampsHandler no request params');

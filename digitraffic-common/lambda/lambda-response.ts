@@ -1,24 +1,24 @@
-export class LambdaResponse {
+export class LambdaResponse<T> {
     readonly status: number;
-    readonly body: any;
+    readonly body: T;
 
-    static ok<T>(body: T): LambdaResponse {
+    static ok<T>(body: T): LambdaResponse<T> {
         return this.create(200, body);
     }
 
-    static bad_request(body: string): LambdaResponse {
+    static bad_request(body: string): LambdaResponse<string> {
         return this.create(400, body);
     }
 
-    static not_found(): LambdaResponse {
+    static not_found(): LambdaResponse<string> {
         return this.create(404, 'Not found');
     }
 
-    static internal_error(): LambdaResponse {
+    static internal_error(): LambdaResponse<string> {
         return this.create(500, 'Internal error');
     }
 
-    static create<T>(status: number, body: T): LambdaResponse {
+    static create<T>(status: number, body: T): LambdaResponse<T> {
         return { status, body };
     }
 }

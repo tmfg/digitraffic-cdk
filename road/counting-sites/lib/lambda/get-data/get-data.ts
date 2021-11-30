@@ -5,7 +5,7 @@ import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
 
 const secretId = process.env[SECRET_ID_KEY] as string;
 
-export const handler = async (event: any) => {
+export const handler = async (event: Record<string, number>) => {
     return withDbSecret(secretId, async () => {
         const start = Date.now();
         const counterId = event.id;
