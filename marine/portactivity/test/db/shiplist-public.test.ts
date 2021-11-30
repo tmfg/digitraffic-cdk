@@ -5,6 +5,7 @@ import {EventType} from "../../lib/model/timestamp";
 import {findByLocodePublicShiplist} from "../../lib/db/shiplist-public";
 import {EventSource} from "../../lib/model/eventsource";
 import {DTDatabase} from "digitraffic-common/postgres/database";
+import {randomBoolean} from "digitraffic-common/test/testutils";
 
 describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
 
@@ -16,14 +17,14 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
             locode,
             eventTime: new Date(),
             source: EventSource.PORTNET,
-            portcallId
+            portcallId,
         });
         const timestamp2 = newTimestamp({
             eventType: EventType.ATA,
             locode,
             eventTime: moment().add(1, 'hours').toDate(),
             source: 'S1',
-            portcallId
+            portcallId,
         });
         await insert(db, [timestamp1, timestamp2]);
 
@@ -40,14 +41,14 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
             eventType: EventType.ETA,
             locode,
             eventTime: new Date(),
-            source: 'Portnet',
+            source: EventSource.PORTNET,
         });
         const timestamp2 = newTimestamp({
             eventType: EventType.ATA,
             locode,
             eventTime: moment().add(1, 'hours').toDate(),
             source: 'S1',
-            portcallId
+            portcallId,
         });
         await insert(db, [timestamp1, timestamp2]);
 
@@ -65,15 +66,15 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
             eventType: EventType.ETA,
             locode,
             eventTime: new Date(),
-            source: 'Portnet',
-            portcallId
+            source: EventSource.PORTNET,
+            portcallId,
         });
         const timestamp2 = newTimestamp({
             eventType: EventType.ETD,
             locode,
             eventTime: moment().add(1, 'hours').toDate(),
             source: 'S1',
-            portcallId
+            portcallId,
         });
         await insert(db, [timestamp1, timestamp2]);
 
@@ -82,6 +83,23 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
         expect(foundTimestamps.length).toBe(2);
         expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
         expect(foundTimestamps[1].event_type).toBe(EventType.ETD);
+    });
+
+    test('findByLocodePublicShiplist - timestamps 4 days in the future', async () => {
+        const locode = 'AA123';
+        const portcallId = 1;
+        const timestamp = newTimestamp({
+            eventType: randomBoolean() ? EventType.ETA : EventType.ETD,
+            locode,
+            eventTime: moment().add(4, 'day').toDate(),
+            source: EventSource.PORTNET,
+            portcallId,
+        });
+        await insert(db, [timestamp]);
+
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
+
+        expect(foundTimestamps.length).toBe(1);
     });
 
     test('findByLocodePublicShiplist - outgoing pilotages are included', async () => {
@@ -94,7 +112,7 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
             from: fromLocode,
             eventTime: new Date(),
             source: EventSource.PILOTWEB,
-            portcallId
+            portcallId,
         });
         await insert(db, [timestamp]);
 

@@ -4,11 +4,17 @@ import {EventSource} from "../model/eventsource";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
 export interface DbPublicShiplist {
+    // eslint-disable-next-line camelcase
     readonly event_type: EventType
+    // eslint-disable-next-line camelcase
     readonly event_time: string
+    // eslint-disable-next-line camelcase
     readonly event_source: string
+    // eslint-disable-next-line camelcase
     readonly record_time: string
+    // eslint-disable-next-line camelcase
     readonly ship_name: string
+    // eslint-disable-next-line camelcase
     readonly portcall_id: number
 }
 
@@ -36,7 +42,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
                   END
           ) AND
         pe.event_time > NOW() - INTERVAL '1 HOURS' AND
-        pe.event_time < NOW() + INTERVAL '3 DAYS' AND
+        pe.event_time < NOW() + INTERVAL '4 DAYS' AND
         CASE WHEN pe.event_type = 'ETA'
         THEN NOT EXISTS(SELECT px.id FROM port_call_timestamp px WHERE px.portcall_id = pe.portcall_id AND px.event_type = 'ATA')
         ELSE TRUE
@@ -45,14 +51,12 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
     ORDER BY pe.event_time
 `;
 
-export function findByLocodePublicShiplist(
-    db: DTDatabase,
-    locode: string
-): Promise<DbPublicShiplist[]> {
+export function findByLocodePublicShiplist(db: DTDatabase,
+    locode: string): Promise<DbPublicShiplist[]> {
     const ps = new PreparedStatement({
         name:'find-by-locode-public-shiplist',
         text: SELECT_BY_LOCODE_PUBLIC_SHIPLIST,
-        values: [locode]
+        values: [locode],
     });
     return db.tx(t => t.manyOrNone(ps));
 }
