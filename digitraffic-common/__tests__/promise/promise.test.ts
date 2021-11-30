@@ -1,4 +1,4 @@
-import {retry} from "../../promise/promise";
+import {retry, RetryLogError} from "../../promise/promise";
 import {getRandomInteger} from "../../test/testutils";
 
 describe('Promise utils tests', () => {
@@ -6,7 +6,7 @@ describe('Promise utils tests', () => {
     test('retry - no retries', async () => {
         const fn = jest.fn().mockResolvedValue(1);
 
-        const ret = await retry(fn, 0, false);
+        const ret = await retry(fn, 0, RetryLogError.NO_LOGGING);
 
         expect(ret).toBe(1);
         expect(fn.mock.calls.length).toBe(1);
@@ -17,7 +17,7 @@ describe('Promise utils tests', () => {
         const retries = getRandomInteger(1, 10);
 
         try {
-            await retry(fn, retries, false);
+            await retry(fn, retries, RetryLogError.NO_LOGGING);
         } catch {
             // ignore
         } finally {
@@ -29,7 +29,7 @@ describe('Promise utils tests', () => {
         const fn = jest.fn().mockResolvedValue(1);
         const retries = getRandomInteger(1, 10);
 
-        const ret = await retry(fn, retries, false);
+        const ret = await retry(fn, retries, RetryLogError.NO_LOGGING);
 
         expect(ret).toBe(1);
         expect(fn.mock.calls.length).toBe(1);
@@ -40,7 +40,7 @@ describe('Promise utils tests', () => {
         const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
 
         try {
-            await retry(fn, getRandomInteger(0, 10), false);
+            await retry(fn, getRandomInteger(0, 10), RetryLogError.NO_LOGGING);
         } catch {
             // ignore
         } finally {
@@ -54,7 +54,7 @@ describe('Promise utils tests', () => {
         const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
 
         try {
-            await retry(fn, 0, true);
+            await retry(fn, 0, RetryLogError.LOG_ALL_AS_ERRORS);
         } catch {
             // ignore
         } finally {
@@ -69,7 +69,7 @@ describe('Promise utils tests', () => {
         const consoleErrorSpy = jest.spyOn(global.console, 'error').mockImplementation();
 
         try {
-            await retry(fn, retries, true);
+            await retry(fn, retries, RetryLogError.LOG_ALL_AS_ERRORS);
         } catch {
             // ignore
         } finally {
@@ -81,7 +81,7 @@ describe('Promise utils tests', () => {
     test('retry - exceeded retry count throws error', async () => {
         const fn = jest.fn().mockRejectedValue('error');
 
-        await expect(() => retry(fn, 3, true)).rejects.toThrow();
+        await expect(() => retry(fn, 3, RetryLogError.LOG_ALL_AS_ERRORS)).rejects.toThrow();
     });
 
     test('retry - defaults', async () => {
@@ -94,26 +94,26 @@ describe('Promise utils tests', () => {
             // ignore
         } finally {
             expect(fn.mock.calls.length).toBe(3 + 1);
-            expect(consoleErrorSpy).toHaveBeenCalledTimes(0);
+            expect(consoleErrorSpy).toHaveBeenCalledTimes(1); // last retry
         }
     });
 
     test('retry - NaN throws error', async () => {
         const fn = jest.fn();
 
-        await expect(() => retry(fn, NaN, false)).rejects.toThrow();
+        await expect(() => retry(fn, NaN, RetryLogError.NO_LOGGING)).rejects.toThrow();
     });
 
     test('retry - Infinity throws error', async () => {
         const fn = jest.fn();
 
-        await expect(() => retry(fn, Infinity, false)).rejects.toThrow();
+        await expect(() => retry(fn, Infinity, RetryLogError.NO_LOGGING)).rejects.toThrow();
     });
 
     test('retry - exceeded maximum retry count throws error', async () => {
         const fn = jest.fn();
 
-        await expect(() => retry(fn, getRandomInteger(101, 1000000), false)).rejects.toThrow();
+        await expect(() => retry(fn, getRandomInteger(101, 1000000), RetryLogError.NO_LOGGING)).rejects.toThrow();
     });
 
     test('retry - use without mocks without retry', async () => {

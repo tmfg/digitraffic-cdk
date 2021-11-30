@@ -5,13 +5,13 @@ import {
     AwakeAiVoyageResponse,
     AwakeAiVoyagesApi,
     AwakeAiVoyageShipStatus,
-    AwakeAiVoyageShipVoyageSchedule
+    AwakeAiVoyageShipVoyageSchedule,
 } from "../api/awake_ai_voyages";
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 import {AwakeAiZoneType} from "../api/awake_common";
-import {retry} from "digitraffic-common/promise/promise";
+import {retry, RetryLogError} from "digitraffic-common/promise/promise";
 
 type AwakeAiETAResponseAndShip = {
     readonly response: AwakeAiVoyageResponse
@@ -36,7 +36,7 @@ export class AwakeAiETAService {
     readonly overriddenDestinations = [
         'FIHEL',
         'FIPOR',
-        'FIHKO'
+        'FIHKO',
     ];
 
     constructor(api: AwakeAiVoyagesApi) {
@@ -48,24 +48,26 @@ export class AwakeAiETAService {
             .then(responses =>
                 responses
                     .reduce<Array<ApiTimestamp>>((acc, result) => {
-                        const val = result.status === 'fulfilled' ? result.value : null;
-                        if (!val) {
-                            return acc;
-                        }
-                        const ts = this.toTimeStamp(val);
-                        return ts ? acc.concat([ts]) : acc;
-                    }, []));
+                    const val = result.status === 'fulfilled' ? result.value : null;
+                    if (!val) {
+                        return acc;
+                    }
+                    const ts = this.toTimeStamp(val);
+                    return ts ? acc.concat([ts]) : acc;
+                }, []));
     }
 
     private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiETAResponseAndShip> {
         const start = Date.now();
-        console.info('method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d',
+        console.info(
+            'method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d',
             ship.imo,
-            (Date.now() - start));
-        const response = await retry(async () => this.api.getETA(ship.imo), 1, false);
+            (Date.now() - start),
+        );
+        const response = await retry(() => this.api.getETA(ship.imo), 1);
         return {
             response,
-            ship
+            ship,
         };
     }
 
@@ -95,19 +97,19 @@ export class AwakeAiETAService {
         return {
             ship: {
                 mmsi: schedule.ship.mmsi,
-                imo: schedule.ship.imo
+                imo: schedule.ship.imo,
             },
             location: {
                 port: this.normalizeDestination(ship.locode,
                     eta.locode as string), // validated to be not null
-                portArea: ship.port_area_code
+                portArea: ship.port_area_code,
             },
             source: EventSource.AWAKE_AI,
             eventType: EventType.ETA,
             eventTime: eta.arrivalTime, // validated to be not null
             recordTime: eta.recordTime,
-            portcallId: ship.portcall_id
-        }
+            portcallId: ship.portcall_id,
+        };
     }
 
     private getETAPrediction(schedule: AwakeAiVoyageShipVoyageSchedule): AwakeAiVoyageEtaPrediction | null {
@@ -129,7 +131,7 @@ export class AwakeAiETAService {
             return null;
         }
 
-        const etaPredictions = eta.predictions.filter(p => p.predictionType == AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction[]
+        const etaPredictions = eta.predictions.filter(p => p.predictionType == AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction[];
         const etaPrediction = etaPredictions.find(p => p.zoneType === AwakeAiZoneType.BERTH);
 
         if (!etaPrediction) {
