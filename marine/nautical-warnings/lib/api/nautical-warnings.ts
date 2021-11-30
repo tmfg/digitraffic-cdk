@@ -1,5 +1,6 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
+import {FeatureCollection} from "geojson";
 
 const LAYER_ACTIVE = 'merivaroitus_julkaistu_dt';
 const LAYER_ARCHIVED = 'merivaroitus_arkistoitu_dt';
@@ -13,15 +14,15 @@ export class NauticalWarningsApi {
         this.baseUrl = baseUrl;
     }
 
-    getActiveWarnings(): Promise<any> {
+    getActiveWarnings(): Promise<FeatureCollection> {
         return this.getWarnings(LAYER_ACTIVE);
     }
 
-    getArchivedWarnings():Promise<any> {
+    getArchivedWarnings():Promise<FeatureCollection> {
         return this.getWarnings(LAYER_ARCHIVED);
     }
 
-    private async getWarnings(layer: string): Promise<string> {
+    private async getWarnings(layer: string): Promise<FeatureCollection> {
         const start = Date.now();
         const url = `${this.baseUrl}?crs=EPSG:4326&layer=${layer}`;
 
@@ -38,8 +39,7 @@ export class NauticalWarningsApi {
             console.error('method=getWarnings failed');
             return Promise.reject(error);
         } finally {
-            console.log(`method=getWarnings tookMs=${Date.now() - start}`)
+            console.log(`method=getWarnings tookMs=${Date.now() - start}`);
         }
     }
-
 }

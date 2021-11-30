@@ -1,15 +1,16 @@
 import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 import * as NauticalWarningsService from "../../service/nautical-warnings";
+import {FeatureCollection} from "geojson";
 
 const secretId = process.env[SECRET_ID] as string;
 
-export async function handlerFn(doWithSecret: SecretFunction<DbSecret, any>) {
-    return doWithSecret(secretId, async () => {
+export function handlerFn(doWithSecret: SecretFunction<DbSecret, void | FeatureCollection | null>) {
+    return doWithSecret(secretId, () => {
         return NauticalWarningsService.getActiveWarnings();
     });
 }
 
-export const handler = async (): Promise<any> => {
+export const handler = (): Promise<void | FeatureCollection | null> => {
     return handlerFn(withDbSecret);
-}
+};

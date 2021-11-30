@@ -5,14 +5,16 @@ import * as NauticalWarningsService from "../../service/nautical-warnings";
 
 const secretId = process.env[SECRET_ID] as string;
 
-export async function handlerFn(doWithSecret: SecretFunction<NauticalWarningsSecret, void>) {
-    return doWithSecret(secretId, async (secret: NauticalWarningsSecret) => {
-        return NauticalWarningsService.updateNauticalWarnings(secret.url);
-    }, {
-        prefix: 'nauticalwarnings'
-    });
+export function handlerFn(doWithSecret: SecretFunction<NauticalWarningsSecret>) {
+    return doWithSecret(
+        secretId, (secret: NauticalWarningsSecret) => {
+            return NauticalWarningsService.updateNauticalWarnings(secret.url);
+        }, {
+            prefix: 'nauticalwarnings',
+        },
+    );
 }
 
-export const handler = async (): Promise<void> => {
+export const handler = (): Promise<void> => {
     return handlerFn(withDbSecret);
-}
+};
