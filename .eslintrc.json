@@ -6,7 +6,7 @@
     },
     "parser": "@typescript-eslint/parser",
     "parserOptions": {
-        "ecmaVersion": 13
+        "ecmaVersion": 2021
     },
     "plugins": [
         "@typescript-eslint"
@@ -17,11 +17,30 @@
         "plugin:@typescript-eslint/recommended"
     ],
     "rules": {
-        "@typescript-eslint/no-explicit-any": "error",
         "require-await": "warn",
+        "function-paren-newline": ["warn",{
+            "minItems": 3
+        }],
+        "comma-dangle": ["warn", "always-multiline"],
+        "semi": ["warn", "always"],
+        "array-bracket-spacing": ["warn", "never"],
+        "keyword-spacing": "warn",
+        "space-before-blocks": "warn",
         "require-atomic-updates": "warn",
+        "no-trailing-spaces": "warn",
+        "dot-notation": "warn",
+        "no-bitwise": "warn",
         "no-return-await": "warn",
+        "no-cond-assign": "warn",
+        "camelcase": "warn",
+        "@typescript-eslint/indent": ["warn", 4],
+        "@typescript-eslint/no-shadow": "warn",
         "@typescript-eslint/no-var-requires": "WARN",
+        "no-debugger": "error",
+        "no-duplicate-imports": "error",
+        "no-throw-literal": "error",
+        "valid-typeof": "error",
+        "@typescript-eslint/no-explicit-any": "error",
         "@typescript-eslint/ban-types": ["error",
             {
                 "types": {
