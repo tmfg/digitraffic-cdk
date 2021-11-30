@@ -7,19 +7,19 @@ const BASE_POLICY_STATEMENT_PROPS: PolicyStatementProps = {
         "logs:PutLogEvents",
         "logs:CreateLogGroup",
         "logs:DescribeLogGroups",
-        "logs:DescribeLogStreams"
+        "logs:DescribeLogStreams",
     ],
-    resources: ["*"]
+    resources: ["*"],
 };
 
 const DB_STATEMENT_PROPS: PolicyStatementProps = {
     actions: [
         "ec2:CreateNetworkInterface",
         "ec2:DescribeNetworkInterfaces",
-        "ec2:DeleteNetworkInterface"
+        "ec2:DeleteNetworkInterface",
     ],
-    resources: ["*"]
-}
+    resources: ["*"],
+};
 
 const CLOUDWATCH_STATEMENT_PROPS: PolicyStatementProps = {
     actions: [
@@ -28,19 +28,21 @@ const CLOUDWATCH_STATEMENT_PROPS: PolicyStatementProps = {
     resources: ["*"],
     conditions: {
         "StringEquals": {
-            "cloudwatch:namespace": "CloudWatchSynthetics"
-        }
-    }
-}
+            "cloudwatch:namespace": "CloudWatchSynthetics",
+        },
+    },
+};
 
 export class DigitrafficCanaryRole extends Role {
     constructor(stack: Construct, canaryName: string) {
-        super(stack, 'canary-role-' + canaryName, {
-            assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            managedPolicies: [
-                ManagedPolicy.fromAwsManagedPolicyName("CloudWatchSyntheticsFullAccess")
-            ]
-        });
+        super(
+            stack, 'canary-role-' + canaryName, {
+                assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
+                managedPolicies: [
+                    ManagedPolicy.fromAwsManagedPolicyName("CloudWatchSyntheticsFullAccess"),
+                ],
+            },
+        );
 
         this.addToPolicy(new PolicyStatement(BASE_POLICY_STATEMENT_PROPS));
         this.addToPolicy(new PolicyStatement(CLOUDWATCH_STATEMENT_PROPS));

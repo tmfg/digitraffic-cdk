@@ -9,15 +9,20 @@ import {Schedule} from "@aws-cdk/aws-events";
 import {Duration} from "@aws-cdk/core";
 
 export class DatabaseCanary extends DigitrafficCanary {
-    constructor(stack: DigitrafficStack,
-                role: Role,
-                secret: ISecret,
-                params: CanaryParameters) {
+    constructor(
+        stack: DigitrafficStack,
+        role: Role,
+        secret: ISecret,
+        params: CanaryParameters,
+    ) {
         const canaryName = `${params.name}-db`;
         const environmentVariables = stack.createDefaultLambdaEnvironment(`Synthetics-${canaryName}`);
 
         // the handler code is defined at the actual project using this
-        super(stack, canaryName, role, params, environmentVariables);
+        super(
+            stack, canaryName, role,
+            params, environmentVariables,
+        );
 
         this.artifactsBucket.grantWrite(this.role);
         secret.grantRead(this.role);
@@ -30,28 +35,43 @@ export class DatabaseCanary extends DigitrafficCanary {
         cfnCanary.vpcConfig = {
             vpcId: stack.vpc.vpcId,
             securityGroupIds: [stack.lambdaDbSg.securityGroupId],
-            subnetIds: subnetIds
+            subnetIds: subnetIds,
         };
     }
 
-    static create(stack: DigitrafficStack, role: Role, params: CanaryParameters): DatabaseCanary {
-        return new DatabaseCanary(stack, role, stack.secret, {...{
-            secret: stack.configuration.secretId,
-            schedule: Schedule.rate(Duration.hours(1)),
-            handler: `${params.name}.handler`
-        }, ...params});
+    static create(
+        stack: DigitrafficStack,
+        role: Role,
+        params: CanaryParameters,
+    ): DatabaseCanary {
+        return new DatabaseCanary(
+            stack, role, stack.secret,
+            {...{
+                secret: stack.configuration.secretId,
+                schedule: Schedule.rate(Duration.hours(1)),
+                handler: `${params.name}.handler`,
+            }, ...params},
+        );
     }
 
-    static createV2(stack: DigitrafficStack, role: Role, name: string, params: Partial<CanaryParameters> = {}): DatabaseCanary {
-        return new DatabaseCanary(stack, role, stack.secret, {...{
+    static createV2(
+        stack: DigitrafficStack,
+        role: Role,
+        name: string,
+        params: Partial<CanaryParameters> = {},
+    ): DatabaseCanary {
+        return new DatabaseCanary(
+            stack, role, stack.secret,
+            {...{
                 secret: stack.configuration.secretId,
                 schedule: Schedule.rate(Duration.hours(1)),
                 handler: `${name}-db.handler`,
                 name,
                 alarm: {
                     alarmName: `${stack.configuration.shortName}-DB-Alarm`,
-                    topicArn: stack.configuration.alarmTopicArn
-                }
-            }, ...params});
+                    topicArn: stack.configuration.alarmTopicArn,
+                },
+            }, ...params},
+        );
     }
 }

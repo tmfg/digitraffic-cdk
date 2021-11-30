@@ -15,31 +15,44 @@ export interface UrlCanaryParameters extends CanaryParameters {
 }
 
 export class UrlCanary extends DigitrafficCanary {
-    constructor(stack: Construct, role: Role, params: UrlCanaryParameters) {
+    constructor(
+        stack: Construct,
+        role: Role,
+        params: UrlCanaryParameters,
+    ) {
         const canaryName = `${params.name}-url`;
         const environmentVariables: LambdaEnvironment = {};
         environmentVariables[ENV_HOSTNAME] = params.hostname;
 
-        if(params.apiKeyId) {
+        if (params.apiKeyId) {
             environmentVariables[ENV_API_KEY] = params.apiKeyId;
         }
 
         // the handler code is defined at the actual project using this
-        super(stack, canaryName, role, params, environmentVariables);
+        super(
+            stack, canaryName, role, params, environmentVariables,
+        );
     }
 
-    static create(stack: DigitrafficStack, role: Role, publicApi: DigitrafficRestApi, params: Partial<UrlCanaryParameters>): UrlCanary {
-        return new UrlCanary(stack, role, {...{
+    static create(
+        stack: DigitrafficStack,
+        role: Role,
+        publicApi: DigitrafficRestApi,
+        params: Partial<UrlCanaryParameters>,
+    ): UrlCanary {
+        return new UrlCanary(
+            stack, role, {...{
                 handler: `${params.name}.handler`,
                 hostname: publicApi.hostname(),
                 apiKeyId: this.getApiKey(publicApi),
-            }, ...params} as UrlCanaryParameters);
+            }, ...params} as UrlCanaryParameters,
+        );
     }
 
     static getApiKey(publicApi: DigitrafficRestApi): string | undefined {
         const apiKeys = publicApi.apiKeyIds;
 
-        if(apiKeys.length > 1) {
+        if (apiKeys.length > 1) {
             console.info("rest api has more than one api!");
         }
 

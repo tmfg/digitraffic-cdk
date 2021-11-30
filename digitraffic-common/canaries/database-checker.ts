@@ -32,7 +32,8 @@ class CountDatabaseCheck extends DatabaseCheck<CountResponse> {
         name: string,
         sql: string,
         minCount: number|null,
-        maxCount: number|null) {
+        maxCount: number|null,
+    ) {
         super(name, sql);
 
         if (minCount == null && maxCount == null) {
@@ -95,8 +96,8 @@ export class DatabaseChecker {
             name,
             sql,
             1,
-            1)
-        );
+            1,
+        ));
 
         return this;
     }
@@ -106,8 +107,8 @@ export class DatabaseChecker {
             name,
             sql,
             null,
-            0)
-        );
+            0,
+        ));
 
         return this;
     }
@@ -117,8 +118,8 @@ export class DatabaseChecker {
             name,
             sql,
             1,
-            null)
-        );
+            null,
+        ));
 
         return this;
     }
@@ -141,7 +142,8 @@ export class DatabaseChecker {
                     synthetics.executeStep(
                         check.name,
                         checkFunction,
-                        stepConfig);
+                        stepConfig,
+                    );
                 }
             });
         });
