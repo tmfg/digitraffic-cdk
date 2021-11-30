@@ -12,7 +12,7 @@ export const API_KEY_HEADER = "x-api-key";
 const baseHeaders = {
     "Digitraffic-User" : "Digitraffic/AWS Canary",
     "Accept-Encoding" : "gzip",
-    "Accept": "*/*"
+    "Accept": "*/*",
 } as Record<string, string>;
 
 type CheckerFunction = (Res: IncomingMessage) => void;
@@ -54,38 +54,44 @@ export class UrlChecker {
 
     expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
-            path: url
+            path: url,
         }};
 
-        return synthetics.executeHttpStep("Verify 200 for " + url, requestOptions, callback);
+        return synthetics.executeHttpStep(
+            "Verify 200 for " + url, requestOptions, callback,
+        );
     }
 
     expect404(url: string): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
-                path: url
-            }};
+            path: url,
+        }};
 
-        return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
+        return synthetics.executeHttpStep(
+            "Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN),
+        );
     }
 
     expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
-        if(!this.requestOptions.headers || !this.requestOptions.headers[API_KEY_HEADER]) {
+        if (!this.requestOptions.headers || !this.requestOptions.headers[API_KEY_HEADER]) {
             console.error("No api key defined");
         }
 
         const requestOptions = {...this.requestOptions, ...{
             path: url,
-            headers: baseHeaders
+            headers: baseHeaders,
         }};
 
-        return synthetics.executeHttpStep("Verify 403 for " + url,
+        return synthetics.executeHttpStep(
+            "Verify 403 for " + url,
             requestOptions,
-            validateStatusCodeAndContentType(403, mediaType ?? MediaType.APPLICATION_JSON));
+            validateStatusCodeAndContentType(403, mediaType ?? MediaType.APPLICATION_JSON),
+        );
     }
 
     done(): string {
         return "Canary successful";
-   }
+    }
 }
 
 export function jsonChecker<T>(fn: JsonCheckerFunction<T>): CheckerFunction {
@@ -96,12 +102,12 @@ export function jsonChecker<T>(fn: JsonCheckerFunction<T>): CheckerFunction {
 
 export function responseChecker(fn: (body: string) => void): CheckerFunction {
     return async (res: IncomingMessage) => {
-        if(!res.statusCode) {
-            throw 'statusCode missing';
+        if (!res.statusCode) {
+            throw new Error('statusCode missing');
         }
 
         if (res.statusCode < 200 || res.statusCode > 299) {
-            throw res.statusCode + ' ' + res.statusMessage;
+            throw new Error(res.statusCode + ' ' + res.statusMessage);
         }
 
         const body = await getResponseBody(res);
@@ -113,10 +119,10 @@ export function responseChecker(fn: (body: string) => void): CheckerFunction {
 async function getResponseBody(response: IncomingMessage): Promise<string> {
     const body = await getBodyFromResponse(response);
 
-    if(response.headers[constants.HTTP2_HEADER_CONTENT_ENCODING] === 'gzip') {
+    if (response.headers[constants.HTTP2_HEADER_CONTENT_ENCODING] === 'gzip') {
         try {
             return zlib.gunzipSync(body).toString();
-        } catch(e) {
+        } catch (e) {
             console.info("error " + JSON.stringify(e));
         }
     }
@@ -141,9 +147,9 @@ function getBodyFromResponse(response: IncomingMessage): Promise<string> {
 export function mustContain(body: string, text: string) {
     console.info("checking " + body);
 
-    if(!body.includes(text)) {
+    if (!body.includes(text)) {
         console.info("Did not contain " + text);
-        throw "Did not contain " + text;
+        throw new Error("Did not contain " + text);
     }
 }
 
@@ -156,11 +162,11 @@ function validateStatusCodeAndContentType(statusCode: number, contentType: Media
     return (res: IncomingMessage) => {
         return new Promise(resolve => {
             if (res.statusCode !== statusCode) {
-                throw `${res.statusCode} ${res.statusMessage}`;
+                throw new Error(`${res.statusCode} ${res.statusMessage}`);
             }
 
-            if(res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== contentType) {
-                throw 'Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE];
+            if (res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== contentType) {
+                throw new Error('Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE]);
             }
 
             resolve();
@@ -209,19 +215,19 @@ export class ResponseChecker {
     responseChecker(fn: (body: string) => void): CheckerFunction {
         return async (res: IncomingMessage): Promise<void> => {
             if (!res.statusCode) {
-                throw 'statusCode missing';
+                throw new Error('statusCode missing');
             }
 
             if (res.statusCode < 200 || res.statusCode > 299) {
-                throw res.statusCode + ' ' + res.statusMessage;
+                throw new Error(res.statusCode + ' ' + res.statusMessage);
             }
 
-            if(this.checkCors && !res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
-                throw 'CORS missing';
+            if (this.checkCors && !res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
+                throw new Error('CORS missing');
             }
 
-            if(res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== this.contentType) {
-                throw 'Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE];
+            if (res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== this.contentType) {
+                throw new Error('Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE]);
             }
 
             const body = await getResponseBody(res);
