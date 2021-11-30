@@ -28,10 +28,14 @@ class CountDatabaseCheck extends DatabaseCheck<CountResponse> {
     readonly minCount: number|null;
     readonly maxCount: number|null;
 
-    constructor(name: string, sql: string, minCount: number|null, maxCount: number|null) {
+    constructor(
+        name: string,
+        sql: string,
+        minCount: number|null,
+        maxCount: number|null) {
         super(name, sql);
 
-        if(minCount == null && maxCount == null) {
+        if (minCount == null && maxCount == null) {
             throw new Error('no max or min given!');
         }
 
@@ -42,23 +46,23 @@ class CountDatabaseCheck extends DatabaseCheck<CountResponse> {
     check(value: CountResponse) {
         if (!value) {
             this.failed = true;
-            throw 'no return value';
+            throw new Error('no return value');
         } else {
             if ('count' in value) {
-                if(this.minCount && value.count < this.minCount) {
+                if (this.minCount && value.count < this.minCount) {
                     this.failed = true;
-                    throw `count was ${value.count}, minimum is ${this.minCount}`;
+                    throw new Error(`count was ${value.count}, minimum is ${this.minCount}`);
                 }
-                if(this.maxCount && value.count > this.maxCount) {
+                if (this.maxCount && value.count > this.maxCount) {
                     this.failed = true;
-                    throw `count was ${value.count}, max is ${this.maxCount}`;
+                    throw new Error(`count was ${value.count}, max is ${this.maxCount}`);
                 }
             } else {
                 this.failed = true;
 
                 console.info("received " + JSON.stringify(value));
 
-                throw 'no count available';
+                throw new Error('no count available');
             }
         }
     }
@@ -68,8 +72,8 @@ const stepConfig = {
     'continueOnStepFailure': true,
     'screenshotOnStepStart': false,
     'screenshotOnStepSuccess': false,
-    'screenshotOnStepFailure': false
-}
+    'screenshotOnStepFailure': false,
+};
 
 export class DatabaseChecker {
     readonly secret: string;
@@ -87,26 +91,41 @@ export class DatabaseChecker {
     }
 
     one(name: string, sql: string) {
-        this.checks.push(new CountDatabaseCheck(name, sql, 1, 1));
+        this.checks.push(new CountDatabaseCheck(
+            name,
+            sql,
+            1,
+            1)
+        );
 
         return this;
     }
 
     empty(name: string, sql: string) {
-        this.checks.push(new CountDatabaseCheck(name, sql, null, 0));
+        this.checks.push(new CountDatabaseCheck(
+            name,
+            sql,
+            null,
+            0)
+        );
 
         return this;
     }
 
     notEmpty(name: string, sql: string) {
-        this.checks.push(new CountDatabaseCheck(name, sql, 1, null));
+        this.checks.push(new CountDatabaseCheck(
+            name,
+            sql,
+            1,
+            null)
+        );
 
         return this;
     }
 
     async expect() {
         if (!this.checks.length) {
-            throw 'No checks';
+            throw new Error('No checks');
         }
 
         await withDbSecret(this.secret, async () => {
@@ -115,16 +134,20 @@ export class DatabaseChecker {
                     console.info("canary checking sql " + check.sql);
 
                     const value = await db.oneOrNone(check.sql);
-
-                    synthetics.executeStep(check.name, () => {
+                    const checkFunction = () => {
                         check.check(value);
-                    }, stepConfig);
+                    };
+
+                    synthetics.executeStep(
+                        check.name,
+                        checkFunction,
+                        stepConfig);
                 }
             });
         });
 
-        if(this.checks.some(check => check.failed)) {
-            throw 'Failed';
+        if (this.checks.some(check => check.failed)) {
+            throw new Error('Failed');
         }
 
         return 'OK';
