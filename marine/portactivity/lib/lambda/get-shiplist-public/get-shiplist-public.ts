@@ -1,35 +1,43 @@
 import {findByLocodePublicShiplist} from '../../db/shiplist-public';
 import {DTDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
-import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
 
-export const handler = async (event: ProxyLambdaRequest) => {
+export type ShiplistSecret = {
+    readonly auth: string
+}
+
+export const handler = (event: ProxyLambdaRequest) => {
     return handlerFn(event, withDbSecret);
 };
 
-function badRequest(message: string): Promise<ProxyLambdaResponse> {
+function response(statusCode: number, message: string): Promise<ProxyLambdaResponse> {
     return Promise.resolve({
-        statusCode: 400,
+        statusCode,
         body: message,
         headers: {
-            'content-type': MediaType.TEXT_PLAIN
-        }
+            'content-type': MediaType.TEXT_PLAIN,
+        },
     });
 }
 
-export async function handlerFn(
-    event: ProxyLambdaRequest,
-    withDbSecretFn: EmptySecretFunction<ProxyLambdaResponse>
-) {
-    return withDbSecretFn(process.env.SECRET_ID as string, () => {
+export function handlerFn(event: ProxyLambdaRequest,
+    withDbSecretFn: SecretFunction<ShiplistSecret, ProxyLambdaResponse>): Promise<ProxyLambdaResponse | void> {
+    return withDbSecretFn(process.env.SECRET_ID as string, (secret: ShiplistSecret) => {
+        if (!event.queryStringParameters.auth) {
+            return response(401, 'Missing authentication');
+        }
+        if (event.queryStringParameters.auth !== secret.auth) {
+            return response(403, 'Invalid authentication');
+        }
         if (!event.queryStringParameters.locode) {
-            return badRequest('Missing LOCODE');
+            return response(400, 'Missing LOCODE');
         }
         if (!IdUtils.isValidLOCODE(event.queryStringParameters.locode)) {
-            return badRequest('Invalid LOCODE');
+            return response(400, 'Invalid LOCODE');
         }
 
         return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
@@ -38,19 +46,18 @@ export async function handlerFn(
                     .map(ts => Object.assign(ts, {
                         source: ts.event_source,
                         eventTime: ts.event_time,
-                        portcallId: ts.portcall_id
+                        portcallId: ts.portcall_id,
                     }));
             // don't overwrite source before merging as it utilizes source name in prioritizing
             const shiplist = mergeTimestamps(dbShiplist).map(ts =>
                 Object.assign(ts, {
-                    source: getDisplayableNameForEventSource(ts.source)
-                })
-            );
+                    source: getDisplayableNameForEventSource(ts.source),
+                }));
 
             return {
                 statusCode: 200,
                 headers: {
-                    'Content-Type': 'text/html'
+                    'Content-Type': 'text/html',
                 },
                 body:
                     `
@@ -294,8 +301,8 @@ export async function handlerFn(
 </script>
 
 </html>    
-`
-            }
+`,
+            };
         });
     });
 }
