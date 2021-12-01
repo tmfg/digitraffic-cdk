@@ -52,14 +52,20 @@ export class UrlChecker {
         });
     }
 
-    expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
+    expectStatus<T>(statusCode: number, url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
-            path: url,
-        }};
+                path: url,
+            }};
 
         return synthetics.executeHttpStep(
-            "Verify 200 for " + url, requestOptions, callback,
+            "Verify " + statusCode + "  for " + url.replace(/auth=.*/, ''),
+            requestOptions,
+            callback,
         );
+    }
+
+    expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
+        return this.expectStatus(200, url, callback);
     }
 
     expect404(url: string): Promise<void> {

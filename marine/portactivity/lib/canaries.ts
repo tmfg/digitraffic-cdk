@@ -26,11 +26,12 @@ export class Canaries {
                 name: 'pa-public',
                 hostname: publicApi.publicApi.hostname(),
                 handler: 'public-api.handler',
+                secret: props.secretId,
                 alarm: {
                     alarmName: 'PortActivity-PublicAPI-Alarm',
                     topicArn: props.warningTopicArn,
                 },
-            });
+            }, stack.secret);
 
             new UrlCanary(stack, urlRole, {
                 name: 'pa-private',

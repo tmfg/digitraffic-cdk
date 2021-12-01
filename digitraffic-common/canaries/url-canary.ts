@@ -5,9 +5,11 @@ import {LambdaEnvironment} from "../model/lambda-environment";
 import {DigitrafficCanary} from "./canary";
 import {DigitrafficStack} from "../stack/stack";
 import {DigitrafficRestApi} from "../api/rest_apis";
+import {ISecret} from "@aws-cdk/aws-secretsmanager";
 
 export const ENV_API_KEY = "apiKeyId";
 export const ENV_HOSTNAME = "hostname";
+export const ENV_SECRET = "secret";
 
 export interface UrlCanaryParameters extends CanaryParameters {
     readonly hostname: string;
@@ -19,13 +21,22 @@ export class UrlCanary extends DigitrafficCanary {
         stack: Construct,
         role: Role,
         params: UrlCanaryParameters,
+        secret?: ISecret,
     ) {
         const canaryName = `${params.name}-url`;
         const environmentVariables: LambdaEnvironment = {};
         environmentVariables[ENV_HOSTNAME] = params.hostname;
 
+        if (params.secret) {
+            environmentVariables[ENV_SECRET] = params.secret;
+        }
+
         if (params.apiKeyId) {
             environmentVariables[ENV_API_KEY] = params.apiKeyId;
+        }
+
+        if (secret) {
+            secret.grantRead(role);
         }
 
         // the handler code is defined at the actual project using this
