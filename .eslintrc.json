@@ -19,7 +19,7 @@
     "rules": {
         "require-await": "warn",
         "function-paren-newline": ["warn",{
-            "minItems": 3
+            "minItems": 5
         }],
         "comma-dangle": ["warn", "always-multiline"],
         "semi": ["warn", "always"],
