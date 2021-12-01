@@ -304,5 +304,8 @@ export function handlerFn(event: ProxyLambdaRequest,
 `,
             };
         });
+    }, {
+        prefix: 'shiplist',
+        expectedKeys: ['auth'],
     });
 }
