@@ -1,5 +1,4 @@
 import {UrlChecker} from "digitraffic-common/canaries/url-checker";
-import {MediaType} from "digitraffic-common/api/mediatypes";
 
 const hostname = process.env.hostname as string;
 const apiKeyId = process.env.apiKeyId as string;
@@ -11,4 +10,4 @@ export const handler = async (): Promise<string> => {
     await checker.expect403WithoutApiKey("/prod/api/v1/timestamps?locode=FIHKO");
 
     return checker.done();
-}
+};

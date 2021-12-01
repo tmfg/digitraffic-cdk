@@ -12,13 +12,13 @@ import {PublicApi} from "./public-api";
 
 export class Canaries {
     constructor(stack: DigitrafficStack,
-                dlq: Queue,
-                publicApi: PublicApi) {
+        dlq: Queue,
+        publicApi: PublicApi) {
         const props = stack.configuration as Props;
 
         addDLQAlarm(stack, dlq, props);
 
-        if(props.enableCanaries) {
+        if (props.enableCanaries) {
             const urlRole = new DigitrafficCanaryRole(stack, 'portactivity-url');
             const dbRole = new DigitrafficCanaryRole(stack, 'portactivity-db').withDatabaseAccess();
 
@@ -28,8 +28,8 @@ export class Canaries {
                 handler: 'public-api.handler',
                 alarm: {
                     alarmName: 'PortActivity-PublicAPI-Alarm',
-                    topicArn: props.warningTopicArn
-                }
+                    topicArn: props.warningTopicArn,
+                },
             });
 
             new UrlCanary(stack, urlRole, {
@@ -39,8 +39,8 @@ export class Canaries {
                 apiKeyId: publicApi.apiKeyId,
                 alarm: {
                     alarmName: 'PortActivity-PrivateAPI-Alarm',
-                    topicArn: props.warningTopicArn
-                }
+                    topicArn: props.warningTopicArn,
+                },
             });
 
             new DatabaseCanary(stack, dbRole, stack.secret, {
@@ -50,8 +50,8 @@ export class Canaries {
                 handler: 'daytime-db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Day-Alarm',
-                    topicArn: props.warningTopicArn
-                }
+                    topicArn: props.warningTopicArn,
+                },
             });
 
             new DatabaseCanary(stack, urlRole, stack.secret, {
@@ -60,8 +60,8 @@ export class Canaries {
                 handler: 'db.handler',
                 alarm: {
                     alarmName: 'PortActivity-Db-Alarm',
-                    topicArn: props.warningTopicArn
-                }
+                    topicArn: props.warningTopicArn,
+                },
             });
         }
     }
@@ -70,12 +70,12 @@ export class Canaries {
 function addDLQAlarm(stack: DigitrafficStack, queue: Queue, appProps: Props) {
     const alarmName = 'PortActivity-TimestampsDLQAlarm';
     queue.metricNumberOfMessagesReceived({
-        period: appProps.dlqNotificationDuration
+        period: appProps.dlqNotificationDuration,
     }).createAlarm(stack, alarmName, {
         alarmName,
         threshold: 0,
         evaluationPeriods: 1,
         treatMissingData: TreatMissingData.NOT_BREACHING,
-        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
+        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
     }).addAlarmAction(new SnsAction(Topic.fromTopicArn(stack, 'Topic', appProps.warningTopicArn)));
 }

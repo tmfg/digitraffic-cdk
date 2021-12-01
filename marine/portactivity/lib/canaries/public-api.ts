@@ -10,4 +10,4 @@ export const handler = async (): Promise<string> => {
     await checker.expect200("/prod/api/v1/metadata");
 
     return checker.done();
-}
+};
