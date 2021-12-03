@@ -17,24 +17,20 @@ export class AreaLightsService {
     async updateLightsForArea(areaTraffic: AreaTraffic): Promise<void> {
         // TODO hardcoded areaId for testing
         const areaId = 10; // areaTraffic.areaId
-        console.info(
-            'method=updateLightsForArea area %d, duration %d, visibility %d',
+        console.info('method=updateLightsForArea area %d, duration %d, visibility %d',
             areaId,
             areaTraffic.durationInMinutes,
-            areaTraffic.visibilityInMeters,
-        );
+            areaTraffic.visibilityInMeters);
 
-        await retry(
-            async () => {
-                const response = await this.api.updateLightsForArea({
-                    routeId: areaId,
-                    visibility: areaTraffic.visibilityInMeters,
-                    time: areaTraffic.durationInMinutes,
-                });
-                if (response.LightsSetSentFailed.length) {
-                    console.error('method=updateLightsForArea LightsSetSentFailed: %s', response.LightsSetSentFailed.join(', '));
-                }
-            }, 2, RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
-        );
+        await retry(async () => {
+            const response = await this.api.updateLightsForArea({
+                routeId: areaId,
+                visibility: areaTraffic.visibilityInMeters,
+                time: areaTraffic.durationInMinutes,
+            });
+            if (response.LightsSetSentFailed.length) {
+                console.warn('method=updateLightsForArea LightsSetSentFailed: %s', response.LightsSetSentFailed.join(', '));
+            }
+        }, 2, RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS);
     }
 }
