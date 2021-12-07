@@ -3,15 +3,20 @@ import {ApiTimestamp, EventType} from "../lib/model/timestamp";
 import {
     AwakeAiATXEventType,
     AwakeAIATXTimestampMessage,
-    AwakeATXZoneEventType
+    AwakeATXZoneEventType,
 } from "../lib/api/awake_ai_atx";
 import {AwakeAiZoneType} from "../lib/api/awake_common";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { v4: uuidv4 } = require('uuid');
+
+// test file
+/* eslint-disable camelcase */
 
 export function newAwakeATXMessage(options?: {
     zoneEventType?: AwakeATXZoneEventType,
-    zoneType?: AwakeAiZoneType
+    zoneType?: AwakeAiZoneType,
+    locode?: string
 }): AwakeAIATXTimestampMessage {
     return {
         eventType: 'zone-event',
@@ -22,11 +27,13 @@ export function newAwakeATXMessage(options?: {
         eventId: 'bar',
         msgType: AwakeAiATXEventType.EVENT,
         shipName: 'someship',
-        locodes: ['FILOL'],
+        locodes: [
+            options?.locode ?? 'FILOL',
+        ],
         location: [53.2, 40.3],
         zoneName: 'somezone',
         zoneEventType: options?.zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
-        zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH
+        zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
     };
 }
 
@@ -64,14 +71,14 @@ export function newTimestamp(props?: {
         eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? null,
         ship: {
             mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0,5)),
-            imo: props?.imo ?? Number(someNumber().toString().slice(0,5))
+            imo: props?.imo ?? Number(someNumber().toString().slice(0,5)),
         },
         location: {
             port: props?.locode ?? someNumber().toString().slice(0,5),
             portArea: props?.portArea ?? someNumber().toString().slice(0,5),
-            from: props?.from ?? someNumber().toString().slice(0,5)
+            from: props?.from ?? someNumber().toString().slice(0,5),
         },
-        portcallId: props?.portcallId ?? someNumber()
+        portcallId: props?.portcallId ?? someNumber(),
     };
 }
 
@@ -90,12 +97,11 @@ export function newVessel(timestamp: ApiTimestamp): Vessel {
         imo: timestamp.ship.imo as number,
         eta: 1,
         call_sign: 'a',
-        destination: 'b'
-    }
+        destination: 'b',
+    };
 }
 
-export function newPortAreaDetails(
-    timestamp: ApiTimestamp,
+export function newPortAreaDetails(timestamp: ApiTimestamp,
     props?: {
         eta?: Date,
         portcallId?: number
@@ -104,7 +110,7 @@ export function newPortAreaDetails(
     return {
         port_area_details_id: Math.floor(Math.random() * 10000),
         port_call_id: props?.portcallId ?? timestamp.portcallId as number,
-        eta: props?.eta?.toISOString()
+        eta: props?.eta?.toISOString(),
     };
 }
 
@@ -117,7 +123,7 @@ export function newPortCall(timestamp: ApiTimestamp, portcallId?: number): PortC
         port_call_timestamp: new Date(),
         port_to_visit: timestamp.location.port,
         mmsi: timestamp.ship.mmsi ?? someNumber(),
-        imo_lloyds: timestamp.ship.imo ?? someNumber()
+        imo_lloyds: timestamp.ship.imo ?? someNumber(),
     };
 }
 

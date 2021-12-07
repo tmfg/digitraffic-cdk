@@ -5,6 +5,8 @@ export enum EventType {
     ATB = 'ATB',
     ATD = 'ATD',
     ETA = 'ETA',
+    ETB = 'ETB',
+    ETP = 'ETP',
     ETD = 'ETD',
     // for pilotage
     RPS = 'RPS',
@@ -42,7 +44,7 @@ export type ApiTimestamp = {
 }
 
 export function validateTimestamp(timestamp: ApiTimestamp): boolean {
-    if(!Object.values(EventType).includes(timestamp.eventType)) {
+    if (!Object.values(EventType).includes(timestamp.eventType)) {
         console.warn('Invalid eventType for timestamp', timestamp);
         return false;
     }
@@ -98,7 +100,7 @@ export function validateTimestamp(timestamp: ApiTimestamp): boolean {
         console.warn('From locode too long', timestamp);
         return false;
     }
-    if(timestamp.location.portArea && timestamp.location.portArea.length > 6) {
+    if (timestamp.location.portArea && timestamp.location.portArea.length > 6) {
         console.warn('PortArea too long', timestamp);
         return false;
     }

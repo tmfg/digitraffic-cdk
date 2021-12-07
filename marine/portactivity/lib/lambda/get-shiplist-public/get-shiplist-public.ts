@@ -47,6 +47,7 @@ export function handlerFn(event: ProxyLambdaRequest,
                         source: ts.event_source,
                         eventTime: ts.event_time,
                         portcallId: ts.portcall_id,
+                        eventType: ts.event_type,
                     }));
             // don't overwrite source before merging as it utilizes source name in prioritizing
             const shiplist = mergeTimestamps(dbShiplist).map(ts =>

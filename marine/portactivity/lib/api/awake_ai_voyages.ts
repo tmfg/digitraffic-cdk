@@ -44,11 +44,11 @@ export type AwakeAiVoyagePrediction = {
     readonly recordTime: string
 
     readonly locode: string
+
+    readonly zoneType: AwakeAiZoneType
 }
 
 export type AwakeAiVoyageEtaPrediction = AwakeAiVoyagePrediction & {
-
-    readonly zoneType: AwakeAiZoneType
 
     // ISO 8601
     readonly arrivalTime: string
@@ -95,12 +95,12 @@ export class AwakeAiVoyagesApi {
             const resp = await axios.get(`${this.url}/${imo}`, {
                 headers: {
                     Authorization: this.apiKey,
-                    Accept: MediaType.APPLICATION_JSON
-                }
+                    Accept: MediaType.APPLICATION_JSON,
+                },
             });
             return {
                 type: AwakeAiETAResponseType.OK,
-                schedule: resp.data
+                schedule: resp.data,
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -108,32 +108,32 @@ export class AwakeAiVoyagesApi {
             }
             throw error;
         } finally {
-            console.log(`method=getETA tookMs=${Date.now() - start}`)
+            console.log(`method=getETA tookMs=${Date.now() - start}`);
         }
     }
 
     static handleError(error: { response?: { status: number } }): AwakeAiVoyageResponse {
         if (!error.response) {
             return {
-                type: AwakeAiETAResponseType.NO_RESPONSE
+                type: AwakeAiETAResponseType.NO_RESPONSE,
             };
         }
         switch (error.response.status) {
             case 404:
                 return {
-                    type: AwakeAiETAResponseType.SHIP_NOT_FOUND
-                }
+                    type: AwakeAiETAResponseType.SHIP_NOT_FOUND,
+                };
             case 422:
                 return {
-                    type: AwakeAiETAResponseType.INVALID_SHIP_ID
+                    type: AwakeAiETAResponseType.INVALID_SHIP_ID,
                 };
             case 500:
                 return {
-                    type: AwakeAiETAResponseType.SERVER_ERROR
+                    type: AwakeAiETAResponseType.SERVER_ERROR,
                 };
             default:
                 return {
-                    type: AwakeAiETAResponseType.UNKNOWN
+                    type: AwakeAiETAResponseType.UNKNOWN,
                 };
         }
     }

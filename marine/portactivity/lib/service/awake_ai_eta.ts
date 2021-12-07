@@ -9,9 +9,9 @@ import {
 } from "../api/awake_ai_voyages";
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
-import {EventSource} from "../model/eventsource";
+import {retry} from "digitraffic-common/promise/promise";
 import {AwakeAiZoneType} from "../api/awake_common";
-import {retry, RetryLogError} from "digitraffic-common/promise/promise";
+import {EventSource} from "../model/eventsource";
 
 type AwakeAiETAResponseAndShip = {
     readonly response: AwakeAiVoyageResponse
@@ -52,18 +52,22 @@ export class AwakeAiETAService {
                     if (!val) {
                         return acc;
                     }
-                    const ts = this.toTimeStamp(val);
-                    return ts ? acc.concat([ts]) : acc;
+                    const timestamps = this.toTimeStamps(val);
+
+                    // temporarily publish ETA also as ETB
+                    const etbs = timestamps
+                        .filter(ts => ts.eventType === EventType.ETA)
+                        .map(ts => ({...ts, ...{eventType: EventType.ETB}}));
+
+                    return acc.concat(timestamps, etbs);
                 }, []));
     }
 
     private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiETAResponseAndShip> {
         const start = Date.now();
-        console.info(
-            'method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d',
+        console.info('method=updateAwakeAiTimestamps fetching ETA for ship with IMO %d tookMs=%d',
             ship.imo,
-            (Date.now() - start),
-        );
+            (Date.now() - start));
         const response = await retry(() => this.api.getETA(ship.imo), 1);
         return {
             response,
@@ -71,56 +75,65 @@ export class AwakeAiETAService {
         };
     }
 
-    private toTimeStamp(resp: AwakeAiETAResponseAndShip): ApiTimestamp | null {
+    private toTimeStamps(resp: AwakeAiETAResponseAndShip): ApiTimestamp[] {
         if (!resp.response.schedule) {
             console.warn(`method=updateAwakeAiTimestamps no ETA received, state=${resp.response.type}`);
-            return null;
+            return [];
         }
         return this.handleSchedule(resp.response.schedule, resp.ship);
     }
 
-    private handleSchedule(schedule: AwakeAiVoyageShipVoyageSchedule, ship: DbETAShip): ApiTimestamp | null {
-        const eta = this.getETAPrediction(schedule);
-
-        if (!eta) {
-            return null;
-        }
-
-        if (eta.locode != ship.locode) {
-            if (this.overriddenDestinations.includes(ship.locode)) {
-                console.warn(`method=updateAwakeAiTimestamps state=${AwakeDataState.OVERRIDDEN_LOCODE} ${eta.locode} with ${ship.locode} in override list`);
-            } else {
-                console.warn(`method=updateAwakeAiTimestamps state=${AwakeDataState.DIFFERING_LOCODE} was ${ship.locode}, was ${eta.locode}, saving timestamp with predicted locode`);
+    private handleSchedule(schedule: AwakeAiVoyageShipVoyageSchedule, ship: DbETAShip): ApiTimestamp[] {
+        return this.getETAPredictions(schedule).map(etaPrediction => {
+            if (!etaPrediction.arrivalTime) {
+                console.warn(`method=isValidSchedule state=${AwakeDataState.NO_PREDICTED_ETA}`);
+                return null;
             }
-        }
 
-        return {
-            ship: {
-                mmsi: schedule.ship.mmsi,
-                imo: schedule.ship.imo,
-            },
-            location: {
-                port: this.normalizeDestination(ship.locode,
-                    eta.locode as string), // validated to be not null
-                portArea: ship.port_area_code,
-            },
-            source: EventSource.AWAKE_AI,
-            eventType: EventType.ETA,
-            eventTime: eta.arrivalTime, // validated to be not null
-            recordTime: eta.recordTime,
-            portcallId: ship.portcall_id,
-        };
+            if (!AwakeAiETAService.destinationIsFinnish(etaPrediction.locode)) {
+                console.warn(`method=isValidSchedule state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}`);
+                return null;
+            }
+
+            if (etaPrediction.locode != ship.locode) {
+                if (this.overriddenDestinations.includes(ship.locode)) {
+                    console.warn(`method=updateAwakeAiTimestamps state=${AwakeDataState.OVERRIDDEN_LOCODE} ${etaPrediction.locode} with ${ship.locode} in override list`);
+                } else {
+                    console.warn(`method=updateAwakeAiTimestamps state=${AwakeDataState.DIFFERING_LOCODE} was ${ship.locode}, was ${etaPrediction.locode}, saving timestamp with predicted locode`);
+                }
+            }
+
+            console.info('method=isValidSchedule schedule was valid');
+
+            const timestamp: ApiTimestamp = {
+                ship: {
+                    mmsi: schedule.ship.mmsi,
+                    imo: schedule.ship.imo,
+                },
+                location: {
+                    port: this.normalizeDestination(ship.locode,
+                        etaPrediction.locode as string), // validated to be not null
+                    portArea: ship.port_area_code,
+                },
+                source: EventSource.AWAKE_AI,
+                eventTime: etaPrediction.arrivalTime, // validated to be not null
+                recordTime: etaPrediction.recordTime,
+                portcallId: ship.portcall_id,
+                eventType: etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA,
+            };
+            return timestamp;
+        }).filter((ts): ts is ApiTimestamp => ts != null);
     }
 
-    private getETAPrediction(schedule: AwakeAiVoyageShipVoyageSchedule): AwakeAiVoyageEtaPrediction | null {
+    private getETAPredictions(schedule: AwakeAiVoyageShipVoyageSchedule): AwakeAiVoyageEtaPrediction[] {
         if (schedule.predictability !== AwakeAiVoyagePredictability.PREDICTABLE) {
             console.warn(`method=isValidSchedule state=${AwakeDataState.NO_PREDICTED_ETA} voyage was not predictable`);
-            return null;
+            return [];
         }
 
         if (!schedule.predictedVoyages.length) {
             console.warn(`method=isValidSchedule state=${AwakeDataState.NO_PREDICTED_ETA} predicted voyages was empty`);
-            return null;
+            return [];
         }
 
         // we are only interested in the current voyage (ETA) for now
@@ -128,30 +141,10 @@ export class AwakeAiETAService {
 
         if (eta.voyageStatus !== AwakeAiVoyageShipStatus.UNDER_WAY) {
             console.warn(`method=isValidSchedule state=${AwakeDataState.SHIP_NOT_UNDER_WAY} actual ship status ${eta.voyageStatus} `);
-            return null;
+            return [];
         }
 
-        const etaPredictions = eta.predictions.filter(p => p.predictionType == AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction[];
-        const etaPrediction = etaPredictions.find(p => p.zoneType === AwakeAiZoneType.BERTH);
-
-        if (!etaPrediction) {
-            console.warn(`method=isValidSchedule state=${AwakeDataState.NO_PREDICTED_ETA} no prediction of type ETA found`);
-            return null;
-        }
-
-        if (!etaPrediction.arrivalTime) {
-            console.warn(`method=isValidSchedule state=${AwakeDataState.NO_PREDICTED_ETA}`);
-            return null;
-        }
-
-        if (!AwakeAiETAService.destinationIsFinnish(etaPrediction.locode)) {
-            console.warn(`method=isValidSchedule state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}`);
-            return null;
-        }
-
-        console.info('method=isValidSchedule schedule was valid');
-
-        return etaPrediction;
+        return eta.predictions.filter(p => p.predictionType === AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction[];
     }
 
 

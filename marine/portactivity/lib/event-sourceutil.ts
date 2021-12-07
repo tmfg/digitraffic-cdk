@@ -1,4 +1,4 @@
-import {ApiTimestamp} from "./model/timestamp";
+import {ApiTimestamp, EventType} from "./model/timestamp";
 import * as R from "ramda";
 import moment, {Moment} from "moment-timezone";
 import {EventSource} from "./model/eventsource";
@@ -11,7 +11,7 @@ export const eventSourceMap = new Map<string, string>([
     [EventSource.AWAKE_AI, VTS_A],
     [EventSource.PORT_HANKO, EventSource.PORT_HANKO],
     [EventSource.SCHEDULES_VTS_CONTROL, VTS_O],
-    [EventSource.SCHEDULES_CALCULATED, VTS_A]
+    [EventSource.SCHEDULES_CALCULATED, VTS_A],
 ]);
 
 const eventSourcePriorities = new Map<string, number>([
@@ -19,7 +19,7 @@ const eventSourcePriorities = new Map<string, number>([
     [EventSource.AWAKE_AI, 80],
     [EventSource.SCHEDULES_CALCULATED, 90],
     [EventSource.SCHEDULES_VTS_CONTROL, 95],
-    [EventSource.PORT_HANKO, 100]
+    [EventSource.PORT_HANKO, 100],
 ]);
 
 export function isPortnetTimestamp(timestamp: ApiTimestamp): boolean {
@@ -45,14 +45,16 @@ export function momentAverage(moments: Moment[]): string {
 type MergeableTimestamp = {
     readonly eventTime: string
     readonly source: string
+    readonly eventType: EventType
     readonly portcallId?: number | null
 }
 
 export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTimestamp[] {
     let ret: MergeableTimestamp[] = timestamps;
 
-    // group by portcall id
-    const byPortcallId: MergeableTimestamp[][] = R.compose(R.values, R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString()))(timestamps);
+    // group by portcall id and event type
+    const byPortcallId: MergeableTimestamp[][] = R.compose(R.values,
+        R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString() + ts.eventType))(timestamps);
 
     let needToSort = false;
 
@@ -64,7 +66,7 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
             ret = ret.filter(t => !vtsAStamps.includes(t));
             const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source) as number), vtsAStamps)) as MergeableTimestamp;
             ret.push({ ...highestPriority, ...{
-                eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime)))
+                eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime))),
             }});
             needToSort = true;
         }
