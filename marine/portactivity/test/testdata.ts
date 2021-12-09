@@ -6,9 +6,7 @@ import {
     AwakeATXZoneEventType,
 } from "../lib/api/awake_ai_atx";
 import {AwakeAiZoneType} from "../lib/api/awake_common";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { v4: uuidv4 } = require('uuid');
+import { v4 as uuidv4 } from 'uuid';
 
 // test file
 /* eslint-disable camelcase */
