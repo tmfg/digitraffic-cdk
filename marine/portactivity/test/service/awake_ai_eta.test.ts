@@ -26,28 +26,35 @@ describe('service awake.ai', () => {
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         const mmsi = 123456789;
-        sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse(ship.locode, ship.imo, mmsi)));
+        const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, mmsi);
+        sinon.stub(api, 'getETA').returns(Promise.resolve(voyageTimestamp));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamps.length).toBe(2);
-        const etaTimestamp = timestamps.find(ts => ts.eventType === EventType.ETA);
-        const etbTimestamp = timestamps.find(ts => ts.eventType === EventType.ETB);
-        expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETA));
-        expect(etbTimestamp).toMatchObject(awakeTimestampFromTimestamp(etbTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETB));
+        expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
-    test('getETA - predicted locode differs', async () => {
+    test('getETA - no timestamps when predicted locode differs and ETA is >= 24 h', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
-        const ship = newDbETAShip();
-        const mmsi = 123456789;
-        sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse('FIHEH', ship.imo, mmsi)));
+        const ship = newDbETAShip('FIKEK', moment().add(getRandomInteger(24, 100), 'hour'));
+        sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse('FILOL', ship.imo, 123456789)));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamps.length).toBe(2);
-        expect(timestamps[0]).toMatchObject(awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code));
+        expect(timestamps.length).toBe(0);
+    });
+
+    test('getETA - timestamps created when predicted locode differs and ETA is < 24 h', async () => {
+        const api = createApi();
+        const service = new AwakeAiETAService(api);
+        const ship = newDbETAShip('FIKEK', moment().add(getRandomInteger(1, 23), 'hour'));
+        const voyageTimestamp = createVoyageResponse('FILOL', ship.imo, 123456789);
+        sinon.stub(api, 'getETA').returns(Promise.resolve(voyageTimestamp));
+
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
+
+        expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
     test('getETA - ship not under way', async () => {
@@ -153,22 +160,19 @@ describe('service awake.ai', () => {
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
         expect(timestamps.length).toBe(1);
-        expectSingleTimeStampToMatch(timestamps, awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code, EventType.ETP));
+        expect(timestamps[0]).toMatchObject(awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code, EventType.ETP));
     });
 
     test('getETA - port locode override', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip(service.overriddenDestinations[getRandomInteger(0, service.overriddenDestinations.length - 1)]);
-        const response = createVoyageResponse('FIKEK', ship.imo, 123456789);
-        sinon.stub(api, 'getETA').returns(Promise.resolve(response));
+        const voyageTimestamp = createVoyageResponse('FIKEK', ship.imo, 123456789);
+        sinon.stub(api, 'getETA').returns(Promise.resolve(voyageTimestamp));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamps.length).toBe(2);
-        const expectedTimestamp = awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (expectedTimestamp.location as any).port = ship.locode;
+        expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
     test('getETA - destination set explicitly when original ETA is less than 24 h', async () => {
@@ -199,15 +203,14 @@ describe('service awake.ai', () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
-        const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
+        const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, 123456789);
         const apiGetETAStub = sinon.stub(api, 'getETA');
         apiGetETAStub.onFirstCall().returns(Promise.reject('error'));
-        apiGetETAStub.onSecondCall().returns(Promise.resolve(response));
+        apiGetETAStub.onSecondCall().returns(Promise.resolve(voyageTimestamp));
 
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
-        expect(timestamps.length).toBe(2);
-        expect(timestamps[0]).toMatchObject(awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code));
+        expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
     test('getETA - retry fail', async () => {
@@ -285,7 +288,10 @@ function awakeTimestampFromTimestamp(timestamp: ApiTimestamp, portArea?: string,
     };
 }
 
-function expectSingleTimeStampToMatch(timestamps: ApiTimestamp[], expectedTimestamp: ApiTimestamp) {
-    expect(timestamps.length).toBe(1);
-    expect(timestamps[0]).toMatchObject(expectedTimestamp);
+function expectEtaAndEtb(ship: DbETAShip, voyageTimestamp: AwakeAiVoyageResponse, timestamps: ApiTimestamp[]) {
+    expect(timestamps.length).toBe(2);
+    const etaTimestamp = timestamps.find(ts => ts.eventType === EventType.ETA);
+    const etbTimestamp = timestamps.find(ts => ts.eventType === EventType.ETB);
+    expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETA));
+    expect(etbTimestamp).toMatchObject(awakeTimestampFromTimestamp(etbTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETB));
 }

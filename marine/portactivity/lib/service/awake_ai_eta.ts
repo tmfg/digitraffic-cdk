@@ -17,6 +17,7 @@ import moment from 'moment-timezone';
 type AwakeAiETAResponseAndShip = {
     readonly response: AwakeAiVoyageResponse
     readonly ship: DbETAShip
+    readonly diffHours: number
 }
 
 enum AwakeDataState {
@@ -71,7 +72,7 @@ export class AwakeAiETAService {
             (Date.now() - start));
 
         // if less than 24 hours to ship's arrival, set destination LOCODE explicitly
-        const diffEtaToNow = moment().diff(moment(ship.eta));
+        const diffEtaToNow = moment(ship.eta).diff(moment());
         const diffHours = moment.duration(diffEtaToNow).asHours();
         const locode = diffHours < 24 ? ship.locode : null;
 
@@ -79,6 +80,7 @@ export class AwakeAiETAService {
         return {
             response,
             ship,
+            diffHours,
         };
     }
 
@@ -87,10 +89,10 @@ export class AwakeAiETAService {
             console.warn(`method=toTimeStamps no ETA received, state=${resp.response.type}`);
             return [];
         }
-        return this.handleSchedule(resp.response.schedule, resp.ship);
+        return this.handleSchedule(resp.response.schedule, resp.ship, resp.diffHours);
     }
 
-    private handleSchedule(schedule: AwakeAiVoyageShipVoyageSchedule, ship: DbETAShip): ApiTimestamp[] {
+    private handleSchedule(schedule: AwakeAiVoyageShipVoyageSchedule, ship: DbETAShip, diffHours: number): ApiTimestamp[] {
         return this.getETAPredictions(schedule).map(etaPrediction => {
             if (!etaPrediction.arrivalTime) {
                 console.warn(`method=handleSchedule state=${AwakeDataState.NO_PREDICTED_ETA}`);
@@ -102,11 +104,14 @@ export class AwakeAiETAService {
                 return null;
             }
 
+            let port: string = etaPrediction.locode;
             if (etaPrediction.locode != ship.locode) {
-                if (this.overriddenDestinations.includes(ship.locode)) {
+                if (diffHours >= 24) {
+                    console.warn(`method=handleSchedule state=${AwakeDataState.DIFFERING_LOCODE} ${etaPrediction.locode} with ${ship.locode}, not persisting`);
+                    return null;
+                } else if (this.overriddenDestinations.includes(ship.locode)) {
                     console.warn(`method=handleSchedule state=${AwakeDataState.OVERRIDDEN_LOCODE} ${etaPrediction.locode} with ${ship.locode} in override list`);
-                } else {
-                    console.warn(`method=handleSchedule state=${AwakeDataState.DIFFERING_LOCODE} was ${ship.locode}, was ${etaPrediction.locode}, saving timestamp with predicted locode`);
+                    port = ship.locode;
                 }
             }
 
@@ -118,8 +123,7 @@ export class AwakeAiETAService {
                     imo: schedule.ship.imo,
                 },
                 location: {
-                    port: this.normalizeDestination(ship.locode,
-                        etaPrediction.locode as string), // validated to be not null
+                    port,
                     portArea: ship.port_area_code,
                 },
                 source: EventSource.AWAKE_AI,
@@ -152,11 +156,6 @@ export class AwakeAiETAService {
         }
 
         return eta.predictions.filter(p => p.predictionType === AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction[];
-    }
-
-
-    private normalizeDestination(expectedDestination: string, predictedDestination: string): string {
-        return this.overriddenDestinations.includes(expectedDestination) ? expectedDestination : predictedDestination;
     }
 
     private static destinationIsFinnish(locode: string): boolean {
