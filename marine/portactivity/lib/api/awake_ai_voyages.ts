@@ -1,5 +1,4 @@
-import axios from 'axios';
-import {AxiosError} from 'axios';
+import axios, {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {AwakeAiZoneType} from "./awake_common";
 
@@ -89,10 +88,19 @@ export class AwakeAiVoyagesApi {
         this.apiKey = apiKey;
     }
 
-    async getETA(imo: number): Promise<AwakeAiVoyageResponse> {
+    /**
+     * Queries the Awake.AI Voyages API for predictions
+     * @param imo Ship IMO
+     * @param locode Destination LOCODE. If set, overrides destination prediction.
+     */
+    async getETA(imo: number, locode: string | null): Promise<AwakeAiVoyageResponse> {
         const start = Date.now();
         try {
-            const resp = await axios.get(`${this.url}/${imo}`, {
+            let url = `${this.url}/${imo}`;
+            if (locode) {
+                url += `?destination=${locode}`;
+            }
+            const resp = await axios.get(url, {
                 headers: {
                     Authorization: this.apiKey,
                     Accept: MediaType.APPLICATION_JSON,

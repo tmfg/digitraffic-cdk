@@ -12,6 +12,7 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {retry} from "digitraffic-common/promise/promise";
 import {AwakeAiZoneType} from "../api/awake_common";
 import {EventSource} from "../model/eventsource";
+import moment from 'moment-timezone';
 
 type AwakeAiETAResponseAndShip = {
     readonly response: AwakeAiVoyageResponse
@@ -68,7 +69,13 @@ export class AwakeAiETAService {
         console.info('method=getAwakeAiTimestamp fetching ETA for ship with IMO %d tookMs=%d',
             ship.imo,
             (Date.now() - start));
-        const response = await retry(() => this.api.getETA(ship.imo), 1);
+
+        // if less than 24 hours to ship's arrival, set destination LOCODE explicitly
+        const diffEtaToNow = moment().diff(moment(ship.eta));
+        const diffHours = moment.duration(diffEtaToNow).asHours();
+        const locode = diffHours < 24 ? ship.locode : null;
+
+        const response = await retry(() => this.api.getETA(ship.imo, locode), 1);
         return {
             response,
             ship,

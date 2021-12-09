@@ -14,6 +14,7 @@ import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
 import {AwakeAiZoneType} from "../../lib/api/awake_common";
 import {getRandomInteger, randomBoolean} from "digitraffic-common/test/testutils";
+import moment from 'moment-timezone';
 
 // test file
 /* eslint-disable camelcase */
@@ -167,6 +168,30 @@ describe('service awake.ai', () => {
         (expectedTimestamp.location as any).port = ship.locode;
     });
 
+    test('getETA - destination set explicitly when original ETA is less than 24 h', async () => {
+        const locode = 'FIKEK';
+        const api = createApi();
+        const service = new AwakeAiETAService(api);
+        const ship = newDbETAShip(locode, moment().add(1, 'hour'));
+        const getETAStub = sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse(locode, ship.imo, 123456789)));
+
+        await service.getAwakeAiTimestamps([ship]);
+
+        expect(getETAStub.calledWith(ship.imo, locode)).toBe(true);
+    });
+
+    test('getETA - destination not set when original ETA is more than 24 h', async () => {
+        const locode = 'FIKEK';
+        const api = createApi();
+        const service = new AwakeAiETAService(api);
+        const ship = newDbETAShip(locode, moment().add(25, 'hour'));
+        const getETAStub = sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse(locode, ship.imo, 123456789)));
+
+        await service.getAwakeAiTimestamps([ship]);
+
+        expect(getETAStub.calledWith(ship.imo)).toBe(true);
+    });
+
     test('getETA - retry', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
@@ -236,12 +261,13 @@ function createApi(): AwakeAiVoyagesApi {
     return new AwakeAiVoyagesApi('', '');
 }
 
-function newDbETAShip(locode?: string): DbETAShip {
+function newDbETAShip(locode?: string, eta?: moment.Moment): DbETAShip {
     return {
         imo: 1234567,
         locode: locode ?? 'FILOL',
         port_area_code: 'FOO',
         portcall_id: 123,
+        eta: eta?.toISOString() ?? moment().add(getRandomInteger(1, 24), 'hour').toISOString(),
     };
 }
 
