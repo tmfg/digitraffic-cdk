@@ -21,7 +21,7 @@ import moment from 'moment-timezone';
 
 describe('service awake.ai', () => {
 
-    test('getETA - creates both ETA and ETB', async () => {
+    test('getAwakeAiTimestamps - creates both ETA and ETB', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -34,7 +34,7 @@ describe('service awake.ai', () => {
         expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
-    test('getETA - no timestamps when predicted locode differs and ETA is >= 24 h', async () => {
+    test('getAwakeAiTimestamps - no timestamps when predicted locode differs and ETA is >= 24 h', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip('FIKEK', moment().add(getRandomInteger(24, 100), 'hour'));
@@ -45,7 +45,7 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getETA - timestamps created when predicted locode differs and ETA is < 24 h', async () => {
+    test('getAwakeAiTimestamps - timestamps created when predicted locode differs and ETA is < 24 h', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip('FIKEK', moment().add(getRandomInteger(1, 23), 'hour'));
@@ -57,7 +57,7 @@ describe('service awake.ai', () => {
         expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
-    test('getETA - ship not under way', async () => {
+    test('getAwakeAiTimestamps - ship not under way', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -73,7 +73,7 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getETA - not predictable', async () => {
+    test('getAwakeAiTimestamps - not predictable', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -94,7 +94,7 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getETA - no predicted voyages', async () => {
+    test('getAwakeAiTimestamps - no predicted voyages', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -108,7 +108,7 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getETA - no ETA predictions', async () => {
+    test('getAwakeAiTimestamps - no ETA predictions', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -122,7 +122,7 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getETA - no predicted destination', async () => {
+    test('getAwakeAiTimestamps - no predicted destination', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -136,7 +136,7 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getETA - port outside Finland', async () => {
+    test('getAwakeAiTimestamps - port outside Finland', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -148,7 +148,7 @@ describe('service awake.ai', () => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getETA - pilotage ETP', async () => {
+    test('getAwakeAiTimestamps - pilotage ETP', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -163,7 +163,7 @@ describe('service awake.ai', () => {
         expect(timestamps[0]).toMatchObject(awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code, EventType.ETP));
     });
 
-    test('getETA - port locode override', async () => {
+    test('getAwakeAiTimestamps - port locode override', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip(service.overriddenDestinations[getRandomInteger(0, service.overriddenDestinations.length - 1)]);
@@ -175,7 +175,7 @@ describe('service awake.ai', () => {
         expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
-    test('getETA - destination set explicitly when original ETA is less than 24 h', async () => {
+    test('getAwakeAiTimestamps - destination set explicitly when original ETA is less than 24 h', async () => {
         const locode = 'FIKEK';
         const api = createApi();
         const service = new AwakeAiETAService(api);
@@ -187,7 +187,7 @@ describe('service awake.ai', () => {
         expect(getETAStub.calledWith(ship.imo, locode)).toBe(true);
     });
 
-    test('getETA - destination not set when original ETA is more than 24 h', async () => {
+    test('getAwakeAiTimestamps - destination not set when original ETA is more than 24 h', async () => {
         const locode = 'FIKEK';
         const api = createApi();
         const service = new AwakeAiETAService(api);
@@ -199,7 +199,7 @@ describe('service awake.ai', () => {
         expect(getETAStub.calledWith(ship.imo)).toBe(true);
     });
 
-    test('getETA - retry', async () => {
+    test('getAwakeAiTimestamps - retry', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -213,7 +213,7 @@ describe('service awake.ai', () => {
         expectEtaAndEtb(ship, voyageTimestamp, timestamps);
     });
 
-    test('getETA - retry fail', async () => {
+    test('getAwakeAiTimestamps - retry fail', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
