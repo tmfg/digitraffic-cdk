@@ -21,7 +21,7 @@ import moment from 'moment-timezone';
 
 describe('service awake.ai', () => {
 
-    test('getETA - ship under way with prediction', async () => {
+    test('getETA - creates both ETA and ETB', async () => {
         const api = createApi();
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
@@ -31,7 +31,10 @@ describe('service awake.ai', () => {
         const timestamps = await service.getAwakeAiTimestamps([ship]);
 
         expect(timestamps.length).toBe(2);
-        expect(timestamps[0]).toMatchObject(awakeTimestampFromTimestamp(timestamps[0], ship.port_area_code));
+        const etaTimestamp = timestamps.find(ts => ts.eventType === EventType.ETA);
+        const etbTimestamp = timestamps.find(ts => ts.eventType === EventType.ETB);
+        expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETA));
+        expect(etbTimestamp).toMatchObject(awakeTimestampFromTimestamp(etbTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETB));
     });
 
     test('getETA - predicted locode differs', async () => {
