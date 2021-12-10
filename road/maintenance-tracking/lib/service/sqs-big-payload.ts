@@ -59,7 +59,7 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
     const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
 
     if (!trackingJson.otsikko.lahettaja.jarjestelma) {
-        console.warn(`method=processMaintenanceTrackingQueue observations sendingSystem is empty using UNKNOWN s3Uri=%s`, s3Uri);
+        console.warn(`method=${logFunctionName} observations sendingSystem is empty using UNKNOWN s3Uri=%s`, s3Uri);
     }
 
     const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma ?? 'UNKNOWN';
@@ -71,11 +71,11 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
         const start = Date.now();
         const insertCount: number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
         const end = Date.now();
-        console.info(`method=processMaintenanceTrackingQueue messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
+        console.info(`method=${logFunctionName} messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
             sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes);
     } catch (e) {
         const clones =  MaintenanceTrackingDb.cloneObservationsWithoutJson(observationDatas);
-        console.error(`method=processMaintenanceTrackingQueue Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(clones)}`, e);
+        console.error(`method=${logFunctionName} Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(clones)}`, e);
         return Promise.reject(e);
     }
     return Promise.resolve();
