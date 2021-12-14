@@ -39,6 +39,7 @@ typings/
 # Configured env script
 **/cdk-set-env.sh
 **/copy-app-config.sh
+**/copy-transport-type-config.sh
 
 # build
 *.js
@@ -77,3 +78,4 @@ digitraffic-common/output
 
 marine/sse/lib/generated/tlsc-sse-reports-schema.d.ts
 /road/counting-sites/output/
+**/private/
