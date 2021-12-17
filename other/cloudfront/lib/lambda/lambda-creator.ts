@@ -1,6 +1,6 @@
-import {Stack,Duration } from '@aws-cdk/core';
-import {Runtime, Function, InlineCode, AssetCode, Version} from '@aws-cdk/aws-lambda';
-import {Role} from '@aws-cdk/aws-iam';
+import {Stack,Duration } from 'aws-cdk-lib';
+import {Runtime, Function, InlineCode, AssetCode, Version} from 'aws-cdk-lib/aws-lambda';
+import {Role} from 'aws-cdk-lib/aws-iam';
 
 const fs = require('fs');
 
@@ -14,7 +14,9 @@ export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role): Versi
     const functionBody = lambdaBody.toString()
         .replace(/EXT_VERSION/gi, versionString);
 
-    return createFunction(stack, edgeLambdaRole, 'gzip-requirement', functionBody, versionString);
+    return createFunction(
+        stack, edgeLambdaRole, 'gzip-requirement', functionBody, versionString,
+    );
 }
 
 export function createWeathercamRedirect(stack: Stack, edgeLambdaRole: Role, domainName: string, hostName: string): Version {
@@ -25,7 +27,9 @@ export function createWeathercamRedirect(stack: Stack, edgeLambdaRole: Role, dom
         .replace(/EXT_DOMAIN_NAME/gi, domainName)
         .replace(/EXT_VERSION/gi, versionString);
 
-    return createFunction(stack, edgeLambdaRole, 'weathercam-redirect', functionBody, versionString);
+    return createFunction(
+        stack, edgeLambdaRole, 'weathercam-redirect', functionBody, versionString,
+    );
 }
 
 export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
@@ -34,7 +38,9 @@ export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
     const functionBody = lambdaBody.toString()
         .replace(/EXT_VERSION/gi, versionString);
 
-    return createFunction(stack, edgeLambdaRole, 'http-headers', functionBody, versionString);
+    return createFunction(
+        stack, edgeLambdaRole, 'http-headers', functionBody, versionString,
+    );
 }
 
 export function createIpRestriction(stack: Stack, edgeLambdaRole: Role, path: string, ipList: string): Version {
@@ -44,22 +50,28 @@ export function createIpRestriction(stack: Stack, edgeLambdaRole: Role, path: st
         .replace(/EXT_IP/gi, ipList)
         .replace(/EXT_VERSION/gi, versionString);
 
-    return createFunction(stack, edgeLambdaRole, `ip-restriction-${path}`, functionBody, versionString);
+    return createFunction(
+        stack, edgeLambdaRole, `ip-restriction-${path}`, functionBody, versionString,
+    );
 }
 
-export function createFunction(stack: Stack, edgeLambdaRole: Role, functionName: string, functionBody: string, versionString: string): Version {
+export function createFunction(
+    stack: Stack, edgeLambdaRole: Role, functionName: string, functionBody: string, versionString: string,
+): Version {
     const edgeFunction = new Function(stack, functionName, {
         runtime: Runtime.NODEJS_12_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
         handler: 'index.handler',
-        role: edgeLambdaRole
+        role: edgeLambdaRole,
     });
 
-    return edgeFunction.addVersion(versionString);
+    return edgeFunction.currentVersion;
 }
 
-export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Role, elasticDomain: string, elasticAppName: string): Function {
+export function createWriteToEsLambda(
+    stack: Stack, env: string, lambdaRole: Role, elasticDomain: string, elasticAppName: string,
+): Function {
     return new Function(stack, `${env}-lambda-forward`, {
         runtime: Runtime.NODEJS_12_X,
         role: lambdaRole,
@@ -70,7 +82,7 @@ export function createWriteToEsLambda(stack: Stack, env: string, lambdaRole: Rol
         environment: {
             APP_DOMAIN: elasticAppName,
             ELASTIC_DOMAIN: elasticDomain,
-            DEPLOY_DATE: new Date().toISOString()
-        }
+            DEPLOY_DATE: new Date().toISOString(),
+        },
     });
 }

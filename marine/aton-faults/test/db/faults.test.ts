@@ -1,4 +1,3 @@
-import * as pgPromise from "pg-promise";
 import {dbTestBase, insert} from "../db-testutil";
 import {newFault} from "../testdata";
 import * as FaultsDb from '../../lib/db/faults';
@@ -8,19 +7,20 @@ import {FaultState} from "../../lib/model/fault";
 import {Language} from "digitraffic-common/model/language";
 import {getRandomNumber} from "digitraffic-common/test/testutils";
 import moment from 'moment';
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-voyageplan-faults', dbTestBase((db: DTDatabase) => {
 
     test('findFaultsByArea - within 15 nautical miles', async () => {
         const fault = newFault({
             geometry: {
                 lat: 60.285807,
-                lon: 27.321659
-            }
+                lon: 27.321659,
+            },
         });
         const route = new LineString([
             new Point(27.024842, 60.524496),
-            new Point(27.224842, 59.900138)
+            new Point(27.224842, 59.900138),
         ]);
 
         await insert(db, [fault]);
@@ -33,12 +33,12 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const fault = newFault({
             geometry: {
                 lat: 60.177569,
-                lon: 27.502246
-            }
+                lon: 27.502246,
+            },
         });
         const route = new LineString([
             new Point(27.029835, 60.474496),
-            new Point(27.224842, 60.400138)
+            new Point(27.224842, 60.400138),
         ]);
 
         await insert(db, [fault]);
@@ -51,27 +51,27 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const faultAvoin = newFault({
             geometry: {
                 lat: 60.474497,
-                lon: 27.029836
+                lon: 27.029836,
             },
-            state: FaultState.Avoin
+            state: FaultState.Avoin,
         });
         const faultKirjattu = newFault({
             geometry: {
                 lat: 60.474498,
-                lon: 27.029837
+                lon: 27.029837,
             },
-            state: FaultState.Kirjattu
+            state: FaultState.Kirjattu,
         });
         const faultAiheeton = newFault({
             geometry: {
                 lat: 60.474499,
-                lon: 27.029838
+                lon: 27.029838,
             },
-            state: FaultState.Aiheeton
+            state: FaultState.Aiheeton,
         });
         const route = new LineString([
             new Point(27.029835, 60.474496),
-            new Point(27.224842, 60.400138)
+            new Point(27.224842, 60.400138),
         ]);
 
         await insert(db, [faultAvoin, faultKirjattu, faultAiheeton]);
@@ -97,11 +97,13 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
 
         const foundFault = await FaultsDb.getFaultById(db, fault.id + 1);
 
-        await expect(foundFault).toBeNull()
+        await expect(foundFault).toBeNull();
     });
 
     test('findAllFaults - empty', async () => {
-        const faults = await findAll(db, Language.FI, 0, (f) => f);
+        const faults = await findAll(
+            db, Language.FI, 0, (f) => f,
+        );
 
         await expect(faults.length).toBe(0);
     });
@@ -110,7 +112,9 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const faults = Array.from({length: getRandomNumber(1, 10)}).map(() => newFault());
         await insert(db, faults);
 
-        const foundFaults = await findAll(db, Language.FI, 10, (f) => f);
+        const foundFaults = await findAll(
+            db, Language.FI, 10, (f) => f,
+        );
 
         await expect(foundFaults.length).toBe(faults.length);
     });
@@ -119,7 +123,9 @@ describe('db-voyageplan-faults', dbTestBase((db: pgPromise.IDatabase<any, any>) 
         const fault = newFault({ fixedTimestamp: moment().add(3, 'hour').toDate() });
         await insert(db, [fault]);
 
-        const faults = await findAll(db, Language.FI, 2, (f) => f);
+        const faults = await findAll(
+            db, Language.FI, 2, (f) => f,
+        );
 
         await expect(faults.length).toBe(1);
     });

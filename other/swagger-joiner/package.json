@@ -28,13 +28,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@aws-cdk/aws-events": "*",
-    "@aws-cdk/aws-events-targets": "*",
-    "@aws-cdk/aws-iam": "*",
-    "@aws-cdk/aws-lambda": "*",
-    "@aws-cdk/aws-logs": "*",
-    "@aws-cdk/aws-s3": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "@types/ramda": "0.27.44",
     "aws-sdk": "*",
     "axios": "^0.21.1",

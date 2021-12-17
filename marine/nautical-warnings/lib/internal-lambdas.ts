@@ -1,8 +1,8 @@
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
-import {Function} from "@aws-cdk/aws-lambda";
+import {Function} from "aws-cdk-lib/aws-lambda";
 import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 

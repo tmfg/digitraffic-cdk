@@ -1,14 +1,15 @@
-import {Construct, Stack, StackProps} from '@aws-cdk/core';
-import {Function,AssetCode} from '@aws-cdk/aws-lambda';
-import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam'
+import {Stack, StackProps} from 'aws-cdk-lib';
+import {Function,AssetCode} from 'aws-cdk-lib/aws-lambda';
+import {Construct} from "constructs";
+import {PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Props} from './app-props';
-import {Bucket, BlockPublicAccess} from "@aws-cdk/aws-s3";
+import {Bucket, BlockPublicAccess} from "aws-cdk-lib/aws-s3";
 import {KEY_ES_ENDPOINT, KEY_S3_BUCKET_NAME, KEY_SNS_TOPIC_ARN} from "./lambda/maintenance-tracking-log-watcher";
 import {defaultLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
-import {Rule,Schedule} from '@aws-cdk/aws-events';
-import {LambdaFunction} from '@aws-cdk/aws-events-targets';
-import * as sns from '@aws-cdk/aws-sns';
-import * as subscriptions from '@aws-cdk/aws-sns-subscriptions';
+import {Rule,Schedule} from 'aws-cdk-lib/aws-events';
+import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
+import * as sns from 'aws-cdk-lib/aws-sns';
+import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 
 export class MaintenanceTrackingLogWatcherStack extends Stack {
 
@@ -17,8 +18,10 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
 
         const lambdaRole = createLambdaRole(this, appProps);
         const logBucket = createLogBucket(this, appProps);
-        const emailTopic = createEmailTopic(this, appProps)
-        const lambdaFunction = createWatchLogAndUploadToS3Lambda(appProps, lambdaRole, emailTopic, logBucket.bucketName, this);
+        const emailTopic = createEmailTopic(this, appProps);
+        const lambdaFunction = createWatchLogAndUploadToS3Lambda(
+            appProps, lambdaRole, emailTopic, logBucket.bucketName, this,
+        );
         const s3WritePolicy = createWritePolicyToS3(logBucket.bucketArn);
 
         createLambdaTrigger(this, lambdaFunction);
@@ -31,19 +34,17 @@ export class MaintenanceTrackingLogWatcherStack extends Stack {
 function createLambdaRole(stack: Stack, appProps: Props) {
     const lambdaRole = new Role(stack, "MaintenanceTrackingLogWatcherStackLambdaElasticSearchRole", {
         assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-        roleName: "MaintenanceTrackingLogWatcherStackLambdaElasticSearchRole"
+        roleName: "MaintenanceTrackingLogWatcherStackLambdaElasticSearchRole",
     });
-    lambdaRole.addToPolicy(
-        new PolicyStatement({
-            actions: [
-                "es:ESHttpPost"
-            ],
-            resources: [
-                appProps.elasticSearchDomainArn,
-                `${appProps.elasticSearchDomainArn}/*`
-            ]
-        })
-    );
+    lambdaRole.addToPolicy(new PolicyStatement({
+        actions: [
+            "es:ESHttpPost",
+        ],
+        resources: [
+            appProps.elasticSearchDomainArn,
+            `${appProps.elasticSearchDomainArn}/*`,
+        ],
+    }));
     return lambdaRole;
 }
 
@@ -52,7 +53,7 @@ function createLogBucket(stack: Stack, appProps: Props) {
         bucketName: `${appProps.s3BucketName}-${appProps.app}-${appProps.env}`,
         versioned: false,
         publicReadAccess: false,
-        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 }
 
@@ -66,7 +67,7 @@ function createEmailTopic(stack: Stack, appProps: Props) {
 
 function createLambdaTrigger(stack: Stack, lambdaFunction: Function) {
     const rule = new Rule(stack, 'MaintenanceTrackingLogWatcherScheduler', {
-        schedule: Schedule.cron( { weekDay: 'MON', hour: '1', minute: '0' } )
+        schedule: Schedule.cron( { weekDay: 'MON', hour: '1', minute: '0' } ),
     });
     rule.addTarget(new LambdaFunction(lambdaFunction));
 }
@@ -84,7 +85,8 @@ function createWatchLogAndUploadToS3Lambda (
     role: Role,
     topic: sns.Topic,
     s3Bucketname : string,
-    stack: Stack): Function {
+    stack: Stack,
+): Function {
 
     const environment: any = {};
     environment[KEY_ES_ENDPOINT] = appProps.elasticSearchEndpoint;
@@ -97,7 +99,7 @@ function createWatchLogAndUploadToS3Lambda (
         code: new AssetCode('dist/lambda'),
         handler: 'maintenance-tracking-log-watcher.handler',
         role: role,
-        environment
+        environment,
     });
 
     return new Function(stack, functionName, lambdaConf);

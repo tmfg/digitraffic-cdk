@@ -1,9 +1,10 @@
-import {Construct, Duration} from "@aws-cdk/core";
-import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics";
+import {Duration} from "aws-cdk-lib";
+import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics-alpha";
 import {LambdaEnvironment} from "../model/lambda-environment";
-import {Role} from "@aws-cdk/aws-iam";
+import {Role} from "aws-cdk-lib/aws-iam";
 import {CanaryAlarm} from "./canary-alarm";
 import {CanaryParameters} from "./canary-parameters";
+import {Construct} from "constructs";
 
 export class DigitrafficCanary extends Canary {
     constructor(
@@ -13,28 +14,24 @@ export class DigitrafficCanary extends Canary {
         params: CanaryParameters,
         environmentVariables: LambdaEnvironment,
     ) {
-        super(
-            scope, canaryName, {
-                runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_3,
-                role,
-                test: Test.custom({
-                    code: new AssetCode("dist", {
-                        exclude: ["lambda"],
-                    }),
-                    handler: params.handler,
+        super(scope, canaryName, {
+            runtime: Runtime.SYNTHETICS_NODEJS_PUPPETEER_3_3,
+            role,
+            test: Test.custom({
+                code: new AssetCode("dist", {
+                    exclude: ["lambda"],
                 }),
-                environmentVariables,
-                canaryName,
-                schedule: params.schedule ?? Schedule.rate(Duration.minutes(15)),
-            },
-        );
+                handler: params.handler,
+            }),
+            environmentVariables,
+            canaryName,
+            schedule: params.schedule ?? Schedule.rate(Duration.minutes(15)),
+        });
 
         this.artifactsBucket.grantWrite(role);
 
         if (params.alarm ?? true) {
-            new CanaryAlarm(
-                scope, this, params,
-            );
+            new CanaryAlarm(scope, this, params);
         }
     }
 }

@@ -1,12 +1,12 @@
-import {Construct} from '@aws-cdk/core';
+import {Construct} from 'constructs';
 import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
 import * as Sqs from './sqs';
 import {PublicApi} from "./public-api";
 import {Props} from './app-props';
-import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
-import {DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget} from "@aws-cdk/aws-rds";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
+import {DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget} from "aws-cdk-lib/aws-rds";
+import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Canaries} from "./canaries";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
@@ -19,7 +19,7 @@ export class PortActivityStack extends DigitrafficStack {
         const queueAndDLQ = Sqs.createQueue(this);
         const dlqBucket = new Bucket(this, 'DLQBucket', {
             bucketName: appProps.dlqBucketName,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         });
 
         InternalLambdas.create(this, queueAndDLQ, dlqBucket);
@@ -31,14 +31,14 @@ export class PortActivityStack extends DigitrafficStack {
 
         new Bucket(this, 'DocumentationBucket', {
             bucketName: appProps.documentationBucketName,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         });
     }
 
     createRdsProxy(secret: ISecret, appProps: Props) {
         const cluster = DatabaseCluster.fromDatabaseClusterAttributes(this, 'DbCluster', {
             clusterIdentifier: appProps.dbClusterIdentifier,
-            engine: DatabaseClusterEngine.AURORA_POSTGRESQL
+            engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
         });
 
         // CDK tries to allow connections between proxy and cluster
@@ -52,7 +52,7 @@ export class PortActivityStack extends DigitrafficStack {
             secrets: [secret],
             proxyTarget: ProxyTarget.fromCluster(cluster),
             securityGroups: [this.lambdaDbSg],
-            requireTLS: false
+            requireTLS: false,
         });
     }
 }

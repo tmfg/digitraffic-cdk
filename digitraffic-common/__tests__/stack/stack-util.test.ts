@@ -1,10 +1,10 @@
-import { Stack } from "@aws-cdk/core";
+import { Stack } from "aws-cdk-lib";
 import * as StackUtil from "../../stack/stack-util";
 
 describe('stack-util tests', () => {
     function assertFullEnv(stackName: string, expected: string) {
         const stack = new Stack(undefined, "name", {
-            stackName
+            stackName,
         });
 
         const fullEnv = StackUtil.getFullEnv(stack);

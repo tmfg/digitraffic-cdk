@@ -1,5 +1,5 @@
 import {LambdaType} from "./lambda/lambda-creator";
-import {LambdaEdgeEventType} from "@aws-cdk/aws-cloudfront";
+import {LambdaEdgeEventType} from "aws-cdk-lib/aws-cloudfront";
 import {WafRules} from "./acl/waf-rules";
 
 export interface CFBehaviorLambda {

@@ -1,4 +1,4 @@
-import {Environment} from "@aws-cdk/core";
+import {Environment} from "aws-cdk-lib";
 
 export type MonitoringConfiguration = {
     readonly warningTopicEmail: string

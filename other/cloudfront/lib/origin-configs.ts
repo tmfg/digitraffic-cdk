@@ -1,25 +1,27 @@
-import {Duration, Stack} from '@aws-cdk/core';
+import {Duration, Stack} from 'aws-cdk-lib';
 import {
     OriginProtocolPolicy,
     OriginAccessIdentity,
     SourceConfiguration,
     Behavior,
     CloudFrontAllowedMethods,
-    LambdaEdgeEventType
-} from '@aws-cdk/aws-cloudfront';
+    LambdaEdgeEventType,
+} from 'aws-cdk-lib/aws-cloudfront';
 import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
-import {Bucket} from '@aws-cdk/aws-s3';
+import {Bucket} from 'aws-cdk-lib/aws-s3';
 
-export function createOriginConfig(stack: Stack, domain: CFDomain,
-                                   oai: OriginAccessIdentity|null,
-                                   lambdaMap: any): SourceConfiguration {
-    if(domain.s3BucketName) {
+export function createOriginConfig(stack: Stack,
+    domain: CFDomain,
+    oai: OriginAccessIdentity|null,
+    lambdaMap: any)
+    : SourceConfiguration {
+    if (domain.s3BucketName) {
         if (!oai) {
             throw new Error('OAI was null! OAI is needed for S3 origin');
         }
         const bucket = Bucket.fromBucketAttributes(stack, `ImportedBucketName-${domain.s3BucketName}`, {
             bucketArn: `arn:aws:s3:::${domain.s3BucketName}`,
-            bucketRegionalDomainName: `${domain.s3BucketName}.s3.eu-west-1.amazonaws.com`
+            bucketRegionalDomainName: `${domain.s3BucketName}.s3.eu-west-1.amazonaws.com`,
         });
 
         bucket.grantRead(oai as OriginAccessIdentity);
@@ -28,29 +30,29 @@ export function createOriginConfig(stack: Stack, domain: CFDomain,
             s3OriginSource: {
                 s3BucketSource: bucket,
                 originAccessIdentity: oai as OriginAccessIdentity,
+                originPath: domain.originPath,
+                originHeaders: createOriginHeaders(domain),
             },
             behaviors: createBehaviors(stack, domain.behaviors || [], lambdaMap),
-            originPath: domain.originPath,
-            originHeaders: createOriginHeaders(domain)
-        }
+        };
     }
     return {
         customOriginSource: {
             domainName: domain.domainName as string,
             httpPort: domain.httpPort ?? 80,
             httpsPort: domain.httpsPort ?? 443,
-            originProtocolPolicy: domain.originProtocolPolicy as OriginProtocolPolicy ?? OriginProtocolPolicy.HTTPS_ONLY
+            originProtocolPolicy: domain.originProtocolPolicy as OriginProtocolPolicy ?? OriginProtocolPolicy.HTTPS_ONLY,
+            originPath: domain.originPath,
+            originHeaders: createOriginHeaders(domain),
         },
         behaviors: createBehaviors(stack, domain.behaviors || [], lambdaMap),
-        originPath: domain.originPath,
-        originHeaders: createOriginHeaders(domain)
-    }
+    };
 }
 
 function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
     if (domain.apiKey !== undefined) {
         return {
-            'x-api-key': domain.apiKey
+            'x-api-key': domain.apiKey,
         } as { [key: string] : string };
     }
 
@@ -65,15 +67,15 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
 //    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
 
     const forwardedValues = {
-            headers: [] as string[],
-            queryString: true,
-            queryStringCacheKeys: b.queryCacheKeys as string[]
-        } as any;
+        headers: [] as string[],
+        queryString: true,
+        queryStringCacheKeys: b.queryCacheKeys as string[],
+    } as any;
 
-    if(b.viewerProtocolPolicy === 'https-only') {
+    if (b.viewerProtocolPolicy === 'https-only') {
         forwardedValues.headers.push('Host');
     }
-    if(b.cacheHeaders != null) {
+    if (b.cacheHeaders != null) {
         (forwardedValues as any).headers = forwardedValues.headers.concat(b.cacheHeaders);
     }
 
@@ -85,20 +87,20 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
         maxTtl: Duration.seconds(b.cacheTtl ?? 60),
         defaultTtl: Duration.seconds(b.cacheTtl ?? 60),
         forwardedValues,
-        lambdaFunctionAssociations: getLambdas(b, lambdaMap)
+        lambdaFunctionAssociations: getLambdas(b, lambdaMap),
     };
 }
 
 function getLambdas(b: CFBehavior, lambdaMap: any) {
     const lambdas = b.lambdas?.map(l => ({
         eventType: l.eventType,
-        lambdaFunction: lambdaMap[l.lambdaType]
+        lambdaFunction: lambdaMap[l.lambdaType],
     })) || [];
 
-    if(b.ipRestriction) {
+    if (b.ipRestriction) {
         lambdas.push({
             eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
-            lambdaFunction: lambdaMap[`IP_${b.ipRestriction}`]
+            lambdaFunction: lambdaMap[`IP_${b.ipRestriction}`],
         });
     }
 

@@ -1,10 +1,10 @@
-import {Construct} from '@aws-cdk/core';
+import {Construct} from 'constructs';
 import * as IntegrationApi from './integration-api';
 import * as InternalLambdas from './internal-lambdas';
 import * as PublicApi from './public-api';
 import {VoyagePlanGatewayProps} from "./app-props";
-import {Secret} from "@aws-cdk/aws-secretsmanager";
-import {Topic} from "@aws-cdk/aws-sns";
+import {Secret} from "aws-cdk-lib/aws-secretsmanager";
+import {Topic} from "aws-cdk-lib/aws-sns";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export class VoyagePlanGatewayStack extends DigitrafficStack {
@@ -16,7 +16,7 @@ export class VoyagePlanGatewayStack extends DigitrafficStack {
         const notifyTopicName = 'VPGW-NotifyTopic';
         const notifyTopic = new Topic(this, notifyTopicName, {
             topicName: notifyTopicName,
-            displayName: notifyTopicName
+            displayName: notifyTopicName,
         });
 
         IntegrationApi.create(secret, notifyTopic, appProps, this);

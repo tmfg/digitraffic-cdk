@@ -1,13 +1,14 @@
-import {Rule, Schedule} from "@aws-cdk/aws-events";
-import {Construct, Duration} from "@aws-cdk/core";
-import {LambdaFunction} from "@aws-cdk/aws-events-targets";
-import {Function} from '@aws-cdk/aws-lambda';
+import {Rule, Schedule} from "aws-cdk-lib/aws-events";
+import {Duration} from "aws-cdk-lib";
+import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
+import {Function} from 'aws-cdk-lib/aws-lambda';
+import {Construct} from "constructs";
 
 export class Scheduler extends Rule {
     constructor(stack: Construct, ruleName: string, schedule: Schedule, lambda?: Function) {
         super(stack, ruleName, { ruleName, schedule });
 
-        if(lambda) {
+        if (lambda) {
             this.addTarget(new LambdaFunction(lambda));
         }
     }

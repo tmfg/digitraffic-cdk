@@ -1,10 +1,10 @@
-import {CfnRealtimeLogConfig} from '@aws-cdk/aws-cloudfront';
-import {Duration, Stack} from '@aws-cdk/core';
-import {Code, Runtime, StartingPosition, Tracing, Function} from '@aws-cdk/aws-lambda';
-import {Queue} from '@aws-cdk/aws-sqs';
-import {PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam'
-import {Stream} from '@aws-cdk/aws-kinesis';
-import {KinesisEventSource} from '@aws-cdk/aws-lambda-event-sources';
+import {CfnRealtimeLogConfig} from 'aws-cdk-lib/aws-cloudfront';
+import {Duration, Stack} from 'aws-cdk-lib';
+import {Code, Runtime, StartingPosition, Tracing, Function} from 'aws-cdk-lib/aws-lambda';
+import {Queue} from 'aws-cdk-lib/aws-sqs';
+import {PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
+import {Stream} from 'aws-cdk-lib/aws-kinesis';
+import {KinesisEventSource} from 'aws-cdk-lib/aws-lambda-event-sources';
 
 import {CLOUDFRONT_STREAMING_LOG_FIELDS} from "./lambda/stream-to-elastic/logging-util";
 import {ElasticProps} from "./app-props";
@@ -14,12 +14,14 @@ export function createRealtimeLogging(stack: Stack, writeToESRole: Role, appName
     const kinesisWriteRole = createRealtimeLoggingRole(stack, appName, kinesis);
     const loggingConfig = createLoggingConfig(stack, appName, kinesis, kinesisWriteRole);
 
-    createKinesisConsumerLambda(stack, appName, kinesis, elasticProps, writeToESRole);
+    createKinesisConsumerLambda(
+        stack, appName, kinesis, elasticProps, writeToESRole,
+    );
 
     return {
         kinesis: kinesis,
         loggingConfig: loggingConfig,
-    }
+    };
 }
 
 function createRealtimeLoggingRole(stack: Stack, appName: string, kinesis: Stream): Role {
@@ -27,20 +29,18 @@ function createRealtimeLoggingRole(stack: Stack, appName: string, kinesis: Strea
 
     const role = new Role(stack, name, {
         assumedBy: new ServicePrincipal('cloudfront.amazonaws.com'),
-        roleName: name
+        roleName: name,
     });
 
-    role.addToPolicy(
-        new PolicyStatement({
-            actions: [
-                'kinesis:DescribeStreamSummary',
-                'kinesis:DescribeStream',
-                'kinesis:PutRecord',
-                'kinesis:PutRecords',
-            ],
-            resources: [kinesis.streamArn],
-        })
-    );
+    role.addToPolicy(new PolicyStatement({
+        actions: [
+            'kinesis:DescribeStreamSummary',
+            'kinesis:DescribeStream',
+            'kinesis:PutRecord',
+            'kinesis:PutRecords',
+        ],
+        resources: [kinesis.streamArn],
+    }));
 
     return role;
 }
@@ -54,7 +54,7 @@ function createKinesisStream(stack: Stack, appName: string): Stream {
     return new Stream(stack, streamName, {
         shardCount: 1,
         streamName: streamName,
-        retentionPeriod: Duration.days(1)
+        retentionPeriod: Duration.days(1),
     });
 }
 
@@ -71,11 +71,13 @@ function createLoggingConfig(stack: Stack, appName: string, kinesis: Stream, rol
         ],
         samplingRate: 100,
         name: `realtime-config-${appName}`,
-        fields: CLOUDFRONT_STREAMING_LOG_FIELDS
+        fields: CLOUDFRONT_STREAMING_LOG_FIELDS,
     });
 }
 
-function createKinesisConsumerLambda(stack: Stack, appName: string, kinesis: Stream, elasticProps: ElasticProps, writeToESRole: Role) {
+function createKinesisConsumerLambda(
+    stack: Stack, appName: string, kinesis: Stream, elasticProps: ElasticProps, writeToESRole: Role,
+) {
     const functionName = `RealtimeLoggingLambda-${appName}`;
 
     const dlq = new Queue(stack, 'DLQ', {
@@ -99,19 +101,17 @@ function createKinesisConsumerLambda(stack: Stack, appName: string, kinesis: Str
         memorySize: elasticProps.streamingProps?.memorySize ?? 256,
     });
 
-//    CloudWatchLogGroupUtil.createLambdaLogGroup(
-//        stack,
-//        functionName,
-//        RetentionDays.ONE_DAY
-//    )
+    //    CloudWatchLogGroupUtil.createLambdaLogGroup(
+    //        stack,
+    //        functionName,
+    //        RetentionDays.ONE_DAY
+    //    )
 
-    fn.addEventSource(
-        new KinesisEventSource(kinesis, {
-            batchSize: elasticProps.streamingProps?.batchSize ?? 100,
-            maxBatchingWindow: Duration.seconds(elasticProps.streamingProps?.maxBatchingWindow ?? 20),
-            startingPosition: StartingPosition.LATEST,
-        })
-    );
+    fn.addEventSource(new KinesisEventSource(kinesis, {
+        batchSize: elasticProps.streamingProps?.batchSize ?? 100,
+        maxBatchingWindow: Duration.seconds(elasticProps.streamingProps?.maxBatchingWindow ?? 20),
+        startingPosition: StartingPosition.LATEST,
+    }));
     kinesis.grantRead(writeToESRole);
 
     return fn;

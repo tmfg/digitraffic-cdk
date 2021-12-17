@@ -1,4 +1,4 @@
-import {Bucket} from "@aws-cdk/aws-s3";
+import {Bucket} from "aws-cdk-lib/aws-s3";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {MarinecamEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
@@ -6,8 +6,7 @@ import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/
 import {MobileServerProps} from "./app-props";
 import {Scheduler} from "digitraffic-common/scheduler/scheduler";
 
-export function create(
-    stack: DigitrafficStack,
+export function create(stack: DigitrafficStack,
     bucket: Bucket) {
 
     const updateLambda = createUpdateImagesLambda(stack, bucket);
@@ -16,12 +15,12 @@ export function create(
 }
 
 function createUpdateImagesLambda(stack: DigitrafficStack,
-                                  bucket: Bucket) {
+    bucket: Bucket) {
     const environment = stack.createLambdaEnvironment();
     environment[MarinecamEnvKeys.BUCKET_NAME] = bucket.bucketName;
 
     const lambda = MonitoredDBFunction.create(stack, 'update-images', environment, {
-        reservedConcurrentExecutions: 2
+        reservedConcurrentExecutions: 2,
     });
 
     Scheduler.every(stack, 'UpdateImages-Rule', (stack.configuration as MobileServerProps).updateFrequency, lambda);

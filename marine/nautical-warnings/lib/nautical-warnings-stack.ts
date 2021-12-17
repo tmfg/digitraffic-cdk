@@ -1,5 +1,5 @@
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {Construct} from "@aws-cdk/core";
+import {Construct} from "constructs";
 import {NauticalWarningConfiguration} from "./app-props";
 import {InternalLambdas} from "./internal-lambdas";
 import {PublicApi} from "./public-api";

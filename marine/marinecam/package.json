@@ -17,7 +17,6 @@
   },
   "devDependencies": {
     "@aws-cdk/assert": "*",
-    "@aws-cdk/aws-ec2": "*",
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
     "@types/node": "*",
@@ -35,15 +34,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "*",
-    "@aws-cdk/aws-cognito": "*",
-    "@aws-cdk/aws-events": "*",
-    "@aws-cdk/aws-events-targets": "*",
-    "@aws-cdk/aws-iam": "*",
-    "@aws-cdk/aws-lambda": "*",
-    "@aws-cdk/aws-s3": "*",
-    "@aws-cdk/aws-secretsmanager": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "amazon-cognito-identity-js": "^4.6.0",
     "aws-sdk": "*",
     "axios": "^0.21.1",

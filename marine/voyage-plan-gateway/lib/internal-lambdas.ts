@@ -1,39 +1,38 @@
-import {AssetCode, Runtime} from '@aws-cdk/aws-lambda';
-import {Duration, Stack} from '@aws-cdk/core';
+import {AssetCode, Runtime} from 'aws-cdk-lib/aws-lambda';
+import {Duration, Stack} from 'aws-cdk-lib';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
-import {Topic} from "@aws-cdk/aws-sns";
-import {LambdaSubscription} from "@aws-cdk/aws-sns-subscriptions";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import {Topic} from "aws-cdk-lib/aws-sns";
+import {LambdaSubscription} from "aws-cdk-lib/aws-sns-subscriptions";
+import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {VoyagePlanGatewayProps} from "./app-props";
 import {VoyagePlanEnvKeys} from "./keys";
-import {Queue, QueueEncryption} from "@aws-cdk/aws-sqs";
-import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
-import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
-import {RetentionDays} from "@aws-cdk/aws-logs";
-import {PolicyStatement} from "@aws-cdk/aws-iam";
+import {Queue, QueueEncryption} from "aws-cdk-lib/aws-sqs";
+import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
+import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
+import {RetentionDays} from "aws-cdk-lib/aws-logs";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
-import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
-import {Rule, Schedule} from "@aws-cdk/aws-events";
-import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {ComparisonOperator, TreatMissingData} from "aws-cdk-lib/aws-cloudwatch";
+import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
+import {Rule, Schedule} from "aws-cdk-lib/aws-events";
+import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export function create(
-    secret: ISecret,
+export function create(secret: ISecret,
     notifyTopic: Topic,
     props: VoyagePlanGatewayProps,
     stack: DigitrafficStack) {
 
     const rtzBucket = new Bucket(stack, 'RTZStorageBucket', {
         bucketName: props.rtzStorageBucketName,
-        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 
     const dlqBucket = new Bucket(stack, 'DLQBucket', {
         bucketName: props.dlqBucketName,
-        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 
     const dlqQueueName = 'VPGW-SendRouteDLQ.fifo';
@@ -41,7 +40,7 @@ export function create(
         queueName: dlqQueueName,
         receiveMessageWaitTime: Duration.seconds(20),
         encryption: QueueEncryption.KMS_MANAGED,
-        fifo: true
+        fifo: true,
     });
 
     const sendRouteQueueName = 'VPGW-SendRouteQueue.fifo';
@@ -51,8 +50,8 @@ export function create(
         fifo: true, // prevent sending route plans twice
         deadLetterQueue: {
             maxReceiveCount: 3,
-            queue: dlq
-        }
+            queue: dlq,
+        },
     });
 
     const processVisMessagesLambda = createProcessVisMessagesLambda(
@@ -60,7 +59,8 @@ export function create(
         notifyTopic,
         sendRouteQueue,
         props,
-        stack);
+        stack,
+    );
     const scheduler = createProcessVisMessagesScheduler(stack);
     scheduler.addTarget(new LambdaFunction(processVisMessagesLambda));
 
@@ -69,9 +69,9 @@ export function create(
         sendRouteQueue,
         rtzBucket,
         props,
-        stack);
-    createProcessDLQLambda(
-        dlqBucket,
+        stack,
+    );
+    createProcessDLQLambda(dlqBucket,
         dlq,
         props,
         stack);
@@ -80,10 +80,10 @@ export function create(
 }
 
 function createProcessVisMessagesScheduler(stack: Stack): Rule {
-    const ruleName = 'VPGW-ProcessVisMessagesScheduler'
+    const ruleName = 'VPGW-ProcessVisMessagesScheduler';
     return new Rule(stack, ruleName, {
         ruleName,
-        schedule: Schedule.expression('cron(*/1 * * * ? *)') // every 1 minutes
+        schedule: Schedule.expression('cron(*/1 * * * ? *)'), // every 1 minutes
     });
 }
 
@@ -92,7 +92,8 @@ function createProcessVisMessagesLambda(
     notifyTopic: Topic,
     sendRouteQueue: Queue,
     props: VoyagePlanGatewayProps,
-    stack: DigitrafficStack) {
+    stack: DigitrafficStack,
+) {
 
     const functionName = "VPGW-ProcessVisMessages";
     const environment = {} as any;
@@ -105,7 +106,7 @@ function createProcessVisMessagesLambda(
         reservedConcurrentExecutions: 2,
         code: new AssetCode('dist/lambda/process-vis-messages'),
         handler: 'lambda-process-vis-messages.handler',
-        environment
+        environment,
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
@@ -124,7 +125,8 @@ function createUploadVoyagePlanLambda(
     sendRouteQueue: Queue,
     rtzBucket: Bucket,
     props: VoyagePlanGatewayProps,
-    stack: DigitrafficStack) {
+    stack: DigitrafficStack,
+) {
 
     const functionName = "VPGW-UploadVoyagePlan";
 
@@ -139,20 +141,19 @@ function createUploadVoyagePlanLambda(
         reservedConcurrentExecutions: 3,
         timeout: 10,
         vpc: stack.vpc,
-        environment
+        environment,
     });
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     secret.grantRead(lambda);
     lambda.addEventSource(new SqsEventSource(sendRouteQueue, {
-        batchSize: 1
+        batchSize: 1,
     }));
     rtzBucket.grantPut(lambda);
 
     new DigitrafficLogSubscriptions(stack, lambda);
 }
 
-function createProcessDLQLambda(
-    dlqBucket: Bucket,
+function createProcessDLQLambda(dlqBucket: Bucket,
     dlq: Queue,
     props: VoyagePlanGatewayProps,
     stack: DigitrafficStack) {
@@ -169,7 +170,7 @@ function createProcessDLQLambda(
         environment: lambdaEnv,
         timeout: Duration.seconds(10),
         reservedConcurrentExecutions: 1,
-        memorySize: 128
+        memorySize: 128,
     });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
@@ -182,19 +183,18 @@ function createProcessDLQLambda(
     processDLQLambda.addToRolePolicy(statement);
 }
 
-function addDLQAlarm(
-    queue: Queue,
+function addDLQAlarm(queue: Queue,
     appProps: VoyagePlanGatewayProps,
     stack: DigitrafficStack) {
-    
+
     const alarmName = 'VPGW-DLQAlarm';
     queue.metricNumberOfMessagesReceived({
-        period: appProps.dlqNotificationDuration
+        period: appProps.dlqNotificationDuration,
     }).createAlarm(stack, alarmName, {
         alarmName,
         threshold: 0,
         evaluationPeriods: 1,
         treatMissingData: TreatMissingData.NOT_BREACHING,
-        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
+        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
     }).addAlarmAction(new SnsAction(stack.warningTopic));
 }

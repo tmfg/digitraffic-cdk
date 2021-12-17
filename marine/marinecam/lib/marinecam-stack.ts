@@ -1,9 +1,9 @@
-import {Construct} from '@aws-cdk/core';
+import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
+import {UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
+import {Construct} from "constructs";
+import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MobileServerProps} from './app-props';
 import * as InternalLambas from './internal-lambdas';
-import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
-import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {PrivateApi} from "./private-api";
 import {Canaries} from "./canaries";
 
@@ -23,16 +23,16 @@ export class MarinecamStack extends DigitrafficStack {
 
 function createUserPool(stack: Construct): [UserPool, UserPoolClient] {
     const userPool = new UserPool(stack, 'UserPool', {
-        userPoolName: 'MarinecamUserPool'
+        userPoolName: 'MarinecamUserPool',
     });
 
     const userPoolClient = new UserPoolClient(stack, 'UserPoolClient', {
         userPool,
         authFlows: {
             userPassword: true,
-            userSrp: true
+            userSrp: true,
         },
-        disableOAuth: true
+        disableOAuth: true,
     });
 
     return [userPool, userPoolClient];
@@ -43,6 +43,6 @@ function createImageBucket(stack: Construct, props: MobileServerProps): Bucket {
         bucketName: `dt-marinecam-${props.production ? 'prod' : 'test'}`,
         versioned: false,
         publicReadAccess: false,
-        blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
     });
 }

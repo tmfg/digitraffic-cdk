@@ -1,4 +1,4 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
+import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
 
 export const EpcMessageSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
@@ -9,32 +9,32 @@ export const EpcMessageSchema: JsonSchema = {
         "EPCMessageHeader": {
             "oneOf": [
                 {
-                    "type": JsonSchemaType.NULL
+                    "type": JsonSchemaType.NULL,
                 },
                 {
-                    ref: "#/definitions/EPCMessageHeaderType"
-                }
-            ]
+                    ref: "#/definitions/EPCMessageHeaderType",
+                },
+            ],
         },
         "EPCRequestBody": {
             "oneOf": [
                 {
-                    "type": JsonSchemaType.NULL
+                    "type": JsonSchemaType.NULL,
                 },
                 {
-                    ref: "#/definitions/EPCAcknowledgeBodyType"
+                    ref: "#/definitions/EPCAcknowledgeBodyType",
                 },
                 {
-                    ref: "#/definitions/EPCCancelBodyType"
+                    ref: "#/definitions/EPCCancelBodyType",
                 },
                 {
-                    ref: "#/definitions/EPCReceiptBodyType"
+                    ref: "#/definitions/EPCReceiptBodyType",
                 },
                 {
-                    ref: "#/definitions/EPCMessageEPCRequestBody"
-                }
-            ]
-        }
+                    ref: "#/definitions/EPCMessageEPCRequestBody",
+                },
+            ],
+        },
     },
     "definitions": {
         "EPCMessageHeaderType": {
@@ -44,107 +44,107 @@ export const EpcMessageSchema: JsonSchema = {
                 "ReplyURI": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SenderId": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SentTime": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "ShipMessageId": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ArrivalDeparture": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Authenticator": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/AuthenticatorType"
-                        }
-                    ]
+                            ref: "#/definitions/AuthenticatorType",
+                        },
+                    ],
                 },
                 "SenderDuty": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CrewDutyType"
-                        }
-                    ]
+                            ref: "#/definitions/CrewDutyType",
+                        },
+                    ],
                 },
                 "JournalNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "MessageType": {
-                    ref: "#/definitions/MessageTypeContentType"
+                    ref: "#/definitions/MessageTypeContentType",
                 },
                 "SenderName": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/NameType"
-                        }
-                    ]
+                            ref: "#/definitions/NameType",
+                        },
+                    ],
                 },
                 "AuthenticatorName": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/NameType"
-                        }
-                    ]
+                            ref: "#/definitions/NameType",
+                        },
+                    ],
                 },
                 "ReportingSystem": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "RelayReportingSystem": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        "type": JsonSchemaType.STRING
-                    }
+                        "type": JsonSchemaType.STRING,
+                    },
                 },
                 "Version": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "AuthenticatorType": {
             "allOf": [
                 {
-                    ref: "#/definitions/ContactInfoType"
+                    ref: "#/definitions/ContactInfoType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
@@ -152,34 +152,34 @@ export const EpcMessageSchema: JsonSchema = {
                     "properties": {
                         "AuthenticationDate": {
                             "type": JsonSchemaType.STRING,
-                            "format": "date-time"
+                            "format": "date-time",
                         },
                         "AuthenticationDateSpecified": {
-                            "type": JsonSchemaType.BOOLEAN
+                            "type": JsonSchemaType.BOOLEAN,
                         },
                         "AuthenticatorRoleCode": {
                             "oneOf": [
                                 {
-                                    "type": JsonSchemaType.NULL
+                                    "type": JsonSchemaType.NULL,
                                 },
                                 {
-                                    ref: "#/definitions/CrewDutyType"
-                                }
-                            ]
+                                    ref: "#/definitions/CrewDutyType",
+                                },
+                            ],
                         },
                         "AuthenticatorLocation": {
                             "oneOf": [
                                 {
-                                    "type": JsonSchemaType.NULL
+                                    "type": JsonSchemaType.NULL,
                                 },
                                 {
-                                    ref: "#/definitions/LocationType"
-                                }
-                            ]
-                        }
-                    }
-                }
-            ]
+                                    ref: "#/definitions/LocationType",
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
         },
         "CrewDutyType": {
             "type": JsonSchemaType.OBJECT,
@@ -188,16 +188,16 @@ export const EpcMessageSchema: JsonSchema = {
                 "Text": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Code": {
-                    ref: "#/definitions/CrewDutyCodeContentType"
+                    ref: "#/definitions/CrewDutyCodeContentType",
                 },
                 "CodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "CrewDutyCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -306,8 +306,8 @@ export const EpcMessageSchema: JsonSchema = {
                 100,
                 101,
                 102,
-                103
-            ]
+                103,
+            ],
         },
         "LocationType": {
             "type": JsonSchemaType.OBJECT,
@@ -316,56 +316,56 @@ export const EpcMessageSchema: JsonSchema = {
                 "Name": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CountryCode": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "CountryCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "FacilityName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "FacilityCode": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "GLN": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Position": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PositionType"
-                        }
-                    ]
+                            ref: "#/definitions/PositionType",
+                        },
+                    ],
                 },
                 "Track": {
-                    ref: "#/definitions/TrackContentType"
+                    ref: "#/definitions/TrackContentType",
                 },
                 "TrackSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "UNLoCode": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "CountryCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -619,8 +619,8 @@ export const EpcMessageSchema: JsonSchema = {
                 245,
                 246,
                 247,
-                248
-            ]
+                248,
+            ],
         },
         "PositionType": {
             "type": JsonSchemaType.OBJECT,
@@ -628,13 +628,13 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "Latitude": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "Longitude": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
-                }
-            }
+                    "format": "decimal",
+                },
+            },
         },
         "TrackContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -642,8 +642,8 @@ export const EpcMessageSchema: JsonSchema = {
             "enum": [
                 0,
                 1,
-                2
-            ]
+                2,
+            ],
         },
         "ContactInfoType": {
             "type": JsonSchemaType.OBJECT,
@@ -652,46 +652,46 @@ export const EpcMessageSchema: JsonSchema = {
                 "Company": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CompanyId": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ContactNumbers": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CommunicationNumberType"
-                        }
-                    ]
+                            ref: "#/definitions/CommunicationNumberType",
+                        },
+                    ],
                 },
                 "Person": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/NameType"
-                        }
-                    ]
+                            ref: "#/definitions/NameType",
+                        },
+                    ],
                 },
                 "Address": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PostalAddressType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/PostalAddressType",
+                        },
+                    ],
+                },
+            },
         },
         "CommunicationNumberType": {
             "type": JsonSchemaType.OBJECT,
@@ -700,34 +700,34 @@ export const EpcMessageSchema: JsonSchema = {
                 "BusinessTelephone": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "EMail": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "HomeTelephone": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "MobileTelephone": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Telefax": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "NameType": {
             "type": JsonSchemaType.OBJECT,
@@ -736,22 +736,22 @@ export const EpcMessageSchema: JsonSchema = {
                 "FamilyName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "GivenName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "MiddleName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "PostalAddressType": {
             "type": JsonSchemaType.OBJECT,
@@ -760,76 +760,76 @@ export const EpcMessageSchema: JsonSchema = {
                 "CityName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CountrySubdivisionName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "LineFive": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "LineFour": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "LineOne": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "LineThree": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "LineTwo": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "PostCodeCode": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "PostOfficeBox": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "StreetName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "StreetNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CountryCode": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "CountryCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "MessageTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -857,8 +857,8 @@ export const EpcMessageSchema: JsonSchema = {
                 19,
                 20,
                 21,
-                22
-            ]
+                22,
+            ],
         },
         "EPCAcknowledgeBodyType": {
             "type": JsonSchemaType.OBJECT,
@@ -867,13 +867,13 @@ export const EpcMessageSchema: JsonSchema = {
                 "EPCClearanceStatus": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/EPCClearanceStatusType"
-                    }
-                }
-            }
+                        ref: "#/definitions/EPCClearanceStatusType",
+                    },
+                },
+            },
         },
         "EPCClearanceStatusType": {
             "type": JsonSchemaType.OBJECT,
@@ -882,23 +882,23 @@ export const EpcMessageSchema: JsonSchema = {
                 "Authority": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "RequestStatus": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/RequestStatusType"
-                        }
-                    ]
+                            ref: "#/definitions/RequestStatusType",
+                        },
+                    ],
                 },
                 "UsesSW": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "RequestStatusType": {
             "type": JsonSchemaType.OBJECT,
@@ -907,13 +907,13 @@ export const EpcMessageSchema: JsonSchema = {
                 "Comment": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Status": {
-                    ref: "#/definitions/RequestStatusTypeContentType"
-                }
-            }
+                    ref: "#/definitions/RequestStatusTypeContentType",
+                },
+            },
         },
         "RequestStatusTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -923,53 +923,53 @@ export const EpcMessageSchema: JsonSchema = {
                 1,
                 2,
                 3,
-                4
-            ]
+                4,
+            ],
         },
         "EPCCancelBodyType": {
             "type": JsonSchemaType.OBJECT,
             "additionalProperties": false,
             "properties": {
                 "Cancel": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "EPCReceiptBodyType": {
             "type": JsonSchemaType.OBJECT,
             "additionalProperties": false,
             "properties": {
                 "CurrentPortSecurityLevel": {
-                    ref: "#/definitions/CurrentPortSecurityLevelType"
+                    ref: "#/definitions/CurrentPortSecurityLevelType",
                 },
                 "RequestErrorCode": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "RequestProcessed": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "RequestStatus": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/RequestStatusTypeContentType"
-                    }
+                        ref: "#/definitions/RequestStatusTypeContentType",
+                    },
                 },
                 "EPCClearanceStatus": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/EPCClearanceStatusType"
-                    }
-                }
-            }
+                        ref: "#/definitions/EPCClearanceStatusType",
+                    },
+                },
+            },
         },
         "CurrentPortSecurityLevelType": {
             "type": JsonSchemaType.INTEGER,
@@ -977,8 +977,8 @@ export const EpcMessageSchema: JsonSchema = {
             "enum": [
                 0,
                 1,
-                2
-            ]
+                2,
+            ],
         },
         "EPCMessageEPCRequestBody": {
             "type": JsonSchemaType.OBJECT,
@@ -987,639 +987,639 @@ export const EpcMessageSchema: JsonSchema = {
                 "Agent": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/AgentType"
-                        }
-                    ]
+                            ref: "#/definitions/AgentType",
+                        },
+                    ],
                 },
                 "AirDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "AirDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "AnchorageArrival": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/AnchorageArrivalType"
-                    }
+                        ref: "#/definitions/AnchorageArrivalType",
+                    },
                 },
                 "AnchorageDeparture": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/AnchorageDepartureType"
-                    }
+                        ref: "#/definitions/AnchorageDepartureType",
+                    },
                 },
                 "ArrivalDraught": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ArrivalDraughtType"
-                        }
-                    ]
+                            ref: "#/definitions/ArrivalDraughtType",
+                        },
+                    ],
                 },
                 "ATP": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ATPType"
-                        }
-                    ]
+                            ref: "#/definitions/ATPType",
+                        },
+                    ],
                 },
                 "Authenticator": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/AuthenticatorType"
-                        }
-                    ]
+                            ref: "#/definitions/AuthenticatorType",
+                        },
+                    ],
                 },
                 "BallastStatus": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/BallastStatusType"
-                        }
-                    ]
+                            ref: "#/definitions/BallastStatusType",
+                        },
+                    ],
                 },
                 "Beam": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "BeamSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "BerthArrival": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/BerthArrivalType"
-                    }
+                        ref: "#/definitions/BerthArrivalType",
+                    },
                 },
                 "BerthDeparture": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/BerthDepartureType"
-                    }
+                        ref: "#/definitions/BerthDepartureType",
+                    },
                 },
                 "BulkLoadUnloadData": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/BulkLoadUnloadDataType"
-                        }
-                    ]
+                            ref: "#/definitions/BulkLoadUnloadDataType",
+                        },
+                    ],
                 },
                 "CallPurpose": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/CallPurposeType"
-                    }
+                        ref: "#/definitions/CallPurposeType",
+                    },
                 },
                 "CargoData": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CargoDataType"
-                        }
-                    ]
+                            ref: "#/definitions/CargoDataType",
+                        },
+                    ],
                 },
                 "CargoOverview": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Company": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CompanyType"
-                        }
-                    ]
+                            ref: "#/definitions/CompanyType",
+                        },
+                    ],
                 },
                 "CrewList": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/CrewMemberDataType"
-                    }
+                        ref: "#/definitions/CrewMemberDataType",
+                    },
                 },
                 "CSO": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CompanySecurityOfficerType"
-                        }
-                    ]
+                            ref: "#/definitions/CompanySecurityOfficerType",
+                        },
+                    ],
                 },
                 "CurrentShipSecurityLevel": {
-                    ref: "#/definitions/CurrentPortSecurityLevelType"
+                    ref: "#/definitions/CurrentPortSecurityLevelType",
                 },
                 "CurrentShipSecurityLevelSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DangerousGoodsCargoIndicator": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DangerousGoodsCargoIndicatorSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DeadWeight": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "DeadWeightSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DepartureDraught": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/DepartureDraughtType"
-                        }
-                    ]
+                            ref: "#/definitions/DepartureDraughtType",
+                        },
+                    ],
                 },
                 "DoubleBottomContent": {
-                    ref: "#/definitions/DoubleBottomContentType"
+                    ref: "#/definitions/DoubleBottomContentType",
                 },
                 "DoubleBottomContentSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DutiableCrewEffects": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/CrewEffectItemType"
-                    }
+                        ref: "#/definitions/CrewEffectItemType",
+                    },
                 },
                 "ETP": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ETPType"
-                        }
-                    ]
+                            ref: "#/definitions/ETPType",
+                        },
+                    ],
                 },
                 "GeneralDescriptionOfDG": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/DGInfoType"
-                    }
+                        ref: "#/definitions/DGInfoType",
+                    },
                 },
                 "GeneralRemark": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "GrossTonnage": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "GrossTonnageSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "HasSecurityPlan": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "HasSecurityPlanSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "HealthData": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/HealthDataType"
-                        }
-                    ]
+                            ref: "#/definitions/HealthDataType",
+                        },
+                    ],
                 },
                 "IceClass": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/IceClassType"
-                        }
-                    ]
+                            ref: "#/definitions/IceClassType",
+                        },
+                    ],
                 },
                 "INFClassContent": {
-                    ref: "#/definitions/INFClassContentType"
+                    ref: "#/definitions/INFClassContentType",
                 },
                 "INFClassContentSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "InmarsatCallNumber": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/InmarsatCallNumberType"
-                        }
-                    ]
+                            ref: "#/definitions/InmarsatCallNumberType",
+                        },
+                    ],
                 },
                 "ISSCertificate": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CertificateType"
-                        }
-                    ]
+                            ref: "#/definitions/CertificateType",
+                        },
+                    ],
                 },
                 "ISSCertificateStatus": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ISSCertificateStatusType"
-                        }
-                    ]
+                            ref: "#/definitions/ISSCertificateStatusType",
+                        },
+                    ],
                 },
                 "LastPortOfCall": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/LastPortOfCallType"
-                        }
-                    ]
+                            ref: "#/definitions/LastPortOfCallType",
+                        },
+                    ],
                 },
                 "LengthOverall": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "LengthOverallSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NavigationalStatus": {
-                    ref: "#/definitions/NavigationalStatusContentType"
+                    ref: "#/definitions/NavigationalStatusContentType",
                 },
                 "NavigationalStatusSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NetTonnage": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "NetTonnageSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NextPortOfCall": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/NextPortOfCallType"
-                        }
-                    ]
+                            ref: "#/definitions/NextPortOfCallType",
+                        },
+                    ],
                 },
                 "NextReportTime": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "NextReportTimeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "OBOLoadUnloadData": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/OBOLoadUnloadDataType"
-                        }
-                    ]
+                            ref: "#/definitions/OBOLoadUnloadDataType",
+                        },
+                    ],
                 },
                 "OtherServiceRequest": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/OtherServiceRequestType"
-                    }
+                        ref: "#/definitions/OtherServiceRequestType",
+                    },
                 },
                 "PassengerList": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/PassengerDataType"
-                    }
+                        ref: "#/definitions/PassengerDataType",
+                    },
                 },
                 "PeriodOfStay": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "PersonsOnboard": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PersonsOnboardNumberType"
-                        }
-                    ]
+                            ref: "#/definitions/PersonsOnboardNumberType",
+                        },
+                    ],
                 },
                 "PortCallList": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/ShipToPortActivityType"
-                    }
+                        ref: "#/definitions/ShipToPortActivityType",
+                    },
                 },
                 "PortOfArrival": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortOfArrivalType"
-                        }
-                    ]
+                            ref: "#/definitions/PortOfArrivalType",
+                        },
+                    ],
                 },
                 "PortOfDeparture": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortOfDepartureType"
-                        }
-                    ]
+                            ref: "#/definitions/PortOfDepartureType",
+                        },
+                    ],
                 },
                 "RadioCommunications": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "RegistryCertificate": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CertificateType"
-                        }
-                    ]
+                            ref: "#/definitions/CertificateType",
+                        },
+                    ],
                 },
                 "ReportingEvent": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/LocationCallType"
-                        }
-                    ]
+                            ref: "#/definitions/LocationCallType",
+                        },
+                    ],
                 },
                 "ROBBunkers": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/ROBBunkersType"
-                    }
+                        ref: "#/definitions/ROBBunkersType",
+                    },
                 },
                 "SecurityOtherMattersToReport": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ShipClass": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ShipClassType"
-                        }
-                    ]
+                            ref: "#/definitions/ShipClassType",
+                        },
+                    ],
                 },
                 "ShipDefects": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ShipDefectsType"
-                        }
-                    ]
+                            ref: "#/definitions/ShipDefectsType",
+                        },
+                    ],
                 },
                 "ShipID": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ShipIDType"
-                        }
-                    ]
+                            ref: "#/definitions/ShipIDType",
+                        },
+                    ],
                 },
                 "ShipSanitationControlCertificate": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CertificateType"
-                        }
-                    ]
+                            ref: "#/definitions/CertificateType",
+                        },
+                    ],
                 },
                 "ShipSanitationControlExemptionCertificate": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CertificateType"
-                        }
-                    ]
+                            ref: "#/definitions/CertificateType",
+                        },
+                    ],
                 },
                 "ShipStatus": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ShipStatusType"
-                        }
-                    ]
+                            ref: "#/definitions/ShipStatusType",
+                        },
+                    ],
                 },
                 "ShipStore": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/ShipStoreItemType"
-                    }
+                        ref: "#/definitions/ShipStoreItemType",
+                    },
                 },
                 "ShipToShipActivityList": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/ShipToShipActivityType"
-                    }
+                        ref: "#/definitions/ShipToShipActivityType",
+                    },
                 },
                 "ShipType": {
-                    ref: "#/definitions/ShipTypeContentType"
+                    ref: "#/definitions/ShipTypeContentType",
                 },
                 "ShipTypeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SummerDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "SummerDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "VoyageDescription": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/VoyageDescriptionItemType"
-                    }
+                        ref: "#/definitions/VoyageDescriptionItemType",
+                    },
                 },
                 "VoyageEvent": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/VoyageEventType"
-                    }
+                        ref: "#/definitions/VoyageEventType",
+                    },
                 },
                 "VoyageNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "WasteDisposalRequirements": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "WasteInformation": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/WasteInformationType"
-                        }
-                    ]
+                            ref: "#/definitions/WasteInformationType",
+                        },
+                    ],
                 },
                 "WayPointList": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/WaypointType"
-                    }
+                        ref: "#/definitions/WaypointType",
+                    },
                 },
                 "WeatherInformation": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/WeatherInformationType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/WeatherInformationType",
+                        },
+                    ],
+                },
+            },
         },
         "AgentType": {
             "allOf": [
                 {
-                    ref: "#/definitions/ContactInfoType"
+                    ref: "#/definitions/ContactInfoType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "AnchorageArrivalType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "LocationCallType": {
             "type": JsonSchemaType.OBJECT,
@@ -1628,32 +1628,32 @@ export const EpcMessageSchema: JsonSchema = {
                 "ArrivalTime": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/DateTimeType"
-                    }
+                        ref: "#/definitions/DateTimeType",
+                    },
                 },
                 "DepartureTime": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/DateTimeType"
-                    }
+                        ref: "#/definitions/DateTimeType",
+                    },
                 },
                 "Location": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/LocationType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/LocationType",
+                        },
+                    ],
+                },
+            },
         },
         "DateTimeType": {
             "type": JsonSchemaType.OBJECT,
@@ -1661,15 +1661,15 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "DateTime": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "TimeType": {
-                    ref: "#/definitions/TimeTypeContentType"
+                    ref: "#/definitions/TimeTypeContentType",
                 },
                 "TimeTypeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "TimeTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -1678,19 +1678,19 @@ export const EpcMessageSchema: JsonSchema = {
                 0,
                 1,
                 2,
-                3
-            ]
+                3,
+            ],
         },
         "AnchorageDepartureType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "ArrivalDraughtType": {
             "type": JsonSchemaType.OBJECT,
@@ -1698,74 +1698,74 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "AftDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "AftDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ForeDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "ForeDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "MidShipDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "MidShipDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "ATPType": {
             "allOf": [
                 {
-                    ref: "#/definitions/DateTimeType"
+                    ref: "#/definitions/DateTimeType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "BallastStatusType": {
             "type": JsonSchemaType.OBJECT,
             "additionalProperties": false,
             "properties": {
                 "IsClean": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IsCleanSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Remarks": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "BerthArrivalType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
                     "additionalProperties": false,
                     "properties": {
                         "BerthType": {
-                            ref: "#/definitions/BerthTypeContentType"
+                            ref: "#/definitions/BerthTypeContentType",
                         },
                         "BerthTypeSpecified": {
-                            "type": JsonSchemaType.BOOLEAN
-                        }
-                    }
-                }
-            ]
+                            "type": JsonSchemaType.BOOLEAN,
+                        },
+                    },
+                },
+            ],
         },
         "BerthTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -1774,27 +1774,27 @@ export const EpcMessageSchema: JsonSchema = {
                 0,
                 1,
                 2,
-                3
-            ]
+                3,
+            ],
         },
         "BerthDepartureType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
                     "additionalProperties": false,
                     "properties": {
                         "BerthType": {
-                            ref: "#/definitions/BerthTypeContentType"
+                            ref: "#/definitions/BerthTypeContentType",
                         },
                         "BerthTypeSpecified": {
-                            "type": JsonSchemaType.BOOLEAN
-                        }
-                    }
-                }
-            ]
+                            "type": JsonSchemaType.BOOLEAN,
+                        },
+                    },
+                },
+            ],
         },
         "BulkLoadUnloadDataType": {
             "type": JsonSchemaType.OBJECT,
@@ -1803,104 +1803,104 @@ export const EpcMessageSchema: JsonSchema = {
                 "AccommodationLadder": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CargoHandlingGear": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CargoType": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ChecklistCompleted": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ChecklistCompletedSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DistanceSideToHatch": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "DistanceSideToHatchSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DistanceWaterlineToHatch": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "DistanceWaterlineToHatchSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IsLoading": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IsLoadingSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "LengthOfCargoArea": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "LengthOfCargoAreaSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "MooringLines": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Remarks": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "RequiredRepairs": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SpecificInstructions": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "TimeForBallasting": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "TotalQuantity": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/BulkCargoPartType"
-                        }
-                    ]
+                            ref: "#/definitions/BulkCargoPartType",
+                        },
+                    ],
                 },
                 "OperationPlan": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/BulkCargoListType"
-                    }
-                }
-            }
+                        ref: "#/definitions/BulkCargoListType",
+                    },
+                },
+            },
         },
         "BulkCargoPartType": {
             "type": JsonSchemaType.OBJECT,
@@ -1909,20 +1909,20 @@ export const EpcMessageSchema: JsonSchema = {
                 "Hatch": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Quantity": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
+                },
+            },
         },
         "MeasureType": {
             "type": JsonSchemaType.OBJECT,
@@ -1930,12 +1930,12 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "Content": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "UnitCode": {
-                    ref: "#/definitions/MeasurementUnitContentType"
-                }
-            }
+                    ref: "#/definitions/MeasurementUnitContentType",
+                },
+            },
         },
         "MeasurementUnitContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -3320,8 +3320,8 @@ export const EpcMessageSchema: JsonSchema = {
                 1376,
                 1377,
                 1378,
-                1379
-            ]
+                1379,
+            ],
         },
         "BulkCargoListType": {
             "type": JsonSchemaType.OBJECT,
@@ -3330,19 +3330,19 @@ export const EpcMessageSchema: JsonSchema = {
                 "Stage": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Unit": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/BulkCargoPartType"
-                    }
-                }
-            }
+                        ref: "#/definitions/BulkCargoPartType",
+                    },
+                },
+            },
         },
         "CallPurposeType": {
             "type": JsonSchemaType.OBJECT,
@@ -3351,16 +3351,16 @@ export const EpcMessageSchema: JsonSchema = {
                 "CallPurposeText": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CallPurposeCode": {
-                    ref: "#/definitions/CallPurposeCodeContentType"
+                    ref: "#/definitions/CallPurposeCodeContentType",
                 },
                 "CallPurposeCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "CallPurposeCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -3388,8 +3388,8 @@ export const EpcMessageSchema: JsonSchema = {
                 19,
                 20,
                 21,
-                22
-            ]
+                22,
+            ],
         },
         "CargoDataType": {
             "type": JsonSchemaType.OBJECT,
@@ -3398,22 +3398,22 @@ export const EpcMessageSchema: JsonSchema = {
                 "Consignment": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/ConsignmentType"
-                    }
+                        ref: "#/definitions/ConsignmentType",
+                    },
                 },
                 "TransportEquipment": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/TransportEquipmentType"
-                    }
-                }
-            }
+                        ref: "#/definitions/TransportEquipmentType",
+                    },
+                },
+            },
         },
         "ConsignmentType": {
             "type": JsonSchemaType.OBJECT,
@@ -3422,58 +3422,58 @@ export const EpcMessageSchema: JsonSchema = {
                 "ConsignmentNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "DangerousGoodsShippersReferenceNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "NumberOfItems": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NumberOfItemsSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "TransportDocumentId": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CargoItem": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/CargoItemType"
-                    }
+                        ref: "#/definitions/CargoItemType",
+                    },
                 },
                 "PortOfLoading": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
                 },
                 "PortOfDischarge": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
+                },
+            },
         },
         "CargoItemType": {
             "type": JsonSchemaType.OBJECT,
@@ -3482,138 +3482,138 @@ export const EpcMessageSchema: JsonSchema = {
                 "ItemNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "MarksAndNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "NoOfPackages": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NoOfPackagesSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NoOfUnits": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NoOfUnitsSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SealNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "TransportDocumentId": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "VehicleIdentificationNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CargoType": {
-                    ref: "#/definitions/CargoTypeContentType"
+                    ref: "#/definitions/CargoTypeContentType",
                 },
                 "CargoTypeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Consignee": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ContactInfoType"
-                        }
-                    ]
+                            ref: "#/definitions/ContactInfoType",
+                        },
+                    ],
                 },
                 "GoodsType": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/GoodsTypeType"
-                        }
-                    ]
+                            ref: "#/definitions/GoodsTypeType",
+                        },
+                    ],
                 },
                 "LostDGDetails": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/LostCargoDetailsType"
-                        }
-                    ]
+                            ref: "#/definitions/LostCargoDetailsType",
+                        },
+                    ],
                 },
                 "Quantity": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "GrossWeight": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "GrossVolume": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "PackageType": {
-                    ref: "#/definitions/PackageTypeContentType"
+                    ref: "#/definitions/PackageTypeContentType",
                 },
                 "PackageTypeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SpecialCargoDetails": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/SpecialCargoDetailsType"
-                    }
+                        ref: "#/definitions/SpecialCargoDetailsType",
+                    },
                 },
                 "TransportEquipment": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/TransportEquipmentType"
-                    }
-                }
-            }
+                        ref: "#/definitions/TransportEquipmentType",
+                    },
+                },
+            },
         },
         "CargoTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -3628,8 +3628,8 @@ export const EpcMessageSchema: JsonSchema = {
                 6,
                 7,
                 8,
-                9
-            ]
+                9,
+            ],
         },
         "GoodsTypeType": {
             "type": JsonSchemaType.OBJECT,
@@ -3638,16 +3638,16 @@ export const EpcMessageSchema: JsonSchema = {
                 "Description": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "HSCode": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "LostCargoDetailsType": {
             "type": JsonSchemaType.OBJECT,
@@ -3656,56 +3656,56 @@ export const EpcMessageSchema: JsonSchema = {
                 "CauseOfLoss": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "EstimatedArea": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "EstimatedAreaSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "EstimatedMovement": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "GoodsCondition": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "LossContinuing": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "LostGoodsStatus": {
-                    ref: "#/definitions/LostGoodsStatusContentType"
+                    ref: "#/definitions/LostGoodsStatusContentType",
                 },
                 "LostGoodsStatusSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "EstimatedGoodsLost": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
+                },
+            },
         },
         "LostGoodsStatusContentType": {
             "type": JsonSchemaType.INTEGER,
             "description": "",
             "enum": [
                 0,
-                1
-            ]
+                1,
+            ],
         },
         "PackageTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4109,8 +4109,8 @@ export const EpcMessageSchema: JsonSchema = {
                 395,
                 396,
                 397,
-                398
-            ]
+                398,
+            ],
         },
         "SpecialCargoDetailsType": {
             "type": JsonSchemaType.OBJECT,
@@ -4119,89 +4119,89 @@ export const EpcMessageSchema: JsonSchema = {
                 "Comment": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "NoOfPackages": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NoOfPackagesSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "VehicleIdentificationNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SafetyDataSheetReference": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/AttachmentType"
-                        }
-                    ]
+                            ref: "#/definitions/AttachmentType",
+                        },
+                    ],
                 },
                 "CargoInformationHolder": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ContactInfoType"
-                        }
-                    ]
+                            ref: "#/definitions/ContactInfoType",
+                        },
+                    ],
                 },
                 "Consignor": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ContactInfoType"
-                        }
-                    ]
+                            ref: "#/definitions/ContactInfoType",
+                        },
+                    ],
                 },
                 "Packer": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ContactInfoType"
-                        }
-                    ]
+                            ref: "#/definitions/ContactInfoType",
+                        },
+                    ],
                 },
                 "DGSafetyDataSheet": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/DGSafetyDataSheetType"
-                        }
-                    ]
+                            ref: "#/definitions/DGSafetyDataSheetType",
+                        },
+                    ],
                 },
                 "DangerousGoodsPackageType": {
-                    ref: "#/definitions/PackageTypeContentType"
+                    ref: "#/definitions/PackageTypeContentType",
                 },
                 "DangerousGoodsPackageTypeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "OriginalPortOfShipment": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
+                },
+            },
         },
         "AttachmentType": {
             "type": JsonSchemaType.OBJECT,
@@ -4210,16 +4210,16 @@ export const EpcMessageSchema: JsonSchema = {
                 "Description": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "URI": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "DGSafetyDataSheetType": {
             "type": JsonSchemaType.OBJECT,
@@ -4228,100 +4228,100 @@ export const EpcMessageSchema: JsonSchema = {
                 "AdditionalInformation": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ProperShippingName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SegregationInformation": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "TechnicalSpecification": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "UNNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "DGClassification": {
-                    ref: "#/definitions/DGClassificationContentType"
+                    ref: "#/definitions/DGClassificationContentType",
                 },
                 "DGClassificationSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "EmergencyInstruction": {
-                    ref: "#/definitions/EmergencyInstructionContentType"
+                    ref: "#/definitions/EmergencyInstructionContentType",
                 },
                 "EmergencyInstructionSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "MARPOLPollutionCode": {
-                    ref: "#/definitions/MARPOLPollutionCodeContentType"
+                    ref: "#/definitions/MARPOLPollutionCodeContentType",
                 },
                 "MARPOLPollutionCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Mass": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "Volume": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "FlashPoint": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "PackingGroup": {
-                    ref: "#/definitions/PackingGroupCodeContentType"
+                    ref: "#/definitions/PackingGroupCodeContentType",
                 },
                 "UNClass": {
-                    ref: "#/definitions/UNHazardClassContentType"
+                    ref: "#/definitions/UNHazardClassContentType",
                 },
                 "UNClassSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SubsidiaryRisks": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/UNHazardClassContentType"
-                    }
-                }
-            }
+                        ref: "#/definitions/UNHazardClassContentType",
+                    },
+                },
+            },
         },
         "DGClassificationContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4331,8 +4331,8 @@ export const EpcMessageSchema: JsonSchema = {
                 1,
                 2,
                 3,
-                4
-            ]
+                4,
+            ],
         },
         "EmergencyInstructionContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4389,8 +4389,8 @@ export const EpcMessageSchema: JsonSchema = {
                 48,
                 49,
                 50,
-                51
-            ]
+                51,
+            ],
         },
         "MARPOLPollutionCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4400,8 +4400,8 @@ export const EpcMessageSchema: JsonSchema = {
                 1,
                 2,
                 3,
-                4
-            ]
+                4,
+            ],
         },
         "PackingGroupCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4410,8 +4410,8 @@ export const EpcMessageSchema: JsonSchema = {
                 0,
                 1,
                 2,
-                3
-            ]
+                3,
+            ],
         },
         "UNHazardClassContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4472,19 +4472,19 @@ export const EpcMessageSchema: JsonSchema = {
                 52,
                 53,
                 54,
-                55
-            ]
+                55,
+            ],
         },
         "PortType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationType"
+                    ref: "#/definitions/LocationType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "TransportEquipmentType": {
             "type": JsonSchemaType.OBJECT,
@@ -4493,16 +4493,16 @@ export const EpcMessageSchema: JsonSchema = {
                 "MarksAndNumbers": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "OnboardLocation": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "CompanyType": {
             "type": JsonSchemaType.OBJECT,
@@ -4511,30 +4511,30 @@ export const EpcMessageSchema: JsonSchema = {
                 "IMOCompanyId": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Contact": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ContactInfoType"
-                        }
-                    ]
+                            ref: "#/definitions/ContactInfoType",
+                        },
+                    ],
                 },
                 "Organisation": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/OrganisationType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/OrganisationType",
+                        },
+                    ],
+                },
+            },
         },
         "OrganisationType": {
             "type": JsonSchemaType.OBJECT,
@@ -4543,37 +4543,37 @@ export const EpcMessageSchema: JsonSchema = {
                 "Name": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "RegistrationDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "RegistrationDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "TaxIdentifier": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        "type": JsonSchemaType.STRING
-                    }
+                        "type": JsonSchemaType.STRING,
+                    },
                 },
                 "RegistrationCountryCode": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "RegistrationCountryCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "CrewMemberDataType": {
             "allOf": [
                 {
-                    ref: "#/definitions/PersonOnboardType"
+                    ref: "#/definitions/PersonOnboardType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
@@ -4582,16 +4582,16 @@ export const EpcMessageSchema: JsonSchema = {
                         "Duty": {
                             "oneOf": [
                                 {
-                                    "type": JsonSchemaType.NULL
+                                    "type": JsonSchemaType.NULL,
                                 },
                                 {
-                                    ref: "#/definitions/CrewDutyType"
-                                }
-                            ]
-                        }
-                    }
-                }
-            ]
+                                    ref: "#/definitions/CrewDutyType",
+                                },
+                            ],
+                        },
+                    },
+                },
+            ],
         },
         "PersonOnboardType": {
             "type": JsonSchemaType.OBJECT,
@@ -4599,152 +4599,152 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "DateOfBirth": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "DateOfBirthSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DebarkationDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "DebarkationDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "EmbarkationDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "EmbarkationDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PlaceOfBirth": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Remarks": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Transit": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "TransitSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "CountryOfBirth": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "CountryOfBirthSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Nationality": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "NationalitySpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "CountryOfResidence": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "CountryOfResidenceSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Gender": {
-                    ref: "#/definitions/GenderContentType"
+                    ref: "#/definitions/GenderContentType",
                 },
                 "GenderSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Name": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/NameType"
-                        }
-                    ]
+                            ref: "#/definitions/NameType",
+                        },
+                    ],
                 },
                 "PersonHealthParticulars": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PersonHealthParticularsType"
-                        }
-                    ]
+                            ref: "#/definitions/PersonHealthParticularsType",
+                        },
+                    ],
                 },
                 "PersonIdDocument": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/PersonIdDocumentType"
-                    }
+                        ref: "#/definitions/PersonIdDocumentType",
+                    },
                 },
                 "VisaNumber": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/PersonIdDocumentType"
-                    }
+                        ref: "#/definitions/PersonIdDocumentType",
+                    },
                 },
                 "PersonReference": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "EmbarkationPort": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
                 },
                 "DebarkationPort": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
                 },
                 "HomeAddress": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PostalAddressType"
-                        }
-                    ]
+                            ref: "#/definitions/PostalAddressType",
+                        },
+                    ],
                 },
                 "VisitAddress": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PostalAddressType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/PostalAddressType",
+                        },
+                    ],
+                },
+            },
         },
         "GenderContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4753,8 +4753,8 @@ export const EpcMessageSchema: JsonSchema = {
                 0,
                 1,
                 2,
-                3
-            ]
+                3,
+            ],
         },
         "PersonHealthParticularsType": {
             "type": JsonSchemaType.OBJECT,
@@ -4763,73 +4763,73 @@ export const EpcMessageSchema: JsonSchema = {
                 "Comments": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ReportedToPortMedical": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ReportedToPortMedicalSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SymptomsDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "SymptomsDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Treatment": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "CaseDisposal": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CaseOfDisposalType"
-                        }
-                    ]
+                            ref: "#/definitions/CaseOfDisposalType",
+                        },
+                    ],
                 },
                 "IllnessCode": {
-                    ref: "#/definitions/IllnessCodeContentType"
+                    ref: "#/definitions/IllnessCodeContentType",
                 },
                 "IllnessCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "CaseOfDisposalType": {
             "type": JsonSchemaType.OBJECT,
             "additionalProperties": false,
             "properties": {
                 "CaseDisposalCode": {
-                    ref: "#/definitions/CaseDisposalCodeContentType"
+                    ref: "#/definitions/CaseDisposalCodeContentType",
                 },
                 "CaseDisposalCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "HealthStateCode": {
-                    ref: "#/definitions/HealthStateCodeContentType"
+                    ref: "#/definitions/HealthStateCodeContentType",
                 },
                 "HealthStateCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "LocationOfEvaculation": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
+                },
+            },
         },
         "CaseDisposalCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4837,8 +4837,8 @@ export const EpcMessageSchema: JsonSchema = {
             "enum": [
                 0,
                 1,
-                2
-            ]
+                2,
+            ],
         },
         "HealthStateCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4846,8 +4846,8 @@ export const EpcMessageSchema: JsonSchema = {
             "enum": [
                 0,
                 1,
-                2
-            ]
+                2,
+            ],
         },
         "IllnessCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -4878,8 +4878,8 @@ export const EpcMessageSchema: JsonSchema = {
                 22,
                 23,
                 24,
-                25
-            ]
+                25,
+            ],
         },
         "PersonIdDocumentType": {
             "type": JsonSchemaType.OBJECT,
@@ -4887,34 +4887,34 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "ExpirationDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "ExpirationDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IdNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "IssueDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "IssueDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IssuingCountry": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "IdDocument": {
-                    ref: "#/definitions/IdDocumentCodeContentType"
+                    ref: "#/definitions/IdDocumentCodeContentType",
                 },
                 "IdDocumentSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "IdDocumentCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -5523,19 +5523,19 @@ export const EpcMessageSchema: JsonSchema = {
                 599,
                 600,
                 601,
-                602
-            ]
+                602,
+            ],
         },
         "CompanySecurityOfficerType": {
             "allOf": [
                 {
-                    ref: "#/definitions/ContactInfoType"
+                    ref: "#/definitions/ContactInfoType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "DepartureDraughtType": {
             "type": JsonSchemaType.OBJECT,
@@ -5543,26 +5543,26 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "AftDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "AftDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ForeDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "ForeDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "MidShipDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "MidShipDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "DoubleBottomContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -5570,8 +5570,8 @@ export const EpcMessageSchema: JsonSchema = {
             "enum": [
                 0,
                 1,
-                2
-            ]
+                2,
+            ],
         },
         "CrewEffectItemType": {
             "type": JsonSchemaType.OBJECT,
@@ -5580,39 +5580,39 @@ export const EpcMessageSchema: JsonSchema = {
                 "EffectDescription": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SequenceNumber": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SequenceNumberSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "CrewEffectItemCode": {
-                    ref: "#/definitions/CrewEffectCodeContentType"
+                    ref: "#/definitions/CrewEffectCodeContentType",
                 },
                 "CrewEffectItemCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Measurement": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "CrewReference": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "CrewEffectCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -5633,19 +5633,19 @@ export const EpcMessageSchema: JsonSchema = {
                 12,
                 13,
                 14,
-                15
-            ]
+                15,
+            ],
         },
         "ETPType": {
             "allOf": [
                 {
-                    ref: "#/definitions/DateTimeType"
+                    ref: "#/definitions/DateTimeType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "DGInfoType": {
             "type": JsonSchemaType.OBJECT,
@@ -5654,198 +5654,198 @@ export const EpcMessageSchema: JsonSchema = {
                 "Description": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Remarks": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "UNNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "MARPOLCode": {
-                    ref: "#/definitions/MARPOLPollutionCodeContentType"
+                    ref: "#/definitions/MARPOLPollutionCodeContentType",
                 },
                 "MARPOLCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Measure": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "UNHazardClass": {
-                    ref: "#/definitions/UNHazardClassContentType"
+                    ref: "#/definitions/UNHazardClassContentType",
                 },
                 "UNHazardClassSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "HealthDataType": {
             "type": JsonSchemaType.OBJECT,
             "additionalProperties": false,
             "properties": {
                 "DiseaseOnBoard": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "DiseaseOnBoardSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IllPersonsGreaterThanExpected": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IllPersonsGreaterThanExpectedSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IllPersonsNow": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IllPersonsNowSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "InfectionConditionOnBoard": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "InfectionConditionOnBoardSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "MedicalConsulted": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "MedicalConsultedSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NumberOfDeaths": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NumberOfDeathsSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NumberOfIllPersons": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NumberOfIllPersonsSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PersonDied": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PersonDiedSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ReInspectionRequired": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ReInspectionRequiredSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SanitaryMeasureApplied": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SanitaryMeasureAppliedSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SickAnimal": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SickAnimalSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "StowawaysFound": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "StowawaysFoundSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ValidShipSanitationControlCertificate": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ValidShipSanitationControlCertificateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ValidShipSanitationControlExemptionCertificate": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ValidShipSanitationControlExemptionCertificateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "VisitedInfectedArea": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "VisitedInfectedAreaSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ShipSanitationControlExemptionCertificate": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CertificateType"
-                        }
-                    ]
+                            ref: "#/definitions/CertificateType",
+                        },
+                    ],
                 },
                 "ShipSanitationControlCertificate": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CertificateType"
-                        }
-                    ]
+                            ref: "#/definitions/CertificateType",
+                        },
+                    ],
                 },
                 "LocationStowawaysJoinedShip": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/LocationType"
-                    }
+                        ref: "#/definitions/LocationType",
+                    },
                 },
                 "SanitaryMeasure": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/SanitaryMeasureType"
-                    }
+                        ref: "#/definitions/SanitaryMeasureType",
+                    },
                 },
                 "CallInInfectedArea": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/ShipToPortActivityType"
-                    }
+                        ref: "#/definitions/ShipToPortActivityType",
+                    },
                 },
                 "LastPortCalls": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/ShipToPortActivityType"
-                    }
-                }
-            }
+                        ref: "#/definitions/ShipToPortActivityType",
+                    },
+                },
+            },
         },
         "CertificateType": {
             "type": JsonSchemaType.OBJECT,
@@ -5854,97 +5854,97 @@ export const EpcMessageSchema: JsonSchema = {
                 "CertificateNumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Comment": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ExpiryDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "ExpiryDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ExtendedUntil": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "ExtendedUntilSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IssueDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "IssueDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "LastEndorsementDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "LastEndorsementDateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Name": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Restrictions": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Code": {
-                    ref: "#/definitions/CertificateCodeContentType"
+                    ref: "#/definitions/CertificateCodeContentType",
                 },
                 "CodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "IssuerType": {
-                    ref: "#/definitions/CertificateIssuerTypeContentType"
+                    ref: "#/definitions/CertificateIssuerTypeContentType",
                 },
                 "IssuerTypeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "CertificateStatus": {
-                    ref: "#/definitions/CertificateStatusContentType"
+                    ref: "#/definitions/CertificateStatusContentType",
                 },
                 "Issuer": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/OrganisationType"
-                        }
-                    ]
+                            ref: "#/definitions/OrganisationType",
+                        },
+                    ],
                 },
                 "IsssuerLocation": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
                 },
                 "IssuerLocationCode": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "CertificateCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -5989,8 +5989,8 @@ export const EpcMessageSchema: JsonSchema = {
                 36,
                 37,
                 38,
-                39
-            ]
+                39,
+            ],
         },
         "CertificateIssuerTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6000,8 +6000,8 @@ export const EpcMessageSchema: JsonSchema = {
                 1,
                 2,
                 3,
-                4
-            ]
+                4,
+            ],
         },
         "CertificateStatusContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6011,8 +6011,8 @@ export const EpcMessageSchema: JsonSchema = {
                 1,
                 2,
                 3,
-                4
-            ]
+                4,
+            ],
         },
         "SanitaryMeasureType": {
             "type": JsonSchemaType.OBJECT,
@@ -6020,24 +6020,24 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "Date": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "DateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "LocationOnBoard": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SanitaryMeasureCode": {
-                    ref: "#/definitions/SanitaryMeasureCodeContentType"
+                    ref: "#/definitions/SanitaryMeasureCodeContentType",
                 },
                 "SanitaryMeasureCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "SanitaryMeasureCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6047,8 +6047,8 @@ export const EpcMessageSchema: JsonSchema = {
                 1,
                 2,
                 3,
-                4
-            ]
+                4,
+            ],
         },
         "ShipToPortActivityType": {
             "type": JsonSchemaType.OBJECT,
@@ -6056,51 +6056,51 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "FromDateTime": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "FromDateTimeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SequenceNumber": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SequenceNumberSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ToDateTime": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "ToDateTimeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PortSecurityLevel": {
-                    ref: "#/definitions/CurrentPortSecurityLevelType"
+                    ref: "#/definitions/CurrentPortSecurityLevelType",
                 },
                 "PortSecurityLevelSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Port": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
                 },
                 "AdditionalSecurityMeasure": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/SecurityMeasureType"
-                    }
-                }
-            }
+                        ref: "#/definitions/SecurityMeasureType",
+                    },
+                },
+            },
         },
         "SecurityMeasureType": {
             "type": JsonSchemaType.OBJECT,
@@ -6109,16 +6109,16 @@ export const EpcMessageSchema: JsonSchema = {
                 "Description": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Code": {
-                    ref: "#/definitions/SecurityMeasureCodeContentType"
+                    ref: "#/definitions/SecurityMeasureCodeContentType",
                 },
                 "CodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "SecurityMeasureCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6131,8 +6131,8 @@ export const EpcMessageSchema: JsonSchema = {
                 4,
                 5,
                 6,
-                7
-            ]
+                7,
+            ],
         },
         "IceClassType": {
             "type": JsonSchemaType.OBJECT,
@@ -6141,22 +6141,22 @@ export const EpcMessageSchema: JsonSchema = {
                 "Comment": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "BalticIceClass": {
-                    ref: "#/definitions/IceClassBalticContentType"
+                    ref: "#/definitions/IceClassBalticContentType",
                 },
                 "BalticIceClassSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PolarClass": {
-                    ref: "#/definitions/PolarClassContentType"
+                    ref: "#/definitions/PolarClassContentType",
                 },
                 "PolarClassSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "IceClassBalticContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6166,8 +6166,8 @@ export const EpcMessageSchema: JsonSchema = {
                 1,
                 2,
                 3,
-                4
-            ]
+                4,
+            ],
         },
         "PolarClassContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6179,8 +6179,8 @@ export const EpcMessageSchema: JsonSchema = {
                 3,
                 4,
                 5,
-                6
-            ]
+                6,
+            ],
         },
         "INFClassContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6189,8 +6189,8 @@ export const EpcMessageSchema: JsonSchema = {
                 0,
                 1,
                 2,
-                3
-            ]
+                3,
+            ],
         },
         "InmarsatCallNumberType": {
             "type": JsonSchemaType.OBJECT,
@@ -6199,16 +6199,16 @@ export const EpcMessageSchema: JsonSchema = {
                 "Alternative": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Inmarsat": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "ISSCertificateStatusType": {
             "type": JsonSchemaType.OBJECT,
@@ -6217,22 +6217,22 @@ export const EpcMessageSchema: JsonSchema = {
                 "ISSCertificateStatusReasonNotValid": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ISSCStatus": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ISSCStatusSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ISSCertificateStatusReasonNotValidCode": {
-                    ref: "#/definitions/ISSCertificateStatusReasonNotValidCodeContentType"
+                    ref: "#/definitions/ISSCertificateStatusReasonNotValidCodeContentType",
                 },
                 "ISSCertificateStatusReasonNotValidCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "ISSCertificateStatusReasonNotValidCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6245,19 +6245,19 @@ export const EpcMessageSchema: JsonSchema = {
                 4,
                 5,
                 6,
-                7
-            ]
+                7,
+            ],
         },
         "LastPortOfCallType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "NavigationalStatusContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6271,19 +6271,19 @@ export const EpcMessageSchema: JsonSchema = {
                 5,
                 6,
                 7,
-                8
-            ]
+                8,
+            ],
         },
         "NextPortOfCallType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "OBOLoadUnloadDataType": {
             "type": JsonSchemaType.OBJECT,
@@ -6291,53 +6291,53 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "LastOilCargoDate": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "PrecedingCargo1": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "PrecedingCargo2": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "PrecedingCargo3": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SlopTankStatus": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "GasFreeCertificate": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/CertificateType"
-                        }
-                    ]
+                            ref: "#/definitions/CertificateType",
+                        },
+                    ],
                 },
                 "LastOilCargoPort": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
+                },
+            },
         },
         "OtherServiceRequestType": {
             "type": JsonSchemaType.OBJECT,
@@ -6346,13 +6346,13 @@ export const EpcMessageSchema: JsonSchema = {
                 "Description": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ServiceType": {
-                    ref: "#/definitions/OtherServiceContentType"
-                }
-            }
+                    ref: "#/definitions/OtherServiceContentType",
+                },
+            },
         },
         "OtherServiceContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6365,19 +6365,19 @@ export const EpcMessageSchema: JsonSchema = {
                 4,
                 5,
                 6,
-                7
-            ]
+                7,
+            ],
         },
         "PassengerDataType": {
             "allOf": [
                 {
-                    ref: "#/definitions/PersonOnboardType"
+                    ref: "#/definitions/PersonOnboardType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "PersonsOnboardNumberType": {
             "type": JsonSchemaType.OBJECT,
@@ -6385,55 +6385,55 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "Crew": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "CrewSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NumberOfMedicalPersonsOnboard": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NumberOfMedicalPersonsOnboardSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NumberOfPersonsOnboard": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "NumberOfPersonsOnboardSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Passengers": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "PassengersSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "PortOfArrivalType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "PortOfDepartureType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "ROBBunkersType": {
             "type": JsonSchemaType.OBJECT,
@@ -6441,24 +6441,24 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "RemainOnBoard": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "RemainOnBoardSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Remarks": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "BunkersType": {
-                    ref: "#/definitions/BunkersTypeContentType"
+                    ref: "#/definitions/BunkersTypeContentType",
                 },
                 "BunkersTypeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "BunkersTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6474,8 +6474,8 @@ export const EpcMessageSchema: JsonSchema = {
                 7,
                 8,
                 9,
-                10
-            ]
+                10,
+            ],
         },
         "ShipClassType": {
             "type": JsonSchemaType.OBJECT,
@@ -6484,28 +6484,28 @@ export const EpcMessageSchema: JsonSchema = {
                 "Notation": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SocietyName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SocietyCode": {
-                    ref: "#/definitions/ClassSocietyContentType"
+                    ref: "#/definitions/ClassSocietyContentType",
                 },
                 "SocietyCodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Country": {
-                    ref: "#/definitions/CountryCodeContentType"
+                    ref: "#/definitions/CountryCodeContentType",
                 },
                 "CountrySpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "ClassSocietyContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6556,62 +6556,62 @@ export const EpcMessageSchema: JsonSchema = {
                 42,
                 43,
                 44,
-                45
-            ]
+                45,
+            ],
         },
         "ShipDefectsType": {
             "type": JsonSchemaType.OBJECT,
             "additionalProperties": false,
             "properties": {
                 "AbilityToTransferCargoBallastFuel": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "AbilityToTransferCargoBallastFuelSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "CargoHandling": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Commuication": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "HullIntegrity": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Maneuvrability": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Mooring": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Navigation": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Other": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
-                }
-            }
+                        JsonSchemaType.STRING,
+                    ],
+                },
+            },
         },
         "ShipIDType": {
             "type": JsonSchemaType.OBJECT,
@@ -6620,55 +6620,55 @@ export const EpcMessageSchema: JsonSchema = {
                 "CallSign": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Comment": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "IMONumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "MMSINumber": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ShipName": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "RegistrationPort": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/RegistrationPortType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/RegistrationPortType",
+                        },
+                    ],
+                },
+            },
         },
         "RegistrationPortType": {
             "allOf": [
                 {
-                    ref: "#/definitions/PortType"
+                    ref: "#/definitions/PortType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "ShipStatusType": {
             "type": JsonSchemaType.OBJECT,
@@ -6676,38 +6676,38 @@ export const EpcMessageSchema: JsonSchema = {
             "properties": {
                 "Course": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "CourseSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PilotOnboard": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PilotOnboardSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "PresentDraught": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "PresentDraughtSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Speed": {
                     "type": JsonSchemaType.NUMBER,
-                    "format": "decimal"
+                    "format": "decimal",
                 },
                 "SpeedSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "NavigationalStatus": {
-                    ref: "#/definitions/NavigationalStatusContentType"
+                    ref: "#/definitions/NavigationalStatusContentType",
                 },
                 "NavigationalStatusSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "ShipStoreItemType": {
             "type": JsonSchemaType.OBJECT,
@@ -6716,39 +6716,39 @@ export const EpcMessageSchema: JsonSchema = {
                 "Description": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "LocationOfStorage": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SequenceNumber": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SequenceNumberSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Measurement": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "Code": {
-                    ref: "#/definitions/ShipStoreItemCodeContentType"
+                    ref: "#/definitions/ShipStoreItemCodeContentType",
                 },
                 "CodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "ShipStoreItemCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6769,8 +6769,8 @@ export const EpcMessageSchema: JsonSchema = {
                 12,
                 13,
                 14,
-                15
-            ]
+                15,
+            ],
         },
         "ShipToShipActivityType": {
             "type": JsonSchemaType.OBJECT,
@@ -6779,56 +6779,56 @@ export const EpcMessageSchema: JsonSchema = {
                 "Activity": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "FromDateTime": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "FromDateTimeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SequenceNumber": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SequenceNumberSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "ToDateTime": {
                     "type": JsonSchemaType.STRING,
-                    "format": "date-time"
+                    "format": "date-time",
                 },
                 "ToDateTimeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Location": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/LocationType"
-                        }
-                    ]
+                            ref: "#/definitions/LocationType",
+                        },
+                    ],
                 },
                 "ShipSecurityMeasure": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/SecurityMeasureType"
-                    }
+                        ref: "#/definitions/SecurityMeasureType",
+                    },
                 },
                 "Code": {
-                    ref: "#/definitions/ShipToShipActivityCodeContentType"
+                    ref: "#/definitions/ShipToShipActivityCodeContentType",
                 },
                 "CodeSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
         },
         "ShipToShipActivityCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6858,8 +6858,8 @@ export const EpcMessageSchema: JsonSchema = {
                 21,
                 22,
                 23,
-                24
-            ]
+                24,
+            ],
         },
         "ShipTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -6954,8 +6954,8 @@ export const EpcMessageSchema: JsonSchema = {
                 86,
                 87,
                 88,
-                89
-            ]
+                89,
+            ],
         },
         "VoyageDescriptionItemType": {
             "type": JsonSchemaType.OBJECT,
@@ -6964,55 +6964,55 @@ export const EpcMessageSchema: JsonSchema = {
                 "Load": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Unload": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "ETA": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/DateTimeType"
-                        }
-                    ]
+                            ref: "#/definitions/DateTimeType",
+                        },
+                    ],
                 },
                 "Port": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
+                },
+            },
         },
         "VoyageEventType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
                     "additionalProperties": false,
                     "properties": {
                         "EventType": {
-                            ref: "#/definitions/VoyageEventTypeContentType"
+                            ref: "#/definitions/VoyageEventTypeContentType",
                         },
                         "EventTypeSpecified": {
-                            "type": JsonSchemaType.BOOLEAN
-                        }
-                    }
-                }
-            ]
+                            "type": JsonSchemaType.BOOLEAN,
+                        },
+                    },
+                },
+            ],
         },
         "VoyageEventTypeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -7020,8 +7020,8 @@ export const EpcMessageSchema: JsonSchema = {
             "enum": [
                 0,
                 1,
-                2
-            ]
+                2,
+            ],
         },
         "WasteInformationType": {
             "type": JsonSchemaType.OBJECT,
@@ -7030,63 +7030,63 @@ export const EpcMessageSchema: JsonSchema = {
                 "Comment": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "PointOfContact": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/ContactInfoType"
-                        }
-                    ]
+                            ref: "#/definitions/ContactInfoType",
+                        },
+                    ],
                 },
                 "LastPortDelivered": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/LocationCallType"
-                        }
-                    ]
+                            ref: "#/definitions/LocationCallType",
+                        },
+                    ],
                 },
                 "NextPortToDeliver": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
                 },
                 "WasteDeliveryStatus": {
-                    ref: "#/definitions/WasteDeliveryStatusContentType"
+                    ref: "#/definitions/WasteDeliveryStatusContentType",
                 },
                 "WasteDeliveryStatusSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "WasteDisposalInformation": {
                     "type": [
                         JsonSchemaType.ARRAY,
-                        JsonSchemaType.NULL
+                        JsonSchemaType.NULL,
                     ],
                     "items": {
-                        ref: "#/definitions/WasteDisposalInformationType"
-                    }
-                }
-            }
+                        ref: "#/definitions/WasteDisposalInformationType",
+                    },
+                },
+            },
         },
         "WasteDeliveryStatusContentType": {
             "type": JsonSchemaType.INTEGER,
             "description": "",
             "enum": [
                 0,
-                1
-            ]
+                1,
+            ],
         },
         "WasteDisposalInformationType": {
             "type": JsonSchemaType.OBJECT,
@@ -7095,65 +7095,65 @@ export const EpcMessageSchema: JsonSchema = {
                 "EstimatedGenerated": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
 
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "MaxStorage": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "RetainedOnboard": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "ToBeDelivered": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/MeasureType"
-                        }
-                    ]
+                            ref: "#/definitions/MeasureType",
+                        },
+                    ],
                 },
                 "DisposedOfInPort": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/PortType"
-                        }
-                    ]
+                            ref: "#/definitions/PortType",
+                        },
+                    ],
                 },
                 "WasteType": {
                     "oneOf": [
                         {
-                            "type": JsonSchemaType.NULL
+                            "type": JsonSchemaType.NULL,
                         },
                         {
-                            ref: "#/definitions/WasteTypeType"
-                        }
-                    ]
-                }
-            }
+                            ref: "#/definitions/WasteTypeType",
+                        },
+                    ],
+                },
+            },
         },
         "WasteTypeType": {
             "type": JsonSchemaType.OBJECT,
@@ -7162,13 +7162,13 @@ export const EpcMessageSchema: JsonSchema = {
                 "Description": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "Code": {
-                    ref: "#/definitions/WasteTypeCodeContentType"
-                }
-            }
+                    ref: "#/definitions/WasteTypeCodeContentType",
+                },
+            },
         },
         "WasteTypeCodeContentType": {
             "type": JsonSchemaType.INTEGER,
@@ -7197,19 +7197,19 @@ export const EpcMessageSchema: JsonSchema = {
                 20,
                 21,
                 22,
-                23
-            ]
+                23,
+            ],
         },
         "WaypointType": {
             "allOf": [
                 {
-                    ref: "#/definitions/LocationCallType"
+                    ref: "#/definitions/LocationCallType",
                 },
                 {
                     "type": JsonSchemaType.OBJECT,
-                    "additionalProperties": false
-                }
-            ]
+                    "additionalProperties": false,
+                },
+            ],
         },
         "WeatherInformationType": {
             "type": JsonSchemaType.OBJECT,
@@ -7218,52 +7218,52 @@ export const EpcMessageSchema: JsonSchema = {
                 "Remarks": {
                     "type": [
                         JsonSchemaType.NULL,
-                        JsonSchemaType.STRING
-                    ]
+                        JsonSchemaType.STRING,
+                    ],
                 },
                 "SeaState": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SeaStateSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SeaStateDirection": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SeaStateDirectionSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "Swell": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SwellSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "SwellDirection": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "SwellDirectionSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "WindDirection": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "WindDirectionSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
+                    "type": JsonSchemaType.BOOLEAN,
                 },
                 "WindForce": {
                     "type": JsonSchemaType.INTEGER,
-                    "format": "int32"
+                    "format": "int32",
                 },
                 "WindForceSpecified": {
-                    "type": JsonSchemaType.BOOLEAN
-                }
-            }
-        }
-    }
+                    "type": JsonSchemaType.BOOLEAN,
+                },
+            },
+        },
+    },
 };

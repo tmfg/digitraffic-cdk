@@ -1,4 +1,4 @@
-import {Construct} from '@aws-cdk/core';
+import {Construct} from "constructs";
 import * as InternalLambdas from './internal-lambdas';
 import {ShiplightProps} from './app-props';
 import {DigitrafficStack} from "digitraffic-common/stack/stack";

@@ -1,8 +1,8 @@
-import {Stack, App, StackProps} from '@aws-cdk/core';
-import {CfnDomain} from "@aws-cdk/aws-elasticsearch";
+import {Stack, App, StackProps} from 'aws-cdk-lib';
+import {CfnDomain} from "aws-cdk-lib/aws-elasticsearch";
 
 export class ElasticsearchStack extends Stack {
-    constructor(scope: App, id: string, elasticsearchProps: Props, props?: StackProps,) {
+    constructor(scope: App, id: string, elasticsearchProps: Props, props?: StackProps) {
         super(scope, id, props);
 
         const esVersion = '7.9';
@@ -17,26 +17,26 @@ export class ElasticsearchStack extends Stack {
                         "Sid": "",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": "*"
+                            "AWS": "*",
                         },
                         "Action": "es:*",
                         "Resource": `arn:aws:es:eu-west-1:${props?.env?.account}:domain/dt-elasticsearch-domain/*`,
                         "Condition": {
                             "IpAddress": {
-                                "aws:SourceIp": elasticsearchProps.allowedIpAddresses
-                            }
-                        }
+                                "aws:SourceIp": elasticsearchProps.allowedIpAddresses,
+                            },
+                        },
                     },
                     {
                         "Sid": "",
                         "Effect": "Allow",
                         "Principal": {
-                            "AWS": elasticsearchProps.allowedRoles
+                            "AWS": elasticsearchProps.allowedRoles,
                         },
                         "Action": "es:*",
-                        "Resource": `arn:aws:es:eu-west-1:${props?.env?.account}:domain/dt-elasticsearch-domain/*`
-                    }
-                ]
+                        "Resource": `arn:aws:es:eu-west-1:${props?.env?.account}:domain/dt-elasticsearch-domain/*`,
+                    },
+                ],
             },
             domainName: domainName,
             ebsOptions: {
@@ -46,13 +46,13 @@ export class ElasticsearchStack extends Stack {
             },
             elasticsearchClusterConfig: {
                 instanceCount: elasticsearchProps.instanceCount,
-                instanceType: elasticsearchProps.instanceType
+                instanceType: elasticsearchProps.instanceType,
             },
-            elasticsearchVersion: esVersion
+            elasticsearchVersion: esVersion,
         });
 
         domain.cfnOptions.updatePolicy = {
-            enableVersionUpgrade: true
+            enableVersionUpgrade: true,
         };
 
         // const metric = new Metric({

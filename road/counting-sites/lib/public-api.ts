@@ -1,6 +1,6 @@
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {Model, Resource} from "@aws-cdk/aws-apigateway";
+import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
 import {MonitoredDBFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MediaType} from "digitraffic-common/api/mediatypes";
@@ -33,12 +33,18 @@ export class PublicApi {
     }
 
     createDocumentation(stack: DigitrafficStack) {
-        addTagsAndSummary('GetMetadata', BETA_TAGS, 'Return all metadata', this.metadataResource, stack);
+        addTagsAndSummary(
+            'GetMetadata', BETA_TAGS, 'Return all metadata', this.metadataResource, stack,
+        );
 
-        addTagsAndSummary('GetCounters', BETA_TAGS, 'Return all counters for domain', this.countersListResource, stack);
+        addTagsAndSummary(
+            'GetCounters', BETA_TAGS, 'Return all counters for domain', this.countersListResource, stack,
+        );
         addQueryParameterDescription('domain', 'Domain', this.countersListResource, stack);
 
-        addTagsAndSummary('GetData', BETA_TAGS, 'Return all data', this.dataResource, stack);
+        addTagsAndSummary(
+            'GetData', BETA_TAGS, 'Return all data', this.dataResource, stack,
+        );
         addQueryParameterDescription('id', 'Site-id', this.dataResource, stack);
     }
 
@@ -53,9 +59,9 @@ export class PublicApi {
         this.dataResource = valuesResource.addResource("{id}");
         this.countersListResource = countersResource.addResource("{domain}");
 
-//        this.errorResponseModel = publicApi.addModel('ErrorResponseModel', MessageModel);
+        //        this.errorResponseModel = publicApi.addModel('ErrorResponseModel', MessageModel);
         this.metadataResponseModel = publicApi.addModel('MetadataResponseModel', MessageModel);
-//        this.dataResponseModel = publicApi.addModel('DataResponseModel', MessageModel);
+        //        this.dataResponseModel = publicApi.addModel('DataResponseModel', MessageModel);
     }
 
     createMetadataEndpoint(stack: DigitrafficStack) {
@@ -67,8 +73,8 @@ export class PublicApi {
             apiKeyRequired: true,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel))
-            ]
+                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+            ],
         });
     }
 
@@ -77,24 +83,24 @@ export class PublicApi {
 
         const countersIntegration = defaultIntegration(lambda, {
             requestParameters: {
-                'integration.request.path.domain': 'method.request.path.domain'
+                'integration.request.path.domain': 'method.request.path.domain',
             },
             requestTemplates: {
-                'application/json': JSON.stringify({domain: "$util.escapeJavaScript($input.params('domain'))"})
+                'application/json': JSON.stringify({domain: "$util.escapeJavaScript($input.params('domain'))"}),
             },
-            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)]
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)],
         });
 
         this.countersListResource.addMethod("GET", countersIntegration, {
             apiKeyRequired: true,
             requestParameters: {
-                'method.request.path.domain': true
+                'method.request.path.domain': true,
             },
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.metadataResponseModel)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel))
-            ]
-        })
+                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+            ],
+        });
     }
 
     createDataEndpoint(stack: DigitrafficStack) {
@@ -102,23 +108,23 @@ export class PublicApi {
 
         const dataIntegration = defaultIntegration(lambda, {
             requestParameters: {
-                'integration.request.path.id': 'method.request.path.id'
+                'integration.request.path.id': 'method.request.path.id',
             },
             requestTemplates: {
-                'application/json': JSON.stringify({id: "$util.escapeJavaScript($input.params('id'))"})
+                'application/json': JSON.stringify({id: "$util.escapeJavaScript($input.params('id'))"}),
             },
-            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)]
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)],
         });
 
         this.dataResource.addMethod("GET", dataIntegration, {
             apiKeyRequired: true,
             requestParameters: {
-                'method.request.path.id': true
+                'method.request.path.id': true,
             },
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel))
-            ]
+                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+            ],
         });
     }
 }

@@ -5,10 +5,10 @@ import {
     MockIntegration,
     PassthroughBehavior,
     Resource,
-    RestApi
-} from '@aws-cdk/aws-apigateway';
-import {Construct} from "@aws-cdk/core";
-import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
+    RestApi,
+} from 'aws-cdk-lib/aws-apigateway';
+import {Construct} from "constructs";
+import {add404Support, createDefaultPolicyDocument} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {FormalityResponseJson} from "./model/formality";
 import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
@@ -30,8 +30,7 @@ import {EpcMessageSchema} from "./model/epcmessage_schema";
 
 export function create(stack: DigitrafficStack) {
 
-    const api = createRestApi(
-        stack,
+    const api = createRestApi(stack,
         'GOFREP-Public',
         'GOFREP public API');
 
@@ -50,7 +49,7 @@ function createRestApi(stack: Construct, apiId: string, apiName: string): RestAp
         },
         restApiName: apiName,
         endpointTypes: [EndpointType.REGIONAL],
-        policy: createDefaultPolicyDocument()
+        policy: createDefaultPolicyDocument(),
     });
     add404Support(restApi, stack);
     return restApi;
@@ -62,14 +61,14 @@ function createMrsReportingFormalityResource(resource: Resource) {
         requestTemplates: {
             'application/json': `{
                 "statusCode": 200
-            }`
+            }`,
         },
         integrationResponses: [{
             statusCode: '200',
             responseTemplates: {
-                'application/json': JSON.stringify(FormalityResponseJson)
-            }
-        }]
+                'application/json': JSON.stringify(FormalityResponseJson),
+            },
+        }],
     });
 
     const metadataResource = resource.addResource('formality');
@@ -77,13 +76,12 @@ function createMrsReportingFormalityResource(resource: Resource) {
     metadataResource.addMethod("GET", integration, {
         apiKeyRequired: true,
         methodResponses: [{
-            statusCode: '200'
-        }]
+            statusCode: '200',
+        }],
     });
 }
 
-function createReceiveMrsReportResource(
-    stack: DigitrafficStack,
+function createReceiveMrsReportResource(stack: DigitrafficStack,
     resource: Resource,
     epcModel: IModel,
     messageModel: IModel) {
@@ -93,10 +91,12 @@ function createReceiveMrsReportResource(
     // ATTENTION!
     // This lambda needs to run in a VPC so that the outbound IP address is always the same (NAT Gateway).
     // The reason for this is IP based restriction in another system's firewall.
-    const handler = MonitoredFunction.create(stack, functionName, databaseFunctionProps(stack,{}, functionName, 'receive-epcmessage', {
-        singleLambda: true,
-        timeout: 10
-    }));
+    const handler = MonitoredFunction.create(stack, functionName, databaseFunctionProps(
+        stack,{}, functionName, 'receive-epcmessage', {
+            singleLambda: true,
+            timeout: 10,
+        },
+    ));
     createSubscription(handler, functionName, stack.configuration.logsDestinationArn, stack);
 
     const integration = defaultIntegration(handler, {
@@ -105,18 +105,18 @@ function createReceiveMrsReportResource(
         responses: [
             getResponse(RESPONSE_200_OK, {disableCors: true}),
             getResponse(RESPONSE_400_BAD_REQUEST, {disableCors: true}),
-            getResponse(RESPONSE_500_SERVER_ERROR, {disableCors: true})
-        ]
+            getResponse(RESPONSE_500_SERVER_ERROR, {disableCors: true}),
+        ],
     });
     metadataResource.addMethod('POST', integration, {
         apiKeyRequired: true,
         requestModels: {
-            "application/json": epcModel
+            "application/json": epcModel,
         },
         methodResponses: [
             methodResponse("200", MediaType.APPLICATION_JSON, epcModel),
             methodResponse("400", MediaType.APPLICATION_JSON, messageModel),
-            methodResponse("500", MediaType.APPLICATION_JSON, messageModel)
-        ]
+            methodResponse("500", MediaType.APPLICATION_JSON, messageModel),
+        ],
     });
 }

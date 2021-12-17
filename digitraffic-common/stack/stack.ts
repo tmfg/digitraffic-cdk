@@ -1,16 +1,18 @@
-import {Aspects, Construct, Stack, StackProps} from "@aws-cdk/core";
-import {IVpc, SecurityGroup, Vpc} from "@aws-cdk/aws-ec2";
-import {ISecurityGroup} from "@aws-cdk/aws-ec2/lib/security-group";
-import {ITopic, Topic} from "@aws-cdk/aws-sns";
-import {LambdaEnvironment, SECRET_ID} from "../model/lambda-environment";
+import {Aspects, Stack, StackProps} from "aws-cdk-lib";
+import {IVpc, SecurityGroup, Vpc} from "aws-cdk-lib/aws-ec2";
+import {ISecurityGroup} from "aws-cdk-lib/aws-ec2/lib/security-group";
+import {ITopic, Topic} from "aws-cdk-lib/aws-sns";
 import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
-import {StringParameter} from "@aws-cdk/aws-ssm";
-import {TrafficType} from "../model/traffictype";
-import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
-import {Function} from "@aws-cdk/aws-lambda";
-import {StackCheckingAspect} from "./stack-checking-aspect";
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
+import {ISecret, Secret} from "aws-cdk-lib/aws-secretsmanager";
+import {Function} from "aws-cdk-lib/aws-lambda";
 
-const SSM_ROOT = '/digitraffic'
+import {StackCheckingAspect} from "./stack-checking-aspect";
+import {LambdaEnvironment, SECRET_ID} from "../model/lambda-environment";
+import {TrafficType} from "../model/traffictype";
+import {Construct} from "constructs";
+
+const SSM_ROOT = '/digitraffic';
 export const SOLUTION_KEY = 'Solution';
 const MONITORING_ROOT = '/monitoring';
 
@@ -56,7 +58,7 @@ export class DigitrafficStack extends Stack {
         this.vpc = Vpc.fromVpcAttributes(this, 'vpc', {
             vpcId: configuration.vpcId,
             privateSubnetIds: configuration.privateSubnetIds,
-            availabilityZones: configuration.availabilityZones
+            availabilityZones: configuration.availabilityZones,
         });
 
         // security group that allows Lambda database access

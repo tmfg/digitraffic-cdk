@@ -1,8 +1,8 @@
-import {Topic} from "@aws-cdk/aws-sns";
+import {Topic} from "aws-cdk-lib/aws-sns";
 import {MQTTConfiguration} from "./app-props";
-import {Stack} from "@aws-cdk/core";
-import {Alarm, ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
-import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
+import {Stack} from "aws-cdk-lib";
+import {Alarm, ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
+import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 
 export class MqttMonitoring {
     private readonly stack: Stack;
@@ -23,13 +23,15 @@ export class MqttMonitoring {
         });
     }
 
-    createAlarmForMetric(name: string, brokerName: string, metricName: string, threshold: number, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD) {
+    createAlarmForMetric(
+        name: string, brokerName: string, metricName: string, threshold: number, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD,
+    ) {
         const metric = new Metric({
             namespace: 'AWS/AmazonMQ',
             metricName,
-            dimensions: {
-                Broker: brokerName
-            }
+            dimensionsMap: {
+                Broker: brokerName,
+            },
         });
 
         const alarmName = `MQTT-${this.stack.stackName}-${brokerName}-${name}`;
@@ -40,7 +42,7 @@ export class MqttMonitoring {
             evaluationPeriods: 5,
             threshold,
             comparisonOperator,
-            datapointsToAlarm: 2
+            datapointsToAlarm: 2,
         });
 
         alarm.addAlarmAction(new SnsAction(this.alarmsTopic));

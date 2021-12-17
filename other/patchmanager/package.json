@@ -16,10 +16,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@aws-cdk/aws-iam": "*",
-    "@aws-cdk/aws-sns": "*",
-    "@aws-cdk/aws-ssm": "*",
-    "@aws-cdk/core": "*"
+    "aws-cdk-lib": "*",
+    "constructs": "*"
   },
   "externals": [
     "aws-sdk"

@@ -1,15 +1,16 @@
-import * as lambda from '@aws-cdk/aws-lambda';
-import {Construct, Duration} from '@aws-cdk/core';
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import {Duration} from 'aws-cdk-lib';
+import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
+import {Construct} from "constructs";
 import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {AppProps} from "./app-props";
-import {Queue} from "@aws-cdk/aws-sqs";
-import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
-import {Bucket} from "@aws-cdk/aws-s3";
-import {RetentionDays} from '@aws-cdk/aws-logs';
+import {Queue} from "aws-cdk-lib/aws-sqs";
+import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
+import {Bucket} from "aws-cdk-lib/aws-s3";
+import {RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {QueueAndDLQ} from "./sqs";
-import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 import {MaintenanceTrackingEnvKeys} from "./keys";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
@@ -21,8 +22,11 @@ export function createProcessQueueAndDlqLambda(
     sqsExtendedMessageBucketArn: string,
     props: AppProps,
     secret: ISecret,
-    stack: DigitrafficStack) {
-    createProcessQueueLambda(queueAndDLQ.queue, dlqBucket.urlForObject(), sqsExtendedMessageBucketArn, props, secret, stack);
+    stack: DigitrafficStack,
+) {
+    createProcessQueueLambda(
+        queueAndDLQ.queue, dlqBucket.urlForObject(), sqsExtendedMessageBucketArn, props, secret, stack,
+    );
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 }
 
@@ -32,7 +36,8 @@ function createProcessQueueLambda(
     sqsExtendedMessageBucketArn: string,
     appProps: AppProps,
     secret: ISecret,
-    stack: DigitrafficStack) {
+    stack: DigitrafficStack,
+) {
 
     const role = createLambdaRoleWithReadS3Policy(stack, sqsExtendedMessageBucketArn);
     const functionName = "MaintenanceTracking-ProcessQueue";
@@ -42,23 +47,24 @@ function createProcessQueueLambda(
     env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = appProps.sqsMessageBucketName;
     env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
 
-    const lambdaConf = databaseFunctionProps(stack, env, functionName, 'process-queue', {
-        reservedConcurrentExecutions: 100,
-        timeout: 60,
-        role: role,
-        memorySize: 256,
-    });
+    const lambdaConf = databaseFunctionProps(
+        stack, env, functionName, 'process-queue', {
+            reservedConcurrentExecutions: 100,
+            timeout: 60,
+            role: role,
+            memorySize: 256,
+        },
+    );
     const processQueueLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     // Handle only one message per time
     processQueueLambda.addEventSource(new SqsEventSource(queue, {
-        batchSize: 1
+        batchSize: 1,
     }));
     secret.grantRead(processQueueLambda);
     createSubscription(processQueueLambda, functionName, appProps.logsDestinationArn, stack);
 }
 
-function createProcessDLQLambda(
-    dlqBucket: Bucket,
+function createProcessDLQLambda(dlqBucket: Bucket,
     dlq: Queue,
     props: AppProps,
     stack: DigitrafficStack) {
@@ -75,7 +81,7 @@ function createProcessDLQLambda(
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1,
         timeout: Duration.seconds(10),
-        memorySize: 256
+        memorySize: 256,
     });
 
     processDLQLambda.addEventSource(new SqsEventSource(dlq));
@@ -92,7 +98,7 @@ function createProcessDLQLambda(
 function createLambdaRoleWithReadS3Policy(stack: Construct, sqsExtendedMessageBucketArn: string) : Role {
     const lambdaRole = new Role(stack, `ReadSqsExtendedMessageBucketRole`, {
         assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-        roleName: `ReadSqsExtendedMessageBucketRole`
+        roleName: `ReadSqsExtendedMessageBucketRole`,
     });
 
     const s3PolicyStatement = new PolicyStatement();

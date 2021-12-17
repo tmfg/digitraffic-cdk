@@ -26,14 +26,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@aws-cdk/aws-events-targets": "*",
-    "@aws-cdk/aws-kinesis": "*",
-    "@aws-cdk/aws-lambda-event-sources": "*",
-    "@aws-cdk/aws-logs-destinations": "*",
-    "@aws-cdk/aws-rds": "*",
-    "@aws-cdk/aws-secretsmanager": "*",
-    "@aws-cdk/aws-ssm": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "@types/aws-lambda": "*",
     "@types/mysql": "^2.15.15",
     "aws-lambda": "^1.0.6",

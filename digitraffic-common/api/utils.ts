@@ -1,4 +1,4 @@
-import {RestApi, Model, JsonSchema, JsonSchemaType, RequestValidator} from '@aws-cdk/aws-apigateway';
+import {RestApi, Model, JsonSchema, JsonSchemaType, RequestValidator} from 'aws-cdk-lib/aws-apigateway';
 import {ModelWithReference} from "./model-with-reference";
 
 /**
@@ -19,7 +19,7 @@ export function getModelReference(modelId: string, restApiId: string) {
 export function addDefaultValidator(api: RestApi): RequestValidator {
     return api.addRequestValidator('DefaultValidator', {
         validateRequestParameters: true,
-        validateRequestBody: true
+        validateRequestBody: true,
     });
 }
 
@@ -35,7 +35,7 @@ export function addServiceModel(modelName: string, api: RestApi, schema: JsonSch
     const mwr = api.addModel(modelName, {
         contentType: 'application/json',
         modelName,
-        schema
+        schema,
     }) as ModelWithReference;
     mwr.modelReference = getModelReference(mwr.modelId, api.restApiId);
     return mwr;
@@ -52,7 +52,7 @@ export function addSimpleServiceModel(modelName: string, api: RestApi, contentTy
     return api.addModel(modelName, {
         contentType,
         modelName,
-        schema: {}
+        schema: {},
     });
 }
 
@@ -66,7 +66,7 @@ export function createArraySchema(model: Model, api: RestApi): JsonSchema {
     return {
         type: JsonSchemaType.ARRAY,
         items: {
-            ref: getModelReference(model.modelId, api.restApiId)
-        }
+            ref: getModelReference(model.modelId, api.restApiId),
+        },
     };
 }

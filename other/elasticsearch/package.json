@@ -14,9 +14,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@aws-cdk/aws-cloudwatch": "*",
-    "@aws-cdk/aws-elasticsearch": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "source-map-support": "^0.5.19"
   }
 }

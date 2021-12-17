@@ -4,12 +4,12 @@ import {
     PassthroughBehavior,
     RequestValidator,
     Resource,
-    RestApi
-} from '@aws-cdk/aws-apigateway';
-import {Function} from '@aws-cdk/aws-lambda';
+    RestApi,
+} from 'aws-cdk-lib/aws-apigateway';
+import {Function} from 'aws-cdk-lib/aws-lambda';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
-import {corsMethod, defaultIntegration, methodResponse,} from "digitraffic-common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/api/utils";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
@@ -20,7 +20,7 @@ import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
-import {IModel} from "@aws-cdk/aws-apigateway/lib/model";
+import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -37,8 +37,7 @@ export class PublicApi {
         const locationModel = addServiceModel("LocationModel", this.publicApi, LocationSchema);
         const timestampModel = addServiceModel("TimestampModel",
             this.publicApi,
-            createTimestampSchema(
-                getModelReference(shipModel.modelId, this.publicApi.restApiId),
+            createTimestampSchema(getModelReference(shipModel.modelId, this.publicApi.restApiId),
                 getModelReference(locationModel.modelId, this.publicApi.restApiId)));
         const timestampsModel = addServiceModel("TimestampsModel", this.publicApi, createArraySchema(timestampModel, this.publicApi));
         const errorResponseModel = this.publicApi.addModel('MessageResponseModel', MessageModel);
@@ -47,7 +46,9 @@ export class PublicApi {
             .addResource("api")
             .addResource("v1");
 
-        this.createTimestampsResource(stack, resource, timestampsModel, errorResponseModel, validator);
+        this.createTimestampsResource(
+            stack, resource, timestampsModel, errorResponseModel, validator,
+        );
         this.createShiplistResource(stack, this.publicApi);
         this.createTimestampMetadataResource(stack, this.publicApi, resource);
     }
@@ -57,7 +58,8 @@ export class PublicApi {
         resource: Resource,
         timestampsJsonModel: IModel,
         errorResponseModel: IModel,
-        validator: RequestValidator): Function {
+        validator: RequestValidator,
+    ): Function {
         const environment = stack.createLambdaEnvironment();
 
         const getTimestampsLambda = MonitoredFunction.createV2(stack, 'get-timestamps', environment, {
@@ -65,8 +67,8 @@ export class PublicApi {
             reservedConcurrentExecutions: 6,
             errorAlarmProps: {
                 create: true,
-                threshold: 3
-            }
+                threshold: 3,
+            },
         });
 
         stack.grantSecret(getTimestampsLambda);
@@ -84,13 +86,13 @@ export class PublicApi {
                     locode: "$util.escapeJavaScript($input.params('locode'))",
                     mmsi: "$util.escapeJavaScript($input.params('mmsi'))",
                     imo: "$util.escapeJavaScript($input.params('imo'))",
-                    source: "$util.escapeJavaScript($input.params('source'))"
-                })
+                    source: "$util.escapeJavaScript($input.params('source'))",
+                }),
             },
             responses: [
                 DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
-                DigitrafficIntegrationResponse.badRequest()
-            ]
+                DigitrafficIntegrationResponse.badRequest(),
+            ],
         });
 
         const timestampResource = resource.addResource('timestamps');
@@ -100,22 +102,24 @@ export class PublicApi {
                 'method.request.querystring.locode': false,
                 'method.request.querystring.mmsi': false,
                 'method.request.querystring.imo': false,
-                'method.request.querystring.source': false
+                'method.request.querystring.source': false,
             },
             requestValidator: validator,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, timestampsJsonModel)),
                 {
-                    statusCode: '400'
-                }
-            ]
+                    statusCode: '400',
+                },
+            ],
         });
 
-        addTagsAndSummary('GetTimestamps',
+        addTagsAndSummary(
+            'GetTimestamps',
             ['timestamps'],
             'Retrieves ship timestamps by ship or port',
             timestampResource,
-            stack);
+            stack,
+        );
         addQueryParameterDescription('locode', 'Port LOCODE', timestampResource, stack);
         addQueryParameterDescription('mmsi', 'Ship MMSI', timestampResource, stack);
         addQueryParameterDescription('imo', 'Ship IMO', timestampResource, stack);
@@ -129,33 +133,34 @@ export class PublicApi {
         const lambda = MonitoredFunction.createV2(stack, 'get-shiplist-public', environment, {
             functionName: 'PortActivity-PublicShiplist',
             timeout: 10,
-            reservedConcurrentExecutions: 6
-        })
+            reservedConcurrentExecutions: 6,
+        });
 
         stack.grantSecret(lambda);
 
         const integration = new LambdaIntegration(lambda, {
-            proxy: true
+            proxy: true,
         });
 
         const shiplistResource = publicApi.root.addResource("shiplist");
         shiplistResource.addMethod("GET", integration, {
-            apiKeyRequired: false
+            apiKeyRequired: false,
         });
 
         new DigitrafficLogSubscriptions(stack, lambda);
 
-        addTagsAndSummary('Shiplist',
+        addTagsAndSummary(
+            'Shiplist',
             ['shiplist'],
             'Returns a list of ships as an HTML page',
             shiplistResource,
-            stack);
+            stack,
+        );
 
         return lambda;
     }
 
-    createTimestampMetadataResource(
-        stack: DigitrafficStack,
+    createTimestampMetadataResource(stack: DigitrafficStack,
         publicApi: RestApi,
         resource: Resource) {
 
@@ -164,14 +169,14 @@ export class PublicApi {
             requestTemplates: {
                 'application/json': `{
                 "statusCode": 200
-            }`
+            }`,
             },
             integrationResponses: [{
                 statusCode: '200',
                 responseTemplates: {
-                    'application/json': JSON.stringify(TimestampMetadata)
-                }
-            }]
+                    'application/json': JSON.stringify(TimestampMetadata),
+                },
+            }],
         });
 
         const metadataResource = resource.addResource('metadata');
@@ -179,14 +184,16 @@ export class PublicApi {
         metadataResource.addMethod("GET", integration, {
             apiKeyRequired: false,
             methodResponses: [{
-                statusCode: '200'
-            }]
+                statusCode: '200',
+            }],
         });
 
-        addTagsAndSummary('Timestamp metadata',
+        addTagsAndSummary(
+            'Timestamp metadata',
             ['metadata'],
             'Returns timestamp related metadata',
             metadataResource,
-            stack);
+            stack,
+        );
     }
 }

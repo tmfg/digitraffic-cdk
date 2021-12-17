@@ -1,4 +1,4 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
+import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
 // Manually converted from json-schema
 
 export const Sse: JsonSchema = {
@@ -7,7 +7,7 @@ export const Sse: JsonSchema = {
     title: "The SSE Report Root Schema",
     additionalProperties: false,
     required: [
-        "SSE_Reports"
+        "SSE_Reports",
     ],
     properties: {
         SSE_Reports: {
@@ -18,7 +18,7 @@ export const Sse: JsonSchema = {
                 title: "The Items Schema",
                 required: [
                     "Site",
-                    "SSE_Fields"
+                    "SSE_Fields",
                 ],
                 properties: {
                     Site: {
@@ -28,13 +28,13 @@ export const Sse: JsonSchema = {
                         required: [
                             "SiteName",
                             "SiteNumber",
-                            "SiteType"
+                            "SiteType",
                         ],
                         properties: {
                             SiteName: {
                                 type: JsonSchemaType.STRING,
                                 title: "The Sitename Schema",
-                                pattern: "^(.*)$"
+                                pattern: "^(.*)$",
                             },
                             SiteNumber: {
                                 type: JsonSchemaType.INTEGER,
@@ -44,11 +44,11 @@ export const Sse: JsonSchema = {
                                 type: JsonSchemaType.STRING,
                                 enum: [
                                     "FIXED",
-                                    "FLOATING"
+                                    "FLOATING",
                                 ],
                                 title: "The SiteType Schema",
-                            }
-                        }
+                            },
+                        },
                     },
                     SSE_Fields: {
                         type: JsonSchemaType.OBJECT,
@@ -59,13 +59,13 @@ export const Sse: JsonSchema = {
                             "SeaState",
                             "Trend",
                             "WindWaveDir",
-                            "Confidence"
+                            "Confidence",
                         ],
                         properties: {
                             Last_Update: {
                                 type: JsonSchemaType.STRING,
                                 title: "The Last_update Schema",
-                                format: "date-time"
+                                format: "date-time",
                             },
                             SeaState: {
                                 type: JsonSchemaType.STRING,
@@ -75,7 +75,7 @@ export const Sse: JsonSchema = {
                                     "MODERATE",
                                     "BREEZE",
                                     "GALE",
-                                    "STORM"
+                                    "STORM",
                                 ],
                                 title: "The Seastate Schema",
                             },
@@ -85,7 +85,7 @@ export const Sse: JsonSchema = {
                                     "UNKNOWN",
                                     "NO_CHANGE",
                                     "ASCENDING",
-                                    "DESCENDING"
+                                    "DESCENDING",
                                 ],
                                 title: "The Trend Schema",
                             },
@@ -94,18 +94,18 @@ export const Sse: JsonSchema = {
                                 title: "The Windwavedir Schema",
                                 multipleOf: 1,
                                 minimum: 0,
-                                maximum: 359
+                                maximum: 359,
                             },
                             Confidence: {
                                 type: JsonSchemaType.STRING,
                                 enum: [
                                     "POOR",
                                     "MODERATE",
-                                    "GOOD"
+                                    "GOOD",
                                 ],
                                 title: "The Confidence Schema",
-                            }
-                        }
+                            },
+                        },
                     },
                     Extra_Fields: {
                         type: JsonSchemaType.OBJECT,
@@ -114,7 +114,7 @@ export const Sse: JsonSchema = {
                         properties: {
                             Temperature: {
                                 type: JsonSchemaType.INTEGER,
-                                title: "The Temperature Schema"
+                                title: "The Temperature Schema",
                             },
                             Heel_Angle: {
                                 type: JsonSchemaType.NUMBER,
@@ -126,22 +126,22 @@ export const Sse: JsonSchema = {
                                 enum: [
                                     "ON",
                                     "OFF",
-                                    "ON_D"
+                                    "ON_D",
                                 ],
                                 title: "The Light_status Schema",
                             },
                             Coord_Latitude: {
                                 type: JsonSchemaType.NUMBER,
-                                title: "The Coord_latitude Schema"
+                                title: "The Coord_latitude Schema",
                             },
                             Coord_Longitude: {
                                 type: JsonSchemaType.NUMBER,
-                                title: "The Coord_longitude Schema"
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
+                                title: "The Coord_longitude Schema",
+                            },
+                        },
+                    },
+                },
+            },
+        },
+    },
+};

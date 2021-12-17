@@ -1,4 +1,4 @@
-import apigateway = require('@aws-cdk/aws-apigateway');
+import apigateway = require('aws-cdk-lib/aws-apigateway');
 
 const TypeIdDescription = `Id of disturbance type:
 1 - Lock malfunction
@@ -13,33 +13,33 @@ const disruptionsProperties: apigateway.JsonSchema = {
     properties: {
         Id: {
             type: apigateway.JsonSchemaType.NUMBER,
-            description: 'Id of disturbance'
+            description: 'Id of disturbance',
         },
         Type_Id: {
             type: apigateway.JsonSchemaType.NUMBER,
-            description: TypeIdDescription
+            description: TypeIdDescription,
         },
         StartDate: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disturbance started date time'
+            description: 'Disturbance started date time',
         },
         EndDate: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disturbance ended date time'
+            description: 'Disturbance ended date time',
         },
         DescriptionFi: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disturbance description, finnish'
+            description: 'Disturbance description, finnish',
         },
         DescriptionSv: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disturbance description, swedish'
+            description: 'Disturbance description, swedish',
         },
         DescriptionEn: {
             type: apigateway.JsonSchemaType.STRING,
-            description: 'Disturbance description, english'
-        }
-    }
+            description: 'Disturbance description, english',
+        },
+    },
 };
 
 export default disruptionsProperties;

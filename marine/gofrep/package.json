@@ -31,9 +31,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "*",
-    "@aws-cdk/aws-lambda": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "aws-sdk": "*",
     "axios": "^0.21.1",
     "moment": "*",

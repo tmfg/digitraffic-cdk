@@ -1,9 +1,12 @@
-import {AliasConfiguration, SecurityPolicyProtocol} from '@aws-cdk/aws-cloudfront';
+import {ViewerCertificate} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
+import {SecurityPolicyProtocol} from "aws-cdk-lib/aws-cloudfront";
 
-export function createAliasConfig(certRef: string, domainNames: string[]): AliasConfiguration {
+export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
     return {
-        acmCertRef: certRef,
-        names: domainNames,
-        securityPolicy: SecurityPolicyProtocol.TLS_V1_2_2019
-    }
+        props: {
+            acmCertificateArn,
+            minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
+        },
+        aliases,
+    };
 }

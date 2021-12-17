@@ -27,15 +27,8 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@aws-cdk/aws-iam": "*",
-    "@aws-cdk/aws-kinesis": "*",
-    "@aws-cdk/aws-lambda": "*",
-    "@aws-cdk/aws-lambda-event-sources": "*",
-    "@aws-cdk/aws-logs": "*",
-    "@aws-cdk/aws-logs-destinations": "*",
-    "@aws-cdk/aws-sns": "*",
-    "@aws-cdk/aws-sns-subscriptions": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "@types/aws-lambda": "*",
     "aws-lambda": "^1.0.6",
     "source-map-support": "^0.5.19"

@@ -1,9 +1,9 @@
 import {DBConfiguration} from "./app-props";
-import {Stack} from "@aws-cdk/core";
-import {DatabaseCluster, DatabaseClusterEngine} from "@aws-cdk/aws-rds";
-import {Topic} from "@aws-cdk/aws-sns";
-import {Alarm, ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
-import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
+import {Stack} from "aws-cdk-lib";
+import {DatabaseCluster, DatabaseClusterEngine} from "aws-cdk-lib/aws-rds";
+import {Topic} from "aws-cdk-lib/aws-sns";
+import {Alarm, ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
+import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 
 export class RdsMonitoring {
@@ -16,7 +16,7 @@ export class RdsMonitoring {
 
         const cluster = DatabaseCluster.fromDatabaseClusterAttributes(stack, 'DbCluster', {
             clusterIdentifier: dbConfiguration.dbClusterIdentifier,
-            engine: DatabaseClusterEngine.AURORA_POSTGRESQL
+            engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
         });
 
         const cpuLimit = dbConfiguration.cpuLimit;
@@ -44,7 +44,7 @@ export class RdsMonitoring {
             evaluationPeriods: 5,
             threshold,
             comparisonOperator,
-            datapointsToAlarm: 2
+            datapointsToAlarm: 2,
         });
 
         alarm.addAlarmAction(new SnsAction(this.alarmsTopic));

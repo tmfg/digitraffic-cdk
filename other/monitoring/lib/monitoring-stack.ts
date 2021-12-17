@@ -1,17 +1,18 @@
-import {Aspects, Construct, Stack} from '@aws-cdk/core';
-import {Topic} from '@aws-cdk/aws-sns';
-import {EmailSubscription} from '@aws-cdk/aws-sns-subscriptions';
+import {Aspects, Stack} from 'aws-cdk-lib';
+import {Topic} from 'aws-cdk-lib/aws-sns';
+import {EmailSubscription} from 'aws-cdk-lib/aws-sns-subscriptions';
 import {MonitoringConfiguration} from "./app-props";
-import {StringParameter} from "@aws-cdk/aws-ssm";
-import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "digitraffic-common/stack/stack";
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
+import {Construct} from "constructs";
 import {RdsMonitoring} from "./rds-monitoring";
 import {MqttMonitoring} from "./mqtt-monitoring";
 import {StackCheckingAspect} from "digitraffic-common/stack/stack-checking-aspect";
+import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "digitraffic-common/stack/stack";
 
 export class MonitoringStack extends Stack {
     constructor(scope: Construct, id: string, configuration: MonitoringConfiguration) {
         super(scope, id, {
-            env: configuration.env
+            env: configuration.env,
         });
 
         const alarmsTopic = this.createTopic('digitraffic-monitoring-alarms', configuration.alarmTopicEmail);
@@ -20,13 +21,13 @@ export class MonitoringStack extends Stack {
         new StringParameter(this, 'AlarmsParam', {
             description: 'Alarms topic ARN',
             parameterName: SSM_KEY_ALARM_TOPIC,
-            stringValue: alarmsTopic.topicArn
+            stringValue: alarmsTopic.topicArn,
         });
 
         new StringParameter(this, 'WarningsParam', {
             description: 'Warnings topic ARN',
             parameterName: SSM_KEY_WARNING_TOPIC,
-            stringValue: warningsTopic.topicArn
+            stringValue: warningsTopic.topicArn,
         });
 
         this.createMonitorings(alarmsTopic, configuration);
@@ -35,11 +36,11 @@ export class MonitoringStack extends Stack {
     }
 
     createMonitorings(alarmsTopic: Topic, configuration: MonitoringConfiguration) {
-        if(configuration.db) {
+        if (configuration.db) {
             new RdsMonitoring(this, alarmsTopic, configuration.db);
         }
 
-        if(configuration.mqtt) {
+        if (configuration.mqtt) {
             new MqttMonitoring(this, alarmsTopic, configuration.mqtt);
         }
 
@@ -48,7 +49,7 @@ export class MonitoringStack extends Stack {
 
     createTopic(topicName: string, email: string): Topic {
         const topic = new Topic(this, topicName, {
-            topicName
+            topicName,
         });
 
         topic.addSubscription(new EmailSubscription(email));

@@ -1,8 +1,8 @@
-import {Architecture, AssetCode, Code, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
-import {Duration} from "@aws-cdk/core";
-import {ISecurityGroup, IVpc} from "@aws-cdk/aws-ec2";
-import {RetentionDays} from '@aws-cdk/aws-logs';
-import {Role} from '@aws-cdk/aws-iam'
+import {Architecture, AssetCode, Code, FunctionProps, Runtime} from 'aws-cdk-lib/aws-lambda';
+import {Duration} from "aws-cdk-lib";
+import {ISecurityGroup, IVpc} from "aws-cdk-lib/aws-ec2";
+import {RetentionDays} from 'aws-cdk-lib/aws-logs';
+import {Role} from 'aws-cdk-lib/aws-iam';
 import {DigitrafficStack} from "./stack";
 import {LambdaEnvironment} from "../model/lambda-environment";
 import {MonitoredFunctionAlarmProps} from "../lambda/monitoredfunction";
@@ -29,20 +29,26 @@ declare interface DbProps {
     ro_uri?: string;
 }
 
-export function databaseFunctionProps(stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters): FunctionProps {
-    return {...lambdaFunctionProps(stack, environment, lambdaName, simpleLambdaName, config), ...{
+export function databaseFunctionProps(
+    stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters,
+): FunctionProps {
+    return {...lambdaFunctionProps(
+        stack, environment, lambdaName, simpleLambdaName, config,
+    ), ...{
         vpc: stack.vpc,
         vpcSubnets: {
-            subnets: stack.vpc.privateSubnets
+            subnets: stack.vpc.privateSubnets,
         },
         securityGroup: stack.lambdaDbSg,
     }};
 }
 
-export function lambdaFunctionProps(stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters): FunctionProps {
+export function lambdaFunctionProps(
+    stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters,
+): FunctionProps {
     return {
         runtime: config?.runtime || Runtime.NODEJS_12_X,
-        architectures: [config?.architecture || Architecture.ARM_64],
+        architecture: config?.architecture || Architecture.ARM_64,
         memorySize: config?.memorySize || 128,
         functionName: lambdaName,
         role: config?.role,
@@ -51,7 +57,7 @@ export function lambdaFunctionProps(stack: DigitrafficStack, environment: Lambda
         reservedConcurrentExecutions: config?.reservedConcurrentExecutions || 2,
         code: getAssetCode(simpleLambdaName, config),
         handler: `${simpleLambdaName}.handler`,
-        environment
+        environment,
     };
 }
 
@@ -68,8 +74,7 @@ function getAssetCode(simpleLambdaName: string, config?: FunctionParameters): As
  * @param props Database connection properties for the Lambda
  * @param config Lambda configuration
  */
-export function dbLambdaConfiguration(
-    vpc: IVpc,
+export function dbLambdaConfiguration(vpc: IVpc,
     lambdaDbSg: ISecurityGroup,
     props: LambdaConfiguration,
     config: FunctionParameters): FunctionProps {
@@ -85,15 +90,15 @@ export function dbLambdaConfiguration(
         environment: config.environment || {
             DB_USER: props.dbProps?.username,
             DB_PASS: props.dbProps?.password,
-            DB_URI: config.readOnly ? props.dbProps?.ro_uri : props.dbProps?.uri
+            DB_URI: config.readOnly ? props.dbProps?.ro_uri : props.dbProps?.uri,
         },
         logRetention: RetentionDays.ONE_YEAR,
         vpc: vpc,
         vpcSubnets: {
-            subnets: vpc.privateSubnets
+            subnets: vpc.privateSubnets,
         },
-        securityGroup: lambdaDbSg,
-        reservedConcurrentExecutions: config.reservedConcurrentExecutions
+        securityGroups: [lambdaDbSg],
+        reservedConcurrentExecutions: config.reservedConcurrentExecutions,
     };
 }
 
@@ -108,14 +113,14 @@ export function defaultLambdaConfiguration(config: FunctionParameters): Function
         reservedConcurrentExecutions: config.reservedConcurrentExecutions,
         code: config.code as Code,
         role: config.role,
-        timeout: Duration.seconds(config.timeout || 10)
+        timeout: Duration.seconds(config.timeout || 10),
     };
     if (config.vpc) {
         return {...props, ...{
             vpc: config.vpc,
             vpcSubnets: {
-                subnets: config.vpc?.privateSubnets
-            }
+                subnets: config.vpc?.privateSubnets,
+            },
         }};
     }
     return props;

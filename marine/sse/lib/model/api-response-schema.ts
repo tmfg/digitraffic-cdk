@@ -1,4 +1,4 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
+import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
 
 export const OkResponse: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
@@ -6,12 +6,12 @@ export const OkResponse: JsonSchema = {
     title: "OK Response Schema",
     additionalProperties: false,
     required: [
-        "count"
+        "count",
     ],
     properties: {
         count: {
             type: JsonSchemaType.NUMBER,
-            title: "Count of saved reports"
-        }
-    }
-}
+            title: "Count of saved reports",
+        },
+    },
+};

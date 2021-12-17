@@ -1,32 +1,29 @@
-import {EndpointType, LambdaIntegration, MethodLoggingLevel, Resource, RestApi} from '@aws-cdk/aws-apigateway';
-import {AssetCode} from '@aws-cdk/aws-lambda';
-import {Stack} from "@aws-cdk/core";
+import {EndpointType, LambdaIntegration, MethodLoggingLevel, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {AssetCode} from 'aws-cdk-lib/aws-lambda';
+import {Stack} from "aws-cdk-lib";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {VoyagePlanGatewayProps} from "./app-props";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {IVpc} from "@aws-cdk/aws-ec2";
-import {add404Support, createDefaultPolicyDocument,} from "digitraffic-common/api/rest_apis";
+import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
+import {IVpc} from "aws-cdk-lib/aws-ec2";
+import {add404Support, createDefaultPolicyDocument} from "digitraffic-common/api/rest_apis";
 import {VoyagePlanEnvKeys} from "./keys";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {TrafficType} from "digitraffic-common/model/traffictype";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export function create(
-    secret: ISecret,
+export function create(secret: ISecret,
     props: VoyagePlanGatewayProps,
     stack: DigitrafficStack) {
 
-    const api = createRestApi(
-        stack,
+    const api = createRestApi(stack,
         'VPGW-Public',
         'VPGW public API');
 
     const resource = api.root.addResource('temp').addResource('schedules');
     createUsagePlan(api, 'VPGW Public CloudFront API Key', 'VPGW Public CloudFront Usage Plan');
-    createVtsProxyHandler(
-        stack,
+    createVtsProxyHandler(stack,
         resource,
         secret,
         props);
@@ -39,14 +36,13 @@ function createRestApi(stack: Stack, apiId: string, apiName: string): RestApi {
         },
         restApiName: apiName,
         endpointTypes: [EndpointType.REGIONAL],
-        policy: createDefaultPolicyDocument()
+        policy: createDefaultPolicyDocument(),
     });
     add404Support(restApi, stack);
     return restApi;
 }
 
-function createVtsProxyHandler(
-    stack: DigitrafficStack,
+function createVtsProxyHandler(stack: DigitrafficStack,
     api: Resource,
     secret: ISecret,
     props: VoyagePlanGatewayProps) {
@@ -65,14 +61,14 @@ function createVtsProxyHandler(
         vpc: stack.vpc,
         timeout: 10,
         reservedConcurrentExecutions: 1,
-        memorySize: 128
+        memorySize: 128,
     }));
     secret.grantRead(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);
     const integration = new LambdaIntegration(handler, {
-        proxy: true
+        proxy: true,
     });
     api.addMethod('GET', integration, {
-        apiKeyRequired: true
+        apiKeyRequired: true,
     });
 }
