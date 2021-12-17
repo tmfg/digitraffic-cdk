@@ -1,8 +1,9 @@
-import {Stack, Construct, StackProps} from '@aws-cdk/core';
-import {Props} from './app-props'
-import {CfnMaintenanceWindow, CfnMaintenanceWindowTarget, CfnMaintenanceWindowTask} from "@aws-cdk/aws-ssm";
-import {Topic} from "@aws-cdk/aws-sns";
-import {Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {Stack, StackProps} from 'aws-cdk-lib';
+import {Props} from './app-props';
+import {CfnMaintenanceWindow, CfnMaintenanceWindowTarget, CfnMaintenanceWindowTask} from "aws-cdk-lib/aws-ssm";
+import {Topic} from "aws-cdk-lib/aws-sns";
+import {Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
+import {Construct} from "constructs";
 
 export class PatchManagerStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {
@@ -15,7 +16,7 @@ export class PatchManagerStack extends Stack {
             allowUnassociatedTargets: false,
             duration: 2, // hours
             cutoff: 1, // hours
-            schedule: appProps.maintenanceWindowCron
+            schedule: appProps.maintenanceWindowCron,
         });
 
         // register maintenance window targets, i.e. EC2 instances by ids
@@ -27,19 +28,19 @@ export class PatchManagerStack extends Stack {
             targets: [
                 {
                     key: 'InstanceIds',
-                    values: appProps.instanceIds
-                }
-            ]
+                    values: appProps.instanceIds,
+                },
+            ],
         });
 
         const snsTopic = Topic.fromTopicArn(this, 'snsTopic', appProps.notificationArn);
         const snsRole = new Role(this, 'snsRole', {
-            assumedBy: new ServicePrincipal('ssm.amazonaws.com')
+            assumedBy: new ServicePrincipal('ssm.amazonaws.com'),
         });
         snsTopic.grantPublish(snsRole);
 
         // create a task to install patch base line updates to target EC2 instances
-        const maintenanceWindowTaskName = 'UpdateEC2Task'
+        const maintenanceWindowTaskName = 'UpdateEC2Task';
         new CfnMaintenanceWindowTask(this, maintenanceWindowTaskName, {
             name: maintenanceWindowTaskName,
             maxConcurrency: '1',
@@ -54,23 +55,23 @@ export class PatchManagerStack extends Stack {
                         notificationEvents: [
                             'TimedOut',
                             'Cancelled',
-                            'Failed'
+                            'Failed',
                         ],
-                        notificationType: 'Command' // status of whole command, not per-instance
+                        notificationType: 'Command', // status of whole command, not per-instance
                     },
                     parameters: {
-                        Operation: ['Install']
-                    }
-                }
+                        Operation: ['Install'],
+                    },
+                },
             },
             taskType: 'RUN_COMMAND',
             windowId: maintenanceWindow.ref,
             targets: [
                 {
                     key: 'WindowTargetIds',
-                    values: [maintenanceWindowTarget.ref]
-                }
-            ]
+                    values: [maintenanceWindowTarget.ref],
+                },
+            ],
         });
 
     }

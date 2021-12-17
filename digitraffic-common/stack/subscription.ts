@@ -1,8 +1,8 @@
-import {Construct} from '@aws-cdk/core';
-import {CfnSubscriptionFilter} from '@aws-cdk/aws-logs';
-import {Function} from '@aws-cdk/aws-lambda';
+import {CfnSubscriptionFilter} from 'aws-cdk-lib/aws-logs';
+import {Function} from 'aws-cdk-lib/aws-lambda';
 import {DigitrafficStack} from "./stack";
 import {MonitoredFunction} from "../lambda/monitoredfunction";
+import {Construct} from "constructs";
 
 /**
  * Creates a subscription filter that subscribes to a Lambda Log Group and delivers the logs to another destination.
@@ -14,10 +14,10 @@ import {MonitoredFunction} from "../lambda/monitoredfunction";
  */
 export function createSubscription(lambda: Function, lambdaName: string, logDestinationArn: string, stack: Construct): CfnSubscriptionFilter {
     const filter = new CfnSubscriptionFilter(stack, `${lambdaName}LogsSubscription`, {
-            logGroupName: `/aws/lambda/${lambdaName}`,
-            filterPattern: '',
-            destinationArn: logDestinationArn
-        });
+        logGroupName: `/aws/lambda/${lambdaName}`,
+        filterPattern: '',
+        destinationArn: logDestinationArn,
+    });
 
     filter.node.addDependency(lambda);
 
@@ -30,7 +30,7 @@ export class DigitrafficLogSubscriptions {
             const filter = new CfnSubscriptionFilter(stack, `${lambda.givenName}LogsSubscription`, {
                 logGroupName: `/aws/lambda/${lambda.givenName}`,
                 filterPattern: '',
-                destinationArn: stack.configuration.logsDestinationArn
+                destinationArn: stack.configuration.logsDestinationArn,
             });
 
             filter.node.addDependency(lambda);

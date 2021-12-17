@@ -1,4 +1,4 @@
-import {Duration} from "@aws-cdk/core";
+import {Duration} from "aws-cdk-lib";
 import {StackConfiguration} from "digitraffic-common/stack/stack";
 
 declare interface VoyagePlanGatewayProps extends StackConfiguration {

@@ -1,4 +1,4 @@
-import {Stack} from '@aws-cdk/core';
+import {Stack} from 'aws-cdk-lib';
 
 export enum AppType {
     ROAD = 'road', MARINE = 'marine', UNKNOWN = 'unknown'

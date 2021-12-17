@@ -1,9 +1,8 @@
-import {Resource, RestApi} from '@aws-cdk/aws-apigateway';
-import {Construct} from '@aws-cdk/core';
-import * as lambda from '@aws-cdk/aws-lambda';
+import {Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createRestApi} from 'digitraffic-common/api/rest_apis';
-import {Queue} from '@aws-cdk/aws-sqs';
+import {Queue} from 'aws-cdk-lib/aws-sqs';
 import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
@@ -21,13 +20,13 @@ import {
 import {createDefaultUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {AppProps} from "./app-props";
-import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "@aws-cdk/aws-iam";
+import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 import {MaintenanceTrackingEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import apigateway = require('@aws-cdk/aws-apigateway');
+import apigateway = require('aws-cdk-lib/aws-apigateway');
+import {Construct} from "constructs";
 
-export function createIntegrationApiAndHandlerLambda(
-    queue: Queue,
+export function createIntegrationApiAndHandlerLambda(queue: Queue,
     sqsExtendedMessageBucketArn: string,
     props: AppProps,
     stack: DigitrafficStack) {
@@ -39,7 +38,9 @@ export function createIntegrationApiAndHandlerLambda(
     addServiceModelToIntegrationApi(integrationApi);
 
     const apiResource = createUpdateMaintenanceTrackingApiGatewayResource(stack, integrationApi);
-    createUpdateRequestHandlerLambda(apiResource, queue, sqsExtendedMessageBucketArn, props, stack);
+    createUpdateRequestHandlerLambda(
+        apiResource, queue, sqsExtendedMessageBucketArn, props, stack,
+    );
     createDefaultUsagePlan(integrationApi, 'Maintenance Tracking Integration');
 }
 
@@ -58,11 +59,10 @@ function addServiceModelToIntegrationApi(integrationApi: RestApi) {
     addServiceModel("Havainto", integrationApi, havaintoSchema);
 
     addServiceModel("TyokoneenseurannanKirjaus", integrationApi,
-                    createSchemaTyokoneenseurannanKirjaus(otsikkoModel.modelReference, havaintoSchema));
+        createSchemaTyokoneenseurannanKirjaus(otsikkoModel.modelReference, havaintoSchema));
 }
 
-function createUpdateMaintenanceTrackingApiGatewayResource(
-    stack: Construct,
+function createUpdateMaintenanceTrackingApiGatewayResource(stack: Construct,
     integrationApi: RestApi) : Resource {
 
     const apiResource = integrationApi.root
@@ -79,7 +79,7 @@ function createUpdateRequestHandlerLambda(
     queue : Queue,
     sqsExtendedMessageBucketArn: string,
     appProps: AppProps,
-    stack: DigitrafficStack
+    stack: DigitrafficStack,
 ) {
     const lambdaFunctionName = 'MaintenanceTracking-UpdateQueue';
 
@@ -96,7 +96,7 @@ function createUpdateRequestHandlerLambda(
         timeout: 60,
         environment: lambdaEnv,
         role: lambdaRole,
-        memorySize: 256
+        memorySize: 256,
     }));
 
     requests.addMethod("POST", new apigateway.LambdaIntegration(updateRequestsHandler), {
@@ -109,12 +109,12 @@ function createUpdateRequestHandlerLambda(
 function createLambdaRoleWithWriteToSqsAndS3Policy(stack: Construct, sqsArn: string, sqsExtendedMessageBucketArn: string) {
     const lambdaRole = new Role(stack, `SendMessageToSqsRole`, {
         assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-        roleName: `SendMessageToSqsRole`
+        roleName: `SendMessageToSqsRole`,
     });
 
     const sqsPolicyStatement = new PolicyStatement();
     sqsPolicyStatement.addActions("sqs:SendMessage");
-    sqsPolicyStatement.addResources(sqsArn)
+    sqsPolicyStatement.addResources(sqsArn);
 
     const s3PolicyStatement = new PolicyStatement();
     s3PolicyStatement.addActions('s3:PutObject');

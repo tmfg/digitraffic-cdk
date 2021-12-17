@@ -1,18 +1,19 @@
-import * as events from '@aws-cdk/aws-events';
-import * as lambda from '@aws-cdk/aws-lambda';
-import * as ec2 from '@aws-cdk/aws-ec2';
-import {LambdaFunction} from '@aws-cdk/aws-events-targets';
-import {Construct, Duration} from '@aws-cdk/core';
+import * as events from 'aws-cdk-lib/aws-events';
+import * as lambda from 'aws-cdk-lib/aws-lambda';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
+import {Duration} from 'aws-cdk-lib';
 import {dbLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
+import {Construct} from "constructs";
 
 // returns lambda names for log group subscriptions
-export function create(
-    vpc: ec2.IVpc,
+export function create(vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     stack: Construct,
-    props: Props): void {
+    props: Props)
+    : void {
 
     const updateServicesLambda = createUpdateServicesLambda(vpc, lambdaDbSg, props, stack);
     const updateStatesLambda = createUpdateStatesLambda(vpc, lambdaDbSg, props, stack);
@@ -22,7 +23,7 @@ export function create(
     const updateMetaDataRuleId = 'Open311-UpdateMetadataRule';
     const updateMetaDataRule = new events.Rule(stack, updateMetaDataRuleId, {
         ruleName: updateMetaDataRuleId,
-        schedule: events.Schedule.rate(Duration.days(1))
+        schedule: events.Schedule.rate(Duration.days(1)),
     });
     updateMetaDataRule.addTarget(new LambdaFunction(updateServicesLambda));
     updateMetaDataRule.addTarget(new LambdaFunction(updateStatesLambda));
@@ -30,11 +31,11 @@ export function create(
     updateMetaDataRule.addTarget(new LambdaFunction(updateSubSubjectsLambda));
 }
 
-function createUpdateServicesLambda(
-    vpc: ec2.IVpc,
+function createUpdateServicesLambda(vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): lambda.Function {
+    stack: Construct)
+    : lambda.Function {
 
     const updateServicesId = 'UpdateServices';
     const environment: LambdaEnvironment = {};
@@ -45,18 +46,18 @@ function createUpdateServicesLambda(
         functionName: updateServicesId,
         code: new lambda.AssetCode('dist/lambda/update-services'),
         handler: 'lambda-update-services.handler',
-        environment
+        environment,
     });
     const updateServicesLambda = new lambda.Function(stack, updateServicesId, lambdaConf);
     createSubscription(updateServicesLambda, updateServicesId, props.logsDestinationArn, stack);
     return updateServicesLambda;
 }
 
-function createUpdateStatesLambda(
-    vpc: ec2.IVpc,
+function createUpdateStatesLambda(vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): lambda.Function {
+    stack: Construct)
+    : lambda.Function {
 
     const updateStatesId = 'UpdateStates';
     const environment: LambdaEnvironment = {};
@@ -67,20 +68,20 @@ function createUpdateStatesLambda(
         functionName: updateStatesId,
         code: new lambda.AssetCode('dist/lambda/update-states'),
         handler: 'lambda-update-states.handler',
-        environment
+        environment,
     });
     const updateStatesLambda = new lambda.Function(stack, updateStatesId, lambdaConf);
     createSubscription(updateStatesLambda, updateStatesId, props.logsDestinationArn, stack);
     return updateStatesLambda;
 }
 
-function createUpdateSubjectsLambda(
-    vpc: ec2.IVpc,
+function createUpdateSubjectsLambda(vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): lambda.Function {
+    stack: Construct)
+    : lambda.Function {
 
-    const updateSubjectsId = 'Open311-UpdateSubjects'
+    const updateSubjectsId = 'Open311-UpdateSubjects';
     const environment: LambdaEnvironment = {};
     environment.ENDPOINT_USER = props.integration.username;
     environment.ENDPOINT_PASS = props.integration.password;
@@ -89,18 +90,18 @@ function createUpdateSubjectsLambda(
         functionName: updateSubjectsId,
         code: new lambda.AssetCode('dist/lambda/update-subjects'),
         handler: 'lambda-update-subjects.handler',
-        environment
+        environment,
     });
     const updateSubjectsLambda = new lambda.Function(stack, updateSubjectsId, lambdaConf);
     createSubscription(updateSubjectsLambda, updateSubjectsId, props.logsDestinationArn, stack);
     return updateSubjectsLambda;
 }
 
-function createUpdateSubSubjectsLambda(
-    vpc: ec2.IVpc,
+function createUpdateSubSubjectsLambda(vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
     props: Props,
-    stack: Construct): lambda.Function {
+    stack: Construct)
+    : lambda.Function {
 
     const updateSubSubjectsId = 'Open311-UpdateSubSubjects';
     const environment: LambdaEnvironment = {};
@@ -111,7 +112,7 @@ function createUpdateSubSubjectsLambda(
         functionName: updateSubSubjectsId,
         code: new lambda.AssetCode('dist/lambda/update-subsubjects'),
         handler: 'lambda-update-subsubjects.handler',
-        environment
+        environment,
     });
     const updateSubSubjectsLambda = new lambda.Function(stack, updateSubSubjectsId, lambdaConf);
     createSubscription(updateSubSubjectsLambda, updateSubSubjectsId, props.logsDestinationArn, stack);

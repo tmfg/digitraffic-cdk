@@ -1,13 +1,14 @@
-import {Queue, QueueEncryption} from "@aws-cdk/aws-sqs";
-import {Construct, Duration} from "@aws-cdk/core";
+import {Queue, QueueEncryption} from "aws-cdk-lib/aws-sqs";
+import {Duration} from "aws-cdk-lib";
+import {Construct} from "constructs";
 
 export function createQueue(scope: Construct): QueueAndDLQ {
     const queueName = 'PortActivity-Timestamps';
-    const dlqQueueName = 'PortActivity-Timestamps-DLQ'
+    const dlqQueueName = 'PortActivity-Timestamps-DLQ';
     const dlq = new Queue(scope, dlqQueueName, {
         queueName: dlqQueueName,
         receiveMessageWaitTime: Duration.seconds(20),
-        encryption: QueueEncryption.KMS_MANAGED
+        encryption: QueueEncryption.KMS_MANAGED,
     });
     const queue = new Queue(scope, queueName, {
         queueName,
@@ -15,12 +16,12 @@ export function createQueue(scope: Construct): QueueAndDLQ {
         receiveMessageWaitTime: Duration.seconds(20),
         deadLetterQueue: {
             maxReceiveCount: 3,
-            queue: dlq
-        }
+            queue: dlq,
+        },
     });
     return {
         queue,
-        dlq
+        dlq,
     };
 }
 

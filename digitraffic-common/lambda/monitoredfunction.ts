@@ -1,10 +1,10 @@
-import {Function, FunctionProps} from '@aws-cdk/aws-lambda';
-import {Duration, Stack} from "@aws-cdk/core";
-import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
-import {ComparisonOperator, Metric} from "@aws-cdk/aws-cloudwatch";
+import {Function, FunctionProps} from 'aws-cdk-lib/aws-lambda';
+import {Duration, Stack} from "aws-cdk-lib";
+import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
+import {ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
 import {TrafficType} from '../model/traffictype';
-import {ITopic} from "@aws-cdk/aws-sns";
+import {ITopic} from "aws-cdk-lib/aws-sns";
 import {LambdaEnvironment} from "../model/lambda-environment";
 import {databaseFunctionProps, MonitoredFunctionParameters} from "../stack/lambda-configs";
 import {pascalCase} from "change-case";
@@ -24,8 +24,6 @@ export type MonitoredFunctionAlarmProps = {
     readonly evaluationPeriods?: number
 
     readonly datapointsToAlarm?: number
-
-    readonly statistic?: string
 
     readonly comparisonOperator?: ComparisonOperator
 }
@@ -49,18 +47,18 @@ export class MonitoredFunction extends Function {
     /** disable all alarms */
     public static readonly DISABLE_ALARMS: MonitoredFunctionProps = {
         durationAlarmProps: {
-            create: false
+            create: false,
         },
         durationWarningProps: {
-            create: false
+            create: false,
         },
         errorAlarmProps: {
-          create: false
+            create: false,
         },
         throttleAlarmProps: {
-            create: false
-        }
-    }
+            create: false,
+        },
+    };
 
     /**
      * Create new MonitoredFunction.  Use topics from given DigitrafficStack.
@@ -70,24 +68,25 @@ export class MonitoredFunction extends Function {
      * @param functionProps Lambda function properties
      * @param props Monitored function properties
      */
-    static create(
-        stack: DigitrafficStack,
+    static create(stack: DigitrafficStack,
         id: string,
         functionProps: FunctionProps,
         props?: MonitoredFunctionProps): MonitoredFunction {
 
-        if(props == MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
+        if (props == MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
             throw new Error(`Function ${functionProps.functionName} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`);
         }
 
-        return new MonitoredFunction(stack,
+        return new MonitoredFunction(
+            stack,
             id,
             functionProps,
             stack.alarmTopic,
             stack.warningTopic,
             stack.configuration.production,
             stack.configuration.trafficType,
-            props);
+            props,
+        );
     }
 
     /**
@@ -100,13 +99,14 @@ export class MonitoredFunction extends Function {
      * @param environment Lambda environment
      * @param functionParameters Lambda function parameters
      */
-    static createV2(
-        stack: DigitrafficStack,
+    static createV2(stack: DigitrafficStack,
         name: string,
         environment: LambdaEnvironment,
         functionParameters?: MonitoredFunctionParameters): MonitoredFunction {
         const functionName = functionParameters?.functionName || `${stack.configuration.shortName}-${pascalCase(name)}`;
-        const functionProps = databaseFunctionProps(stack, environment, functionName, name, functionParameters);
+        const functionProps = databaseFunctionProps(
+            stack, environment, functionName, name, functionParameters,
+        );
 
         return MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
     }
@@ -129,7 +129,8 @@ export class MonitoredFunction extends Function {
         warningSnsTopic: ITopic,
         production: boolean,
         trafficType: TrafficType | null,
-        props?: MonitoredFunctionProps) {
+        props?: MonitoredFunctionProps,
+    ) {
         super(scope, id, functionProps);
 
         this.givenName = functionProps.functionName as string;
@@ -142,8 +143,9 @@ export class MonitoredFunction extends Function {
                 throw new Error('Timeout needs to be explicitly set');
             }
             const timeout = functionProps.timeout as Duration;
-            this.createAlarm(scope,
-                this.metricDuration(),
+            this.createAlarm(
+                scope,
+                this.metricDuration().with({statistic: 'max'}),
                 'Duration',
                 'Duration alarm',
                 `Duration has exceeded ${timeout.toSeconds()} seconds`,
@@ -152,17 +154,18 @@ export class MonitoredFunction extends Function {
                 timeout.toMilliseconds(),
                 1,
                 1,
-                'max',
                 ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-                props?.durationAlarmProps);
+                props?.durationAlarmProps,
+            );
         }
         if (props?.durationWarningProps?.create !== false) {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
             const timeout = functionProps.timeout as Duration;
-            this.createAlarm(scope,
-                this.metricDuration(),
+            this.createAlarm(
+                scope,
+                this.metricDuration().with({statistic: 'max'}),
                 'Duration-Warning',
                 'Duration warning',
                 `Duration is 85 % of max ${timeout.toSeconds()} seconds`,
@@ -171,13 +174,14 @@ export class MonitoredFunction extends Function {
                 timeout.toMilliseconds() * 0.85,
                 1,
                 1,
-                'max',
                 ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-                props?.durationWarningProps);
+                props?.durationWarningProps,
+            );
         }
 
         if (props?.errorAlarmProps?.create !== false) {
-            this.createAlarm(scope,
+            this.createAlarm(
+                scope,
                 this.metricErrors(),
                 'Errors',
                 'Errors alarm',
@@ -187,13 +191,14 @@ export class MonitoredFunction extends Function {
                 1,
                 1,
                 1,
-                'sum',
                 ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
-                props?.errorAlarmProps);
+                props?.errorAlarmProps,
+            );
         }
 
         if (props?.throttleAlarmProps?.create !== false) {
-            this.createAlarm(scope,
+            this.createAlarm(
+                scope,
                 this.metricThrottles(),
                 'Throttles',
                 'Throttles alarm',
@@ -203,9 +208,9 @@ export class MonitoredFunction extends Function {
                 0,
                 1,
                 1,
-                'sum',
                 ComparisonOperator.GREATER_THAN_THRESHOLD,
-                props?.throttleAlarmProps);
+                props?.throttleAlarmProps,
+            );
         }
     }
 
@@ -220,9 +225,8 @@ export class MonitoredFunction extends Function {
         threshold: number,
         evaluationPeriods: number,
         datapointsToAlarm: number,
-        statistic: string,
         comparisonOperator: ComparisonOperator,
-        alarmProps?: MonitoredFunctionAlarmProps
+        alarmProps?: MonitoredFunctionAlarmProps,
     ) {
         metric.createAlarm(stack, `${this.node.id}-${alarmId}`, {
             alarmName: `${trafficType ?? ''} ${stack.stackName} ${this.functionName} ${alarmName}`.trim(),
@@ -230,13 +234,11 @@ export class MonitoredFunction extends Function {
             threshold: alarmProps?.threshold ?? threshold,
             evaluationPeriods: alarmProps?.evaluationPeriods ?? evaluationPeriods,
             datapointsToAlarm: alarmProps?.datapointsToAlarm ?? datapointsToAlarm,
-            statistic: alarmProps?.statistic ?? statistic,
-            comparisonOperator: alarmProps?.comparisonOperator ?? comparisonOperator
+            comparisonOperator: alarmProps?.comparisonOperator ?? comparisonOperator,
         }).addAlarmAction(alarmSnsAction);
     }
 
-    private getAlarmActionForEnv(
-        alarmAction: SnsAction,
+    private getAlarmActionForEnv(alarmAction: SnsAction,
         warningAction: SnsAction,
         production: boolean): SnsAction {
 
@@ -259,14 +261,15 @@ export class MonitoredDBFunction {
      * @param environment Lambda environment
      * @param functionParameters Lambda function parameters
      */
-    static create(
-        stack: DigitrafficStack,
+    static create(stack: DigitrafficStack,
         name: string,
         environment?: LambdaEnvironment,
         functionParameters?: MonitoredFunctionParameters): MonitoredFunction {
         const functionName = functionParameters?.functionName || `${stack.configuration.shortName}-${pascalCase(name)}`;
         const env = environment ? environment : stack.createLambdaEnvironment();
-        const functionProps = databaseFunctionProps(stack, env, functionName, name, functionParameters);
+        const functionProps = databaseFunctionProps(
+            stack, env, functionName, name, functionParameters,
+        );
 
         const mf = MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
 

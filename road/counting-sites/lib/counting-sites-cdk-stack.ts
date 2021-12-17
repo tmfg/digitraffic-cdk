@@ -1,4 +1,4 @@
-import {Construct} from "@aws-cdk/core";
+import {Construct} from "constructs";
 import {InternalLambdas} from "./internal-lambdas";
 import {Canaries} from "./canaries";
 import {PublicApi} from "./public-api";

@@ -1,10 +1,10 @@
-import {AssetCode, Function, FunctionProps, Runtime} from '@aws-cdk/aws-lambda';
-import {Duration, Stack} from '@aws-cdk/core';
+import {AssetCode, Function, FunctionProps, Runtime} from 'aws-cdk-lib/aws-lambda';
+import {Duration, Stack} from 'aws-cdk-lib';
 import {createSubscription} from 'digitraffic-common/stack/subscription';
 import {Props} from './app-props';
-import {RetentionDays} from "@aws-cdk/aws-logs";
-import {PolicyStatement} from "@aws-cdk/aws-iam";
-import {Bucket} from "@aws-cdk/aws-s3";
+import {RetentionDays} from "aws-cdk-lib/aws-logs";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+import {Bucket} from "aws-cdk-lib/aws-s3";
 import {
     KEY_BUCKET_NAME,
     KEY_REGION,
@@ -15,16 +15,15 @@ import {
     KEY_HOST,
     KEY_TITLE,
     KEY_DESCRIPTION,
-    KEY_REMOVESECURITY
+    KEY_REMOVESECURITY,
 } from "./lambda/update-swagger/lambda-update-swagger";
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
-import {Rule, Schedule} from "@aws-cdk/aws-events";
-import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {Rule, Schedule} from "aws-cdk-lib/aws-events";
+import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export function create(
-    stack: DigitrafficStack,
+export function create(stack: DigitrafficStack,
     bucket: Bucket) {
 
     createUpdateSwaggerDescriptionsLambda(stack, bucket);
@@ -48,7 +47,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1,
         memorySize: 128,
-        timeout: Duration.seconds(10)
+        timeout: Duration.seconds(10),
     };
 
     const updateDocsLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
@@ -99,7 +98,7 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
         memorySize: 192,
         reservedConcurrentExecutions: 1,
         environment: lambdaEnv,
-        timeout: Duration.seconds(10)
+        timeout: Duration.seconds(10),
     };
 
     const updateSwaggerLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
@@ -119,7 +118,7 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
     const ruleName = `${stack.stackName}-UpdateSwaggerRule`;
     const rule = new Rule(stack, ruleName, {
         schedule: Schedule.rate(Duration.hours(1)),
-        ruleName
+        ruleName,
     });
     rule.addTarget(new LambdaFunction(updateSwaggerLambda));
 }

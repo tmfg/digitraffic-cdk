@@ -1,4 +1,4 @@
-import {Schedule} from "@aws-cdk/aws-synthetics";
+import {Schedule} from "@aws-cdk/aws-synthetics-alpha";
 
 export type CanaryParameters = {
     readonly name: string;

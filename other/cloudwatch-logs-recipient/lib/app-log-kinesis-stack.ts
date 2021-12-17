@@ -1,7 +1,8 @@
-import {Stack, Construct, StackProps} from '@aws-cdk/core';
-import {LogGroup, FilterPattern} from '@aws-cdk/aws-logs';
-import {Stream} from '@aws-cdk/aws-kinesis';
-import {KinesisDestination} from '@aws-cdk/aws-logs-destinations';
+import {Stack, StackProps} from 'aws-cdk-lib';
+import {LogGroup, FilterPattern} from 'aws-cdk-lib/aws-logs';
+import {Stream} from 'aws-cdk-lib/aws-kinesis';
+import {KinesisDestination} from 'aws-cdk-lib/aws-logs-destinations';
+import {Construct} from "constructs";
 
 export class AppLogsSubscriptionStack extends Stack {
     constructor(scope: Construct, id: string, appProps: AppLogSubscription, props?: StackProps) {
@@ -16,10 +17,10 @@ export class AppLogsSubscriptionStack extends Stack {
     createSubscriptions(scope: Construct, kinesisDestination: KinesisDestination, logGroupName: string) {
         const logGroup = LogGroup.fromLogGroupName(this, logGroupName, logGroupName);
 
-        if(logGroup != null) {
+        if (logGroup != null) {
             logGroup.addSubscriptionFilter(`kinesis-subscription`, {
                 destination: kinesisDestination,
-                filterPattern: FilterPattern.allEvents()
+                filterPattern: FilterPattern.allEvents(),
             });
         }
     }

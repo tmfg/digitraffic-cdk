@@ -1,7 +1,6 @@
-import {Model, RestApi} from '@aws-cdk/aws-apigateway';
-import {Function} from '@aws-cdk/aws-lambda';
+import {Model, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {Function} from 'aws-cdk-lib/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
-import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
@@ -12,7 +11,7 @@ import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredDBFunction} from "digitraffic-common/lambda/monitoredfunction";
 
 export function create(stack: DigitrafficStack): Function {
     const publicApi = new DigitrafficRestApi(stack, 'ATON-public', 'ATON public API');
@@ -28,7 +27,7 @@ export function create(stack: DigitrafficStack): Function {
 
 function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, faultsJsonModel: Model): Function {
     const getFaultsLambda = MonitoredDBFunction.create(stack, 'get-faults', undefined, {
-        reservedConcurrentExecutions: 3
+        reservedConcurrentExecutions: 3,
     });
 
     const apiResource = publicApi.root.addResource("api");
@@ -41,26 +40,26 @@ function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, 
     const getFaultsIntegration = defaultIntegration(getFaultsLambda, {
         requestParameters: {
             'integration.request.querystring.language': 'method.request.querystring.language',
-            'integration.request.querystring.fixed_in_hours': 'method.request.querystring.fixed_in_hours'
+            'integration.request.querystring.fixed_in_hours': 'method.request.querystring.fixed_in_hours',
         },
         requestTemplates: {
             'application/json': JSON.stringify({
                 language: "$util.escapeJavaScript($input.params('language'))",
-                fixed_in_hours: "$util.escapeJavaScript($input.params('fixed_in_hours'))"
-            })
-        }
+                fixed_in_hours: "$util.escapeJavaScript($input.params('fixed_in_hours'))",
+            }),
+        },
     });
 
     resources.addMethod("GET", getFaultsIntegration, {
         apiKeyRequired: true,
         requestParameters: {
             'method.request.querystring.language': false,
-            'method.request.querystring.fixed_in_hours': false
+            'method.request.querystring.fixed_in_hours': false,
         },
         methodResponses: [
             corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, faultsJsonModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel))
-        ]
+            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel)),
+        ],
     });
 
     addTags('GetFaults', DATA_V1_TAGS, resources, stack);

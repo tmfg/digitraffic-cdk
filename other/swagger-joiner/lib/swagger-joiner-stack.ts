@@ -1,8 +1,8 @@
-import {Construct, StackProps} from '@aws-cdk/core';
 import {Props} from './app-props';
-import * as InternalLambdas from './internal-lambdas'
-import {BlockPublicAccess, Bucket, HttpMethods} from "@aws-cdk/aws-s3";
-import {CanonicalUserPrincipal, Effect, PolicyStatement} from "@aws-cdk/aws-iam";
+import * as InternalLambdas from './internal-lambdas';
+import {BlockPublicAccess, Bucket, HttpMethods} from "aws-cdk-lib/aws-s3";
+import {CanonicalUserPrincipal, Effect, PolicyStatement} from "aws-cdk-lib/aws-iam";
+import {Construct} from "constructs";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
 export class SwaggerJoinerStack extends DigitrafficStack {
@@ -21,8 +21,8 @@ export class SwaggerJoinerStack extends DigitrafficStack {
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
             cors: [{
                 allowedOrigins: ['*'],
-                allowedMethods: [HttpMethods.GET]
-            }]
+                allowedMethods: [HttpMethods.GET],
+            }],
         });
 
         if (props.s3VpcEndpointId) {
@@ -31,10 +31,10 @@ export class SwaggerJoinerStack extends DigitrafficStack {
                 actions: ['s3:GetObject'],
                 conditions: {
                     StringEquals: {
-                        'aws:sourceVpce': props.s3VpcEndpointId
-                    }
+                        'aws:sourceVpce': props.s3VpcEndpointId,
+                    },
                 },
-                resources: [`${bucket.bucketArn}/*`]
+                resources: [`${bucket.bucketArn}/*`],
             });
             getObjectStatement.addAnyPrincipal();
             bucket.addToResourcePolicy(getObjectStatement);
@@ -44,9 +44,9 @@ export class SwaggerJoinerStack extends DigitrafficStack {
                 effect: Effect.ALLOW,
                 actions: ['s3:GetObject'],
                 principals: [
-                    new CanonicalUserPrincipal(props.cloudFrontCanonicalUser)
+                    new CanonicalUserPrincipal(props.cloudFrontCanonicalUser),
                 ],
-                resources: [`${bucket.bucketArn}/*`]
+                resources: [`${bucket.bucketArn}/*`],
             }));
         }
 

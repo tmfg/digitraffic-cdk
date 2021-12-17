@@ -32,13 +32,7 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "*",
-    "@aws-cdk/aws-ec2": "*",
-    "@aws-cdk/aws-ecs": "*",
-    "@aws-cdk/aws-events-targets": "*",
-    "@aws-cdk/aws-lambda": "*",
-    "@aws-cdk/aws-secretsmanager": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
     "axios": "^0.21.1",
     "digitraffic-common": "*",
     "geojson-validation": "^1.0.2",

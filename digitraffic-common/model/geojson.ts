@@ -1,4 +1,4 @@
-import {JsonSchemaVersion, JsonSchemaType} from '@aws-cdk/aws-apigateway';
+import {JsonSchemaVersion, JsonSchemaType} from 'aws-cdk-lib/aws-apigateway';
 
 /**
  * Creates a JSON Schema for a GeoJSON Feature. Can be used to generate OpenAPI descriptions.
@@ -14,16 +14,16 @@ export function featureSchema(modelReference: string) {
             type: {
                 type: JsonSchemaType.STRING,
                 description: 'Feature',
-                enum: ['Feature']
+                enum: ['Feature'],
             },
             properties: {
-                ref: modelReference
+                ref: modelReference,
             },
             geometry: {
                 type: JsonSchemaType.OBJECT,
-                description: 'GeoJSON geometry'
-            }
-        }
+                description: 'GeoJSON geometry',
+            },
+        },
     };
 }
 
@@ -42,14 +42,14 @@ export function geojsonSchema(modelReference: string) {
             type: {
                 type: JsonSchemaType.STRING,
                 description: 'FeatureCollection',
-                enum: ['FeatureCollection']
+                enum: ['FeatureCollection'],
             },
             features: {
                 type: JsonSchemaType.ARRAY,
                 items: {
-                    ref: modelReference
-                }
-            }
-        }
+                    ref: modelReference,
+                },
+            },
+        },
     };
 }

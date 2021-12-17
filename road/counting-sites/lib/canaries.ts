@@ -1,14 +1,14 @@
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
-import {Schedule} from "@aws-cdk/aws-events";
+import {Schedule} from "aws-cdk-lib/aws-events";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {Duration} from "@aws-cdk/core";
+import {Duration} from "aws-cdk-lib";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if(stack.configuration.enableCanaries) {
+        if (stack.configuration.enableCanaries) {
             const urlRole = new DigitrafficCanaryRole(stack, 'cs-url');
             const dbRole = new DigitrafficCanaryRole(stack, 'cs-db').withDatabaseAccess();
 
@@ -19,8 +19,8 @@ export class Canaries {
                 schedule: Schedule.rate(Duration.minutes(30)),
                 alarm: {
                     alarmName: 'CountingSites-PublicAPI-Alarm',
-                    topicArn: stack.configuration.alarmTopicArn
-                }
+                    topicArn: stack.configuration.alarmTopicArn,
+                },
             });
         }
     }

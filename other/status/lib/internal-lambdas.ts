@@ -1,22 +1,28 @@
-import {Duration, Stack} from "@aws-cdk/core";
-import {AssetCode, FunctionProps, Runtime} from "@aws-cdk/aws-lambda";
-import {RetentionDays} from "@aws-cdk/aws-logs";
-import {ISecret, Secret} from "@aws-cdk/aws-secretsmanager";
-import {Rule, Schedule} from "@aws-cdk/aws-events";
-import {LambdaFunction} from "@aws-cdk/aws-events-targets";
+import {Duration, Stack} from "aws-cdk-lib";
+import {AssetCode, FunctionProps, Runtime} from "aws-cdk-lib/aws-lambda";
+import {RetentionDays} from "aws-cdk-lib/aws-logs";
+import {ISecret, Secret} from "aws-cdk-lib/aws-secretsmanager";
+import {Rule, Schedule} from "aws-cdk-lib/aws-events";
+import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {Props} from "./app-props";
 import {StatusEnvKeys} from "./keys";
-import {ITopic} from "@aws-cdk/aws-sns";
+import {ITopic} from "aws-cdk-lib/aws-sns";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {TrafficType} from "digitraffic-common/model/traffictype";
 
 
 export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props) {
     const secret = Secret.fromSecretCompleteArn(stack, 'Secret', props.secretsManagerSecretArn);
-    createUpdateStatusesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
-    createHandleMaintenanceLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
-    createCheckComponentStatesLambda(secret, alarmSnsTopic, warningSnsTopic, stack, props);
+    createUpdateStatusesLambda(
+        secret, alarmSnsTopic, warningSnsTopic, stack, props,
+    );
+    createHandleMaintenanceLambda(
+        secret, alarmSnsTopic, warningSnsTopic, stack, props,
+    );
+    createCheckComponentStatesLambda(
+        secret, alarmSnsTopic, warningSnsTopic, stack, props,
+    );
 }
 
 function createUpdateStatusesLambda(
@@ -24,8 +30,9 @@ function createUpdateStatusesLambda(
     alarmSnsTopic: ITopic,
     warningSnsTopic: ITopic,
     stack: Stack,
-    props: Props) {
-    
+    props: Props,
+) {
+
     const environment: any = {};
     environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
     environment[StatusEnvKeys.SECRET_ID] = props.secretsManagerSecretArn;
@@ -41,7 +48,7 @@ function createUpdateStatusesLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
         logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: 1
+        reservedConcurrentExecutions: 1,
     };
 
     const lambda = new MonitoredFunction(
@@ -51,12 +58,13 @@ function createUpdateStatusesLambda(
         alarmSnsTopic,
         warningSnsTopic,
         true,
-        TrafficType.OTHER);
+        TrafficType.OTHER,
+    );
 
     secret.grantRead(lambda);
 
     const rule = new Rule(stack, 'UpdateStatusesRule', {
-        schedule: Schedule.rate(Duration.hours(1))
+        schedule: Schedule.rate(Duration.hours(1)),
     });
     rule.addTarget(new LambdaFunction(lambda));
 
@@ -68,8 +76,9 @@ function createHandleMaintenanceLambda(
     alarmSnsTopic: ITopic,
     warningSnsTopic: ITopic,
     stack: Stack,
-    props: Props) {
-    
+    props: Props,
+) {
+
     const functionName = "Status-HandleMaintenance";
     const lambdaConf: FunctionProps = {
         functionName: functionName,
@@ -80,10 +89,10 @@ function createHandleMaintenanceLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {
             STATUSPAGE_URL: props.statusPageUrl,
-            SECRET_ARN: props.secretsManagerSecretArn
+            SECRET_ARN: props.secretsManagerSecretArn,
         },
         logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: 1
+        reservedConcurrentExecutions: 1,
     };
 
     const lambda = new MonitoredFunction(
@@ -93,12 +102,13 @@ function createHandleMaintenanceLambda(
         alarmSnsTopic,
         warningSnsTopic,
         true,
-        TrafficType.OTHER);
+        TrafficType.OTHER,
+    );
 
     secret.grantRead(lambda);
 
     const rule = new Rule(stack, 'HandleMaintenanceRule', {
-        schedule: Schedule.rate(Duration.minutes(1))
+        schedule: Schedule.rate(Duration.minutes(1)),
     });
     rule.addTarget(new LambdaFunction(lambda));
 
@@ -111,8 +121,9 @@ function createCheckComponentStatesLambda(
     alarmSnsTopic: ITopic,
     warningSnsTopic: ITopic,
     stack: Stack,
-    props: Props) {
-    
+    props: Props,
+) {
+
     const functionName = "Status-CheckComponentStates";
     const lambdaConf: FunctionProps = {
         functionName: functionName,
@@ -123,10 +134,10 @@ function createCheckComponentStatesLambda(
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {
             STATUSPAGE_URL: props.statusPageUrl,
-            SECRET_ARN: props.secretsManagerSecretArn
+            SECRET_ARN: props.secretsManagerSecretArn,
         },
         logRetention: RetentionDays.ONE_YEAR,
-        reservedConcurrentExecutions: 1
+        reservedConcurrentExecutions: 1,
     };
 
     const lambda = new MonitoredFunction(
@@ -136,12 +147,13 @@ function createCheckComponentStatesLambda(
         alarmSnsTopic,
         warningSnsTopic,
         true,
-        TrafficType.OTHER);
+        TrafficType.OTHER,
+    );
 
     secret.grantRead(lambda);
 
     const rule = new Rule(stack, 'CheckComponentStatesRule', {
-        schedule: Schedule.rate(Duration.hours(1))
+        schedule: Schedule.rate(Duration.hours(1)),
     });
     rule.addTarget(new LambdaFunction(lambda));
 

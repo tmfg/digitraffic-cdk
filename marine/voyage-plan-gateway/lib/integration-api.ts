@@ -4,29 +4,27 @@ import {
     PassthroughBehavior,
     Resource,
     ResponseType,
-} from '@aws-cdk/aws-apigateway';
-import {AssetCode, Function} from '@aws-cdk/aws-lambda';
-import {Stack} from "@aws-cdk/core";
+} from 'aws-cdk-lib/aws-apigateway';
+import {AssetCode, Function} from 'aws-cdk-lib/aws-lambda';
+import {Stack} from "aws-cdk-lib";
 import {createSubscription} from "digitraffic-common/stack/subscription";
 import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {VoyagePlanEnvKeys} from "./keys";
 import {VoyagePlanGatewayProps} from "./app-props";
-import {ISecret} from "@aws-cdk/aws-secretsmanager";
-import {createRestApi,} from "digitraffic-common/api/rest_apis";
-import {Topic} from "@aws-cdk/aws-sns";
+import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
+import {createRestApi} from "digitraffic-common/api/rest_apis";
+import {Topic} from "aws-cdk-lib/aws-sns";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {TrafficType} from "digitraffic-common/model/traffictype";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export function create(
-    secret: ISecret,
+export function create(secret: ISecret,
     notifyTopic: Topic,
     props: VoyagePlanGatewayProps,
     stack: DigitrafficStack) {
 
-    const integrationApi = createRestApi(
-        stack,
+    const integrationApi = createRestApi(stack,
         'VPGW-Integration',
         'VPGW integration API');
     // set response for missing auth token to 501 as desired by API registrar
@@ -35,12 +33,14 @@ export function create(
         type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
         statusCode: '501',
         templates: {
-            'application/json': 'Not implemented'
-        }
+            'application/json': 'Not implemented',
+        },
     });
     createUsagePlan(integrationApi, 'VPGW CloudFront API Key', 'VPGW Faults CloudFront Usage Plan');
-    const resource = integrationApi.root.addResource("vpgw")
-    createNotifyHandler(secret, stack, notifyTopic, resource, props);
+    const resource = integrationApi.root.addResource("vpgw");
+    createNotifyHandler(
+        secret, stack, notifyTopic, resource, props,
+    );
 }
 
 function createNotifyHandler(
@@ -48,12 +48,15 @@ function createNotifyHandler(
     stack: DigitrafficStack,
     notifyTopic: Topic,
     api: Resource,
-    props: VoyagePlanGatewayProps) {
+    props: VoyagePlanGatewayProps,
+) {
 
     const handler = createHandler(stack, notifyTopic, props);
     secret.grantRead(handler);
-    const resource = api.addResource("notify")
-    createIntegrationResource(stack, secret, props, resource, handler);
+    const resource = api.addResource("notify");
+    createIntegrationResource(
+        stack, secret, props, resource, handler,
+    );
 }
 
 function createIntegrationResource(
@@ -61,29 +64,28 @@ function createIntegrationResource(
     secret: ISecret,
     props: VoyagePlanGatewayProps,
     resource: Resource,
-    handler: Function) {
+    handler: Function,
+) {
 
     const integration = new LambdaIntegration(handler, {
         proxy: true,
         integrationResponses: [
-            { statusCode: '204' }
+            { statusCode: '204' },
         ],
-        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH // because of proxy type integration
+        passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH, // because of proxy type integration
     });
 
     resource.addMethod("POST", integration, {
         apiKeyRequired: true,
         methodResponses: [
-            { statusCode: '204' }
-        ]
+            { statusCode: '204' },
+        ],
     });
 }
 
-function createHandler(
-    stack: DigitrafficStack,
+function createHandler(stack: DigitrafficStack,
     notifyTopic: Topic,
-    props: VoyagePlanGatewayProps,
-) {
+    props: VoyagePlanGatewayProps) {
 
     const functionName = 'VPGW-Notify';
     const environment: any = {};
@@ -94,7 +96,7 @@ function createHandler(
         handler: 'lambda-notify.handler',
         timeout: 10,
         reservedConcurrentExecutions: 1,
-        environment
+        environment,
     }));
     notifyTopic.grantPublish(handler);
     createSubscription(handler, functionName, props.logsDestinationArn, stack);

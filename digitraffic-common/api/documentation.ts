@@ -1,5 +1,5 @@
-import {Construct} from "@aws-cdk/core";
-import {CfnDocumentationPart, Resource} from "@aws-cdk/aws-apigateway";
+import {Construct} from "constructs";
+import {CfnDocumentationPart, Resource} from "aws-cdk-lib/aws-apigateway";
 
 // Documentation parts are objects that describe an API Gateway API or parts of an API
 // https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-documenting-api.html
@@ -11,20 +11,18 @@ import {CfnDocumentationPart, Resource} from "@aws-cdk/aws-apigateway";
  * @param resource REST API resource
  * @param stack CloudFormation stack
  */
-export function addQueryParameterDescription(
-    name: string,
+export function addQueryParameterDescription(name: string,
     description: string,
     resource: Resource,
-    stack: Construct
-) {
+    stack: Construct) {
     new CfnDocumentationPart(stack, `${name}Documentation`, {
         restApiId: resource.api.restApiId,
         location: {
             type: 'QUERY_PARAMETER',
             name,
-            path: resource.path
+            path: resource.path,
         },
-        properties: JSON.stringify({description})
+        properties: JSON.stringify({description}),
     });
 }
 
@@ -35,19 +33,17 @@ export function addQueryParameterDescription(
  * @param resource REST API resource
  * @param stack CloudFormation stack
  */
-export function addDocumentation(
-    methodDescription: string,
+export function addDocumentation(methodDescription: string,
     documentationProperties: object,
     resource: Resource,
-    stack: Construct
-) {
+    stack: Construct) {
     new CfnDocumentationPart(stack, `${methodDescription}Documentation`, {
         restApiId: resource.api.restApiId,
         location: {
             type: 'METHOD',
-            path: resource.path
+            path: resource.path,
         },
-        properties: JSON.stringify(documentationProperties)
+        properties: JSON.stringify(documentationProperties),
     });
 }
 
@@ -58,12 +54,10 @@ export function addDocumentation(
  * @param resource REST API resource
  * @param stack CloudFormation stack
  */
-export function addTags(
-    methodDescription: string,
+export function addTags(methodDescription: string,
     tags: string[],
     resource: Resource,
-    stack: Construct
-) {
+    stack: Construct) {
     addDocumentation(methodDescription, {tags}, resource, stack);
 }
 
@@ -80,7 +74,7 @@ export function addTagsAndSummary(
     tags: string[],
     summary: string,
     resource: Resource,
-    stack: Construct
+    stack: Construct,
 ) {
     addDocumentation(methodDescription, {tags, summary}, resource, stack);
 }

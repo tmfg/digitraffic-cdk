@@ -1,13 +1,14 @@
-import {Construct, Stack, StackProps} from '@aws-cdk/core';
-import {CfnDistribution, OriginAccessIdentity} from '@aws-cdk/aws-cloudfront';
-import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from '@aws-cdk/aws-iam';
+import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront';
+import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
+import {Construct} from "constructs";
+import {Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig} from "./origin-configs";
 import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
 import {
     createGzipRequirement,
     createHttpHeaders, createIpRestriction,
     createWeathercamRedirect,
-    LambdaType
+    LambdaType,
 } from "./lambda/lambda-creator";
 import {createDistribution} from "./distribution-util";
 import {createRealtimeLogging} from "./streaming-util";
@@ -22,13 +23,17 @@ export class CloudfrontCdkStack extends Stack {
             ? createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps)
             : null;
 
-        cloudfrontProps.props.forEach(p => this.createDistribution(p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps));
+        cloudfrontProps.props.forEach(p => this.createDistribution(
+            p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps,
+        ));
+
+        //        Aspects.of(this).add(new StackCheckingAspect());
     }
 
     createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
         const lambdaRole = new Role(stack, `WriteToElasticRole`, {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: `WriteToElasticRole`
+            roleName: `WriteToElasticRole`,
         });
         lambdaRole.addToPolicy(new PolicyStatement({
             actions: [
@@ -37,12 +42,12 @@ export class CloudfrontCdkStack extends Stack {
                 "es:DescribeElasticsearchDomainConfig",
                 "es:ESHttpPost",
                 "es:ESHttpPut",
-                "es:ESHttpGet"
+                "es:ESHttpGet",
             ],
             resources: [
                 elasticProps.elasticArn,
-                `${elasticProps.elasticArn}/*`
-            ]
+                `${elasticProps.elasticArn}/*`,
+            ],
         }));
         lambdaRole.addToPolicy(new PolicyStatement( {
             actions: [
@@ -50,11 +55,11 @@ export class CloudfrontCdkStack extends Stack {
                 "logs:CreateLogStream",
                 "logs:PutLogEvents",
                 "logs:DescribeLogGroups",
-                "logs:DescribeLogStreams"
+                "logs:DescribeLogStreams",
             ],
             resources: [
-                "arn:aws:logs:*:*:*"
-            ]
+                "arn:aws:logs:*:*:*",
+            ],
         }));
 
         return lambdaRole;
@@ -63,15 +68,13 @@ export class CloudfrontCdkStack extends Stack {
     createLambdaMap(lProps: CFLambdaProps | undefined): any {
         const lambdaMap: any = {};
 
-        if(lProps !== undefined) {
+        if (lProps !== undefined) {
             const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
-                assumedBy: new CompositePrincipal(
-                    new ServicePrincipal("lambda.amazonaws.com"),
-                    new ServicePrincipal("edgelambda.amazonaws.com"),
-                ),
+                assumedBy: new CompositePrincipal(new ServicePrincipal("lambda.amazonaws.com"),
+                    new ServicePrincipal("edgelambda.amazonaws.com")),
                 managedPolicies: [
-                    ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
-                ]
+                    ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
+                ],
             });
 
             if (lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
@@ -102,16 +105,20 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaMap;
     }
 
-    createDistribution(distributionProps: Props, role: Role, lambdaMap: any, streamingConfig: any, cloudfrontProps: CFProps) {
+    createDistribution(
+        distributionProps: Props, role: Role, lambdaMap: any, streamingConfig: any, cloudfrontProps: CFProps,
+    ) {
         const oai = distributionProps.originAccessIdentity ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`) : null;
         const originConfigs = distributionProps.domains.map(d => createOriginConfig(this, d, oai, lambdaMap));
-        const distribution = createDistribution(this, distributionProps, originConfigs, role, cloudfrontProps, streamingConfig);
+        const distribution = createDistribution(
+            this, distributionProps, originConfigs, role, cloudfrontProps, streamingConfig,
+        );
 
         // cdk does not support viewerPolicy as it should
         // so collect map of policies and force them into cloudformation
         const viewerPolicies = this.getViewerPolicies(distributionProps.domains);
 
-        if(Object.keys(viewerPolicies).length > 0) {
+        if (Object.keys(viewerPolicies).length > 0) {
             const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
             const distributionConfig = cfnDistribution.distributionConfig as CfnDistribution.DistributionConfigProperty;
             const behaviors = distributionConfig?.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
@@ -131,7 +138,7 @@ export class CloudfrontCdkStack extends Stack {
     setViewerPolicy(behavior: any, viewerPolicies: any, pathPattern: string) {
         const policy = viewerPolicies[pathPattern];
 
-        if(policy) {
+        if (policy) {
             (behavior as any).viewerProtocolPolicy = policy;
         }
     }
@@ -141,10 +148,10 @@ export class CloudfrontCdkStack extends Stack {
 
         domains.forEach(d => {
             d.behaviors?.forEach(b => {
-                if(b.viewerProtocolPolicy != null) {
+                if (b.viewerProtocolPolicy != null) {
                     policyMap[b.path] = b.viewerProtocolPolicy;
                 }
-            })
+            });
         });
 
         return policyMap;

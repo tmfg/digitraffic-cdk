@@ -5,9 +5,9 @@ import {
     ResponseType,
     EndpointType,
     RestApiProps
-} from '@aws-cdk/aws-apigateway';
-import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from '@aws-cdk/aws-iam';
-import {Construct} from "@aws-cdk/core";
+} from 'aws-cdk-lib/aws-apigateway';
+import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from 'aws-cdk-lib/aws-iam';
+import {Construct} from "constructs";
 import {DigitrafficStack} from "../stack/stack";
 import {createUsagePlan} from "../stack/usage-plans";
 

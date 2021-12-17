@@ -1,17 +1,18 @@
-import {Queue, QueueEncryption, QueueProps} from "@aws-cdk/aws-sqs";
-import {Construct, Duration} from "@aws-cdk/core";
+import {Queue, QueueEncryption, QueueProps} from "aws-cdk-lib/aws-sqs";
+import {Duration} from "aws-cdk-lib";
 import {DigitrafficStack} from "../stack/stack";
-import {BlockPublicAccess, Bucket} from "@aws-cdk/aws-s3";
+import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {MonitoredFunction} from "../lambda/monitoredfunction";
-import {PolicyStatement} from "@aws-cdk/aws-iam";
-import {InlineCode, Runtime} from "@aws-cdk/aws-lambda";
-import {RetentionDays} from "@aws-cdk/aws-logs";
-import {SqsEventSource} from "@aws-cdk/aws-lambda-event-sources";
-import {ComparisonOperator, TreatMissingData} from "@aws-cdk/aws-cloudwatch";
-import {SnsAction} from "@aws-cdk/aws-cloudwatch-actions";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+import {InlineCode, Runtime} from "aws-cdk-lib/aws-lambda";
+import {RetentionDays} from "aws-cdk-lib/aws-logs";
+import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
+import {ComparisonOperator, TreatMissingData} from "aws-cdk-lib/aws-cloudwatch";
+import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {ManagedUpload} from "aws-sdk/clients/s3";
 import {S3} from "aws-sdk";
 import {SQSEvent, SQSHandler, SQSRecord} from "aws-lambda";
+import {Construct} from "constructs";
 
 /**
  * Construct for creating SQS-queues.
@@ -31,8 +32,8 @@ export class DigitrafficSqsQueue extends Queue {
             queueName,
             deadLetterQueue: props.deadLetterQueue || {
                 maxReceiveCount: 2,
-                queue: DigitrafficDLQueue.create(stack, name)
-            }
+                queue: DigitrafficDLQueue.create(stack, name),
+            },
         }};
 
         return new DigitrafficSqsQueue(stack, queueName, queueProps);
@@ -50,7 +51,7 @@ export class DigitrafficDLQueue {
         });
 
         const dlqBucket = new Bucket(stack, `${dlqName}-Bucket`, {
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         });
 
         const dlqFunctionName = `${dlqName}-Function`;
@@ -62,7 +63,7 @@ export class DigitrafficDLQueue {
             timeout: Duration.seconds(10),
             handler: 'index.handler',
             memorySize: 128,
-            reservedConcurrentExecutions: 1
+            reservedConcurrentExecutions: 1,
         });
 
         const statement = new PolicyStatement();
@@ -82,13 +83,13 @@ export class DigitrafficDLQueue {
 function addDLQAlarm(stack: DigitrafficStack, dlqName: string, dlq: Queue) {
     const alarmName = `${dlqName}-Alarm`;
     dlq.metricNumberOfMessagesReceived({
-        period: Duration.minutes(5)
+        period: Duration.minutes(5),
     }).createAlarm(stack, alarmName, {
         alarmName,
         threshold: 0,
         evaluationPeriods: 1,
         treatMissingData: TreatMissingData.NOT_BREACHING,
-        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
+        comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
     }).addAlarmAction(new SnsAction(stack.warningTopic));
 }
 
@@ -119,7 +120,7 @@ async function uploadToS3(s3: S3, bucketName: string, body: string, objectName: 
 
 function doUpload(s3: S3, Bucket: string, Body: string, Key: string): Promise<ManagedUpload.SendData> {
     return s3.upload({
-        Bucket, Body, Key
+        Bucket, Body, Key,
     }).promise();
 }
 
@@ -133,9 +134,8 @@ function createHandler(): SQSHandler {
 
         const millis = new Date().getTime();
         await Promise.all(event.Records.map((e: SQSRecord, idx: number) =>
-            uploadToS3(new AWS.S3(), bucketName, e.body, `dlq-${millis}-${idx}.json`)
-        ));
-    }
+            uploadToS3(new AWS.S3(), bucketName, e.body, `dlq-${millis}-${idx}.json`)));
+    };
 }
 
 const DLQ_LAMBDA_CODE = `const AWS = require('aws-sdk');

@@ -1,18 +1,18 @@
 import {dbTestBase, insert, insertActiveWarnings, TEST_ACTIVE_WARNINGS_VALID, TEST_ATON_SECRET} from "../db-testutil";
-import * as pgPromise from "pg-promise";
 import {handlerFn} from '../../lib/lambda/upload-voyage-plan/upload-voyage-plan';
 import {newFaultWithGeometry, voyagePlan} from "../testdata";
 import {SQS} from "aws-sdk";
 import * as sinon from 'sinon';
-import {SinonStub} from "sinon";
+import {SinonStub} from 'sinon';
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
 import {UploadVoyagePlanEvent} from "../../lib/model/upload-voyageplan-event";
 import {AtonSecret} from "../../lib/model/secret";
 import {createSecretFunction} from "digitraffic-common/test/secret";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const sandbox = sinon.createSandbox();
 
-describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('upload-voyage-plan', dbTestBase((db: DTDatabase) => {
     const secretFn = createSecretFunction<AtonSecret, void>(TEST_ATON_SECRET);
 
     afterEach(() => sandbox.restore());
@@ -21,11 +21,11 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
         const fault1 = newFaultWithGeometry(60.285807, 27.321659);
         const fault2 = newFaultWithGeometry(60.285817, 27.321660);
 
-//        await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
+        //        await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
         await insert(db, [fault1, fault2]);
         const uploadEvent: UploadVoyagePlanEvent = {
             voyagePlan,
-            callbackEndpoint: 'some-endpoint'
+            callbackEndpoint: 'some-endpoint',
         };
         const [sqs, sendSbtu] = makeSqsStub();
 
@@ -39,7 +39,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
 
         const uploadEvent: UploadVoyagePlanEvent = {
             voyagePlan,
-            callbackEndpoint: 'some-endpoint'
+            callbackEndpoint: 'some-endpoint',
         };
         const [sqs, sendStub] = makeSqsStub();
 
@@ -50,7 +50,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
 
     test('failed route parsing', async () => {
         const uploadEvent: UploadVoyagePlanEvent = {
-            voyagePlan: 'asdfasdf'
+            voyagePlan: 'asdfasdf',
         };
         const [sqs] = makeSqsStub();
         const ackStub = sandbox.stub().returns(Promise.resolve());
@@ -62,7 +62,7 @@ describe('upload-voyage-plan', dbTestBase((db: pgPromise.IDatabase<any, any>) =>
 
 }));
 
-async function insertFault(db: pgPromise.IDatabase<any, any>) {
+async function insertFault(db: DTDatabase) {
     const fault = newFaultWithGeometry(60.285807, 27.321659);
     await insert(db, [fault]);
 }

@@ -1,9 +1,10 @@
-import {Stack, Construct, StackProps, Duration} from '@aws-cdk/core';
-import {Props} from './app-props'
+import {Stack, StackProps} from 'aws-cdk-lib';
+import {Construct} from "constructs";
+import {Props} from './app-props';
 import * as InternalLambdas from './internal-lambdas';
 import * as HealthCheckProxyApi from './healthcheck-proxy-api';
-import {Topic} from "@aws-cdk/aws-sns";
-import {StringParameter} from "@aws-cdk/aws-ssm";
+import {Topic} from "aws-cdk-lib/aws-sns";
+import {StringParameter} from "aws-cdk-lib/aws-ssm";
 import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "digitraffic-common/stack/stack";
 
 export class StatusStack extends Stack {

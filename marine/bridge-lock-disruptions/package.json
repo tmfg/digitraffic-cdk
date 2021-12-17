@@ -33,10 +33,8 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-apigateway": "*",
-    "@aws-cdk/aws-events-targets": "*",
-    "@aws-cdk/aws-secretsmanager": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",
     "axios": "^0.21.1",

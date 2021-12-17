@@ -2,12 +2,12 @@ import {AUTHORIZATION_FAILED_MESSAGE, BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FO
 import {
     InternalServerErrorResponseTemplate,
     createResponses,
-    XmlResponseTemplate, NotFoundResponseTemplate, SvgResponseTemplate, BadRequestResponseTemplate
+    XmlResponseTemplate, NotFoundResponseTemplate, SvgResponseTemplate, BadRequestResponseTemplate,
 } from "./response";
-import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehavior} from "@aws-cdk/aws-apigateway";
-import {Function} from '@aws-cdk/aws-lambda';
+import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehavior} from "aws-cdk-lib/aws-apigateway";
+import {Function} from 'aws-cdk-lib/aws-lambda';
 import {MediaType} from './mediatypes';
-import {IModel} from "@aws-cdk/aws-apigateway/lib/model";
+import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
 
 /**
  * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
@@ -25,56 +25,56 @@ $inputRoot.body
 
 export const RESPONSE_401_UNAUTHORIZED: IntegrationResponse = {
     statusCode: '401',
-    selectionPattern: AUTHORIZATION_FAILED_MESSAGE
-}
+    selectionPattern: AUTHORIZATION_FAILED_MESSAGE,
+};
 
 export const RESPONSE_200_OK: IntegrationResponse = {
-    statusCode: '200'
+    statusCode: '200',
 };
 
 export const RESPONSE_400_BAD_REQUEST: IntegrationResponse = {
     statusCode: '400',
     selectionPattern: BAD_REQUEST_MESSAGE,
-    responseTemplates: BadRequestResponseTemplate
-}
+    responseTemplates: BadRequestResponseTemplate,
+};
 
 export const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
     statusCode: '500',
     selectionPattern: ERROR_MESSAGE,
-    responseTemplates: InternalServerErrorResponseTemplate
+    responseTemplates: InternalServerErrorResponseTemplate,
 };
 
 const RESPONSE_XML = {
-    responseTemplates: XmlResponseTemplate
+    responseTemplates: XmlResponseTemplate,
 };
 
 export const RESPONSE_SVG = {
-    responseTemplates: SvgResponseTemplate
-}
+    responseTemplates: SvgResponseTemplate,
+};
 
 export const RESPONSE_CORS_INTEGRATION = {
     responseParameters: {
-        'method.response.header.Access-Control-Allow-Origin': "'*'"
-    }
+        'method.response.header.Access-Control-Allow-Origin': "'*'",
+    },
 };
 
 export const RESPONSE_404_NOT_FOUND = {
     statusCode: '404',
     selectionPattern: NOT_FOUND_MESSAGE,
-    responseTemplates: NotFoundResponseTemplate
+    responseTemplates: NotFoundResponseTemplate,
 };
 
 export const TEMPLATE_COGNITO_GROUPS = {
     'application/json': JSON.stringify({
         "groups": "$context.authorizer.claims['cognito:groups']",
-        "username": "$context.authorizer.claims['cognito:username']"
+        "username": "$context.authorizer.claims['cognito:username']",
     })};
 
 export function methodResponse(status: string, contentType: MediaType, model: IModel, parameters?: Record<string, boolean>): MethodResponse {
     return  {
         statusCode: status,
         responseModels: createResponses(contentType, model),
-        responseParameters: parameters || {}
+        responseParameters: parameters || {},
     };
 
 }
@@ -82,8 +82,8 @@ export function methodResponse(status: string, contentType: MediaType, model: IM
 export function corsMethod(response: MethodResponse): MethodResponse {
     return {...response, ...{
         responseParameters: {
-            'method.response.header.Access-Control-Allow-Origin': true
-        }
+            'method.response.header.Access-Control-Allow-Origin': true,
+        },
     }};
 }
 
@@ -101,10 +101,8 @@ interface IntegrationOptions {
  * @param lambdaFunction The Lambda function
  * @param options Options
  */
-export function defaultIntegration(
-    lambdaFunction: Function,
-    options?: IntegrationOptions,
-): LambdaIntegration {
+export function defaultIntegration(lambdaFunction: Function,
+    options?: IntegrationOptions): LambdaIntegration {
     return new LambdaIntegration(lambdaFunction, {
         proxy: false,
         integrationResponses: options?.responses || [
@@ -116,15 +114,15 @@ export function defaultIntegration(
         ],
         requestParameters: options?.requestParameters || {},
         requestTemplates: options?.requestTemplates || {},
-        passthroughBehavior: options?.passthroughBehavior ?? PassthroughBehavior.WHEN_NO_MATCH
+        passthroughBehavior: options?.passthroughBehavior ?? PassthroughBehavior.WHEN_NO_MATCH,
     });
 }
 
 export function getResponse(response: IntegrationResponse, options?: IntegrationOptions): IntegrationResponse {
-    if(options?.xml) {
+    if (options?.xml) {
         response = {...response, ...RESPONSE_XML};
     }
-    if(!options?.disableCors) {
+    if (!options?.disableCors) {
         response = {...response, ...RESPONSE_CORS_INTEGRATION};
     }
 

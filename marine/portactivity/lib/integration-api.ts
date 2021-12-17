@@ -1,17 +1,15 @@
-import {Model, RequestValidator, RestApi} from '@aws-cdk/aws-apigateway';
-import {Construct} from '@aws-cdk/core';
+import {Model, RequestValidator, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {Construct} from 'constructs';
 import {DigitrafficRestApi} from 'digitraffic-common/api/rest_apis';
-import {Queue} from '@aws-cdk/aws-sqs';
+import {Queue} from 'aws-cdk-lib/aws-sqs';
 import {attachQueueToApiGatewayResource} from "digitraffic-common/api/sqs";
 import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import {createTimestampSchema, LocationSchema, ShipSchema} from "./model/timestamp-schema";
 import {addTagsAndSummary} from "digitraffic-common/api/documentation";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 
-export function create(
-    queue: Queue,
-    stack: DigitrafficStack
-): void {
+export function create(queue: Queue,
+    stack: DigitrafficStack): void {
 
     const integrationApi = new DigitrafficRestApi(stack,
         'PortActivity-Integration',
@@ -20,15 +18,13 @@ export function create(
     const locationModel = addServiceModel("LocationModel", integrationApi, LocationSchema);
     const timestampModel = addServiceModel("TimestampModel",
         integrationApi,
-        createTimestampSchema(
-            getModelReference(shipModel.modelId, integrationApi.restApiId),
+        createTimestampSchema(getModelReference(shipModel.modelId, integrationApi.restApiId),
             getModelReference(locationModel.modelId, integrationApi.restApiId)));
     createUpdateTimestampResource(stack, integrationApi, queue, timestampModel);
     createUsagePlan(integrationApi);
 }
 
-function createUpdateTimestampResource(
-    stack: Construct,
+function createUpdateTimestampResource(stack: Construct,
     integrationApi: RestApi,
     queue: Queue,
     timestampModel: Model) {
@@ -39,31 +35,35 @@ function createUpdateTimestampResource(
         validateRequestBody: true,
         validateRequestParameters: true,
         requestValidatorName: 'PortActivityTimestampIntegrationRequestValidator',
-        restApi: integrationApi
+        restApi: integrationApi,
     });
-    attachQueueToApiGatewayResource(stack,
+    attachQueueToApiGatewayResource(
+        stack,
         queue,
         timestampResource,
         requestValidator,
         'PortCallTimestamp',
         true,
         {
-            'application/json': timestampModel
-        });
-    addTagsAndSummary('UpdateTimestamp',
+            'application/json': timestampModel,
+        },
+    );
+    addTagsAndSummary(
+        'UpdateTimestamp',
         ['timestamps'],
         'Updates a single ship timestamp',
         timestampResource,
-        stack);
+        stack,
+    );
 }
 
 function createUsagePlan(integrationApi: RestApi) {
     const apiKey = integrationApi.addApiKey('Port Activity Integration API key');
     const plan = integrationApi.addUsagePlan('Port Activity Integration Usage Plan', {
         name: 'Integration Usage Plan',
-        apiKey
     });
     plan.addApiStage({
-        stage: integrationApi.deploymentStage
+        stage: integrationApi.deploymentStage,
     });
+    plan.addApiKey(apiKey);
 }

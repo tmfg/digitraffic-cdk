@@ -8,11 +8,11 @@ import {Feature, FeatureCollection} from "geojson";
 const MAX_DISTANCE_NM = 15;
 
 export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<FeatureCollection|null> {
-    const warnings = await inDatabaseReadonly(async (db: DTDatabase) => {
+    const warnings = await inDatabaseReadonly((db: DTDatabase) => {
         return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
     }) as FeatureCollection;
 
-    if(!warnings) {
+    if (!warnings) {
         return null;
     }
 
@@ -22,9 +22,11 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
             .map(p => [p.$.lon, p.$.lat]));
 
     // filter out warnings not in the route
-    warnings.features = warnings.features.filter((f: any) => !turf.booleanDisjoint(turf.buffer(f.geometry, MAX_DISTANCE_NM, {
-        units: 'nauticalmiles'
-    }), voyageLineString));
+    warnings.features = warnings.features.filter((f: Feature) => !turf.booleanDisjoint(turf.buffer(
+        f.geometry, MAX_DISTANCE_NM, {
+            units: 'nauticalmiles',
+        },
+    ), voyageLineString));
 
     return warnings;
 }
@@ -38,10 +40,10 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
 export async function findWarning(db: DTDatabase, id: number): Promise<Feature|null> {
     const warnings = await CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE) as FeatureCollection;
 
-    if(!warnings) {
+    if (!warnings) {
         return null;
     }
 
-    return warnings.features.find((f: any) => f.properties.id === id) || null;
+    return warnings.features.find((f: Feature) => f.properties?.id === id) || null;
 }
 

@@ -4,11 +4,11 @@ import {
     IdentitySource,
     Model,
     RequestAuthorizer,
-    Resource
-} from '@aws-cdk/aws-apigateway';
-import {UserPool, UserPoolClient} from "@aws-cdk/aws-cognito";
-import {Role, ServicePrincipal} from '@aws-cdk/aws-iam';
-import {Bucket} from "@aws-cdk/aws-s3";
+    Resource,
+} from 'aws-cdk-lib/aws-apigateway';
+import {UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
+import {Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
+import {Bucket} from "aws-cdk-lib/aws-s3";
 import {createResponses} from "digitraffic-common/api/response";
 import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digitraffic-common/api/responses";
 import {MediaType} from "digitraffic-common/api/mediatypes";
@@ -39,11 +39,13 @@ export class PrivateApi {
         this.stack = stack;
         this.bucket = bucket;
 
-        this.publicApi = new DigitrafficRestApi(stack, 'Marinecam-restricted', 'Marinecam restricted API', undefined, {
-            binaryMediaTypes: [
-                MediaType.IMAGE_JPEG
-            ]
-        });
+        this.publicApi = new DigitrafficRestApi(
+            stack, 'Marinecam-restricted', 'Marinecam restricted API', undefined, {
+                binaryMediaTypes: [
+                    MediaType.IMAGE_JPEG,
+                ],
+            },
+        );
         this.publicApi.createUsagePlan('Marinecam Api Key', 'Marinecam Usage Plan');
 
         const readImageRole = this.createReadImageRole();
@@ -55,11 +57,9 @@ export class PrivateApi {
         this.createApikeyProtectedResources(readImageRole);
     }
 
-    createPasswordProtectedResources(
-        readImageRole: Role,
+    createPasswordProtectedResources(readImageRole: Role,
         userPool: UserPool,
-        userPoolClient: UserPoolClient
-    ) {
+        userPoolClient: UserPoolClient) {
         const authorizer = this.createLambdaAuthorizer(userPool, userPoolClient);
 
         this.createGetImageResource(authorizer, readImageRole);
@@ -74,7 +74,7 @@ export class PrivateApi {
     createResourceTree() {
         // old authorizer protected resources
         const camerasResource = this.publicApi.root.addResource("cameras");
-        const folderResource = camerasResource.addResource("{folderName}")
+        const folderResource = camerasResource.addResource("{folderName}");
         this.imageResource = folderResource.addResource("{imageName}");
         this.metadataResource = camerasResource.addResource("metadata");
 
@@ -93,7 +93,7 @@ export class PrivateApi {
             responses: [
                 DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
                 DigitrafficIntegrationResponse.badRequest(),
-            ]
+            ],
         });
 
         this.apiMetadataResource.addMethod("GET", metadataIntegration, {
@@ -101,8 +101,8 @@ export class PrivateApi {
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 corsMethod(methodResponse("403", MediaType.TEXT_PLAIN, Model.ERROR_MODEL)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.ERROR_MODEL))
-            ]
+                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.ERROR_MODEL)),
+            ],
         });
     }
 
@@ -113,8 +113,8 @@ export class PrivateApi {
             requestTemplates: {
                 'application/json': `{
                 "groups": "$util.parseJson($context.authorizer.groups)"
-            }`
-            }
+            }`,
+            },
         });
 
         this.metadataResource.addMethod("GET", listCamerasIntegration, {
@@ -122,17 +122,19 @@ export class PrivateApi {
             apiKeyRequired: false,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.ERROR_MODEL))
-            ]
+                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.ERROR_MODEL)),
+            ],
         });
 
-        addTagsAndSummary('List Cameras', BETA_TAGS, 'List all camera metadata', this.metadataResource, this.stack);
+        addTagsAndSummary(
+            'List Cameras', BETA_TAGS, 'List all camera metadata', this.metadataResource, this.stack,
+        );
     }
 
     createReadImageRole(): Role {
         const readImageRole = new Role(this.stack, "role", {
             assumedBy: new ServicePrincipal('apigateway.amazonaws.com'),
-            path: "/service-role/"
+            path: "/service-role/",
         });
 
         this.bucket.grantRead(readImageRole);
@@ -158,33 +160,33 @@ export class PrivateApi {
                             "method.response.header.Access-Control-Allow-Origin": "'*'",
                             "method.response.header.Timestamp": "'integration.response.header.Date'",
                             "method.response.header.Content-Length": "'integration.response.header.Content-Length'",
-                            "method.response.header.Content-Type": "'integration.response.header.Content-Type'"
+                            "method.response.header.Content-Type": "'integration.response.header.Content-Type'",
                         },
                     }),
                     getResponse({
                         statusCode: "404",
                         selectionPattern: '404',
-                        responseTemplates: createResponses(MediaType.APPLICATION_JSON, 'not found')
-                    })
+                        responseTemplates: createResponses(MediaType.APPLICATION_JSON, 'not found'),
+                    }),
                 ],
-            }
+            },
         });
 
         this.apiImageResource.addMethod("GET", getImageIntegration, {
             apiKeyRequired: true,
             requestParameters: {
-                'method.request.path.imageName': true
+                'method.request.path.imageName': true,
             },
             methodResponses: [
                 methodResponse("200", MediaType.IMAGE_JPEG, Model.EMPTY_MODEL, {
                     'method.response.header.Access-Control-Allow-Origin': true,
                     'method.response.header.Timestamp': true,
                     'method.response.header.Content-Type': true,
-                    'method.response.header.Content-Length': true
+                    'method.response.header.Content-Length': true,
                 }),
                 corsMethod(methodResponse("403", MediaType.TEXT_PLAIN, Model.ERROR_MODEL)),
-                corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, Model.ERROR_MODEL))
-            ]
+                corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, Model.ERROR_MODEL)),
+            ],
         });
     }
 
@@ -197,7 +199,7 @@ export class PrivateApi {
                 credentialsRole: readImageRole,
                 requestParameters: {
                     'integration.request.path.objectName': 'method.request.path.imageName',
-                    'integration.request.path.folderName': 'method.request.path.folderName'
+                    'integration.request.path.folderName': 'method.request.path.folderName',
                 },
                 integrationResponses: [
                     getResponse({
@@ -207,57 +209,61 @@ export class PrivateApi {
                             "method.response.header.Access-Control-Allow-Origin": "'*'",
                             "method.response.header.Timestamp": "'integration.response.header.Date'",
                             "method.response.header.Content-Length": "'integration.response.header.Content-Length'",
-                            "method.response.header.Content-Type": "'integration.response.header.Content-Type'"
+                            "method.response.header.Content-Type": "'integration.response.header.Content-Type'",
                         },
                     }),
                     getResponse({
                         statusCode: "404",
                         selectionPattern: '404',
-                        responseTemplates: createResponses(MediaType.APPLICATION_JSON, 'not found')
-                    })
+                        responseTemplates: createResponses(MediaType.APPLICATION_JSON, 'not found'),
+                    }),
                 ],
-            }
+            },
         });
         this.imageResource.addMethod("GET", getImageIntegration, {
             authorizer,
             apiKeyRequired: false,
             requestParameters: {
                 'method.request.path.imageName': true,
-                'method.request.path.folderName': true
+                'method.request.path.folderName': true,
             },
             methodResponses: [
                 methodResponse("200", MediaType.IMAGE_JPEG, Model.EMPTY_MODEL, {
                     'method.response.header.Access-Control-Allow-Origin': true,
                     'method.response.header.Timestamp': true,
                     'method.response.header.Content-Type': true,
-                    'method.response.header.Content-Length': true
+                    'method.response.header.Content-Length': true,
 
                 }),
                 methodResponse("404", MediaType.APPLICATION_JSON, Model.ERROR_MODEL, {
-                    'method.response.header.Access-Control-Allow-Origin': true
-                })
-            ]
+                    'method.response.header.Access-Control-Allow-Origin': true,
+                }),
+            ],
         });
 
-        addTagsAndSummary('GetImage', BETA_TAGS, 'Return image', this.imageResource, this.stack);
+        addTagsAndSummary(
+            'GetImage', BETA_TAGS, 'Return image', this.imageResource, this.stack,
+        );
     }
 
     createLambdaAuthorizer(userPool: UserPool,
-                           userPoolClient: UserPoolClient): RequestAuthorizer {
+        userPoolClient: UserPoolClient): RequestAuthorizer {
         const functionName = 'Marinecam-Authorizer';
         const environment: LambdaEnvironment = {};
         environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;
         environment[MarinecamEnvKeys.POOLCLIENT_ID] = userPoolClient.userPoolClientId;
 
-        const authFunction = MonitoredFunction.create(this.stack, functionName, lambdaFunctionProps(this.stack, environment, functionName, 'authorizer', {
-            timeout: 10,
-        }));
+        const authFunction = MonitoredFunction.create(this.stack, functionName, lambdaFunctionProps(
+            this.stack, environment, functionName, 'authorizer', {
+                timeout: 10,
+            },
+        ));
 
         return new RequestAuthorizer(this.stack, 'images-authorizer', {
             handler: authFunction,
             identitySources: [
-                IdentitySource.header('Authorization')
-            ]
+                IdentitySource.header('Authorization'),
+            ],
         });
     }
 }

@@ -1,4 +1,4 @@
-import {IntegrationResponse} from "@aws-cdk/aws-apigateway";
+import {IntegrationResponse} from "aws-cdk-lib/aws-apigateway";
 import {RESPONSE_DEFAULT_LAMBDA} from "./responses";
 import {MediaType} from "./mediatypes";
 
@@ -18,8 +18,8 @@ export abstract class DigitrafficIntegrationResponse {
 
         return {
             statusCode,
-            responseTemplates
-        }
+            responseTemplates,
+        };
     }
 }
 

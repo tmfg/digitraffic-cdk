@@ -1,4 +1,4 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
+import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
 
 export const Organisaatio: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
@@ -7,12 +7,12 @@ export const Organisaatio: JsonSchema = {
     required: ['ytunnus'],
     properties: {
         nimi: {
-            type: JsonSchemaType.STRING
+            type: JsonSchemaType.STRING,
         },
         ytunnus: {
-            type: JsonSchemaType.STRING
-        }
-    }
+            type: JsonSchemaType.STRING,
+        },
+    },
 };
 
 export const Tunniste: JsonSchema = {
@@ -22,9 +22,9 @@ export const Tunniste: JsonSchema = {
     required: ['id'],
     properties: {
         id: {
-            type: JsonSchemaType.INTEGER
-        }
-    }
+            type: JsonSchemaType.INTEGER,
+        },
+    },
 };
 
 export function createSchemaOtsikko(organisaatioRef: string, tunnisteRef: string): JsonSchema {
@@ -45,20 +45,20 @@ export function createSchemaOtsikko(organisaatioRef: string, tunnisteRef: string
                     organisaatio: {
                         type: JsonSchemaType.OBJECT,
                         additionalProperties: false,
-                        ref: organisaatioRef
-                    }
-                }
+                        ref: organisaatioRef,
+                    },
+                },
             },
             viestintunniste: {
                 type: JsonSchemaType.OBJECT,
                 additionalProperties: false,
-                ref: tunnisteRef
+                ref: tunnisteRef,
             },
             lahetysaika: {
                 type: JsonSchemaType.STRING,
                 format: "date-time",
-            }
-        }
+            },
+        },
     };
 }
 
@@ -69,16 +69,16 @@ export const Koordinaattisijainti: JsonSchema = {
     required: ['x', 'y'],
     properties: {
         x: {
-            type: JsonSchemaType.NUMBER
+            type: JsonSchemaType.NUMBER,
         },
         y: {
-            type: JsonSchemaType.NUMBER
+            type: JsonSchemaType.NUMBER,
         },
         z: {
-            type: JsonSchemaType.NUMBER
-        }
-    }
-}
+            type: JsonSchemaType.NUMBER,
+        },
+    },
+};
 
 export const Viivageometriasijainti: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
@@ -88,8 +88,8 @@ export const Viivageometriasijainti: JsonSchema = {
     properties: {
         type: {
             enum: [
-                "LineString"
-            ]
+                "LineString",
+            ],
         },
         coordinates: {
             type: JsonSchemaType.ARRAY,
@@ -100,16 +100,16 @@ export const Viivageometriasijainti: JsonSchema = {
                 maxItems: 2,
                 items: [
                     {
-                        type: JsonSchemaType.NUMBER
+                        type: JsonSchemaType.NUMBER,
                     },
                     {
-                        type: JsonSchemaType.NUMBER
-                    }
-                ]
-            } as JsonSchema
-        }
-    }
-}
+                        type: JsonSchemaType.NUMBER,
+                    },
+                ],
+            } as JsonSchema,
+        },
+    },
+};
 
 export function createSchemaGeometriaSijainti(koordinaattisijaintiRef: string, viivageometriasijaintiRef: string): JsonSchema {
     return {
@@ -119,14 +119,14 @@ export function createSchemaGeometriaSijainti(koordinaattisijaintiRef: string, v
             koordinaatit: {
                 type: JsonSchemaType.OBJECT,
                 additionalProperties: false,
-                ref: koordinaattisijaintiRef
+                ref: koordinaattisijaintiRef,
             },
             viivageometria: {
                 type: JsonSchemaType.OBJECT,
                 additionalProperties: false,
                 ref: viivageometriasijaintiRef,
-            }
-        }
+            },
+        },
     };
 }
 
@@ -146,26 +146,26 @@ export function createSchemaHavainto(geometriaSijaintiRef: string): JsonSchema {
                         required: ['id', 'tyokonetyyppi'],
                         properties: {
                             id: {
-                                type: JsonSchemaType.INTEGER
+                                type: JsonSchemaType.INTEGER,
                             },
                             tunnus: {
-                                type: JsonSchemaType.STRING
+                                type: JsonSchemaType.STRING,
                             },
                             tyokonetyyppi: {
-                                type: JsonSchemaType.STRING
-                            }
-                        }
+                                type: JsonSchemaType.STRING,
+                            },
+                        },
                     },
                     sijainti: {
                         type: JsonSchemaType.OBJECT,
                         additionalProperties: false,
-                        ref: geometriaSijaintiRef
+                        ref: geometriaSijaintiRef,
                     },
                     suunta: {
-                        type: JsonSchemaType.NUMBER
+                        type: JsonSchemaType.NUMBER,
                     },
                     urakkaid: {
-                        type: JsonSchemaType.INTEGER
+                        type: JsonSchemaType.INTEGER,
                     },
                     havaintoaika: {
                         type: JsonSchemaType.STRING,
@@ -211,13 +211,13 @@ export function createSchemaHavainto(geometriaSijaintiRef: string): JsonSchema {
                                 "tiemerkinta",
                                 "tiestotarkastus",
                                 "tilaajan laadunvalvonta",
-                                "turvalaite"
-                            ]
-                        }
-                    }
-                }
-            }
-        }
+                                "turvalaite",
+                            ],
+                        },
+                    },
+                },
+            },
+        },
     };
 }
 
@@ -231,12 +231,12 @@ export function createSchemaTyokoneenseurannanKirjaus(otsikkoRef: string, havain
             otsikko: {
                 type: JsonSchemaType.OBJECT,
                 additionalProperties: false,
-                ref: otsikkoRef
+                ref: otsikkoRef,
             },
             havainnot: {
                 type: JsonSchemaType.ARRAY,
-                items: havainto
-            }
-        }
+                items: havainto,
+            },
+        },
     };
 }

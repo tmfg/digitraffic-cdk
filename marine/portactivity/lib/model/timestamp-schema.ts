@@ -1,4 +1,4 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "@aws-cdk/aws-apigateway";
+import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
 import {EventType} from "./timestamp";
 
 export const ShipSchema: JsonSchema = {
@@ -8,13 +8,13 @@ export const ShipSchema: JsonSchema = {
     properties: {
         mmsi: {
             type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING, JsonSchemaType.NULL],
-            description: 'MMSI'
+            description: 'MMSI',
         },
         imo: {
             type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING, JsonSchemaType.NULL],
-            description: 'IMO'
-        }
-    }
+            description: 'IMO',
+        },
+    },
 };
 
 export const LocationSchema: JsonSchema = {
@@ -25,17 +25,17 @@ export const LocationSchema: JsonSchema = {
     properties: {
         port: {
             type: JsonSchemaType.STRING,
-            description: 'Port LOCODE'
+            description: 'Port LOCODE',
         },
         portArea: {
             type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
-            description: 'Port area LOCODE'
+            description: 'Port area LOCODE',
         },
         from: {
             type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
-            description: 'Previous port area LOCODE'
+            description: 'Previous port area LOCODE',
         },
-    }
+    },
 };
 
 export function createTimestampSchema(shipReference: string, locationReference: string): JsonSchema {
@@ -49,44 +49,44 @@ export function createTimestampSchema(shipReference: string, locationReference: 
             'recordTime',
             'source',
             'ship',
-            'location'
+            'location',
         ],
         properties: {
             eventType: {
                 type: JsonSchemaType.STRING,
                 enum: Object.keys(EventType),
-                description: `Event type: ${Object.keys(EventType)}`
+                description: `Event type: ${Object.keys(EventType)}`,
             },
             eventTime: {
                 type: JsonSchemaType.STRING,
-                description: 'Event time in ISO 8601 date format'
+                description: 'Event time in ISO 8601 date format',
             },
             eventTimeConfidenceLower: {
                 type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
-                description: 'Event time confidence, lower. ISO 8601 formatted duration'
+                description: 'Event time confidence, lower. ISO 8601 formatted duration',
             },
             eventTimeConfidenceUpper: {
                 type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
-                description: 'Event time confidence, upper. ISO 8601 formatted duration'
+                description: 'Event time confidence, upper. ISO 8601 formatted duration',
             },
             recordTime: {
                 type: JsonSchemaType.STRING,
-                description: 'Timestamp of event creation in ISO 8601 date format'
+                description: 'Timestamp of event creation in ISO 8601 date format',
             },
             source: {
                 type: JsonSchemaType.STRING,
-                description: 'Event source'
+                description: 'Event source',
             },
             ship: {
-                ref: shipReference
+                ref: shipReference,
             },
             location: {
-                ref: locationReference
+                ref: locationReference,
             },
             portcallId: {
                 type: [JsonSchemaType.NUMBER, JsonSchemaType.NULL],
-                description: 'ID of Portnet port call'
+                description: 'ID of Portnet port call',
             },
-        }
+        },
     };
 }

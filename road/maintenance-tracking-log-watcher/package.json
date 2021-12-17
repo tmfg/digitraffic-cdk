@@ -31,13 +31,8 @@
     "typescript": "^4.1.3"
   },
   "dependencies": {
-    "@aws-cdk/aws-events": "*",
-    "@aws-cdk/aws-events-targets": "*",
-    "@aws-cdk/aws-iam": "*",
-    "@aws-cdk/aws-s3": "*",
-    "@aws-cdk/aws-sns": "*",
-    "@aws-cdk/aws-sns-subscriptions": "*",
-    "@aws-cdk/core": "*",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "@types/node-fetch": "^2.5.7",
     "moment": "*",
     "moment-timezone": "*",

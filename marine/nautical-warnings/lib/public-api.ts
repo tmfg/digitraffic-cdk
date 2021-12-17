@@ -2,7 +2,7 @@ import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {MessageModel} from "digitraffic-common/api/response";
-import {Model, Resource} from "@aws-cdk/aws-apigateway";
+import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
 import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
@@ -58,16 +58,16 @@ export class PublicApi {
             apiKeyRequired: false,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geojsonModel)),
-                corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel))
-            ]
+                corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel)),
+            ],
         });
 
         this.archivedResource.addMethod("GET", archivedIntegration, {
             apiKeyRequired: false,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geojsonModel)),
-                corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel))
-            ]
+                corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel)),
+            ],
         });
 
         addTags('GetActiveNauticalWarnings', BETA_TAGS, this.activeResource, stack);
