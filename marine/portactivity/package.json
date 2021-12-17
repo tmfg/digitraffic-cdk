@@ -18,7 +18,7 @@
   "devDependencies": {
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
-    "@types/node": "*",,
+    "@types/node": "*",
     "@types/sinon": "^10.0.0",
     "@types/uuid": "^8.3.3",
     "@types/xml2js": "^0.4.8",

@@ -19,7 +19,7 @@
     "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
-    "@types/node": "*",,
+    "@types/node": "*",
     "@types/sinon": "^10.0.0",
     "esbuild": "^0.8.36",
     "eslint": "^7.13.0",

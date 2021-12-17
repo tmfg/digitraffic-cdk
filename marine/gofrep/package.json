@@ -15,7 +15,7 @@
     "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
-    "@types/node": "*",,
+    "@types/node": "*",
     "@types/sinon": "^10.0.0",
     "@types/xml2js": "^0.4.8",
     "@typescript-eslint/eslint-plugin": "^4.12.0",

@@ -9,7 +9,7 @@
   },
   "devDependencies": {
     "@types/jest": "^26.0.22",
-    "@types/node": "*",,
+    "@types/node": "*",
     "@types/aws-lambda": "*",
     "typescript": "*"
   },
