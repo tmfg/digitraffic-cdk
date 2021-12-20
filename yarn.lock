@@ -1962,14 +1962,6 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.60.tgz#35f3d6213daed95da7f0f73e75bcc6980e90597b"
   integrity sha512-F0KIgDJfy2nA3zMLmWGKxcH2ZVEtCZXHHdOQs2gSaQ27+lNeEfGxzkIw90aXswATX7AZ33tahPbzy6KAfUreVw==
 
-<<<<<<< HEAD
-=======
-"@types/node@^14.14.27", "@types/node@^14.17.34":
-  version "14.18.1"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-14.18.1.tgz#459886b51f52aa923dc06b9ea81cb8b1d733e9d3"
-  integrity sha512-fTFWOFrgAkj737w1o0HLTIgisgYHnsZfeiqhG1Ltrf/iJjudEbUwetQAsfrtVE49JGwvpEzQR+EbMkIqG4227g==
-
->>>>>>> DPO-1669
 "@types/openlayers@*", "@types/openlayers@^4.6.17":
   version "4.6.18"
   resolved "https://registry.yarnpkg.com/@types/openlayers/-/openlayers-4.6.18.tgz#745122d14bc3c7aab8839c5c1b1411e0fd7c75d3"
@@ -6000,11 +5992,7 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-<<<<<<< HEAD
 typescript@*, typescript@^4.4.3, typescript@^4.5.4:
-=======
-typescript@^4.1.3, typescript@^4.1.6, typescript@^4.4.3, typescript@^4.4.4:
->>>>>>> DPO-1669
   version "4.5.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-4.5.4.tgz#a17d3a0263bf5c8723b9c52f43c5084edf13c2e8"
   integrity sha512-VgYs2A2QIRuGphtzFV7aQJduJ2gyfTljngLzjpfW9FoYZF6xuw1W0vW9ghCKLfcWrCFxK81CSGRAvS1pn4fIUg==
