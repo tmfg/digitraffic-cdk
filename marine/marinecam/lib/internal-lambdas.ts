@@ -1,5 +1,4 @@
 import {Bucket} from "aws-cdk-lib/aws-s3";
-import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {MarinecamEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";

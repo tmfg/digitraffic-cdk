@@ -59,7 +59,7 @@ export function createFunction(
     stack: Stack, edgeLambdaRole: Role, functionName: string, functionBody: string, versionString: string,
 ): Version {
     const edgeFunction = new Function(stack, functionName, {
-        runtime: Runtime.NODEJS_12_X,
+        runtime: Runtime.NODEJS_14_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
         handler: 'index.handler',
@@ -73,7 +73,7 @@ export function createWriteToEsLambda(
     stack: Stack, env: string, lambdaRole: Role, elasticDomain: string, elasticAppName: string,
 ): Function {
     return new Function(stack, `${env}-lambda-forward`, {
-        runtime: Runtime.NODEJS_12_X,
+        runtime: Runtime.NODEJS_14_X,
         role: lambdaRole,
         memorySize: 512,
         timeout: Duration.seconds(60),

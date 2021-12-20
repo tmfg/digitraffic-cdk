@@ -86,7 +86,7 @@ function createKinesisConsumerLambda(
 
     const fn = new Function(stack, functionName, {
         functionName: functionName,
-        runtime: Runtime.NODEJS_12_X,
+        runtime: Runtime.NODEJS_14_X,
         handler: 'lambda-stream-to-elastic.handler',
         code: Code.fromAsset('dist/lambda/stream-to-elastic'),
         deadLetterQueue: dlq,

@@ -5,7 +5,7 @@ import {DigitrafficStack, SOLUTION_KEY, StackConfiguration} from "./stack";
 import {IConstruct} from "constructs";
 
 const MAX_CONCURRENCY_LIMIT = 100;
-const NODE_RUNTIME = Runtime.NODEJS_12_X.name;
+const NODE_RUNTIME = Runtime.NODEJS_14_X.name;
 
 export class StackCheckingAspect implements IAspect {
     private readonly configuration?: StackConfiguration;

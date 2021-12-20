@@ -58,7 +58,7 @@ function createMqttProxyResource(
             functionName,
             code: assetCode,
             handler: 'lambda-mqtt-proxy-healthcheck.handler',
-            runtime: Runtime.NODEJS_12_X,
+            runtime: Runtime.NODEJS_14_X,
             reservedConcurrentExecutions: 1,
             timeout: Duration.seconds(10),
             memorySize: 128,

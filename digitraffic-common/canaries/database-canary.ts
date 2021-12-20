@@ -1,12 +1,13 @@
 import {Role} from "aws-cdk-lib/aws-iam";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
-//import {CfnCanary} from "@aws-cdk/aws-synthetics-alpha";
+import {CfnCanary} from "aws-cdk-lib/aws-synthetics";
+import {Schedule} from "aws-cdk-lib/aws-events";
+import {Duration} from "aws-cdk-lib";
 
 import {CanaryParameters} from "./canary-parameters";
 import {DigitrafficCanary} from "./canary";
 import {DigitrafficStack} from "../stack/stack";
-import {Schedule} from "aws-cdk-lib/aws-events";
-import {Duration} from "aws-cdk-lib";
+
 
 export class DatabaseCanary extends DigitrafficCanary {
     constructor(stack: DigitrafficStack,
@@ -26,7 +27,7 @@ export class DatabaseCanary extends DigitrafficCanary {
         secret.grantRead(this.role);
 
         // need to override vpc and security group, can't do this with cdk
-        const cfnCanary = this.node.defaultChild as any;
+        const cfnCanary = this.node.defaultChild as CfnCanary;
 
         const subnetIds = stack.vpc.privateSubnets.map(subnet => subnet.subnetId);
 

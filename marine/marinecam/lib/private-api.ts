@@ -247,7 +247,8 @@ export class PrivateApi {
     }
 
     createLambdaAuthorizer(userPool: UserPool,
-        userPoolClient: UserPoolClient): RequestAuthorizer {
+        userPoolClient: UserPoolClient)
+        : RequestAuthorizer {
         const functionName = 'Marinecam-Authorizer';
         const environment: LambdaEnvironment = {};
         environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;

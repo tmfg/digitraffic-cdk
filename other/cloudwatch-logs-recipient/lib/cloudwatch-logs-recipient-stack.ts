@@ -130,7 +130,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             architectures: [Architecture.ARM_64],
             code: new AssetCode('dist/lambda/', {exclude: ["app-*"]}),
             handler: 'lambda-kinesis-to-es.handler',
-            runtime: Runtime.NODEJS_12_X,
+            runtime: Runtime.NODEJS_14_X,
             timeout: Duration.seconds(20),
             logRetention: RetentionDays.ONE_YEAR,
             memorySize: 256,
@@ -162,7 +162,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             architectures: [Architecture.ARM_64],
             code: new AssetCode('dist/lambda/', {exclude: ["lambda-*"]}),
             handler: 'app-kinesis-to-es.handler',
-            runtime: Runtime.NODEJS_12_X,
+            runtime: Runtime.NODEJS_14_X,
             timeout: Duration.seconds(20),
             logRetention: RetentionDays.ONE_YEAR,
             environment: {

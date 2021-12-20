@@ -47,7 +47,7 @@ export function lambdaFunctionProps(
     stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters,
 ): FunctionProps {
     return {
-        runtime: config?.runtime || Runtime.NODEJS_12_X,
+        runtime: config?.runtime || Runtime.NODEJS_14_X,
         architecture: config?.architecture || Architecture.ARM_64,
         memorySize: config?.memorySize || 128,
         functionName: lambdaName,
@@ -80,7 +80,7 @@ export function dbLambdaConfiguration(vpc: IVpc,
     config: FunctionParameters): FunctionProps {
 
     return {
-        runtime: props.runtime || Runtime.NODEJS_12_X,
+        runtime: props.runtime || Runtime.NODEJS_14_X,
         memorySize: props.memorySize || config.memorySize || 1024,
         functionName: config.functionName,
         code: config.code as Code,
@@ -104,7 +104,7 @@ export function dbLambdaConfiguration(vpc: IVpc,
 
 export function defaultLambdaConfiguration(config: FunctionParameters): FunctionProps {
     const props: FunctionProps = {
-        runtime: Runtime.NODEJS_12_X,
+        runtime: Runtime.NODEJS_14_X,
         memorySize: config.memorySize ?? 128,
         functionName: config.functionName,
         handler: config.handler as string,
