@@ -24,5 +24,6 @@ export const ports: Port[] = [
     'FIKAS',
     'FINLI',
     'FIKTK',
-    'FITRY'
+    'FITRY',
+    'FIKUO',
 ];
