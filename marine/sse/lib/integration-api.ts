@@ -1,10 +1,10 @@
-import {IntegrationResponse, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
-import * as Lambda from 'aws-cdk-lib/aws-lambda';
+import {IModel, IntegrationResponse, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
 import {createRestApi} from 'digitraffic-common/api/rest_apis';
 import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Construct} from "constructs";
+import {Function} from "aws-cdk-lib/aws-lambda";
 
 import * as SseSchema from "./model/sse-schema";
 import * as ApiResponseSchema from "./model/api-response-schema";
@@ -22,7 +22,6 @@ import {MessageModel} from "digitraffic-common/api/response";
 import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/api/errors";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import apigateway = require('aws-cdk-lib/aws-apigateway');
 
 export function createIntegrationApiAndHandlerLambda(secret: ISecret,
     stack: DigitrafficStack) {
@@ -58,12 +57,12 @@ function createUpdateSseApiGatewayResource(stack: Construct,
 }
 
 function createUpdateRequestHandlerLambda(
-    requests: apigateway.Resource,
-    sseRequestModel: any,
-    okResponseModel: any,
-    errorResponseModel: any,
+    requests: Resource,
+    sseRequestModel: IModel,
+    okResponseModel: IModel,
+    errorResponseModel: IModel,
     stack: DigitrafficStack,
-): Lambda.Function {
+): Function {
 
     const lambdaFunctionName = 'SSE-UpdateSseData';
     const environment = stack.createDefaultLambdaEnvironment('SSE');
