@@ -2,32 +2,24 @@ import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {UrlCanary} from "digitraffic-common/canaries/url-canary";
 import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
+import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 
 export class Canaries {
-    constructor(stack: DigitrafficStack) {
-        if(stack.configuration.enableCanaries) {
+    constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
+        if (stack.configuration.enableCanaries) {
             const urlRole = new DigitrafficCanaryRole(stack, 'aton-url');
             const dbRole = new DigitrafficCanaryRole(stack, 'aton-db').withDatabaseAccess();
 
-            new UrlCanary(stack, urlRole, {
+            UrlCanary.create(stack, urlRole, publicApi, {
                 name: 'aton-public',
-                hostname: "meri-test.digitraffic.fi",
                 handler: 'public-api.handler',
                 alarm: {
                     alarmName: 'ATON-PublicAPI-Alarm',
-                    topicArn: stack.configuration.warningTopicArn
-                }
+                    topicArn: stack.configuration.warningTopicArn,
+                },
             });
 
-            new DatabaseCanary(stack, dbRole, stack.secret, {
-                name: 'aton',
-                secret: stack.configuration.secretId,
-                handler: 'db.handler',
-                alarm: {
-                    alarmName: 'ATON-Db-Alarm',
-                    topicArn: stack.configuration.warningTopicArn
-                }
-            });
+            DatabaseCanary.createV2(stack, dbRole, 'aton');
         }
     }
 }

@@ -19,7 +19,7 @@ export class AtonFaultsStack extends DigitrafficStack {
 
         IntegrationApi.create(this, s124Queue);
         InternalLambdas.create(this, s124Queue);
-        PublicApi.create(this);
-        new Canaries(this);
+        const publicApi = PublicApi.create(this);
+        new Canaries(this, publicApi);
     }
 }

@@ -58,10 +58,15 @@ export class UrlCanary extends DigitrafficCanary {
         const apiKeys = publicApi.apiKeyIds;
 
         if (apiKeys.length > 1) {
-            console.info("rest api has more than one api!");
+            console.info("rest api has more than one api");
+        }
+
+        if (apiKeys.length === 0) {
+            console.info("rest api has no api keys");
+            return undefined;
         }
 
         // always use first api key
-        return publicApi.apiKeyIds.length > 0 ? publicApi.apiKeyIds[0] : undefined;
+        return publicApi.apiKeyIds[0];
     }
 }

@@ -1,11 +1,10 @@
 import {Model, RestApi} from 'aws-cdk-lib/aws-apigateway';
-import {Function} from 'aws-cdk-lib/aws-lambda';
+import {Function, Runtime} from 'aws-cdk-lib/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
 import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
-import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/api/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
 import {MediaType} from "digitraffic-common/api/mediatypes";
@@ -13,16 +12,18 @@ import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {MonitoredDBFunction} from "digitraffic-common/lambda/monitoredfunction";
 
-export function create(stack: DigitrafficStack): Function {
+export function create(stack: DigitrafficStack): DigitrafficRestApi {
     const publicApi = new DigitrafficRestApi(stack, 'ATON-public', 'ATON public API');
 
-    createUsagePlan(publicApi, 'ATON Api Key', 'ATON Usage Plan');
+    publicApi.createUsagePlan('ATON Api Key', 'ATON Usage Plan');
 
     const faultModel = addServiceModel("FaultModel", publicApi, FaultSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
     const faultsModel = addServiceModel("FaultsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    return createAnnotationsResource(stack, publicApi, faultsModel);
+    createAnnotationsResource(stack, publicApi, faultsModel);
+
+    return publicApi;
 }
 
 function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, faultsJsonModel: Model): Function {

@@ -52,16 +52,18 @@ export class UrlChecker {
         });
     }
 
+    static createV2(): Promise<UrlChecker> {
+        return this.create(process.env.hostname as string, process.env.apiKeyId as string);
+    }
+
     expectStatus<T>(statusCode: number, url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
-                path: url,
-            }};
+            path: url,
+        }};
 
-        return synthetics.executeHttpStep(
-            "Verify " + statusCode + "  for " + url.replace(/auth=.*/, ''),
+        return synthetics.executeHttpStep("Verify " + statusCode + "  for " + url.replace(/auth=.*/, ''),
             requestOptions,
-            callback,
-        );
+            callback);
     }
 
     expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
@@ -73,9 +75,7 @@ export class UrlChecker {
             path: url,
         }};
 
-        return synthetics.executeHttpStep(
-            "Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN),
-        );
+        return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
     expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
@@ -88,11 +88,9 @@ export class UrlChecker {
             headers: baseHeaders,
         }};
 
-        return synthetics.executeHttpStep(
-            "Verify 403 for " + url,
+        return synthetics.executeHttpStep("Verify 403 for " + url,
             requestOptions,
-            validateStatusCodeAndContentType(403, mediaType ?? MediaType.APPLICATION_JSON),
-        );
+            validateStatusCodeAndContentType(403, mediaType || MediaType.APPLICATION_JSON));
     }
 
     done(): string {
