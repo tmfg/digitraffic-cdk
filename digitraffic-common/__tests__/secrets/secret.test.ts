@@ -6,8 +6,8 @@ const SECRET_ID = "test_secret";
 const SECRET_WITH_PREFIX = {
     "prefix.value" : "value",
     "prefix.name" : "name",
-    "wrong.value" : "value"
-}
+    "wrong.value" : "value",
+};
 const SECRET_EMPTY = {};
 
 stubSecretsManager();
@@ -22,7 +22,7 @@ describe('secret - test', () => {
     test('getSecret - no secret', async () => {
         mockSecret(null);
         await expect(async () => {
-            await getSecret(SECRET_ID, '')
+            await getSecret(SECRET_ID, '');
         }).rejects.toThrowError("No secret found!");
     });
 
@@ -43,7 +43,7 @@ describe('secret - test', () => {
         const secret = await getSecret(SECRET_ID, 'prefix');
         expect(secret).toEqual({
             value: "value",
-            name: "name"
+            name: "name",
         });
     });
 });

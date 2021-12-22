@@ -28,12 +28,10 @@ class CountDatabaseCheck extends DatabaseCheck<CountResponse> {
     readonly minCount: number|null;
     readonly maxCount: number|null;
 
-    constructor(
-        name: string,
+    constructor(name: string,
         sql: string,
         minCount: number|null,
-        maxCount: number|null,
-    ) {
+        maxCount: number|null) {
         super(name, sql);
 
         if (minCount == null && maxCount == null) {
@@ -92,34 +90,28 @@ export class DatabaseChecker {
     }
 
     one(name: string, sql: string) {
-        this.checks.push(new CountDatabaseCheck(
-            name,
+        this.checks.push(new CountDatabaseCheck(name,
             sql,
             1,
-            1,
-        ));
+            1));
 
         return this;
     }
 
     empty(name: string, sql: string) {
-        this.checks.push(new CountDatabaseCheck(
-            name,
+        this.checks.push(new CountDatabaseCheck(name,
             sql,
             null,
-            0,
-        ));
+            0));
 
         return this;
     }
 
     notEmpty(name: string, sql: string) {
-        this.checks.push(new CountDatabaseCheck(
-            name,
+        this.checks.push(new CountDatabaseCheck(name,
             sql,
             1,
-            null,
-        ));
+            null));
 
         return this;
     }
@@ -139,11 +131,9 @@ export class DatabaseChecker {
                         check.check(value);
                     };
 
-                    synthetics.executeStep(
-                        check.name,
+                    synthetics.executeStep(check.name,
                         checkFunction,
-                        stepConfig,
-                    );
+                        stepConfig);
                 }
             });
         });

@@ -6,8 +6,8 @@ const SECRET_ID = "test_secret";
 const SECRET_WITH_PREFIX = {
     "prefix.value" : "value",
     "prefix.name" : "name",
-    "wrong.value" : "value"
-}
+    "wrong.value" : "value",
+};
 const SECRET_EMPTY = {};
 
 stubSecretsManager();
@@ -51,9 +51,9 @@ describe('secret - test', () => {
         await withSecretAndPrefix(SECRET_ID, 'prefix',  (secret: GenericSecret) => {
             expect(secret).toEqual({
                 value: "value",
-                name: "name"
+                name: "name",
             });
         });
-           
+
     });
 });

@@ -4,7 +4,7 @@ import {
     GatewayResponse,
     ResponseType,
     EndpointType,
-    RestApiProps
+    RestApiProps,
 } from 'aws-cdk-lib/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
@@ -14,7 +14,9 @@ import {createUsagePlan} from "../stack/usage-plans";
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];
 
-    constructor(stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined, config?: Partial<RestApiProps>) {
+    constructor(
+        stack: DigitrafficStack, apiId: string, apiName: string, allowFromIpAddresses?: string[] | undefined, config?: Partial<RestApiProps>,
+    ) {
         const policyDocument = allowFromIpAddresses == null ? createDefaultPolicyDocument() : createIpRestrictionPolicyDocument(allowFromIpAddresses);
 
         // override default config with given extra config
@@ -24,7 +26,7 @@ export class DigitrafficRestApi extends RestApi {
             },
             restApiName: apiName,
             endpointTypes: [EndpointType.REGIONAL],
-            policy: policyDocument
+            policy: policyDocument,
         }, ...config};
 
         super(stack, apiId, apiConfig);
@@ -60,8 +62,8 @@ export function add404Support(restApi: RestApi, stack: Construct) {
         type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
         statusCode: '404',
         templates: {
-            'application/json': '{"message": "Not found"}'
-        }
+            'application/json': '{"message": "Not found"}',
+        },
     });
 }
 
@@ -71,8 +73,8 @@ export function add401Support(restApi: RestApi, stack: Construct) {
         type: ResponseType.UNAUTHORIZED,
         statusCode: "401",
         responseHeaders: {
-            'WWW-Authenticate': "'Basic'"
-        }
+            'WWW-Authenticate': "'Basic'",
+        },
     });
 }
 
@@ -85,8 +87,7 @@ export function add401Support(restApi: RestApi, stack: Construct) {
  * @param restApi RestApi
  * @param stack Construct
  */
-export function setReturnCodeForMissingAuthenticationToken(
-    returnCode: number,
+export function setReturnCodeForMissingAuthenticationToken(returnCode: number,
     message: string,
     restApi: RestApi,
     stack: Construct) {
@@ -96,8 +97,8 @@ export function setReturnCodeForMissingAuthenticationToken(
         type: ResponseType.MISSING_AUTHENTICATION_TOKEN,
         statusCode: `${returnCode}`,
         templates: {
-            'application/json': `{"message": ${message}}`
-        }
+            'application/json': `{"message": ${message}}`,
+        },
     });
 }
 
@@ -109,7 +110,7 @@ export function createRestApi(stack: Construct, apiId: string, apiName: string, 
         },
         restApiName: apiName,
         endpointTypes: [EndpointType.REGIONAL],
-        policy: policyDocument
+        policy: policyDocument,
     });
     add404Support(restApi, stack);
     return restApi;
@@ -121,17 +122,17 @@ export function createDefaultPolicyDocument() {
             new PolicyStatement({
                 effect: Effect.ALLOW,
                 actions: [
-                    "execute-api:Invoke"
+                    "execute-api:Invoke",
                 ],
                 resources: [
-                    "*"
+                    "*",
                 ],
                 principals: [
-                    new AnyPrincipal()
-                ]
-            })
-        ]
-    })
+                    new AnyPrincipal(),
+                ],
+            }),
+        ],
+    });
 }
 
 
@@ -142,19 +143,19 @@ export function createIpRestrictionPolicyDocument(allowFromIpAddresses: string[]
                 effect: Effect.ALLOW,
                 conditions: {
                     "IpAddress": {
-                        "aws:SourceIp": allowFromIpAddresses
+                        "aws:SourceIp": allowFromIpAddresses,
                     },
                 },
                 actions: [
-                    "execute-api:Invoke"
+                    "execute-api:Invoke",
                 ],
                 resources: [
-                    "*"
+                    "*",
                 ],
                 principals: [
-                    new AnyPrincipal()
-                ]
-            })
-        ]
-    })
+                    new AnyPrincipal(),
+                ],
+            }),
+        ],
+    });
 }

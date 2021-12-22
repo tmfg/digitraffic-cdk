@@ -6,7 +6,7 @@ const DEFAULT_PATH = "/";
 const PORT = 8091;
 
 const DEFAULT_PROPS = {
-    "/": () => ""
+    "/": () => "",
 };
 
 describe('TestHttpServer - test', () => {
@@ -35,7 +35,7 @@ describe('TestHttpServer - test', () => {
             const request = http.request({
                 path,
                 port: PORT,
-                method
+                method,
             }, (response: IncomingMessage) => {
                 response.on('data', () => {
                     // do nothing
@@ -51,7 +51,7 @@ describe('TestHttpServer - test', () => {
                 });
             });
 
-            if(method === "POST") {
+            if (method === "POST") {
                 request.write(body);
             }
             request.end();

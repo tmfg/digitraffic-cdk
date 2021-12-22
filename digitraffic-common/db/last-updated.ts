@@ -14,7 +14,7 @@ type UpdatedTimestamp = {
 
 export function getLastUpdated(db: DTDatabase, datatype: DataType): Promise<Date | null> {
     return db.oneOrNone("select updated from data_updated where data_type=$(datatype)", {
-        datatype: datatype
+        datatype: datatype,
     }, (x: UpdatedTimestamp) => x?.updated || null);
 }
 
@@ -23,21 +23,20 @@ export function updateLastUpdated(db: DTDatabase, datatype: DataType, updated: D
 values(nextval('seq_data_updated'), $(datatype), $(updated))
 on conflict (data_type)
 do update set updated = $(updated)`,
-        { updated, datatype });
+    { updated, datatype });
 }
 
 export function getUpdatedTimestamp(db: DTDatabase, datatype: string): Promise<Date | null> {
     return db.oneOrNone("select updated_time as updated from updated_timestamp where updated_name=$(datatype)", {
-        datatype: datatype
+        datatype: datatype,
     }, (x: UpdatedTimestamp) => x?.updated || null);
 }
 
 export function updateUpdatedTimestamp(db: DTDatabase | DTTransaction, datatype: string, date: Date, by = ''): Promise<null> {
-    return db.none(
-`insert into updated_timestamp(updated_name, updated_time, updated_by)
+    return db.none(`insert into updated_timestamp(updated_name, updated_time, updated_by)
 values($(datatype), $(date), $(by))
 on conflict (updated_name)
 do update set updated_time = $(date), updated_by = $(by)`,
-        { date, datatype, by });
+    { date, datatype, by });
 }
 

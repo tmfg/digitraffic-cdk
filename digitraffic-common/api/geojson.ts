@@ -9,6 +9,6 @@ export function createFeatureCollection(features: Feature[], lastUpdated: Date |
     return {
         type: "FeatureCollection",
         lastUpdated: lastUpdated,
-        features: features
+        features: features,
     } as FeatureCollection;
 }

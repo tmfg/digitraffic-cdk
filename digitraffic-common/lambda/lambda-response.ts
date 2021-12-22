@@ -6,15 +6,15 @@ export class LambdaResponse<T> {
         return this.create(200, body);
     }
 
-    static bad_request(body: string): LambdaResponse<string> {
+    static badRequest(body: string): LambdaResponse<string> {
         return this.create(400, body);
     }
 
-    static not_found(): LambdaResponse<string> {
+    static notFound(): LambdaResponse<string> {
         return this.create(404, 'Not found');
     }
 
-    static internal_error(): LambdaResponse<string> {
+    static internalError(): LambdaResponse<string> {
         return this.create(500, 'Internal error');
     }
 

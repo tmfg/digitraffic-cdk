@@ -1,11 +1,11 @@
-import {SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import * as CountingSitesService from "../../service/counting-sites";
 import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
+import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
-const secretId = process.env[SECRET_ID_KEY] as string;
+const secretId = process.env[SECRET_ID] as string;
 
-export const handler = async (event: any) => {
+export const handler = async (event: Record<string, string>) => {
     return withDbSecret(secretId, async () => {
         const start = Date.now();
         const domain = event.domain;
@@ -13,15 +13,15 @@ export const handler = async (event: any) => {
         try {
             const featureCollection = await CountingSitesService.getCountersForDomain(domain);
 
-            if(featureCollection.features) {
+            if (featureCollection.features) {
                 return LambdaResponse.ok(JSON.stringify(featureCollection, null, 3));
             } else {
-                return LambdaResponse.not_found();
+                return LambdaResponse.notFound();
             }
-        } catch(e) {
-            return LambdaResponse.internal_error();
+        } catch (e) {
+            return LambdaResponse.internalError();
         } finally {
-            console.info("method=CountingSites.GetCounters tookMs=%d", (Date.now() - start))
+            console.info("method=CountingSites.GetCounters tookMs=%d", (Date.now() - start));
         }
     });
 };

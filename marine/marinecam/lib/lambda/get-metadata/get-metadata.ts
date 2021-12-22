@@ -13,8 +13,8 @@ export const handler = async () => {
         });
 
         return LambdaResponse.ok(cameras);
-    } catch(e) {
+    } catch (e) {
         console.error(e);
-        return LambdaResponse.internal_error();
+        return LambdaResponse.internalError();
     }
-}
+};

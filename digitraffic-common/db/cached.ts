@@ -26,9 +26,7 @@ export enum JSON_CACHE_KEY {
     NAUTICAL_WARNINGS_ARCHIVED = 'nautical-warnings-archived'
 }
 
-export function updateCachedJson<T>(
-    db: DTDatabase | DTTransaction, cacheKey: JSON_CACHE_KEY, value: T,
-): Promise<null> {
+export function updateCachedJson<T>(db: DTDatabase | DTTransaction, cacheKey: JSON_CACHE_KEY, value: T): Promise<null> {
     return db.none(PS_UPDATE_CACHE_VALUE, [cacheKey, value]);
 }
 

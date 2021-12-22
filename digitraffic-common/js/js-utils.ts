@@ -4,9 +4,9 @@
  */
 export function shuffle<T>(array: T[]): T[] {
     // pretty fast way to copy an array, not necessarily the fastest
-    const newArray = array.slice(0)
-    newArray.sort((x) => 0.5 - Math.random())
-    return newArray
+    const newArray = array.slice(0);
+    newArray.sort((x) => 0.5 - Math.random());
+    return newArray;
 }
 
 /**

@@ -60,7 +60,7 @@ export class StackCheckingAspect implements IAspect {
             }
 
             if (f.runtime !== NODE_RUNTIME) {
-                Annotations.of(node).addError('wrong runtime ' + f.runtime);
+                Annotations.of(node).addWarning('wrong runtime ' + f.runtime);
             }
 
             if (this.configuration?.shortName && f.functionName && f.functionName.indexOf(this.configuration.shortName) != 0) {
