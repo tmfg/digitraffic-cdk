@@ -111,7 +111,9 @@ function createUpdateTimestampsFromSchedules(stack: DigitrafficStack, queue: Que
         environment,
         reservedConcurrentExecutions: 1,
         vpc: stack.vpc,
-        vpcSubnets: stack.vpc.privateSubnets,
+        vpcSubnets: {
+            subnets: stack.vpc.privateSubnets,
+        },
     }));
 
     queue.grantSendMessages(lambda);
