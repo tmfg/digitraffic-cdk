@@ -4,6 +4,6 @@ export function getApiKeyFromAPIGateway(keyId: string): Promise<APIGateway.Types
     const agw = new APIGateway();
     return agw.getApiKey({
         apiKey: keyId,
-        includeValue: true
+        includeValue: true,
     }).promise();
 }

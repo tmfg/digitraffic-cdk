@@ -5,6 +5,7 @@
 export function shuffle<T>(array: T[]): T[] {
     // pretty fast way to copy an array, not necessarily the fastest
     const newArray = array.slice(0);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     newArray.sort((x) => 0.5 - Math.random());
     return newArray;
 }

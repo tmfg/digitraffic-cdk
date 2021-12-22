@@ -11,11 +11,9 @@ export enum RetryLogError {
  * @param logError Logging options
  * @return Promise return value
  */
-export async function retry<T>(
-    asyncFn: () => Promise<T>,
+export async function retry<T>(asyncFn: () => Promise<T>,
     retries = 3,
-    logError = RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS,
-): Promise<T> {
+    logError = RetryLogError.LOG_LAST_RETRY_AS_ERROR_OTHERS_AS_WARNS): Promise<T> {
 
     if (!isFinite(retries)) {
         throw new Error('Only finite numbers are supported');
@@ -44,10 +42,8 @@ export async function retry<T>(
             throw new Error('No retries left');
         }
         console.warn('method=retry invocation failed, retrying with remaining retries %d', remainingRetries);
-        return retry(
-            asyncFn,
+        return retry(asyncFn,
             remainingRetries,
-            logError,
-        );
+            logError);
     }
 }
