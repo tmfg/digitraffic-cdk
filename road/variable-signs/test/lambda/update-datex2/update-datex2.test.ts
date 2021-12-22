@@ -1,13 +1,12 @@
-import * as pgPromise from "pg-promise"
-import {handlerFn} from "../../../lib/lambda/update-datex2/update-datex2"
-import {dbTestBase} from "../../db-testutil"
-import {readFileSync} from 'fs'
-import * as VariableSignsService from '../../../lib/service/variable-signs'
+import {handlerFn, StatusCodeValue} from "../../../lib/lambda/update-datex2/update-datex2";
+import {dbTestBase} from "../../db-testutil";
+import {readFileSync} from 'fs';
+import * as VariableSignsService from '../../../lib/service/variable-signs';
 import {createSecretFunction} from "digitraffic-common/test/secret";
 
-describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('lambda-update-datex2', dbTestBase(() => {
     test('update_valid_datex2', async () => {
-        const response = await updateFile('valid_datex2.xml', 200);
+        await updateFile('valid_datex2.xml', 200);
 
         const datex2 = (await VariableSignsService.findActiveSignsDatex2()).body;
 
@@ -27,27 +26,27 @@ describe('lambda-update-datex2', dbTestBase((db: pgPromise.IDatabase<any,any>) =
     test('insert_update', async () => {
         await updateFile('valid_datex2.xml', 200);
 
-        const datex2 = (await VariableSignsService.findActiveSignsDatex2()).body;
-        expect(datex2).toMatch(/<overallStartTime>2020-02-19T14:45:02.013Z<\/overallStartTime>/);
+        const oldDatex2 = (await VariableSignsService.findActiveSignsDatex2()).body;
+        expect(oldDatex2).toMatch(/<overallStartTime>2020-02-19T14:45:02.013Z<\/overallStartTime>/);
 
         // and then update
         await updateFile('valid_datex2_updated.xml', 200);
 
-        const datex2_2 = (await VariableSignsService.findActiveSignsDatex2()).body;
-        expect(datex2_2).toMatch(/<overallStartTime>2020-02-20T14:45:02.013Z<\/overallStartTime>/);
+        const newDatex2 = (await VariableSignsService.findActiveSignsDatex2()).body;
+        expect(newDatex2).toMatch(/<overallStartTime>2020-02-20T14:45:02.013Z<\/overallStartTime>/);
 
     });
 }));
 
-async function updateFile(filename: string, expectedStatusCode: number): Promise<any> {
+async function updateFile(filename: string, expectedStatusCode: number): Promise<StatusCodeValue> {
     const request = getRequest(filename);
     const response = await handlerFn(createSecretFunction({}), request);
 
-    expect(response.statusCode).toBe(expectedStatusCode);
+    expect(response!.statusCode).toBe(expectedStatusCode);
 
-    return response;
+    return response!;
 }
 
-function getRequest(filename: string): any {
-    return {body: readFileSync('test/lambda/update-datex2/' + filename, 'utf8')}
+function getRequest(filename: string) {
+    return {body: readFileSync('test/lambda/update-datex2/' + filename, 'utf8')};
 }

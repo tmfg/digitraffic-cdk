@@ -1,17 +1,17 @@
 import assert from "assert";
 import {FeatureCollection} from "geojson";
 import {ResponseChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
-import {ENV_API_KEY, ENV_HOSTNAME} from "digitraffic-common/canaries/url-canary";
 import {MetadataResponse} from "../model/metadata";
+import {DbData} from "../model/data";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const GeoJsonValidator = require('geojson-validation');
 
-const hostname = process.env[ENV_HOSTNAME] as string;
-const apiKeyId = process.env[ENV_API_KEY] as string;
+const hostname = process.env.hostname as string;
+const apiKeyId = process.env.apiKeyId as string;
 
 const METADATA_URL = "/prod/api/counters/beta/metadata";
-const DATA_URL = "/prod/api/counters/beta/values"
+const DATA_URL = "/prod/api/counters/beta/values";
 const COUNTERS_URL = "/prod/api/counters/beta/counters";
 
 export const handler = async () => {
@@ -25,7 +25,7 @@ export const handler = async () => {
 
     await checker.expect403WithoutApiKey(DATA_URL + "/4");
     await checker.expect404(DATA_URL + "/9999999");
-    await checker.expect200(DATA_URL + "/4", rc.checkJson((json: any[]) => {
+    await checker.expect200(DATA_URL + "/4", rc.checkJson((json: DbData[]) => {
         assert.ok(json.length > 10);
     }));
 
@@ -37,4 +37,4 @@ export const handler = async () => {
     }));
 
     return checker.done();
-}
+};

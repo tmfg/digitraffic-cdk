@@ -18,7 +18,7 @@ export function getLastUpdated(db: DTDatabase, datatype: DataType): Promise<Date
     }, (x: UpdatedTimestamp) => x?.updated || null);
 }
 
-export function updateLastUpdated(db: DTDatabase, datatype: DataType, updated: Date): Promise<null> {
+export function updateLastUpdated(db: DTDatabase | DTTransaction, datatype: DataType, updated: Date): Promise<null> {
     return db.none(`insert into data_updated(id, data_type, updated)
 values(nextval('seq_data_updated'), $(datatype), $(updated))
 on conflict (data_type)

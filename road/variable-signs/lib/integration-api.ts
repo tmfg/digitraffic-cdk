@@ -1,6 +1,5 @@
 import {LambdaIntegration, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
-import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";

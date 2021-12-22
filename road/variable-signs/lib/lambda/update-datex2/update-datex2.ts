@@ -1,5 +1,5 @@
 import {updateDatex2} from "../../service/variable-sign-updater";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
 import {GenericSecret} from "digitraffic-common/secrets/secret";
 
@@ -9,15 +9,15 @@ export type StatusCodeValue = {
     readonly statusCode: number;
 }
 
-export const handler = async (event: any) : Promise<StatusCodeValue> => {
+export const handler = async (event: Record<string, string>) : Promise<StatusCodeValue | void> => {
     return handlerFn(withDbSecret, event);
 };
 
-export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: GenericSecret) => Promise<StatusCodeValue>) => Promise<any>, event: any): Promise<StatusCodeValue> {
+export function handlerFn(withDbSecretFn: SecretFunction<GenericSecret, StatusCodeValue>, event: Record<string, string>): Promise<StatusCodeValue | void> {
     return withDbSecretFn(secretId, async () => {
         const datex2 = event.body;
 
-        if(datex2) {
+        if (datex2) {
             console.info('DEBUG ' + datex2);
 
             try {

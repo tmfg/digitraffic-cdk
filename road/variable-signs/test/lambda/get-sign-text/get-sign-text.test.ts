@@ -38,44 +38,44 @@ describe('text-converter-tests', () => {
         expectValue("[VARATIE_123]", ["BEGIN", "n1", "n2", "n3", "END"]);
         expectValue("VARATIE_123", ["BEGIN", "n1", "n2", "n3", "END"]);
         expectValue("varatie_123", ["BEGIN", "n1", "n2", "n3", "END"]);
-    })
+    });
 
     test('varareitti', () => {
         expectValue("[VARAREITTI_123]", ["BEGIN", "n1", "n2", "n3","END"]);
         expectValue("[varareitti_123]", ["BEGIN", "n1", "n2", "n3","END"]);
         expectValue("varareitti_123", ["BEGIN", "n1", "n2", "n3","END"]);
-    })
+    });
 
     test('ramppi_123', () => {
         expectValue("[RAMPPI_123]", ["RAMP", "n1", "n2", "n3", "END"]);
         expectValue("RAMPPI_123", ["RAMP", "n1", "n2", "n3", "END"]);
         expectValue("ramppi_123", ["RAMP", "n1", "n2", "n3", "END"]);
-    })
+    });
 
     test('single_ramppi', () => {
         expectValue("RAMPPI", ["RAMP"]);
-    })
+    });
 
     test('broken_texts', () => {
         expectError("[1VARAREITTI_123]");
         expectError("[VARAREITTI_VARAREITTI_123]");
         expectError("[VARAREITTI_VARATIE_123]");
-    })
+    });
 
-   test('single_harbour', () => {
-        expectValue("LAIVA_VASEN", ["HARBOUR"])
-        expectValue("LAIVA_OIKEA", ["HARBOUR"])
+    test('single_harbour', () => {
+        expectValue("LAIVA_VASEN", ["HARBOUR"]);
+        expectValue("LAIVA_OIKEA", ["HARBOUR"]);
     });
 
     test('harbour_with_road', () => {
-       expectError("TIE_LAIVA_VASEN");
+        expectError("TIE_LAIVA_VASEN");
     });
 
     test('single_airport', () => {
-        expectValue("LENTOKONE_VASEN", ["AIRPORT"])
-        expectValue("LENTOKONE_OIKEA", ["AIRPORT"])
-        expectValue("LENTOKONE_ALAS", ["AIRPORT"])
-        expectValue("LENTOKONE_YLOS", ["AIRPORT"])
+        expectValue("LENTOKONE_VASEN", ["AIRPORT"]);
+        expectValue("LENTOKONE_OIKEA", ["AIRPORT"]);
+        expectValue("LENTOKONE_ALAS", ["AIRPORT"]);
+        expectValue("LENTOKONE_YLOS", ["AIRPORT"]);
     });
 
     test('nuoli', () => {
@@ -87,22 +87,22 @@ describe('text-converter-tests', () => {
     function expectValue(text: string, elements: string[] = []) {
         const svg = convertTextToSvg(text);
 
-        if(elements) expectElements(svg, elements);
+        if (elements) expectElements(svg, elements);
     }
 
     function expectError(text: string, errorText = "") {
         expect(() => convertTextToSvg(text)).toThrow(errorText);
-    }   
+    }
 
     function expectElements(svg: string, elements: string[]) {
         const usedSymbols = findUsedSymbols(svg);
 
-//        console.info("symbols " + usedSymbols);
-//        console.info("expected " + elements);
+        //        console.info("symbols " + usedSymbols);
+        //        console.info("expected " + elements);
 
         expect(usedSymbols.length).toEqual(elements.length);
 
-        for(let i = 0;i < elements.length;i++) {
+        for (let i = 0;i < elements.length;i++) {
             expect(usedSymbols[i]).toEqual(elements[i]);
         }
     }
@@ -111,10 +111,10 @@ describe('text-converter-tests', () => {
         const lines = svg.split('\n').filter(l => l.startsWith("<use href"));
 
         return lines.map(l => {
-           const i1 = l.indexOf("\"");
-           const i2 = l.indexOf("\"", i1+1);
+            const i1 = l.indexOf("\"");
+            const i2 = l.indexOf("\"", i1+1);
 
-           return l.substring(i1 + 2, i2);
+            return l.substring(i1 + 2, i2);
         });
     }
-}); 
+});

@@ -4,12 +4,12 @@ import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
 
 const secretId = process.env[SECRET_ID_KEY] as string;
 
-export const handler = async (): Promise<any> => {
+export const handler = async () => {
     const start = Date.now();
 
     try {
-        return await withDbSecret(secretId, async () => {
-            return await findActiveSignsDatex2();
+        return await withDbSecret(secretId, () => {
+            return findActiveSignsDatex2();
         });
     } finally {
         console.info("method=findActiveSignsDatex2 tookMs=%d", (Date.now()-start));

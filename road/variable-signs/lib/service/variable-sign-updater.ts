@@ -1,7 +1,6 @@
 import * as DeviceDB from "../db/datex2";
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
-import {inDatabase} from "digitraffic-common/postgres/database";
-import {IDatabase} from "pg-promise";
+import {DTDatabase, DTTransaction, inDatabase} from "digitraffic-common/postgres/database";
 import {StatusCodeValue} from "../lambda/update-datex2/update-datex2";
 
 const REG_PAYLOAD = /<payloadPublication/g;
@@ -23,20 +22,20 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
     const start = Date.now();
     const timestamp = new Date(start);
 
-    if(!validate(datex2)) {
-        return {statusCode: 400}
+    if (!validate(datex2)) {
+        return {statusCode: 400};
     }
 
     const situations = parseSituations(datex2);
 
     try {
-        await inDatabase(async (db: IDatabase<any, any>) => {
-            return db.tx((tx: any) => {
+        await inDatabase((db: DTDatabase) => {
+            return db.tx((tx: DTTransaction) => {
                 return tx.batch([
                     ...DeviceDB.saveDatex2(tx, situations, timestamp),
-                    LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp)
+                    LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp),
                 ]);
-            })
+            });
         });
 
         return {statusCode: 200};
@@ -61,7 +60,7 @@ export function parseSituations(datex2: string): Situation[] {
 
             situations.push(parseSituation(datex2.substr(sitIndex, sitEndIndex - sitIndex + DATEX2_SITUATION_TAG_END.length)));
         }
-    } while(sitIndex !== -1)
+    } while (sitIndex !== -1);
 
     return situations;
 }
@@ -70,8 +69,8 @@ function parseSituation(datex2: string): Situation {
     return {
         id: parseId(datex2),
         datex2: datex2,
-        effect_date: parseEffectDate(datex2)
-    }
+        effect_date: parseEffectDate(datex2),
+    };
 }
 
 function parseId(datex2: string): string {
@@ -88,13 +87,13 @@ function parseEffectDate(datex2: string): Date {
 }
 
 function validate(datex2: string): boolean {
-    if(!datex2.includes(XML_TAG_START)) {
-        console.error('no xml-tag')
+    if (!datex2.includes(XML_TAG_START)) {
+        console.error('no xml-tag');
         return false;
     }
 
     const ppCount = occurrences(datex2, REG_PAYLOAD);
-    if(ppCount !== 1) {
+    if (ppCount !== 1) {
         console.error('%d payloadPublications', ppCount);
         return false;
     }

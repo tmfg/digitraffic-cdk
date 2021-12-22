@@ -1,5 +1,4 @@
-import {findSymbol, InputSymbols, isValidSymbol, TextSymbol, SymbolType} from "./textSymbol";
-import {getSymbolType} from "./textSymbol";
+import {findSymbol, InputSymbols, isValidSymbol, TextSymbol, SymbolType, getSymbolType} from "./textSymbol";
 import {InputError} from "digitraffic-common/error/input-error";
 
 const MAX_LENGTH = 30;
@@ -39,7 +38,7 @@ function checkSize(text: string) {
 function checkUnderlines(text: string) {
     const count = text.split('_').length - 1;
 
-    if(count > 1) {
+    if (count > 1) {
         error(ERROR_ONE_UNDERSCORE);
     }
 }
@@ -52,18 +51,18 @@ function checkAndRemoveBrackets(text: string): string {
     const count1 = text.split('[').length - 1;
     const count2 = text.split(']').length - 1;
 
-    if(firstChar === '[') {
+    if (firstChar === '[') {
         // ok, last char must be ]
-        if(lastChar !== ']') {
+        if (lastChar !== ']') {
             error(ERROR_TEXT_SYNTAX);
-        } else if(count1 > 1 || count2 > 1) {
+        } else if (count1 > 1 || count2 > 1) {
             error(ERROR_TEXT_SYNTAX);
         }
 
         return text.substring(1, text.length - 1);
     }
 
-    if(count1 > 0 || count2 > 0) {
+    if (count1 > 0 || count2 > 0) {
         error(ERROR_TEXT_SYNTAX);
     }
 
@@ -99,7 +98,7 @@ function convertToSymbols(symbols: Symbols): TextSymbol[] {
     const symbolList = symbols.symbols.map(s => findSymbol(symbols.symbolType, s));
 
     // and end symbol, if first symbol is starting borders
-    if(symbolList[0].startsBorders()) {
+    if (symbolList[0].startsBorders()) {
         symbolList.push(findSymbol(symbols.symbolType, 'END'));
     }
 
@@ -112,21 +111,21 @@ function convertToSymbols(symbols: Symbols): TextSymbol[] {
 function findUsedSymbolTexts(text: string): Symbols {
     const singleSymbol = findSingleSymbol(text);
 
-    if(singleSymbol) {
+    if (singleSymbol) {
         return {
             symbolType: SymbolType.SINGLE,
-            symbols: [singleSymbol]
-        }
+            symbols: [singleSymbol],
+        };
     }
 
     let index = 0;
     const symbolList = [] as string[];
     let symbolType = SymbolType.NORMAL;
 
-    while(index < text.length) {
+    while (index < text.length) {
         const mark = text.indexOf('_', index);
         let symbol;
-        if(mark !== -1) {
+        if (mark !== -1) {
             const symbolText = text.substring(index, mark + 1);
             symbolType = getSymbolType(symbolText.toUpperCase());
             symbol = getSymbol(symbolText.toUpperCase());
@@ -138,10 +137,10 @@ function findUsedSymbolTexts(text: string): Symbols {
             index++;
         }
 
-        if(isValidSymbol(symbolType, symbol)) {
+        if (isValidSymbol(symbolType, symbol)) {
             symbolList.push(symbol);
         } else {
-            if(symbolType === SymbolType.NORMAL) {
+            if (symbolType === SymbolType.NORMAL) {
                 error(`${ERROR_INVALID_SYMBOL} ${symbol}`);
             }
             error(`${ERROR_INVALID_SYMBOL} ${symbol} for ${symbolType}`);
@@ -150,16 +149,16 @@ function findUsedSymbolTexts(text: string): Symbols {
 
     return {
         symbolType: symbolType,
-        symbols: symbolList
+        symbols: symbolList,
     };
 }
 
 const BEGIN_SYMBOLS = [InputSymbols.ROAD.toString(), InputSymbols.DETOUR.toString(), InputSymbols.DIVERSION.toString()];
 
 function getSymbol(text: string): string {
-    if(text === InputSymbols.RAMP) {
+    if (text === InputSymbols.RAMP) {
         return "RAMPPI_BEGIN";
-    } else if(BEGIN_SYMBOLS.includes(text)) {
+    } else if (BEGIN_SYMBOLS.includes(text)) {
         return "BEGIN";
     }
 

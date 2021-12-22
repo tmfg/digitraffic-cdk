@@ -47,23 +47,37 @@ const END = 'END';
 const BEGIN = 'BEGIN';
 
 // start/end symbols
-addEnd(END, 5, '<polygon points="4,31 0,31 0,29 2,29 2,3 0,3 0,1 4,1"/>', SymbolType.ROAD + END, SymbolType.ROAD);
-addEnd(END, 5, `<path d="M1,31H3V29H1ZM1,1V3H3V1ZM1,19H3V17H1Zm0,8H3V25H1Zm0-4H3V21H1Zm0-8H3V13H1ZM1,7H3V5H1Zm0,4H3V9H1Z"/>`, SymbolType.DIVERSION + END, SymbolType.DIVERSION);
-addEnd(END, 5, `<polygon points="0 1 4 1 4 6.5 2 6.5 2 3 0 3 0 1"/>
+addEnd(
+    END, 5, '<polygon points="4,31 0,31 0,29 2,29 2,3 0,3 0,1 4,1"/>', SymbolType.ROAD + END, SymbolType.ROAD,
+);
+addEnd(
+    END, 5, `<path d="M1,31H3V29H1ZM1,1V3H3V1ZM1,19H3V17H1Zm0,8H3V25H1Zm0-4H3V21H1Zm0-8H3V13H1ZM1,7H3V5H1Zm0,4H3V9H1Z"/>`, SymbolType.DIVERSION + END, SymbolType.DIVERSION,
+);
+addEnd(
+    END, 5, `<polygon points="0 1 4 1 4 6.5 2 6.5 2 3 0 3 0 1"/>
 <path d="M2,9.682H4v4.227H2Zm0,8.409H4v4.227H2Z"/>
-<polygon points="2 25.5 4 25.5 4 31 0 31 0 29 2 29 2 25.5"/>`, SymbolType.DETOUR + END, SymbolType.DETOUR);
+<polygon points="2 25.5 4 25.5 4 31 0 31 0 29 2 29 2 25.5"/>`, SymbolType.DETOUR + END, SymbolType.DETOUR,
+);
 
-addEnd(BEGIN, 5, `<polygon points="5,31 1,31 1,1 5,1 5,3 3,3 3,29 5,29 "/>`, SymbolType.ROAD + BEGIN, SymbolType.ROAD);
-addEnd(BEGIN, 5, `<path d="M2,31H4V29H2ZM2,1V3H4V1ZM2,19H4V17H2Zm0,8H4V25H2Zm0-4H4V21H2Zm0-8H4V13H2ZM2,7H4V5H2Zm0,4H4V9H2Z"/>`, SymbolType.DIVERSION + BEGIN, SymbolType.DIVERSION);
-addEnd(BEGIN, 5, `<polygon points="5 31 1 31 1 25.5 3 25.5 3 29 5 29 5 31"/>
+addEnd(
+    BEGIN, 5, `<polygon points="5,31 1,31 1,1 5,1 5,3 3,3 3,29 5,29 "/>`, SymbolType.ROAD + BEGIN, SymbolType.ROAD,
+);
+addEnd(
+    BEGIN, 5, `<path d="M2,31H4V29H2ZM2,1V3H4V1ZM2,19H4V17H2Zm0,8H4V25H2Zm0-4H4V21H2Zm0-8H4V13H2ZM2,7H4V5H2Zm0,4H4V9H2Z"/>`, SymbolType.DIVERSION + BEGIN, SymbolType.DIVERSION,
+);
+addEnd(
+    BEGIN, 5, `<polygon points="5 31 1 31 1 25.5 3 25.5 3 29 5 29 5 31"/>
 <path d="M3,22.318H1V18.091H3Zm0-8.409H1V9.682H3Z"/>
-<polygon points="3 6.5 1 6.5 1 1 5 1 5 3 3 3 3 6.5"/>`, SymbolType.DETOUR + BEGIN, SymbolType.DETOUR)
+<polygon points="3 6.5 1 6.5 1 1 5 1 5 3 3 3 3 6.5"/>`, SymbolType.DETOUR + BEGIN, SymbolType.DETOUR,
+);
 
-addEnd('RAMP', 30, `<polygon points="5.1,26 11.7,26 13.4,6 10.7,6"/>
+addEnd(
+    'RAMP', 30, `<polygon points="5.1,26 11.7,26 13.4,6 10.7,6"/>
 <polygon points="23.1,26 16.4,26 14.8,6 17.4,6"/>
 <polygon points="27.8,11.8 22,6 27.8,6"/>
 <path d="M16.2,21.2c0-5.2,1.8-8.6,4.5-10.6l5-3.7L26.9,8l-3.8,4.5c-1.4,1.8-2.3,4.3-1.6,8L16.2,21.2z"/>
-<polygon points="30,31 1,31 1,1 30,1 30,3 3,3 3,29 30,29"/>`, SymbolType.ROAD + InputSymbols.RAMP + BEGIN, SymbolType.ROAD);
+<polygon points="30,31 1,31 1,1 30,1 30,3 3,3 3,29 30,29"/>`, SymbolType.ROAD + InputSymbols.RAMP + BEGIN, SymbolType.ROAD,
+);
 
 // numbers
 addSymbol('n1', 16, `<path d="M11.3,25.4H7.4V14.7l0-1.8L7.5,11c-0.7,0.7-1.1,1.1-1.4,1.3L4,14l-1.9-2.4l6-4.8h3.2V25.4z"/>`, '1');
@@ -92,7 +106,7 @@ addSymbol('n8', 16, `<path d="M8,6.6c1.8,0,3.2,0.4,4.3,1.2c1.1,0.8,1.6,1.9,1.6,3
 \t\tc0-1.1,0.3-2,0.8-2.8c0.6-0.8,1.5-1.5,2.7-2.2c-1.1-0.7-1.8-1.4-2.3-2.1S2.1,12,2.1,11.1c0-1.3,0.5-2.4,1.7-3.2S6.2,6.6,8,6.6z
 \t\t M5.1,20.5c0,0.7,0.3,1.3,0.8,1.7s1.2,0.6,2.1,0.6c1,0,1.7-0.2,2.2-0.6c0.5-0.4,0.7-1,0.7-1.7c0-0.6-0.2-1.1-0.7-1.6
 \t\tc-0.5-0.5-1.3-1-2.3-1.6C6,18.2,5.1,19.2,5.1,20.5z M8,9.5c-0.7,0-1.2,0.2-1.6,0.5c-0.4,0.3-0.6,0.8-0.6,1.4c0,0.5,0.2,1,0.5,1.4
-\t\tC6.6,13.2,7.2,13.6,8,14c0.8-0.4,1.4-0.8,1.7-1.2s0.5-0.9,0.5-1.4c0-0.6-0.2-1-0.6-1.4S8.7,9.5,8,9.5z"/>`,'8')
+\t\tC6.6,13.2,7.2,13.6,8,14c0.8-0.4,1.4-0.8,1.7-1.2s0.5-0.9,0.5-1.4c0-0.6-0.2-1-0.6-1.4S8.7,9.5,8,9.5z"/>`,'8');
 addSymbol('n9', 16, `<path d="M14.5,14.8c0,3.7-0.8,6.4-2.3,8.2s-3.9,2.7-7,2.7c-1.1,0-1.9-0.1-2.5-0.2v-3.1c0.7,0.2,1.5,0.3,2.2,0.3
 \t\tc1.3,0,2.4-0.2,3.2-0.6c0.8-0.4,1.5-1,1.9-1.8c0.4-0.8,0.7-2,0.8-3.4h-0.2c-0.5,0.8-1.1,1.4-1.7,1.7S7.6,19,6.6,19
 \t\tc-1.6,0-2.9-0.5-3.8-1.6c-0.9-1-1.4-2.5-1.4-4.3c0-2,0.6-3.6,1.7-4.7c1.1-1.2,2.7-1.7,4.6-1.7c1.4,0,2.6,0.3,3.6,1
@@ -176,7 +190,7 @@ addSingle('ARROW_BOTTOM_RIGHT', 32, `<rect x="4.9" y="11.9" transform="matrix(0.
    <polygon points="24.5,16 24.5,24.5 16,24.5"/>`, 'NUOLI_OIKEAALAS');
 
 export function getSymbolType(first: string): SymbolType {
-    switch(first) {
+    switch (first) {
         case InputSymbols.ROAD:
             return SymbolType.ROAD;
         case InputSymbols.DETOUR:
@@ -218,7 +232,9 @@ function addSingle(name: string, width: number, svg: string, id: string = name) 
     SYMBOL_CACHE[SymbolType.SINGLE + id] = new TextSymbol(width, svg, name, SymbolType.SINGLE);
 }
 
-function addEnd(name: string, width: number, svg: string, id: string, symbolType: SymbolType) {
+function addEnd(
+    name: string, width: number, svg: string, id: string, symbolType: SymbolType,
+) {
     SYMBOL_CACHE[id] = new TextSymbol(width, svg, name, symbolType);
 }
 

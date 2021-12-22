@@ -1,7 +1,6 @@
-import {inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
+import {DTDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
 import * as DatexDB from "../db/datex2";
-import {IDatabase} from "pg-promise";
 
 const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <d2LogicalModel modelBaseVersion="2"
@@ -24,8 +23,8 @@ const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 </d2LogicalModel>
 `;
 
-export async function findActiveSignsDatex2(): Promise<any> {
-    return inDatabaseReadonly(async (db: IDatabase<any,any>) => {
+export function findActiveSignsDatex2() {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         const datex2: string[] = (await DatexDB.findAll(db)).map(d => d.datex2);
         const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.VS_DATEX2);
         const body = createResponse(datex2, lastUpdated);

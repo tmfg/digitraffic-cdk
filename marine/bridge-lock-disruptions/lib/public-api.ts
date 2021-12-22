@@ -1,4 +1,4 @@
-import {EndpointType, MethodLoggingLevel, RequestValidator, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {EndpointType, IModel, MethodLoggingLevel, RequestValidator, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {Construct} from "constructs";
@@ -35,7 +35,7 @@ export function create(secret: ISecret,
 
 function createDisruptionsResource(
     publicApi: RestApi,
-    disruptionsJsonModel: any,
+    disruptionsJsonModel: IModel,
     validator: RequestValidator,
     secret: ISecret,
     stack: DigitrafficStack,
