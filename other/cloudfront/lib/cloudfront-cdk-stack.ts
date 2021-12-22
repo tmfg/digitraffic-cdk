@@ -17,6 +17,10 @@ type ViewerPolicyMap = {
     [key: string]: string,
 };
 
+type MutablePolicy = {
+    viewerProtocolPolicy: string
+}
+
 export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
@@ -81,7 +85,7 @@ export class CloudfrontCdkStack extends Stack {
 
             if (lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
                 lambdaMap[LambdaType.WEATHERCAM_REDIRECT] =
-                    createWeathercamRedirect(this, edgeLambdaRole, lProps.lambdaParameters.weathercamDomainName, lProps.lambdaParameters.weathercamHostName);
+                    createWeathercamRedirect(this, edgeLambdaRole, lProps.lambdaParameters!.weathercamDomainName!, lProps.lambdaParameters!.weathercamHostName!);
             }
 
             if (lProps.lambdaTypes.includes(LambdaType.GZIP_REQUIREMENT)) {
@@ -137,11 +141,11 @@ export class CloudfrontCdkStack extends Stack {
         return distribution;
     }
 
-    setViewerPolicy(behavior: CfnDistribution.CacheBehaviorProperty, viewerPolicies: ViewerPolicyMap, pathPattern: string) {
-        const policy = viewerPolicies[pathPattern];
+    setViewerPolicy(behavior: CfnDistribution.CacheBehaviorProperty, viewerPolicyMap: ViewerPolicyMap, pathPattern: string) {
+        const viewerProtocolPolicy = viewerPolicyMap[pathPattern];
 
-        if (policy) {
-            (behavior as any).viewerProtocolPolicy = policy;
+        if (viewerProtocolPolicy) {
+            (behavior as MutablePolicy).viewerProtocolPolicy = viewerProtocolPolicy;
         }
     }
 

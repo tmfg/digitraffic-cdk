@@ -1,4 +1,4 @@
-import { Context, KinesisStreamEvent, KinesisStreamRecord } from 'aws-lambda';
+import { KinesisStreamEvent, KinesisStreamRecord } from 'aws-lambda';
 import {findHeaderValue} from "./logging-util";
 
 import * as AWSx from "aws-sdk";
@@ -12,12 +12,12 @@ const env = appDomain.split('-')[1];
 
 const elasticDomain = process.env.ELASTIC_DOMAIN as string;
 const endpoint = new AWS.Endpoint(elasticDomain);
-const creds = new AWS.EnvironmentCredentials("AWS")
+const creds = new AWS.EnvironmentCredentials("AWS");
 
 const COMPRESS_OPTIONS = {
     level: 8,
     memLevel: 9,
-    chunkSize: 1024*16*1024
+    chunkSize: 1024*16*1024,
 };
 
 // fields contains all the selected log fields in the order specified in loggint-utils.ts CLOUDFRONT_STREAMING_LOG_FIELDS
@@ -68,8 +68,8 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
             upstream_response_time: +timeToFirstByte,
             http_digitraffic_user: digitrafficUser,
             accept_encoding: acceptEncoding,
-            http_x_forwarded_proto: xForwardedProto
-        }
+            http_x_forwarded_proto: xForwardedProto,
+        },
     };
 }
 
@@ -77,7 +77,7 @@ async function transformRecord(record: KinesisStreamRecord): Promise<any> {
     const buffer = Buffer.from(record.kinesis.data, 'base64');
     const cloudfrontRealtimeLogData: string = buffer.toString('utf8');
 
-//    console.log('line: ' + cloudfrontRealtimeLogData);
+    //    console.log('line: ' + cloudfrontRealtimeLogData);
 
     const logLineData = cloudfrontRealtimeLogData.trim().split('\t');
 
@@ -92,34 +92,33 @@ function createIndexName(): string {
     return `dt-nginx-${year}.${month}`;
 }
 
-export const handler = async (event: KinesisStreamEvent, context: Context, callback: any) => {
+export const handler = async (event: KinesisStreamEvent) => {
     try {
         const action = { index: { _index: createIndexName(), _type: '_doc' } } as any;
 
-//        console.log('using action ' + JSON.stringify(action));
+        //        console.log('using action ' + JSON.stringify(action));
 
-        const recordTransformPromises = event.Records.map(
-            async (record: KinesisStreamRecord) => transformRecord(record));
+        const recordTransformPromises = event.Records.map(async (record: KinesisStreamRecord) => transformRecord(record));
 
         const data = await Promise.all(recordTransformPromises);
         const returnValue = await sendMessageToEs(createBulkMessage(action, data));
 
-        if(returnValue.length < 200) {
+        if (returnValue.length < 200) {
             console.log("return value " + returnValue);
         }
     } catch (e) {
         console.log('exception: ' + e);
         throw e;
     }
-}
+};
 
 function createBulkMessage(action: any, lines: any[]): string {
     let message = "";
-    
+
     lines.forEach(line => {
         message+= JSON.stringify(action) + '\n';
         message+= JSON.stringify(line) + '\n';
-    })
+    });
 
     message += '\n';
 
@@ -133,7 +132,7 @@ function sendMessageToEs(message: string): Promise<any> {
     request.path = "/_bulk";
     request.region = "eu-west-1";
     request.headers["presigned-expires"] = false;
-    request.headers["Host"] = endpoint.host;
+    request.headers.Host = endpoint.host;
     request.body = zlib.gzipSync(message, COMPRESS_OPTIONS);
     request.headers["Content-Type"] = "application/x-ndjson";
     request.headers["Content-Encoding"] = "gzip";
@@ -145,8 +144,7 @@ function sendMessageToEs(message: string): Promise<any> {
 
     const client = new AWS.NodeHttpClient();
     return new Promise((resolve, reject) => {
-        client.handleRequest(
-            request,
+        client.handleRequest(request,
             null,
             function(httpResp: any) {
                 let respBody = "";

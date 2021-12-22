@@ -22,7 +22,7 @@ exports.handler = function handler(event: any, context: any, callback: any) {
     const { request } = event.Records[0].cf;
     const { querystring } = request;
 
-    if(querystring.length > 0) {
+    if (querystring.length > 0) {
         request.origin = {
             custom: {
                 domainName: domainName,
@@ -32,10 +32,11 @@ exports.handler = function handler(event: any, context: any, callback: any) {
                 sslProtocols: sslProtocols,
                 readTimeout: 5,
                 keepaliveTimeout: 5,
-                customHeaders: {}
-            }
+                customHeaders: {},
+            },
         };
-        request.headers['host'] = hostHeader;
+
+        request.headers.host = hostHeader;
     }
 
     // If nothing matches, return request unchanged

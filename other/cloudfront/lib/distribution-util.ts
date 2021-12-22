@@ -1,13 +1,10 @@
 import {CloudFrontWebDistribution, SourceConfiguration} from 'aws-cdk-lib/aws-cloudfront';
-import {Stack, CfnResource} from 'aws-cdk-lib';
-import {BlockPublicAccess, Bucket} from 'aws-cdk-lib/aws-s3';
-import {LambdaDestination} from 'aws-cdk-lib/aws-s3-notifications';
+import {CfnResource, Stack} from 'aws-cdk-lib';
 import {Role} from 'aws-cdk-lib/aws-iam';
 import {CfnWebACL} from 'aws-cdk-lib/aws-wafv2';
 import {ViewerCertificate} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
 import {createViewerCertificate} from "digitraffic-common/stack/alias-configs";
-import {createWriteToEsLambda} from "./lambda/lambda-creator";
 import {createWebAcl} from "./acl/acl-creator";
 import {CFProps, Props} from './app-props';
 import {StreamingConfig} from "./streaming-util";
@@ -31,14 +28,8 @@ export function createDistribution(
     const webAcl = doCreateWebAcl(stack, distributionProps);
     const viewerCertificate = distributionProps.acmCertRef == null ? undefined: createViewerCertificate(distributionProps.acmCertRef as string, distributionProps.aliasNames as string[]);
 
-    if (cloudfrontProps.elasticProps.streamingProps) {
-        return createDistributionWithStreamingLogging(
-            stack, distributionProps, originConfigs, viewerCertificate, role, webAcl, streamingConfig,
-        );
-    }
-
-    return createDistributionWithS3Logging(
-        stack, distributionProps, originConfigs, viewerCertificate, role, cloudfrontProps, webAcl,
+    return createDistributionWithStreamingLogging(
+        stack, distributionProps, originConfigs, viewerCertificate, role, webAcl, streamingConfig,
     );
 }
 
@@ -76,40 +67,4 @@ function addRealtimeLogging(
     }
 
     distributionCf.addPropertyOverride('DistributionConfig.DefaultCacheBehavior.RealtimeLogConfigArn', streamingConfig.loggingConfig.ref);
-}
-
-function createDistributionWithS3Logging(
-    stack: Stack,
-    distributionProps: Props,
-    originConfigs: SourceConfiguration[],
-    viewerCertificate: ViewerCertificate | undefined,
-    role: Role,
-    cloudfrontProps: CFProps,
-    webAcl: CfnWebACL | null,
-): CloudFrontWebDistribution {
-    const env = distributionProps.environmentName;
-
-    const bucket = new Bucket(stack, `${env}-CF-logBucket`, {
-        versioned: false,
-        bucketName: `${env}-cf-logs`,
-        publicReadAccess: false,
-        blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-    });
-
-    const lambda = createWriteToEsLambda(
-        stack, env, role, cloudfrontProps.elasticProps.elasticDomain, cloudfrontProps.elasticAppName,
-    );
-
-    bucket.addObjectCreatedNotification(new LambdaDestination(lambda));
-    bucket.grantRead(lambda);
-
-    return new CloudFrontWebDistribution(stack, distributionProps.distributionName, {
-        originConfigs,
-        viewerCertificate,
-        loggingConfig: {
-            bucket: bucket,
-            prefix: 'logs',
-        },
-        webACLId: webAcl?.attrArn,
-    });
 }

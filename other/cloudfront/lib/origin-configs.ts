@@ -10,6 +10,7 @@ import {
 import {Bucket} from 'aws-cdk-lib/aws-s3';
 import {Version} from "aws-cdk-lib/aws-lambda";
 import {CFBehavior, CFDomain} from "./app-props";
+import {CfnDistribution} from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
 
 export type LambdaMap = Record<string, Version>;
 
@@ -66,24 +67,24 @@ function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: Lambd
     return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
-function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, defaultBehavior = false): Behavior {
+function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDefaultBehavior = false): Behavior {
 //    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
 
     const forwardedValues = {
         headers: [] as string[],
         queryString: true,
         queryStringCacheKeys: b.queryCacheKeys as string[],
-    } as any;
+    } as CfnDistribution.ForwardedValuesProperty;
 
     if (b.viewerProtocolPolicy === 'https-only') {
-        forwardedValues.headers.push('Host');
+        (forwardedValues.headers as string[]).push('Host');
     }
     if (b.cacheHeaders != null) {
-        (forwardedValues as any).headers = forwardedValues.headers.concat(b.cacheHeaders);
+        (forwardedValues.headers as string[]).push(...b.cacheHeaders);
     }
 
     return {
-        isDefaultBehavior: defaultBehavior,
+        isDefaultBehavior,
         allowedMethods: b.allowedMethods ?? CloudFrontAllowedMethods.GET_HEAD,
         pathPattern: b.path,
         minTtl: Duration.seconds(0),

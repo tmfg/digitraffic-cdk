@@ -15,7 +15,7 @@ const FORBIDDEN = {
 exports.handler = function handler(event: any, context: any, callback: any) {
     const request = event.Records[0].cf.request;
 
-    if(ALLOWED_IPS.indexOf(request.clientIp) === -1) {
+    if (ALLOWED_IPS.indexOf(request.clientIp) === -1) {
         callback(null, FORBIDDEN);
     }
 

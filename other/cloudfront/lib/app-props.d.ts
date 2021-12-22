@@ -3,13 +3,13 @@ import {LambdaEdgeEventType} from "aws-cdk-lib/aws-cloudfront";
 import {WafRules} from "./acl/waf-rules";
 import {CloudFrontAllowedMethods} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
-export interface CFBehaviorLambda {
+export type CFBehaviorLambda = {
     lambdaType: LambdaType,
     eventType: LambdaEdgeEventType,
     lambdaParameter?: Record<string, string>
 }
 
-export interface CFBehavior {
+export type CFBehavior = {
     path: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
@@ -20,7 +20,7 @@ export interface CFBehavior {
     ipRestriction?: string
 }
 
-export interface CFDomain {
+export type CFDomain = {
     s3BucketName?: string,
     domainName?: string,
     originPath?: string,
@@ -31,7 +31,7 @@ export interface CFDomain {
     behaviors: CFBehavior[]
 }
 
-export interface Props {
+export type Props = {
     originAccessIdentity?: boolean,
     distributionName: string,
     environmentName: string,
@@ -41,26 +41,34 @@ export interface Props {
     domains: CFDomain[]
 }
 
-export interface ElasticProps {
+export type ElasticProps = {
     streamingProps: StreamingLogProps,
     elasticDomain: string,
     elasticArn: string,
 }
 
-export interface StreamingLogProps {
+export type StreamingLogProps = {
     memorySize?: number,
     batchSize?: number,
     maxBatchingWindow?: number
 }
 
-export interface CFProps {
+export type CFProps = {
     elasticProps: ElasticProps,
     elasticAppName: string,
     props: Props[],
     lambdaProps?: CFLambdaProps,
 }
 
-export interface CFLambdaProps {
+export type CFLambdaParameters = {
+    weathercamDomainName?: string,
+    weathercamHostName?: string,
+    ipRestrictions?: {
+        [key: string]: string,
+    },
+}
+
+export type CFLambdaProps = {
     lambdaTypes: LambdaType[],
-    lambdaParameters?: any
+    lambdaParameters?: CFLambdaParameters
 }
