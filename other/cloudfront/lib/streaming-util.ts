@@ -9,7 +9,12 @@ import {KinesisEventSource} from 'aws-cdk-lib/aws-lambda-event-sources';
 import {CLOUDFRONT_STREAMING_LOG_FIELDS} from "./lambda/stream-to-elastic/logging-util";
 import {ElasticProps} from "./app-props";
 
-export function createRealtimeLogging(stack: Stack, writeToESRole: Role, appName: string, elasticProps: ElasticProps): any {
+export type StreamingConfig = {
+    kinesis: Stream,
+    loggingConfig: CfnRealtimeLogConfig,
+}
+
+export function createRealtimeLogging(stack: Stack, writeToESRole: Role, appName: string, elasticProps: ElasticProps): StreamingConfig {
     const kinesis = createKinesisStream(stack, appName);
     const kinesisWriteRole = createRealtimeLoggingRole(stack, appName, kinesis);
     const loggingConfig = createLoggingConfig(stack, appName, kinesis, kinesisWriteRole);
@@ -58,7 +63,7 @@ function createKinesisStream(stack: Stack, appName: string): Stream {
     });
 }
 
-function createLoggingConfig(stack: Stack, appName: string, kinesis: Stream, role: Role): any {
+function createLoggingConfig(stack: Stack, appName: string, kinesis: Stream, role: Role): CfnRealtimeLogConfig {
     return new CfnRealtimeLogConfig(stack, `RealtimeLogConfig-${appName}`, {
         endPoints: [
             {

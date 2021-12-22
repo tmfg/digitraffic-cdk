@@ -2,8 +2,8 @@ import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront'
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
 import {Stack, StackProps} from "aws-cdk-lib";
-import {createOriginConfig} from "./origin-configs";
-import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from '../lib/app-props';
+import {createOriginConfig, LambdaMap} from "./origin-configs";
+import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
 import {
     createGzipRequirement,
     createHttpHeaders, createIpRestriction,
@@ -11,7 +11,11 @@ import {
     LambdaType,
 } from "./lambda/lambda-creator";
 import {createDistribution} from "./distribution-util";
-import {createRealtimeLogging} from "./streaming-util";
+import {createRealtimeLogging, StreamingConfig} from "./streaming-util";
+
+type ViewerPolicyMap = {
+    [key: string]: string,
+};
 
 export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
@@ -19,9 +23,7 @@ export class CloudfrontCdkStack extends Stack {
 
         const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
-        const streamingConfig = cloudfrontProps.elasticProps.streamingProps
-            ? createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps)
-            : null;
+        const streamingConfig = createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps);
 
         cloudfrontProps.props.forEach(p => this.createDistribution(
             p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps,
@@ -65,8 +67,8 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaRole;
     }
 
-    createLambdaMap(lProps: CFLambdaProps | undefined): any {
-        const lambdaMap: any = {};
+    createLambdaMap(lProps: CFLambdaProps | undefined): LambdaMap {
+        const lambdaMap: LambdaMap = {};
 
         if (lProps !== undefined) {
             const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
@@ -106,7 +108,7 @@ export class CloudfrontCdkStack extends Stack {
     }
 
     createDistribution(
-        distributionProps: Props, role: Role, lambdaMap: any, streamingConfig: any, cloudfrontProps: CFProps,
+        distributionProps: Props, role: Role, lambdaMap: LambdaMap, streamingConfig: StreamingConfig, cloudfrontProps: CFProps,
     ) {
         const oai = distributionProps.originAccessIdentity ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`) : null;
         const originConfigs = distributionProps.domains.map(d => createOriginConfig(this, d, oai, lambdaMap));
@@ -129,13 +131,13 @@ export class CloudfrontCdkStack extends Stack {
             });
 
             // and the default behavior
-            this.setViewerPolicy(distributionConfig.defaultCacheBehavior, viewerPolicies, '*');
+            this.setViewerPolicy(distributionConfig.defaultCacheBehavior as CfnDistribution.CacheBehaviorProperty, viewerPolicies, '*');
         }
 
         return distribution;
     }
 
-    setViewerPolicy(behavior: any, viewerPolicies: any, pathPattern: string) {
+    setViewerPolicy(behavior: CfnDistribution.CacheBehaviorProperty, viewerPolicies: ViewerPolicyMap, pathPattern: string) {
         const policy = viewerPolicies[pathPattern];
 
         if (policy) {
@@ -143,8 +145,8 @@ export class CloudfrontCdkStack extends Stack {
         }
     }
 
-    getViewerPolicies(domains: CFDomain[]) {
-        const policyMap: any = {};
+    getViewerPolicies(domains: CFDomain[]): ViewerPolicyMap {
+        const policyMap: ViewerPolicyMap = {};
 
         domains.forEach(d => {
             d.behaviors?.forEach(b => {

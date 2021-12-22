@@ -1,5 +1,5 @@
 import {CfnWebACL} from 'aws-cdk-lib/aws-wafv2';
-import {Stack} from 'aws-cdk-lib';
+import {IResolvable, Stack} from 'aws-cdk-lib';
 import {WafRules} from "./waf-rules";
 
 const RESPONSEKEY_WITH_DIGITRAFFIC_USER = 'DT_429_KEY_WITH_HEADER';
@@ -23,7 +23,12 @@ const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
     },
 };
 
-function createRuleProperty(name: string, priority: number, rule: any, overrideAction = true): CfnWebACL.RuleProperty {
+type RuleProperty = {
+    action?: CfnWebACL.RuleActionProperty,
+    statement: CfnWebACL.StatementProperty,
+}
+
+function createRuleProperty(name: string, priority: number, rule: RuleProperty, overrideAction = true): CfnWebACL.RuleProperty {
     return {...{
         name,
         priority,
@@ -35,8 +40,12 @@ function createRuleProperty(name: string, priority: number, rule: any, overrideA
     }, ...rule, ...(overrideAction ? {overrideAction: {none: {}}} : {})};
 }
 
-function createCustomResponseBodies(rules: WafRules): any {
-    const customResponseBodies: any = {};
+type CustomResponseBodies = {
+    [key: string]: (CfnWebACL.CustomResponseBodyProperty | IResolvable);
+};
+
+function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
+    const customResponseBodies: CustomResponseBodies = {};
 
     if (rules.withHeaderLimit) {
         customResponseBodies[RESPONSEKEY_WITH_DIGITRAFFIC_USER] = {
@@ -165,14 +174,6 @@ function notStatement(statement: CfnWebACL.StatementProperty): CfnWebACL.Stateme
     return {
         notStatement: {
             statement,
-        },
-    };
-}
-
-function andStatements(...statements: CfnWebACL.StatementProperty[]): CfnWebACL.StatementProperty {
-    return {
-        andStatement: {
-            statements,
         },
     };
 }

@@ -17,17 +17,17 @@ exports.handler = function handler(event: any, context: any, callback: any) {
             headers: {
                 'access-control-max-age': [{
                     key: 'access-control-max-age',
-                    value: '86400'
-                }]
-            }
+                    value: '86400',
+                }],
+            },
         };
         addCorsHeaders(response);
         callback(null, response);
-    } else if(!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {
+    } else if (!isAcceptGzipHeaderPresent(request) && isGetRequest(request)) {
         const response = {
             status: 406,
             statusDescription: "Not Acceptable",
-            body: "Use of gzip compression is required with Accept-Encoding: gzip header."
+            body: "Use of gzip compression is required with Accept-Encoding: gzip header.",
         };
 
         callback(null, response);

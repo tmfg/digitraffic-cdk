@@ -7,13 +7,16 @@ import {
     CloudFrontAllowedMethods,
     LambdaEdgeEventType,
 } from 'aws-cdk-lib/aws-cloudfront';
-import {CFBehavior, CFDomain} from "../../cloudfront/lib/app-props";
 import {Bucket} from 'aws-cdk-lib/aws-s3';
+import {Version} from "aws-cdk-lib/aws-lambda";
+import {CFBehavior, CFDomain} from "./app-props";
+
+export type LambdaMap = Record<string, Version>;
 
 export function createOriginConfig(stack: Stack,
     domain: CFDomain,
     oai: OriginAccessIdentity|null,
-    lambdaMap: any)
+    lambdaMap: LambdaMap)
     : SourceConfiguration {
     if (domain.s3BucketName) {
         if (!oai) {
@@ -59,11 +62,11 @@ function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
     return {};
 }
 
-function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: any): Behavior[] {
+function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: LambdaMap): Behavior[] {
     return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
-function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBehavior = false): Behavior {
+function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, defaultBehavior = false): Behavior {
 //    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
 
     const forwardedValues = {
@@ -91,7 +94,7 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: any, defaultBeha
     };
 }
 
-function getLambdas(b: CFBehavior, lambdaMap: any) {
+function getLambdas(b: CFBehavior, lambdaMap: LambdaMap) {
     const lambdas = b.lambdas?.map(l => ({
         eventType: l.eventType,
         lambdaFunction: lambdaMap[l.lambdaType],

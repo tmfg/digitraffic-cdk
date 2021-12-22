@@ -1,4 +1,4 @@
-import {CloudFrontWebDistribution} from 'aws-cdk-lib/aws-cloudfront';
+import {CloudFrontWebDistribution, SourceConfiguration} from 'aws-cdk-lib/aws-cloudfront';
 import {Stack, CfnResource} from 'aws-cdk-lib';
 import {BlockPublicAccess, Bucket} from 'aws-cdk-lib/aws-s3';
 import {LambdaDestination} from 'aws-cdk-lib/aws-s3-notifications';
@@ -10,6 +10,7 @@ import {createViewerCertificate} from "digitraffic-common/stack/alias-configs";
 import {createWriteToEsLambda} from "./lambda/lambda-creator";
 import {createWebAcl} from "./acl/acl-creator";
 import {CFProps, Props} from './app-props';
+import {StreamingConfig} from "./streaming-util";
 
 function doCreateWebAcl(stack: Stack, props: Props): CfnWebACL | null {
     if (props.aclRules) {
@@ -22,10 +23,10 @@ function doCreateWebAcl(stack: Stack, props: Props): CfnWebACL | null {
 export function createDistribution(
     stack: Stack,
     distributionProps: Props,
-    originConfigs: any[],
+    originConfigs: SourceConfiguration[],
     role: Role,
     cloudfrontProps: CFProps,
-    streamingConfig: any,
+    streamingConfig: StreamingConfig,
 ): CloudFrontWebDistribution {
     const webAcl = doCreateWebAcl(stack, distributionProps);
     const viewerCertificate = distributionProps.acmCertRef == null ? undefined: createViewerCertificate(distributionProps.acmCertRef as string, distributionProps.aliasNames as string[]);
@@ -44,11 +45,11 @@ export function createDistribution(
 function createDistributionWithStreamingLogging(
     stack: Stack,
     distributionProps: Props,
-    originConfigs: any[],
+    originConfigs: SourceConfiguration[],
     viewerCertificate: ViewerCertificate | undefined,
     role: Role,
-    webAcl: any,
-    streamingConfig: any,
+    webAcl: CfnWebACL | null,
+    streamingConfig: StreamingConfig,
 ): CloudFrontWebDistribution {
     const env = distributionProps.environmentName;
 
@@ -66,7 +67,7 @@ function createDistributionWithStreamingLogging(
 }
 
 function addRealtimeLogging(
-    stack: Stack, distribution: CloudFrontWebDistribution, role:Role, env: string, streamingConfig: any, originCount: number,
+    stack: Stack, distribution: CloudFrontWebDistribution, role:Role, env: string, streamingConfig: StreamingConfig, originCount: number,
 ) {
     const distributionCf = distribution.node.defaultChild as CfnResource;
 
@@ -80,11 +81,11 @@ function addRealtimeLogging(
 function createDistributionWithS3Logging(
     stack: Stack,
     distributionProps: Props,
-    originConfigs: any[],
+    originConfigs: SourceConfiguration[],
     viewerCertificate: ViewerCertificate | undefined,
     role: Role,
     cloudfrontProps: CFProps,
-    webAcl: any,
+    webAcl: CfnWebACL | null,
 ): CloudFrontWebDistribution {
     const env = distributionProps.environmentName;
 

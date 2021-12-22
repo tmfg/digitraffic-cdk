@@ -1,18 +1,19 @@
 import {LambdaType} from "./lambda/lambda-creator";
 import {LambdaEdgeEventType} from "aws-cdk-lib/aws-cloudfront";
 import {WafRules} from "./acl/waf-rules";
+import {CloudFrontAllowedMethods} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
 export interface CFBehaviorLambda {
     lambdaType: LambdaType,
     eventType: LambdaEdgeEventType,
-    lambdaParameter?: any
+    lambdaParameter?: Record<string, string>
 }
 
 export interface CFBehavior {
     path: string,
     cacheTtl?: number,
     queryCacheKeys?: string[],
-    allowedMethods?: any,
+    allowedMethods?: CloudFrontAllowedMethods,
     viewerProtocolPolicy?: string,
     lambdas?: CFBehaviorLambda[],
     cacheHeaders?: string[],
@@ -41,7 +42,7 @@ export interface Props {
 }
 
 export interface ElasticProps {
-    streamingProps?: StreamingLogProps,
+    streamingProps: StreamingLogProps,
     elasticDomain: string,
     elasticArn: string,
 }

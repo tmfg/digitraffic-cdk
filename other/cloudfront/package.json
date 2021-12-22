@@ -22,15 +22,15 @@
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy"
   },
   "devDependencies": {
+    "aws-cdk-lib": "*",
     "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/node": "*",
     "@types/sinon": "^10.0.0",
     "aws-sdk": "*",
-    "esbuild": "^0.8.36",
+    "esbuild": "*",
     "parallelshell": "3.0.1",
     "sinon": "^11.1.2",
-    "ts-node": "^8.10.2",
     "typescript": "*"
   },
   "dependencies": {

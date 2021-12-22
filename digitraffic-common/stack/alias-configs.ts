@@ -5,6 +5,7 @@ export function createViewerCertificate(acmCertificateArn: string, aliases: stri
     return {
         props: {
             acmCertificateArn,
+            sslSupportMethod: 'sni-only',
             minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
         },
         aliases,
