@@ -1,8 +1,8 @@
 import {findActiveSignsDatex2} from "../../service/variable-signs";
-import {SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
 import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
-const secretId = process.env[SECRET_ID_KEY] as string;
+const secretId = process.env[SECRET_ID] as string;
 
 export const handler = async () => {
     const start = Date.now();

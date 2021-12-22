@@ -7,15 +7,12 @@ import {DbData} from "../model/data";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const GeoJsonValidator = require('geojson-validation');
 
-const hostname = process.env.hostname as string;
-const apiKeyId = process.env.apiKeyId as string;
-
 const METADATA_URL = "/prod/api/counters/beta/metadata";
 const DATA_URL = "/prod/api/counters/beta/values";
 const COUNTERS_URL = "/prod/api/counters/beta/counters";
 
 export const handler = async () => {
-    const checker = await UrlChecker.create(hostname, apiKeyId);
+    const checker = await UrlChecker.createV2();
     const rc = ResponseChecker.forJson();
 
     await checker.expect403WithoutApiKey(METADATA_URL);

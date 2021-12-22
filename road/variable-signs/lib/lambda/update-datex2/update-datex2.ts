@@ -1,9 +1,9 @@
 import {updateDatex2} from "../../service/variable-sign-updater";
 import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {SECRET_ID_KEY} from "digitraffic-common/stack/lambda-configs";
 import {GenericSecret} from "digitraffic-common/secrets/secret";
+import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
-const secretId = process.env[SECRET_ID_KEY] as string;
+const secretId = process.env[SECRET_ID] as string;
 
 export type StatusCodeValue = {
     readonly statusCode: number;

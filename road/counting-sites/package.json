@@ -28,7 +28,6 @@
     "parallelshell": "3.0.1",
     "sinon": "^11.1.2",
     "ts-jest": "^27.0.4",
-    "ts-node": "^8.10.2",
     "typescript": "*"
   },
   "dependencies": {
