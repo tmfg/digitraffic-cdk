@@ -61,7 +61,7 @@ export async function withDbSecret<Secret, Response>(secretId: string, fn: Secre
 
     if (!cachedSecret) {
         // if prefix is given, first set db values and then fetch secret
-        if(options?.prefix) {
+        if (options?.prefix) {
             // first set db values
             await withSecret(secretId, (fetchedSecret: DbSecret) => {
                 setDbSecret(fetchedSecret);

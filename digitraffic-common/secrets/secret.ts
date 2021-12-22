@@ -2,7 +2,7 @@ import {SecretsManager} from 'aws-sdk';
 import {SecretToPromiseFunction} from "./dbsecret";
 
 const smClient = new SecretsManager({
-    region: process.env.AWS_REGION
+    region: process.env.AWS_REGION,
 });
 
 export type GenericSecret = Record<string, string>;
@@ -13,7 +13,7 @@ export async function withSecret<Secret, Response>(secretId: string, fn: SecretT
 
 export async function getSecret<Secret>(secretId: string, prefix = ''): Promise<Secret> {
     const secretObj = await smClient.getSecretValue({
-        SecretId: secretId
+        SecretId: secretId,
     }).promise();
 
     if (!secretObj.SecretString) {
@@ -22,7 +22,7 @@ export async function getSecret<Secret>(secretId: string, prefix = ''): Promise<
 
     const secret = JSON.parse(secretObj.SecretString);
 
-    if(prefix === '') {
+    if (prefix === '') {
         return secret;
     }
 
@@ -33,8 +33,8 @@ function parseSecret<Secret>(secret: GenericSecret, prefix: string): Secret {
     const parsed: GenericSecret = {};
     const skip = prefix.length;
 
-    for(const key in secret) {
-        if(key.startsWith(prefix)) {
+    for (const key in secret) {
+        if (key.startsWith(prefix)) {
             parsed[key.substring(skip)] = secret[key] as string;
         }
     }

@@ -1,13 +1,11 @@
 import {Architecture, AssetCode, Code, FunctionProps, Runtime} from 'aws-cdk-lib/aws-lambda';
 import {Duration} from "aws-cdk-lib";
-import {ISecurityGroup, IVpc} from "aws-cdk-lib/aws-ec2";
+import {ISecurityGroup, IVpc, SubnetSelection} from "aws-cdk-lib/aws-ec2";
 import {RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {Role} from 'aws-cdk-lib/aws-iam';
 import {DigitrafficStack} from "./stack";
 import {LambdaEnvironment} from "../model/lambda-environment";
 import {MonitoredFunctionAlarmProps} from "../lambda/monitoredfunction";
-
-export const SECRET_ID_KEY = "SECRET_ID";
 
 export interface LambdaConfiguration {
     vpcId: string;
@@ -88,9 +86,9 @@ export function dbLambdaConfiguration(vpc: IVpc,
         handler: config.handler as string,
         timeout: Duration.seconds(config.timeout || props.defaultLambdaDurationSeconds || 60),
         environment: config.environment || {
-            DB_USER: props.dbProps?.username,
-            DB_PASS: props.dbProps?.password,
-            DB_URI: config.readOnly ? props.dbProps?.ro_uri : props.dbProps?.uri,
+            DB_USER: props.dbProps?.username as string,
+            DB_PASS: props.dbProps?.password as string,
+            DB_URI: (config.readOnly ? props.dbProps?.ro_uri : props.dbProps?.uri) as string,
         },
         logRetention: RetentionDays.ONE_YEAR,
         vpc: vpc,
@@ -133,11 +131,13 @@ export interface FunctionParameters {
     code?: Code;
     handler?: string;
     readOnly?: boolean;
-    environment?: any;
+    environment?: {
+        [key: string]: string;
+    };
     reservedConcurrentExecutions?: number;
     role?: Role;
     vpc?: IVpc;
-    vpcSubnets?: any;
+    vpcSubnets?: SubnetSelection;
     runtime?: Runtime;
     architecture?: Architecture;
     singleLambda?: boolean;
