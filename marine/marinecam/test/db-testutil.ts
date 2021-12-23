@@ -1,24 +1,20 @@
-import {IDatabase, ITask} from "pg-promise";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-export function inTransaction(db: IDatabase<unknown>, fn: (t: ITask<unknown>) => void) {
-    return async () => {
-        await db.tx(async (t: ITask<unknown>) => await fn(t));
-    };
+export function dbTestBase(fn: (db: DTDatabase) => void) {
+    return commonDbTestBase(
+        fn, truncate, 'marinecam', 'marinecam', 'localhost:54321/marine',
+    );
 }
 
-export function dbTestBase(fn: (db: IDatabase<unknown>) => void) {
-    return commonDbTestBase(fn, truncate, 'marinecam', 'marinecam', 'localhost:54321/marine');
-}
-
-export async function truncate(db: IDatabase<unknown>): Promise<any> {
+export function truncate(db: DTDatabase) {
     return db.tx(async t => {
         await t.none('DELETE FROM camera');
         await t.none('DELETE FROM camera_group');
     });
 }
 
-export function insertCameraGroup(db: IDatabase<unknown>, id: string, name: string) {
+export function insertCameraGroup(db: DTDatabase, id: string, name: string) {
     return db.tx(t => {
         return t.none(`
             insert into camera_group(id, name)
@@ -27,7 +23,7 @@ export function insertCameraGroup(db: IDatabase<unknown>, id: string, name: stri
     });
 }
 
-export function insertCamera(db: IDatabase<unknown>, id: string, name: string, groupId: string) {
+export function insertCamera(db: DTDatabase, id: string, name: string, groupId: string) {
     return db.tx(t => {
         return t.none(`
             insert into camera(id, name, camera_group_id, last_updated)

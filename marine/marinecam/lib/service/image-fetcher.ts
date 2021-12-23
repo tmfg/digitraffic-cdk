@@ -4,20 +4,24 @@ import * as MetadataService from './metadata';
 
 export const CAMERA_GROUP_ID = 'Saimaa';
 
-export async function updateAllCameras(url: string, username: string, password: string, bucketName: string, certificate: string): Promise<void> {
+export async function updateAllCameras(
+    url: string, username: string, password: string, bucketName: string, certificate: string,
+) {
     const cameraIds = await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
+    console.info("DEBUG cameras " + cameraIds.length);
     const session = await loginToCameraServer(url, username, password, certificate);
+    console.info("DEBUG login done");
 
     return updateAllImages(cameraIds, session, bucketName);
 }
 
-async function updateAllImages(cameraIds: string[], session: Session, bucketName: string): Promise<any> {
+async function updateAllImages(cameraIds: string[], session: Session, bucketName: string) {
     const updatedCameras = [] as string[];
 
     await Promise.allSettled(cameraIds.map(async cameraId => {
         const image = await getImageFromCamera(session, cameraId);
 
-        if(!image) {
+        if (!image) {
             console.info("empty picture from camera " + cameraId);
         } else {
             updatedCameras.push(cameraId);

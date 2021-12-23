@@ -14,8 +14,8 @@ let imageServerCertificate: string;
 
 export function handlerFn(doWithSecret: SecretFunction<GenericSecret>) {
     return async () => {
-        if(!imageServerUrl) {
-            await doWithSecret(secretId, async (secret: GenericSecret) => {
+        if (!imageServerUrl) {
+            await doWithSecret(secretId, (secret: GenericSecret) => {
                 imageServerUrl = secret[MarinecamSecretKeys.IMAGE_SERVER_URL];
                 imageServerUsername = secret[MarinecamSecretKeys.IMAGE_SERVER_USERNAME];
                 imageServerPassword = secret[MarinecamSecretKeys.IMAGE_SERVER_PASSWORD];
@@ -25,7 +25,9 @@ export function handlerFn(doWithSecret: SecretFunction<GenericSecret>) {
 
         console.info("updating images from " + imageServerUrl);
 
-        return ImageFetcher.updateAllCameras(imageServerUrl, imageServerUsername, imageServerPassword, bucketName, imageServerCertificate);
+        return ImageFetcher.updateAllCameras(
+            imageServerUrl, imageServerUsername, imageServerPassword, bucketName, imageServerCertificate,
+        );
     };
 }
 

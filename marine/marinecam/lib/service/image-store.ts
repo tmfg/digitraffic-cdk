@@ -4,13 +4,13 @@ import {ManagedUpload} from "aws-sdk/lib/s3/managed_upload";
 
 const BASE64 = 'base64';
 
-export async function storeImage(cameraId: string, image: string, bucketName: string): Promise<ManagedUpload.SendData> {
+export function storeImage(cameraId: string, image: string, bucketName: string): Promise<ManagedUpload.SendData> {
     const imageName = `${cameraId}.jpg`;
 
     console.info("storing image %s to s3 with size %d", cameraId, image.length);
 
     // for local testing
-    if(bucketName === '') {
+    if (bucketName === '') {
         const fs = require('fs');
 
         console.info("storing image %s locally!", cameraId);
@@ -26,7 +26,7 @@ export async function storeImage(cameraId: string, image: string, bucketName: st
     }
 }
 
-export function uploadToS3(bucketName: string, body: any, filename: string): Promise<ManagedUpload.SendData> {
+export function uploadToS3(bucketName: string, body: Buffer, filename: string): Promise<ManagedUpload.SendData> {
     const s3 = new S3();
     return s3.upload({
         Bucket: bucketName,
@@ -34,6 +34,6 @@ export function uploadToS3(bucketName: string, body: any, filename: string): Pro
         Key: filename,
         ACL: 'private',
         CacheControl: 'max-age=120',
-        ContentType: MediaType.IMAGE_JPEG
+        ContentType: MediaType.IMAGE_JPEG,
     }).promise();
 }

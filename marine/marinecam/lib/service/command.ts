@@ -25,6 +25,14 @@ type ResponseParam = {
     }
 };
 
+type CameraResponse = {
+    "$": {
+        Id: string;
+        Name: string;
+        Type: string;
+    }
+}
+
 export abstract class Command<T> {
     readonly name: string;
     readonly inputParameters: Record<string, string>;
@@ -43,7 +51,7 @@ export abstract class Command<T> {
     public createInputParameters(): string {
         let inputs = '';
 
-        for(const [key,value] of Object.entries(this.inputParameters)) {
+        for (const [key,value] of Object.entries(this.inputParameters)) {
             inputs+= `<Param Name="${key}" Value="${value}"/>`;
         }
 
@@ -103,12 +111,12 @@ export class GetAllCamerasCommand extends Command<Camera[]> {
     public getResult(response: CommandResponse): Camera[] {
         const cameras = response.Communication.Command[0].Items[0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
 
-        const info = cameras.map((c: any) => {
+        const info = cameras.map((c: CameraResponse) => {
             return {
                 id: c.$.Id,
                 name: c.$.Name,
-                type: c.$.Type
-            }
+                type: c.$.Type,
+            };
         });
 
         console.info(JSON.stringify(info, null, 3));
@@ -129,7 +137,7 @@ export class GetThumbnailCommand extends Command<string> {
     }
 
     public getResult(response: CommandResponse): string {
-        return response.Communication.Command[0].Thumbnail![0];
+        return (response.Communication.Command[0].Thumbnail as string[])[0];
     }
 }
 
@@ -139,7 +147,7 @@ export class GetThumbnailByTimeCommand extends Command<string> {
     }
 
     public getResult(response: CommandResponse): string {
-        return response.Communication.Command[0].Thumbnail![0];
+        return (response.Communication.Command[0].Thumbnail as string[])[0];
     }
 }
 

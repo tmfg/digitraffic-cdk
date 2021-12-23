@@ -2,14 +2,11 @@ import {ResponseChecker, UrlChecker} from "digitraffic-common/canaries/url-check
 import assert from "assert";
 import {Camera} from "../model/camera";
 
-const hostname = process.env.hostname as string;
-const apiKeyId = process.env.apiKeyId as string;
-
 const METADATA_URL = "/prod/api/marinecam/ibnet/metadata";
 const CAMERA_URL = "/prod/api/marinecam/ibnet/1305f095-4338-4f16-bbcf-b4a7a2a38abc.jpg";
 
 export const handler = async () => {
-    const checker = await UrlChecker.create(hostname, apiKeyId);
+    const checker = await UrlChecker.createV2();
     const jsonChecker = ResponseChecker.forJson();
     const imageChecker = ResponseChecker.forJpeg();
 
@@ -23,4 +20,4 @@ export const handler = async () => {
     await checker.expect403WithoutApiKey(CAMERA_URL);
 
     return checker.done();
-}
+};

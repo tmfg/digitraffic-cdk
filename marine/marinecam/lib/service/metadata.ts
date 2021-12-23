@@ -9,7 +9,7 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
     const start = Date.now();
 
     try {
-        return await inDatabaseReadonly(async (db: DTDatabase) => {
+        return await inDatabaseReadonly((db: DTDatabase) => {
             return MetadataDB.getAllCameras(db, usersGroups);
         });
     } finally {
@@ -17,14 +17,14 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
     }
 }
 
-export async function updateMetadataUpdated(cameraIds: string[], updated: Date): Promise<PromiseSettledResult<null>[]> {
-    return inDatabase(async (db: DTDatabase) => {
+export function updateMetadataUpdated(cameraIds: string[], updated: Date): Promise<PromiseSettledResult<null>[]> {
+    return inDatabase((db: DTDatabase) => {
         return MetadataDB.updateCameraMetadata(db, cameraIds, updated);
     });
 }
 
-export async function getAllCameraIdsForGroup(groupId: string): Promise<string[]> {
-    return inDatabaseReadonly(async (db: DTDatabase) => {
+export function getAllCameraIdsForGroup(groupId: string): Promise<string[]> {
+    return inDatabaseReadonly((db: DTDatabase) => {
         return MetadataDB.getAllCameraIdsForGroup(db, groupId);
     });
 }

@@ -1,9 +1,9 @@
-import {CognitoUserPool, CognitoUser, AuthenticationDetails} from 'amazon-cognito-identity-js';
+import {CognitoUserPool, CognitoUser, AuthenticationDetails, CognitoUserSession} from 'amazon-cognito-identity-js';
 import {MarinecamEnvKeys} from "../../keys";
 
 const POOL_DATA = {
     UserPoolId: process.env[MarinecamEnvKeys.USERPOOL_ID] as string,
-    ClientId: process.env[MarinecamEnvKeys.POOLCLIENT_ID] as string
+    ClientId: process.env[MarinecamEnvKeys.POOLCLIENT_ID] as string,
 };
 
 const userPool = new CognitoUserPool(POOL_DATA);
@@ -11,16 +11,16 @@ const userPool = new CognitoUserPool(POOL_DATA);
 function createCognitoUser(username: string) {
     const userData = {
         Username: username,
-        Pool: userPool
+        Pool: userPool,
     };
 
     return new CognitoUser(userData);
 }
 
-export async function loginUser(username: string, password: string): Promise<any> {
+export function loginUser(username: string, password: string): Promise<CognitoUserSession | null> {
     const authDetails = new AuthenticationDetails({
         Username: username,
-        Password: password
+        Password: password,
     });
 
     const cognitoUser = createCognitoUser(username);
@@ -28,37 +28,37 @@ export async function loginUser(username: string, password: string): Promise<any
     return new Promise(resolve => {
         try {
             cognitoUser.authenticateUser(authDetails, {
-                onSuccess: (result: any) => {
+                onSuccess: (result: CognitoUserSession) => {
                     resolve(result);
                 },
 
-                onFailure: (result: any) => {
+                onFailure: (result) => {
                     console.info("authenticateUser failed:" + JSON.stringify(result));
 
                     resolve(null);
                 },
 
-                newPasswordRequired: async (userAttributes: any, requiredAttributes: any) => {
+                newPasswordRequired: (userAttributes, requiredAttributes) => {
                     return changeUserPassword(cognitoUser, password, userAttributes);
-                }
+                },
             });
-        } catch(error) {
+        } catch (error) {
             console.info("error from authenticateUser:" + JSON.stringify(error));
         }
     });
 }
 
-async function changeUserPassword(cognitoUser: any, newPassword: string, userAttributes: any): Promise<any> {
+function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: any): Promise<CognitoUserSession | null> {
     return new Promise(resolve => {
         cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
-            onSuccess: (result: any) => {
+            onSuccess: (result: CognitoUserSession) => {
                 resolve(result);
             },
-            onFailure: (result: any) => {
+            onFailure: (result) => {
                 console.info("passwordchallenge failed:" + JSON.stringify(result));
 
                 resolve(null);
-            }
+            },
         });
     });
 }

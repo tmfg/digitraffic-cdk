@@ -2,6 +2,7 @@ import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
 import * as https from "https";
 import util from "util";
 import {parseString} from "xml2js";
+import axiosRetry from "axios-retry";
 
 import {Camera} from "../model/camera";
 import {
@@ -12,8 +13,10 @@ import {
     GetAllCamerasCommand, GetThumbnailByTimeCommand,
     GetThumbnailCommand,
     LoginCommand,
-    RequestStreamCommand
+    RequestStreamCommand,
 } from "./command";
+
+axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay});
 
 const COMPR_LEVEL = '70';
 const DEST_WIDTH = '1280';
@@ -23,7 +26,7 @@ const COMMUNICATION_URL_PART = '/Communication';
 const VIDEO_URL_PART = '/Video/';
 
 const agent = new https.Agent({
-  rejectUnauthorized: false
+    rejectUnauthorized: false,
 });
 
 const parse = util.promisify(parseString);
@@ -43,23 +46,23 @@ export class Session {
         this.videoUrl = url + VIDEO_URL_PART;
         this.sequenceId = 1;
 
-        if(acceptSelfSignedCertificate) {
+        if (acceptSelfSignedCertificate) {
             this.agent = new https.Agent({
-                rejectUnauthorized: false
+                rejectUnauthorized: false,
             });
         } else {
-            if(!certificate) {
+            if (!certificate) {
                 throw new Error("No certificate!");
             }
 
             this.agent = new https.Agent({
                 rejectUnauthorized: false,
-                cert: certificate
+                cert: certificate,
             });
         }
     }
 
-    async post(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse> {
+    post(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse> {
         return axios.post(url, xml, {...configuration, ...{ httpsAgent: agent, timeout: 3000 }});
     }
 
@@ -67,7 +70,7 @@ export class Session {
         const xml = command.createXml(this.sequenceId, this.connectionId);
         this.sequenceId++;
 
-//        console.info("sending:" + xml);
+        //        console.info("sending:" + xml);
 
         const resp = await this.post(this.communicationUrl, xml);
 
@@ -78,7 +81,7 @@ export class Session {
         const response = await parse(resp.data) as CommandResponse;
         command.checkError(response);
 
-//        console.info("response " + JSON.stringify(response, null, 2));
+        //        console.info("response " + JSON.stringify(response, null, 2));
 
         return command.getResult(response);
     }
@@ -89,7 +92,7 @@ export class Session {
         return this.connectionId;
     }
 
-    async login(username: string, password: string): Promise<void> {
+    login(username: string, password: string): Promise<void> {
         const command = new LoginCommand()
             .addInputParameters('Username', username)
             .addInputParameters('Password', password);
@@ -97,11 +100,11 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async getAllViewsAndCameras(): Promise<Camera[]> {
+    getAllViewsAndCameras(): Promise<Camera[]> {
         return this.sendMessage(new GetAllCamerasCommand());
     }
 
-    async getThumbnail(cameraId: string): Promise<string> {
+    getThumbnail(cameraId: string): Promise<string> {
         const command = new GetThumbnailCommand()
             .addInputParameters('CameraId', cameraId)
             .addInputParameters('DestWidth', DEST_WIDTH)
@@ -111,7 +114,7 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async getThumbnailByTime(cameraId: string): Promise<string> {
+    getThumbnailByTime(cameraId: string): Promise<string> {
         const command = new GetThumbnailByTimeCommand()
             .addInputParameters('CameraId', cameraId)
             .addInputParameters('Time', Date.now().toString())
@@ -122,7 +125,7 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async requestStream(cameraId: string): Promise<string> {
+    requestStream(cameraId: string): Promise<string> {
         const command = new RequestStreamCommand()
             .addInputParameters('CameraId', cameraId)
             .addInputParameters('DestWidth', DEST_WIDTH)
@@ -135,12 +138,12 @@ export class Session {
             .addInputParameters('RequestSize', 'Yes')
             .addInputParameters('StreamType', 'Transcoded')
             .addInputParameters('ResizeAvailable', 'Yes')
-            .addInputParameters('Blocking', 'Yes')
+            .addInputParameters('Blocking', 'Yes');
 
         return this.sendMessage(command);
     }
 
-    async setStreamTime(videoId: string): Promise<void> {
+    setStreamTime(videoId: string): Promise<void> {
         const command = new ChangeStreamCommand()
             .addInputParameters('VideoId', videoId)
             .addInputParameters('Time', Date.now().toString());
@@ -148,7 +151,7 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async setStreamSpeed(videoId: string): Promise<unknown> {
+    setStreamSpeed(videoId: string): Promise<unknown> {
         const command = new ChangeStreamCommand()
             .addInputParameters('VideoId', videoId)
             .addInputParameters('Speed', '1.0');
@@ -169,7 +172,7 @@ export class Session {
         const headerSize = buffer.readUInt16LE(16 + 8 + 4 + 4);
 
         // if no data, return empty
-        if(dataSize === 0) {
+        if (dataSize === 0) {
             return null;
         }
 
@@ -177,7 +180,7 @@ export class Session {
         return buffer.slice(headerSize).toString('base64');
     }
 
-    async closeStream(videoId: string): Promise<void> {
+    closeStream(videoId: string): Promise<void> {
         const command = new CloseStreamCommand()
             .addInputParameters('VideoId', videoId);
 

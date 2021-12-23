@@ -1,11 +1,11 @@
-import {IDatabase} from "pg-promise";
 import {dbTestBase, insertCamera, insertCameraGroup} from "../db-testutil";
 import {getAllCameraIdsForGroup, getAllCameras, updateCameraMetadata} from "../../lib/db/metadata";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
 const GROUP_SAIMAA = 'Saimaa';
 const GROUP_LOIMAA = 'Loimaa';
 
-describe('db-metadata', dbTestBase((db: IDatabase<any, any>) => {
+describe('db-metadata', dbTestBase((db: DTDatabase) => {
     test('getIds - empty', async () => {
         const ids = await getAllCameraIdsForGroup(db, GROUP_SAIMAA);
 

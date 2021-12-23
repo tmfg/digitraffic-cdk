@@ -11,18 +11,18 @@ const GROUP_SEPARATOR=',';
 export const handler = (event: Record<string, string>) => {
     const usersGroups = getUserGroups(event.groups);
 
-    if(usersGroups.length === 0) {
+    if (usersGroups.length === 0) {
         return Promise.resolve([] as Camera[]);
     }
 
     return withDbSecret(secretId, () => {
         return MetadataService.listAllCameras(usersGroups);
     });
-}
+};
 
 // eventGroups is in form [group1, group2...]
 function getUserGroups(eventGroups: string): string[] {
-    if(!eventGroups) {
+    if (!eventGroups) {
         return [];
     }
 
