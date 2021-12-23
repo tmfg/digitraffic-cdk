@@ -1,19 +1,20 @@
 import "source-map-support/register";
 import {
     Context,
-    KinesisStreamEvent,
     KinesisStreamRecord,
-    CloudWatchLogsDecodedData
+    CloudWatchLogsDecodedData, KinesisStreamHandler,
 } from "aws-lambda";
 
 import * as AWSx from "aws-sdk";
 import {
     extractJson, filterIds, getFailedIds,
     getIndexName, isControlMessage,
-    isNumeric, parseESReturnValue
+    parseESReturnValue, parseNumber,
 } from "./util";
 import {getAppFromSenderAccount, getEnvFromSenderAccount} from "./accounts";
 import {notifyFailedItems} from "./notify";
+import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
+import {IncomingMessage} from "http";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 
@@ -28,7 +29,7 @@ const region = endpointParts[2];
 const MAX_BODY_SIZE = 1000000;
 const SEPARATOR_LAMBDA_LOGS = '\t';
 
-export const handler = (event: KinesisStreamEvent, context: Context): void => {
+export const handler: KinesisStreamHandler = (event, context): void => {
     const statistics = {};
 
     try {
@@ -58,10 +59,10 @@ function handleRecord(record: KinesisStreamRecord, statistics: any): string {
     const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
-    const ucompressed = zlib.gunzipSync(zippedInput).toString();
+    const uncompressed = zlib.gunzipSync(zippedInput).toString();
 
     // parse the input from JSON
-    const awslogsData = JSON.parse(ucompressed.toString('utf8'));
+    const awslogsData = JSON.parse(uncompressed.toString('utf8'));
 
     // skip control messages
     if (isControlMessage(awslogsData)) {
@@ -72,7 +73,7 @@ function handleRecord(record: KinesisStreamRecord, statistics: any): string {
     return transform(awslogsData, statistics);
 }
 
-function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkData: string) {
+function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchBulkData: string) {
     // post documents to the Amazon Elasticsearch Service
     post(elasticsearchBulkData, (error: any, success: any, statusCode: any, failedItems: any) => {
         if (error) {
@@ -103,7 +104,7 @@ export function post(body: string, callback: any) {
 
     console.log("sending POST to es unCompressedSize=%d", body.length);
 
-    if(body.length === 0) {
+    if (body.length === 0) {
         return;
     }
 
@@ -111,7 +112,7 @@ export function post(body: string, callback: any) {
     req.path = "/_bulk?pipeline=keyval";
     req.region = region;
     req.headers["presigned-expires"] = false;
-    req.headers["Host"] = esEndpoint.host;
+    req.headers.Host = esEndpoint.host;
     req.body = body;
     req.headers["Content-Type"] = "application/json";
 
@@ -119,25 +120,21 @@ export function post(body: string, callback: any) {
     signer.addAuthorization(creds, new Date());
 
     const send = new AWS.NodeHttpClient();
-    send.handleRequest(
-        req,
-        null,
-        function(response: any) {
-            let respBody = "";
-            response.on("data", function(chunk: any) {
-                respBody += chunk;
-            });
-            response.on("end", function(chunk: any) {
-                const parsedValues = parseESReturnValue(response, respBody);
+    send.handleRequest(req, null, (response: IncomingMessage) => {
+        let respBody = "";
+        response.on("data", function(chunk: any) {
+            respBody += chunk;
+        });
+        response.on("end", function(chunk: any) {
+            const parsedValues = parseESReturnValue(response, respBody);
 
-                callback(parsedValues.error, parsedValues.success, response.statusCode, parsedValues.failedItems);
-            });
-        },
-        function(err: any) {
-            console.log("Error: " + err);
-            callback(Error(err));
-        }
-    );
+            callback(parsedValues.error, parsedValues.success, response.statusCode, parsedValues.failedItems);
+        });
+    },
+    function(err: Error) {
+        console.log("Error: " + err);
+        callback(err);
+    });
 }
 
 export function transform(payload: CloudWatchLogsDecodedData, statistics: any, idsToFilter: string[] = []): string {
@@ -146,20 +143,20 @@ export function transform(payload: CloudWatchLogsDecodedData, statistics: any, i
     const appName = `${app}-${env}-lambda`;
 
     return payload.logEvents
-        .filter((e: any) => !idsToFilter.includes(e.id))
-        .filter((e: any) => !isLambdaLifecycleEvent(e.message))
-        .filter((e: any) => !isDebugLine(e.message))
-        .map((logEvent: any) => {
+        .filter(e => !idsToFilter.includes(e.id))
+        .filter(e => !isLambdaLifecycleEvent(e.message))
+        .filter(e => !isDebugLine(e.message))
+        .map(logEvent => {
             const messageParts = logEvent.message.split(SEPARATOR_LAMBDA_LOGS); // timestamp, id, level, message
 
             const source = buildSource(logEvent.message, logEvent.extractedFields);
             source["@id"] = logEvent.id;
-            source["@timestamp"] = new Date(1 * logEvent.timestamp).toISOString();
-            source["level"] = messageParts[2];
-            source["message"] = messageParts[3];
+            source["@timestamp"] = new Date(logEvent.timestamp).toISOString();
+            source.level = messageParts[2];
+            source.message = messageParts[3];
             source["@log_group"] = payload.logGroup;
             source["@app"] = appName;
-            source["fields"] = {app: appName};
+            source.fields = {app: appName};
             source["@transport_type"] = app;
 
             const action = {index: {_id: logEvent.id, _index: null}} as any;
@@ -198,8 +195,8 @@ function buildFromMessage(message: string): any {
         .replace(/"null"/gi, "null");
 
     return {
-        log_line
-    }
+        log_line,
+    };
 }
 
 function isDebugLine(logline: string): boolean {
@@ -214,26 +211,25 @@ function isDebugLine(logline: string): boolean {
     return split.length > 3 && split[3].startsWith("DEBUG");
 }
 
-function buildFromExtractedFields(message: string, extractedFields: any[]): any {
+function buildFromExtractedFields(message: string, extractedFields: CloudWatchLogsLogEventExtractedFields): any {
     const source = {} as any;
 
     for (const key in extractedFields) {
         if (extractedFields[key]) {
-            const value = extractedFields[key];
+            const value = extractedFields[key] as string;
 
-            if (isNumeric(value)) {
-                source[key] = 1 * value;
-                continue;
-            }
+            const numValue = parseNumber(value);
 
-            if (value) {
+            if (numValue) {
+                source[key] = numValue;
+            } else {
                 const jsonSubString = extractJson(value);
                 if (jsonSubString !== null) {
-                    source["$" + key] = JSON.parse(jsonSubString);
+                    source['$' + key] = JSON.parse(jsonSubString);
                 }
-            }
 
-            source[key] = value;
+                source[key] = value;
+            }
         }
     }
     source.message = message;

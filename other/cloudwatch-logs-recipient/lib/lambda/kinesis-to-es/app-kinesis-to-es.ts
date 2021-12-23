@@ -3,18 +3,24 @@ import {
     extractJson, filterIds,
     getFailedIds,
     getIndexName, isControlMessage,
-    isInfinity,
-    isNumeric,
-    parseESReturnValue
+    parseESReturnValue, parseNumber,
 } from "./util";
 
 const https = require('https');
 const zlib = require('zlib');
 const crypto = require('crypto');
 
-import {KinesisStreamEvent, KinesisStreamRecord, CloudWatchLogsDecodedData} from "aws-lambda";
+import {
+    KinesisStreamEvent,
+    KinesisStreamRecord,
+    CloudWatchLogsDecodedData,
+    KinesisStreamHandler,
+    Context,
+} from "aws-lambda";
 import {getAppFromSenderAccount} from "./accounts";
 import {notifyFailedItems} from "./notify";
+import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
+import {IncomingMessage} from "http";
 
 const endpoint = process.env.ES_ENDPOINT as string;
 const knownAccounts = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
@@ -25,7 +31,7 @@ const service = endpointParts[3];
 
 const MAX_BODY_SIZE = 5000000;
 
-export const handler = function(event: KinesisStreamEvent, context: any) {
+export const handler: KinesisStreamHandler = function(event, context) {
     const statistics = {};
 
     try {
@@ -55,10 +61,10 @@ function handleRecord(record: KinesisStreamRecord, statistics: any): string {
     const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
-    const ucompressed = zlib.gunzipSync(zippedInput).toString();
+    const uncompressed = zlib.gunzipSync(zippedInput).toString();
 
     // parse the input from JSON
-    const awslogsData = JSON.parse(ucompressed.toString('utf8'));
+    const awslogsData = JSON.parse(uncompressed.toString('utf8'));
 
     // skip control messages
     if (isControlMessage(awslogsData)) {
@@ -69,7 +75,7 @@ function handleRecord(record: KinesisStreamRecord, statistics: any): string {
     return transform(awslogsData, statistics);
 }
 
-function postToElastic(context: any, retryOnFailure: boolean, elasticsearchBulkData: string) {
+function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchBulkData: string) {
     // post documents to the Amazon Elasticsearch Service
     post(elasticsearchBulkData, (error: any, success: any, statusCode: any, failedItems: any) => {
         if (error) {
@@ -118,7 +124,7 @@ function transform(payload: CloudWatchLogsDecodedData, statistics: any): string 
         action.index._index = indexName;
 
         // update statistics
-        if(!statistics[indexName]) {
+        if (!statistics[indexName]) {
             statistics[indexName] = 1;
         } else {
             statistics[indexName] = statistics[indexName] + 1;
@@ -133,16 +139,16 @@ function transform(payload: CloudWatchLogsDecodedData, statistics: any): string 
 }
 
 function getAppName(logGroup: string, app: string): string {
-    if(logGroup.includes('amazonmq')) {
+    if (logGroup.includes('amazonmq')) {
         return `${app}-mqtt`;
-    } else if(logGroup.includes('nginx')) {
+    } else if (logGroup.includes('nginx')) {
         return 'dt-nginx';
     }
 
     return logGroup;
 }
 
-export function buildSource(message: string, extractedFields?: any[]): any {
+export function buildSource(message: string, extractedFields?: CloudWatchLogsLogEventExtractedFields): any {
     if (extractedFields) {
         return buildFromExtractedFields(extractedFields);
     }
@@ -150,29 +156,25 @@ export function buildSource(message: string, extractedFields?: any[]): any {
     return buildFromMessage(message, true);
 }
 
-function buildFromExtractedFields(extractedFields: any[]): any {
+function buildFromExtractedFields(extractedFields: CloudWatchLogsLogEventExtractedFields): any {
     const source = {} as any;
 
     for (const key in extractedFields) {
         if (extractedFields[key]) {
-            const value = extractedFields[key];
+            const value = extractedFields[key] as string;
 
-            if (isNumeric(value)) {
-                source[key] = 1 * value;
-                continue;
+            const numValue = parseNumber(value);
+
+            if (numValue) {
+                source[key] = numValue;
+            } else {
+                const jsonSubString = extractJson(value);
+                if (jsonSubString !== null) {
+                    source['$' + key] = JSON.parse(jsonSubString);
+                }
+
+                source[key] = value;
             }
-
-            if (isInfinity(value)) {
-                source[key] = -1;
-                continue;
-            }
-
-            const jsonSubString = extractJson(value);
-            if (jsonSubString !== null) {
-                source['$' + key] = JSON.parse(jsonSubString);
-            }
-
-            source[key] = value;
         }
     }
 
@@ -184,11 +186,11 @@ function post(body: string, callback: any) {
 
     console.log("sending POST to es unCompressedSize=%d", body.length);
 
-    if(body.length === 0) {
+    if (body.length === 0) {
         return;
     }
 
-    const request = https.request(requestParams, function(response: any) {
+    const request = https.request(requestParams, (response: IncomingMessage) => {
         let responseBody = '';
         response.on('data', function(chunk: any) {
             responseBody += chunk;
@@ -198,7 +200,7 @@ function post(body: string, callback: any) {
 
             callback(parsedValues.error, parsedValues.success, response.statusCode, parsedValues.failedItems);
         });
-    }).on('error', function(e: any) {
+    }).on('error', (e: Error) => {
         callback(e);
     });
     request.end(requestParams.body);
@@ -222,8 +224,8 @@ function buildRequest(body: string): any {
             'Host': endpoint,
             'Content-Length': Buffer.byteLength(body),
             'X-Amz-Security-Token': process.env.AWS_SESSION_TOKEN,
-            'X-Amz-Date': datetime
-        } as any
+            'X-Amz-Date': datetime,
+        } as any,
     };
 
     const canonicalHeaders = Object.keys(request.headers)
@@ -244,19 +246,19 @@ function buildRequest(body: string): any {
         hash(request.body, 'hex'),
     ].join('\n');
 
-    const credentialString = [ date, region, service, 'aws4_request' ].join('/');
+    const credentialString = [date, region, service, 'aws4_request'].join('/');
 
     const stringToSign = [
         'AWS4-HMAC-SHA256',
         datetime,
         credentialString,
-        hash(canonicalString, 'hex')
+        hash(canonicalString, 'hex'),
     ] .join('\n');
 
     request.headers.Authorization = [
         'AWS4-HMAC-SHA256 Credential=' + process.env.AWS_ACCESS_KEY_ID + '/' + credentialString,
         'SignedHeaders=' + signedHeaders,
-        'Signature=' + hmac(kSigning, stringToSign, 'hex')
+        'Signature=' + hmac(kSigning, stringToSign, 'hex'),
     ].join(', ');
 
     return request;

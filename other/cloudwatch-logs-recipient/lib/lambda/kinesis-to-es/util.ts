@@ -1,3 +1,5 @@
+import {IncomingMessage} from "http";
+
 const nanValue = -1;
 
 export function getIndexName(appName: string, timestampFromEvent: any): string {
@@ -6,14 +8,14 @@ export function getIndexName(appName: string, timestampFromEvent: any): string {
     // index name format: app-YYYY.MM
     const timePart = [
         timestamp.getUTCFullYear(),              // year
-        ('0' + (timestamp.getUTCMonth() + 1)).slice(-2)  // month
+        ('0' + (timestamp.getUTCMonth() + 1)).slice(-2),  // month
     ].join('.');
 
     return `${appName}-${timePart}`;
 }
 
 export function buildFromMessage(message: string, enableJsonParse: boolean): any {
-    if(skipElasticLogging(message)) {
+    if (skipElasticLogging(message)) {
         return {};
     }
 
@@ -23,17 +25,17 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
         .replace(/"null"/gi, "null");
 
     try {
-        if(enableJsonParse) {
+        if (enableJsonParse) {
             const parsedJson = parseJson(message);
 
-            if(parsedJson) {
+            if (parsedJson) {
                 return parsedJson;
             }
         }
 
         return {
-            log_line
-        }
+            log_line,
+        };
     } catch (e) {
         console.info("error " + e);
         console.error("Error converting to json:" + message);
@@ -73,7 +75,7 @@ function skipElasticLogging(message: string): boolean {
     return message.includes("<?xml");
 }
 
-export function extractJson(message: string): any {
+export function extractJson(message: string): string | null {
     const jsonStart = message.indexOf("{");
     if (jsonStart < 0) {
         return null;
@@ -92,12 +94,24 @@ export function isValidJson(message: string): boolean {
     return true;
 }
 
-export function isNumeric(n: any): boolean {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+export function parseNumber(value: string): number | null {
+    const numValue = parseFloat(value);
+
+    if (isNumeric(numValue)) {
+        return numValue;
+    } else if (isInfinity(numValue)) {
+        return -1;
+    }
+
+    return null;
 }
 
-export function isInfinity(n: any): boolean {
-    return !isNaN(parseFloat(n)) && !isFinite(n);
+export function isNumeric(num: number): boolean {
+    return !isNaN(num) && isFinite(num);
+}
+
+export function isInfinity(num: number): boolean {
+    return !isNaN(num) && !isFinite(num);
 }
 
 export function getFailedIds(failedItems: any[]): string[] {
@@ -109,26 +123,26 @@ export function isControlMessage(payload: any): boolean {
 }
 
 export function filterIds(body: string, ids: string[]): string {
-   const lines = body.split('\n');
-   let newBody = "";
+    const lines = body.split('\n');
+    let newBody = "";
 
-   for(let i = 0;i < lines.length;i+= 2) {
-       const indexLine = lines[i];
-       const logLine = lines[i+1];
+    for (let i = 0;i < lines.length;i+= 2) {
+        const indexLine = lines[i];
+        const logLine = lines[i+1];
 
         // ends with newline, so one empty line in the end
-       if(indexLine.length > 0 && !containsIds(logLine, ids)) {
-           newBody+= indexLine + '\n';
-           newBody+= logLine + '\n';
-       }
-   }
+        if (indexLine.length > 0 && !containsIds(logLine, ids)) {
+            newBody+= indexLine + '\n';
+            newBody+= logLine + '\n';
+        }
+    }
 
-   return newBody;
+    return newBody;
 }
 
 function containsIds(line: string, ids: string[]): boolean {
-    for(const id of ids) {
-        if(line.indexOf(id) !== -1) {
+    for (const id of ids) {
+        if (line.indexOf(id) !== -1) {
             return true;
         }
     }
@@ -136,31 +150,55 @@ function containsIds(line: string, ids: string[]): boolean {
     return false;
 }
 
-export function parseESReturnValue(response: any, responseBody: string): any {
+type ItemStatus = {
+    index: {
+        status: number;
+    };
+}
+
+export type ESReturnValue = {
+    success?: {
+        attemptedItems: number,
+        successfulItems: number
+        failedItems: number,
+    },
+    error?: {
+        statusCode: number,
+        responseBody: string,
+    },
+    failedItems?: ItemStatus[]
+}
+
+export function parseESReturnValue(response: IncomingMessage, responseBody: string): ESReturnValue {
     const info = JSON.parse(responseBody);
     let failedItems;
     let success;
+    let error;
 
-    if (response.statusCode >= 200 && response.statusCode < 299) {
-        failedItems = info.items.filter(function(x: any) {
+    const statusCode = response.statusCode || -1;
+
+    if (statusCode >= 200 && statusCode < 299) {
+        failedItems = info.items.filter(function(x: ItemStatus) {
             return x.index.status >= 300;
         });
 
         success = {
             "attemptedItems": info.items.length,
             "successfulItems": info.items.length - failedItems.length,
-            "failedItems": failedItems.length
+            "failedItems": failedItems.length,
         };
     }
 
-    const error = response.statusCode !== 200 || info.errors === true ? {
-        "statusCode": response.statusCode,
-        "responseBody": responseBody
-    } : null;
+    if (statusCode !== 200 || info.errors === true) {
+        error = {
+            "statusCode": statusCode,
+            "responseBody": responseBody,
+        };
+    }
 
     return {
         success: success,
         error: error,
-        failedItems: failedItems
-    }
+        failedItems: failedItems,
+    };
 }
