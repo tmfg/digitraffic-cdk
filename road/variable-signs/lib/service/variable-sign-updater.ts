@@ -58,7 +58,7 @@ export function parseSituations(datex2: string): Situation[] {
             const sitEndIndex = datex2.indexOf(DATEX2_SITUATION_TAG_END, sitIndex + DATEX2_SITUATION_TAG_START.length);
             index = sitEndIndex;
 
-            situations.push(parseSituation(datex2.substring(sitIndex, sitEndIndex - sitIndex + DATEX2_SITUATION_TAG_END.length)));
+            situations.push(parseSituation(datex2.substr(sitIndex, sitEndIndex - sitIndex + DATEX2_SITUATION_TAG_END.length)));
         }
     } while (sitIndex !== -1);
 
