@@ -13,15 +13,18 @@ export function dbTestBase(
     truncateFn: (db: DTDatabase) => void,
     dbUser: string,
     dbPass: string,
-    dbUri: string): () => void {
+    dbUri: string,
+): () => void {
 
     const theDbUri = process.env.DB_URI ?? dbUri;
     console.log(`Test database URI: ${theDbUri}`);
 
     return () => {
-        const db: DTDatabase = initDbConnection(dbUser, dbPass, 'test', theDbUri, {
-            noWarnings: true // ignore duplicate connection warning for tests
-        });
+        const db: DTDatabase = initDbConnection(
+            dbUser, dbPass, 'test', theDbUri, {
+                noWarnings: true, // ignore duplicate connection warning for tests
+            },
+        );
 
         beforeAll(async () => {
             process.env[DatabaseEnvironmentKeys.DB_USER] = dbUser;
@@ -33,7 +36,7 @@ export function dbTestBase(
 
         afterAll(async () => {
             await truncateFn(db);
-            db.$pool.end();
+            await db.$pool.end();
         });
 
         beforeEach(async () => {

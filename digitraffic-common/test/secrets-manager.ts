@@ -11,22 +11,22 @@ const secretValue = sinon.stub();
  */
 export function stubSecretsManager() {
     const smStub = {
-        getSecretValue: secretValue
+        getSecretValue: secretValue,
     };
 
     sinon.stub(AWS, 'SecretsManager').returns(smStub);
 }
 
 export function mockSecret<Secret>(secret: Secret) {
-    if(!secret) {
+    if (!secret) {
         secretValue.returns({
-           promise: sinon.stub().returns({})
+            promise: sinon.stub().returns({}),
         });
     } else {
         secretValue.returns({
             promise: sinon.stub().returns({
-                SecretString: JSON.stringify(secret)
-            })
-        })
+                SecretString: JSON.stringify(secret),
+            }),
+        });
     }
 }

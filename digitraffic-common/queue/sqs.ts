@@ -98,7 +98,7 @@ function getDlqCode(bucketName: string): InlineCode {
         .replace("__bucketName__", bucketName)
         .replace("__upload__", uploadToS3.toString())
         .replace("__doUpload__", doUpload.toString())
-        .replace("__handler__", createHandler().toString().substr(23)); // remove function handler() from signature
+        .replace("__handler__", createHandler().toString().substring(23)); // remove function handler() from signature
 
     return new InlineCode(functionBody);
 }
@@ -112,15 +112,15 @@ async function uploadToS3(s3: S3, bucketName: string, body: string, objectName: 
         console.warn('method=uploadToS3 retrying upload to bucket %s', bucketName);
         try {
             await doUpload(s3, bucketName, body, objectName);
-        } catch (error) {
+        } catch (e2) {
             console.error('method=uploadToS3 failed retrying upload to bucket %s', bucketName);
         }
     }
 }
 
-function doUpload(s3: S3, Bucket: string, Body: string, Key: string): Promise<ManagedUpload.SendData> {
+function doUpload(s3: S3, bucketName: string, Body: string, Key: string): Promise<ManagedUpload.SendData> {
     return s3.upload({
-        Bucket, Body, Key,
+        Bucket: bucketName, Body, Key,
     }).promise();
 }
 

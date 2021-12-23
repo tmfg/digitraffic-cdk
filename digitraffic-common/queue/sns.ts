@@ -11,7 +11,7 @@ import {SNS} from "aws-sdk";
 export async function snsPublish(message: string, topicArn: string, sns: SNS) {
     const publishParams = {
         Message: message,
-        TopicArn: topicArn
+        TopicArn: topicArn,
     };
     try {
         await sns.publish(publishParams).promise();
@@ -19,8 +19,8 @@ export async function snsPublish(message: string, topicArn: string, sns: SNS) {
         console.error('method=snsPublish error, retrying', error);
         try {
             await sns.publish(publishParams).promise();
-        } catch (error) {
-            console.error('method=snsPublish error after retry', error);
+        } catch (e2) {
+            console.error('method=snsPublish error after retry', e2);
         }
     }
 }

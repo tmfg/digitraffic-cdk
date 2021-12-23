@@ -36,7 +36,7 @@ export class TestHttpServer {
                 if (chunk) {
                     dataStr += chunk;
                 }
-            })
+            });
 
             if (path in props) {
                 this.debuglog('..url matched');
