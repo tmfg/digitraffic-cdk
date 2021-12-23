@@ -1,10 +1,12 @@
+import {Statistics} from "../../../lib/lambda/kinesis-to-es/statistics";
+
 const accountNumber = '123456789012';
 const app = 'someapp';
 const env = 'someenv';
 const accounts: Account[] = [{
     accountNumber,
     app,
-    env
+    env,
 }];
 process.env.KNOWN_ACCOUNTS = JSON.stringify(accounts);
 process.env.ES_ENDPOINT = 'some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com';
@@ -13,7 +15,7 @@ import {CloudWatchLogsDecodedData, CloudWatchLogsLogEvent} from "aws-lambda";
 import {
     buildSource,
     isLambdaLifecycleEvent,
-    transform
+    transform,
 } from '../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es';
 import {getAppFromSenderAccount, getEnvFromSenderAccount} from "../../../lib/lambda/kinesis-to-es/accounts";
 
@@ -61,7 +63,7 @@ describe('kinesis-to-es', () => {
         const logEvent: CloudWatchLogsLogEvent = {
             id: 'some-id',
             timestamp: 0,
-            message: 'message'
+            message: 'message',
         };
         const data: CloudWatchLogsDecodedData = {
             owner: account.accountNumber,
@@ -69,10 +71,10 @@ describe('kinesis-to-es', () => {
             logStream: '',
             subscriptionFilters: [],
             messageType: '',
-            logEvents: [logEvent]
+            logEvents: [logEvent],
         };
 
-        const transformed = transform(data, {});
+        const transformed = transform(data, new Statistics());
 
         expect(transformed).toBe('{"index":{"_id":"some-id","_index":"someapp-someenv-lambda-1970.01","_type":"doc"}}\n' +
             '{"log_line":"message","@id":"some-id","@timestamp":"1970-01-01T00:00:00.000Z","@log_group":"","@app":"someapp-someenv-lambda","fields":{"app":"someapp-someenv-lambda"},"@transport_type":"someapp"}\n');

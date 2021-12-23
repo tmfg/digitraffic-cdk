@@ -2,8 +2,8 @@ import {IncomingMessage} from "http";
 
 const nanValue = -1;
 
-export function getIndexName(appName: string, timestampFromEvent: any): string {
-    const timestamp = new Date(1 * timestampFromEvent);
+export function getIndexName(appName: string, timestampFromEvent: number): string {
+    const timestamp = new Date(timestampFromEvent);
 
     // index name format: app-YYYY.MM
     const timePart = [
@@ -19,7 +19,7 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
         return {};
     }
 
-    const log_line = message.replace('[, ]', '[0.0,0.0]')
+    const logLine = message.replace('[, ]', '[0.0,0.0]')
         .replace(/"Infinity"/gi, "-1")
         .replace(/Infinity/gi, "-1")
         .replace(/"null"/gi, "null");
@@ -34,7 +34,8 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
         }
 
         return {
-            log_line,
+            // eslint-disable-next-line camelcase
+            log_line: logLine,
         };
     } catch (e) {
         console.info("error " + e);
@@ -44,13 +45,14 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
     return {};
 }
 
-function parseJson(message: string): any {
+function parseJson<T>(message: string): T | null {
     const jsonSubString = extractJson(message);
     if (jsonSubString !== null) {
         const parsedJson = JSON.parse(jsonSubString);
 
         // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
         if ('@fields' in parsedJson && 'upstream_response_time' in parsedJson['@fields']) {
+            // eslint-disable-next-line camelcase
             parsedJson['@fields'].upstream_response_time = parseUpstreamResponseTime(parsedJson);
         }
 

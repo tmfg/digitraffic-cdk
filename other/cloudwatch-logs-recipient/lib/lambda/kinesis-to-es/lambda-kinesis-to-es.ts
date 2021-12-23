@@ -15,6 +15,7 @@ import {getAppFromSenderAccount, getEnvFromSenderAccount} from "./accounts";
 import {notifyFailedItems} from "./notify";
 import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
 import {IncomingMessage} from "http";
+import {Statistics} from "./statistics";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 
@@ -30,7 +31,7 @@ const MAX_BODY_SIZE = 1000000;
 const SEPARATOR_LAMBDA_LOGS = '\t';
 
 export const handler: KinesisStreamHandler = (event, context): void => {
-    const statistics = {};
+    const statistics = new Statistics();
 
     try {
         let batchBody = "";
@@ -55,7 +56,7 @@ export const handler: KinesisStreamHandler = (event, context): void => {
     }
 };
 
-function handleRecord(record: KinesisStreamRecord, statistics: any): string {
+function handleRecord(record: KinesisStreamRecord, statistics: Statistics): string {
     const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
@@ -137,7 +138,7 @@ export function post(body: string, callback: any) {
     });
 }
 
-export function transform(payload: CloudWatchLogsDecodedData, statistics: any, idsToFilter: string[] = []): string {
+export function transform(payload: CloudWatchLogsDecodedData, statistics: Statistics, idsToFilter: string[] = []): string {
     const app = getAppFromSenderAccount(payload.owner, knownAccounts);
     const env = getEnvFromSenderAccount(payload.owner, knownAccounts);
     const appName = `${app}-${env}-lambda`;
@@ -163,12 +164,7 @@ export function transform(payload: CloudWatchLogsDecodedData, statistics: any, i
             action.index._index = getIndexName(appName, logEvent.timestamp);
             action.index._type = 'doc';
 
-            // update statistics
-            if (!statistics[payload.logGroup]) {
-                statistics[payload.logGroup] = 1;
-            } else {
-                statistics[payload.logGroup] = statistics[payload.logGroup] + 1;
-            }
+            statistics.addStatistics(payload.logGroup);
 
             return [JSON.stringify(action), JSON.stringify(source)].join("\n");
         }).join("\n") + "\n"; // must end with new-line
@@ -178,7 +174,7 @@ export function isLambdaLifecycleEvent(message: string) {
     return message.startsWith('START RequestId') || message.startsWith('END RequestId') || message.startsWith('REPORT RequestId');
 }
 
-export function buildSource(message: string, extractedFields: any): any {
+export function buildSource(message: string, extractedFields?: CloudWatchLogsLogEventExtractedFields): any {
     message = message.replace("[, ]", "[0.0,0.0]");
 
     if (extractedFields) {
@@ -189,13 +185,14 @@ export function buildSource(message: string, extractedFields: any): any {
 }
 
 function buildFromMessage(message: string): any {
-    const log_line = message.replace('[, ]', '[0.0,0.0]')
+    const logLine = message.replace('[, ]', '[0.0,0.0]')
         .replace(/"Infinity"/g, "-1")
         .replace(/Infinity/gi, "-1")
         .replace(/"null"/gi, "null");
 
     return {
-        log_line,
+        // eslint-disable-next-line camelcase
+        log_line: logLine,
     };
 }
 

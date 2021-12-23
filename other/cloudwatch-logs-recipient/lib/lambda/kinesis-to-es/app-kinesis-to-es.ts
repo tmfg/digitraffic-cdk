@@ -1,26 +1,23 @@
 import {
     buildFromMessage,
-    extractJson, filterIds,
+    extractJson,
+    filterIds,
     getFailedIds,
-    getIndexName, isControlMessage,
-    parseESReturnValue, parseNumber,
+    getIndexName,
+    isControlMessage,
+    parseESReturnValue,
+    parseNumber,
 } from "./util";
-
-const https = require('https');
-const zlib = require('zlib');
-const crypto = require('crypto');
-
-import {
-    KinesisStreamEvent,
-    KinesisStreamRecord,
-    CloudWatchLogsDecodedData,
-    KinesisStreamHandler,
-    Context,
-} from "aws-lambda";
+import {CloudWatchLogsDecodedData, Context, KinesisStreamHandler, KinesisStreamRecord} from "aws-lambda";
 import {getAppFromSenderAccount} from "./accounts";
 import {notifyFailedItems} from "./notify";
 import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
 import {IncomingMessage} from "http";
+import {Statistics} from "./statistics";
+
+const https = require('https');
+const zlib = require('zlib');
+const crypto = require('crypto');
 
 const endpoint = process.env.ES_ENDPOINT as string;
 const knownAccounts = JSON.parse(process.env.KNOWN_ACCOUNTS as string);
@@ -32,7 +29,7 @@ const service = endpointParts[3];
 const MAX_BODY_SIZE = 5000000;
 
 export const handler: KinesisStreamHandler = function(event, context) {
-    const statistics = {};
+    const statistics = new Statistics();
 
     try {
         let batchBody = "";
@@ -57,7 +54,7 @@ export const handler: KinesisStreamHandler = function(event, context) {
     }
 };
 
-function handleRecord(record: KinesisStreamRecord, statistics: any): string {
+function handleRecord(record: KinesisStreamRecord, statistics: Statistics): string {
     const zippedInput = Buffer.from(record.kinesis.data, "base64");
 
     // decompress the input
@@ -101,13 +98,13 @@ function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchB
     });
 }
 
-function transform(payload: CloudWatchLogsDecodedData, statistics: any): string {
+function transform(payload: CloudWatchLogsDecodedData, statistics: Statistics): string {
     let bulkRequestBody = '';
 
     const app = getAppFromSenderAccount(payload.owner, knownAccounts);
     const appName = getAppName(payload.logGroup, app);
 
-    payload.logEvents.forEach((logEvent: any) => {
+    payload.logEvents.forEach((logEvent) => {
         const source = buildSource(logEvent.message, logEvent.extractedFields);
 
         source['@id'] = logEvent.id;
@@ -123,12 +120,7 @@ function transform(payload: CloudWatchLogsDecodedData, statistics: any): string 
         action.index._id = logEvent.id;
         action.index._index = indexName;
 
-        // update statistics
-        if (!statistics[indexName]) {
-            statistics[indexName] = 1;
-        } else {
-            statistics[indexName] = statistics[indexName] + 1;
-        }
+        statistics.addStatistics(indexName);
 
         bulkRequestBody += [
             JSON.stringify(action),
@@ -208,7 +200,7 @@ function post(body: string, callback: any) {
 
 function buildRequest(body: string): any {
     const datetime = (new Date()).toISOString().replace(/[:-]|\.\d{3}/g, '');
-    const date = datetime.substr(0, 8);
+    const date = datetime.substring(0, 8);
     const kDate = hmac('AWS4' + process.env.AWS_SECRET_ACCESS_KEY, date);
     const kRegion = hmac(kDate, region);
     const kService = hmac(kRegion, service);

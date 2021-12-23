@@ -4,13 +4,13 @@ const env = 'someenv';
 const accounts: Account[] = [{
     accountNumber,
     app,
-    env
+    env,
 }];
 process.env.KNOWN_ACCOUNTS = JSON.stringify(accounts);
 process.env.ES_ENDPOINT = 'some-elasticsearch-domain-asdfasdfasdf.eu-west-1.es.amazonaws.com';
 
 import {
-    buildSource
+    buildSource,
 } from '../../../lib/lambda/kinesis-to-es/app-kinesis-to-es';
 
 describe('app-kinesis-to-es', () => {
