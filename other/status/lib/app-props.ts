@@ -3,10 +3,17 @@ export enum EndpointProtocol {
     WebSocket
 }
 
+export enum EndpointHttpMethod {
+    GET = 'GET',
+    HEAD = 'HEAD',
+    POST = 'POST'
+}
+
 export type MonitoredEndpoint = {
     readonly name: string
     readonly url: string
     readonly protocol: EndpointProtocol
+    readonly method?: EndpointHttpMethod
     readonly sendData?: any
 }
 

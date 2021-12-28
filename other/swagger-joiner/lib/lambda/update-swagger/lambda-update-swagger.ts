@@ -70,6 +70,15 @@ export const handler = async (): Promise<any> => {
         }
     }
 
+    // remove HEAD methods used for health checks
+    for (const path in merged.paths) {
+        for (const method in merged.paths[path]) {
+            if (method.toUpperCase() === 'HEAD') {
+                delete merged.paths[path][method];
+            }
+        }
+    }
+
     const swaggerFilename = 'dt-swagger.js';
     const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;
 

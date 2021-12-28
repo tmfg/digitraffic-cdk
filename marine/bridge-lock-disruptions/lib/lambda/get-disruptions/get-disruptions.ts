@@ -1,12 +1,20 @@
 import {findAllDisruptions} from "../../service/disruptions";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
+import {FeatureCollection} from "geojson";
 
-export const handler = async (): Promise<any> => {
+export const handler = () => {
     return handlerFn(withDbSecret);
 };
 
-export function handlerFn(withDbSecretFn: (secretId: string, fn: (_: any) => Promise<void>) => Promise<any>): Promise<any> {
-    return withDbSecretFn(process.env.SECRET_ID as string, (_: any): Promise<any> => {
-        return findAllDisruptions();
-    });
+export async function handlerFn(withDbSecretFn: EmptySecretFunction<FeatureCollection>): Promise<LambdaResponse<string>> {
+    try {
+        const disruptions = await withDbSecretFn(process.env.SECRET_ID as string, () => {
+            return findAllDisruptions();
+        }) as FeatureCollection;
+        return LambdaResponse.ok(JSON.stringify(disruptions));
+    } catch (error) {
+        console.error('method=getDisruptionsHandler error', error);
+        return LambdaResponse.internalError();
+    }
 }

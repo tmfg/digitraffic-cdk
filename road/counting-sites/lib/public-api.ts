@@ -58,10 +58,7 @@ export class PublicApi {
         this.metadataResource = betaResource.addResource("metadata");
         this.dataResource = valuesResource.addResource("{id}");
         this.countersListResource = countersResource.addResource("{domain}");
-
-        //        this.errorResponseModel = publicApi.addModel('ErrorResponseModel', MessageModel);
         this.metadataResponseModel = publicApi.addModel('MetadataResponseModel', MessageModel);
-        //        this.dataResponseModel = publicApi.addModel('DataResponseModel', MessageModel);
     }
 
     createMetadataEndpoint(stack: DigitrafficStack) {
@@ -69,12 +66,14 @@ export class PublicApi {
 
         const metadataIntegration = defaultIntegration(lambda);
 
-        this.metadataResource.addMethod("GET", metadataIntegration, {
-            apiKeyRequired: true,
-            methodResponses: [
-                corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-            ],
+        ['GET', 'HEAD'].forEach((httpMethod) => {
+            this.metadataResource.addMethod(httpMethod, metadataIntegration, {
+                apiKeyRequired: true,
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                ],
+            });
         });
     }
 
@@ -91,15 +90,17 @@ export class PublicApi {
             responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)],
         });
 
-        this.countersListResource.addMethod("GET", countersIntegration, {
-            apiKeyRequired: true,
-            requestParameters: {
-                'method.request.path.domain': true,
-            },
-            methodResponses: [
-                corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.metadataResponseModel)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-            ],
+        ['GET', 'HEAD'].forEach((httpMethod) => {
+            this.countersListResource.addMethod(httpMethod, countersIntegration, {
+                apiKeyRequired: true,
+                requestParameters: {
+                    'method.request.path.domain': true,
+                },
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                ],
+            });
         });
     }
 
@@ -116,15 +117,17 @@ export class PublicApi {
             responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)],
         });
 
-        this.dataResource.addMethod("GET", dataIntegration, {
-            apiKeyRequired: true,
-            requestParameters: {
-                'method.request.path.id': true,
-            },
-            methodResponses: [
-                corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-                corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-            ],
+        ['GET', 'HEAD'].forEach((httpMethod) => {
+            this.dataResource.addMethod(httpMethod, dataIntegration, {
+                apiKeyRequired: true,
+                requestParameters: {
+                    'method.request.path.id': true,
+                },
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                ],
+            });
         });
     }
 }

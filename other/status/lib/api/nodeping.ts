@@ -1,5 +1,5 @@
 import axios from "axios";
-import {EndpointProtocol, MonitoredEndpoint} from "../app-props";
+import {EndpointHttpMethod, EndpointProtocol, MonitoredEndpoint} from "../app-props";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 
 const NODEPING_API = 'https://api.nodeping.com/api/1';
@@ -9,12 +9,19 @@ export enum NodePingCheckState {
     UP = 1
 }
 
+export enum NodePingCheckType {
+    HTTPADV = 'HTTPADV',
+    WEBSOCKET = 'WEBSOCKET'
+}
+
 export type NodePingCheck = {
     readonly _id: string
     readonly label: string
-    readonly type: string
+    readonly type: NodePingCheckType
     readonly state: NodePingCheckState
     readonly parameters: {
+        readonly target: string
+        readonly method: EndpointHttpMethod
         readonly threshold: number
     }
 }
@@ -23,10 +30,9 @@ export class NodePingApi {
 
     private readonly token: string;
     private readonly subAccountId: string;
-    public readonly checkTimeoutSeconds?: number
+    public readonly checkTimeoutSeconds?: number;
 
-    constructor(
-        token: string,
+    constructor(token: string,
         subAccountId: string,
         checkTimeoutSeconds?: number) {
 
@@ -50,8 +56,9 @@ export class NodePingApi {
         app: string,
         statuspageApiKey: string,
         statuspagePageId: string,
-        statuspageComponentId: string) {
-        console.log('Creating NodePing contact for endpoint %s', endpoint)
+        statuspageComponentId: string,
+    ) {
+        console.log('Creating NodePing contact for endpoint %s', endpoint);
         const resp = await axios.post(`${NODEPING_API}/contacts`, {
             token: this.token,
             customerid: this.subAccountId,
@@ -61,10 +68,10 @@ export class NodePingApi {
                 type: 'webhook',
                 action: 'patch',
                 headers: {
-                    Authorization: `OAuth ${statuspageApiKey}`
+                    Authorization: `OAuth ${statuspageApiKey}`,
                 },
-                data: {'component[status]': '{if success}operational{else}major_outage{/if}'}
-            }]
+                data: {'component[status]': '{if success}operational{else}major_outage{/if}'},
+            }],
         });
         if (resp.status !== 200) {
             throw new Error('Unable to create contact');
@@ -73,7 +80,7 @@ export class NodePingApi {
     }
 
     async getNodepingChecks(): Promise<NodePingCheck[]> {
-        console.log('Fetching NodePing checks')
+        console.log('Fetching NodePing checks');
         const resp = await axios.get(`${NODEPING_API}/checks?token=${this.token}&customerid=${this.subAccountId}`);
         if (resp.status !== 200) {
             throw new Error('Unable to fetch checks');
@@ -87,13 +94,15 @@ export class NodePingApi {
         contactIds: string[],
         app: string,
         appName: string,
-        extraData?: MonitoredEndpoint) {
+        extraData?: MonitoredEndpoint,
+    ) {
 
         console.log('Creating NodePing check for endpoint', endpoint);
         const notification: any = {};
         contactIds.forEach(contactId => {
             notification[`${contactId}`] = {'delay': 0, 'schedule': 'All'};
         });
+        const method = extraData?.method ?? EndpointHttpMethod.HEAD;
         const data: any = {
             customerid: this.subAccountId,
             token: this.token,
@@ -105,8 +114,8 @@ export class NodePingApi {
             enabled: true,
             follow: true,
             sendheaders: {'accept-encoding': 'gzip', 'digitraffic-user': 'Digitraffic Status'},
-            method: extraData?.sendData == null ? 'GET' : 'POST',
-            notifications: [notification]
+            method,
+            notifications: [notification],
         };
         if (extraData?.sendData) {
             data.postdata = extraData.sendData;
@@ -114,8 +123,8 @@ export class NodePingApi {
         }
         const resp = await axios.post(`${NODEPING_API}/checks`, data, {
             headers: {
-                'Content-type': MediaType.APPLICATION_JSON
-            }
+                'Content-type': MediaType.APPLICATION_JSON,
+            },
         });
         if (resp.status !== 200 || resp.data.error) {
             console.error('method=createNodepingCheck Unable to create check', resp.data.error);
@@ -124,19 +133,20 @@ export class NodePingApi {
         console.log('..done');
     }
 
-    async updateNodepingCheck(id: string, type: string) {
+    async updateNodepingCheck(id: string, type: string, method: EndpointHttpMethod) {
         const data: any = {
             customerid: this.subAccountId,
             token: this.token,
             id,
             type,
-            threshold: this.checkTimeoutSeconds
+            threshold: this.checkTimeoutSeconds,
+            method,
         };
         console.info(`method=updateNodepingCheck Updating NodePing check id ${id}, properties ${JSON.stringify(data)}`);
         const resp = await axios.put(`${NODEPING_API}/checks`, data, {
             headers: {
-                'Content-type': MediaType.APPLICATION_JSON
-            }
+                'Content-type': MediaType.APPLICATION_JSON,
+            },
         });
         if (resp.status !== 200 || resp.data.error) {
             console.error('method=updateNodepingCheck Unable to update check', resp.data.error);
@@ -144,12 +154,22 @@ export class NodePingApi {
         }
     }
 
-    checkNeedsUpdate(check: NodePingCheck): boolean {
+    checkNeedsUpdate(check: NodePingCheck, correspondingExtraEndpoint?: MonitoredEndpoint): boolean {
         let needsUpdate = false;
+
         if (this.checkTimeoutSeconds && this.checkTimeoutSeconds != check.parameters.threshold) {
             console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} timeout ${check.parameters.threshold} lower than default ${this.checkTimeoutSeconds}`);
             needsUpdate = true;
         }
+
+        if (check.type === NodePingCheckType.HTTPADV) {
+            const method = correspondingExtraEndpoint?.method ?? EndpointHttpMethod.HEAD;
+            if (check.parameters.method !== method) {
+                console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} method was not ${EndpointHttpMethod.HEAD}, instead: ${check.parameters.method}`);
+                needsUpdate = true;
+            }
+        }
+
         return needsUpdate;
     }
 }

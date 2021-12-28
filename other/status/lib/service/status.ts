@@ -2,12 +2,11 @@ import {NodePingApi, NodePingCheck, NodePingCheckState} from "../api/nodeping";
 import {StatuspageApi, StatuspageComponent, StatuspageComponentStatus} from "../api/statuspage";
 import {UpdateStatusSecret} from "../secret";
 import {AppEndpoints} from "../model/app-endpoints";
-import {MonitoredApp} from "../app-props";
+import {EndpointHttpMethod, MonitoredApp, MonitoredEndpoint} from "../app-props";
 import {DigitrafficApi} from "../api/digitraffic";
 import {TrafficType} from "digitraffic-common/model/traffictype";
 
-export async function getNodePingAndStatuspageComponentStatuses(
-    secret: UpdateStatusSecret,
+export async function getNodePingAndStatuspageComponentStatuses(secret: UpdateStatusSecret,
     statuspageApi: StatuspageApi,
     nodePingApi: NodePingApi): Promise<string[]> {
 
@@ -68,8 +67,7 @@ function getStatuspageComponentGroupId(appEndpoints: AppEndpoints, secret: Updat
     throw new Error(`Error fetching Status page component group id for app ${appEndpoints.app}! Unknown app or missing component group id`);
 }
 
-async function updateComponentsAndChecksForApp(
-    appEndpoints: AppEndpoints,
+async function updateComponentsAndChecksForApp(appEndpoints: AppEndpoints,
     secret: UpdateStatusSecret,
     statuspageApi: StatuspageApi,
     nodePingApi: NodePingApi): Promise<void> {
@@ -94,51 +92,57 @@ async function updateComponentsAndChecksForApp(
     const missingContacts = allEndpoints.filter(e => !contactNames.includes(e) && !contactNames.includes(`${appEndpoints.app} ${e}`));
     console.log('Missing contacts', missingContacts);
 
-        for (const missingContact of missingContacts) {
-            const component = statuspageComponents.find(c => c.name === missingContact);
-            if (!component) {
-                throw new Error(`Component for missing contact ${missingContact} not found`);
-            }
-            await nodePingApi.createNodepingContact(missingContact,
-                appEndpoints.app,
-                secret.nodePingToken,
-                secret.statuspagePageId,
-                component.id)
+    for (const missingContact of missingContacts) {
+        const component = statuspageComponents.find(c => c.name === missingContact);
+        if (!component) {
+            throw new Error(`Component for missing contact ${missingContact} not found`);
         }
-        if (missingContacts.length > 0) {
-            contacts = await nodePingApi.getNodepingContacts();
+        await nodePingApi.createNodepingContact(
+            missingContact,
+            appEndpoints.app,
+            secret.nodePingToken,
+            secret.statuspagePageId,
+            component.id,
+        );
+    }
+    if (missingContacts.length > 0) {
+        contacts = await nodePingApi.getNodepingContacts();
+    }
+
+    const checks = await nodePingApi.getNodepingChecks();
+    const checkNames = checks.map((check: any) => check.label);
+    const missingChecks = allEndpoints.filter(e => !checkNames.includes(e) && !checkNames.includes(`${appEndpoints.app} ${e}`));
+    console.log('Missing checks', missingChecks);
+
+    for (const missingCheck of missingChecks) {
+        const contact: any = Object.values(contacts).find((c: any) =>
+            c.name === missingCheck || `${appEndpoints.app} ${c.name}` === missingCheck || c.name === `${appEndpoints.app} ${missingCheck}`);
+        if (!contact) {
+            throw new Error(`Contact for ${missingCheck} not found`);
         }
+        const correspondingExtraEndpoint = appEndpoints.extraEndpoints.find(e => e.name === missingCheck);
+        await nodePingApi.createNodepingCheck(
+            missingCheck,
+            [
+                Object.keys(contact.addresses)[0] as string,
+                secret.nodePingContactIdSlack1,
+                secret.nodePingContactIdSlack2,
+            ],
+            appEndpoints.hostPart,
+            appEndpoints.app,
+            correspondingExtraEndpoint,
+        );
+    }
 
-        const checks = await nodePingApi.getNodepingChecks();
-        const checkNames = checks.map((check: any) => check.label);
-        const missingChecks = allEndpoints.filter(e => !checkNames.includes(e) && !checkNames.includes(`${appEndpoints.app} ${e}`));
-        console.log('Missing checks', missingChecks);
-
-        for (const missingCheck of missingChecks) {
-            const contact: any = Object.values(contacts).find((c: any) =>
-                c.name === missingCheck || `${appEndpoints.app} ${c.name}` === missingCheck || c.name === `${appEndpoints.app} ${missingCheck}`);
-            if (!contact) {
-                throw new Error(`Contact for ${missingCheck} not found`);
-            }
-            const correspondingExtraEndpoint = appEndpoints.extraEndpoints.find(e => e.name === missingCheck);
-            await nodePingApi.createNodepingCheck(missingCheck,
-                [
-                    Object.keys(contact['addresses'])[0] as string,
-                    secret.nodePingContactIdSlack1,
-                    secret.nodePingContactIdSlack2
-                ],
-                appEndpoints.hostPart,
-                appEndpoints.app,
-                correspondingExtraEndpoint);
-        }
-
-        await updateChecks(checks, nodePingApi);
+    await updateChecks(checks, nodePingApi, appEndpoints.extraEndpoints);
 }
 
-export async function updateChecks(checks: NodePingCheck[], nodePingApi: NodePingApi) {
-    const updateableChecks = checks.filter(check => nodePingApi.checkNeedsUpdate(check));
-    for (const updateableCheck of updateableChecks) {
-        await nodePingApi.updateNodepingCheck(updateableCheck._id, updateableCheck.type);
+export async function updateChecks(checks: NodePingCheck[], nodePingApi: NodePingApi, extraEndpoints: MonitoredEndpoint[]) {
+    for (const check of checks) {
+        const correspondingExtraEndpoint = extraEndpoints.find(e => e.url === check.parameters.target);
+        if (nodePingApi.checkNeedsUpdate(check, correspondingExtraEndpoint)) {
+            await nodePingApi.updateNodepingCheck(check._id, check.type, correspondingExtraEndpoint?.method ?? EndpointHttpMethod.HEAD);
+        }
     }
 }
 
@@ -147,7 +151,8 @@ export async function updateComponentsAndChecks(
     digitrafficApi: DigitrafficApi,
     statuspageApi: StatuspageApi,
     nodePingApi: NodePingApi,
-    secret: UpdateStatusSecret) {
+    secret: UpdateStatusSecret,
+) {
 
     const endpoints: AppEndpoints[] = await Promise.all(apps.map(digitrafficApi.getAppEndpoints));
 

@@ -1,11 +1,18 @@
-import {EndpointType, IModel, MethodLoggingLevel, RequestValidator, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {
+    EndpointType,
+    IModel,
+    LambdaIntegration,
+    MethodLoggingLevel,
+    RequestValidator,
+    Resource,
+    RestApi,
+} from 'aws-cdk-lib/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {Construct} from "constructs";
 import {default as DisruptionSchema} from './model/disruption-schema';
 import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {MessageModel} from "digitraffic-common/api/response";
 import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
 import {addDefaultValidator, addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
@@ -15,6 +22,7 @@ import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
 
 export function create(secret: ISecret,
     stack: DigitrafficStack) {
@@ -22,27 +30,23 @@ export function create(secret: ISecret,
 
     createUsagePlan(publicApi, 'BridgeLock Api Key', 'BridgeLock Usage Plan');
 
-    const validator = addDefaultValidator(publicApi);
-
     const disruptionModel = addServiceModel("DisruptionModel", publicApi, DisruptionSchema);
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId)));
     const disruptionsModel = addServiceModel("DisruptionsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
     createDisruptionsResource(
-        publicApi, disruptionsModel, validator, secret, stack,
+        publicApi, disruptionsModel, secret, stack,
     );
 }
 
 function createDisruptionsResource(
     publicApi: RestApi,
     disruptionsJsonModel: IModel,
-    validator: RequestValidator,
     secret: ISecret,
     stack: DigitrafficStack,
 ): Function {
 
     const functionName = 'BridgeLockDisruption-GetDisruptions';
-    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
     const environment = stack.createDefaultLambdaEnvironment('BridgeLockDisruption');
 
     const getDisruptionsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(
@@ -54,15 +58,19 @@ function createDisruptionsResource(
     secret.grantRead(getDisruptionsLambda);
 
     const resources = createResourcePaths(publicApi);
-    const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda);
+    const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda, {
+        responses: [
+            DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)
+        ]
+    });
 
-    resources.addMethod("GET", getDisruptionsIntegration, {
-        apiKeyRequired: true,
-        requestValidator: validator,
-        methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, disruptionsJsonModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, errorResponseModel)),
-        ],
+    ['GET', 'HEAD'].forEach(httpMethod => {
+        resources.addMethod(httpMethod, getDisruptionsIntegration, {
+            apiKeyRequired: true,
+            methodResponses: [
+                corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, disruptionsJsonModel))
+            ],
+        });
     });
 
     new DigitrafficLogSubscriptions(stack, getDisruptionsLambda);

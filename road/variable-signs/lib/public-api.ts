@@ -47,12 +47,14 @@ function createDatex2Resource(stack: DigitrafficStack, publicApi: RestApi): Func
     const imagesResource = vsResource.addResource("images");
     const imageResource = imagesResource.addResource("{text}");
 
-    datex2Resource.addMethod("GET", getDatex2Integration, {
-        apiKeyRequired: true,
-        methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_XML, xmlModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_XML, errorResponseModel)),
-        ],
+    ['GET', 'HEAD'].forEach(httpMethod => {
+        datex2Resource.addMethod(httpMethod, getDatex2Integration, {
+            apiKeyRequired: true,
+            methodResponses: [
+                corsMethod(methodResponse("200", MediaType.APPLICATION_XML, xmlModel)),
+                corsMethod(methodResponse("500", MediaType.APPLICATION_XML, errorResponseModel)),
+            ],
+        });
     });
 
     addTagsAndSummary(

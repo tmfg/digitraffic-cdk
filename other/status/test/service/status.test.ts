@@ -1,9 +1,10 @@
 import * as sinon from 'sinon';
 import * as StatusService from '../../lib/service/status';
-import {NodePingApi, NodePingCheck, NodePingCheckState} from "../../lib/api/nodeping";
+import {NodePingApi, NodePingCheck, NodePingCheckState, NodePingCheckType} from "../../lib/api/nodeping";
 import {UpdateStatusSecret} from "../../lib/secret";
 import {StatuspageApi, StatuspageComponentStatus} from "../../lib/api/statuspage";
 import {randomString} from "digitraffic-common/test/testutils";
+import {EndpointHttpMethod} from "../../lib/app-props";
 
 describe('status service', () => {
 
@@ -102,15 +103,17 @@ describe('status service', () => {
         const checks: NodePingCheck[] = [{
             _id: randomString(),
             label: randomString(),
-            type: 'HTTPADV',
+            type: NodePingCheckType.HTTPADV,
             state: NodePingCheckState.UP,
             parameters: {
+                target: 'http://some.url',
+                method: EndpointHttpMethod.HEAD,
                 threshold: 20
             }
         }];
         const nodePingApiUpdateSpy = sinon.stub(nodePingApi, 'updateNodepingCheck').returns(Promise.resolve());
 
-        await StatusService.updateChecks(checks, nodePingApi);
+        await StatusService.updateChecks(checks, nodePingApi, []);
 
         expect(nodePingApiUpdateSpy.called);
     });
