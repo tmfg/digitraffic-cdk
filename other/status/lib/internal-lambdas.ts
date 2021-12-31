@@ -37,6 +37,7 @@ function createUpdateStatusesLambda(
     environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
     environment[StatusEnvKeys.SECRET_ID] = props.secretsManagerSecretArn;
     environment[StatusEnvKeys.CHECK_TIMEOUT_SECONDS] = String(props.nodePingTimeoutSeconds);
+    environment[StatusEnvKeys.INTERVAL_MINUTES] = String(props.nodePingCheckInterval);
 
     const functionName = "Status-UpdateStatuses";
     const lambdaConf: FunctionProps = {

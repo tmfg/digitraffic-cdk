@@ -19,6 +19,7 @@ export type NodePingCheck = {
     readonly label: string
     readonly type: NodePingCheckType
     readonly state: NodePingCheckState
+    readonly interval: number
     readonly parameters: {
         readonly target: string
         readonly method: EndpointHttpMethod
@@ -31,14 +32,17 @@ export class NodePingApi {
     private readonly token: string;
     private readonly subAccountId: string;
     public readonly checkTimeoutSeconds?: number;
+    public readonly checkInterval?: number;
 
     constructor(token: string,
         subAccountId: string,
-        checkTimeoutSeconds?: number) {
+        checkTimeoutSeconds?: number,
+        checkInterval?: number) {
 
         this.token = token;
         this.subAccountId = subAccountId;
         this.checkTimeoutSeconds = checkTimeoutSeconds;
+        this.checkInterval = checkInterval;
     }
 
     async getNodepingContacts () {
@@ -141,6 +145,7 @@ export class NodePingApi {
             type,
             threshold: this.checkTimeoutSeconds,
             method,
+            interval: this.checkInterval,
         };
         console.info(`method=updateNodepingCheck Updating NodePing check id ${id}, properties ${JSON.stringify(data)}`);
         const resp = await axios.put(`${NODEPING_API}/checks`, data, {
@@ -158,7 +163,12 @@ export class NodePingApi {
         let needsUpdate = false;
 
         if (this.checkTimeoutSeconds && this.checkTimeoutSeconds != check.parameters.threshold) {
-            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} timeout ${check.parameters.threshold} lower than default ${this.checkTimeoutSeconds}`);
+            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} timeout ${check.parameters.threshold} different than default ${this.checkTimeoutSeconds}`);
+            needsUpdate = true;
+        }
+
+        if (this.checkInterval && this.checkInterval != check.interval) {
+            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} interval ${check.interval} different than default ${this.checkInterval}`);
             needsUpdate = true;
         }
 

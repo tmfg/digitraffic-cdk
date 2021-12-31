@@ -8,8 +8,7 @@ import {EndpointHttpMethod} from "../../lib/app-props";
 
 describe('status service', () => {
 
-    function testGetNodePingAndStatuspageComponentStatuses(
-        name: string,
+    function testGetNodePingAndStatuspageComponentStatuses(name: string,
         expectationFn: (statuses: string[]) => void,
         returnFromStatuspage: any = [],
         returnFromNodePing: any = []) {
@@ -44,7 +43,7 @@ describe('status service', () => {
             name: 'testcomponent',
             id: 'someid',
             group_id: 'somegroupid',
-            status: StatuspageComponentStatus.operational
+            status: StatuspageComponentStatus.operational,
         }], []);
 
     testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - component groups don't create checks`,
@@ -54,7 +53,7 @@ describe('status service', () => {
             name: 'testcomponent',
             id: 'someid',
             group_id: null,
-            status: StatuspageComponentStatus.operational
+            status: StatuspageComponentStatus.operational,
         }], []);
 
     testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - NodePing check UP, Statuspage check DOWN`,
@@ -65,10 +64,10 @@ describe('status service', () => {
             name: 'testcomponent',
             id: 'someid',
             group_id: 'somegroupid',
-            status: StatuspageComponentStatus.major_outage
+            status: StatuspageComponentStatus.major_outage,
         }], [{
             label: 'testcomponent',
-            state: NodePingCheckState.UP
+            state: NodePingCheckState.UP,
         }]);
 
     testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - NodePing check DOWN, Statuspage check UP`,
@@ -79,10 +78,10 @@ describe('status service', () => {
             name: 'testcomponent',
             id: 'someid',
             group_id: 'somegroupid',
-            status: StatuspageComponentStatus.operational
+            status: StatuspageComponentStatus.operational,
         }], [{
             label: 'testcomponent',
-            state: NodePingCheckState.DOWN
+            state: NodePingCheckState.DOWN,
         }]);
 
     testGetNodePingAndStatuspageComponentStatuses(`getNodePingAndStatuspageComponentStatuses - app name is stripped`,
@@ -92,10 +91,10 @@ describe('status service', () => {
             name: 'api/foo/bar',
             id: 'someid',
             group_id: 'somegroupid',
-            status: StatuspageComponentStatus.operational
+            status: StatuspageComponentStatus.operational,
         }], [{
             label: 'Road api/foo/bar',
-            state: NodePingCheckState.UP
+            state: NodePingCheckState.UP,
         }]);
 
     test('updateChecks - check is updated ', async () => {
@@ -105,11 +104,12 @@ describe('status service', () => {
             label: randomString(),
             type: NodePingCheckType.HTTPADV,
             state: NodePingCheckState.UP,
+            interval: 5,
             parameters: {
                 target: 'http://some.url',
                 method: EndpointHttpMethod.HEAD,
-                threshold: 20
-            }
+                threshold: 20,
+            },
         }];
         const nodePingApiUpdateSpy = sinon.stub(nodePingApi, 'updateNodepingCheck').returns(Promise.resolve());
 
@@ -131,6 +131,6 @@ function emptySecret(): UpdateStatusSecret {
         nodePingToken: '',
         nodePingContactIdSlack1: '',
         nodePingContactIdSlack2: '',
-        reportUrl: ''
+        reportUrl: '',
     };
 }
