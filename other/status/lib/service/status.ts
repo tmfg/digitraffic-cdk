@@ -134,7 +134,8 @@ async function updateComponentsAndChecksForApp(appEndpoints: AppEndpoints,
         );
     }
 
-    await updateChecks(checks, nodePingApi, appEndpoints.extraEndpoints);
+    console.log('Updating checks for app %s', appEndpoints.app);
+    await updateChecks(checks.filter(c => c.label.toLowerCase().includes(appEndpoints.app.toLowerCase())), nodePingApi, appEndpoints.extraEndpoints);
 }
 
 export async function updateChecks(checks: NodePingCheck[], nodePingApi: NodePingApi, extraEndpoints: MonitoredEndpoint[]) {
