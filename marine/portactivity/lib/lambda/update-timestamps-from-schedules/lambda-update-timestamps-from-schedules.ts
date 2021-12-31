@@ -9,7 +9,7 @@ type SchedulesSecret = {
     readonly "schedules.url": string
 }
 
-export const handler = async function (): Promise<void> {
+export const handler = function (): Promise<void> {
     return withSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: SchedulesSecret) => {
         const schedulesUrl = secret[PortactivitySecretKeys.SCHEDULES_URL];
 
@@ -21,4 +21,4 @@ export const handler = async function (): Promise<void> {
 
         await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
     });
-}
+};

@@ -70,6 +70,7 @@ async function insertFault(db: DTDatabase) {
 function makeSqsStub(): [SQS, SinonStub] {
     const sqs = new SQS();
     const sendStub = sandbox.stub().returns(Promise.resolve());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     sandbox.stub(sqs, 'sendMessage').returns({promise: sendStub} as any);
     return [sqs, sendStub];
 }

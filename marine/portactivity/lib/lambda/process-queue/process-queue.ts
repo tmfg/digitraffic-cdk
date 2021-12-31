@@ -1,4 +1,4 @@
-import {saveTimestamp} from "../../service/timestamps";
+import {saveTimestamp, UpdatedTimestamp} from "../../service/timestamps";
 import {validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
 import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
@@ -6,22 +6,20 @@ import {PortactivityEnvKeys} from "../../keys";
 import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const middy = require('@middy/core')
+const middy = require('@middy/core');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
+const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure');
 
-export function handlerFn(
-    withDbSecretFn: EmptySecretFunction<PromiseSettledResult<any>[]>
-) {
-    return async (event: SQSEvent) => {
-        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async () => {
-            return inDatabase(async (db: DTDatabase) => {
-                return await Promise.allSettled(event.Records.map(r => {
+export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResult<void | UpdatedTimestamp | null>[]>) {
+    return (event: SQSEvent) => {
+        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, () => {
+            return inDatabase((db: DTDatabase) => {
+                return Promise.allSettled(event.Records.map(r => {
                     const timestamp = JSON.parse(r.body);
                     console.info('DEBUG method=processTimestampQueue processing timestamp', timestamp);
 
                     if (!validateTimestamp(timestamp)) {
-                        console.warn('DEBUG method=processTimestampQueue timestamp did not pass validation')
+                        console.warn('DEBUG method=processTimestampQueue timestamp did not pass validation');
                         // resolve so this gets removed from the queue
                         return Promise.resolve();
                     }

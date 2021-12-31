@@ -18,13 +18,11 @@ const queueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as stri
 
 const expectedKeys = [
     PortactivitySecretKeys.AWAKE_URL,
-    PortactivitySecretKeys.AWAKE_AUTH
+    PortactivitySecretKeys.AWAKE_AUTH,
 ];
 
-export function handlerFn(
-    withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSecret, void>,
-    AwakeAiETAServiceClass: new (api: AwakeAiVoyagesApi) => AwakeAiETAService,
-): (event: SNSEvent) => Promise<void> {
+export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSecret, void>,
+    AwakeAiETAServiceClass: new (api: AwakeAiVoyagesApi) => AwakeAiETAService): (event: SNSEvent) => Promise<void> {
 
     return (event: SNSEvent) => {
         // always a single event, guaranteed by SNS

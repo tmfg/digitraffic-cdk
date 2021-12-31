@@ -48,7 +48,7 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
     });
 }
 
-function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: any): Promise<CognitoUserSession | null> {
+function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: object): Promise<CognitoUserSession | null> {
     return new Promise(resolve => {
         cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
             onSuccess: (result: CognitoUserSession) => {

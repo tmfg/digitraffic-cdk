@@ -29,7 +29,7 @@ describe('timestamp model', () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (timestamp as any).eventTime = '123456-qwerty'
+        (timestamp as any).eventTime = '123456-qwerty';
 
         expect(validateTimestamp(timestamp)).toBe(false);
     });
@@ -38,7 +38,7 @@ describe('timestamp model', () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (timestamp as any).eventTimeConfidenceLower = 'PT1Hasdf'
+        (timestamp as any).eventTimeConfidenceLower = 'PT1Hasdf';
 
         expect(validateTimestamp(timestamp)).toBe(false);
     });
@@ -47,7 +47,7 @@ describe('timestamp model', () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (timestamp as any).eventTimeConfidenceUpper = 'PT1Hasdf'
+        (timestamp as any).eventTimeConfidenceUpper = 'PT1Hasdf';
 
         expect(validateTimestamp(timestamp)).toBe(false);
     });
@@ -56,7 +56,7 @@ describe('timestamp model', () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (timestamp as any).eventTimeConfidenceUpper = 'PT1Hasdf'
+        (timestamp as any).eventTimeConfidenceUpper = 'PT1Hasdf';
 
         expect(validateTimestamp(timestamp)).toBe(false);
     });
@@ -74,7 +74,7 @@ describe('timestamp model', () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (timestamp as any).recordTime = '123456-qwerty'
+        (timestamp as any).recordTime = '123456-qwerty';
 
         expect(validateTimestamp(timestamp)).toBe(false);
     });

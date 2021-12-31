@@ -6,6 +6,7 @@ import {newTimestamp} from "../testdata";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 import * as R from 'ramda';
 import {createEmptySecretFunction} from "digitraffic-common/test/secret";
+import {UpdatedTimestamp} from "../../lib/service/timestamps";
 
 // empty sec usage function for tests
 const NOOP_WITH_SECRET = createEmptySecretFunction<PromiseSettledResult<any>[]>();
@@ -20,7 +21,7 @@ describe('process-queue', dbTestBase((db: DTDatabase) => {
         const timestamp = newTimestamp();
 
         await handlerFn(NOOP_WITH_SECRET)({
-            Records: [createRecord(timestamp)]
+            Records: [createRecord(timestamp)],
         });
 
         const allTimestamps = await findAll(db);
@@ -31,7 +32,7 @@ describe('process-queue', dbTestBase((db: DTDatabase) => {
         const timestamp = R.omit(['portcallId'], newTimestamp());
 
         await handlerFn(NOOP_WITH_SECRET)({
-            Records: [createRecord(timestamp)]
+            Records: [createRecord(timestamp)],
         });
 
         const allTimestamps = await findAll(db);
@@ -42,7 +43,7 @@ describe('process-queue', dbTestBase((db: DTDatabase) => {
         const timestamp = R.omit(['eventType'], newTimestamp()) as ApiTimestamp;
 
         await handlerFn(NOOP_WITH_SECRET)({
-            Records: [createRecord(timestamp)]
+            Records: [createRecord(timestamp)],
         });
 
         const allTimestamps = await findAll(db);
@@ -54,8 +55,8 @@ describe('process-queue', dbTestBase((db: DTDatabase) => {
         const invalidTimestamp = R.omit(['eventType'], newTimestamp()) as ApiTimestamp;
 
         const promises = await handlerFn(NOOP_WITH_SECRET)({
-            Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)]
-        }) as PromiseSettledResult<any>[];
+            Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)],
+        }) as PromiseSettledResult<void | UpdatedTimestamp | null>[];
 
         expect(promises.filter((p: PromiseSettledResult<unknown>) => p.status == 'fulfilled')).toHaveLength(2);
         const allTimestamps = await findAll(db);
@@ -80,6 +81,6 @@ function createRecord(timestamp: ApiTimestamp): SQSRecord {
         },
         eventSource: '',
         eventSourceARN: '',
-        awsRegion: ''
+        awsRegion: '',
     };
 }

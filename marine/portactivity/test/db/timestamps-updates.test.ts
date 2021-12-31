@@ -10,7 +10,7 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
     test('updateTimestamp - properties', async () => {
         const timestamp = newTimestamp({
             eventTimeConfidenceLower: 'PT1H',
-            eventTimeConfidenceUpper: 'PT4H'
+            eventTimeConfidenceUpper: 'PT4H',
         });
 
         await TimestampsDb.updateTimestamp(db, timestamp);
@@ -35,8 +35,8 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
         const timestamp = Object.assign(newTimestamp(), {
             ship: {
                 mmsi: 123,
-                imo: undefined
-            }
+                imo: undefined,
+            },
         });
 
         await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
@@ -46,8 +46,8 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
         const timestamp = Object.assign(newTimestamp(), {
             ship: {
                 mmsi: undefined,
-                imo: 456
-            }
+                imo: 456,
+            },
         });
 
         await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
@@ -57,8 +57,8 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
         const timestamp = Object.assign(newTimestamp(), {
             ship: {
                 mmsi: 123,
-                imo: 456
-            }
+                imo: 456,
+            },
         });
 
         await TimestampsDb.updateTimestamp(db, timestamp);
@@ -79,10 +79,10 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
 
     test('createUpdateValues - mmsi 0', () => {
         const imo = 123456789;
-         const values = TimestampsDb.createUpdateValues(newTimestamp({
-             mmsi: 0,
-             imo
-         }));
+        const values = TimestampsDb.createUpdateValues(newTimestamp({
+            mmsi: 0,
+            imo,
+        }));
 
         expect(values[9]).toBe(undefined);
         expect(values[10]).toBe(imo);
@@ -92,7 +92,7 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
         const mmsi = 123456789;
         const values = TimestampsDb.createUpdateValues(newTimestamp({
             mmsi,
-            imo: 0
+            imo: 0,
         }));
 
         expect(values[9]).toBe(mmsi);
@@ -102,7 +102,7 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
     test('portcall id - supplied', async () => {
         const portcallId = 123;
         const timestamp = newTimestamp({
-            portcallId
+            portcallId,
         });
 
         await TimestampsDb.updateTimestamp(db, timestamp);
@@ -114,7 +114,7 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
         const eventTime = moment();
         const timestamp = newTimestamp({
             eventType: EventType.ETA,
-            eventTime: eventTime.toDate()
+            eventTime: eventTime.toDate(),
         });
         const portAreaDetails = await generatePortCalls(timestamp);
         const nearestTimestamp = // sort by nearest time
@@ -124,12 +124,14 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
                 return aDiff - bDiff;
             })[0];
 
-        const portcallId = await TimestampsDb.findPortcallId(db,
+        const portcallId = await TimestampsDb.findPortcallId(
+            db,
             timestamp.location.port,
             timestamp.eventType,
             moment(timestamp.eventTime).toDate(),
             timestamp.ship.mmsi,
-            timestamp.ship.imo);
+            timestamp.ship.imo,
+        );
 
         expect(portcallId).toBe(nearestTimestamp.port_call_id);
     });
@@ -138,16 +140,18 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
         const eventTime = moment();
         const timestamp = newTimestamp({
             eventType: EventType.ETA,
-            eventTime: eventTime.toDate()
+            eventTime: eventTime.toDate(),
         });
         await generatePortCalls(timestamp);
 
-        const portcallId = await TimestampsDb.findPortcallId(db,
+        const portcallId = await TimestampsDb.findPortcallId(
+            db,
             'NOT_FOUND',
             timestamp.eventType,
             moment(timestamp.eventTime).toDate(),
             123,
-            456);
+            456,
+        );
 
         expect(portcallId).toBeNull();
     });
@@ -159,7 +163,7 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
             const pc = newPortCall(timestamp, portcallId);
             const pac = newPortAreaDetails(timestamp, {
                 portcallId: portcallId,
-                eta: moment(timestamp.eventTime).add(1 + Math.floor(Math.random() * 100), 'minutes').toDate()
+                eta: moment(timestamp.eventTime).add(1 + Math.floor(Math.random() * 100), 'minutes').toDate(),
             });
             return [pc, pac];
         });

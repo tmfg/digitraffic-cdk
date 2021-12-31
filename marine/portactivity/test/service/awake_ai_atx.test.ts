@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import {
     AwakeAiATXApi,
     AwakeAIATXTimestampMessage,
-    AwakeATXZoneEventType
+    AwakeATXZoneEventType,
 } from "../../lib/api/awake_ai_atx";
 import {AwakeAiATXService} from "../../lib/service/awake_ai_atx";
 import {dbTestBase, insertPortAreaDetails, insertPortCall} from "../db-testutil";
@@ -15,6 +15,9 @@ import {AwakeAiZoneType} from "../../lib/api/awake_common";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ws = require('ws');
 import {DTDatabase} from "digitraffic-common/postgres/database";
+
+// test file
+/* eslint-disable camelcase */
 
 describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
 
@@ -46,13 +49,13 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
             eventTime: atxMessage.eventTimestamp,
             recordTime: atxMessage.eventTimestamp,
             location: {
-                port: atxMessage.locodes[0]
+                port: atxMessage.locodes[0],
             },
             ship: {
                 mmsi: atxMessage.mmsi,
-                imo: atxMessage.imo
+                imo: atxMessage.imo,
             },
-            source: EventSource.AWAKE_AI
+            source: EventSource.AWAKE_AI,
         };
         expect(timestamps[0]).toMatchObject(expectedTimestamp);
     });
@@ -71,7 +74,7 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
         expect(timestamps.length).toBe(0);
     });
 
-    async function createPortcall(atxMessage: AwakeAIATXTimestampMessage, portcallId: number) {
+    function createPortcall(atxMessage: AwakeAIATXTimestampMessage, portcallId: number) {
         return db.tx(t => {
             insertPortCall(t, {
                 port_call_id: portcallId,
@@ -81,12 +84,12 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
                 port_call_timestamp: new Date(),
                 port_to_visit: atxMessage.locodes[0],
                 mmsi: atxMessage.mmsi,
-                imo_lloyds: atxMessage.imo
+                imo_lloyds: atxMessage.imo,
             });
             insertPortAreaDetails(t, {
                 port_call_id: portcallId,
                 port_area_details_id: someNumber(),
-                eta: new Date().toISOString()
+                eta: new Date().toISOString(),
             });
         });
     }

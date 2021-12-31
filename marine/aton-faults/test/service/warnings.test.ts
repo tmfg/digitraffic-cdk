@@ -1,5 +1,4 @@
 import {dbTestBase, insertActiveWarnings, TEST_ACTIVE_WARNINGS_VALID} from "../db-testutil";
-import {IDatabase} from "pg-promise";
 import {findWarningsForVoyagePlan} from "../../lib/service/warnings";
 import {voyagePlan} from "../testdata";
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
@@ -11,12 +10,12 @@ jest.setTimeout(30000);
 
 const parseXml = util.promisify(xml2js.parseString);
 
-describe('warnings-service', dbTestBase((db: IDatabase<any, any>) => {
+describe('warnings-service', dbTestBase((db) => {
 
     async function findWarnings() {
         const rtz = (await parseXml(voyagePlan)) as RtzVoyagePlan;
 
-        return await findWarningsForVoyagePlan(rtz);
+        return findWarningsForVoyagePlan(rtz);
     }
 
     test('findWarningsForVoyagePlan - empty', async () => {

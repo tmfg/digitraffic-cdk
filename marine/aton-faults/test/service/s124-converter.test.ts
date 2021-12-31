@@ -1,11 +1,10 @@
-import {dbTestBase, TEST_ACTIVE_WARNINGS_VALID} from "../db-testutil";
-import {IDatabase} from "pg-promise";
+import {TEST_ACTIVE_WARNINGS_VALID} from "../db-testutil";
 import {convertWarning} from "../../lib/service/s124-converter";
 import * as xsdValidator from "xsd-schema-validator";
 import {Builder} from "xml2js";
 import {Feature} from "geojson";
 
-describe('converter-service', dbTestBase((db: IDatabase<any, any>) => {
+describe('converter-service', () => {
 
     test('convert - warnings warning', async () => {
         expect(TEST_ACTIVE_WARNINGS_VALID.features).toHaveLength(7);
@@ -22,4 +21,4 @@ describe('converter-service', dbTestBase((db: IDatabase<any, any>) => {
 
         console.info(xml);
     });
-}));
+});

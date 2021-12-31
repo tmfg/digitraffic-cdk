@@ -146,14 +146,14 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             locode,
             eventType: EventType.ETA,
             eventTime: moment().add(1, 'hours').toDate(),
-            source: EventSource.PORTNET
+            source: EventSource.PORTNET,
         });
         const eta2 = newTimestamp({
             imo,
             locode,
             eventType: EventType.ETA,
             eventTime: moment().add(2, 'hours').toDate(),
-            source: EventSource.PORTNET
+            source: EventSource.PORTNET,
         });
         await insertPortCall(db, newPortCall(eta1));
         await insertPortCall(db, newPortCall(eta2));
@@ -175,14 +175,14 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             locode: locode1,
             eventType: EventType.ETA,
             eventTime: moment().add(1, 'hours').toDate(),
-            source: EventSource.PORTNET
+            source: EventSource.PORTNET,
         });
         const eta2 = newTimestamp({
             imo,
             locode: locode2,
             eventType: EventType.ETA,
             eventTime: moment().add(2, 'hours').toDate(),
-            source: EventSource.PORTNET
+            source: EventSource.PORTNET,
         });
         await insertPortCall(db, newPortCall(eta1));
         await insertPortCall(db, newPortCall(eta2));
@@ -203,14 +203,14 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             locode,
             eventType: EventType.ETA,
             eventTime: moment().add(1, 'hours').toDate(),
-            source: EventSource.PORTNET
+            source: EventSource.PORTNET,
         });
         const eta2 = newTimestamp({
             imo: 654321,
             locode,
             eventType: EventType.ETA,
             eventTime: moment().add(2, 'hours').toDate(),
-            source: EventSource.PORTNET
+            source: EventSource.PORTNET,
         });
         await insertPortCall(db, newPortCall(eta1));
         await insertPortCall(db, newPortCall(eta2));

@@ -10,7 +10,7 @@ type PilotWebSecret = {
     readonly 'pilotweb.auth': string
 }
 
-export const handler = async function (): Promise<void> {
+export const handler = function (): Promise<void> {
     return withDbSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: PilotWebSecret): Promise<void> => {
         const pilotwebUrl = secret[PortactivitySecretKeys.PILOTWEB_URL];
         const authHeader = secret[PortactivitySecretKeys.PILOTWEB_AUTH];
@@ -21,4 +21,4 @@ export const handler = async function (): Promise<void> {
 
         await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
     });
-}
+};

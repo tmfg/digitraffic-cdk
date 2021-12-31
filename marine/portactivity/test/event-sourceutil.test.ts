@@ -14,7 +14,7 @@ describe('event-sourceutil', () => {
         const m1 = moment(1622549546737);
         const m2 = moment(1622549553609);
 
-        const average = momentAverage([m1, m2])
+        const average = momentAverage([m1, m2]);
 
         expect(average).toBe('2021-06-01T12:12:30.173Z');
     });
@@ -36,7 +36,7 @@ describe('event-sourceutil', () => {
         const timestamps = [
             newTimestamp({ source: EventSource.SCHEDULES_CALCULATED, portcallId }),
             newTimestamp({ source: EventSource.PORTNET, portcallId }),
-            newTimestamp({ source: EventSource.AWAKE_AI, portcallId })
+            newTimestamp({ source: EventSource.AWAKE_AI, portcallId }),
         ];
 
         const merged = mergeTimestamps(timestamps);
@@ -55,7 +55,7 @@ describe('event-sourceutil', () => {
             vtsControlTimestamp,
             schedulesTimestamp,
             portnetTimestamp,
-            vtsTimestamp
+            vtsTimestamp,
         ]);
 
         const merged = mergeTimestamps(timestamps);
@@ -74,7 +74,7 @@ describe('event-sourceutil', () => {
         const timestamps = [
             teqplayTimestamp,
             schedulesTimestamp,
-            vtsTimestamp
+            vtsTimestamp,
         ];
 
         const merged = mergeTimestamps(timestamps)[0] as ApiTimestamp;

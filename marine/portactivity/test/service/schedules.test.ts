@@ -22,21 +22,21 @@ const etdTimestamp = '2021-04-27T06:17:36Z';
 
 describe('schedules', () => {
 
-    test('SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [ ] ETD', async () => {
+    test('SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [ ] ETD', () => {
         const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, false), false);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETA, false));
     });
 
-    test('SchedulesService.schedulesToTimestamps - under VTS control - [ ] ETA [x] ETD', async () => {
+    test('SchedulesService.schedulesToTimestamps - under VTS control - [ ] ETA [x] ETD', () => {
         const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, false, true), false);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETD, false));
     });
 
-    test('SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [x] ETD', async () => {
+    test('SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [x] ETD', () => {
         const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, true), false);
 
         expect(timestamps.length).toBe(6);
@@ -44,21 +44,21 @@ describe('schedules', () => {
         timestamps.filter(ts => ts.eventType == EventType.ETD).forEach(ts => verifyStructure(ts, EventType.ETD, false));
     });
 
-    test('SchedulesService.schedulesToTimestamps - calculated - [x] ETA [ ] ETD', async () => {
+    test('SchedulesService.schedulesToTimestamps - calculated - [x] ETA [ ] ETD', () => {
         const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, false), true);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETA, true));
     });
 
-    test('SchedulesService.schedulesToTimestamps - calculated - [ ] ETA [x] ETD', async () => {
+    test('SchedulesService.schedulesToTimestamps - calculated - [ ] ETA [x] ETD', () => {
         const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, false, true), true);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETD, true));
     });
 
-    test('SchedulesService.schedulesToTimestamps - calculated - [x] ETA [x] ETD', async () => {
+    test('SchedulesService.schedulesToTimestamps - calculated - [x] ETA [x] ETD', () => {
         const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, true), true);
 
         expect(timestamps.length).toBe(6);
@@ -70,7 +70,7 @@ describe('schedules', () => {
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: moment().subtract(getRandomNumber(6, 9999), 'minutes').toDate(),
-            locode
+            locode,
         });
 
         expect(SchedulesService.filterTimestamps([etd]).length).toBe(0);
@@ -80,7 +80,7 @@ describe('schedules', () => {
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: moment().subtract(getRandomNumber(1, 5), 'minutes').toDate(),
-            locode
+            locode,
         });
 
         expect(SchedulesService.filterTimestamps([etd]).length).toBe(1);
@@ -96,25 +96,25 @@ function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean):
                 $: { UUID: uuid },
                 timetable: [{
                     destination: [{
-                        $: { locode, destination, portfacility }
+                        $: { locode, destination, portfacility },
                     }],
                     eta: eta ? [{
-                        $: { time: etaEventTime, uts: etaTimestamp }
+                        $: { time: etaEventTime, uts: etaTimestamp },
                     }] : undefined,
                     etd: etd ? [{
-                        $: { time: etdEventTime, uts: etdTimestamp }
-                    }] : undefined
+                        $: { time: etdEventTime, uts: etdTimestamp },
+                    }] : undefined,
                 }],
                 vessel: [{
                     $: {
                         vesselName,
                         callsign,
                         mmsi,
-                        imo
-                    }
-                }]
-            }))
-        }
+                        imo,
+                    },
+                }],
+            })),
+        },
     };
 }
 
@@ -125,5 +125,5 @@ function verifyStructure(ts: ApiTimestamp, eventType: EventType.ETA | EventType.
     expect(ts.eventType).toBe(eventType);
     expect(ts.eventTime).toBe(eventType == EventType.ETA ? etaEventTime : etdEventTime);
     expect(ts.recordTime).toBe(eventType == EventType.ETA ? etaTimestamp : etdTimestamp);
-    expect(ts.source).toBe(calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL)
+    expect(ts.source).toBe(calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL);
 }

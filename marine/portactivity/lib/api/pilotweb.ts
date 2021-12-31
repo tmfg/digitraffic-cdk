@@ -1,8 +1,8 @@
-import * as https from 'https'
+import * as https from 'https';
 
 const PILOTAGES_PATH = "/digitraffic/pilotages/active";
 
-export async function getMessages(host: string, authHeader: string): Promise<string> {
+export function getMessages(host: string, authHeader: string): Promise<string> {
     let content = '';
 
     return new Promise((resolve, reject) => {
@@ -12,8 +12,8 @@ export async function getMessages(host: string, authHeader: string): Promise<str
             method: 'GET',
             headers: {
                 'Authorization': `Basic ${authHeader}`,
-                'Content-Type': 'text/plain'
-            }
+                'Content-Type': 'text/plain',
+            },
         }, (response) => {
             //another chunk of data has been received, so append it to `str`
             response.on('data', (chunk) => {

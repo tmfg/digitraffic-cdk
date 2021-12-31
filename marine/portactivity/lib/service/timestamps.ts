@@ -1,5 +1,5 @@
-import * as TimestampsDB from '../db/timestamps'
-import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps'
+import * as TimestampsDB from '../db/timestamps';
+import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps';
 import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
@@ -14,14 +14,16 @@ export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean
 }
 
-export async function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<UpdatedTimestamp | null> {
+export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<UpdatedTimestamp | null> {
     return db.tx(async t => {
-        const portcallId = timestamp.portcallId || (await TimestampsDB.findPortcallId(db,
+        const portcallId = timestamp.portcallId || (await TimestampsDB.findPortcallId(
+            db,
             timestamp.location.port,
             timestamp.eventType,
             moment(timestamp.eventTime).toDate(),
             timestamp.ship.mmsi,
-            timestamp.ship.imo));
+            timestamp.ship.imo,
+        ));
 
         if (!portcallId) {
             console.warn(`method=saveTimestamp portcall id not found for timestamp %s`, JSON.stringify(timestamp));
@@ -47,41 +49,33 @@ export async function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Pr
 
         const ship: Ship = {
             imo,
-            mmsi
+            mmsi,
         };
 
         return doSaveTimestamp(t, { ...timestamp, ...{ portcallId, ship }});
     });
 }
 
-export async function saveTimestamps(timestamps: ApiTimestamp[]): Promise<Array<DbUpdatedTimestamp | null>> {
-    return await inDatabase(async (db: DTDatabase) => {
-        return await db.tx(t => t.batch(
-            timestamps.map(timestamp => doSaveTimestamp(t, timestamp))
-        ));
+export function saveTimestamps(timestamps: ApiTimestamp[]): Promise<Array<DbUpdatedTimestamp | null>> {
+    return inDatabase(async (db: DTDatabase) => {
+        return db.tx(t => t.batch(timestamps.map(timestamp => doSaveTimestamp(t, timestamp))));
     });
 }
 
-async function doSaveTimestamp(
-    tx: DTTransaction,
-    timestamp: ApiTimestamp
-): Promise<UpdatedTimestamp | null> {
+async function doSaveTimestamp(tx: DTTransaction,
+    timestamp: ApiTimestamp): Promise<UpdatedTimestamp | null> {
     const removedTimestamps = await removeOldTimestamps(tx, timestamp);
     const updatedTimestamp = await TimestampsDB.updateTimestamp(tx, timestamp);
     return updatedTimestamp ? { ...updatedTimestamp, locodeChanged: removedTimestamps.length > 0 } : null;
 }
 
-async function removeOldTimestamps(
-    tx: DTTransaction,
-    timestamp: ApiTimestamp
-): Promise<DbTimestampIdAndLocode[]> {
+async function removeOldTimestamps(tx: DTTransaction,
+    timestamp: ApiTimestamp): Promise<DbTimestampIdAndLocode[]> {
     let timestampsAnotherLocode: DbTimestampIdAndLocode[] = [];
     if (isPortnetTimestamp(timestamp)) {
-        timestampsAnotherLocode = await TimestampsDB.findPortnetTimestampsForAnotherLocode(
-            tx,
+        timestampsAnotherLocode = await TimestampsDB.findPortnetTimestampsForAnotherLocode(tx,
             timestamp.portcallId as number,
-            timestamp.location.port
-        );
+            timestamp.location.port);
         if (timestampsAnotherLocode.length) {
             console.info(`method=doSaveTimestamp deleting timestamps with changed locode,timestamp ids: ${timestampsAnotherLocode.map(e => e.id)}`);
             await tx.batch(timestampsAnotherLocode.map(e => TimestampsDB.deleteById(tx, e.id)));
@@ -90,12 +84,10 @@ async function removeOldTimestamps(
     return timestampsAnotherLocode;
 }
 
-export async function findAllTimestamps(
-    locode?: string,
+export async function findAllTimestamps(locode?: string,
     mmsi?: number,
     imo?: number,
-    source?: string
-): Promise<ApiTimestamp[]> {
+    source?: string): Promise<ApiTimestamp[]> {
     const start = Date.now();
     const timestamps: ApiTimestamp[] = await inDatabaseReadonly(async (db: DTDatabase) => {
         if (locode) {
@@ -121,14 +113,14 @@ export async function findAllTimestamps(
         sourceId: e.source_id,
         ship: {
             mmsi: e.ship_mmsi,
-            imo: e.ship_imo
+            imo: e.ship_imo,
         },
         location: {
             port: e.location_locode,
             portArea: e.location_portarea,
-            from: e.location_from_locode
+            from: e.location_from_locode,
         },
-        portcallId: e.portcall_id
+        portcallId: e.portcall_id,
     })));
     return mergeTimestamps(timestamps) as ApiTimestamp[];
 }
@@ -137,7 +129,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
     console.info(`method=findETAShipsByLocode find for ${ports}`);
 
     const startFindPortnetETAsByLocodes = Date.now();
-    const portnetShips = await inDatabaseReadonly(async (db: DTDatabase) => {
+    const portnetShips = await inDatabaseReadonly((db: DTDatabase) => {
         return TimestampsDB.findPortnetETAsByLocodes(db, ports);
     }).finally(() => {
         console.info('method=findPortnetETAsByLocodes tookMs=%d', (Date.now() - startFindPortnetETAsByLocodes));
@@ -154,10 +146,9 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
         const startFindVtsShipsTooCloseToPort = Date.now();
         return await inDatabaseReadonly(async (db: DTDatabase) => {
             const shipsTooCloseToPortImos =
-                (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(
-                    db,
+                (await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(db,
                     newestShips.map(s => s.portcall_id)))
-                .map(s => s.imo);
+                    .map(s => s.imo);
             console.info('method=findETAShipsByLocode Ships too close to port', shipsTooCloseToPortImos);
             const filteredShips = newestShips.filter(s => shipsTooCloseToPortImos.includes(s.imo));
             console.info('method=findETAShipsByLocode Did not fetch ETA for ships too close to port', filteredShips);

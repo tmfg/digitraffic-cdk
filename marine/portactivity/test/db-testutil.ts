@@ -6,12 +6,14 @@ import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testuti
 import {DTDatabase, DTTransaction} from "digitraffic-common/postgres/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
-    return commonDbTestBase(fn, truncate, 'portactivity', 'portactivity', 'localhost:54321/marine');
+    return commonDbTestBase(
+        fn, truncate, 'portactivity', 'portactivity', 'localhost:54321/marine',
+    );
 }
 
 export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: DTTransaction) => void) {
     return async (): Promise<void> => {
-        await db.tx(async (t: DTTransaction) => { await fn(t) });
+        await db.tx(async (t: DTTransaction) => { await fn(t); });
     };
 }
 
@@ -27,7 +29,7 @@ export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
 
 export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> {
     return db.tx(t => {
-       return t.manyOrNone(`
+        return t.manyOrNone(`
         SELECT
             event_type,
             event_time,

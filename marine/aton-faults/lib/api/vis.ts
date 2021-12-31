@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, {AxiosError} from 'axios';
 import {Agent} from 'https';
 
 export async function postDocument(
@@ -6,7 +6,8 @@ export async function postDocument(
     url: string,
     ca: string,
     clientCertificate: string,
-    privateKey: string): Promise<void> {
+    privateKey: string,
+): Promise<void> {
     console.info(`method=postDocument url=${url}`);
 
     // try-catch so axios won't log keys/certs
@@ -15,21 +16,23 @@ export async function postDocument(
             httpsAgent: new Agent({
                 ca,
                 cert: clientCertificate,
-                key: privateKey
+                key: privateKey,
             }),
             headers: {
-                'Content-Type': 'text/xml;charset=utf-8'
-            }
+                'Content-Type': 'text/xml;charset=utf-8',
+            },
         });
 
         if (resp.status != 200) {
             console.error(`method=postDocument returned status=${resp.status}, status text: ${resp.statusText}`);
             return Promise.reject();
         }
-    } catch (error: any) {
+    } catch (error) {
         // can't log error without exposing keys/certs
         console.error('method=postDocument unexpected error');
-        console.error(error.response.data);
+        if (axios.isAxiosError(error)) {
+            console.error((error as AxiosError).response?.data);
+        }
         return Promise.reject();
     }
 }
@@ -45,21 +48,21 @@ export async function query(imo: string, url: string): Promise<string | null> {
             return Promise.reject();
         }
 
-//        console.info("DEBUG " + JSON.stringify(resp.data, null, 2));
+        //        console.info("DEBUG " + JSON.stringify(resp.data, null, 2));
 
         const instanceList = resp.data;
 
-        if(!instanceList) {
+        if (!instanceList) {
             console.info("empty instanceList!");
             return null;
-        } else if(instanceList.length == 1) {
+        } else if (instanceList.length == 1) {
             return instanceList[0].endpointUri;
         }
 
         console.info("instancelist length %d!", instanceList.length);
 
         return null;
-    } catch (error: any) {
+    } catch (error) {
         // can't log error without exposing keys/certs
         console.error('method=query unexpected error');
         return Promise.reject();
