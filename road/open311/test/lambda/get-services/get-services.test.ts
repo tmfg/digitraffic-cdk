@@ -1,10 +1,9 @@
-import * as pgPromise from "pg-promise";
 import {handler} from "../../../lib/lambda/get-services/lambda-get-services";
 import * as ServicesDb from "../../../lib/db/services";
 import {newService} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 
-describe('lambda-get-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('lambda-get-services', dbTestBase((db) => {
 
     test('no services', async () => {
         const response = await handler();

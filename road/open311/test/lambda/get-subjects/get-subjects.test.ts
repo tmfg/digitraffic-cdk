@@ -1,4 +1,3 @@
-import * as pgPromise from "pg-promise";
 import {handler} from "../../../lib/lambda/get-subjects/lambda-get-subjects";
 import * as SubjectsDb from "../../../lib/db/subjects";
 import {newSubject} from "../../testdata";
@@ -6,7 +5,7 @@ import {dbTestBase} from "../../db-testutil";
 import {Locale} from "../../../lib/model/locale";
 import {shuffle} from "digitraffic-common/js/js-utils";
 
-describe('lambda-get-subjects', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('lambda-get-subjects', dbTestBase((db) => {
 
     test('no subjects', async () => {
         const response = await handler({locale: Locale.ENGLISH});

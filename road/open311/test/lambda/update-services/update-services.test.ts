@@ -1,4 +1,3 @@
-import * as pgPromise from "pg-promise";
 import {handler} from '../../../lib/lambda/update-services/lambda-update-services';
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
@@ -10,14 +9,14 @@ process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
 
-describe('update-services', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('update-services', dbTestBase((db) => {
 
     test('update', async () => {
         const server = new TestHttpServer();
         server.listen(SERVER_PORT, {
             "/services.xml": () => {
                 return fakeServices();
-            }
+            },
         });
 
         try {

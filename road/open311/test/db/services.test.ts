@@ -1,9 +1,8 @@
-import * as pgPromise from "pg-promise";
 import * as ServicesDb from "../../lib/db/services";
 import {newService} from "../testdata";
 import {dbTestBase} from "../db-testutil";
 
-describe('db-services', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('db-services', dbTestBase((db) => {
 
     test('findAll', async () => {
         const services = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {

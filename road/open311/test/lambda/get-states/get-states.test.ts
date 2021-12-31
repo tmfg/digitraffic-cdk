@@ -1,4 +1,3 @@
-import * as pgPromise from "pg-promise";
 import {handler} from "../../../lib/lambda/get-states/lambda-get-states";
 import * as StatesDb from "../../../lib/db/states";
 import {newState} from "../../testdata";
@@ -6,7 +5,7 @@ import {dbTestBase} from "../../db-testutil";
 import {Locale} from "../../../lib/model/locale";
 import {shuffle} from "digitraffic-common/js/js-utils";
 
-describe('lambda-get-states', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('lambda-get-states', dbTestBase((db) => {
 
     test('no states', async () => {
         const response = await handler({locale: Locale.ENGLISH});

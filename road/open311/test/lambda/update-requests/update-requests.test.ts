@@ -1,16 +1,19 @@
-import * as pgPromise from "pg-promise";
 import {handler} from "../../../lib/lambda/update-requests/lambda-update-requests";
 import {newServiceRequest, newServiceRequestWithExtensionsDto} from "../../testdata";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
 import {ServiceRequestStatus} from "../../../lib/model/service-request";
 import {toServiceRequestWithExtensions} from "../../../lib/service/requests";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const testEvent = require('../../test-event');
 
-describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+// test file
+/* eslint-disable camelcase */
+
+describe('update-requests', dbTestBase((db) => {
 
     test('No body - invalid request', async () => {
         const response = await handler(Object.assign({}, testEvent, {
-            body: null
+            body: null,
         }));
 
         expect(response.statusCode).toBe(400);
@@ -18,7 +21,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Empty array - invalid request', async () => {
         const response = await handler(Object.assign({}, testEvent, {
-            body: "[]"
+            body: "[]",
         }));
 
         expect(response.statusCode).toBe(400);
@@ -26,16 +29,17 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Invalid request', async () => {
         const req = newServiceRequestWithExtensionsDto();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         (req as any).requested_datetime = '';
 
         await expect(handler(Object.assign({}, testEvent, {
-            body: JSON.stringify([req])
+            body: JSON.stringify([req]),
         }))).rejects.toThrow();
     });
 
     test('Single service request - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
-            body: JSON.stringify([newServiceRequestWithExtensionsDto()])
+            body: JSON.stringify([newServiceRequestWithExtensionsDto()]),
         }));
 
         expect(response.statusCode).toBe(200);
@@ -43,7 +47,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Single service request without extended_attributes - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
-            body: JSON.stringify([newServiceRequest()])
+            body: JSON.stringify([newServiceRequest()]),
         }));
 
         expect(response.statusCode).toBe(200);
@@ -51,7 +55,7 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
     test('Multiple service requests - created', async () => {
         const response = await handler(Object.assign({}, testEvent, {
-            body: JSON.stringify([newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto()])
+            body: JSON.stringify([newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto(), newServiceRequestWithExtensionsDto()]),
         }));
 
         expect(response.statusCode).toBe(200);
@@ -63,8 +67,8 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
 
         const response = await handler(Object.assign({}, testEvent, {
             body: JSON.stringify([Object.assign({}, sr, {
-                status: ServiceRequestStatus.closed
-            })])
+                status: ServiceRequestStatus.closed,
+            })]),
         }));
 
         expect(response.statusCode).toBe(200);
@@ -75,11 +79,11 @@ describe('update-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
         await insertServiceRequest(db, [toServiceRequestWithExtensions(sr)]);
         const changeSr = {...newServiceRequestWithExtensionsDto(), ...{
             status: ServiceRequestStatus.open,
-            description: "other description"
+            description: "other description",
         }};
 
         const response = await handler(Object.assign({}, testEvent, {
-            body: JSON.stringify(changeSr)
+            body: JSON.stringify(changeSr),
         }));
 
         expect(response.statusCode).toBe(200);

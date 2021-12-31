@@ -1,15 +1,17 @@
-import * as pgPromise from "pg-promise";
 import {handler} from "../../../lib/lambda/get-request/lambda-get-request";
 import {newServiceRequest} from "../../testdata";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
 import {NOT_FOUND_MESSAGE} from "digitraffic-common/api/errors";
 
-describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+// test file
+/* eslint-disable camelcase */
 
-    test('Not found throws error', async () => {
+describe('lambda-get-request', dbTestBase((db) => {
+
+    test('Not found throws error', () => {
         expect(handler({
             request_id: '123',
-            extensions: 'false'
+            extensions: 'false',
         })).rejects.toEqual(new Error(NOT_FOUND_MESSAGE));
     });
 
@@ -19,10 +21,10 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 
         const response = await handler({
             request_id: sr.service_request_id,
-            extensions: 'true'
+            extensions: 'true',
         });
 
-        expect(response['extended_attributes']).toBeDefined();
+        expect(response.extended_attributes).toBeDefined();
     });
 
     test('Get with no extensions', async () => {
@@ -31,10 +33,10 @@ describe('lambda-get-request', dbTestBase((db: pgPromise.IDatabase<any,any>) => 
 
         const response = await handler({
             request_id: sr.service_request_id,
-            extensions: 'false'
+            extensions: 'false',
         });
 
-        expect(response['extended_attributes']).toBeUndefined();
+        expect(response.extended_attributes).toBeUndefined();
     });
 
 }));

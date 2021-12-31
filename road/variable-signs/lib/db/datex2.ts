@@ -21,7 +21,7 @@ const FIND_ALL_PS = new PreparedStatement({
     text: SELECT_ALL,
 });
 
-export function saveDatex2(db: DTTransaction, situations: Situation[], timestamp: Date): Promise<any>[] {
+export function saveDatex2(db: DTTransaction, situations: Situation[], timestamp: Date): Promise<null>[] {
     return situations.map(s => {
         return db.none(INSERT_PS, [
             s.id,
@@ -31,6 +31,6 @@ export function saveDatex2(db: DTTransaction, situations: Situation[], timestamp
     });
 }
 
-export async function findAll(db: DTDatabase): Promise<any[]> {
+export function findAll(db: DTDatabase): Promise<Situation[]> {
     return db.any(FIND_ALL_PS);
 }

@@ -1,9 +1,8 @@
-import * as pgPromise from "pg-promise";
 import {handler} from "../../../lib/lambda/get-requests/lambda-get-requests";
 import {newServiceRequest} from "../../testdata";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
 
-describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('lambda-get-requests', dbTestBase((db) => {
 
     test('no service requests', async () => {
         const response = await handler({extensions: 'false'});
@@ -26,7 +25,7 @@ describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
 
         const response = await handler({extensions: 'true'});
 
-        expect(response[0]['extended_attributes']).toBeDefined();
+        expect(response[0].extended_attributes).toBeDefined();
     });
 
     test('no extensions', async () => {
@@ -34,7 +33,7 @@ describe('lambda-get-requests', dbTestBase((db: pgPromise.IDatabase<any,any>) =>
 
         const response = await handler({extensions: 'false'});
 
-        expect(response[0]['extended_attributes']).toBeUndefined();
+        expect(response[0].extended_attributes).toBeUndefined();
     });
 
 }));

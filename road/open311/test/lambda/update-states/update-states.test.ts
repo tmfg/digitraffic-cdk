@@ -19,7 +19,7 @@ describe('update-states', dbTestBase((db: DTDatabase) => {
             "/states": (url) => {
                 const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                 return fakeStates(locale);
-            }
+            },
         });
 
         try {

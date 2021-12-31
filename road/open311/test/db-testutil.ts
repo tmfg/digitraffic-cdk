@@ -1,30 +1,30 @@
-import * as pgPromise from "pg-promise";
 import {ServiceRequest} from "../lib/model/service-request";
 import * as RequestsDb from "../lib/db/requests";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {IDatabase} from "pg-promise";
+import {DTDatabase} from "digitraffic-common/postgres/database";
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
-    return commonDbTestBase(fn, truncate, 'road', 'road', 'localhost:54322/road');
+export function dbTestBase(fn: (db: DTDatabase) => void) {
+    return commonDbTestBase(
+        fn, truncate, 'road', 'road', 'localhost:54322/road',
+    );
 }
 
-export async function truncate(db: pgPromise.IDatabase<any, any>): Promise<null> {
+export function truncate(db: DTDatabase): Promise<null[]> {
     return db.tx(t => {
-       return t.batch([
-           db.none('DELETE FROM open311_service_request'),
-           db.none('DELETE FROM open311_service_request_state'),
-           db.none('DELETE FROM open311_service'),
-           db.none('DELETE FROM open311_subject'),
-           db.none('DELETE FROM open311_subsubject')
-       ]);
+        return t.batch([
+            db.none('DELETE FROM open311_service_request'),
+            db.none('DELETE FROM open311_service_request_state'),
+            db.none('DELETE FROM open311_service'),
+            db.none('DELETE FROM open311_subject'),
+            db.none('DELETE FROM open311_subsubject'),
+        ]);
     });
 }
 
-export function insertServiceRequest(db: pgPromise.IDatabase<any, any>, serviceRequests: ServiceRequest[]): Promise<void> {
+export function insertServiceRequest(db: DTDatabase, serviceRequests: ServiceRequest[]): Promise<null[]> {
     return db.tx(t => {
-        const queries: any[] = serviceRequests.map(serviceRequest => {
-            return t.none(
-                `INSERT INTO open311_service_request(
+        const queries: Promise<null>[] = serviceRequests.map(serviceRequest => {
+            return t.none(`INSERT INTO open311_service_request(
                      service_request_id,
                      status,
                      status_notes,

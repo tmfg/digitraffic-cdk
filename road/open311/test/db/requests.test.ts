@@ -4,6 +4,9 @@ import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestStatus} from "../../lib/model/service-request";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
+// test file
+/* eslint-disable camelcase */
+
 describe('db-requests', dbTestBase((db: DTDatabase) => {
 
     test('findAll', async () => {
@@ -38,7 +41,7 @@ describe('db-requests', dbTestBase((db: DTDatabase) => {
         await insertServiceRequest(db, [serviceRequest]);
 
         await RequestsDb.update([Object.assign({}, serviceRequest, {
-            status: ServiceRequestStatus.closed
+            status: ServiceRequestStatus.closed,
         })], db);
         const foundServiceRequests = await RequestsDb.findAll(db);
 
@@ -77,7 +80,7 @@ describe('db-requests', dbTestBase((db: DTDatabase) => {
             service_object_type: 'another service_object_type',
             media_urls: ['http://doesnotexist.lol'],
             subject_id: 15,
-            subSubject_id: 20
+            subSubject_id: 20,
         };
         await RequestsDb.update( [Object.assign({}, serviceRequest, updatingServiceRequest)], db);
         const foundServiceRequests = await RequestsDb.findAll(db);

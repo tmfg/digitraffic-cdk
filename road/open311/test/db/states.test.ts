@@ -1,10 +1,9 @@
-import * as pgPromise from "pg-promise";
 import * as StatesDb from "../../lib/db/states";
 import {newState} from "../testdata";
 import {dbTestBase} from "../db-testutil";
 import {Locale} from "../../lib/model/locale";
 
-describe('db-states', dbTestBase((db: pgPromise.IDatabase<any,any>) => {
+describe('db-states', dbTestBase((db) => {
 
     test('findAll', async () => {
         const locale = Locale.ENGLISH;

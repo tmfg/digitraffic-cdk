@@ -1,10 +1,20 @@
-import {ServiceRequestStatus, ServiceRequestWithExtensions} from "../model/service-request";
+import {
+    ServiceRequestStatus,
+    ServiceRequestWithExtensions,
+} from "../model/service-request";
 import {PreparedStatement} from "pg-promise";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
+// Full of underscores
+/* eslint-disable camelcase */
+
+type DbServiceRequest = ServiceRequestWithExtensions & {
+    subsubject_id: number
+}
+
 const DELETE_REQUEST_PS = new PreparedStatement({
     name: 'delete-request-by-id',
-    text: 'DELETE FROM open311_service_request WHERE service_request_id = $1'
+    text: 'DELETE FROM open311_service_request WHERE service_request_id = $1',
 });
 
 const UPSERT_REQUEST_PS = new PreparedStatement({
@@ -82,31 +92,25 @@ const UPSERT_REQUEST_PS = new PreparedStatement({
         service_object_type = $22,
         media_urls = $23,
         subject_id = $24,
-        subsubject_id = $25`
+        subsubject_id = $25`,
 });
 
 export function findAll(db: DTDatabase): Promise<ServiceRequestWithExtensions[]> {
     return db.manyOrNone(`${SELECT_REQUEST} ORDER BY service_request_id`).then(requests => requests.map(r => toServiceRequest(r)));
 }
 
-export function find(
-    service_request_id: string,
-    db: DTDatabase
-): Promise<ServiceRequestWithExtensions | null > {
+export function find(service_request_id: string, db: DTDatabase): Promise<ServiceRequestWithExtensions | null > {
     const ps = new PreparedStatement({
         name: 'find-service-request-by-id',
         text: `${SELECT_REQUEST} WHERE service_request_id = $1`,
-        values: [service_request_id]
+        values: [service_request_id],
     });
     return db.oneOrNone(ps).then(r => r == null ? null : toServiceRequest(r));
 }
 
-export function update(
-    serviceRequests: ServiceRequestWithExtensions[],
-    db: DTDatabase
-): Promise<any[]> {
+export function update(serviceRequests: ServiceRequestWithExtensions[], db: DTDatabase): Promise<null[]> {
     return db.tx(t => {
-        const queries: any[] = serviceRequests.map(serviceRequest => {
+        const queries: Promise<null>[] = serviceRequests.map(serviceRequest => {
             if (serviceRequest.status === ServiceRequestStatus.closed) {
                 return t.none(DELETE_REQUEST_PS, [serviceRequest.service_request_id]);
             } else {
@@ -117,10 +121,7 @@ export function update(
     });
 }
 
-export function doDelete(
-    serviceRequestId: string,
-    db: DTDatabase
-): Promise<null> {
+export function doDelete(serviceRequestId: string, db: DTDatabase): Promise<null> {
     return db.tx(t => {
         return t.none('DELETE FROM open311_service_request WHERE service_request_id = $1', serviceRequestId);
     });
@@ -154,7 +155,7 @@ const SELECT_REQUEST = `
         subsubject_id
 FROM open311_service_request`;
 
-function toServiceRequest(r: any): ServiceRequestWithExtensions {
+function toServiceRequest(r: DbServiceRequest): ServiceRequestWithExtensions {
     return {
         service_request_id: r.service_request_id,
         status: r.status,
@@ -180,13 +181,14 @@ function toServiceRequest(r: any): ServiceRequestWithExtensions {
         service_object_type: r.service_object_type,
         media_urls: r.media_urls,
         subject_id: r.subject_id,
-        subSubject_id: r.subsubject_id
+        subSubject_id: r.subsubject_id,
     };
 }
 
 /**
  * Creates an object with all necessary properties for pg-promise
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createEditObject(serviceRequest: ServiceRequestWithExtensions): any[] {
     const editObject = { ...{
         status_notes: null,
@@ -209,16 +211,16 @@ export function createEditObject(serviceRequest: ServiceRequestWithExtensions): 
         service_object_type: null,
         media_urls: null,
         subject_id: null,
-        subSubject_id: null
+        subSubject_id: null,
     }, ...serviceRequest};
 
     // DPO-1167 handle long/lat empty string
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const editObjectWithLonLat = serviceRequest.long !== '' && serviceRequest.lat !== '' ? editObject : { ...serviceRequest, ...{
-            long: null,
-            lat: null
-        }
+        long: null,
+        lat: null,
+    },
     };
 
     // ordering is important!

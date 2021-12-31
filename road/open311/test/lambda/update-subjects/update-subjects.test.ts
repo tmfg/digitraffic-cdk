@@ -1,4 +1,3 @@
-import * as pgPromise from "pg-promise";
 import {handler} from '../../../lib/lambda/update-subjects/lambda-update-subjects';
 import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
@@ -11,7 +10,7 @@ process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
 
-describe('update-subjects', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('update-subjects', dbTestBase((db) => {
 
     test('update', async () => {
         const server = new TestHttpServer();
@@ -19,7 +18,7 @@ describe('update-subjects', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
             "/subjects": (url) => {
                 const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                 return fakeSubjects(locale);
-            }
+            },
         });
 
         try {

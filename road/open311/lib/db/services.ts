@@ -2,9 +2,12 @@ import {Service} from "../model/service";
 import {PreparedStatement} from "pg-promise";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
+// Full of underscores
+/* eslint-disable camelcase */
+
 const DELETE_SERVICES_PS = new PreparedStatement({
     name: 'delete-service',
-    text: 'DELETE FROM open311_service'
+    text: 'DELETE FROM open311_service',
 });
 
 const INSERT_SERVICE_PS = new PreparedStatement({
@@ -24,7 +27,7 @@ const INSERT_SERVICE_PS = new PreparedStatement({
                $4::boolean,
                $5,
                $6,
-               $7)`
+               $7)`,
 });
 
 const SELECT_SERVICES_PS = new PreparedStatement({
@@ -36,7 +39,7 @@ const SELECT_SERVICES_PS = new PreparedStatement({
                   type,
                   keywords,
                   "group"
-           FROM open311_service ORDER BY service_code`
+           FROM open311_service ORDER BY service_code`,
 });
 
 const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
@@ -48,25 +51,22 @@ const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
                   type,
                   keywords,
                   "group"
-           FROM open311_service WHERE service_code = $1`
+           FROM open311_service WHERE service_code = $1`,
 });
 
 const SELECT_SERVICE_CODES_PS = new PreparedStatement({
     name: 'select-servicecodes',
-    text: 'SELECT service_code FROM open311_service'
+    text: 'SELECT service_code FROM open311_service',
 });
 
 interface ServiceServiceCode {
     readonly service_code: string;
 }
 
-export function update(
-    services: Service[],
-    db: DTDatabase
-): Promise<any[]> {
+export function update(services: Service[], db: DTDatabase): Promise<null[]> {
     return db.tx(t => {
         t.none(DELETE_SERVICES_PS);
-        const queries: any[] = services.map(service => {
+        const queries: Promise<null>[] = services.map(service => {
             return t.none(INSERT_SERVICE_PS, createEditObject(service));
         });
         return t.batch(queries);
@@ -81,14 +81,12 @@ export function findAll(db: DTDatabase): Promise<Service[]> {
     return db.manyOrNone(SELECT_SERVICES_PS).then(requests => requests.map(r => toService(r)));
 }
 
-export function find(
-    service_request_id: string,
-    db: DTDatabase
-): Promise<Service | null > {
-    return db.oneOrNone(SELECT_SERVICE_BY_CODE_PS, [service_request_id]).then(r => r == null ? null : toService(r));
+export function find(serviceRequestId: string,
+    db: DTDatabase): Promise<Service | null > {
+    return db.oneOrNone(SELECT_SERVICE_BY_CODE_PS, [serviceRequestId]).then(r => r == null ? null : toService(r));
 }
 
-function toService(s: any): Service {
+function toService(s: Service): Service {
     return {
         service_code: s.service_code,
         service_name: s.service_name,
@@ -96,7 +94,7 @@ function toService(s: any): Service {
         metadata: s.metadata,
         type: s.type,
         keywords: s.keywords,
-        group: s.group
+        group: s.group,
     };
 }
 
@@ -104,6 +102,7 @@ function toService(s: any): Service {
 /**
  * Creates an object with all necessary properties for pg-promise
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createEditObject(service: Service): any[] {
     const editObject = { ...{
         service_code: undefined,
@@ -112,7 +111,7 @@ function createEditObject(service: Service): any[] {
         metadata: undefined,
         type: undefined,
         keywords: undefined,
-        group: undefined
+        group: undefined,
     }, ...service};
 
     // ordering is important!

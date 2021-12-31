@@ -4,9 +4,12 @@ import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestWithExtensions} from "../../lib/model/service-request";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
+// test file
+/* eslint-disable camelcase */
+
 describe('requests-service', dbTestBase((db: DTDatabase) => {
 
-    test('toServiceRequest', async () => {
+    test('toServiceRequest', () => {
         const originalSr = newServiceRequest();
 
         const convertedSr = RequestsService.toServiceRequest(originalSr);
@@ -15,7 +18,7 @@ describe('requests-service', dbTestBase((db: DTDatabase) => {
         expect(convertedSr).toMatchObject(originalSr);
     });
 
-    test('toServiceRequestWithExtensions', async () => {
+    test('toServiceRequestWithExtensions', () => {
         const originalSr = newServiceRequest();
 
         const convertedSr = RequestsService.toServiceRequestWithExtensions(originalSr);
@@ -65,7 +68,7 @@ function addNestedExtensionProps(r: any) {
         service_object_type: r.service_object_type,
         media_urls: r.media_urls,
         subject_id: r.subject_id,
-        subSubject_id: r.subSubject_id
+        subSubject_id: r.subSubject_id,
     };
 }
 
