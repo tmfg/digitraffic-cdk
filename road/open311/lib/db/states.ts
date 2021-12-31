@@ -24,7 +24,7 @@ export function findAll(locale: Locale,
 }
 
 export function update(states: ServiceRequestState[],
-    db: DTDatabase): Promise<any[]> {
+    db: DTDatabase): Promise<null[]> {
     return db.tx(t => {
         t.none(DELETE_STATES_PS);
         const queries: Promise<null>[] = states.map(state => {

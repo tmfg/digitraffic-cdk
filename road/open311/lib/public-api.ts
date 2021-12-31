@@ -165,6 +165,7 @@ function createGetRequestIntegration(
         },
         requestTemplates: {
             'application/json': JSON.stringify({
+                // eslint-disable-next-line camelcase
                 request_id: "$util.escapeJavaScript($input.params('request_id'))",
                 extensions: "$util.escapeJavaScript($input.params('extensions'))",
             }),
@@ -418,6 +419,7 @@ function createGetServiceIntegration(
         requestParameters: {
             'integration.request.path.service_id': 'method.request.path.service_id',
         }, requestTemplates: {
+            // eslint-disable-next-line camelcase
             'application/json': JSON.stringify({service_id: "$util.escapeJavaScript($input.params('service_id'))"}),
         },
     });

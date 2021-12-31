@@ -2,10 +2,11 @@ import {doDelete as dbDelete, find as dbFind, findAll as dbFindAll, update as db
 import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
 import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
 
-export async function findAll(
-    extensions: boolean
-): Promise<ServiceRequest[]> {
-    return await inDatabase(async (db: DTDatabase) => {
+// Full of underscores
+/* eslint-disable camelcase */
+
+export function findAll(extensions: boolean): Promise<ServiceRequest[]> {
+    return inDatabase(async (db: DTDatabase) => {
         const requests = await dbFindAll(db);
         if (!extensions) {
             return requests.map(r => toServiceRequest(r));
@@ -15,11 +16,9 @@ export async function findAll(
     });
 }
 
-export async function find(
-    serviceRequestId: string,
-    extensions: boolean
-): Promise<ServiceRequest | null> {
-    return await inDatabase(async (db: DTDatabase) => {
+export function find(serviceRequestId: string,
+    extensions: boolean): Promise<ServiceRequest | null> {
+    return inDatabase(async (db: DTDatabase) => {
         const r =  await dbFind(serviceRequestId, db);
         if (!r) {
             return null;
@@ -28,20 +27,16 @@ export async function find(
     });
 }
 
-export async function doDelete(
-    serviceRequestId: string
-): Promise<null> {
-    return await inDatabase(async (db: DTDatabase) => {
-        return await dbDelete(serviceRequestId, db);
+export function doDelete(serviceRequestId: string): Promise<null> {
+    return inDatabase((db: DTDatabase) => {
+        return dbDelete(serviceRequestId, db);
     });
 }
 
-export async function update(
-    requests: ServiceRequestWithExtensions[]
-): Promise<void> {
+export function update(requests: ServiceRequestWithExtensions[]): Promise<void> {
     const start = Date.now();
-    return await inDatabase(async (db: DTDatabase) => {
-        return await dbUpdate(requests, db);
+    return inDatabase((db: DTDatabase) => {
+        return dbUpdate(requests, db);
     }).then(a => {
         const end = Date.now();
         console.info("method=updateRequests updatedCount=%d tookMs=%d", a.length, (end - start));
@@ -62,9 +57,9 @@ export function toServiceRequestWithExtensions(r: ServiceRequestWithExtensions):
                 service_object_type: r.service_object_type,
                 media_urls: r.media_urls,
                 subject_id: r.subject_id,
-                subSubject_id: r.subSubject_id
-            }
-        }
+                subSubject_id: r.subSubject_id,
+            },
+        },
     };
 }
 
@@ -87,6 +82,6 @@ export function toServiceRequest(r: ServiceRequestWithExtensions): ServiceReques
         zipcode: r.zipcode,
         long: r.long,
         lat: r.lat,
-        media_url: r.media_url
+        media_url: r.media_url,
     };
 }

@@ -2,20 +2,18 @@ import axios from 'axios';
 import * as util from 'util';
 import * as xml2js from 'xml2js';
 
-export async function getXml<T>(
-    endpointUser: string,
+export async function getXml<T>(endpointUser: string,
     endpointPass: string,
     endpointUrl: string,
-    path: string
-): Promise<T> {
+    path: string): Promise<T> {
     const resp = await axios.get(`${endpointUrl}${path}`, {
         headers: {
-            'Accept': 'application/xml'
+            'Accept': 'application/xml',
         },
         auth: {
             username: endpointUser,
-            password: endpointPass
-        }
+            password: endpointPass,
+        },
     });
     if (resp.status !== 200) {
         console.error(`method=getXml query to ${path} failed status ${resp.status}`);

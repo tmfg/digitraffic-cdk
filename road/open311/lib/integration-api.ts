@@ -12,14 +12,14 @@ import {MessageModel} from "digitraffic-common/api/response";
 import {MediaType} from "digitraffic-common/api/mediatypes";
 
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
-    const integrationApi = createApi(stack, props.vpcId);
+    const integrationApi = createApi(stack);
     createRequestsResource(
         stack, integrationApi, vpc, lambdaDbSg, props,
     );
     createUsagePlan(integrationApi);
 }
 
-function createApi(stack: Construct, vpcId: string) {
+function createApi(stack: Construct) {
     return new apigateway.RestApi(stack, 'Open311-integration', {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
@@ -108,6 +108,7 @@ function createDeleteRequestHandler(
         },
         requestTemplates: {
             'application/json': JSON.stringify({
+                // eslint-disable-next-line camelcase
                 request_id: "$util.escapeJavaScript($input.params('request_id'))",
                 extensions: "$util.escapeJavaScript($input.params('extensions'))",
             }),
