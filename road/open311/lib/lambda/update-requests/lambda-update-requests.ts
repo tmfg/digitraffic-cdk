@@ -3,8 +3,10 @@ import {ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../
 import * as RequestsService from "../../service/requests";
 import {invalidRequest} from "../../http-util";
 
-export const handler = async (
-    event: APIGatewayEvent): Promise<any> => {
+// Full of underscores
+/* eslint-disable camelcase */
+
+export const handler = async (event: APIGatewayEvent): Promise<object> => {
     if (!event.body) {
         return invalidRequest();
     }
@@ -45,6 +47,6 @@ function toServiceRequestWithExtensions(r: ServiceRequestWithExtensionsDto): Ser
         title: r.extended_attributes?.title,
         service_object_id: r.extended_attributes?.service_object_id,
         service_object_type: r.extended_attributes?.service_object_type,
-        media_urls: r.extended_attributes?.media_urls
+        media_urls: r.extended_attributes?.media_urls,
     };
-} 
+}

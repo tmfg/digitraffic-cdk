@@ -1,5 +1,6 @@
 import * as ServicesService from "../../service/services";
+import {Service} from "../../model/service";
 
-export const handler = async (): Promise<any> => {
-    return await ServicesService.findAll();
+export const handler = (): Promise<Service[]> => {
+    return ServicesService.findAll();
 };
