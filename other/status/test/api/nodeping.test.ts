@@ -1,4 +1,10 @@
-import {NodePingApi, NodePingCheck, NodePingCheckState, NodePingCheckType} from "../../lib/api/nodeping";
+import {
+    NODEPING_DIGITRAFFIC_USER,
+    NodePingApi,
+    NodePingCheck,
+    NodePingCheckState,
+    NodePingCheckType,
+} from "../../lib/api/nodeping";
 import {randomString} from "digitraffic-common/test/testutils";
 import {EndpointHttpMethod, EndpointProtocol} from "../../lib/app-props";
 
@@ -28,6 +34,27 @@ describe('NodePing API', () => {
     test('checkNeedsUpdate - interval configured - different interval value', () => {
         const api = makeApi({interval: 1});
         const check = makeCheck({interval: 5});
+
+        expect(api.checkNeedsUpdate(check)).toBe(true);
+    });
+
+    test('checkNeedsUpdate - correct digitraffic-user', () => {
+        const api = makeApi();
+        const check = makeCheck({headers: { 'digitraffic-user': NODEPING_DIGITRAFFIC_USER }});
+
+        expect(api.checkNeedsUpdate(check)).toBe(false);
+    });
+
+    test('checkNeedsUpdate - wrong digitraffic-user', () => {
+        const api = makeApi();
+        const check = makeCheck({headers: {'digitraffic-user': 'asdf'}});
+
+        expect(api.checkNeedsUpdate(check)).toBe(true);
+    });
+
+    test('checkNeedsUpdate - digitraffic-user not configured', () => {
+        const api = makeApi();
+        const check = makeCheck({headers: {'not-digitraffic-user': 'asdf'}});
 
         expect(api.checkNeedsUpdate(check)).toBe(true);
     });
@@ -87,11 +114,11 @@ describe('NodePing API', () => {
 
 });
 
-function makeApi(options?: {timeout?: number, interval?: number}): NodePingApi {
+function makeApi(options?: {timeout?: number, interval?: number }): NodePingApi {
     return new NodePingApi('token', 'subAccountId', options?.timeout, options?.interval);
 }
 
-function makeCheck(options?: {timeout?: number, method?: EndpointHttpMethod, interval?: number }): NodePingCheck {
+function makeCheck(options?: {timeout?: number, method?: EndpointHttpMethod, interval?: number, headers?: Record<string, string>}): NodePingCheck {
     return {
         _id: randomString(),
         type: NodePingCheckType.HTTPADV,
@@ -102,6 +129,7 @@ function makeCheck(options?: {timeout?: number, method?: EndpointHttpMethod, int
             target: 'http://some.url',
             method: options?.method ?? EndpointHttpMethod.HEAD,
             threshold: options?.timeout ?? 30,
+            sendheaders: options?.headers ?? {'digitraffic-user': NODEPING_DIGITRAFFIC_USER},
         },
     };
 }

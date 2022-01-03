@@ -109,6 +109,7 @@ describe('status service', () => {
                 target: 'http://some.url',
                 method: EndpointHttpMethod.HEAD,
                 threshold: 20,
+                sendheaders: {},
             },
         }];
         const nodePingApiUpdateSpy = sinon.stub(nodePingApi, 'updateNodepingCheck').returns(Promise.resolve());

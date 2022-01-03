@@ -4,6 +4,8 @@ import {MediaType} from "digitraffic-common/api/mediatypes";
 
 const NODEPING_API = 'https://api.nodeping.com/api/1';
 
+export const NODEPING_DIGITRAFFIC_USER = 'internal-digitraffic-status';
+
 export enum NodePingCheckState {
     DOWN = 0,
     UP = 1
@@ -24,6 +26,7 @@ export type NodePingCheck = {
         readonly target: string
         readonly method: EndpointHttpMethod
         readonly threshold: number
+        readonly sendheaders: Record<string, string>
     }
 }
 
@@ -178,6 +181,13 @@ export class NodePingApi {
                 console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} method was not ${EndpointHttpMethod.HEAD}, instead: ${check.parameters.method}`);
                 needsUpdate = true;
             }
+        }
+
+        // eslint-disable-next-line no-prototype-builtins
+        const digitrafficUser = check.parameters.sendheaders['digitraffic-user'];
+        if (digitrafficUser !== NODEPING_DIGITRAFFIC_USER) {
+            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} doesn't have digitraffic user headerr`);
+            needsUpdate = true;
         }
 
         return needsUpdate;
