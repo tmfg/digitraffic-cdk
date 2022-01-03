@@ -2,11 +2,12 @@ import {APIGatewayEvent} from 'aws-lambda';
 import {ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../../model/service-request";
 import * as RequestsService from "../../service/requests";
 import {invalidRequest} from "../../http-util";
+import {ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
 
 // Full of underscores
 /* eslint-disable camelcase */
 
-export const handler = async (event: APIGatewayEvent): Promise<object> => {
+export const handler = async (event: APIGatewayEvent): Promise<ProxyLambdaResponse> => {
     if (!event.body) {
         return invalidRequest();
     }
