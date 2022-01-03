@@ -184,9 +184,9 @@ export class NodePingApi {
         }
 
         // eslint-disable-next-line no-prototype-builtins
-        const digitrafficUser = check.parameters.sendheaders['digitraffic-user'];
+        const digitrafficUser = Object.entries(check.parameters.sendheaders).find(e => e[0].toLowerCase() === 'digitraffic-user')?.[1];
         if (digitrafficUser !== NODEPING_DIGITRAFFIC_USER) {
-            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} doesn't have digitraffic user headerr`);
+            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} doesn't have digitraffic user header`);
             needsUpdate = true;
         }
 
