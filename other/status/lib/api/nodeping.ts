@@ -120,7 +120,7 @@ export class NodePingApi {
             threshold: this.checkTimeoutSeconds,
             enabled: true,
             follow: true,
-            sendheaders: {'accept-encoding': 'gzip', 'digitraffic-user': 'Digitraffic Status'},
+            sendheaders: {'accept-encoding': 'gzip', 'digitraffic-user': NODEPING_DIGITRAFFIC_USER},
             method,
             notifications: [notification],
         };
