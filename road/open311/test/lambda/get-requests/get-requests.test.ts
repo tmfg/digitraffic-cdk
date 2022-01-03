@@ -25,7 +25,8 @@ describe('lambda-get-requests', dbTestBase((db) => {
 
         const response = await handler({extensions: 'true'});
 
-        expect(response[0].extended_attributes).toBeDefined();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((response[0] as any).extended_attributes).toBeDefined();
     });
 
     test('no extensions', async () => {
@@ -33,7 +34,8 @@ describe('lambda-get-requests', dbTestBase((db) => {
 
         const response = await handler({extensions: 'false'});
 
-        expect(response[0].extended_attributes).toBeUndefined();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((response[0] as any).extended_attributes).toBeUndefined();
     });
 
 }));

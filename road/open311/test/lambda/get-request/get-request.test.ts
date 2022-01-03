@@ -24,7 +24,8 @@ describe('lambda-get-request', dbTestBase((db) => {
             extensions: 'true',
         });
 
-        expect(response.extended_attributes).toBeDefined();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((response as any).extended_attributes).toBeDefined();
     });
 
     test('Get with no extensions', async () => {
@@ -36,7 +37,8 @@ describe('lambda-get-request', dbTestBase((db) => {
             extensions: 'false',
         });
 
-        expect(response.extended_attributes).toBeUndefined();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        expect((response as any).extended_attributes).toBeUndefined();
     });
 
 }));
