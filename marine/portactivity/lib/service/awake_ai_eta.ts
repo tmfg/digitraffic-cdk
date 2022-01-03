@@ -41,6 +41,10 @@ export class AwakeAiETAService {
         'FIHKO',
     ];
 
+    readonly publishAsETBDestinations = [
+        'FIRAU',
+    ];
+
     constructor(api: AwakeAiVoyagesApi) {
         this.api = api;
     }
@@ -58,6 +62,7 @@ export class AwakeAiETAService {
 
                     // temporarily publish ETA also as ETB
                     const etbs = timestamps
+                        .filter(ts => this.publishAsETBDestinations.includes(ts.location.port))
                         .filter(ts => ts.eventType === EventType.ETA)
                         .map(ts => ({...ts, ...{eventType: EventType.ETB}}));
 
@@ -113,6 +118,11 @@ export class AwakeAiETAService {
                     console.warn(`method=handleSchedule state=${AwakeDataState.OVERRIDDEN_LOCODE} ${etaPrediction.locode} with ${ship.locode} in override list`);
                     port = ship.locode;
                 }
+            }
+
+            if (etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA && !this.publishAsETBDestinations.includes(port)) {
+                console.warn(`method=handleSchedule ETP event for non-publishable port ${port}`);
+                return null;
             }
 
             console.info('method=handleSchedule schedule was valid');
