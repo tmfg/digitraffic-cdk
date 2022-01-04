@@ -4,7 +4,7 @@ import * as IdUtils from 'digitraffic-common/marine/id_utils';
 import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
 import {ApiTimestamp} from "../../model/timestamp";
 
-export const handler = async (event: GetTimeStampsEvent) => {
+export const handler = (event: GetTimeStampsEvent) => {
     return handlerFn(event, withDbSecret);
 };
 
