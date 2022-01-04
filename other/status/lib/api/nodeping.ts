@@ -6,6 +6,8 @@ const NODEPING_API = 'https://api.nodeping.com/api/1';
 
 export const NODEPING_DIGITRAFFIC_USER = 'internal-digitraffic-status';
 
+const NODEPING_SENT_HEADERS = {'accept-encoding': 'gzip', 'digitraffic-user': NODEPING_DIGITRAFFIC_USER};
+
 export enum NodePingCheckState {
     DOWN = 0,
     UP = 1
@@ -120,7 +122,7 @@ export class NodePingApi {
             threshold: this.checkTimeoutSeconds,
             enabled: true,
             follow: true,
-            sendheaders: {'accept-encoding': 'gzip', 'digitraffic-user': NODEPING_DIGITRAFFIC_USER},
+            sendheaders: NODEPING_SENT_HEADERS,
             method,
             notifications: [notification],
         };
@@ -149,6 +151,7 @@ export class NodePingApi {
             threshold: this.checkTimeoutSeconds,
             method,
             interval: this.checkInterval,
+            sendheaders: NODEPING_SENT_HEADERS,
         };
         console.info(`method=updateNodepingCheck Updating NodePing check id ${id}, properties ${JSON.stringify(data)}`);
         const resp = await axios.put(`${NODEPING_API}/checks`, data, {
@@ -181,13 +184,13 @@ export class NodePingApi {
                 console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} method was not ${EndpointHttpMethod.HEAD}, instead: ${check.parameters.method}`);
                 needsUpdate = true;
             }
-        }
 
-        // eslint-disable-next-line no-prototype-builtins
-        const digitrafficUser = Object.entries(check.parameters.sendheaders).find(e => e[0].toLowerCase() === 'digitraffic-user')?.[1];
-        if (digitrafficUser !== NODEPING_DIGITRAFFIC_USER) {
-            console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} doesn't have digitraffic user header`);
-            needsUpdate = true;
+            // eslint-disable-next-line no-prototype-builtins
+            const digitrafficUser = Object.entries(check.parameters.sendheaders ?? {}).find(e => e[0].toLowerCase() === 'digitraffic-user')?.[1];
+            if (digitrafficUser !== NODEPING_DIGITRAFFIC_USER) {
+                console.warn(`method=checkNeedsUpdate check id ${check._id}, label ${check.label} doesn't have digitraffic user header`);
+                needsUpdate = true;
+            }
         }
 
         return needsUpdate;
