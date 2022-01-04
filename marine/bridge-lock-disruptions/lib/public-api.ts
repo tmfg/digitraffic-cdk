@@ -34,17 +34,13 @@ export function create(secret: ISecret,
     const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId)));
     const disruptionsModel = addServiceModel("DisruptionsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
-    createDisruptionsResource(
-        publicApi, disruptionsModel, secret, stack,
-    );
+    createDisruptionsResource(publicApi, disruptionsModel, secret, stack);
 }
 
-function createDisruptionsResource(
-    publicApi: RestApi,
+function createDisruptionsResource(publicApi: RestApi,
     disruptionsJsonModel: IModel,
     secret: ISecret,
-    stack: DigitrafficStack,
-): Function {
+    stack: DigitrafficStack): Function {
 
     const functionName = 'BridgeLockDisruption-GetDisruptions';
     const environment = stack.createDefaultLambdaEnvironment('BridgeLockDisruption');
@@ -52,6 +48,7 @@ function createDisruptionsResource(
     const getDisruptionsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(
         stack, environment, functionName, 'get-disruptions', {
             timeout: 60,
+            reservedConcurrentExecutions: 3,
         },
     ));
 
@@ -60,15 +57,15 @@ function createDisruptionsResource(
     const resources = createResourcePaths(publicApi);
     const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda, {
         responses: [
-            DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)
-        ]
+            DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
+        ],
     });
 
     ['GET', 'HEAD'].forEach(httpMethod => {
         resources.addMethod(httpMethod, getDisruptionsIntegration, {
             apiKeyRequired: true,
             methodResponses: [
-                corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, disruptionsJsonModel))
+                corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, disruptionsJsonModel)),
             ],
         });
     });
