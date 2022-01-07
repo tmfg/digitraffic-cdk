@@ -13,16 +13,16 @@ const DOMAIN_NAME = 'TEST_DOMAIN';
 describe('update tests', dbTestBase((db: DTDatabase) => {
     const EMPTY_DATA = JSON.stringify([]);
 
-    async function assertCountersInDb(domain: string, expected: number, fn?: any) {
+    async function assertCountersInDb(domain: string, expected: number, fn?: Function) {
         const counters = await findAllCountersForUpdateForDomain(db, domain);
         expect(counters).toHaveLength(expected);
 
-        if(fn) {
+        if (fn) {
             fn(counters);
         }
     }
 
-    async function withServerAllSites(response: string, fn: ((server: TestHttpServer) => void)) {
+    function withServerAllSites(response: string, fn: ((server: TestHttpServer) => void)) {
         return withServer(PORT, URL_ALL_SITES, response, fn);
     }
 
@@ -50,9 +50,9 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
                 longitude: 10,
                 userType: 1,
                 interval: 15,
-                sens: 1
-            }
-        ]
+                sens: 1,
+            },
+        ],
     }]);
 
     test('updateMetadataForDomain - insert', async () => {
@@ -65,7 +65,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
             expect(server.getCallCount()).toEqual(1);
         });
 
-        await assertCountersInDb(DOMAIN_NAME, 1, (counters: any[]) => {
+        await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
             expect(counters[0].name).toEqual('DOMAINNAME COUNTERNAME');
         });
 

@@ -1,4 +1,4 @@
-import {IDatabase, PreparedStatement} from "pg-promise";
+import {PreparedStatement} from "pg-promise";
 import {ApiData, DbData} from "../model/data";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
@@ -14,12 +14,12 @@ const SQL_GET_DATA =
 
 const PS_INSERT_DATA = new PreparedStatement({
     name: 'insert-data',
-    text: SQL_INSERT_DATA
+    text: SQL_INSERT_DATA,
 });
 
 const PS_GET_DATA = new PreparedStatement({
     name: 'get-data',
-    text: SQL_GET_DATA
+    text: SQL_GET_DATA,
 });
 
 export async function insertData(db: DTDatabase, site_id: number, interval: number, data: ApiData[]) {

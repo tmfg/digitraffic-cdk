@@ -65,18 +65,18 @@ const PS_ALL_COUNTERS_FOR_DOMAIN_FEATURE_COLLECTION = new PreparedStatement({
 });
 
 const PS_INSERT_COUNTER = new PreparedStatement({
-   name: 'insert-counter',
-   text: SQL_INSERT_COUNTER
+    name: 'insert-counter',
+    text: SQL_INSERT_COUNTER,
 });
 
 const PS_UPDATE_COUNTER = new PreparedStatement({
     name: 'update-counter',
-    text: SQL_UPDATE_COUNTER
+    text: SQL_UPDATE_COUNTER,
 });
 
 const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
     name: 'update-counter-timestamp',
-    text: SQL_UPDATER_COUNTER_TIMESTAMP
+    text: SQL_UPDATER_COUNTER_TIMESTAMP,
 });
 
 export function findAllCountersForDomain(db: DTDatabase, domain: string): Promise<FeatureCollection> {
@@ -90,12 +90,11 @@ export function findAllCountersForUpdateForDomain(db: DTDatabase, domain: string
 export function insertCounters(db: DTDatabase, domain: string, counters: ApiCounter[]): Promise<null[]> {
     return Promise.all(counters
         .map(c => db.none(PS_INSERT_COUNTER,
-            [c.id, domain, c.domain, c.name, `POINT(${c.longitude} ${c.latitude})`, c.userType, c.interval, c.sens]))
-    );
+            [c.id, domain, c.domain, c.name, `POINT(${c.longitude} ${c.latitude})`, c.userType, c.interval, c.sens])));
 }
 
 export function removeCounters(db: DTDatabase, counters: DbCounter[]): Promise<null> {
-    if(counters.length > 0) {
+    if (counters.length > 0) {
         return db.none(SQL_REMOVE_COUNTERS, [counters.map(c => c.id)]);
     }
 
@@ -104,8 +103,7 @@ export function removeCounters(db: DTDatabase, counters: DbCounter[]): Promise<n
 
 export function updateCounters(db: DTDatabase, counters: ApiCounter[]): Promise<null[]> {
     return Promise.all(counters
-        .map(c => db.none(PS_UPDATE_COUNTER, [c.domain, `POINT(${c.longitude} ${c.latitude})`,c.interval, c.sens, c.id]))
-    );
+        .map(c => db.none(PS_UPDATE_COUNTER, [c.domain, `POINT(${c.longitude} ${c.latitude})`,c.interval, c.sens, c.id])));
 }
 
 export function updateCounterTimestamp(db: DTDatabase, counterId: number, timestamp: Date): Promise<null> {

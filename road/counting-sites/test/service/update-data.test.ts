@@ -10,7 +10,7 @@ import {DTDatabase} from "digitraffic-common/postgres/database";
 const DOMAIN_NAME = 'TEST_DOMAIN';
 
 describe('update tests', dbTestBase((db: DTDatabase) => {
-    const EMPTY_DATA:any[] = [];
+    const EMPTY_DATA: ApiData[] = [];
 
     afterEach(() => {
         sinon.restore();
@@ -20,11 +20,11 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
         return sinon.stub(EcoCounterApi.prototype, 'getDataForSite').returns(Promise.resolve(response));
     }
 
-    async function assertDataInDb(expected: number, siteId: number, fn?: any) {
+    async function assertDataInDb(expected: number, siteId: number, fn?: Function) {
         const data = await findAllData(db, siteId);
         expect(data).toHaveLength(expected);
 
-        if(fn) {
+        if (fn) {
             fn(data);
         }
     }
@@ -53,7 +53,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
             "date": "2015-09-25T05:00:00+0000",
             "isoDate": new Date("2015-09-25T05:00:00+0200"),
             "counts": 1,
-            "status": 1
+            "status": 1,
         }];
 
     test('updateDataForDomain - one counter and data', async () => {

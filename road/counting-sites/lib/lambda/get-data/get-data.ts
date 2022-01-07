@@ -5,25 +5,23 @@ import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
 const secretId = process.env[SECRET_ID] as string;
 
-export const handler = async (event: Record<string, number>) => {
-    return withDbSecret(secretId, async () => {
+export const handler = (event: Record<string, number>) => {
+    return withDbSecret(secretId, () => {
         const start = Date.now();
         const counterId = event.id;
 
-        try {
-            const data = await CountingSitesService.getDataForCounter(counterId);
-
+        return CountingSitesService.getDataForCounter(counterId).then(data => {
             if (data.length === 0) {
                 return LambdaResponse.notFound();
             }
             return LambdaResponse.ok(data);
-        } catch (e) {
-            console.info("error " + e);
+        }).catch(error => {
+            console.info("error " + error);
 
             return LambdaResponse.internalError();
-        } finally {
+        }).finally(() => {
             console.info("method=CountingSites.GetData tookMs=%d", (Date.now() - start));
-        }
+        });
     });
 };
 

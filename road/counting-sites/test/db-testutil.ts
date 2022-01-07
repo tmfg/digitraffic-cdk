@@ -4,11 +4,13 @@ import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(fn, truncate, 'road', 'road', 'localhost:54322/road');
+    return commonDbTestBase(
+        fn, truncate, 'road', 'road', 'localhost:54322/road',
+    );
 }
 
-async function truncate(db: DTDatabase): Promise<void> {
-    return await db.tx(async t => {
+function truncate(db: DTDatabase): Promise<void> {
+    return db.tx(async t => {
         await t.none('DELETE FROM counting_site_data');
         await t.none('DELETE FROM counting_site_counter');
         await t.none('DELETE FROM counting_site_domain');
@@ -18,7 +20,7 @@ async function truncate(db: DTDatabase): Promise<void> {
 
 export function insertDomain(db: DTDatabase, domainName: string): Promise<null> {
     return db.tx(t => {
-            return t.none(`
+        return t.none(`
                 insert into counting_site_domain("name", description, added_timestamp)
                 values(
                        $1,
@@ -51,9 +53,9 @@ export function insertLastUpdated(db: DTDatabase, id: number, updated: Date): Pr
 export async function withServer(port: number, url: string, response: string, fn: ((server: TestHttpServer) => void)): Promise<void> {
     const server = new TestHttpServer();
 
-    const props: any = {};
-
-    props[url] = () => response;
+    const props = {
+        [url]: () => response,
+    };
 
     server.listen(port, props, false);
 

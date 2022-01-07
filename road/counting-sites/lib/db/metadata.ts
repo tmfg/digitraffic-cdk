@@ -11,8 +11,8 @@ const SQL_ALL_DOMAINS =
 
 const PS_ALL_USER_TYPES = new PreparedStatement({
     name: 'find-all-user-types',
-    text: SQL_ALL_USER_TYPES
-})
+    text: SQL_ALL_USER_TYPES,
+});
 
 const PS_ALL_DOMAINS = new PreparedStatement({
     name: 'select-domains',

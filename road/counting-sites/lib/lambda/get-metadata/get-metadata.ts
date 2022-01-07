@@ -8,11 +8,9 @@ export const handler = () => {
     return withDbSecret(secretId, () => {
         const start = Date.now();
 
-        try {
-            return CountingSitesService.getMetadata();
-        } finally {
+        return CountingSitesService.getMetadata().finally(() => {
             console.info("method=CountingSites.GetMetadata tookMs=%d", (Date.now() - start));
-        }
+        });
     });
 };
 

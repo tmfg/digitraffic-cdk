@@ -22,20 +22,20 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
         await CounterDb.removeCounters(db, removedCounters);
         await CounterDb.updateCounters(db, updatedCounters);
 
-        if(newCounters.length > 0 || removedCounters.length > 0 || updatedCounters.length > 0) {
+        if (newCounters.length > 0 || removedCounters.length > 0 || updatedCounters.length > 0) {
             await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_METADATA, updatedTimestamp);
         }
         await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_METADATA_CHECK, updatedTimestamp);
     });
 }
 
-export async function updateDataForDomain(domainName: string, apiKey: string, url: string): Promise<null> {
+export async function updateDataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
     const api = new EcoCounterApi(apiKey, url);
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
     return inDatabase(async (db: DTDatabase) => {
         await Promise.allSettled(Object.values(countersInDb).map(async (counter: DbCounter) => {
-            if(isDataUpdateNeeded(counter)) {
+            if (isDataUpdateNeeded(counter)) {
                 // either last update timestamp + 1 day or ten days ago(for first time)
                 const fromStamp = counter.last_data_timestamp ? moment(counter.last_data_timestamp) : moment().subtract(10, 'days').startOf('day');
                 const endStamp = fromStamp.clone().add(1, 'days');
@@ -52,7 +52,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
             return;
         }));
 
-        return await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_DATA, new Date());
+        await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_DATA, new Date());
     });
 }
 
@@ -78,13 +78,12 @@ function compareCounters(countersInApi: Record<string, ApiCounter>, countersInDb
     return [newCounters, removedCounters, updatedCounters];
 }
 
-async function getAllCountersFromDb(domain: string): Promise<Record<string, DbCounter>> {
+async function getAllCountersFromDb(domain: string): Promise<Record<number, DbCounter>> {
     const counters = await inDatabaseReadonly( (db: DTDatabase) => {
         return CounterDb.findAllCountersForUpdateForDomain(db, domain);
     }) as DbCounter[];
 
     return Object.fromEntries(counters
-        .map((c: any) => [c.site_id as string, c])
-    );
+        .map((c: DbCounter) => [c.site_id, c]));
 }
 

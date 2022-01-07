@@ -6,7 +6,7 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
     const DOMAIN1 = 'DOMAIN1';
     const DOMAIN2 = 'DOMAIN2';
 
-    test('get domains - empty', async () => {
+    test('getMadata - empty', async () => {
         const metadata = await CountingSitesService.getMetadata();
 
         expect(metadata.domains).toHaveLength(0);
@@ -15,7 +15,7 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
         expect(metadata.lastUpdated).toBeNull();
     });
 
-    test('get domains - two domains', async () => {
+    test('getMetadata - two domains', async () => {
         const now = new Date();
         now.setMilliseconds(0);
 
@@ -32,4 +32,17 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
         expect(metadata.lastUpdated).toEqual(now);
         expect(Object.keys(metadata.userTypes)).toHaveLength(11);
     });
+
+    test('getCountersForDomain - empty', async () => {
+        const counters = await CountingSitesService.getCountersForDomain('empy');
+
+        expect(counters.features).toBeNull();
+    });
+
+    test('getDataForCounter - empty', async () => {
+        const data = await CountingSitesService.getDataForCounter(0);
+
+        expect(data).toHaveLength(0);
+    });
+
 }));

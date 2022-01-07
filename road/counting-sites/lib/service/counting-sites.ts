@@ -9,7 +9,7 @@ import {FeatureCollection} from "geojson";
 import {DbUserType} from "../model/usertype";
 import {MetadataResponse} from "../model/metadata";
 
-export async function getMetadata(): Promise<MetadataResponse> {
+export function getMetadata(): Promise<MetadataResponse> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
         const domains = await MetadataDB.findAllDomains(db);
         const userTypes = await MetadataDB.findAllUserTypes(db);
@@ -19,14 +19,16 @@ export async function getMetadata(): Promise<MetadataResponse> {
     });
 }
 
-export async function getDataForCounter(counterId: number): Promise<DbData[]> {
-    return inDatabaseReadonly(async (db: DTDatabase) => {
+export function getDataForCounter(counterId: number): Promise<DbData[]> {
+    // should we return error, when counter is not found?
+    return inDatabaseReadonly((db: DTDatabase) => {
         return DataDb.findAllData(db, counterId);
     });
 }
 
-export async function getCountersForDomain(domain: string): Promise<FeatureCollection> {
-    return inDatabaseReadonly(async (db: DTDatabase) => {
+export function getCountersForDomain(domain: string): Promise<FeatureCollection> {
+    // should we return error, when domain is not found?
+    return inDatabaseReadonly((db: DTDatabase) => {
         return CounterDb.findAllCountersForDomain(db, domain);
     });
 }
@@ -39,7 +41,7 @@ function createResponse(domains: DbDomain[], userTypes: DbUserType[], lastUpdate
         directions: {
             "1": "in",
             "2": "out",
-            "5": "no direction"
-        }
-    }
+            "5": "no direction",
+        },
+    };
 }

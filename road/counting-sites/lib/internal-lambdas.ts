@@ -22,7 +22,7 @@ export class InternalLambdas {
         environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = 'cs.oulu';
 
         return MonitoredFunction.createV2(stack, 'update-metadata', environment, {
-            functionName: stack.configuration.shortName + '-UpdateMetadata-Oulu'
+            functionName: stack.configuration.shortName + '-UpdateMetadata-Oulu',
         });
     }
 
@@ -33,7 +33,7 @@ export class InternalLambdas {
 
         return MonitoredFunction.createV2(stack, 'update-data', environment, {
             functionName: stack.configuration.shortName + '-UpdateData-Oulu',
-            memorySize: 256
+            memorySize: 256,
         });
     }
 }

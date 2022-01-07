@@ -4,7 +4,7 @@ import {DataType} from "digitraffic-common/db/last-updated";
 
 const secretId = process.env[SECRET_ID] as string;
 
-export const handler = async () => {
+export const handler = () => {
     const checker = new DatabaseChecker(secretId);
 
     checker.notEmpty('domains not empty',
