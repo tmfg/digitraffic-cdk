@@ -9,23 +9,21 @@ const secretId = process.env[SECRET_ID] as string;
 export const handler = (event: Record<string, string>) => {
     const start = Date.now();
 
-    try {
-        return withDbSecret(secretId, async () => {
-            const language = getLanguage(event.language);
-            const fixedInHours = getFixed(event.fixed_in_hours);
+    return withDbSecret(secretId, async () => {
+        const language = getLanguage(event.language);
+        const fixedInHours = getFixed(event.fixed_in_hours);
 
-            const faults = await findAllFaults(language, fixedInHours);
-            return LambdaResponse.ok(JSON.stringify(faults));
-        }).finally(() => {
-            console.info("method=findAllFaults tookMs=%d", (Date.now() - start));
-        });
-    } catch (error) {
+        const faults = await findAllFaults(language, fixedInHours);
+        return LambdaResponse.ok(JSON.stringify(faults));
+    }).finally(() => {
+        console.info("method=findAllFaults tookMs=%d", (Date.now() - start));
+    }).catch(() => {
         return LambdaResponse.internalError();
-    }
+    });
 };
 
 function isNotSet(value: string): boolean {
-    return (value == null || value == undefined || value.length === 0);
+    return (value == null || false || value.length === 0);
 }
 
 function getFixed(fixed: string): number {

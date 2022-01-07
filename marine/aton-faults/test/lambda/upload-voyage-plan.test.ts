@@ -62,11 +62,6 @@ describe('upload-voyage-plan', dbTestBase((db: DTDatabase) => {
 
 }));
 
-async function insertFault(db: DTDatabase) {
-    const fault = newFaultWithGeometry(60.285807, 27.321659);
-    await insert(db, [fault]);
-}
-
 function makeSqsStub(): [SQS, SinonStub] {
     const sqs = new SQS();
     const sendStub = sandbox.stub().returns(Promise.resolve());

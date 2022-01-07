@@ -44,6 +44,7 @@
     "aws-sdk": "*",
     "axios": "^0.21.1",
     "constructs": "*",
+    "digitraffic-common": "*",
     "moment": "*",
     "moment-timezone": "*",
     "parse-link-header": "^2.0.0",
