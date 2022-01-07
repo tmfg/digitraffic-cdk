@@ -31,9 +31,9 @@ export type FaultProps = {
     // eslint-disable-next-line camelcase
     readonly fairway_number: number
     // eslint-disable-next-line camelcase
-    readonly fairway_name_fi: number
+    readonly fairway_name_fi: string
     // eslint-disable-next-line camelcase
-    readonly fairway_name_sv: number
+    readonly fairway_name_sv: string
     // eslint-disable-next-line camelcase
     readonly area_number: number
     // eslint-disable-next-line camelcase
@@ -44,9 +44,7 @@ const ATON_DATA_TYPE = "ATON_FAULTS";
 
 export function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
-        const features = await FaultsDB.findAll(
-            db, language, fixedInHours, convertFeature,
-        );
+        const features = await FaultsDB.findAll(db, language, fixedInHours, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_DATA_TYPE);
 
         return createFeatureCollection(features, lastUpdated);
@@ -77,9 +75,7 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
     const faultIds = await inDatabaseReadonly((db: DTDatabase) => {
         return FaultsDB.findFaultIdsByRoute(db, voyageLineString);
     });
-    console.info(
-        "method=findFaultIdsForVoyagePlan tookMs=%d count=%d", Date.now() - start, faultIds.length,
-    );
+    console.info("method=findFaultIdsForVoyagePlan tookMs=%d count=%d", Date.now() - start, faultIds.length);
     return faultIds;
 }
 
@@ -90,19 +86,13 @@ export function saveFaults(domain: string, newFaults: Feature[]) {
     return inDatabase((db: DTDatabase) => {
         return db.tx(t => {
             return t.batch([
-                ...FaultsDB.updateFaults(
-                    db, domain, validated,
-                ),
-                LastUpdatedDB.updateUpdatedTimestamp(
-                    db, ATON_DATA_TYPE, new Date(start),
-                ),
+                ...FaultsDB.updateFaults(db, domain, validated),
+                LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start)),
             ]);
         });
     }).finally(() => {
         const end = Date.now();
-        console.info(
-            "method=saveFaults updatedCount=%d tookMs=%d", newFaults.length, (end - start),
-        );
+        console.info("method=saveFaults updatedCount=%d tookMs=%d", newFaults.length, (end - start));
     });
 }
 

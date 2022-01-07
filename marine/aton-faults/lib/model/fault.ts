@@ -11,8 +11,8 @@ export interface DbFault {
     readonly aton_name_sv: string
     readonly aton_type: string
     readonly fairway_number: number
-    readonly fairway_name_fi: number
-    readonly fairway_name_sv: number
+    readonly fairway_name_fi: string
+    readonly fairway_name_sv: string
     readonly area_number: number
     readonly area_description: string
     readonly geometry: string

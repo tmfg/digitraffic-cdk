@@ -1,7 +1,6 @@
-import {FaultProps, findAllFaults, getFaultS124ById} from "../../lib/service/faults";
+import {FaultProps, findAllFaults, getFaultS124ById, saveFaults} from "../../lib/service/faults";
 import {newFault} from "../testdata";
-import {dbTestBase, insert} from "../db-testutil";
-import * as xsdValidator from 'xsd-schema-validator';
+import {dbTestBase, insert, validateS124} from "../db-testutil";
 import {Language} from "digitraffic-common/model/language";
 import {DTDatabase} from "digitraffic-common/postgres/database";
 
@@ -9,6 +8,11 @@ import {DTDatabase} from "digitraffic-common/postgres/database";
 jest.setTimeout(30000);
 
 describe('faults', dbTestBase((db: DTDatabase) => {
+
+    test('getFaults124ById - not found', async () => {
+        const nullFault = await getFaultS124ById(db, 666);
+        expect(nullFault).toBeNull();
+    });
 
     test('getFaultS124ById creates valid XML', async () => {
         const fault = newFault({
@@ -27,17 +31,7 @@ describe('faults', dbTestBase((db: DTDatabase) => {
 
         console.info(faultS124);
 
-        await xsdValidator.validateXML(
-            faultS124, 'test/service/S124.xsd', (err, result) => {
-                expect(err).toBeFalsy();
-                if (err) {
-                    console.info(faultS124);
-
-                    throw err;
-                }
-                expect(result.valid).toBe(true);
-            },
-        );
+        await validateS124(faultS124);
     });
 
     test('findAllFaults', async () => {
@@ -58,6 +52,10 @@ describe('faults', dbTestBase((db: DTDatabase) => {
         expect(props.state).toBe(fault.state);
         expect(props.type).toBe(fault.aton_fault_type);
         expect(props.aton_type).toBe(fault.aton_type);
+    });
+
+    test('saveFaults - empty', async () => {
+        await saveFaults('C_NA', []);
     });
 
 }));

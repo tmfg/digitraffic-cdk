@@ -1,5 +1,5 @@
 import {dbTestBase, insertActiveWarnings, TEST_ACTIVE_WARNINGS_VALID} from "../db-testutil";
-import {findWarningsForVoyagePlan} from "../../lib/service/warnings";
+import {findWarning, findWarningsForVoyagePlan} from "../../lib/service/warnings";
 import {voyagePlan} from "../testdata";
 import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
 import util from "util";
@@ -30,5 +30,20 @@ describe('warnings-service', dbTestBase((db) => {
         const warnings = await findWarnings();
         // one feature is in the path
         expect(warnings?.features).toHaveLength(2);
+    });
+
+    test('findWarning - not found', async() => {
+        const nullWarning = await findWarning(db, 666);
+        expect(nullWarning).toBeNull();
+    });
+
+    test('findWarning - one warning', async() => {
+        await insertActiveWarnings(db, TEST_ACTIVE_WARNINGS_VALID);
+
+        const nullWarning = await findWarning(db, 666);
+        expect(nullWarning).toBeNull();
+
+        const warning = await findWarning(db, 20625);
+        expect(warning).toBeDefined();
     });
 }));

@@ -2,6 +2,7 @@ import moment from "moment-timezone";
 import {DbFault} from "../model/fault";
 import {Feature, Geometry} from "geojson";
 import * as wkx from "wkx";
+import {GmlEnvelope, S124DataSet, S124Member, S124IMember} from "../model/dataset";
 
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
 const HOUR_MINUTE_SECOND = "HH:MM:SSZ";
@@ -14,12 +15,7 @@ const PRODUCTION_AGENCY = {
 const NAME_OF_SERIES_ATON_FAULTS = 'Finnish ATON Faults';
 const NAME_OF_SERIES_NAUTICAL_WARNINGS = 'Finnish Nautical Warnings';
 
-const NODE_S124_DATASET = 'S124:DataSet';
-const NODE_MEMBER = 'member';
-const NODE_IMEMBER = 'imember';
-const NODE_BOUNDED_BY = 'gml:boundedBy';
-
-function createDataSet(id: string): any {
+function createDataSet(id: string, boundedBy: GmlEnvelope, member: S124Member, imember: S124IMember): S124DataSet {
     return {
         'S124:DataSet': {
             '$': {
@@ -31,13 +27,14 @@ function createDataSet(id: string): any {
                 'xmlns:xlink': "http://www.w3.org/1999/xlink",
                 'gml:id': id,
             },
+            "gml:boundedBy": boundedBy,
+            member,
+            imember,
         },
     };
 }
 
-function createId(
-    domain: string, id: number, year: number,
-): string {
+function createId(domain: string, id: number, year: number): string {
     return `FI.${domain}.${id}.${year}`;
 }
 
@@ -45,29 +42,22 @@ function createUrn(id: string): string {
     return `urn:mrn:s124:${id}.P`;
 }
 
-export function convertFault(fault: DbFault): any {
+export function convertFault(fault: DbFault): S124DataSet {
     const faultId = -fault.id;
     const year = fault.entry_timestamp.getFullYear() - 2000;
 
-    const id = createId(
-        'AF', faultId, year,
-    );
+    const id = createId('AF', faultId, year);
     const urn = createUrn(id);
 
-    const root: any = createDataSet(id);
-    const dataSet = root[NODE_S124_DATASET];
+    const boundedBy = createBoundedBy(createCoordinatePair(fault.geometry),createCoordinatePair(fault.geometry));
 
-    dataSet[NODE_BOUNDED_BY] = createBoundedBy(createCoordinatePair(fault.geometry),createCoordinatePair(fault.geometry));
-
-    dataSet[NODE_IMEMBER] = {
+    const imember = {
         'S124:S124_NWPreamble': {
             '$': {
                 'gml:id' : `PR.${id}`,
             },
             id: urn,
-            messageSeriesIdentifier : createMessageSeriesIdentifier(
-                NAME_OF_SERIES_ATON_FAULTS, faultId, year,
-            ),
+            messageSeriesIdentifier : createMessageSeriesIdentifier(NAME_OF_SERIES_ATON_FAULTS, faultId, year),
             sourceDate: moment(fault.entry_timestamp).format(YEAR_MONTH_DAY),
             generalArea: 'Baltic sea',
             locality : {
@@ -85,7 +75,7 @@ export function convertFault(fault: DbFault): any {
         },
     };
 
-    dataSet[NODE_MEMBER] = {
+    const member = {
         'S124:S124_NavigationalWarningPart': {
             '$': {
                 'gml:id' : `${id}.1`,
@@ -100,41 +90,32 @@ export function convertFault(fault: DbFault): any {
         },
     };
 
-    return root;
+    return createDataSet(id, boundedBy, member, imember);
 }
 
-export function convertWarning(warning: Feature): any {
-    const p = warning.properties as any;
+export function convertWarning(warning: Feature) {
+    const p = warning.properties as Record<string, string | number>;
     const year = moment(p.creationTime).year() - 2000;
-    const warningId = p.id;
-    const id = createId(
-        'NW', warningId, year,
-    );
+    const warningId = p.id as number;
+    const id = createId('NW', warningId, year);
     const urn = createUrn(id);
 
-    const root = createDataSet(id);
-    const dataSet = root[NODE_S124_DATASET];
+    const boundedBy =  createBoundedBy('17.0000 55.0000', '32.0000 75.0000');
 
-    dataSet[NODE_BOUNDED_BY] = createBoundedBy('17.0000 55.0000', '32.0000 75.0000');
-
-    //        console.info("properties " + JSON.stringify(p));
-
-    dataSet[NODE_IMEMBER] = {
+    const imember = {
         'S124:S124_NWPreamble': {
             '$': {
                 'gml:id': `PR.${id}`,
             },
             id: urn,
-            messageSeriesIdentifier: createMessageSeriesIdentifier(
-                NAME_OF_SERIES_NAUTICAL_WARNINGS, warningId, year,
-            ),
+            messageSeriesIdentifier: createMessageSeriesIdentifier(NAME_OF_SERIES_NAUTICAL_WARNINGS, warningId, year),
             sourceDate: moment(p.creationTime).format(YEAR_MONTH_DAY),
             generalArea: 'Baltic sea',
             locality: {
-                text: p.areasEn,
+                text: p.areasEn as string,
             },
             title: {
-                text: `${p.typeEn}`,
+                text: p.typeEn as string,
             },
             fixedDateRange: createFixedDateRangeForWarning(p),
             theWarningPart: {
@@ -145,7 +126,7 @@ export function convertWarning(warning: Feature): any {
         },
     };
 
-    dataSet[NODE_MEMBER] = {
+    const member = {
         'S124:S124_NavigationalWarningPart': {
             '$': {
                 'gml:id': `${id}.1`,
@@ -163,10 +144,10 @@ export function convertWarning(warning: Feature): any {
         },
     };
 
-    return root;
+    return createDataSet(id, boundedBy, member, imember);
 }
 
-function createBoundedBy(lowerCorner: string, upperCorner: string): any {
+function createBoundedBy(lowerCorner: string, upperCorner: string): GmlEnvelope {
     return {
         'gml:Envelope': {
             '$': {
@@ -178,7 +159,7 @@ function createBoundedBy(lowerCorner: string, upperCorner: string): any {
     };
 }
 
-function createFixedDateRangeForWarning(p: any) {
+function createFixedDateRangeForWarning(p: Record<string, string | number>) {
     const vst = moment(p.validityStartTime);
 
     if (p.validityEndTime) {
@@ -251,14 +232,12 @@ function createPointProperty(geometry: string, id: string) {
 }
 
 function createCoordinatePair(geometry: string) {
-    const g = wkx.Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as any;
+    const g = wkx.Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as { coordinates: string[] };
 
     return `${g.coordinates[0]} ${g.coordinates[1]}`;
 }
 
-function createMessageSeriesIdentifier(
-    NameOfSeries: string, warningNumber: number, year: number,
-) {
+function createMessageSeriesIdentifier(NameOfSeries: string, warningNumber: number, year: number) {
     return {
         NameOfSeries,
         typeOfWarning : 'local',
