@@ -46,7 +46,7 @@
     "constructs": "*",
     "moment": "*",
     "moment-timezone": "*",
-    "parse-link-header": "^1.0.1",
+    "parse-link-header": "^2.0.0",
     "pg-native": "*",
     "pg-promise": "*",
     "source-map-support": "^0.5.19",
