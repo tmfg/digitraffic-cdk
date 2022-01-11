@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {ApiData, DbCsvData, DbData} from "../model/data";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const SQL_INSERT_DATA =
     `insert into counting_site_data(id, counter_id, data_timestamp, count, status, interval)

@@ -1,6 +1,6 @@
-import * as MaintenanceTrackingDB from "../db/maintenance-tracking-db"
-import {DbObservationData, Status} from "../db/maintenance-tracking-db"
-import {inDatabase} from "digitraffic-common/postgres/database";
+import * as MaintenanceTrackingDB from "../db/maintenance-tracking-db";
+import {DbObservationData, Status} from "../db/maintenance-tracking-db";
+import {inDatabase} from "digitraffic-common/database/database";
 import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";
 import {Havainto} from "../model/models";
@@ -14,7 +14,7 @@ export async function saveMaintenanceTrackingObservationData(observationDatas: D
         return await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationDatas);
     });
     // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
-    return a.filter(id => id != null).length
+    return a.filter(id => id != null).length;
 }
 
 export function createMaintenanceTrackingMessageHash(maintenanceTrackingDataJson: string) : string {
@@ -29,7 +29,7 @@ export function createObservationHash(maintenanceTrackingObservationDataJson: st
 
 export function convertToDbObservationData(item: Havainto, sendingTime: Date, sendingSystem: string, s3Uri: string) {
     const observationJson = JSON.stringify(item.havainto);
-    const observationTime = moment(item.havainto.havaintoaika).toDate()
+    const observationTime = moment(item.havainto.havaintoaika).toDate();
     const harjaContractId = item.havainto.urakkaid;
     const harjaWorkmachineId = item.havainto.tyokone.id;
     const data: DbObservationData = {
@@ -41,7 +41,7 @@ export function convertToDbObservationData(item: Havainto, sendingTime: Date, se
         sendingSystem: sendingSystem,
         status: Status.UNHANDLED,
         hash: createObservationHash(observationJson),
-        s3Uri: s3Uri
+        s3Uri: s3Uri,
     };
     return data;
 }

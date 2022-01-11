@@ -2,6 +2,7 @@
  * Returns a new copy of an array, shuffled using Math.random()
  * @param array Array
  */
+// DEPRECATED, MOVE TO TEST-something
 export function shuffle<T>(array: T[]): T[] {
     // pretty fast way to copy an array, not necessarily the fastest
     const newArray = array.slice(0);
@@ -22,6 +23,7 @@ export function decodeBase64(str: string, encoding: BufferEncoding) {
     return Buffer.from(str, 'base64').toString(encoding);
 }
 
+// DEPRECATED, REMOVE!
 export function NO_OP(): void {
     // intentionally empty
 }

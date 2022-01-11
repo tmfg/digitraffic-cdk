@@ -1,5 +1,5 @@
-import {DTDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
-import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
+import {DTDatabase, inDatabaseReadonly} from 'digitraffic-common/database/database';
+import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import * as DatexDB from "../db/datex2";
 
 const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>

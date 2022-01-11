@@ -1,10 +1,10 @@
 import {Duration} from "aws-cdk-lib";
 import {AssetCode, Canary, Runtime, Schedule, Test} from "@aws-cdk/aws-synthetics-alpha";
-import {LambdaEnvironment} from "../../model/lambda-environment";
 import {Role} from "aws-cdk-lib/aws-iam";
 import {CanaryAlarm} from "./canary-alarm";
 import {CanaryParameters} from "./canary-parameters";
 import {Construct} from "constructs";
+import {LambdaEnvironment} from "../../types/lambda-environment";
 
 export class DigitrafficCanary extends Canary {
     constructor(

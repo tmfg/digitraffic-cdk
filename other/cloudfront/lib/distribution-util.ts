@@ -4,7 +4,7 @@ import {Role} from 'aws-cdk-lib/aws-iam';
 import {CfnWebACL} from 'aws-cdk-lib/aws-wafv2';
 import {ViewerCertificate} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
-import {createViewerCertificate} from "digitraffic-common/stack/alias-configs";
+import {createViewerCertificate} from "digitraffic-common/aws/infra/stack/alias-configs";
 import {createWebAcl} from "./acl/acl-creator";
 import {CFProps, Props} from './app-props';
 import {StreamingConfig} from "./streaming-util";

@@ -1,7 +1,7 @@
 import * as TimestampsService from "../../service/timestamps";
-import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {EmptySecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import * as IdUtils from 'digitraffic-common/marine/id_utils';
-import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
+import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 import {ApiTimestamp} from "../../model/timestamp";
 
 export const handler = (event: GetTimeStampsEvent) => {

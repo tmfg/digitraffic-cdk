@@ -1,4 +1,4 @@
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as AreaTrafficDb from '../db/areatraffic';
 import {DbAreaTraffic} from '../db/areatraffic';
 import {AreaTraffic} from "../model/areatraffic";
@@ -25,7 +25,7 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
             .map(area => ({
                 areaId: area.id,
                 durationInMinutes: area.brighten_duration_min,
-                visibilityInMeters: null
+                visibilityInMeters: null,
             }));
     });
 }

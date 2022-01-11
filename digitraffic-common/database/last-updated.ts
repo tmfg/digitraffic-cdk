@@ -1,5 +1,4 @@
-import {DTDatabase} from "../postgres/database";
-import {DTTransaction} from "digitraffic-common/postgres/database";
+import {DTDatabase, DTTransaction} from "./database";
 
 export enum DataType {
     VS_DATEX2="VS_DATEX2",

@@ -1,6 +1,7 @@
 import {ViewerCertificate} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 import {SecurityPolicyProtocol} from "aws-cdk-lib/aws-cloudfront";
 
+// TODO: move to cloudfront
 export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
     return {
         props: {

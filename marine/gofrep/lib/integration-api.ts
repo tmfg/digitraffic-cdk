@@ -9,10 +9,10 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {Construct} from "constructs";
 import {add404Support, createDefaultPolicyDocument} from "digitraffic-common/api/rest_apis";
-import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
 import {FormalityResponseJson} from "./model/formality";
-import {databaseFunctionProps} from "digitraffic-common/stack/lambda-configs";
-import {createSubscription} from "digitraffic-common/stack/subscription";
+import {databaseFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
+import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
 import {
     defaultIntegration,
     getResponse,
@@ -22,10 +22,10 @@ import {
     RESPONSE_500_SERVER_ERROR,
 } from "digitraffic-common/api/responses";
 import {addServiceModel} from "digitraffic-common/api/utils";
-import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {MessageModel} from "digitraffic-common/api/response";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {EpcMessageSchema} from "./model/epcmessage_schema";
 
 export function create(stack: DigitrafficStack) {

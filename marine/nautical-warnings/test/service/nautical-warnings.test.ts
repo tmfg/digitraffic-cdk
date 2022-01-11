@@ -2,7 +2,7 @@ import {dbTestBase, insertActiveWarnings, insertArchivedWarnings} from "../db-te
 import {getActiveWarnings, getArchivedWarnings, updateNauticalWarnings} from "../../lib/service/nautical-warnings";
 import * as sinon from "sinon";
 import {NauticalWarningsApi} from "../../lib/api/nautical-warnings";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 import {FeatureCollection} from "geojson";
 
 const gjv = require("geojson-validation");

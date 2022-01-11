@@ -1,6 +1,6 @@
 import {AssetCode, Function, FunctionProps, Runtime} from 'aws-cdk-lib/aws-lambda';
 import {Duration, Stack} from 'aws-cdk-lib';
-import {createSubscription} from 'digitraffic-common/stack/subscription';
+import {createSubscription} from 'digitraffic-common/aws/infra/stack/subscription';
 import {Props} from './app-props';
 import {RetentionDays} from "aws-cdk-lib/aws-logs";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam";
@@ -20,8 +20,8 @@ import {
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
 import {Rule, Schedule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 
 export function create(stack: DigitrafficStack,
     bucket: Bucket) {

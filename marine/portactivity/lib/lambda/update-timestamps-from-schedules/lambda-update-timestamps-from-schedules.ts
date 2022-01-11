@@ -1,4 +1,4 @@
-import {withSecret} from "digitraffic-common/secrets/secret";
+import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {sendMessage} from "../../service/queue-service";
 import * as SchedulesService from "../../service/schedules";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";

@@ -1,5 +1,5 @@
-import {DatabaseChecker} from "digitraffic-common/aws/canaries/database-checker";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
+import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
 
 const secretId = process.env[SECRET_ID] as string;
 

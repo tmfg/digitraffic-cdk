@@ -3,7 +3,7 @@ import {DbTimestamp} from "../lib/db/timestamps";
 import * as TimestampsDb from '../lib/db/timestamps';
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {DTDatabase, DTTransaction} from "digitraffic-common/postgres/database";
+import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(

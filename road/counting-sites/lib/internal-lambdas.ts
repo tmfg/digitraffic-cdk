@@ -1,8 +1,8 @@
-import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
+import {DigitrafficLogSubscriptions} from "digitraffic-common/aws/infra/stack/subscription";
 import {CountingSitesEnvKeys} from "./keys";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {Scheduler} from "digitraffic-common/scheduler/scheduler";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
 
 export class InternalLambdas {
     constructor(stack: DigitrafficStack) {

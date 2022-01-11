@@ -1,14 +1,14 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {withSecret} from "digitraffic-common/secrets/secret";
+import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
-import {RtzVoyagePlan} from "digitraffic-common/marine/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 import {VtsApi} from "../../api/vts";
-import {SlackApi} from "digitraffic-common/slack/slack-api";
+import {SlackApi} from "digitraffic-common/utils/slack";
 import {RtzStorageApi} from "../../api/rtzstorage";
-import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;

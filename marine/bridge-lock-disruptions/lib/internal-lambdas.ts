@@ -1,10 +1,10 @@
 import {Function} from 'aws-cdk-lib/aws-lambda';
-import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
-import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
+import {databaseFunctionProps} from 'digitraffic-common/aws/infra/stack/lambda-configs';
+import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {Scheduler} from "digitraffic-common/scheduler/scheduler";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
 
 export function create(secret: ISecret,
     stack: DigitrafficStack): Function {

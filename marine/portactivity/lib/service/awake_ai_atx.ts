@@ -1,7 +1,7 @@
 import {AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType} from "../api/awake_ai_atx";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import * as TimestampDAO from '../db/timestamps';
-import {DTDatabase, inDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import moment from 'moment-timezone';
 import {EventSource} from "../model/eventsource";
 import {AwakeAiZoneType} from "../api/awake_common";
@@ -29,12 +29,14 @@ export class AwakeAiATXService {
                     const port =  atx.locodes[0];
                     const eventType = atx.zoneEventType == AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD;
                     const eventTime = moment(atx.eventTimestamp).toDate();
-                    const portcallId = await TimestampDAO.findPortcallId(db,
+                    const portcallId = await TimestampDAO.findPortcallId(
+                        db,
                         port,
                         eventType,
                         eventTime,
                         atx.mmsi,
-                        atx.imo);
+                        atx.imo,
+                    );
 
                     if (portcallId) {
                         return {
@@ -44,12 +46,12 @@ export class AwakeAiATXService {
                             source: EventSource.AWAKE_AI,
                             ship: {
                                 imo: atx.imo,
-                                mmsi: atx.mmsi
+                                mmsi: atx.mmsi,
                             },
                             location: {
-                                port
+                                port,
                             },
-                            portcallId
+                            portcallId,
                         } as ApiTimestamp;
                     } else {
                         console.warn('method=getATXs no portcall found for %s IMO', atx.zoneEventType, atx.imo);

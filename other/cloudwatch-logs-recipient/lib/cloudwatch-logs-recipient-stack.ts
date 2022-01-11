@@ -7,7 +7,7 @@ import {KinesisEventSource} from 'aws-cdk-lib/aws-lambda-event-sources';
 import {ITopic, Topic} from 'aws-cdk-lib/aws-sns';
 import {EmailSubscription} from 'aws-cdk-lib/aws-sns-subscriptions';
 import {Construct} from "constructs";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 
 export class CloudWatchLogsRecipientStack extends Stack {
     constructor(scope: Construct, id: string, cwlrProps: Props, props?: StackProps) {

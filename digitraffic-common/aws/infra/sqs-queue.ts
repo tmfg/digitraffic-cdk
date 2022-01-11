@@ -1,8 +1,6 @@
 import {Queue, QueueEncryption, QueueProps} from "aws-cdk-lib/aws-sqs";
 import {Duration} from "aws-cdk-lib";
-import {DigitrafficStack} from "../stack/stack";
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
-import {MonitoredFunction} from "../lambda/monitoredfunction";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {InlineCode, Runtime} from "aws-cdk-lib/aws-lambda";
 import {RetentionDays} from "aws-cdk-lib/aws-logs";
@@ -13,6 +11,8 @@ import {ManagedUpload} from "aws-sdk/clients/s3";
 import {S3} from "aws-sdk";
 import {SQSEvent, SQSHandler, SQSRecord} from "aws-lambda";
 import {Construct} from "constructs";
+import {DigitrafficStack} from "./stack/stack";
+import {MonitoredFunction} from "./stack/monitoredfunction";
 
 /**
  * Construct for creating SQS-queues.

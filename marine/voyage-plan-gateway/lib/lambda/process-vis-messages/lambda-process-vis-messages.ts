@@ -1,6 +1,6 @@
 import {SQS} from "aws-sdk";
 import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
-import {withSecret} from "digitraffic-common/secrets/secret";
+import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
@@ -12,10 +12,8 @@ const queueUrl = process.env[VoyagePlanEnvKeys.QUEUE_URL] as string;
 
 const MessageGroupId = 'VPGW-MessageGroupId';
 
-export function handlerFn(
-    sqs: SQS,
-    doWithSecret: (secretId: string, fn: (secret: any) => any) => any
-): () => Promise<void> {
+export function handlerFn(sqs: SQS,
+    doWithSecret: (secretId: string, fn: (secret: any) => any) => any): () => Promise<void> {
     return async function(): Promise<void> {
         return await doWithSecret(secretId, async (secret: any) => {
 
@@ -42,7 +40,7 @@ export function handlerFn(
                 console.info('method=vpgwProcessVisMessages Processing RTZ message %s', routeMessage.stmMessage.message);
                 const message: VisMessageWithCallbackEndpoint = {
                     callbackEndpoint: routeMessage.CallbackEndpoint,
-                    message: routeMessage.stmMessage.message
+                    message: routeMessage.stmMessage.message,
                 };
                 // gzip data to avoid SQS 256 KB limit
                 const gzippedMessage = zlib.gzipSync(Buffer.from(JSON.stringify(message), 'utf-8'));
@@ -51,7 +49,7 @@ export function handlerFn(
                     // SQS only allows character data so the message must also be base64 encoded
                     MessageBody: gzippedMessage.toString('base64'),
                     MessageGroupId,
-                    MessageDeduplicationId: createRtzHash(routeMessage.stmMessage.message)
+                    MessageDeduplicationId: createRtzHash(routeMessage.stmMessage.message),
                 }).promise();
             }
         });

@@ -1,11 +1,11 @@
 import {Construct} from "constructs";
 import {CanaryParameters} from "./canary-parameters";
 import {Role} from "aws-cdk-lib/aws-iam";
-import {LambdaEnvironment} from "../../model/lambda-environment";
 import {DigitrafficCanary} from "./canary";
-import {DigitrafficStack} from "../../stack/stack";
-import {DigitrafficRestApi} from "../../api/rest_apis";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
+import {LambdaEnvironment} from "../../types/lambda-environment";
+import {DigitrafficStack} from "../stack/stack";
+import {DigitrafficRestApi} from "../../../api/rest_apis";
 
 export const ENV_API_KEY = "apiKeyId";
 export const ENV_HOSTNAME = "hostname";

@@ -3,7 +3,7 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../service/portareas";
 import moment from "moment";
 import {EventSource} from "../model/eventsource";
-import {DTDatabase, DTTransaction} from "digitraffic-common/postgres/database";
+import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;

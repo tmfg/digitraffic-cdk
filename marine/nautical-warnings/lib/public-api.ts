@@ -1,17 +1,17 @@
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
 import {MessageModel} from "digitraffic-common/api/response";
 import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficLogSubscriptions} from "digitraffic-common/aws/infra/stack/subscription";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {featureSchema, geojsonSchema} from "digitraffic-common/aws/types/geojson";
 import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
 import nauticalWarningProperties from "./model/nautical-warnings-schema";
-import {addTags} from "digitraffic-common/api/documentation";
-import {BETA_TAGS} from "digitraffic-common/api/tags";
+import {addTags} from "digitraffic-common/aws/infra/documentation";
+import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
 
 export class PublicApi {
     readonly apiKeyId: string;

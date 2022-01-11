@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {Camera, DbCamera} from "../model/camera";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const PS_CAMERA_IDS = new PreparedStatement({
     name: 'get-camera-ids',

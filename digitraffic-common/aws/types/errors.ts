@@ -1,3 +1,4 @@
+// DEPRECATED, remove this!
 export const NOT_FOUND_MESSAGE = 'NOT_FOUND';
 export const AUTHORIZATION_FAILED_MESSAGE = "AUTHORIZATION_FAILED";
 export const ERROR_MESSAGE = 'ERROR';

@@ -1,5 +1,5 @@
 import axios, {AxiosError} from 'axios';
-import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {AwakeAiZoneType} from "./awake_common";
 
 export enum AwakeAiETAResponseType {

@@ -1,7 +1,7 @@
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {DigitrafficCanaryRole} from "digitraffic-common/aws/canaries/canary-role";
-import {DatabaseCanary} from "digitraffic-common/aws/canaries/database-canary";
-import {UrlCanary} from "digitraffic-common/aws/canaries/url-canary";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficCanaryRole} from "digitraffic-common/aws/infra/canaries/canary-role";
+import {DatabaseCanary} from "digitraffic-common/aws/infra/canaries/database-canary";
+import {UrlCanary} from "digitraffic-common/aws/infra/canaries/url-canary";
 import {PublicApi} from "./public-api";
 
 export class Canaries {

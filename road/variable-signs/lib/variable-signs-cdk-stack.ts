@@ -1,7 +1,7 @@
 import {Construct} from 'constructs';
 import * as IntegrationApi from "./integration-api";
 import * as PublicApi from "./public-api";
-import {DigitrafficStack, StackConfiguration} from "digitraffic-common/stack/stack";
+import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
 
 export class VariableSignsCdkStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {

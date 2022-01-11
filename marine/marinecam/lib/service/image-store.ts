@@ -1,5 +1,5 @@
 import {S3} from "aws-sdk";
-import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {ManagedUpload} from "aws-sdk/lib/s3/managed_upload";
 
 const BASE64 = 'base64';

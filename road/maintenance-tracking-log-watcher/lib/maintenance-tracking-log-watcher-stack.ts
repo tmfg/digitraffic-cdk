@@ -5,7 +5,7 @@ import {PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Props} from './app-props';
 import {Bucket, BlockPublicAccess} from "aws-cdk-lib/aws-s3";
 import {KEY_ES_ENDPOINT, KEY_S3_BUCKET_NAME, KEY_SNS_TOPIC_ARN} from "./lambda/maintenance-tracking-log-watcher";
-import {defaultLambdaConfiguration} from "digitraffic-common/stack/lambda-configs";
+import {defaultLambdaConfiguration} from "digitraffic-common/aws/infra/stack/lambda-configs";
 import {Rule,Schedule} from 'aws-cdk-lib/aws-events';
 import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
 import * as sns from 'aws-cdk-lib/aws-sns';

@@ -1,5 +1,5 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(

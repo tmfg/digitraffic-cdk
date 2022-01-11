@@ -4,7 +4,7 @@ import {newTimestamp} from "../testdata";
 import {EventType} from "../../lib/model/timestamp";
 import {findByLocodePublicShiplist} from "../../lib/db/shiplist-public";
 import {EventSource} from "../../lib/model/eventsource";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 import {randomBoolean} from "digitraffic-common/test/testutils";
 
 describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {

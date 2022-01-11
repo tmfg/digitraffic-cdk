@@ -1,9 +1,9 @@
 import {PreparedStatement} from "pg-promise";
 import {
     TheConfidenceSchema, TheCoordLatitudeSchema, TheCoordLongitudeSchema, TheHeelAngleSchema, TheLastUpdateSchema,
-    TheLightStatusSchema, TheSeastateSchema, TheSiteTypeSchema, TheTemperatureSchema, TheTrendSchema, TheWindwavedirSchema
+    TheLightStatusSchema, TheSeastateSchema, TheSiteTypeSchema, TheTemperatureSchema, TheTrendSchema, TheWindwavedirSchema,
 } from "../generated/tlsc-sse-reports-schema";
-import {DTTransaction} from "digitraffic-common/postgres/database";
+import {DTTransaction} from "digitraffic-common/database/database";
 
 export type DbSseReport = {
     readonly sseReportId?: bigint,
@@ -70,7 +70,7 @@ const INSERT_SSE_REPORT_SQL = `
 
 const psUpdateLatestSite = new PreparedStatement({
     name: 'update-sse-report-latest-site',
-    text: UPDATE_LATEST_SITE_TO_FALSE_SQL
+    text: UPDATE_LATEST_SITE_TO_FALSE_SQL,
 });
 
 export function updateLatestSiteToFalse(db: DTTransaction, siteNumber: number): Promise<null> {
@@ -80,7 +80,7 @@ export function updateLatestSiteToFalse(db: DTTransaction, siteNumber: number): 
 export function insertSseReportData(db: DTTransaction, sseData: DbSseReport): Promise<null> {
     const ps = new PreparedStatement({
         name: 'update-sse-report',
-        text: INSERT_SSE_REPORT_SQL
+        text: INSERT_SSE_REPORT_SQL,
     });
     return db.none(ps, createInsertValuesArray(sseData));
 }
@@ -99,6 +99,6 @@ export function createInsertValuesArray(e: DbSseReport): unknown[] {
         e.temperature,
         e.longitude,
         e.latitude,
-        e.siteType
+        e.siteType,
     ];
 }

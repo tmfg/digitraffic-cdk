@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 
 export type AreaVisibilityResponse = {
     // ISO 8601
@@ -10,8 +10,8 @@ export type AreaVisibilityResponse = {
 
 export class AreaVisibilityApi {
 
-    private readonly url: string
-    private readonly token: string
+    private readonly url: string;
+    private readonly token: string;
 
     constructor(url: string, token: string) {
         this.url = url;
@@ -24,8 +24,8 @@ export class AreaVisibilityApi {
             const resp = await axios.get(`${this.url}/${area}`, {
                 headers: {
                     'token': this.token,
-                    Accept: MediaType.APPLICATION_JSON
-                }
+                    Accept: MediaType.APPLICATION_JSON,
+                },
             });
             if (resp.status != 200) {
                 console.error(`method=getVisibilityForArea returned status=${resp.status}`);
@@ -36,7 +36,7 @@ export class AreaVisibilityApi {
             console.error(`method=getVisibilityForArea failed`);
             throw new Error('Getting visibility for area failed');
         } finally {
-            console.log(`method=getVisibilityForArea tookMs=${Date.now() - start}`)
+            console.log(`method=getVisibilityForArea tookMs=${Date.now() - start}`);
         }
     }
 }

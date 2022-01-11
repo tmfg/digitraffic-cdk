@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {withSecret} from "digitraffic-common/secrets/secret";
+import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
@@ -9,8 +9,8 @@ export async function handler(event: any): Promise<any> {
         if (event.queryStringParameters.auth !== secret[VoyagePlanSecretKeys.SCHEDULES_ACCESS_TOKEN]) {
             return {
                 statusCode: 403,
-                body: 'Denied'
-            }
+                body: 'Denied',
+            };
         }
         let url = secret[VoyagePlanSecretKeys.SCHEDULES_URL];
         const calculated = event.queryStringParameters.calculated === 'true';
@@ -31,8 +31,8 @@ export async function handler(event: any): Promise<any> {
         const resp = await axios.get(fullUrl);
         return {
             statusCode: 200,
-            body: resp.data
-        }
+            body: resp.data,
+        };
     });
 }
 

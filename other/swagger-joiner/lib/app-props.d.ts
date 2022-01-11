@@ -1,4 +1,4 @@
-import {StackConfiguration} from "digitraffic-common/stack/stack";
+import {StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
 
 export interface Props extends StackConfiguration {
     // Digitraffic application URL

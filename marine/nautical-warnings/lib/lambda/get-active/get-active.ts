@@ -1,5 +1,5 @@
-import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
 import * as NauticalWarningsService from "../../service/nautical-warnings";
 import {FeatureCollection} from "geojson";
 

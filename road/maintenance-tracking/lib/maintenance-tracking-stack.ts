@@ -5,7 +5,7 @@ import * as Sqs from './sqs';
 import {AppProps} from './app-props';
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {Secret} from "aws-cdk-lib/aws-secretsmanager";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {Construct} from "constructs";
 
 export class MaintenanceTrackingStack extends DigitrafficStack {
