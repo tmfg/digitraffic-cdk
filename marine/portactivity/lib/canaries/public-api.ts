@@ -1,4 +1,4 @@
-import {UrlChecker} from "digitraffic-common/canaries/url-checker";
+import {UrlChecker} from "digitraffic-common/aws/canaries/url-checker";
 import {getSecret} from "digitraffic-common/secrets/secret";
 import {ShiplistSecret} from "../lambda/get-shiplist-public/get-shiplist-public";
 

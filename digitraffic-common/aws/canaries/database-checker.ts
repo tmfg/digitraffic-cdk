@@ -1,5 +1,5 @@
-import {withDbSecret} from "../secrets/dbsecret";
-import {DTDatabase, inDatabaseReadonly} from "../postgres/database";
+import {withDbSecret} from "../../secrets/dbsecret";
+import {DTDatabase, inDatabaseReadonly} from "../../postgres/database";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');

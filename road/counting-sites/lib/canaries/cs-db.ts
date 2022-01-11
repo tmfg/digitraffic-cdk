@@ -1,4 +1,4 @@
-import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
+import {DatabaseChecker} from "digitraffic-common/aws/canaries/database-checker";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 import {DataType} from "digitraffic-common/db/last-updated";
 

@@ -1,10 +1,10 @@
-import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
+import {DatabaseChecker} from "digitraffic-common/aws/canaries/database-checker";
 import {EventSource} from "../model/eventsource";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
 const secretId = process.env[SECRET_ID] as string;
 
-export const handler = async (): Promise<string> => {
+export const handler = (): Promise<string> => {
     const checker = new DatabaseChecker(secretId);
 
     checker.notEmpty('port call timestamps in last hour',

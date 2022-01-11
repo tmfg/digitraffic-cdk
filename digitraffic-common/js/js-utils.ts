@@ -21,3 +21,7 @@ export function decodeBase64ToAscii(str: string) {
 export function decodeBase64(str: string, encoding: BufferEncoding) {
     return Buffer.from(str, 'base64').toString(encoding);
 }
+
+export function NO_OP(): void {
+    // intentionally empty
+}

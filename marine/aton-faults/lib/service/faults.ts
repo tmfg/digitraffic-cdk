@@ -4,7 +4,7 @@ import * as S124Converter from "./s124-converter";
 import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
-import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz/voyageplan";
 import {Feature, FeatureCollection, GeometryObject} from "geojson";
 import {createFeatureCollection} from "digitraffic-common/api/geojson";
 import {Language} from "digitraffic-common/model/language";

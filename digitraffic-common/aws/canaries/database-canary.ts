@@ -6,8 +6,7 @@ import {Duration} from "aws-cdk-lib";
 
 import {CanaryParameters} from "./canary-parameters";
 import {DigitrafficCanary} from "./canary";
-import {DigitrafficStack} from "../stack/stack";
-
+import {DigitrafficStack} from "../../stack/stack";
 
 export class DatabaseCanary extends DigitrafficCanary {
     constructor(stack: DigitrafficStack,

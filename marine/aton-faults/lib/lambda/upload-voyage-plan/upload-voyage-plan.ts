@@ -1,6 +1,6 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz/voyageplan";
 import {SQS} from "aws-sdk";
 import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
 import {BAD_REQUEST_MESSAGE} from "digitraffic-common/api/errors";
@@ -24,14 +24,14 @@ let visService: VisService;
 
 export function handlerFn(sqs: SQS, doWithSecret: SecretFunction<AtonSecret>): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function(event: UploadVoyagePlanEvent): Promise<void> {
-        if(!visService) {
+        if (!visService) {
             await doWithSecret(secretId, (secret: AtonSecret) => {
                 const clientCertificate = decodeSecretValue(secret.certificate);
                 const privateKey = decodeSecretValue(secret.privatekey);
                 const caCert = decodeSecretValue(secret.ca);
                 visService = new VisService(caCert, clientCertificate, privateKey, secret.serviceRegistryUrl);
             }, {
-                prefix: 'aton'
+                prefix: 'aton',
             });
         }
 
@@ -54,12 +54,12 @@ export function handlerFn(sqs: SQS, doWithSecret: SecretFunction<AtonSecret>): (
             const vpService = new VoyagePlanService(sqs, endpoint, sendS124QueueUrl);
             return vpService.handleVoyagePlan(voyagePlan);
         }
-    }
+    };
 }
 
 function decodeSecretValue(value: string) {
     // for tests, no need to inject base64-stuff into secret
-    if(!value) {
+    if (!value) {
         return "";
     }
 
@@ -67,7 +67,7 @@ function decodeSecretValue(value: string) {
 }
 
 async function getEndpointUrl(event: UploadVoyagePlanEvent, voyagePlan: RtzVoyagePlan): Promise<string> {
-    if(event.callbackEndpoint) {
+    if (event.callbackEndpoint) {
         console.info("Using callback endpoint from event!");
         return event.callbackEndpoint;
     }
@@ -76,7 +76,7 @@ async function getEndpointUrl(event: UploadVoyagePlanEvent, voyagePlan: RtzVoyag
         const url = await visService.queryCallBackForImo(voyagePlan.route.routeInfo[0].$.vesselIMO);
 
         return `${url}/area`;
-    } catch(e) {
+    } catch (e) {
         return "";
     }
 }

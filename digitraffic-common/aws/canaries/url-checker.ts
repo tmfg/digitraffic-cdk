@@ -1,5 +1,5 @@
-import {MediaType} from "../api/mediatypes";
-import {getApiKeyFromAPIGateway} from "../api/apikey";
+import {MediaType} from "../../api/mediatypes";
+import {getApiKeyFromAPIGateway} from "../../api/apikey";
 import {constants} from "http2";
 import {IncomingMessage, RequestOptions} from "http";
 
