@@ -7,7 +7,6 @@ import {BAD_REQUEST_MESSAGE} from "digitraffic-common/aws/types/errors";
 import {AtonEnvKeys} from "../../keys";
 import {VoyagePlanService} from "../../service/voyage-plan";
 import {UploadVoyagePlanEvent} from "../../model/upload-voyageplan-event";
-import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
 import {AtonSecret} from "../../model/secret";
 import {decodeBase64ToAscii} from "digitraffic-common/utils/base64";
 import {VisService} from "../../service/vis";
@@ -17,7 +16,7 @@ import {VisService} from "../../service/vis";
  * https://www.seatrafficmanagement.info/developers-forum/vis/
  */
 
-const secretId = process.env[SECRET_ID] as string;
+const secretId = process.env.SECRET_ID as string;
 const sendS124QueueUrl = process.env[AtonEnvKeys.SEND_S124_QUEUE_URL] as string;
 
 let visService: VisService;

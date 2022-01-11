@@ -89,6 +89,10 @@ export class DatabaseChecker {
             .withFailedCanaryMetric(true);
     }
 
+    static create() {
+        return new DatabaseChecker(process.env.SECRET_ID as string);
+    }
+
     one(name: string, sql: string) {
         this.checks.push(new CountDatabaseCheck(name,
             sql,

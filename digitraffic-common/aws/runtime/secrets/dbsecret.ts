@@ -12,7 +12,7 @@ export enum DatabaseEnvironmentKeys {
     DB_PASS = "DB_PASS",
     DB_URI = "DB_URI",
     DB_RO_URI = "DB_RO_URI",
-    DB_APPLICATION = "DB_APPLICATION"
+    DB_APPLICATION = "DB_APPLICATION",
 }
 
 function setDbSecret(secret: DbSecret) {

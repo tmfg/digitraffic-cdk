@@ -14,9 +14,8 @@ import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digit
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
 import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
-import {lambdaFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
+import {LambdaEnvironment, lambdaFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
-import {LambdaEnvironment} from "digitraffic-common/aws/types/lambda-environment";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {add401Support, DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
 import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
@@ -250,9 +249,10 @@ export class PrivateApi {
         userPoolClient: UserPoolClient)
         : RequestAuthorizer {
         const functionName = 'Marinecam-Authorizer';
-        const environment: LambdaEnvironment = {};
-        environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;
-        environment[MarinecamEnvKeys.POOLCLIENT_ID] = userPoolClient.userPoolClientId;
+        const environment: LambdaEnvironment = {
+            [MarinecamEnvKeys.USERPOOL_ID]: userPool.userPoolId,
+            [MarinecamEnvKeys.POOLCLIENT_ID]: userPoolClient.userPoolClientId,
+        };
 
         const authFunction = MonitoredFunction.create(this.stack, functionName, lambdaFunctionProps(
             this.stack, environment, functionName, 'authorizer', {

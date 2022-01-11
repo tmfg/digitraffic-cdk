@@ -3,7 +3,6 @@ import * as WarningsService from "../../service/warnings";
 import * as S124Converter from "../../service/s124-converter";
 import {VisService} from "../../service/vis";
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
-import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
 import {S124Type, SendS124Event} from "../../model/upload-voyageplan-event";
 import {AtonSecret} from "../../model/secret";
 import {decodeBase64ToAscii} from "digitraffic-common/utils/base64";
@@ -18,7 +17,7 @@ const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failu
 
 let visService: VisService;
 
-const secretId = process.env[SECRET_ID] as string;
+const secretId = process.env.SECRET_ID as string;
 
 /**
  * This handler should only receive and send a single S124-message

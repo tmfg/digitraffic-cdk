@@ -4,7 +4,7 @@ import {Role} from "aws-cdk-lib/aws-iam";
 import {CanaryAlarm} from "./canary-alarm";
 import {CanaryParameters} from "./canary-parameters";
 import {Construct} from "constructs";
-import {LambdaEnvironment} from "../../types/lambda-environment";
+import {LambdaEnvironment} from "../stack/lambda-configs";
 
 export class DigitrafficCanary extends Canary {
     constructor(

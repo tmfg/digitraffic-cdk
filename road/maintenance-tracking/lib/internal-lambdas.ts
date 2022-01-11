@@ -2,7 +2,7 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {Duration} from 'aws-cdk-lib';
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Construct} from "constructs";
-import {databaseFunctionProps} from 'digitraffic-common/aws/infra/stack/lambda-configs';
+import {databaseFunctionProps, LambdaEnvironment} from 'digitraffic-common/aws/infra/stack/lambda-configs';
 import {createSubscription} from 'digitraffic-common/aws/infra/stack/subscription';
 import {AppProps} from "./app-props";
 import {Queue} from "aws-cdk-lib/aws-sqs";
@@ -12,7 +12,6 @@ import {RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 import {MaintenanceTrackingEnvKeys} from "./keys";
-import {LambdaEnvironment} from "digitraffic-common/aws/types/lambda-environment";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 
