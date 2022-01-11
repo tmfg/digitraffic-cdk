@@ -2,8 +2,8 @@ import {ports} from '../../service/portareas';
 import * as TimestampService from '../../service/timestamps';
 import {PortactivityEnvKeys} from "../../keys";
 import {SNS} from "aws-sdk";
-import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import * as SNSUtil from 'digitraffic-common/queue/sns';
+import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import * as MessagingUtil from 'digitraffic-common/aws/runtime/messaging';
 import * as R from 'ramda';
 
 const publishTopic = process.env[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] as string;
@@ -17,7 +17,7 @@ export function handlerFn(withSecretFn: SecretFunction<DbSecret, void>, sns: SNS
                 ships.length);
 
             for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {
-                await SNSUtil.snsPublish(JSON.stringify(chunk), publishTopic, sns);
+                await MessagingUtil.snsPublish(JSON.stringify(chunk), publishTopic, sns);
             }
         }, {});
     };

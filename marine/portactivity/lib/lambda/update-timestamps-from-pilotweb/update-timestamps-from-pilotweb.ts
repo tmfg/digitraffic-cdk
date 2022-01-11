@@ -1,5 +1,5 @@
 import {sendMessage} from "../../service/queue-service";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import * as PilotwebService from "../../service/pilotweb";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 

@@ -1,5 +1,7 @@
 import {Stack} from 'aws-cdk-lib';
 
+// TODO: is still in use?
+
 export enum AppType {
     ROAD = 'road', MARINE = 'marine', UNKNOWN = 'unknown'
 }

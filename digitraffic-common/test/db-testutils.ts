@@ -1,12 +1,5 @@
-import {DTDatabase, initDbConnection} from "../postgres/database";
-import {DatabaseEnvironmentKeys} from "../secrets/dbsecret";
-
-/*
-export function inTransaction(db: IDatabase<any, any>, fn: (t: ITask<any>) => void) {
-    return async () => {
-        await db.tx(async (t: any) => await fn(t));
-    };
-}*/
+import {DTDatabase, initDbConnection} from "../database/database";
+import {DatabaseEnvironmentKeys} from "../aws/runtime/secrets/dbsecret";
 
 export function dbTestBase(
     fn: (db: DTDatabase) => void,

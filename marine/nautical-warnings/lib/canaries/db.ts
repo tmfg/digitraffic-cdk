@@ -1,6 +1,6 @@
-import {DatabaseChecker} from "digitraffic-common/aws/canaries/database-checker";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
-import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
+import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
+import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
+import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
 
 const secretId = process.env[SECRET_ID] as string;
 

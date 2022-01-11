@@ -1,7 +1,7 @@
 import * as SseSchema from "../generated/tlsc-sse-reports-schema";
 import * as SseDb from "../db/sse-db";
-import {DTDatabase, inDatabase} from 'digitraffic-common/postgres/database';
-import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
+import {DTDatabase, inDatabase} from 'digitraffic-common/database/database';
+import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 
 export const SSE_DATA_DATA_TYPE = "SSE_DATA";
 
@@ -22,7 +22,7 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
                     return t.batch([
                         SseDb.updateLatestSiteToFalse(t, dbSseSseReport.siteNumber),
                         SseDb.insertSseReportData(t, dbSseSseReport),
-                        LastUpdatedDB.updateUpdatedTimestamp(t, SSE_DATA_DATA_TYPE, new Date())
+                        LastUpdatedDB.updateUpdatedTimestamp(t, SSE_DATA_DATA_TYPE, new Date()),
                     ]);
                 }).then(() => {
                     saved++;
@@ -38,12 +38,11 @@ export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) :
         }
         const result : SseSaveResult = {
             errors,
-            saved
-        }
+            saved,
+        };
         console.info(`method=saveSseData result ${JSON.stringify(result)}`);
         return result;
-    }
-)}
+    });}
 
 export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseDb.DbSseReport {
 
@@ -68,7 +67,7 @@ export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseD
         lightStatus: sseReport.Extra_Fields?.Light_Status,
         temperature: sseReport.Extra_Fields?.Temperature,
         longitude: sseReport.Extra_Fields?.Coord_Longitude ?? -1,
-        latitude: sseReport.Extra_Fields?.Coord_Latitude ?? -1
+        latitude: sseReport.Extra_Fields?.Coord_Latitude ?? -1,
     };
     return data;
 }

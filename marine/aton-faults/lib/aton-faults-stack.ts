@@ -1,7 +1,7 @@
 import {Duration} from 'aws-cdk-lib';
 import {Construct} from "constructs";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {DigitrafficSqsQueue} from "digitraffic-common/queue/sqs";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficSqsQueue} from "digitraffic-common/aws/infra/sqs-queue";
 import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
 import * as PublicApi from './public-api';

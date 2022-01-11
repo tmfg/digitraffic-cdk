@@ -1,4 +1,4 @@
-import {DbSecret, EmptySecretFunction, SecretFunction, SecretToPromiseFunction} from "../secrets/dbsecret";
+import {DbSecret, EmptySecretFunction, SecretFunction, SecretToPromiseFunction} from "../aws/runtime/secrets/dbsecret";
 
 const EMPTY_DB_SECRET: DbSecret = {
     username: '',

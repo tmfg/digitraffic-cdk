@@ -12,7 +12,7 @@ const SECRET_EMPTY = {};
 
 stubSecretsManager();
 
-import {getSecret} from "../../secrets/secret";
+import {getSecret} from "../../aws/runtime/secrets/secret";
 
 describe('secret - test', () => {
     afterEach(() => {

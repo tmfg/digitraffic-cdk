@@ -1,5 +1,5 @@
-import {retry, RetryLogError} from "../../promise/promise";
 import {getRandomInteger} from "../../test/testutils";
+import {retry, RetryLogError} from "../../utils/retry";
 
 describe('Promise utils tests', () => {
 

@@ -1,12 +1,12 @@
 import {Location} from "../model/timestamp";
 import {PreparedStatement} from "pg-promise";
 import {Pilotage} from "../model/pilotage";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL = 'select id, schedule_updated from pilotage where state != \'FINISHED\'';
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
     name: 'get-active-pilotage-timestamps',
-    text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL
+    text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL,
 });
 
 const UPSERT_PILOTAGES_SQL = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, 
@@ -70,16 +70,16 @@ export async function findPortCallId(db: DTDatabase, pilotage: Pilotage, locatio
     const p1 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.port]);
     const p2 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.from]);
 
-    if(p1 && p2 && location.port !== location.from) {
+    if (p1 && p2 && location.port !== location.from) {
         console.info("portcalls found for both %s and %s", location.port, location.from);
         return p2.port_call_id;
     }
 
-    if(!p1 && !p2) {
+    if (!p1 && !p2) {
         console.info("no portcalls found for %s or %s", location.port, location.from);
-    } else if(p1) {
+    } else if (p1) {
         return p1.port_call_id;
-    } else if(p2) {
+    } else if (p2) {
         return p2.port_call_id;
     }
 
@@ -96,7 +96,7 @@ export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
 }
 
 export async function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<unknown> {
-    if(pilotages && pilotages.length > 0) {
+    if (pilotages && pilotages.length > 0) {
         return Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
             id: pilotage.id,
             vesselImo: pilotage.vessel.imo,
@@ -119,7 +119,7 @@ export async function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Pr
 }
 
 export async function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<void[]> {
-    if(pilotageIds && pilotageIds.length > 0) {
+    if (pilotageIds && pilotageIds.length > 0) {
         return db.manyOrNone(DELETE_PILOTAGES_SQL, [pilotageIds]);
     }
 

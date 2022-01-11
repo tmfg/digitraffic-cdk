@@ -1,6 +1,6 @@
 import assert from "assert";
 import {FeatureCollection} from "geojson";
-import {ResponseChecker, UrlChecker} from "digitraffic-common/aws/canaries/url-checker";
+import {ResponseChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
 import {MetadataResponse} from "../model/metadata";
 import {DbData} from "../model/data";
 

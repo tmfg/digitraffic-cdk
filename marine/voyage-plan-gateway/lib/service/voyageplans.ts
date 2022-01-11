@@ -3,7 +3,7 @@ import {
     RtzSchedules,
     RtzVoyagePlan,
     RtzWaypoint,
-} from "digitraffic-common/marine/rtz/voyageplan";
+} from "digitraffic-common/marine/rtz";
 import * as jsts from 'jsts';
 import moment, {Moment} from 'moment-timezone';
 import GeometryFactory = jsts.geom.GeometryFactory;

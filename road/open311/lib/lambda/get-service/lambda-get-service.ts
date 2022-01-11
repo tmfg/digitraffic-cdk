@@ -1,5 +1,5 @@
 import * as ServicesService from "../../service/services";
-import {NOT_FOUND_MESSAGE} from 'digitraffic-common/api/errors';
+import {NOT_FOUND_MESSAGE} from 'digitraffic-common/aws/types/errors';
 import {Service} from "../../model/service";
 
 // eslint-disable-next-line camelcase

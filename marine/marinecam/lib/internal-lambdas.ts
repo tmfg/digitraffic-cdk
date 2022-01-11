@@ -1,9 +1,9 @@
 import {Bucket} from "aws-cdk-lib/aws-s3";
 import {MarinecamEnvKeys} from "./keys";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MonitoredDBFunction} from "digitraffic-common/lambda/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {MobileServerProps} from "./app-props";
-import {Scheduler} from "digitraffic-common/scheduler/scheduler";
+import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
 
 export function create(stack: DigitrafficStack,
     bucket: Bucket) {

@@ -3,12 +3,12 @@ import {SQSRecord} from "aws-lambda/trigger/sqs";
 import { SqsConsumer } from 'sns-sqs-big-payload';
 import * as SqsBigPayload from "../../service/sqs-big-payload";
 import {MaintenanceTrackingEnvKeys} from "../../keys";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const middy = require('@middy/core')
+const middy = require('@middy/core');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure')
+const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure');
 
 const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] as string;
 const sqsQueueUrl = process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] as string;
@@ -18,11 +18,11 @@ const region = process.env.AWS_REGION as string;
 const sqsConsumerInstance : SqsConsumer = SqsBigPayload.createSqsConsumer(sqsQueueUrl, region, "processMaintenanceTrackingQueue");
 
 export function handlerFn(sqsConsumer : SqsConsumer,
-                          doWithSecret: (secretId: string, fn: (secret: any) => any)
-                              => any) : (event: SQSEvent) => Promise<void> {
+    doWithSecret: (secretId: string, fn: (secret: any) => any)
+    => any) : (event: SQSEvent) => Promise<void> {
     return function(event: SQSEvent): Promise<void> {
         return doWithSecret(secretId, async () => {
-            console.info(`method=processMaintenanceTrackingQueue Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`)
+            console.info(`method=processMaintenanceTrackingQueue Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`);
 
             return Promise.allSettled(event.Records.map(async (record: SQSRecord) => {
                 try {

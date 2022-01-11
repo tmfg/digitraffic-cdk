@@ -1,8 +1,8 @@
 import {findAllFaults} from "../../service/faults";
-import {Language} from "digitraffic-common/model/language";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
-import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
+import {Language} from "digitraffic-common/types/language";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
+import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 
 const secretId = process.env[SECRET_ID] as string;
 

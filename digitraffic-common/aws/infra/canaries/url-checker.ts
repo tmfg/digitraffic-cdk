@@ -1,11 +1,11 @@
-import {MediaType} from "../../api/mediatypes";
-import {getApiKeyFromAPIGateway} from "../../api/apikey";
 import {constants} from "http2";
 import {IncomingMessage, RequestOptions} from "http";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
 import zlib = require('zlib');
+import {getApiKeyFromAPIGateway} from "../../../api/apikey";
+import {MediaType} from "../../types/mediatypes";
 
 export const API_KEY_HEADER = "x-api-key";
 

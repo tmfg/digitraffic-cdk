@@ -1,7 +1,7 @@
-import {RtzVoyagePlan} from "digitraffic-common/marine/rtz/voyageplan";
-import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
-import * as CachedDao from "digitraffic-common/db/cached";
-import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
+import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import * as CachedDao from "digitraffic-common/database/cached";
+import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
 import * as turf from "@turf/turf";
 import {Feature, FeatureCollection} from "geojson";
 

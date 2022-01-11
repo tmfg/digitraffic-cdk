@@ -7,17 +7,17 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {AssetCode, Function} from 'aws-cdk-lib/aws-lambda';
 import {Stack} from "aws-cdk-lib";
-import {createSubscription} from "digitraffic-common/stack/subscription";
-import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
-import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
+import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
+import {defaultLambdaConfiguration} from 'digitraffic-common/aws/infra/stack/lambda-configs';
+import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
 import {VoyagePlanEnvKeys} from "./keys";
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {createRestApi} from "digitraffic-common/api/rest_apis";
 import {Topic} from "aws-cdk-lib/aws-sns";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {TrafficType} from "digitraffic-common/types/traffictype";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 
 export function create(secret: ISecret,
     notifyTopic: Topic,

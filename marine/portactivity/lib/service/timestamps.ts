@@ -1,6 +1,6 @@
 import * as TimestampsDB from '../db/timestamps';
 import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../db/timestamps';
-import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from 'digitraffic-common/postgres/database';
+import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from 'digitraffic-common/database/database';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
     isPortnetTimestamp,

@@ -3,12 +3,12 @@ import {Duration, Stack} from "aws-cdk-lib";
 import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";
-import {TrafficType} from '../model/traffictype';
 import {ITopic} from "aws-cdk-lib/aws-sns";
-import {LambdaEnvironment} from "../model/lambda-environment";
 import {databaseFunctionProps, MonitoredFunctionParameters} from "../stack/lambda-configs";
 import {pascalCase} from "change-case";
 import {DigitrafficLogSubscriptions} from "../stack/subscription";
+import {LambdaEnvironment} from "../../types/lambda-environment";
+import {TrafficType} from "../../../types/traffictype";
 
 /**
  * Allows customization of CloudWatch Alarm properties

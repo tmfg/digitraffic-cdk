@@ -1,4 +1,3 @@
-import {AUTHORIZATION_FAILED_MESSAGE, BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE} from "./errors";
 import {
     InternalServerErrorResponseTemplate,
     createResponses,
@@ -6,8 +5,9 @@ import {
 } from "./response";
 import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehavior} from "aws-cdk-lib/aws-apigateway";
 import {Function} from 'aws-cdk-lib/aws-lambda';
-import {MediaType} from './mediatypes';
 import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
+import {MediaType} from "../aws/types/mediatypes";
+import {AUTHORIZATION_FAILED_MESSAGE, BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE} from "../aws/types/errors";
 
 /**
  * This is velocity-script, that assumes the response to be LambdaResponse(status and body).

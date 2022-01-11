@@ -2,7 +2,7 @@ import {dbTestBase} from "../db-testutil";
 import {deletePilotages, findPortCallId, getTimestamps, updatePilotages} from "../../lib/db/pilotages";
 import {Pilotage} from "../../lib/model/pilotage";
 import {Location} from "lib/model/timestamp";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 describe('db-pilotages-public', dbTestBase((db: DTDatabase) => {
     function createPilotage(): Pilotage {
@@ -11,26 +11,26 @@ describe('db-pilotages-public', dbTestBase((db: DTDatabase) => {
             state: 'TEST',
             vessel: {
                 name: 'test',
-                mmsi: 123
+                mmsi: 123,
             },
             route: {
                 start: {
-                    code: 'ABC'
+                    code: 'ABC',
                 },
                 end: {
-                    code: 'DEF'
-                }
+                    code: 'DEF',
+                },
             },
             vesselEta: '',
             endTime: '',
             scheduleSource: 'test',
-            scheduleUpdated: ''
+            scheduleUpdated: '',
         };
     }
 
     function createLocation(): Location {
         return {
-            port: 'ABC'
+            port: 'ABC',
         };
     }
 
@@ -102,11 +102,11 @@ export function insertPilotage(db: DTDatabase, id: number, state: string, schedu
         state,
         route: {
             start: {
-                code: 'START'
+                code: 'START',
             },
             end: {
-                code: 'END'
-            }
-        }
+                code: 'END',
+            },
+        },
     }]);
 }

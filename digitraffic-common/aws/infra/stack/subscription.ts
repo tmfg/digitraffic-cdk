@@ -1,8 +1,8 @@
 import {CfnSubscriptionFilter} from 'aws-cdk-lib/aws-logs';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {DigitrafficStack} from "./stack";
-import {MonitoredFunction} from "../lambda/monitoredfunction";
 import {Construct} from "constructs";
+import {MonitoredFunction} from "./monitoredfunction";
 
 /**
  * Creates a subscription filter that subscribes to a Lambda Log Group and delivers the logs to another destination.

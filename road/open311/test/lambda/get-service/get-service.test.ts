@@ -2,7 +2,7 @@ import {handler} from "../../../lib/lambda/get-service/lambda-get-service";
 import {newService} from "../../testdata";
 import * as ServicesService from "../../../lib/db/services";
 import {dbTestBase} from "../../db-testutil";
-import {NOT_FOUND_MESSAGE} from "digitraffic-common/api/errors";
+import {NOT_FOUND_MESSAGE} from "digitraffic-common/aws/types/errors";
 
 // test file
 /* eslint-disable camelcase */

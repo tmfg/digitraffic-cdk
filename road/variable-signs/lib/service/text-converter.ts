@@ -1,5 +1,5 @@
 import {findSymbol, InputSymbols, isValidSymbol, TextSymbol, SymbolType, getSymbolType} from "./textSymbol";
-import {InputError} from "digitraffic-common/error/input-error";
+import {InputError} from "digitraffic-common/types/input-error";
 
 const MAX_LENGTH = 30;
 

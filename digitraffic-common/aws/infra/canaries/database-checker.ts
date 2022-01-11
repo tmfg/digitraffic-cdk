@@ -1,7 +1,7 @@
-import {withDbSecret} from "../../secrets/dbsecret";
-import {DTDatabase, inDatabaseReadonly} from "../../postgres/database";
-
 // eslint-disable-next-line @typescript-eslint/no-var-requires
+import {withDbSecret} from "../../runtime/secrets/dbsecret";
+import {DTDatabase, inDatabaseReadonly} from "../../../database/database";
+
 const synthetics = require('Synthetics');
 
 abstract class DatabaseCheck<T> {

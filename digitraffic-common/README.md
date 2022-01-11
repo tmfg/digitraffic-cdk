@@ -11,7 +11,7 @@ In package.json dependencies:
 
 In code:
 ```
-import {DigitrafficStack, StackConfiguration} from "digitraffic-common/stack/stack";
+import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
 ```
 
 ### DigitrafficStack

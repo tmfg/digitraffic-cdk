@@ -1,9 +1,11 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 import {ShipTypes} from "../lib/db/areatraffic";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
-    return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
+    return commonDbTestBase(
+        fn, truncate, 'marine', 'marine', 'localhost:54321/marine',
+    );
 }
 
 export async function assertArea(db: DTDatabase, id: number, duration?: number): Promise<Date> {
@@ -11,7 +13,7 @@ export async function assertArea(db: DTDatabase, id: number, duration?: number):
         return await t.oneOrNone('select brighten_sent,brighten_end from areatraffic where id = $1', [id]);
     });
 
-    if(duration) {
+    if (duration) {
         expect(area).toBeDefined();
         expect(area.brighten_sent).toBeDefined();
         expect(area.brighten_end).toBeDefined();
@@ -27,10 +29,12 @@ export async function assertArea(db: DTDatabase, id: number, duration?: number):
     return area;
 }
 
-export async function insertAreaTraffic(db: DTDatabase, id: number, name: string, duration: number, geometry: string): Promise<void> {
+export async function insertAreaTraffic(
+    db: DTDatabase, id: number, name: string, duration: number, geometry: string,
+): Promise<void> {
     await db.tx(async t => {
-       await t.none('INSERT INTO areatraffic(id,name,brighten_duration_min,geometry) values ($1, $2, $3, $4)',
-           [id, name, duration, geometry]);
+        await t.none('INSERT INTO areatraffic(id,name,brighten_duration_min,geometry) values ($1, $2, $3, $4)',
+            [id, name, duration, geometry]);
     });
 }
 
@@ -38,7 +42,7 @@ export async function insertVessel(db: DTDatabase, mmsi: number, ship_type: Ship
     await db.tx(async t => {
         await t.none('INSERT INTO vessel(mmsi,timestamp,name,ship_type,reference_point_a,reference_point_b,reference_point_c,reference_point_d,pos_type,draught,imo,eta) ' +
             'values ($1, $2, $3, $4, 1,1,1,1,1,1,1,1)',
-            [mmsi, Date.now(), 'test', ship_type]);
+        [mmsi, Date.now(), 'test', ship_type]);
     });
 }
 
@@ -47,7 +51,7 @@ export async function insertVesselLocation(db: DTDatabase, mmsi: number, timesta
     await db.tx(async t => {
         await t.none('INSERT INTO vessel_location(mmsi,timestamp_ext,x,y,sog,cog,nav_stat,rot,pos_acc,raim,timestamp) ' +
             'values ($1, $2, $3, 1, 1, 1, 1, 1, true, true, 1)',
-            [mmsi, timestamp, x]);
+        [mmsi, timestamp, x]);
     });
 }
 

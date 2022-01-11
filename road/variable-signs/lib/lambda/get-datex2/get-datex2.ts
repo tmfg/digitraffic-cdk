@@ -1,6 +1,6 @@
 import {findActiveSignsDatex2} from "../../service/variable-signs";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
 
 const secretId = process.env[SECRET_ID] as string;
 

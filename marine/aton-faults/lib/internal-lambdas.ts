@@ -1,8 +1,8 @@
 import {AtonProps} from "./app-props";
 import {AtonEnvKeys} from "./keys";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {Scheduler} from "digitraffic-common/scheduler/scheduler";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
 import {Queue} from "aws-cdk-lib/aws-sqs";
 import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
 import {Duration} from "aws-cdk-lib";

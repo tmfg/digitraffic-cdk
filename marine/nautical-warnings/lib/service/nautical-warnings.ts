@@ -1,7 +1,7 @@
 import {NauticalWarningsApi} from "../api/nautical-warnings";
-import * as CachedDao from "digitraffic-common/db/cached";
-import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
-import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import * as CachedDao from "digitraffic-common/database/cached";
+import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
+import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import moment from "moment-timezone";
 import {Feature, FeatureCollection, GeoJsonProperties} from "geojson";
 
@@ -24,38 +24,24 @@ export async function updateNauticalWarnings(url: string): Promise<void> {
     const active = await api.getActiveWarnings();
     const archived = await api.getArchivedWarnings();
 
-    console.info("DEBUG active " + JSON.stringify(
-        active, null, 2,
-    ));
-    console.info("DEBUG archived " + JSON.stringify(
-        archived, null, 2,
-    ));
+    console.info("DEBUG active " + JSON.stringify(active, null, 2));
+    console.info("DEBUG archived " + JSON.stringify(archived, null, 2));
 
     await inDatabase((db: DTDatabase) => {
         return db.tx(tx => {
             return Promise.allSettled([
-                validateAndUpdate(
-                    tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active,
-                ),
-                validateAndUpdate(
-                    tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived,
-                ),
+                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active),
+                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived),
             ]);
         });
     });
 }
 
-function validateAndUpdate(
-    tx: DTDatabase | DTTransaction, cacheKey: JSON_CACHE_KEY, featureCollection: FeatureCollection,
-): Promise<null> {
+function validateAndUpdate(tx: DTDatabase | DTTransaction, cacheKey: JSON_CACHE_KEY, featureCollection: FeatureCollection): Promise<null> {
     if (gjv.isFeatureCollection(featureCollection, true)) {
-        return CachedDao.updateCachedJson(
-            tx, cacheKey, convert(featureCollection),
-        );
+        return CachedDao.updateCachedJson(tx, cacheKey, convert(featureCollection));
     } else {
-        console.info("DEBUG " + JSON.stringify(
-            featureCollection, null, 2,
-        ));
+        console.info("DEBUG " + JSON.stringify(featureCollection, null, 2));
         console.error("invalid geojson for " + cacheKey);
     }
 
@@ -112,9 +98,7 @@ function convertDate(value: string, format: string): string | null {
         return null;
     }
 
-    const converted = moment.tz(
-        value, format, 'Europe/Helsinki',
-    );
+    const converted = moment.tz(value, format, 'Europe/Helsinki');
 
     if (!converted.isValid()) {
         console.info(value + " was not valid with " + format);

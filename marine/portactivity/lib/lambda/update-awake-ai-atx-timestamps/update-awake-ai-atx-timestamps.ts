@@ -1,4 +1,4 @@
-import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {sendMessage} from "../../service/queue-service";
 import {AwakeAiATXService} from "../../service/awake_ai_atx";

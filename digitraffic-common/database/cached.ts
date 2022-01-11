@@ -1,5 +1,5 @@
 import {PreparedStatement} from "pg-promise";
-import {DTDatabase, DTTransaction} from "../postgres/database";
+import {DTDatabase, DTTransaction} from "./database";
 
 const SQL_UPDATE_CACHE_VALUE =
     `insert into cached_json(cache_id, content, last_updated)

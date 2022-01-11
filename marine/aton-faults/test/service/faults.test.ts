@@ -1,8 +1,8 @@
 import {FaultProps, findAllFaults, getFaultS124ById, saveFaults} from "../../lib/service/faults";
 import {newFault} from "../testdata";
 import {dbTestBase, insert, validateS124} from "../db-testutil";
-import {Language} from "digitraffic-common/model/language";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {Language} from "digitraffic-common/types/language";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 // XML validation takes a while
 jest.setTimeout(30000);

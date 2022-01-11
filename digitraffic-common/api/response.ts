@@ -1,5 +1,5 @@
 import apigateway = require('aws-cdk-lib/aws-apigateway');
-import {MediaType} from "./mediatypes";
+import {MediaType} from "../aws/types/mediatypes";
 
 export const INPUT_RAW = "$input.path('$')";
 export const BODY_FROM_INPUT_PATH = "$input.path('$').body";

@@ -8,7 +8,7 @@ import {
     AwakeAiATXEventType,
     SUBSCRIPTION_MESSAGE,
 } from "../../lib/api/awake_ai_atx";
-import {NO_OP} from "digitraffic-common/js/js-utils";
+import {NO_OP} from "digitraffic-common/utils/base64";
 
 describe('api-awake-ai-atx', () => {
 

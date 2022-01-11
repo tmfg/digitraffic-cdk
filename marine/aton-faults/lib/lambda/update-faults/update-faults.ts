@@ -1,9 +1,9 @@
 import {getFaults} from "../../api/faults";
 import {saveFaults} from "../../service/faults";
 import {Integration} from "../../app-props";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {AtonEnvKeys} from "../../keys";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
 
 const secretId = process.env[SECRET_ID] as string;
 const envValue = process.env[AtonEnvKeys.INTEGRATIONS] as string;
@@ -15,7 +15,7 @@ export const handler = () => {
 
 function updateAllFaults(): Promise<void> {
     return withDbSecret(secretId, async () => {
-        for(const i of integrations) {
+        for (const i of integrations) {
             const newFaults = await getFaults(i.url);
             await saveFaults(i.domain, newFaults);
         }

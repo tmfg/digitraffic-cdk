@@ -1,4 +1,4 @@
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {Construct} from "constructs";
 import {NauticalWarningConfiguration} from "./app-props";
 import {InternalLambdas} from "./internal-lambdas";
