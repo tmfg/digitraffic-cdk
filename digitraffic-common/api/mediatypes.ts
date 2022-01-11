@@ -5,5 +5,6 @@ export enum MediaType {
     IMAGE_SVG = 'image/svg+xml',
     IMAGE_JPEG = 'image/jpeg',
     TEXT_PLAIN = 'text/plain',
-    TEXT_HTML = 'text/html'
+    TEXT_HTML = 'text/html',
+    TEXT_CSV = 'text/csv',
 }
