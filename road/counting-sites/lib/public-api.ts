@@ -14,6 +14,7 @@ export class PublicApi {
     metadataResource: Resource;
     countersListResource: Resource;
     dataResource: Resource;
+    dataCsvResource: Resource;
 
     errorResponseModel: Model;
     metadataResponseModel: Model;
@@ -27,6 +28,7 @@ export class PublicApi {
 
         this.createMetadataEndpoint(stack);
         this.createDataEndpoint(stack);
+        this.createDataCsvEndpoint(stack);
         this.createCountersEndpoint(stack);
 
         this.createDocumentation(stack);
@@ -45,6 +47,11 @@ export class PublicApi {
         addTagsAndSummary(
             'GetData', BETA_TAGS, 'Return all data', this.dataResource, stack,
         );
+
+        addTagsAndSummary(
+            'GetData as CSV', BETA_TAGS, 'Return all data', this.dataCsvResource, stack,
+        );
+
         addQueryParameterDescription('id', 'Site-id', this.dataResource, stack);
     }
 
@@ -53,10 +60,13 @@ export class PublicApi {
         const csResource = apiResource.addResource("counters");
         const betaResource = csResource.addResource("beta");
         const valuesResource = betaResource.addResource("values");
+        const csvValuesResource = betaResource.addResource("csv-values");
+        const monthResource = csvValuesResource.addResource("{year}");
         const countersResource = betaResource.addResource("counters");
 
         this.metadataResource = betaResource.addResource("metadata");
         this.dataResource = valuesResource.addResource("{id}");
+        this.dataCsvResource = monthResource.addResource("{month}");
         this.countersListResource = countersResource.addResource("{domain}");
         this.metadataResponseModel = publicApi.addModel('MetadataResponseModel', MessageModel);
     }
@@ -125,6 +135,40 @@ export class PublicApi {
                 },
                 methodResponses: [
                     corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                ],
+            });
+        });
+    }
+
+    createDataCsvEndpoint(stack: DigitrafficStack) {
+        const lambda = MonitoredDBFunction.create(stack, 'get-data-csv', undefined, {
+            memorySize: 256,
+        });
+
+        const dataIntegration = defaultIntegration(lambda, {
+            requestParameters: {
+                'integration.request.path.year': 'method.request.path.year',
+                'integration.request.path.month': 'method.request.path.month',
+            },
+            requestTemplates: {
+                'application/json': JSON.stringify({
+                    year: "$util.escapeJavaScript($input.params('year'))",
+                    month: "$util.escapeJavaScript($input.params('month'))",
+                }),
+            },
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)],
+        });
+
+        ['GET', 'HEAD'].forEach((httpMethod) => {
+            this.dataCsvResource.addMethod(httpMethod, dataIntegration, {
+                apiKeyRequired: true,
+                requestParameters: {
+                    'method.request.path.year': true,
+                    'method.request.path.month': true,
+                },
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.TEXT_CSV, this.metadataResponseModel)),
                     corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
                 ],
             });

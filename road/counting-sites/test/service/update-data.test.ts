@@ -88,7 +88,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
         await updateDataForDomain(DOMAIN_NAME, '', '');
 
         // timestamp said the data was just updated, so no new data was added
-        assertDataInDb(0, 1);
+        await assertDataInDb(0, 1);
         expect(counterApiResponse.callCount).toEqual(0);
     });
 }));

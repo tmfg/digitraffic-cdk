@@ -33,10 +33,12 @@
   "dependencies": {
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
+    "csv-writer": "^1.6.0",
     "digitraffic-common": "*",
     "geojson-validation": "^1.0.2",
     "pg-native": "*",
-    "pg-promise": "*"
+    "pg-promise": "*",
+    "ramda": "0.27.1"
   },
   "externals": [
     "aws-sdk"
