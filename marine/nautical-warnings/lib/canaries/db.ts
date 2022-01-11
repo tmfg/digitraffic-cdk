@@ -1,10 +1,10 @@
-import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
+import {DatabaseChecker} from "digitraffic-common/aws/canaries/database-checker";
 import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
 
 const secretId = process.env[SECRET_ID] as string;
 
-export const handler = async () => {
+export const handler = () => {
     const checker = new DatabaseChecker(secretId);
 
     checker.one('active cache is not empty',

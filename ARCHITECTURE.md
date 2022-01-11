@@ -16,7 +16,7 @@ lib
 |
 └───lambda (lambdas)
 |   └───update-foos
-|       └───lambda-update-foos.ts
+|       └───update-foos.ts
 |
 └───model (domain objects and JSON schemas)
 |   └───foo-schema.ts

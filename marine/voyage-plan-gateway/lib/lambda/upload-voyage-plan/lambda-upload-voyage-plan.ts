@@ -3,11 +3,12 @@ import * as xml2js from 'xml2js';
 import {withSecret} from "digitraffic-common/secrets/secret";
 import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
-import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz/voyageplan";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 import {VtsApi} from "../../api/vts";
 import {SlackApi} from "digitraffic-common/slack/slack-api";
 import {RtzStorageApi} from "../../api/rtzstorage";
+import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
@@ -15,7 +16,7 @@ const bucketName = process.env[VoyagePlanEnvKeys.BUCKET_NAME] as string;
 
 export type SnsEvent = {
     readonly Records: {
-       readonly body: string
+        readonly body: string
     }[]
 }
 
@@ -24,20 +25,18 @@ type VoyagePlanSecrets = {
     readonly 'vpgw.slackUrl'?: string
 }
 
-let api: VtsApi | null = null
+let api: VtsApi | null = null;
 let slackApi: SlackApi | null = null;
 let rtzStorageApi: RtzStorageApi | null = null;
 
 /**
  * XML parsing and validation errors do not throw an error. This is to remove invalid messages from the queue.
  */
-export function handlerFn(
-    doWithSecret: (secretId: string, fn: (secret: any) => any) => any,
+export function handlerFn(doWithSecret: SecretFunction<VoyagePlanSecrets, string>,
     VtsApiClass: new (url: string) => VtsApi,
-    SlackApiClass: new (url: string) => SlackApi
-): (event: SnsEvent) => Promise<string> {
-    return async function(event: SnsEvent): Promise<string> {
-        return await doWithSecret(secretId, async (secret: VoyagePlanSecrets) => {
+    SlackApiClass: new (url: string) => SlackApi) {
+    return function(event: SnsEvent) {
+        return doWithSecret(secretId, async (secret: VoyagePlanSecrets) => {
             if (event.Records.length > 1) {
                 console.error('method=vpgwUploadVoyagePlan More than one record received! count=%d',
                     event.Records.length);
@@ -92,7 +91,7 @@ export function handlerFn(
                 await api.sendVoyagePlan(visMessage.message);
                 console.info('method=uploadVoyagePlan upload to VTS ok');
             } else {
-                console.info('method=uploadVoyagePlan No VTS API, voyage plan not sent')
+                console.info('method=uploadVoyagePlan No VTS API, voyage plan not sent');
             }
 
             return Promise.resolve('Voyage plan processed');

@@ -1,12 +1,12 @@
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
-import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
-import {UrlCanary} from "digitraffic-common/canaries/url-canary";
+import {DigitrafficCanaryRole} from "digitraffic-common/aws/canaries/canary-role";
+import {DatabaseCanary} from "digitraffic-common/aws/canaries/database-canary";
+import {UrlCanary} from "digitraffic-common/aws/canaries/url-canary";
 import {PublicApi} from "./public-api";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: PublicApi) {
-        if(stack.configuration.enableCanaries) {
+        if (stack.configuration.enableCanaries) {
             const urlRole = new DigitrafficCanaryRole(stack, 'nw-url');
             const dbRole = new DigitrafficCanaryRole(stack, 'nw-db').withDatabaseAccess();
 
@@ -16,9 +16,9 @@ export class Canaries {
                 handler: 'public-api.handler',
                 alarm: {
                     alarmName: 'NW-PublicAPI-Alarm',
-                    topicArn: stack.configuration.warningTopicArn
+                    topicArn: stack.configuration.warningTopicArn,
                 },
-                apiKeyId: publicApi.apiKeyId
+                apiKeyId: publicApi.apiKeyId,
             });
 
             new DatabaseCanary(stack, dbRole, stack.secret, {
@@ -27,8 +27,8 @@ export class Canaries {
                 handler: 'db.handler',
                 alarm: {
                     alarmName: 'NW-Db-Alarm',
-                    topicArn: stack.configuration.warningTopicArn
-                }
+                    topicArn: stack.configuration.warningTopicArn,
+                },
             });
 
         }

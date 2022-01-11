@@ -3,11 +3,11 @@ import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {ComparisonOperator, TreatMissingData} from "aws-cdk-lib/aws-cloudwatch";
 import {Schedule} from "@aws-cdk/aws-synthetics-alpha";
-import {UrlCanary} from "digitraffic-common/canaries/url-canary";
-import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
+import {UrlCanary} from "digitraffic-common/aws/canaries/url-canary";
+import {DatabaseCanary} from "digitraffic-common/aws/canaries/database-canary";
 import {DigitrafficStack} from "digitraffic-common/stack/stack";
 import {Props} from "./app-props";
-import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
+import {DigitrafficCanaryRole} from "digitraffic-common/aws/canaries/canary-role";
 import {PublicApi} from "./public-api";
 
 export class Canaries {

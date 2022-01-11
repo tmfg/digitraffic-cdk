@@ -3,7 +3,7 @@ import {
     RtzSchedules,
     RtzVoyagePlan,
     RtzWaypoint,
-} from "digitraffic-common/rtz/voyageplan";
+} from "digitraffic-common/marine/rtz/voyageplan";
 import * as jsts from 'jsts';
 import moment, {Moment} from 'moment-timezone';
 import GeometryFactory = jsts.geom.GeometryFactory;
@@ -24,7 +24,7 @@ const SPATIAL_LIMITS = gf.createPolygon(gf.createLinearRing([
     new jsts.geom.Coordinate(29.62, 70.40),
     new jsts.geom.Coordinate(26.68, 71.28),
     new jsts.geom.Coordinate(21.05, 69.78),
-    new jsts.geom.Coordinate(20.84, 68.82)
+    new jsts.geom.Coordinate(20.84, 68.82),
 ]), []);
 
 export enum ValidationError {
@@ -127,13 +127,13 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
                 sched.calculated.forEach(s => {
                     if (!s.scheduleElement || !s.scheduleElement.length) {
                         console.warn('method=validateSchedulesStructure Missing schedule element');
-                    //    validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
+                        //    validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
                     }
                     s.scheduleElement.forEach(se => {
                         if (!se.$) {
                             console.warn('method=validateSchedulesStructure No schedule element attributes');
-                      //      validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
+                            //      validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                             return;
                         }
                         if (!se.$.eta && !se.$.etd) {
@@ -152,7 +152,7 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
                     s.scheduleElement.forEach(se => {
                         if (!se.$) {
                             console.warn('method=validateSchedulesStructure No schedule element attributes');
-                          //  validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
+                            //  validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                             return;
                         }
                     });

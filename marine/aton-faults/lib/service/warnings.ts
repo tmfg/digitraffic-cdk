@@ -1,4 +1,4 @@
-import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz/voyageplan";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
 import * as CachedDao from "digitraffic-common/db/cached";
 import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
@@ -22,11 +22,9 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
             .map(p => [p.$.lon, p.$.lat]));
 
     // filter out warnings not in the route
-    warnings.features = warnings.features.filter((f: Feature) => !turf.booleanDisjoint(turf.buffer(
-        f.geometry, MAX_DISTANCE_NM, {
-            units: 'nauticalmiles',
-        },
-    ), voyageLineString));
+    warnings.features = warnings.features.filter((f: Feature) => !turf.booleanDisjoint(turf.buffer(f.geometry, MAX_DISTANCE_NM, {
+        units: 'nauticalmiles',
+    }), voyageLineString));
 
     return warnings;
 }
@@ -35,6 +33,7 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
  * Find warning with the given id.
  *
  * The warnings are cached in database, so we get all active warnings then filter the one with given id
+ * @param db
  * @param id
  */
 export async function findWarning(db: DTDatabase, id: number): Promise<Feature|null> {

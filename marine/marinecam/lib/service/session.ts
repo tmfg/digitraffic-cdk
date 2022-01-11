@@ -16,7 +16,13 @@ import {
     RequestStreamCommand,
 } from "./command";
 
-axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay});
+axiosRetry(axios, {
+    retryCondition: (error) => {
+        console.info("DEBUG retry for " + error.code);
+        return true;
+    },
+    retryDelay: (retry) => 1000  + retry * 3000,
+});
 
 const COMPR_LEVEL = '70';
 const DEST_WIDTH = '1280';

@@ -1,4 +1,4 @@
-import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz/voyageplan";
 import * as FaultsService from "./faults";
 import * as WarningsService from "./warnings";
 import {AWSError, SQS} from "aws-sdk";
@@ -31,7 +31,7 @@ export class VoyagePlanService {
             await this.sendSqs(this.sendS124QueueUrl, {
                 type: S124Type.FAULT,
                 id,
-                callbackEndpoint: this.callbackEndpoint
+                callbackEndpoint: this.callbackEndpoint,
             });
         }
 
@@ -41,14 +41,14 @@ export class VoyagePlanService {
     private async sendWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<void> {
         const warnings = await WarningsService.findWarningsForVoyagePlan(voyagePlan);
 
-        if(warnings && warnings.features) {
+        if (warnings && warnings.features) {
             console.info("sending %d warnings", warnings.features.length);
 
             for (const feature of warnings.features) {
                 await this.sendSqs(this.sendS124QueueUrl, {
                     type: S124Type.WARNING,
                     id: feature?.properties?.id,
-                    callbackEndpoint: this.callbackEndpoint
+                    callbackEndpoint: this.callbackEndpoint,
                 });
             }
         }
@@ -57,7 +57,7 @@ export class VoyagePlanService {
     private sendSqs(QueueUrl: string, event: SendS124Event): Promise<PromiseResult<SendMessageResult, AWSError>> {
         return this.sqs.sendMessage({
             MessageBody: JSON.stringify(event),
-            QueueUrl
+            QueueUrl,
         }).promise();
     }
 }
