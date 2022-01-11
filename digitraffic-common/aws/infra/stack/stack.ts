@@ -9,8 +9,7 @@ import {Function} from "aws-cdk-lib/aws-lambda";
 import {StackCheckingAspect} from "./stack-checking-aspect";
 import {Construct} from "constructs";
 import {TrafficType} from "../../../types/traffictype";
-import {LambdaEnvironment, SECRET_ID} from "../../types/lambda-environment";
-import {DatabaseEnvironmentKeys} from "../../runtime/secrets/dbsecret";
+import {DBLambdaEnvironment} from "./lambda-configs";
 
 const SSM_ROOT = '/digitraffic';
 export const SOLUTION_KEY = 'Solution';
@@ -77,16 +76,15 @@ export class DigitrafficStack extends Stack {
         Aspects.of(this).add(StackCheckingAspect.create(this));
     }
 
-    createLambdaEnvironment(): LambdaEnvironment {
+    createLambdaEnvironment(): DBLambdaEnvironment {
         return this.createDefaultLambdaEnvironment(this.configuration.shortName as string);
     }
 
-    createDefaultLambdaEnvironment(dbApplication: string): LambdaEnvironment {
-        const environment: LambdaEnvironment = {};
-        environment[SECRET_ID] = this.configuration.secretId;
-        environment[DatabaseEnvironmentKeys.DB_APPLICATION] = dbApplication;
-
-        return environment;
+    createDefaultLambdaEnvironment(dbApplication: string): DBLambdaEnvironment {
+        return {
+            SECRET_ID: this.configuration.secretId,
+            DB_APPLICATION: dbApplication,
+        };
     }
 
     grantSecret(...lambdas: Function[]) {

@@ -1,6 +1,10 @@
 import {AssetCode, Runtime} from 'aws-cdk-lib/aws-lambda';
 import {Duration, Stack} from 'aws-cdk-lib';
-import {databaseFunctionProps, defaultLambdaConfiguration} from 'digitraffic-common/aws/infra/stack/lambda-configs';
+import {
+    databaseFunctionProps,
+    defaultLambdaConfiguration,
+    LambdaEnvironment,
+} from 'digitraffic-common/aws/infra/stack/lambda-configs';
 import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
 import {Queue} from "aws-cdk-lib/aws-sqs";
 import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
@@ -13,7 +17,6 @@ import {Rule, Schedule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 import {LambdaSubscription} from "aws-cdk-lib/aws-sns-subscriptions";
 import {PortactivityEnvKeys} from "./keys";
-import {LambdaEnvironment} from "digitraffic-common/aws/types/lambda-environment";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {Props} from './app-props';

@@ -3,9 +3,8 @@ import {saveFaults} from "../../service/faults";
 import {Integration} from "../../app-props";
 import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {AtonEnvKeys} from "../../keys";
-import {SECRET_ID} from "digitraffic-common/aws/types/lambda-environment";
 
-const secretId = process.env[SECRET_ID] as string;
+const secretId = process.env.SECRET_ID as string;
 const envValue = process.env[AtonEnvKeys.INTEGRATIONS] as string;
 const integrations = envValue ? JSON.parse(envValue) as Integration[] : [];
 

@@ -4,8 +4,14 @@ import {ISecurityGroup, IVpc, SubnetSelection} from "aws-cdk-lib/aws-ec2";
 import {RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {Role} from 'aws-cdk-lib/aws-iam';
 import {DigitrafficStack} from "./stack";
-import {LambdaEnvironment} from "../../types/lambda-environment";
 import {MonitoredFunctionAlarmProps} from "./monitoredfunction";
+
+export type LambdaEnvironment = Record<string, string>;
+
+export type DBLambdaEnvironment = LambdaEnvironment & {
+    SECRET_ID: string
+    DB_APPLICATION: string
+}
 
 export interface LambdaConfiguration {
     vpcId: string;
