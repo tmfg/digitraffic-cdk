@@ -1,11 +1,12 @@
-import * as SchedulesService from "../../lib/service/schedules";
-import {SchedulesResponse} from "../../lib/api/schedules";
+import * as sinon from 'sinon';
+import {SchedulesApi, SchedulesResponse} from "../../lib/api/schedules";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";
 import moment from 'moment-timezone';
 import {getRandomNumber} from "digitraffic-common/test/testutils";
 import {ports} from "../../lib/service/portareas";
 import {EventSource} from "../../lib/model/eventsource";
+import {SchedulesService} from "../../lib/service/schedules";
 
 const uuid = '123123123';
 const vesselName = 'TEST';
@@ -23,21 +24,29 @@ const etdTimestamp = '2021-04-27T06:17:36Z';
 describe('schedules', () => {
 
     test('SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [ ] ETD', () => {
-        const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, false), false);
+        const api = createApi();
+        const service = new SchedulesService(api);
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, false), false);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETA, false));
     });
 
     test('SchedulesService.schedulesToTimestamps - under VTS control - [ ] ETA [x] ETD', () => {
-        const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, false, true), false);
+        const api = createApi();
+        const service = new SchedulesService(api);
+
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, false, true), false);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETD, false));
     });
 
     test('SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [x] ETD', () => {
-        const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, true), false);
+        const api = createApi();
+        const service = new SchedulesService(api);
+
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, true), false);
 
         expect(timestamps.length).toBe(6);
         timestamps.filter(ts => ts.eventType == EventType.ETA).forEach(ts => verifyStructure(ts, EventType.ETA, false));
@@ -45,21 +54,30 @@ describe('schedules', () => {
     });
 
     test('SchedulesService.schedulesToTimestamps - calculated - [x] ETA [ ] ETD', () => {
-        const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, false), true);
+        const api = createApi();
+        const service = new SchedulesService(api);
+
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, false), true);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETA, true));
     });
 
     test('SchedulesService.schedulesToTimestamps - calculated - [ ] ETA [x] ETD', () => {
-        const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, false, true), true);
+        const api = createApi();
+        const service = new SchedulesService(api);
+
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, false, true), true);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach(ts => verifyStructure(ts, EventType.ETD, true));
     });
 
     test('SchedulesService.schedulesToTimestamps - calculated - [x] ETA [x] ETD', () => {
-        const timestamps = SchedulesService.schedulesToTimestamps(createSchedulesResponse(3, true, true), true);
+        const api = createApi();
+        const service = new SchedulesService(api);
+
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, true), true);
 
         expect(timestamps.length).toBe(6);
         timestamps.filter(ts => ts.eventType == EventType.ETA).forEach(ts => verifyStructure(ts, EventType.ETA, true));
@@ -67,23 +85,29 @@ describe('schedules', () => {
     });
 
     test('filterTimestamps - older than 5 minutes are filtered', () => {
+        const api = createApi();
+        const service = new SchedulesService(api);
+
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: moment().subtract(getRandomNumber(6, 9999), 'minutes').toDate(),
             locode,
         });
 
-        expect(SchedulesService.filterTimestamps([etd]).length).toBe(0);
+        expect(service.filterTimestamps([etd]).length).toBe(0);
     });
 
     test('filterTimestamps - newer than 5 minutes are not filtered', () => {
+        const api = createApi();
+        const service = new SchedulesService(api);
+
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: moment().subtract(getRandomNumber(1, 5), 'minutes').toDate(),
             locode,
         });
 
-        expect(SchedulesService.filterTimestamps([etd]).length).toBe(1);
+        expect(service.filterTimestamps([etd]).length).toBe(1);
     });
 
 });
@@ -116,6 +140,10 @@ function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean):
             })),
         },
     };
+}
+
+function createApi() {
+    return new SchedulesApi('');
 }
 
 function verifyStructure(ts: ApiTimestamp, eventType: EventType.ETA | EventType.ETD, calculated: boolean) {

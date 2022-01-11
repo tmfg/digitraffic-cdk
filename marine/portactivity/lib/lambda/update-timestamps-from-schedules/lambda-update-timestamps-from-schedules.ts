@@ -1,24 +1,37 @@
 import {withSecret} from "digitraffic-common/secrets/secret";
 import {sendMessage} from "../../service/queue-service";
-import * as SchedulesService from "../../service/schedules";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
+import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
+import {SchedulesApi} from "../../api/schedules";
+import {SchedulesService} from "../../service/schedules";
 
 const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
-type SchedulesSecret = {
+export type SchedulesSecret = {
     readonly "schedules.url": string
 }
 
-export const handler = function (): Promise<void> {
-    return withSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: SchedulesSecret) => {
-        const schedulesUrl = secret[PortactivitySecretKeys.SCHEDULES_URL];
+let service: SchedulesService;
 
-        const vtsControlTimestamps = await SchedulesService.getTimestampsUnderVtsControl(schedulesUrl);
-        const calculatedTimestamps = await SchedulesService.getCalculatedTimestamps(schedulesUrl);
-        const timestamps = vtsControlTimestamps.concat(calculatedTimestamps);
+export const handler = handlerFn(withSecret, SchedulesService, sendMessage);
 
-        console.info("method=updateTimestampsFromSchedules count=%d", timestamps.length);
+export function handlerFn(withDbSecretFn: SecretFunction<SchedulesSecret, void>,
+    SchedulesServiceClass: { new(api: SchedulesApi): SchedulesService },
+    sendMessageFn: (ts: unknown, sqsQueueUrl: string) => Promise<void>) {
+    return () => {
+        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: SchedulesSecret) => {
+            if (!service) {
+                const schedulesUrl = secret[PortactivitySecretKeys.SCHEDULES_URL];
+                service = new SchedulesServiceClass(new SchedulesApi(schedulesUrl));
+            }
 
-        await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
-    });
-};
+            const vtsControlTimestamps = await service.getTimestampsUnderVtsControl();
+            const calculatedTimestamps = await service.getCalculatedTimestamps();
+            const timestamps = vtsControlTimestamps.concat(calculatedTimestamps);
+
+            console.info("method=updateTimestampsFromSchedules count=%d", timestamps.length);
+
+            await Promise.allSettled(timestamps.map(ts => sendMessageFn(ts, sqsQueueUrl)));
+        });
+    };
+}

@@ -1,8 +1,8 @@
 import {
-    getSchedulesTimestamps,
+    SchedulesApi,
     SchedulesResponse,
     ScheduleTimetable,
-    Timestamp
+    Timestamp,
 } from "../../lib/api/schedules";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 
@@ -14,10 +14,11 @@ describe('api-schedules', () => {
         server.listen(port, {
             "/schedules": () => {
                 return fakeSchedules;
-            }
+            },
         });
         try {
-            const resp = await getSchedulesTimestamps(`http://localhost:${port}/schedules`, false);
+            const api = new SchedulesApi(`http://localhost:${port}/schedules`);
+            const resp = await api.getSchedulesTimestamps(false);
             verifyXmlResponse(resp);
         } finally {
             server.close();
@@ -30,10 +31,11 @@ describe('api-schedules', () => {
         server.listen(port, {
             "/schedules/calculated": () => {
                 return fakeSchedules;
-            }
+            },
         });
         try {
-            const resp = await getSchedulesTimestamps(`http://localhost:${port}/schedules`, true);
+            const api = new SchedulesApi(`http://localhost:${port}/schedules`);
+            const resp = await api.getSchedulesTimestamps(true);
             verifyXmlResponse(resp);
         } finally {
             server.close();
@@ -48,16 +50,16 @@ function verifyXmlResponse(resp: SchedulesResponse) {
     expect(s[0].$.UUID).toBe(uuid);
 
     expect(s[0].timetable.length).toBe(1);
-    const tt = s[0].timetable[0] as ScheduleTimetable
+    const tt = s[0].timetable[0] as ScheduleTimetable;
 
     expect(tt.eta?.length).toBe(1);
     const eta = (tt.eta as Timestamp[])[0];
     expect(eta.$.time).toBe(etaEventTime);
     expect(eta.$.uts).toBe(etaTimestamp);
 
-    expect(tt.destination.length).toBe(1);
-    const dest = tt.destination[0];
-    expect(dest.$.locode).toBe(locode);
+    expect(tt.destination?.length).toBe(1);
+    const dest = tt.destination?.[0];
+    expect(dest?.$.locode).toBe(locode);
 
     const v = s[0].vessel;
     expect(v.length).toBe(1);
