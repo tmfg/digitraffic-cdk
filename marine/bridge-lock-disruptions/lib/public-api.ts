@@ -1,20 +1,11 @@
-import {
-    EndpointType,
-    IModel,
-    LambdaIntegration,
-    MethodLoggingLevel,
-    RequestValidator,
-    Resource,
-    RestApi,
-} from 'aws-cdk-lib/aws-apigateway';
+import {EndpointType, IModel, MethodLoggingLevel, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {AnyPrincipal, Effect, PolicyDocument, PolicyStatement} from 'aws-cdk-lib/aws-iam';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {Construct} from "constructs";
 import {default as DisruptionSchema} from './model/disruption-schema';
 import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {featureSchema, geojsonSchema} from "digitraffic-common/aws/types/geojson";
-import {addDefaultValidator, addServiceModel, getModelReference} from "digitraffic-common/api/utils";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
+import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
 import {databaseFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
 import {addTags} from "digitraffic-common/aws/infra/documentation";
 import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";

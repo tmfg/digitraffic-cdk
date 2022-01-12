@@ -1,9 +1,9 @@
 import {Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {defaultLambdaConfiguration, LambdaEnvironment} from 'digitraffic-common/aws/infra/stack/lambda-configs';
-import {createRestApi} from 'digitraffic-common/api/rest_apis';
+import {createRestApi} from 'digitraffic-common/aws/infra/stack/rest_apis';
 import {Queue} from 'aws-cdk-lib/aws-sqs';
-import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
+import {addDefaultValidator, addServiceModel} from "digitraffic-common/utils/api-model";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 
 import {

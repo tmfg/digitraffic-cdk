@@ -4,8 +4,8 @@ import {IncomingMessage, RequestOptions} from "http";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
 import zlib = require('zlib');
-import {getApiKeyFromAPIGateway} from "../../../api/apikey";
 import {MediaType} from "../../types/mediatypes";
+import {getApiKeyFromAPIGateway} from "../../runtime/apikey";
 
 export const API_KEY_HEADER = "x-api-key";
 

@@ -1,10 +1,10 @@
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
 import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {MessageModel} from "digitraffic-common/api/response";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
 import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/infra/digitraffic-integration-response";

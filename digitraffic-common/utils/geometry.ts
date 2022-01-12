@@ -1,4 +1,4 @@
-import {Geometry, Position} from "geojson";
+import {Feature, FeatureCollection, Geometry, Position} from "geojson";
 
 export function createGeometry(geometry: Geometry): string {
     if (geometry.type === 'LineString') {
@@ -39,4 +39,17 @@ function multiPolygon(coordinates: Position[][][]):string {
 
 function coordinatePair(coordinate: Position): string {
     return `${coordinate[0]} ${coordinate[1]}`;
+}
+
+/**
+ * Create a FeatureCollection from a list of features with a 'last updated' property
+ * @param features List of Features
+ * @param lastUpdated Last updated date
+ */
+export function createFeatureCollection(features: Feature[], lastUpdated: Date | null): FeatureCollection {
+    return {
+        type: "FeatureCollection",
+        lastUpdated: lastUpdated,
+        features: features,
+    } as FeatureCollection;
 }

@@ -5,7 +5,7 @@ import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
-import {createFeatureCollection} from "digitraffic-common/api/geojson";
+import {createFeatureCollection} from "digitraffic-common/utils/geometry";
 import {Geometry} from "wkx";
 import {DbDisruption} from "../db/disruptions";
 

@@ -4,8 +4,8 @@ import {Role} from "aws-cdk-lib/aws-iam";
 import {DigitrafficCanary} from "./canary";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {DigitrafficStack} from "../stack/stack";
-import {DigitrafficRestApi} from "../../../api/rest_apis";
 import {LambdaEnvironment} from "../stack/lambda-configs";
+import {DigitrafficRestApi} from "../stack/rest_apis";
 
 export const ENV_API_KEY = "apiKeyId";
 export const ENV_HOSTNAME = "hostname";

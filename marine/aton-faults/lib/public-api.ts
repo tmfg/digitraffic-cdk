@@ -1,15 +1,15 @@
 import {LambdaIntegration, Model, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {MessageModel} from "digitraffic-common/api/response";
-import {featureSchema, geojsonSchema} from "digitraffic-common/aws/types/geojson";
-import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
+import {featureSchema, geojsonSchema} from "digitraffic-common/utils/api-model";
+import {addServiceModel, getModelReference} from "digitraffic-common/utils/api-model";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/aws/infra/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/infra/digitraffic-integration-response";
 
