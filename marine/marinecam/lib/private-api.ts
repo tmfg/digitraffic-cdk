@@ -19,7 +19,7 @@ import {MarinecamEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {add401Support, DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/infra/digitraffic-integration-response";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 export class PrivateApi {
     private readonly stack: DigitrafficStack;

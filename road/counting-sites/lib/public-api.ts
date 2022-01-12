@@ -7,7 +7,7 @@ import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {MessageModel} from "digitraffic-common/aws/infra/api/response";
 import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/infra/digitraffic-integration-response";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
