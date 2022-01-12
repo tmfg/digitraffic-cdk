@@ -27,7 +27,7 @@ function response(statusCode: number, message: string): Promise<ProxyLambdaRespo
 export function handlerFn(event: ProxyLambdaRequest,
     withDbSecretFn: SecretFunction<ShiplistSecret, ProxyLambdaResponse>): Promise<ProxyLambdaResponse | void> {
     return withDbSecretFn(process.env.SECRET_ID as string, (secret: ShiplistSecret) => {
-        if (!event.queryStringParameters.auth) {
+        if (!event.queryStringParameters || !event.queryStringParameters.auth) {
             return response(401, 'Missing authentication');
         }
         if (event.queryStringParameters.auth !== secret.auth) {
