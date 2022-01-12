@@ -3,7 +3,7 @@ import {Schedule} from "aws-cdk-lib/aws-events";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {DigitrafficCanaryRole} from "digitraffic-common/aws/infra/canaries/canary-role";
 import {UrlCanary} from "digitraffic-common/aws/infra/canaries/url-canary";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {Duration} from "aws-cdk-lib";
 
 export class Canaries {

@@ -6,7 +6,7 @@ import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
 import {Feature, FeatureCollection, GeometryObject} from "geojson";
-import {createFeatureCollection} from "digitraffic-common/api/geojson";
+import {createFeatureCollection} from "digitraffic-common/utils/geometry";
 import {Language} from "digitraffic-common/types/language";
 import {DbFault} from "../model/fault";
 

@@ -1,8 +1,8 @@
 import * as SubjectsDb from "../../lib/db/subjects";
 import {newSubject} from "../testdata";
 import {dbTestBase} from "../db-testutil";
-import {shuffle} from "digitraffic-common/utils/base64";
 import {Locale} from "../../lib/model/locale";
+import {shuffle} from "digitraffic-common/test/testutils";
 
 describe('db-subjects', dbTestBase((db) => {
 

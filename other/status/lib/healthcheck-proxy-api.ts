@@ -1,5 +1,5 @@
 import {Props} from "./app-props";
-import {createIpRestrictionPolicyDocument} from "digitraffic-common/api/rest_apis";
+import {createIpRestrictionPolicyDocument} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {EndpointType, LambdaIntegration, MethodLoggingLevel, Resource, RestApi} from "aws-cdk-lib/aws-apigateway";
 import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
 import {AssetCode, Function, Runtime} from "aws-cdk-lib/aws-lambda";

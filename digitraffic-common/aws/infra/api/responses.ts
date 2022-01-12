@@ -6,22 +6,8 @@ import {
 import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehavior} from "aws-cdk-lib/aws-apigateway";
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
-import {MediaType} from "../aws/types/mediatypes";
-import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE} from "../aws/types/errors";
-
-/**
- * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
- * It will always return the body and status, but if status in something else than 200 OK the content-type
- * will be overridden to text/plain. (it's assumed, that lambda will return error text)
- */
-export const RESPONSE_DEFAULT_LAMBDA = `#set($inputRoot = $input.path('$'))
-$inputRoot.body
-#if ($inputRoot.status != 200)
-#set ($context.responseOverride.status = $inputRoot.status)
-#set ($context.responseOverride.header.Content-Type = 'text/plain')
-#end
-#set ($context.responseOverride.header.Access-Control-Allow-Origin = '*')
-`;
+import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE} from "../../types/errors";
+import {MediaType} from "../../types/mediatypes";
 
 export const RESPONSE_200_OK: IntegrationResponse = {
     statusCode: '200',
@@ -41,10 +27,6 @@ export const RESPONSE_500_SERVER_ERROR: IntegrationResponse = {
 
 const RESPONSE_XML = {
     responseTemplates: XmlResponseTemplate,
-};
-
-export const RESPONSE_SVG = {
-    responseTemplates: SvgResponseTemplate,
 };
 
 export const RESPONSE_CORS_INTEGRATION = {

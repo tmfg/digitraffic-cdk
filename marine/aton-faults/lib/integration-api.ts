@@ -1,11 +1,11 @@
 import {Model, PassthroughBehavior, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {Construct} from "constructs";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
-import {defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
+import {defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {MessageModel} from "digitraffic-common/api/response";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
 import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
 import {AtonEnvKeys} from "./keys";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";

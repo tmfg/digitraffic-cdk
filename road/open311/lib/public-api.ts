@@ -5,12 +5,12 @@ import {EndpointType} from "aws-cdk-lib/aws-apigateway";
 import {Stack} from "aws-cdk-lib";
 import {Construct} from "constructs";
 
-import {createIpRestrictionPolicyDocument} from 'digitraffic-common/api/rest_apis';
-import {MessageModel} from 'digitraffic-common/api/response';
-import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-common/api/utils';
+import {createIpRestrictionPolicyDocument} from 'digitraffic-common/aws/infra/stack/rest_apis';
+import {MessageModel} from 'digitraffic-common/aws/infra/api/response';
+import {addDefaultValidator, addServiceModel, createArraySchema} from 'digitraffic-common/utils/api-model';
 import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
 import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {addTags} from "digitraffic-common/aws/infra/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
 import {dbLambdaConfiguration} from 'digitraffic-common/aws/infra/stack/lambda-configs';

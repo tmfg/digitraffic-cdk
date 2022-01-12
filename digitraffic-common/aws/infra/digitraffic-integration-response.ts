@@ -1,6 +1,6 @@
 import {IntegrationResponse} from "aws-cdk-lib/aws-apigateway";
 import {MediaType} from "../types/mediatypes";
-import {RESPONSE_DEFAULT_LAMBDA} from "../../api/responses";
+import {RESPONSE_DEFAULT_LAMBDA} from "./api/response";
 
 export abstract class DigitrafficIntegrationResponse {
 
@@ -13,12 +13,11 @@ export abstract class DigitrafficIntegrationResponse {
     }
 
     static create(statusCode: string, mediaType: MediaType): IntegrationResponse {
-        const responseTemplates: Record<string, string> = {};
-        responseTemplates[mediaType] = RESPONSE_DEFAULT_LAMBDA;
-
         return {
             statusCode,
-            responseTemplates,
+            responseTemplates: {
+                [mediaType]: RESPONSE_DEFAULT_LAMBDA,
+            },
         };
     }
 }

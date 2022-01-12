@@ -3,7 +3,7 @@ import * as SubSubjectsDb from "../../../lib/db/subsubjects";
 import {newSubSubject} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 import {Locale} from "../../../lib/model/locale";
-import {shuffle} from "digitraffic-common/utils/base64";
+import {shuffle} from "digitraffic-common/test/testutils";
 
 describe('lambda-get-subsubjects', dbTestBase((db) => {
 

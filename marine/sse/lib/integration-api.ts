@@ -1,7 +1,7 @@
 import {IModel, IntegrationResponse, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {databaseFunctionProps} from 'digitraffic-common/aws/infra/stack/lambda-configs';
-import {createRestApi} from 'digitraffic-common/api/rest_apis';
-import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
+import {createRestApi} from 'digitraffic-common/aws/infra/stack/rest_apis';
+import {addDefaultValidator, addServiceModel} from "digitraffic-common/utils/api-model";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Construct} from "constructs";
 import {Function} from "aws-cdk-lib/aws-lambda";
@@ -16,9 +16,9 @@ import {
     getResponse,
     methodResponse,
     RESPONSE_200_OK,
-} from "digitraffic-common/api/responses";
+} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {MessageModel} from "digitraffic-common/api/response";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
 import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/aws/types/errors";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";

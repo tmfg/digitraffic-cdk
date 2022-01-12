@@ -1,8 +1,21 @@
 import apigateway = require('aws-cdk-lib/aws-apigateway');
-import {MediaType} from "../aws/types/mediatypes";
+import {MediaType} from "../../types/mediatypes";
 
-export const INPUT_RAW = "$input.path('$')";
-export const BODY_FROM_INPUT_PATH = "$input.path('$').body";
+/**
+ * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
+ * It will always return the body and status, but if status in something else than 200 OK the content-type
+ * will be overridden to text/plain. (it's assumed, that lambda will return error text)
+ */
+export const RESPONSE_DEFAULT_LAMBDA = `#set($inputRoot = $input.path('$'))
+$inputRoot.body
+#if ($inputRoot.status != 200)
+#set ($context.responseOverride.status = $inputRoot.status)
+#set ($context.responseOverride.header.Content-Type = 'text/plain')
+#end
+#set ($context.responseOverride.header.Access-Control-Allow-Origin = '*')
+`;
+
+const BODY_FROM_INPUT_PATH = "$input.path('$').body";
 
 const messageSchema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,

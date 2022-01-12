@@ -6,7 +6,7 @@ import {defaultLambdaConfiguration} from 'digitraffic-common/aws/infra/stack/lam
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {IVpc} from "aws-cdk-lib/aws-ec2";
-import {add404Support, createDefaultPolicyDocument} from "digitraffic-common/api/rest_apis";
+import {add404Support, createDefaultPolicyDocument} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {VoyagePlanEnvKeys} from "./keys";
 import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";

@@ -8,8 +8,8 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
-import {DigitrafficStack} from "../aws/infra/stack/stack";
-import {createUsagePlan} from "../aws/infra/usage-plans";
+import {DigitrafficStack} from "./stack";
+import {createUsagePlan} from "../usage-plans";
 
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];

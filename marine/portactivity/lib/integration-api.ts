@@ -1,9 +1,9 @@
 import {Model, RequestValidator, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Construct} from 'constructs';
-import {DigitrafficRestApi} from 'digitraffic-common/api/rest_apis';
+import {DigitrafficRestApi} from 'digitraffic-common/aws/infra/stack/rest_apis';
 import {Queue} from 'aws-cdk-lib/aws-sqs';
 import {attachQueueToApiGatewayResource} from "digitraffic-common/aws/infra/sqs-integration";
-import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
+import {addServiceModel, getModelReference} from "digitraffic-common/utils/api-model";
 import {createTimestampSchema, LocationSchema, ShipSchema} from "./model/timestamp-schema";
 import {addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
