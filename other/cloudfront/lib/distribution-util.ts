@@ -1,13 +1,24 @@
-import {CloudFrontWebDistribution, SourceConfiguration} from 'aws-cdk-lib/aws-cloudfront';
+import {CloudFrontWebDistribution, SecurityPolicyProtocol, SourceConfiguration} from 'aws-cdk-lib/aws-cloudfront';
 import {CfnResource, Stack} from 'aws-cdk-lib';
 import {Role} from 'aws-cdk-lib/aws-iam';
 import {CfnWebACL} from 'aws-cdk-lib/aws-wafv2';
 import {ViewerCertificate} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
-import {createViewerCertificate} from "digitraffic-common/aws/infra/stack/alias-configs";
 import {createWebAcl} from "./acl/acl-creator";
 import {CFProps, Props} from './app-props';
 import {StreamingConfig} from "./streaming-util";
+
+export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
+    return {
+        props: {
+            acmCertificateArn,
+            sslSupportMethod: 'sni-only',
+            minimumProtocolVersion: SecurityPolicyProtocol.TLS_V1_2_2021,
+        },
+        aliases,
+    };
+}
+
 
 function doCreateWebAcl(stack: Stack, props: Props): CfnWebACL | null {
     if (props.aclRules) {

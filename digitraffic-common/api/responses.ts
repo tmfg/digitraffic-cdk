@@ -7,7 +7,7 @@ import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehav
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
 import {MediaType} from "../aws/types/mediatypes";
-import {AUTHORIZATION_FAILED_MESSAGE, BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE} from "../aws/types/errors";
+import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE, NOT_FOUND_MESSAGE} from "../aws/types/errors";
 
 /**
  * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
@@ -22,11 +22,6 @@ $inputRoot.body
 #end
 #set ($context.responseOverride.header.Access-Control-Allow-Origin = '*')
 `;
-
-export const RESPONSE_401_UNAUTHORIZED: IntegrationResponse = {
-    statusCode: '401',
-    selectionPattern: AUTHORIZATION_FAILED_MESSAGE,
-};
 
 export const RESPONSE_200_OK: IntegrationResponse = {
     statusCode: '200',
@@ -108,7 +103,6 @@ export function defaultIntegration(lambdaFunction: Function,
         integrationResponses: options?.responses || [
             getResponse(RESPONSE_200_OK, options),
             getResponse(RESPONSE_400_BAD_REQUEST, options),
-            getResponse(RESPONSE_401_UNAUTHORIZED, options),
             getResponse(RESPONSE_404_NOT_FOUND, options),
             getResponse(RESPONSE_500_SERVER_ERROR, options),
         ],
