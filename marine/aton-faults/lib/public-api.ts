@@ -1,10 +1,9 @@
-import {LambdaIntegration, Model, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {Model, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MessageModel} from "digitraffic-common/aws/infra/api/response";
-import {featureSchema, geojsonSchema} from "digitraffic-common/utils/api-model";
-import {addServiceModel, getModelReference} from "digitraffic-common/utils/api-model";
+import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/aws/infra/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
@@ -47,6 +46,7 @@ function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, 
         requestTemplates: {
             'application/json': JSON.stringify({
                 language: "$util.escapeJavaScript($input.params('language'))",
+                // eslint-disable-next-line camelcase
                 fixed_in_hours: "$util.escapeJavaScript($input.params('fixed_in_hours'))",
             }),
         },

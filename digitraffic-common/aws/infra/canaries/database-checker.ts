@@ -2,6 +2,7 @@
 import {withDbSecret} from "../../runtime/secrets/dbsecret";
 import {DTDatabase, inDatabaseReadonly} from "../../../database/database";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
 
 abstract class DatabaseCheck<T> {

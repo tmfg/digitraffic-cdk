@@ -1,7 +1,7 @@
 import {
     InternalServerErrorResponseTemplate,
     createResponses,
-    XmlResponseTemplate, NotFoundResponseTemplate, SvgResponseTemplate, BadRequestResponseTemplate,
+    XmlResponseTemplate, NotFoundResponseTemplate, BadRequestResponseTemplate,
 } from "./response";
 import {LambdaIntegration, MethodResponse, IntegrationResponse, PassthroughBehavior} from "aws-cdk-lib/aws-apigateway";
 import {Function} from 'aws-cdk-lib/aws-lambda';
@@ -40,12 +40,6 @@ export const RESPONSE_404_NOT_FOUND = {
     selectionPattern: NOT_FOUND_MESSAGE,
     responseTemplates: NotFoundResponseTemplate,
 };
-
-export const TEMPLATE_COGNITO_GROUPS = {
-    'application/json': JSON.stringify({
-        "groups": "$context.authorizer.claims['cognito:groups']",
-        "username": "$context.authorizer.claims['cognito:username']",
-    })};
 
 export function methodResponse(status: string, contentType: MediaType, model: IModel, parameters?: Record<string, boolean>): MethodResponse {
     return  {

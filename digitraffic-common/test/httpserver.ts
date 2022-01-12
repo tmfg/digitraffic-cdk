@@ -29,6 +29,7 @@ export class TestHttpServer {
 
             Object.keys(props).forEach(k => this.debuglog(k));
             this.debuglog('Received request to url ' + req.url + '..');
+            // eslint-disable-next-line @typescript-eslint/no-var-requires
             const path = require('url').parse(req.url).pathname;
 
             let dataStr = '';

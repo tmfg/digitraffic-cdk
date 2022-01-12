@@ -1,7 +1,7 @@
 import axios, {AxiosResponse} from 'axios';
 import {Feature} from "geojson";
 
-export async function getFaults(endpointUrl: string): Promise<Feature[]> {
+export function getFaults(endpointUrl: string): Promise<Feature[]> {
     return getFaultsFromServer(endpointUrl).then(resp => {
         if (resp.status === 200) {
             return resp.data.features;
@@ -18,7 +18,7 @@ export async function getFaults(endpointUrl: string): Promise<Feature[]> {
     });
 }
 
-export async function getFaultsFromServer(url: string): Promise<AxiosResponse> {
+export function getFaultsFromServer(url: string): Promise<AxiosResponse> {
     const start = Date.now();
 
     console.info("getFaultsFromServer: getting faults from " + url);
@@ -26,8 +26,8 @@ export async function getFaultsFromServer(url: string): Promise<AxiosResponse> {
     return axios.get(url, {
         timeout: 10000,
         headers: {
-            'Accept': 'application/json'
-        }
+            'Accept': 'application/json',
+        },
     }).then(response => {
         const end = Date.now();
         console.info("method=getFaultsFromServer faultCount=%d tookMs=%d", response.data.features.length, (end-start));
