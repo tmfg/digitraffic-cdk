@@ -13,7 +13,7 @@ import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/infra/digitraffic-integration-response";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 export function create(secret: ISecret,
     stack: DigitrafficStack) {
