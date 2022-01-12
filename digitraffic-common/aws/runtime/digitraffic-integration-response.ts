@@ -1,6 +1,6 @@
 import {IntegrationResponse} from "aws-cdk-lib/aws-apigateway";
 import {MediaType} from "../types/mediatypes";
-import {RESPONSE_DEFAULT_LAMBDA} from "./api/response";
+import {RESPONSE_DEFAULT_LAMBDA} from "../infra/api/response";
 
 export abstract class DigitrafficIntegrationResponse {
 
