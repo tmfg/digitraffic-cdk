@@ -1,6 +1,6 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {JSON_CACHE_KEY} from "digitraffic-common/db/cached";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(

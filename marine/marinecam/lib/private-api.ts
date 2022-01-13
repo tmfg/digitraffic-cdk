@@ -9,18 +9,17 @@ import {
 import {UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
 import {Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Bucket} from "aws-cdk-lib/aws-s3";
-import {createResponses} from "digitraffic-common/api/response";
-import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digitraffic-common/api/responses";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {addTagsAndSummary} from "digitraffic-common/api/documentation";
-import {BETA_TAGS} from "digitraffic-common/api/tags";
-import {lambdaFunctionProps} from "digitraffic-common/stack/lambda-configs";
+import {createResponses} from "digitraffic-common/aws/infra/api/response";
+import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digitraffic-common/aws/infra/api/responses";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
+import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
+import {LambdaEnvironment, lambdaFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {add401Support, DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {add401Support, DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
+import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 export class PrivateApi {
     private readonly stack: DigitrafficStack;
@@ -250,9 +249,10 @@ export class PrivateApi {
         userPoolClient: UserPoolClient)
         : RequestAuthorizer {
         const functionName = 'Marinecam-Authorizer';
-        const environment: LambdaEnvironment = {};
-        environment[MarinecamEnvKeys.USERPOOL_ID] = userPool.userPoolId;
-        environment[MarinecamEnvKeys.POOLCLIENT_ID] = userPoolClient.userPoolClientId;
+        const environment: LambdaEnvironment = {
+            [MarinecamEnvKeys.USERPOOL_ID]: userPool.userPoolId,
+            [MarinecamEnvKeys.POOLCLIENT_ID]: userPoolClient.userPoolClientId,
+        };
 
         const authFunction = MonitoredFunction.create(this.stack, functionName, lambdaFunctionProps(
             this.stack, environment, functionName, 'authorizer', {

@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {Situation} from "../service/variable-sign-updater";
-import {DTDatabase, DTTransaction} from "digitraffic-common/postgres/database";
+import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 
 const INSERT_DATEX2 =
 `insert into device_data_datex2(device_id,datex2,effect_date,updated_timestamp)

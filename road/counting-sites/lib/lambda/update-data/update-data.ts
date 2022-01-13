@@ -1,10 +1,9 @@
 import * as UpdateService from "../../service/update";
 import {CountingSitesSecret} from "../../model/counting-sites-secret";
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import { CountingSitesEnvKeys } from "../../keys";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
 
-const secretId = process.env[SECRET_ID] as string;
+const secretId = process.env.SECRET_ID as string;
 const domainName = process.env[CountingSitesEnvKeys.DOMAIN_NAME] as string;
 const domainPrefix = process.env[CountingSitesEnvKeys.DOMAIN_PREFIX] as string;
 

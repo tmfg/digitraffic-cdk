@@ -8,13 +8,12 @@ import {
 import {AwakeAiATXService} from "../../lib/service/awake_ai_atx";
 import {dbTestBase, insertPortAreaDetails, insertPortCall} from "../db-testutil";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
-import {randomBoolean} from "digitraffic-common/test/testutils";
+import {randomBoolean, shuffle} from "digitraffic-common/test/testutils";
 import {EventSource} from "../../lib/model/eventsource";
-import {shuffle} from "digitraffic-common/js/js-utils";
 import {AwakeAiZoneType} from "../../lib/api/awake_common";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const ws = require('ws');
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 // test file
 /* eslint-disable camelcase */

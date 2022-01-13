@@ -21,3 +21,15 @@ export function getRandomIntegerAsString(min: number , max: number) : string {
 export function randomBoolean(): boolean {
     return Math.random() < 0.5;
 }
+
+/**
+ * Returns a new copy of an array, shuffled using Math.random()
+ * @param array Array
+ */
+export function shuffle<T>(array: T[]): T[] {
+    // pretty fast way to copy an array, not necessarily the fastest
+    const newArray = array.slice(0);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    newArray.sort((x) => 0.5 - Math.random());
+    return newArray;
+}

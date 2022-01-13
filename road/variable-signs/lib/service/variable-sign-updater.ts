@@ -1,6 +1,6 @@
 import * as DeviceDB from "../db/datex2";
-import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
-import {DTDatabase, DTTransaction, inDatabase} from "digitraffic-common/postgres/database";
+import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import {DTDatabase, DTTransaction, inDatabase} from "digitraffic-common/database/database";
 import {StatusCodeValue} from "../lambda/update-datex2/update-datex2";
 
 const REG_PAYLOAD = /<payloadPublication/g;

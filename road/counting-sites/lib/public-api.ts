@@ -1,13 +1,13 @@
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
-import {MonitoredDBFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {MessageModel} from "digitraffic-common/api/response";
-import {BETA_TAGS} from "digitraffic-common/api/tags";
-import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
+import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
+import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
+import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;

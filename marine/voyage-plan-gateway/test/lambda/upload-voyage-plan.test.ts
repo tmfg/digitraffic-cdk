@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import moment from 'moment-timezone';
 import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
 import {VtsApi} from "../../lib/api/vts";
-import {SlackApi} from "digitraffic-common/slack/slack-api";
+import {SlackApi} from "digitraffic-common/utils/slack";
 import {RtzStorageApi} from "../../lib/api/rtzstorage";
 const zlib = require('zlib');
 
@@ -205,11 +205,11 @@ function voyagePlan() {
 function createSnsEvent(xml: string): SnsEvent {
     const message: VisMessageWithCallbackEndpoint = {
         callbackEndpoint: '',
-        message: xml
+        message: xml,
     };
     return {
         Records: [{
             body: zlib.gzipSync(Buffer.from(JSON.stringify(message))).toString('base64'),
-        }]
+        }],
     };
 }

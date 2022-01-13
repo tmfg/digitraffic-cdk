@@ -5,8 +5,8 @@ import {
 import moment from "moment-timezone";
 import {newTimestamp} from "./testdata";
 import {ApiTimestamp} from "../lib/model/timestamp";
-import {shuffle} from "digitraffic-common/js/js-utils";
 import {EventSource} from "../lib/model/eventsource";
+import {shuffle} from "digitraffic-common/test/testutils";
 
 describe('event-sourceutil', () => {
 

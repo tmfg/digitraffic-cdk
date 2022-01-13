@@ -1,7 +1,7 @@
 import {dbTestBase} from "../db-testutil";
 import {handlerFn,ShiplistSecret} from "../../lib/lambda/get-shiplist-public/get-shiplist-public";
 import {createSecretFunction} from "digitraffic-common/test/secret";
-import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
+import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/aws/types/proxytypes";
 
 const secret: ShiplistSecret = {
     auth: 'test',

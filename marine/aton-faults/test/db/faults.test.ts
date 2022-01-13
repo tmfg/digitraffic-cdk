@@ -4,10 +4,10 @@ import * as FaultsDb from '../../lib/db/faults';
 import {findAll} from '../../lib/db/faults';
 import {LineString, Point} from "wkx";
 import {FaultState} from "../../lib/model/fault";
-import {Language} from "digitraffic-common/model/language";
+import {Language} from "digitraffic-common/types/language";
 import {getRandomNumber} from "digitraffic-common/test/testutils";
 import moment from 'moment';
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 describe('db-voyageplan-faults', dbTestBase((db: DTDatabase) => {
 
@@ -101,9 +101,7 @@ describe('db-voyageplan-faults', dbTestBase((db: DTDatabase) => {
     });
 
     test('findAllFaults - empty', async () => {
-        const faults = await findAll(
-            db, Language.FI, 0, (f) => f,
-        );
+        const faults = await findAll(db, Language.FI, 0, (f) => f);
 
         await expect(faults.length).toBe(0);
     });
@@ -112,9 +110,7 @@ describe('db-voyageplan-faults', dbTestBase((db: DTDatabase) => {
         const faults = Array.from({length: getRandomNumber(1, 10)}).map(() => newFault());
         await insert(db, faults);
 
-        const foundFaults = await findAll(
-            db, Language.FI, 10, (f) => f,
-        );
+        const foundFaults = await findAll(db, Language.FI, 10, (f) => f);
 
         await expect(foundFaults.length).toBe(faults.length);
     });
@@ -123,9 +119,7 @@ describe('db-voyageplan-faults', dbTestBase((db: DTDatabase) => {
         const fault = newFault({ fixedTimestamp: moment().add(3, 'hour').toDate() });
         await insert(db, [fault]);
 
-        const faults = await findAll(
-            db, Language.FI, 2, (f) => f,
-        );
+        const faults = await findAll(db, Language.FI, 2, (f) => f);
 
         await expect(faults.length).toBe(1);
     });

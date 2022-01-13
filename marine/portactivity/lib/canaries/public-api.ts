@@ -1,5 +1,5 @@
-import {UrlChecker} from "digitraffic-common/canaries/url-checker";
-import {getSecret} from "digitraffic-common/secrets/secret";
+import {UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
+import {getSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {ShiplistSecret} from "../lambda/get-shiplist-public/get-shiplist-public";
 
 const hostname = process.env.hostname as string;

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {MediaType} from "digitraffic-common/api/mediatypes";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {ApiCounter} from "../model/counter";
 import {ApiData} from "../model/data";
 import {ApiChannel, ApiSite} from "../model/site";

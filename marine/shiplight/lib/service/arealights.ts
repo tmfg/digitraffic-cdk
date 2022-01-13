@@ -1,6 +1,6 @@
 import {AreaLightsApi} from "../api/arealights";
 import {AreaTraffic} from "../model/areatraffic";
-import {retry, RetryLogError} from "digitraffic-common/promise/promise";
+import {retry, RetryLogError} from "digitraffic-common/utils/retry";
 
 export class AreaLightsService {
 

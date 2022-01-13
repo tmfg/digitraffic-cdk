@@ -1,9 +1,9 @@
-import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
+import {DatabaseCanary} from "digitraffic-common/aws/infra/canaries/database-canary";
 import {Schedule} from "aws-cdk-lib/aws-events";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {DigitrafficCanaryRole} from "digitraffic-common/canaries/canary-role";
-import {UrlCanary} from "digitraffic-common/canaries/url-canary";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficCanaryRole} from "digitraffic-common/aws/infra/canaries/canary-role";
+import {UrlCanary} from "digitraffic-common/aws/infra/canaries/url-canary";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {Duration} from "aws-cdk-lib";
 
 export class Canaries {

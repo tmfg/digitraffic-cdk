@@ -3,7 +3,7 @@ import * as StatesDb from "../../../lib/db/states";
 import {newState} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 import {Locale} from "../../../lib/model/locale";
-import {shuffle} from "digitraffic-common/js/js-utils";
+import {shuffle} from "digitraffic-common/test/testutils";
 
 describe('lambda-get-states', dbTestBase((db) => {
 

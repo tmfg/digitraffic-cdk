@@ -3,7 +3,7 @@ import {dbTestBase} from "../../db-testutil";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import * as SubSubjectsDb from "../../../lib/db/subsubjects";
 import {Locale} from "../../../lib/model/locale";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const SERVER_PORT = 8091;
 
@@ -19,7 +19,7 @@ describe('update-subsubjects', dbTestBase((db: DTDatabase) => {
             "/subsubjects": (url) => {
                 const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
                 return fakeSubSubjects(locale);
-            }
+            },
         });
 
         try {

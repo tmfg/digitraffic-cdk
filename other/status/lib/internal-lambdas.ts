@@ -4,12 +4,12 @@ import {RetentionDays} from "aws-cdk-lib/aws-logs";
 import {ISecret, Secret} from "aws-cdk-lib/aws-secretsmanager";
 import {Rule, Schedule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
-import {createSubscription} from "digitraffic-common/stack/subscription";
+import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
 import {Props} from "./app-props";
 import {StatusEnvKeys} from "./keys";
 import {ITopic} from "aws-cdk-lib/aws-sns";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {TrafficType} from "digitraffic-common/model/traffictype";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {TrafficType} from "digitraffic-common/types/traffictype";
 
 
 export function create(stack: Stack, alarmSnsTopic: ITopic, warningSnsTopic: ITopic, props: Props) {

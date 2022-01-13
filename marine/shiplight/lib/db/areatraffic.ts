@@ -1,5 +1,5 @@
 import {PreparedStatement} from 'pg-promise';
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 export type DbAreaTraffic = {
     readonly id: number
@@ -40,12 +40,12 @@ const SQL_UPDATE_AREA_TRAFFIC_SENDTIME = `
 
 const PS_GET_AREA_TRAFFIC = new PreparedStatement({
     name: 'get-area-traffic',
-    text: SQL_GET_AREA_TRAFFIC
+    text: SQL_GET_AREA_TRAFFIC,
 });
 
 const PS_UPDATE_AREA_TRAFFIC_SENDTIME = new PreparedStatement({
     name: 'update-area-traffic-sendtime',
-    text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME
+    text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME,
 });
 
 export function getAreaTraffic(db: DTDatabase): Promise<DbAreaTraffic[]> {

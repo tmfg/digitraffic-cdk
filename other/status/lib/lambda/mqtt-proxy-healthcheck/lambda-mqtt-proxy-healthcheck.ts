@@ -1,5 +1,5 @@
 import {Client} from 'paho-mqtt';
-import {ProxyLambdaResponse} from "digitraffic-common/api/proxytypes";
+import {ProxyLambdaResponse} from "digitraffic-common/aws/types/proxytypes";
 
 export const KEY_APP = 'KEY_APP';
 
@@ -18,18 +18,18 @@ function fakeBrowserHack() {
     global.localStorage = {
         store: {},
         getItem: function (key: string) {
-            return this.store[key]
+            return this.store[key];
         },
         setItem: function (key: string, value: string) {
-            this.store[key] = value
+            this.store[key] = value;
         },
         removeItem: function (key: string) {
-            delete this.store[key]
-        }
-    }
+            delete this.store[key];
+        },
+    };
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    global.window = global
+    global.window = global;
 }
 
 export async function handler(): Promise<ProxyLambdaResponse> {
@@ -43,14 +43,14 @@ export async function handler(): Promise<ProxyLambdaResponse> {
             onFailure: reject,
             useSSL: true,
             userName: 'digitraffic',
-            password: 'digitrafficPassword'
+            password: 'digitrafficPassword',
         });
     });
     await promise;
 
     const resp = {
         statusCode: client.isConnected() ? 200 : 500,
-        body: ''
+        body: '',
     };
 
     client.disconnect();

@@ -1,27 +1,27 @@
 import {IModel, IntegrationResponse, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
-import {databaseFunctionProps} from 'digitraffic-common/stack/lambda-configs';
-import {createRestApi} from 'digitraffic-common/api/rest_apis';
-import {addDefaultValidator, addServiceModel} from "digitraffic-common/api/utils";
+import {databaseFunctionProps} from 'digitraffic-common/aws/infra/stack/lambda-configs';
+import {createRestApi} from 'digitraffic-common/aws/infra/stack/rest_apis';
+import {addDefaultValidator, addServiceModel} from "digitraffic-common/utils/api-model";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Construct} from "constructs";
 import {Function} from "aws-cdk-lib/aws-lambda";
 
 import * as SseSchema from "./model/sse-schema";
 import * as ApiResponseSchema from "./model/api-response-schema";
-import {createDefaultUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {createSubscription} from "digitraffic-common/stack/subscription";
+import {createDefaultUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
+import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
 import {
     corsMethod,
     defaultIntegration,
     getResponse,
     methodResponse,
     RESPONSE_200_OK,
-} from "digitraffic-common/api/responses";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {MessageModel} from "digitraffic-common/api/response";
-import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/api/errors";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
+} from "digitraffic-common/aws/infra/api/responses";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
+import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/aws/types/errors";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 
 export function createIntegrationApiAndHandlerLambda(secret: ISecret,
     stack: DigitrafficStack) {

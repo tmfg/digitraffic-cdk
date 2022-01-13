@@ -1,7 +1,7 @@
 import {AssetCode, Runtime} from 'aws-cdk-lib/aws-lambda';
 import {Duration, Stack} from 'aws-cdk-lib';
-import {defaultLambdaConfiguration} from 'digitraffic-common/stack/lambda-configs';
-import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
+import {defaultLambdaConfiguration, LambdaEnvironment} from 'digitraffic-common/aws/infra/stack/lambda-configs';
+import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {LambdaSubscription} from "aws-cdk-lib/aws-sns-subscriptions";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
@@ -12,13 +12,12 @@ import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {RetentionDays} from "aws-cdk-lib/aws-logs";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam";
-import {LambdaEnvironment} from "digitraffic-common/model/lambda-environment";
 import {ComparisonOperator, TreatMissingData} from "aws-cdk-lib/aws-cloudwatch";
 import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {Rule, Schedule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 
 export function create(secret: ISecret,
     notifyTopic: Topic,
@@ -96,7 +95,7 @@ function createProcessVisMessagesLambda(
 ) {
 
     const functionName = "VPGW-ProcessVisMessages";
-    const environment = {} as any;
+    const environment: LambdaEnvironment = {};
     environment[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
     environment[VoyagePlanEnvKeys.QUEUE_URL] = sendRouteQueue.queueUrl;
     const lambdaConf = defaultLambdaConfiguration({
@@ -130,7 +129,7 @@ function createUploadVoyagePlanLambda(
 
     const functionName = "VPGW-UploadVoyagePlan";
 
-    const environment = {} as any;
+    const environment: LambdaEnvironment = {};
     environment[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
     environment[VoyagePlanEnvKeys.BUCKET_NAME] = rtzBucket.bucketName;
 

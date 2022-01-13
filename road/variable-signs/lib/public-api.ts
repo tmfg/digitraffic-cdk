@@ -1,17 +1,17 @@
-import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {addSimpleServiceModel} from "digitraffic-common/api/utils";
+import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
+import {addSimpleServiceModel} from "digitraffic-common/utils/api-model";
 import {RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {DigitrafficLogSubscriptions} from "digitraffic-common/stack/subscription";
-import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
-import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
-import {MessageModel} from "digitraffic-common/api/response";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
+import {DigitrafficLogSubscriptions} from "digitraffic-common/aws/infra/stack/subscription";
+import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
+import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 export function create(stack: DigitrafficStack) {
     const publicApi = new DigitrafficRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');

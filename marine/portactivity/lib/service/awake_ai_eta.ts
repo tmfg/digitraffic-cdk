@@ -9,7 +9,7 @@ import {
 } from "../api/awake_ai_voyages";
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
-import {retry} from "digitraffic-common/promise/promise";
+import {retry} from "digitraffic-common/utils/retry";
 import {AwakeAiZoneType} from "../api/awake_common";
 import {EventSource} from "../model/eventsource";
 import moment from 'moment-timezone';

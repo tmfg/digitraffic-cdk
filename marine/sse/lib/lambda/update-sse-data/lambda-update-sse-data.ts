@@ -1,8 +1,8 @@
 // import aws from 'aws-sdk';
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import * as SSE from "../../generated/tlsc-sse-reports-schema"
-import * as SseUpdateService from "../../service/sse-update-service"
-import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/api/errors";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import * as SSE from "../../generated/tlsc-sse-reports-schema";
+import * as SseUpdateService from "../../service/sse-update-service";
+import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/aws/types/errors";
 import {SseSaveResult} from "../../service/sse-update-service";
 
 export const KEY_SECRET_ID = 'SECRET_ID';
@@ -36,12 +36,12 @@ export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) =
                 throw errorJson(ERROR_MESSAGE, `Error while updating sse data: ${e.message}.`);
             }
         });
-    }
+    };
 }
 
 function errorJson(errorMessage : string, detailedMessage : string) : string {
     return JSON.stringify({
         "error" : errorMessage,
-        "errorMessage" : detailedMessage
-    })
+        "errorMessage" : detailedMessage,
+    });
 }

@@ -1,9 +1,9 @@
-import {withSecret} from "digitraffic-common/secrets/secret";
+import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {sendMessage} from "../../service/queue-service";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
-import {SecretFunction} from "digitraffic-common/secrets/dbsecret";
 import {SchedulesApi} from "../../api/schedules";
 import {SchedulesService} from "../../service/schedules";
+import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 
 const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 

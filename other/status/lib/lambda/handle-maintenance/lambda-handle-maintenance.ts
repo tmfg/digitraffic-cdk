@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {SecretsManager} from 'aws-sdk';
 import {UpdateStatusSecret} from "../../secret";
-import {SlackApi} from "digitraffic-common/slack/slack-api";
+import {SlackApi} from "digitraffic-common/utils/slack";
 
 let api: SlackApi;
 
@@ -9,10 +9,10 @@ const NODEPING_API = 'https://api.nodeping.com/api/1';
 const STATUSPAGE_URL = process.env.STATUSPAGE_URL as string;
 
 // Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
-const DEFAULT_TIMEOUT_MS = 25000
+const DEFAULT_TIMEOUT_MS = 25000;
 
 const smClient = new SecretsManager({
-    region: process.env.AWS_REGION
+    region: process.env.AWS_REGION,
 });
 
 interface StatuspageMaintenances {
@@ -28,7 +28,7 @@ interface NodePingCheck {
 
 async function getActiveStatusPageMaintenances(): Promise<StatuspageMaintenances> {
     const r = await axios.get(`${STATUSPAGE_URL}/api/v2/scheduled-maintenances/active.json`, {
-        timeout: DEFAULT_TIMEOUT_MS
+        timeout: DEFAULT_TIMEOUT_MS,
     });
     if (r.status !== 200) {
         throw new Error('Unable to get Statuspage maintenances');
@@ -38,7 +38,7 @@ async function getActiveStatusPageMaintenances(): Promise<StatuspageMaintenances
 
 async function getEnabledNodePingChecks(nodepingToken: string, subaccountId: string): Promise<NodePingCheck[]> {
     const r = await axios.get(`${NODEPING_API}/checks?token=${nodepingToken}&customerid=${subaccountId}`, {
-        timeout: DEFAULT_TIMEOUT_MS
+        timeout: DEFAULT_TIMEOUT_MS,
     });
     if (r.status !== 200) {
         throw new Error('Unable to fetch checks');
@@ -50,7 +50,7 @@ async function getEnabledNodePingChecks(nodepingToken: string, subaccountId: str
 async function setNodePingCheckStateToDisabled(disabled: boolean, nodepingToken: string, subaccountId: string) {
     console.info(`method=setNodePingCheckStateToDisabled Setting NodePing checks disabled state to ${disabled}`);
     const r = await axios.put(`${NODEPING_API}/checks?disableall=${disabled}&token=${nodepingToken}&customerid=${subaccountId}`, {
-        timeout: DEFAULT_TIMEOUT_MS
+        timeout: DEFAULT_TIMEOUT_MS,
     });
     if (r.status !== 200) {
         throw new Error('Unable to update checks');
@@ -73,20 +73,20 @@ async function handleMaintenance(secret: UpdateStatusSecret) {
         if (enabledNodePingChecks.length) {
             console.info('method=handleMaintenance Active maintenances found, disabling NodePing checks');
             await disableNodePingChecks(secret.nodePingToken, secret.nodepingSubAccountId);
-            await api.notify('NodePing checks disabled, maintenance has started!')
+            await api.notify('NodePing checks disabled, maintenance has started!');
         }
     } else {
         if (!enabledNodePingChecks.length) {
             console.info('method=handleMaintenance No active maintenances found, enabling disabled NodePing checks');
             await enableNodePingChecks(secret.nodePingToken, secret.nodepingSubAccountId);
-            await api.notify('NodePing checks enabled, maintenance has ended!')
+            await api.notify('NodePing checks enabled, maintenance has ended!');
         }
     }
 }
 
-export const handler = async (): Promise<any> => {
+export const handler = async () => {
     const secretObj = await smClient.getSecretValue({
-        SecretId: process.env.SECRET_ARN as string
+        SecretId: process.env.SECRET_ARN as string,
     }).promise();
     if (!secretObj.SecretString) {
         throw new Error('No secret found!');
@@ -98,4 +98,4 @@ export const handler = async (): Promise<any> => {
     }
 
     await handleMaintenance(secret);
-}
+};

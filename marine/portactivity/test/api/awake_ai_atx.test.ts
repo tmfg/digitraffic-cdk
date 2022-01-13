@@ -6,9 +6,12 @@ jest.mock('ws');
 import {
     AwakeAiATXApi,
     AwakeAiATXEventType,
-    SUBSCRIPTION_MESSAGE
+    SUBSCRIPTION_MESSAGE,
 } from "../../lib/api/awake_ai_atx";
-import {NO_OP} from "digitraffic-common/functions/functions";
+
+function NO_OP(): void {
+    // intentionally empty
+}
 
 describe('api-awake-ai-atx', () => {
 
@@ -25,7 +28,7 @@ describe('api-awake-ai-atx', () => {
                 }
             },
             send: sendMock,
-            close: NO_OP
+            close: NO_OP,
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
@@ -44,12 +47,12 @@ describe('api-awake-ai-atx', () => {
                 } else if (event === 'message') {
                     callback(JSON.stringify({
                         subscriptionId,
-                        msgType: AwakeAiATXEventType.SUBSCRIPTION_STATUS
+                        msgType: AwakeAiATXEventType.SUBSCRIPTION_STATUS,
                     }));
                 }
             },
             send: sendMock,
-            close: NO_OP
+            close: NO_OP,
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
@@ -71,7 +74,7 @@ describe('api-awake-ai-atx', () => {
                 }
             },
             send: sendMock,
-            close: NO_OP
+            close: NO_OP,
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
@@ -88,11 +91,11 @@ describe('api-awake-ai-atx', () => {
                 throw new Error('test error');
             },
             send: sendMock,
-            close: NO_OP
+            close: NO_OP,
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
-        await expect(async () => api.getATXs(10)).rejects.toThrow();
+        await expect(() => api.getATXs(10)).rejects.toThrow();
     });
 
 });

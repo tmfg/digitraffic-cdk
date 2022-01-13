@@ -1,29 +1,26 @@
 import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
-import {shuffle} from "digitraffic-common/js/js-utils";
 import {DbTimestamp} from "../../lib/db/timestamps";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
+import {shuffle} from "digitraffic-common/test/testutils";
 
 describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
 
     const locode = 'BB456';
-    generateOrderingTest(
-        'locode',
+    generateOrderingTest('locode',
         {locode},
         () => locode,
         (identifier: string | number) => TimestampsDb.findByLocode(db, identifier as string));
 
     const mmsi = 123;
-    generateOrderingTest(
-        'mmsi',
+    generateOrderingTest('mmsi',
         {mmsi},
         () => mmsi,
         (identifier: string | number) => TimestampsDb.findByMmsi(db, identifier as number));
 
     const imo = 123;
-    generateOrderingTest(
-        'imo',
+    generateOrderingTest('imo',
         {imo},
         () => imo,
         (identifier: string | number) => TimestampsDb.findByImo(db, identifier as number));
@@ -36,8 +33,7 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
      * @param getIdProp Method for fetching id property
      * @param fetchMethod Method for fetching test data
      */
-    function generateOrderingTest(
-        idPropText: string,
+    function generateOrderingTest(idPropText: string,
         idProp: { mmsi?: number, imo?: number, locode?: string },
         getIdProp: () => number | string,
         fetchMethod: (identifier: string | number) => Promise<DbTimestamp[]>) {
@@ -51,21 +47,21 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT4H',
-                eventTimeConfidenceUpper: 'PT10H'
+                eventTimeConfidenceUpper: 'PT10H',
             }, idProp));
             const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: 'PT1H',
-                eventTimeConfidenceUpper: 'PT10H'
+                eventTimeConfidenceUpper: 'PT10H',
             }, idProp));
             const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT8H',
-                eventTimeConfidenceUpper: 'PT10H'
+                eventTimeConfidenceUpper: 'PT10H',
             }, idProp));
             const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
             await insert(db, timestamps);
@@ -82,21 +78,21 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
-                eventTimeConfidenceUpper: 'PT4H'
+                eventTimeConfidenceUpper: 'PT4H',
             }, idProp));
             const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: 'PT10H',
-                eventTimeConfidenceUpper: 'PT2H'
+                eventTimeConfidenceUpper: 'PT2H',
             }, idProp));
             const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
-                eventTimeConfidenceUpper: 'PT8H'
+                eventTimeConfidenceUpper: 'PT8H',
             }, idProp));
             const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
             await insert(db, timestamps);
@@ -114,7 +110,7 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
-                eventTimeConfidenceUpper: 'PT4H'
+                eventTimeConfidenceUpper: 'PT4H',
             }, idProp));
             // confidence 12 H
             const timestampSource2 = newTimestamp(Object.assign({
@@ -122,7 +118,7 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: 'PT10H',
-                eventTimeConfidenceUpper: 'PT2H'
+                eventTimeConfidenceUpper: 'PT2H',
             }, idProp));
             // confidence 26 H
             const timestampSource3 = newTimestamp(Object.assign({
@@ -130,7 +126,7 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
-                eventTimeConfidenceUpper: 'PT8H'
+                eventTimeConfidenceUpper: 'PT8H',
             }, idProp));
             const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
             await insert(db, timestamps);
@@ -147,21 +143,21 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
-                eventTimeConfidenceUpper: 'PT4H'
+                eventTimeConfidenceUpper: 'PT4H',
             }, idProp));
             const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: null,
-                eventTimeConfidenceUpper: 'PT29H'
+                eventTimeConfidenceUpper: 'PT29H',
             }, idProp));
             const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
-                eventTimeConfidenceUpper: 'PT8H'
+                eventTimeConfidenceUpper: 'PT8H',
             }, idProp));
             const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
             await insert(db, timestamps);
@@ -178,21 +174,21 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
-                eventTimeConfidenceUpper: 'PT4H'
+                eventTimeConfidenceUpper: 'PT4H',
             }, idProp));
             const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: 'PT29H',
-                eventTimeConfidenceUpper: null
+                eventTimeConfidenceUpper: null,
             }, idProp));
             const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
-                eventTimeConfidenceUpper: 'PT8H'
+                eventTimeConfidenceUpper: 'PT8H',
             }, idProp));
             const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
             await insert(db, timestamps);
@@ -209,21 +205,21 @@ describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
                 locode: testLocode,
                 source: 'source1',
                 eventTimeConfidenceLower: 'PT10H',
-                eventTimeConfidenceUpper: 'PT4H'
+                eventTimeConfidenceUpper: 'PT4H',
             }, idProp));
             const timestampSource2 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source2',
                 eventTimeConfidenceLower: null,
-                eventTimeConfidenceUpper: null
+                eventTimeConfidenceUpper: null,
             }, idProp));
             const timestampSource3 = newTimestamp(Object.assign({
                 mmsi: testMmsi,
                 locode: testLocode,
                 source: 'source3',
                 eventTimeConfidenceLower: 'PT18H',
-                eventTimeConfidenceUpper: 'PT8H'
+                eventTimeConfidenceUpper: 'PT8H',
             }, idProp));
             const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
             await insert(db, timestamps);

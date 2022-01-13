@@ -1,4 +1,4 @@
-import {UrlChecker} from "digitraffic-common/canaries/url-checker";
+import {UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
 
 const hostname = process.env.hostname as string;
 const apiKeyId = process.env.apiKeyId as string;

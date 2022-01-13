@@ -1,10 +1,9 @@
 import * as MetadataService from '../../service/metadata';
 
-import {withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {Camera} from "../../model/camera";
 
-const secretId = process.env[SECRET_ID] as string;
+const secretId = process.env.SECRET_ID as string;
 
 const GROUP_SEPARATOR=',';
 

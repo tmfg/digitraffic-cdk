@@ -1,17 +1,16 @@
-import {LambdaIntegration, Model, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
+import {Model, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {MessageModel} from "digitraffic-common/api/response";
-import {featureSchema, geojsonSchema} from "digitraffic-common/model/geojson";
-import {addServiceModel, getModelReference} from "digitraffic-common/api/utils";
-import {addQueryParameterDescription, addTags} from "digitraffic-common/api/documentation";
-import {DATA_V1_TAGS} from "digitraffic-common/api/tags";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
-import {MonitoredDBFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
+import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
+import {addQueryParameterDescription, addTags} from "digitraffic-common/aws/infra/documentation";
+import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
+import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 export function create(stack: DigitrafficStack): DigitrafficRestApi {
     const publicApi = new DigitrafficRestApi(stack, 'ATON-public', 'ATON public API');
@@ -47,6 +46,7 @@ function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, 
         requestTemplates: {
             'application/json': JSON.stringify({
                 language: "$util.escapeJavaScript($input.params('language'))",
+                // eslint-disable-next-line camelcase
                 fixed_in_hours: "$util.escapeJavaScript($input.params('fixed_in_hours'))",
             }),
         },
@@ -61,7 +61,7 @@ function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, 
                 'method.request.querystring.fixed_in_hours': false,
             },
             methodResponses: [
-                corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, faultsJsonModel))
+                corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, faultsJsonModel)),
             ],
         });
     });

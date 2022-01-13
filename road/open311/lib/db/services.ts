@@ -1,6 +1,6 @@
 import {Service} from "../model/service";
 import {PreparedStatement} from "pg-promise";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 // Full of underscores
 /* eslint-disable camelcase */

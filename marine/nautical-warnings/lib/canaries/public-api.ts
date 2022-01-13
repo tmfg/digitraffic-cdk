@@ -1,10 +1,11 @@
-import {jsonChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
+import {jsonChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
 import assert from "assert";
 import {FeatureCollection} from "geojson";
 
 const hostname = process.env.hostname as string;
 const apiKeyId = process.env.apiKeyId as string;
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const gjv = require("geojson-validation");
 
 export const handler = async () => {

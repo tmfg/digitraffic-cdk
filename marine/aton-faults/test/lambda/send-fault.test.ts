@@ -7,7 +7,7 @@ import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {S124Type, SendS124Event} from "../../lib/model/upload-voyageplan-event";
 import {createSecretFunction} from "digitraffic-common/test/secret";
 import {AtonSecret} from "../../lib/model/secret";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;

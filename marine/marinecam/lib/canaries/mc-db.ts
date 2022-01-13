@@ -1,10 +1,7 @@
-import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
-
-const secretId = process.env[SECRET_ID] as string;
+import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
 
 export const handler = () => {
-    const checker = new DatabaseChecker(secretId);
+    const checker = DatabaseChecker.create();
 
     checker.notEmpty('cameras not empty',
         'select count(*) from camera');

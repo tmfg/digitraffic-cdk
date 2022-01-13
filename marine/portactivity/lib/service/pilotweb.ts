@@ -5,9 +5,9 @@ import * as LocationConverter from './location-converter';
 
 import {ApiTimestamp, EventType, Location} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
-import {inDatabase} from "digitraffic-common/postgres/database";
+import {inDatabase} from "digitraffic-common/database/database";
 import {EventSource} from "../model/eventsource";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
     const message = await PilotwebAPI.getMessages(host, authHeader);
@@ -61,7 +61,7 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
     return (await Promise.all(newAndUpdated.map(async (p: Pilotage): Promise<ApiTimestamp | null> => {
         const base = createApiTimestamp(p);
 
-        if(base) {
+        if (base) {
             const location = LocationConverter.convertLocation(p.route);
             const portcallId = await getPortCallId(db, p, location);
 
@@ -73,11 +73,11 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
                         sourceId: p.id.toString(),
                         ship: {
                             mmsi: p.vessel.mmsi,
-                            imo: p.vessel.imo
+                            imo: p.vessel.imo,
                         },
                         location,
-                        portcallId
-                    }
+                        portcallId,
+                    },
                 } as ApiTimestamp;
             }
 
@@ -88,7 +88,7 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
 }
 
 async function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | null> {
-    if(p.portnetPortCallId) {
+    if (p.portnetPortCallId) {
         return p.portnetPortCallId;
     }
 
@@ -100,26 +100,26 @@ async function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): P
 function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | null {
     const eventTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime).toISOString();
 
-    if(pilotage.state === 'ESTIMATE' || pilotage.state === 'NOTICE') {
+    if (pilotage.state === 'ESTIMATE' || pilotage.state === 'NOTICE') {
         return {
             eventType: EventType.RPS,
-            eventTime
+            eventTime,
         };
-    } else if(pilotage.state === 'ORDER') {
+    } else if (pilotage.state === 'ORDER') {
         return {
             eventType: EventType.PPS,
-            eventTime
+            eventTime,
         };
-    } else if(pilotage.state === 'ACTIVE') {
+    } else if (pilotage.state === 'ACTIVE') {
         return {
             eventType: EventType.APS,
-            eventTime: pilotage.vesselEta
-        }
-    } else if(pilotage.state === 'FINISHED') {
+            eventTime: pilotage.vesselEta,
+        };
+    } else if (pilotage.state === 'FINISHED') {
         return {
             eventType: EventType.APC,
-            eventTime: pilotage.endTime
-        }
+            eventTime: pilotage.endTime,
+        };
     }
 
     return null;
@@ -128,10 +128,10 @@ function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | null {
 function getMaxDate(date1string: string, date2string: string | undefined): Date {
     const date1 = new Date(date1string);
 
-    if(date2string) {
+    if (date2string) {
         const date2 = new Date(date2string);
 
-        if(date2.getTime() > date1.getTime()) {
+        if (date2.getTime() > date1.getTime()) {
             return date2;
         }
     }
@@ -147,10 +147,10 @@ function findNewAndUpdated(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage
         const updatedPilotage = timestamp && timestamp.toISOString() !== p.scheduleUpdated;
         const newPilotage = !timestamp && p.state !== 'FINISHED';
 
-        if(updatedPilotage || newPilotage) {
+        if (updatedPilotage || newPilotage) {
             newAndUpdated.push(p);
         }
-    })
+    });
 
     return newAndUpdated;
 }
@@ -162,11 +162,11 @@ function findRemoved(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage[]): n
     // construct id-map from pilotages(id -> pilotage)
     pilotages.forEach(p => {
         pilotageMap[p.id] = p;
-    })
+    });
 
     Object.keys(idMap).forEach(key => {
         const id = Number.parseInt(key);
-        if(!pilotageMap[id]) {
+        if (!pilotageMap[id]) {
             removed.push(id);
         }
     });

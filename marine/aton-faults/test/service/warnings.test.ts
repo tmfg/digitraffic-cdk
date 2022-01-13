@@ -1,7 +1,7 @@
 import {dbTestBase, insertActiveWarnings, TEST_ACTIVE_WARNINGS_VALID} from "../db-testutil";
 import {findWarning, findWarningsForVoyagePlan} from "../../lib/service/warnings";
 import {voyagePlan} from "../testdata";
-import {RtzVoyagePlan} from "digitraffic-common/rtz/voyageplan";
+import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
 import util from "util";
 import * as xml2js from "xml2js";
 

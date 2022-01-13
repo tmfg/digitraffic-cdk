@@ -1,7 +1,7 @@
 import {PreparedStatement} from "pg-promise";
 import {ApiCounter, DbCounter} from "../model/counter";
 import {FeatureCollection} from "geojson";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const SQL_ALL_COUNTERS =
     `select id, site_id, domain_name, site_domain, name, ST_Y(location::geometry) as lat, ST_Y(location::geometry) as lon, user_type_id, interval, direction, added_timestamp, last_data_timestamp, removed_timestamp

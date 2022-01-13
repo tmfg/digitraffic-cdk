@@ -5,7 +5,7 @@ import {findAllData} from "../../lib/db/data";
 
 import * as sinon from 'sinon';
 import {ApiData} from "../../lib/model/data";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const DOMAIN_NAME = 'TEST_DOMAIN';
 

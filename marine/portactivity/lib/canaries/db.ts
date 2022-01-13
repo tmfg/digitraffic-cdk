@@ -1,10 +1,7 @@
-import {DatabaseChecker} from "digitraffic-common/canaries/database-checker";
-import {SECRET_ID} from "digitraffic-common/model/lambda-environment";
+import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
 
-const secretId = process.env[SECRET_ID] as string;
-
-export const handler = async (): Promise<string> => {
-    const checker = new DatabaseChecker(secretId);
+export const handler = (): Promise<string> => {
+    const checker = DatabaseChecker.create();
 
     checker.notEmpty("pilotages in last hour",
         "select count(*) from pilotage where schedule_updated > (current_timestamp - interval '1 hour')");

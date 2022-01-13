@@ -1,5 +1,3 @@
-import moment from "moment-timezone";
-
 export type GmlEnvelope = {
     'gml:Envelope': {
         '$': {

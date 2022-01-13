@@ -1,8 +1,8 @@
 import * as CounterDb from "../db/counter";
 import * as DataDb from "../db/data";
-import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
+import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import * as MetadataDB from "../db/metadata";
-import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {DbDomain} from "../model/domain";
 import {DbCsvData, DbData} from "../model/data";
 import {FeatureCollection} from "geojson";

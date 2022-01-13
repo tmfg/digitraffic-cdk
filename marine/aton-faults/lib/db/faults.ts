@@ -1,9 +1,9 @@
 import {PreparedStatement} from "pg-promise";
-import {createGeometry} from "digitraffic-common/postgres/geometry";
+import {createGeometry} from "digitraffic-common/utils/geometry";
 import {LineString} from "wkx";
 import {DbFault} from "../model/fault";
-import {Language} from "digitraffic-common/model/language";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {Language} from "digitraffic-common/types/language";
+import {DTDatabase} from "digitraffic-common/database/database";
 import {Feature, GeoJsonProperties} from "geojson";
 
 import moment = require('moment-timezone');
@@ -104,12 +104,12 @@ const FAULT_IDS_BY_AREA =
 
 const PS_FAULT_BY_ID = new PreparedStatement({
     name: 'get-fault-by-id',
-    text: GET_FAULT_BY_ID
+    text: GET_FAULT_BY_ID,
 });
 
 const PS_FAULT_IDS_BY_AREA = new PreparedStatement({
     name: 'get-fault-ids-by-area',
-    text: FAULT_IDS_BY_AREA
+    text: FAULT_IDS_BY_AREA,
 });
 
 export function getFaultById(db: DTDatabase, faultId: number): Promise<DbFault | null> {
@@ -121,7 +121,7 @@ interface DbFaultId {
 }
 
 export function findFaultIdsByRoute(db: DTDatabase, route: LineString): Promise<number[]> {
-    const ids = db.tx(t => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()))
+    const ids = db.tx(t => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()));
     // bigints are returned as string by pg-promise since they could overflow
     // however these are plain integers
     return ids.then((result: DbFaultId[]) => result.map(r => Number(r.id)));
@@ -152,7 +152,7 @@ export function updateFaults(db: DTDatabase, domain: string, faults: Feature[]):
             p.VAYLA_NIMI_FI,
             p.VAYLA_NIMI_SE,
             p.MERIALUE_NRO,
-            createGeometry(f.geometry)
+            createGeometry(f.geometry),
         ]);
     });
 }
@@ -161,15 +161,15 @@ export function findAll<T>(db: DTDatabase, language: Language, fixedInHours: num
     const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
     const ps = new PreparedStatement({
         name: 'get-all-faults',
-        text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString())
-    })
+        text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString()),
+    });
 
     return db.manyOrNone(ps, [fixedLimit])
         .then(faults => faults.map(conversion));
 }
 
 function parseHelsinkiTime(date: string|null): Date|null {
-    if(date != null) {
+    if (date != null) {
         // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
         return moment.tz(date, 'YYYY-MM-DD HH:mm:ss', 'Europe/Helsinki').toDate();
     }

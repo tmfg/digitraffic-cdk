@@ -1,11 +1,11 @@
-import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
-import * as DisruptionsDB from "../db/disruptions"
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/postgres/database";
+import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import * as DisruptionsDB from "../db/disruptions";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
-import {createFeatureCollection} from "digitraffic-common/api/geojson";
+import {createFeatureCollection} from "digitraffic-common/utils/geometry";
 import {Geometry} from "wkx";
 import {DbDisruption} from "../db/disruptions";
 
@@ -34,7 +34,7 @@ export async function saveDisruptions(disruptions: SpatialDisruption[]) {
         return await db.tx(t => {
             return t.batch([
                 ...DisruptionsDB.updateDisruptions(db, disruptions),
-                LastUpdatedDB.updateUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE, new Date(start))
+                LastUpdatedDB.updateUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE, new Date(start)),
             ]);
         });
     }).then((a: any) => {
@@ -59,7 +59,7 @@ export function featureToDisruption(feature: Feature): SpatialDisruption {
         DescriptionFi: props.DescriptionFi,
         DescriptionSv: props.DescriptionSv,
         DescriptionEn: props.DescriptionEn,
-        geometry: feature.geometry
+        geometry: feature.geometry,
     };
 }
 
@@ -84,13 +84,13 @@ export function convertFeature(disruption: DbDisruption): Feature {
         EndDate: disruption.end_date,
         DescriptionFi: disruption.description_fi,
         DescriptionSv: disruption.description_sv,
-        DescriptionEn: disruption.description_en
+        DescriptionEn: disruption.description_en,
     };
     // convert geometry from db to geojson
     const geometry = Geometry.parse(Buffer.from(disruption.geometry, "hex")).toGeoJSON() as GeoJSONGeometry;
     return {
         type: "Feature",
         properties,
-        geometry
+        geometry,
     };
 }

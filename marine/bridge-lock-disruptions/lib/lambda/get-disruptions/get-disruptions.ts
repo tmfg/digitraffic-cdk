@@ -1,6 +1,6 @@
 import {findAllDisruptions} from "../../service/disruptions";
-import {EmptySecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
-import {LambdaResponse} from "digitraffic-common/lambda/lambda-response";
+import {EmptySecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 import {FeatureCollection} from "geojson";
 
 export const handler = () => {

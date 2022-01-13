@@ -8,13 +8,13 @@ import {AreaVisibilityService} from "../../lib/service/areavisibility";
 import {AreaVisibilityApi} from "../../lib/api/areavisibility";
 import {AreaLightsApi} from "../../lib/api/arealights";
 import {AreaLightsService} from "../../lib/service/arealights";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const secret: ShiplightSecret = {
     lightsControlEndpointUrl: 'test',
     lightsControlApiKey: 'test',
     visibilityEndpointUrl: 'test',
-    visibilityApiKey: 'test'
+    visibilityApiKey: 'test',
 };
 
 describe('update-lights', dbTestBase((db: DTDatabase) => {
@@ -31,13 +31,15 @@ describe('update-lights', dbTestBase((db: DTDatabase) => {
         const visibilityInMeters = 1000;
         sinon.stub(AreaVisibilityApi.prototype, 'getVisibilityForArea').returns(Promise.resolve({
             lastUpdated: new Date().toISOString(),
-            visibilityInMeters
+            visibilityInMeters,
         }));
         sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve({
             LightsSetSentFailed: [],
-            LightsSetSentSuccessfully: []
+            LightsSetSentSuccessfully: [],
         }));
-        await insertAreaTraffic(db, areaId, 'testi1', durationInMinutes, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
+        await insertAreaTraffic(
+            db, areaId, 'testi1', durationInMinutes, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))",
+        );
         await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
         await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
 

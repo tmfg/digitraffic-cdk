@@ -1,6 +1,6 @@
 import * as AreaTrafficService from '../../service/areatraffic';
 import {ShiplightEnvKeys} from "../../keys";
-import {SecretFunction, withDbSecret} from "digitraffic-common/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {ShiplightSecret} from "../../model/shiplight-secret";
 import {AreaVisibilityApi} from "../../api/areavisibility";
 import {AreaVisibilityService} from "../../service/areavisibility";
@@ -10,10 +10,9 @@ import {AreaLightsService} from "../../service/arealights";
 const secretId = process.env[ShiplightEnvKeys.SECRET_ID] as string;
 
 let visibilityApi: AreaVisibilityApi;
-let lightsApi: AreaLightsApi
+let lightsApi: AreaLightsApi;
 
-export async function handlerFn(
-    doWithSecret: SecretFunction<ShiplightSecret>,
+export async function handlerFn(doWithSecret: SecretFunction<ShiplightSecret>,
     AreaVisibilityServiceClass: new (api: AreaVisibilityApi) => AreaVisibilityService,
     AreaLightsServiceClass: new (api: AreaLightsApi) => AreaLightsService): Promise<void> {
 
@@ -36,7 +35,7 @@ export async function handlerFn(
             try {
                 const visibility = await visibilityService.getVisibilityForAreaInMetres(area.areaId);
                 await lightsService.updateLightsForArea({ ...area, ...{
-                    visibilityInMeters: visibility.visibilityInMeters
+                    visibilityInMeters: visibility.visibilityInMeters,
                 }});
                 await AreaTrafficService.updateAreaTrafficSendTime(area.areaId);
             } catch (e) {
@@ -44,7 +43,7 @@ export async function handlerFn(
             }
         }
     }, {
-        prefix: 'shiplight'
+        prefix: 'shiplight',
     });
 }
 

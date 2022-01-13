@@ -4,7 +4,6 @@ import {DatabaseCluster, DatabaseClusterEngine} from "aws-cdk-lib/aws-rds";
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {Alarm, ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
 import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
-import {DatabaseCanary} from "digitraffic-common/canaries/database-canary";
 
 export class RdsMonitoring {
     private readonly stack: Stack;

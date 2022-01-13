@@ -8,18 +8,18 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
-import {DigitrafficLogSubscriptions} from 'digitraffic-common/stack/subscription';
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/api/responses";
-import {MessageModel} from "digitraffic-common/api/response";
-import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/api/utils";
-import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/api/documentation";
-import {createUsagePlan} from "digitraffic-common/stack/usage-plans";
-import {DigitrafficRestApi} from "digitraffic-common/api/rest_apis";
+import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
+import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
+import {MessageModel} from "digitraffic-common/aws/infra/api/response";
+import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/utils/api-model";
+import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
+import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
+import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
-import {DigitrafficStack} from "digitraffic-common/stack/stack";
-import {MediaType} from "digitraffic-common/api/mediatypes";
-import {MonitoredFunction} from "digitraffic-common/lambda/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/api/digitraffic-integration-response";
+import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
 
 export class PublicApi {

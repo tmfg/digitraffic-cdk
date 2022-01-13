@@ -2,7 +2,7 @@ import {config as AWSConfig} from "aws-sdk";
 import {default as axios, AxiosRequestConfig} from 'axios';
 import {constructSwagger, mergeApiDescriptions} from "../../swagger-utils";
 import {exportSwaggerApi} from "../../apigw-utils";
-import {uploadToS3} from 'digitraffic-common/stack/s3-utils';
+import {uploadToS3} from 'digitraffic-common/aws/runtime/s3';
 
 export const KEY_BUCKET_NAME = 'BUCKET_NAME';
 export const KEY_REGION = 'REGION';
@@ -16,9 +16,9 @@ export const KEY_DESCRIPTION = 'DESCRIPTION';
 export const KEY_REMOVESECURITY = 'REMOVESECURITY';
 
 const apiRequestHeaders: AxiosRequestConfig = {
-  headers: {
-      'Accept-Encoding': 'gzip'
-  }
+    headers: {
+        'Accept-Encoding': 'gzip',
+    },
 };
 
 export const handler = async (): Promise<any> => {
@@ -49,7 +49,7 @@ export const handler = async (): Promise<any> => {
     delete merged['x-amazon-apigateway-policy']; // implementation details
 
     if (host) {
-        merged['host'] = host;
+        merged.host = host;
         delete merged.basePath;
     }
 
@@ -86,17 +86,15 @@ export const handler = async (): Promise<any> => {
     const swaggerSpecFilenameFinal = directory ? `${directory}/${swaggerSpecFilename}` : swaggerSpecFilename;
 
     await Promise.all([
-        uploadToS3(
-            bucketName,
+        uploadToS3(bucketName,
             constructSwagger(merged),
-            swaggerFilenameFinal
-        ),
+            swaggerFilenameFinal),
         uploadToS3(
             bucketName,
             JSON.stringify(merged),
             swaggerSpecFilenameFinal,
             'private',
-            'application/json'
-        )
+            'application/json',
+        ),
     ]);
 };

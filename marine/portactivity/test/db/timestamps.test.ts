@@ -5,7 +5,7 @@ import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
 import {DbTimestamp} from "../../lib/db/timestamps";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const EVENT_SOURCE = 'TEST';
 
@@ -48,7 +48,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     function testFound(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - found`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
-                recordTime: moment().toISOString() // avoid filtering
+                recordTime: moment().toISOString(), // avoid filtering
             });
             await insert(db, [timestamp]);
 
@@ -61,7 +61,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         test(`${description} - found 71 h in the future`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 recordTime: moment().toISOString(), // avoid filtering,
-                eventTime: moment().add(71, 'hours')
+                eventTime: moment().add(71, 'hours'),
             });
             await insert(db, [timestamp]);
 
@@ -83,7 +83,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     function testNotFound(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - not found`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
-                recordTime: moment().toISOString() // avoid filtering
+                recordTime: moment().toISOString(), // avoid filtering
             });
             await insert(db, [timestamp]);
 
@@ -106,7 +106,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
             const timestamp2 = {
                 ...timestamp,
                 eventTime: moment(timestamp2Date).add(5, 'hour').toISOString(),
-                recordTime: moment(timestamp2Date).add(5, 'hour').toISOString()
+                recordTime: moment(timestamp2Date).add(5, 'hour').toISOString(),
             };
             await insert(db, [timestamp, timestamp2]);
 
@@ -125,7 +125,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     function testTooOld(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - too old`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
-                eventTime: moment().subtract('13', 'days').toISOString() // enable filtering
+                eventTime: moment().subtract('13', 'days').toISOString(), // enable filtering
             });
             await insert(db, [timestamp]);
 
@@ -142,7 +142,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     function testTooFarInTheFuture(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - too far in the future`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
-                eventTime: moment().add('4', 'days').toISOString() // enable filtering
+                eventTime: moment().add('4', 'days').toISOString(), // enable filtering
             });
             await insert(db, [timestamp]);
 
@@ -159,10 +159,10 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     test('findByMmsi - two sources', async () => {
         const mmsi = 123;
         const timestampSource1 = Object.assign(newTimestamp({mmsi}), {
-            source: 'source1'
+            source: 'source1',
         });
         const timestampSource2 = Object.assign(newTimestamp({mmsi}), {
-            source: 'source2'
+            source: 'source2',
         });
         await insert(db, [timestampSource1, timestampSource2]);
 
@@ -173,10 +173,10 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     test('findByImo - two sources', async () => {
         const imo = 456;
         const timestampSource1 = Object.assign(newTimestamp({imo}), {
-            source: 'source1'
+            source: 'source1',
         });
         const timestampSource2 = Object.assign(newTimestamp({imo}), {
-            source: 'source2'
+            source: 'source2',
         });
         await insert(db, [timestampSource1, timestampSource2]);
 
@@ -187,10 +187,10 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     test('findByLocode - two sources', async () => {
         const locode = 'AA111';
         const timestampSource1 = Object.assign(newTimestamp({locode}), {
-            source: 'source1'
+            source: 'source1',
         });
         const timestampSource2 = Object.assign(newTimestamp({locode}), {
-            source: 'source2'
+            source: 'source2',
         });
         await insert(db, [timestampSource1, timestampSource2]);
 
@@ -202,7 +202,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         const locode = 'AA123';
         const from = 'BB456';
         const timestamp = Object.assign(newTimestamp({ locode, from, source: EventSource.PORTNET }), {
-            recordTime: moment().toISOString() // avoid filtering
+            recordTime: moment().toISOString(), // avoid filtering
         });
         await insert(db, [timestamp]);
 
@@ -214,7 +214,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         const locode = 'AA123';
         const from = 'BB456';
         const timestamp = Object.assign(newTimestamp({ locode, from, source: EventSource.PILOTWEB }), {
-            recordTime: moment().toISOString() // avoid filtering
+            recordTime: moment().toISOString(), // avoid filtering
         });
         await insert(db, [timestamp]);
 
@@ -234,7 +234,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         expect(foundTimestamps.length).toBe(1);
         expect(foundTimestamps[0]).toMatchObject({
             locode,
-            imo: timestamp.ship.imo
+            imo: timestamp.ship.imo,
         });
     });
 
@@ -303,7 +303,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
             portcallId: 1,
             eventType: EventType.ETA,
             source: EventSource.AWAKE_AI,
-            eventTime
+            eventTime,
         });
         await insert(db, [ts]);
 
@@ -319,7 +319,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
             portcallId: 1,
             eventType: EventType.ETA,
             source: EventSource.AWAKE_AI,
-            eventTime
+            eventTime,
         });
         await insert(db, [ts]);
 

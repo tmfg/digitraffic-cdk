@@ -1,10 +1,12 @@
 import {DbSseReport} from "../lib/db/sse-db";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {IDatabase} from "pg-promise";
-import * as LastUpdatedDB from "digitraffic-common/db/last-updated";
+import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 
 export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
-    return commonDbTestBase(fn, truncate, 'marine', 'marine', 'localhost:54321/marine');
+    return commonDbTestBase(
+        fn, truncate, 'marine', 'marine', 'localhost:54321/marine',
+    );
 }
 
 export async function truncate(db: IDatabase<any, any>): Promise<null> {

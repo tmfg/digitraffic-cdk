@@ -1,7 +1,7 @@
 import {PreparedStatement} from "pg-promise";
 import {ServiceRequestState} from "../model/service-request-state";
 import {Locale} from "../model/locale";
-import {DTDatabase} from "digitraffic-common/postgres/database";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 const DELETE_STATES_PS = new PreparedStatement({
     name: 'delete-states',

@@ -57,8 +57,7 @@ const SELECT_DISRUPTION_SQL = `
     FROM bridgelock_disruption
 `;
 
-export function findAll(
-    db: IDatabase<any, any>): Promise<DbDisruption[]> {
+export function findAll(db: IDatabase<any, any>): Promise<DbDisruption[]> {
     return db.tx(t => t.manyOrNone(SELECT_DISRUPTION_SQL));
 }
 
@@ -68,8 +67,7 @@ export function updateDisruptions(db: IDatabase<any, any>, disruptions: SpatialD
     });
 }
 
-export function deleteAllButDisruptions(
-    db: IDatabase<any, any>,
+export function deleteAllButDisruptions(db: IDatabase<any, any>,
     ids: number[]): Promise<any> {
     if (ids.length == 0) {
         return db.tx(t => t.none('DELETE FROM bridgelock_disruption'));
@@ -87,6 +85,6 @@ export function createEditObject(disruption: SpatialDisruption): DbDisruption {
         geometry: disruption.geometry,
         description_fi: disruption.DescriptionFi,
         description_sv: disruption.DescriptionSv,
-        description_en: disruption.DescriptionEn
+        description_en: disruption.DescriptionEn,
     };
 }

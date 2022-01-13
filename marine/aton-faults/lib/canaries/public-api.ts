@@ -1,4 +1,4 @@
-import {ResponseChecker, UrlChecker} from "digitraffic-common/canaries/url-checker";
+import {ResponseChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
 import assert from "assert";
 import {Feature, FeatureCollection} from "geojson";
 

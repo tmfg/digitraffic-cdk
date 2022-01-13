@@ -1,3 +1,3 @@
-import {StackConfiguration} from "digitraffic-common/stack/stack";
+import {StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
 
 export type AppProps = StackConfiguration;
