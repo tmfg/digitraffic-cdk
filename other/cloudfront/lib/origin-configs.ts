@@ -1,16 +1,17 @@
 import {Duration, Stack} from 'aws-cdk-lib';
 import {
-    OriginProtocolPolicy,
-    OriginAccessIdentity,
-    SourceConfiguration,
     Behavior,
     CloudFrontAllowedMethods,
-    LambdaEdgeEventType,
+    LambdaEdgeEventType, LambdaFunctionAssociation,
+    OriginAccessIdentity,
+    OriginProtocolPolicy,
+    SourceConfiguration,
 } from 'aws-cdk-lib/aws-cloudfront';
 import {Bucket} from 'aws-cdk-lib/aws-s3';
 import {Version} from "aws-cdk-lib/aws-lambda";
 import {CFBehavior, CFDomain} from "./app-props";
 import {CfnDistribution} from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
+import {LambdaType} from "./lambda/lambda-creator";
 
 export type LambdaMap = Record<string, Version>;
 
@@ -68,7 +69,7 @@ function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: Lambd
 }
 
 function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDefaultBehavior = false): Behavior {
-//    console.info('creating behavior %s with default %d', b.path, defaultBehavior);
+    //console.info('creating behavior %s with default %d', b.path, isDefaultBehavior);
 
     const forwardedValues = {
         headers: [] as string[],
@@ -95,11 +96,29 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDef
     };
 }
 
-function getLambdas(b: CFBehavior, lambdaMap: LambdaMap) {
-    const lambdas = b.lambdas?.map(l => ({
-        eventType: l.eventType,
-        lambdaFunction: lambdaMap[l.lambdaType],
-    })) || [];
+function getLambdas(b: CFBehavior, lambdaMap: LambdaMap): LambdaFunctionAssociation[] | undefined {
+    const lambdas: LambdaFunctionAssociation[] = [];
+
+    if (b.gzipRequirementLambda) {
+        lambdas.push({
+            eventType: getEventType(LambdaType.GZIP_REQUIREMENT),
+            lambdaFunction: lambdaMap[LambdaType.GZIP_REQUIREMENT],
+        });
+    }
+
+    if (b.httpHeadersLambda) {
+        lambdas.push({
+            eventType: getEventType(LambdaType.HTTP_HEADERS),
+            lambdaFunction: lambdaMap[LambdaType.HTTP_HEADERS],
+        });
+    }
+
+    if (b.weathercamRedirectLambda) {
+        lambdas.push({
+            eventType: getEventType(LambdaType.WEATHERCAM_REDIRECT),
+            lambdaFunction: lambdaMap[LambdaType.WEATHERCAM_REDIRECT],
+        });
+    }
 
     if (b.ipRestriction) {
         lambdas.push({
@@ -108,5 +127,19 @@ function getLambdas(b: CFBehavior, lambdaMap: LambdaMap) {
         });
     }
 
-    return lambdas.length === 0 ? undefined : lambdas;
+    return lambdas.length == 0 ? undefined : lambdas;
 }
+
+function getEventType(type: LambdaType): LambdaEdgeEventType {
+    switch (type) {
+        case LambdaType.WEATHERCAM_REDIRECT:
+        case LambdaType.IP_RESTRICTION:
+        case LambdaType.GZIP_REQUIREMENT:
+            return LambdaEdgeEventType.ORIGIN_REQUEST;
+        case LambdaType.HTTP_HEADERS:
+            return LambdaEdgeEventType.VIEWER_RESPONSE;
+        default:
+            throw new Error('unknown lambdatype');
+    }
+}
+

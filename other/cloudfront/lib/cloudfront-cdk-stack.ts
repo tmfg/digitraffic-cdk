@@ -1,7 +1,7 @@
 import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront';
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
-import {Stack, StackProps} from "aws-cdk-lib";
+import {Annotations, Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig, LambdaMap} from "./origin-configs";
 import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
 import {
@@ -25,6 +25,8 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
+        this.validateDefaultBehaviors(cloudfrontProps.props);
+
         const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
         const streamingConfig = createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps);
@@ -34,6 +36,21 @@ export class CloudfrontCdkStack extends Stack {
         ));
 
         //        Aspects.of(this).add(new StackCheckingAspect());
+    }
+
+    validateDefaultBehaviors(props: Props[]) {
+        props.forEach(distribution => {
+            // check default behaviors
+            const defaults = distribution.domains.flatMap(d => d.behaviors)
+                .filter(b => b.path === "*");
+
+            if (defaults.length === 0) {
+                console.error("no defaults for " + distribution.distributionName);
+            } else if (defaults.length > 1) {
+                console.error("multiple defaults for " + distribution.distributionName);
+                console.error(defaults);
+            }
+        });
     }
 
     createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {

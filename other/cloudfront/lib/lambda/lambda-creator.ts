@@ -1,5 +1,5 @@
-import {Stack,Duration } from 'aws-cdk-lib';
-import {Runtime, Function, InlineCode, AssetCode, Version} from 'aws-cdk-lib/aws-lambda';
+import {Stack} from 'aws-cdk-lib';
+import {Function, InlineCode, Runtime, Version} from 'aws-cdk-lib/aws-lambda';
 import {Role} from 'aws-cdk-lib/aws-iam';
 
 const fs = require('fs');
