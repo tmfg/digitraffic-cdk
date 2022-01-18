@@ -3,181 +3,176 @@ import {CloudFrontAllowedMethods} from "aws-cdk-lib/aws-cloudfront";
 import {WafRules} from "./acl/waf-rules";
 
 export class CFBehavior {
-    path: string;
-    cacheTtl?: number;
+    readonly path: string;
+    cacheTtl: number;
     queryCacheKeys?: string[];
-    allowedMethods?: CloudFrontAllowedMethods;
+    allowedMethods: CloudFrontAllowedMethods;
     viewerProtocolPolicy?: string;
-    cacheHeaders?: string[];
+    cacheHeaders: string[];
 
     // lambda-configs
-    lambdaTypes?: Set<LambdaType>;
+    readonly lambdaTypes: Set<LambdaType> = new Set();
 
-    ipRestriction?: string;
-}
+    ipRestriction: string;
 
-export class BehaviorBuilder extends CFBehavior {
-    constructor(behavior: CFBehavior) {
-        super();
-        this.path = behavior.path;
-        this.cacheTtl = behavior.cacheTtl;
-        this.queryCacheKeys = behavior.queryCacheKeys;
-        this.allowedMethods = behavior.allowedMethods;
-        this.viewerProtocolPolicy = behavior.viewerProtocolPolicy;
-        this.cacheHeaders = behavior.cacheHeaders;
+    constructor(path: string) {
+        this.path = path;
+        this.cacheTtl = 60;
+        this.allowedMethods = CloudFrontAllowedMethods.GET_HEAD;
+
+        this.cacheHeaders = [];
 
         this.lambdaTypes = new Set();
     }
 
-    static path(path = "*"): BehaviorBuilder {
-        return new BehaviorBuilder({
-            path,
-        });
+    static path(path = "*"): CFBehavior {
+        return new CFBehavior(path);
     }
 
-    static standard(path = "*", ...cacheHeaders: string[]): BehaviorBuilder {
-        return new BehaviorBuilder({
-            path,
-            cacheHeaders,
-        }).withGzipRequirementLambda().withHttpHeadersLambda();
+    static standard(path = "*", ...cacheHeaders: string[]): CFBehavior {
+        return new CFBehavior(path)
+            .withCacheHeaders(...cacheHeaders)
+            .withGzipRequirementLambda()
+            .withHttpHeadersLambda();
     }
 
-    static passAll(path = "*", ...cacheHeaders: string[]): BehaviorBuilder {
-        return new BehaviorBuilder({
-            path,
-            allowedMethods: CloudFrontAllowedMethods.ALL,
-            cacheHeaders,
-        });
+    static passAll(path = "*", ...cacheHeaders: string[]): CFBehavior {
+        return new CFBehavior(path)
+            .withCacheHeaders(...cacheHeaders)
+            .allowAllMethods();
     }
 
-    public withCacheTtl(ttl: number): BehaviorBuilder {
+    public withCacheTtl(ttl: number): CFBehavior {
         this.cacheTtl = ttl;
 
         return this;
     }
 
-    public withQueryCacheKeys(...keys: string[]): BehaviorBuilder {
+    public withQueryCacheKeys(...keys: string[]): CFBehavior {
         this.queryCacheKeys = keys;
 
         return this;
     }
 
-    public withCacheHeaders(...headers: string[]): BehaviorBuilder {
+    public withCacheHeaders(...headers: string[]): CFBehavior {
         this.cacheHeaders = headers;
 
         return this;
     }
 
-    public allowHttpAndHttps(): BehaviorBuilder {
+    public allowHttpAndHttps(): CFBehavior {
         this.viewerProtocolPolicy = "allow-all";
 
         return this;
     }
 
-    public httpsOnly(): BehaviorBuilder {
+    public httpsOnly(): CFBehavior {
         this.viewerProtocolPolicy = "https-only";
 
         return this;
     }
 
-    public withIpRestrictionLambda(restriction: string): BehaviorBuilder {
+    public withIpRestrictionLambda(restriction: string): CFBehavior {
         this.ipRestriction = restriction;
 
         return this;
     }
 
-    public withLambda(lambdaType: LambdaType): BehaviorBuilder {
+    public withLambda(lambdaType: LambdaType): CFBehavior {
         this.lambdaTypes?.add(lambdaType);
 
         return this;
     }
 
-    public allowAllMethods(): BehaviorBuilder {
+    public allowAllMethods(): CFBehavior {
         this.allowedMethods = CloudFrontAllowedMethods.ALL;
 
         return this;
     }
 
-    public withGzipRequirementLambda(): BehaviorBuilder {
+    public withGzipRequirementLambda(): CFBehavior {
         return this.withLambda(LambdaType.GZIP_REQUIREMENT);
     }
 
-    public withHttpHeadersLambda(): BehaviorBuilder {
+    public withHttpHeadersLambda(): CFBehavior {
         return this.withLambda(LambdaType.HTTP_HEADERS);
     }
 }
 
-export class CFDomain {
-    s3BucketName?: string;
-    domainName?: string;
+export class CFDistribution {
+    behaviors: CFBehavior[];
+
+    constructor(behaviors: CFBehavior[]) {
+        this.behaviors = behaviors;
+    }
+}
+
+export class CFDomain extends CFDistribution {
+    domainName: string;
     originPath?: string;
     originProtocolPolicy?: string;
     httpPort?: number;
     httpsPort?: number;
     apiKey?: string;
-    behaviors: CFBehavior[];
-}
 
-export class DomainBuilder extends CFDomain {
+    constructor(domainName: string, ...behaviors: CFBehavior[]) {
+        super(behaviors);
+        this.domainName = domainName;
+    }
+
     static passAllDomain(domainName: string) {
-        return {
-            domainName,
-            behaviors: [BehaviorBuilder.passAll()],
-        };
+        return new CFDomain(domainName, CFBehavior.passAll());
     }
 
-    static apiGateway(domainName: string, ...behaviors: CFBehavior[]): DomainBuilder {
-        return {
-            domainName,
-            originPath: "/prod",
-            behaviors,
-        } as DomainBuilder;
+    static apiGateway(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
+        const domain = new CFDomain(domainName, ...behaviors);
+
+        domain.originPath = "/prod";
+
+        return domain;
     }
 
-    static apiGatewayWithApiKey(domainName: string, apiKey: string, ...behaviors: CFBehavior[]): DomainBuilder {
-        return {
-            domainName,
-            originPath: "/prod",
-            apiKey,
-            behaviors,
-        } as DomainBuilder;
+    static apiGatewayWithApiKey(domainName: string, apiKey: string, ...behaviors: CFBehavior[]): CFDomain {
+        const domain = this.apiGateway(domainName, ...behaviors);
+
+        domain.apiKey = apiKey;
+
+        return domain;
     }
 
-    static nginx(domainName: string, ...behaviors: CFBehavior[]): DomainBuilder {
-        return {
-            domainName,
-            originProtocolPolicy: 'http-only',
-            behaviors,
-        } as DomainBuilder;
+    static nginx(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
+        const domain = new CFDomain(domainName, ...behaviors);
+
+        domain.originProtocolPolicy = 'http-only';
+
+        return domain;
     }
 
     static mqtt(domainName: string) {
-        return {
-            domainName,
-            originProtocolPolicy: 'https-only',
-            behaviors: [
-                BehaviorBuilder.passAll("mqtt*").httpsOnly(),
-            ],
-        };
+        const domain = new CFDomain(domainName, CFBehavior.passAll("mqtt*").httpsOnly());
+
+        domain.originProtocolPolicy = 'https-only';
+
+        return domain;
+    }
+}
+
+export class S3Domain extends CFDistribution {
+    s3BucketName?: string;
+    originPath?: string;
+
+    constructor(s3BucketName: string, ...behaviors: CFBehavior[]) {
+        super(behaviors);
+
+        this.s3BucketName = s3BucketName;
     }
 
-    static swagger(s3BucketName: string, path = "swagger/*"): DomainBuilder {
-        return {
-            s3BucketName,
-            behaviors: [
-                {
-                    path,
-                    cacheTtl: 120,
-                },
-            ],
-        } as DomainBuilder;
+    static swagger(s3BucketName: string, path = "swagger/*"): S3Domain {
+        return this.s3(s3BucketName, CFBehavior.path(path).withCacheTtl(120));
     }
 
-    static s3(s3BucketName: string, ...behaviors: CFBehavior[]): DomainBuilder {
-        return {
-            s3BucketName,
-            behaviors,
-        } as DomainBuilder;
+    static s3(s3BucketName: string, ...behaviors: CFBehavior[]): S3Domain {
+        return new S3Domain(s3BucketName, ...behaviors);
     }
 }
 
@@ -188,7 +183,7 @@ export type Props = {
     readonly aliasNames: string[] | null,
     readonly acmCertRef: string | null,
     readonly aclRules?: WafRules,
-    readonly domains: CFDomain[]
+    readonly distributions: CFDistribution[]
 }
 
 export type ElasticProps = {
