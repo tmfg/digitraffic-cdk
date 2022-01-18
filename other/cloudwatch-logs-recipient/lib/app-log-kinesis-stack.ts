@@ -3,6 +3,7 @@ import {LogGroup, FilterPattern} from 'aws-cdk-lib/aws-logs';
 import {Stream} from 'aws-cdk-lib/aws-kinesis';
 import {KinesisDestination} from 'aws-cdk-lib/aws-logs-destinations';
 import {Construct} from "constructs";
+import {AppLogSubscription} from "./app-props";
 
 export class AppLogsSubscriptionStack extends Stack {
     constructor(scope: Construct, id: string, appProps: AppLogSubscription, props?: StackProps) {

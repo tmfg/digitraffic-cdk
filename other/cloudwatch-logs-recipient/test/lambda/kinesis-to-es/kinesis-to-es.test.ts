@@ -18,6 +18,7 @@ import {
     transform,
 } from '../../../lib/lambda/kinesis-to-es/lambda-kinesis-to-es';
 import {getAppFromSenderAccount, getEnvFromSenderAccount} from "../../../lib/lambda/kinesis-to-es/accounts";
+import {Account} from "../../../lib/app-props";
 
 const TEST_LOGLINE = '2021-10-08T05:41:10.271Z\tec182986-d87f-5ce8-8ad8-705f04503e55\tINFO\tlogline';
 

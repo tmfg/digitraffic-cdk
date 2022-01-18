@@ -1,3 +1,5 @@
+import {Account} from "../../app-props";
+
 export function getAppFromSenderAccount(owner: string, knownAccounts: Account[]): string {
     const app = knownAccounts.find(value => {
         if (value.accountNumber === owner) {

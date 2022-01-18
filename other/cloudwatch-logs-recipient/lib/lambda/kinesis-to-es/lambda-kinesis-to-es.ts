@@ -8,7 +8,7 @@ import {
 import * as AWSx from "aws-sdk";
 import {
     extractJson, filterIds, getFailedIds,
-    getIndexName, isControlMessage,
+    getIndexName, isControlMessage, ItemStatus,
     parseESReturnValue, parseNumber,
 } from "./util";
 import {getAppFromSenderAccount, getEnvFromSenderAccount} from "./accounts";
@@ -16,6 +16,7 @@ import {notifyFailedItems} from "./notify";
 import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwatch-logs";
 import {IncomingMessage} from "http";
 import {Statistics} from "./statistics";
+import {Account} from "../../app-props";
 const AWS = AWSx as any;
 const zlib = require("zlib");
 
@@ -27,7 +28,7 @@ const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.c
 const esEndpoint = new AWS.Endpoint(endpoint);
 const region = endpointParts[2];
 
-const MAX_BODY_SIZE = 1000000;
+const MAX_BODY_SIZE = 800000;
 const SEPARATOR_LAMBDA_LOGS = '\t';
 
 export const handler: KinesisStreamHandler = (event, context): void => {
@@ -76,7 +77,7 @@ function handleRecord(record: KinesisStreamRecord, statistics: Statistics): stri
 
 function postToElastic(context: Context, retryOnFailure: boolean, elasticsearchBulkData: string) {
     // post documents to the Amazon Elasticsearch Service
-    post(elasticsearchBulkData, (error: any, success: any, statusCode: any, failedItems: any) => {
+    post(elasticsearchBulkData, (error: any, success: any, statusCode: number, failedItems: ItemStatus[]) => {
         if (error) {
             console.log('Error: ' + JSON.stringify(error, null, 2));
 
