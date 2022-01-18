@@ -1,5 +1,5 @@
 import {LambdaType} from "./lambda/lambda-creator";
-import {CloudFrontAllowedMethods, LambdaEdgeEventType} from "aws-cdk-lib/aws-cloudfront";
+import {CloudFrontAllowedMethods} from "aws-cdk-lib/aws-cloudfront";
 import {WafRules} from "./acl/waf-rules";
 
 export class CFBehavior {
@@ -11,10 +11,9 @@ export class CFBehavior {
     cacheHeaders?: string[];
 
     // lambda-configs
+    lambdaTypes?: Set<LambdaType>;
+
     ipRestriction?: string;
-    gzipRequirementLambda?: boolean;
-    httpHeadersLambda?: boolean;
-    weathercamRedirectLambda?: boolean;
 }
 
 export class BehaviorBuilder extends CFBehavior {
@@ -26,10 +25,8 @@ export class BehaviorBuilder extends CFBehavior {
         this.allowedMethods = behavior.allowedMethods;
         this.viewerProtocolPolicy = behavior.viewerProtocolPolicy;
         this.cacheHeaders = behavior.cacheHeaders;
-        this.ipRestriction = behavior.ipRestriction;
-        this.gzipRequirementLambda = behavior.gzipRequirementLambda;
-        this.httpHeadersLambda = behavior.httpHeadersLambda;
-        this.weathercamRedirectLambda = behavior.weathercamRedirectLambda;
+
+        this.lambdaTypes = new Set();
     }
 
     static path(path = "*"): BehaviorBuilder {
@@ -41,10 +38,8 @@ export class BehaviorBuilder extends CFBehavior {
     static standard(path = "*", ...cacheHeaders: string[]): BehaviorBuilder {
         return new BehaviorBuilder({
             path,
-            gzipRequirementLambda: true,
-            httpHeadersLambda: true,
             cacheHeaders,
-        });
+        }).withGzipRequirementLambda().withHttpHeadersLambda();
     }
 
     static passAll(path = "*", ...cacheHeaders: string[]): BehaviorBuilder {
@@ -85,8 +80,14 @@ export class BehaviorBuilder extends CFBehavior {
         return this;
     }
 
-    public restriction(restriction: string): BehaviorBuilder {
+    public withIpRestrictionLambda(restriction: string): BehaviorBuilder {
         this.ipRestriction = restriction;
+
+        return this;
+    }
+
+    public withLambda(lambdaType: LambdaType): BehaviorBuilder {
+        this.lambdaTypes?.add(lambdaType);
 
         return this;
     }
@@ -98,20 +99,11 @@ export class BehaviorBuilder extends CFBehavior {
     }
 
     public withGzipRequirementLambda(): BehaviorBuilder {
-        this.gzipRequirementLambda= true;
-
-        return this;
+        return this.withLambda(LambdaType.GZIP_REQUIREMENT);
     }
 
     public withHttpHeadersLambda(): BehaviorBuilder {
-        this.httpHeadersLambda = true;
-        return this;
-    }
-
-    public withWeathercamRedirectLambda(): BehaviorBuilder {
-        this.weathercamRedirectLambda = true;
-
-        return this;
+        return this.withLambda(LambdaType.HTTP_HEADERS);
     }
 }
 
@@ -190,43 +182,43 @@ export class DomainBuilder extends CFDomain {
 }
 
 export type Props = {
-    originAccessIdentity?: boolean,
-    distributionName: string,
-    environmentName: string,
-    aliasNames: string[] | null,
-    acmCertRef: string | null,
-    aclRules?: WafRules,
-    domains: CFDomain[]
+    readonly originAccessIdentity?: boolean,
+    readonly distributionName: string,
+    readonly environmentName: string,
+    readonly aliasNames: string[] | null,
+    readonly acmCertRef: string | null,
+    readonly aclRules?: WafRules,
+    readonly domains: CFDomain[]
 }
 
 export type ElasticProps = {
-    streamingProps: StreamingLogProps,
-    elasticDomain: string,
-    elasticArn: string,
+    readonly streamingProps: StreamingLogProps,
+    readonly elasticDomain: string,
+    readonly elasticArn: string,
 }
 
 export type StreamingLogProps = {
-    memorySize?: number,
-    batchSize?: number,
-    maxBatchingWindow?: number
+    readonly memorySize?: number,
+    readonly batchSize?: number,
+    readonly maxBatchingWindow?: number
 }
 
 export type CFProps = {
-    elasticProps: ElasticProps,
-    elasticAppName: string,
-    props: Props[],
-    lambdaProps?: CFLambdaProps,
+    readonly elasticProps: ElasticProps,
+    readonly elasticAppName: string,
+    readonly props: Props[],
+    readonly lambdaProps?: CFLambdaProps,
 }
 
 export type CFLambdaParameters = {
-    weathercamDomainName?: string,
-    weathercamHostName?: string,
-    ipRestrictions?: {
+    readonly weathercamDomainName?: string,
+    readonly weathercamHostName?: string,
+    readonly ipRestrictions?: {
         [key: string]: string,
     },
 }
 
 export type CFLambdaProps = {
-    lambdaTypes: LambdaType[],
-    lambdaParameters?: CFLambdaParameters
+    readonly lambdaTypes: LambdaType[],
+    readonly lambdaParameters?: CFLambdaParameters
 }

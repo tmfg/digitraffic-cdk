@@ -2,7 +2,8 @@ import {Duration, Stack} from 'aws-cdk-lib';
 import {
     Behavior,
     CloudFrontAllowedMethods,
-    LambdaEdgeEventType, LambdaFunctionAssociation,
+    LambdaEdgeEventType,
+    LambdaFunctionAssociation,
     OriginAccessIdentity,
     OriginProtocolPolicy,
     SourceConfiguration,
@@ -99,26 +100,14 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDef
 function getLambdas(b: CFBehavior, lambdaMap: LambdaMap): LambdaFunctionAssociation[] | undefined {
     const lambdas: LambdaFunctionAssociation[] = [];
 
-    if (b.gzipRequirementLambda) {
-        lambdas.push({
-            eventType: getEventType(LambdaType.GZIP_REQUIREMENT),
-            lambdaFunction: lambdaMap[LambdaType.GZIP_REQUIREMENT],
-        });
-    }
-
-    if (b.httpHeadersLambda) {
-        lambdas.push({
-            eventType: getEventType(LambdaType.HTTP_HEADERS),
-            lambdaFunction: lambdaMap[LambdaType.HTTP_HEADERS],
-        });
-    }
-
-    if (b.weathercamRedirectLambda) {
-        lambdas.push({
-            eventType: getEventType(LambdaType.WEATHERCAM_REDIRECT),
-            lambdaFunction: lambdaMap[LambdaType.WEATHERCAM_REDIRECT],
-        });
-    }
+    Object.values(LambdaType).forEach(type => {
+        if (b.lambdaTypes?.has(type as LambdaType)) {
+            lambdas.push({
+                eventType: getEventType(type as LambdaType),
+                lambdaFunction: lambdaMap[type],
+            });
+        }
+    });
 
     if (b.ipRestriction) {
         lambdas.push({
