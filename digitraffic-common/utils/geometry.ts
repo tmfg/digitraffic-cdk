@@ -61,3 +61,7 @@ const geoJsonValidator = require('geojson-validation');
 export function isValidGeoJson<T>(json: T): boolean {
     return geoJsonValidator.valid(json);
 }
+
+export function isFeatureCollection<T>(json: T): boolean {
+    return geoJsonValidator.isFeatureCollection(json);
+}
