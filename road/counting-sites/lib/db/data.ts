@@ -19,6 +19,8 @@ const SQL_GET_DATA_FOR_MONTH =
     and csc.user_type_id = csut.id 
     and date_part('year', data_timestamp) = $1
     and date_part('month', data_timestamp) = $2
+    and (csc.domain_name = $3 or $3 is null)
+    and (csd.counter_id = $4 or $4 is null)
     order by 1, 2, 3, 4`;
 
 const PS_INSERT_DATA = new PreparedStatement({
@@ -35,6 +37,7 @@ const PS_GET_DATA_FOR_MONTH = new PreparedStatement({
     name: 'get-data-for-month',
     text: SQL_GET_DATA_FOR_MONTH,
 });
+
 export function insertData(db: DTDatabase, siteId: number, interval: number, data: ApiData[]) {
     return Promise.all(data.map(d => {
         return db.none(PS_INSERT_DATA, [siteId, d.date, d.counts, d.status, interval]);
@@ -45,6 +48,8 @@ export function findAllData(db: DTDatabase, counterId: number): Promise<DbData[]
     return db.manyOrNone(PS_GET_DATA,[counterId]);
 }
 
-export function getAllDataForMonth(db: DTDatabase, year: number, month: number): Promise<DbCsvData[]> {
-    return db.manyOrNone(PS_GET_DATA_FOR_MONTH, [year, month]);
+export function getAllDataForMonth(
+    db: DTDatabase, year: number, month: number, domainName: string | null, counterId: number | null,
+): Promise<DbCsvData[]> {
+    return db.manyOrNone(PS_GET_DATA_FOR_MONTH, [year, month, domainName, counterId]);
 }

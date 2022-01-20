@@ -4,7 +4,7 @@ import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import * as MetadataDB from "../db/metadata";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {DbDomain} from "../model/domain";
-import {DbCsvData, DbData} from "../model/data";
+import {DbCsvData, ResponseData} from "../model/data";
 import {FeatureCollection} from "geojson";
 import {DbUserType} from "../model/usertype";
 import {MetadataResponse} from "../model/metadata";
@@ -21,13 +21,13 @@ export function getMetadata(): Promise<MetadataResponse> {
     });
 }
 
-export function getCsvData(year: number, month: number): Promise<string> {
-    console.info("getting csv data for year %d month %d", year, month);
-
+export function getCsvData(year: number, month: number, domainName: string, counterId: string): Promise<string> {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return DataDb.getAllDataForMonth(db, year, month);
+        return DataDb.getAllDataForMonth(
+            db, year, month, parseString(domainName), parseNumber(counterId),
+        );
     }).then(data => {
-        console.info("data fetched!");
+        console.info("method=getCsvData rowCount=%d", data.length);
 
         const csv = createObjectCsvStringifier({
             header: [
@@ -48,11 +48,24 @@ export function getCsvData(year: number, month: number): Promise<string> {
     });
 }
 
-export function getDataForCounter(counterId: number): Promise<DbData[]> {
+function parseString(value: string): string | null {
+    return !value || value === "" ? null : value;
+}
+
+function parseNumber(value: string): number | null {
+    return !value || value === "" ? null : Number.parseInt(value);
+}
+
+export function getDataForCounter(counterId: number) {
     // should we return error, when counter is not found?
     return inDatabaseReadonly((db: DTDatabase) => {
         return DataDb.findAllData(db, counterId);
-    });
+    }).then(data => data.map(row => ({
+        dataTimestamp: row.data_timestamp,
+        interval: row.interval,
+        count: row.count,
+        status: row.status,
+    } as ResponseData)));
 }
 
 export function getCountersForDomain(domain: string): Promise<FeatureCollection> {
@@ -65,7 +78,12 @@ export function getCountersForDomain(domain: string): Promise<FeatureCollection>
 function createResponse(domains: DbDomain[], userTypes: DbUserType[], lastUpdated: Date|null): MetadataResponse {
     return {
         lastUpdated,
-        domains,
+        domains: domains.map(d => ({
+            name: d.name,
+            description: d.description,
+            addedTimestamp: d.added_timestamp,
+            removedTimestamp: d.removed_timestamp,
+        })),
         userTypes,
         directions: {
             "1": "in",

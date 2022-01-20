@@ -1,11 +1,13 @@
 import {constants} from "http2";
 import {IncomingMessage, RequestOptions} from "http";
+import * as Assert from "digitraffic-common/test/asserter";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
 import zlib = require('zlib');
 import {MediaType} from "../../types/mediatypes";
 import {getApiKeyFromAPIGateway} from "../../runtime/apikey";
+import {FeatureCollection} from "geojson";
 
 export const API_KEY_HEADER = "x-api-key";
 
@@ -16,7 +18,7 @@ const baseHeaders = {
 } as Record<string, string>;
 
 type CheckerFunction = (Res: IncomingMessage) => void;
-type JsonCheckerFunction<T> = (json: T, body: string) => void;
+type JsonCheckerFunction<T> = (json: T, body: string, message: IncomingMessage) => void;
 
 export class UrlChecker {
     private readonly requestOptions: RequestOptions;
@@ -56,7 +58,7 @@ export class UrlChecker {
         return this.create(process.env.hostname as string, process.env.apiKeyId as string);
     }
 
-    expectStatus<T>(statusCode: number, url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
+    expectStatus<T>(statusCode: number, url: string, callback: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
             path: url,
         }};
@@ -66,7 +68,11 @@ export class UrlChecker {
             callback);
     }
 
-    expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
+    expect200<T>(url: string, ...callbacks: JsonCheckerFunction<T>[]): Promise<void> {
+        const callback = async (json: T, body: string, res: IncomingMessage) => {
+            await Promise.allSettled(callbacks.map(c => c(json, body, res)));
+        };
+
         return this.expectStatus(200, url, callback);
     }
 
@@ -99,12 +105,12 @@ export class UrlChecker {
 }
 
 export function jsonChecker<T>(fn: JsonCheckerFunction<T>): CheckerFunction {
-    return responseChecker((body: string) => {
-        fn(JSON.parse(body), body);
+    return responseChecker((res: IncomingMessage, body: string) => {
+        fn(JSON.parse(body), body, res);
     });
 }
 
-export function responseChecker(fn: (body: string) => void): CheckerFunction {
+export function responseChecker(fn: (res: IncomingMessage, body: string) => void): CheckerFunction {
     return async (res: IncomingMessage) => {
         if (!res.statusCode) {
             throw new Error('statusCode missing');
@@ -116,7 +122,7 @@ export function responseChecker(fn: (body: string) => void): CheckerFunction {
 
         const body = await getResponseBody(res);
 
-        fn(body);
+        fn(res, body);
     };
 }
 
@@ -190,6 +196,10 @@ export class ResponseChecker {
         return new ResponseChecker(MediaType.APPLICATION_JSON);
     }
 
+    static forCSV(): ResponseChecker {
+        return new ResponseChecker(MediaType.TEXT_CSV);
+    }
+
     static forGeojson(): ResponseChecker {
         return new ResponseChecker(MediaType.APPLICATION_GEOJSON);
     }
@@ -210,13 +220,13 @@ export class ResponseChecker {
         });
     }
 
-    checkJson<T>(fn: (json: T, body: string) => void): CheckerFunction {
-        return this.responseChecker((body: string) => {
-            fn(JSON.parse(body), body);
+    checkJson<T>(fn: (json: T, body: string, res: IncomingMessage) => void): CheckerFunction {
+        return this.responseChecker((body: string, res: IncomingMessage) => {
+            fn(JSON.parse(body), body, res);
         });
     }
 
-    responseChecker(fn: (body: string) => void): CheckerFunction {
+    responseChecker(fn: (body: string, res: IncomingMessage) => void): CheckerFunction {
         return async (res: IncomingMessage): Promise<void> => {
             if (!res.statusCode) {
                 throw new Error('statusCode missing');
@@ -236,7 +246,41 @@ export class ResponseChecker {
 
             const body = await getResponseBody(res);
 
-            fn(body);
+            fn(body, res);
+        };
+    }
+}
+
+export class GeoJsonChecker {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    static readonly geoJsonValidator = require('geojson-validation');
+
+    static validFeatureCollection(fn?: (json: FeatureCollection) => void): CheckerFunction {
+        return ResponseChecker.forGeojson().checkJson((json: FeatureCollection) => {
+            Assert.assertEquals(json.type, 'FeatureCollection');
+            Assert.assertTrue(this.geoJsonValidator.valid(json));
+
+            if (fn) {
+                fn(json);
+            }
+        });
+    }
+}
+
+export class HeaderChecker {
+    static checkHeaderExists(headerName: string): CheckerFunction {
+        return (res: IncomingMessage) => {
+            if (! res.headers[headerName]) {
+                throw new Error('Missing header: ' + headerName);
+            }
+        };
+    }
+
+    static checkHeaderMissing(headerName: string): CheckerFunction {
+        return (res: IncomingMessage) => {
+            if (res.headers[headerName]) {
+                throw new Error('Header should not exist: ' + headerName);
+            }
         };
     }
 }

@@ -19,7 +19,6 @@ const SQL_ALL_COUNTERS_FOR_DOMAIN =
                                     'properties', json_build_object(
                                             'id', id,
                                             'name', name,
-                                            'siteId', site_id,
                                             'userType', user_type_id,
                                             'interval', interval,
                                             'direction', direction,

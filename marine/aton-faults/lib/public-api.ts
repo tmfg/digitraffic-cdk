@@ -3,7 +3,7 @@ import {Function} from 'aws-cdk-lib/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MessageModel} from "digitraffic-common/aws/infra/api/response";
-import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
+import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/aws/infra/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
@@ -17,9 +17,9 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
     publicApi.createUsagePlan('ATON Api Key', 'ATON Usage Plan');
 
-    const faultModel = addServiceModel("FaultModel", publicApi, FaultSchema);
-    const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
-    const faultsModel = addServiceModel("FaultsModel", publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
+    const faultModel = publicApi.addJsonModel("FaultModel", FaultSchema);
+    const featureModel = publicApi.addJsonModel("FeatureModel", featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
+    const faultsModel = publicApi.addJsonModel("FaultsModel", geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
     createAnnotationsResource(stack, publicApi, faultsModel);
 

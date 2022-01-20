@@ -4,7 +4,9 @@ import {MediaType} from "../../types/mediatypes";
 /**
  * This is velocity-script, that assumes the response to be LambdaResponse(status and body).
  * It will always return the body and status, but if status in something else than 200 OK the content-type
- * will be overridden to text/plain. (it's assumed, that lambda will return error text)
+ * will be overridden to text/plain. (it's assumed, that lambda will return error text).
+ *
+ * If fileName is set, then Content-Disposition-header will be set to use it
  */
 export const RESPONSE_DEFAULT_LAMBDA = `#set($inputRoot = $input.path('$'))
 $inputRoot.body
@@ -13,10 +15,15 @@ $inputRoot.body
 #set ($context.responseOverride.header.Content-Type = 'text/plain')
 #end
 #set ($context.responseOverride.header.Access-Control-Allow-Origin = '*')
+#if ("$!inputRoot.fileName" != "")
+#set ($disposition = 'attachment; filename="FN"')
+#set ($context.responseOverride.header.Content-Disposition = $disposition.replaceAll('FN', $inputRoot.fileName))
+#end
 `;
 
 const BODY_FROM_INPUT_PATH = "$input.path('$').body";
 
+// DEPRECATED
 const messageSchema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
@@ -29,6 +36,7 @@ const messageSchema: apigateway.JsonSchema = {
     },
 };
 
+// DEPRECATED
 export const MessageModel = {
     contentType: MediaType.APPLICATION_JSON,
     modelName: 'MessageResponseModel',

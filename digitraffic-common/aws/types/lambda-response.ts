@@ -1,9 +1,10 @@
 export class LambdaResponse<T> {
     readonly status: number;
     readonly body: T;
+    readonly fileName?: string;
 
-    static ok<T>(body: T): LambdaResponse<T> {
-        return this.create(200, body);
+    static ok<T>(body: T, fileName?: string): LambdaResponse<T> {
+        return this.create(200, body, fileName);
     }
 
     static badRequest(body: string): LambdaResponse<string> {
@@ -18,7 +19,7 @@ export class LambdaResponse<T> {
         return this.create(500, 'Internal error');
     }
 
-    static create<T>(status: number, body: T): LambdaResponse<T> {
-        return { status, body };
+    static create<T>(status: number, body: T, fileName?: string): LambdaResponse<T> {
+        return { status, body, fileName };
     }
 }
