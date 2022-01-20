@@ -1,45 +1,24 @@
 import {
     SchedulesApi,
+    SchedulesDirection,
     SchedulesResponse,
     ScheduleTimetable,
     Timestamp,
 } from "../../lib/api/schedules";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import * as sinon from "sinon";
+import axios from "axios";
 
 describe('api-schedules', () => {
 
-    test('getSchedulesTimestamps - in VTS control', async () => {
-        const port = 8089;
-        const server = new TestHttpServer();
-        server.listen(port, {
-            "/schedules": () => {
-                return fakeSchedules;
-            },
-        });
-        try {
-            const api = new SchedulesApi(`http://localhost:${port}/schedules`);
-            const resp = await api.getSchedulesTimestamps(false);
-            verifyXmlResponse(resp);
-        } finally {
-            server.close();
-        }
+    afterEach(() => {
+        sinon.restore();
     });
 
-    test('getSchedulesTimestamps - calculated', async () => {
-        const port = 8090;
-        const server = new TestHttpServer();
-        server.listen(port, {
-            "/schedules/calculated": () => {
-                return fakeSchedules;
-            },
-        });
-        try {
-            const api = new SchedulesApi(`http://localhost:${port}/schedules`);
-            const resp = await api.getSchedulesTimestamps(true);
-            verifyXmlResponse(resp);
-        } finally {
-            server.close();
-        }
+    test('getSchedulesTimestamps - in VTS control', async () => {
+        const api = new SchedulesApi(`http:/something/schedules`);
+        sinon.stub(axios, 'get').returns(Promise.resolve({data: fakeSchedules}));
+        const resp = await api.getSchedulesTimestamps(SchedulesDirection.EAST,false);
+        verifyXmlResponse(resp);
     });
 
 });

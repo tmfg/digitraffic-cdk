@@ -2,6 +2,11 @@ import axios from 'axios';
 import * as util from 'util';
 import * as xml2js from 'xml2js';
 
+export enum SchedulesDirection {
+    EAST = 'east',
+    WEST = 'west',
+}
+
 export class SchedulesApi {
 
     private readonly url: string
@@ -10,9 +15,9 @@ export class SchedulesApi {
         this.url = url;
     }
 
-    async getSchedulesTimestamps(calculated: boolean): Promise<SchedulesResponse> {
+    async getSchedulesTimestamps(direction: SchedulesDirection, calculated: boolean): Promise<SchedulesResponse> {
         const start = Date.now();
-        const fullUrl = calculated ? this.url + '/calculated' : this.url;
+        const fullUrl = this.url + '/' + direction + (calculated ? '/calculated' : '');
         const resp = await axios.get(fullUrl);
         const parse = util.promisify(xml2js.parseString);
         console.info('method=getSchedulesTimestamp tookMs=%d', (Date.now() - start));

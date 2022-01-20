@@ -1,4 +1,4 @@
-import {Destination, SchedulesApi, SchedulesResponse, Timestamp, Vessel} from "../api/schedules";
+import {Destination, SchedulesApi, SchedulesDirection, SchedulesResponse, Timestamp, Vessel} from "../api/schedules";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {ports} from "./portareas";
 import moment from 'moment-timezone';
@@ -12,14 +12,19 @@ export class SchedulesService {
         this.api = api;
     }
 
-    async getTimestampsUnderVtsControl(): Promise<ApiTimestamp[]> {
-        const resp = await this.api.getSchedulesTimestamps(false);
-        return this.filterTimestamps(this.schedulesToTimestamps(resp, false));
+    getTimestampsUnderVtsControl(): Promise<ApiTimestamp[]> {
+        return this.doGetTimestamps(false);
     }
 
-    async getCalculatedTimestamps(): Promise<ApiTimestamp[]> {
-        const resp = await this.api.getSchedulesTimestamps( true);
-        return this.filterTimestamps(this.schedulesToTimestamps(resp, true));
+    getCalculatedTimestamps(): Promise<ApiTimestamp[]> {
+        return this.doGetTimestamps(true);
+    }
+
+    async doGetTimestamps(calculated: boolean) {
+        const timestampsEast = await this.api.getSchedulesTimestamps(SchedulesDirection.EAST, calculated);
+        const timestampsWest = await this.api.getSchedulesTimestamps(SchedulesDirection.WEST, calculated);
+        return this.filterTimestamps(this.schedulesToTimestamps(timestampsEast, calculated))
+            .concat(this.filterTimestamps(this.schedulesToTimestamps(timestampsWest, calculated)));
     }
 
     filterTimestamps(timestamps: ApiTimestamp[]) {
