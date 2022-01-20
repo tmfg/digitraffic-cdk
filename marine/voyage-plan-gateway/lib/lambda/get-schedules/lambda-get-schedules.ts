@@ -1,11 +1,12 @@
 import axios from 'axios';
 import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
+import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/aws/types/proxytypes";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 
-export async function handler(event: any): Promise<any> {
-    return await withSecret(secretId, async (secret: any) => {
+export function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> {
+    return withSecret(secretId, async (secret: any) => {
         if (event.queryStringParameters.auth !== secret[VoyagePlanSecretKeys.SCHEDULES_ACCESS_TOKEN]) {
             return {
                 statusCode: 403,
@@ -13,6 +14,17 @@ export async function handler(event: any): Promise<any> {
             };
         }
         let url = secret[VoyagePlanSecretKeys.SCHEDULES_URL];
+        if (event.queryStringParameters.direction) {
+            if (['east', 'west'].includes(event.queryStringParameters.direction)) {
+                url += '/' + event.queryStringParameters.direction;
+            } else {
+                return {
+                    statusCode: 400,
+                    body: 'Unknown direction',
+                };
+            }
+        }
+
         const calculated = event.queryStringParameters.calculated === 'true';
         if (calculated) {
             url += '/calculated';
@@ -33,7 +45,7 @@ export async function handler(event: any): Promise<any> {
             statusCode: 200,
             body: resp.data,
         };
-    });
+    }) as Promise<ProxyLambdaResponse>;
 }
 
 function handleQueryParam(param: string, queryParams: any, params: string[]) {
