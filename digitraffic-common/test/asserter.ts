@@ -29,3 +29,9 @@ export function assertLengthGreaterThan<T>(data: T[], expected: number) {
         throw new Error(`Given array length ${data.length} was not greater than ${expected}`);
     }
 }
+
+export function assertGreaterThan(value: number, expected: number) {
+    if (value <= expected) {
+        throw new Error(`Value ${value} was expected to be greater than ${expected}`);
+    }
+}

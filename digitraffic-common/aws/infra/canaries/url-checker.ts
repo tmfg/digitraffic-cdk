@@ -8,6 +8,7 @@ import zlib = require('zlib');
 import {MediaType} from "../../types/mediatypes";
 import {getApiKeyFromAPIGateway} from "../../runtime/apikey";
 import {FeatureCollection} from "geojson";
+import {isValidGeoJson} from "../../../utils/geometry";
 
 export const API_KEY_HEADER = "x-api-key";
 
@@ -104,28 +105,6 @@ export class UrlChecker {
     }
 }
 
-export function jsonChecker<T>(fn: JsonCheckerFunction<T>): CheckerFunction {
-    return responseChecker((res: IncomingMessage, body: string) => {
-        fn(JSON.parse(body), body, res);
-    });
-}
-
-export function responseChecker(fn: (res: IncomingMessage, body: string) => void): CheckerFunction {
-    return async (res: IncomingMessage) => {
-        if (!res.statusCode) {
-            throw new Error('statusCode missing');
-        }
-
-        if (res.statusCode < 200 || res.statusCode > 299) {
-            throw new Error(res.statusCode + ' ' + res.statusMessage);
-        }
-
-        const body = await getResponseBody(res);
-
-        fn(res, body);
-    };
-}
-
 async function getResponseBody(response: IncomingMessage): Promise<string> {
     const body = await getBodyFromResponse(response);
 
@@ -154,15 +133,6 @@ function getBodyFromResponse(response: IncomingMessage): Promise<string> {
     });
 }
 
-export function mustContain(body: string, text: string) {
-    console.info("checking " + body);
-
-    if (!body.includes(text)) {
-        console.info("Did not contain " + text);
-        throw new Error("Did not contain " + text);
-    }
-}
-
 /**
  * Returns function, that validates that the status code and content-type from response are the given values
  * @param statusCode
@@ -184,6 +154,7 @@ function validateStatusCodeAndContentType(statusCode: number, contentType: Media
     };
 }
 
+// DEPRECATED
 export class ResponseChecker {
     private readonly contentType;
     private checkCors = true;
@@ -206,12 +177,6 @@ export class ResponseChecker {
 
     static forJpeg(): ResponseChecker {
         return new ResponseChecker(MediaType.IMAGE_JPEG);
-    }
-
-    noCors(): ResponseChecker {
-        this.checkCors = false;
-
-        return this;
     }
 
     check(): CheckerFunction {
@@ -251,14 +216,51 @@ export class ResponseChecker {
     }
 }
 
-export class GeoJsonChecker {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    static readonly geoJsonValidator = require('geojson-validation');
+export class ContentChecker {
+    static checkJson<T>(fn: (json: T, body: string, res: IncomingMessage) => void): CheckerFunction {
+        return async (res: IncomingMessage): Promise<void> => {
+            const body = await getResponseBody(res);
 
+            fn(JSON.parse(body), body, res);
+        };
+    }
+
+    static checkResponse(fn: (body: string, res: IncomingMessage) => void): CheckerFunction {
+        return async (res: IncomingMessage): Promise<void> => {
+            const body = await getResponseBody(res);
+
+            fn(body, res);
+        };
+    }
+}
+
+export class ContentTypeChecker {
+    static checkContentType(contentType: MediaType) {
+        return (res: IncomingMessage) => {
+            if (!res.statusCode) {
+                throw new Error('statusCode missing');
+            }
+
+            if (res.statusCode < 200 || res.statusCode > 299) {
+                throw new Error(res.statusCode + ' ' + res.statusMessage);
+            }
+
+            if (!res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
+                throw new Error('CORS missing');
+            }
+
+            if (res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== contentType) {
+                throw new Error('Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE]);
+            }
+        };
+    }
+}
+
+export class GeoJsonChecker {
     static validFeatureCollection(fn?: (json: FeatureCollection) => void): CheckerFunction {
         return ResponseChecker.forGeojson().checkJson((json: FeatureCollection) => {
             Assert.assertEquals(json.type, 'FeatureCollection');
-            Assert.assertTrue(this.geoJsonValidator.valid(json));
+            Assert.assertTrue(isValidGeoJson(json));
 
             if (fn) {
                 fn(json);
@@ -270,7 +272,7 @@ export class GeoJsonChecker {
 export class HeaderChecker {
     static checkHeaderExists(headerName: string): CheckerFunction {
         return (res: IncomingMessage) => {
-            if (! res.headers[headerName]) {
+            if (!res.headers[headerName]) {
                 throw new Error('Missing header: ' + headerName);
             }
         };

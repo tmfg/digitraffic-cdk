@@ -1,4 +1,5 @@
 import {Feature, FeatureCollection, Geometry, Position} from "geojson";
+import * as Assert from "../test/asserter";
 
 export function createGeometry(geometry: Geometry): string {
     if (geometry.type === 'LineString') {
@@ -52,4 +53,11 @@ export function createFeatureCollection(features: Feature[], lastUpdated: Date |
         lastUpdated: lastUpdated,
         features: features,
     } as FeatureCollection;
+}
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const geoJsonValidator = require('geojson-validation');
+
+export function isValidGeoJson<T>(json: T): boolean {
+    return geoJsonValidator.valid(json);
 }

@@ -5,19 +5,16 @@ import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
-import {createFeatureCollection} from "digitraffic-common/utils/geometry";
+import {createFeatureCollection, isValidGeoJson} from "digitraffic-common/utils/geometry";
 import {Geometry} from "wkx";
 import {DbDisruption} from "../db/disruptions";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const GeoJsonValidator = require('geojson-validation');
 
 export const DISRUPTIONS_DATE_FORMAT = 'D.M.YYYY H:mm';
 const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
 
-export async function findAllDisruptions(): Promise<FeatureCollection> {
+export function findAllDisruptions(): Promise<FeatureCollection> {
     const start = Date.now();
-    return await inDatabaseReadonly(async (db: DTDatabase) => {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
         const disruptions = await DisruptionsDB.findAll(db);
         const disruptionsFeatures = disruptions.map(convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE);
@@ -31,13 +28,13 @@ export async function saveDisruptions(disruptions: SpatialDisruption[]) {
     const start = Date.now();
     await inDatabase(async (db: DTDatabase) => {
         await DisruptionsDB.deleteAllButDisruptions(db, disruptions.map(d => d.Id));
-        return await db.tx(t => {
+        return db.tx(t => {
             return t.batch([
                 ...DisruptionsDB.updateDisruptions(db, disruptions),
                 LastUpdatedDB.updateUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE, new Date(start)),
             ]);
         });
-    }).then((a: any) => {
+    }).then(a => {
         const end = Date.now();
         console.info("method=saveDisruptions updatedCount=%d tookMs=%d", a.length, (end - start));
     });
@@ -69,7 +66,7 @@ export function normalizeDisruptionDate(dateStr: string): Date {
 
 export function validateGeoJson(geoJson: GeoJSON) {
     try {
-        return GeoJsonValidator.valid(geoJson);
+        return isValidGeoJson(geoJson);
     } catch (e) {
         console.warn('Invalid GeoJSON', geoJson);
         return false;
