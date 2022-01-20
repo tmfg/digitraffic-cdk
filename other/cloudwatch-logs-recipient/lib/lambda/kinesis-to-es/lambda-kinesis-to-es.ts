@@ -28,7 +28,7 @@ const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.c
 const esEndpoint = new AWS.Endpoint(endpoint);
 const region = endpointParts[2];
 
-const MAX_BODY_SIZE = 800000;
+const MAX_BODY_SIZE = 4 * 1000 * 1000;
 const SEPARATOR_LAMBDA_LOGS = '\t';
 
 export const handler: KinesisStreamHandler = (event, context): void => {
