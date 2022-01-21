@@ -1,27 +1,28 @@
-import {AssetCode, Function, FunctionProps, Runtime} from 'aws-cdk-lib/aws-lambda';
-import {Duration, Stack} from 'aws-cdk-lib';
+import {AssetCode, FunctionProps, Runtime} from 'aws-cdk-lib/aws-lambda';
+import {Duration} from 'aws-cdk-lib';
 import {createSubscription} from 'digitraffic-common/aws/infra/stack/subscription';
 import {Props} from './app-props';
 import {RetentionDays} from "aws-cdk-lib/aws-logs";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {Bucket} from "aws-cdk-lib/aws-s3";
 import {
-    KEY_BUCKET_NAME,
-    KEY_REGION,
-    KEY_APP_URL,
-    KEY_APP_BETA_URL,
     KEY_APIGW_APPS,
+    KEY_APP_BETA_URL,
+    KEY_APP_URL,
+    KEY_BUCKET_NAME,
+    KEY_DESCRIPTION,
     KEY_DIRECTORY,
     KEY_HOST,
-    KEY_TITLE,
-    KEY_DESCRIPTION,
+    KEY_REGION,
     KEY_REMOVESECURITY,
+    KEY_TITLE,
 } from "./lambda/update-swagger/lambda-update-swagger";
 import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
 import {Rule, Schedule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {LambdaEnvironment} from "digitraffic-common/aws/infra/stack/lambda-configs";
 
 export function create(stack: DigitrafficStack,
     bucket: Bucket) {
@@ -34,7 +35,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
     const functionName = `${stack.stackName}-UpdateApiDocumentation`;
     const props = stack.configuration as Props;
 
-    const lambdaEnv: any = {};
+    const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[KEY_REGION] = stack.region;
     lambdaEnv[KEY_APIGW_IDS] = JSON.stringify(props.apiGwAppIds);
 
@@ -65,11 +66,11 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
     const props = stack.configuration as Props;
 
-    const lambdaEnv: any = {};
+    const lambdaEnv: LambdaEnvironment = {};
     lambdaEnv[KEY_BUCKET_NAME] = bucket.bucketName;
     lambdaEnv[KEY_REGION] = stack.region;
     lambdaEnv[KEY_APIGW_APPS] = JSON.stringify(props.apiGwAppIds);
-    lambdaEnv[KEY_APP_URL] = props.appUrl;
+    lambdaEnv[KEY_APP_URL] = props.appUrl as string;
     if (props.betaAppUrl) {
         lambdaEnv[KEY_APP_BETA_URL] = props.betaAppUrl;
     }

@@ -1,5 +1,4 @@
 import {Feature, FeatureCollection, Geometry, Position} from "geojson";
-import * as Assert from "../test/asserter";
 
 export function createGeometry(geometry: Geometry): string {
     if (geometry.type === 'LineString') {

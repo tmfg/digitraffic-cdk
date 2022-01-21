@@ -21,7 +21,7 @@ const apiRequestHeaders: AxiosRequestConfig = {
     },
 };
 
-export const handler = async (): Promise<any> => {
+export const handler = async () => {
     const bucketName = process.env[KEY_BUCKET_NAME] as string;
     const appUrl = process.env[KEY_APP_URL] as string | undefined;
     const appBetaUrl = process.env[KEY_APP_BETA_URL] as string | undefined;
