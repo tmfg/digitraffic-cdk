@@ -1,5 +1,8 @@
 import apigateway = require('aws-cdk-lib/aws-apigateway');
-// TODO update this
+
+// camels
+/* eslint-disable camelcase */
+
 const schema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,

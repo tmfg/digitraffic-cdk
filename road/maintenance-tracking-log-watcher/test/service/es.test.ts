@@ -4,8 +4,8 @@ import moment from 'moment-timezone';
 
 describe('maintenance-tracking-log-watch-es', () => {
 
-    test('parseDataToString - 2 hits', async () => {
-        const esQueryResultJsonString = readFile('esQueryResult.json')
+    test('parseDataToString - 2 hits', () => {
+        const esQueryResultJsonString = readFile('esQueryResult.json');
         const resultJsonObj = JSON.parse(esQueryResultJsonString);
         const resultLog = parseDataToString(resultJsonObj);
         const expected =
@@ -15,15 +15,15 @@ method=resolveGeometries 2`;
         expect(resultLog).toEqual(expected);
     });
 
-    test('parseDataToString - no hits', async () => {
-        const esQueryResultJsonString = readFile('esQueryResultNoHits.json')
+    test('parseDataToString - no hits', () => {
+        const esQueryResultJsonString = readFile('esQueryResultNoHits.json');
         const resultJsonObj = JSON.parse(esQueryResultJsonString);
         const resultLog = parseDataToString(resultJsonObj);
         const expected = "";
         expect(resultLog).toEqual(expected);
     });
 
-    test('getQuery', async () => {
+    test('getQuery', () => {
         const fromISOString = moment().subtract(1, 'weeks').startOf('isoWeek').toDate().toISOString();
         const toISOString = moment().subtract(1, 'weeks').endOf('isoWeek').toDate().toISOString();
         const queryJsonStr = getQuery(fromISOString, toISOString);

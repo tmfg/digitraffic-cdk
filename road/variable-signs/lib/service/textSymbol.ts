@@ -6,7 +6,7 @@ export enum SymbolType {
     ROAD = "ROAD_",
     DETOUR = "DETOUR_",
     DIVERSION = "DIVERSION_",
-    SINGLE = "SINGLE_"
+    SINGLE = "SINGLE_",
 }
 
 // these are symbols used in the input text
@@ -21,7 +21,7 @@ export class TextSymbol {
     public width: number;
     public svg: string;
     public name: string;
-    public symbolType: SymbolType
+    public symbolType: SymbolType;
 
     constructor(width: number, svg: string, name: string, symbolType: SymbolType) {
         this.width = width;

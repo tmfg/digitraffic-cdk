@@ -5,5 +5,6 @@ export const handler = async (event: DeleteRequestEvent): Promise <void> => {
 };
 
 interface DeleteRequestEvent {
+    // eslint-disable-next-line camelcase
     readonly request_id: string;
 }

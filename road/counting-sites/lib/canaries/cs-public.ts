@@ -3,7 +3,6 @@ import {
     ContentTypeChecker,
     GeoJsonChecker,
     HeaderChecker,
-    ResponseChecker,
     UrlChecker,
 } from "digitraffic-common/aws/infra/canaries/url-checker";
 import {MetadataResponse} from "../model/metadata";

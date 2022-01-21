@@ -4,6 +4,9 @@ export enum ServiceType {
     blackbox = 'blackbox'
 }
 
+// camels
+/* eslint-disable camelcase */
+
 export interface Service {
     service_code: string;
     service_name: string;

@@ -7,6 +7,9 @@ import {randomString, shuffle} from "digitraffic-common/test/testutils";
 import {SubSubject} from "../lib/model/subsubject";
 import {Locale} from "../lib/model/locale";
 
+// test file
+/* eslint-disable camelcase */
+
 export function newService(): Service {
     return {
         service_code: Math.random().toFixed(3).split('.')[1],

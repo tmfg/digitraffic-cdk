@@ -5,6 +5,7 @@ export interface SubSubject {
     readonly name: string
     readonly id: number
     readonly locale: Locale
+    // eslint-disable-next-line camelcase
     readonly subject_id: number;
 }
 
