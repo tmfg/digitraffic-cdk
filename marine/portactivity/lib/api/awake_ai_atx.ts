@@ -105,7 +105,7 @@ export class AwakeAiATXApi {
         this.WebSocketClass = WebSocketClass;
     }
 
-    getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
+    async getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
         const webSocket = new this.WebSocketClass(this.url + this.apiKey);
 
         webSocket.on('open', () => {
