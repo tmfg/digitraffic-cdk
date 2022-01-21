@@ -16,7 +16,7 @@ export class AwakeAiATXService {
 
     async getATXs(timeoutMillis: number): Promise<ApiTimestamp[]> {
         const atxs = await this.api.getATXs(timeoutMillis);
-        return inDatabase((db: DTDatabase) => {
+        return inDatabase(async (db: DTDatabase) => {
             const promises = atxs
                 .filter(atx => atx.zoneType === AwakeAiZoneType.BERTH)
                 .map(async (atx: AwakeAIATXTimestampMessage) => {

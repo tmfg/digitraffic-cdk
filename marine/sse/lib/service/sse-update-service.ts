@@ -10,7 +10,7 @@ export type SseSaveResult = {
     readonly errors: number
 }
 
-export function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<SseSaveResult> {
+export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<SseSaveResult> {
     return inDatabase(async (db: DTDatabase) => {
         let saved = 0;
         let errors = 0;

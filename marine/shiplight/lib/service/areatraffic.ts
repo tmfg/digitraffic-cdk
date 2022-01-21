@@ -3,7 +3,7 @@ import * as AreaTrafficDb from '../db/areatraffic';
 import {DbAreaTraffic} from '../db/areatraffic';
 import {AreaTraffic} from "../model/areatraffic";
 
-export function updateAreaTrafficSendTime(areaId: number) {
+export async function updateAreaTrafficSendTime(areaId: number) {
     return inDatabase((db: DTDatabase) => {
         console.info("updating area %d", areaId);
         return AreaTrafficDb.updateAreaTrafficSendTime(db, areaId);

@@ -16,8 +16,8 @@ const MessageGroupId = 'VPGW-MessageGroupId';
 
 export function handlerFn(sqs: SQS,
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any): () => Promise<void> {
-    return function(): Promise<void> {
-        return doWithSecret(secretId, async (secret: any) => {
+    return async function(): Promise<void> {
+        return await doWithSecret(secretId, async (secret: any) => {
 
             const privateVisUrl = secret[VoyagePlanSecretKeys.PRIVATE_VIS_URL] as string;
             const appId = secret[VoyagePlanSecretKeys.APP_ID];

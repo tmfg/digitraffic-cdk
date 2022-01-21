@@ -57,7 +57,7 @@ export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<
 }
 
 export function saveTimestamps(timestamps: ApiTimestamp[]): Promise<Array<DbUpdatedTimestamp | null>> {
-    return inDatabase((db: DTDatabase) => {
+    return inDatabase(async (db: DTDatabase) => {
         return db.tx(t => t.batch(timestamps.map(timestamp => doSaveTimestamp(t, timestamp))));
     });
 }
