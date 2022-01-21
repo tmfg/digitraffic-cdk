@@ -15,8 +15,11 @@ import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwat
 import {IncomingMessage} from "http";
 import {Statistics} from "./statistics";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const https = require('https');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require('zlib');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const crypto = require('crypto');
 
 const endpoint = process.env.ES_ENDPOINT as string;

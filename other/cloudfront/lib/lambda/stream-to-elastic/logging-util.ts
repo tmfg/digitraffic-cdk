@@ -22,12 +22,12 @@ export const CLOUDFRONT_STREAMING_LOG_FIELDS = [
 ];
 
 export function findHeaderValue(headerName: string, allHeaders: string): string|null {
-    for(const value of allHeaders.split('%0A')) {
-       const values = value.split(':');
+    for (const value of allHeaders.split('%0A')) {
+        const values = value.split(':');
 
-       if(values[0].toUpperCase() === headerName.toUpperCase()) {
-           return unescape(values[1]);
-       }
+        if (values[0].toUpperCase() === headerName.toUpperCase()) {
+            return unescape(values[1]);
+        }
     }
 
     return null;

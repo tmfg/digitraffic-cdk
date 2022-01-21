@@ -1,12 +1,13 @@
 import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront';
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
-import {Annotations, Stack, StackProps} from "aws-cdk-lib";
+import {Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig, LambdaMap} from "./origin-configs";
-import {CFDistribution, CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
+import {CFDistribution, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
 import {
     createGzipRequirement,
-    createHttpHeaders, createIpRestriction,
+    createHttpHeaders,
+    createIpRestriction,
     createWeathercamRedirect,
     LambdaType,
 } from "./lambda/lambda-creator";

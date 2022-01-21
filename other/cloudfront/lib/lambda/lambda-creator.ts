@@ -2,6 +2,7 @@ import {Stack} from 'aws-cdk-lib';
 import {Function, InlineCode, Runtime, Version} from 'aws-cdk-lib/aws-lambda';
 import {Role} from 'aws-cdk-lib/aws-iam';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
 
 export enum LambdaType {

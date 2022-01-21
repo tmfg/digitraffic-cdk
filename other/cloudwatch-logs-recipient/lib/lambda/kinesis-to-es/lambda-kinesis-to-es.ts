@@ -18,6 +18,8 @@ import {IncomingMessage} from "http";
 import {Statistics} from "./statistics";
 import {Account} from "../../app-props";
 const AWS = AWSx as any;
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require("zlib");
 
 const knownAccounts: Account[] = JSON.parse(process.env.KNOWN_ACCOUNTS as string);

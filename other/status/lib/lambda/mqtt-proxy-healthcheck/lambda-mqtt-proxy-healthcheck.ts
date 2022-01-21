@@ -13,9 +13,8 @@ function fakeBrowserHack() {
     // @ts-ignore
     global.WebSocket = require('ws');
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    global.localStorage = {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (global as any).localStorage = {
         store: {},
         getItem: function (key: string) {
             return this.store[key];
@@ -27,9 +26,8 @@ function fakeBrowserHack() {
             delete this.store[key];
         },
     };
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    global.window = global;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (global as any).window = global;
 }
 
 export async function handler(): Promise<ProxyLambdaResponse> {
