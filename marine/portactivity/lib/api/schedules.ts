@@ -17,11 +17,15 @@ export class SchedulesApi {
 
     async getSchedulesTimestamps(direction: SchedulesDirection, calculated: boolean): Promise<SchedulesResponse> {
         const start = Date.now();
-        const fullUrl = this.url + '/' + direction + (calculated ? '/calculated' : '');
+        const fullUrl = this.createUrl(direction, calculated);
         const resp = await axios.get(fullUrl);
         const parse = util.promisify(xml2js.parseString);
         console.info('method=getSchedulesTimestamp tookMs=%d', (Date.now() - start));
         return await parse(resp.data) as SchedulesResponse;
+    }
+
+    private createUrl(direction: SchedulesDirection, calculated: boolean): string {
+        return `${this.url}/${direction}${calculated ? '/calculated' : ''}`;
     }
 
 }
