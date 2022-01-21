@@ -185,7 +185,7 @@ const createIndex = async function (): Promise<string> {
     }
     marineFilterHtml += '</table>';
 
-    return html = `
+    return `
   <html>
   <head>  
     <style>

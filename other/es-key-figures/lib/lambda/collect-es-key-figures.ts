@@ -232,7 +232,7 @@ async function getApiPaths(): Promise<{ transportType: string, paths: Set<string
 }
 
 function getKeyFigures(): KeyFigure[] {
-    return keyFigures = [
+    return [
         {
             'name': 'Http req',
             'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
