@@ -1,7 +1,7 @@
 import { SqsProducer, SqsConsumer } from 'sns-sqs-big-payload';
 import * as MaintenanceTrackingDb from "../db/maintenance-tracking-db";
 import * as MaintenanceTrackingService from "./maintenance-tracking";
-import {TyokoneenseurannanKirjaus, Havainto} from "../model/models"
+import {TyokoneenseurannanKirjaus, Havainto} from "../model/models";
 import moment from 'moment-timezone';
 
 // https://github.com/aspecto-io/sns-sqs-big-payload#sqs-producer
@@ -15,7 +15,7 @@ export function createSqsProducer(sqsQueueUrl : string, region : string, sqsBuck
         // If true, library uses compatibility mode with Amazon SQS Extended Client Library for Java
         // See https://github.com/awslabs/amazon-sqs-java-extended-client-lib
         extendedLibraryCompatibility: false,
-        s3Bucket: sqsBucketName
+        s3Bucket: sqsBucketName,
     });
 }
 
@@ -28,12 +28,12 @@ export function createSqsConsumer(sqsQueueUrl : string, region : string, logFunc
         getPayloadFromS3: true,
         // Parse JSON string payload to JSON object
         parsePayload: (raw) => {
-            return JSON.parse(raw)
+            return JSON.parse(raw);
         },
         // Callback to handle message. Payload is parsed JSON object
         handleMessage: async ({payload, message, s3PayloadMeta}) => {
             return handleMessage(payload, message, s3PayloadMeta, logFunctionName);
-        }
+        },
     });
 }
 
@@ -71,8 +71,10 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
         const start = Date.now();
         const insertCount: number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
         const end = Date.now();
-        console.info(`method=${logFunctionName} messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
-            sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes);
+        console.info(
+            `method=${logFunctionName} messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
+            sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes,
+        );
     } catch (e) {
         const clones =  MaintenanceTrackingDb.cloneObservationsWithoutJson(observationDatas);
         console.error(`method=${logFunctionName} Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(clones)}`, e);

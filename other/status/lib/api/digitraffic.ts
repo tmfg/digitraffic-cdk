@@ -5,11 +5,11 @@ import {AppEndpoints} from "../model/app-endpoints";
 export class DigitrafficApi {
 
     async getAppEndpoints(app: MonitoredApp): Promise<AppEndpoints> {
-        console.log('Fetching digitraffic endpoints')
+        console.log('Fetching digitraffic endpoints');
         const resp = await axios.get(app.url, {
             headers: {
-                'accept-encoding': 'gzip'
-            }
+                'accept-encoding': 'gzip',
+            },
         });
         if (resp.status !== 200) {
             throw new Error('Unable to fetch contacts');
@@ -24,7 +24,7 @@ export class DigitrafficApi {
             app: app.name,
             hostPart: app.hostPart,
             endpoints: (([] as string[]).concat(notBeta).concat(beta)).filter(e => !app.excluded.includes(e)),
-            extraEndpoints: app.endpoints
+            extraEndpoints: app.endpoints,
         };
     }
 
