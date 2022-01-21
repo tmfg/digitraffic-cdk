@@ -10,7 +10,7 @@ export type SseSaveResult = {
     readonly errors: number
 }
 
-export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<SseSaveResult> {
+export function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<SseSaveResult> {
     return inDatabase(async (db: DTDatabase) => {
         let saved = 0;
         let errors = 0;
@@ -52,7 +52,7 @@ export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseD
         throw new Error('Missing Coord_Longitude');
     }
 
-    const data: SseDb.DbSseReport = {
+    return {
         siteNumber: sseReport.Site.SiteNumber,
         siteName: sseReport.Site.SiteName,
         siteType: sseReport.Site.SiteType,
@@ -69,6 +69,5 @@ export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseD
         longitude: sseReport.Extra_Fields?.Coord_Longitude ?? -1,
         latitude: sseReport.Extra_Fields?.Coord_Latitude ?? -1,
     };
-    return data;
 }
 

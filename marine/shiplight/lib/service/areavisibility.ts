@@ -27,7 +27,7 @@ export class AreaVisibilityService {
             return { visibilityInMeters: resp.visibilityInMeters };
         } catch (error) {
             // error logged at API level
-            return { visibilityInMeters: null }
+            return { visibilityInMeters: null };
         }
     }
 }

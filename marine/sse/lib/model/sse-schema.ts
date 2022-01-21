@@ -1,6 +1,9 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
 // Manually converted from json-schema
 
+// camels
+/* eslint-disable camelcase */
+
 export const Sse: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.OBJECT,

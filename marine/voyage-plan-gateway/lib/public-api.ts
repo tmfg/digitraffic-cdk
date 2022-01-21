@@ -45,7 +45,7 @@ function createVtsProxyHandler(stack: DigitrafficStack,
     secret: ISecret,
     props: VoyagePlanGatewayProps) {
 
-    const env: any = {};
+    const env: Record<string, string> = {};
     env[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
     const functionName = 'VPGW-Get-Schedules';
     // ATTENTION!

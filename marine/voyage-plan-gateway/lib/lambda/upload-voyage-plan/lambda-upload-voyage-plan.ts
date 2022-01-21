@@ -9,6 +9,7 @@ import {VtsApi} from "../../api/vts";
 import {SlackApi} from "digitraffic-common/utils/slack";
 import {RtzStorageApi} from "../../api/rtzstorage";
 import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;

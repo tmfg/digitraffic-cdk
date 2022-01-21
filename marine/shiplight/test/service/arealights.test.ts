@@ -14,7 +14,7 @@ describe('arealights service', () => {
         const updateLightsForAreaStub =
             sinon.stub(AreaLightsApi.prototype, 'updateLightsForArea').returns(Promise.resolve({
                 LightsSetSentFailed: [],
-                LightsSetSentSuccessfully: []
+                LightsSetSentSuccessfully: [],
             }));
 
         await service.updateLightsForArea(areaTraffic);
@@ -22,7 +22,7 @@ describe('arealights service', () => {
         expect(updateLightsForAreaStub.calledWith(sinon.match({
             routeId: areaTraffic.areaId,
             visibility: areaTraffic.visibilityInMeters,
-            time: areaTraffic.durationInMinutes
+            time: areaTraffic.durationInMinutes,
         }))).toBe(true);
     });
 
@@ -34,7 +34,7 @@ describe('arealights service', () => {
         updateLightsForAreaStub.onFirstCall().callsFake(() => Promise.reject());
         updateLightsForAreaStub.onSecondCall().returns(Promise.resolve({
             LightsSetSentFailed: [],
-            LightsSetSentSuccessfully: []
+            LightsSetSentSuccessfully: [],
         }));
 
         await service.updateLightsForArea(areaTraffic);
@@ -42,7 +42,7 @@ describe('arealights service', () => {
         const matcher = sinon.match({
             routeId: areaTraffic.areaId,
             visibility: areaTraffic.visibilityInMeters,
-            time: areaTraffic.durationInMinutes
+            time: areaTraffic.durationInMinutes,
         });
         expect(updateLightsForAreaStub.callCount).toBe(2);
         expect(updateLightsForAreaStub.getCall(0).calledWith(matcher)).toBe(true);
@@ -57,7 +57,7 @@ describe('arealights service', () => {
         return {
             areaId: 10,
             durationInMinutes: 45,
-            visibilityInMeters: 5000
+            visibilityInMeters: 5000,
         };
     }
 });

@@ -1,4 +1,3 @@
-import * as sinon from 'sinon';
 import {SchedulesApi, SchedulesDirection, SchedulesResponse} from "../../lib/api/schedules";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";

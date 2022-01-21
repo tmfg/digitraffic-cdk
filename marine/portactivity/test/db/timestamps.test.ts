@@ -45,19 +45,19 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         expect(removed).toHaveLength(1);
     });
 
-    function testFound(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testFound(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - found`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 recordTime: moment().toISOString(), // avoid filtering
             });
             await insert(db, [timestamp]);
 
-            const foundTimestamp = await fn(db, timestamp);
+            const foundTimestamp = await fn(timestamp);
             expect(foundTimestamp.length).toBe(1);
         });
     }
 
-    function testFoundInFuture(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testFoundInFuture(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - found 71 h in the future`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 recordTime: moment().toISOString(), // avoid filtering,
@@ -65,40 +65,40 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
             });
             await insert(db, [timestamp]);
 
-            const foundTimestamp = await fn(db, timestamp);
+            const foundTimestamp = await fn(timestamp);
             expect(foundTimestamp.length).toBe(1);
         });
     }
 
-    testFound('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testFound('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
-    testFound('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testFound('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testFound('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testFound('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    testFoundInFuture('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testFoundInFuture('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
-    testFoundInFuture('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testFoundInFuture('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testFoundInFuture('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testFoundInFuture('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testFoundInFuture('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testFoundInFuture('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    function testNotFound(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testNotFound(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - not found`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 recordTime: moment().toISOString(), // avoid filtering
             });
             await insert(db, [timestamp]);
 
-            const foundTimestamp = await fn(db, timestamp);
+            const foundTimestamp = await fn(timestamp);
             expect(foundTimestamp.length).toBe(0);
         });
     }
 
-    testNotFound('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number + 1));
-    testNotFound('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number - 1));
-    testNotFound('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port + 'asdf'));
-    testNotFound('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.source + 'asdf'));
+    testNotFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number + 1));
+    testNotFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number - 1));
+    testNotFound('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port + 'asdf'));
+    testNotFound('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.source + 'asdf'));
 
 
-    function testNewest(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testNewest(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - multiple - only newest`, async () => {
             const timestamp = newTimestamp();
             const timestamp2Date = new Date();
@@ -110,51 +110,51 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
             };
             await insert(db, [timestamp, timestamp2]);
 
-            const foundTimestamp = await fn(db, timestamp);
+            const foundTimestamp = await fn(timestamp);
 
             expect(foundTimestamp.length).toBe(1);
             expect(moment(foundTimestamp[0].record_time).toISOString()).toBe(timestamp2.recordTime);
         });
     }
 
-    testNewest('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testNewest('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
-    testNewest('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testNewest('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testNewest('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testNewest('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testNewest('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testNewest('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    function testTooOld(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testTooOld(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - too old`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 eventTime: moment().subtract('13', 'days').toISOString(), // enable filtering
             });
             await insert(db, [timestamp]);
 
-            const foundTimestamp = await fn(db, timestamp);
+            const foundTimestamp = await fn(timestamp);
             expect(foundTimestamp.length).toBe(0);
         });
     }
 
-    testTooOld('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testTooOld('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
-    testTooOld('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testTooOld('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testTooOld('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testTooOld('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testTooOld('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testTooOld('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    function testTooFarInTheFuture(description: string, fn: (db: DTDatabase, timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+    function testTooFarInTheFuture(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
         test(`${description} - too far in the future`, async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 eventTime: moment().add('4', 'days').toISOString(), // enable filtering
             });
             await insert(db, [timestamp]);
 
-            const foundTimestamp = await fn(db, timestamp);
+            const foundTimestamp = await fn(timestamp);
             expect(foundTimestamp.length).toBe(0);
         });
     }
 
-    testTooFarInTheFuture('findByMmsi', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testTooFarInTheFuture('findByImo', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
-    testTooFarInTheFuture('findByLocode', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
-    testTooFarInTheFuture('findBySource', (db: DTDatabase, timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
+    testTooFarInTheFuture('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
+    testTooFarInTheFuture('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testTooFarInTheFuture('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
+    testTooFarInTheFuture('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
     test('findByMmsi - two sources', async () => {
         const mmsi = 123;
@@ -378,7 +378,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         expect(imo).toEqual(timestamp.ship.imo);
     });
 
-    async function createPortcall(timestamp: ApiTimestamp) {
+    function createPortcall(timestamp: ApiTimestamp) {
         return db.tx(t => {
             insertPortCall(t, newPortCall(timestamp));
             insertPortAreaDetails(t, newPortAreaDetails(timestamp));

@@ -5,6 +5,9 @@ import moment from "moment";
 import {EventSource} from "../model/eventsource";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 
+// camels
+/* eslint-disable camelcase */
+
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
 

@@ -88,8 +88,8 @@ export const SUBSCRIPTION_MESSAGE = {
     msgType: 'subscribe',
     parameters: [{
         eventType: 'zone-event',
-        countries: ['FI']
-    }]
+        countries: ['FI'],
+    }],
 };
 
 export class AwakeAiATXApi {
@@ -105,7 +105,7 @@ export class AwakeAiATXApi {
         this.WebSocketClass = WebSocketClass;
     }
 
-    async getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
+    getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
         const webSocket = new this.WebSocketClass(this.url + this.apiKey);
 
         webSocket.on('open', () => {
@@ -139,10 +139,10 @@ export class AwakeAiATXApi {
     }
 
     static createResumeMessage(subscriptionId: string): { msgType: string, resume: string } {
-        console.info('method=createResumeMessage Existing session found')
+        console.info('method=createResumeMessage Existing session found');
         return {
             msgType: 'subscribe',
-            resume: subscriptionId
+            resume: subscriptionId,
         };
     }
 }

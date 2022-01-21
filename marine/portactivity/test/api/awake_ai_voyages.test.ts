@@ -2,11 +2,11 @@ import {AwakeAiVoyagesApi, AwakeAiETAResponseType} from "../../lib/api/awake_ai_
 
 describe('api-awake_ai', () => {
 
-   test('handleError - no response', () => {
-       const ret = AwakeAiVoyagesApi.handleError({});
+    test('handleError - no response', () => {
+        const ret = AwakeAiVoyagesApi.handleError({});
 
-       expect(ret.type).toBe(AwakeAiETAResponseType.NO_RESPONSE);
-   });
+        expect(ret.type).toBe(AwakeAiETAResponseType.NO_RESPONSE);
+    });
 
     test('handleError - ship not found', () => {
         const ret = AwakeAiVoyagesApi.handleError({ response: { status: 404 } });

@@ -7,8 +7,8 @@ describe('epcmessage service', () => {
     test('createEpcMessageResponse', () => {
         const epcMessage: EpcMessage = {
             EPCMessageHeader: {
-                ShipMessageId: '1'
-            }
+                ShipMessageId: '1',
+            },
         };
         const dateStr = '2021-07-29T10:20:30Z';
         const date = moment(dateStr).toDate();
@@ -19,8 +19,8 @@ describe('epcmessage service', () => {
             EPCMessageHeader: {
                 SentTime: dateStr,
                 MessageType: 0,
-                Version: ''
-            }
+                Version: '',
+            },
         });
     });
 

@@ -88,6 +88,7 @@ export abstract class Command<T> {
 }
 
 class DefaultCommand extends Command<void> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public getResult(result: CommandResponse): void {
         // do nothing
     }

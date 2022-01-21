@@ -2,7 +2,6 @@ import {Model, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {default as FaultSchema} from './model/fault-schema';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
-import {MessageModel} from "digitraffic-common/aws/infra/api/response";
 import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
 import {addQueryParameterDescription, addTags} from "digitraffic-common/aws/infra/documentation";
 import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
@@ -35,8 +34,6 @@ function createAnnotationsResource(stack: DigitrafficStack, publicApi: RestApi, 
     const atonResource = apiResource.addResource("aton");
     const v1Resource = atonResource.addResource("v1");
     const resources = v1Resource.addResource("faults");
-
-    const errorResponseModel = publicApi.addModel('MessageResponseModel', MessageModel);
 
     const getFaultsIntegration = defaultIntegration(getFaultsLambda, {
         requestParameters: {

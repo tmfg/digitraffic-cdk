@@ -12,7 +12,7 @@ const secretId = process.env[ShiplightEnvKeys.SECRET_ID] as string;
 let visibilityApi: AreaVisibilityApi;
 let lightsApi: AreaLightsApi;
 
-export async function handlerFn(doWithSecret: SecretFunction<ShiplightSecret>,
+export function handlerFn(doWithSecret: SecretFunction<ShiplightSecret>,
     AreaVisibilityServiceClass: new (api: AreaVisibilityApi) => AreaVisibilityService,
     AreaLightsServiceClass: new (api: AreaLightsApi) => AreaLightsService): Promise<void> {
 
@@ -47,7 +47,7 @@ export async function handlerFn(doWithSecret: SecretFunction<ShiplightSecret>,
     });
 }
 
-export const handler = async (): Promise<void> => {
+export const handler = (): Promise<void> => {
     return handlerFn(withDbSecret, AreaVisibilityService, AreaLightsService);
 };
 

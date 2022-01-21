@@ -4,7 +4,9 @@ import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const crypto = require('crypto');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
@@ -14,8 +16,8 @@ const MessageGroupId = 'VPGW-MessageGroupId';
 
 export function handlerFn(sqs: SQS,
     doWithSecret: (secretId: string, fn: (secret: any) => any) => any): () => Promise<void> {
-    return async function(): Promise<void> {
-        return await doWithSecret(secretId, async (secret: any) => {
+    return function(): Promise<void> {
+        return doWithSecret(secretId, async (secret: any) => {
 
             const privateVisUrl = secret[VoyagePlanSecretKeys.PRIVATE_VIS_URL] as string;
             const appId = secret[VoyagePlanSecretKeys.APP_ID];

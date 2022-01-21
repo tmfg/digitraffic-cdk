@@ -1,12 +1,12 @@
-import * as pgPromise from "pg-promise";
 import {dbTestBase, insertDisruption} from "../db-testutil";
 import {newDisruption, someNumber} from "../testdata";
 import {DbDisruption} from "../../lib/db/disruptions";
 import * as DisruptionsDb from '../../lib/db/disruptions';
 import {Geometry} from "wkx";
 import {Geometry as GeoJSONGeometry} from "geojson";
+import {DTDatabase} from "digitraffic-common/database/database";
 
-describe('db-disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-disruptions', dbTestBase((db: DTDatabase) => {
 
     test('findAll', async () => {
         const disruptions = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
