@@ -20,7 +20,7 @@ export class SchedulesService {
         return this.doGetTimestamps(true);
     }
 
-    async doGetTimestamps(calculated: boolean) {
+    private async doGetTimestamps(calculated: boolean) {
         const timestampsEast = await this.api.getSchedulesTimestamps(SchedulesDirection.EAST, calculated);
         const timestampsWest = await this.api.getSchedulesTimestamps(SchedulesDirection.WEST, calculated);
         return this.filterTimestamps(this.schedulesToTimestamps(timestampsEast, calculated))
