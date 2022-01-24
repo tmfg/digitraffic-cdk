@@ -35,7 +35,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "*",
-    "amazon-cognito-identity-js": "^4.6.0",
+    "amazon-cognito-identity-js": "5.2.4",
     "aws-sdk": "*",
     "axios": "^0.21.1",
     "axios-retry": "^3.2.0",
