@@ -6,7 +6,7 @@ import {EventSource} from "../model/eventsource";
 
 export class SchedulesService {
 
-    private readonly api: SchedulesApi
+    private readonly api: SchedulesApi;
 
     constructor(api: SchedulesApi) {
         this.api = api;

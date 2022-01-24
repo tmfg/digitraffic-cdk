@@ -8,7 +8,7 @@ import {AwakeAiZoneType} from "../api/awake_common";
 
 export class AwakeAiATXService {
 
-    private readonly api: AwakeAiATXApi
+    private readonly api: AwakeAiATXApi;
 
     constructor(api: AwakeAiATXApi) {
         this.api = api;
@@ -16,7 +16,7 @@ export class AwakeAiATXService {
 
     async getATXs(timeoutMillis: number): Promise<ApiTimestamp[]> {
         const atxs = await this.api.getATXs(timeoutMillis);
-        return inDatabase(async (db: DTDatabase) => {
+        return inDatabase( (db: DTDatabase) => {
             const promises = atxs
                 .filter(atx => atx.zoneType === AwakeAiZoneType.BERTH)
                 .map(async (atx: AwakeAIATXTimestampMessage) => {

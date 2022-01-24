@@ -5,9 +5,8 @@ import * as LocationConverter from './location-converter';
 
 import {ApiTimestamp, EventType, Location} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
-import {inDatabase} from "digitraffic-common/database/database";
+import {inDatabase, DTDatabase} from "digitraffic-common/database/database";
 import {EventSource} from "../model/eventsource";
-import {DTDatabase} from "digitraffic-common/database/database";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
     const message = await PilotwebAPI.getMessages(host, authHeader);
@@ -87,14 +86,14 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
     }))).filter(x => x != null) as ApiTimestamp[];
 }
 
-async function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | null> {
+function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | null> {
     if (p.portnetPortCallId) {
-        return p.portnetPortCallId;
+        return Promise.resolve(p.portnetPortCallId);
     }
 
     console.info("no portcallid from pilotage %d", p.id);
 
-    return await PilotagesDAO.findPortCallId(db, p, location);
+    return PilotagesDAO.findPortCallId(db, p, location);
 }
 
 function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | null {
@@ -156,7 +155,7 @@ function findNewAndUpdated(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage
 }
 
 function findRemoved(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage[]): number[] {
-    const pilotageMap = {} as any;
+    const pilotageMap = {} as Record<number, Pilotage>;
     const removed = [] as number[];
 
     // construct id-map from pilotages(id -> pilotage)
