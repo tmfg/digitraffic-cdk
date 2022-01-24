@@ -1,4 +1,2 @@
-export type DbUserType = {
-    readonly id: number;
-    readonly name: string;
-};
+export type ResultUserTypes = Record<number, string>;
+

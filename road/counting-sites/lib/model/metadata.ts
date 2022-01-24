@@ -1,73 +1,53 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from 'aws-cdk-lib/aws-apigateway';
 
-import {DbUserType} from "./usertype";
-import {ResultDomain} from "./domain";
-
-export type MetadataResponse = {
-    lastUpdated: Date | null;
-    domains: ResultDomain[];
-    userTypes: DbUserType[];
-    directions: Record<string, string>;
-};
-
-export const metadataProperties: JsonSchema = {
+export const domainsProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Counting Sites Metadata',
+    description: 'Counting Sites Domain',
     properties: {
-        lastUpdated: {
+        name: {
+            type: JsonSchemaType.STRING,
+            format: "string",
+            description: 'Domain name',
+        },
+        description: {
+            type: JsonSchemaType.STRING,
+            format: "string",
+            description: 'Domain description',
+        },
+        addedTimestamp: {
             type: JsonSchemaType.STRING,
             format: "date-time",
-            description: 'Metadate last updated',
+            description: 'Domain added',
         },
-        domains: {
-            type: JsonSchemaType.ARRAY,
-            title: "Counting Site domains",
-            items: {
-                type: JsonSchemaType.OBJECT,
-                properties: {
-                    name: {
-                        type: JsonSchemaType.STRING,
-                        format: "string",
-                        description: 'Domain name',
-                    },
-                    description: {
-                        type: JsonSchemaType.STRING,
-                        format: "string",
-                        description: 'Domain description',
-                    },
-                    addedTimestamp: {
-                        type: JsonSchemaType.STRING,
-                        format: "date-time",
-                        description: 'Domain added',
-                    },
-                    removedTimestamp: {
-                        type: JsonSchemaType.STRING,
-                        format: "date-time",
-                        description: 'Domain removed',
-                    },
-                },
-            },
+        removedTimestamp: {
+            type: JsonSchemaType.STRING,
+            format: "date-time",
+            description: 'Domain removed',
         },
-        userTypes: {
-            type: JsonSchemaType.OBJECT,
-            title: "Counting Site user types",
-            patternProperties: {
-                ".*": {
-                    type: JsonSchemaType.STRING,
-                    description: 'User type description',
-                },
-            },
+    },
+};
+
+export const userTypesProperties: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT4,
+    type: JsonSchemaType.OBJECT,
+    description: 'Counting Sites Usertype',
+    patternProperties: {
+        ".*": {
+            type: JsonSchemaType.STRING,
+            description: 'User type description',
         },
-        directions: {
-            type: JsonSchemaType.OBJECT,
-            title: "Counting Site directions",
-            patternProperties: {
-                ".*": {
-                    type: JsonSchemaType.STRING,
-                    description: 'Direction description',
-                },
-            },
+    },
+};
+
+export const directionProperties: JsonSchema = {
+    schema: JsonSchemaVersion.DRAFT4,
+    type: JsonSchemaType.OBJECT,
+    description: 'Counting Sites Directions',
+    patternProperties: {
+        ".*": {
+            type: JsonSchemaType.STRING,
+            description: 'Direction description',
         },
     },
 };

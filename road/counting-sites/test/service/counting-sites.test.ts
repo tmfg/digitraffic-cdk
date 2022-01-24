@@ -6,16 +6,13 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
     const DOMAIN1 = 'DOMAIN1';
     const DOMAIN2 = 'DOMAIN2';
 
-    test('getMadata - empty', async () => {
-        const metadata = await CountingSitesService.getMetadata();
+    test('getDomains - empty', async () => {
+        const domains = await CountingSitesService.getDomains();
 
-        expect(metadata.domains).toHaveLength(0);
-        expect(Object.keys(metadata.userTypes)).toHaveLength(11);
-        expect(Object.keys(metadata.directions)).toHaveLength(3);
-        expect(metadata.lastUpdated).toBeNull();
+        expect(domains).toHaveLength(0);
     });
 
-    test('getMetadata - two domains', async () => {
+    test('getDomains - two domains', async () => {
         const now = new Date();
         now.setMilliseconds(0);
 
@@ -24,13 +21,17 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
         await insertCounter(db, 1, DOMAIN1, 1);
         await insertLastUpdated(db, 1, now);
 
-        const metadata = await CountingSitesService.getMetadata();
+        const domains = await CountingSitesService.getDomains();
 
-        expect(metadata.domains).toHaveLength(2);
-        expect(metadata.domains[0].name).toEqual(DOMAIN1);
-        expect(metadata.domains[1].name).toEqual(DOMAIN2);
-        expect(metadata.lastUpdated).toEqual(now);
-        expect(Object.keys(metadata.userTypes)).toHaveLength(11);
+        expect(domains).toHaveLength(2);
+        expect(domains[0].name).toEqual(DOMAIN1);
+        expect(domains[1].name).toEqual(DOMAIN2);
+    });
+
+    test('getUserTypes', async () => {
+        const userTypes = await CountingSitesService.getUserTypes();
+
+        expect(Object.keys(userTypes)).toHaveLength(11);
     });
 
     test('getCountersForDomain - empty', async () => {

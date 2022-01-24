@@ -1,24 +1,28 @@
 import * as CounterDb from "../db/counter";
 import * as DataDb from "../db/data";
-import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import * as MetadataDB from "../db/metadata";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
-import {DbDomain} from "../model/domain";
+import {ResultDomain} from "../model/domain";
 import {DbCsvData, ResponseData} from "../model/data";
 import {FeatureCollection} from "geojson";
-import {DbUserType} from "../model/usertype";
-import {MetadataResponse} from "../model/metadata";
 import {createObjectCsvStringifier} from 'csv-writer';
 import * as R from 'ramda';
 
-export function getMetadata(): Promise<MetadataResponse> {
+export function getUserTypes() {
     return inDatabaseReadonly(async (db: DTDatabase) => {
-        const domains = await MetadataDB.findAllDomains(db);
-        const userTypes = await MetadataDB.findAllUserTypes(db);
-        const lastUpdated = await LastUpdatedDB.getLastUpdated(db, LastUpdatedDB.DataType.COUNTING_SITES_DATA);
-
-        return createResponse(domains, userTypes, lastUpdated);
+        return MetadataDB.findAllUserTypes(db);
     });
+}
+
+export function getDomains() {
+    return inDatabaseReadonly(async (db: DTDatabase) => {
+        return MetadataDB.findAllDomains(db);
+    }).then(domains => domains.map(d => ({
+        name: d.name,
+        description: d.description,
+        addedTimestamp: d.added_timestamp,
+        removedTimestamp: d.removed_timestamp,
+    })) as ResultDomain[]);
 }
 
 export function getCsvData(year: number, month: number, domainName: string, counterId: string): Promise<string> {
@@ -73,22 +77,4 @@ export function getCountersForDomain(domain: string): Promise<FeatureCollection>
     return inDatabaseReadonly((db: DTDatabase) => {
         return CounterDb.findAllCountersForDomain(db, domain);
     });
-}
-
-function createResponse(domains: DbDomain[], userTypes: DbUserType[], lastUpdated: Date|null): MetadataResponse {
-    return {
-        lastUpdated,
-        domains: domains.map(d => ({
-            name: d.name,
-            description: d.description,
-            addedTimestamp: d.added_timestamp,
-            removedTimestamp: d.removed_timestamp,
-        })),
-        userTypes,
-        directions: {
-            "1": "in",
-            "2": "out",
-            "5": "no direction",
-        },
-    };
 }
