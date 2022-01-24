@@ -15,11 +15,37 @@ export type S124Member = {
         },
         id: string,
         geometry: any,
+        Subject?: {
+            text: string,
+        },
         header: {
             '$': {
                 'owns': string,
             },
         },
+    },
+}
+
+export type S124MessageSeriesIdentifier = {
+    NameOfSeries: string,
+    typeOfWarning : string,
+    warningNumber : number,
+    year : number,
+    productionAgency: {
+        language: string,
+        text: string,
+    },
+    country: string,
+}
+
+export type S124FixedDateRange = {
+    timeOfDayStart?: string,
+    timeOfDayEnd?: string,
+    dateStart: {
+        date: string,
+    },
+    dateEnd?: {
+        date: string,
     },
 }
 
@@ -29,7 +55,7 @@ export type S124IMember = {
             'gml:id' : string,
         },
         id: string,
-        messageSeriesIdentifier : any,
+        messageSeriesIdentifier : S124MessageSeriesIdentifier,
         sourceDate: string,
         generalArea: string,
         locality : {
@@ -38,7 +64,7 @@ export type S124IMember = {
         title:  {
             text : string,
         },
-        fixedDateRange : any,
+        fixedDateRange? : S124FixedDateRange,
         theWarningPart: {
             '$': {
                 'xlink:href': string,
