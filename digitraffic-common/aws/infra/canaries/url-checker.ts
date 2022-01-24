@@ -1,6 +1,6 @@
 import {constants} from "http2";
 import {IncomingMessage, RequestOptions} from "http";
-import * as Assert from "digitraffic-common/test/asserter";
+import {Asserter} from "digitraffic-common/test/asserter";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
@@ -259,8 +259,8 @@ export class ContentTypeChecker {
 export class GeoJsonChecker {
     static validFeatureCollection(fn?: (json: FeatureCollection) => void): CheckerFunction {
         return ResponseChecker.forGeojson().checkJson((json: FeatureCollection) => {
-            Assert.assertEquals(json.type, 'FeatureCollection');
-            Assert.assertTrue(isValidGeoJson(json));
+            Asserter.assertEquals(json.type, 'FeatureCollection');
+            Asserter.assertTrue(isValidGeoJson(json));
 
             if (fn) {
                 fn(json);

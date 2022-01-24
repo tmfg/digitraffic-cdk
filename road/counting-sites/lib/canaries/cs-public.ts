@@ -6,7 +6,7 @@ import {
     UrlChecker,
 } from "digitraffic-common/aws/infra/canaries/url-checker";
 import {DbData} from "../model/data";
-import * as Assert from "digitraffic-common/test/asserter";
+import {Asserter} from "digitraffic-common/test/asserter";
 import {constants} from "http2";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {ResultDomain} from "../model/domain";
@@ -29,7 +29,7 @@ export const handler = async () => {
     await checker.expect200(USERTYPES_URL,
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
         ContentChecker.checkJson((userTypes: ResultUserTypes) => {
-            Assert.assertLengthGreaterThan(Object.keys(userTypes), 1);
+            Asserter.assertLengthGreaterThan(Object.keys(userTypes), 1);
         }));
 
     // check domains
@@ -37,7 +37,7 @@ export const handler = async () => {
     await checker.expect200(DOMAINS_URL,
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
         ContentChecker.checkJson((domains: ResultDomain[]) => {
-            Assert.assertLengthGreaterThan(domains, 1);
+            Asserter.assertLengthGreaterThan(domains, 1);
         }));
 
     // check directions
@@ -45,7 +45,7 @@ export const handler = async () => {
     await checker.expect200(DIRECTIONS_URL,
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
         ContentChecker.checkJson((directions: Record<number, string>) => {
-            Assert.assertLength(Object.keys(directions), 3);
+            Asserter.assertLength(Object.keys(directions), 3);
         }));
 
     // json values
@@ -55,7 +55,7 @@ export const handler = async () => {
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
         HeaderChecker.checkHeaderMissing(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
         ContentChecker.checkJson((json: DbData[]) => {
-            Assert.assertLengthGreaterThan(json, 10);
+            Asserter.assertLengthGreaterThan(json, 10);
         }));
 
     // counters
@@ -71,11 +71,11 @@ export const handler = async () => {
         ContentTypeChecker.checkContentType(MediaType.TEXT_CSV),
         HeaderChecker.checkHeaderExists(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
         ContentChecker.checkResponse(body => {
-            Assert.assertLengthGreaterThan(body.split('\n'), 10);
+            Asserter.assertLengthGreaterThan(body.split('\n'), 10);
         }));
 
     await checker.expect200(CSV_URL + "/2022/01?counterId=-21", ContentChecker.checkResponse(body => {
-        Assert.assertLength(body.split('\n'), 0); // just header
+        Asserter.assertLength(body.split('\n'), 0); // just header
     }));
 
     return checker.done();
