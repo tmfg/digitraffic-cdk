@@ -118,7 +118,7 @@ export class NodePingApi {
             label: endpoint.includes(appName) ? endpoint : `${appName} ${endpoint}`,
             type: extraData?.protocol === EndpointProtocol.WebSocket ? 'WEBSOCKET' : 'HTTPADV',
             target: extraData?.url ?? `https://${app}.digitraffic.fi${endpoint}`,
-            interval: 5,
+            interval: this.checkInterval,
             threshold: this.checkTimeoutSeconds,
             enabled: true,
             follow: true,
