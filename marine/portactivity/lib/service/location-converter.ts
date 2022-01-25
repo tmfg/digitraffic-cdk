@@ -51,6 +51,9 @@ function initMap() {
 
     pilotwebToPortnetLocodeMap.FIEUR = 'FIEJO';
     pilotwebToPortnetLocodeMap.FIOLK = 'FIEJO';
+
+    pilotwebToPortnetLocodeMap.FIKEA = 'FIKEM';
+    pilotwebToPortnetLocodeMap.FIKEV = 'FIKEM';
 }
 
 export function convertLocation(route: PilotageRoute): Location {
