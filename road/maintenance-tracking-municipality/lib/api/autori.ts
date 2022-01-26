@@ -21,6 +21,7 @@ export class AutoriApi {
         this.username = username;
         this.password = password;
         this.endpointUrl = endpointUrl;
+        console.info(`AutoriApi using endpointUrl ${endpointUrl}`);
     }
 
     /**
@@ -32,7 +33,7 @@ export class AutoriApi {
         const start = Date.now();
         const serverUrl = `${this.endpointUrl}${url}`;
 
-        console.info(`method=${method} Sending to url ${serverUrl}`);
+        // console.info(`method=${method} Sending to url ${serverUrl}`);
 
         try {
             const resp : AxiosResponse = await axios.get(serverUrl, {
@@ -47,7 +48,7 @@ export class AutoriApi {
                 },
             });
             if (resp.status !== 200) {
-                console.error(`method=${method} returned status=${resp.status} data=${resp.data}`);
+                console.error(`method=${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`);
                 return Promise.reject();
             }
             return resp.data;
@@ -67,7 +68,7 @@ export class AutoriApi {
             }
             return Promise.reject();
         } finally {
-            console.info(`method=${method} tookMs=${Date.now() - start}`);
+            console.info(`method=${method} tookMs=${Date.now() - start} for ${serverUrl}`);
         }
     }
 
@@ -93,11 +94,10 @@ export class AutoriApi {
                 console.info(`method=getNextRouteDataForContract No new data for contract ${contract}`);
                 return [];
             }
-            const newFrom = moment(to).subtract(1, 'ms');
-            return this.getNextRouteDataForContract(contract, newFrom.toDate(), periodHours);
+            const nextFrom = moment(to).subtract(1, 'ms');
+            return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodHours);
         }
         return data;
-
     }
 
     /**
@@ -109,7 +109,17 @@ export class AutoriApi {
     async getRouteDataForContract(contract: string, from: Date, to: Date): Promise<ApiRouteData[]> {
         const fromString = from.toISOString(); // With milliseconds Z-time
         const toString = to.toISOString();
-        console.info(`method=getRouteDataForContract ${contract} from=%s to=%s`, fromString, toString);
-        return this.getFromServer(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`);
+        // console.info(`method=getRouteDataForContract ${contract} from=%s to=%s`, fromString, toString);
+        // const routeData : Promise<ApiRouteData[]> = this.getFromServer(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`)
+        //     .then();
+        // return routeData;
+        const start = Date.now();
+        return this.getFromServer(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`)
+            .then(response => {
+                const end = Date.now();
+                const routeData = response as ApiRouteData[];
+                console.info(`method=getRouteDataForContract ${contract} from: ${fromString} to: ${toString} data count=${routeData.length} tookMs=${end-start}`, fromString, toString);
+                return routeData;
+            });
     }
 }

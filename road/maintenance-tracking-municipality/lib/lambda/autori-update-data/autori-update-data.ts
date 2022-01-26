@@ -12,7 +12,7 @@ const domainPrefix = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_P
 export const handler = async (): Promise<void> => {
     const start = Date.now();
 
-    const secret = await getSecret<MaintenanceTrackingMunicipalitySecret>(secretId);
+    const secret = await getSecret<MaintenanceTrackingMunicipalitySecret>(secretId, domainPrefix);
     const autoriApi = new AutoriApi(secret.username, secret.password, secret.url);
     const autoriUpdateService = new AutoriUpdate(autoriApi);
 
@@ -34,10 +34,9 @@ export const handler = async (): Promise<void> => {
         }, {
             prefix: domainPrefix,
         }) as TrackingSaveResult;
-        console.info(`method=autoriUpdateData saved: ${savedResult.saved} and errors: ${savedResult.errors} tookMs=`);
-        console.info(`method=updateData.${domainName} saved: ${savedResult.saved} and errors: ${savedResult.errors} tookMs=${(Date.now()-start)}`);
+        console.info(`method=autoriUpdateData saved: ${savedResult.saved} and errors: ${savedResult.errors} tookMs=${(Date.now()-start)}`);
     } catch (error) {
-        console.error('method=updateData upsertWorkMachine failed', error);
+        console.error('method=autoriUpdateData upsertWorkMachine failed', error);
         throw error;
     }
 };

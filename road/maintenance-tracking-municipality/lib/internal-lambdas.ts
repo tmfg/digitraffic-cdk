@@ -8,7 +8,7 @@ export class InternalLambdas {
     constructor(stack: DigitrafficStack) {
 
         const updateDataForAutoriOuluLambda = this.createUpdateDataLambdaForAutoriOulu(stack);
-        Scheduler.everyMinutes(stack, 'RuleForDataUpdate', 10, updateDataForAutoriOuluLambda);
+        Scheduler.everyMinutes(stack, 'MaintenanceTrackingMunicipalityAutoriOuluDataUpdate', 10, updateDataForAutoriOuluLambda);
 
         new DigitrafficLogSubscriptions(stack, updateDataForAutoriOuluLambda);
         stack.grantSecret(updateDataForAutoriOuluLambda);
@@ -21,9 +21,10 @@ export class InternalLambdas {
         environment[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] = domain;
         environment[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX] = 'mt.municipality.autori-oulu';
 
-        return MonitoredFunction.createV2(stack, 'update-data', environment, {
+        return MonitoredFunction.createV2(stack, 'autori-update-data', environment, {
             functionName: stack.configuration.shortName + '-' + domain,
             memorySize: 256,
+            singleLambda: true,
         });
     }
 }

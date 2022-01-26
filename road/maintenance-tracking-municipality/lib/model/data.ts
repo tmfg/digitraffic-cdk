@@ -15,7 +15,7 @@ export type ApiRouteData = {
     readonly id: string,
     readonly startTime: Date,
     readonly endTime: Date,
-    readonly operations: [string]
+    readonly operations: string[]
 }
 
 export type ApiOperationData = {
@@ -39,17 +39,11 @@ export type DbMaintenanceTracking = {
     readonly endTime: Date
     readonly direction: number | undefined
     readonly finished: boolean
-    readonly municipalityDomain: string
+    readonly domain: string
+    readonly contract: string
     readonly municipalityMessageOriginalId: string
-    readonly tasks: [string]
+    readonly tasks: string[]
 }
-
-// // TODO unused?
-// export type TaskMapping = {
-//     readonly harjaTask: string
-//     readonly externalTask: string
-//     readonly ignore: boolean
-// }
 
 export type DbNumberId = {
     readonly id : number
@@ -63,7 +57,7 @@ export type DbDomainContract = {
     readonly domain : string
     readonly contract: string
     readonly name: string
-    readonly copyright: string | undefined,
+    readonly source: string | undefined,
     readonly start_date: Date,
     readonly end_date: Date,
     readonly data_last_updated: Date | undefined,

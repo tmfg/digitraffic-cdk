@@ -5,15 +5,15 @@ import {DTDatabase} from "digitraffic-common/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
-        fn, truncate, 'road', 'road', 'docker.local:54322/road',
+        fn, truncate, 'road', 'road', 'localhost:54322/road',
     );
 }
 
-async function truncate(db: DTDatabase): Promise<void> {
-    return await db.tx(async t => {
+function truncate(db: DTDatabase): Promise<void> {
+    return db.tx(async t => {
         // await t.none('DELETE FROM maintenance_tracking_task');
         // await t.none('DELETE FROM maintenance_tracking');
-        // await t.none('DELETE FROM data_updated');
+        await t.none('DELETE FROM data_updated');
     });
 }
 
@@ -52,9 +52,9 @@ export function insertLastUpdated(db: DTDatabase, id: number, updated: Date): Pr
 export async function withServer(port: number, url: string, response: string, fn: ((server: TestHttpServer) => void)): Promise<void> {
     const server = new TestHttpServer();
 
-    const props: any = {};
-
-    props[url] = () => response;
+    const props = {
+        [url]: () => response,
+    };
 
     server.listen(port, props, false);
 

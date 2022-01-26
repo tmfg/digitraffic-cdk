@@ -6,9 +6,11 @@ import {
     DbDomainTaskMapping,
     DbWorkMachine,
 } from "../model/data";
-import {DTDatabase, DTTransaction, inTransaction} from "digitraffic-common/database/database";
+import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 
 const SRID = 4326; // WGS84
+
+
 
 const SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT =
     `INSERT INTO maintenance_tracking_domain_contract(domain, contract, name, start_date, end_date, data_last_updated)
@@ -26,63 +28,6 @@ const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT = new PreparedStatement({
     text: SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT,
 });
 
-const SQL_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED =
-    `UPDATE maintenance_tracking_domain_contract
-     UPDATE SET data_last_updated = $3
-     WHERE domain = $1
-       AND contract = $2
-       AND coalesce(data_last_updated, timestamp '1970-01-01T00:00:00Z') < $3`;
-
-const PS_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED = new PreparedStatement({
-    name: 'UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED',
-    text: SQL_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED,
-});
-
-
-const SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING =
-    `INSERT INTO maintenance_tracking_domain_task_mapping (name, original_id, domain, ignore)
-     VALUES ($1, $2, $3, $4)
-     ON CONFLICT(domain, original_id)
-     DO NOTHING
-     returning original_id`;
-
-const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING = new PreparedStatement({
-    name: 'UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING',
-    text: SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING,
-});
-
-
-
-const SQL_UPSERT_MAINTENANCE_TRACKING =
-    `INSERT INTO maintenance_tracking(id, sending_system, sending_time, last_point, line_string, work_machine_id, start_time, end_time, direction, finished, domain, message_original_id)
-     VALUES (NEXTVAL('seq_maintenance_tracking'), $1, $2, ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID})), ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID})), $5, $6, $7, $8, $9, $10, $11)
-     RETURNING ID`;
-// ON CONFLICT(domain, message_original_id)
-// WHERE (domain is not null) DO
-// UPDATE SET sending_system = $1,
-//            sending_time = $2,
-//            last_point = ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID})),
-//            line_string = ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID})),
-//            work_machine_id = $5,
-//            start_time = $6,
-//            end_time = $7,
-//            direction = $8,
-//            finished = $9`;
-
-const SQL_INSERT_MAINTENANCE_TRACKING_TASK =
-    `INSERT INTO maintenance_tracking_task(maintenance_tracking_id, task)
-     VALUES ($1, $2)`;
-
-const PS_UPSERT_MAINTENANCE_TRACKING = new PreparedStatement({
-    name: 'UPSERT_MAINTENANCE_TRACKING',
-    text: SQL_UPSERT_MAINTENANCE_TRACKING,
-});
-
-const PS_INSERT_MAINTENANCE_TRACKING_TASK = new PreparedStatement({
-    name: 'INSERT_MAINTENANCE_TRACKING_TASK',
-    text: SQL_INSERT_MAINTENANCE_TRACKING_TASK,
-});
-
 export function upsertContracts(db: DTDatabase, dbContracts: DbDomainContract[]) : Promise<DbTextId[]> {
     try {
         return db.tx(t => {
@@ -97,6 +42,20 @@ export function upsertContracts(db: DTDatabase, dbContracts: DbDomainContract[])
     }
 }
 
+
+
+const SQL_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED =
+    `UPDATE maintenance_tracking_domain_contract
+     UPDATE SET data_last_updated = $3
+     WHERE domain = $1
+       AND contract = $2
+       AND coalesce(data_last_updated, timestamp '1970-01-01T00:00:00Z') < $3`;
+
+const PS_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED = new PreparedStatement({
+    name: 'UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED',
+    text: SQL_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED,
+});
+
 export function updateContractLastUpdated(db: DTTransaction, domain: string, contract: string, lastUpdated : Date) : Promise<null> {
     try {
         return db.none(PS_UPDATE_MAINTENANCE_TRACKING_DOMAIN_CONTRACT_DATA_LAST_UPDATED,
@@ -106,6 +65,20 @@ export function updateContractLastUpdated(db: DTTransaction, domain: string, con
         throw e;
     }
 }
+
+
+
+const SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING =
+    `INSERT INTO maintenance_tracking_domain_task_mapping (name, original_id, domain, ignore)
+     VALUES ($1, $2, $3, $4)
+     ON CONFLICT(domain, original_id)
+     DO NOTHING
+     returning original_id`;
+
+const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING = new PreparedStatement({
+    name: 'UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING',
+    text: SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING,
+});
 
 export function insertNewTasks(db: DTDatabase, dbTaskMapping: DbDomainTaskMapping[]) : Promise<DbTextId[]> {
     return db.tx(t => {
@@ -117,12 +90,48 @@ export function insertNewTasks(db: DTDatabase, dbTaskMapping: DbDomainTaskMappin
     });
 }
 
+
+
+const SQL_UPSERT_MAINTENANCE_TRACKING =
+    `INSERT INTO maintenance_tracking(id, sending_system, sending_time, last_point, line_string, work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id)
+     VALUES (NEXTVAL('seq_maintenance_tracking'), $1, $2, ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID})), ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID})), $5, $6, $7, $8, $9, $10, $11, $12)
+     RETURNING ID`;
+// Might come in use in future
+// ON CONFLICT(domain, message_original_id)
+// WHERE (domain is not null) DO
+// UPDATE SET sending_system = $1,
+//            sending_time = $2,
+//            last_point = ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID})),
+//            line_string = ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID})),
+//            work_machine_id = $5,
+//            start_time = $6,
+//            end_time = $7,
+//            direction = $8,
+//            finished = $9`;
+
+const PS_UPSERT_MAINTENANCE_TRACKING = new PreparedStatement({
+    name: 'UPSERT_MAINTENANCE_TRACKING',
+    text: SQL_UPSERT_MAINTENANCE_TRACKING,
+});
+
+
+
+const SQL_INSERT_MAINTENANCE_TRACKING_TASK =
+    `INSERT INTO maintenance_tracking_task(maintenance_tracking_id, task)
+     VALUES ($1, $2)`;
+
+
+const PS_INSERT_MAINTENANCE_TRACKING_TASK = new PreparedStatement({
+    name: 'INSERT_MAINTENANCE_TRACKING_TASK',
+    text: SQL_INSERT_MAINTENANCE_TRACKING_TASK,
+});
+
 export function upsertMaintenanceTracking(db: DTTransaction, data: DbMaintenanceTracking[]) {
     return Promise.all(data.map(async d => {
 
         console.info("method=upsertMaintenanceTracking INSERT: " + JSON.stringify(d));
         const mtId: DbNumberId = await db.one(PS_UPSERT_MAINTENANCE_TRACKING,
-            [d.sendingSystem, d.sendingTime, d.lastPoint, d.lineString, d.workMachineId, d.startTime, d.endTime, d.direction, d.finished, d.municipalityDomain, d.municipalityMessageOriginalId])
+            [d.sendingSystem, d.sendingTime, d.lastPoint, d.lineString, d.workMachineId, d.startTime, d.endTime, d.direction, d.finished, d.domain, d.contract, d.municipalityMessageOriginalId])
             .catch((error) => {
                 console.error('method=upsertMaintenanceTracking failed', error);
                 throw error;
@@ -138,6 +147,8 @@ export function upsertMaintenanceTracking(db: DTTransaction, data: DbMaintenance
         }));
     }));
 }
+
+
 
 const SQL_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE =
     `INSERT INTO maintenance_tracking_work_machine(id, harja_id, harja_urakka_id, type)
@@ -155,25 +166,27 @@ export function upsertWorkMachine(db: DTTransaction, data: DbWorkMachine) : Prom
     return db.one(PS_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE , [data.harjaId, data.harjaUrakkaId, data.type]);
 }
 
-const SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_COPYRIGHT = `
+
+
+const SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_SOURCE = `
     SELECT c.domain,
            c.contract,
            c.name,
-           c.copyright,
+           c.source,
            c.start_date, 
            c.end_date, 
            c.data_last_updated
     FROM maintenance_tracking_domain_contract c 
     WHERE c.domain = $1
-      AND copyright is not null`;
+      AND source is not null`;
 
-const PS_GET_CONTRACTS_WITH_COPYRIGHT = new PreparedStatement({
-    name: 'GET_MAINTENANCE_T_MUNICIPALITY_DOMAIN_CONTRACTS_WITH_COPYRIGHT',
-    text: SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_COPYRIGHT,
+const PS_GET_CONTRACTS_WITH_SOURCE = new PreparedStatement({
+    name: 'GET_MAINTENANCE_T_MUNICIPALITY_DOMAIN_CONTRACTS_WITH_SOURCE',
+    text: SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_SOURCE,
 });
 
-export function getContractsWithCopyright(domainName: string, db: DTDatabase): Promise<DbDomainContract[]> {
-    return db.manyOrNone(PS_GET_CONTRACTS_WITH_COPYRIGHT, [domainName]);
+export function getContractsWithSource(domainName: string, db: DTDatabase): Promise<DbDomainContract[]> {
+    return db.manyOrNone(PS_GET_CONTRACTS_WITH_SOURCE, [domainName]);
 }
 
 const SQL_GET_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPINGS = `

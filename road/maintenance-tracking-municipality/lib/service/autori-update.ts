@@ -3,7 +3,6 @@ import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/dat
 import {AutoriApi} from "../api/autori";
 import moment from "moment";
 import {Point} from "geojson";
-const crypto = require('crypto');
 import {
     ApiContractData,
     ApiOperationData,
@@ -12,6 +11,7 @@ import {
     DbDomainContract, DbDomainTaskMapping,
     DbWorkMachine, DbTextId,
 } from "../model/data";
+import {createHarjaId} from "./utils";
 
 const UNKNOWN_TASK_NAME = 'UNKNOWN';
 
@@ -41,7 +41,7 @@ export class AutoriUpdate {
         const dbIds: DbTextId[] = await inDatabase(async (db: DTDatabase) => {
             return await DataDb.upsertContracts(db, dbContracts);
         });
-        console.info(`method=updateContracts Insert return value: ${JSON.stringify(dbIds)}`);
+        console.info(`method=updateContracts domain=${domainName} Insert return value: ${JSON.stringify(dbIds)}`);
         // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
         return dbIds.filter(id => id != null).length;
     }
@@ -65,7 +65,7 @@ export class AutoriUpdate {
         const dbIds: DbTextId[] = await inDatabase(async (db: DTDatabase) => {
             return await DataDb.insertNewTasks(db, taskMappings);
         });
-        console.info(`method=updateTasks Insert return value: ${JSON.stringify(dbIds)}`);
+        console.info(`method=updateTasks domain=${domainName} Insert return value: ${JSON.stringify(dbIds)}`);
         // Returns array [{"original_id":89},null,null,{"original_id":90}] -> nulls are conflicting ones not inserted
         return dbIds.filter(dbId => dbId && dbId.id != null).length;
     }
@@ -81,39 +81,47 @@ export class AutoriUpdate {
     // export async function updateData(username: string, password: string, endpointUrl: string, domainName: string): Promise<TrackingSaveResult> {
     async updateTrackings(domainName: string): Promise<TrackingSaveResult> {
 
-        const saved = 0;
+        let saved = 0;
         let errors = 0;
 
         try {
             const contracts: DbDomainContract[] = await inDatabaseReadonly(async (db: DTDatabase) => {
-                return await DataDb.getContractsWithCopyright(domainName, db);
+                return await DataDb.getContractsWithSource(domainName, db);
             });
-            console.info(`methood=updateData contracts: ${JSON.stringify(contracts)}`);
+            console.info(`methood=updateTrackings domain=${domainName} contracts: ${JSON.stringify(contracts)}`);
 
             const taskMappings: DbDomainTaskMapping[] = await inDatabaseReadonly(async (db: DTDatabase) => {
                 return await DataDb.getTaskMappings(domainName, db);
             });
 
-            console.info(`methood=updateData taskMappings: ${JSON.stringify(taskMappings)}`);
+            console.info(`methood=updateTrackings taskMappings: ${JSON.stringify(taskMappings)}`);
 
             await Promise.allSettled(contracts.map(async (contract: DbDomainContract) => {
-                console.info(`method=updateData for contract=${contract.contract}`);
+                console.info(`method=updateTrackings for domain=${domainName} contract=${contract.contract}`);
 
                 let start = this.resolveContractLastUpdateTime( contract );
+                console.info(`resolveContractLastUpdateTime: domain=${domainName} contract=${contract.contract} ${start.toISOString()}`);
                 let routeData: ApiRouteData[] = [];
                 do {
-                    console.info(`methood=updateData getNextRouteDataForContract from ${start.toISOString()}`);
+                    console.info(`methood=updateTrackings domain=${domainName} contract=${contract.contract} getNextRouteDataForContract from ${start.toISOString()}`);
                     routeData = await this.api.getNextRouteDataForContract(contract.contract, start, 24);
+                    console.info(`routeData.length ${routeData.length}`);
                     if (routeData.length > 0) {
-                        await this.updateRoutes(contract, routeData, taskMappings);
+                        const  result = await this.updateRoutes(contract, routeData, taskMappings);
+                        saved += result.saved;
+                        errors += result.errors;
                         start = this.getLatestUpdatedDateForRouteData(routeData);
+                        console.info(`getLatestUpdatedDateForRouteData: domain=${domainName} contract=${contract.contract} ${start.toISOString()}`);
+                    } else {
+                        console.info(`methood=updateTrackings No new data for contract=${contract} after ${start.toISOString()}`);
                     }
+
                 } while (routeData.length > 0);
             }));
 
         } catch (error) {
             errors++;
-            console.error("method=updateData Failed for all contracts", error);
+            console.error(`method=updateTrackings domain=${domainName} Failed for all contracts`, error);
             throw error;
         }
 
@@ -122,13 +130,21 @@ export class AutoriUpdate {
             saved,
         } as TrackingSaveResult;
 
-        console.info(`method=saveSseData result ${JSON.stringify(result)}`);
+        console.info(`method=updateTrackings result ${JSON.stringify(result)}`);
         return result;
     }
 
     getLatestUpdatedDateForRouteData(routeData: ApiRouteData[]) : Date {
-        const maxEpochMs = Math.max.apply(null, routeData.map(value => value.updated.getTime()));
-        return new Date(maxEpochMs);
+        try {
+            const maxEpochMs = Math.max.apply(null, routeData.map(value => {
+                console.info(`value.updated ${value.updated}`);
+                return new Date(value.updated).getTime();
+            }));
+            return new Date(maxEpochMs);
+        } catch (e) {
+            console.error(e);
+            throw e;
+        }
     }
 
     async updateRoutes(contract: DbDomainContract, routeData: ApiRouteData[], taskMappings: DbDomainTaskMapping[]) : Promise<TrackingSaveResult> {
@@ -146,7 +162,7 @@ export class AutoriUpdate {
                     console.info(`method=updateData upsertWorkMachine with id ${machineId.id}`);
 
                     const tasks: string[] = this.getTasksForOperations(routeData.operations, taskMappings);
-                    const data: DbMaintenanceTracking[] = this.createDbMaintenanceTracking(machineId.id, routeData, contract.domain, tasks);
+                    const data: DbMaintenanceTracking[] = this.createDbMaintenanceTracking(machineId.id, routeData, contract, tasks);
                     console.info(`method=updateData inserting ${data.length} trackings for machine ${machineId.id}`);
                     return await db.tx(async tx => {
                         await DataDb.upsertMaintenanceTracking(tx, data);
@@ -160,7 +176,7 @@ export class AutoriUpdate {
                     });
                 } catch (error) {
                     errors++;
-                    console.error(`method=updateData failed for contract ${contract.contract} and domain ${contract.domain} for routeData ${routeData.id}`, error);
+                    console.error(`method=updateData failed for contract=${contract.contract} and domain=${contract.domain} for routeData ${routeData.id}`, error);
                 }
             }));
         });
@@ -172,14 +188,18 @@ export class AutoriUpdate {
 
     resolveContractLastUpdateTime(contract: DbDomainContract) : Date {
         if (contract.data_last_updated) {
+            console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.data_last_updated ${contract.data_last_updated.toISOString()}`);
             return contract.data_last_updated;
         } else if (contract.start_date) {
+            console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.start_date ${contract.start_date.toISOString()}`);
             return contract.start_date;
         }
-        return moment().add(-7, 'days').toDate();
+        const result = moment().add(-7, 'days').toDate();
+        console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using -7, 'days' ${result.toLocaleString()}`);
+        return result;
     }
 
-    createDbMaintenanceTracking(workMachineId: number, routeData: ApiRouteData, domainName: string, tasks: string[]): DbMaintenanceTracking[] {
+    createDbMaintenanceTracking(workMachineId: number, routeData: ApiRouteData, contract: DbDomainContract, tasks: string[]): DbMaintenanceTracking[] {
 
         if (tasks.length == 0) {
             console.info(`method=createDbMaintenanceTracking No tasks for tracking api id ${routeData.id} -> no data to save`);
@@ -207,26 +227,21 @@ export class AutoriUpdate {
                 endTime: routeData.endTime,
                 lastPoint: lastPoint,
                 lineString: lineString,
-                sendingSystem: domainName,
+                sendingSystem: contract.domain,
                 workMachineId: workMachineId,
                 tasks: tasks,
-                municipalityDomain: domainName,
+                domain: contract.domain,
+                contract: contract.contract,
                 municipalityMessageOriginalId: routeData.id,
                 finished: true,
             } as DbMaintenanceTracking;
         });
     }
 
-    createHarjaId(src: string): BigInt {
-        const hex = crypto.createHash("sha256").update(src).digest("hex");
-        // Postgres BigInt is 8 byte signed -> take first 7 1/2 bytes to be safe side for unsigned hex value
-        return BigInt('0x' + hex.substring(0, 15));
-    }
-
     createDbWorkMachine(contractId: string, vehicleType: string, domainName: string): DbWorkMachine {
         return {
-            harjaUrakkaId: this.createHarjaId(contractId).valueOf(),
-            harjaId: this.createHarjaId(vehicleType).valueOf(),
+            harjaUrakkaId: createHarjaId(contractId).valueOf(),
+            harjaId: createHarjaId(vehicleType).valueOf(),
             type: `domainName: ${domainName} / contractId: ${contractId} / vehicleType: ${vehicleType}`,
         };
     }
@@ -241,7 +256,7 @@ export class AutoriUpdate {
                 start_date: contract.startDate,
                 end_date: contract.endDate,
                 data_last_updated: undefined,
-                copyright: undefined,
+                source: undefined,
             } as DbDomainContract;
         });
     }
@@ -257,7 +272,12 @@ export class AutoriUpdate {
         });
     }
 
-    getTasksForOperations(operations: [string] | undefined, taskMappings: DbDomainTaskMapping[]): string[] {
+    /**
+     * Map domain route operations to Harja tasks
+     * @param operations to map
+     * @param taskMappings mapping of tasks from database
+     */
+    getTasksForOperations(operations: string[], taskMappings: DbDomainTaskMapping[]): string[] {
         if (operations === undefined) {
             return [];
         }
@@ -267,8 +287,7 @@ export class AutoriUpdate {
                 return mapping.original_id == operation && !mapping.ignore;
             });
             if (taskMapping) {
-                const task = taskMapping.name;
-                filtered.push(task);
+                filtered.push(taskMapping.name);
             }
             return filtered;
         }, []);
