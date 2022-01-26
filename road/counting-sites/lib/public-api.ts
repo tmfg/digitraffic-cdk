@@ -235,7 +235,7 @@ export class PublicApi {
     }
 
     createDirectionsEndpoint() {
-        new DigitrafficStaticIntegration(this.directionsResource, MediaType.APPLICATION_JSON, {
+        DigitrafficStaticIntegration.json(this.directionsResource, {
             1: "In",
             2: "Out",
             3: "No directions",

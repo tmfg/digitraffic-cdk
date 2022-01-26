@@ -17,8 +17,7 @@ const SQL_GET_DATA_FOR_MONTH =
     from counting_site_data csd, counting_site_counter csc, counting_site_user_type csut 
     where csd.counter_id = csc.id
     and csc.user_type_id = csut.id 
-    and date_part('year', data_timestamp) = $1
-    and date_part('month', data_timestamp) = $2
+    and data_timestamp >= $1 and data_timestamp < $2
     and (csc.domain_name = $3 or $3 is null)
     and (csd.counter_id = $4 or $4 is null)
     order by 1, 2, 3, 4`;
@@ -51,5 +50,8 @@ export function findAllData(db: DTDatabase, counterId: number): Promise<DbData[]
 export function getAllDataForMonth(
     db: DTDatabase, year: number, month: number, domainName: string | null, counterId: number | null,
 ): Promise<DbCsvData[]> {
-    return db.manyOrNone(PS_GET_DATA_FOR_MONTH, [year, month, domainName, counterId]);
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(new Date(startDate).setMonth(month));
+
+    return db.manyOrNone(PS_GET_DATA_FOR_MONTH, [startDate, endDate, domainName, counterId]);
 }
