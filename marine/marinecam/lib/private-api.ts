@@ -61,7 +61,7 @@ export class PrivateApi {
             this.createPasswordProtectedResources(readImageRole, userPool, userPoolClient);
         }
 
-        if ((stack.configuration as MobileServerProps).enableApiProtectedApi) {
+        if ((stack.configuration as MobileServerProps).enableKeyProtectedApi) {
             this.createApikeyProtectedResources(readImageRole);
         }
     }

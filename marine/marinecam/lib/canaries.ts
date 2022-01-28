@@ -12,7 +12,7 @@ export class Canaries {
         if (stack.configuration.enableCanaries) {
             const dbRole = new DigitrafficCanaryRole(stack, 'marinecam-db').withDatabaseAccess();
 
-            if ((stack.configuration as MobileServerProps).enableApiProtectedApi) {
+            if ((stack.configuration as MobileServerProps).enableKeyProtectedApi) {
                 const urlRole = new DigitrafficCanaryRole(stack, 'marinecam-url');
                 UrlCanary.create(stack, urlRole, publicApi, {
                     name: 'mc-restricted',
