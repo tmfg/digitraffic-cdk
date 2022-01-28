@@ -3,6 +3,10 @@ import {CfnFunction, Runtime} from 'aws-cdk-lib/aws-lambda';
 import {CfnBucket} from "aws-cdk-lib/aws-s3";
 import {DigitrafficStack, SOLUTION_KEY, StackConfiguration} from "./stack";
 import {IConstruct} from "constructs";
+import {CfnMethod, CfnResource} from "aws-cdk-lib/aws-apigateway";
+import {paramCase, snakeCase} from "change-case";
+import {CfnIntegration} from "aws-cdk-lib/aws-apigatewayv2";
+import IntegrationProperty = CfnMethod.IntegrationProperty;
 
 const MAX_CONCURRENCY_LIMIT = 100;
 const NODE_RUNTIME = Runtime.NODEJS_14_X.name;
@@ -25,6 +29,7 @@ export class StackCheckingAspect implements IAspect {
         this.checkFunction(node);
         this.checkTags(node);
         this.checkBucket(node);
+        this.checkResourceCasing(node);
     }
 
     checkStack(node: IConstruct) {
@@ -88,6 +93,39 @@ export class StackCheckingAspect implements IAspect {
                 if (!c.blockPublicAcls || !c.blockPublicPolicy || !c.ignorePublicAcls || !c.restrictPublicBuckets) {
                     Annotations.of(node).addError('Check bucket publicity');
                 }
+            }
+        }
+    }
+
+    isValidPath(path: string) {
+        return path.includes('{') || paramCase(path) === path;
+    }
+
+    isValidQueryString(name: string) {
+        return snakeCase(name) === name;
+    }
+
+    checkResourceCasing(node: IConstruct) {
+        if (node instanceof CfnResource) {
+            const r = node as CfnResource;
+
+            if (!this.isValidPath(r.pathPart)) {
+                Annotations.of(node).addError(`Path part ${r.pathPart} needs to be in kebab-case`);
+            }
+        } else if (node instanceof CfnMethod) {
+            const m = node as CfnMethod;
+            const i = m.integration as IntegrationProperty;
+
+            if (i && i.requestParameters) {
+                Object.keys(i.requestParameters).forEach(key => {
+                    const split = key.split('.');
+                    const type = split[2];
+                    const name = split[3];
+
+                    if (type === 'querystring' && !this.isValidQueryString(name)) {
+                        Annotations.of(node).addError(`Querystring ${name} needs to be in snake case`);
+                    }
+                });
             }
         }
     }
