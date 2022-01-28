@@ -10,6 +10,10 @@ export const handler = (event: Record<string, number | string>) => {
         const year = event.year as number;
         const month = event.month as number;
 
+        if ((year && !month) || (month && !year)) {
+            return Promise.resolve(LambdaResponse.badRequest('You must give both year and month'));
+        }
+
         const domainName = event.domainName as string;
         const counterId = event.counterId as string;
 

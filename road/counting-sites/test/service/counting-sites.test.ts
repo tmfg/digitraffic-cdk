@@ -1,10 +1,17 @@
-import {dbTestBase, insertCounter, insertDomain, insertLastUpdated} from "../db-testutil";
+import {dbTestBase, insertCounter, insertData, insertDomain, insertLastUpdated} from "../db-testutil";
 import * as CountingSitesService from "../../lib/service/counting-sites";
 import {DTDatabase} from "digitraffic-common/database/database";
 
 describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
     const DOMAIN1 = 'DOMAIN1';
     const DOMAIN2 = 'DOMAIN2';
+
+    function assertDataLines(csv: string, expected: number) {
+        // every line ends with \n and every csv contains header
+        // so empty csv has one line ending -> splits to 2 parts
+
+        expect(csv.split('\n')).toHaveLength(2 + expected);
+    }
 
     test('getDomains - empty', async () => {
         const domains = await CountingSitesService.getDomains();
@@ -34,16 +41,90 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
         expect(Object.keys(userTypes)).toHaveLength(11);
     });
 
-    test('getCountersForDomain - empty', async () => {
-        const counters = await CountingSitesService.getCountersForDomain('empy');
+    test('findCounters - not found', async () => {
+        await insertDomain(db, DOMAIN1);
+        await insertCounter(db, 1, DOMAIN1, 1);
 
-        expect(counters.features).toBeNull();
+        // no counters
+        const counters = await CountingSitesService.findCounters('not_found');
+
+        expect(counters.features).toHaveLength(0);
     });
 
-    test('getDataForCounter - empty', async () => {
-        const data = await CountingSitesService.getDataForCounter(0);
+    test('findCounters - two domains find one', async () => {
+        await insertDomain(db, DOMAIN1);
+        await insertDomain(db, DOMAIN2);
+        await insertCounter(db, 1, DOMAIN1, 1);
+        await insertCounter(db, 2, DOMAIN1, 1);
+        await insertCounter(db, 3, DOMAIN2, 1);
+
+        // two counters on domain1
+        const counters1 = await CountingSitesService.findCounters(DOMAIN1);
+        expect(counters1.features).toHaveLength(2);
+
+        // one counter on domain2
+        const counters2 = await CountingSitesService.findCounters(DOMAIN2);
+        expect(counters2.features).toHaveLength(1);
+    });
+
+    test('findCounters - two domains find both', async () => {
+        await insertDomain(db, DOMAIN1);
+        await insertDomain(db, DOMAIN2);
+        await insertCounter(db, 1, DOMAIN1, 1);
+        await insertCounter(db, 2, DOMAIN1, 1);
+        await insertCounter(db, 3, DOMAIN2, 1);
+
+        // total 3 counters on all domains
+        const counters = await CountingSitesService.findCounters();
+        expect(counters.features).toHaveLength(3);
+    });
+
+    test('findData - empty', async () => {
+        const data = await CountingSitesService.findData(0);
 
         expect(data).toHaveLength(0);
     });
 
+    test('findData - one value', async () => {
+        await insertDomain(db, DOMAIN1);
+        await insertCounter(db, 1, DOMAIN1, 1);
+        await insertData(db, 1, 15);
+
+        const data1 = await CountingSitesService.findData(2);
+        expect(data1).toHaveLength(0);
+
+        const data2 = await CountingSitesService.findData(1);
+        expect(data2).toHaveLength(1);
+
+        const data3 = await CountingSitesService.findData(null, DOMAIN2);
+        expect(data3).toHaveLength(0);
+
+        const data4 = await CountingSitesService.findData(null, DOMAIN1);
+        expect(data4).toHaveLength(1);
+    });
+
+    test('getCsvData - empty', async () => {
+        const data = await CountingSitesService.getCsvData(2021, 10, "", "");
+
+        assertDataLines(data, 0);
+    });
+
+    test('getCsvData - one value', async () => {
+        // inserted data is 31.10.2021
+        await insertDomain(db, DOMAIN1);
+        await insertCounter(db, 1, DOMAIN1, 1);
+        await insertData(db, 1, 15);
+
+        const data1 = await CountingSitesService.getCsvData(2021, 9, "", "");
+        assertDataLines(data1, 0);
+
+        const data2 = await CountingSitesService.getCsvData(2021, 10, "", "");
+        assertDataLines(data2, 1);
+
+        const data3 = await CountingSitesService.getCsvData(2021, 10, DOMAIN2, "");
+        assertDataLines(data3, 0);
+
+        const data4 = await CountingSitesService.getCsvData(2021, 10, DOMAIN1, "");
+        assertDataLines(data4, 1);
+    });
 }));

@@ -4,21 +4,22 @@ import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 
 const secretId = process.env.SECRET_ID as string;
 
-export const handler = (event: Record<string, number | string>) => {
+export const handler = (event: Record<string, string>) => {
     return withDbSecret(secretId, () => {
         const start = Date.now();
+        const counterId = event.counterId;
 
-        const counterId = event.counterId as number;
-        const domainName = event.domainName as string;
-
-        return CountingSitesService.findData(counterId, domainName).then(data => {
-            return LambdaResponse.ok(data);
+        return CountingSitesService.findCounters(null, counterId).then(featureCollection => {
+            if (featureCollection?.features.length === 0) {
+                return LambdaResponse.notFound();
+            }
+            return LambdaResponse.ok(JSON.stringify(featureCollection, null, 3));
         }).catch(error => {
             console.info("error " + error);
 
             return LambdaResponse.internalError();
         }).finally(() => {
-            console.info("method=CountingSites.GetData tookMs=%d", (Date.now() - start));
+            console.info("method=CountingSites.GetCounter tookMs=%d", (Date.now() - start));
         });
     });
 };

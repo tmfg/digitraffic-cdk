@@ -63,6 +63,9 @@ export function addTags(methodDescription: string,
 
 /**
  * Adds OpenAPI tags and a method summary to an API method
+ *
+ * @deprecated Use DigitrafficRestApi.documentResource
+ *
  * @param methodDescription Description of API method
  * @param tags OpenAPI tags
  * @param summary OpenAPI summary
@@ -77,4 +80,28 @@ export function addTagsAndSummary(
     stack: Construct,
 ) {
     addDocumentation(methodDescription, {tags, summary}, resource, stack);
+}
+
+export class DocumentationPart {
+    readonly parameterName: string;
+    readonly type: string;
+    readonly documentationProperties: object;
+
+    private constructor(parameterName: string, documentationProperties: object, type: string) {
+        this.parameterName = parameterName;
+        this.documentationProperties = documentationProperties;
+        this.type = type;
+    }
+
+    static queryParameter(parameterName: string, description: string) {
+        return new DocumentationPart(parameterName, {description}, "QUERY_PARAMETER");
+    }
+
+    static pathParameter(parameterName: string, description: string) {
+        return new DocumentationPart(parameterName, {description}, "PATH_PARAMETER");
+    }
+
+    static method(tags: string[], name: string, summary: string) {
+        return new DocumentationPart(name, {tags, summary}, "METHOD");
+    }
 }

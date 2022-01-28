@@ -7,10 +7,12 @@ const SQL_INSERT_DATA =
     values (NEXTVAL('counting_site_data_id_seq'), $1, $2, $3, $4, $5)`;
 
 const SQL_GET_DATA =
-    `select data_timestamp, interval, count, status 
-    from counting_site_data 
-    where counter_id = $1
-    order by data_timestamp`;
+    `select csd.data_timestamp, csd.interval, csd.count, csd.status 
+    from counting_site_data csd, counting_site_counter csc
+    where csd.counter_id = csc.id 
+    and (csd.counter_id = $1 or $1 is null)
+    and (csc.domain_name = $2 or $2 is null)
+    order by 1`;
 
 const SQL_GET_DATA_FOR_MONTH =
     `select csc.domain_name, csc.name counter_name, csut.name user_type, csd.data_timestamp, csd.interval, csd.count, csd.status 
@@ -43,8 +45,8 @@ export function insertData(db: DTDatabase, siteId: number, interval: number, dat
     }));
 }
 
-export function findAllData(db: DTDatabase, counterId: number): Promise<DbData[]> {
-    return db.manyOrNone(PS_GET_DATA,[counterId]);
+export function findAllData(db: DTDatabase, counterId: number | null, domainName: string | null): Promise<DbData[]> {
+    return db.manyOrNone(PS_GET_DATA,[counterId, domainName]);
 }
 
 export function getAllDataForMonth(

@@ -40,6 +40,10 @@ export const counterProperties: JsonSchema = {
             type: JsonSchemaType.STRING,
             description: 'Counter name',
         },
+        domain: {
+            type: JsonSchemaType.STRING,
+            description: 'Domain name',
+        },
         userType: {
             type: JsonSchemaType.INTEGER,
             description: 'Counter type',

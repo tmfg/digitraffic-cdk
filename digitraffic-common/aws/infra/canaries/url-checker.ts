@@ -85,6 +85,14 @@ export class UrlChecker {
         return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
+    expect400(url: string): Promise<void> {
+        const requestOptions = {...this.requestOptions, ...{
+            path: url,
+        }};
+
+        return synthetics.executeHttpStep("Verify 400 for " + url, requestOptions, validateStatusCodeAndContentType(400, MediaType.TEXT_PLAIN));
+    }
+
     expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
         if (!this.requestOptions.headers || !this.requestOptions.headers[API_KEY_HEADER]) {
             console.error("No api key defined");

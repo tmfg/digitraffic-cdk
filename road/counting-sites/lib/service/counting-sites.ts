@@ -4,18 +4,17 @@ import * as MetadataDB from "../db/metadata";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {ResultDomain} from "../model/domain";
 import {DbCsvData, ResponseData} from "../model/data";
-import {FeatureCollection} from "geojson";
 import {createObjectCsvStringifier} from 'csv-writer';
 import * as R from 'ramda';
 
 export function getUserTypes() {
-    return inDatabaseReadonly(async (db: DTDatabase) => {
+    return inDatabaseReadonly(db => {
         return MetadataDB.findAllUserTypes(db);
     });
 }
 
 export function getDomains() {
-    return inDatabaseReadonly(async (db: DTDatabase) => {
+    return inDatabaseReadonly(db => {
         return MetadataDB.findAllDomains(db);
     }).then(domains => domains.map(d => ({
         name: d.name,
@@ -26,7 +25,7 @@ export function getDomains() {
 }
 
 export function getCsvData(year: number, month: number, domainName: string, counterId: string): Promise<string> {
-    return inDatabaseReadonly((db: DTDatabase) => {
+    return inDatabaseReadonly(db => {
         return DataDb.getAllDataForMonth(
             db, year, month, parseString(domainName), parseNumber(counterId),
         );
@@ -47,8 +46,9 @@ export function getCsvData(year: number, month: number, domainName: string, coun
 
         // overwrite timestamp to iso 8601
         const dataOut = data.map((row: DbCsvData) => R.assoc('timestamp', row.data_timestamp.toISOString(), row));
+        const rows = data.length === 0 ? "" : csv.stringifyRecords(dataOut);
 
-        return csv.getHeaderString() + csv.stringifyRecords(dataOut);
+        return csv.getHeaderString() + rows;
     });
 }
 
@@ -60,10 +60,10 @@ function parseNumber(value: string): number | null {
     return !value || value === "" ? null : Number.parseInt(value);
 }
 
-export function getDataForCounter(counterId: number) {
+export function findData(counterId: number | null = null, domainName: string | null = null) {
     // should we return error, when counter is not found?
     return inDatabaseReadonly((db: DTDatabase) => {
-        return DataDb.findAllData(db, counterId);
+        return DataDb.findAllData(db, counterId, domainName);
     }).then(data => data.map(row => ({
         dataTimestamp: row.data_timestamp,
         interval: row.interval,
@@ -72,9 +72,12 @@ export function getDataForCounter(counterId: number) {
     } as ResponseData)));
 }
 
-export function getCountersForDomain(domain: string): Promise<FeatureCollection> {
-    // should we return error, when domain is not found?
-    return inDatabaseReadonly((db: DTDatabase) => {
-        return CounterDb.findAllCountersForDomain(db, domain);
+export function findCounters(domain: string | null = null, counterId: string | null = null) {
+    return inDatabaseReadonly(db => {
+        return CounterDb.findCounters(db, domain, counterId);
     });
 }
+
+
+
+
