@@ -72,12 +72,12 @@ export class AutoriApi {
         }
     }
 
-    async getContracts(): Promise<ApiContractData[]> {
-        return this.getFromServer('getContracts', URL_CONTRACTS);
+    getContracts(): Promise<ApiContractData[]> {
+        return this.getFromServer<ApiContractData[]>('getContracts', URL_CONTRACTS);
     }
 
-    async getOperations(): Promise<ApiOperationData[]> {
-        return this.getFromServer('getOperations', URL_OPERATIONS);
+    getOperations(): Promise<ApiOperationData[]> {
+        return this.getFromServer<ApiOperationData[]>('getOperations', URL_OPERATIONS);
     }
 
     /**
@@ -86,18 +86,21 @@ export class AutoriApi {
      * @param from data that has been modified after (exclusive) this
      * @param periodHours how long period of data to fetch in hours
      */
-    async getNextRouteDataForContract(contract: string, from: Date, periodHours : number): Promise<ApiRouteData[]> {
+    getNextRouteDataForContract(contract: string, from: Date, periodHours : number): Promise<ApiRouteData[]> {
         const to = moment(from).add(periodHours, 'hours').add(1, 'ms'); // End and start are exclusive
-        const data = await this.getRouteDataForContract(contract, from, to.toDate());
-        if (data.length == 0) {
-            if (to.isAfter(moment())) { // If we pass current date, then we give up
-                console.info(`method=getNextRouteDataForContract No new data for contract ${contract}`);
-                return [];
-            }
-            const nextFrom = moment(to).subtract(1, 'ms');
-            return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodHours);
-        }
-        return data;
+        return this.getRouteDataForContract(contract, from, to.toDate())
+            .then((data) => {
+                if (data.length == 0) {
+                    if (to.isAfter(moment())) { // If we pass current date, then we give up
+                        console.info(`method=getNextRouteDataForContract No new data for contract ${contract}`);
+                        return [];
+                    }
+                    // subtract 1ms as api start and end dates are exclusive
+                    const nextFrom = moment(to).subtract(1, 'ms');
+                    return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodHours);
+                }
+                return data;
+            });
     }
 
     /**
@@ -106,19 +109,15 @@ export class AutoriApi {
      * @param from data that has been modified after (exclusive) this
      * @param to data that has been modified before (exclusive) this
      */
-    async getRouteDataForContract(contract: string, from: Date, to: Date): Promise<ApiRouteData[]> {
+    getRouteDataForContract(contract: string, from: Date, to: Date): Promise<ApiRouteData[]> {
         const fromString = from.toISOString(); // With milliseconds Z-time
         const toString = to.toISOString();
-        // console.info(`method=getRouteDataForContract ${contract} from=%s to=%s`, fromString, toString);
-        // const routeData : Promise<ApiRouteData[]> = this.getFromServer(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`)
-        //     .then();
-        // return routeData;
         const start = Date.now();
-        return this.getFromServer(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`)
-            .then(response => {
+
+        return this.getFromServer<ApiRouteData[]>(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`)
+            .then(routeData => {
                 const end = Date.now();
-                const routeData = response as ApiRouteData[];
-                console.info(`method=getRouteDataForContract ${contract} from: ${fromString} to: ${toString} data count=${routeData.length} tookMs=${end-start}`, fromString, toString);
+                console.info(`method=getRouteDataForContract ${contract} from: ${fromString} to: ${toString} data count=${routeData.length} tookMs=${end-start}`);
                 return routeData;
             });
     }

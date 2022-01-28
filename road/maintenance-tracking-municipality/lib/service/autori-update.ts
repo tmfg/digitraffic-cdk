@@ -13,7 +13,7 @@ import {
 } from "../model/data";
 import {createHarjaId} from "./utils";
 
-const UNKNOWN_TASK_NAME = 'UNKNOWN';
+export const UNKNOWN_TASK_NAME = 'UNKNOWN';
 
 export interface TrackingSaveResult {
     errors : number,
@@ -39,7 +39,7 @@ export class AutoriUpdate {
         const dbContracts: DbDomainContract[] = this.createDbDomainContracts(apiContracts, domainName);
 
         const dbIds: DbTextId[] = await inDatabase(async (db: DTDatabase) => {
-            return await DataDb.upsertContracts(db, dbContracts);
+            return DataDb.upsertContracts(db, dbContracts);
         });
         console.info(`method=updateContracts domain=${domainName} Insert return value: ${JSON.stringify(dbIds)}`);
         // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
@@ -48,16 +48,10 @@ export class AutoriUpdate {
 
     /**
      * Update tasks from remote api to db
-     * @param username Basic auth username
-     * @param password Basic auth password
-     * @param endpointUrl Enpoint url ie https://mydomain.com
      * @param domainName Solution domain name ie. myprovider-helsinki
      * @return inserted count
      */
-    // export async function updateTasks(username: string, password: string, endpointUrl: string, domainName: string): Promise<number> {
     async updateTasks(domainName: string): Promise<number> {
-
-        // const api = new AutoriApi(username, password, endpointUrl);
 
         const apiOperations: ApiOperationData[] = await this.api.getOperations();
         const taskMappings: DbDomainTaskMapping[] = this.createDbDomainTaskMappings(apiOperations, domainName);
@@ -72,13 +66,9 @@ export class AutoriUpdate {
 
 
     /**
-     *
-     * @param username Basic auth username
-     * @param password Basic auth password
-     * @param endpointUrl Enpoint url ie https://mydomain.com
      * @param domainName Solution domain name ie. myprovider-helsinki
+     * @return TrackingSaveResult update result
      */
-    // export async function updateData(username: string, password: string, endpointUrl: string, domainName: string): Promise<TrackingSaveResult> {
     async updateTrackings(domainName: string): Promise<TrackingSaveResult> {
 
         let saved = 0;
@@ -86,12 +76,12 @@ export class AutoriUpdate {
 
         try {
             const contracts: DbDomainContract[] = await inDatabaseReadonly(async (db: DTDatabase) => {
-                return await DataDb.getContractsWithSource(domainName, db);
+                return DataDb.getContractsWithSource(db, domainName);
             });
             console.info(`methood=updateTrackings domain=${domainName} contracts: ${JSON.stringify(contracts)}`);
 
             const taskMappings: DbDomainTaskMapping[] = await inDatabaseReadonly(async (db: DTDatabase) => {
-                return await DataDb.getTaskMappings(domainName, db);
+                return DataDb.getTaskMappings(db, domainName);
             });
 
             console.info(`methood=updateTrackings taskMappings: ${JSON.stringify(taskMappings)}`);
@@ -152,12 +142,12 @@ export class AutoriUpdate {
         let errors = 0;
 
         await inDatabase(async (db: DTDatabase) => {
-            return await Promise.allSettled(routeData.map(async (routeData: ApiRouteData) => {
+            return Promise.allSettled(routeData.map(async (routeData: ApiRouteData) => {
 
                 try {
                     const machineId = await db.tx(async tx => {
                         const workMachine: DbWorkMachine = this.createDbWorkMachine(contract.contract, routeData.vehicleType, contract.domain);
-                        return await DataDb.upsertWorkMachine(tx, workMachine);
+                        return DataDb.upsertWorkMachine(tx, workMachine);
                     });
                     console.info(`method=updateData upsertWorkMachine with id ${machineId.id}`);
 
@@ -194,14 +184,15 @@ export class AutoriUpdate {
             console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.start_date ${contract.start_date.toISOString()}`);
             return contract.start_date;
         }
-        const result = moment().add(-7, 'days').toDate();
+        // Fallback one week to past from now
+        const result = moment().subtract(7, 'days').toDate();
         console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using -7, 'days' ${result.toLocaleString()}`);
         return result;
     }
 
-    createDbMaintenanceTracking(workMachineId: number, routeData: ApiRouteData, contract: DbDomainContract, tasks: string[]): DbMaintenanceTracking[] {
+    createDbMaintenanceTracking(workMachineId: number, routeData: ApiRouteData, contract: DbDomainContract, harjaTasks: string[]): DbMaintenanceTracking[] {
 
-        if (tasks.length == 0) {
+        if (harjaTasks.length == 0) {
             console.info(`method=createDbMaintenanceTracking No tasks for tracking api id ${routeData.id} -> no data to save`);
             return [];
         }
@@ -222,17 +213,17 @@ export class AutoriUpdate {
             }
             return {
                 direction: undefined,
-                sendingTime: routeData.created,
-                startTime: routeData.endTime,
-                endTime: routeData.endTime,
-                lastPoint: lastPoint,
-                lineString: lineString,
-                sendingSystem: contract.domain,
-                workMachineId: workMachineId,
-                tasks: tasks,
+                sending_time: routeData.created,
+                start_time: routeData.endTime,
+                end_time: routeData.endTime,
+                last_point: lastPoint,
+                line_string: lineString,
+                sending_system: contract.domain,
+                work_machine_id: workMachineId,
+                tasks: harjaTasks,
                 domain: contract.domain,
                 contract: contract.contract,
-                municipalityMessageOriginalId: routeData.id,
+                message_original_id: routeData.id,
                 finished: true,
             } as DbMaintenanceTracking;
         });
@@ -240,36 +231,31 @@ export class AutoriUpdate {
 
     createDbWorkMachine(contractId: string, vehicleType: string, domainName: string): DbWorkMachine {
         return {
-            harjaUrakkaId: createHarjaId(contractId).valueOf(),
-            harjaId: createHarjaId(vehicleType).valueOf(),
+            harjaUrakkaId: createHarjaId(contractId),
+            harjaId: createHarjaId(vehicleType),
             type: `domainName: ${domainName} / contractId: ${contractId} / vehicleType: ${vehicleType}`,
         };
     }
 
     createDbDomainContracts(contracts: ApiContractData[], domainName: string): DbDomainContract[] {
-        return contracts.map((contract) => {
-
-            return {
-                domain: domainName,
-                contract: contract.id,
-                name: contract.name,
-                start_date: contract.startDate,
-                end_date: contract.endDate,
-                data_last_updated: undefined,
-                source: undefined,
-            } as DbDomainContract;
-        });
+        return contracts.map(contract => ({
+            domain: domainName,
+            contract: contract.id,
+            name: contract.name,
+            start_date: contract.startDate,
+            end_date: contract.endDate,
+            data_last_updated: undefined,
+            source: undefined,
+        }));
     }
 
-    createDbDomainTaskMappings(contracts: ApiOperationData[], domainName: string): DbDomainTaskMapping[] {
-        return contracts.map((operation) => {
-            return {
-                name: UNKNOWN_TASK_NAME,
-                original_id: operation.id,
-                domain: domainName,
-                ignore: true,
-            } as DbDomainTaskMapping;
-        });
+    createDbDomainTaskMappings(operations: ApiOperationData[], domainName: string): DbDomainTaskMapping[] {
+        return operations.map(operation => ({
+            name: UNKNOWN_TASK_NAME,
+            original_id: operation.id,
+            domain: domainName,
+            ignore: true,
+        }));
     }
 
     /**
@@ -287,7 +273,7 @@ export class AutoriUpdate {
                 return mapping.original_id == operation && !mapping.ignore;
             });
             if (taskMapping) {
-                filtered.push(taskMapping.name);
+                return filtered.concat(taskMapping.name);
             }
             return filtered;
         }, []);

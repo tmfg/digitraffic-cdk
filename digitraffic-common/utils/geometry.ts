@@ -1,5 +1,7 @@
 import {Feature, FeatureCollection, Geometry, Position} from "geojson";
 
+export const SRID_WGS84 = 4326;
+
 export function createGeometry(geometry: Geometry): string {
     if (geometry.type === 'LineString') {
         const coordinates = linestring(geometry.coordinates);

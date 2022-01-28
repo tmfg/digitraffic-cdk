@@ -1,6 +1,6 @@
 # Digitraffic Road - Maintenance tracking integration for municipality data
 
-Maintenance tracking municipality integration fetches data from sources and saves data to db.
+Maintenance tracking municipality integration fetches data from different domains and saves data to db. Data is then .
 
 ## Run build
 
@@ -11,25 +11,12 @@ Maintenance tracking municipality integration fetches data from sources and save
 ## Deploy to AWS
 
 * Show changes
-    * `./cdk-diff.sh test` or 
-    * `./cdk-diff.sh prod` 
+    * `yarn run cdk-diff-road-test` or 
+    * `yarn run cdk-diff-road-prod` 
 * Deploy
-    * `./cdk-deploy.sh test` or 
-    * `./cdk-deploy.sh prod`
+    * `yarn run cdk-deploy-road-test` or 
+    * `yarn run cdk-deploy-road-prod`
+* 
 * Synthesize a CloudFormation template for local inspection (not required)
-    * `./cdk-synth.sh test` or
-    * `./cdk-synth.sh prod` 
-
-# Misc
-
-## Send message to integration api
-
-* Got to scripts directory
-    * `cd test/scripts/`
-* Run script to post tracking json -message
-    * `./post-to-apigateway-lambda.sh <lambda-base-url|integration-url> <api-key-value> <path/to/message.json>`
-
-## Message count in
-
-Maximum count of messages in has been around 4000/5min -> 4000/5/60 = 14/s.
-Normally about 5000 msg/h -> 83 msg/min.
+    * `yarn run cdk-synth-road-test` or
+    * `yarn run cdk-synth-road-prod` 

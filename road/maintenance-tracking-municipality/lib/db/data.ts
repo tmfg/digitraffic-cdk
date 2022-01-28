@@ -7,9 +7,7 @@ import {
     DbWorkMachine,
 } from "../model/data";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
-
-const SRID = 4326; // WGS84
-
+import {SRID_WGS84} from "digitraffic-common/utils/geometry";
 
 
 const SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT =
@@ -85,7 +83,6 @@ export function insertNewTasks(db: DTDatabase, dbTaskMapping: DbDomainTaskMappin
         return t.batch(dbTaskMapping.map(taskMapping => {
             return t.oneOrNone(PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING,
                 [taskMapping.name, taskMapping.original_id, taskMapping.domain, taskMapping.ignore]) as Promise<DbTextId>;
-            // return a;
         }));
     });
 }
@@ -94,7 +91,7 @@ export function insertNewTasks(db: DTDatabase, dbTaskMapping: DbDomainTaskMappin
 
 const SQL_UPSERT_MAINTENANCE_TRACKING =
     `INSERT INTO maintenance_tracking(id, sending_system, sending_time, last_point, line_string, work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id)
-     VALUES (NEXTVAL('seq_maintenance_tracking'), $1, $2, ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID})), ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID})), $5, $6, $7, $8, $9, $10, $11, $12)
+     VALUES (NEXTVAL('seq_maintenance_tracking'), $1, $2, ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID_WGS84})), ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID_WGS84})), $5, $6, $7, $8, $9, $10, $11, $12)
      RETURNING ID`;
 // Might come in use in future
 // ON CONFLICT(domain, message_original_id)
@@ -131,7 +128,7 @@ export function upsertMaintenanceTracking(db: DTTransaction, data: DbMaintenance
 
         console.info("method=upsertMaintenanceTracking INSERT: " + JSON.stringify(d));
         const mtId: DbNumberId = await db.one(PS_UPSERT_MAINTENANCE_TRACKING,
-            [d.sendingSystem, d.sendingTime, d.lastPoint, d.lineString, d.workMachineId, d.startTime, d.endTime, d.direction, d.finished, d.domain, d.contract, d.municipalityMessageOriginalId])
+            [d.sending_system, d.sending_time, d.last_point, d.line_string, d.work_machine_id, d.start_time, d.end_time, d.direction, d.finished, d.domain, d.contract, d.message_original_id])
             .catch((error) => {
                 console.error('method=upsertMaintenanceTracking failed', error);
                 throw error;
@@ -185,7 +182,7 @@ const PS_GET_CONTRACTS_WITH_SOURCE = new PreparedStatement({
     text: SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_SOURCE,
 });
 
-export function getContractsWithSource(domainName: string, db: DTDatabase): Promise<DbDomainContract[]> {
+export function getContractsWithSource(db: DTDatabase, domainName: string): Promise<DbDomainContract[]> {
     return db.manyOrNone(PS_GET_CONTRACTS_WITH_SOURCE, [domainName]);
 }
 
@@ -202,7 +199,7 @@ const PS_GET_TASK_MAPPINGS = new PreparedStatement({
     text: SQL_GET_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPINGS,
 });
 
-export function getTaskMappings(domainName: string, db: DTDatabase): Promise<DbDomainTaskMapping[]> {
+export function getTaskMappings(db: DTDatabase, domainName: string): Promise<DbDomainTaskMapping[]> {
     return db.manyOrNone(PS_GET_TASK_MAPPINGS, [domainName]);
 }
 

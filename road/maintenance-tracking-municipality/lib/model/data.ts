@@ -3,8 +3,8 @@ import {FeatureCollection} from "geojson";
 export type ApiContractData = {
     readonly id: string,
     readonly name: string,
-    readonly startDate: Date,
-    readonly endDate: Date
+    readonly startDate: Date | undefined,
+    readonly endDate: Date | undefined
 }
 
 export type ApiRouteData = {
@@ -30,18 +30,18 @@ export type DbWorkMachine = {
 }
 
 export type DbMaintenanceTracking = {
-    readonly sendingSystem : string
-    readonly sendingTime: Date
-    readonly lastPoint: string
-    readonly lineString: string | undefined
-    readonly workMachineId: number
-    readonly startTime: Date
-    readonly endTime: Date
+    readonly sending_system : string
+    readonly sending_time: Date
+    readonly last_point: string
+    readonly line_string: string | undefined
+    readonly work_machine_id: number
+    readonly start_time: Date
+    readonly end_time: Date
     readonly direction: number | undefined
     readonly finished: boolean
     readonly domain: string
     readonly contract: string
-    readonly municipalityMessageOriginalId: string
+    readonly message_original_id: string
     readonly tasks: string[]
 }
 
@@ -58,8 +58,8 @@ export type DbDomainContract = {
     readonly contract: string
     readonly name: string
     readonly source: string | undefined,
-    readonly start_date: Date,
-    readonly end_date: Date,
+    readonly start_date: Date | undefined,
+    readonly end_date: Date | undefined,
     readonly data_last_updated: Date | undefined,
 }
 

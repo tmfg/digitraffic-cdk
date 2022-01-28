@@ -15,9 +15,11 @@
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
-    "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff-todo",
+    "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
     "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
-    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy-todo"
+    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy",
+    "cdk-synth-road-test": "cdk synth MaintenanceTrackingMunicipalityRoadTest --no-staging > template-road-test.yaml",
+    "cdk-synth-road-prod": "cdk synth MaintenanceTrackingMunicipalityRoadProd --no-staging > template-road-prod.yaml"
   },
   "devDependencies": {
     "@aws-cdk/assert": "*",
@@ -38,7 +40,6 @@
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
     "digitraffic-common": "*",
-    "geojson-validation": "^1.0.2",
     "pg-native": "*",
     "pg-promise": "*"
   },
