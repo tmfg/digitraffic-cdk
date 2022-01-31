@@ -83,9 +83,7 @@ def make_adjustments(df):
 
 def fetch_data_from_database(logger):
     if os.getenv('DB_SECRET_ARN'):
-        start = time.time()
         secret = secret_manager.get_secret(os.getenv('DB_SECRET_ARN'))
-        logger.info(f'method=data.fetch_data_from_database took={time.time()-start} mesasage=fetch secret manager arn')
 
     else:
         secret = dict(

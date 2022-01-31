@@ -14,11 +14,8 @@ ALL_TIME_WITH_TREND = True if os.getenv('APP_ALL_TIME_WITH_TREND', 'DISABLE') ==
 if ALL_TIME_WITH_TREND:
     from sklearn.linear_model import LinearRegression
 
-GIGA = pow(10, 9)
 TERA = pow(10, 12)
 MILJ = pow(10, 6)
-MRD = pow(10, 9)
-BILJ = pow(10, 12)
 
 
 def parse_unidentified(x):
