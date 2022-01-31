@@ -30,7 +30,7 @@ const SQL_ALL_COUNTERS_FEATURE_COLLECTION = `select json_build_object(
                     ) as collection
      from counting_site_counter
      where (domain_name = $1 or $1 is null)
-     and (id = $2 or $2::numeric is null)
+     and (id = $2 or $2 is null)
      `;
 
 const SQL_INSERT_COUNTER =
@@ -80,8 +80,16 @@ const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
     text: SQL_UPDATER_COUNTER_TIMESTAMP,
 });
 
-export function findCounters(db: DTDatabase, domain: string | null, counterId: string | null): Promise<FeatureCollection> {
-    return db.one(PS_FIND_COUNTERS_FEATURE_COLLECTION, [domain, counterId]).then(r => r.collection);
+export function nullString(value: string): string | null {
+    return value === "" ? null : value;
+}
+
+export function nullNumber(value: string): number | null {
+    return value === "" ? null : Number.parseInt(value);
+}
+
+export function findCounters(db: DTDatabase, domain: string, counterId: string): Promise<FeatureCollection> {
+    return db.one(PS_FIND_COUNTERS_FEATURE_COLLECTION, [nullString(domain), nullNumber(counterId)]).then(r => r.collection);
 }
 
 export function findAllCountersForUpdateForDomain(db: DTDatabase, domain: string): Promise<DbCounter[]> {

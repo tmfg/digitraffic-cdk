@@ -1,12 +1,13 @@
 import {PreparedStatement} from "pg-promise";
 import {ApiData, DbCsvData, DbData} from "../model/data";
 import {DTDatabase} from "digitraffic-common/database/database";
+import {nullNumber, nullString} from "./counter";
 
-const SQL_INSERT_DATA =
+const SQL_INSERT_VALUES =
     `insert into counting_site_data(id, counter_id, data_timestamp, count, status, interval)
     values (NEXTVAL('counting_site_data_id_seq'), $1, $2, $3, $4, $5)`;
 
-const SQL_GET_DATA =
+const SQL_FIND_VALUES =
     `select csd.data_timestamp, csd.interval, csd.count, csd.status 
     from counting_site_data csd, counting_site_counter csc
     where csd.counter_id = csc.id 
@@ -14,7 +15,7 @@ const SQL_GET_DATA =
     and (csc.domain_name = $2 or $2 is null)
     order by 1`;
 
-const SQL_GET_DATA_FOR_MONTH =
+const SQL_FIND_VALUES_FOR_MONTH =
     `select csc.domain_name, csc.name counter_name, csut.name user_type, csd.data_timestamp, csd.interval, csd.count, csd.status 
     from counting_site_data csd, counting_site_counter csc, counting_site_user_type csut 
     where csd.counter_id = csc.id
@@ -24,36 +25,36 @@ const SQL_GET_DATA_FOR_MONTH =
     and (csd.counter_id = $4 or $4 is null)
     order by 1, 2, 3, 4`;
 
-const PS_INSERT_DATA = new PreparedStatement({
-    name: 'insert-data',
-    text: SQL_INSERT_DATA,
+const PS_INSERT_COUNTER_VALUES = new PreparedStatement({
+    name: 'insert-values',
+    text: SQL_INSERT_VALUES,
 });
 
-const PS_GET_DATA = new PreparedStatement({
-    name: 'get-data',
-    text: SQL_GET_DATA,
+const PS_GET_VALUES = new PreparedStatement({
+    name: 'find-values',
+    text: SQL_FIND_VALUES,
 });
 
-const PS_GET_DATA_FOR_MONTH = new PreparedStatement({
-    name: 'get-data-for-month',
-    text: SQL_GET_DATA_FOR_MONTH,
+const PS_FIND_VALUES_FOR_MONTH = new PreparedStatement({
+    name: 'find-data-for-month',
+    text: SQL_FIND_VALUES_FOR_MONTH,
 });
 
-export function insertData(db: DTDatabase, siteId: number, interval: number, data: ApiData[]) {
+export function insertCounterValues(db: DTDatabase, siteId: number, interval: number, data: ApiData[]) {
     return Promise.all(data.map(d => {
-        return db.none(PS_INSERT_DATA, [siteId, d.date, d.counts, d.status, interval]);
+        return db.none(PS_INSERT_COUNTER_VALUES, [siteId, d.date, d.counts, d.status, interval]);
     }));
 }
 
-export function findAllData(db: DTDatabase, counterId: number | null, domainName: string | null): Promise<DbData[]> {
-    return db.manyOrNone(PS_GET_DATA,[counterId, domainName]);
+export function findValues(db: DTDatabase, counterId: string, domainName: string): Promise<DbData[]> {
+    return db.manyOrNone(PS_GET_VALUES,[nullNumber(counterId), nullString(domainName)]);
 }
 
-export function getAllDataForMonth(
-    db: DTDatabase, year: number, month: number, domainName: string | null, counterId: number | null,
+export function findDataForMonth(
+    db: DTDatabase, year: number, month: number, domainName: string, counterId: string,
 ): Promise<DbCsvData[]> {
     const startDate = new Date(Date.UTC(year, month - 1, 1));
     const endDate = new Date(new Date(startDate).setMonth(month));
 
-    return db.manyOrNone(PS_GET_DATA_FOR_MONTH, [startDate, endDate, domainName, counterId]);
+    return db.manyOrNone(PS_FIND_VALUES_FOR_MONTH, [startDate, endDate, nullString(domainName), nullNumber(counterId)]);
 }

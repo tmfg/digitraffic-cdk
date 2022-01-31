@@ -9,7 +9,7 @@ export const handler = (event: Record<string, string>) => {
         const start = Date.now();
         const counterId = event.counterId;
 
-        return CountingSitesService.findCounters(null, counterId).then(featureCollection => {
+        return CountingSitesService.findCounters("", counterId).then(featureCollection => {
             if (featureCollection?.features.length === 0) {
                 return LambdaResponse.notFound();
             }

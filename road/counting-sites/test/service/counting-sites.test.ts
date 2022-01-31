@@ -80,7 +80,7 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
     });
 
     test('findData - empty', async () => {
-        const data = await CountingSitesService.findData(0);
+        const data = await CountingSitesService.findCounterValues("0");
 
         expect(data).toHaveLength(0);
     });
@@ -90,21 +90,21 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
         await insertCounter(db, 1, DOMAIN1, 1);
         await insertData(db, 1, 15);
 
-        const data1 = await CountingSitesService.findData(2);
+        const data1 = await CountingSitesService.findCounterValues("2");
         expect(data1).toHaveLength(0);
 
-        const data2 = await CountingSitesService.findData(1);
+        const data2 = await CountingSitesService.findCounterValues("1");
         expect(data2).toHaveLength(1);
 
-        const data3 = await CountingSitesService.findData(null, DOMAIN2);
+        const data3 = await CountingSitesService.findCounterValues("", DOMAIN2);
         expect(data3).toHaveLength(0);
 
-        const data4 = await CountingSitesService.findData(null, DOMAIN1);
+        const data4 = await CountingSitesService.findCounterValues("", DOMAIN1);
         expect(data4).toHaveLength(1);
     });
 
     test('getCsvData - empty', async () => {
-        const data = await CountingSitesService.getCsvData(2021, 10, "", "");
+        const data = await CountingSitesService.getValuesForMonth(2021, 10, "", "");
 
         assertDataLines(data, 0);
     });
@@ -115,16 +115,16 @@ describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
         await insertCounter(db, 1, DOMAIN1, 1);
         await insertData(db, 1, 15);
 
-        const data1 = await CountingSitesService.getCsvData(2021, 9, "", "");
+        const data1 = await CountingSitesService.getValuesForMonth(2021, 9, "", "");
         assertDataLines(data1, 0);
 
-        const data2 = await CountingSitesService.getCsvData(2021, 10, "", "");
+        const data2 = await CountingSitesService.getValuesForMonth(2021, 10, "", "");
         assertDataLines(data2, 1);
 
-        const data3 = await CountingSitesService.getCsvData(2021, 10, DOMAIN2, "");
+        const data3 = await CountingSitesService.getValuesForMonth(2021, 10, DOMAIN2, "");
         assertDataLines(data3, 0);
 
-        const data4 = await CountingSitesService.getCsvData(2021, 10, DOMAIN1, "");
+        const data4 = await CountingSitesService.getValuesForMonth(2021, 10, DOMAIN1, "");
         assertDataLines(data4, 1);
     });
 }));

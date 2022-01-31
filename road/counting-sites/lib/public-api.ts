@@ -4,10 +4,7 @@ import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
 import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {
-    addTagsAndSummary,
-    DocumentationPart,
-} from "digitraffic-common/aws/infra/documentation";
+import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 import {directionProperties, domainsProperties, userTypesProperties} from "./model/metadata";
 import {dataProperties} from "./model/data";
@@ -15,7 +12,7 @@ import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-commo
 import {counterProperties} from "./model/counter";
 import {DigitrafficStaticIntegration} from "digitraffic-common/aws/infra/api/static-integration";
 
-const COUNTERS_TAGS = ["Counters(Beta)"];
+const COUNTING_SITE_TAGS = ["Counting site(Beta)"];
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
@@ -55,28 +52,28 @@ export class PublicApi {
     }
 
     createDocumentation() {
-        this.publicApi.documentResource(this.userTypesResource, DocumentationPart.method(COUNTERS_TAGS, 'GetUserTypes', 'Return all user types'));
-        this.publicApi.documentResource(this.domainsResource, DocumentationPart.method(COUNTERS_TAGS, 'GetDomains', 'Return all domains'));
-        this.publicApi.documentResource(this.directionsResource, DocumentationPart.method(COUNTERS_TAGS, 'GetDirections', 'Return all directions'));
+        this.publicApi.documentResource(this.userTypesResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetUserTypes', 'Return all user types'));
+        this.publicApi.documentResource(this.domainsResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDomains', 'Return all domains'));
+        this.publicApi.documentResource(this.directionsResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDirections', 'Return all directions'));
 
         this.publicApi.documentResource(this.countersResource,
-            DocumentationPart.method(COUNTERS_TAGS, 'GetCounters', 'Return all counters for domain'),
-            DocumentationPart.queryParameter('domainName', 'Domain name'));
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetCounters', 'Return all counters for domain'),
+            DocumentationPart.queryParameter('domain_name', 'Domain name'));
 
         this.publicApi.documentResource(this.counterResource,
-            DocumentationPart.method(COUNTERS_TAGS, 'GetCounter', 'Return single counter'),
-            DocumentationPart.pathParameter('counterId', 'Counter id'));
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetCounter', 'Return single counter'),
+            DocumentationPart.pathParameter('counter_id', 'Counter id'));
 
         this.publicApi.documentResource(this.valuesResource,
-            DocumentationPart.method(COUNTERS_TAGS, 'GetData', 'Return counter values'),
-            DocumentationPart.queryParameter('counterId', 'Counter id'),
-            DocumentationPart.queryParameter('domainName', 'Domain name'));
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetData', 'Return counter values'),
+            DocumentationPart.queryParameter('counter_id', 'Counter id'),
+            DocumentationPart.queryParameter('domain_name', 'Domain name'));
 
         this.publicApi.documentResource(
             this.csvValuesResource,
-            DocumentationPart.method(COUNTERS_TAGS, 'GetDataCSV', 'Return counter values in CSV'),
-            DocumentationPart.queryParameter('counterId', 'Counter id'),
-            DocumentationPart.queryParameter('domainName', 'Domain name'),
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDataCSV', 'Return counter values in CSV'),
+            DocumentationPart.queryParameter('counter_id', 'Counter id'),
+            DocumentationPart.queryParameter('domain_name', 'Domain name'),
             DocumentationPart.queryParameter('year', 'Year'),
             DocumentationPart.queryParameter('month', 'Month'),
         );
@@ -147,10 +144,10 @@ export class PublicApi {
 
         const integration = defaultIntegration(lambda, {
             requestParameters: {
-                'integration.request.path.domainName': 'method.request.path.domainName',
+                'integration.request.querystring.domain_name': 'method.request.querystring.domain_name',
             },
             requestTemplates: {
-                'application/json': JSON.stringify({domainName: "$util.escapeJavaScript($input.params('domainName'))"}),
+                'application/json': JSON.stringify({domainName: "$util.escapeJavaScript($input.params('domain_name'))"}),
             },
             responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)],
         });
@@ -159,7 +156,7 @@ export class PublicApi {
             this.countersResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 requestParameters: {
-                    'method.request.path.domainName': false,
+                    'method.request.querystring.domain_name': false,
                 },
                 methodResponses: [
                     corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geoJsonResponseModel)),
@@ -201,13 +198,13 @@ export class PublicApi {
 
         const integration = defaultIntegration(lambda, {
             requestParameters: {
-                'integration.request.querystring.counterId': 'method.request.querystring.counterId',
-                'integration.request.querystring.domainName': 'method.request.querystring.domainName',
+                'integration.request.querystring.counter_id': 'method.request.querystring.counter_id',
+                'integration.request.querystring.domain_name': 'method.request.querystring.domain_name',
             },
             requestTemplates: {
                 'application/json': JSON.stringify({
-                    counterId: "$util.escapeJavaScript($input.params('counterId'))",
-                    domainName: "$util.escapeJavaScript($input.params('domainName'))",
+                    counterId: "$util.escapeJavaScript($input.params('counter_id'))",
+                    domainName: "$util.escapeJavaScript($input.params('domain_name'))",
                 }),
             },
             responses: [
@@ -220,8 +217,8 @@ export class PublicApi {
             this.valuesResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 requestParameters: {
-                    'method.request.path.counterId': false,
-                    'method.request.path.domainName': false,
+                    'method.request.querystring.counter_id': false,
+                    'method.request.querystring.domain_name': false,
                 },
                 methodResponses: [
                     corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.jsonValuesResponseModel)),
@@ -240,15 +237,15 @@ export class PublicApi {
             requestParameters: {
                 'integration.request.querystring.year': 'method.request.querystring.year',
                 'integration.request.querystring.month': 'method.request.querystring.month',
-                'integration.request.querystring.domainName': 'method.request.querystring.domainName',
-                'integration.request.querystring.counterId': 'method.request.querystring.counterId',
+                'integration.request.querystring.domain_name': 'method.request.querystring.domain_name',
+                'integration.request.querystring.counter_id': 'method.request.querystring.counter_id',
             },
             requestTemplates: {
                 'application/json': JSON.stringify({
                     year: "$util.escapeJavaScript($input.params('year'))",
                     month: "$util.escapeJavaScript($input.params('month'))",
-                    domainName: "$util.escapeJavaScript($input.params('domainName'))",
-                    counterId: "$util.escapeJavaScript($input.params('counterId'))",
+                    domainName: "$util.escapeJavaScript($input.params('domain_name'))",
+                    counterId: "$util.escapeJavaScript($input.params('counter_id'))",
                 }),
             },
             responses: [
@@ -263,8 +260,8 @@ export class PublicApi {
                 requestParameters: {
                     'method.request.querystring.year': false,
                     'method.request.querystring.month': false,
-                    'method.request.querystring.domainName': false,
-                    'method.request.querystring.counterId': false,
+                    'method.request.querystring.domain_name': false,
+                    'method.request.querystring.counter_id': false,
                 },
                 methodResponses: [
                     corsMethod(methodResponse("200", MediaType.TEXT_CSV, this.csvValuesResponseModel)),

@@ -4,14 +4,14 @@ import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 
 const secretId = process.env.SECRET_ID as string;
 
-export const handler = (event: Record<string, number | string>) => {
+export const handler = (event: Record<string, string>) => {
     return withDbSecret(secretId, () => {
         const start = Date.now();
 
-        const counterId = event.counterId as number;
-        const domainName = event.domainName as string;
+        const counterId = event.counterId;
+        const domainName = event.domainName;
 
-        return CountingSitesService.findData(counterId, domainName).then(data => {
+        return CountingSitesService.findCounterValues(counterId, domainName).then(data => {
             return LambdaResponse.ok(data);
         }).catch(error => {
             console.info("error " + error);
