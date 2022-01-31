@@ -1,9 +1,5 @@
-flask_app := digitraffic_figures
-db_host := 127.0.0.1
-db_user := key_figures
-db_password := key_figures
-db_port := 3306
-db_database := key_figures
+include .env
+
 python := python3.9
 
 create_venv:
@@ -25,33 +21,32 @@ freeze_venv:
 	venv/bin/pip freeze > requirements.txt
 
 clean_docker:
-	cd dbfigures && docker compose kill && docker compose rm -f
+	docker compose kill && docker compose rm -f
 
 csv_to_db:
 	cat data/key_figures/*.csv > combined.csv
-	sed -e 's/\([^–]\)id,from,to,name,filter,query,value/\1/' < combined.csv > dbfigures/key_figures.csv
+	sed -e 's/\([^–]\)id,from,to,name,filter,query,value/\1/' < combined.csv > key_figures.csv
 	rm combined.csv
-	cd dbfigures \
-		&& docker compose cp ./key_figures.csv db:/tmp/key_figures.csv \
-		&& docker compose exec db mysql -u"${db_user}" -p"${db_password}" -e 'truncate key_figures;' ${db_database} \
-		&& docker compose exec db sh -c "mysql -uroot -p'"${db_password}"' -e 'SET GLOBAL local_infile=1';" \
-		&& docker compose exec db sh -c "mysqlimport --ignore-lines=1 --fields-enclosed-by='"'"'"' --fields-terminated-by=',' --local=1 -uroot -p'"${db_password}"' ${db_database} /tmp/key_figures.csv"
-	rm dbfigures/key_figures.csv
+	docker compose cp ./key_figures.csv db:/tmp/key_figures.csv
+	docker compose exec db mysql -u"${DB_USER}" -p"${DB_PASSWORD}" -e 'truncate key_figures;' ${DB_DATABASE}
+	docker compose exec db sh -c "mysql -uroot -p'"${DB_PASSWORD}"' -e 'SET GLOBAL local_infile=1';"
+	docker compose exec db sh -c "mysqlimport --ignore-lines=1 --fields-enclosed-by='"'"'"' --fields-terminated-by=',' --local=1 -uroot -p'"${DB_PASSWORD}"' ${DB_DATABASE} /tmp/key_figures.csv"
+	rm key_figures.csv
 
 start_db:
-	cd dbfigures && docker compose up -d
+	docker compose up -d
 
-run: export FLASK_APP=${flask_app}
+run: export FLASK_APP=${FLASK_APP}
 run:
 	venv/bin/flask run
 
-dev: export FLASK_APP=${flask_app}
+dev: export FLASK_APP=${FLASK_APP}
 dev: export FLASK_ENV=development
-dev: export DB_HOST=${db_host}
-dev: export DB_PORT=${db_port}
-dev: export DB_DATABASE=${db_database}
-dev: export DB_USERNAME=${db_user}
-dev: export DB_PASSWORD=${db_password}
+dev: export DB_HOST=${DB_HOST}
+dev: export DB_PORT=${DB_PORT}
+dev: export DB_DATABASE=${DB_DATABASE}
+dev: export DB_USERNAME=${DB_USER}
+dev: export DB_PASSWORD=${DB_PASSWORD}
 dev:
 	venv/bin/flask run
 
