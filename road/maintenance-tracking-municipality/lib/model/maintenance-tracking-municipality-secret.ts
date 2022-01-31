@@ -1,5 +1,5 @@
 export type MaintenanceTrackingMunicipalitySecret = {
-    username: string,
-    password: string,
-    url: string
+    readonly username: string,
+    readonly password: string,
+    readonly url: string
 }

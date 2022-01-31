@@ -7,9 +7,11 @@ import {
     ApiContractData,
     ApiOperationData,
     ApiRouteData,
+    DbDomainContract,
+    DbDomainTaskMapping,
     DbMaintenanceTracking,
-    DbDomainContract, DbDomainTaskMapping,
-    DbWorkMachine, DbTextId,
+    DbTextId,
+    DbWorkMachine,
 } from "../model/data";
 import {createHarjaId} from "./utils";
 
@@ -71,57 +73,37 @@ export class AutoriUpdate {
      */
     async updateTrackings(domainName: string): Promise<TrackingSaveResult> {
 
-        let saved = 0;
-        let errors = 0;
+        const start = Date.now();
 
         try {
             const contracts: DbDomainContract[] = await inDatabaseReadonly(async (db: DTDatabase) => {
                 return DataDb.getContractsWithSource(db, domainName);
             });
-            console.info(`methood=updateTrackings domain=${domainName} contracts: ${JSON.stringify(contracts)}`);
+            // console.info(`methood=updateTrackings domain=${domainName} contracts: ${JSON.stringify(contracts)}`);
 
             const taskMappings: DbDomainTaskMapping[] = await inDatabaseReadonly(async (db: DTDatabase) => {
                 return DataDb.getTaskMappings(db, domainName);
             });
+            // console.info(`methood=updateTrackings taskMappings: ${JSON.stringify(taskMappings)}`);
 
-            console.info(`methood=updateTrackings taskMappings: ${JSON.stringify(taskMappings)}`);
-
-            await Promise.allSettled(contracts.map(async (contract: DbDomainContract) => {
-                console.info(`method=updateTrackings for domain=${domainName} contract=${contract.contract}`);
-
-                let start = this.resolveContractLastUpdateTime( contract );
+            return Promise.allSettled(contracts.map(async (contract: DbDomainContract) => {
+                // console.info(`method=updateTrackings for domain=${domainName} contract=${contract.contract}`);
+                const start = this.resolveContractLastUpdateTime( contract );
                 console.info(`resolveContractLastUpdateTime: domain=${domainName} contract=${contract.contract} ${start.toISOString()}`);
-                let routeData: ApiRouteData[] = [];
-                do {
-                    console.info(`methood=updateTrackings domain=${domainName} contract=${contract.contract} getNextRouteDataForContract from ${start.toISOString()}`);
-                    routeData = await this.api.getNextRouteDataForContract(contract.contract, start, 24);
-                    console.info(`routeData.length ${routeData.length}`);
-                    if (routeData.length > 0) {
-                        const  result = await this.updateRoutes(contract, routeData, taskMappings);
-                        saved += result.saved;
-                        errors += result.errors;
-                        start = this.getLatestUpdatedDateForRouteData(routeData);
-                        console.info(`getLatestUpdatedDateForRouteData: domain=${domainName} contract=${contract.contract} ${start.toISOString()}`);
-                    } else {
-                        console.info(`methood=updateTrackings No new data for contract=${contract} after ${start.toISOString()}`);
-                    }
-
-                } while (routeData.length > 0);
-            }));
-
+                return this.updateContracTrackings(contract, taskMappings, start);
+            })).then((results : PromiseSettledResult<TrackingSaveResult>[]) => {
+                const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
+                const errors = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.errors : 1), 0);
+                console.info(`method=updateTrackings count=${saved} errors=${errors} tookMs=${Date.now()-start}`);
+                return {
+                    saved: saved,
+                    errors: errors,
+                };
+            });
         } catch (error) {
-            errors++;
             console.error(`method=updateTrackings domain=${domainName} Failed for all contracts`, error);
             throw error;
         }
-
-        const result = {
-            errors,
-            saved,
-        } as TrackingSaveResult;
-
-        console.info(`method=updateTrackings result ${JSON.stringify(result)}`);
-        return result;
     }
 
     getLatestUpdatedDateForRouteData(routeData: ApiRouteData[]) : Date {
@@ -137,7 +119,7 @@ export class AutoriUpdate {
         }
     }
 
-    async updateRoutes(contract: DbDomainContract, routeData: ApiRouteData[], taskMappings: DbDomainTaskMapping[]) : Promise<TrackingSaveResult> {
+    private async saveTrackings(contract: DbDomainContract, routeData: ApiRouteData[], taskMappings: DbDomainTaskMapping[]) : Promise<TrackingSaveResult> {
         let saved = 0;
         let errors = 0;
 
@@ -278,5 +260,62 @@ export class AutoriUpdate {
             return filtered;
         }, []);
         return tasks;
+    }
+
+    /**
+     * Function will get route data from api from given date and save it to db and recursively
+     * call again the function with new date until no new data is available
+     *
+     * @param contract witch trackings to update
+     * @param taskMappings mappings for api tasks -> harja tasks
+     * @param start exclusive start time where to start asking for new data from api
+     * @private
+     */
+    private updateContracTrackings(contract: DbDomainContract, taskMappings : DbDomainTaskMapping[], start: Date) : Promise<TrackingSaveResult> {
+        console.info(`methood=updateContracTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${start.toISOString()}`);
+        // routeData = await this.api.getNextRouteDataForContract(contract.contract, start, 24);
+        console.debug(`method=updateContracTrackings going to call getNextRouteDataForContract(${contract.contract}, ${start.toISOString()}, 24)`);
+        return this.api.getNextRouteDataForContract(contract.contract, start, 24)
+            .then((routeData: ApiRouteData[]) => {
+
+                if (routeData.length > 0) {
+                    return this.saveTrackings(contract, routeData, taskMappings)
+                        .then((result : TrackingSaveResult) => {
+                            const latestUpdated = this.getLatestUpdatedDateForRouteData(routeData);
+                            // console.info(`getLatestUpdatedDateForRouteData: domain=${contract.domain} contract=${contract.contract} ${start.toISOString()}`);
+                            return this.updateContracTrackings(contract, taskMappings, latestUpdated)
+                                .then((nextResult : TrackingSaveResult) => {
+                                    return {
+                                        saved: result.saved + nextResult.saved,
+                                        errors: result.errors + nextResult.errors,
+                                    };
+                                }).catch((error) => {
+                                    console.error(`methood=updateContracTrackings Error ${error}`);
+                                    return {
+                                        saved: result.saved,
+                                        errors: result.errors + 1,
+                                    };
+                                });
+                        }).catch((error) => {
+                            console.error(`methood=updateContracTrackings Error ${error}`);
+                            return {
+                                saved: 0,
+                                errors: 1,
+                            };
+                        });
+                } else {
+                    console.info(`methood=updateContracTrackings No new data for contract=${contract} after ${start.toISOString()}`);
+                    return {
+                        saved: 0,
+                        errors: 0,
+                    };
+                }
+            })
+            .catch((error) => {
+                console.error(`methood=updateContracTrackings Error ${error}`);
+                return {
+                    saved: 0,
+                    errors: 0};
+            });
     }
 }

@@ -29,7 +29,7 @@ export class AutoriApi {
      * @param method to log
      * @param url url after domain. Ie. /api/contracts
      */
-    async getFromServer<T>(method: string, url: string): Promise<T> {
+    private async getFromServer<T>(method: string, url: string): Promise<T> {
         const start = Date.now();
         const serverUrl = `${this.endpointUrl}${url}`;
 
@@ -72,11 +72,11 @@ export class AutoriApi {
         }
     }
 
-    getContracts(): Promise<ApiContractData[]> {
+    public getContracts(): Promise<ApiContractData[]> {
         return this.getFromServer<ApiContractData[]>('getContracts', URL_CONTRACTS);
     }
 
-    getOperations(): Promise<ApiOperationData[]> {
+    public getOperations(): Promise<ApiOperationData[]> {
         return this.getFromServer<ApiOperationData[]>('getOperations', URL_OPERATIONS);
     }
 
@@ -86,7 +86,7 @@ export class AutoriApi {
      * @param from data that has been modified after (exclusive) this
      * @param periodHours how long period of data to fetch in hours
      */
-    getNextRouteDataForContract(contract: string, from: Date, periodHours : number): Promise<ApiRouteData[]> {
+    public getNextRouteDataForContract(contract: string, from: Date, periodHours : number): Promise<ApiRouteData[]> {
         const to = moment(from).add(periodHours, 'hours').add(1, 'ms'); // End and start are exclusive
         return this.getRouteDataForContract(contract, from, to.toDate())
             .then((data) => {
@@ -97,9 +97,13 @@ export class AutoriApi {
                     }
                     // subtract 1ms as api start and end dates are exclusive
                     const nextFrom = moment(to).subtract(1, 'ms');
+                    console.debug(`method=getNextRouteDataForContract going to call getNextRouteDataForContract(${contract}, ${nextFrom.toDate().toISOString()}, ${periodHours})`);
                     return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodHours);
                 }
                 return data;
+            }).catch(error => {
+                console.info(`method=getNextRouteDataForContract ${contract} from: ${from.toISOString()} to: ${to.toISOString()} error: ${error}`);
+                throw error;
             });
     }
 
@@ -109,7 +113,7 @@ export class AutoriApi {
      * @param from data that has been modified after (exclusive) this
      * @param to data that has been modified before (exclusive) this
      */
-    getRouteDataForContract(contract: string, from: Date, to: Date): Promise<ApiRouteData[]> {
+    private getRouteDataForContract(contract: string, from: Date, to: Date): Promise<ApiRouteData[]> {
         const fromString = from.toISOString(); // With milliseconds Z-time
         const toString = to.toISOString();
         const start = Date.now();
@@ -119,6 +123,9 @@ export class AutoriApi {
                 const end = Date.now();
                 console.info(`method=getRouteDataForContract ${contract} from: ${fromString} to: ${toString} data count=${routeData.length} tookMs=${end-start}`);
                 return routeData;
+            }).catch(error => {
+                console.error(`method=getRouteDataForContract ${contract} from: ${fromString} to: ${toString} error: ${error}`);
+                throw error;
             });
     }
 }

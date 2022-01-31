@@ -1,14 +1,17 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {DataType} from "digitraffic-common/database/last-updated";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {DTDatabase} from "digitraffic-common/database/database";
-import {lambda_layer_awscli} from "aws-cdk-lib";
 import {DbDomainContract, DbMaintenanceTracking} from "../lib/model/data";
-import {SRID_WGS84} from "digitraffic-common/utils/geometry";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
         fn, truncate, 'road', 'road', 'localhost:54322/road',
+    );
+}
+
+export function dbTestBaseNoTruncate(fn: (db: DTDatabase) => void) {
+    return commonDbTestBase(
+        fn, async () => { return; }, 'road', 'road', 'localhost:54322/road',
     );
 }
 
@@ -45,8 +48,8 @@ export function insertDomaindTaskMapping(
 }
 
 export function insertDomaindContract(
-    db: DTDatabase, domainName: string, contract: string, name: string, startDate: Date | undefined, endDate: Date | undefined,
-    dataLastUpdated: undefined, source : string,
+    db: DTDatabase, domainName: string, contract: string, name: string, source : string, startDate?: Date, endDate?: Date,
+    dataLastUpdated?: Date,
 ): Promise<null> {
     return db.tx(t => {
         return t.none(`

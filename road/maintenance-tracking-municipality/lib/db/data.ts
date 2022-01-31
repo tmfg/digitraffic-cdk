@@ -1,11 +1,5 @@
 import {PreparedStatement} from "pg-promise";
-import {
-    DbNumberId, DbTextId,
-    DbMaintenanceTracking,
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbWorkMachine,
-} from "../model/data";
+import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/data";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 import {SRID_WGS84} from "digitraffic-common/utils/geometry";
 
@@ -29,10 +23,11 @@ const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT = new PreparedStatement({
 export function upsertContracts(db: DTDatabase, dbContracts: DbDomainContract[]) : Promise<DbTextId[]> {
     try {
         return db.tx(t => {
-            return t.batch(dbContracts.map(contract => {
+            const upsertContract = (contract: DbDomainContract) => {
                 return t.oneOrNone(PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT,
                     [contract.domain, contract.contract, contract.name, contract.start_date, contract.end_date, contract.data_last_updated]) as Promise<DbTextId>;
-            }));
+            };
+            return t.batch(dbContracts.map(upsertContract));
         });
     } catch (e) {
         console.error(`method=upsertContracts failed`, e);
@@ -80,10 +75,11 @@ const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING = new PreparedStatement
 
 export function insertNewTasks(db: DTDatabase, dbTaskMapping: DbDomainTaskMapping[]) : Promise<DbTextId[]> {
     return db.tx(t => {
-        return t.batch(dbTaskMapping.map(taskMapping => {
+        const upsertTaskMapping = (taskMapping: DbDomainTaskMapping) => {
             return t.oneOrNone(PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPING,
                 [taskMapping.name, taskMapping.original_id, taskMapping.domain, taskMapping.ignore]) as Promise<DbTextId>;
-        }));
+        };
+        return t.batch(dbTaskMapping.map(upsertTaskMapping));
     });
 }
 
@@ -123,26 +119,31 @@ const PS_INSERT_MAINTENANCE_TRACKING_TASK = new PreparedStatement({
     text: SQL_INSERT_MAINTENANCE_TRACKING_TASK,
 });
 
-export function upsertMaintenanceTracking(db: DTTransaction, data: DbMaintenanceTracking[]) {
-    return Promise.all(data.map(async d => {
+export function upsertMaintenanceTracking(db: DTTransaction, data: DbMaintenanceTracking[]): Promise<DbNumberId[]> {
 
-        console.info("method=upsertMaintenanceTracking INSERT: " + JSON.stringify(d));
+    const upsertTracking = async (tracking: DbMaintenanceTracking) => {
+
+        // console.info("method=upsertMaintenanceTracking INSERT: " + JSON.stringify(tracking));
         const mtId: DbNumberId = await db.one(PS_UPSERT_MAINTENANCE_TRACKING,
-            [d.sending_system, d.sending_time, d.last_point, d.line_string, d.work_machine_id, d.start_time, d.end_time, d.direction, d.finished, d.domain, d.contract, d.message_original_id])
+            [tracking.sending_system, tracking.sending_time, tracking.last_point, tracking.line_string, tracking.work_machine_id, tracking.start_time, tracking.end_time, tracking.direction, tracking.finished, tracking.domain, tracking.contract, tracking.message_original_id])
             .catch((error) => {
                 console.error('method=upsertMaintenanceTracking failed', error);
                 throw error;
             });
-        console.info(`method=upsertMaintenanceTracking id=${mtId.id} tasks: ${JSON.stringify(d.tasks)}`);
 
-        await db.batch(d.tasks.map(task => {
-            return db.none(PS_INSERT_MAINTENANCE_TRACKING_TASK, [mtId.id, task])
+        const insertHarjaTask = (harjaTask: string) => {
+            return db.none(PS_INSERT_MAINTENANCE_TRACKING_TASK, [mtId.id, harjaTask])
                 .catch((error) => {
-                    console.error(`method=upsertMaintenanceTracking insert task ${task} for tracking ${mtId.id} failed`, error);
+                    console.error(`method=upsertMaintenanceTracking insert task ${harjaTask} for tracking ${mtId.id} failed`, error);
                     throw error;
                 });
-        }));
-    }));
+        };
+        await db.batch(tracking.tasks.map(insertHarjaTask));
+        return mtId;
+        // console.info(`method=upsertMaintenanceTracking id=${mtId.id} tasks: ${JSON.stringify(tracking.tasks)}`);
+    };
+
+    return Promise.all(data.map(upsertTracking));
 }
 
 
