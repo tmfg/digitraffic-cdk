@@ -5,7 +5,6 @@ import {DigitrafficStack, SOLUTION_KEY, StackConfiguration} from "./stack";
 import {IConstruct} from "constructs";
 import {CfnMethod, CfnResource} from "aws-cdk-lib/aws-apigateway";
 import {paramCase, snakeCase} from "change-case";
-import {CfnIntegration} from "aws-cdk-lib/aws-apigatewayv2";
 import IntegrationProperty = CfnMethod.IntegrationProperty;
 
 const MAX_CONCURRENCY_LIMIT = 100;
@@ -25,14 +24,14 @@ export class StackCheckingAspect implements IAspect {
     public visit(node: IConstruct): void {
         //console.info("visiting class " + node.constructor.name);
 
-        this.checkStack(node);
+        StackCheckingAspect.checkStack(node);
         this.checkFunction(node);
-        this.checkTags(node);
-        this.checkBucket(node);
+        StackCheckingAspect.checkTags(node);
+        StackCheckingAspect.checkBucket(node);
         this.checkResourceCasing(node);
     }
 
-    checkStack(node: IConstruct) {
+    private static checkStack(node: IConstruct) {
         if (node instanceof DigitrafficStack) {
             const s = node as DigitrafficStack;
 
@@ -46,7 +45,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    checkFunction(node: IConstruct) {
+    private checkFunction(node: IConstruct) {
         if (node instanceof CfnFunction) {
             const f = node as CfnFunction;
 
@@ -74,7 +73,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    checkTags(node: IConstruct) {
+    private static checkTags(node: IConstruct) {
         if (node instanceof Stack) {
             const s = node as Stack;
 
@@ -84,7 +83,7 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    checkBucket(node: IConstruct) {
+    private static checkBucket(node: IConstruct) {
         if (node instanceof CfnBucket) {
             const b = node as CfnBucket;
             const c = b.publicAccessBlockConfiguration as CfnBucket.PublicAccessBlockConfigurationProperty;
@@ -97,33 +96,33 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    isValidPath(path: string) {
+    private static isValidPath(path: string) {
         return path.includes('{') || paramCase(path) === path;
     }
 
-    isValidQueryString(name: string) {
+    private static isValidQueryString(name: string) {
         return snakeCase(name) === name;
     }
 
-    checkResourceCasing(node: IConstruct) {
+    private checkResourceCasing(node: IConstruct) {
         if (node instanceof CfnResource) {
-            const r = node as CfnResource;
+            const resource = node as CfnResource;
 
-            if (!this.isValidPath(r.pathPart)) {
-                Annotations.of(node).addError(`Path part ${r.pathPart} needs to be in kebab-case`);
+            if (!StackCheckingAspect.isValidPath(resource.pathPart)) {
+                Annotations.of(node).addError(`Path part ${resource.pathPart} needs to be in kebab-case`);
             }
         } else if (node instanceof CfnMethod) {
-            const m = node as CfnMethod;
-            const i = m.integration as IntegrationProperty;
+            const method = node as CfnMethod;
+            const integration = method.integration as IntegrationProperty;
 
-            if (i && i.requestParameters) {
-                Object.keys(i.requestParameters).forEach(key => {
+            if (integration && integration.requestParameters) {
+                Object.keys(integration.requestParameters).forEach(key => {
                     const split = key.split('.');
                     const type = split[2];
                     const name = split[3];
 
-                    if (type === 'querystring' && !this.isValidQueryString(name)) {
-                        Annotations.of(node).addError(`Querystring ${name} needs to be in snake case`);
+                    if (type === 'querystring' && !StackCheckingAspect.isValidQueryString(name)) {
+                        Annotations.of(node).addError(`Querystring ${name} needs to be in snake_case`);
                     }
                 });
             }
