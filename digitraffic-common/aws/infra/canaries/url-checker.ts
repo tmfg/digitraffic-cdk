@@ -13,7 +13,7 @@ import {isValidGeoJson} from "../../../utils/geometry";
 export const API_KEY_HEADER = "x-api-key";
 
 const baseHeaders = {
-    "Digitraffic-User" : "Digitraffic/AWS Canary",
+    "Digitraffic-User" : "internal-digitraffic-canary",
     "Accept-Encoding" : "gzip",
     "Accept": "*/*",
 } as Record<string, string>;
