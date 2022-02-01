@@ -58,6 +58,7 @@ export class AwakeAiETAService {
                     if (!val) {
                         return acc;
                     }
+                    console.info('method=getAwakeAiTimestamps Received ETA response: %s', JSON.stringify(val));
                     const timestamps = this.toTimeStamps(val);
 
                     // temporarily publish ETA also as ETB
@@ -72,9 +73,6 @@ export class AwakeAiETAService {
 
     private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiETAResponseAndShip> {
         const start = Date.now();
-        console.info('method=getAwakeAiTimestamp fetching ETA for ship with IMO %d tookMs=%d',
-            ship.imo,
-            (Date.now() - start));
 
         // if less than 24 hours to ship's arrival, set destination LOCODE explicitly
         const diffEtaToNow = moment(ship.eta).diff(moment());
@@ -82,6 +80,15 @@ export class AwakeAiETAService {
         const locode = diffHours < 24 ? ship.locode : null;
 
         const response = await retry(() => this.api.getETA(ship.imo, locode), 1);
+
+        console.info(
+            'method=getAwakeAiTimestamp fetching ETA for ship with IMO: %d, LOCODE: %s, portcallid: %d, tookMs=%d',
+            ship.imo,
+            ship.locode,
+            ship.portcall_id,
+            (Date.now() - start),
+        );
+
         return {
             response,
             ship,
@@ -100,32 +107,32 @@ export class AwakeAiETAService {
     private handleSchedule(schedule: AwakeAiVoyageShipVoyageSchedule, ship: DbETAShip, diffHours: number): ApiTimestamp[] {
         return this.getETAPredictions(schedule).map(etaPrediction => {
             if (!etaPrediction.arrivalTime) {
-                console.warn(`method=handleSchedule state=${AwakeDataState.NO_PREDICTED_ETA}`);
+                console.warn(`method=handleSchedule state=${AwakeDataState.NO_PREDICTED_ETA}, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                 return null;
             }
 
             if (!AwakeAiETAService.destinationIsFinnish(etaPrediction.locode)) {
-                console.warn(`method=handleSchedule state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}`);
+                console.warn(`method=handleSchedule state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                 return null;
             }
 
             let port: string = etaPrediction.locode;
             if (etaPrediction.locode != ship.locode) {
                 if (diffHours >= 24) {
-                    console.warn(`method=handleSchedule state=${AwakeDataState.DIFFERING_LOCODE} ${etaPrediction.locode} with ${ship.locode}, not persisting`);
+                    console.warn(`method=handleSchedule state=${AwakeDataState.DIFFERING_LOCODE} not persisting, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                     return null;
                 } else if (this.overriddenDestinations.includes(ship.locode)) {
-                    console.warn(`method=handleSchedule state=${AwakeDataState.OVERRIDDEN_LOCODE} ${etaPrediction.locode} with ${ship.locode} in override list`);
+                    console.warn(`method=handleSchedule state=${AwakeDataState.OVERRIDDEN_LOCODE} LOCODE in override list, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                     port = ship.locode;
                 }
             }
 
             if (etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA && !this.publishAsETBDestinations.includes(port)) {
-                console.warn(`method=handleSchedule ETP event for non-publishable port ${port}`);
+                console.warn(`method=handleSchedule ETP event for non-publishable LOCODE, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                 return null;
             }
 
-            console.info('method=handleSchedule schedule was valid');
+            console.info(`method=handleSchedule schedule was valid, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
 
             const timestamp: ApiTimestamp = {
                 ship: {
@@ -142,18 +149,19 @@ export class AwakeAiETAService {
                 portcallId: ship.portcall_id,
                 eventType: etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA,
             };
+            console.info('method=handleSchedule created timestamp: %s', JSON.stringify(timestamp));
             return timestamp;
         }).filter((ts): ts is ApiTimestamp => ts != null);
     }
 
     private getETAPredictions(schedule: AwakeAiVoyageShipVoyageSchedule): AwakeAiVoyageEtaPrediction[] {
         if (schedule.predictability !== AwakeAiVoyagePredictability.PREDICTABLE) {
-            console.warn(`method=getETAPredictions state=${AwakeDataState.NO_PREDICTED_ETA} voyage was not predictable`);
+            console.warn(`method=getETAPredictions state=${AwakeDataState.NO_PREDICTED_ETA} voyage was not predictable, schedule ${JSON.stringify(schedule)}`);
             return [];
         }
 
         if (!schedule.predictedVoyages.length) {
-            console.warn(`method=getETAPredictions state=${AwakeDataState.NO_PREDICTED_ETA} predicted voyages was empty`);
+            console.warn(`method=getETAPredictions state=${AwakeDataState.NO_PREDICTED_ETA} predicted voyages was empty, schedule ${JSON.stringify(schedule)}`);
             return [];
         }
 
@@ -161,7 +169,7 @@ export class AwakeAiETAService {
         const eta = schedule.predictedVoyages[0];
 
         if (eta.voyageStatus !== AwakeAiVoyageShipStatus.UNDER_WAY) {
-            console.warn(`method=getETAPredictions state=${AwakeDataState.SHIP_NOT_UNDER_WAY} actual ship status ${eta.voyageStatus} `);
+            console.warn(`method=getETAPredictions state=${AwakeDataState.SHIP_NOT_UNDER_WAY} actual ship status ${eta.voyageStatus}, schedule ${JSON.stringify(schedule)}`);
             return [];
         }
 

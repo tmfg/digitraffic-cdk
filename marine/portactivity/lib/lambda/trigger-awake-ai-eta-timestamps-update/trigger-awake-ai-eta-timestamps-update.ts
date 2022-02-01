@@ -16,6 +16,11 @@ export function handlerFn(withSecretFn: SecretFunction<DbSecret, void>, sns: SNS
             console.info('method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for count=%d ships',
                 ships.length);
 
+            for (const ship of ships) {
+                console.info('method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for ship with IMO: %d, LOCODE: %s, portcallid: %d',
+                    ship.imo, ship.locode, ship.portcall_id);
+            }
+
             for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {
                 await MessagingUtil.snsPublish(JSON.stringify(chunk), publishTopic, sns);
             }
