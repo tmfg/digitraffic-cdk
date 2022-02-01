@@ -12,7 +12,7 @@ export const handler = (event: Record<string, string>) => {
         const domainName = event.domainName;
 
         return CountingSitesService.findCounterValues(counterId, domainName).then(data => {
-            return LambdaResponse.ok(data);
+            return LambdaResponse.okJson(data);
         }).catch(error => {
             console.info("error " + error);
 

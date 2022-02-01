@@ -3,19 +3,23 @@ export class LambdaResponse<T> {
     readonly body: T;
     readonly fileName?: string;
 
-    static ok<T>(body: T, fileName?: string): LambdaResponse<T> {
+    static ok<T>(body: T, fileName?: string) {
         return this.create(200, body, fileName);
     }
 
-    static badRequest(body: string): LambdaResponse<string> {
+    static okJson<T>(json: T, fileName?: string) {
+        return this.create(200, JSON.stringify(json, null, 2), fileName);
+    }
+
+    static badRequest(body: string) {
         return this.create(400, body);
     }
 
-    static notFound(): LambdaResponse<string> {
+    static notFound() {
         return this.create(404, 'Not found');
     }
 
-    static internalError(): LambdaResponse<string> {
+    static internalError() {
         return this.create(500, 'Internal error');
     }
 

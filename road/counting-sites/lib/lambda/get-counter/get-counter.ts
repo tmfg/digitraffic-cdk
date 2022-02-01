@@ -13,7 +13,7 @@ export const handler = (event: Record<string, string>) => {
             if (featureCollection?.features.length === 0) {
                 return LambdaResponse.notFound();
             }
-            return LambdaResponse.ok(JSON.stringify(featureCollection, null, 3));
+            return LambdaResponse.okJson(featureCollection);
         }).catch(error => {
             console.info("error " + error);
 

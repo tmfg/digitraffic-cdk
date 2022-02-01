@@ -10,7 +10,7 @@ export const handler = (event: Record<string, string>) => {
         const domainName = event.domainName;
 
         return CountingSitesService.findCounters(domainName).then(featureCollection => {
-            return LambdaResponse.ok(JSON.stringify(featureCollection, null, 3));
+            return LambdaResponse.okJson(featureCollection);
         }).catch(error => {
             console.info("error " + error);
 
