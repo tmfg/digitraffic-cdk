@@ -10,15 +10,7 @@ import {
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {AutoriUpdate, UNKNOWN_TASK_NAME} from "../../lib/service/autori-update";
 import {AutoriApi} from "../../lib/api/autori";
-import {
-    ApiContractData,
-    ApiOperationData,
-    ApiRouteData,
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbMaintenanceTracking,
-    DbWorkMachine,
-} from "../../lib/model/data";
+import {ApiContractData, ApiOperationData, ApiRouteData,} from "../../lib/model/data";
 import * as sinon from "sinon";
 import {SinonStub} from "sinon";
 import {Feature, Geometry, LineString, Position} from "geojson";
@@ -26,6 +18,7 @@ import * as utils from "../../lib/service/utils";
 import moment from "moment";
 import {getRandomNumber, randomString} from "digitraffic-common/test/testutils";
 import * as DataDb from "../../lib/db/data";
+import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../../lib/model/db-data";
 
 
 const DOMAIN_1 = 'autori-oulu';
@@ -52,8 +45,6 @@ const autoriUpdateService = createAutoriUpdateService();
 function createAutoriUpdateService() {
     return new AutoriUpdate(AutoriApi.prototype);
 }
-
-jest.setTimeout(10000000);
 
 describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
@@ -119,6 +110,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             const ls = parseLineString(t?.line_string);
             expect(ls.coordinates[0][1]).toEqual(g.coordinates[0][1]);
             console.info(`Found ${JSON.stringify(ls)}`);
+            expect(t?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(now));
+            expect(t?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(now));
         });
     });
 
@@ -297,17 +290,17 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             db, HARJA_PAVING ,OPERATION_PAVING, DOMAIN_1, false,
         );
 
+        // Create two routes, 2 days and 1 day old
         const route2d: ApiRouteData = createApiRouteData(past2D, createLineStringGeometries(1, 1), [OPERATION_BRUSHNG]);
         const route1d: ApiRouteData = createApiRouteData(past1D, createLineStringGeometries(1, 1), [OPERATION_PAVING]);
 
-
-        console.debug(`past3D: ${past3D.toISOString()} past2D: ${past2D.toISOString()}`);
+        // Sub api to return those routes
         const stub = getStubForGetNextRouteDataForContract();
         mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past3D, [route2d]);
         mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past2D, [route1d]);
         mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past1D, []);
 
-        await autoriUpdateService.updateTrackings(DOMAIN_1);
+        await autoriUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
         const trackings = await findAllTrackings(db, DOMAIN_1);
         expect(trackings.length).toEqual(2);
@@ -316,9 +309,13 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
         expect(olderTracking?.tasks.length).toEqual(1);
         expect(olderTracking?.tasks).toContain(HARJA_BRUSHING);
+        expect(olderTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past2D));
+        expect(olderTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past2D));
 
         expect(latestTracking?.tasks.length).toEqual(1);
         expect(latestTracking?.tasks).toContain(HARJA_PAVING);
+        expect(latestTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past1D));
+        expect(latestTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past1D));
     });
 
 
@@ -438,10 +435,18 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             created: new Date(),
             updated: updated,
             id: randomString(),
-            startTime: moment().subtract(1, 'hours').toDate(),
-            endTime: new Date(),
+            startTime: createTrackingStartTimeFromUpdatedTime(updated),
+            endTime: createTrackingEndTimeFromUpdatedTime(updated),
             operations: operations,
         };
+    }
+
+    function createTrackingStartTimeFromUpdatedTime(updatedTime : Date) : Date {
+        return moment(updatedTime).subtract(5, 'minutes').toDate();
+    }
+
+    function createTrackingEndTimeFromUpdatedTime(updatedTime : Date) : Date {
+        return moment(updatedTime).subtract(1, 'minutes').toDate();
     }
 
     function createApiRoutedataFeatures(geometries : Geometry[]) : Feature[] {

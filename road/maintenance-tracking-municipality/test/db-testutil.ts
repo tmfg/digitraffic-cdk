@@ -1,7 +1,7 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {DTDatabase} from "digitraffic-common/database/database";
-import {DbDomainContract, DbMaintenanceTracking} from "../lib/model/data";
+import {DbDomainContract, DbMaintenanceTracking} from "../lib/model/db-data";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(

@@ -1,7 +1,7 @@
 import {PreparedStatement} from "pg-promise";
-import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/data";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 import {SRID_WGS84} from "digitraffic-common/utils/geometry";
+import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/db-data";
 
 
 const SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT =

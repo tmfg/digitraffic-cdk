@@ -26,7 +26,7 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingMunici
         try {
             await autoriUpdateService.updateContracts(domainName);
             await autoriUpdateService.updateTasks(domainName);
-            return autoriUpdateService.updateTrackings(domainName)
+            return autoriUpdateService.updateTrackingsForDomain(domainName)
                 .then(savedResult => {
                     console.info(`method=autoriUpdateData count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
                     return savedResult;
