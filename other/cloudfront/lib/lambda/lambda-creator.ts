@@ -1,4 +1,4 @@
-import {Stack} from 'aws-cdk-lib';
+import {Duration, Stack} from 'aws-cdk-lib';
 import {Function, InlineCode, Runtime, Version} from 'aws-cdk-lib/aws-lambda';
 import {Role} from 'aws-cdk-lib/aws-iam';
 
@@ -55,6 +55,8 @@ export function createFunction(stack: Stack, edgeLambdaRole: Role, functionName:
         code: new InlineCode(functionBody),
         handler: 'index.handler',
         role: edgeLambdaRole,
+        reservedConcurrentExecutions: 10,
+        timeout: Duration.seconds(2),
     });
 
     return edgeFunction.currentVersion;

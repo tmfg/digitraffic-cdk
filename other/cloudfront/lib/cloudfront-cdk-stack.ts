@@ -1,7 +1,7 @@
 import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront';
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
-import {Stack, StackProps} from "aws-cdk-lib";
+import {Aspects, Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig, LambdaMap} from "./origin-configs";
 import {CFDistribution, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
 import {
@@ -13,6 +13,7 @@ import {
 } from "./lambda/lambda-creator";
 import {createDistribution} from "./distribution-util";
 import {createRealtimeLogging, StreamingConfig} from "./streaming-util";
+import {StackCheckingAspect} from "digitraffic-common/aws/infra/stack/stack-checking-aspect";
 
 type ViewerPolicyMap = {
     [key: string]: string,
@@ -36,7 +37,7 @@ export class CloudfrontCdkStack extends Stack {
             p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps,
         ));
 
-        //        Aspects.of(this).add(new StackCheckingAspect());
+        Aspects.of(this).add(new StackCheckingAspect());
     }
 
     validateDefaultBehaviors(props: Props[]) {

@@ -6,6 +6,7 @@ import {IConstruct} from "constructs";
 import {CfnMethod, CfnResource} from "aws-cdk-lib/aws-apigateway";
 import {paramCase, snakeCase} from "change-case";
 import IntegrationProperty = CfnMethod.IntegrationProperty;
+import {CfnQueue} from "aws-cdk-lib/aws-sqs";
 
 const MAX_CONCURRENCY_LIMIT = 100;
 const NODE_RUNTIME = Runtime.NODEJS_14_X.name;
@@ -29,6 +30,7 @@ export class StackCheckingAspect implements IAspect {
         StackCheckingAspect.checkTags(node);
         StackCheckingAspect.checkBucket(node);
         this.checkResourceCasing(node);
+        StackCheckingAspect.checkQueueEncryption(node);
     }
 
     private static checkStack(node: IConstruct) {
@@ -125,6 +127,16 @@ export class StackCheckingAspect implements IAspect {
                         Annotations.of(node).addError(`Querystring ${name} needs to be in snake_case`);
                     }
                 });
+            }
+        }
+    }
+
+    private static checkQueueEncryption(node: IConstruct) {
+        if (node instanceof CfnQueue) {
+            const queue = node as CfnQueue;
+
+            if (!queue.kmsMasterKeyId) {
+                Annotations.of(node).addError('Queue must have encryption enabled');
             }
         }
     }
