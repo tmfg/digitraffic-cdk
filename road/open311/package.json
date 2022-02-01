@@ -35,8 +35,8 @@
   },
   "dependencies": {
     "aws-cdk-lib": "*",
-    "aws-sdk": "*",
     "axios": "^0.21.1",
+    "digitraffic-common": "*",
     "pg-native": "*",
     "pg-promise": "*",
     "source-map-support": "^0.5.19"
