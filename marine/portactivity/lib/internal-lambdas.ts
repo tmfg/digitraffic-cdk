@@ -35,22 +35,22 @@ export function create(stack: DigitrafficStack,
         topicName: awakeETAUpdateTopicName,
         displayName: awakeETAUpdateTopicName,
     });
-    const triggerAwakeAiETATimestampsLambda = createTriggerAwakeAiETATimestampsLambda(stack, triggerAwakeETAUpdateTopic);
-    const updateAwakeAiETATimestampsLambda = createUpdateAwakeAiETATimestampsLambda(stack, triggerAwakeETAUpdateTopic, queueAndDLQ.queue);
+    const triggerAwakeAiETAShipTimestampsLambda = createTriggerAwakeAiETAShipTimestampsLambda(stack, triggerAwakeETAUpdateTopic);
+    const updateAwakeAiETAShipTimestampsLambda = createUpdateAwakeAiETAShipTimestampsLambda(stack, triggerAwakeETAUpdateTopic, queueAndDLQ.queue);
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(stack, queueAndDLQ.queue);
     const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(stack, queueAndDLQ.queue);
 
     stack.grantSecret(
-        cpqLambda, triggerAwakeAiETATimestampsLambda, updateAwakeAiETATimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda,
+        cpqLambda, triggerAwakeAiETAShipTimestampsLambda, updateAwakeAiETAShipTimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda,
     );
     new DigitrafficLogSubscriptions(
-        stack, cpqLambda, triggerAwakeAiETATimestampsLambda, updateAwakeAiETATimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda,
+        stack, cpqLambda, triggerAwakeAiETAShipTimestampsLambda, updateAwakeAiETAShipTimestampsLambda, updateScheduleTimestampsLambda, updateTimestampsFromPilotwebLambda,
     );
 
     Scheduler.everyMinutes(stack,
         'PortActivity-UpdateAwakeETAScheduler',
         10,
-        triggerAwakeAiETATimestampsLambda);
+        triggerAwakeAiETAShipTimestampsLambda);
     Scheduler.everyMinutes(stack,
         'PortActivity-UpdateSchedulesScheduler',
         10,
@@ -69,11 +69,11 @@ export function create(stack: DigitrafficStack,
     }
 }
 
-function createTriggerAwakeAiETATimestampsLambda(stack: DigitrafficStack, topic: Topic) {
+function createTriggerAwakeAiETAShipTimestampsLambda(stack: DigitrafficStack, topic: Topic) {
     const environment = stack.createLambdaEnvironment();
     environment[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] = topic.topicArn;
 
-    const lambda = MonitoredFunction.createV2(stack, 'trigger-awake-ai-eta-timestamps-update', environment, {
+    const lambda = MonitoredFunction.createV2(stack, 'trigger-awake-ai-eta-ship-timestamps-update', environment, {
         memorySize: 128,
         timeout: 10,
         reservedConcurrentExecutions: 1,
@@ -176,16 +176,16 @@ function createATXScheduler(stack: Stack): Rule {
     });
 }
 
-function createUpdateAwakeAiETATimestampsLambda(stack: DigitrafficStack,
+function createUpdateAwakeAiETAShipTimestampsLambda(stack: DigitrafficStack,
     topic: Topic,
     queue: Queue): MonitoredFunction {
 
     const environment = stack.createLambdaEnvironment();
     environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
 
-    const functionName = 'PortActivity-UpdateAwakeAiETATimestamps';
+    const functionName = 'PortActivity-UpdateAwakeAiETAShipTimestamps';
     const lambdaConf = databaseFunctionProps(
-        stack, environment, functionName, 'update-awake-ai-eta-timestamps', {
+        stack, environment, functionName, 'update-awake-ai-eta-ship-timestamps', {
             timeout: 30,
             reservedConcurrentExecutions: 14,
         },

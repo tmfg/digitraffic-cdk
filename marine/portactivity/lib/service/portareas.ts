@@ -28,4 +28,6 @@ export const ports: Port[] = [
     'FIKUO',
     'FITKU',
     'FIKEM',
+    'FILAN',
+    'FIMHQ',
 ];

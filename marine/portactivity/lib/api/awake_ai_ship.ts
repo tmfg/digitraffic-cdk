@@ -1,8 +1,8 @@
 import axios, {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {AwakeAiZoneType} from "./awake_common";
+import {AwakeAiPredictedVoyage, AwakeAiPrediction, AwakeAiShip} from "./awake_common";
 
-export enum AwakeAiETAResponseType {
+export enum AwakeAiShipResponseType {
     OK = 'OK',
     SHIP_NOT_FOUND = 'SHIP_NOT_FOUND',
     INVALID_SHIP_ID = 'INVALID_SHIP_ID',
@@ -11,71 +11,30 @@ export enum AwakeAiETAResponseType {
     UNKNOWN = 'UNKNOWN'
 }
 
-export type AwakeAiVoyageResponse = {
-    readonly type: AwakeAiETAResponseType
-    readonly schedule?: AwakeAiVoyageShipVoyageSchedule
+export type AwakeAiShipApiResponse = {
+    readonly type: AwakeAiShipResponseType
+    readonly schedule?: AwakeAiShipVoyageSchedule
 }
 
-export enum AwakeAiVoyageShipStatus {
-    UNDER_WAY = 'underway',
-    STOPPED = 'stopped',
-    NOT_PREDICTABLE = 'not_predictable',
-    VESSEL_DATA_NOT_UPDATED = 'vessel_data_not_updated'
-}
-
-export enum AwakeAiVoyagePredictability {
+export enum AwakeAiShipPredictability {
     PREDICTABLE = 'predictable',
     NOT_PREDICTABLE = 'not-predictable',
     SHIP_DATA_NOT_UPDATED = 'ship-data-not-updated'
 }
 
-export enum AwakeAiVoyagePredictionType {
-    ETA = 'eta',
-    TRAVEL_TIME = 'travel-time',
-    DESTINATION = 'destination'
-}
-
-export type AwakeAiVoyagePrediction = {
-
-    readonly predictionType: AwakeAiVoyagePredictionType
-
-    // ISO 8601
-    readonly recordTime: string
-
-    readonly locode: string
-
-    readonly zoneType: AwakeAiZoneType
-}
-
-export type AwakeAiVoyageEtaPrediction = AwakeAiVoyagePrediction & {
+export type AwakeAiVoyageEtaPrediction = AwakeAiPrediction & {
 
     // ISO 8601
     readonly arrivalTime: string
 }
 
-export type AwakeAiVoyagePredictedVoyage = {
+export type AwakeAiShipVoyageSchedule = {
 
-    readonly voyageStatus: AwakeAiVoyageShipStatus
+    readonly ship: AwakeAiShip
 
-    /**
-     * Voyage sequence number, 0 for current voyage.
-     */
-    readonly sequenceNo: number
+    readonly predictability: AwakeAiShipPredictability
 
-    readonly predictions: AwakeAiVoyagePrediction[]
-}
-
-export type AwakeAiVoyageShipVoyageSchedule = {
-
-    readonly ship: {
-        readonly mmsi: number
-        readonly imo?: number
-        readonly shipName?: string,
-    }
-
-    readonly predictability: AwakeAiVoyagePredictability
-
-    readonly predictedVoyages: AwakeAiVoyagePredictedVoyage[]
+    readonly predictedVoyages: AwakeAiPredictedVoyage[]
 }
 
 export class AwakeAiVoyagesApi {
@@ -93,7 +52,7 @@ export class AwakeAiVoyagesApi {
      * @param imo Ship IMO
      * @param locode Destination LOCODE. If set, overrides destination prediction.
      */
-    async getETA(imo: number, locode: string | null): Promise<AwakeAiVoyageResponse> {
+    async getETA(imo: number, locode: string | null): Promise<AwakeAiShipApiResponse> {
         const start = Date.now();
         try {
             let url = `${this.url}/${imo}`;
@@ -107,7 +66,7 @@ export class AwakeAiVoyagesApi {
                 },
             });
             return {
-                type: AwakeAiETAResponseType.OK,
+                type: AwakeAiShipResponseType.OK,
                 schedule: resp.data,
             };
         } catch (error) {
@@ -120,28 +79,28 @@ export class AwakeAiVoyagesApi {
         }
     }
 
-    static handleError(error: { response?: { status: number } }): AwakeAiVoyageResponse {
+    static handleError(error: { response?: { status: number } }): AwakeAiShipApiResponse {
         if (!error.response) {
             return {
-                type: AwakeAiETAResponseType.NO_RESPONSE,
+                type: AwakeAiShipResponseType.NO_RESPONSE,
             };
         }
         switch (error.response.status) {
             case 404:
                 return {
-                    type: AwakeAiETAResponseType.SHIP_NOT_FOUND,
+                    type: AwakeAiShipResponseType.SHIP_NOT_FOUND,
                 };
             case 422:
                 return {
-                    type: AwakeAiETAResponseType.INVALID_SHIP_ID,
+                    type: AwakeAiShipResponseType.INVALID_SHIP_ID,
                 };
             case 500:
                 return {
-                    type: AwakeAiETAResponseType.SERVER_ERROR,
+                    type: AwakeAiShipResponseType.SERVER_ERROR,
                 };
             default:
                 return {
-                    type: AwakeAiETAResponseType.UNKNOWN,
+                    type: AwakeAiShipResponseType.UNKNOWN,
                 };
         }
     }

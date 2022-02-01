@@ -1,21 +1,17 @@
 import {
+    AwakeAiShipApiResponse, AwakeAiShipPredictability, AwakeAiShipVoyageSchedule,
     AwakeAiVoyageEtaPrediction,
-    AwakeAiVoyagePredictability,
-    AwakeAiVoyagePredictionType,
-    AwakeAiVoyageResponse,
     AwakeAiVoyagesApi,
-    AwakeAiVoyageShipStatus,
-    AwakeAiVoyageShipVoyageSchedule,
-} from "../api/awake_ai_voyages";
+} from "../api/awake_ai_ship";
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {retry} from "digitraffic-common/utils/retry";
-import {AwakeAiZoneType} from "../api/awake_common";
+import {AwakeAiPredictionType, AwakeAiShipStatus, AwakeAiZoneType} from "../api/awake_common";
 import {EventSource} from "../model/eventsource";
 import moment from 'moment-timezone';
 
 type AwakeAiETAResponseAndShip = {
-    readonly response: AwakeAiVoyageResponse
+    readonly response: AwakeAiShipApiResponse
     readonly ship: DbETAShip
     readonly diffHours: number
 }
@@ -97,7 +93,7 @@ export class AwakeAiETAService {
         return this.handleSchedule(resp.response.schedule, resp.ship, resp.diffHours);
     }
 
-    private handleSchedule(schedule: AwakeAiVoyageShipVoyageSchedule, ship: DbETAShip, diffHours: number): ApiTimestamp[] {
+    private handleSchedule(schedule: AwakeAiShipVoyageSchedule, ship: DbETAShip, diffHours: number): ApiTimestamp[] {
         return this.getETAPredictions(schedule).map(etaPrediction => {
             if (!etaPrediction.arrivalTime) {
                 console.warn(`method=handleSchedule state=${AwakeDataState.NO_PREDICTED_ETA}`);
@@ -146,8 +142,8 @@ export class AwakeAiETAService {
         }).filter((ts): ts is ApiTimestamp => ts != null);
     }
 
-    private getETAPredictions(schedule: AwakeAiVoyageShipVoyageSchedule): AwakeAiVoyageEtaPrediction[] {
-        if (schedule.predictability !== AwakeAiVoyagePredictability.PREDICTABLE) {
+    private getETAPredictions(schedule: AwakeAiShipVoyageSchedule): AwakeAiVoyageEtaPrediction[] {
+        if (schedule.predictability !== AwakeAiShipPredictability.PREDICTABLE) {
             console.warn(`method=getETAPredictions state=${AwakeDataState.NO_PREDICTED_ETA} voyage was not predictable`);
             return [];
         }
@@ -160,12 +156,12 @@ export class AwakeAiETAService {
         // we are only interested in the current voyage (ETA) for now
         const eta = schedule.predictedVoyages[0];
 
-        if (eta.voyageStatus !== AwakeAiVoyageShipStatus.UNDER_WAY) {
+        if (eta.voyageStatus !== AwakeAiShipStatus.UNDER_WAY) {
             console.warn(`method=getETAPredictions state=${AwakeDataState.SHIP_NOT_UNDER_WAY} actual ship status ${eta.voyageStatus} `);
             return [];
         }
 
-        return eta.predictions.filter(p => p.predictionType === AwakeAiVoyagePredictionType.ETA) as AwakeAiVoyageEtaPrediction[];
+        return eta.predictions.filter(p => p.predictionType === AwakeAiPredictionType.ETA) as AwakeAiVoyageEtaPrediction[];
     }
 
     private static destinationIsFinnish(locode: string): boolean {

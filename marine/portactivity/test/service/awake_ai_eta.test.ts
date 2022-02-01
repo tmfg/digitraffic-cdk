@@ -1,18 +1,16 @@
 import * as sinon from 'sinon';
 import {
-    AwakeAiETAResponseType,
+    AwakeAiShipApiResponse,
+    AwakeAiShipPredictability,
+    AwakeAiShipResponseType,
     AwakeAiVoyageEtaPrediction,
-    AwakeAiVoyagePredictability,
-    AwakeAiVoyagePredictionType,
-    AwakeAiVoyageResponse,
     AwakeAiVoyagesApi,
-    AwakeAiVoyageShipStatus,
-} from "../../lib/api/awake_ai_voyages";
+} from "../../lib/api/awake_ai_ship";
 import {AwakeAiETAService} from "../../lib/service/awake_ai_eta";
 import {DbETAShip} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
-import {AwakeAiZoneType} from "../../lib/api/awake_common";
+import {AwakeAiPredictionType, AwakeAiShipStatus, AwakeAiZoneType} from "../../lib/api/awake_common";
 import {getRandomInteger, randomBoolean} from "digitraffic-common/test/testutils";
 import moment from 'moment-timezone';
 
@@ -75,7 +73,7 @@ describe('service awake.ai', () => {
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         const mmsi = 123456789;
-        const notUnderWayStatuses = [AwakeAiVoyageShipStatus.STOPPED, AwakeAiVoyageShipStatus.NOT_PREDICTABLE, AwakeAiVoyageShipStatus.VESSEL_DATA_NOT_UPDATED];
+        const notUnderWayStatuses = [AwakeAiShipStatus.STOPPED, AwakeAiShipStatus.NOT_PREDICTABLE, AwakeAiShipStatus.VESSEL_DATA_NOT_UPDATED];
         const status = notUnderWayStatuses[Math.floor(Math.random() * 2) + 1]; // get random status
         sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse(ship.locode, ship.imo, mmsi, {
             status,
@@ -91,13 +89,13 @@ describe('service awake.ai', () => {
         const service = new AwakeAiETAService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
-            type: AwakeAiETAResponseType.OK,
+            type: AwakeAiShipResponseType.OK,
             schedule: {
                 ship: {
                     imo: ship.imo,
                     mmsi: 123456789,
                 },
-                predictability: randomBoolean() ? AwakeAiVoyagePredictability.NOT_PREDICTABLE : AwakeAiVoyagePredictability.SHIP_DATA_NOT_UPDATED,
+                predictability: randomBoolean() ? AwakeAiShipPredictability.NOT_PREDICTABLE : AwakeAiShipPredictability.SHIP_DATA_NOT_UPDATED,
                 predictedVoyages: [],
             },
         }));
@@ -261,28 +259,28 @@ function createVoyageResponse(locode: string,
     imo: number,
     mmsi: number,
     options?: {
-        status?: AwakeAiVoyageShipStatus,
+        status?: AwakeAiShipStatus,
         zoneType?: AwakeAiZoneType
-    }): AwakeAiVoyageResponse {
+    }): AwakeAiShipApiResponse {
 
     const etaPrediction: AwakeAiVoyageEtaPrediction = {
         recordTime: new Date().toISOString(),
         locode: locode,
-        predictionType: AwakeAiVoyagePredictionType.ETA,
+        predictionType: AwakeAiPredictionType.ETA,
         arrivalTime: new Date().toISOString(),
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
     };
 
     return {
-        type: AwakeAiETAResponseType.OK,
+        type: AwakeAiShipResponseType.OK,
         schedule: {
             ship: {
                 mmsi,
                 imo,
             },
-            predictability: AwakeAiVoyagePredictability.PREDICTABLE,
+            predictability: AwakeAiShipPredictability.PREDICTABLE,
             predictedVoyages: [{
-                voyageStatus: options?.status ?? AwakeAiVoyageShipStatus.UNDER_WAY,
+                voyageStatus: options?.status ?? AwakeAiShipStatus.UNDER_WAY,
                 sequenceNo: 0,
                 predictions: [etaPrediction],
             }],
@@ -315,13 +313,13 @@ function awakeTimestampFromTimestamp(timestamp: ApiTimestamp, portArea?: string,
     };
 }
 
-function expectJustEta(ship: DbETAShip, voyageTimestamp: AwakeAiVoyageResponse, timestamps: ApiTimestamp[]) {
+function expectJustEta(ship: DbETAShip, voyageTimestamp: AwakeAiShipApiResponse, timestamps: ApiTimestamp[]) {
     expect(timestamps.length).toBe(1);
     const etaTimestamp = timestamps.find(ts => ts.eventType === EventType.ETA);
     expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETA));
 }
 
-function expectEtaAndEtb(ship: DbETAShip, voyageTimestamp: AwakeAiVoyageResponse, timestamps: ApiTimestamp[]) {
+function expectEtaAndEtb(ship: DbETAShip, voyageTimestamp: AwakeAiShipApiResponse, timestamps: ApiTimestamp[]) {
     expect(timestamps.length).toBe(2);
     const etaTimestamp = timestamps.find(ts => ts.eventType === EventType.ETA);
     const etbTimestamp = timestamps.find(ts => ts.eventType === EventType.ETB);
