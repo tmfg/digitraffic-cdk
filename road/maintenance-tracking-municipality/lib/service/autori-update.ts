@@ -233,6 +233,7 @@ export class AutoriUpdate {
                 throw new Error(`Unsupported geometry type for maintenance tracking ${f.geometry.type}`);
             }
 
+            /* eslint-disable camelcase */
             return {
                 direction: undefined,
                 sending_time: routeData.created,
@@ -248,6 +249,7 @@ export class AutoriUpdate {
                 message_original_id: routeData.id,
                 finished: true,
             };
+            /* eslint-enable camelcase */
         });
     }
 
@@ -260,24 +262,30 @@ export class AutoriUpdate {
     }
 
     createDbDomainContracts(contracts: ApiContractData[], domainName: string): DbDomainContract[] {
-        return contracts.map(contract => ({
-            domain: domainName,
-            contract: contract.id,
-            name: contract.name,
-            start_date: contract.startDate,
-            end_date: contract.endDate,
-            data_last_updated: undefined,
-            source: undefined,
-        }));
+        return contracts.map(contract => (
+            /* eslint-disable camelcase */
+            {
+                domain: domainName,
+                contract: contract.id,
+                name: contract.name,
+                start_date: contract.startDate,
+                end_date: contract.endDate,
+                data_last_updated: undefined,
+                source: undefined,
+                /* eslint-enable camelcase */
+            }));
     }
 
     createDbDomainTaskMappings(operations: ApiOperationData[], domainName: string): DbDomainTaskMapping[] {
-        return operations.map(operation => ({
-            name: UNKNOWN_TASK_NAME,
-            original_id: operation.id,
-            domain: domainName,
-            ignore: true,
-        }));
+        return operations.map(operation => (
+            /* eslint-disable camelcase */
+            {
+                name: UNKNOWN_TASK_NAME,
+                original_id: operation.id,
+                domain: domainName,
+                ignore: true,
+                /* eslint-enable camelcase */
+            }));
     }
 
     /**
