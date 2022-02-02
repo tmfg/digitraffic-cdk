@@ -6,6 +6,8 @@ import {Point} from "geojson";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/data";
 import {createHarjaId} from "./utils";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
+import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
+import {DataType} from "digitraffic-common/database/last-updated";
 
 export const UNKNOWN_TASK_NAME = 'UNKNOWN';
 
@@ -114,13 +116,32 @@ export class AutoriUpdate {
             })).then((results : PromiseSettledResult<TrackingSaveResult>[]) => {
                 const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
                 const errors = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.errors : 1), 0);
+
+                inDatabase(async (db: DTDatabase) => {
+                    await LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED, new Date(timerStart));
+                    if (saved > 0) {
+                        await LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA, new Date(timerStart));
+                    }
+                });
                 console.info(`method=updateTrackingsForDomain domain=${domainName} count=${saved} errors=${errors} tookMs=${Date.now()-timerStart}`);
                 return new TrackingSaveResult(saved,errors);
+            }).then((finalResult) => {
+                return this.updateDataUpdated(finalResult);
             });
         } catch (error) {
             console.error(`method=updateTrackings domain=${domainName} Failed for all contracts`, error);
             throw error;
         }
+    }
+
+    private updateDataUpdated(finalResult : TrackingSaveResult) : Promise<TrackingSaveResult> {
+        return inDatabase(async (db: DTDatabase) => {
+            const now = new Date();
+            await LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED, now);
+            if (finalResult.saved > 0) {
+                await LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA, now);
+            }
+        }).then(() => { return finalResult; });
     }
 
     getLatestUpdatedDateForRouteData(routeData: ApiRouteData[]) : Date {
@@ -197,8 +218,8 @@ export class AutoriUpdate {
 
         return routeData.geography.features.map((f) => {
 
-            let lastPoint = undefined;
-            let lineString = undefined;
+            let lastPoint: string;
+            let lineString: string | undefined;
 
             if (f.geometry.type == "Point") {
                 lastPoint = JSON.stringify(f.geometry);
@@ -208,7 +229,10 @@ export class AutoriUpdate {
                     coordinates: f.geometry.coordinates[f.geometry.coordinates.length - 1],
                 } as Point);
                 lineString = JSON.stringify(f.geometry);
+            } else {
+                throw new Error(`Unsupported geometry type for maintenance tracking ${f.geometry.type}`);
             }
+
             return {
                 direction: undefined,
                 sending_time: routeData.created,
@@ -223,7 +247,7 @@ export class AutoriUpdate {
                 contract: contract.contract,
                 message_original_id: routeData.id,
                 finished: true,
-            } as DbMaintenanceTracking;
+            };
         });
     }
 

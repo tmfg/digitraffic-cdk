@@ -10,7 +10,7 @@ import {
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {AutoriUpdate, UNKNOWN_TASK_NAME} from "../../lib/service/autori-update";
 import {AutoriApi} from "../../lib/api/autori";
-import {ApiContractData, ApiOperationData, ApiRouteData,} from "../../lib/model/data";
+import {ApiContractData, ApiOperationData, ApiRouteData} from "../../lib/model/data";
 import * as sinon from "sinon";
 import {SinonStub} from "sinon";
 import {Feature, Geometry, LineString, Position} from "geojson";
@@ -19,6 +19,8 @@ import moment from "moment";
 import {getRandomNumber, randomString} from "digitraffic-common/test/testutils";
 import * as DataDb from "../../lib/db/data";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../../lib/model/db-data";
+import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
+import {DataType} from "digitraffic-common/database/last-updated";
 
 
 const DOMAIN_1 = 'autori-oulu';
@@ -48,9 +50,9 @@ function createAutoriUpdateService() {
 
 describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
-    afterEach(() => {
+    afterEach(async () => {
         sinon.restore();
-        truncate(db);
+        await truncate(db);
     });
 
     test('getTasksForOperations', () => {
@@ -316,7 +318,13 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         expect(latestTracking?.tasks).toContain(HARJA_PAVING);
         expect(latestTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past1D));
         expect(latestTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past1D));
+
+        const checked = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED);
+        const updated = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA);
+        expectToBeCloseTo(checked!.getTime(), Date.now(), 500); // ! means "I know better"
+        expectToBeCloseTo(updated!.getTime(), Date.now(), 500);
     });
+
 
 
     // test('saveTrackings', async () => {
@@ -489,4 +497,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
     //     return { name: name, original_id: originalId, domain: domain, ignore: ignore };
     // }
 
+    function expectToBeCloseTo(value: number, expected: number, delta: number) {
+        expect(expected-value).toBeGreaterThanOrEqual(-1* delta);
+        expect(expected-value).toBeLessThanOrEqual(delta);
+    }
 }));

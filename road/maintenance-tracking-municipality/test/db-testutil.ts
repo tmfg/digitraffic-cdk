@@ -17,12 +17,11 @@ export function dbTestBaseNoTruncate(fn: (db: DTDatabase) => void) {
 
 export function truncate(db: DTDatabase): Promise<void> {
     return db.tx(async t => {
-        await t.none('DELETE FROM maintenance_tracking');
-        await t.none('DELETE FROM maintenance_tracking_domain_task_mapping');
-        await t.none('DELETE FROM maintenance_tracking_domain_contract');
-        await t.none('DELETE FROM maintenance_tracking_domain');
-        await t.none('DELETE FROM maintenance_tracking');
-        await t.none('DELETE FROM data_updated');
+        await t.none('TRUNCATE maintenance_tracking CASCADE');
+        await t.none('TRUNCATE maintenance_tracking_domain_task_mapping CASCADE');
+        await t.none('TRUNCATE maintenance_tracking_domain_contract CASCADE');
+        await t.none('TRUNCATE maintenance_tracking_domain CASCADE');
+        await t.none('TRUNCATE data_updated');
     });
 }
 
