@@ -3,7 +3,7 @@ import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/dat
 import {AutoriApi} from "../api/autori";
 import moment from "moment";
 import {Point} from "geojson";
-import {ApiContractData, ApiOperationData, ApiRouteData,} from "../model/data";
+import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/data";
 import {createHarjaId} from "./utils";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
 
@@ -14,11 +14,11 @@ export class TrackingSaveResult {
     errors : number;
 
     static createSaved(saved=1): TrackingSaveResult {
-        return new TrackingSaveResult(saved, 1);
+        return new TrackingSaveResult(saved, 0);
     }
 
     static createError(errors=1): TrackingSaveResult {
-        return new TrackingSaveResult(errors, 1);
+        return new TrackingSaveResult(0, errors);
     }
 
     constructor(saved: number, errors: number) {
@@ -94,7 +94,7 @@ export class AutoriUpdate {
      */
     async updateTrackingsForDomain(domainName: string): Promise<TrackingSaveResult> {
 
-        const start = Date.now();
+        const timerStart = Date.now();
 
         try {
             const contracts: DbDomainContract[] = await inDatabaseReadonly( (db: DTDatabase) => {
@@ -114,7 +114,7 @@ export class AutoriUpdate {
             })).then((results : PromiseSettledResult<TrackingSaveResult>[]) => {
                 const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
                 const errors = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.errors : 1), 0);
-                console.info(`method=updateTrackingsForDomain domain=${domainName} count=${saved} errors=${errors} tookMs=${Date.now()-start}`);
+                console.info(`method=updateTrackingsForDomain domain=${domainName} count=${saved} errors=${errors} tookMs=${Date.now()-timerStart}`);
                 return new TrackingSaveResult(saved,errors);
             });
         } catch (error) {
@@ -142,7 +142,7 @@ export class AutoriUpdate {
             return Promise.allSettled(routeDatas.map(async (routeData: ApiRouteData) => {
 
                 try {
-                    const machineId = await db.tx(async tx => {
+                    const machineId = await db.tx(tx => {
                         const workMachine: DbWorkMachine = this.createDbWorkMachine(contract.contract, routeData.vehicleType, contract.domain);
                         return DataDb.upsertWorkMachine(tx, workMachine);
                     });
@@ -266,7 +266,7 @@ export class AutoriUpdate {
             return [];
         }
 
-        const tasks: string[] = operations.reduce(function (filtered: string[], operation) {
+        return operations.reduce(function (filtered: string[], operation) {
             const taskMapping = taskMappings.find((mapping: DbDomainTaskMapping): boolean => {
                 return mapping.original_id == operation && !mapping.ignore;
             });
@@ -275,7 +275,6 @@ export class AutoriUpdate {
             }
             return filtered;
         }, []);
-        return tasks;
     }
 
     /**
@@ -310,7 +309,7 @@ export class AutoriUpdate {
         return (routeData: ApiRouteData[]): Promise<TrackingSaveResult> => {
 
             if (routeData.length === 0) {
-                console.info(`method=saveContracRoutesAsTrackings No new data for contract=${contract} after ${apiDataUpdatedFrom.toISOString()}`);
+                console.info(`method=saveContracRoutesAsTrackings No new data for contract=${contract.contract} after ${apiDataUpdatedFrom.toISOString()}`);
                 return Promise.resolve(new TrackingSaveResult(0,0));
             }
 
