@@ -97,7 +97,7 @@ export class AutoriApi {
                     }
                     // subtract 1ms as api start and end dates are exclusive
                     const nextFrom = moment(to).subtract(1, 'ms');
-                    console.debug(`method=getNextRouteDataForContract going to call getNextRouteDataForContract(${contract}, ${nextFrom.toDate().toISOString()}, ${periodHours})`);
+                    console.debug(`DEBUG method=getNextRouteDataForContract going to call getNextRouteDataForContract(${contract}, ${nextFrom.toDate().toISOString()}, ${periodHours})`);
                     return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodHours);
                 }
                 return data;

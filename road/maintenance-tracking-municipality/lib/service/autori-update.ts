@@ -146,19 +146,19 @@ export class AutoriUpdate {
                         const workMachine: DbWorkMachine = this.createDbWorkMachine(contract.contract, routeData.vehicleType, contract.domain);
                         return DataDb.upsertWorkMachine(tx, workMachine);
                     });
-                    console.info(`method=saveTrackingsToDb upsertWorkMachine with id ${machineId.id}`);
+                    console.debug(`DEBUG method=saveTrackingsToDb upsertWorkMachine with id ${machineId.id}`);
 
                     const tasks: string[] = this.getTasksForOperations(routeData.operations, taskMappings);
                     const data: DbMaintenanceTracking[] = this.createDbMaintenanceTracking(machineId.id, routeData, contract, tasks);
-                    console.info(`method=saveTrackingsToDb inserting ${data.length} trackings for machine ${machineId.id}`);
+                    console.debug(`DEBUG method=saveTrackingsToDb inserting ${data.length} trackings for machine ${machineId.id}`);
                     return await db.tx(async tx => {
                         await DataDb.upsertMaintenanceTracking(tx, data);
                         await DataDb.updateContractLastUpdated(tx, contract.domain, contract.contract, routeData.updated);
                     }).then(() => {
-                        console.info(`method=saveTrackingsToDb upsertMaintenanceTracking count ${data.length} done`);
+                        // console.info(`method=saveTrackingsToDb upsertMaintenanceTracking count ${data.length} done`);
                         return TrackingSaveResult.createSaved();
                     }).catch((error) => {
-                        console.error('method=saveTrackingsToDb upsertMaintenanceTracking failed', error);
+                        console.debug(`DEBUG method=saveTrackingsToDb upsertMaintenanceTracking failed`, error);
                         return TrackingSaveResult.createError();
                     });
                 } catch (error) {
@@ -176,22 +176,22 @@ export class AutoriUpdate {
 
     resolveContractLastUpdateTime(contract: DbDomainContract) : Date {
         if (contract.data_last_updated) {
-            console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.data_last_updated ${contract.data_last_updated.toISOString()}`);
+            console.debug(`DEBUG method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.data_last_updated ${contract.data_last_updated.toISOString()}`);
             return contract.data_last_updated;
         } else if (contract.start_date) {
-            console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.start_date ${contract.start_date.toISOString()}`);
+            console.debug(`DEBUG method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.start_date ${contract.start_date.toISOString()}`);
             return contract.start_date;
         }
         // Fallback one week to past from now
         const result = moment().subtract(7, 'days').toDate();
-        console.info(`method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using -7, 'days' ${result.toLocaleString()}`);
+        console.debug(`DEBUG method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using -7, 'days' ${result.toLocaleString()}`);
         return result;
     }
 
     createDbMaintenanceTracking(workMachineId: number, routeData: ApiRouteData, contract: DbDomainContract, harjaTasks: string[]): DbMaintenanceTracking[] {
 
         if (harjaTasks.length === 0) {
-            console.info(`method=createDbMaintenanceTracking No tasks for tracking api id ${routeData.id} -> no data to save`);
+            console.info(`method=createDbMaintenanceTracking domain=${contract.domain} contract=${contract.contract} No tasks for tracking api id ${routeData.id} -> no data to save`);
             return [];
         }
 
@@ -289,7 +289,7 @@ export class AutoriUpdate {
     private updateContracTrackings(contract: DbDomainContract, taskMappings : DbDomainTaskMapping[], apiDataUpdatedFrom: Date) : Promise<TrackingSaveResult> {
         console.info(`method=updateContracTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`);
         // routeData = await this.api.getNextRouteDataForContract(contract.contract, start, 24);
-        console.debug(`method=updateContracTrackings going to call getNextRouteDataForContract(${contract.contract}, ${apiDataUpdatedFrom.toISOString()}, 24)`);
+        console.debug(`DEBUG method=updateContracTrackings going to call getNextRouteDataForContract(${contract.contract}, ${apiDataUpdatedFrom.toISOString()}, 24)`);
         return this.api.getNextRouteDataForContract(contract.contract, apiDataUpdatedFrom, 24)
             .then(this.saveContracRoutesAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
             .catch((error) => {
