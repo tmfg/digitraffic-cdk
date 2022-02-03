@@ -27,7 +27,7 @@ enum AwakeDataState {
     NO_ETA_TIMESTAMP = 'NO_ETA_TIMESTAMP',
 }
 
-export class AwakeAiETAService {
+export class AwakeAiETAShipService {
 
     private readonly api: AwakeAiETAShipApi;
 
@@ -100,7 +100,7 @@ export class AwakeAiETAService {
                 return null;
             }
 
-            if (!AwakeAiETAService.destinationIsFinnish(etaPrediction.locode)) {
+            if (!AwakeAiETAShipService.destinationIsFinnish(etaPrediction.locode)) {
                 console.warn(`method=handleSchedule state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}`);
                 return null;
             }

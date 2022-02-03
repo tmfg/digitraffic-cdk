@@ -1,6 +1,6 @@
 import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
-import {AwakeAiETAService} from "../../service/awake_ai_eta";
+import {AwakeAiETAShipService} from "../../service/awake_ai_eta_ship";
 import {AwakeAiETAShipApi} from "../../api/awake_ai_ship";
 import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {SNSEvent} from "aws-lambda";
@@ -12,7 +12,7 @@ type UpdateAwakeAiTimestampsSecret = {
     readonly 'awake.voyagesauth': string
 }
 
-let service: AwakeAiETAService;
+let service: AwakeAiETAShipService;
 
 const queueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
@@ -22,7 +22,7 @@ const expectedKeys = [
 ];
 
 export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSecret, void>,
-    AwakeAiETAServiceClass: new (api: AwakeAiETAShipApi) => AwakeAiETAService): (event: SNSEvent) => Promise<void> {
+    AwakeAiETAServiceClass: new (api: AwakeAiETAShipApi) => AwakeAiETAShipService): (event: SNSEvent) => Promise<void> {
 
     return (event: SNSEvent) => {
         // always a single event, guaranteed by SNS
@@ -42,4 +42,4 @@ export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSe
     };
 }
 
-export const handler = handlerFn(withSecret, AwakeAiETAService);
+export const handler = handlerFn(withSecret, AwakeAiETAShipService);

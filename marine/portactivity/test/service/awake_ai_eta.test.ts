@@ -6,7 +6,7 @@ import {
     AwakeAiVoyageEtaPrediction,
     AwakeAiETAShipApi,
 } from "../../lib/api/awake_ai_ship";
-import {AwakeAiETAService} from "../../lib/service/awake_ai_eta";
+import {AwakeAiETAShipService} from "../../lib/service/awake_ai_eta_ship";
 import {DbETAShip} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
@@ -21,7 +21,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - creates both ETA and ETB only for FIRAU', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip('FIRAU');
         const mmsi = 123456789;
         const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, mmsi);
@@ -34,7 +34,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - creates just ETA', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip('FILOL');
         const mmsi = 123456789;
         const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, mmsi);
@@ -47,7 +47,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - no timestamps when predicted locode differs and ETA is >= 24 h', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip('FIKEK', moment().add(getRandomInteger(24, 100), 'hour'));
         sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse('FILOL', ship.imo, 123456789)));
 
@@ -58,7 +58,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - timestamps created when predicted locode differs and ETA is < 24 h', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip('FIKEK', moment().add(getRandomInteger(1, 23), 'hour'));
         const voyageTimestamp = createVoyageResponse('FILOL', ship.imo, 123456789);
         sinon.stub(api, 'getETA').returns(Promise.resolve(voyageTimestamp));
@@ -70,7 +70,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - ship not under way', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const mmsi = 123456789;
         const notUnderWayStatuses = [AwakeAiShipStatus.STOPPED, AwakeAiShipStatus.NOT_PREDICTABLE, AwakeAiShipStatus.VESSEL_DATA_NOT_UPDATED];
@@ -86,7 +86,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - not predictable', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         sinon.stub(api, 'getETA').returns(Promise.resolve({
             type: AwakeAiShipResponseType.OK,
@@ -107,7 +107,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - no predicted voyages', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -121,7 +121,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - no ETA predictions', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
         /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -135,7 +135,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - no predicted destination', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
         /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -149,7 +149,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - port outside Finland', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse('EEMUG', ship.imo, 123456789);
         sinon.stub(api, 'getETA').returns(Promise.resolve(response));
@@ -161,7 +161,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - pilotage ETP only for FIRAU', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse('FIRAU', ship.imo, 123456789, {
             zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA,
@@ -176,7 +176,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - no pilotage ETP', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse('FILOL', ship.imo, 123456789, {
             zoneType: AwakeAiZoneType.PILOT_BOARDING_AREA,
@@ -190,7 +190,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - port locode override', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip(service.overriddenDestinations[getRandomInteger(0, service.overriddenDestinations.length - 1)]);
         const voyageTimestamp = createVoyageResponse('FIKEK', ship.imo, 123456789);
         sinon.stub(api, 'getETA').returns(Promise.resolve(voyageTimestamp));
@@ -203,7 +203,7 @@ describe('service awake.ai', () => {
     test('getAwakeAiTimestamps - destination set explicitly when original ETA is less than 24 h', async () => {
         const locode = 'FIKEK';
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip(locode, moment().add(1, 'hour'));
         const getETAStub = sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse(locode, ship.imo, 123456789)));
 
@@ -215,7 +215,7 @@ describe('service awake.ai', () => {
     test('getAwakeAiTimestamps - destination not set when original ETA is more than 24 h', async () => {
         const locode = 'FIKEK';
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip(locode, moment().add(25, 'hour'));
         const getETAStub = sinon.stub(api, 'getETA').returns(Promise.resolve(createVoyageResponse(locode, ship.imo, 123456789)));
 
@@ -226,7 +226,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - retry', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const voyageTimestamp = createVoyageResponse(ship.locode, ship.imo, 123456789);
         const apiGetETAStub = sinon.stub(api, 'getETA');
@@ -240,7 +240,7 @@ describe('service awake.ai', () => {
 
     test('getAwakeAiTimestamps - retry fail', async () => {
         const api = createApi();
-        const service = new AwakeAiETAService(api);
+        const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
         const apiGetETAStub = sinon.stub(api, 'getETA');
