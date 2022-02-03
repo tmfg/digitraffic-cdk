@@ -4,7 +4,7 @@ import {
     AwakeAiShipPredictability,
     AwakeAiShipResponseType,
     AwakeAiVoyageEtaPrediction,
-    AwakeAiVoyagesApi,
+    AwakeAiETAShipApi,
 } from "../../lib/api/awake_ai_ship";
 import {AwakeAiETAService} from "../../lib/service/awake_ai_eta";
 import {DbETAShip} from "../../lib/db/timestamps";
@@ -288,8 +288,8 @@ function createVoyageResponse(locode: string,
     };
 }
 
-function createApi(): AwakeAiVoyagesApi {
-    return new AwakeAiVoyagesApi('', '');
+function createApi(): AwakeAiETAShipApi {
+    return new AwakeAiETAShipApi('', '');
 }
 
 function newDbETAShip(locode?: string, eta?: moment.Moment): DbETAShip {

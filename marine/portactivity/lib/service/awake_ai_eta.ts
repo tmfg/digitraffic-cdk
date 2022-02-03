@@ -1,7 +1,7 @@
 import {
     AwakeAiShipApiResponse, AwakeAiShipPredictability, AwakeAiShipVoyageSchedule,
     AwakeAiVoyageEtaPrediction,
-    AwakeAiVoyagesApi,
+    AwakeAiETAShipApi,
 } from "../api/awake_ai_ship";
 import {DbETAShip} from "../db/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
@@ -29,7 +29,7 @@ enum AwakeDataState {
 
 export class AwakeAiETAService {
 
-    private readonly api: AwakeAiVoyagesApi;
+    private readonly api: AwakeAiETAShipApi;
 
     readonly overriddenDestinations = [
         'FIHEL',
@@ -41,7 +41,7 @@ export class AwakeAiETAService {
         'FIRAU',
     ];
 
-    constructor(api: AwakeAiVoyagesApi) {
+    constructor(api: AwakeAiETAShipApi) {
         this.api = api;
     }
 

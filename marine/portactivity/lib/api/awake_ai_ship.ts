@@ -37,7 +37,7 @@ export type AwakeAiShipVoyageSchedule = {
     readonly predictedVoyages: AwakeAiPredictedVoyage[]
 }
 
-export class AwakeAiVoyagesApi {
+export class AwakeAiETAShipApi {
 
     private readonly url: string
     private readonly apiKey: string
@@ -48,7 +48,7 @@ export class AwakeAiVoyagesApi {
     }
 
     /**
-     * Queries the Awake.AI Voyages API for predictions
+     * Queries the Awake.AI ship ETA API for predictions
      * @param imo Ship IMO
      * @param locode Destination LOCODE. If set, overrides destination prediction.
      */
@@ -71,7 +71,7 @@ export class AwakeAiVoyagesApi {
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                return AwakeAiVoyagesApi.handleError(error as AxiosError);
+                return AwakeAiETAShipApi.handleError(error as AxiosError);
             }
             throw error;
         } finally {
