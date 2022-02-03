@@ -113,18 +113,21 @@ export class AutoriUpdate {
                 // console.info(`method=updateTrackingsForDomain for domain=${domainName} contract=${contract.contract}`);
                 const start = this.resolveContractLastUpdateTime( contract );
                 return this.updateContracTrackings(contract, taskMappings, start);
-            })).then((results : PromiseSettledResult<TrackingSaveResult>[]) => {
+            })).then(async (results: PromiseSettledResult<TrackingSaveResult>[]) => {
                 const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
                 const errors = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.errors : 1), 0);
 
-                inDatabase(async (db: DTDatabase) => {
-                    await LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED, new Date(timerStart));
-                    if (saved > 0) {
-                        await LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA, new Date(timerStart));
-                    }
+                await inDatabase((db: DTDatabase) => {
+                    return LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED, new Date(timerStart))
+                        .then(() => {
+                            if (saved > 0) {
+                                return LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA, new Date(timerStart));
+                            }
+                            return;
+                        });
                 });
-                console.info(`method=updateTrackingsForDomain domain=${domainName} count=${saved} errors=${errors} tookMs=${Date.now()-timerStart}`);
-                return new TrackingSaveResult(saved,errors);
+                console.info(`method=updateTrackingsForDomain domain=${domainName} count=${saved} errors=${errors} tookMs=${Date.now() - timerStart}`);
+                return new TrackingSaveResult(saved, errors);
             }).then((finalResult) => {
                 return this.updateDataUpdated(finalResult);
             });
