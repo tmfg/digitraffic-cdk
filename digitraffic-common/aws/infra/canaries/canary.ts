@@ -23,7 +23,7 @@ export class DigitrafficCanary extends Canary {
                 }),
                 handler: params.handler,
             }),
-            environmentVariables,
+            environmentVariables: { ...environmentVariables, ...params?.canaryEnv },
             canaryName,
             schedule: params.schedule ?? Schedule.rate(Duration.minutes(15)),
         });

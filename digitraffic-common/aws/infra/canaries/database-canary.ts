@@ -48,6 +48,13 @@ export class DatabaseCanary extends DigitrafficCanary {
             }, ...params});
     }
 
+    /**
+     *
+     * @param stack
+     * @param role
+     * @param name max len is 10 char. name + -db.handler -> max 21 char
+     * @param params
+     */
     static createV2(stack: DigitrafficStack,
         role: Role,
         name: string,
