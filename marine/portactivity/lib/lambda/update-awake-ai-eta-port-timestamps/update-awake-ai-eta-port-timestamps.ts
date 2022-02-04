@@ -1,18 +1,17 @@
 import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
-import {AwakeAiETAShipService} from "../../service/awake_ai_eta_ship";
-import {AwakeAiETAShipApi} from "../../api/awake_ai_ship";
 import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {SNSEvent} from "aws-lambda";
-import {DbETAShip} from "../../db/timestamps";
 import {sendMessage} from "../../service/queue-service";
+import {AwakeAiETAPortApi} from "../../api/awake_ai_port";
+import {AwakeAiETAPortService} from "../../service/awake_ai_eta_port";
 
 type UpdateAwakeAiTimestampsSecret = {
-    readonly 'awake.voyagesurl': string
+    readonly 'awake.porturl': string
     readonly 'awake.voyagesauth': string
 }
 
-let service: AwakeAiETAShipService;
+let service: AwakeAiETAPortService;
 
 const queueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
@@ -22,24 +21,24 @@ const expectedKeys = [
 ];
 
 export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSecret, void>,
-    AwakeAiETAServiceClass: new (api: AwakeAiETAShipApi) => AwakeAiETAShipService): (event: SNSEvent) => Promise<void> {
+    AwakeAiETAServiceClass: new (api: AwakeAiETAPortApi) => AwakeAiETAPortService): (event: SNSEvent) => Promise<void> {
 
     return (event: SNSEvent) => {
         // always a single event, guaranteed by SNS
-        const ships = JSON.parse(event.Records[0].Sns.Message) as DbETAShip[];
+        const locode = event.Records[0].Sns.Message;
 
         return withSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<void> => {
             if (!service) {
-                service = new AwakeAiETAServiceClass(new AwakeAiETAShipApi(secret["awake.voyagesurl"], secret["awake.voyagesauth"]));
+                service = new AwakeAiETAServiceClass(new AwakeAiETAPortApi(secret["awake.porturl"], secret["awake.voyagesauth"]));
             }
-            const timestamps = await service.getAwakeAiTimestamps(ships);
+            const timestamps = await service.getAwakeAiTimestamps(locode);
 
             const start = Date.now();
-            console.info('method=updateAwakeAiETAShipTimestampsHandler Sending timestamps to queue..');
+            console.info('method=updateAwakeAiETAPortTimestampsHandler Sending timestamps to queue..');
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
-            console.info('method=updateAwakeAiETAShipTimestampsHandler ..done in tookMs=%d', Date.now()-start);
+            console.info('method=updateAwakeAiETAPortTimestampsHandler ..done in tookMs=%d', Date.now()-start);
         }, {expectedKeys});
     };
 }
 
-export const handler = handlerFn(withSecret, AwakeAiETAShipService);
+export const handler = handlerFn(withSecret, AwakeAiETAPortService);

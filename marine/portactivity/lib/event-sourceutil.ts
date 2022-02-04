@@ -5,6 +5,7 @@ import {EventSource} from "./model/eventsource";
 
 export const VTS_A = 'VTS A';
 export const VTS_O = 'VTS O';
+export const PRED = 'PRED';
 
 export const eventSourceMap = new Map<string, string>([
     [EventSource.PORTNET, "PNET"],
@@ -12,10 +13,12 @@ export const eventSourceMap = new Map<string, string>([
     [EventSource.PORT_HANKO, EventSource.PORT_HANKO],
     [EventSource.SCHEDULES_VTS_CONTROL, VTS_O],
     [EventSource.SCHEDULES_CALCULATED, VTS_A],
+    [EventSource.AWAKE_AI_PRED, PRED],
 ]);
 
 const eventSourcePriorities = new Map<string, number>([
     [EventSource.PORTNET, 10],
+    [EventSource.AWAKE_AI, 40],
     [EventSource.AWAKE_AI, 80],
     [EventSource.SCHEDULES_CALCULATED, 90],
     [EventSource.SCHEDULES_VTS_CONTROL, 95],

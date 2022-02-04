@@ -21,7 +21,7 @@ export type AwakeAiPortResponse = {
     readonly schedule?: AwakeAiPortSchedule[]
 }
 
-export class AwakeAiPortApi {
+export class AwakeAiETAPortApi {
 
     private readonly url: string
     private readonly apiKey: string
@@ -52,7 +52,7 @@ export class AwakeAiPortApi {
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                return AwakeAiPortApi.handleError(error as AxiosError);
+                return AwakeAiETAPortApi.handleError(error as AxiosError);
             }
             throw error;
         } finally {

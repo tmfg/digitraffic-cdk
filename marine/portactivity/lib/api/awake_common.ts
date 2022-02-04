@@ -8,7 +8,7 @@ export enum AwakeAiZoneType {
 
 export type AwakeAiShip = {
     readonly mmsi: number
-    readonly imo?: number
+    readonly imo: number
     readonly shipName?: string,
 }
 
