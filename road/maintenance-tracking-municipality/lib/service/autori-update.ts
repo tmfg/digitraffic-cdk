@@ -150,7 +150,7 @@ export class AutoriUpdate {
     getLatestUpdatedDateForRouteData(routeData: ApiRouteData[]) : Date {
         try {
             const maxEpochMs = Math.max.apply(null, routeData.map(value => {
-                return new Date(value.updated).getTime();
+                return new Date(value.updated || value.endTime).getTime();
             }));
             return new Date(maxEpochMs);
         } catch (e) {
@@ -167,7 +167,7 @@ export class AutoriUpdate {
 
                 try {
                     const machineId = await db.tx(tx => {
-                        const workMachine: DbWorkMachine = this.createDbWorkMachine(contract.contract, routeData.vehicleType, contract.domain);
+                        const workMachine: DbWorkMachine = this.createDbWorkMachine(contract.contract, contract.domain, routeData.vehicleType);
                         return DataDb.upsertWorkMachine(tx, workMachine);
                     });
                     console.debug(`DEBUG method=saveTrackingsToDb upsertWorkMachine with id ${machineId.id}`);
@@ -177,7 +177,7 @@ export class AutoriUpdate {
                     console.debug(`DEBUG method=saveTrackingsToDb inserting ${data.length} trackings for machine ${machineId.id}`);
                     return await db.tx(async tx => {
                         await DataDb.upsertMaintenanceTracking(tx, data);
-                        await DataDb.updateContractLastUpdated(tx, contract.domain, contract.contract, routeData.updated);
+                        await DataDb.updateContractLastUpdated(tx, contract.domain, contract.contract, routeData.updated || routeData.endTime);
                     }).then(() => {
                         // console.info(`method=saveTrackingsToDb upsertMaintenanceTracking count ${data.length} done`);
                         return TrackingSaveResult.createSaved();
@@ -219,6 +219,10 @@ export class AutoriUpdate {
             return [];
         }
 
+        if (!routeData.geography) {
+            return [];
+        }
+
         return routeData.geography.features.map((f) => {
 
             let lastPoint: string;
@@ -239,7 +243,7 @@ export class AutoriUpdate {
             /* eslint-disable camelcase */
             return {
                 direction: undefined,
-                sending_time: routeData.created,
+                sending_time: routeData.created || new Date(),
                 start_time: routeData.startTime,
                 end_time: routeData.endTime,
                 last_point: lastPoint,
@@ -256,10 +260,10 @@ export class AutoriUpdate {
         });
     }
 
-    createDbWorkMachine(contractId: string, vehicleType: string, domainName: string): DbWorkMachine {
+    createDbWorkMachine(contractId: string, domainName: string, vehicleType?: string): DbWorkMachine {
         return {
             harjaUrakkaId: createHarjaId(contractId),
-            harjaId: createHarjaId(vehicleType),
+            harjaId: createHarjaId(vehicleType || 'dummy'),
             type: `domainName: ${domainName} / contractId: ${contractId} / vehicleType: ${vehicleType}`,
         };
     }

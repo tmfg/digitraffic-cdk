@@ -8,10 +8,10 @@ export type ApiContractData = {
 }
 
 export type ApiRouteData = {
-    readonly vehicleType: string
-    readonly geography: FeatureCollection, // FeatureCollection // optional
-    readonly created: Date, // optional
-    readonly updated: Date, // optional
+    readonly vehicleType?: string
+    readonly geography?: FeatureCollection,
+    readonly created?: Date,
+    readonly updated?: Date,
     readonly id: string,
     readonly startTime: Date,
     readonly endTime: Date,

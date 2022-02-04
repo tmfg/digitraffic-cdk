@@ -78,7 +78,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
     });
 
     test('createDbWorkMachine', () => {
-        const wm : DbWorkMachine = autoriUpdateService.createDbWorkMachine(CONTRACT_ID, VEHICLE_TYPE, DOMAIN_1);
+        const wm : DbWorkMachine = autoriUpdateService.createDbWorkMachine(CONTRACT_ID, DOMAIN_1, VEHICLE_TYPE);
         expect(wm.harjaUrakkaId).toEqual(utils.createHarjaId(CONTRACT_ID));
         expect(wm.harjaId).toEqual(utils.createHarjaId(VEHICLE_TYPE));
         expect(wm.type).toContain(CONTRACT_ID);
