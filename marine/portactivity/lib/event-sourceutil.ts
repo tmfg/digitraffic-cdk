@@ -18,7 +18,7 @@ export const eventSourceMap = new Map<string, string>([
 
 const eventSourcePriorities = new Map<string, number>([
     [EventSource.PORTNET, 10],
-    [EventSource.AWAKE_AI, 40],
+    [EventSource.AWAKE_AI_PRED, 40],
     [EventSource.AWAKE_AI, 80],
     [EventSource.SCHEDULES_CALCULATED, 90],
     [EventSource.SCHEDULES_VTS_CONTROL, 95],

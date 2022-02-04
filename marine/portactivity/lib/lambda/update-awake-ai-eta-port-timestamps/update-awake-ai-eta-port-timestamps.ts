@@ -30,8 +30,8 @@ export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSe
             const timestamps = await service.getAwakeAiTimestamps(locode);
 
             const start = Date.now();
-            console.info('method=updateAwakeAiETAPortTimestampsHandler Sending timestamps to queue..');
-            // await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
+            console.info(`method=updateAwakeAiETAPortTimestampsHandler Sending ${timestamps.length} timestamps to queue..`);
+            await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
             console.info('method=updateAwakeAiETAPortTimestampsHandler ..done in tookMs=%d', Date.now()-start);
         }, {expectedKeys});
     };

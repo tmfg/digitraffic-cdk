@@ -1,5 +1,10 @@
 import {ApiTimestamp} from "../model/timestamp";
-import {AwakeAiPredictionType, AwakeAiShipStatus, AwakeAiVoyageEtaPrediction} from "../api/awake_common";
+import {
+    AwakeAiPredictionType,
+    AwakeAiShipStatus,
+    AwakeAiVoyageEtaPrediction,
+    AwakeAiZoneType,
+} from "../api/awake_common";
 import moment from 'moment-timezone';
 import {AwakeAiETAPortApi} from "../api/awake_ai_port";
 import {predictionToTimestamp} from "./awake_ai_eta_helper";
@@ -25,9 +30,11 @@ export class AwakeAiETAPortService {
 
         return resp.schedule.filter(schedule => schedule.voyage.voyageStatus === AwakeAiShipStatus.UNDER_WAY).flatMap(schedule => {
 
-            const etaPredictions = schedule.voyage.predictions.filter(p => p.predictionType === AwakeAiPredictionType.ETA) as AwakeAiVoyageEtaPrediction[];
+            const etaPredictions = schedule.voyage.predictions
+                .filter(p => p.predictionType === AwakeAiPredictionType.ETA)
+                .filter(p => p.zoneType === AwakeAiZoneType.BERTH) as AwakeAiVoyageEtaPrediction[];
             return etaPredictions.map(eta => {
-                if (moment(eta.arrivalTime).isAfter(moment().subtract(24, 'hour'))) {
+                if (moment(eta.arrivalTime).isBefore(moment().add(24, 'hour'))) {
                     console.warn(`method=AwakeAiETAPortService.getAwakeAiTimestamps arrival is closer than 24 hours, not persisting ETA: ${JSON.stringify(eta)}`);
                     return null;
                 }

@@ -100,7 +100,7 @@ function createResponse(options?: {
                     locode: 'FILOL',
                     zoneType: AwakeAiZoneType.BERTH,
                     recordTime: new Date().toISOString(),
-                    arrivalTime: options?.arrivalTime ?? moment().subtract(25, 'hour').toISOString(),
+                    arrivalTime: options?.arrivalTime ?? moment().add(25, 'hour').toISOString(),
                 } as AwakeAiVoyageEtaPrediction],
                 sequenceNo: 1,
             },
