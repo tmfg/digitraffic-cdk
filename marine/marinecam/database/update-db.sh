@@ -4,12 +4,12 @@ ENVIRONMENT=${1:-dev}
 COMMAND=${2:-migrate}
 
 docker build \
--t portactivity-db-updater \
+-t marinecam-db-updater \
 . \
 --build-arg ENVIRONMENT=$ENVIRONMENT
 
 docker run --rm \
---name portactivity-db-updater \
+--name marinecam-db-updater \
 --network=dnet1 \
-portactivity-db-updater \
+marinecam-db-updater \
 $COMMAND

@@ -12,30 +12,12 @@ export class MarinecamStack extends DigitrafficStack {
         super(scope, id, configuration);
 
         const bucket = createImageBucket(this, configuration);
-        const [userPool, userPoolClient] = createUserPool(this);
 
         InternalLambas.create(this, bucket);
-        const privateApi = new PrivateApi(this, bucket, userPool, userPoolClient);
+        const privateApi = new PrivateApi(this, bucket);
 
         new Canaries(this, privateApi.publicApi);
     }
-}
-
-function createUserPool(stack: Construct): [UserPool, UserPoolClient] {
-    const userPool = new UserPool(stack, 'UserPool', {
-        userPoolName: 'MarinecamUserPool',
-    });
-
-    const userPoolClient = new UserPoolClient(stack, 'UserPoolClient', {
-        userPool,
-        authFlows: {
-            userPassword: true,
-            userSrp: true,
-        },
-        disableOAuth: true,
-    });
-
-    return [userPool, userPoolClient];
 }
 
 function createImageBucket(stack: Construct, props: MobileServerProps): Bucket {

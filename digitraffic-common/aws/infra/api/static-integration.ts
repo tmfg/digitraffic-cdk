@@ -17,11 +17,11 @@ const METHOD_RESPONSE_200 = {
  * @param mediaType
  * @param response
  */
-export class DigitrafficStaticIntegration<T> extends MockIntegration {
+export class DigitrafficStaticIntegration extends MockIntegration {
     constructor(
-        resource: Resource, mediaType: MediaType, response: T, enableCors = true, apiKeyRequired = true,
+        resource: Resource, mediaType: MediaType, response: string, enableCors = true, apiKeyRequired = true,
     ) {
-        const integrationResponse = DigitrafficStaticIntegration.createIntegrationResponse(response, mediaType, enableCors);
+        const integrationResponse = DigitrafficStaticIntegration.createIntegrationResponse(JSON.stringify(response), mediaType, enableCors);
 
         super({
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
@@ -37,11 +37,17 @@ export class DigitrafficStaticIntegration<T> extends MockIntegration {
         });
     }
 
-    private static createIntegrationResponse<K>(response: K, mediaType: MediaType, enableCors: boolean) {
+    static json<K>(resource: Resource, response: K, enableCors = true, apiKeyRequired = true) {
+        return new DigitrafficStaticIntegration(
+            resource, MediaType.APPLICATION_JSON, JSON.stringify(response), enableCors, apiKeyRequired,
+        );
+    }
+
+    private static createIntegrationResponse(response: string, mediaType: MediaType, enableCors: boolean) {
         const integrationResponse = {
             statusCode: '200',
             responseTemplates: {
-                [mediaType]: JSON.stringify(response),
+                [mediaType]: response,
             },
         };
 

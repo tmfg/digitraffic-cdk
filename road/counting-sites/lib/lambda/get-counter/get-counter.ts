@@ -7,18 +7,19 @@ const secretId = process.env.SECRET_ID as string;
 export const handler = (event: Record<string, string>) => {
     return withDbSecret(secretId, () => {
         const start = Date.now();
-
         const counterId = event.counterId;
-        const domainName = event.domainName;
 
-        return CountingSitesService.findCounterValues(counterId, domainName).then(data => {
-            return LambdaResponse.okJson(data);
+        return CountingSitesService.findCounters("", counterId).then(featureCollection => {
+            if (featureCollection?.features.length === 0) {
+                return LambdaResponse.notFound();
+            }
+            return LambdaResponse.okJson(featureCollection);
         }).catch(error => {
             console.info("error " + error);
 
             return LambdaResponse.internalError();
         }).finally(() => {
-            console.info("method=CountingSites.GetData tookMs=%d", (Date.now() - start));
+            console.info("method=CountingSites.GetCounter tookMs=%d", (Date.now() - start));
         });
     });
 };

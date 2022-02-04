@@ -13,7 +13,7 @@ import {isValidGeoJson} from "../../../utils/geometry";
 export const API_KEY_HEADER = "x-api-key";
 
 const baseHeaders = {
-    "Digitraffic-User" : "Digitraffic/AWS Canary",
+    "Digitraffic-User" : "internal-digitraffic-canary",
     "Accept-Encoding" : "gzip",
     "Accept": "*/*",
 } as Record<string, string>;
@@ -83,6 +83,14 @@ export class UrlChecker {
         }};
 
         return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
+    }
+
+    expect400(url: string): Promise<void> {
+        const requestOptions = {...this.requestOptions, ...{
+            path: url,
+        }};
+
+        return synthetics.executeHttpStep("Verify 400 for " + url, requestOptions, validateStatusCodeAndContentType(400, MediaType.TEXT_PLAIN));
     }
 
     expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {

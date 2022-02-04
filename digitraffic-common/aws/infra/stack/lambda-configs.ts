@@ -102,7 +102,7 @@ export function dbLambdaConfiguration(vpc: IVpc,
             subnets: vpc.privateSubnets,
         },
         securityGroups: [lambdaDbSg],
-        reservedConcurrentExecutions: config.reservedConcurrentExecutions,
+        reservedConcurrentExecutions: config.reservedConcurrentExecutions || 3,
     };
 }
 
