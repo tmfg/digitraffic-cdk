@@ -11,6 +11,7 @@ import {retry} from "digitraffic-common/utils/retry";
 import {AwakeAiPredictionType, AwakeAiShipStatus, AwakeAiZoneType} from "../api/awake_common";
 import moment from 'moment-timezone';
 import {AwakeDataState, predictionToTimestamp} from "./awake_ai_eta_helper";
+import {EventSource} from "../model/eventsource";
 
 type AwakeAiETAResponseAndShip = {
     readonly response: AwakeAiShipApiResponse
@@ -105,6 +106,7 @@ export class AwakeAiETAShipService {
 
             return predictionToTimestamp(
                 etaPrediction,
+                EventSource.AWAKE_AI,
                 ship.locode,
                 schedule.ship.mmsi,
                 ship.imo,

@@ -25,6 +25,7 @@ function destinationIsFinnish(locode: string): boolean {
 
 export function predictionToTimestamp(
     prediction: AwakeAiVoyageEtaPrediction,
+    source: EventSource,
     locode: string,
     mmsi: number,
     imo: number,
@@ -53,7 +54,7 @@ export function predictionToTimestamp(
             port: locode,
             portArea,
         },
-        source: EventSource.AWAKE_AI,
+        source,
         eventTime: prediction.arrivalTime,
         recordTime: prediction.recordTime,
         portcallId,

@@ -4,6 +4,7 @@ import {AwakeAiPredictionType, AwakeAiShipStatus} from "../api/awake_common";
 import moment from 'moment-timezone';
 import {AwakeAiETAPortApi} from "../api/awake_ai_port";
 import {predictionToTimestamp} from "./awake_ai_eta_helper";
+import {EventSource} from "../model/eventsource";
 
 export class AwakeAiETAPortService {
 
@@ -32,10 +33,13 @@ export class AwakeAiETAPortService {
                     return null;
                 }
 
-                return predictionToTimestamp(eta,
+                return predictionToTimestamp(
+                    eta,
+                    EventSource.AWAKE_AI_PRED,
                     locode,
                     schedule.ship.mmsi,
-                    schedule.ship.imo);
+                    schedule.ship.imo,
+                );
             });
 
         }).filter((ts): ts is ApiTimestamp => ts != null);
