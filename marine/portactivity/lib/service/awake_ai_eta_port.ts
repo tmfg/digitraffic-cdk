@@ -1,6 +1,5 @@
-import {AwakeAiVoyageEtaPrediction} from "../api/awake_ai_ship";
 import {ApiTimestamp} from "../model/timestamp";
-import {AwakeAiPredictionType, AwakeAiShipStatus} from "../api/awake_common";
+import {AwakeAiPredictionType, AwakeAiShipStatus, AwakeAiVoyageEtaPrediction} from "../api/awake_common";
 import moment from 'moment-timezone';
 import {AwakeAiETAPortApi} from "../api/awake_ai_port";
 import {predictionToTimestamp} from "./awake_ai_eta_helper";

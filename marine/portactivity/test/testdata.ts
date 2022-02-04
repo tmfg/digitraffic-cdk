@@ -7,6 +7,8 @@ import {
 } from "../lib/api/awake_ai_atx";
 import {AwakeAiZoneType} from "../lib/api/awake_common";
 import { v4 as uuidv4 } from 'uuid';
+import {randomInt} from "crypto";
+import {getRandomNumber} from "digitraffic-common/test/testutils";
 
 // test file
 /* eslint-disable camelcase */
@@ -37,6 +39,14 @@ export function newAwakeATXMessage(options?: {
 
 export function someNumber(): number {
     return 1 + Math.floor(Math.random() * 999999);
+}
+
+export function randomIMO() {
+    return getRandomNumber(1000000, 9999999);
+}
+
+export function randomMMSI() {
+    return getRandomNumber(100000000, 999999999);
 }
 
 export function newTimestamp(props?: {

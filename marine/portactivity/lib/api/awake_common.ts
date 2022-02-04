@@ -30,6 +30,12 @@ export type AwakeAiPrediction = {
     readonly zoneType: AwakeAiZoneType
 }
 
+export type AwakeAiVoyageEtaPrediction = AwakeAiPrediction & {
+
+    // ISO 8601
+    readonly arrivalTime: string
+}
+
 export enum AwakeAiShipStatus {
     UNDER_WAY = 'underway',
     STOPPED = 'stopped',

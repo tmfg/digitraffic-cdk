@@ -22,12 +22,6 @@ export enum AwakeAiShipPredictability {
     SHIP_DATA_NOT_UPDATED = 'ship-data-not-updated'
 }
 
-export type AwakeAiVoyageEtaPrediction = AwakeAiPrediction & {
-
-    // ISO 8601
-    readonly arrivalTime: string
-}
-
 export type AwakeAiShipVoyageSchedule = {
 
     readonly ship: AwakeAiShip

@@ -3,21 +3,25 @@ import {
     AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
     AwakeAiShipResponseType,
-    AwakeAiVoyageEtaPrediction,
     AwakeAiETAShipApi,
 } from "../../lib/api/awake_ai_ship";
 import {AwakeAiETAShipService} from "../../lib/service/awake_ai_eta_ship";
 import {DbETAShip} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
-import {AwakeAiPredictionType, AwakeAiShipStatus, AwakeAiZoneType} from "../../lib/api/awake_common";
+import {
+    AwakeAiPredictionType,
+    AwakeAiShipStatus,
+    AwakeAiVoyageEtaPrediction,
+    AwakeAiZoneType,
+} from "../../lib/api/awake_common";
 import {getRandomInteger, randomBoolean} from "digitraffic-common/test/testutils";
 import moment from 'moment-timezone';
 
 // test file
 /* eslint-disable camelcase */
 
-describe('service awake.ai', () => {
+describe('AwakeAiETAShipService', () => {
 
     test('getAwakeAiTimestamps - creates both ETA and ETB only for FIRAU', async () => {
         const api = createApi();
