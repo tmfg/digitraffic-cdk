@@ -9,71 +9,71 @@ export const FormalityResponseJson = {
                 "Telegraphy": "A",
                 "Function": "Vessel",
                 "InformationRequired": "Vessel’s name, call sign and IMO identification. MMSI may be reported.",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "C",
                 "Function": "Position",
                 "InformationRequired": "Geographical position by two 6 digit groups;",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "E",
                 "Function": "True course",
                 "InformationRequired": "True course in three (3) digit groups",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "F",
                 "Function": "Speed",
                 "InformationRequired": "Speed in knots with one decimal",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "I",
                 "Function": "Destination and ETA",
                 "InformationRequired": "Destination and ETA",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "O",
                 "Function": "Draught",
                 "InformationRequired": "Vessel’s present draught in metres with one decimal",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "P",
                 "Function": "Cargo on board",
                 "InformationRequired": "Hazardous cargo onboard, IMO main classes and quantity in metric tonnes  with up to two decimals.",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "T",
                 "Function": "Ship's representative and/or owner",
                 "InformationRequired": "Contact information of agent in the Gulf of Finland",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "U",
                 "Function": "Ship size and type",
                 "InformationRequired": "Vessel type and length",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "W",
                 "Function": "Number of persons on board",
                 "InformationRequired": "Total number of persons onboard",
-                "SemanticsVariesWithReportType": "false"
+                "SemanticsVariesWithReportType": "false",
             },
             {
                 "Telegraphy": "X",
                 "Function": "Miscellaneous",
                 "InformationRequired": "Characteristics and estimated quantity of bunker fuel for ships carrying more  than 5,000 tons of bunkers and navigational status.",
-                "SemanticsVariesWithReportType": "false"
-            }
+                "SemanticsVariesWithReportType": "false",
+            },
         ],
-        "ReportingTriggers": []
-    }
+        "ReportingTriggers": [],
+    },
 
 
 };

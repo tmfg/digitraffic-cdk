@@ -2,7 +2,7 @@ import * as S3Utils from "digitraffic-common/aws/runtime/s3";
 
 export class RtzStorageApi {
 
-    private readonly bucketName: string
+    private readonly bucketName: string;
 
     constructor(bucketName: string) {
         this.bucketName = bucketName;

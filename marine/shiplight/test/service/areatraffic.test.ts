@@ -1,14 +1,17 @@
 import {needToBrighten} from "../../lib/service/areatraffic";
 import {DbAreaTraffic} from "../../lib/db/areatraffic";
 
+// test file
+/* eslint-disable camelcase */
+
 describe('areatraffic service', () => {
-    test('needToBrighten - never sent', async () => {
+    test('needToBrighten - never sent', () => {
         const area = createArea(1, 10);
 
         expect(needToBrighten(area)).toBe(true);
     });
 
-    test('needToBrighten - ends in 1 hour', async () => {
+    test('needToBrighten - ends in 1 hour', () => {
         const sent = new Date();
         const end = new Date();
         end.setHours(end.getHours() + 1);
@@ -17,7 +20,7 @@ describe('areatraffic service', () => {
         expect(needToBrighten(area)).toBe(false);
     });
 
-    test('needToBrighten - ended hour ago', async () => {
+    test('needToBrighten - ended hour ago', () => {
         const sent = new Date();
         const end = new Date();
         end.setHours(end.getHours() - 1);
@@ -26,7 +29,7 @@ describe('areatraffic service', () => {
         expect(needToBrighten(area)).toBe(true);
     });
 
-    test('needToBrighten - ends in 30 seconds', async () => {
+    test('needToBrighten - ends in 30 seconds', () => {
         const sent = new Date();
         const end = new Date();
         end.setSeconds(end.getSeconds() + 30);
@@ -41,7 +44,7 @@ describe('areatraffic service', () => {
             name: id.toString(),
             brighten_duration_min,
             brighten_sent,
-            brighten_end
+            brighten_end,
         };
     }
 });

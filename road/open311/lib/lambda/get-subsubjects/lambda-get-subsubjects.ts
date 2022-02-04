@@ -9,6 +9,6 @@ export const handler = async (event: LocaleEvent): Promise<DigitrafficApiSubSubj
         name: s.name,
         id: s.id,
         locale: s.locale,
-        subjectId: s.subject_id
+        subjectId: s.subject_id,
     }));
 };

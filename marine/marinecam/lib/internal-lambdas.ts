@@ -10,6 +10,7 @@ export function create(stack: DigitrafficStack,
 
     const updateLambda = createUpdateImagesLambda(stack, bucket);
 
+    Scheduler.every(stack, 'UpdateImages-Rule', (stack.configuration as MobileServerProps).updateFrequency, updateLambda);
     bucket.grantWrite(updateLambda);
 }
 
@@ -18,11 +19,5 @@ function createUpdateImagesLambda(stack: DigitrafficStack,
     const environment = stack.createLambdaEnvironment();
     environment[MarinecamEnvKeys.BUCKET_NAME] = bucket.bucketName;
 
-    const lambda = MonitoredDBFunction.create(stack, 'update-images', environment, {
-        reservedConcurrentExecutions: 2,
-    });
-
-    Scheduler.every(stack, 'UpdateImages-Rule', (stack.configuration as MobileServerProps).updateFrequency, lambda);
-
-    return lambda;
+    return MonitoredDBFunction.create(stack, 'update-images', environment);
 }

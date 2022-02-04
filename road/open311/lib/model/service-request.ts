@@ -3,6 +3,9 @@ export enum ServiceRequestStatus {
     closed = 'closed'
 }
 
+// camels
+/* eslint-disable camelcase */
+
 export interface ServiceRequest {
     readonly service_request_id: string
     readonly status: ServiceRequestStatus

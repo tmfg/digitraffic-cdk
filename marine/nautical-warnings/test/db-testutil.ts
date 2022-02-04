@@ -17,7 +17,7 @@ export function insertArchivedWarnings<T>(db: DTDatabase, value: T): Promise<nul
 }
 
 function truncate(db: DTDatabase): Promise<null> {
-    return db.tx(async t => {
+    return db.tx (t => {
         return t.none('DELETE FROM cached_json');
     });
 }

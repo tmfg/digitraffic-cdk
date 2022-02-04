@@ -1,25 +1,21 @@
-import {jsonChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
-import assert from "assert";
+import {ContentTypeChecker, GeoJsonChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
 import {FeatureCollection} from "geojson";
-
-const hostname = process.env.hostname as string;
-const apiKeyId = process.env.apiKeyId as string;
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const gjv = require("geojson-validation");
+import {Asserter} from "digitraffic-common/test/asserter";
+import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 
 export const handler = async () => {
-    const checker = await UrlChecker.create(hostname, apiKeyId);
+    const checker = await UrlChecker.createV2();
 
-    await checker.expect200("/prod/api/nautical-warnings/beta/active", jsonChecker((json: FeatureCollection) => {
-        assert.ok(gjv.isFeatureCollection(json));
-        assert.ok(json.features.length > 1);
-        assert.ok(json.features[0]?.properties?.id > 0);
-    }));
+    await checker.expect200("/prod/api/nautical-warnings/beta/active",
+        ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
+        GeoJsonChecker.validFeatureCollection((json: FeatureCollection) => {
+            Asserter.assertLengthGreaterThan(json.features, 1);
+            Asserter.assertGreaterThan(json.features[0]?.properties?.id, 0);
+        }));
 
-    await checker.expect200("/prod/api/nautical-warnings/beta/archived", jsonChecker((json: FeatureCollection) => {
-        assert.ok(gjv.isFeatureCollection(json));
-    }));
+    await checker.expect200("/prod/api/nautical-warnings/beta/archived",
+        ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
+        GeoJsonChecker.validFeatureCollection());
 
     return checker.done();
 };

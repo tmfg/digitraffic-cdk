@@ -6,8 +6,8 @@ import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
 
 export class InternalLambdas {
     constructor(stack: DigitrafficStack) {
-        const updateMetadataLambda = this.createUpdateMetadataLambdaForOulu(stack);
-        const updateDataLambda = this.createUpdateDataLambdaForOulu(stack);
+        const updateMetadataLambda = InternalLambdas.createUpdateMetadataLambdaForOulu(stack);
+        const updateDataLambda = InternalLambdas.createUpdateDataLambdaForOulu(stack);
 
         Scheduler.everyHour(stack, 'RuleForMetadataUpdate', updateMetadataLambda);
         Scheduler.everyHour(stack, 'RuleForDataUpdate', updateDataLambda);
@@ -16,7 +16,7 @@ export class InternalLambdas {
         stack.grantSecret(updateMetadataLambda, updateDataLambda);
     }
 
-    private createUpdateMetadataLambdaForOulu(stack: DigitrafficStack): MonitoredFunction {
+    private static createUpdateMetadataLambdaForOulu(stack: DigitrafficStack): MonitoredFunction {
         const environment = stack.createLambdaEnvironment();
         environment[CountingSitesEnvKeys.DOMAIN_NAME] = 'Oulu';
         environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = 'cs.oulu';
@@ -26,7 +26,7 @@ export class InternalLambdas {
         });
     }
 
-    private createUpdateDataLambdaForOulu(stack: DigitrafficStack): MonitoredFunction {
+    private static createUpdateDataLambdaForOulu(stack: DigitrafficStack): MonitoredFunction {
         const environment = stack.createLambdaEnvironment();
         environment[CountingSitesEnvKeys.DOMAIN_NAME] = 'Oulu';
         environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = 'cs.oulu';

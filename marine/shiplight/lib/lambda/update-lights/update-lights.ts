@@ -47,7 +47,7 @@ export async function handlerFn(doWithSecret: SecretFunction<ShiplightSecret>,
     });
 }
 
-export const handler = async (): Promise<void> => {
+export const handler = (): Promise<void> => {
     return handlerFn(withDbSecret, AreaVisibilityService, AreaLightsService);
 };
 

@@ -4,84 +4,136 @@ import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
 import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {MessageModel} from "digitraffic-common/aws/infra/api/response";
-import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
-import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
+import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
+import {directionProperties, domainsProperties, userTypesProperties} from "./model/metadata";
+import {dataProperties} from "./model/data";
+import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
+import {counterProperties} from "./model/counter";
+import {DigitrafficStaticIntegration} from "digitraffic-common/aws/infra/api/static-integration";
+
+const COUNTING_SITE_TAGS = ["Counting site(Beta)"];
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
-    metadataResource: Resource;
-    countersListResource: Resource;
-    dataResource: Resource;
-    dataCsvResource: Resource;
 
-    errorResponseModel: Model;
-    metadataResponseModel: Model;
-    dataResponseModel: Model;
+    valuesResource: Resource;
+    csvValuesResource: Resource;
+    countersResource: Resource;
+    counterResource: Resource;
+
+    userTypesResource: Resource;
+    domainsResource: Resource;
+    directionsResource: Resource;
+
+    userTypesResponseModel: Model;
+    domainsResponseModel: Model;
+    directionsResponseModel: Model;
+    jsonValuesResponseModel: Model;
+    geoJsonResponseModel: Model;
+    csvValuesResponseModel: Model;
 
     constructor(stack: DigitrafficStack) {
         this.publicApi = new DigitrafficRestApi(stack, 'CountingSites-public', 'Counting Sites Public API');
         this.publicApi.createUsagePlan('CS Api Key', 'CS Usage Plan');
 
         this.createResources(this.publicApi);
+        this.createModels(this.publicApi);
 
-        this.createMetadataEndpoint(stack);
-        this.createDataEndpoint(stack);
-        this.createDataCsvEndpoint(stack);
+        this.createUserTypesEndpoint(stack);
+        this.createDomainsEndpoint(stack);
+        this.createDirectionsEndpoint();
+        this.createValuesEndpoint(stack);
+        this.createCsvValuesEndpoint(stack);
         this.createCountersEndpoint(stack);
+        this.createCounterEndpoint(stack);
 
-        this.createDocumentation(stack);
+        this.createDocumentation();
     }
 
-    createDocumentation(stack: DigitrafficStack) {
-        addTagsAndSummary(
-            'GetMetadata', BETA_TAGS, 'Return all metadata', this.metadataResource, stack,
-        );
+    createDocumentation() {
+        this.publicApi.documentResource(this.userTypesResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetUserTypes', 'Return all user types'));
+        this.publicApi.documentResource(this.domainsResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDomains', 'Return all domains'));
+        this.publicApi.documentResource(this.directionsResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDirections', 'Return all directions'));
 
-        addTagsAndSummary(
-            'GetCounters', BETA_TAGS, 'Return all counters for domain', this.countersListResource, stack,
-        );
-        addQueryParameterDescription('domain', 'Domain', this.countersListResource, stack);
+        this.publicApi.documentResource(this.countersResource,
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetCounters', 'Return all counters for domain'),
+            DocumentationPart.queryParameter('domain_name', 'Domain name'));
 
-        addTagsAndSummary(
-            'GetData', BETA_TAGS, 'Return all data', this.dataResource, stack,
-        );
+        this.publicApi.documentResource(this.counterResource,
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetCounter', 'Return single counter'),
+            DocumentationPart.pathParameter('counter_id', 'Counter id'));
 
-        addTagsAndSummary(
-            'GetData as CSV', BETA_TAGS, 'Return all data', this.dataCsvResource, stack,
-        );
+        this.publicApi.documentResource(this.valuesResource,
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetData', 'Return counter values'),
+            DocumentationPart.queryParameter('counter_id', 'Counter id'),
+            DocumentationPart.queryParameter('domain_name', 'Domain name'));
 
-        addQueryParameterDescription('id', 'Site-id', this.dataResource, stack);
+        this.publicApi.documentResource(
+            this.csvValuesResource,
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDataCSV', 'Return counter values in CSV'),
+            DocumentationPart.queryParameter('counter_id', 'Counter id'),
+            DocumentationPart.queryParameter('domain_name', 'Domain name'),
+            DocumentationPart.queryParameter('year', 'Year'),
+            DocumentationPart.queryParameter('month', 'Month'),
+        );
     }
 
     createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
-        const csResource = apiResource.addResource("counters");
+        const csResource = apiResource.addResource("counting-site");
         const betaResource = csResource.addResource("beta");
-        const valuesResource = betaResource.addResource("values");
-        const csvValuesResource = betaResource.addResource("csv-values");
-        const monthResource = csvValuesResource.addResource("{year}");
-        const countersResource = betaResource.addResource("counters");
 
-        this.metadataResource = betaResource.addResource("metadata");
-        this.dataResource = valuesResource.addResource("{id}");
-        this.dataCsvResource = monthResource.addResource("{month}");
-        this.countersListResource = countersResource.addResource("{domain}");
-        this.metadataResponseModel = publicApi.addModel('MetadataResponseModel', MessageModel);
+        this.valuesResource = betaResource.addResource("values");
+        this.csvValuesResource = betaResource.addResource("csv-values");
+        this.countersResource = betaResource.addResource("counters");
+        this.counterResource = this.countersResource.addResource("{counterId}");
+
+        this.userTypesResource = betaResource.addResource("user-types");
+        this.domainsResource = betaResource.addResource("domains");
+        this.directionsResource = betaResource.addResource("directions");
     }
 
-    createMetadataEndpoint(stack: DigitrafficStack) {
-        const lambda = MonitoredDBFunction.create(stack, 'get-metadata');
+    createModels(publicApi: DigitrafficRestApi) {
+        this.userTypesResponseModel = publicApi.addJsonModel('UserTypesResponseModel', userTypesProperties);
+        this.domainsResponseModel = publicApi.addJsonModel('DomainsResponseModel', domainsProperties);
+        this.directionsResponseModel = publicApi.addJsonModel("DirectionsResponseModel", directionProperties);
+        this.jsonValuesResponseModel = publicApi.addJsonModel('JsonDataResponseModel', dataProperties);
 
-        const metadataIntegration = defaultIntegration(lambda);
+        const counterModel = publicApi.addJsonModel("CounterModel", counterProperties);
+        const featureModel = publicApi.addJsonModel("CounterFeatureModel", featureSchema(getModelReference(counterModel.modelId, publicApi.restApiId)));
+        this.geoJsonResponseModel = publicApi.addJsonModel("CountersModel", geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
+
+        this.csvValuesResponseModel = publicApi.addCSVModel("CSVDataModel");
+    }
+
+    createUserTypesEndpoint(stack: DigitrafficStack) {
+        const lambda = MonitoredDBFunction.create(stack, 'get-user-types');
+
+        const integration = defaultIntegration(lambda);
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
-            this.metadataResource.addMethod(httpMethod, metadataIntegration, {
+            this.userTypesResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.userTypesResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
+                ],
+            });
+        });
+    }
+
+    createDomainsEndpoint(stack: DigitrafficStack) {
+        const lambda = MonitoredDBFunction.create(stack, 'get-domains');
+
+        const integration = defaultIntegration(lambda);
+
+        ['GET', 'HEAD'].forEach((httpMethod) => {
+            this.domainsResource.addMethod(httpMethod, integration, {
+                apiKeyRequired: true,
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.domainsResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 ],
             });
         });
@@ -90,88 +142,140 @@ export class PublicApi {
     createCountersEndpoint(stack: DigitrafficStack) {
         const lambda = MonitoredDBFunction.create(stack, 'get-counters');
 
-        const countersIntegration = defaultIntegration(lambda, {
+        const integration = defaultIntegration(lambda, {
             requestParameters: {
-                'integration.request.path.domain': 'method.request.path.domain',
+                'integration.request.querystring.domain_name': 'method.request.querystring.domain_name',
             },
             requestTemplates: {
-                'application/json': JSON.stringify({domain: "$util.escapeJavaScript($input.params('domain'))"}),
+                'application/json': JSON.stringify({domainName: "$util.escapeJavaScript($input.params('domain_name'))"}),
             },
             responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)],
         });
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
-            this.countersListResource.addMethod(httpMethod, countersIntegration, {
+            this.countersResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 requestParameters: {
-                    'method.request.path.domain': true,
+                    'method.request.querystring.domain_name': false,
                 },
                 methodResponses: [
-                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.metadataResponseModel)),
-                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geoJsonResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 ],
             });
         });
     }
 
-    createDataEndpoint(stack: DigitrafficStack) {
-        const lambda = MonitoredDBFunction.create(stack, 'get-data');
+    createCounterEndpoint(stack: DigitrafficStack) {
+        const lambda = MonitoredDBFunction.create(stack, 'get-counter');
 
-        const dataIntegration = defaultIntegration(lambda, {
+        const integration = defaultIntegration(lambda, {
             requestParameters: {
-                'integration.request.path.id': 'method.request.path.id',
+                'integration.request.path.counterId': 'method.request.path.counterId',
             },
             requestTemplates: {
-                'application/json': JSON.stringify({id: "$util.escapeJavaScript($input.params('id'))"}),
+                'application/json': JSON.stringify({counterId: "$util.escapeJavaScript($input.params('counterId'))"}),
             },
-            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)],
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)],
         });
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
-            this.dataResource.addMethod(httpMethod, dataIntegration, {
+            this.counterResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 requestParameters: {
-                    'method.request.path.id': true,
+                    'method.request.path.counterId': true,
                 },
                 methodResponses: [
-                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
-                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geoJsonResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 ],
             });
         });
     }
 
-    createDataCsvEndpoint(stack: DigitrafficStack) {
+    createValuesEndpoint(stack: DigitrafficStack) {
+        const lambda = MonitoredDBFunction.create(stack, 'get-data');
+
+        const integration = defaultIntegration(lambda, {
+            requestParameters: {
+                'integration.request.querystring.counter_id': 'method.request.querystring.counter_id',
+                'integration.request.querystring.domain_name': 'method.request.querystring.domain_name',
+            },
+            requestTemplates: {
+                'application/json': JSON.stringify({
+                    counterId: "$util.escapeJavaScript($input.params('counter_id'))",
+                    domainName: "$util.escapeJavaScript($input.params('domain_name'))",
+                }),
+            },
+            responses: [
+                DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
+                DigitrafficIntegrationResponse.badRequest(),
+            ],
+        });
+
+        ['GET', 'HEAD'].forEach((httpMethod) => {
+            this.valuesResource.addMethod(httpMethod, integration, {
+                apiKeyRequired: true,
+                requestParameters: {
+                    'method.request.querystring.counter_id': false,
+                    'method.request.querystring.domain_name': false,
+                },
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.jsonValuesResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
+                ],
+            });
+        });
+    }
+
+    createCsvValuesEndpoint(stack: DigitrafficStack) {
         const lambda = MonitoredDBFunction.create(stack, 'get-data-csv', undefined, {
             memorySize: 256,
         });
 
-        const dataIntegration = defaultIntegration(lambda, {
+        const integration = defaultIntegration(lambda, {
             requestParameters: {
-                'integration.request.path.year': 'method.request.path.year',
-                'integration.request.path.month': 'method.request.path.month',
+                'integration.request.querystring.year': 'method.request.querystring.year',
+                'integration.request.querystring.month': 'method.request.querystring.month',
+                'integration.request.querystring.domain_name': 'method.request.querystring.domain_name',
+                'integration.request.querystring.counter_id': 'method.request.querystring.counter_id',
             },
             requestTemplates: {
                 'application/json': JSON.stringify({
                     year: "$util.escapeJavaScript($input.params('year'))",
                     month: "$util.escapeJavaScript($input.params('month'))",
+                    domainName: "$util.escapeJavaScript($input.params('domain_name'))",
+                    counterId: "$util.escapeJavaScript($input.params('counter_id'))",
                 }),
             },
-            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)],
+            responses: [
+                DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
+                DigitrafficIntegrationResponse.badRequest(),
+            ],
         });
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
-            this.dataCsvResource.addMethod(httpMethod, dataIntegration, {
+            this.csvValuesResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 requestParameters: {
-                    'method.request.path.year': true,
-                    'method.request.path.month': true,
+                    'method.request.querystring.year': false,
+                    'method.request.querystring.month': false,
+                    'method.request.querystring.domain_name': false,
+                    'method.request.querystring.counter_id': false,
                 },
                 methodResponses: [
-                    corsMethod(methodResponse("200", MediaType.TEXT_CSV, this.metadataResponseModel)),
-                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, this.metadataResponseModel)),
+                    corsMethod(methodResponse("200", MediaType.TEXT_CSV, this.csvValuesResponseModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 ],
             });
+        });
+    }
+
+    createDirectionsEndpoint() {
+        DigitrafficStaticIntegration.json(this.directionsResource, {
+            1: "In",
+            2: "Out",
+            3: "No directions",
         });
     }
 }

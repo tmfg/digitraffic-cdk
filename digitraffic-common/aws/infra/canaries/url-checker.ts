@@ -1,22 +1,25 @@
 import {constants} from "http2";
 import {IncomingMessage, RequestOptions} from "http";
+import {Asserter} from "digitraffic-common/test/asserter";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
 import zlib = require('zlib');
 import {MediaType} from "../../types/mediatypes";
 import {getApiKeyFromAPIGateway} from "../../runtime/apikey";
+import {FeatureCollection} from "geojson";
+import {isValidGeoJson} from "../../../utils/geometry";
 
 export const API_KEY_HEADER = "x-api-key";
 
 const baseHeaders = {
-    "Digitraffic-User" : "Digitraffic/AWS Canary",
+    "Digitraffic-User" : "internal-digitraffic-canary",
     "Accept-Encoding" : "gzip",
     "Accept": "*/*",
 } as Record<string, string>;
 
 type CheckerFunction = (Res: IncomingMessage) => void;
-type JsonCheckerFunction<T> = (json: T, body: string) => void;
+type JsonCheckerFunction<T> = (json: T, body: string, message: IncomingMessage) => void;
 
 export class UrlChecker {
     private readonly requestOptions: RequestOptions;
@@ -56,7 +59,7 @@ export class UrlChecker {
         return this.create(process.env.hostname as string, process.env.apiKeyId as string);
     }
 
-    expectStatus<T>(statusCode: number, url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
+    expectStatus<T>(statusCode: number, url: string, callback: JsonCheckerFunction<T>): Promise<void> {
         const requestOptions = {...this.requestOptions, ...{
             path: url,
         }};
@@ -66,7 +69,11 @@ export class UrlChecker {
             callback);
     }
 
-    expect200<T>(url: string, callback?: JsonCheckerFunction<T>): Promise<void> {
+    expect200<T>(url: string, ...callbacks: JsonCheckerFunction<T>[]): Promise<void> {
+        const callback = async (json: T, body: string, res: IncomingMessage) => {
+            await Promise.allSettled(callbacks.map(c => c(json, body, res)));
+        };
+
         return this.expectStatus(200, url, callback);
     }
 
@@ -76,6 +83,14 @@ export class UrlChecker {
         }};
 
         return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
+    }
+
+    expect400(url: string): Promise<void> {
+        const requestOptions = {...this.requestOptions, ...{
+            path: url,
+        }};
+
+        return synthetics.executeHttpStep("Verify 400 for " + url, requestOptions, validateStatusCodeAndContentType(400, MediaType.TEXT_PLAIN));
     }
 
     expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
@@ -96,28 +111,6 @@ export class UrlChecker {
     done(): string {
         return "Canary successful";
     }
-}
-
-export function jsonChecker<T>(fn: JsonCheckerFunction<T>): CheckerFunction {
-    return responseChecker((body: string) => {
-        fn(JSON.parse(body), body);
-    });
-}
-
-export function responseChecker(fn: (body: string) => void): CheckerFunction {
-    return async (res: IncomingMessage) => {
-        if (!res.statusCode) {
-            throw new Error('statusCode missing');
-        }
-
-        if (res.statusCode < 200 || res.statusCode > 299) {
-            throw new Error(res.statusCode + ' ' + res.statusMessage);
-        }
-
-        const body = await getResponseBody(res);
-
-        fn(body);
-    };
 }
 
 async function getResponseBody(response: IncomingMessage): Promise<string> {
@@ -148,15 +141,6 @@ function getBodyFromResponse(response: IncomingMessage): Promise<string> {
     });
 }
 
-export function mustContain(body: string, text: string) {
-    console.info("checking " + body);
-
-    if (!body.includes(text)) {
-        console.info("Did not contain " + text);
-        throw new Error("Did not contain " + text);
-    }
-}
-
 /**
  * Returns function, that validates that the status code and content-type from response are the given values
  * @param statusCode
@@ -178,6 +162,7 @@ function validateStatusCodeAndContentType(statusCode: number, contentType: Media
     };
 }
 
+// DEPRECATED
 export class ResponseChecker {
     private readonly contentType;
     private checkCors = true;
@@ -190,6 +175,10 @@ export class ResponseChecker {
         return new ResponseChecker(MediaType.APPLICATION_JSON);
     }
 
+    static forCSV(): ResponseChecker {
+        return new ResponseChecker(MediaType.TEXT_CSV);
+    }
+
     static forGeojson(): ResponseChecker {
         return new ResponseChecker(MediaType.APPLICATION_GEOJSON);
     }
@@ -198,25 +187,19 @@ export class ResponseChecker {
         return new ResponseChecker(MediaType.IMAGE_JPEG);
     }
 
-    noCors(): ResponseChecker {
-        this.checkCors = false;
-
-        return this;
-    }
-
     check(): CheckerFunction {
         return this.responseChecker(() => {
             // no need to do anything
         });
     }
 
-    checkJson<T>(fn: (json: T, body: string) => void): CheckerFunction {
-        return this.responseChecker((body: string) => {
-            fn(JSON.parse(body), body);
+    checkJson<T>(fn: (json: T, body: string, res: IncomingMessage) => void): CheckerFunction {
+        return this.responseChecker((body: string, res: IncomingMessage) => {
+            fn(JSON.parse(body), body, res);
         });
     }
 
-    responseChecker(fn: (body: string) => void): CheckerFunction {
+    responseChecker(fn: (body: string, res: IncomingMessage) => void): CheckerFunction {
         return async (res: IncomingMessage): Promise<void> => {
             if (!res.statusCode) {
                 throw new Error('statusCode missing');
@@ -236,7 +219,78 @@ export class ResponseChecker {
 
             const body = await getResponseBody(res);
 
-            fn(body);
+            fn(body, res);
+        };
+    }
+}
+
+export class ContentChecker {
+    static checkJson<T>(fn: (json: T, body: string, res: IncomingMessage) => void): CheckerFunction {
+        return async (res: IncomingMessage): Promise<void> => {
+            const body = await getResponseBody(res);
+
+            fn(JSON.parse(body), body, res);
+        };
+    }
+
+    static checkResponse(fn: (body: string, res: IncomingMessage) => void): CheckerFunction {
+        return async (res: IncomingMessage): Promise<void> => {
+            const body = await getResponseBody(res);
+
+            fn(body, res);
+        };
+    }
+}
+
+export class ContentTypeChecker {
+    static checkContentType(contentType: MediaType) {
+        return (res: IncomingMessage) => {
+            if (!res.statusCode) {
+                throw new Error('statusCode missing');
+            }
+
+            if (res.statusCode < 200 || res.statusCode > 299) {
+                throw new Error(res.statusCode + ' ' + res.statusMessage);
+            }
+
+            if (!res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
+                throw new Error('CORS missing');
+            }
+
+            if (res.headers[constants.HTTP2_HEADER_CONTENT_TYPE] !== contentType) {
+                throw new Error('Wrong content-type ' + res.headers[constants.HTTP2_HEADER_CONTENT_TYPE]);
+            }
+        };
+    }
+}
+
+export class GeoJsonChecker {
+    static validFeatureCollection(fn?: (json: FeatureCollection) => void): CheckerFunction {
+        return ResponseChecker.forGeojson().checkJson((json: FeatureCollection) => {
+            Asserter.assertEquals(json.type, 'FeatureCollection');
+            Asserter.assertTrue(isValidGeoJson(json));
+
+            if (fn) {
+                fn(json);
+            }
+        });
+    }
+}
+
+export class HeaderChecker {
+    static checkHeaderExists(headerName: string): CheckerFunction {
+        return (res: IncomingMessage) => {
+            if (!res.headers[headerName]) {
+                throw new Error('Missing header: ' + headerName);
+            }
+        };
+    }
+
+    static checkHeaderMissing(headerName: string): CheckerFunction {
+        return (res: IncomingMessage) => {
+            if (res.headers[headerName]) {
+                throw new Error('Header should not exist: ' + headerName);
+            }
         };
     }
 }

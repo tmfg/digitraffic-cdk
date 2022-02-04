@@ -52,7 +52,7 @@ export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseD
         throw new Error('Missing Coord_Longitude');
     }
 
-    const data: SseDb.DbSseReport = {
+    return {
         siteNumber: sseReport.Site.SiteNumber,
         siteName: sseReport.Site.SiteName,
         siteType: sseReport.Site.SiteType,
@@ -69,6 +69,5 @@ export function convertToDbSseReport(sseReport: SseSchema.TheItemsSchema) : SseD
         longitude: sseReport.Extra_Fields?.Coord_Longitude ?? -1,
         latitude: sseReport.Extra_Fields?.Coord_Latitude ?? -1,
     };
-    return data;
 }
 

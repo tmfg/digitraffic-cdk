@@ -15,8 +15,11 @@ import {CloudWatchLogsLogEventExtractedFields} from "aws-lambda/trigger/cloudwat
 import {IncomingMessage} from "http";
 import {Statistics} from "./statistics";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const https = require('https');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require('zlib');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const crypto = require('crypto');
 
 const endpoint = process.env.ES_ENDPOINT as string;
@@ -26,7 +29,7 @@ const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.c
 const region = endpointParts[2];
 const service = endpointParts[3];
 
-const MAX_BODY_SIZE = 5000000;
+const MAX_BODY_SIZE = 4 * 1000 * 1000;
 
 export const handler: KinesisStreamHandler = function(event, context) {
     const statistics = new Statistics();
@@ -108,7 +111,7 @@ function transform(payload: CloudWatchLogsDecodedData, statistics: Statistics): 
         const source = buildSource(logEvent.message, logEvent.extractedFields);
 
         source['@id'] = logEvent.id;
-        source['@timestamp'] = new Date(1 * logEvent.timestamp).toISOString();
+        source['@timestamp'] = new Date(logEvent.timestamp).toISOString();
         source['@owner'] = payload.owner;
         source['@log_group'] = payload.logGroup;
         source['@log_stream'] = payload.logStream;

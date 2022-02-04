@@ -4,8 +4,7 @@ import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
 import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import moment from "moment-timezone";
 import {Feature, FeatureCollection, GeoJsonProperties} from "geojson";
-
-const gjv = require("geojson-validation");
+import {isFeatureCollection} from "digitraffic-common/utils/geometry";
 
 export function getActiveWarnings(): Promise<FeatureCollection | null> {
     return inDatabaseReadonly((db: DTDatabase) => {
@@ -38,7 +37,7 @@ export async function updateNauticalWarnings(url: string): Promise<void> {
 }
 
 function validateAndUpdate(tx: DTDatabase | DTTransaction, cacheKey: JSON_CACHE_KEY, featureCollection: FeatureCollection): Promise<null> {
-    if (gjv.isFeatureCollection(featureCollection, true)) {
+    if (isFeatureCollection(featureCollection)) {
         return CachedDao.updateCachedJson(tx, cacheKey, convert(featureCollection));
     } else {
         console.info("DEBUG " + JSON.stringify(featureCollection, null, 2));

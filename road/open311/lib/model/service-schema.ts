@@ -5,10 +5,12 @@ const schema: apigateway.JsonSchema = {
     type: apigateway.JsonSchemaType.OBJECT,
     description: 'Open311 service model from https://github.com/open311/schema-validation',
     properties: {
+        // eslint-disable-next-line camelcase
         service_code: {
             type: apigateway.JsonSchemaType.STRING,
             description: 'unique identifier for the service request type',
         },
+        // eslint-disable-next-line camelcase
         service_name: {
             type: apigateway.JsonSchemaType.STRING,
             description: 'human readable name of the service request type',

@@ -9,7 +9,7 @@ import {createEmptySecretFunction} from "digitraffic-common/test/secret";
 import {UpdatedTimestamp} from "../../lib/service/timestamps";
 
 // empty sec usage function for tests
-const NOOP_WITH_SECRET = createEmptySecretFunction<PromiseSettledResult<any>[]>();
+const NOOP_WITH_SECRET = createEmptySecretFunction<PromiseSettledResult<void | UpdatedTimestamp | null>[]>();
 
 describe('process-queue', dbTestBase((db: DTDatabase) => {
 

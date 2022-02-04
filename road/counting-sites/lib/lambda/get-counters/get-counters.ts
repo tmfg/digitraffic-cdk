@@ -7,14 +7,10 @@ const secretId = process.env.SECRET_ID as string;
 export const handler = (event: Record<string, string>) => {
     return withDbSecret(secretId, () => {
         const start = Date.now();
-        const domain = event.domain;
+        const domainName = event.domainName;
 
-        return CountingSitesService.getCountersForDomain(domain).then(featureCollection => {
-            if (featureCollection.features) {
-                return LambdaResponse.ok(JSON.stringify(featureCollection, null, 3));
-            } else {
-                return LambdaResponse.notFound();
-            }
+        return CountingSitesService.findCounters(domainName).then(featureCollection => {
+            return LambdaResponse.okJson(featureCollection);
         }).catch(error => {
             console.info("error " + error);
 

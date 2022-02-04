@@ -5,6 +5,7 @@ import {IDatabase} from "pg-promise";
 import moment from "moment-timezone";
 import {Havainto} from "../model/models";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const crypto = require('crypto');
 
 const matchViestitunnisteRegex = /"viestintunniste"\s*:\s*{\s*"id"\s*:\s*[0-9]*\s*}\s*,/;

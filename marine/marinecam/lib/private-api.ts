@@ -20,6 +20,8 @@ import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {add401Support, DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
+import {MobileServerProps} from "./app-props";
+import {Construct} from "constructs";
 
 export class PrivateApi {
     private readonly stack: DigitrafficStack;
@@ -34,7 +36,7 @@ export class PrivateApi {
     private apiImageResource: Resource;
     private apiMetadataResource: Resource;
 
-    constructor(stack: DigitrafficStack, bucket: Bucket, userPool: UserPool, userPoolClient: UserPoolClient) {
+    constructor(stack: DigitrafficStack, bucket: Bucket) {
         this.stack = stack;
         this.bucket = bucket;
 
@@ -52,8 +54,33 @@ export class PrivateApi {
         add401Support(this.publicApi, stack);
 
         this.createResourceTree();
-        this.createPasswordProtectedResources(readImageRole, userPool, userPoolClient);
-        this.createApikeyProtectedResources(readImageRole);
+
+        if ((stack.configuration as MobileServerProps).enablePasswordProtectedApi) {
+            const [userPool, userPoolClient] = this.createUserPool(stack);
+
+            this.createPasswordProtectedResources(readImageRole, userPool, userPoolClient);
+        }
+
+        if ((stack.configuration as MobileServerProps).enableKeyProtectedApi) {
+            this.createApikeyProtectedResources(readImageRole);
+        }
+    }
+
+    createUserPool(stack: Construct): [UserPool, UserPoolClient] {
+        const userPool = new UserPool(stack, 'UserPool', {
+            userPoolName: 'MarinecamUserPool',
+        });
+
+        const userPoolClient = new UserPoolClient(stack, 'UserPoolClient', {
+            userPool,
+            authFlows: {
+                userPassword: true,
+                userSrp: true,
+            },
+            disableOAuth: true,
+        });
+
+        return [userPool, userPoolClient];
     }
 
     createPasswordProtectedResources(readImageRole: Role,

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios from 'axios';
 
 export type AreaLightsBrightenRequest = {
 
@@ -32,8 +32,8 @@ export type AreaLightsBrightenResponse = {
 
 export class AreaLightsApi {
 
-    private readonly url: string
-    private readonly apiKey: string
+    private readonly url: string;
+    private readonly apiKey: string;
 
     constructor(url: string, apiKey: string) {
         this.url = url;
@@ -45,8 +45,8 @@ export class AreaLightsApi {
         try {
             const resp = await axios.post(this.url, request, {
                 headers: {
-                    'x-api-key': this.apiKey
-                }
+                    'x-api-key': this.apiKey,
+                },
             });
             if (resp.status !== 200) {
                 console.error(`method=updateLightsForArea returned status=${resp.status}`);
@@ -58,7 +58,7 @@ export class AreaLightsApi {
             console.error('method=updateLightsForArea failed');
             throw new Error('Update lights for area failed');
         } finally {
-            console.log(`method=updateLightsForArea tookMs=${Date.now() - start}`)
+            console.log(`method=updateLightsForArea tookMs=${Date.now() - start}`);
         }
     }
 }

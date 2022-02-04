@@ -5,12 +5,10 @@ import {createSubscription} from "digitraffic-common/aws/infra/stack/subscriptio
 import {defaultLambdaConfiguration} from 'digitraffic-common/aws/infra/stack/lambda-configs';
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
-import {IVpc} from "aws-cdk-lib/aws-ec2";
 import {add404Support, createDefaultPolicyDocument} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {VoyagePlanEnvKeys} from "./keys";
 import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {TrafficType} from "digitraffic-common/types/traffictype";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 
 export function create(secret: ISecret,
@@ -47,7 +45,7 @@ function createVtsProxyHandler(stack: DigitrafficStack,
     secret: ISecret,
     props: VoyagePlanGatewayProps) {
 
-    const env: any = {};
+    const env: Record<string, string> = {};
     env[VoyagePlanEnvKeys.SECRET_ID] = props.secretId;
     const functionName = 'VPGW-Get-Schedules';
     // ATTENTION!

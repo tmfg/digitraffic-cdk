@@ -4,7 +4,9 @@ import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const crypto = require('crypto');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require('zlib');
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;

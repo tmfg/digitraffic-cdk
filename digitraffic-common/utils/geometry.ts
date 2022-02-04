@@ -55,3 +55,14 @@ export function createFeatureCollection(features: Feature[], lastUpdated: Date |
         features: features,
     } as FeatureCollection;
 }
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const geoJsonValidator = require('geojson-validation');
+
+export function isValidGeoJson<T>(json: T): boolean {
+    return geoJsonValidator.valid(json);
+}
+
+export function isFeatureCollection<T>(json: T): boolean {
+    return geoJsonValidator.isFeatureCollection(json);
+}

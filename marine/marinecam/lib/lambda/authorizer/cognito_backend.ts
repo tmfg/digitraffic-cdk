@@ -38,7 +38,7 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
                     resolve(null);
                 },
 
-                newPasswordRequired: (userAttributes, requiredAttributes) => {
+                newPasswordRequired: (userAttributes) => {
                     return changeUserPassword(cognitoUser, password, userAttributes);
                 },
             });

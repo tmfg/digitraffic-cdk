@@ -7,11 +7,11 @@ import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfun
 import {DigitrafficLogSubscriptions} from "digitraffic-common/aws/infra/stack/subscription";
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {featureSchema, geojsonSchema} from "digitraffic-common/utils/api-model";
-import {addServiceModel, getModelReference} from "digitraffic-common/utils/api-model";
+import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
 import nauticalWarningProperties from "./model/nautical-warnings-schema";
-import {addTags} from "digitraffic-common/aws/infra/documentation";
-import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
+import {addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
+
+const NAUTICAL_WARNINGS_TAGS = ['Nautical Warnings(Beta)'];
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -70,7 +70,11 @@ export class PublicApi {
             ],
         });
 
-        addTags('GetActiveNauticalWarnings', BETA_TAGS, this.activeResource, stack);
-        addTags('GetArchivedNauticalWarnings', BETA_TAGS, this.archivedResource, stack);
+        addTagsAndSummary(
+            'GetActiveNauticalWarnings', NAUTICAL_WARNINGS_TAGS, 'Return all active nautical warnings', this.activeResource, stack,
+        );
+        addTagsAndSummary(
+            'GetArchivedNauticalWarnings', NAUTICAL_WARNINGS_TAGS, 'Return all archived nautical warnings', this.archivedResource, stack,
+        );
     }
 }

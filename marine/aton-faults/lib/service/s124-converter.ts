@@ -2,7 +2,14 @@ import moment from "moment-timezone";
 import {DbFault} from "../model/fault";
 import {Feature, Geometry} from "geojson";
 import * as wkx from "wkx";
-import {GmlEnvelope, S124DataSet, S124Member, S124IMember} from "../model/dataset";
+import {
+    GmlEnvelope,
+    S124DataSet,
+    S124Member,
+    S124IMember,
+    S124MessageSeriesIdentifier,
+    S124FixedDateRange,
+} from "../model/dataset";
 
 const YEAR_MONTH_DAY = "YYYY-MM-DD";
 const HOUR_MINUTE_SECOND = "HH:MM:SSZ";
@@ -51,7 +58,7 @@ export function convertFault(fault: DbFault): S124DataSet {
 
     const boundedBy = createBoundedBy(createCoordinatePair(fault.geometry),createCoordinatePair(fault.geometry));
 
-    const imember = {
+    const imember: S124IMember = {
         'S124:S124_NWPreamble': {
             '$': {
                 'gml:id' : `PR.${id}`,
@@ -75,7 +82,7 @@ export function convertFault(fault: DbFault): S124DataSet {
         },
     };
 
-    const member = {
+    const member: S124Member = {
         'S124:S124_NavigationalWarningPart': {
             '$': {
                 'gml:id' : `${id}.1`,
@@ -102,7 +109,7 @@ export function convertWarning(warning: Feature) {
 
     const boundedBy =  createBoundedBy('17.0000 55.0000', '32.0000 75.0000');
 
-    const imember = {
+    const imember: S124IMember = {
         'S124:S124_NWPreamble': {
             '$': {
                 'gml:id': `PR.${id}`,
@@ -126,7 +133,7 @@ export function convertWarning(warning: Feature) {
         },
     };
 
-    const member = {
+    const member: S124Member = {
         'S124:S124_NavigationalWarningPart': {
             '$': {
                 'gml:id': `${id}.1`,
@@ -159,7 +166,7 @@ function createBoundedBy(lowerCorner: string, upperCorner: string): GmlEnvelope 
     };
 }
 
-function createFixedDateRangeForWarning(p: Record<string, string | number>) {
+function createFixedDateRangeForWarning(p: Record<string, string | number>): S124FixedDateRange | undefined {
     const vst = moment(p.validityStartTime);
 
     if (p.validityEndTime) {
@@ -186,10 +193,10 @@ function createFixedDateRangeForWarning(p: Record<string, string | number>) {
         };
     }
 
-    return {};
+    return undefined;
 }
 
-function createFixedDateRangeForFault(fault: DbFault) {
+function createFixedDateRangeForFault(fault: DbFault): S124FixedDateRange {
     if (fault.fixed_timestamp) {
         return {
             dateStart: {
@@ -237,7 +244,7 @@ function createCoordinatePair(geometry: string) {
     return `${g.coordinates[0]} ${g.coordinates[1]}`;
 }
 
-function createMessageSeriesIdentifier(NameOfSeries: string, warningNumber: number, year: number) {
+function createMessageSeriesIdentifier(NameOfSeries: string, warningNumber: number, year: number): S124MessageSeriesIdentifier {
     return {
         NameOfSeries,
         typeOfWarning : 'local',

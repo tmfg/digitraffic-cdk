@@ -1,4 +1,5 @@
 import {IncomingMessage} from "http";
+import {CloudWatchLogsDecodedData} from "aws-lambda";
 
 const nanValue = -1;
 
@@ -116,11 +117,11 @@ export function isInfinity(num: number): boolean {
     return !isNaN(num) && !isFinite(num);
 }
 
-export function getFailedIds(failedItems: any[]): string[] {
+export function getFailedIds(failedItems: ItemStatus[]): string[] {
     return failedItems.map(f => f.index._id);
 }
 
-export function isControlMessage(payload: any): boolean {
+export function isControlMessage(payload: CloudWatchLogsDecodedData): boolean {
     return payload.messageType === 'CONTROL_MESSAGE';
 }
 
@@ -152,9 +153,10 @@ function containsIds(line: string, ids: string[]): boolean {
     return false;
 }
 
-type ItemStatus = {
+export type ItemStatus = {
     index: {
         status: number;
+        _id: string;
     };
 }
 

@@ -4,6 +4,6 @@ export async function sendEmail(message: string, snsTopicArn: string): Promise<a
     console.info(`method=sendEmail to ${snsTopicArn}`);
     return new SNS().publish({
         Message: message,
-        TopicArn: snsTopicArn
+        TopicArn: snsTopicArn,
     }).promise();
 }

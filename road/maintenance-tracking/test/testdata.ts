@@ -2,8 +2,8 @@ import {DbObservationData} from "../lib/db/maintenance-tracking-db";
 import {getRandomIntegerAsString} from "digitraffic-common/test/testutils";
 import * as R from 'ramda';
 
-const ID_PLACEHOLDER = 'ID_PLACEHOLDER'
-const TK_PLACEHOLDER = 'TK_PLACEHOLDER'
+const ID_PLACEHOLDER = 'ID_PLACEHOLDER';
+const TK_PLACEHOLDER = 'TK_PLACEHOLDER';
 const TRACKING_JSON_WITH_3_OBSERVATIONS =
         `{
             "otsikko": {
@@ -125,5 +125,5 @@ export function assertObservationData(srcObservations: DbObservationData[], resu
 }
 
 export function getRandompId(): string {
-    return getRandomIntegerAsString(100000, 100000000000)
+    return getRandomIntegerAsString(100000, 100000000000);
 }

@@ -1,7 +1,8 @@
-import {Stack,Duration } from 'aws-cdk-lib';
-import {Runtime, Function, InlineCode, AssetCode, Version} from 'aws-cdk-lib/aws-lambda';
+import {Duration, Stack} from 'aws-cdk-lib';
+import {Function, InlineCode, Runtime, Version} from 'aws-cdk-lib/aws-lambda';
 import {Role} from 'aws-cdk-lib/aws-iam';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
 
 export enum LambdaType {
@@ -54,6 +55,8 @@ export function createFunction(stack: Stack, edgeLambdaRole: Role, functionName:
         code: new InlineCode(functionBody),
         handler: 'index.handler',
         role: edgeLambdaRole,
+        reservedConcurrentExecutions: 10,
+        timeout: Duration.seconds(2),
     });
 
     return edgeFunction.currentVersion;

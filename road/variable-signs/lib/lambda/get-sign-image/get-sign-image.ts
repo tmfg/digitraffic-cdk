@@ -2,7 +2,7 @@ import * as TextConverterService from "../../service/text-converter";
 import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 import {InputError} from "digitraffic-common/types/input-error";
 
-export const handler = async (event: Record<string, string>) => {
+export const handler = (event: Record<string, string>) => {
     const start = Date.now();
     const text = event.text as string;
 

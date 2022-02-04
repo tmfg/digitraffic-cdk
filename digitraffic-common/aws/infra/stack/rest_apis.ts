@@ -4,12 +4,17 @@ import {
     GatewayResponse,
     ResponseType,
     EndpointType,
-    RestApiProps,
+    RestApiProps, JsonSchema, Model, CfnDocumentationPart, Resource,
 } from 'aws-cdk-lib/aws-apigateway';
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
 import {DigitrafficStack} from "./stack";
 import {createUsagePlan} from "../usage-plans";
+import {ModelWithReference} from "../../types/model-with-reference";
+import {getModelReference} from "../../../utils/api-model";
+import {MediaType} from "../../types/mediatypes";
+import R = require('ramda');
+import {DocumentationPart} from "../documentation";
 
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];
@@ -46,6 +51,48 @@ export class DigitrafficRestApi extends RestApi {
         this.apiKeyIds.push(newKeyId);
 
         return newKeyId;
+    }
+
+    addJsonModel(modelName: string, schema: JsonSchema) {
+        return this.getModelWithReference(this.addModel(modelName, {
+            contentType: MediaType.APPLICATION_JSON,
+            modelName,
+            schema,
+        }));
+    }
+
+    addCSVModel(modelName: string) {
+        return this.getModelWithReference(this.addModel(modelName, {
+            contentType: MediaType.TEXT_CSV,
+            modelName,
+            schema: {},
+        }));
+    }
+
+    private getModelWithReference(model: Model): ModelWithReference {
+        return R.assoc('modelReference', getModelReference(model.modelId, this.restApiId), model);
+    }
+
+    private addDocumentationPart(
+        resource: Resource, parameterName: string, resourceName: string, type: string, properties: object,
+    ) {
+        const location: CfnDocumentationPart.LocationProperty = {
+            type,
+            path: resource.path,
+            name: type != 'METHOD' ? parameterName : undefined,
+        };
+
+        new CfnDocumentationPart(this.stack, resourceName, {
+            restApiId: resource.api.restApiId,
+            location,
+            properties: JSON.stringify(properties),
+        });
+    }
+
+    documentResource(resource: Resource, ...documentationPart: DocumentationPart[]) {
+        documentationPart.forEach(dp => this.addDocumentationPart(
+            resource, dp.parameterName, `${resource.path}.${dp.parameterName}.Documentation`, dp.type, dp.documentationProperties,
+        ));
     }
 }
 

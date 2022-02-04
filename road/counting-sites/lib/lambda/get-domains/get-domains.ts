@@ -7,8 +7,8 @@ export const handler = () => {
     return withDbSecret(secretId, () => {
         const start = Date.now();
 
-        return CountingSitesService.getMetadata().finally(() => {
-            console.info("method=CountingSites.GetMetadata tookMs=%d", (Date.now() - start));
+        return CountingSitesService.getDomains().finally(() => {
+            console.info("method=CountingSites.GetDomains tookMs=%d", (Date.now() - start));
         });
     });
 };

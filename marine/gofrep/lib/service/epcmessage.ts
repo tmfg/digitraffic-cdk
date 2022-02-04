@@ -7,7 +7,7 @@ export function createEpcMessageResponse(epcMessage: EpcMessage, date: Date): Ep
         EPCMessageHeader: {
             SentTime: dateStr,
             MessageType: 0,
-            Version: ''
-        }
+            Version: '',
+        },
     };
 }

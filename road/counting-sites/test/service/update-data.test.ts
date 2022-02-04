@@ -1,7 +1,7 @@
 import {EcoCounterApi} from "../../lib/api/eco-counter";
 import {updateDataForDomain} from "../../lib/service/update";
 import {dbTestBase, insertCounter, insertDomain} from "../db-testutil";
-import {findAllData} from "../../lib/db/data";
+import {findValues} from "../../lib/db/data";
 
 import * as sinon from 'sinon';
 import {ApiData} from "../../lib/model/data";
@@ -20,8 +20,8 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
         return sinon.stub(EcoCounterApi.prototype, 'getDataForSite').returns(Promise.resolve(response));
     }
 
-    async function assertDataInDb(expected: number, siteId: number, fn?: Function) {
-        const data = await findAllData(db, siteId);
+    async function assertDataInDb(expected: number, counterId: string, fn?: Function) {
+        const data = await findValues(db, counterId, '');
         expect(data).toHaveLength(expected);
 
         if (fn) {
@@ -63,7 +63,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
 
         await updateDataForDomain(DOMAIN_NAME, '', '');
 
-        await assertDataInDb(1, 1);
+        await assertDataInDb(1, "1");
         expect(counterApiResponse.callCount).toEqual(1);
     });
 
@@ -75,7 +75,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
 
         await updateDataForDomain(DOMAIN_NAME, '', '');
 
-        await assertDataInDb(1, 1);
+        await assertDataInDb(1, "1");
         expect(counterApiResponse.callCount).toEqual(1);
     });
 
@@ -88,7 +88,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
         await updateDataForDomain(DOMAIN_NAME, '', '');
 
         // timestamp said the data was just updated, so no new data was added
-        await assertDataInDb(0, 1);
+        await assertDataInDb(0, "1");
         expect(counterApiResponse.callCount).toEqual(0);
     });
 }));

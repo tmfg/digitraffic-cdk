@@ -44,7 +44,7 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
 
                 console.info("method=updateDataForDomain counter=%d updatedCount=%d", counter.id, data.length);
 
-                await DataDb.insertData(db, counter.id, counter.interval, data);
+                await DataDb.insertCounterValues(db, counter.id, counter.interval, data);
                 return CounterDb.updateCounterTimestamp(db, counter.id, endStamp.toDate());
             }
 

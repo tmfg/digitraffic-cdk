@@ -13,8 +13,8 @@ export class StatusReportApi {
         const reportText = reportLines.join('\n');
         const resp = await axios.post(this.reportUrl, JSON.stringify({ text: reportText }), {
             headers: {
-                'Content-Type': 'application/json'
-            }
+                'Content-Type': 'application/json',
+            },
         });
         if (resp.status !== 200) {
             throw new Error('Unable to send report');

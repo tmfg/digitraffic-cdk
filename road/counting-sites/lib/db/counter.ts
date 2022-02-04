@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {ApiCounter, DbCounter} from "../model/counter";
-import {FeatureCollection} from "geojson";
+import {Feature, FeatureCollection} from "geojson";
 import {DTDatabase} from "digitraffic-common/database/database";
 
 const SQL_ALL_COUNTERS =
@@ -9,17 +9,16 @@ const SQL_ALL_COUNTERS =
     where domain_name = $1
     order by id`;
 
-const SQL_ALL_COUNTERS_FOR_DOMAIN =
-    `select json_build_object(
+const SQL_ALL_COUNTERS_FEATURE_COLLECTION = `select json_build_object(
                     'type', 'FeatureCollection',
-                    'features', json_agg(
+                    'features', coalesce(json_agg(
                             json_build_object(
                                     'type', 'Feature',
                                     'geometry', ST_AsGeoJSON(location::geometry)::json,
                                     'properties', json_build_object(
                                             'id', id,
                                             'name', name,
-                                            'siteId', site_id,
+                                            'domain', domain_name,
                                             'userType', user_type_id,
                                             'interval', interval,
                                             'direction', direction,
@@ -27,10 +26,12 @@ const SQL_ALL_COUNTERS_FOR_DOMAIN =
                                             'removedTimestamp', removed_timestamp
                                         )
                                 )
-                        )
-                ) as collection
+                        ), '[]')
+                    ) as collection
      from counting_site_counter
-     where domain_name = $1`;
+     where (domain_name = $1 or $1 is null)
+     and (id = $2 or $2 is null)
+     `;
 
 const SQL_INSERT_COUNTER =
     `insert into counting_site_counter(id, site_id, domain_name, site_domain, name, location, user_type_id, interval, direction, added_timestamp)
@@ -59,9 +60,9 @@ const PS_ALL_COUNTERS = new PreparedStatement({
     text: SQL_ALL_COUNTERS,
 });
 
-const PS_ALL_COUNTERS_FOR_DOMAIN_FEATURE_COLLECTION = new PreparedStatement({
-    name: 'select-counters-for-domain',
-    text: SQL_ALL_COUNTERS_FOR_DOMAIN,
+const PS_FIND_COUNTERS_FEATURE_COLLECTION = new PreparedStatement({
+    name: 'select-counters-feature-collection',
+    text: SQL_ALL_COUNTERS_FEATURE_COLLECTION,
 });
 
 const PS_INSERT_COUNTER = new PreparedStatement({
@@ -79,8 +80,16 @@ const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
     text: SQL_UPDATER_COUNTER_TIMESTAMP,
 });
 
-export function findAllCountersForDomain(db: DTDatabase, domain: string): Promise<FeatureCollection> {
-    return db.one(PS_ALL_COUNTERS_FOR_DOMAIN_FEATURE_COLLECTION, [domain]).then(r => r.collection);
+export function nullString(value: string): string | null {
+    return value === "" ? null : value;
+}
+
+export function nullNumber(value: string): number | null {
+    return value === "" ? null : Number.parseInt(value);
+}
+
+export function findCounters(db: DTDatabase, domain: string, counterId: string): Promise<FeatureCollection> {
+    return db.one(PS_FIND_COUNTERS_FEATURE_COLLECTION, [nullString(domain), nullNumber(counterId)]).then(r => r.collection);
 }
 
 export function findAllCountersForUpdateForDomain(db: DTDatabase, domain: string): Promise<DbCounter[]> {

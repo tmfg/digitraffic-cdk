@@ -69,6 +69,7 @@ function parseSituation(datex2: string): Situation {
     return {
         id: parseId(datex2),
         datex2: datex2,
+        // eslint-disable-next-line camelcase
         effect_date: parseEffectDate(datex2),
     };
 }

@@ -8,11 +8,11 @@ describe('swagger-utils', () => {
         const apiGwApi2 = {paths: {'/apigw2/path': {}}};
 
         expect(mergeApiDescriptions([appApi, apiGwApi1, apiGwApi2])).toMatchObject({
-           paths: {
-               '/app/path': {},
-               '/apigw1/path': {},
-               '/apigw2/path': {}
-           }
+            paths: {
+                '/app/path': {},
+                '/apigw1/path': {},
+                '/apigw2/path': {},
+            },
         });
     });
 

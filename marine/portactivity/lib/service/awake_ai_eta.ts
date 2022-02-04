@@ -33,7 +33,7 @@ enum AwakeDataState {
 
 export class AwakeAiETAService {
 
-    private readonly api: AwakeAiVoyagesApi
+    private readonly api: AwakeAiVoyagesApi;
 
     readonly overriddenDestinations = [
         'FIHEL',

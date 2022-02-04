@@ -3,6 +3,9 @@ import {FeatureCollection} from "geojson";
 import moment from 'moment';
 import {DISRUPTIONS_DATE_FORMAT} from "../lib/service/disruptions";
 
+// test file
+/* eslint-disable camelcase */
+
 export function someNumber() {
     return Math.floor(Math.random() * 999999);
 }
@@ -23,8 +26,8 @@ export function newDisruption(): SpatialDisruption {
         Id: someNumber(),
         geometry: {
             type: "Point",
-            coordinates: [someNumber(), someNumber()]
-        }
+            coordinates: [someNumber(), someNumber()],
+        },
     };
 }
 
@@ -37,15 +40,15 @@ export function disruptionFeatures(): FeatureCollection {
                 type: 'Feature',
                 geometry: {
                     type: 'Point',
-                    coordinates: [Math.random() * 10, Math.random() * 10]
+                    coordinates: [Math.random() * 10, Math.random() * 10],
                 },
                 properties: {
                     ...d, ...{
                         StartDate: moment(d.StartDate).format(DISRUPTIONS_DATE_FORMAT),
-                        EndDate: moment(d.EndDate).format(DISRUPTIONS_DATE_FORMAT)
-                    }
-                }
-            }
-        })
+                        EndDate: moment(d.EndDate).format(DISRUPTIONS_DATE_FORMAT),
+                    },
+                },
+            };
+        }),
     };
 }

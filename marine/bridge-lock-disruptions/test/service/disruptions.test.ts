@@ -1,12 +1,13 @@
 import {dbTestBase, insertDisruption} from "../db-testutil";
-import * as pgPromise from "pg-promise";
 import {newDisruption} from "../testdata";
 import * as DisruptionsService from "../../lib/service/disruptions";
 import * as DisruptionsDb from '../../lib/db/disruptions';
+import {DTDatabase} from "digitraffic-common/database/database";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const testGeojson = require('../testdisruptions.json');
 
-describe('disruptions', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('disruptions', dbTestBase((db: DTDatabase) => {
 
     test('findAllDisruptions', async () => {
         const disruptions = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {

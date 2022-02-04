@@ -1,3 +1,5 @@
+import {Account} from "../../../lib/app-props";
+
 const accountNumber = '123456789012';
 const app = 'someapp';
 const env = 'someenv';

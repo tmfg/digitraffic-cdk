@@ -31,8 +31,8 @@ export async function getMessages(privateVisUrl: string, appId: string, apiKey: 
     const resp = await axios.get(fullUrl, {
         headers: {
             Accept: 'application/json',
-            Authorization: generateHmacAuthorizationHeader(fullUrl, appId, apiKey)
-        }
+            Authorization: generateHmacAuthorizationHeader(fullUrl, appId, apiKey),
+        },
     });
     return resp.data as VisMessagesResponse;
 }

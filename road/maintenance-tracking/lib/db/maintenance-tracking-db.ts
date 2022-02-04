@@ -49,11 +49,8 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
 
 export function insertMaintenanceTrackingObservationData(db: IDatabase<any, any>, observations: DbObservationData[]): Promise<any> {
     return db.tx(t => {
-        return t.batch(
-            observations.map(observation =>
-                db.oneOrNone(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)
-            )
-        )
+        return t.batch(observations.map(observation =>
+            db.oneOrNone(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)));
     });
 }
 
@@ -67,7 +64,7 @@ export function createInsertObservationValues(e: DbObservationData): any[] {
         e.sendingSystem,
         e.status,
         e.hash,
-        e.s3Uri
+        e.s3Uri,
     ];
 }
 

@@ -1,6 +1,10 @@
 import {DbFault, FaultState} from "../lib/model/fault";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { v4: uuidv4 } = require('uuid');
+
+// test file
+/* eslint-disable camelcase */
 
 export function someNumber() {
     return Math.floor(Math.random() * 999999);

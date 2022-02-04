@@ -1,5 +1,4 @@
-import * as sinon from 'sinon';
-import {SchedulesApi, SchedulesResponse} from "../../lib/api/schedules";
+import {SchedulesApi, SchedulesDirection, SchedulesResponse} from "../../lib/api/schedules";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";
 import moment from 'moment-timezone';
@@ -22,6 +21,29 @@ const etdEventTime = '2021-04-27T20:00:00Z';
 const etdTimestamp = '2021-04-27T06:17:36Z';
 
 describe('schedules', () => {
+
+    testGetTimestamps('SchedulesService.getTimestampsUnderVtsControl - calls API twice',
+        (service: SchedulesService) => service.getTimestampsUnderVtsControl(),
+        false);
+
+    testGetTimestamps('SchedulesService.getCalculatedTimestamps - calls API twice',
+        (service: SchedulesService) => service.getCalculatedTimestamps(),
+        true);
+
+    function testGetTimestamps(description: string, serviceFn: (service: SchedulesService) => Promise<ApiTimestamp[]>, calculated: boolean) {
+        test(description, async () => {
+            const api = createApi();
+            const getSchedulesTimestampsSpy = jest.spyOn(api, 'getSchedulesTimestamps')
+                .mockImplementation(() => Promise.resolve(createSchedulesResponse(1, false, false)));
+            const service = new SchedulesService(api);
+
+            await serviceFn(service);
+
+            expect(getSchedulesTimestampsSpy).toHaveBeenCalledTimes(2);
+            expect(getSchedulesTimestampsSpy).toHaveBeenNthCalledWith(1 , SchedulesDirection.EAST, calculated);
+            expect(getSchedulesTimestampsSpy).toHaveBeenNthCalledWith(2 , SchedulesDirection.WEST, calculated);
+        });
+    }
 
     test('SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [ ] ETD', () => {
         const api = createApi();

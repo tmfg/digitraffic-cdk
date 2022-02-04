@@ -1,6 +1,6 @@
 import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
 import { SqsProducer } from 'sns-sqs-big-payload';
-import * as SqsBigPayload from "../../service/sqs-big-payload"
+import * as SqsBigPayload from "../../service/sqs-big-payload";
 import {MaintenanceTrackingEnvKeys} from "../../keys";
 const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] as string;
 const sqsQueueUrl = process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] as string;
@@ -31,7 +31,7 @@ export function handlerFn(sqsProducer : SqsProducer) {
             console.error(`method=updateMaintenanceTrackingRequest Error while sending message to SQS tookMs=${(end - start)}`, e);
             return Promise.reject(invalidRequest(`Error while sending message to SQS: ${e}`));
         }
-    }
+    };
 }
 
 export const handler: (apiGWRequest: any) => Promise<any> = handlerFn(sqsProducerInstance);
@@ -39,13 +39,13 @@ export const handler: (apiGWRequest: any) => Promise<any> = handlerFn(sqsProduce
 export function invalidRequest(msg: string): object {
     return {
         statusCode: 400,
-        body: `Invalid request: ${msg}`
+        body: `Invalid request: ${msg}`,
     };
 }
 
 export function ok(): object {
     return {
         statusCode: 200,
-        body: 'OK'
+        body: 'OK',
     };
 }

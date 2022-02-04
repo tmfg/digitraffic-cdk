@@ -57,7 +57,7 @@ export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<
 }
 
 export function saveTimestamps(timestamps: ApiTimestamp[]): Promise<Array<DbUpdatedTimestamp | null>> {
-    return inDatabase(async (db: DTDatabase) => {
+    return inDatabase((db: DTDatabase) => {
         return db.tx(t => t.batch(timestamps.map(timestamp => doSaveTimestamp(t, timestamp))));
     });
 }
@@ -89,6 +89,7 @@ export async function findAllTimestamps(locode?: string,
     imo?: number,
     source?: string): Promise<ApiTimestamp[]> {
     const start = Date.now();
+    // eslint-disable-next-line require-await
     const timestamps: ApiTimestamp[] = await inDatabaseReadonly(async (db: DTDatabase) => {
         if (locode) {
             return TimestampsDB.findByLocode(db, locode);

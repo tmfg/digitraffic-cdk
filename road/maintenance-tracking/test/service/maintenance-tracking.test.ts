@@ -5,7 +5,7 @@ import {assertObservationData, getTrackingJsonWith3Observations} from "../testda
 
 describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
-    beforeEach(() => truncate(db))
+    beforeEach(() => truncate(db));
 
     test('saveMaintenanceTrackingObservationData', async () => {
         const json = getTrackingJsonWith3Observations('1', '1');
@@ -41,7 +41,7 @@ describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) 
     test('saveMaintenanceTrackingObservationData with two equal observations and one different should ony different be saved from second message', async () => {
         const json1 = getTrackingJsonWith3Observations('1', '1');
         const json2 = getTrackingJsonWith3Observations('2', '1')
-                        .replace('[293358, 6889073]', '[293358, 6889074]');
+            .replace('[293358, 6889073]', '[293358, 6889074]');
 
         await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
         await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));

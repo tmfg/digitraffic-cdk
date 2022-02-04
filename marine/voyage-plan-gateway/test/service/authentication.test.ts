@@ -25,5 +25,5 @@ describe('authentication service', () => {
 
         expect(/amx \w+:[a-zA-Z0-9:=/+]+:[a-zA-Z0-9-]+:\w+/.test(header)).toBe(true);
     });
-    
+
 });

@@ -1,8 +1,6 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target":"ES2018",
-    "module": "commonjs",
-    "lib": ["es2020"],
     "declaration": false,
     "strict": true,
     "noImplicitAny": true,
@@ -22,9 +20,8 @@
       "./node_modules/@types",
       "../../node_modules/@types"
     ],
+    "esModuleInterop": true,
     "moduleResolution": "node",
-    "preserveSymlinks": true,
-    "baseUrl": "."
-  },
-  "exclude": ["cdk.out", "tsd"]
+    "preserveSymlinks": true
+  }
 }

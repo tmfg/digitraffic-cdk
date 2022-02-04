@@ -1,11 +1,11 @@
 import * as DbTestutil from "../db-testutil";
-import * as pgPromise from "pg-promise";
 import * as SSESchema from "../../lib/generated/tlsc-sse-reports-schema";
 import * as SseUpdateService from "../../lib/service/sse-update-service";
 import * as SseDb from "../../lib/db/sse-db";
 import * as Testdata from "../testdata";
+import {DTDatabase} from "digitraffic-common/database/database";
 
-describe('sse-update-service-test', DbTestutil.dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('sse-update-service-test', DbTestutil.dbTestBase((db: DTDatabase) => {
 
     test('save report', async () => {
         const start = new Date();

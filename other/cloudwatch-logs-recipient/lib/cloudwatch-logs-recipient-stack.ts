@@ -8,6 +8,7 @@ import {ITopic, Topic} from 'aws-cdk-lib/aws-sns';
 import {EmailSubscription} from 'aws-cdk-lib/aws-sns-subscriptions';
 import {Construct} from "constructs";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {Props} from "./app-props";
 
 export class CloudWatchLogsRecipientStack extends Stack {
     constructor(scope: Construct, id: string, cwlrProps: Props, props?: StackProps) {
@@ -44,14 +45,16 @@ export class CloudWatchLogsRecipientStack extends Stack {
         emailSqsTopic.grantPublish(appLogsToESLambda);
 
         lambdaLogsToESLambda.addEventSource(new KinesisEventSource(lambdaLogsToESStream, {
+            parallelizationFactor: 2,
             startingPosition: StartingPosition.TRIM_HORIZON,
-            batchSize: 10000,
+            batchSize: 200,
             maxBatchingWindow: Duration.seconds(30),
         }));
 
         appLogsToESLambda.addEventSource(new KinesisEventSource(appLogsTOEsStream, {
+            parallelizationFactor: 2,
             startingPosition: StartingPosition.TRIM_HORIZON,
-            batchSize: 10000,
+            batchSize: 200,
             maxBatchingWindow: Duration.seconds(30),
         }));
     }
@@ -131,9 +134,9 @@ export class CloudWatchLogsRecipientStack extends Stack {
             code: new AssetCode('dist/lambda/', {exclude: ["app-*"]}),
             handler: 'lambda-kinesis-to-es.handler',
             runtime: Runtime.NODEJS_14_X,
-            timeout: Duration.seconds(20),
+            timeout: Duration.seconds(30),
             logRetention: RetentionDays.ONE_YEAR,
-            memorySize: 256,
+            memorySize: 512,
             environment: {
                 KNOWN_ACCOUNTS: JSON.stringify(props.accounts),
                 ES_ENDPOINT: props.elasticSearchEndpoint,
@@ -163,7 +166,7 @@ export class CloudWatchLogsRecipientStack extends Stack {
             code: new AssetCode('dist/lambda/', {exclude: ["lambda-*"]}),
             handler: 'app-kinesis-to-es.handler',
             runtime: Runtime.NODEJS_14_X,
-            timeout: Duration.seconds(20),
+            timeout: Duration.seconds(30),
             logRetention: RetentionDays.ONE_YEAR,
             environment: {
                 KNOWN_ACCOUNTS: JSON.stringify(props.accounts),

@@ -35,12 +35,21 @@ export function insertCounter(db: DTDatabase, id: number, domainName: string, us
         return t.none(`
                 insert into counting_site_counter(id, site_id, domain_name, name, site_domain, location, user_type_id, "interval", direction, added_timestamp)
                 values(
-                       $1, 1,
+                       $1, $1,
                        $2, 'name', 'DOMAIN', 'POINT(10 10)',
                        $3, 15, 1, current_date)                
             `, [id, domainName, userType]);
     });
 }
+export function insertData(db: DTDatabase, counterId: number, count: number) {
+    return db.tx(t => {
+        return t.none(`insert into counting_site_data(id, counter_id, data_timestamp, count, interval)
+                       values (NEXTVAL('counting_site_data_id_seq'), $1, '2021-10-31T00:00:00' , $2, 15)       
+            `, [counterId, count]);
+
+    });
+}
+
 export function insertLastUpdated(db: DTDatabase, id: number, updated: Date): Promise<null> {
     return db.tx(t => {
         return t.none(`

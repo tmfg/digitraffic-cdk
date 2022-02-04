@@ -10,20 +10,18 @@ interface KeyFigure {
     query: string
 }
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const mysql = require('mysql');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const util = require('util');
+
 const conn = mysql.createConnection({
     host: process.env.MYSQL_ENDPOINT,
     user: process.env.MYSQL_USERNAME,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
 });
-// const conn = mysql.createConnection({
-//   host: 'localhost',
-//   user: 'root',
-//   password: 'jaakko',
-//   database: 'key_figures'
-// });
+
 const query = util.promisify(conn.query).bind(conn);
 
 const createGraph = function (id: string, otsikko: string, data: any): string {
@@ -99,7 +97,7 @@ const endDataToGraphData = function (data: KeyFigure[]): { values: [Date, number
 };
 
 const createDetailPage = async function (filter: string): Promise<string> {
-    const html = `
+    return `
   <html>
   <head>  
     <style>
@@ -163,8 +161,6 @@ const createDetailPage = async function (filter: string): Promise<string> {
   </body>
   </html>
 `;
-
-    return html;
 };
 
 const createIndex = async function (): Promise<string> {
@@ -189,7 +185,7 @@ const createIndex = async function (): Promise<string> {
     }
     marineFilterHtml += '</table>';
 
-    const html = `
+    return `
   <html>
   <head>  
     <style>
@@ -269,8 +265,6 @@ const createIndex = async function (): Promise<string> {
   </body>
   </html>
 `;
-
-    return html;
 };
 
 const base64encodeFilter = function (filter: string): string {

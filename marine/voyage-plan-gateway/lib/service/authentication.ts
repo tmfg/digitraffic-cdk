@@ -1,4 +1,5 @@
 import CryptoJS from 'crypto-js';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const { v4: uuidv4 } = require('uuid');
 
 /**

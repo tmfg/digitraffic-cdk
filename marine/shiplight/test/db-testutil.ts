@@ -2,6 +2,9 @@ import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testuti
 import {DTDatabase} from "digitraffic-common/database/database";
 import {ShipTypes} from "../lib/db/areatraffic";
 
+// test file
+/* eslint-disable camelcase */
+
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(
         fn, truncate, 'marine', 'marine', 'localhost:54321/marine',
@@ -9,8 +12,8 @@ export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
 }
 
 export async function assertArea(db: DTDatabase, id: number, duration?: number): Promise<Date> {
-    const area = await db.tx(async t => {
-        return await t.oneOrNone('select brighten_sent,brighten_end from areatraffic where id = $1', [id]);
+    const area = await db.tx(t => {
+        return t.oneOrNone('select brighten_sent,brighten_end from areatraffic where id = $1', [id]);
     });
 
     if (duration) {

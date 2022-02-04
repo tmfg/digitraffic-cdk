@@ -1,17 +1,19 @@
 import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront';
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
-import {Stack, StackProps} from "aws-cdk-lib";
+import {Aspects, Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig, LambdaMap} from "./origin-configs";
-import {CFDomain, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
+import {CFDistribution, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
 import {
     createGzipRequirement,
-    createHttpHeaders, createIpRestriction,
+    createHttpHeaders,
+    createIpRestriction,
     createWeathercamRedirect,
     LambdaType,
 } from "./lambda/lambda-creator";
 import {createDistribution} from "./distribution-util";
 import {createRealtimeLogging, StreamingConfig} from "./streaming-util";
+import {StackCheckingAspect} from "digitraffic-common/aws/infra/stack/stack-checking-aspect";
 
 type ViewerPolicyMap = {
     [key: string]: string,
@@ -25,6 +27,8 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
+        this.validateDefaultBehaviors(cloudfrontProps.props);
+
         const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
         const streamingConfig = createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps);
@@ -33,7 +37,22 @@ export class CloudfrontCdkStack extends Stack {
             p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps,
         ));
 
-        //        Aspects.of(this).add(new StackCheckingAspect());
+        Aspects.of(this).add(new StackCheckingAspect());
+    }
+
+    validateDefaultBehaviors(props: Props[]) {
+        props.forEach(distribution => {
+            // check default behaviors
+            const defaults = distribution.distributions.flatMap(d => d.behaviors)
+                .filter(b => b.path === "*");
+
+            if (defaults.length === 0) {
+                console.error("no defaults for " + distribution.distributionName);
+            } else if (defaults.length > 1) {
+                console.error("multiple defaults for " + distribution.distributionName);
+                console.error(defaults);
+            }
+        });
     }
 
     createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
@@ -115,14 +134,14 @@ export class CloudfrontCdkStack extends Stack {
         distributionProps: Props, role: Role, lambdaMap: LambdaMap, streamingConfig: StreamingConfig, cloudfrontProps: CFProps,
     ) {
         const oai = distributionProps.originAccessIdentity ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`) : null;
-        const originConfigs = distributionProps.domains.map(d => createOriginConfig(this, d, oai, lambdaMap));
+        const originConfigs = distributionProps.distributions.map(d => createOriginConfig(this, d, oai, lambdaMap));
         const distribution = createDistribution(
             this, distributionProps, originConfigs, role, cloudfrontProps, streamingConfig,
         );
 
         // cdk does not support viewerPolicy as it should
         // so collect map of policies and force them into cloudformation
-        const viewerPolicies = this.getViewerPolicies(distributionProps.domains);
+        const viewerPolicies = this.getViewerPolicies(distributionProps.distributions);
 
         if (Object.keys(viewerPolicies).length > 0) {
             const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
@@ -149,7 +168,7 @@ export class CloudfrontCdkStack extends Stack {
         }
     }
 
-    getViewerPolicies(domains: CFDomain[]): ViewerPolicyMap {
+    getViewerPolicies(domains: CFDistribution[]): ViewerPolicyMap {
         const policyMap: ViewerPolicyMap = {};
 
         domains.forEach(d => {

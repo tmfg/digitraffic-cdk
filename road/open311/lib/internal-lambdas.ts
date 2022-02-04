@@ -37,16 +37,16 @@ function createUpdateServicesLambda(vpc: ec2.IVpc,
     : lambda.Function {
 
     const updateServicesId = 'UpdateServices';
-    const environment: LambdaEnvironment = {};
-    environment.ENDPOINT_USER = props.integration.username;
-    environment.ENDPOINT_PASS = props.integration.password;
-    environment.ENDPOINT_URL = props.integration.url;
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: updateServicesId,
         code: new lambda.AssetCode('dist/lambda/update-services'),
         handler: 'lambda-update-services.handler',
-        environment,
     });
+
+    lambdaConf.environment!.ENDPOINT_USER = props.integration.username;
+    lambdaConf.environment!.ENDPOINT_PASS = props.integration.password;
+    lambdaConf.environment!.ENDPOINT_URL = props.integration.url;
+
     const updateServicesLambda = new lambda.Function(stack, updateServicesId, lambdaConf);
     createSubscription(updateServicesLambda, updateServicesId, props.logsDestinationArn, stack);
     return updateServicesLambda;
@@ -59,16 +59,16 @@ function createUpdateStatesLambda(vpc: ec2.IVpc,
     : lambda.Function {
 
     const updateStatesId = 'UpdateStates';
-    const environment: LambdaEnvironment = {};
-    environment.ENDPOINT_USER = props.integration.username;
-    environment.ENDPOINT_PASS = props.integration.password;
-    environment.ENDPOINT_URL = props.integration.url;
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: updateStatesId,
         code: new lambda.AssetCode('dist/lambda/update-states'),
         handler: 'lambda-update-states.handler',
-        environment,
     });
+
+    lambdaConf.environment!.ENDPOINT_USER = props.integration.username;
+    lambdaConf.environment!.ENDPOINT_PASS = props.integration.password;
+    lambdaConf.environment!.ENDPOINT_URL = props.integration.url;
+
     const updateStatesLambda = new lambda.Function(stack, updateStatesId, lambdaConf);
     createSubscription(updateStatesLambda, updateStatesId, props.logsDestinationArn, stack);
     return updateStatesLambda;
@@ -81,16 +81,16 @@ function createUpdateSubjectsLambda(vpc: ec2.IVpc,
     : lambda.Function {
 
     const updateSubjectsId = 'Open311-UpdateSubjects';
-    const environment: LambdaEnvironment = {};
-    environment.ENDPOINT_USER = props.integration.username;
-    environment.ENDPOINT_PASS = props.integration.password;
-    environment.ENDPOINT_URL = props.integration.url;
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: updateSubjectsId,
         code: new lambda.AssetCode('dist/lambda/update-subjects'),
         handler: 'lambda-update-subjects.handler',
-        environment,
     });
+
+    lambdaConf.environment!.ENDPOINT_USER = props.integration.username;
+    lambdaConf.environment!.ENDPOINT_PASS = props.integration.password;
+    lambdaConf.environment!.ENDPOINT_URL = props.integration.url;
+
     const updateSubjectsLambda = new lambda.Function(stack, updateSubjectsId, lambdaConf);
     createSubscription(updateSubjectsLambda, updateSubjectsId, props.logsDestinationArn, stack);
     return updateSubjectsLambda;
@@ -103,16 +103,16 @@ function createUpdateSubSubjectsLambda(vpc: ec2.IVpc,
     : lambda.Function {
 
     const updateSubSubjectsId = 'Open311-UpdateSubSubjects';
-    const environment: LambdaEnvironment = {};
-    environment.ENDPOINT_USER = props.integration.username;
-    environment.ENDPOINT_PASS = props.integration.password;
-    environment.ENDPOINT_URL = props.integration.url;
     const lambdaConf = dbLambdaConfiguration(vpc, lambdaDbSg, props, {
         functionName: updateSubSubjectsId,
         code: new lambda.AssetCode('dist/lambda/update-subsubjects'),
         handler: 'lambda-update-subsubjects.handler',
-        environment,
     });
+
+    lambdaConf.environment!.ENDPOINT_USER = props.integration.username;
+    lambdaConf.environment!.ENDPOINT_PASS = props.integration.password;
+    lambdaConf.environment!.ENDPOINT_URL = props.integration.url;
+
     const updateSubSubjectsLambda = new lambda.Function(stack, updateSubSubjectsId, lambdaConf);
     createSubscription(updateSubSubjectsLambda, updateSubSubjectsId, props.logsDestinationArn, stack);
     return updateSubSubjectsLambda;

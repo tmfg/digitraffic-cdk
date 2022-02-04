@@ -1,7 +1,7 @@
 import {CfnRealtimeLogConfig} from 'aws-cdk-lib/aws-cloudfront';
 import {Duration, Stack} from 'aws-cdk-lib';
 import {Code, Runtime, StartingPosition, Tracing, Function} from 'aws-cdk-lib/aws-lambda';
-import {Queue} from 'aws-cdk-lib/aws-sqs';
+import {Queue, QueueEncryption} from 'aws-cdk-lib/aws-sqs';
 import {PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Stream} from 'aws-cdk-lib/aws-kinesis';
 import {KinesisEventSource} from 'aws-cdk-lib/aws-lambda-event-sources';
@@ -87,6 +87,7 @@ function createKinesisConsumerLambda(
 
     const dlq = new Queue(stack, 'DLQ', {
         retentionPeriod: Duration.days(7),
+        encryption: QueueEncryption.KMS_MANAGED,
     });
 
     const fn = new Function(stack, functionName, {
@@ -105,12 +106,6 @@ function createKinesisConsumerLambda(
         timeout: Duration.seconds(60),
         memorySize: elasticProps.streamingProps?.memorySize ?? 256,
     });
-
-    //    CloudWatchLogGroupUtil.createLambdaLogGroup(
-    //        stack,
-    //        functionName,
-    //        RetentionDays.ONE_DAY
-    //    )
 
     fn.addEventSource(new KinesisEventSource(kinesis, {
         batchSize: elasticProps.streamingProps?.batchSize ?? 100,

@@ -37,7 +37,7 @@ export function handlerFn(doWithSecret: SecretFunction<AtonSecret>) {
             await inDatabaseReadonly((db: DTDatabase) => {
                 return Promise.allSettled(event.Records
                     .map(r => JSON.parse(r.body) as SendS124Event)
-                    .map(event => handleEvent(db, event)));
+                    .map(e => handleEvent(db, e)));
             });
         }, {
             prefix: 'aton',
