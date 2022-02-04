@@ -55,10 +55,11 @@ export class AwakeAiETAShipApi {
     async getETA(imo: number, locode: string | null): Promise<AwakeAiShipApiResponse> {
         const start = Date.now();
         try {
-            let url = `${this.url}/${imo}`;
+            let url = `${this.url}/ship/${imo}`;
             if (locode) {
                 url += `?destination=${locode}`;
             }
+            console.info(`AwakeAiETAShipApi.getETA calling URL ${url}`);
             const resp = await axios.get(url, {
                 headers: {
                     Authorization: this.apiKey,
@@ -75,7 +76,7 @@ export class AwakeAiETAShipApi {
             }
             throw error;
         } finally {
-            console.log(`method=getETA tookMs=${Date.now() - start}`);
+            console.log(`method=AwakeAiETAShipApi.getETA tookMs=${Date.now() - start}`);
         }
     }
 

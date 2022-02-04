@@ -6,11 +6,7 @@ import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 import {SNSEvent} from "aws-lambda";
 import {DbETAShip} from "../../db/timestamps";
 import {sendMessage} from "../../service/queue-service";
-
-type UpdateAwakeAiTimestampsSecret = {
-    readonly 'awake.voyagesurl': string
-    readonly 'awake.voyagesauth': string
-}
+import {UpdateAwakeAiTimestampsSecret} from "../../service/awake_ai_eta_helper";
 
 let service: AwakeAiETAShipService;
 

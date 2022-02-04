@@ -39,7 +39,8 @@ export class AwakeAiETAPortApi {
     async getETAs(locode: string): Promise<AwakeAiPortResponse> {
         const start = Date.now();
         try {
-            const url = `${this.url}/${locode}`;
+            const url = `${this.url}/port/${locode}/arrivals`;
+            console.info(`AwakeAiETAPortApi.getETAs calling URL ${url}`);
             const resp = await axios.get(url, {
                 headers: {
                     Authorization: this.apiKey,
@@ -56,7 +57,7 @@ export class AwakeAiETAPortApi {
             }
             throw error;
         } finally {
-            console.log(`method=getETA tookMs=${Date.now() - start}`);
+            console.log(`method=AwakeAiETAPortApi.getETAs tookMs=${Date.now() - start}`);
         }
     }
 

@@ -3,6 +3,11 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 import {AwakeAiVoyageEtaPrediction} from "../api/awake_ai_ship";
 
+export type UpdateAwakeAiTimestampsSecret = {
+    readonly 'awake.voyagesurl': string
+    readonly 'awake.voyagesauth': string
+}
+
 export enum AwakeDataState {
     OK = 'OK',
     SHIP_NOT_UNDER_WAY = 'SHIP_NOT_UNDER_WAY',
@@ -28,18 +33,18 @@ export function predictionToTimestamp(
 ): ApiTimestamp | null {
 
     if (!prediction.arrivalTime) {
-        console.warn(`method=AwakeAiETAHelper.predictionToTimestamp state=${AwakeDataState.NO_PREDICTED_ETA}`);
+        console.warn(`method=AwakeAiETAHelper.handleSchedule state=${AwakeDataState.NO_PREDICTED_ETA}, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
         return null;
     }
 
     if (!destinationIsFinnish(prediction.locode)) {
-        console.warn(`method=AwakeAiETAHelper.predictionToTimestamp state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}`);
+        console.warn(`method=AwakeAiETAHelper.predictionToTimestamp state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
         return null;
     }
 
-    console.info('method=AwakeAiETAHelper.predictionToTimestamp schedule was valid');
+    console.info(`method=AwakeAiETAHelper.predictionToTimestamp prediction was valid, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
 
-    return {
+    const timestamp = {
         ship: {
             mmsi,
             imo,
@@ -54,4 +59,6 @@ export function predictionToTimestamp(
         portcallId,
         eventType: prediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA,
     };
+    console.info(`method=AwakeAiETAHelper.predictionToTimestamp created timestamp: ${JSON.stringify(timestamp)}'`);
+    return timestamp;
 }

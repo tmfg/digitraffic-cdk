@@ -5,11 +5,7 @@ import {SNSEvent} from "aws-lambda";
 import {sendMessage} from "../../service/queue-service";
 import {AwakeAiETAPortApi} from "../../api/awake_ai_port";
 import {AwakeAiETAPortService} from "../../service/awake_ai_eta_port";
-
-type UpdateAwakeAiTimestampsSecret = {
-    readonly 'awake.porturl': string
-    readonly 'awake.voyagesauth': string
-}
+import {UpdateAwakeAiTimestampsSecret} from "../../service/awake_ai_eta_helper";
 
 let service: AwakeAiETAPortService;
 
@@ -29,13 +25,13 @@ export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSe
 
         return withSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<void> => {
             if (!service) {
-                service = new AwakeAiETAServiceClass(new AwakeAiETAPortApi(secret["awake.porturl"], secret["awake.voyagesauth"]));
+                service = new AwakeAiETAServiceClass(new AwakeAiETAPortApi(secret["awake.voyagesurl"], secret["awake.voyagesauth"]));
             }
             const timestamps = await service.getAwakeAiTimestamps(locode);
 
             const start = Date.now();
             console.info('method=updateAwakeAiETAPortTimestampsHandler Sending timestamps to queue..');
-            await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
+            // await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
             console.info('method=updateAwakeAiETAPortTimestampsHandler ..done in tookMs=%d', Date.now()-start);
         }, {expectedKeys});
     };

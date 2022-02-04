@@ -51,7 +51,7 @@ export function create(stack: DigitrafficStack,
     );
     const updateAwakeAiETAPortTimestampsLambda = createUpdateAwakeAiETATimestampsLambda(
         stack,
-        triggerAwakeETAShipUpdateTopic,
+        triggerAwakeETAPortUpdateTopic,
         queueAndDLQ.queue,
         'PortActivity-UpdateAwakeAiETAPortTimestamps',
         'update-awake-ai-eta-port-timestamps',
