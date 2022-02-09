@@ -329,12 +329,19 @@ const FIND_PORTCALL_ID_SQL = `
             (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $1)
         )
     ) AND pc.port_to_visit = $3::CHARACTER VARYING(5)
+    AND
+        CASE
+            WHEN $4 = 'ETA' THEN pac.eta >= NOW()
+            WHEN $4 = 'ETD' THEN pac.etd >= NOW()
+            WHEN $4 = 'ATA' THEN pac.ata <= NOW()
+            WHEN $4 = 'ATD' THEN pac.atd <= NOW()
+        END
     ORDER BY
         CASE
         WHEN $4 = 'ETA' THEN ABS(EXTRACT(EPOCH FROM pac.eta - $5))
+        WHEN $4 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $5))
         WHEN $4 = 'ATA' THEN ABS(EXTRACT(EPOCH FROM pac.ata - $5))
         WHEN $4 = 'ATD' THEN ABS(EXTRACT(EPOCH FROM pac.atd - $5))
-        WHEN $4 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $5))
         END
     LIMIT 1
 `;

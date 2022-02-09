@@ -112,6 +112,9 @@ export function newVessel(timestamp: ApiTimestamp): Vessel {
 export function newPortAreaDetails(timestamp: ApiTimestamp,
     props?: {
         eta?: Date,
+        etd?: Date,
+        ata?: Date,
+        atd?: Date,
         portcallId?: number
     }): PortAreaDetails {
 
@@ -119,6 +122,9 @@ export function newPortAreaDetails(timestamp: ApiTimestamp,
         port_area_details_id: Math.floor(Math.random() * 10000),
         port_call_id: props?.portcallId ?? timestamp.portcallId as number,
         eta: props?.eta?.toISOString(),
+        etd: props?.etd?.toISOString(),
+        ata: props?.ata?.toISOString(),
+        atd: props?.atd?.toISOString(),
     };
 }
 
@@ -157,6 +163,9 @@ export interface PortAreaDetails {
     readonly port_area_details_id: number
     readonly port_call_id: number
     readonly eta?: string
+    readonly etd?: string
+    readonly ata?: string
+    readonly atd?: string
 }
 
 export interface PortCall {

@@ -134,11 +134,17 @@ export async function insertPortAreaDetails(db: DTTransaction | DTDatabase, p: P
         INSERT INTO public.port_area_details(
             port_area_details_id,
             port_call_id,
-            eta
+            eta,
+            etd,
+            ata,
+            atd
         ) VALUES (
             $(port_area_details_id),
             $(port_call_id),
-            $(eta)
+            $(eta),
+            $(etd),
+            $(ata),
+            $(atd)
         )
     `, p);
 }
