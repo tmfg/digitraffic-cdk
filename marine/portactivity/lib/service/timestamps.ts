@@ -9,6 +9,7 @@ import {
 import {Port} from "./portareas";
 import moment from 'moment-timezone';
 import * as R from 'ramda';
+import {EventSource} from "../model/eventsource";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean
@@ -26,9 +27,13 @@ export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<
         ));
 
         if (!portcallId) {
-            console.warn(`method=saveTimestamp portcall id not found for timestamp %s`, JSON.stringify(timestamp));
-            // resolve so this gets removed from the queue
-            return null;
+            if (timestamp.source !== EventSource.AWAKE_AI_PRED) {
+                console.warn(`method=saveTimestamp no port call id could be found for, not persisting timestamp: ${JSON.stringify(timestamp)}`);
+                // resolve so this gets removed from the queue
+                return null;
+            } else {
+                console.info(`method=saveTimestamp portcall id not found but persisting because source is: ${EventSource.AWAKE_AI_PRED}, timestamp: ${JSON.stringify(timestamp)}`);
+            }
         }
 
         // mmsi should exist in this case
