@@ -82,10 +82,12 @@ export function create(stack: DigitrafficStack,
         'PortActivity-UpdateAwakeETAShipScheduler',
         10,
         triggerAwakeAiETAShipTimestampsLambda);
-    Scheduler.everyMinutes(stack,
-        'PortActivity-UpdateAwakeETAPortScheduler',
-        30,
-        triggerAwakeAiETAPortTimestampsLambda);
+    if ((stack.configuration as Props).awakePortApi) {
+        Scheduler.everyMinutes(stack,
+            'PortActivity-UpdateAwakeETAPortScheduler',
+            30,
+            triggerAwakeAiETAPortTimestampsLambda);
+    }
     Scheduler.everyMinutes(stack,
         'PortActivity-UpdateSchedulesScheduler',
         10,
