@@ -52,21 +52,25 @@ export class DatabaseCanary extends DigitrafficCanary {
      *
      * @param stack
      * @param role
-     * @param name max len is 10 char. name + -db.handler -> max 21 char
+     * @param name name of the typescipt file without -db -suffix. Max len is 10 char if @param canaryName is not given.
      * @param params
+     * @param canaryName Optional name for canary if multiple canaries is made from same ${name}-db.ts canary file.
      */
-    static createV2(stack: DigitrafficStack,
+    static createV2(
+        stack: DigitrafficStack,
         role: Role,
         name: string,
-        params: Partial<CanaryParameters> = {}): DatabaseCanary {
+        params: Partial<CanaryParameters> = {},
+        canaryName: string =name,
+    ): DatabaseCanary {
         return new DatabaseCanary(stack, role, stack.secret,
             {...{
                 secret: stack.configuration.secretId,
                 schedule: Schedule.rate(Duration.hours(1)),
                 handler: `${name}-db.handler`,
-                name,
+                name : canaryName,
                 alarm: {
-                    alarmName: `${stack.configuration.shortName}-DB-Alarm`,
+                    alarmName: (canaryName === name ? `${stack.configuration.shortName}-DB-Alarm` : `${canaryName}-DB-Alarm`),
                     topicArn: stack.configuration.alarmTopicArn,
                 },
             }, ...params});

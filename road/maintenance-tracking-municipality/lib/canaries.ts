@@ -9,8 +9,16 @@ export class Canaries {
         if (stack.configuration.enableCanaries) {
             const dbRole = new DigitrafficCanaryRole(stack, 'mtm-db').withDatabaseAccess();
 
-            DatabaseCanary.createV2(stack, dbRole, 'mtm',
-                { canaryEnv : { [MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] : "autori-oulu" } });
+            DatabaseCanary.createV2(
+                stack, dbRole, 'mtm',
+                { canaryEnv : { [MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] : "autori-oulu" } },
+                'mtm-autori-oulu',
+            );
+            DatabaseCanary.createV2(
+                stack, dbRole, 'mtm',
+                { canaryEnv : { [MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] : "autori-kuopio" } },
+                'mtm-autori-kuopio',
+            );
         }
     }
 }

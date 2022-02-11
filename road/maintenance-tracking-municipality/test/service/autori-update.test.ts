@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
     dbTestBase,
     findAllDomaindContracts,
@@ -21,6 +22,7 @@ import * as DataDb from "../../lib/db/data";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../../lib/model/db-data";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {DataType} from "digitraffic-common/database/last-updated";
+import {AUTORI_MAX_MINUTES_TO_HISTORY} from "../../lib/constants";
 
 
 const DOMAIN_1 = 'autori-oulu';
@@ -108,7 +110,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         // Expect all geometries to be found
         expect(trackings.length).toEqual(geometries.length); // same as geometries count
         geometries.forEach(g => {
-            const t : DbMaintenanceTracking | undefined = trackings.find(t => parseLineString(t.line_string).coordinates[0][0] == g.coordinates[0][0]);
+            const t : DbMaintenanceTracking | undefined = trackings.find(tr => parseLineString(tr.line_string).coordinates[0][0] == g.coordinates[0][0]);
             const ls = parseLineString(t?.line_string);
             expect(ls.coordinates[0][1]).toEqual(g.coordinates[0][1]);
             console.info(`Found ${JSON.stringify(ls)}`);
@@ -139,8 +141,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
     });
 
 
-    test('resolveContractLastUpdateTime', () => {
-        const lastUdated = moment().subtract(30, 'days').toDate();
+    test('resolveNextStartTimeForDataFetchFromHistory', () => {
+        const lastUdated = moment().subtract(1, 'minutes').toDate();
         const contract = {
             contract: CONTRACT_ID,
             data_last_updated: lastUdated,
@@ -150,12 +152,30 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             name: "Urakka 1",
             source: "Foo / Bar",
         } as DbDomainContract;
-        const resolved = autoriUpdateService.resolveContractLastUpdateTime(contract);
+        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
         expect(resolved).toEqual(lastUdated);
     });
 
-    test('resolveContractLastUpdateTime start date', () => {
-        const startDate = moment().subtract(30, 'days').toDate();
+    test('resolveNextStartTimeForDataFetchFromHistory over 12 month', () => {
+        // max from 1.1.2022 or < 12 months - 1h
+        const shouldResolveTo = moment().subtract(AUTORI_MAX_MINUTES_TO_HISTORY, 'minutes').toDate();
+
+        const lastUdated = moment().subtract(13, 'months').toDate();
+        const contract = {
+            contract: CONTRACT_ID,
+            data_last_updated: lastUdated,
+            domain: DOMAIN_1,
+            start_date: moment().subtract(30, 'days').toDate(),
+            end_date: moment().add(30, 'days').toDate(),
+            name: "Urakka 1",
+            source: "Foo / Bar",
+        } as DbDomainContract;
+        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
+        expectToBeCloseTo(resolved.getTime(), shouldResolveTo.getTime(), 10000);
+    });
+
+    test('resolveNextStartTimeForDataFetchFromHistory start date', () => {
+        const startDate = moment().subtract(2, 'minutes').toDate();
         const contract = {
             contract: CONTRACT_ID,
             data_last_updated: undefined,
@@ -165,13 +185,13 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             name: "Urakka 1",
             source: "Foo / Bar",
         } as DbDomainContract;
-        const resolved = autoriUpdateService.resolveContractLastUpdateTime(contract);
+        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
         expect(resolved).toEqual(startDate);
     });
 
-    test('resolveContractLastUpdateTime fall back', () => {
-        const fallBackMin = moment().subtract(7, 'days').subtract(1, 'seconds').toDate().getTime();
-        const fallBackMax = moment().subtract(7, 'days').add(1, 'seconds').toDate().getTime();
+    test('resolveNextStartTimeForDataFetchFromHistory fall back', () => {
+        const fallBackMin = moment().subtract(AUTORI_MAX_MINUTES_TO_HISTORY, 'minutes').subtract(1, 'seconds').toDate().getTime();
+        const fallBackMax = moment().subtract(AUTORI_MAX_MINUTES_TO_HISTORY, 'minutes').add(1, 'seconds').toDate().getTime();
         const contract = {
             contract: CONTRACT_ID,
             data_last_updated: undefined,
@@ -181,7 +201,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             name: "Urakka 1",
             source: "Foo / Bar",
         } as DbDomainContract;
-        const resolved = autoriUpdateService.resolveContractLastUpdateTime(contract);
+        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
         console.info(`min ${fallBackMin} actual ${resolved.getTime()} max ${fallBackMax}`);
         expect(resolved.getTime()).toBeGreaterThanOrEqual(fallBackMin);
         expect(resolved.getTime()).toBeLessThanOrEqual(fallBackMax);
@@ -198,8 +218,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
         await autoriUpdateService.updateTasks(DOMAIN_1);
 
-        const taskMappings1: DbDomainTaskMapping[] = await inDatabaseReadonly(async (db: DTDatabase) => {
-            return DataDb.getTaskMappings(db, DOMAIN_1);
+        const taskMappings1: DbDomainTaskMapping[] = await inDatabaseReadonly((ro: DTDatabase) => {
+            return DataDb.getTaskMappings(ro, DOMAIN_1);
         });
 
         expect(taskMappings1.length).toEqual(2);
@@ -222,8 +242,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
         await autoriUpdateService.updateTasks(DOMAIN_1);
 
-        const taskMappings1: DbDomainTaskMapping[] = await inDatabaseReadonly(async (db: DTDatabase) => {
-            return DataDb.getTaskMappings(db, DOMAIN_1);
+        const taskMappings1: DbDomainTaskMapping[] = await inDatabaseReadonly((ro: DTDatabase) => {
+            return DataDb.getTaskMappings(ro, DOMAIN_1);
         });
 
         expect(taskMappings1.length).toEqual(1);
@@ -256,8 +276,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         await autoriUpdateService.updateContracts(DOMAIN_1);
 
         // We should only get the existing with updated end date as the new one don't have source
-        const contractsWithSouce: DbDomainContract[] = await inDatabaseReadonly(async (db: DTDatabase) => {
-            return DataDb.getContractsWithSource(db, DOMAIN_1);
+        const contractsWithSouce: DbDomainContract[] = await inDatabaseReadonly((ro: DTDatabase) => {
+            return DataDb.getContractsWithSource(ro, DOMAIN_1);
         });
 
 
@@ -276,14 +296,14 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
     test('updateTrackings', async () => {
         const contractName = "Urakka 1";
-        const past3D = moment().subtract(3, 'days').toDate();
-        const past2D = moment().subtract(2, 'days').toDate();
-        const past1D = moment().subtract(1, 'days').toDate();
+        const past3 = moment().subtract(6, 'minutes').toDate();
+        const past2 = moment().subtract(4, 'minutes').toDate();
+        const past1 = moment().subtract(2, 'minutes').toDate();
 
         await insertDomain(db, DOMAIN_1, SOURCE_1);
         await insertDomaindContract(
             db, DOMAIN_1, CONTRACT_ID, contractName, SOURCE_1, moment().subtract(1, 'months').toDate(),
-            moment().add(1, 'months').toDate(), past3D,
+            moment().add(1, 'months').toDate(), past3,
         );
         await insertDomaindTaskMapping(
             db, HARJA_BRUSHING ,OPERATION_BRUSHNG, DOMAIN_1, false,
@@ -293,14 +313,14 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         );
 
         // Create two routes, 2 days and 1 day old
-        const route2d: ApiRouteData = createApiRouteData(past2D, createLineStringGeometries(1, 1), [OPERATION_BRUSHNG]);
-        const route1d: ApiRouteData = createApiRouteData(past1D, createLineStringGeometries(1, 1), [OPERATION_PAVING]);
+        const route2d: ApiRouteData = createApiRouteData(past2, createLineStringGeometries(1, 1), [OPERATION_BRUSHNG]);
+        const route1d: ApiRouteData = createApiRouteData(past1, createLineStringGeometries(1, 1), [OPERATION_PAVING]);
 
         // Sub api to return those routes
         const stub = getStubForGetNextRouteDataForContract();
-        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past3D, [route2d]);
-        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past2D, [route1d]);
-        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past1D, []);
+        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past3, [route2d]);
+        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past2, [route1d]);
+        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past1, []);
 
         await autoriUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
@@ -311,18 +331,18 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
         expect(olderTracking?.tasks.length).toEqual(1);
         expect(olderTracking?.tasks).toContain(HARJA_BRUSHING);
-        expect(olderTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past2D));
-        expect(olderTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past2D));
+        expect(olderTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past2));
+        expect(olderTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past2));
 
         expect(latestTracking?.tasks.length).toEqual(1);
         expect(latestTracking?.tasks).toContain(HARJA_PAVING);
-        expect(latestTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past1D));
-        expect(latestTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past1D));
+        expect(latestTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past1));
+        expect(latestTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past1));
 
         const checked = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED);
         const updated = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA);
-        expectToBeCloseTo(checked!.getTime(), Date.now(), 500); // ! means "I know better"
-        expectToBeCloseTo(updated!.getTime(), Date.now(), 500);
+        expectToBeCloseTo(<number>checked?.getTime(), Date.now(), 500);
+        expectToBeCloseTo(<number>updated?.getTime(), Date.now(), 500);
     });
 
 
@@ -388,8 +408,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
     }
 
     function mockGetNextRouteDataForContractApiResponse(stub: SinonStub, contract : string, from: Date, response: ApiRouteData[]) {
-        console.info(`mockGetNextRouteDataForContractApiResponse ${contract}, ${from.toISOString()}, 24`);
-        stub.withArgs(contract, from, 24).returns(Promise.resolve(response));
+        console.info(`mockGetNextRouteDataForContractApiResponse ${contract}, ${from.toISOString()}, 1`);
+        stub.withArgs(contract, from, 1).returns(Promise.resolve(response));
     }
 
 
@@ -478,7 +498,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
     }
 
     function createLineStringGeometries(minCount: number, maxCount: number) : LineString[]  {
-        return Array.from({length: getRandomNumber(minCount, maxCount)}, (_, i) => {
+        return Array.from({length: getRandomNumber(minCount, maxCount)}, () => {
             return createLineString([
                 [getRandomNumber(X_MIN, X_MAX), getRandomNumber(Y_MIN, Y_MAX)],
                 [getRandomNumber(X_MIN, X_MAX), getRandomNumber(Y_MIN, Y_MAX)],

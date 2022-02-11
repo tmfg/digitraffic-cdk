@@ -48,7 +48,7 @@ export class AutoriApi {
                 },
             });
             if (resp.status !== 200) {
-                console.error(`method=${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`);
+                console.error(`method=getFromServer.${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`);
                 return Promise.reject();
             }
             return resp.data;
@@ -56,19 +56,19 @@ export class AutoriApi {
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError;
                 if (axiosError.response) {
-                    console.error(`method=${method} GET failed for ${serverUrl}. Error response code: ${axiosError.response.status} and message: ${axiosError.response.data}`);
+                    console.error(`method=getFromServer.${method} GET failed for ${serverUrl}. Error response code: ${axiosError.response.status} and message: ${axiosError.response.data}`);
                 } else if (axiosError.request) {
-                    console.error(`method=${method} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`);
+                    console.error(`method=getFromServer.${method} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`);
                 } else {
                     // Something happened in setting up the request that triggered an Error
-                    console.error(`method=${method} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`);
+                    console.error(`method=getFromServer.${method} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`);
                 }
             } else {
-                console.error(`method=${method} GET failed for ${serverUrl} outside axios. Error message: ${error}`);
+                console.error(`method=getFromServer.${method} GET failed for ${serverUrl} outside axios. Error message: ${error}`);
             }
             return Promise.reject();
         } finally {
-            console.info(`method=${method} tookMs=${Date.now() - start} for ${serverUrl}`);
+            console.debug(`method=getFromServer.${method} tookMs=${Date.now() - start} for ${serverUrl}`);
         }
     }
 
@@ -84,10 +84,10 @@ export class AutoriApi {
      * Gets next data after given time and period
      * @param contract id of the contract
      * @param from data that has been modified after (exclusive) this
-     * @param periodHours how long period of data to fetch in hours
+     * @param periodMinutes how long period of data to fetch in hours
      */
-    public getNextRouteDataForContract(contract: string, from: Date, periodHours : number): Promise<ApiRouteData[]> {
-        const to = moment(from).add(periodHours, 'hours').add(1, 'ms'); // End and start are exclusive
+    public getNextRouteDataForContract(contract: string, from: Date, periodMinutes : number): Promise<ApiRouteData[]> {
+        const to = moment(from).add(periodMinutes, 'hours').add(1, 'ms'); // End and start are exclusive
         return this.getRouteDataForContract(contract, from, to.toDate())
             .then((data) => {
                 if (data.length == 0) {
@@ -97,12 +97,12 @@ export class AutoriApi {
                     }
                     // subtract 1ms as api start and end dates are exclusive
                     const nextFrom = moment(to).subtract(1, 'ms');
-                    console.debug(`DEBUG method=getNextRouteDataForContract going to call getNextRouteDataForContract(${contract}, ${nextFrom.toDate().toISOString()}, ${periodHours})`);
-                    return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodHours);
+                    console.debug(`DEBUG method=getNextRouteDataForContract going to call getNextRouteDataForContract(${contract}, ${nextFrom.toDate().toISOString()}, ${periodMinutes})`);
+                    return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodMinutes);
                 }
                 return data;
             }).catch(error => {
-                console.info(`method=getNextRouteDataForContract ${contract} from: ${from.toISOString()} to: ${to.toISOString()} error: ${error}`);
+                console.error(`method=getNextRouteDataForContract ${contract} startTime=${from.toISOString()} endTime=${to.toISOString()} error: ${error}`);
                 throw error;
             });
     }
@@ -121,10 +121,10 @@ export class AutoriApi {
         return this.getFromServer<ApiRouteData[]>(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`)
             .then(routeData => {
                 const end = Date.now();
-                console.info(`method=getRouteDataForContract ${contract} from: ${fromString} to: ${toString} data count=${routeData.length} tookMs=${end-start}`);
+                console.debug(`DEBUG method=getRouteDataForContract ${contract} startTime=${fromString} endTime=${toString} data count=${routeData.length} tookMs=${end-start}`);
                 return routeData;
             }).catch(error => {
-                console.error(`method=getRouteDataForContract ${contract} from: ${fromString} to: ${toString} error: ${error}`);
+                console.error(`method=getRouteDataForContract ${contract} startTime=${fromString} endTime=${toString} error: ${error}`);
                 throw error;
             });
     }

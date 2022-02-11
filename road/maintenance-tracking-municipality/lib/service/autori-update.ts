@@ -8,6 +8,7 @@ import {createHarjaId} from "./utils";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {DataType} from "digitraffic-common/database/last-updated";
+import {AUTORI_MAX_MINUTES_AT_ONCE, AUTORI_MAX_MINUTES_TO_HISTORY} from "../constants";
 
 export const UNKNOWN_TASK_NAME = 'UNKNOWN';
 
@@ -111,7 +112,7 @@ export class AutoriUpdate {
 
             return Promise.allSettled(contracts.map((contract: DbDomainContract) => {
                 // console.info(`method=updateTrackingsForDomain for domain=${domainName} contract=${contract.contract}`);
-                const start = this.resolveContractLastUpdateTime( contract );
+                const start = this.resolveNextStartTimeForDataFetchFromHistory( contract );
                 return this.updateContracTrackings(contract, taskMappings, start);
             })).then(async (results: PromiseSettledResult<TrackingSaveResult>[]) => {
                 const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
@@ -198,17 +199,27 @@ export class AutoriUpdate {
         });
     }
 
-    resolveContractLastUpdateTime(contract: DbDomainContract) : Date {
+    /**
+     * Find out from what time the data should be retrieved from history
+     * @param contract
+     */
+    resolveNextStartTimeForDataFetchFromHistory(contract: DbDomainContract) : Date {
+        // Allowed to get last 5 min data, no further history, use max 7 min to have no gaps in data
+        const maxDate = moment().subtract(AUTORI_MAX_MINUTES_TO_HISTORY, 'minutes').toDate();
+
+        let resolvedTime = moment().subtract(AUTORI_MAX_MINUTES_TO_HISTORY, 'minutes').toDate();
         if (contract.data_last_updated) {
             console.debug(`DEBUG method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.data_last_updated ${contract.data_last_updated.toISOString()}`);
-            return contract.data_last_updated;
+            resolvedTime = contract.data_last_updated;
         } else if (contract.start_date) {
             console.debug(`DEBUG method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.start_date ${contract.start_date.toISOString()}`);
-            return contract.start_date;
+            resolvedTime = contract.start_date;
+        } else {
+            console.debug(`DEBUG method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using -7, 'minutes' ${resolvedTime.toLocaleString()}`);
         }
-        // Fallback one week to past from now
-        const result = moment().subtract(7, 'days').toDate();
-        console.debug(`DEBUG method=resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using -7, 'days' ${result.toLocaleString()}`);
+
+        const result = new Date(Math.max(resolvedTime.getTime(), maxDate.getTime()));
+        console.debug(`DEBUG method=resolveContractLastUpdateTime resolvedTime=${resolvedTime.toISOString()} maxDate=${maxDate.toISOString()}  result=${result.toISOString()} `);
         return result;
     }
 
@@ -329,7 +340,7 @@ export class AutoriUpdate {
         console.info(`method=updateContracTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`);
         // routeData = await this.api.getNextRouteDataForContract(contract.contract, start, 24);
         console.debug(`DEBUG method=updateContracTrackings going to call getNextRouteDataForContract(${contract.contract}, ${apiDataUpdatedFrom.toISOString()}, 24)`);
-        return this.api.getNextRouteDataForContract(contract.contract, apiDataUpdatedFrom, 24)
+        return this.api.getNextRouteDataForContract(contract.contract, apiDataUpdatedFrom, AUTORI_MAX_MINUTES_AT_ONCE)
             .then(this.saveContracRoutesAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
             .catch((error) => {
                 console.error(`method=updateContracTrackings Error ${error}`);

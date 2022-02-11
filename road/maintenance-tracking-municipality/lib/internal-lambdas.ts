@@ -7,24 +7,30 @@ import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
 export class InternalLambdas {
     constructor(stack: DigitrafficStack) {
 
-        const updateDataForAutoriOuluLambda = this.createUpdateDataLambdaForAutoriOulu(stack);
-        Scheduler.everyMinutes(stack, 'MaintenanceTrackingMunicipalityAutoriOuluDataUpdate', 10, updateDataForAutoriOuluLambda);
+        const updateDataForAutoriOuluLambda = InternalLambdas.createUpdateDataLambdaForAutori(stack, 'autori-oulu', 5);
+        const updateDataForAutoriKuopioLambda = InternalLambdas.createUpdateDataLambdaForAutori(stack, 'autori-kuopio', 5);
 
         new DigitrafficLogSubscriptions(stack, updateDataForAutoriOuluLambda);
+        new DigitrafficLogSubscriptions(stack, updateDataForAutoriKuopioLambda);
         stack.grantSecret(updateDataForAutoriOuluLambda);
+        stack.grantSecret(updateDataForAutoriKuopioLambda);
     }
 
-    private createUpdateDataLambdaForAutoriOulu(stack: DigitrafficStack): MonitoredFunction {
+    private static createUpdateDataLambdaForAutori(stack: DigitrafficStack, domain: string, runEveryMinutes : number): MonitoredFunction {
 
-        const domain = 'autori-oulu';
         const environment = stack.createLambdaEnvironment();
         environment[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] = domain;
-        environment[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX] = 'mt.municipality.autori-oulu';
-
-        return MonitoredFunction.createV2(stack, 'autori-update-data', environment, {
+        environment[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX] = `mt.municipality.${domain}`;
+        // Run every 5 minutes and timeout before it
+        const lambdaFunction = MonitoredFunction.createV2(stack, 'autori-update-data', environment, {
             functionName: stack.configuration.shortName + '-' + domain,
-            memorySize: 256,
+            memorySize: 512,
             singleLambda: true,
+            timeout: (4*60)+30,
+            reservedConcurrentExecutions: 1,
         });
+
+        Scheduler.everyMinutes(stack, `MaintenanceTrackingMunicipalityDataUpdate-${domain}`, runEveryMinutes, lambdaFunction);
+        return lambdaFunction;
     }
 }

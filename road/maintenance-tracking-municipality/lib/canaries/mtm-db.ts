@@ -2,12 +2,10 @@ import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-ch
 import {DataType} from "digitraffic-common/database/last-updated";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../keys";
 
-const secretId = process.env.SECRET_ID as string;
 const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] as string;
-// const domainName = 'autori-oulu';
 
 export const handler = async () => {
-    const checker = new DatabaseChecker(secretId);
+    const checker = DatabaseChecker.create();
 
     checker.notEmpty(`domain ${domainName} is found`,
         `SELECT count(*) FROM maintenance_tracking_domain WHERE name = '${domainName}'`);
@@ -32,10 +30,10 @@ export const handler = async () => {
     checker.notEmpty(`domain ${domainName} has task mappings`,
         `select count(*) from maintenance_tracking_domain_task_mapping WHERE domain = '${domainName}'`);
 
-    checker.notEmpty('data updated in last 1 hours',
+    checker.notEmpty('data updated in last hour',
         `SELECT count(*) from data_updated where data_type = '${DataType.MAINTENANCE_TRACKING_DATA}' and updated > now() - interval '1 hours'`);
 
-    checker.notEmpty('data checked in last 1 hours',
+    checker.notEmpty('data checked in last hour',
         `SELECT count(*) from data_updated where data_type = '${DataType.MAINTENANCE_TRACKING_DATA_CHECKED}' and updated > now() - interval '1 hours'`);
 
     return checker.expect();
