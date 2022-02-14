@@ -116,7 +116,10 @@ const SELECT_BY_LOCODE = `
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.event_source = pe.event_source AND
-                  px.portcall_id = pe.portcall_id
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
           ) AND
     pe.event_time > ${TIMESTAMPS_BEFORE} AND
     pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
@@ -142,7 +145,10 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
                   px.location_locode = pe.location_locode AND
                   px.event_source = pe.event_source AND
                   px.ship_mmsi = pe.ship_mmsi AND
-                  px.portcall_id = pe.portcall_id
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
           ) AND
           pe.event_time < NOW() + INTERVAL '84 HOUR' AND
           pe.event_type = 'ETA' AND
@@ -163,7 +169,10 @@ const SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT = `
                   px.location_locode = pe.location_locode AND
                   px.event_source = pe.event_source AND
                   px.ship_mmsi = pe.ship_mmsi AND
-                  px.portcall_id = pe.portcall_id
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
           ) AND
           pe.portcall_id IN ($1:list) AND
           pe.event_type = '${EventType.ETA}' AND
@@ -196,7 +205,10 @@ const SELECT_BY_MMSI = `
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.event_source = pe.event_source AND
-                  px.portcall_id = pe.portcall_id
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
         pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
@@ -229,7 +241,10 @@ const SELECT_BY_IMO = `
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.event_source = pe.event_source AND
-                  px.portcall_id = pe.portcall_id
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
         pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
@@ -262,7 +277,10 @@ const SELECT_BY_SOURCE = `
                   px.location_locode = pe.location_locode AND
                   px.ship_mmsi = pe.ship_mmsi AND
                   px.event_source = pe.event_source AND
-                  px.portcall_id = pe.portcall_id
+                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
+                  THEN px.portcall_id = pe.portcall_id
+                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
         pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
@@ -311,12 +329,19 @@ const FIND_PORTCALL_ID_SQL = `
             (SELECT DISTINCT FIRST_VALUE(imo_lloyds) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE mmsi = $1)
         )
     ) AND pc.port_to_visit = $3::CHARACTER VARYING(5)
+    AND
+        CASE
+            WHEN $4 = 'ETA' THEN pac.eta >= NOW()
+            WHEN $4 = 'ETD' THEN pac.etd >= NOW()
+            WHEN $4 = 'ATA' THEN pac.ata <= NOW()
+            WHEN $4 = 'ATD' THEN pac.atd <= NOW()
+        END
     ORDER BY
         CASE
         WHEN $4 = 'ETA' THEN ABS(EXTRACT(EPOCH FROM pac.eta - $5))
+        WHEN $4 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $5))
         WHEN $4 = 'ATA' THEN ABS(EXTRACT(EPOCH FROM pac.ata - $5))
         WHEN $4 = 'ATD' THEN ABS(EXTRACT(EPOCH FROM pac.atd - $5))
-        WHEN $4 = 'ETD' THEN ABS(EXTRACT(EPOCH FROM pac.etd - $5))
         END
     LIMIT 1
 `;

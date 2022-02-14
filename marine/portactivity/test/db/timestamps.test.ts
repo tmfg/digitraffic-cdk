@@ -3,9 +3,9 @@ import {dbTestBase, insert, insertPortAreaDetails, insertPortCall, insertVessel}
 import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
+import {DTDatabase} from "digitraffic-common/database/database";
 import {EventSource} from "../../lib/model/eventsource";
 import {DbTimestamp} from "../../lib/db/timestamps";
-import {DTDatabase} from "digitraffic-common/database/database";
 
 const EVENT_SOURCE = 'TEST';
 
@@ -377,6 +377,88 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
 
         expect(imo).toEqual(timestamp.ship.imo);
     });
+
+    function findPortcallIdTest(description: string,
+        eventType: EventType,
+        eventTime: Date,
+        expectPortcallIdFound: boolean) {
+
+        test(`findPortcallId - ${description}`, async () => {
+            const timestamp = newTimestamp({
+                eventTime,
+                eventType,
+            });
+            // create port call (ship, LOCODE)
+            await insertPortCall(db, newPortCall(timestamp));
+            // create port call details (actual ETA/ETD/ATA/ATD) time for event type and time
+            let portAreaDetailsProps: { eta?: Date, etd?: Date, ata?: Date, atd?: Date } = {};
+            if (eventType === EventType.ETA) {
+                portAreaDetailsProps = {eta: eventTime};
+            } else if (eventType === EventType.ETD) {
+                portAreaDetailsProps = {etd: eventTime};
+            } else if (eventType === EventType.ATA) {
+                portAreaDetailsProps = {ata: eventTime};
+            } else if (eventType === EventType.ATD) {
+                portAreaDetailsProps = {atd: eventTime};
+            }
+            await insertPortAreaDetails(db, newPortAreaDetails(timestamp, portAreaDetailsProps));
+
+            const portcallId = await TimestampsDb.findPortcallId(
+                db,
+                timestamp.location.port,
+                timestamp.eventType,
+                moment().toDate(),
+                timestamp.ship.mmsi,
+                timestamp.ship.imo,
+            );
+
+            if (expectPortcallIdFound) {
+                expect(portcallId).not.toBeNull();
+            } else {
+                expect(portcallId).toBeNull();
+            }
+        });
+    }
+
+    findPortcallIdTest('ETA too old',
+        EventType.ETA,
+        moment().subtract(1, 'hour').toDate(),
+        false);
+
+    findPortcallIdTest('ETA ok',
+        EventType.ETA,
+        moment().add(1, 'hour').toDate(),
+        true);
+
+    findPortcallIdTest('ETD too old',
+        EventType.ETD,
+        moment().subtract(1, 'hour').toDate(),
+        false);
+
+    findPortcallIdTest('ETD ok',
+        EventType.ETD,
+        moment().add(1, 'hour').toDate(),
+        true);
+
+    findPortcallIdTest('ATA too new',
+        EventType.ATA,
+        moment().add(1, 'hour').toDate(),
+        false);
+
+    findPortcallIdTest('ATA ok',
+        EventType.ATA,
+        moment().subtract(1, 'hour').toDate(),
+        true);
+
+    findPortcallIdTest('ATD too new',
+        EventType.ATD,
+        moment().add(1, 'hour').toDate(),
+        false);
+
+    findPortcallIdTest('ATD ok',
+        EventType.ATD,
+        moment().subtract(1, 'hour').toDate(),
+        true);
 
     function createPortcall(timestamp: ApiTimestamp) {
         return db.tx(t => {

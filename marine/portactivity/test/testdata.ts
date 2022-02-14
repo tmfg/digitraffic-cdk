@@ -7,6 +7,8 @@ import {
 } from "../lib/api/awake_ai_atx";
 import {AwakeAiZoneType} from "../lib/api/awake_common";
 import { v4 as uuidv4 } from 'uuid';
+import {randomInt} from "crypto";
+import {getRandomNumber} from "digitraffic-common/test/testutils";
 
 // test file
 /* eslint-disable camelcase */
@@ -37,6 +39,14 @@ export function newAwakeATXMessage(options?: {
 
 export function someNumber(): number {
     return 1 + Math.floor(Math.random() * 999999);
+}
+
+export function randomIMO() {
+    return getRandomNumber(1000000, 9999999);
+}
+
+export function randomMMSI() {
+    return getRandomNumber(100000000, 999999999);
 }
 
 export function newTimestamp(props?: {
@@ -102,6 +112,9 @@ export function newVessel(timestamp: ApiTimestamp): Vessel {
 export function newPortAreaDetails(timestamp: ApiTimestamp,
     props?: {
         eta?: Date,
+        etd?: Date,
+        ata?: Date,
+        atd?: Date,
         portcallId?: number
     }): PortAreaDetails {
 
@@ -109,6 +122,9 @@ export function newPortAreaDetails(timestamp: ApiTimestamp,
         port_area_details_id: Math.floor(Math.random() * 10000),
         port_call_id: props?.portcallId ?? timestamp.portcallId as number,
         eta: props?.eta?.toISOString(),
+        etd: props?.etd?.toISOString(),
+        ata: props?.ata?.toISOString(),
+        atd: props?.atd?.toISOString(),
     };
 }
 
@@ -147,6 +163,9 @@ export interface PortAreaDetails {
     readonly port_area_details_id: number
     readonly port_call_id: number
     readonly eta?: string
+    readonly etd?: string
+    readonly ata?: string
+    readonly atd?: string
 }
 
 export interface PortCall {

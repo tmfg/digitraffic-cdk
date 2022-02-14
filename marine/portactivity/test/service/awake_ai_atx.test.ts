@@ -1,3 +1,4 @@
+import moment from "moment-timezone";
 import {newAwakeATXMessage, someNumber} from "../testdata";
 import * as sinon from 'sinon';
 import {
@@ -88,7 +89,10 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
             insertPortAreaDetails(t, {
                 port_call_id: portcallId,
                 port_area_details_id: someNumber(),
-                eta: new Date().toISOString(),
+                ata: moment().subtract(1, 'hour').toISOString(),
+                atd: moment().subtract(1, 'hour').toISOString(),
+                eta: moment().add(1, 'hour').toISOString(),
+                etd: moment().add(1, 'hour').toISOString(),
             });
         });
     }
