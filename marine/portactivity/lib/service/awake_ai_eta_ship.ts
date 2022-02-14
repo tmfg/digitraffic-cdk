@@ -61,7 +61,7 @@ export class AwakeAiETAShipService {
     private async getAwakeAiTimestamp(ship: DbETAShip): Promise<AwakeAiETAResponseAndShip> {
         const start = Date.now();
 
-        // if less than 24 hours to ship's arrival, set destination LOCODE explicitly
+        // if less than 24 hours to ship's arrival, set destination LOCODE explicitly for ETA request
         const diffEtaToNow = moment(ship.eta).diff(moment());
         const diffHours = moment.duration(diffEtaToNow).asHours();
         const locode = diffHours < 24 ? ship.locode : null;
@@ -87,17 +87,23 @@ export class AwakeAiETAShipService {
     private handleSchedule(schedule: AwakeAiShipVoyageSchedule, ship: DbETAShip, diffHours: number): ApiTimestamp[] {
         return this.getETAPredictions(schedule).map(etaPrediction => {
 
+            // use ETA prediction LOCODE by default
             let port: string = etaPrediction.locode;
+
             if (etaPrediction.locode != ship.locode) {
                 if (diffHours >= 24) {
+                    // 24 hours or more to ship arrival and LOCODE doesn't match, ignore this
                     console.warn(`method=AwakeAiETAShipService.handleSchedule state=${AwakeDataState.DIFFERING_LOCODE} not persisting, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                     return null;
                 } else if (this.overriddenDestinations.includes(ship.locode)) {
+                    // less than 24 hours to ship arrival and port call LOCODE is in list of overridden destinations
+                    // don't trust predicted destination, override destination with port call LOCODE
                     console.warn(`method=AwakeAiETAShipService.handleSchedule state=${AwakeDataState.OVERRIDDEN_LOCODE} LOCODE in override list, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                     port = ship.locode;
                 }
             }
 
+            // allow pilot boarding area ETAs only for specific ports
             if (etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA && !this.publishAsETBDestinations.includes(port)) {
                 console.warn(`method=AwakeAiETAShipService.handleSchedule ETP event for non-publishable LOCODE, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                 return null;
