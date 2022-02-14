@@ -15,33 +15,38 @@ export const UNKNOWN_TASK_NAME = 'UNKNOWN';
 export class TrackingSaveResult {
     saved : number;
     errors : number;
+    sizeBytes: number;
 
-    static createSaved(saved=1): TrackingSaveResult {
-        return new TrackingSaveResult(saved, 0);
+    static createSaved(sizeBytes: number): TrackingSaveResult {
+        return new TrackingSaveResult(sizeBytes,1, 0);
     }
 
-    static createError(errors=1): TrackingSaveResult {
-        return new TrackingSaveResult(0, errors);
+    static createError(sizeBytes: number): TrackingSaveResult {
+        return new TrackingSaveResult(sizeBytes, 0, 1);
     }
 
-    constructor(saved: number, errors: number) {
+    constructor(sizeBytes: number, saved: number, errors: number) {
         this.saved = saved;
         this.errors = errors;
+        this.sizeBytes = sizeBytes;
     }
 
     sum(other: TrackingSaveResult): TrackingSaveResult {
         this.saved += other.saved;
         this.errors += other.errors;
+        this.sizeBytes += other.sizeBytes;
         return this;
     }
 
-    addSaved(savedToAdd=1) {
-        this.saved += savedToAdd;
+    addSaved(sizeBytes: number) {
+        this.saved += 1;
+        this.sizeBytes += sizeBytes;
         return this;
     }
 
-    addError(errorsToAdd=1) {
-        this.errors += errorsToAdd;
+    addError(sizeBytes: number) {
+        this.errors += 1;
+        this.sizeBytes += sizeBytes;
         return this;
     }
 }
@@ -117,18 +122,9 @@ export class AutoriUpdate {
             })).then(async (results: PromiseSettledResult<TrackingSaveResult>[]) => {
                 const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
                 const errors = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.errors : 1), 0);
-
-                await inDatabase((db: DTDatabase) => {
-                    return LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED, new Date(timerStart))
-                        .then(() => {
-                            if (saved > 0) {
-                                return LastUpdatedDb.updateLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA, new Date(timerStart));
-                            }
-                            return;
-                        });
-                });
+                const sizeBytes = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.sizeBytes : 0), 0);
                 console.info(`method=updateTrackingsForDomain domain=${domainName} count=${saved} errors=${errors} tookMs=${Date.now() - timerStart}`);
-                return new TrackingSaveResult(saved, errors);
+                return new TrackingSaveResult(sizeBytes, saved, errors);
             }).then((finalResult) => {
                 return this.updateDataUpdated(finalResult);
             });
@@ -166,6 +162,9 @@ export class AutoriUpdate {
         return inDatabase((db: DTDatabase) => {
             return Promise.allSettled(routeDatas.map(async (routeData: ApiRouteData) => {
 
+                // estimated message size
+                const messageSizeBytes = Buffer.byteLength(JSON.stringify(routeData));
+
                 try {
                     const machineId = await db.tx(tx => {
                         const workMachine: DbWorkMachine = this.createDbWorkMachine(contract.contract, contract.domain, routeData.vehicleType);
@@ -181,20 +180,21 @@ export class AutoriUpdate {
                         await DataDb.updateContractLastUpdated(tx, contract.domain, contract.contract, routeData.updated || routeData.endTime);
                     }).then(() => {
                         // console.info(`method=saveTrackingsToDb upsertMaintenanceTracking count ${data.length} done`);
-                        return TrackingSaveResult.createSaved();
+                        return TrackingSaveResult.createSaved(messageSizeBytes);
                     }).catch((error) => {
                         console.debug(`DEBUG method=saveTrackingsToDb upsertMaintenanceTracking failed`, error);
-                        return TrackingSaveResult.createError();
+                        return TrackingSaveResult.createError(messageSizeBytes);
                     });
                 } catch (error) {
                     console.error(`method=saveTrackingsToDb failed for contract=${contract.contract} and domain=${contract.domain} for routeData ${routeData.id}`, error);
-                    return TrackingSaveResult.createError();
+                    return TrackingSaveResult.createError(messageSizeBytes);
                 }
             })).then((results : PromiseSettledResult<TrackingSaveResult>[]) => {
                 const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
                 const errors = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.errors : 1), 0);
-                console.info(`method=saveTrackingsToDb domain=${contract.domain} contract=${contract.contract} count=${saved} errors=${errors} tookMs=${Date.now()-start}`);
-                return new TrackingSaveResult(saved, errors);
+                const sizeBytes = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.sizeBytes : 0), 0);
+                console.info(`method=saveTrackingsToDb domain=${contract.domain} contract=${contract.contract} insertCount=${saved} errors=${errors} total message sizeBytes=${sizeBytes} tookMs=${Date.now()-start}`);
+                return new TrackingSaveResult(sizeBytes, saved, errors);
             });
         });
     }
@@ -340,11 +340,11 @@ export class AutoriUpdate {
         console.info(`method=updateContracTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`);
         // routeData = await this.api.getNextRouteDataForContract(contract.contract, start, 24);
         console.debug(`DEBUG method=updateContracTrackings going to call getNextRouteDataForContract(${contract.contract}, ${apiDataUpdatedFrom.toISOString()}, 24)`);
-        return this.api.getNextRouteDataForContract(contract.contract, apiDataUpdatedFrom, AUTORI_MAX_MINUTES_AT_ONCE)
+        return this.api.getNextRouteDataForContract(contract, apiDataUpdatedFrom, AUTORI_MAX_MINUTES_AT_ONCE)
             .then(this.saveContracRoutesAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
             .catch((error) => {
                 console.error(`method=updateContracTrackings Error ${error}`);
-                return TrackingSaveResult.createError();
+                return TrackingSaveResult.createError(0);
             });
     }
 
@@ -360,9 +360,11 @@ export class AutoriUpdate {
 
             if (routeData.length === 0) {
                 console.info(`method=saveContracRoutesAsTrackings No new data for contract=${contract.contract} after ${apiDataUpdatedFrom.toISOString()}`);
-                return Promise.resolve(new TrackingSaveResult(0,0));
+                return Promise.resolve(new TrackingSaveResult(0,0, 0));
             }
 
+            // Estimated message size
+            const messageSizeBytes = Buffer.byteLength(JSON.stringify(routeData));
             return this.saveTrackingsToDb(contract, routeData, taskMappings)
                 .then((result: TrackingSaveResult) => {
                     const latestUpdated = this.getLatestUpdatedDateForRouteData(routeData);
@@ -373,11 +375,11 @@ export class AutoriUpdate {
                             return result.sum(nextResult);
                         }).catch((error) => {
                             console.error(`method=saveContracRoutesAsTrackings Error ${error}`);
-                            return result.addError();
+                            return result.addError(messageSizeBytes);
                         });
                 }).catch((error) => {
                     console.error(`method=saveContracRoutesAsTrackings Error ${error}`);
-                    return TrackingSaveResult.createError();
+                    return TrackingSaveResult.createError(messageSizeBytes);
                 });
         };
     }

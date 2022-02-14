@@ -2,6 +2,7 @@ import axios, {AxiosError, AxiosResponse} from 'axios';
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/data";
 import moment from "moment";
+import {DbDomainContract} from "../model/db-data";
 
 export const URL_CONTRACTS = '/api/contracts';
 export const URL_ROUTE = '/api/route';
@@ -86,7 +87,7 @@ export class AutoriApi {
      * @param from data that has been modified after (exclusive) this
      * @param periodMinutes how long period of data to fetch in hours
      */
-    public getNextRouteDataForContract(contract: string, from: Date, periodMinutes : number): Promise<ApiRouteData[]> {
+    public getNextRouteDataForContract( contract: DbDomainContract, from: Date, periodMinutes : number): Promise<ApiRouteData[]> {
         const to = moment(from).add(periodMinutes, 'hours').add(1, 'ms'); // End and start are exclusive
         return this.getRouteDataForContract(contract, from, to.toDate())
             .then((data) => {
@@ -102,7 +103,7 @@ export class AutoriApi {
                 }
                 return data;
             }).catch(error => {
-                console.error(`method=getNextRouteDataForContract ${contract} startTime=${from.toISOString()} endTime=${to.toISOString()} error: ${error}`);
+                console.error(`method=getNextRouteDataForContract domain=${contract.domain} contract=${contract.contract} startTime=${from.toISOString()} endTime=${to.toISOString()} error: ${error}`);
                 throw error;
             });
     }
@@ -113,18 +114,18 @@ export class AutoriApi {
      * @param from data that has been modified after (exclusive) this
      * @param to data that has been modified before (exclusive) this
      */
-    private getRouteDataForContract(contract: string, from: Date, to: Date): Promise<ApiRouteData[]> {
+    private getRouteDataForContract(contract: DbDomainContract, from: Date, to: Date): Promise<ApiRouteData[]> {
         const fromString = from.toISOString(); // With milliseconds Z-time
         const toString = to.toISOString();
         const start = Date.now();
 
-        return this.getFromServer<ApiRouteData[]>(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract}&changedStart=${fromString}&changedEnd=${toString}`)
+        return this.getFromServer<ApiRouteData[]>(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract.contract}&changedStart=${fromString}&changedEnd=${toString}`)
             .then(routeData => {
                 const end = Date.now();
-                console.debug(`DEBUG method=getRouteDataForContract ${contract} startTime=${fromString} endTime=${toString} data count=${routeData.length} tookMs=${end-start}`);
+                console.debug(`DEBUG method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} startTime=${fromString} endTime=${toString} data count=${routeData.length} tookMs=${end-start}`);
                 return routeData;
             }).catch(error => {
-                console.error(`method=getRouteDataForContract ${contract} startTime=${fromString} endTime=${toString} error: ${error}`);
+                console.error(`method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} startTime=${fromString} endTime=${toString} error: ${error}`);
                 throw error;
             });
     }

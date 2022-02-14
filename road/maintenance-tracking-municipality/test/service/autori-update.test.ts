@@ -22,7 +22,8 @@ import * as DataDb from "../../lib/db/data";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../../lib/model/db-data";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {DataType} from "digitraffic-common/database/last-updated";
-import {AUTORI_MAX_MINUTES_TO_HISTORY} from "../../lib/constants";
+import {AUTORI_MAX_MINUTES_AT_ONCE, AUTORI_MAX_MINUTES_TO_HISTORY} from "../../lib/constants";
+import {getContractsWithSource} from "../../lib/db/data";
 
 
 const DOMAIN_1 = 'autori-oulu';
@@ -312,16 +313,19 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             db, HARJA_PAVING ,OPERATION_PAVING, DOMAIN_1, false,
         );
 
+        const contract = (await getContractsWithSource(db, DOMAIN_1))[0];
+
         // Create two routes, 2 days and 1 day old
         const route2d: ApiRouteData = createApiRouteData(past2, createLineStringGeometries(1, 1), [OPERATION_BRUSHNG]);
         const route1d: ApiRouteData = createApiRouteData(past1, createLineStringGeometries(1, 1), [OPERATION_PAVING]);
 
         // Sub api to return those routes
         const stub = getStubForGetNextRouteDataForContract();
-        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past3, [route2d]);
-        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past2, [route1d]);
-        mockGetNextRouteDataForContractApiResponse(stub, CONTRACT_ID, past1, []);
+        mockGetNextRouteDataForContractApiResponse(stub, contract, past3, [route2d]);
+        mockGetNextRouteDataForContractApiResponse(stub, contract, past2, [route1d]);
+        mockGetNextRouteDataForContractApiResponse(stub, contract, past1, []);
 
+        console.info(`Dates: ${past3.toISOString()} – ${past2.toISOString()} – ${past1.toISOString()}`);
         await autoriUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
         const trackings = await findAllTrackings(db, DOMAIN_1);
@@ -407,9 +411,9 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         return sinon.stub(AutoriApi.prototype, 'getNextRouteDataForContract');
     }
 
-    function mockGetNextRouteDataForContractApiResponse(stub: SinonStub, contract : string, from: Date, response: ApiRouteData[]) {
-        console.info(`mockGetNextRouteDataForContractApiResponse ${contract}, ${from.toISOString()}, 1`);
-        stub.withArgs(contract, from, 1).returns(Promise.resolve(response));
+    function mockGetNextRouteDataForContractApiResponse(stub: SinonStub, contract : DbDomainContract, from: Date, response: ApiRouteData[]) {
+        console.info(`mock getNextRouteDataForContract ApiResponse ${contract.contract}, ${from.toISOString()}, ${AUTORI_MAX_MINUTES_AT_ONCE}`);
+        stub.withArgs(sinon.match({ contract: contract.contract }), from, AUTORI_MAX_MINUTES_AT_ONCE).returns(Promise.resolve(response));
     }
 
 
