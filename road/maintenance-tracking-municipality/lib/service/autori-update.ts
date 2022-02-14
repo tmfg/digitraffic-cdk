@@ -17,8 +17,8 @@ export class TrackingSaveResult {
     errors : number;
     sizeBytes: number;
 
-    static createSaved(sizeBytes: number): TrackingSaveResult {
-        return new TrackingSaveResult(sizeBytes,1, 0);
+    static createSaved(sizeBytes: number, saved=1): TrackingSaveResult {
+        return new TrackingSaveResult(sizeBytes, saved, 0);
     }
 
     static createError(sizeBytes: number): TrackingSaveResult {
@@ -119,7 +119,7 @@ export class AutoriUpdate {
                 // console.info(`method=updateTrackingsForDomain for domain=${domainName} contract=${contract.contract}`);
                 const start = this.resolveNextStartTimeForDataFetchFromHistory( contract );
                 return this.updateContracTrackings(contract, taskMappings, start);
-            })).then(async (results: PromiseSettledResult<TrackingSaveResult>[]) => {
+            })).then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
                 const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
                 const errors = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.errors : 1), 0);
                 const sizeBytes = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.sizeBytes : 0), 0);
@@ -180,9 +180,10 @@ export class AutoriUpdate {
                         await DataDb.updateContractLastUpdated(tx, contract.domain, contract.contract, routeData.updated || routeData.endTime);
                     }).then(() => {
                         // console.info(`method=saveTrackingsToDb upsertMaintenanceTracking count ${data.length} done`);
-                        return TrackingSaveResult.createSaved(messageSizeBytes);
+                        console.info(`method=saveTrackingsToDb.upsert domain=${contract.domain} contract=${contract.contract} insertCount=${data.length} errors=0 total message sizeBytes=${messageSizeBytes} tookMs=${Date.now()-start}`);
+                        return TrackingSaveResult.createSaved(messageSizeBytes, data.length);
                     }).catch((error) => {
-                        console.debug(`DEBUG method=saveTrackingsToDb upsertMaintenanceTracking failed`, error);
+                        console.error(`method=saveTrackingsToDb.upsert domain=${contract.domain} contract=${contract.contract} insertCount=0 errors=1 total message sizeBytes=${messageSizeBytes} tookMs=${Date.now()-start}`, error);
                         return TrackingSaveResult.createError(messageSizeBytes);
                     });
                 } catch (error) {

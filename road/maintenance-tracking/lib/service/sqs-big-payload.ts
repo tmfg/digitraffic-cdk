@@ -72,7 +72,7 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
         const insertCount: number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
         const end = Date.now();
         console.info(
-            `method=${logFunctionName} messageSendingTime=%s observations insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
+            `method=${logFunctionName} messageSendingTime=%s observations domain=harja insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
             sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes,
         );
     } catch (e) {

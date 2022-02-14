@@ -24,7 +24,7 @@ export class InternalLambdas {
         // Run every 5 minutes and timeout before it
         const lambdaFunction = MonitoredFunction.createV2(stack, 'autori-update-data', environment, {
             functionName: stack.configuration.shortName + '-' + domain,
-            memorySize: 512,
+            memorySize: 256,
             singleLambda: true,
             timeout: (4*60)+30,
             reservedConcurrentExecutions: 1,

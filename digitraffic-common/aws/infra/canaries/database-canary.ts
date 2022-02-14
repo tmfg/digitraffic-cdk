@@ -61,7 +61,7 @@ export class DatabaseCanary extends DigitrafficCanary {
         role: Role,
         name: string,
         params: Partial<CanaryParameters> = {},
-        canaryName: string =name,
+        canaryName=name,
     ): DatabaseCanary {
         return new DatabaseCanary(stack, role, stack.secret,
             {...{
