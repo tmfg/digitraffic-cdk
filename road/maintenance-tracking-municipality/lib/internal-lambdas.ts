@@ -26,7 +26,7 @@ export class InternalLambdas {
             functionName: stack.configuration.shortName + '-' + domain,
             memorySize: 256,
             singleLambda: true,
-            timeout: (4*60)+30,
+            timeout: 60,
             reservedConcurrentExecutions: 1,
         });
 
