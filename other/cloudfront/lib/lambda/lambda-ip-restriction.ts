@@ -1,5 +1,7 @@
 const ALLOWED_IPS = "EXT_IP".split(',');
 
+const VERSION_HEADERS = "EXT_VERSION";
+
 /*
     This is a edge lambda that should be run at cloudfront at origin request event.
     It checks the request for correct ip-address and return 403 if it does not match.
