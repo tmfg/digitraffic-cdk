@@ -33,6 +33,7 @@ function initMap() {
     pilotwebToPortnetLocodeMap.FI403 = 'FIHEL';
     pilotwebToPortnetLocodeMap.FI404 = 'FIHEL';
     pilotwebToPortnetLocodeMap.FI405 = 'FIHEL';
+    pilotwebToPortnetLocodeMap.FIVAL = 'FIHEL';
 
     pilotwebToPortnetLocodeMap.FIKHA = 'FIKTK';
     pilotwebToPortnetLocodeMap.FIKMU = 'FIKTK';
