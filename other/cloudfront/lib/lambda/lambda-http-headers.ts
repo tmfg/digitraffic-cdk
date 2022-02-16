@@ -17,5 +17,12 @@ exports.handler = (event: any, context: any, callback: any) => {
         addCorsHeaders(response);
     }
 
+    for (const header of Object.keys(response.headers)) {
+        const headerLowerCased = header.toLowerCase();
+        if (headerLowerCased.includes('x-amz') || headerLowerCased.includes('x-amzn')) {
+            delete response.headers[header];
+        }
+    }
+
     callback(null, response);
 };
