@@ -1,11 +1,12 @@
 import moment from 'moment';
-import {dbTestBase, insert, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
+import {dbTestBase, findAll, insert, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
 import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {DTDatabase} from "digitraffic-common/database/database";
 import {EventSource} from "../../lib/model/eventsource";
 import {DbTimestamp} from "../../lib/db/timestamps";
+import {getRandomInteger} from "digitraffic-common/test/testutils";
 
 const EVENT_SOURCE = 'TEST';
 
@@ -459,6 +460,28 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         EventType.ATD,
         moment().subtract(1, 'hour').toDate(),
         true);
+
+    test('deleteOldTimestamps - older than 7 days is deleted', async () => {
+        await insert(db, [newTimestamp({
+            eventTime: moment().subtract(7, 'day').subtract(getRandomInteger(0, 999), 'hour').toDate(),
+        })]);
+
+        await db.tx(t => TimestampsDb.deleteOldTimestamps(t));
+
+        const timestamps = await findAll(db);
+        expect(timestamps.length).toBe(0);
+    });
+
+    test('deleteOldTimestamps - newer than 7 days old is not deleted', async () => {
+        await insert(db, [newTimestamp({
+            eventTime: moment().subtract(7, 'day').add(getRandomInteger(1, 999), 'hour').toDate(),
+        })]);
+
+        await db.tx(t => TimestampsDb.deleteOldTimestamps(t));
+
+        const timestamps = await findAll(db);
+        expect(timestamps.length).toBe(1);
+    });
 
     function createPortcall(timestamp: ApiTimestamp) {
         return db.tx(t => {

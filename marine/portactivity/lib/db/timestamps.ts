@@ -11,6 +11,8 @@ import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
 
+const OLD_TIMESTAMP_INTERVAL = '7 days';
+
 export type DbTimestamp = {
     readonly event_type: EventType
     readonly event_time: Date
@@ -360,6 +362,14 @@ const FIND_IMO_BY_MMSI_SQL = `
     ) AS imo
 `.trim();
 
+const DELETE_OLD_TIMESTAMPS_SQL = `
+    DELETE FROM port_call_timestamp WHERE event_time < NOW() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}'
+`.trim();
+
+const DELETE_OLD_PILOTAGES_SQL = `
+    DELETE FROM pilotage WHERE pilotage_end_time < NOW() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}'
+`.trim();
+
 export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: 'update-timestamps',
@@ -486,6 +496,13 @@ export async function findImoByMmsi(db: DTDatabase | DTTransaction, mmsi: number
         return imo.imo as number;
     }
     return null;
+}
+
+export function deleteOldTimestamps(db: DTTransaction) {
+    return db.batch([
+        db.none(DELETE_OLD_PILOTAGES_SQL),
+        db.none(DELETE_OLD_TIMESTAMPS_SQL),
+    ]);
 }
 
 export function createUpdateValues(e: ApiTimestamp): unknown[] {

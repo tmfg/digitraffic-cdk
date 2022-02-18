@@ -166,3 +166,9 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
         return Promise.resolve([]);
     }
 }
+
+export function deleteOldTimestamps() {
+    return inDatabase((db: DTDatabase) => {
+        return db.tx(t => TimestampsDB.deleteOldTimestamps(t));
+    });
+}
