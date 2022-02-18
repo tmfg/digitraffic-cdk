@@ -1,4 +1,4 @@
-import {LambdaType} from "./lambda/lambda-creator";
+import {FunctionType, LambdaType} from "./lambda/lambda-creator";
 import {CloudFrontAllowedMethods} from "aws-cdk-lib/aws-cloudfront";
 import {WafRules} from "./acl/waf-rules";
 
@@ -12,6 +12,7 @@ export class CFBehavior {
 
     // lambda-configs
     readonly lambdaTypes: Set<LambdaType> = new Set();
+    readonly functionTypes: Set<FunctionType> = new Set();
 
     ipRestriction: string;
 
@@ -78,8 +79,14 @@ export class CFBehavior {
         return this;
     }
 
-    public withLambda(lambdaType: LambdaType): CFBehavior {
-        this.lambdaTypes?.add(lambdaType);
+    public withLambda(type: LambdaType): CFBehavior {
+        this.lambdaTypes.add(type);
+
+        return this;
+    }
+
+    public withFunction(type: FunctionType): CFBehavior {
+        this.functionTypes.add(type);
 
         return this;
     }
@@ -96,6 +103,10 @@ export class CFBehavior {
 
     public withHttpHeadersLambda(): CFBehavior {
         return this.withLambda(LambdaType.HTTP_HEADERS);
+    }
+
+    public withIndexHtmlFunction(): CFBehavior {
+        return this.withFunction(FunctionType.INDEX_HTML);
     }
 }
 
@@ -114,6 +125,7 @@ export class CFDomain extends CFDistribution {
     httpPort?: number;
     httpsPort?: number;
     apiKey?: string;
+    headers: Record<string, string> = {};
 
     constructor(domainName: string, ...behaviors: CFBehavior[]) {
         super(behaviors);
@@ -155,6 +167,12 @@ export class CFDomain extends CFDistribution {
 
         return domain;
     }
+
+    private addHeader(name: string, value: string) {
+        this.headers[name] = value;
+
+        return this;
+    }
 }
 
 export class S3Domain extends CFDistribution {
@@ -168,7 +186,9 @@ export class S3Domain extends CFDistribution {
     }
 
     static swagger(s3BucketName: string, path = "swagger/*"): S3Domain {
-        return this.s3(s3BucketName, CFBehavior.path(path).withCacheTtl(120));
+        return this.s3(s3BucketName, CFBehavior.path(path)
+            .withCacheTtl(120)
+            .withIndexHtmlFunction());
     }
 
     static s3(s3BucketName: string, ...behaviors: CFBehavior[]): S3Domain {
@@ -214,6 +234,6 @@ export type CFLambdaParameters = {
 }
 
 export type CFLambdaProps = {
-    readonly lambdaTypes: LambdaType[],
+    readonly lambdaTypes: (LambdaType | FunctionType)[],
     readonly lambdaParameters?: CFLambdaParameters
 }

@@ -2,18 +2,19 @@ import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront'
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
 import {Aspects, Stack, StackProps} from "aws-cdk-lib";
-import {createOriginConfig, LambdaMap} from "./origin-configs";
+import {createOriginConfig} from "./origin-configs";
 import {CFDistribution, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
 import {
     createGzipRequirement,
-    createHttpHeaders,
+    createHttpHeaders, createIndexHtml,
     createIpRestriction,
-    createWeathercamRedirect,
+    createWeathercamRedirect, FunctionType,
     LambdaType,
 } from "./lambda/lambda-creator";
 import {createDistribution} from "./distribution-util";
 import {createRealtimeLogging, StreamingConfig} from "./streaming-util";
 import {StackCheckingAspect} from "digitraffic-common/aws/infra/stack/stack-checking-aspect";
+import {LambdaMap} from "./lambda-map";
 
 type ViewerPolicyMap = {
     [key: string]: string,
@@ -91,7 +92,7 @@ export class CloudfrontCdkStack extends Stack {
     }
 
     createLambdaMap(lProps: CFLambdaProps | undefined): LambdaMap {
-        const lambdaMap: LambdaMap = {};
+        const lambdaMap = new LambdaMap();
 
         if (lProps !== undefined) {
             const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
@@ -103,18 +104,20 @@ export class CloudfrontCdkStack extends Stack {
             });
 
             if (lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
-                lambdaMap[LambdaType.WEATHERCAM_REDIRECT] =
-                    createWeathercamRedirect(this, edgeLambdaRole, lProps.lambdaParameters!.weathercamDomainName!, lProps.lambdaParameters!.weathercamHostName!);
+                lambdaMap.addLambda(LambdaType.WEATHERCAM_REDIRECT,
+                    createWeathercamRedirect(this, edgeLambdaRole, lProps.lambdaParameters!.weathercamDomainName!, lProps.lambdaParameters!.weathercamHostName!));
             }
 
             if (lProps.lambdaTypes.includes(LambdaType.GZIP_REQUIREMENT)) {
-                lambdaMap[LambdaType.GZIP_REQUIREMENT] =
-                    createGzipRequirement(this, edgeLambdaRole);
+                lambdaMap.addLambda(LambdaType.GZIP_REQUIREMENT, createGzipRequirement(this, edgeLambdaRole));
             }
 
             if (lProps.lambdaTypes.includes(LambdaType.HTTP_HEADERS)) {
-                lambdaMap[LambdaType.HTTP_HEADERS] =
-                    createHttpHeaders(this, edgeLambdaRole);
+                lambdaMap.addLambda(LambdaType.HTTP_HEADERS, createHttpHeaders(this, edgeLambdaRole));
+            }
+
+            if (lProps.lambdaTypes.includes(FunctionType.INDEX_HTML)) {
+                lambdaMap.addFunction(FunctionType.INDEX_HTML, createIndexHtml(this, edgeLambdaRole));
             }
 
             // handle ip restrictions
@@ -122,7 +125,7 @@ export class CloudfrontCdkStack extends Stack {
                 for (const key of Object.keys(lProps.lambdaParameters.ipRestrictions)) {
                     const restriction = lProps.lambdaParameters.ipRestrictions[key];
 
-                    lambdaMap[`IP_${key}`] = createIpRestriction(this, edgeLambdaRole, key, restriction);
+                    lambdaMap.addRestriction(key, createIpRestriction(this, edgeLambdaRole, key, restriction));
                 }
             }
         }
