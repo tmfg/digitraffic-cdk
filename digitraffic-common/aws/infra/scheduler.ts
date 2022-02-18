@@ -25,6 +25,10 @@ export class Scheduler extends Rule {
         return Scheduler.every(stack, ruleName, Duration.hours(1), lambda);
     }
 
+    static everyDay(stack: Construct, ruleName: string, lambda?: Function) {
+        return Scheduler.every(stack, ruleName, Duration.days(1), lambda);
+    }
+
     static every(stack: Construct, ruleName: string, duration: Duration, lambda?: Function) {
         return new Scheduler(stack, ruleName, Schedule.rate(duration), lambda);
     }
