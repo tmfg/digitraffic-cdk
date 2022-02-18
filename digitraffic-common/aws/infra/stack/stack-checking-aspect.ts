@@ -100,8 +100,17 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private static isValidPath(path: string) {
-        return path.includes('{') || paramCase(path) === path;
+    private static isValidPath(path: string): boolean {
+        // if path includes . or { check only the trailing part of path
+        if (path.includes('.')) {
+            return this.isValidPath(path.split('.')[0]);
+        }
+
+        if (path.includes('{')) {
+            return this.isValidPath(path.split('{')[0]);
+        }
+
+        return paramCase(path) === path;
     }
 
     private static isValidQueryString(name: string) {
