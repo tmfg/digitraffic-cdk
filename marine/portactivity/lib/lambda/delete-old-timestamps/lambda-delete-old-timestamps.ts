@@ -4,6 +4,6 @@ import {PortactivityEnvKeys} from "../../keys";
 
 export function handler() {
     return withSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async () => {
-        await TimestampsService.deleteOldTimestamps();
+        await TimestampsService.deleteOldTimestampsAndPilotages();
     });
 }

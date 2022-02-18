@@ -1,4 +1,12 @@
-import {dbTestBase, findAll, insert, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
+import {
+    dbTestBase,
+    findAll, getPilotagesCount,
+    insert,
+    insertPilotage,
+    insertPortAreaDetails,
+    insertPortCall,
+    insertVessel,
+} from "../db-testutil";
 import * as pgPromise from "pg-promise";
 import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import moment from 'moment-timezone';
@@ -221,6 +229,25 @@ describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const ships = await TimestampsService.findETAShipsByLocode([locode]);
 
         expect(ships.length).toBe(2);
+    });
+
+    test('deleteOldTimestampsAndPilotages - deletes both old timestamps and pilotages', async () => {
+        const olderThanAWeek = moment().subtract(7, 'day').toDate();
+        await insert(db, [newTimestamp({
+            eventTime: olderThanAWeek,
+        })]);
+        await insertPilotage(
+            db,
+            1,
+            'ACTIVE',
+            new Date(),
+            olderThanAWeek,
+        );
+
+        await TimestampsService.deleteOldTimestampsAndPilotages();
+
+        expect((await findAll(db)).length).toBe(0);
+        expect((await getPilotagesCount(db))).toBe(0);
     });
 
 }));

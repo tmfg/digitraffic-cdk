@@ -363,11 +363,15 @@ const FIND_IMO_BY_MMSI_SQL = `
 `.trim();
 
 const DELETE_OLD_TIMESTAMPS_SQL = `
-    DELETE FROM port_call_timestamp WHERE event_time < NOW() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}'
+    WITH deleted AS (
+        DELETE FROM port_call_timestamp WHERE event_time < now() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}' RETURNING *
+    ) SELECT COUNT(*) FROM deleted
 `.trim();
 
 const DELETE_OLD_PILOTAGES_SQL = `
-    DELETE FROM pilotage WHERE pilotage_end_time < NOW() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}'
+    WITH deleted AS (
+        DELETE FROM pilotage WHERE pilotage_end_time < NOW() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}' RETURNING *
+    ) SELECT COUNT(*) FROM deleted
 `.trim();
 
 export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
@@ -498,11 +502,14 @@ export async function findImoByMmsi(db: DTDatabase | DTTransaction, mmsi: number
     return null;
 }
 
-export function deleteOldTimestamps(db: DTTransaction) {
-    return db.batch([
-        db.none(DELETE_OLD_PILOTAGES_SQL),
-        db.none(DELETE_OLD_TIMESTAMPS_SQL),
-    ]);
+export async function deleteOldTimestamps(db: DTTransaction): Promise<number> {
+    const ret = await db.one(DELETE_OLD_TIMESTAMPS_SQL);
+    return ret.count;
+}
+
+export async function deleteOldPilotages(db: DTTransaction): Promise<number> {
+    const ret = await db.one(DELETE_OLD_PILOTAGES_SQL);
+    return ret.count;
 }
 
 export function createUpdateValues(e: ApiTimestamp): unknown[] {

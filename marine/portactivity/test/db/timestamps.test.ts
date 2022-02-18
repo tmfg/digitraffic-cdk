@@ -1,11 +1,11 @@
 import moment from 'moment';
-import {dbTestBase, findAll, insert, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
+import {dbTestBase, insert, insertPilotage, insertPortAreaDetails, insertPortCall, insertVessel} from "../db-testutil";
 import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import * as TimestampsDb from "../../lib/db/timestamps";
+import {DbTimestamp} from "../../lib/db/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {DTDatabase} from "digitraffic-common/database/database";
 import {EventSource} from "../../lib/model/eventsource";
-import {DbTimestamp} from "../../lib/db/timestamps";
 import {getRandomInteger} from "digitraffic-common/test/testutils";
 
 const EVENT_SOURCE = 'TEST';
@@ -463,25 +463,59 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
 
     test('deleteOldTimestamps - older than 7 days is deleted', async () => {
         await insert(db, [newTimestamp({
-            eventTime: moment().subtract(7, 'day').subtract(getRandomInteger(0, 999), 'hour').toDate(),
+            eventTime: olderThanAWeek(),
         })]);
 
-        await db.tx(t => TimestampsDb.deleteOldTimestamps(t));
+        const deletedCount = await db.tx(t => TimestampsDb.deleteOldTimestamps(t));
 
-        const timestamps = await findAll(db);
-        expect(timestamps.length).toBe(0);
+        expect(deletedCount).toBe(1);
     });
 
     test('deleteOldTimestamps - newer than 7 days old is not deleted', async () => {
         await insert(db, [newTimestamp({
-            eventTime: moment().subtract(7, 'day').add(getRandomInteger(1, 999), 'hour').toDate(),
+            eventTime: newerThanAWeek(),
         })]);
 
-        await db.tx(t => TimestampsDb.deleteOldTimestamps(t));
+        const deletedCount = await db.tx(t => TimestampsDb.deleteOldTimestamps(t));
 
-        const timestamps = await findAll(db);
-        expect(timestamps.length).toBe(1);
+        expect(deletedCount).toBe(0);
     });
+
+    test('deleteOldPilotages - older than 7 days is deleted', async () => {
+        await insertPilotage(
+            db,
+            1,
+            'ACTIVE',
+            new Date(),
+            olderThanAWeek(),
+        );
+
+        const deletedCount = await db.tx(t => TimestampsDb.deleteOldPilotages(t));
+
+        expect(deletedCount).toBe(1);
+    });
+
+    test('deleteOldPilotages - newer than 7 days old is not deleted', async () => {
+        await insertPilotage(
+            db,
+            1,
+            'ACTIVE',
+            new Date(),
+            newerThanAWeek(),
+        );
+
+        const deletedCount = await db.tx(t => TimestampsDb.deleteOldPilotages(t));
+
+        expect(deletedCount).toBe(0);
+    });
+
+    function olderThanAWeek() {
+        return moment().subtract(7, 'day').subtract(getRandomInteger(0, 999), 'hour').toDate();
+    }
+
+    function newerThanAWeek() {
+        return moment().subtract(7, 'day').add(getRandomInteger(1, 999), 'hour').toDate();
+    }
 
     function createPortcall(timestamp: ApiTimestamp) {
         return db.tx(t => {
