@@ -10,12 +10,12 @@ import {Bucket} from 'aws-cdk-lib/aws-s3';
 import {CFBehavior, CFDistribution, CFDomain, S3Domain} from "./app-props";
 import {CfnDistribution} from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
 import {FunctionAssociation} from "aws-cdk-lib/aws-cloudfront/lib/function";
-import {LambdaMap} from "./lambda-map";
+import {LambdaHolder} from "./lambda-holder";
 
 export function createOriginConfig(stack: Stack,
     distribution: CFDistribution,
     oai: OriginAccessIdentity|null,
-    lambdaMap: LambdaMap)
+    lambdaMap: LambdaHolder)
     : SourceConfiguration {
     if (distribution instanceof S3Domain) {
         if (!oai) {
@@ -63,11 +63,11 @@ function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
     return headers;
 }
 
-function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: LambdaMap): Behavior[] {
+function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: LambdaHolder): Behavior[] {
     return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
-function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDefaultBehavior = false): Behavior {
+function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaHolder, isDefaultBehavior = false): Behavior {
     //console.info('creating behavior %s with default %d', b.path, isDefaultBehavior);
 
     const forwardedValues = {
@@ -96,17 +96,18 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDef
     };
 }
 
-function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaMap): FunctionAssociation[] | undefined {
+function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaHolder): FunctionAssociation[] | undefined {
     const functionAssociations: FunctionAssociation[] = [];
 
     b.functionTypes.forEach(type => {
         functionAssociations.push(lambdaMap.getFunctionAssociation(type));
     });
 
-    return functionAssociations.length == 0 ? undefined : functionAssociations;
+    return functionAssociations;
+//    return functionAssociations.length == 0 ? undefined : functionAssociations;
 }
 
-function getLambdas(b: CFBehavior, lambdaMap: LambdaMap): LambdaFunctionAssociation[] | undefined {
+function getLambdas(b: CFBehavior, lambdaMap: LambdaHolder): LambdaFunctionAssociation[] | undefined {
     const lambdaFunctionAssociations: LambdaFunctionAssociation[] = [];
 
     b.lambdaTypes.forEach(type => {
@@ -117,7 +118,8 @@ function getLambdas(b: CFBehavior, lambdaMap: LambdaMap): LambdaFunctionAssociat
         lambdaFunctionAssociations.push(lambdaMap.getRestriction(b.ipRestriction));
     }
 
-    return lambdaFunctionAssociations.length == 0 ? undefined : lambdaFunctionAssociations;
+    return lambdaFunctionAssociations;
+//    return lambdaFunctionAssociations.length == 0 ? undefined : lambdaFunctionAssociations;
 }
 
 

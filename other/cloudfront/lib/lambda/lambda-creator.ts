@@ -14,58 +14,49 @@ export enum FunctionType {
     INDEX_HTML
 }
 
-export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role) {
+function readBodyWithVersion(fileName: string) {
     const versionString = new Date().toISOString();
-    const lambdaBody = fs.readFileSync('dist/lambda/lambda-gzip-requirement.js');
-    const functionBody = lambdaBody.toString()
-        .replace(/EXT_VERSION/gi, versionString);
+    const body = fs.readFileSync(fileName);
 
-    return createFunction(stack, edgeLambdaRole, 'gzip-requirement', functionBody);
+    return body.toString().replace(/EXT_VERSION/gi, versionString);
+}
+
+export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role) {
+    const body = readBodyWithVersion('dist/lambda/lambda-gzip-requirement.js');
+
+    return createFunction(stack, edgeLambdaRole, 'gzip-requirement', body);
 }
 
 export function createWeathercamRedirect(stack: Stack, edgeLambdaRole: Role, domainName: string, hostName: string) {
-    const versionString = new Date().toISOString();
-    const lambdaBody = fs.readFileSync('dist/lambda/lambda-redirect.js');
-    const functionBody = lambdaBody.toString()
+    const body = readBodyWithVersion('dist/lambda/lambda-redirect.js');
+    const functionBody = body.toString()
         .replace(/EXT_HOST_NAME/gi, hostName)
-        .replace(/EXT_DOMAIN_NAME/gi, domainName)
-        .replace(/EXT_VERSION/gi, versionString);
+        .replace(/EXT_DOMAIN_NAME/gi, domainName);
 
     return createFunction(stack, edgeLambdaRole, 'weathercam-redirect', functionBody);
 }
 
 export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role) {
-    const versionString = new Date().toISOString();
-    const lambdaBody = fs.readFileSync('dist/lambda/lambda-http-headers.js');
-    const functionBody = lambdaBody.toString()
-        .replace(/EXT_VERSION/gi, versionString);
+    const body = readBodyWithVersion('dist/lambda/lambda-http-headers.js');
 
-    return createFunction(stack, edgeLambdaRole, 'http-headers', functionBody);
+    return createFunction(stack, edgeLambdaRole, 'http-headers', body);
 }
 
 export function createIndexHtml(stack: Stack, edgeLambdaRole: Role) {
-    const versionString = new Date().toISOString();
-    const lambdaBody = fs.readFileSync('lib/lambda/lambda-index-html.js');
-    const functionBody = lambdaBody.toString()
-        .replace(/EXT_VERSION/gi, versionString);
+    const body = readBodyWithVersion('lib/lambda/lambda-index-html.js');
 
-    return createCloudfrontFunction(stack, 'index-html', functionBody);
+    return createCloudfrontFunction(stack, 'index-html', body);
 }
 
 export function createIpRestriction(stack: Stack, edgeLambdaRole: Role, path: string, ipList: string) {
-    const versionString = new Date().toISOString();
-    const lambdaBody = fs.readFileSync('dist/lambda/lambda-ip-restriction.js');
-    const functionBody = lambdaBody.toString()
-        .replace(/EXT_IP/gi, ipList)
-        .replace(/EXT_VERSION/gi, versionString);
+    const body = readBodyWithVersion('dist/lambda/lambda-ip-restriction.js');
+    const functionBody = body.toString().replace(/EXT_IP/gi, ipList);
 
     return createFunction(stack, edgeLambdaRole, `ip-restriction-${path}`, functionBody);
 }
 
 export function createCloudfrontFunction(stack: Stack, functionName: string, functionBody: string) {
     const cloudfrontFunction = new Cloudfront.Function(stack, functionName, {
-        //        runtime: Runtime.NODEJS_14_X,
-        //        handler: 'index.handler',
         code: Cloudfront.FunctionCode.fromInline(functionBody),
     });
 

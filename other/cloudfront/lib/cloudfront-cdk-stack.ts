@@ -14,7 +14,7 @@ import {
 import {createDistribution} from "./distribution-util";
 import {createRealtimeLogging, StreamingConfig} from "./streaming-util";
 import {StackCheckingAspect} from "digitraffic-common/aws/infra/stack/stack-checking-aspect";
-import {LambdaMap} from "./lambda-map";
+import {LambdaHolder} from "./lambda-holder";
 
 type ViewerPolicyMap = {
     [key: string]: string,
@@ -91,8 +91,8 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaRole;
     }
 
-    createLambdaMap(lProps: CFLambdaProps | undefined): LambdaMap {
-        const lambdaMap = new LambdaMap();
+    createLambdaMap(lProps: CFLambdaProps | undefined): LambdaHolder {
+        const lambdaMap = new LambdaHolder();
 
         if (lProps !== undefined) {
             const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
@@ -134,7 +134,7 @@ export class CloudfrontCdkStack extends Stack {
     }
 
     createDistribution(
-        distributionProps: Props, role: Role, lambdaMap: LambdaMap, streamingConfig: StreamingConfig, cloudfrontProps: CFProps,
+        distributionProps: Props, role: Role, lambdaMap: LambdaHolder, streamingConfig: StreamingConfig, cloudfrontProps: CFProps,
     ) {
         const oai = distributionProps.originAccessIdentity ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`) : null;
         const originConfigs = distributionProps.distributions.map(d => createOriginConfig(this, d, oai, lambdaMap));

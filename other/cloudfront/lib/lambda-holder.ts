@@ -4,7 +4,7 @@ import {FunctionEventType, LambdaEdgeEventType, LambdaFunctionAssociation} from 
 import {FunctionType, LambdaType} from "./lambda/lambda-creator";
 import {FunctionAssociation} from "aws-cdk-lib/aws-cloudfront/lib/function";
 
-export class LambdaMap {
+export class LambdaHolder {
     readonly lambdas: Record<number, IVersion> = {};
     readonly functions: Record<number, Cloudfront.Function> = {};
     readonly restrictions: Record<string, IVersion> = {};
@@ -23,14 +23,14 @@ export class LambdaMap {
 
     getFunctionAssociation(functionType: FunctionType): FunctionAssociation {
         return {
-            eventType: LambdaMap.getFunctionEventType(functionType),
+            eventType: LambdaHolder.getFunctionEventType(functionType),
             function: this.functions[functionType],
         };
     }
 
     getLambdaAssociation(lambdaType: LambdaType): LambdaFunctionAssociation {
         return {
-            eventType: LambdaMap.getLambdaEventType(lambdaType),
+            eventType: LambdaHolder.getLambdaEventType(lambdaType),
             lambdaFunction: this.lambdas[lambdaType],
         };
     }
