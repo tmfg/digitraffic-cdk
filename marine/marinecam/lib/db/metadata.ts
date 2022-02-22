@@ -7,7 +7,7 @@ const PS_CAMERA_IDS = new PreparedStatement({
     text: 'select id from camera where camera_group_id = $1',
 });
 
-const SQL_LIST_CAMERAS = "select id, name, camera_group_id, last_updated from camera where camera_group_id in ($1:list)";
+const SQL_LIST_CAMERAS = "select id, name, camera_group_id, last_updated, st_y(location::geometry) lat, st_x(location::geometry) long from camera where camera_group_id in ($1:list)";
 
 const PS_UPDATE_TIMESTAMP = new PreparedStatement({
     name: 'update-timestamp',
@@ -16,12 +16,16 @@ const PS_UPDATE_TIMESTAMP = new PreparedStatement({
 
 export async function getAllCameras(db: DTDatabase, usersGroups: string[]): Promise<Camera[]> {
     // Prepared statement use not possible due to dynamic IN-list
-    return (await db.manyOrNone(SQL_LIST_CAMERAS, [usersGroups])).map((x: DbCamera) => ({
-        id: x.id,
-        name: x.name,
-        cameraGroupId: x.camera_group_id,
-        lastUpdated: x.last_updated,
-    }));
+    return (await db.manyOrNone(SQL_LIST_CAMERAS, [usersGroups])).map((camera: DbCamera) => {
+        return {
+            id: camera.id,
+            name: camera.name,
+            cameraGroupId: camera.camera_group_id,
+            lastUpdated: camera.last_updated,
+            latitude: camera.lat,
+            longitude: camera.long,
+        };
+    });
 }
 
 export function updateCameraMetadata(db: DTDatabase, cameraIds: string[], updated: Date): Promise<PromiseSettledResult<null>[]> {

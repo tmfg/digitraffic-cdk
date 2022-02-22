@@ -11,6 +11,7 @@ export function storeImage(cameraId: string, image: string, bucketName: string):
 
     // for local testing
     if (bucketName === '') {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
         const fs = require('fs');
 
         console.info("storing image %s locally!", cameraId);
