@@ -26,8 +26,8 @@ export function insertCameraGroup(db: DTDatabase, id: string, name: string) {
 export function insertCamera(db: DTDatabase, id: string, name: string, groupId: string) {
     return db.tx(t => {
         return t.none(`
-            insert into camera(id, name, camera_group_id, last_updated)
-            values($1, $2, $3, current_date)
+            insert into camera(id, name, camera_group_id, last_updated, location)
+            values($1, $2, $3, current_date, 'POINT(1 1)')
         `, [id, name, groupId]);
     });
 }
