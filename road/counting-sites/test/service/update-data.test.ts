@@ -21,7 +21,9 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
     }
 
     async function assertDataInDb(expected: number, counterId: string, fn?: Function) {
-        const data = await findValues(db, counterId, '');
+        const data = await findValues(
+            db, 2015, 9, counterId, '',
+        );
         expect(data).toHaveLength(expected);
 
         if (fn) {

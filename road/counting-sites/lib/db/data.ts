@@ -8,11 +8,12 @@ const SQL_INSERT_VALUES =
     values (NEXTVAL('counting_site_data_id_seq'), $1, $2, $3, $4, $5)`;
 
 const SQL_FIND_VALUES =
-    `select csd.data_timestamp, csd.interval, csd.count, csd.status 
+    `select csd.counter_id, csd.data_timestamp, csd.interval, csd.count, csd.status 
     from counting_site_data csd, counting_site_counter csc
-    where csd.counter_id = csc.id 
-    and (csd.counter_id = $1 or $1 is null)
-    and (csc.domain_name = $2 or $2 is null)
+    where csd.counter_id = csc.id
+    and data_timestamp >= $1 and data_timestamp < $2
+    and (csc.domain_name = $3 or $3 is null)
+    and (csd.counter_id = $4 or $4 is null)
     order by 1`;
 
 const SQL_FIND_VALUES_FOR_MONTH =
@@ -46,8 +47,13 @@ export function insertCounterValues(db: DTDatabase, siteId: number, interval: nu
     }));
 }
 
-export function findValues(db: DTDatabase, counterId: string, domainName: string): Promise<DbData[]> {
-    return db.manyOrNone(PS_GET_VALUES,[nullNumber(counterId), nullString(domainName)]);
+export function findValues(
+    db: DTDatabase, year: number, month: number, counterId: string, domainName: string,
+): Promise<DbData[]> {
+    const startDate = new Date(Date.UTC(year, month - 1, 1));
+    const endDate = new Date(new Date(startDate).setMonth(month));
+
+    return db.manyOrNone(PS_GET_VALUES,[startDate, endDate, nullString(domainName), nullNumber(counterId)]);
 }
 
 export function findDataForMonth(

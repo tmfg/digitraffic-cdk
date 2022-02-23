@@ -51,10 +51,17 @@ export function getValuesForMonth(year: number, month: number, domainName: strin
     });
 }
 
-export function findCounterValues(counterId = "", domainName = "") {
+export function findCounterValues(year?: number, month?: number, counterId = "", domainName = "") {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return DataDb.findValues(db, counterId, domainName);
+        return DataDb.findValues(
+            db,
+            year || new Date().getUTCFullYear(),
+            month || new Date().getUTCMonth() + 1,
+            counterId,
+            domainName,
+        );
     }).then(data => data.map(row => ({
+        counterId: row.counter_id,
         dataTimestamp: row.data_timestamp,
         interval: row.interval,
         count: row.count,

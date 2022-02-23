@@ -19,7 +19,7 @@ const DIRECTIONS_URL = BASE_URL + "directions";
 
 const VALUES_URL = BASE_URL + "values";
 const COUNTERS_URL = BASE_URL + "counters";
-const CSV_URL = BASE_URL + "csv-values";
+const CSV_URL = BASE_URL + "values.csv";
 
 export const handler = async () => {
     const checker = await UrlChecker.createV2();

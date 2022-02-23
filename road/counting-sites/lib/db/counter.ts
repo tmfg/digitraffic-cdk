@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {ApiCounter, DbCounter} from "../model/counter";
-import {Feature, FeatureCollection} from "geojson";
+import {FeatureCollection} from "geojson";
 import {DTDatabase} from "digitraffic-common/database/database";
 
 const SQL_ALL_COUNTERS =

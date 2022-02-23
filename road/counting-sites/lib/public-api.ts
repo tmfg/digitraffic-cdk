@@ -64,14 +64,18 @@ export class PublicApi {
             DocumentationPart.method(COUNTING_SITE_TAGS, 'GetCounter', 'Return single counter'),
             DocumentationPart.pathParameter('counter_id', 'Counter id'));
 
-        this.publicApi.documentResource(this.valuesResource,
-            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetData', 'Return counter values'),
+        this.publicApi.documentResource(
+            this.valuesResource,
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetData', 'Return counter values.  If no year&month specified, current month will be used.'),
             DocumentationPart.queryParameter('counter_id', 'Counter id'),
-            DocumentationPart.queryParameter('domain_name', 'Domain name'));
+            DocumentationPart.queryParameter('domain_name', 'Domain name'),
+            DocumentationPart.queryParameter('year', 'Year'),
+            DocumentationPart.queryParameter('month', 'Month'),
+        );
 
         this.publicApi.documentResource(
             this.csvValuesResource,
-            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDataCSV', 'Return counter values in CSV'),
+            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDataCSV', 'Return counter values in CSV. If no year&month specified, current month will be used'),
             DocumentationPart.queryParameter('counter_id', 'Counter id'),
             DocumentationPart.queryParameter('domain_name', 'Domain name'),
             DocumentationPart.queryParameter('year', 'Year'),
@@ -82,16 +86,16 @@ export class PublicApi {
     createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
         const csResource = apiResource.addResource("counting-site");
-        const betaResource = csResource.addResource("beta");
+        const versionResource = csResource.addResource("beta");
 
-        this.valuesResource = betaResource.addResource("values");
-        this.csvValuesResource = betaResource.addResource("csv-values");
-        this.countersResource = betaResource.addResource("counters");
+        this.valuesResource = versionResource.addResource("values");
+        this.csvValuesResource = versionResource.addResource("values.csv");
+        this.countersResource = versionResource.addResource("counters");
         this.counterResource = this.countersResource.addResource("{counterId}");
 
-        this.userTypesResource = betaResource.addResource("user-types");
-        this.domainsResource = betaResource.addResource("domains");
-        this.directionsResource = betaResource.addResource("directions");
+        this.userTypesResource = versionResource.addResource("user-types");
+        this.domainsResource = versionResource.addResource("domains");
+        this.directionsResource = versionResource.addResource("directions");
     }
 
     createModels(publicApi: DigitrafficRestApi) {
@@ -200,11 +204,15 @@ export class PublicApi {
             requestParameters: {
                 'integration.request.querystring.counter_id': 'method.request.querystring.counter_id',
                 'integration.request.querystring.domain_name': 'method.request.querystring.domain_name',
+                'integration.request.querystring.year': 'method.request.querystring.year',
+                'integration.request.querystring.month': 'method.request.querystring.month',
             },
             requestTemplates: {
                 'application/json': JSON.stringify({
                     counterId: "$util.escapeJavaScript($input.params('counter_id'))",
                     domainName: "$util.escapeJavaScript($input.params('domain_name'))",
+                    year: "$util.escapeJavaScript($input.params('domain_name'))",
+                    month: "$util.escapeJavaScript($input.params('month'))",
                 }),
             },
             responses: [
@@ -219,6 +227,8 @@ export class PublicApi {
                 requestParameters: {
                     'method.request.querystring.counter_id': false,
                     'method.request.querystring.domain_name': false,
+                    'method.request.querystring.year': false,
+                    'method.request.querystring.month': false,
                 },
                 methodResponses: [
                     corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.jsonValuesResponseModel)),
