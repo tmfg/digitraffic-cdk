@@ -96,7 +96,7 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaHolder, is
     };
 }
 
-function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaHolder): FunctionAssociation[] | undefined {
+function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaHolder): FunctionAssociation[] {
     const functionAssociations: FunctionAssociation[] = [];
 
     b.functionTypes.forEach(type => {
@@ -104,10 +104,9 @@ function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaHolder): Functio
     });
 
     return functionAssociations;
-//    return functionAssociations.length == 0 ? undefined : functionAssociations;
 }
 
-function getLambdas(b: CFBehavior, lambdaMap: LambdaHolder): LambdaFunctionAssociation[] | undefined {
+function getLambdas(b: CFBehavior, lambdaMap: LambdaHolder): LambdaFunctionAssociation[] {
     const lambdaFunctionAssociations: LambdaFunctionAssociation[] = [];
 
     b.lambdaTypes.forEach(type => {
@@ -119,7 +118,6 @@ function getLambdas(b: CFBehavior, lambdaMap: LambdaHolder): LambdaFunctionAssoc
     }
 
     return lambdaFunctionAssociations;
-//    return lambdaFunctionAssociations.length == 0 ? undefined : lambdaFunctionAssociations;
 }
 
 
