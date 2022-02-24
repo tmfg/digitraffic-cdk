@@ -222,7 +222,7 @@ export type CFProps = {
     readonly elasticProps: ElasticProps,
     readonly elasticAppName: string,
     readonly props: Props[],
-    readonly lambdaProps?: CFLambdaProps,
+    readonly lambdaParameters?: CFLambdaParameters
 }
 
 export type CFLambdaParameters = {
@@ -231,9 +231,4 @@ export type CFLambdaParameters = {
     readonly ipRestrictions?: {
         [key: string]: string,
     },
-}
-
-export type CFLambdaProps = {
-    readonly lambdaTypes: (LambdaType | FunctionType)[],
-    readonly lambdaParameters?: CFLambdaParameters
 }

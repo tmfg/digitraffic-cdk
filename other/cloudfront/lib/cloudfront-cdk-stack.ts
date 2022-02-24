@@ -3,7 +3,7 @@ import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincip
 import {Construct} from "constructs";
 import {Aspects, Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig} from "./origin-configs";
-import {CFDistribution, CFLambdaProps, CFProps, ElasticProps, Props} from './app-props';
+import {CFDistribution, CFLambdaParameters, CFProps, ElasticProps, Props} from './app-props';
 import {
     createGzipRequirement,
     createHttpHeaders, createIndexHtml,
@@ -30,7 +30,7 @@ export class CloudfrontCdkStack extends Stack {
 
         this.validateDefaultBehaviors(cloudfrontProps.props);
 
-        const lambdaMap = this.createLambdaMap(cloudfrontProps.lambdaProps);
+        const lambdaMap = this.createLambdaMap(cloudfrontProps.props, cloudfrontProps.lambdaParameters);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
         const streamingConfig = createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps);
 
@@ -91,44 +91,70 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaRole;
     }
 
-    createLambdaMap(lProps: CFLambdaProps | undefined): LambdaHolder {
-        const lambdaMap = new LambdaHolder();
+    findLambdaTypes(props: Props[]) {
+        const lambdaTypes = new Set();
+        const functionTypes = new Set();
+        const ipRestrictions = new Set<string>();
 
-        if (lProps !== undefined) {
-            const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
-                assumedBy: new CompositePrincipal(new ServicePrincipal("lambda.amazonaws.com"),
-                    new ServicePrincipal("edgelambda.amazonaws.com")),
-                managedPolicies: [
-                    ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
-                ],
+        props.flatMap(p => p.distributions)
+            .flatMap(d => d.behaviors)
+            .forEach(b => {
+                b.lambdaTypes.forEach(type => lambdaTypes.add(type));
+                b.functionTypes.forEach(type => functionTypes.add(type));
+                if (b.ipRestriction) {
+                    ipRestrictions.add(b.ipRestriction);
+                }
             });
 
-            if (lProps.lambdaTypes.includes(LambdaType.WEATHERCAM_REDIRECT)) {
+        return {lambdaTypes, functionTypes, ipRestrictions};
+    }
+
+    createLambdaMap(props: Props[], lParameters: CFLambdaParameters | undefined): LambdaHolder {
+        const lambdaMap = new LambdaHolder();
+
+        const types = this.findLambdaTypes(props);
+
+        const edgeLambdaRole = new Role(this, 'edgeLambdaRole', {
+            assumedBy: new CompositePrincipal(new ServicePrincipal("lambda.amazonaws.com"),
+                new ServicePrincipal("edgelambda.amazonaws.com")),
+            managedPolicies: [
+                ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole"),
+            ],
+        });
+
+        if (types.lambdaTypes.has(LambdaType.WEATHERCAM_REDIRECT)) {
+            if (!lParameters?.weathercamDomainName) {
+                throw new Error("Missing lambdaParameter weathercamDomainName");
+            } else if (!lParameters?.weathercamHostName) {
+                throw new Error("Missing lambdaParameter weathercamHostName");
+            } else {
                 lambdaMap.addLambda(LambdaType.WEATHERCAM_REDIRECT,
-                    createWeathercamRedirect(this, edgeLambdaRole, lProps.lambdaParameters!.weathercamDomainName!, lProps.lambdaParameters!.weathercamHostName!));
-            }
-
-            if (lProps.lambdaTypes.includes(LambdaType.GZIP_REQUIREMENT)) {
-                lambdaMap.addLambda(LambdaType.GZIP_REQUIREMENT, createGzipRequirement(this, edgeLambdaRole));
-            }
-
-            if (lProps.lambdaTypes.includes(LambdaType.HTTP_HEADERS)) {
-                lambdaMap.addLambda(LambdaType.HTTP_HEADERS, createHttpHeaders(this, edgeLambdaRole));
-            }
-
-            if (lProps.lambdaTypes.includes(FunctionType.INDEX_HTML)) {
-                lambdaMap.addFunction(FunctionType.INDEX_HTML, createIndexHtml(this, edgeLambdaRole));
-            }
-
-            // handle ip restrictions
-            if (lProps.lambdaParameters && lProps.lambdaParameters.ipRestrictions) {
-                for (const key of Object.keys(lProps.lambdaParameters.ipRestrictions)) {
-                    const restriction = lProps.lambdaParameters.ipRestrictions[key];
-
-                    lambdaMap.addRestriction(key, createIpRestriction(this, edgeLambdaRole, key, restriction));
-                }
+                    createWeathercamRedirect(this, edgeLambdaRole, lParameters.weathercamDomainName!, lParameters.weathercamHostName!));
             }
         }
+
+        if (types.lambdaTypes.has(LambdaType.GZIP_REQUIREMENT)) {
+            lambdaMap.addLambda(LambdaType.GZIP_REQUIREMENT, createGzipRequirement(this, edgeLambdaRole));
+        }
+
+        if (types.lambdaTypes.has(LambdaType.HTTP_HEADERS)) {
+            lambdaMap.addLambda(LambdaType.HTTP_HEADERS, createHttpHeaders(this, edgeLambdaRole));
+        }
+
+        if (types.functionTypes.has(FunctionType.INDEX_HTML)) {
+            lambdaMap.addFunction(FunctionType.INDEX_HTML, createIndexHtml(this, edgeLambdaRole));
+        }
+
+        // handle ip restrictions
+        const ipRestrictions = lParameters?.ipRestrictions;
+
+        types.ipRestrictions.forEach(key => {
+            if (!ipRestrictions || !ipRestrictions[key]) {
+                throw new Error("missing lambdaParameter ip restriction " + key);
+            } else {
+                lambdaMap.addRestriction(key, createIpRestriction(this, edgeLambdaRole, key, ipRestrictions[key]));
+            }
+        });
 
         return lambdaMap;
     }
