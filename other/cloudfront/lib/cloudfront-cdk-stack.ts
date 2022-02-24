@@ -1,7 +1,7 @@
 import {CfnDistribution, OriginAccessIdentity} from 'aws-cdk-lib/aws-cloudfront';
 import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
-import {Aspects, Stack, StackProps} from "aws-cdk-lib";
+import {Annotations, Aspects, Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig} from "./origin-configs";
 import {CFDistribution, CFLambdaParameters, CFProps, ElasticProps, Props} from './app-props';
 import {
@@ -48,10 +48,10 @@ export class CloudfrontCdkStack extends Stack {
                 .filter(b => b.path === "*");
 
             if (defaults.length === 0) {
-                console.error("no defaults for " + distribution.distributionName);
+                Annotations.of(this).addError("no defaults for " + distribution.distributionName);
             } else if (defaults.length > 1) {
-                console.error("multiple defaults for " + distribution.distributionName);
-                console.error(defaults);
+                Annotations.of(this).addError("multiple defaults for " + distribution.distributionName);
+                console.error("defaults:%s", defaults);
             }
         });
     }
@@ -149,10 +149,10 @@ export class CloudfrontCdkStack extends Stack {
         const ipRestrictions = lParameters?.ipRestrictions;
 
         types.ipRestrictions.forEach(key => {
-            if (!ipRestrictions || !ipRestrictions[key]) {
-                throw new Error("missing lambdaParameter ip restriction " + key);
-            } else {
+            if (ipRestrictions && ipRestrictions[key]) {
                 lambdaMap.addRestriction(key, createIpRestriction(this, edgeLambdaRole, key, ipRestrictions[key]));
+            } else {
+                throw new Error("missing lambdaParameter ip restriction " + key);
             }
         });
 
