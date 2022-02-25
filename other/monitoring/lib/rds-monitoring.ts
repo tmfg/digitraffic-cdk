@@ -33,13 +33,22 @@ export class RdsMonitoring {
         this.createAlarm('VolumeReadIOPS', cluster.metricVolumeReadIOPs(), volumeReadIOPSLimit);
         this.createAlarm('Deadlocks', cluster.metricDeadlocks());
 
-        this.createEventSubscription();
+        this.createEventSubscriptions();
     }
 
-    createEventSubscription() {
-        const subscriptionName = `DB-${this.stack.stackName}-subscription`;
+    createEventSubscriptions() {
+        this.createEventSubscription('db-instance', ['availability', 'configuration change', 'read replica', 'maintenance', 'failure']);
+        this.createEventSubscription('db-cluster');
+        this.createEventSubscription('db-parameter-group');
+        this.createEventSubscription('db-security-group');
+    }
+
+    createEventSubscription(sourceType: string, eventCategories: string[] = []) {
+        const subscriptionName = `Subscription-${this.stack.stackName}-${sourceType}`;
         return new CfnEventSubscription(this.stack, subscriptionName, {
             snsTopicArn: this.alarmsTopic.topicArn,
+            eventCategories,
+            sourceType,
         });
     }
 
