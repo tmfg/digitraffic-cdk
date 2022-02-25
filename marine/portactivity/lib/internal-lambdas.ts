@@ -58,7 +58,7 @@ export function create(stack: DigitrafficStack,
     );
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(stack, queueAndDLQ.queue);
     const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(stack, queueAndDLQ.queue);
-    const deleteOldTimestampsLambda = createOldTimestampsLambda(stack);
+    const deleteOldTimestampsLambda = createDeleteOldTimestampsLambda(stack);
 
     stack.grantSecret(
         cpqLambda,
@@ -138,7 +138,7 @@ function createUpdateTimestampsFromPilotwebLambda(stack: DigitrafficStack, queue
     return lambda;
 }
 
-function createOldTimestampsLambda(stack: DigitrafficStack): MonitoredFunction {
+function createDeleteOldTimestampsLambda(stack: DigitrafficStack): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
     return MonitoredFunction.createV2(stack, 'delete-old-timestamps', environment, {
         memorySize: 128,
