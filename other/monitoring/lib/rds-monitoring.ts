@@ -1,6 +1,6 @@
 import {DBConfiguration} from "./app-props";
 import {Stack} from "aws-cdk-lib";
-import {DatabaseCluster, DatabaseClusterEngine} from "aws-cdk-lib/aws-rds";
+import {CfnEventSubscription, DatabaseCluster, DatabaseClusterEngine} from "aws-cdk-lib/aws-rds";
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {Alarm, ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
 import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
@@ -32,6 +32,15 @@ export class RdsMonitoring {
         this.createAlarm('VolumeWriteIOPS', cluster.metricVolumeWriteIOPs(), volumeWriteIOPSLimit);
         this.createAlarm('VolumeReadIOPS', cluster.metricVolumeReadIOPs(), volumeReadIOPSLimit);
         this.createAlarm('Deadlocks', cluster.metricDeadlocks());
+
+        this.createEventSubscription();
+    }
+
+    createEventSubscription() {
+        const subscriptionName = `DB-${this.stack.stackName}-subscription`;
+        return new CfnEventSubscription(this.stack, subscriptionName, {
+            snsTopicArn: this.alarmsTopic.topicArn,
+        });
     }
 
     createAlarm(name: string, metric: Metric, threshold = 1, comparisonOperator = ComparisonOperator.GREATER_THAN_THRESHOLD) {
