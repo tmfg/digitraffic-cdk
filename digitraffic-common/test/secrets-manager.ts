@@ -15,6 +15,8 @@ export function stubSecretsManager() {
     };
 
     sinon.stub(AWS, 'SecretsManager').returns(smStub);
+
+    return smStub.getSecretValue;
 }
 
 export function mockSecret<Secret>(secret: Secret) {

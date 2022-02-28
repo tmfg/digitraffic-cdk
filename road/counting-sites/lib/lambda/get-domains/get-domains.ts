@@ -1,15 +1,14 @@
-import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import * as CountingSitesService from "../../service/counting-sites";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 
-const secretId = process.env.SECRET_ID as string;
+const holder = SecretHolder.create();
 
-export const handler = () => {
-    return withDbSecret(secretId, () => {
-        const start = Date.now();
+export const handler = async () => {
+    await holder.setDatabaseCredentials();
 
-        return CountingSitesService.getDomains().finally(() => {
-            console.info("method=CountingSites.GetDomains tookMs=%d", (Date.now() - start));
-        });
+    const start = Date.now();
+
+    return CountingSitesService.getDomains().finally(() => {
+        console.info("method=CountingSites.GetDomains tookMs=%d", (Date.now() - start));
     });
 };
-
