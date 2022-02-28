@@ -1,8 +1,9 @@
 import {MaintenanceTrackingMunicipalitySecret} from "../../model/maintenance-tracking-municipality-secret";
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
-import {AutoriUpdate, TrackingSaveResult} from "../../service/autori-update";
+import {AutoriUpdate} from "../../service/autori-update";
 import {AutoriApi} from "../../api/autori";
+import {TrackingSaveResult} from "../../model/service-data";
 
 const secretId = process.env.SECRET_ID as string;
 const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] as string;

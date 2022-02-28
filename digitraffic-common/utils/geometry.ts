@@ -1,6 +1,9 @@
-import {Feature, FeatureCollection, Geometry, Position} from "geojson";
+import {Feature, FeatureCollection, Geometry, Position, Point, LineString} from "geojson";
 
 export const SRID_WGS84 = 4326;
+
+// EPSG:3067 -> metric for distance
+export const SRID_METRIC = 3067;
 
 export function createGeometry(geometry: Geometry): string {
     if (geometry.type === 'LineString') {
@@ -43,6 +46,10 @@ function coordinatePair(coordinate: Position): string {
     return `${coordinate[0]} ${coordinate[1]}`;
 }
 
+export function pointFromCoordinates(xLon: number, yLat: number): string {
+    return `ST_SetSRID( ST_Point(${xLon} ${yLat}), ${SRID_WGS84})`;
+}
+
 /**
  * Create a FeatureCollection from a list of features with a 'last updated' property
  * @param features List of Features
@@ -65,4 +72,58 @@ export function isValidGeoJson<T>(json: T): boolean {
 
 export function isFeatureCollection<T>(json: T): boolean {
     return geoJsonValidator.isFeatureCollection(json);
+}
+
+const DEGREES_TO_RADIANS = 0.017453292519943295; // = Math.PI / 180
+const EARTH_RADIUS_KM = 6371;
+
+
+/**
+ * Returns the distance between this and given GeoJSON point in kilometers. Doesn't take in account altitude.
+ * Based on the following Stack Overflow question:
+ * http://stackoverflow.com/questions/27928/calculate-distance-between-two-latitude-longitude-points-haversine-formula,
+ * which is based on https://en.wikipedia.org/wiki/Haversine_formula (error rate: ~0.55%).
+ */
+export function distanceBetweenWGS84PointsInKm(fromXLon:number, fromYLat:number, toXLon:number, toYLat:number): number  {
+
+    const diffLat = toRadians(toYLat - fromYLat);
+    const diffLon = toRadians(toXLon - fromXLon);
+
+    const a =
+        Math.sin(diffLat / 2) * Math.sin(diffLat / 2) +
+        Math.cos(toRadians(fromYLat)) * Math.cos(toRadians(toYLat)) *
+        Math.sin(diffLon / 2) * Math.sin(diffLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return EARTH_RADIUS_KM * c;
+}
+
+export function distanceBetweenPositionsInKm(pos1: Position, pos2: Position) {
+    return distanceBetweenWGS84PointsInKm(pos1[0], pos1[1], pos2[0], pos2[1]);
+}
+
+export function distanceBetweenPositionsInM(pos1: Position, pos2: Position) {
+    return distanceBetweenPositionsInKm(pos1, pos2) * 1000; // km -> m
+}
+
+// Converts numeric degrees to radians
+function toRadians(angdeg:number) {
+    return angdeg * DEGREES_TO_RADIANS;
+}
+
+export class GeoJsonPoint implements Point {
+    readonly type = "Point";
+    readonly coordinates: Position;
+
+    constructor(coordinates: Position) {
+        this.coordinates = coordinates;
+    }
+}
+
+export class GeoJsonLineString implements LineString {
+    readonly type = "LineString";
+    readonly coordinates: Position[];
+
+    constructor(coordinates: Position[]) {
+        this.coordinates = coordinates;
+    }
 }

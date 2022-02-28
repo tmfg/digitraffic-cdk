@@ -1,6 +1,6 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/data";
+import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
 import moment from "moment";
 import {DbDomainContract} from "../model/db-data";
 
@@ -85,10 +85,10 @@ export class AutoriApi {
      * Gets next data after given time and period
      * @param contract id of the contract
      * @param from data that has been modified after (exclusive) this
-     * @param periodMinutes how long period of data to fetch in hours
+     * @param periodInMinutes how long period of data to fetch in hours
      */
-    public getNextRouteDataForContract( contract: DbDomainContract, from: Date, periodMinutes : number): Promise<ApiRouteData[]> {
-        const to = moment(from).add(periodMinutes, 'hours').add(1, 'ms'); // End and start are exclusive
+    public getNextRouteDataForContract( contract: DbDomainContract, from: Date, periodInMinutes : number): Promise<ApiRouteData[]> {
+        const to = moment(from).add(periodInMinutes, 'hours').add(1, 'ms'); // End and start are exclusive
         return this.getRouteDataForContract(contract, from, to.toDate())
             .then((data) => {
                 if (data.length == 0) {
@@ -98,8 +98,8 @@ export class AutoriApi {
                     }
                     // subtract 1ms as api start and end dates are exclusive
                     const nextFrom = moment(to).subtract(1, 'ms');
-                    console.debug(`DEBUG method=getNextRouteDataForContract going to call getNextRouteDataForContract(${contract}, ${nextFrom.toDate().toISOString()}, ${periodMinutes})`);
-                    return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodMinutes);
+                    console.debug(`DEBUG method=getNextRouteDataForContract going to call getNextRouteDataForContract(${contract}, ${nextFrom.toDate().toISOString()}, ${periodInMinutes})`);
+                    return this.getNextRouteDataForContract(contract, nextFrom.toDate(), periodInMinutes);
                 }
                 return data;
             }).catch(error => {

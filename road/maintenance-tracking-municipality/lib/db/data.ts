@@ -1,7 +1,10 @@
 import {PreparedStatement} from "pg-promise";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
-import {SRID_WGS84} from "digitraffic-common/utils/geometry";
-import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/db-data";
+import {SRID_WGS84, SRID_METRIC, pointFromCoordinates, createGeometry} from "digitraffic-common/utils/geometry";
+
+import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/db-data";
+import {Position} from "geojson";
+
 
 
 const SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT =
@@ -83,11 +86,32 @@ export function insertNewTasks(db: DTDatabase, dbTaskMapping: DbDomainTaskMappin
     });
 }
 
+const PS_UPDATE_MAINTENANCE_TRACKING_END_POINT = new PreparedStatement({
+    name: 'PS_UPDATE_MAINTENANCE_TRACKING_END_POINT',
+    text: `UPDATE maintenance_tracking 
+           SET finished = true,
+               end_time = $2,
+               last_point = ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84})),
+               line_string = ST_MakeLine(coalesce(line_string, last_point), ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84})))
+           WHERE finished = false
+             AND id = $1`,
+});
 
+export function appendMaintenanceTrackingEndPoint(db: DTDatabase | DTTransaction, id: bigint, endPosition: Position, endTime: Date) {
+    return db.none(PS_UPDATE_MAINTENANCE_TRACKING_END_POINT,
+        [id, endTime, `POINT(${endPosition[0]} ${endPosition[1]})`]);
+}
 
 const SQL_UPSERT_MAINTENANCE_TRACKING =
-    `INSERT INTO maintenance_tracking(id, sending_system, sending_time, last_point, line_string, work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id)
-     VALUES (NEXTVAL('seq_maintenance_tracking'), $1, $2, ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID_WGS84})), ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID_WGS84})), $5, $6, $7, $8, $9, $10, $11, $12)
+    `INSERT INTO maintenance_tracking(
+             id, sending_system, sending_time, 
+             last_point,
+             line_string,
+             work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id, previous_tracking_id)
+     VALUES (NEXTVAL('seq_maintenance_tracking'), $1, $2, 
+             ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID_WGS84})), 
+             ST_Simplify(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID_WGS84})), 0.00005, true), 
+             $5, $6, $7, $8, $9, $10, $11, $12, $13)
      RETURNING ID`;
 // Might come in use in future
 // ON CONFLICT(domain, message_original_id)
@@ -108,7 +132,6 @@ const PS_UPSERT_MAINTENANCE_TRACKING = new PreparedStatement({
 });
 
 
-
 const SQL_INSERT_MAINTENANCE_TRACKING_TASK =
     `INSERT INTO maintenance_tracking_task(maintenance_tracking_id, task)
      VALUES ($1, $2)`;
@@ -119,33 +142,45 @@ const PS_INSERT_MAINTENANCE_TRACKING_TASK = new PreparedStatement({
     text: SQL_INSERT_MAINTENANCE_TRACKING_TASK,
 });
 
-export function upsertMaintenanceTracking(db: DTTransaction, data: DbMaintenanceTracking[]): Promise<DbNumberId[]> {
 
-    const upsertTracking = async (tracking: DbMaintenanceTracking) => {
-
-        // console.info("method=upsertMaintenanceTracking INSERT: " + JSON.stringify(tracking));
-        const mtId: DbNumberId = await db.one(PS_UPSERT_MAINTENANCE_TRACKING,
-            [tracking.sending_system, tracking.sending_time, tracking.last_point, tracking.line_string, tracking.work_machine_id, tracking.start_time, tracking.end_time, tracking.direction, tracking.finished, tracking.domain, tracking.contract, tracking.message_original_id])
-            .catch((error) => {
-                console.error('method=upsertMaintenanceTracking failed', error);
-                throw error;
-            });
-
-        const insertHarjaTask = (harjaTask: string) => {
-            return db.none(PS_INSERT_MAINTENANCE_TRACKING_TASK, [mtId.id, harjaTask])
-                .catch((error) => {
-                    console.error(`method=upsertMaintenanceTracking insert task ${harjaTask} for tracking ${mtId.id} failed`, error);
-                    throw error;
-                });
-        };
-        await db.batch(tracking.tasks.map(insertHarjaTask));
-        return mtId;
-        // console.info(`method=upsertMaintenanceTracking id=${mtId.id} tasks: ${JSON.stringify(tracking.tasks)}`);
-    };
-
-    return Promise.all(data.map(upsertTracking));
+export function upsertMaintenanceTrackings(db: DTTransaction, data: DbMaintenanceTracking[]): Promise<DbNumberId[]> {
+    return Promise.all(data.map((tracking) => upsertMaintenanceTracking(db, tracking)));
 }
 
+export async function upsertMaintenanceTracking(tx: DTTransaction, tracking: DbMaintenanceTracking): Promise<DbNumberId> {
+
+    const lineString = tracking.line_string ? JSON.stringify(tracking.line_string) : null;
+    const mtId: DbNumberId = await tx.one(PS_UPSERT_MAINTENANCE_TRACKING,
+        [tracking.sending_system, tracking.sending_time, JSON.stringify(tracking.last_point), lineString, tracking.work_machine_id, tracking.start_time, tracking.end_time, tracking.direction, tracking.finished, tracking.domain, tracking.contract, tracking.message_original_id, tracking.previous_tracking_id])
+        .catch((error) => {
+            console.error('method=upsertMaintenanceTracking failed', error);
+            throw error;
+        });
+    if (tracking.previous_tracking_id) {
+        await updateMaintenanceTrackingFinished(tx, tracking.previous_tracking_id);
+    }
+
+    const insertHarjaTask = (harjaTask: string) => {
+        return tx.none(PS_INSERT_MAINTENANCE_TRACKING_TASK, [mtId.id, harjaTask])
+            .catch((error) => {
+                console.error(`method=upsertMaintenanceTracking insert task ${harjaTask} for tracking ${mtId.id} failed`, error);
+                throw error;
+            });
+    };
+    return tx.batch(tracking.tasks.map(insertHarjaTask)).then(() => mtId);
+}
+
+const PS_UPDATE_MAINTENANCE_TRACKING_FINISHED = new PreparedStatement({
+    name: 'PS_UPDATE_MAINTENANCE_TRACKING_FINISHED',
+    text: `UPDATE maintenance_tracking 
+           SET finished = true
+           WHERE finished = false
+             AND id = $1`,
+});
+
+export function updateMaintenanceTrackingFinished(db: DTDatabase | DTTransaction, id: bigint): Promise<null> {
+    return db.none(PS_UPDATE_MAINTENANCE_TRACKING_FINISHED, [id]);
+}
 
 
 const SQL_UPSERT_MAINTENANCE_TRACKING_WORK_MACHINE =
@@ -166,7 +201,33 @@ export function upsertWorkMachine(db: DTTransaction, data: DbWorkMachine) : Prom
 
 
 
-const SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_SOURCE = `
+const PS_FIND_LATEST_UNFINISHED_TRACKING = new PreparedStatement({
+    name: 'PS_FIND_LATEST_TRACKING_FOR_WORK_MACHINE',
+    text: `
+    select t.id
+         , ST_AsGeoJSON(t.last_point) last_point
+         , t.end_time
+         , t.work_machine_id
+         , t.finished
+         , array_agg(task.task order by task.task, 1) as tasks
+    from maintenance_tracking t
+    inner join maintenance_tracking_task task on t.id = task.maintenance_tracking_id
+    where domain = $1::text
+      and work_machine_id = $2::bigint
+    group by t.id, t.end_time
+    order by t.end_time desc
+    limit 1`,
+});
+
+export function findLatestTrackingForWorkMachine(db: DTDatabase, domainName: string, workMachineId: bigint) : Promise<DbLatestTracking | null> {
+    return db.oneOrNone(PS_FIND_LATEST_UNFINISHED_TRACKING,
+        [domainName, workMachineId]);
+}
+
+
+const PS_GET_CONTRACTS_WITH_SOURCE = new PreparedStatement({
+    name: 'PS_GET_MAINTENANCE_T_MUNICIPALITY_DOMAIN_CONTRACTS_WITH_SOURCE',
+    text: `
     SELECT c.domain,
            c.contract,
            c.name,
@@ -176,15 +237,15 @@ const SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_SOURCE = `
            c.data_last_updated
     FROM maintenance_tracking_domain_contract c 
     WHERE c.domain = $1
-      AND source is not null`;
-
-const PS_GET_CONTRACTS_WITH_SOURCE = new PreparedStatement({
-    name: 'GET_MAINTENANCE_T_MUNICIPALITY_DOMAIN_CONTRACTS_WITH_SOURCE',
-    text: SQL_GET_MAINTENANCE_TRACKING_DOMAIN_CONTRACTS_WITH_SOURCE,
+      AND source is not null`,
 });
 
 export function getContractsWithSource(db: DTDatabase, domainName: string): Promise<DbDomainContract[]> {
     return db.manyOrNone(PS_GET_CONTRACTS_WITH_SOURCE, [domainName]);
+}
+
+export function getContractWithSource(db: DTDatabase, domainName: string): Promise<DbDomainContract|null> {
+    return db.oneOrNone(PS_GET_CONTRACTS_WITH_SOURCE, [domainName]);
 }
 
 const SQL_GET_MAINTENANCE_TRACKING_DOMAIN_TASK_MAPPINGS = `

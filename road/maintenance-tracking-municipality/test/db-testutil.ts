@@ -1,5 +1,4 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
 import {DTDatabase} from "digitraffic-common/database/database";
 import {DbDomainContract, DbMaintenanceTracking} from "../lib/model/db-data";
 
@@ -18,6 +17,7 @@ export function dbTestBaseNoTruncate(fn: (db: DTDatabase) => void) {
 export function truncate(db: DTDatabase): Promise<void> {
     return db.tx(async t => {
         await t.none('TRUNCATE maintenance_tracking CASCADE');
+        await t.none('TRUNCATE maintenance_tracking_work_machine CASCADE');
         await t.none('TRUNCATE maintenance_tracking_domain_task_mapping CASCADE');
         await t.none('TRUNCATE maintenance_tracking_domain_contract CASCADE');
         await t.none('TRUNCATE maintenance_tracking_domain CASCADE');
@@ -46,8 +46,14 @@ export function insertDomaindTaskMapping(
     });
 }
 
+export function insertDbDomaindContract(db: DTDatabase, contract: DbDomainContract) {
+    return insertDomaindContract(
+        db, contract.domain, contract.contract, contract.name, contract.source, contract.start_date, contract.end_date,
+    );
+}
+
 export function insertDomaindContract(
-    db: DTDatabase, domainName: string, contract: string, name: string, source : string, startDate?: Date, endDate?: Date,
+    db: DTDatabase, domainName: string, contract: string, name: string, source? : string, startDate?: Date, endDate?: Date,
     dataLastUpdated?: Date,
 ): Promise<null> {
     return db.tx(t => {
@@ -89,21 +95,4 @@ export function findAllTrackings(db: DTDatabase, domainName: string): Promise<Db
                 group by tracking.id`,
         [domainName]);
     });
-}
-
-
-export async function withServer(port: number, url: string, response: string, fn: ((server: TestHttpServer) => void)): Promise<void> {
-    const server = new TestHttpServer();
-
-    const props = {
-        [url]: () => response,
-    };
-
-    server.listen(port, props, false);
-
-    try {
-        await fn(server);
-    } finally {
-        server.close();
-    }
 }
