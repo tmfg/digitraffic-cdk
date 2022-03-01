@@ -55,7 +55,7 @@ export class PaikanninUpdate {
                 return DataDb.getTaskMappings(db, domainName);
             });
 
-            return inDatabase(async (db: DTDatabase) => {
+            return inDatabase((db: DTDatabase) => {
 
                 return Promise.allSettled(events.map(async (device: ApiWorkeventDevice) => {
 
@@ -92,23 +92,26 @@ export class PaikanninUpdate {
                         if (latest &&
                             !latest.finished &&
                             maintenanceTrackings.length > 0) {
-                            const nextTracking = maintenanceTrackings[0];
+                            const nextTracking: DbMaintenanceTracking = maintenanceTrackings[0];
                             const previousEndPosition: Position = JSON.parse(latest.last_point).coordinates;
                             const nextStartPosition: Position = PaikanninUtils.getStartPosition(nextTracking);
                             if (PaikanninUtils.isExtendingPreviousTracking(previousEndPosition, nextStartPosition, latest.end_time, nextTracking.start_time)) {
                                 // Append new end point only, if it's distinct from the current end point
                                 if (PaikanninUtils.areDistinctPositions(previousEndPosition, nextStartPosition)) {
-                                    await DataDb.appendMaintenanceTrackingEndPoint(tx, latest.id, nextStartPosition, nextTracking.start_time);
+                                    await DataDb.appendMaintenanceTrackingEndPoint(
+                                        tx, latest.id, nextStartPosition, nextTracking.start_time, nextTracking.start_direction,
+                                    );
                                 }
 
                                 // If the task are the same, then set reference to previous tracking id
                                 if (PaikanninUtils.hasBothStringArraysSameValues(latest.tasks, nextTracking.tasks)) {
+                                    // eslint-disable-next-line camelcase
                                     nextTracking.previous_tracking_id = latest.id;
                                 }
                             }
                         }
 
-                        return Promise.allSettled(maintenanceTrackings.map(async (mt) => {
+                        return Promise.allSettled(maintenanceTrackings.map((mt) => {
 
                             // console.info(`method=PaikanninUpdate.updateTrackingsForDomain upsertMaintenanceTracking...`);
                             return DataDb.upsertMaintenanceTracking(tx, mt)
@@ -179,6 +182,8 @@ export class PaikanninUpdate {
             contract: contract.contract,
             message_original_id: 'none',
             finished: true,
+            // This is additional meta data, not saved to eb but used to update previous tracking
+            start_direction: lastEvent.heading,
             /* eslint-enable camelcase */
         };
     }
@@ -208,7 +213,7 @@ export class PaikanninUpdate {
         if (!events || events.length < 2) {
             return null;
         }
-        const coordinates: Position[] = events.reduce((coordinates: Position[], nextEvent) => {
+        const lineStringCoordinates: Position[] = events.reduce((coordinates: Position[], nextEvent) => {
             const nextCoordinate: Position = [nextEvent.lon, nextEvent.lat];
             if (coordinates.length > 0 ) {
                 const previousCoordinate: Position = coordinates[coordinates.length-1];
@@ -222,8 +227,8 @@ export class PaikanninUpdate {
             return coordinates;
         }, []);
 
-        if (coordinates.length > 1) {
-            return new GeoJsonLineString(coordinates);
+        if (lineStringCoordinates.length > 1) {
+            return new GeoJsonLineString(lineStringCoordinates);
         }
         return null;
     }

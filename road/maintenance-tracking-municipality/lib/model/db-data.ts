@@ -22,6 +22,8 @@ export type DbMaintenanceTracking = {
     readonly message_original_id: string
     readonly tasks: string[]
     previous_tracking_id?: bigint|null
+    // This is additional meta data, not saved to db, but used to update previous tracking
+    start_direction?: number //
 }
 
 export type DbLatestTracking = {

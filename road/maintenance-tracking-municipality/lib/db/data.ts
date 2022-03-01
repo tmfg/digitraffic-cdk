@@ -1,10 +1,9 @@
 import {PreparedStatement} from "pg-promise";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
-import {SRID_WGS84, SRID_METRIC, pointFromCoordinates, createGeometry} from "digitraffic-common/utils/geometry";
+import {SRID_WGS84} from "digitraffic-common/utils/geometry";
 
 import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/db-data";
 import {Position} from "geojson";
-
 
 
 const SQL_UPSERT_MAINTENANCE_TRACKING_DOMAIN_CONTRACT =
@@ -92,14 +91,17 @@ const PS_UPDATE_MAINTENANCE_TRACKING_END_POINT = new PreparedStatement({
            SET finished = true,
                end_time = $2,
                last_point = ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84})),
-               line_string = ST_MakeLine(coalesce(line_string, last_point), ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84})))
+               line_string = ST_MakeLine(coalesce(line_string, last_point), ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84}))),
+               direction = $4
            WHERE finished = false
              AND id = $1`,
 });
 
-export function appendMaintenanceTrackingEndPoint(db: DTDatabase | DTTransaction, id: bigint, endPosition: Position, endTime: Date) {
+export function appendMaintenanceTrackingEndPoint(
+    db: DTDatabase | DTTransaction, id: bigint, endPosition: Position, endTime: Date, direction?: number,
+) {
     return db.none(PS_UPDATE_MAINTENANCE_TRACKING_END_POINT,
-        [id, endTime, `POINT(${endPosition[0]} ${endPosition[1]})`]);
+        [id, endTime, `POINT(${endPosition[0]} ${endPosition[1]})`, direction]);
 }
 
 const SQL_UPSERT_MAINTENANCE_TRACKING =
@@ -205,7 +207,7 @@ const PS_FIND_LATEST_UNFINISHED_TRACKING = new PreparedStatement({
     name: 'PS_FIND_LATEST_TRACKING_FOR_WORK_MACHINE',
     text: `
     select t.id
-         , ST_AsGeoJSON(t.last_point) last_point
+         , ST_AsGeoJSON(t.last_point) as last_point
          , t.end_time
          , t.work_machine_id
          , t.finished
