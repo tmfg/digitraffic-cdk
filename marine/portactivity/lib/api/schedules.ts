@@ -8,8 +8,7 @@ export enum SchedulesDirection {
 }
 
 export class SchedulesApi {
-
-    private readonly url: string
+    private readonly url: string;
 
     constructor(url: string) {
         this.url = url;

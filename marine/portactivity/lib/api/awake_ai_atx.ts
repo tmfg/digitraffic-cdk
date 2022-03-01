@@ -93,11 +93,10 @@ export const SUBSCRIPTION_MESSAGE = {
 };
 
 export class AwakeAiATXApi {
-
-    private readonly url: string
-    private readonly apiKey: string
-    private readonly WebSocketClass: new (url: string) => WebSocket
-    private subscriptionId: string
+    private readonly url: string;
+    private readonly apiKey: string;
+    private readonly WebSocketClass: new (url: string) => WebSocket;
+    private subscriptionId: string;
 
     constructor(url: string, apiKey: string, WebSocketClass: new (url: string) => WebSocket) {
         this.url = url;
@@ -105,7 +104,7 @@ export class AwakeAiATXApi {
         this.WebSocketClass = WebSocketClass;
     }
 
-    async getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
+    getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
         const webSocket = new this.WebSocketClass(this.url + this.apiKey);
 
         webSocket.on('open', () => {

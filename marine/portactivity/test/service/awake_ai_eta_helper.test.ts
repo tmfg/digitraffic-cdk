@@ -4,7 +4,6 @@ import {EventSource} from "../../lib/model/eventsource";
 import {randomIMO, randomMMSI} from "../testdata";
 import {randomBoolean} from "digitraffic-common/test/testutils";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
-import moment from "moment-timezone";
 
 describe('Awake.AI ETA helper', () => {
 

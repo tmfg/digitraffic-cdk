@@ -7,15 +7,15 @@ import {
     insertPortCall,
     insertVessel,
 } from "../db-testutil";
-import * as pgPromise from "pg-promise";
 import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testdata";
 import moment from 'moment-timezone';
 import * as TimestampsService from "../../lib/service/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
 import * as R from "ramda";
+import {DTDatabase} from "digitraffic-common/database/database";
 
-describe('timestamps', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('timestamps', dbTestBase((db: DTDatabase) => {
 
     test('findAllTimestamps - locode', async () => {
         const timestamp = newTimestamp();

@@ -382,7 +382,7 @@ export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTi
     return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
-export async function removeTimestamps(db: DTDatabase | DTTransaction, source: string, sourceIds: string[]): Promise<number[]> {
+export function removeTimestamps(db: DTDatabase | DTTransaction, source: string, sourceIds: string[]): Promise<number[]> {
     if (sourceIds.length > 0) {
         return db.manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
             .then(array => array.map(object => object.id));
