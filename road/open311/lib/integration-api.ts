@@ -55,7 +55,7 @@ function createRequestsResource(
     const validator = addDefaultValidator(integrationApi);
     const apiResource = integrationApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
-    const open311Resource = v1Resource.addResource("open311");
+    const open311Resource = v1Resource.addResource("open311-integration");
     const requests = open311Resource.addResource("requests");
     const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
 
