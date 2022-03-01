@@ -277,8 +277,6 @@ export class AutoriUpdate {
      */
     private updateContracTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date): Promise<TrackingSaveResult> {
         console.info(`method=AutoriUpdate.updateContracTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`);
-        // routeData = await this.api.getNextRouteDataForContract(contract.contract, start, 24);
-        console.debug(`DEBUG method=AutoriUpdate.updateContracTrackings going to call getNextRouteDataForContract(${contract.contract}, ${apiDataUpdatedFrom.toISOString()}, 24)`);
         return this.api.getNextRouteDataForContract(contract, apiDataUpdatedFrom, AUTORI_MAX_MINUTES_AT_ONCE)
             .then(this.saveContracRoutesAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
             .catch((error) => {
