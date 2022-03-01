@@ -1,4 +1,3 @@
-import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import * as CountingSitesService from "../../service/counting-sites";
 import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 import {validate, ValuesQueryParameters} from "../../model/parameters";

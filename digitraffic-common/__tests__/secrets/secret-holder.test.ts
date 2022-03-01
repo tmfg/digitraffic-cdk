@@ -105,11 +105,11 @@ describe('SecretHolder - tests', () => {
 
         const callCount = stubSM.callCount;
 
-        const secret = await holder.get();
+        await holder.get();
         expect(stubSM.callCount).toEqual(callCount + 1);
 
         // gets cached secret
-        const secret2 = await holder.get();
+        await holder.get();
         expect(stubSM.callCount).toEqual(callCount + 1);
     });
 
@@ -122,14 +122,14 @@ describe('SecretHolder - tests', () => {
 
         const callCount = stubSM.callCount;
 
-        const secret = await holder.get();
+        await holder.get();
         expect(stubSM.callCount).toEqual(callCount + 1);
 
         // cache expires, fetches secret again
         const start = Date.now();
         while (Date.now() < start+2000);
 
-        const secret2 = await holder.get();
+        await holder.get();
         expect(stubSM.callCount).toEqual(callCount + 2);
     });
 });

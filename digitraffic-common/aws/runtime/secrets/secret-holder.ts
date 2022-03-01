@@ -1,14 +1,23 @@
 import {GenericSecret, getSecret} from "./secret";
 import {checkExpectedSecretKeys, DatabaseEnvironmentKeys, DbSecret} from "./dbsecret";
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const NodeTtl = require('node-ttl');
 
 const DEFAULT_PREFIX = '';
 const DEFAULT_SECRET_KEY = 'SECRET';
 const DEFAULT_CONFIGURATION = {
-    ttl: 1*60, // timeout secrets in 5 minutes
+    ttl: 5*60, // timeout secrets in 5 minutes
 };
 
+/**
+ * Utility class for getting secrets from Secret Manager.
+ * Supports prefix for secrets, checking of expected keys and ttl-configuration.
+ *
+ * By default, secrets are cached for 5 minutes and then reread from the Secrets Manager(This can be overridden with configuration).
+ *
+ * Supports setting the database environment paramaters from the secret too.
+ */
 export class SecretHolder<Secret> {
     private readonly secretId: string;
     private readonly prefix: string;
@@ -24,7 +33,7 @@ export class SecretHolder<Secret> {
         this.secretCache = new NodeTtl(configuration);
     }
 
-    async initSecret() {
+    private async initSecret() {
         const secretValue = await getSecret<Secret>(this.secretId);
 
         this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
