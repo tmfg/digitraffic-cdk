@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "postbuild": "esbuild lib/lambda/**/*.ts  --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
+    "postbuildz": "esbuild lib/lambda/**/*.ts  --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
     "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
@@ -16,6 +16,7 @@
   "devDependencies": {
     "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
+    "@types/geojson": "^7946.0.7",
     "@types/jest": "^26.0.22",
     "@types/node": "*",
     "@types/sinon": "^10.0.0",
@@ -33,6 +34,7 @@
   "dependencies": {
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
+    "digitraffic-common": "*",
     "moment": "*",
     "pg-promise": "*"
   },
