@@ -13,7 +13,7 @@ export const handler = (event: Record<string, string>) => {
         const fixedInHours = getFixed(event.fixed_in_hours);
 
         const faults = await findAllFaults(language, fixedInHours);
-        return LambdaResponse.ok(JSON.stringify(faults));
+        return LambdaResponse.okJson(faults);
     }).finally(() => {
         console.info("method=findAllFaults tookMs=%d", (Date.now() - start));
     }).catch(() => {
