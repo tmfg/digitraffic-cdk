@@ -3,6 +3,8 @@ import {ApiExcavationPermit} from "../model/excavation-permit";
 import {PermitResponse, PermitElement} from "../model/permit-xml";
 import moment from "moment";
 import * as xml2js from 'xml2js';
+import {inDatabaseReadonly} from "digitraffic-common/database/database";
+import {getActivePermitsGeojson} from "../db/excavation-permit";
 
 export async function getExcavationPermits(): Promise<ApiExcavationPermit[]> {
     const api = new PermitsApi();
@@ -13,9 +15,15 @@ export async function getExcavationPermits(): Promise<ApiExcavationPermit[]> {
         .map(permitElement => convertPermit(permitElement));
 }
 
+export function findPermitsInGeojson() {
+    return inDatabaseReadonly(db => {
+        return getActivePermitsGeojson(db);
+    });
+}
+
 function isValidExcavationPermit(permitElement: PermitElement): boolean {
     return permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi"] === "Kaivulupa"
-        && permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null
+        && permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null;
 }
 
 function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
@@ -29,7 +37,7 @@ function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
     });
 }
 
-async function xmlToJs(xml: string): Promise<PermitResponse> {
+function xmlToJs(xml: string): Promise<PermitResponse> {
     return xml2js.parseStringPromise(xml, {explicitArray: false});
 }
 
