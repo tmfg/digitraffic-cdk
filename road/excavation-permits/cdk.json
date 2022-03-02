@@ -1,0 +1,3 @@
+{
+  "app": "npx node bin/excavation-permits-app.js"
+}
