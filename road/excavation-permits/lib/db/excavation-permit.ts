@@ -1,7 +1,8 @@
 import {DTDatabase} from "../../../../digitraffic-common/database/database";
 import {PreparedStatement} from "pg-promise";
-import {ApiExcavationPermit} from "../model/excavation-permit";
-import {FeatureCollection} from "geojson";
+import {ApiExcavationPermit, DbPermit} from "../model/excavation-permit";
+import {FeatureCollection, Geometry as GeoJSONGeometry} from "geojson";
+import {Geometry} from "wkx";
 
 const SQL_INSERT_PERMIT =
     `INSERT INTO excavation_permits (id, subject, geometry, effective_from, effective_to)
@@ -25,14 +26,23 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
         ) as collection
      from excavation_permits`;
 
+const SQL_FIND_ALL_PERMITS =
+    `select id, subject, geometry, effective_from, effective_to
+     from excavation_permits`;
+
 const PS_INSERT_PERMIT = new PreparedStatement({
     name: 'insert-permit',
     text: SQL_INSERT_PERMIT,
 });
 
-const PS_FIND_ALL = new PreparedStatement({
+const PS_FIND_ALL_GEOJSON = new PreparedStatement({
     name: 'find-all-permits-geojson',
     text: SQL_FIND_ALL_PERMITS_GEOJSON,
+});
+
+const PS_FIND_ALL = new PreparedStatement({
+    name: 'find-all-permits',
+    text: SQL_FIND_ALL_PERMITS,
 });
 
 export function insertPermits(db: DTDatabase, permits: ApiExcavationPermit[]): Promise<null[]> {
@@ -42,5 +52,15 @@ export function insertPermits(db: DTDatabase, permits: ApiExcavationPermit[]): P
 }
 
 export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollection> {
-    return db.one(PS_FIND_ALL).then(result => result.collection);
+    return db.one(PS_FIND_ALL_GEOJSON).then(result => result.collection);
+}
+
+export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
+    return db.manyOrNone(PS_FIND_ALL).then(results => results.map(result => ({
+        id: result.id,
+        subject: result.subject,
+        geometry: Geometry.parse(Buffer.from(result.geometry, "hex")).toGeoJSON() as GeoJSONGeometry,
+        effectiveFrom: result.effective_from,
+        effectiveTo: result.effective_to,
+    })));
 }

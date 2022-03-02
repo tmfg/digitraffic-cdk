@@ -1,4 +1,5 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
+import {Geometry} from "geojson";
 
 export type ApiExcavationPermit = {
     readonly id: string;
@@ -6,6 +7,14 @@ export type ApiExcavationPermit = {
     readonly gmlGeometryXmlString: string;
     readonly effectiveFrom: Date;
     readonly effectiveTo: Date;
+}
+
+export type DbPermit = {
+    readonly id: string
+    readonly subject: string
+    readonly geometry: Geometry
+    readonly effectiveFrom: Date
+    readonly effectiveTo?: Date
 }
 
 export const permitProperties: JsonSchema = {
