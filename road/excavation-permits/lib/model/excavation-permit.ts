@@ -11,10 +11,13 @@ export type ApiExcavationPermit = {
 
 export type DbPermit = {
     readonly id: string
+    readonly version: number
     readonly subject: string
     readonly geometry: Geometry
     readonly effectiveFrom: Date
     readonly effectiveTo?: Date
+    readonly createdAt: Date
+    readonly updatedAt?: Date
 }
 
 export const permitProperties: JsonSchema = {
@@ -25,6 +28,10 @@ export const permitProperties: JsonSchema = {
         id: {
             type: JsonSchemaType.INTEGER,
             description: 'Permit id',
+        },
+        version: {
+            type: JsonSchemaType.INTEGER,
+            description: 'Permit version',
         },
         subject: {
             type: JsonSchemaType.STRING,
@@ -40,5 +47,16 @@ export const permitProperties: JsonSchema = {
             format: 'date-time',
             description: 'Permit effective to',
         },
+        createdAt: {
+            type: JsonSchemaType.INTEGER,
+            format: 'date-time',
+            description: 'Permit creation time',
+        },
+        updatedAt: {
+            type: JsonSchemaType.INTEGER,
+            format: 'date-time',
+            description: 'Permit update time',
+        },
+
     },
 };

@@ -9,13 +9,13 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
 
 function truncate(db: DTDatabase): Promise<void> {
     return db.tx(async t => {
-        await t.none('DELETE FROM excavation_permits');
+        await t.none('DELETE FROM excavation_permit');
     });
 }
 
 export function insertPermit(db: DTDatabase, id: number, subject: string) {
     return db.tx(async t => {
-        await t.none(`insert into excavation_permits(id, subject, geometry, effective_from, effective_to)
-values ($1, $2, point(10, 10)::geometry, now(), null)`, [id, subject]);
+        await t.none(`insert into excavation_permit(id, version, subject, geometry, effective_from, created_at)
+values ($1, 1, $2, point(10, 10)::geometry, now(), now())`, [id, subject]);
     });
 }

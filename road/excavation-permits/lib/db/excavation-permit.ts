@@ -17,18 +17,21 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
                      'geometry', ST_AsGeoJSON(geometry::geometry)::json,
                      'properties', json_build_object(
                          'id', id,
+                         'version', version,
                          'subject', subject,
                          'effectiveFrom', effective_from,
-                         'effectiveTo', effective_to
+                         'effectiveTo', effective_to,
+                         'createdAt', created_at,
+                         'updatedAt', updated_at
                      )
                  )
              ), '[]')
         ) as collection
-     from excavation_permits`;
+     from excavation_permit`;
 
 const SQL_FIND_ALL_PERMITS =
-    `select id, subject, geometry, effective_from, effective_to
-     from excavation_permits`;
+    `select id, version, subject, geometry, effective_from, effective_to, created_at, updated_at
+     from excavation_permit`;
 
 const PS_INSERT_PERMIT = new PreparedStatement({
     name: 'insert-permit',
@@ -58,9 +61,12 @@ export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollecti
 export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
     return db.manyOrNone(PS_FIND_ALL).then(results => results.map(result => ({
         id: result.id,
+        version: result.version,
         subject: result.subject,
         geometry: Geometry.parse(Buffer.from(result.geometry, "hex")).toGeoJSON() as GeoJSONGeometry,
         effectiveFrom: result.effective_from,
         effectiveTo: result.effective_to,
+        createdAt: result.created_at,
+        updatedAt: result.updated_at,
     })));
 }
