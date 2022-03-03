@@ -10,7 +10,8 @@ describe("permits service tests", dbTestBase((db: DTDatabase) => {
     sinon.stub(PermitsApi.prototype, "getPermitsXml").returns(Promise.resolve(TEST_XML_PERMITS));
 
     test("getExcavationPermits should filter invalid or null permit types", async () => {
-        const parsedPermits = await getExcavationPermits();
+        const parsedPermits = await getExcavationPermits("123");
+
         expect(parsedPermits).toHaveLength(1);
     });
 

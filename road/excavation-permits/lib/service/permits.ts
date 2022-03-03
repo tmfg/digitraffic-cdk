@@ -7,8 +7,11 @@ import {inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as ExcavationPermitsDAO  from "../db/excavation-permit";
 import {Geometry, Point} from "geojson";
 
-export async function getExcavationPermits(): Promise<ApiExcavationPermit[]> {
-    const api = new PermitsApi();
+const API_URL = "https://lahti.infraweb.fi:1880";
+const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
+
+export async function getExcavationPermits(authKey: string): Promise<ApiExcavationPermit[]> {
+    const api = new PermitsApi(API_URL, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
     const jsonPermits = await xmlToJs(xmlPermits);
     return jsonPermits["wfs:FeatureCollection"]["gml:featureMember"]
@@ -104,7 +107,9 @@ function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
         subject: permitObject["GIS:LuvanTarkoitus"],
         gmlGeometryXmlString: jsToXml(permitObject["GIS:Geometry"]),
         effectiveFrom: moment(`${permitObject["GIS:VoimassaolonAlkamispaiva"]} ${permitObject["GIS:VoimassaolonAlkamisaika"]}`, "DD.MM.YYYY HH:mm").toDate(),
-        effectiveTo: moment(`${permitObject["GIS:VoimassaolonPaattymispaiva"]} ${permitObject["GIS:VoimassaolonPaattymissaika"]}`, "DD.MM.YYYY HH:mm").toDate(),
+        effectiveTo: permitObject["GIS:VoimassaolonPaattymispaiva"] != null ?
+            moment(`${permitObject["GIS:VoimassaolonPaattymispaiva"]} ${permitObject["GIS:VoimassaolonPaattymissaika"]}`, "DD.MM.YYYY HH:mm").toDate()
+            : null,
     });
 }
 

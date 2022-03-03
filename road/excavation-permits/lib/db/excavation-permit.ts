@@ -5,8 +5,8 @@ import {FeatureCollection, Geometry as GeoJSONGeometry} from "geojson";
 import {Geometry} from "wkx";
 
 const SQL_INSERT_PERMIT =
-    `INSERT INTO excavation_permits (id, subject, geometry, effective_from, effective_to)
-     VALUES ($1, $2, (SELECT ST_Transform(ST_GeomFromGML($3), 4326)), $4, $5)`;
+    `INSERT INTO excavation_permit (id, version, subject, geometry, effective_from, effective_to, created_at, updated_at)
+     VALUES ($1, 1, $2, ST_Transform(ST_GeomFromGML($3), 4326), $4, $5, NOW(), NOW())`;
 
 const SQL_FIND_ALL_PERMITS_GEOJSON =
     `select json_build_object(
@@ -29,9 +29,13 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
         ) as collection
      from excavation_permit`;
 
+
 const SQL_FIND_ALL_PERMITS =
     `select id, version, subject, geometry, effective_from, effective_to, created_at, updated_at
      from excavation_permit`;
+
+const SQL_FIND_ALL_PERMIT_IDS = "SELECT id FROM excavation_permit";
+
 
 const PS_INSERT_PERMIT = new PreparedStatement({
     name: 'insert-permit',
@@ -46,6 +50,11 @@ const PS_FIND_ALL_GEOJSON = new PreparedStatement({
 const PS_FIND_ALL = new PreparedStatement({
     name: 'find-all-permits',
     text: SQL_FIND_ALL_PERMITS,
+});
+
+const PS_FIND_ALL_IDS = new PreparedStatement({
+    name: 'find-all-permit-ids',
+    text: SQL_FIND_ALL_PERMIT_IDS,
 });
 
 export function insertPermits(db: DTDatabase, permits: ApiExcavationPermit[]): Promise<null[]> {
@@ -69,4 +78,8 @@ export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
         createdAt: result.created_at,
         updatedAt: result.updated_at,
     })));
+}
+
+export function getAllPermitIds(db: DTDatabase): Promise<string[]> {
+    return db.manyOrNone(PS_FIND_ALL_IDS);
 }
