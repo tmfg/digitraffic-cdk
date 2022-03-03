@@ -32,30 +32,21 @@ function convertD2Light(permits: DbPermit[]) {
     const situationRecord = permits.map(permit => (
         {
             "id": permit.id,
-            "version": "1",
-            "creationTime": "2018-09-10T10:29:04Z",
-            "versionTime": "2018-09-10T10:29:04Z",
+            "version": permit.version,
+            "creationTime": permit.createdAt,
+            "versionTime": permit.updatedAt,
             "startTime": permit.effectiveFrom,
             "endTime": permit.effectiveTo,
             "type": {
                 "value": "maintenanceWork",
             },
             "detailedTypeText": permit.subject,
-            "severity": "Katutyölupa",
+            "severity": "Medium",
             "safetyRelatedMessage": false,
-            "sourceName": "Lahden kaupunki, lisenssi CC 4.0 BY",
+            "sourceName": "Lahden kaupunki",
             "generalPublicComment": permit.subject,
             "situationId": permit.id,
-            "situationVersionTime": "2018-09-10T10:29:04Z",
             "location": convertLocation(permit.geometry),
-            /*                "line": {
-                    "gmlLineString": {
-                        "srsName": "EPSG:4326",
-                        "srsDimension": 2,
-                        "posList": "23.75274 61.49714 23.75473 61.49729 23.75475 61.49729 23.75484 61.4973 23.75722 61.49749 23.75805 61.49754 23.7593 61.49764 23.75987 61.49764 23.75988 61.49764 23.75994 61.49764 23.76072 61.49769 23.76077 61.49769 23.76165 61.49775 23.76171 61.49776 23.76231 61.49781 23.76306 61.49787 23.76408 61.49795 23.76415 61.49795 23.76424 61.49796 23.7643 61.49796 23.76431 61.49797 23.76448 61.49798 23.76449 61.49798 23.76468 61.498 23.76488 61.49801 23.76505 61.49802 23.76566 61.49806 23.76578 61.49807 23.76611 61.49813 23.76692 61.49818 23.76698 61.49818 23.76858 61.49829 23.77003 61.4984 23.7701 61.49841 23.77011 61.49841 23.77109 61.49847 23.77125 61.4984",
-                    },
-                },
-            },*/
         }
     ));
 
