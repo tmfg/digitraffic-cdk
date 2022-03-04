@@ -5,8 +5,8 @@ import {FeatureCollection, Geometry as GeoJSONGeometry} from "geojson";
 import {Geometry} from "wkx";
 
 const SQL_INSERT_PERMIT =
-    `INSERT INTO excavation_permit (id, version, subject, permit_type, geometry, effective_from, effective_to, created_at, updated_at)
-     VALUES ($1, 1, $2, $3, ST_Transform(ST_GeomFromGML($4), 4326), $5, $6, NOW(), NOW())`;
+    `INSERT INTO excavation_permit (id, version, subject, geometry, effective_from, effective_to, created_at, updated_at)
+     VALUES ($1, 1, $2, ST_Transform(ST_GeomFromGML($3), 4326), $4, $5, NOW(), NOW())`;
 
 const SQL_FIND_ALL_PERMITS_GEOJSON =
     `select json_build_object(
@@ -19,7 +19,6 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
                          'id', id,
                          'version', version,
                          'subject', subject,
-                         'permitType', permit_type,
                          'effectiveFrom', effective_from,
                          'effectiveTo', effective_to,
                          'createdAt', created_at,
@@ -32,7 +31,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
 
 
 const SQL_FIND_ALL_PERMITS =
-    `select id, version, subject, permit_type, geometry, effective_from, effective_to, created_at, updated_at
+    `select id, version, subject, geometry, effective_from, effective_to, created_at, updated_at
      from excavation_permit`;
 
 const SQL_FIND_ALL_PERMIT_IDS = "SELECT id FROM excavation_permit";
@@ -60,7 +59,7 @@ const PS_FIND_ALL_IDS = new PreparedStatement({
 export function insertPermits(db: DTTransaction, permits: ApiExcavationPermit[]): Promise<null[]> {
     return Promise.all(permits
         .map(permit => db.none(PS_INSERT_PERMIT,
-            [permit.id, permit.subject, permit.permitType, permit.gmlGeometryXmlString, permit.effectiveFrom, permit.effectiveTo])));
+            [permit.id, permit.subject, permit.gmlGeometryXmlString, permit.effectiveFrom, permit.effectiveTo])));
 }
 
 export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollection> {
@@ -72,7 +71,6 @@ export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
         id: result.id,
         version: result.version,
         subject: result.subject,
-        permitType: result.permit_type,
         geometry: Geometry.parse(Buffer.from(result.geometry, "hex")).toGeoJSON() as GeoJSONGeometry,
         effectiveFrom: result.effective_from,
         effectiveTo: result.effective_to,

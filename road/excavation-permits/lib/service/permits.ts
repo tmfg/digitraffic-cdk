@@ -104,7 +104,6 @@ function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
     return {
         id: permitObject["GIS:Id"],
         subject: permitObject["GIS:LuvanTarkoitus"],
-        permitType: permitObject["GIS:Lupatyyppi"],
         gmlGeometryXmlString: jsToXml(permitObject["GIS:Geometry"]),
         effectiveFrom: moment(`${permitObject["GIS:VoimassaolonAlkamispaiva"]} ${permitObject["GIS:VoimassaolonAlkamisaika"]}`, "DD.MM.YYYY HH:mm").toDate(),
         effectiveTo: permitObject["GIS:VoimassaolonPaattymispaiva"] != null ?
