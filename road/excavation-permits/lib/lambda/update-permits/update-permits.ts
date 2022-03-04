@@ -2,9 +2,8 @@ import {SecretHolder} from "../../../../../digitraffic-common/aws/runtime/secret
 import * as UpdateService from "../../service/update";
 import {PermitsSecret} from "../../model/permits-secret";
 
-const authKeySecretId = process.env.AUTH_KEY_ID as string;
-
-const holder = SecretHolder.create<PermitsSecret>(authKeySecretId);
+const PERMIT_DOMAIN = process.env.PERMIT_DOMAIN as string;
+const holder = SecretHolder.create<PermitsSecret>('ep.' + PERMIT_DOMAIN);
 
 export const handler = async () => {
     await holder.setDatabaseCredentials();
@@ -14,8 +13,8 @@ export const handler = async () => {
     try {
         const secret = await holder.get();
 
-        return UpdateService.updatePermits(secret.authKey);
+        return UpdateService.updatePermits(secret.authKey, secret.url);
     } finally {
-        console.info("method=updatePermits.%s tookMs=%d", (Date.now()-start));
+        console.info("method=updatePermits.%s tookMs=%d", PERMIT_DOMAIN, (Date.now()-start));
     }
 };

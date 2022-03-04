@@ -2,9 +2,8 @@ import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/dat
 import * as permitsService from "./permits";
 import * as permitDb from "../db/excavation-permit";
 
-export async function updatePermits(authKey: string) {
-
-    const permitsInApi = await permitsService.getExcavationPermits(authKey);
+export async function updatePermits(authKey: string, url: string) {
+    const permitsInApi = await permitsService.getExcavationPermits(authKey, url);
     const permitIdsInDb = await getAllPermitIdsFromDb();
 
     const idList = permitIdsInDb.map(row => row.id);

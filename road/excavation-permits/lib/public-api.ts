@@ -7,6 +7,7 @@ import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
 import {permitProperties} from "./model/excavation-permit";
+import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 const EXCAVATION_PERMITS_TAGS = ["Excavation permit(Beta)"];
 
@@ -26,6 +27,7 @@ export class PublicApi {
         this.createModels(this.publicApi);
 
         this.createGeojsonEndpoint(stack);
+        this.createD2LightEndpoint(stack);
 
         this.createDocumentation();
     }
@@ -57,13 +59,15 @@ export class PublicApi {
     private createGeojsonEndpoint(stack: DigitrafficStack) {
         const lambda = MonitoredDBFunction.create(stack, 'get-permits-geojson');
 
-        const integration = defaultIntegration(lambda);
+        const integration = defaultIntegration(lambda, {
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)],
+        });
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
             this.permitsGeojsonResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.permitsGeoJsonModel)),
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.permitsGeoJsonModel)),
                     corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 ],
             });
@@ -73,10 +77,12 @@ export class PublicApi {
     private createD2LightEndpoint(stack: DigitrafficStack) {
         const lambda = MonitoredDBFunction.create(stack, 'get-permits-datex2');
 
-        const integration = defaultIntegration(lambda);
+        const integration = defaultIntegration(lambda, {
+            responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON)],
+        });
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
-            this.permitsGeojsonResource.addMethod(httpMethod, integration, {
+            this.permitsD2LightResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
                     corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.permitsGeoJsonModel)),

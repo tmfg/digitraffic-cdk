@@ -1,10 +1,28 @@
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
+import {DigitrafficCanaryRole} from "digitraffic-common/aws/infra/canaries/canary-role";
+import {DatabaseCanary} from "digitraffic-common/aws/infra/canaries/database-canary";
+import {UrlCanary} from "digitraffic-common/aws/infra/canaries/url-canary";
+import {Schedule} from "aws-cdk-lib/aws-events";
+import {Duration} from "aws-cdk-lib";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
         if (stack.configuration.enableCanaries) {
-            // NOT YET
+            const urlRole = new DigitrafficCanaryRole(stack, 'ep-url');
+            const dbRole = new DigitrafficCanaryRole(stack, 'ep-db').withDatabaseAccess();
+
+            //            DatabaseCanary.createV2(stack, dbRole, 'ep');
+
+            UrlCanary.create(stack, urlRole, publicApi, {
+                name: 'ep-public',
+                schedule: Schedule.rate(Duration.minutes(30)),
+                alarm: {
+                    alarmName: 'ExcavationPermits-PublicAPI-Alarm',
+                    topicArn: stack.configuration.alarmTopicArn,
+                },
+            });
+
         }
     }
 

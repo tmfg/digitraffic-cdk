@@ -1,17 +1,16 @@
 import {PermitsApi} from "../api/permits";
 import {ApiExcavationPermit, DbPermit} from "../model/excavation-permit";
-import {PermitResponse, PermitElement} from "../model/permit-xml";
+import {PermitElement, PermitResponse} from "../model/permit-xml";
 import moment from "moment";
 import * as xml2js from 'xml2js';
 import {inDatabaseReadonly} from "digitraffic-common/database/database";
-import * as ExcavationPermitsDAO  from "../db/excavation-permit";
-import {Geometry, Point} from "geojson";
+import * as ExcavationPermitsDAO from "../db/excavation-permit";
+import {Geometry} from "geojson";
 
-const API_URL = "https://lahti.infraweb.fi:1880";
-const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
+const PERMITS_PATH = "/api/v1/kartat/kaivuluvat";
 
-export async function getExcavationPermits(authKey: string): Promise<ApiExcavationPermit[]> {
-    const api = new PermitsApi(API_URL, PERMITS_PATH, authKey);
+export async function getExcavationPermits(authKey: string, url: string): Promise<ApiExcavationPermit[]> {
+    const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
     const jsonPermits = await xmlToJs(xmlPermits);
     return jsonPermits["wfs:FeatureCollection"]["gml:featureMember"]
@@ -119,6 +118,6 @@ function xmlToJs(xml: string): Promise<PermitResponse> {
 
 function jsToXml(obj: Record<string, unknown>): string {
     const builder = new xml2js.Builder({headless: true, renderOpts: {pretty: false}});
-    const xmlString = builder.buildObject(obj);
-    return xmlString;
+
+    return builder.buildObject(obj);
 }
