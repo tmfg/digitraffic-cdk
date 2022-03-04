@@ -14,6 +14,7 @@ export class InternalLambdas {
         lambdaEnvironment.PERMIT_DOMAIN = permitDomain;
 
         return MonitoredDBFunction.create(stack, 'update-permits', lambdaEnvironment, {
+            memorySize: 512,
             functionName: 'ExcavationPermits-UpdatePermits-' + permitDomain,
         });
     }

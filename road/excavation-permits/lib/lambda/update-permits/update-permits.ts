@@ -13,7 +13,7 @@ export const handler = async () => {
     try {
         const secret = await holder.get();
 
-        return UpdateService.updatePermits(secret.authKey, secret.url);
+        return await UpdateService.updatePermits(secret.authKey, secret.url);
     } finally {
         console.info("method=updatePermits.%s tookMs=%d", PERMIT_DOMAIN, (Date.now()-start));
     }

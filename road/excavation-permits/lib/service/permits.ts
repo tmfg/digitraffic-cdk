@@ -7,7 +7,7 @@ import {inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as ExcavationPermitsDAO from "../db/excavation-permit";
 import {Geometry} from "geojson";
 
-const PERMITS_PATH = "/api/v1/kartat/kaivuluvat";
+const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
 export async function getExcavationPermits(authKey: string, url: string): Promise<ApiExcavationPermit[]> {
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
@@ -101,15 +101,16 @@ function isValidExcavationPermit(permitElement: PermitElement): boolean {
 
 function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
     const permitObject = permitElement["GIS:YlAlLuvat"];
-    return <ApiExcavationPermit>({
+    return {
         id: permitObject["GIS:Id"],
         subject: permitObject["GIS:LuvanTarkoitus"],
+        permitType: permitObject["GIS:Lupatyyppi"],
         gmlGeometryXmlString: jsToXml(permitObject["GIS:Geometry"]),
         effectiveFrom: moment(`${permitObject["GIS:VoimassaolonAlkamispaiva"]} ${permitObject["GIS:VoimassaolonAlkamisaika"]}`, "DD.MM.YYYY HH:mm").toDate(),
         effectiveTo: permitObject["GIS:VoimassaolonPaattymispaiva"] != null ?
             moment(`${permitObject["GIS:VoimassaolonPaattymispaiva"]} ${permitObject["GIS:VoimassaolonPaattymissaika"]}`, "DD.MM.YYYY HH:mm").toDate()
-            : null,
-    });
+            : undefined,
+    };
 }
 
 function xmlToJs(xml: string): Promise<PermitResponse> {
