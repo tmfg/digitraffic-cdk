@@ -1,4 +1,4 @@
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly, inTransaction} from "digitraffic-common/database/database";
 import * as permitsService from "./permits";
 import * as permitDb from "../db/excavation-permit";
 
@@ -10,7 +10,7 @@ export async function updatePermits(authKey: string, url: string) {
     const newPermits = permitsInApi.filter(permit => !idList.includes(permit.id));
 
     if (newPermits.length > 0) {
-        await inDatabase((db: DTDatabase) => {
+        await inTransaction((db: DTTransaction) => {
             return permitDb.insertPermits(db, newPermits);
         });
     }
@@ -19,6 +19,6 @@ export async function updatePermits(authKey: string, url: string) {
 async function getAllPermitIdsFromDb(): Promise<Record<string, string>[]> {
     const idRows = await inDatabaseReadonly((db: DTDatabase) => {
         return permitDb.getAllPermitIds(db);
-    }) as unknown as Record<string, string>[];
+    });
     return idRows;
 }

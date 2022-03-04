@@ -14,17 +14,21 @@ export class PermitsApi {
     async getPermitsXml(): Promise<string> {
         const start = Date.now();
 
-        const resp = await axios.get(`${this.apiUrl}${this.path}?authKey=${this.authKey}`, {
-            headers: {
-                'Accept': 'application/xml',
-            },
-        }).finally(() => {
+        try {
+            const resp = await axios.get(`${this.apiUrl}${this.path}?authKey=${this.authKey}`, {
+                headers: {
+                    'Accept': 'application/xml',
+                },
+            });
+            if (resp.status !== 200) {
+                console.error(`method=getPermitsXml query to ${this.path} failed status ${resp.status}`);
+                throw Error(`Query to ${this.path} failed`);
+            }
+            return resp.data;
+        } catch (error) {
+            throw error;
+        } finally {
             console.info("method=getPermitsXml tookMs=%d", (Date.now() - start));
-        });
-        if (resp.status !== 200) {
-            console.error(`method=getPermitsXml query to ${this.path} failed status ${resp.status}`);
-            throw Error(`Query to ${this.path} failed`);
         }
-        return resp.data;
     }
 }

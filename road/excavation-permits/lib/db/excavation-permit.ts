@@ -1,4 +1,4 @@
-import {DTDatabase} from "../../../../digitraffic-common/database/database";
+import {DTDatabase, DTTransaction} from "../../../../digitraffic-common/database/database";
 import {PreparedStatement} from "pg-promise";
 import {ApiExcavationPermit, DbPermit} from "../model/excavation-permit";
 import {FeatureCollection, Geometry as GeoJSONGeometry} from "geojson";
@@ -57,7 +57,7 @@ const PS_FIND_ALL_IDS = new PreparedStatement({
     text: SQL_FIND_ALL_PERMIT_IDS,
 });
 
-export function insertPermits(db: DTDatabase, permits: ApiExcavationPermit[]): Promise<null[]> {
+export function insertPermits(db: DTTransaction, permits: ApiExcavationPermit[]): Promise<null[]> {
     return Promise.all(permits
         .map(permit => db.none(PS_INSERT_PERMIT,
             [permit.id, permit.subject, permit.permitType, permit.gmlGeometryXmlString, permit.effectiveFrom, permit.effectiveTo])));
@@ -81,6 +81,6 @@ export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
     } as DbPermit)));
 }
 
-export function getAllPermitIds(db: DTDatabase): Promise<string[]> {
+export function getAllPermitIds(db: DTDatabase): Promise<Record<string, string>[]> {
     return db.manyOrNone(PS_FIND_ALL_IDS);
 }
