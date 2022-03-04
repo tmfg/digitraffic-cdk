@@ -59,7 +59,7 @@ export class PaikanninApi {
             }
             return Promise.reject();
         } finally {
-            console.debug(`method=PaikanninApi.getFromServer.${method} tookMs=${Date.now() - start} for ${serverUrl}`);
+            console.info(`method=PaikanninApi.getFromServer.${method} tookMs=${Date.now() - start} for ${serverUrl}`);
         }
     }
 

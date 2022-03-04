@@ -8,6 +8,7 @@ export type DbWorkMachine = {
 }
 
 export type DbMaintenanceTracking = {
+    readonly id?: number|null
     readonly sending_system: string
     readonly sending_time: Date
     readonly last_point: GeoJsonPoint
@@ -21,13 +22,13 @@ export type DbMaintenanceTracking = {
     readonly contract: string
     readonly message_original_id: string
     readonly tasks: string[]
-    previous_tracking_id?: bigint|null
+    previous_tracking_id?: number|null
     // This is additional meta data, not saved to db, but used to update previous tracking
     start_direction?: number //
 }
 
 export type DbLatestTracking = {
-    readonly id: bigint
+    readonly id: number
     readonly last_point: string
     readonly end_time: Date
     readonly finished: boolean
@@ -40,6 +41,13 @@ export type DbNumberId = {
 
 export type DbTextId = {
     readonly id: string
+}
+
+export type DbDomain = {
+    readonly name: string
+    readonly source: string
+    readonly created?: Date
+    readonly modified?: Date
 }
 
 export type DbDomainContract = {

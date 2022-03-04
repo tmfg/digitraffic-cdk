@@ -1,26 +1,39 @@
 /* eslint-disable camelcase */
-import {dbTestBase} from "../db-testutil";
-import {DTDatabase} from "digitraffic-common/database/database";
 import moment from "moment";
-import {getRandomNumber, getRandomBigInt, randomString} from "digitraffic-common/test/testutils";
-import {areDistinctPositions, groupEventsToIndividualTrackings} from "../../lib/service/paikannin-utils";
+import {getRandomInteger, randomString} from "digitraffic-common/test/testutils";
+import {areDistinctPositions, createDbWorkMachine, getTasksForOperations, groupEventsToIndividualTrackings} from "../../lib/service/paikannin-utils";
 import {ApiWorkevent, ApiWorkeventIoDevice} from "../../lib/model/paikannin-api-data";
-import {POINT_550m_FROM_START, POINT_450m_FROM_START, POINT_START} from "../testutil";
+import {createTaskMapping} from "../testutil";
+import {DbWorkMachine} from "../../lib/model/db-data";
+import * as Utils from "../../lib/service/utils";
+import {
+    DOMAIN_1,
+    HARJA_BRUSHING,
+    HARJA_PAVING,
+    HARJA_SALTING,
+    PAIKANNIN_OPERATION_BRUSHNG,
+    PAIKANNIN_OPERATION_PAVING,
+    PAIKANNIN_OPERATION_SALTING,
+    POINT_450M_FROM_START,
+    POINT_550M_FROM_START,
+    POINT_750M_FROM_START,
+    POINT_START,
+} from "../testconstants";
 
-const ioChannel1 = 'Brushing';
-const ioChannel2 = 'Paving';
-
-describe('paikannin-utils-service-test', dbTestBase((db: DTDatabase) => {
+describe('paikannin-utils-service-test', () => {
 
     test('groupEventsToIndividualTrackings - events in chronological order', () => {
         const now = new Date();
         const past = moment(now).subtract(1, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([ioChannel1], past),
-            createWorkEvent([ioChannel1], now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, past),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
         ];
 
-        // this shold be groupped to ioChannel1, ioChannel1+ioChannel2 and ioChannel2 tasks
+        // this shold be groupped within task
+        // - PAIKANNIN_OPERATION_BRUSHNG,
+        // - PAIKANNIN_OPERATION_BRUSHNG+PAIKANNIN_OPERATION_PAVING and
+        // - PAIKANNIN_OPERATION_PAVING
         const groups = groupEventsToIndividualTrackings(events, past);
 
         expect(groups).toHaveLength(1);
@@ -30,51 +43,55 @@ describe('paikannin-utils-service-test', dbTestBase((db: DTDatabase) => {
         const now = new Date();
         const past = moment(now).subtract(1, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([ioChannel1], now),
-            createWorkEvent([ioChannel1], past),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, past),
         ];
 
-        // this shold be groupped to ioChannel1, ioChannel1+ioChannel2 and ioChannel2 tasks
-        const groups = groupEventsToIndividualTrackings(events, past);
+        // this shold be groupped to two as they are not in chronological order
+        const groups = groupEventsToIndividualTrackings(events, subtractSecond(past));
 
         expect(groups).toHaveLength(2);
     });
 
     test('groupEventsToIndividualTrackings - task changes', () => {
         // Create work events with three different task combinations
+        const time = moment().subtract(10, 'minutes');
+        const start = time.toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([ioChannel1]),
-            createWorkEvent([ioChannel1]),
-            createWorkEvent([ioChannel1,ioChannel2]),
-            createWorkEvent([ioChannel1,ioChannel2]),
-            createWorkEvent([ioChannel2]),
-            createWorkEvent([ioChannel2]),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name,PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name,PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
         ];
 
-        // this shold be groupped to ioChannel1, ioChannel1+ioChannel2 and ioChannel2 tasks
-        const groups = groupEventsToIndividualTrackings(events, moment().subtract(1, 'minutes').toDate());
+        // this shold be groupped with task groups: PAIKANNIN_OPERATION_BRUSHNG, PAIKANNIN_OPERATION_BRUSHNG+PAIKANNIN_OPERATION_PAVING.name and PAIKANNIN_OPERATION_PAVING.name tasks
+        const groups = groupEventsToIndividualTrackings(events, start);
 
         expect(groups).toHaveLength(3);
-        expect(groups[0]).toHaveLength(2);
-        expect(groups[0]).toHaveLength(2);
-        expect(groups[0]).toHaveLength(2);
+        expect(groups[0]).toHaveLength(3); // end is added and is same as next group start
+        expect(groups[0][2].timestamp).toEqual(groups[1][0].timestamp); // end is added and is same as next group start
+        expect(groups[0]).toHaveLength(3); // end is added and is same as next group start
+        expect(groups[1][2].timestamp).toEqual(groups[2][0].timestamp); // end is added and is same as next group start
+        expect(groups[2]).toHaveLength(2);
 
-        assertContainsEvents(groups[0], [ioChannel1]);
-        assertContainsEvents(groups[1], [ioChannel1, ioChannel2]);
-        assertContainsEvents(groups[2], [ioChannel2]);
+        assertContainsEvents(groups[0], [PAIKANNIN_OPERATION_BRUSHNG.name]);
+        assertContainsEvents(groups[1], [PAIKANNIN_OPERATION_BRUSHNG.name, PAIKANNIN_OPERATION_PAVING.name]);
+        assertContainsEvents(groups[2], [PAIKANNIN_OPERATION_PAVING.name]);
     });
 
     test('groupEventsToIndividualTrackings - events inside 5 minute time limit', () => {
-        // Create work events with over 5 min diff
+        // Create work events with under 5 min diff
         const now = new Date();
         const just5Min = moment(now).subtract(5, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([ioChannel1], just5Min),
-            createWorkEvent([ioChannel1], now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, just5Min),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
         ];
 
         // this shold be groupped to one tracking
-        const groups = groupEventsToIndividualTrackings(events, just5Min);
+        const groups = groupEventsToIndividualTrackings(events, subtractSecond(just5Min));
         expect(groups).toHaveLength(1);
     });
 
@@ -83,22 +100,23 @@ describe('paikannin-utils-service-test', dbTestBase((db: DTDatabase) => {
         const now = new Date();
         const over5Min = moment(now).subtract(5, 'minutes').subtract(1, 'seconds').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([ioChannel1], over5Min),
-            createWorkEvent([ioChannel1], now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, over5Min),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
         ];
 
         // this shold be groupped to two trackings
-        const groups = groupEventsToIndividualTrackings(events, over5Min);
+        const groups = groupEventsToIndividualTrackings(events, subtractSecond(over5Min));
         expect(groups).toHaveLength(2);
     });
 
-    test('groupEventsToIndividualTrackings - events under 0,5 km limit', () => {
-        // Create work events with under 0,5 km diff
+
+    test('groupEventsToIndividualTrackings - events under 0,7 km limit', () => {
+        // Create work events with under 0,7 km diff
         const now = new Date();
         const previous = moment(now).subtract(4, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([ioChannel1], previous, POINT_START),
-            createWorkEventWithLocation([ioChannel1], now, POINT_450m_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_550M_FROM_START),
         ];
 
         // this shold be groupped to one trackings
@@ -106,17 +124,17 @@ describe('paikannin-utils-service-test', dbTestBase((db: DTDatabase) => {
         expect(groups).toHaveLength(1);
     });
 
-    test('groupEventsToIndividualTrackings - events over 0,5 km limit', () => {
-        // Create work events with over 0,5 km diff
+    test('groupEventsToIndividualTrackings - events over 0,7 km limit', () => {
+        // Create work events with over 0,7 km diff
         const now = new Date();
         const previous = moment(now).subtract(4, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([ioChannel1], previous, POINT_START),
-            createWorkEventWithLocation([ioChannel1], now, POINT_550m_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_750M_FROM_START),
         ];
 
         // this shold be groupped to two trackings
-        const groups = groupEventsToIndividualTrackings(events, previous);
+        const groups = groupEventsToIndividualTrackings(events, subtractSecond(previous));
         expect(groups).toHaveLength(2);
     });
 
@@ -125,8 +143,8 @@ describe('paikannin-utils-service-test', dbTestBase((db: DTDatabase) => {
         const now = new Date();
         const previous = moment(now).subtract(12, 'seconds').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([ioChannel1], previous, POINT_START),
-            createWorkEventWithLocation([ioChannel1], now, POINT_450m_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_450M_FROM_START),
         ];
 
         // this shold be groupped to one trackings
@@ -139,12 +157,12 @@ describe('paikannin-utils-service-test', dbTestBase((db: DTDatabase) => {
         const now = new Date();
         const previous = moment(now).subtract(11, 'seconds').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([ioChannel1], previous, POINT_START),
-            createWorkEventWithLocation([ioChannel1], now, POINT_450m_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_450M_FROM_START),
         ];
 
         // this shold be groupped to two trackings
-        const groups = groupEventsToIndividualTrackings(events, previous);
+        const groups = groupEventsToIndividualTrackings(events, subtractSecond(previous));
         expect(groups).toHaveLength(2);
     });
 
@@ -155,9 +173,48 @@ describe('paikannin-utils-service-test', dbTestBase((db: DTDatabase) => {
         expect(areDistinctPositions([1,2],[1,2.000000000000001])).toBe(true);
     });
 
+    test('createDbWorkMachine', () => {
+        const DOMAIN = 'paikannin-kuopio';
+        const DEV_ID = 1;
+        const DEV_TYPE = 'Aura-auto';
+        const wm : DbWorkMachine = createDbWorkMachine(DOMAIN, DEV_ID, DEV_TYPE);
+        expect(wm.harjaUrakkaId).toEqual(Utils.createHarjaId(DOMAIN));
+        expect(wm.harjaId.toString()).toEqual(DEV_ID.toString());
+        expect(wm.type).toContain(DOMAIN);
+        expect(wm.type).toContain(DEV_ID.toString());
+        expect(wm.type).toContain(DEV_TYPE);
+    });
 
+    test('getTasksForOperations', () => {
+        const taskMappings = [
+            // Map domain operations to harja tasks
+            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHNG.name, false),
+            createTaskMapping(DOMAIN_1, HARJA_PAVING, PAIKANNIN_OPERATION_PAVING.name, true),
+            createTaskMapping(DOMAIN_1, HARJA_SALTING, PAIKANNIN_OPERATION_SALTING.name, false),
+        ];
 
-}));
+        const tasks : string[] = getTasksForOperations([PAIKANNIN_OPERATION_BRUSHNG, PAIKANNIN_OPERATION_PAVING],
+            taskMappings);
+
+        expect(tasks).toHaveLength(1);
+        expect(tasks).toContain(HARJA_BRUSHING);
+    });
+
+    test('getTasksForOperations duplicates', () => {
+        const taskMappings = [
+            // Map domain operations to harja tasks, map two operations to one task
+            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHNG.name, false),
+            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_PAVING.name, false),
+            createTaskMapping(DOMAIN_1, HARJA_SALTING, PAIKANNIN_OPERATION_SALTING.name, false),
+        ];
+
+        const tasks : string[] = getTasksForOperations([PAIKANNIN_OPERATION_BRUSHNG, PAIKANNIN_OPERATION_PAVING], taskMappings);
+
+        expect(tasks).toHaveLength(1);
+        expect(tasks).toContain(HARJA_BRUSHING);
+    });
+
+});
 
 function assertContainsEvents(events: ApiWorkevent[], ioChannels: string[]) {
     const ioSet = new Set(ioChannels);
@@ -167,42 +224,45 @@ function assertContainsEvents(events: ApiWorkevent[], ioChannels: string[]) {
     });
 }
 
-function createWorkEvent(workEvents: string[], time=new Date()): ApiWorkevent {
+function createWorkEvent(workEvents: string[], deviceId=getRandomInteger(1,100), time=new Date()): ApiWorkevent {
     return {
-        deviceId: getRandomBigInt(1,100),
+        deviceId: deviceId,
         timest: time.toISOString(),
         deviceName: randomString(),
-        altitude: 10n,
+        altitude: 10,
         heading: 10,
         ioChannels: createWorkEventDevices(workEvents),
         lat: 60,
         lon: 28,
-        speed: 100n,
+        speed: 100,
         timestamp: time,
     };
 }
 
 function createWorkEventWithLocation(workEvents: string[], time: Date, xy: number[]): ApiWorkevent {
     return {
-        deviceId: getRandomBigInt(1,100),
+        deviceId: getRandomInteger(1,100),
         timest: time.toISOString(),
         deviceName: randomString(),
-        altitude: 10n,
+        altitude: 10,
         heading: 10,
         ioChannels: createWorkEventDevices(workEvents),
         lat: xy[1],
         lon: xy[0],
-        speed: 100n,
+        speed: 100,
         timestamp: time,
     };
 }
 
 function createWorkEventDevices(workEvents: string[]): ApiWorkeventIoDevice[] {
-    const v = workEvents.map(value => {
+    return workEvents.map(value => {
         return {
-            id: getRandomNumber(1, 100),
+            id: getRandomInteger(1, 100),
             name: value,
         } as ApiWorkeventIoDevice;
     });
-    return v;
+}
+
+function subtractSecond(time: Date): Date {
+    return moment(time).subtract(1,'seconds').toDate();
 }

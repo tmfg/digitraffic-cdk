@@ -1,8 +1,8 @@
 import {ApiWorkevent, ApiWorkeventIoDevice} from "../model/paikannin-api-data";
-import {distanceBetweenPositionsInKm} from "digitraffic-common/utils/geometry";
+import {distanceBetweenPositionsInKm, GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geometry";
 import {MAX_TIME_BETWEEN_TRACKINGS_MS, MAX_SPEED_BETWEEN_TRACKINGS_KMH, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM} from "../constants";
 import {Position} from "geojson";
-import {DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
+import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
 import {createHarjaId} from "./utils";
 
 
@@ -13,13 +13,15 @@ import {createHarjaId} from "./utils";
  * - events have computational speed over 140.0 km/h
  * - events' tasks change
  * - events are not in chronological order
- * @param events
+ *
+ * @param events to handle
+ * @param filterBeforeOrEquaTime if even time is this or before this, it will be ignored
  */
-export function groupEventsToIndividualTrackings(events: ApiWorkevent[], filterBeforeTime?: Date): ApiWorkevent[][] {
+export function groupEventsToIndividualTrackings(events: ApiWorkevent[], filterBeforeOrEquaTime?: Date): ApiWorkevent[][] {
     const chunks : ApiWorkevent[][] = []; // initial array of arrays
     // ascending order
     // const ordered = events.sort((a, b) => (a.timestamp.getTime() < b.timestamp.getTime() ? -1 : 1));
-    return toEventGroups(chunks, events, filterBeforeTime);
+    return toEventGroups(chunks, events, filterBeforeOrEquaTime);
 }
 
 /**
@@ -33,16 +35,19 @@ export function groupEventsToIndividualTrackings(events: ApiWorkevent[], filterB
  *
  * @param targetGroups
  * @param sourceEvents
- * @param filterBeforeTime
+ * @param filterBeforeOrEquaTime
  */
-function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkevent[], filterBeforeTime?: Date): ApiWorkevent[][] {
+function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkevent[], filterBeforeOrEquaTime?: Date): ApiWorkevent[][] {
     if (sourceEvents.length > 0) {
         // take fist element away from start of the array
-        const nextEvent: ApiWorkevent = sourceEvents.shift()!;
+        const nextEvent: ApiWorkevent | undefined = sourceEvents.shift();
+        if (!nextEvent) {
+            return targetGroups;
+        }
 
         // if element is older than allowed throw it away
-        if (filterBeforeTime && nextEvent.timestamp.getTime() <= filterBeforeTime.getTime() ) {
-            return toEventGroups(targetGroups, sourceEvents, filterBeforeTime);
+        if (filterBeforeOrEquaTime && nextEvent.timestamp.getTime() <= filterBeforeOrEquaTime.getTime() ) {
+            return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
         } else if (targetGroups.length > 0) {
             // Take prev event from groups and compare it to next
             const prevGroup: ApiWorkevent[] = targetGroups[targetGroups.length-1];
@@ -70,10 +75,10 @@ function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkeven
                 // Not extending previous tracking -> create new group
                 targetGroups.push([nextEvent]);
             }
-            return toEventGroups(targetGroups, sourceEvents, filterBeforeTime);
+            return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
         } else {
             targetGroups.push([nextEvent]); // nextChunk
-            return toEventGroups(targetGroups, sourceEvents, filterBeforeTime);
+            return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
         }
     }
     return targetGroups;
@@ -120,16 +125,17 @@ function ioChennelsToStrings(ioChannels : ApiWorkeventIoDevice[]): string[] {
 }
 
 /**
- * Checks given values for
+ * Checks limits between given points for
  * - time limit
  * - distance limit
  * - speed limit
- * Not checking tasks
- * @param mt current maintenance tracking
- * @param previousEndTime previous tracking end time
- * @param previousEndPoint previous tracking end point
- * @param previousTasks previous tracking tasks
- * @private
+ * NOTE! Not checking tasks
+ *
+ * @param previousPosition end position of previous tracking
+ * @param nextPosition first position of next tracking
+ * @param previousTime time of previous position
+ * @param nextTime time of next position
+
  */
 export function isExtendingPreviousTracking(previousPosition: Position, nextPosition: Position, previousTime: Date, nextTime: Date): boolean {
     if (isOverTimeLimit(previousTime, nextTime)) {
@@ -153,10 +159,10 @@ export function getStartPosition(mt: DbMaintenanceTracking): Position {
     return mt.last_point.coordinates;
 }
 
-export function createDbWorkMachine(domainName: string, deviceId: bigint, deviceName: string): DbWorkMachine {
+export function createDbWorkMachine(domainName: string, deviceId: number, deviceName: string): DbWorkMachine {
     return {
         harjaUrakkaId: createHarjaId(domainName),
-        harjaId: deviceId,
+        harjaId: BigInt(deviceId),
         type: `domainName: ${domainName} / deviceId: ${deviceId} / deviceName: ${deviceName}`,
     };
 }
@@ -179,5 +185,91 @@ function cloneApiWorkeventWithNewTasks(prevEvent: ApiWorkevent, ioChannels: ApiW
         lon: prevEvent.lon,
         speed: prevEvent.speed,
         timestamp: prevEvent.timestamp,
+    };
+}
+
+/**
+ * Map domain route operations to Harja tasks
+ *
+ * For paikannin we use ApiWorkeventIoDevice.name as original id as there can be different codes for every machine.
+ *
+ * @param operations ApiWorkeventIoDevices to map from
+ * @param taskMappings mapping of tasks from database
+ */
+export function getTasksForOperations(operations: ApiWorkeventIoDevice[], taskMappings: DbDomainTaskMapping[]): string[] {
+    if (operations === undefined) {
+        return [];
+    }
+
+    return operations.reduce(function (filtered: string[], operation) {
+        const taskMapping = taskMappings.find((mapping: DbDomainTaskMapping): boolean => {
+            return mapping.original_id == operation.name.trim() && !mapping.ignore;
+        });
+        if (taskMapping && !filtered.includes(taskMapping.name)) {
+            return filtered.concat(taskMapping.name);
+        }
+        return filtered;
+    }, []);
+}
+
+export function createLineStringFromEvents(events: ApiWorkevent[]) : GeoJsonLineString|null {
+    if (!events || events.length < 2) {
+        return null;
+    }
+    const lineStringCoordinates: Position[] = events.reduce((coordinates: Position[], nextEvent) => {
+        const nextCoordinate: Position = [nextEvent.lon, nextEvent.lat];
+        if (coordinates.length > 0 ) {
+            const previousCoordinate: Position = coordinates[coordinates.length-1];
+            // Linestring points must differ from previous values
+            if ( previousCoordinate[0] !=  nextCoordinate[0] || previousCoordinate[1] !=  nextCoordinate[1]) {
+                coordinates.push(nextCoordinate);
+            }
+        } else {
+            coordinates.push(nextCoordinate);
+        }
+        return coordinates;
+    }, []);
+
+    if (lineStringCoordinates.length > 1) {
+        return new GeoJsonLineString(lineStringCoordinates);
+    }
+    return null;
+}
+
+export function createDbMaintenanceTracking(contract: DbDomainContract,
+    workMachineId: bigint,
+    events: ApiWorkevent[],
+    taskMappings: DbDomainTaskMapping[]) : DbMaintenanceTracking | null {
+
+    const tasks: string[] = getTasksForOperations(events[0].ioChannels, taskMappings);
+    if (tasks.length === 0) {
+        return null;
+    }
+
+    const firstEvent = events[0];
+    // lastPoint
+    const lastEvent = events[events.length-1];
+    const lastPoint = new GeoJsonPoint([lastEvent.lon, lastEvent.lat]);
+    const lineString = createLineStringFromEvents(events);
+
+    return {
+        // direction: 0,
+        /* eslint-disable camelcase */
+        sending_time: lastEvent.timestamp,
+        start_time: firstEvent.timestamp,
+        end_time: lastEvent.timestamp,
+        last_point: lastPoint,
+        line_string: lineString,
+        direction: lastEvent.heading,
+        sending_system: contract.domain,
+        work_machine_id: workMachineId,
+        tasks: tasks,
+        domain: contract.domain,
+        contract: contract.contract,
+        message_original_id: 'none',
+        finished: true,
+        // This is additional meta data, not saved to eb but used to update previous tracking
+        start_direction: lastEvent.heading,
+        /* eslint-enable camelcase */
     };
 }

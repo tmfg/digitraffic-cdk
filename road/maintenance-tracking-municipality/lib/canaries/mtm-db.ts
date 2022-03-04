@@ -4,7 +4,7 @@ import {MaintenanceTrackingMunicipalityEnvKeys} from "../keys";
 
 const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] as string;
 
-export const handler = async () => {
+export const handler = () => {
     const checker = DatabaseChecker.create();
 
     checker.notEmpty(`domain ${domainName} is found`,
@@ -16,19 +16,18 @@ export const handler = async () => {
     checker.empty(`domain ${domainName} doesn't have contracts without source information`,
         `SELECT count(*) FROM maintenance_tracking_domain_contract WHERE source IS NULL AND domain = '${domainName}'`);
 
-    // TODO commented until in production
-    // checker.notEmpty(`domain ${domainName} have contract's data updated in last 48 hours`,
-    //     `SELECT count(*) FROM maintenance_tracking_domain_contract WHERE data_last_updated > now() - interval '48 hours' AND domain = '${domainName}'`);
-
     checker.empty(`domain ${domainName} doesn't have contracts those data is not updated in last 48 hours`,
         `SELECT count(*) FROM maintenance_tracking_domain_contract WHERE data_last_updated < now() - interval '48 hours' AND domain = '${domainName}'`);
 
     // TODO commented until in production
-    // checker.notEmpty(`domain ${domainName} has fresh data from ast 48h`,
-    //     `select count(*) from (SELECT * FROM maintenance_tracking WHERE maintenance_tracking.end_time > now() - interval '48 hours' AND domain = '${domainName}' limit 1) sub`);
+    checker.notEmpty(`domain ${domainName} has fresh data from last 48h`,
+        `select count(*) from (SELECT * FROM maintenance_tracking WHERE maintenance_tracking.end_time > now() - interval '48 hours' AND domain = '${domainName}' limit 1) sub`);
 
     checker.notEmpty(`domain ${domainName} has task mappings`,
         `select count(*) from maintenance_tracking_domain_task_mapping WHERE domain = '${domainName}'`);
+
+    checker.notEmpty(`domain ${domainName} doesn't have unckecked task mappings`,
+        `select count(*) from maintenance_tracking_domain_task_mapping WHERE domain = '${domainName}' AND info like ('%TODO%')`);
 
     checker.notEmpty('data updated in last hour',
         `SELECT count(*) from data_updated where data_type = '${DataType.MAINTENANCE_TRACKING_DATA}' and updated > now() - interval '1 hours'`);

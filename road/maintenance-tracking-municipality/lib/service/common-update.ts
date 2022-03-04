@@ -2,6 +2,7 @@ import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {DataType} from "digitraffic-common/database/last-updated";
 import {TrackingSaveResult} from "../model/service-data";
+import * as DbData from "../db/data";
 
 export function sumResults(results: PromiseSettledResult<TrackingSaveResult>[]): TrackingSaveResult {
     const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
@@ -22,3 +23,8 @@ export function updateDataUpdated(finalResult: TrackingSaveResult): Promise<Trac
     });
 }
 
+export function upsertDomain(domain: string): Promise<null> {
+    return inDatabase((db: DTDatabase) => {
+        return DbData.upsertDomain(db, domain);
+    });
+}

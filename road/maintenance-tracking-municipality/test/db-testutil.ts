@@ -1,6 +1,6 @@
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {DTDatabase} from "digitraffic-common/database/database";
-import {DbDomainContract, DbMaintenanceTracking} from "../lib/model/db-data";
+import {DbDomain, DbDomainContract, DbMaintenanceTracking} from "../lib/model/db-data";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
@@ -10,7 +10,7 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
 
 export function dbTestBaseNoTruncate(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
-        fn, async () => { return; }, 'road', 'road', 'localhost:54322/road',
+        fn,  () => { return; }, 'road', 'road', 'localhost:54322/road',
     );
 }
 
@@ -74,6 +74,17 @@ export function findAllDomaindContracts(db: DTDatabase, domainName: string): Pro
     });
 }
 
+export function getDomain(db: DTDatabase, domainName: string): Promise<DbDomain> {
+    return db.tx(t => {
+        return t.one(`
+                select name, source, created, modified
+                from maintenance_tracking_domain domain
+                where domain.name = $1`,
+        [domainName]);
+    });
+}
+
+
 export function getDomaindContract(db: DTDatabase, domainName: string, contractId : string): Promise<DbDomainContract> {
     return db.tx(t => {
         return t.one(`
@@ -87,12 +98,17 @@ export function getDomaindContract(db: DTDatabase, domainName: string, contractI
 export function findAllTrackings(db: DTDatabase, domainName: string): Promise<DbMaintenanceTracking[]>  {
     return db.tx(t => {
         return t.manyOrNone(`
-                select id, sending_system, sending_time, last_point, line_string, work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id,
+                select id, previous_tracking_id, sending_system, sending_time, 
+                       ST_AsGeoJSON(last_point::geometry)::json last_point, ST_AsGeoJSON(line_string::geometry)::json line_string, 
+                       work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id,
                        ARRAY_AGG(task.task) AS tasks
                 from maintenance_tracking tracking
                 inner join maintenance_tracking_task task on tracking.id = task.maintenance_tracking_id
                 where tracking.domain = $1
-                group by tracking.id`,
-        [domainName]);
+                group by tracking.id, tracking.end_time
+                order by tracking.end_time`,
+        [domainName]).then(value => {
+            return value;
+        });
     });
 }

@@ -11,21 +11,21 @@ export type ApiIoChannel = {
 }
 
 export type ApiWorkeventDevice = {
-    readonly deviceId: bigint,
+    readonly deviceId: number,
     readonly deviceName: string,
     readonly workEvents: ApiWorkevent[]
 }
 
 export type ApiWorkevent = {
-    readonly deviceId: bigint
+    readonly deviceId: number
     readonly timest: string
     readonly deviceName: string
-    readonly altitude: bigint
+    readonly altitude: number
     readonly heading: number
     readonly ioChannels: ApiWorkeventIoDevice[]
     readonly lat: number
     readonly lon: number
-    readonly speed: bigint
+    readonly speed: number
     timestamp: Date
 }
 

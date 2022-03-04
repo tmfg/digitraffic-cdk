@@ -7,7 +7,7 @@ import {createHarjaId} from "./utils";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
 import {AUTORI_MAX_MINUTES_AT_ONCE, AUTORI_MAX_MINUTES_TO_HISTORY} from "../constants";
 import {TrackingSaveResult, UNKNOWN_TASK_NAME} from "../model/service-data";
-import {GeoJsonLineString, GeoJsonPoint} from "../../../../digitraffic-common/utils/geometry";
+import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geometry";
 import * as CommonUpdateService from "./common-update";
 
 export class AutoriUpdate {
@@ -23,7 +23,7 @@ export class AutoriUpdate {
      * @param domainName Solution domain name ie. myprovider-helsinki
      * @return inserted count
      */
-    async updateContracts(domainName: string): Promise<number> {
+    async updateContractsForDomain(domainName: string): Promise<number> {
 
         const apiContracts: ApiContractData[] = await this.api.getContracts();
         const dbContracts: DbDomainContract[] = this.createDbDomainContracts(apiContracts, domainName);
@@ -41,13 +41,13 @@ export class AutoriUpdate {
      * @param domainName Solution domain name ie. myprovider-helsinki
      * @return inserted count
      */
-    async updateTasks(domainName: string): Promise<number> {
+    async updateTaskMappingsForDomain(domainName: string): Promise<number> {
 
         const apiOperations: ApiOperationData[] = await this.api.getOperations();
         const taskMappings: DbDomainTaskMapping[] = this.createDbDomainTaskMappings(apiOperations, domainName);
 
         const dbIds: DbTextId[] = await inDatabase((db: DTDatabase) => {
-            return DataDb.insertNewTasks(db, taskMappings);
+            return DataDb.upsertTaskMappings(db, taskMappings);
         });
         console.info(`method=AutoriUpdate.updateTasks domain=${domainName} Insert return value: ${JSON.stringify(dbIds)}`);
         // Returns array [{"original_id":89},null,null,{"original_id":90}] -> nulls are conflicting ones not inserted

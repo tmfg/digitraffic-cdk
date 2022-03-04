@@ -1,9 +1,10 @@
-import {MaintenanceTrackingMunicipalitySecret} from "../../model/maintenance-tracking-municipality-secret";
+import {MaintenanceTrackingAutoriSecret} from "../../model/maintenance-tracking-municipality-secret";
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
 import {AutoriUpdate} from "../../service/autori-update";
 import {AutoriApi} from "../../api/autori";
 import {TrackingSaveResult} from "../../model/service-data";
+import * as CommonUpdate from "../../service/common-update";
 
 const secretId = process.env.SECRET_ID as string;
 const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] as string;
@@ -11,12 +12,12 @@ const domainPrefix = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_P
 
 let autoriUpdateService : AutoriUpdate;
 
-export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingMunicipalitySecret>) {
+export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingAutoriSecret>) {
     return async () : Promise<TrackingSaveResult> => {
         const start = Date.now();
 
         if (!autoriUpdateService) {
-            await doWithSecret(secretId, (secret: MaintenanceTrackingMunicipalitySecret) => {
+            await doWithSecret(secretId, (secret: MaintenanceTrackingAutoriSecret) => {
                 const autoriApi = new AutoriApi(secret.username, secret.password, secret.url);
                 autoriUpdateService = new AutoriUpdate(autoriApi);
             }, {
@@ -25,15 +26,17 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingMunici
         }
 
         try {
-            await autoriUpdateService.updateContracts(domainName);
-            await autoriUpdateService.updateTasks(domainName);
+            await CommonUpdate.upsertDomain(domainName);
+            await autoriUpdateService.updateContractsForDomain(domainName);
+            await autoriUpdateService.updateTaskMappingsForDomain(domainName);
+
             return autoriUpdateService.updateTrackingsForDomain(domainName)
                 .then(savedResult => {
-                    console.info(`method=autoriUpdateData count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
+                    console.info(`method=MaintenanceTrackingMunicipality.autoriUpdateData domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
                     return savedResult;
                 });
         } catch (error) {
-            console.error(`method=autoriUpdateData upsertWorkMachine failed after ${(Date.now() - start)} ms`, error);
+            console.error(`method=MaintenanceTrackingMunicipality.autoriUpdateData failed after ${(Date.now() - start)} ms`, error);
             throw error;
         }
     };
