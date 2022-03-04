@@ -166,3 +166,15 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
         return Promise.resolve([]);
     }
 }
+
+export function deleteOldTimestampsAndPilotages() {
+    return inDatabase((db: DTDatabase) => {
+        return db.tx(async t => {
+            const deletedPilotagesCount = await TimestampsDB.deleteOldPilotages(t);
+            console.info(`method=TimestampsService.deleteOldTimestamps pilotages count=${deletedPilotagesCount}`);
+
+            const deletedTimestampsCount = await TimestampsDB.deleteOldTimestamps(t);
+            console.info(`method=TimestampsService.deleteOldTimestamps timestamps count=${deletedTimestampsCount}`);
+        });
+    });
+}

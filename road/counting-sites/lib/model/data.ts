@@ -8,6 +8,7 @@ export type ApiData = {
 }
 
 export type DbData = {
+    readonly counter_id: number;
     readonly data_timestamp: Date
     readonly interval: number
     readonly count: number
@@ -15,6 +16,7 @@ export type DbData = {
 }
 
 export type ResponseData = {
+    readonly counterId: number;
     readonly dataTimestamp: Date
     readonly interval: number
     readonly count: number

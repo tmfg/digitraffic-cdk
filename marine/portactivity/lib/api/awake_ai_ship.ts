@@ -1,6 +1,6 @@
 import axios, {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {AwakeAiPredictedVoyage, AwakeAiPrediction, AwakeAiShip} from "./awake_common";
+import {AwakeAiPredictedVoyage, AwakeAiShip} from "./awake_common";
 
 export enum AwakeAiShipResponseType {
     OK = 'OK',
@@ -32,9 +32,8 @@ export type AwakeAiShipVoyageSchedule = {
 }
 
 export class AwakeAiETAShipApi {
-
-    private readonly url: string
-    private readonly apiKey: string
+    private readonly url: string;
+    private readonly apiKey: string;
 
     constructor(url: string, apiKey: string) {
         this.url = url;

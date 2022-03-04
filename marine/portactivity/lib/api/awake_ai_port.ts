@@ -22,9 +22,8 @@ export type AwakeAiPortResponse = {
 }
 
 export class AwakeAiETAPortApi {
-
-    private readonly url: string
-    private readonly apiKey: string
+    private readonly url: string;
+    private readonly apiKey: string;
 
     constructor(url: string, apiKey: string) {
         this.url = url;
@@ -33,7 +32,6 @@ export class AwakeAiETAPortApi {
 
     /**
      * Queries the Awake.AI Voyages API for predictions
-     * @param imo Ship IMO
      * @param locode Destination LOCODE. If set, overrides destination prediction.
      */
     async getETAs(locode: string): Promise<AwakeAiPortResponse> {

@@ -11,6 +11,8 @@ import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
 
+const OLD_TIMESTAMP_INTERVAL = '7 days';
+
 export type DbTimestamp = {
     readonly event_type: EventType
     readonly event_time: Date
@@ -360,6 +362,18 @@ const FIND_IMO_BY_MMSI_SQL = `
     ) AS imo
 `.trim();
 
+const DELETE_OLD_TIMESTAMPS_SQL = `
+    WITH deleted AS (
+        DELETE FROM port_call_timestamp WHERE event_time < now() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}' RETURNING *
+    ) SELECT COUNT(*) FROM deleted
+`.trim();
+
+const DELETE_OLD_PILOTAGES_SQL = `
+    WITH deleted AS (
+        DELETE FROM pilotage WHERE pilotage_end_time < NOW() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}' RETURNING *
+    ) SELECT COUNT(*) FROM deleted
+`.trim();
+
 export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: 'update-timestamps',
@@ -368,7 +382,7 @@ export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTi
     return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
-export async function removeTimestamps(db: DTDatabase | DTTransaction, source: string, sourceIds: string[]): Promise<number[]> {
+export function removeTimestamps(db: DTDatabase | DTTransaction, source: string, sourceIds: string[]): Promise<number[]> {
     if (sourceIds.length > 0) {
         return db.manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
             .then(array => array.map(object => object.id));
@@ -486,6 +500,16 @@ export async function findImoByMmsi(db: DTDatabase | DTTransaction, mmsi: number
         return imo.imo as number;
     }
     return null;
+}
+
+export async function deleteOldTimestamps(db: DTTransaction): Promise<number> {
+    const ret = await db.one(DELETE_OLD_TIMESTAMPS_SQL);
+    return ret.count;
+}
+
+export async function deleteOldPilotages(db: DTTransaction): Promise<number> {
+    const ret = await db.one(DELETE_OLD_PILOTAGES_SQL);
+    return ret.count;
 }
 
 export function createUpdateValues(e: ApiTimestamp): unknown[] {

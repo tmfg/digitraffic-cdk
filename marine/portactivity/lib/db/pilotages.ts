@@ -95,7 +95,7 @@ export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
     return idMap;
 }
 
-export async function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<unknown> {
+export function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<unknown> {
     if (pilotages && pilotages.length > 0) {
         return Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
             id: pilotage.id,
@@ -118,7 +118,7 @@ export async function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Pr
     return Promise.resolve();
 }
 
-export async function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<void[]> {
+export function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<void[]> {
     if (pilotageIds && pilotageIds.length > 0) {
         return db.manyOrNone(DELETE_PILOTAGES_SQL, [pilotageIds]);
     }

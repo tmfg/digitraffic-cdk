@@ -24,9 +24,15 @@ export function handlerFn(doWithSecret: SecretFunction<GenericSecret>) {
 
         console.info("updating images from " + imageServerUrl);
 
-        return ImageFetcher.updateAllCameras(
-            imageServerUrl, imageServerUsername, imageServerPassword, bucketName, imageServerCertificate,
-        );
+        try {
+            return ImageFetcher.updateAllCameras(
+                imageServerUrl, imageServerUsername, imageServerPassword, bucketName, imageServerCertificate,
+            );
+        } catch (error) {
+            console.log("updateAllCameras failed with %s", error);
+
+            return Promise.resolve();
+        }
     };
 }
 

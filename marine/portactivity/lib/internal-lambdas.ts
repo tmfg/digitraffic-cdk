@@ -58,6 +58,7 @@ export function create(stack: DigitrafficStack,
     );
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(stack, queueAndDLQ.queue);
     const updateTimestampsFromPilotwebLambda = createUpdateTimestampsFromPilotwebLambda(stack, queueAndDLQ.queue);
+    const deleteOldTimestampsLambda = createOldTimestampsLambda(stack);
 
     stack.grantSecret(
         cpqLambda,
@@ -66,6 +67,7 @@ export function create(stack: DigitrafficStack,
         updateAwakeAiETAPortTimestampsLambda,
         updateScheduleTimestampsLambda,
         updateTimestampsFromPilotwebLambda,
+        deleteOldTimestampsLambda,
     );
     new DigitrafficLogSubscriptions(
         stack,
@@ -76,6 +78,7 @@ export function create(stack: DigitrafficStack,
         updateAwakeAiETAPortTimestampsLambda,
         updateScheduleTimestampsLambda,
         updateTimestampsFromPilotwebLambda,
+        deleteOldTimestampsLambda,
     );
 
     Scheduler.everyMinutes(stack,
@@ -96,6 +99,9 @@ export function create(stack: DigitrafficStack,
         'PortActivity-PilotwebScheduler',
         1,
         updateTimestampsFromPilotwebLambda);
+    Scheduler.everyDay(stack,
+        'PortActivity-DeleteOldTimestampsScheduler',
+        deleteOldTimestampsLambda);
 
     if ((stack.configuration as Props).awakeATx) {
         const updateAwakeAiATXTimestampsLambda = createUpdateAwakeAiATXTimestampsLambda(stack, queueAndDLQ.queue);
@@ -130,6 +136,15 @@ function createUpdateTimestampsFromPilotwebLambda(stack: DigitrafficStack, queue
     queue.grantSendMessages(lambda);
 
     return lambda;
+}
+
+function createOldTimestampsLambda(stack: DigitrafficStack): MonitoredFunction {
+    const environment = stack.createLambdaEnvironment();
+    return MonitoredFunction.createV2(stack, 'delete-old-timestamps', environment, {
+        memorySize: 128,
+        timeout: 5,
+        reservedConcurrentExecutions: 1,
+    });
 }
 
 // ATTENTION!

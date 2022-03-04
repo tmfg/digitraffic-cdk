@@ -1,5 +1,7 @@
 import {addCorsHeaders} from "../lambda-util";
 
+const VERSION_HEADERS = "EXT_VERSION";
+
 /*
     This is a edge lambda that should be run at cloudfront at origin request event.
     It checks the request for accept-encoding header and if it does not contains gzip return 406.

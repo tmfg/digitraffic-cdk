@@ -1,5 +1,4 @@
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
-import {UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
 import {Construct} from "constructs";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {MobileServerProps} from './app-props';

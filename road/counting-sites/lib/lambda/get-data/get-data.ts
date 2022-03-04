@@ -1,25 +1,28 @@
-import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import * as CountingSitesService from "../../service/counting-sites";
 import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
+import {validate, ValuesQueryParameters} from "../../model/parameters";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 
-const secretId = process.env.SECRET_ID as string;
+const holder = SecretHolder.create();
 
-export const handler = (event: Record<string, string>) => {
-    return withDbSecret(secretId, () => {
-        const start = Date.now();
+export const handler = async (event: ValuesQueryParameters) => {
+    await holder.setDatabaseCredentials();
 
-        const counterId = event.counterId;
-        const domainName = event.domainName;
+    const start = Date.now();
 
-        return CountingSitesService.findCounterValues(counterId, domainName).then(data => {
-            return LambdaResponse.okJson(data);
-        }).catch(error => {
-            console.info("error " + error);
+    const validationError = validate(event);
+    if (validationError) {
+        return Promise.resolve(LambdaResponse.badRequest(validationError));
+    }
 
-            return LambdaResponse.internalError();
-        }).finally(() => {
-            console.info("method=CountingSites.GetData tookMs=%d", (Date.now() - start));
-        });
+    return CountingSitesService.findCounterValues(event.year, event.month, event.counterId, event.domainName).then(data => {
+        return LambdaResponse.okJson(data);
+    }).catch(error => {
+        console.info("error " + error);
+
+        return LambdaResponse.internalError();
+    }).finally(() => {
+        console.info("method=CountingSites.GetData tookMs=%d", (Date.now() - start));
     });
 };
 

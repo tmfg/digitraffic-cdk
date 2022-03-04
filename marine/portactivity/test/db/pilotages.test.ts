@@ -1,5 +1,5 @@
-import {dbTestBase} from "../db-testutil";
-import {deletePilotages, findPortCallId, getTimestamps, updatePilotages} from "../../lib/db/pilotages";
+import {dbTestBase, insertPilotage} from "../db-testutil";
+import {deletePilotages, findPortCallId, getTimestamps} from "../../lib/db/pilotages";
 import {Pilotage} from "../../lib/model/pilotage";
 import {Location} from "lib/model/timestamp";
 import {DTDatabase} from "digitraffic-common/database/database";
@@ -85,28 +85,3 @@ describe('db-pilotages-public', dbTestBase((db: DTDatabase) => {
         expect(timestampMap2[2]).toStrictEqual(now);
     });
 }));
-
-export function insertPilotage(db: DTDatabase, id: number, state: string, scheduleUpdated: Date): Promise<unknown> {
-    return updatePilotages(db, [{
-        id,
-        vessel: {
-            name: 'test',
-            imo: 1,
-            mmsi: 1,
-        },
-        vesselEta: new Date().toISOString(),
-        pilotBoardingTime: new Date().toISOString(),
-        endTime: new Date().toISOString(),
-        scheduleUpdated: scheduleUpdated.toISOString(),
-        scheduleSource: 'test',
-        state,
-        route: {
-            start: {
-                code: 'START',
-            },
-            end: {
-                code: 'END',
-            },
-        },
-    }]);
-}

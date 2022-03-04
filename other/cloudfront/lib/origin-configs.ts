@@ -1,24 +1,21 @@
 import {Duration, Stack} from 'aws-cdk-lib';
 import {
     Behavior,
-    LambdaEdgeEventType,
     LambdaFunctionAssociation,
     OriginAccessIdentity,
     OriginProtocolPolicy,
     SourceConfiguration,
 } from 'aws-cdk-lib/aws-cloudfront';
 import {Bucket} from 'aws-cdk-lib/aws-s3';
-import {Version} from "aws-cdk-lib/aws-lambda";
 import {CFBehavior, CFDistribution, CFDomain, S3Domain} from "./app-props";
 import {CfnDistribution} from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
-import {LambdaType} from "./lambda/lambda-creator";
-
-export type LambdaMap = Record<string, Version>;
+import {FunctionAssociation} from "aws-cdk-lib/aws-cloudfront/lib/function";
+import {LambdaHolder} from "./lambda-holder";
 
 export function createOriginConfig(stack: Stack,
     distribution: CFDistribution,
     oai: OriginAccessIdentity|null,
-    lambdaMap: LambdaMap)
+    lambdaMap: LambdaHolder)
     : SourceConfiguration {
     if (distribution instanceof S3Domain) {
         if (!oai) {
@@ -57,20 +54,20 @@ export function createOriginConfig(stack: Stack,
 }
 
 function createOriginHeaders(domain: CFDomain): { [key: string] : string } {
+    const headers = domain.headers || {};
+
     if (domain.apiKey !== undefined) {
-        return {
-            'x-api-key': domain.apiKey,
-        } as { [key: string] : string };
+        headers['x-api-key'] = domain.apiKey;
     }
 
-    return {};
+    return headers;
 }
 
-function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: LambdaMap): Behavior[] {
+function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: LambdaHolder): Behavior[] {
     return behaviors.map(b => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
-function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDefaultBehavior = false): Behavior {
+function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaHolder, isDefaultBehavior = false): Behavior {
     //console.info('creating behavior %s with default %d', b.path, isDefaultBehavior);
 
     const forwardedValues = {
@@ -94,42 +91,33 @@ function createBehavior(stack: Stack, b: CFBehavior, lambdaMap: LambdaMap, isDef
         maxTtl: Duration.seconds(b.cacheTtl),
         defaultTtl: Duration.seconds(b.cacheTtl),
         forwardedValues,
+        functionAssociations: getCloudfrontFunctions(b, lambdaMap),
         lambdaFunctionAssociations: getLambdas(b, lambdaMap),
     };
 }
 
-function getLambdas(b: CFBehavior, lambdaMap: LambdaMap): LambdaFunctionAssociation[] | undefined {
-    const lambdas: LambdaFunctionAssociation[] = [];
+function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaHolder): FunctionAssociation[] {
+    const functionAssociations: FunctionAssociation[] = [];
 
-    Object.values(LambdaType).forEach(type => {
-        if (b.lambdaTypes?.has(type as LambdaType)) {
-            lambdas.push({
-                eventType: getEventType(type as LambdaType),
-                lambdaFunction: lambdaMap[type],
-            });
-        }
+    b.functionTypes.forEach(type => {
+        functionAssociations.push(lambdaMap.getFunctionAssociation(type));
+    });
+
+    return functionAssociations;
+}
+
+function getLambdas(b: CFBehavior, lambdaMap: LambdaHolder): LambdaFunctionAssociation[] {
+    const lambdaFunctionAssociations: LambdaFunctionAssociation[] = [];
+
+    b.lambdaTypes.forEach(type => {
+        lambdaFunctionAssociations.push(lambdaMap.getLambdaAssociation(type));
     });
 
     if (b.ipRestriction) {
-        lambdas.push({
-            eventType: LambdaEdgeEventType.ORIGIN_REQUEST,
-            lambdaFunction: lambdaMap[`IP_${b.ipRestriction}`],
-        });
+        lambdaFunctionAssociations.push(lambdaMap.getRestriction(b.ipRestriction));
     }
 
-    return lambdas.length == 0 ? undefined : lambdas;
+    return lambdaFunctionAssociations;
 }
 
-function getEventType(type: LambdaType): LambdaEdgeEventType {
-    switch (type) {
-        case LambdaType.WEATHERCAM_REDIRECT:
-        case LambdaType.IP_RESTRICTION:
-        case LambdaType.GZIP_REQUIREMENT:
-            return LambdaEdgeEventType.ORIGIN_REQUEST;
-        case LambdaType.HTTP_HEADERS:
-            return LambdaEdgeEventType.VIEWER_RESPONSE;
-        default:
-            throw new Error('unknown lambdatype');
-    }
-}
 

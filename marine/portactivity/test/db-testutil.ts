@@ -4,6 +4,7 @@ import * as TimestampsDb from '../lib/db/timestamps';
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
+import {updatePilotages} from "../lib/db/pilotages";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(
@@ -47,6 +48,11 @@ export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> 
             portcall_id
         FROM port_call_timestamp`);
     });
+}
+
+export async function getPilotagesCount(db: DTDatabase | DTTransaction): Promise<number> {
+    const ret = await db.tx(t => t.one('SELECT COUNT(*) FROM pilotage'));
+    return ret.count;
 }
 
 export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[]): Promise<void> {
@@ -171,4 +177,35 @@ export async function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall
             $(imo_lloyds)
         )
     `, p);
+}
+
+export function insertPilotage(
+    db: DTDatabase,
+    id: number,
+    state: string,
+    scheduleUpdated: Date,
+    endTime?: Date,
+): Promise<unknown> {
+    return updatePilotages(db, [{
+        id,
+        vessel: {
+            name: 'test',
+            imo: 1,
+            mmsi: 1,
+        },
+        vesselEta: new Date().toISOString(),
+        pilotBoardingTime: new Date().toISOString(),
+        endTime: endTime?.toISOString() ?? new Date().toISOString(),
+        scheduleUpdated: scheduleUpdated.toISOString(),
+        scheduleSource: 'test',
+        state,
+        route: {
+            start: {
+                code: 'START',
+            },
+            end: {
+                code: 'END',
+            },
+        },
+    }]);
 }

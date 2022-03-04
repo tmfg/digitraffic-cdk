@@ -7,6 +7,7 @@ import {CfnMethod, CfnResource} from "aws-cdk-lib/aws-apigateway";
 import {paramCase, snakeCase} from "change-case";
 import IntegrationProperty = CfnMethod.IntegrationProperty;
 import {CfnQueue} from "aws-cdk-lib/aws-sqs";
+import {LogRetention} from "aws-cdk-lib/aws-logs";
 
 const MAX_CONCURRENCY_LIMIT = 100;
 const NODE_RUNTIME = Runtime.NODEJS_14_X.name;
@@ -31,6 +32,7 @@ export class StackCheckingAspect implements IAspect {
         StackCheckingAspect.checkBucket(node);
         this.checkResourceCasing(node);
         StackCheckingAspect.checkQueueEncryption(node);
+        StackCheckingAspect.checkLogGroupRetention(node);
     }
 
     private static checkStack(node: IConstruct) {
@@ -98,8 +100,17 @@ export class StackCheckingAspect implements IAspect {
         }
     }
 
-    private static isValidPath(path: string) {
-        return path.includes('{') || paramCase(path) === path;
+    private static isValidPath(path: string): boolean {
+        // if path includes . or { check only the trailing part of path
+        if (path.includes('.')) {
+            return this.isValidPath(path.split('.')[0]);
+        }
+
+        if (path.includes('{')) {
+            return this.isValidPath(path.split('{')[0]);
+        }
+
+        return paramCase(path) === path;
     }
 
     private static isValidQueryString(name: string) {
@@ -137,6 +148,17 @@ export class StackCheckingAspect implements IAspect {
 
             if (!queue.kmsMasterKeyId) {
                 Annotations.of(node).addError('Queue must have encryption enabled');
+            }
+        }
+    }
+
+    private static checkLogGroupRetention(node: IConstruct) {
+        if (node instanceof LogRetention) {
+            const child = node.node.defaultChild as unknown as Record<string, Record<string, string>>;
+            const retention = child._cfnProperties.RetentionInDays;
+
+            if (!retention) {
+                Annotations.of(node).addError(`Log group ${node.node.path} must define log group retention`);
             }
         }
     }
