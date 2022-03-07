@@ -41,11 +41,14 @@ export const handler: KinesisStreamHandler = (event, context): void => {
 
         event.Records.forEach((record: KinesisStreamRecord) => {
             const recordBody = handleRecord(record, statistics);
-            batchBody += recordBody;
 
-            if (batchBody.length > MAX_BODY_SIZE) {
-                postToElastic(context, true, batchBody);
-                batchBody = "";
+            if (recordBody.trim().length > 0) {
+                batchBody += recordBody;
+
+                if (batchBody.length > MAX_BODY_SIZE) {
+                    postToElastic(context, true, batchBody);
+                    batchBody = "";
+                }
             }
         });
 
