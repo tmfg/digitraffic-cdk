@@ -20,18 +20,10 @@ export function buildFromMessage(message: string, enableJsonParse: boolean): any
         return {};
     }
 
-    message = message.replace('[, ]', '[0.0,0.0]')
-        .replace(/\"Infinity\"/g, "-1")
+    const logLine = message.replace('[, ]', '[0.0,0.0]')
+        .replace(/"Infinity"/gi, "-1")
         .replace(/Infinity/gi, "-1")
-        .replace(/\"null\"/gi, "null")
-        .replace(/\\n/g, "\\n")
-        .replace(/\\'/g, "\\'")
-        .replace(/\\"/g, '\\"')
-        .replace(/\\&/g, "\\&")
-        .replace(/\\r/g, "\\r")
-        .replace(/\\t/g, "\\t")
-        .replace(/\\b/g, "\\b")
-        .replace(/\\f/g, "\\f");
+        .replace(/"null"/gi, "null");
 
     try {
         if (enableJsonParse) {
@@ -142,13 +134,13 @@ export function filterIds(body: string, ids: string[]): string {
         const logLine = lines[i+1];
 
         // ends with newline, so one empty line in the end
-       if(indexLine.length > 0 && !containsIds(logLine, ids)) {
-           newBody+= indexLine + '\n';
-           newBody+= logLine + '\n';
-       }
-   }
+        if (indexLine.length > 0 && !containsIds(logLine, ids)) {
+            newBody+= indexLine + '\n';
+            newBody+= logLine + '\n';
+        }
+    }
 
-   return newBody;
+    return newBody;
 }
 
 function containsIds(line: string, ids: string[]): boolean {
