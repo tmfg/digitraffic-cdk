@@ -6,11 +6,8 @@ export async function updatePermits(authKey: string, url: string) {
     const permitsInApi = await permitsService.getExcavationPermits(authKey, url);
     const permitIdsInDb = await getAllPermitIdsFromDb();
 
-    const idList = permitIdsInDb.map(row => row.id);
-    const newPermits = permitsInApi.filter(permit => !idList.includes(permit.id));
-
-    console.info("oldPermits " + idList);
-    console.info("newPermits " + permitsInApi.map(p => p.id));
+    const idList = permitIdsInDb.map(row => row.sourceId);
+    const newPermits = permitsInApi.filter(permit => !idList.includes(permit.sourceId));
 
     if (newPermits.length > 0) {
         await inTransaction((db: DTTransaction) => {

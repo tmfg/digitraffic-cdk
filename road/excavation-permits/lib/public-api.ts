@@ -6,7 +6,7 @@ import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredf
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
-import {permitProperties} from "./model/excavation-permit";
+import {permitProperties} from "./model/permit";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
 const EXCAVATION_PERMITS_TAGS = ["Excavation permit(Beta)"];

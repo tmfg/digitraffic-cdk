@@ -1,4 +1,4 @@
 export type PermitsSecret = {
-    authKey: string
-    url: string
+    readonly authKey: string
+    readonly url: string
 }

@@ -1,5 +1,5 @@
 import {PermitsApi} from "../api/permits";
-import {ApiExcavationPermit, DbPermit} from "../model/excavation-permit";
+import {ApiPermit, DbPermit} from "../model/permit";
 import {PermitElement, PermitResponse} from "../model/permit-xml";
 import moment from "moment";
 import * as xml2js from 'xml2js';
@@ -9,7 +9,7 @@ import {Geometry} from "geojson";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
-export async function getExcavationPermits(authKey: string, url: string): Promise<ApiExcavationPermit[]> {
+export async function getExcavationPermits(authKey: string, url: string): Promise<ApiPermit[]> {
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
     const jsonPermits = await xmlToJs(xmlPermits);
@@ -43,11 +43,11 @@ function convertD2Light(permits: DbPermit[]) {
             "type": {
                 "value": "maintenanceWork",
             },
-            "detailedTypeText": permit.subject,
+            "detailedTypeText": permit.permitSubject,
             "severity": "Medium",
             "safetyRelatedMessage": false,
-            "sourceName": "Lahden kaupunki",
-            "generalPublicComment": permit.subject,
+            "sourceName": permit.source,
+            "generalPublicComment": permit.permitSubject,
             "situationId": permit.id,
             "location": convertLocation(permit.geometry),
         }
@@ -101,11 +101,12 @@ function isValidExcavationPermit(permitElement: PermitElement): boolean {
     && permitElement["GIS:YlAlLuvat"]["GIS:Id"] !== '0';
 }
 
-function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
+function convertPermit(permitElement: PermitElement): ApiPermit {
     const permitObject = permitElement["GIS:YlAlLuvat"];
     return {
-        id: permitObject["GIS:Id"],
-        subject: permitObject["GIS:LuvanTarkoitus"],
+        sourceId: permitObject["GIS:Id"],
+        source: "Lahden kaupunki",
+        permitSubject: permitObject["GIS:LuvanTarkoitus"],
         permitType: permitObject["GIS:Lupatyyppi"],
         gmlGeometryXmlString: jsToXml(permitObject["GIS:Geometry"]),
         effectiveFrom: moment(`${permitObject["GIS:VoimassaolonAlkamispaiva"]} ${permitObject["GIS:VoimassaolonAlkamisaika"]}`, "DD.MM.YYYY HH:mm").toDate(),

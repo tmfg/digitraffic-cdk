@@ -1,12 +1,12 @@
 import {DTDatabase, DTTransaction} from "../../../../digitraffic-common/database/database";
 import {PreparedStatement} from "pg-promise";
-import {ApiExcavationPermit, DbPermit} from "../model/excavation-permit";
+import {ApiPermit, DbPermit} from "../model/permit";
 import {FeatureCollection, Geometry as GeoJSONGeometry} from "geojson";
 import {Geometry} from "wkx";
 
 const SQL_INSERT_PERMIT =
-    `INSERT INTO excavation_permit (id, version, permit_type, subject, geometry, effective_from, effective_to, created_at, updated_at)
-     VALUES ($1, 1, $2, $3, ST_Transform(ST_GeomFromGML($4), 4326), $5, $6, NOW(), NOW())`;
+    `INSERT INTO permit (id, source_id, source, permit_type, permit_subject, geometry, effective_from, effective_to, created_at, updated_at, version)
+     VALUES (DEFAULT, $1, $2, $3, $4, ST_Transform(ST_GeomFromGML($5), 4326), $6, $7, NOW(), NOW(), 1)`;
 
 const SQL_FIND_ALL_PERMITS_GEOJSON =
     `select json_build_object(
@@ -28,14 +28,14 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
                  )
              ), '[]')
         ) as collection
-     from excavation_permit`;
+     from permit`;
 
 
 const SQL_FIND_ALL_PERMITS =
     `select id, version, permit_type, subject, geometry, effective_from, effective_to, created_at, updated_at
-     from excavation_permit`;
+     from permit`;
 
-const SQL_FIND_ALL_PERMIT_IDS = "SELECT id FROM excavation_permit";
+const SQL_FIND_ALL_PERMIT_IDS = "SELECT id FROM permit";
 
 const PS_INSERT_PERMIT = new PreparedStatement({
     name: 'insert-permit',
@@ -57,10 +57,10 @@ const PS_FIND_ALL_IDS = new PreparedStatement({
     text: SQL_FIND_ALL_PERMIT_IDS,
 });
 
-export function insertPermits(db: DTTransaction, permits: ApiExcavationPermit[]): Promise<null[]> {
+export function insertPermits(db: DTTransaction, permits: ApiPermit[]): Promise<null[]> {
     return Promise.all(permits
         .map(permit => db.none(PS_INSERT_PERMIT,
-            [permit.id, permit.permitType, permit.subject, permit.gmlGeometryXmlString, permit.effectiveFrom, permit.effectiveTo])));
+            [permit.sourceId, permit.source, permit.permitType, permit.permitSubject, permit.gmlGeometryXmlString, permit.effectiveFrom, permit.effectiveTo])));
 }
 
 export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollection> {
@@ -70,7 +70,10 @@ export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollecti
 export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
     return db.manyOrNone(PS_FIND_ALL).then(results => results.map(result => ({
         id: result.id,
+        sourceId: result.sourceId,
+        source: result.source,
         version: result.version,
+        permitSubject: result.permit_subject,
         permitType: result.permit_type,
         subject: result.subject,
         geometry: Geometry.parse(Buffer.from(result.geometry, "hex")).toGeoJSON() as GeoJSONGeometry,

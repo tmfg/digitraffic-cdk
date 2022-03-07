@@ -1,35 +1,46 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
 import {Geometry} from "geojson";
 
-export type ApiExcavationPermit = {
-    readonly id: string;
-    readonly subject: string;
-    readonly permitType: string;
-    readonly gmlGeometryXmlString: string;
-    readonly effectiveFrom: Date;
-    readonly effectiveTo?: Date;
+export type ApiPermit = {
+    readonly sourceId: string
+    readonly source: string
+    readonly permitSubject: string
+    readonly permitType: string
+    readonly gmlGeometryXmlString: string
+    readonly effectiveFrom: Date
+    readonly effectiveTo?: Date
 }
 
 export type DbPermit = {
     readonly id: string
-    readonly version: number
+    readonly sourceId: string
+    readonly source: string
     readonly permitType: string
-    readonly subject: string
+    readonly permitSubject: string
     readonly geometry: Geometry
     readonly effectiveFrom: Date
     readonly effectiveTo?: Date
     readonly createdAt: Date
     readonly updatedAt: Date
+    readonly version: number
 }
 
 export const permitProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Excavation Permit properties',
+    description: 'Permit properties',
     properties: {
         id: {
             type: JsonSchemaType.INTEGER,
             description: 'Permit id',
+        },
+        sourceId: {
+            type: JsonSchemaType.STRING,
+            description: 'Permit id in source',
+        },
+        source: {
+            type: JsonSchemaType.STRING,
+            description: 'Permit source',
         },
         version: {
             type: JsonSchemaType.INTEGER,
@@ -39,7 +50,7 @@ export const permitProperties: JsonSchema = {
             type: JsonSchemaType.STRING,
             description: 'Permit type',
         },
-        subject: {
+        permitSubject: {
             type: JsonSchemaType.STRING,
             description: 'Permit purpose',
         },
