@@ -13,6 +13,7 @@ export async function getExcavationPermits(authKey: string, url: string): Promis
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
     const jsonPermits = await xmlToJs(xmlPermits);
+
     return jsonPermits["wfs:FeatureCollection"]["gml:featureMember"]
         .filter(permitElement => isValidExcavationPermit(permitElement))
         .map(permitElement => convertPermit(permitElement));
@@ -95,8 +96,9 @@ function convertLocation(geometry: Geometry) {
 }
 
 function isValidExcavationPermit(permitElement: PermitElement): boolean {
-    return permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi"] === "Kaivulupa"
-        && permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null;
+    // for some reason, duplicate 0-id permits
+    return permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null
+    && permitElement["GIS:YlAlLuvat"]["GIS:Id"] !== '0';
 }
 
 function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
@@ -104,6 +106,7 @@ function convertPermit(permitElement: PermitElement): ApiExcavationPermit {
     return {
         id: permitObject["GIS:Id"],
         subject: permitObject["GIS:LuvanTarkoitus"],
+        permitType: permitObject["GIS:Lupatyyppi"],
         gmlGeometryXmlString: jsToXml(permitObject["GIS:Geometry"]),
         effectiveFrom: moment(`${permitObject["GIS:VoimassaolonAlkamispaiva"]} ${permitObject["GIS:VoimassaolonAlkamisaika"]}`, "DD.MM.YYYY HH:mm").toDate(),
         effectiveTo: permitObject["GIS:VoimassaolonPaattymispaiva"] != null ?

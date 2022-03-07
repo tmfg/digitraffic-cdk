@@ -4,6 +4,7 @@ import {Geometry} from "geojson";
 export type ApiExcavationPermit = {
     readonly id: string;
     readonly subject: string;
+    readonly permitType: string;
     readonly gmlGeometryXmlString: string;
     readonly effectiveFrom: Date;
     readonly effectiveTo?: Date;
@@ -12,6 +13,7 @@ export type ApiExcavationPermit = {
 export type DbPermit = {
     readonly id: string
     readonly version: number
+    readonly permitType: string
     readonly subject: string
     readonly geometry: Geometry
     readonly effectiveFrom: Date
@@ -32,6 +34,10 @@ export const permitProperties: JsonSchema = {
         version: {
             type: JsonSchemaType.INTEGER,
             description: 'Permit version',
+        },
+        permitType: {
+            type: JsonSchemaType.STRING,
+            description: 'Permit type',
         },
         subject: {
             type: JsonSchemaType.STRING,

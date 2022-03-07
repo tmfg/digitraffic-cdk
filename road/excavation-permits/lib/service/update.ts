@@ -9,13 +9,16 @@ export async function updatePermits(authKey: string, url: string) {
     const idList = permitIdsInDb.map(row => row.id);
     const newPermits = permitsInApi.filter(permit => !idList.includes(permit.id));
 
+    console.info("oldPermits " + idList);
+    console.info("newPermits " + permitsInApi.map(p => p.id));
+
     if (newPermits.length > 0) {
         await inTransaction((db: DTTransaction) => {
             return permitDb.insertPermits(db, newPermits);
         });
-
-        console.info("method=UpdateService.updatePermits count=%d insertCount=%d", permitIdsInDb.length, newPermits.length);
     }
+
+    console.info("method=UpdateService.updatePermits count=%d insertCount=%d", permitIdsInDb.length, newPermits.length);
 }
 
 async function getAllPermitIdsFromDb(): Promise<Record<string, string>[]> {

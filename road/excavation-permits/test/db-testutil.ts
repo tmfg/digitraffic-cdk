@@ -15,7 +15,7 @@ function truncate(db: DTDatabase): Promise<void> {
 
 export function insertPermit(db: DTDatabase, id: number, subject: string) {
     return db.tx(async t => {
-        await t.none(`insert into excavation_permit(id, version, subject, geometry, effective_from, created_at)
-values ($1, 1, $2, point(10, 10)::geometry, now(), now())`, [id, subject]);
+        await t.none(`insert into excavation_permit(id, version, permit_type, subject, geometry, effective_from, created_at)
+values ($1, 1, 'Kaivulupa', $2, point(10, 10)::geometry, now(), now())`, [id, subject]);
     });
 }
