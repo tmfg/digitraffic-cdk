@@ -13,12 +13,13 @@ export async function updatePermits(authKey: string, url: string) {
         await inTransaction((db: DTTransaction) => {
             return permitDb.insertPermits(db, newPermits);
         });
+
+        console.info("method=UpdateService.updatePermits count=%d insertCount=%d", permitIdsInDb.length, newPermits.length);
     }
 }
 
 async function getAllPermitIdsFromDb(): Promise<Record<string, string>[]> {
-    const idRows = await inDatabaseReadonly((db: DTDatabase) => {
+    return await inDatabaseReadonly((db: DTDatabase) => {
         return permitDb.getAllPermitIds(db);
     });
-    return idRows;
 }
