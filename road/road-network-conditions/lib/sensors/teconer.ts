@@ -1,0 +1,26 @@
+import {SensorDataPoint} from "./sensor";
+
+type Entry = {
+    ts: number,
+    value: string,
+}
+
+export type TeconerData = {
+    Friction: Entry[],
+    State: Entry[],
+    Latitude: Entry[],
+    Longitude: Entry[],
+}
+
+export function convertTeconer(device:string): (td: TeconerData) => SensorDataPoint[] {
+    return (td: TeconerData) =>
+        td.Friction.reduce((acc: SensorDataPoint[], val, index) => acc.concat({
+            device,
+            friction: parseFloat(td.Friction[index].value),
+            latitude: parseFloat(td.Latitude[index].value),
+            longitude: parseFloat(td.Longitude[index].value),
+            code: parseInt(td.State[index].value, 10),
+            state: "",
+            timestamp: val.ts,
+        }), []);
+}

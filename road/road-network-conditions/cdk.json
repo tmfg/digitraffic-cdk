@@ -1,0 +1,3 @@
+{
+  "app": "npx node bin/road-network-conditions.js"
+}
