@@ -1,5 +1,5 @@
 import {PermitsApi} from "../api/permits";
-import {ApiPermit, DbPermit} from "../model/permit";
+import {ApiPermit, DbPermit, PermitType} from "../model/permit";
 import {PermitElement, PermitResponse} from "../model/permit-xml";
 import moment from "moment";
 import * as xml2js from 'xml2js';
@@ -40,9 +40,7 @@ function convertD2Light(permits: DbPermit[]) {
             "versionTime": permit.updatedAt,
             "startTime": permit.effectiveFrom,
             "endTime": permit.effectiveTo,
-            "type": {
-                "value": "maintenanceWork",
-            },
+            "type": permit.permitType,
             "detailedTypeText": permit.permitSubject,
             "severity": "Medium",
             "safetyRelatedMessage": false,
@@ -98,22 +96,47 @@ function convertLocation(geometry: Geometry) {
 function isValidExcavationPermit(permitElement: PermitElement): boolean {
     // for some reason, duplicate 0-id permits
     return permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null
-    && permitElement["GIS:YlAlLuvat"]["GIS:Id"] !== '0';
+    && permitElement["GIS:YlAlLuvat"]["GIS:Id"] !== '0'
+    && permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi"] !== 'Alueen tilapäinen käyttölupa';
 }
 
 function convertPermit(permitElement: PermitElement): ApiPermit {
     const permitObject = permitElement["GIS:YlAlLuvat"];
+    const permitType = mapLupatyyppi(permitObject["GIS:Lupatyyppi_koodi"]);
+    const permitSubject = convertSubject(permitType, permitObject["GIS:LuvanTarkoitus"], permitObject["GIS:Nimi"]);
+
     return {
         sourceId: permitObject["GIS:Id"],
         source: "Lahden kaupunki",
-        permitSubject: permitObject["GIS:LuvanTarkoitus"],
-        permitType: permitObject["GIS:Lupatyyppi"],
+        permitSubject,
+        permitType,
         gmlGeometryXmlString: jsToXml(permitObject["GIS:Geometry"]),
         effectiveFrom: moment(`${permitObject["GIS:VoimassaolonAlkamispaiva"]} ${permitObject["GIS:VoimassaolonAlkamisaika"]}`, "DD.MM.YYYY HH:mm").toDate(),
         effectiveTo: permitObject["GIS:VoimassaolonPaattymispaiva"] != null ?
             moment(`${permitObject["GIS:VoimassaolonPaattymispaiva"]} ${permitObject["GIS:VoimassaolonPaattymissaika"]}`, "DD.MM.YYYY HH:mm").toDate()
             : undefined,
     };
+}
+
+function convertSubject(permitType: PermitType, tarkoitus: string, nimi: string) {
+    if (permitType === PermitType.CONSTRUCTION_WORKS) {
+        return tarkoitus;
+    }
+
+    return nimi || tarkoitus;
+}
+
+function mapLupatyyppi(lupatyyppiKoodi: string) {
+    switch (lupatyyppiKoodi) {
+        case '2': // kaivulupa
+            return PermitType.CONSTRUCTION_WORKS;
+        case '41': // tilapäinen käyttölupa
+        case '60': // käyttölupa tapahtuman järjestämiseen
+            return PermitType.PUBLIC_EVENT;
+        default:
+            console.info("unknown lupatyyppi koodi " + lupatyyppiKoodi);
+            return PermitType.OTHER;
+    }
 }
 
 function xmlToJs(xml: string): Promise<PermitResponse> {

@@ -19,7 +19,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
                          'id', id,
                          'version', version,
                          'permitType', permit_type,
-                         'subject', subject,
+                         'subject', permit_subject,
                          'effectiveFrom', effective_from,
                          'effectiveTo', effective_to,
                          'createdAt', created_at,
@@ -32,7 +32,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
 
 
 const SQL_FIND_ALL_PERMITS =
-    `select id, version, permit_type, subject, geometry, effective_from, effective_to, created_at, updated_at
+    `select id, version, permit_type, permit_subject, geometry, effective_from, effective_to, created_at, updated_at
      from permit`;
 
 const SQL_FIND_ALL_PERMIT_IDS = "SELECT id FROM permit";

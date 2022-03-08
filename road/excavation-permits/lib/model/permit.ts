@@ -11,6 +11,10 @@ export type ApiPermit = {
     readonly effectiveTo?: Date
 }
 
+export enum PermitType {
+    CONSTRUCTION_WORKS = "constructionWorks", PUBLIC_EVENT = 'publicEvent', OTHER = "other"
+}
+
 export type DbPermit = {
     readonly id: string
     readonly sourceId: string

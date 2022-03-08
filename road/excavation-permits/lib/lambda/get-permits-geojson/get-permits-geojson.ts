@@ -12,7 +12,7 @@ export const handler = async () => {
     return PermitsService.findPermitsInGeojson().then(result => {
         return LambdaResponse.okJson(result);
     }).catch(error => {
-        console.info("error " + error);
+        console.error("method=ExcavationPermits.GetPermitsGeoJson error " + error);
 
         return LambdaResponse.internalError();
     }).finally(() => {

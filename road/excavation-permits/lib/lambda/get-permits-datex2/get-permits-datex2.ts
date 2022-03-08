@@ -12,7 +12,7 @@ export const handler = async () => {
     return PermitsService.findPermitsInD2Light().then(result => {
         return LambdaResponse.okJson(result);
     }).catch(error => {
-        console.info("error " + error);
+        console.error("method=ExcavationPermits.GetPermitsInD2Light " + error);
 
         return LambdaResponse.internalError();
     }).finally(() => {

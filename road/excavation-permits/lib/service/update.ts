@@ -15,7 +15,7 @@ export async function updatePermits(authKey: string, url: string) {
         });
     }
 
-    console.info("method=UpdateService.updatePermits count=%d insertCount=%d", permitIdsInDb.length, newPermits.length);
+    console.info("method=UpdateService.updatePermits count=%d insertCount=%d", permitsInApi.length, newPermits.length);
 }
 
 async function getAllPermitIdsFromDb(): Promise<Record<string, string>[]> {
