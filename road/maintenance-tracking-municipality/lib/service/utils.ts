@@ -9,3 +9,12 @@ export function createHarjaId(src: string): bigint {
     // Postgres BigInt is 8 byte signed -> take first 7 1/2 bytes to be safe side for unsigned hex value
     return BigInt('0x' + hex.substring(0, 15)).valueOf();
 }
+
+export function countEstimatedSizeOfMesage(message: object) {
+    try {
+        return Buffer.byteLength(JSON.stringify(message)); // Just estimate of the size of new data
+    } catch (e) {
+        console.error(e);
+    }
+    return 0;
+}

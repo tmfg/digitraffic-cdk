@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking} from "../lib/model/db-data";
 import moment from "moment";
-import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geometry";
+import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 import {LineString, Position} from "geojson";
 import {getRandomNumber} from "digitraffic-common/test/testutils";
 import {X_MAX, X_MIN, Y_MAX, Y_MIN} from "./testconstants";
@@ -20,7 +20,7 @@ export function createDbDomainContract(contract : string, domain : string, dataL
 
 export function createDbMaintenanceTracking(
     contract: DbDomainContract,
-    workMachineId: bigint, startTime: Date, endTime: Date, harjaTasks: string[], lastPoint: GeoJsonPoint, lineString?: GeoJsonLineString,
+    workMachineId: number, startTime: Date, endTime: Date, harjaTasks: string[], lastPoint: GeoJsonPoint, lineString?: GeoJsonLineString,
 ) : DbMaintenanceTracking {
     return {
         direction: 0,

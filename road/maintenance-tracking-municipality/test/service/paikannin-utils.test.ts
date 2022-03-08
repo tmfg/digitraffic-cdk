@@ -19,6 +19,7 @@ import {
     POINT_750M_FROM_START,
     POINT_START,
 } from "../testconstants";
+import {PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS} from "../../lib/constants";
 
 describe('paikannin-utils-service-test', () => {
 
@@ -98,7 +99,7 @@ describe('paikannin-utils-service-test', () => {
     test('groupEventsToIndividualTrackings - events over 5 minute time limit', () => {
         // Create work events with over 5 min diff
         const now = new Date();
-        const over5Min = moment(now).subtract(5, 'minutes').subtract(1, 'seconds').toDate();
+        const over5Min = moment(now).subtract(PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS, 'milliseconds').subtract(1, 'seconds').toDate();
         const events: ApiWorkevent[] = [
             createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, over5Min),
             createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),

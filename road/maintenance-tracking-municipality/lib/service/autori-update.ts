@@ -3,11 +3,11 @@ import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/dat
 import {AutoriApi} from "../api/autori";
 import moment from "moment";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
-import {createHarjaId} from "./utils";
+import {countEstimatedSizeOfMesage, createHarjaId} from "./utils";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
 import {AUTORI_MAX_MINUTES_AT_ONCE, AUTORI_MAX_MINUTES_TO_HISTORY} from "../constants";
 import {TrackingSaveResult, UNKNOWN_TASK_NAME} from "../model/service-data";
-import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geometry";
+import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 import * as CommonUpdateService from "./common-update";
 
 export class AutoriUpdate {
@@ -107,7 +107,7 @@ export class AutoriUpdate {
             return Promise.allSettled(routeDatas.map(async (routeData: ApiRouteData) => {
 
                 // estimated message size
-                const messageSizeBytes = Buffer.byteLength(JSON.stringify(routeData));
+                const messageSizeBytes = countEstimatedSizeOfMesage(routeData);
 
                 try {
                     const machineId = await db.tx(tx => {
@@ -165,7 +165,7 @@ export class AutoriUpdate {
         return result;
     }
 
-    createDbMaintenanceTracking(workMachineId: bigint, routeData: ApiRouteData, contract: DbDomainContract, harjaTasks: string[]): DbMaintenanceTracking[] {
+    createDbMaintenanceTracking(workMachineId: number, routeData: ApiRouteData, contract: DbDomainContract, harjaTasks: string[]): DbMaintenanceTracking[] {
 
         if (harjaTasks.length === 0) {
             console.info(`method=AutoriUpdate.createDbMaintenanceTracking domain=${contract.domain} contract=${contract.contract} No tasks for tracking api id ${routeData.id} -> no data to save`);
@@ -301,7 +301,7 @@ export class AutoriUpdate {
             }
 
             // Estimated message size
-            const messageSizeBytes = Buffer.byteLength(JSON.stringify(routeData));
+            const messageSizeBytes = countEstimatedSizeOfMesage(routeData);
             return this.saveTrackingsToDb(contract, routeData, taskMappings)
                 .then((result: TrackingSaveResult) => {
                     const latestUpdated = this.getLatestUpdatedDateForRouteData(routeData);

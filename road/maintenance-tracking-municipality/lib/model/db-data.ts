@@ -1,5 +1,5 @@
 // eslint-disable camelcase
-import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geometry";
+import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 
 export type DbWorkMachine = {
     readonly harjaId: bigint
@@ -13,7 +13,7 @@ export type DbMaintenanceTracking = {
     readonly sending_time: Date
     readonly last_point: GeoJsonPoint
     line_string: GeoJsonLineString|null
-    readonly work_machine_id: bigint
+    readonly work_machine_id: number
     start_time: Date
     readonly end_time: Date
     readonly direction?: number
@@ -36,7 +36,7 @@ export type DbLatestTracking = {
 }
 
 export type DbNumberId = {
-    readonly id: bigint
+    readonly id: number
 }
 
 export type DbTextId = {

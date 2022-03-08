@@ -1,9 +1,10 @@
 import {ApiWorkevent, ApiWorkeventIoDevice} from "../model/paikannin-api-data";
-import {distanceBetweenPositionsInKm, GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geometry";
-import {MAX_TIME_BETWEEN_TRACKINGS_MS, MAX_SPEED_BETWEEN_TRACKINGS_KMH, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM} from "../constants";
+import {distanceBetweenPositionsInKm} from "digitraffic-common/utils/geometry";
+import {MAX_SPEED_BETWEEN_TRACKINGS_KMH, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM, PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS} from "../constants";
 import {Position} from "geojson";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
 import {createHarjaId} from "./utils";
+import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 
 
 /**
@@ -85,7 +86,7 @@ function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkeven
 }
 
 export function isOverTimeLimit(previous: Date, next: Date) {
-    return countDiffMs(previous, next) > MAX_TIME_BETWEEN_TRACKINGS_MS;
+    return countDiffMs(previous, next) > PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS;
 }
 
 export function countDiffMs(previous: Date, next: Date): number {
@@ -217,7 +218,7 @@ export function createLineStringFromEvents(events: ApiWorkevent[]) : GeoJsonLine
         return null;
     }
     const lineStringCoordinates: Position[] = events.reduce((coordinates: Position[], nextEvent) => {
-        const nextCoordinate: Position = [nextEvent.lon, nextEvent.lat];
+        const nextCoordinate: Position = [nextEvent.lon, nextEvent.lat, nextEvent.altitude];
         if (coordinates.length > 0 ) {
             const previousCoordinate: Position = coordinates[coordinates.length-1];
             // Linestring points must differ from previous values
@@ -237,7 +238,7 @@ export function createLineStringFromEvents(events: ApiWorkevent[]) : GeoJsonLine
 }
 
 export function createDbMaintenanceTracking(contract: DbDomainContract,
-    workMachineId: bigint,
+    workMachineId: number,
     events: ApiWorkevent[],
     taskMappings: DbDomainTaskMapping[]) : DbMaintenanceTracking | null {
 
@@ -249,7 +250,7 @@ export function createDbMaintenanceTracking(contract: DbDomainContract,
     const firstEvent = events[0];
     // lastPoint
     const lastEvent = events[events.length-1];
-    const lastPoint = new GeoJsonPoint([lastEvent.lon, lastEvent.lat]);
+    const lastPoint = new GeoJsonPoint([lastEvent.lon, lastEvent.lat, lastEvent.altitude]);
     const lineString = createLineStringFromEvents(events);
 
     return {

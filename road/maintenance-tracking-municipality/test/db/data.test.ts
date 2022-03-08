@@ -8,7 +8,7 @@ import * as DataDb from "../../lib/db/data";
 import {DbMaintenanceTracking, DbNumberId, DbWorkMachine} from "../../lib/model/db-data";
 import {createDbDomainContract, createDbMaintenanceTracking} from "../testutil";
 import {Point, Position} from "geojson";
-import {GeoJsonPoint} from "digitraffic-common/utils/geometry";
+import {GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 import {CONTRACT_ID, DOMAIN_1, HARJA_BRUSHING, HARJA_PAVING, POINT_START, SOURCE_1, VEHICLE_TYPE} from "../testconstants";
 
 const autoriUpdateService = createAutoriUpdateService();

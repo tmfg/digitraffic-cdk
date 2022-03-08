@@ -110,7 +110,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
     });
 
     test('createDbMaintenanceTracking', () => {
-        const workMachineId = 1n;
+        const workMachineId = 1;
         const now = moment().toDate();
         const geometries : LineString[] = createLineStringGeometries(2,5);
         const route : ApiRouteData = createApiRouteData(now, geometries);
@@ -132,7 +132,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
     test('createDbMaintenanceTracking empty tasks', () => {
         const route : ApiRouteData = createApiRouteData(new Date(), createLineStringGeometries(2,5));
         const dbContract = createDbDomainContract("contract-1", DOMAIN_1);
-        const trackings : DbMaintenanceTracking[] = autoriUpdateService.createDbMaintenanceTracking(1n, route, dbContract, []);
+        const trackings : DbMaintenanceTracking[] = autoriUpdateService.createDbMaintenanceTracking(1, route, dbContract, []);
 
         expect(trackings.length).toEqual(0); // No tasks -> no trackings
     });
@@ -471,13 +471,6 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
                 },
             };
         });
-    }
-
-    function parseLineString(lineString? : string) : LineString {
-        if (lineString) {
-            return JSON.parse(lineString) as LineString;
-        }
-        throw new Error('No lineString given!');
     }
 
     function createApiOperationData(id : string, operationName : string) : ApiOperationData {

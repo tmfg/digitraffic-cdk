@@ -32,11 +32,11 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingPaikan
 
             return paikanninUpdateService.updateTrackingsForDomain(domainName)
                 .then(savedResult => {
-                    console.info(`method=method=MaintenanceTrackingMunicipality.paikanninUpdateData domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
+                    console.info(`method=MaintenanceTrackingMunicipality.paikanninUpdateData domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
                     return savedResult;
                 });
         } catch (error) {
-            console.error(`method=method=MaintenanceTrackingMunicipality.paikanninUpdateData failed after ${(Date.now() - start)} ms`, error);
+            console.error(`method=MaintenanceTrackingMunicipality.paikanninUpdateData failed after ${(Date.now() - start)} ms`, error);
             throw error;
         }
     };

@@ -22,6 +22,7 @@ import {UNKNOWN_TASK_NAME} from "../../lib/model/service-data";
 import moment from "moment";
 import {createCoordinates, createDbDomainContract, createLineString, createLineStringGeometry} from "../testutil";
 import {LineString} from "geojson";
+import {PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM} from "../../lib/constants";
 
 const paikanninUpdateService = createPaikanninUpdateService();
 
@@ -114,9 +115,9 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
             db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHNG.name, DOMAIN_1, false,
         );
 
-        const ln = createLineStringGeometry(22, 0.60);
-        // remove two elements from the middle so there will be over 0,7 km jump in the middle of coordinates
-        // -> should be divided in two distinct trackings
+        const ln = createLineStringGeometry(22, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        // remove two elements from the middle so there will be over PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM jump
+        // in the middle of coordinates -> should be divided in two distinct trackings
         ln.coordinates.splice(10, 2);
 
         // Create one route and big jump between routes, 10 and 0 minutes old
@@ -145,7 +146,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
             db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHNG.name, DOMAIN_1, false,
         );
 
-        const coords = createCoordinates(20, 0.65);
+        const coords = createCoordinates(20, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
         const coords1 = coords.slice(0,10);
         const coords2 = coords.slice(10);
 

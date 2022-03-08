@@ -246,7 +246,7 @@ const PS_FIND_LATEST_NOT_FINNISHED_TRACKING_FOR_WORK_MACHINE = new PreparedState
     limit 1`,
 });
 
-export function findLatestNotFinishedTrackingForWorkMachine(db: DTDatabase, domainName: string, workMachineId: bigint) : Promise<DbLatestTracking | null> {
+export function findLatestNotFinishedTrackingForWorkMachine(db: DTDatabase, domainName: string, workMachineId: number) : Promise<DbLatestTracking | null> {
     return db.oneOrNone(PS_FIND_LATEST_NOT_FINNISHED_TRACKING_FOR_WORK_MACHINE,
         [domainName, workMachineId]);
 }
