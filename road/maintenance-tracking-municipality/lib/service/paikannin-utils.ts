@@ -8,81 +8,70 @@ import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-
 
 
 /**
- * Splits work events to groups by following rules:
- * – events have over 5 minutes between them
- * - events have over 0,5 km between them
- * - events have computational speed over 140.0 km/h
+ * Splits work events to groups/distinct trackings by following rules:
+ * – events have over 5 minutes between them (PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS)
+ * - events have over 0,5 km between them (PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM)
+ * - events have computational speed over 140.0 km/h (MAX_SPEED_BETWEEN_TRACKINGS_KMH)
  * - events' tasks change
  * - events are not in chronological order
+ * This wont check if work is transition run or not
  *
  * @param events to handle
  * @param filterBeforeOrEquaTime if even time is this or before this, it will be ignored
  */
 export function groupEventsToIndividualTrackings(events: ApiWorkevent[], filterBeforeOrEquaTime?: Date): ApiWorkevent[][] {
-    const chunks : ApiWorkevent[][] = []; // initial array of arrays
+    const targetGroups : ApiWorkevent[][] = []; // initial array of arrays
     // ascending order
     // const ordered = events.sort((a, b) => (a.timestamp.getTime() < b.timestamp.getTime() ? -1 : 1));
-    return toEventGroups(chunks, events, filterBeforeOrEquaTime);
+    return toEventGroups(targetGroups, events, filterBeforeOrEquaTime);
 }
 
-/**
- * Havaintodataa (maintenance_tracking_observation_data) yhdistetään tai erotellaan erillisiksi suoritteiksi (maintenance_tracking) useiden ehtojen perusteella
- * - Havaintojen aikaleimojen väli > 5 min -> uusi suorite
- * - Pisteiden välinen etäisyys > 0,5 km -> uusi suorite
- * - Pisteiden välinen nopeus on >= 140.0 km/h -> uusi suorite
- * - Ajoneuvon tekemät tehtävät vaihtuvat -> uusi suorite
- * - Uuden havainnon aikaleima ennen edellistä  -> uusi suorite (voidaan yhdistää vain kronologisessa järjestyksessä olevat havainnot)
- * - Tarkastetaan muualla: - Siirtymäajo (ei tehtäviä (task) käynissä) -> ei tallenneta ollenkaan
- *
- * @param targetGroups
- * @param sourceEvents
- * @param filterBeforeOrEquaTime
- */
 function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkevent[], filterBeforeOrEquaTime?: Date): ApiWorkevent[][] {
-    if (sourceEvents.length > 0) {
-        // take fist element away from start of the array
-        const nextEvent: ApiWorkevent | undefined = sourceEvents.shift();
-        if (!nextEvent) {
-            return targetGroups;
-        }
-
-        // if element is older than allowed throw it away
-        if (filterBeforeOrEquaTime && nextEvent.timestamp.getTime() <= filterBeforeOrEquaTime.getTime() ) {
-            return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
-        } else if (targetGroups.length > 0) {
-            // Take prev event from groups and compare it to next
-            const prevGroup: ApiWorkevent[] = targetGroups[targetGroups.length-1];
-            const prevEvent: ApiWorkevent = prevGroup[prevGroup.length-1];
-
-            const prevTime = prevEvent.timestamp;
-            const nextTime = nextEvent.timestamp;
-
-            const prevPosition: Position = [prevEvent.lon, prevEvent.lat];
-            const nextPosition: Position = [nextEvent.lon, nextEvent.lat];
-            // Not in chronological order
-            if (prevTime.getTime() > nextTime.getTime()) {
-                targetGroups.push([nextEvent]); // create new group form next event
-            } else if (isExtendingPreviousTracking(prevPosition, nextPosition, prevTime, nextTime)) {
-                // Check if is continuing same task or has changed task between points
-                if (isSameTasks(prevEvent.ioChannels, nextEvent.ioChannels)) {
-                    prevGroup.push(nextEvent); // continue in previous group
-                } else {
-                    // Create new group but append next point also as end point for previous point tracking
-                    const endEventClone: ApiWorkevent = cloneApiWorkeventWithNewTasks(nextEvent, prevEvent.ioChannels);
-                    prevGroup.push(endEventClone);
-                    targetGroups.push([nextEvent]); // This will be start of the newGroup
-                }
-            } else {
-                // Not extending previous tracking -> create new group
-                targetGroups.push([nextEvent]);
-            }
-            return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
-        } else {
-            targetGroups.push([nextEvent]); // nextChunk
-            return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
-        }
+    // Check we have events in array
+    if (!sourceEvents.length) {
+        return targetGroups;
     }
-    return targetGroups;
+    // Take first element away from start of the array
+    const nextEvent: ApiWorkevent | undefined = sourceEvents.shift();
+    if (!nextEvent) {
+        return targetGroups;
+    }
+
+    // If element is older than allowed throw it away
+    if (filterBeforeOrEquaTime && nextEvent.timestamp.getTime() <= filterBeforeOrEquaTime.getTime() ) {
+        return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
+    } else if (targetGroups.length > 0) {
+        // Take prev event from groups and compare it to next
+        const prevGroup: ApiWorkevent[] = targetGroups[targetGroups.length-1];
+        const prevEvent: ApiWorkevent = prevGroup[prevGroup.length-1];
+
+        const prevTime = prevEvent.timestamp;
+        const nextTime = nextEvent.timestamp;
+
+        const prevPosition: Position = [prevEvent.lon, prevEvent.lat];
+        const nextPosition: Position = [nextEvent.lon, nextEvent.lat];
+        // Not in chronological order
+        if (prevTime.getTime() > nextTime.getTime()) {
+            targetGroups.push([nextEvent]); // create new group form next event
+        } else if (isExtendingPreviousTracking(prevPosition, nextPosition, prevTime, nextTime)) {
+            // Check if is continuing same task or has changed task between points
+            if (isSameTasks(prevEvent.ioChannels, nextEvent.ioChannels)) {
+                prevGroup.push(nextEvent); // continue in previous group
+            } else {
+                // Create new group but append next point also as end point for previous point tracking
+                const endEventClone: ApiWorkevent = cloneApiWorkeventWithNewTasks(nextEvent, prevEvent.ioChannels);
+                prevGroup.push(endEventClone);
+                targetGroups.push([nextEvent]); // This will be start of the newGroup
+            }
+        } else {
+            // Not extending previous tracking -> create new group
+            targetGroups.push([nextEvent]);
+        }
+        return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
+    } else {
+        targetGroups.push([nextEvent]); // create new group
+        return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
+    }
 }
 
 export function isOverTimeLimit(previous: Date, next: Date) {

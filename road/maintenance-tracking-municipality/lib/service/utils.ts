@@ -10,11 +10,11 @@ export function createHarjaId(src: string): bigint {
     return BigInt('0x' + hex.substring(0, 15)).valueOf();
 }
 
-export function countEstimatedSizeOfMesage(message: object) {
+export function countEstimatedSizeOfMessage(message: object) {
     try {
         return Buffer.byteLength(JSON.stringify(message)); // Just estimate of the size of new data
     } catch (e) {
-        console.error(e);
+        console.error(`method=utils.countEstimatedSizeOfMessage`, e);
     }
     return 0;
 }

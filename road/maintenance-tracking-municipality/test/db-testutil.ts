@@ -25,7 +25,7 @@ export function truncate(db: DTDatabase): Promise<void> {
     });
 }
 
-export function insertDomain(db: DTDatabase, domainName: string, source : string): Promise<null> {
+export function insertDomain(db: DTDatabase, domainName: string, source? : string): Promise<null> {
     return db.tx(t => {
         return t.none(`
                 insert into maintenance_tracking_domain(name, source)
@@ -99,7 +99,7 @@ export function findAllTrackings(db: DTDatabase, domainName: string): Promise<Db
     return db.tx(t => {
         return t.manyOrNone(`
                 select id, previous_tracking_id, sending_system, sending_time, 
-                       ST_AsGeoJSON(last_point::geometry)::json last_point, ST_AsGeoJSON(line_string::geometry)::json line_string, 
+                       ST_AsGeoJSON(last_point::geometry)::json as last_point, ST_AsGeoJSON(line_string::geometry)::json as line_string, 
                        work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id,
                        ARRAY_AGG(task.task) AS tasks
                 from maintenance_tracking tracking

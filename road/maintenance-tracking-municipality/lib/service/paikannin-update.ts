@@ -9,7 +9,7 @@ import {ApiDevice, ApiWorkevent, ApiWorkeventDevice} from "../model/paikannin-ap
 import {PAIKANNIN_MAX_MINUTES_TO_HISTORY, PAIKANNIN_MIN_MINUTES_FROM_PRESENT} from "../constants";
 import * as CommonUpdateService from "./common-update";
 import * as PaikanninUtils from "./paikannin-utils";
-import {countEstimatedSizeOfMesage} from "./utils";
+import {countEstimatedSizeOfMessage} from "./utils";
 
 export class PaikanninUpdate {
 
@@ -148,7 +148,7 @@ export class PaikanninUpdate {
         return this.saveMaintenanceTrackings(db, contract, maintenanceTrackings, latest)
             .then(saveResult => {
 
-                const summedResult = new TrackingSaveResult(countEstimatedSizeOfMesage(result), saveResult.saved, saveResult.errors);
+                const summedResult = new TrackingSaveResult(countEstimatedSizeOfMessage(result), saveResult.saved, saveResult.errors);
                 console.info(`method=PaikanninUpdate.updateApiWorkeventDeviceTrackings domain=${contract.domain} workMachineId=${machineId.id} machineHarjaId=${workMachine.harjaId} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                 return summedResult;
             });

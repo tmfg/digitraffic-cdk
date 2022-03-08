@@ -61,7 +61,7 @@ describe('db-data-test', dbTestBase((db: DTDatabase) => {
 
         expect(latest).toBeTruthy();
         expect(latest?.id).toEqual(trackintIds[0].id);
-        console.info(JSON.stringify(latest));
+        console.info(`Latest tracking: ${JSON.stringify(latest)}`);
     });
 
     test('upsertDomain', async () => {

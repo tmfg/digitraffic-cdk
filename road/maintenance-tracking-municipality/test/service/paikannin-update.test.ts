@@ -1,16 +1,23 @@
 /* eslint-disable camelcase */
-import {dbTestBase, findAllTrackings, getDomaindContract, insertDbDomaindContract, insertDomaindTaskMapping, truncate} from "../db-testutil";
+import {
+    dbTestBase,
+    findAllTrackings,
+    getDomaindContract,
+    insertDbDomaindContract,
+    insertDomain,
+    insertDomaindTaskMapping,
+    truncate,
+} from "../db-testutil";
 import {DTDatabase} from "digitraffic-common/database/database";
 import * as sinon from "sinon";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking} from "../../lib/model/db-data";
 import {PaikanninUpdate} from "../../lib/service/paikannin-update";
 import {PaikanninApi} from "../../lib/api/paikannin";
-import * as CommonUpdateService from "../../lib/service/common-update";
 import {
     DOMAIN_1,
     HARJA_BRUSHING,
     HARJA_PAVING,
-    PAIKANNIN_OPERATION_BRUSHNG,
+    PAIKANNIN_OPERATION_BRUSHING,
     PAIKANNIN_OPERATION_PAVING,
     PAIKANNIN_OPERATION_SALTING,
 } from "../testconstants";
@@ -38,7 +45,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
     });
 
     test('upsertContractForDomain', async () => {
-        await CommonUpdateService.upsertDomain(DOMAIN_1);
+        await insertDomain(db, DOMAIN_1);
 
         await paikanninUpdateService.upsertContractForDomain(DOMAIN_1);
 
@@ -53,9 +60,9 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
     });
 
     test('updateTaskMappingsForDomain', async () => {
-        await CommonUpdateService.upsertDomain(DOMAIN_1);
+        await insertDomain(db, DOMAIN_1);
 
-        const ioChannels1: ApiIoChannel[]= [createApiIoChannel(PAIKANNIN_OPERATION_SALTING.name), createApiIoChannel(PAIKANNIN_OPERATION_BRUSHNG.name)];
+        const ioChannels1: ApiIoChannel[]= [createApiIoChannel(PAIKANNIN_OPERATION_SALTING.name), createApiIoChannel(PAIKANNIN_OPERATION_BRUSHING.name)];
         const device1 :ApiDevice = createDevice(ioChannels1);
         const ioChannels2: ApiIoChannel[]= [createApiIoChannel(PAIKANNIN_OPERATION_SALTING.name), createApiIoChannel(PAIKANNIN_OPERATION_PAVING.name)];
         const device2 :ApiDevice = createDevice(ioChannels2);
@@ -68,18 +75,18 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
 
         const operationNames: string[] = mappings.map((value) => value.original_id);
         expect(operationNames.includes(PAIKANNIN_OPERATION_SALTING.name)).toEqual(true);
-        expect(operationNames.includes(PAIKANNIN_OPERATION_BRUSHNG.name)).toEqual(true);
+        expect(operationNames.includes(PAIKANNIN_OPERATION_BRUSHING.name)).toEqual(true);
         expect(operationNames.includes(PAIKANNIN_OPERATION_PAVING.name)).toEqual(true);
         mappings.forEach(value => expect(value.ignore).toEqual(true));
         mappings.forEach(value => expect(value.name).toEqual(UNKNOWN_TASK_NAME));
     });
 
     test('updateTrackings', async () => {
-        await CommonUpdateService.upsertDomain(DOMAIN_1);
+        await insertDomain(db, DOMAIN_1);
         await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
 
         await insertDomaindTaskMapping(
-            db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHNG.name, DOMAIN_1, false,
+            db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHING.name, DOMAIN_1, false,
         );
         await insertDomaindTaskMapping(
             db, HARJA_PAVING ,PAIKANNIN_OPERATION_PAVING.name, DOMAIN_1, false,
@@ -88,7 +95,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
         // Create two routes, 10 and 0 minutes old
         const past10 = moment().subtract(10, 'minutes').toDate();
         const past0 = new Date();
-        const route2d: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, past10, createLineStringGeometry(10, 0.1), [PAIKANNIN_OPERATION_BRUSHNG]);
+        const route2d: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, past10, createLineStringGeometry(10, 0.1), [PAIKANNIN_OPERATION_BRUSHING]);
         const route1d: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, past0, createLineStringGeometry(9, 0.1), [PAIKANNIN_OPERATION_PAVING]);
 
         await mockGetWorkEventsApiResponse([route2d]);
@@ -108,11 +115,11 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
     });
 
     test('updateTrackings and split on big distance between points', async () => {
-        await CommonUpdateService.upsertDomain(DOMAIN_1);
+        await insertDomain(db, DOMAIN_1);
         await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
 
         await insertDomaindTaskMapping(
-            db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHNG.name, DOMAIN_1, false,
+            db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHING.name, DOMAIN_1, false,
         );
 
         const ln = createLineStringGeometry(22, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
@@ -122,7 +129,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
 
         // Create one route and big jump between routes, 10 and 0 minutes old
         const end = new Date();
-        const route: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, end, ln, [PAIKANNIN_OPERATION_BRUSHNG]);
+        const route: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, end, ln, [PAIKANNIN_OPERATION_BRUSHING]);
 
         await mockGetWorkEventsApiResponse([route]);
         await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
@@ -139,11 +146,11 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
     });
 
     test('updateTrackings and continue previous', async () => {
-        await CommonUpdateService.upsertDomain(DOMAIN_1);
+        await insertDomain(db, DOMAIN_1);
         await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
 
         await insertDomaindTaskMapping(
-            db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHNG.name, DOMAIN_1, false,
+            db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHING.name, DOMAIN_1, false,
         );
 
         const coords = createCoordinates(20, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
@@ -155,8 +162,8 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
         const end2 = new Date();
         const end1 = moment(end2).subtract(10, 'minutes').toDate();
 
-        const route1: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, end1, createLineString(coords1), [PAIKANNIN_OPERATION_BRUSHNG]);
-        const route2: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, end2, createLineString(coords2), [PAIKANNIN_OPERATION_BRUSHNG]);
+        const route1: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, end1, createLineString(coords1), [PAIKANNIN_OPERATION_BRUSHING]);
+        const route2: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, end2, createLineString(coords2), [PAIKANNIN_OPERATION_BRUSHING]);
 
         await mockGetWorkEventsApiResponse([route1]);
         await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
@@ -174,7 +181,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
         expect(trackings[0].id).toEqual(trackings[1].previous_tracking_id);
     });
 
-    function createApiRouteDataForEveryMinute(deviceId: number, endTime : Date, geometry : LineString, operations:ApiWorkeventIoDevice[]=[PAIKANNIN_OPERATION_BRUSHNG, PAIKANNIN_OPERATION_PAVING, PAIKANNIN_OPERATION_SALTING]) : ApiWorkeventDevice {
+    function createApiRouteDataForEveryMinute(deviceId: number, endTime : Date, geometry : LineString, operations:ApiWorkeventIoDevice[]=[PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_PAVING, PAIKANNIN_OPERATION_SALTING]) : ApiWorkeventDevice {
 
         // Update for every event + minute
         const timeMoment = moment(endTime).subtract(geometry.coordinates.length, 'minutes');

@@ -20,10 +20,10 @@ export const HARJA_BRUSHING = 'BRUSHING';
 export const HARJA_PAVING = 'PAVING';
 export const HARJA_SALTING = 'SALTING';
 
-export const AUTORI_OPERATION_BRUSHNG = 'task1';
+export const AUTORI_OPERATION_BRUSHING = 'task1';
 export const AUTORI_OPERATION_PAVING = 'task2';
 export const AUTORI_OPERATION_SALTING = 'task3';
 
-export const PAIKANNIN_OPERATION_BRUSHNG = { name: AUTORI_OPERATION_BRUSHNG, id: 1 } as ApiWorkeventIoDevice;
+export const PAIKANNIN_OPERATION_BRUSHING = { name: AUTORI_OPERATION_BRUSHING, id: 1 } as ApiWorkeventIoDevice;
 export const PAIKANNIN_OPERATION_PAVING = { name: AUTORI_OPERATION_PAVING, id: 2 } as ApiWorkeventIoDevice;
 export const PAIKANNIN_OPERATION_SALTING = { name: AUTORI_OPERATION_SALTING, id: 3 } as ApiWorkeventIoDevice;

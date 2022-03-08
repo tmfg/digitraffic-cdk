@@ -11,7 +11,7 @@ import {
     HARJA_BRUSHING,
     HARJA_PAVING,
     HARJA_SALTING,
-    PAIKANNIN_OPERATION_BRUSHNG,
+    PAIKANNIN_OPERATION_BRUSHING,
     PAIKANNIN_OPERATION_PAVING,
     PAIKANNIN_OPERATION_SALTING,
     POINT_450M_FROM_START,
@@ -27,8 +27,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const past = moment(now).subtract(1, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, past),
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, past),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, now),
         ];
 
         // this shold be groupped within task
@@ -44,8 +44,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const past = moment(now).subtract(1, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, past),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, past),
         ];
 
         // this shold be groupped to two as they are not in chronological order
@@ -59,10 +59,10 @@ describe('paikannin-utils-service-test', () => {
         const time = moment().subtract(10, 'minutes');
         const start = time.toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, time.add(1, 'seconds').toDate()),
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, time.add(1, 'seconds').toDate()),
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name,PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name,PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name,PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name,PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
             createWorkEvent([PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
             createWorkEvent([PAIKANNIN_OPERATION_PAVING.name], 1, time.add(1, 'seconds').toDate()),
         ];
@@ -77,8 +77,8 @@ describe('paikannin-utils-service-test', () => {
         expect(groups[1][2].timestamp).toEqual(groups[2][0].timestamp); // end is added and is same as next group start
         expect(groups[2]).toHaveLength(2);
 
-        assertContainsEvents(groups[0], [PAIKANNIN_OPERATION_BRUSHNG.name]);
-        assertContainsEvents(groups[1], [PAIKANNIN_OPERATION_BRUSHNG.name, PAIKANNIN_OPERATION_PAVING.name]);
+        assertContainsEvents(groups[0], [PAIKANNIN_OPERATION_BRUSHING.name]);
+        assertContainsEvents(groups[1], [PAIKANNIN_OPERATION_BRUSHING.name, PAIKANNIN_OPERATION_PAVING.name]);
         assertContainsEvents(groups[2], [PAIKANNIN_OPERATION_PAVING.name]);
     });
 
@@ -87,8 +87,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const just5Min = moment(now).subtract(5, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, just5Min),
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, just5Min),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, now),
         ];
 
         // this shold be groupped to one tracking
@@ -101,8 +101,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const over5Min = moment(now).subtract(PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS, 'milliseconds').subtract(1, 'seconds').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, over5Min),
-            createWorkEvent([PAIKANNIN_OPERATION_BRUSHNG.name], 1, now),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, over5Min),
+            createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, now),
         ];
 
         // this shold be groupped to two trackings
@@ -116,8 +116,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const previous = moment(now).subtract(4, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_550M_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], now, POINT_550M_FROM_START),
         ];
 
         // this shold be groupped to one trackings
@@ -130,8 +130,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const previous = moment(now).subtract(4, 'minutes').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_750M_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], now, POINT_750M_FROM_START),
         ];
 
         // this shold be groupped to two trackings
@@ -144,8 +144,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const previous = moment(now).subtract(12, 'seconds').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_450M_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], now, POINT_450M_FROM_START),
         ];
 
         // this shold be groupped to one trackings
@@ -158,8 +158,8 @@ describe('paikannin-utils-service-test', () => {
         const now = new Date();
         const previous = moment(now).subtract(11, 'seconds').toDate();
         const events: ApiWorkevent[] = [
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], previous, POINT_START),
-            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHNG.name], now, POINT_450M_FROM_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], previous, POINT_START),
+            createWorkEventWithLocation([PAIKANNIN_OPERATION_BRUSHING.name], now, POINT_450M_FROM_START),
         ];
 
         // this shold be groupped to two trackings
@@ -189,12 +189,12 @@ describe('paikannin-utils-service-test', () => {
     test('getTasksForOperations', () => {
         const taskMappings = [
             // Map domain operations to harja tasks
-            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHNG.name, false),
+            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHING.name, false),
             createTaskMapping(DOMAIN_1, HARJA_PAVING, PAIKANNIN_OPERATION_PAVING.name, true),
             createTaskMapping(DOMAIN_1, HARJA_SALTING, PAIKANNIN_OPERATION_SALTING.name, false),
         ];
 
-        const tasks : string[] = getTasksForOperations([PAIKANNIN_OPERATION_BRUSHNG, PAIKANNIN_OPERATION_PAVING],
+        const tasks : string[] = getTasksForOperations([PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_PAVING],
             taskMappings);
 
         expect(tasks).toHaveLength(1);
@@ -204,12 +204,12 @@ describe('paikannin-utils-service-test', () => {
     test('getTasksForOperations duplicates', () => {
         const taskMappings = [
             // Map domain operations to harja tasks, map two operations to one task
-            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHNG.name, false),
+            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHING.name, false),
             createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_PAVING.name, false),
             createTaskMapping(DOMAIN_1, HARJA_SALTING, PAIKANNIN_OPERATION_SALTING.name, false),
         ];
 
-        const tasks : string[] = getTasksForOperations([PAIKANNIN_OPERATION_BRUSHNG, PAIKANNIN_OPERATION_PAVING], taskMappings);
+        const tasks : string[] = getTasksForOperations([PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_PAVING], taskMappings);
 
         expect(tasks).toHaveLength(1);
         expect(tasks).toContain(HARJA_BRUSHING);
