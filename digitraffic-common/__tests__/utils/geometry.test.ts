@@ -11,13 +11,13 @@ const TAMPERE_KUOPIO_DISTANCE_KM = 255.8;
 describe('geometry tests', () => {
 
     test('distanceBetweenWGS84PointsInKm', () => {
-        Asserter.assertToBeCloseTo(geometry.distanceBetweenWGS84PointsInKm(TAMPERE_WGS84_X, TAMPERE_WGS84_Y, KUOPIO_WGS84_X, KUOPIO_WGS84_Y),TAMPERE_KUOPIO_DISTANCE_KM, 0.5);
-        console.info(geometry.distanceBetweenWGS84PointsInKm(TAMPERE_WGS84_X, TAMPERE_WGS84_Y, KUOPIO_WGS84_X, KUOPIO_WGS84_Y));
+        Asserter.assertToBeCloseTo(geometry.distanceBetweenPositionsInKm([TAMPERE_WGS84_X, TAMPERE_WGS84_Y], [KUOPIO_WGS84_X, KUOPIO_WGS84_Y]),TAMPERE_KUOPIO_DISTANCE_KM, 0.5);
+        console.info(geometry.distanceBetweenPositionsInKm([TAMPERE_WGS84_X, TAMPERE_WGS84_Y], [KUOPIO_WGS84_X, KUOPIO_WGS84_Y]));
     });
 
     test('distanceBetweenWGS84PointsInKm', () => {
-        Asserter.assertToBeCloseTo(geometry.distanceBetweenWGS84PointsInKm(TAMPERE_WGS84_X, TAMPERE_WGS84_Y, KUOPIO_WGS84_X, KUOPIO_WGS84_Y),TAMPERE_KUOPIO_DISTANCE_KM, 0.5);
-        console.info(geometry.distanceBetweenWGS84PointsInKm(TAMPERE_WGS84_X, TAMPERE_WGS84_Y, KUOPIO_WGS84_X, KUOPIO_WGS84_Y));
+        Asserter.assertToBeCloseTo(geometry.distanceBetweenPositionsInM([TAMPERE_WGS84_X, TAMPERE_WGS84_Y], [KUOPIO_WGS84_X, KUOPIO_WGS84_Y]),TAMPERE_KUOPIO_DISTANCE_KM*1000, 500);
+        console.info(geometry.distanceBetweenPositionsInM([TAMPERE_WGS84_X, TAMPERE_WGS84_Y], [KUOPIO_WGS84_X, KUOPIO_WGS84_Y]));
     });
 
 });
