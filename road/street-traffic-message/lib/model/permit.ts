@@ -12,7 +12,10 @@ export type ApiPermit = {
 }
 
 export enum PermitType {
-    CONSTRUCTION_WORKS = "constructionWorks", PUBLIC_EVENT = 'publicEvent', OTHER = "other"
+    CONSTRUCTION_WORKS = "constructionWorks",
+    PUBLIC_EVENT = 'publicEvent',
+    GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS = 'generalInstructionOrMessageToRoadUsers',
+    OTHER = "other"
 }
 
 export type DbPermit = {

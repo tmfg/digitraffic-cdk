@@ -9,7 +9,7 @@ import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-commo
 import {permitProperties} from "./model/permit";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
-const EXCAVATION_PERMITS_TAGS = ["Excavation permit(Beta)"];
+const STREET_TRAFFIC_MESSAGE_TAGS = ["Street Traffic Message(Beta)"];
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
@@ -20,8 +20,8 @@ export class PublicApi {
     private permitsGeoJsonModel: Model;
 
     constructor(stack: DigitrafficStack) {
-        this.publicApi = new DigitrafficRestApi(stack, 'ExcavationPermits-public', 'Excavation Permits public API');
-        this.publicApi.createUsagePlan('EP Api Key', 'EP Usage Plan');
+        this.publicApi = new DigitrafficRestApi(stack, 'StreetTrafficMessage-public', 'Street Traffic Message public API');
+        this.publicApi.createUsagePlan('STM Api Key', 'STM Usage Plan');
 
         this.createResources(this.publicApi);
         this.createModels(this.publicApi);
@@ -34,8 +34,8 @@ export class PublicApi {
 
     private createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
-        const evResource = apiResource.addResource("excavation-permit");
-        const versionResource = evResource.addResource("beta");
+        const stmResource = apiResource.addResource("street-traffic-message");
+        const versionResource = stmResource.addResource("beta");
 
         this.permitsGeojsonResource = versionResource.addResource("permits");
         this.permitsD2LightResource = versionResource.addResource("permits.d2light");
@@ -49,10 +49,10 @@ export class PublicApi {
 
     private createDocumentation() {
         this.publicApi.documentResource(this.permitsGeojsonResource,
-            DocumentationPart.method(EXCAVATION_PERMITS_TAGS, 'GetPermits GeoJSON', 'Return all permits in GeoJSON'));
+            DocumentationPart.method(STREET_TRAFFIC_MESSAGE_TAGS, 'GetPermits GeoJSON', 'Return all permits in GeoJSON'));
 
         this.publicApi.documentResource(this.permitsD2LightResource,
-            DocumentationPart.method(EXCAVATION_PERMITS_TAGS, 'GetPermits D2Light', 'Return all permits in D2Light'));
+            DocumentationPart.method(STREET_TRAFFIC_MESSAGE_TAGS, 'GetPermits D2Light', 'Return all permits in D2Light'));
 
     }
 

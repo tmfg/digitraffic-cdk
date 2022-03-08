@@ -10,7 +10,7 @@ import {constants} from "http2";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {FeatureCollection} from "geojson";
 
-const BASE_URL = "/prod/api/excavation-permit/beta/";
+const BASE_URL = "/prod/api/street-traffic-message/beta/";
 
 const PERMITS_GEOJSON_URL = BASE_URL + "permits";
 const PERMITS_D2LIGHT_URL = BASE_URL + "permits.d2light";

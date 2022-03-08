@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import {PermitsApi} from "../../lib/api/permits";
-import {findPermitsInD2Light, findPermitsInGeojson, getExcavationPermits} from "../../lib/service/permits";
+import {findPermitsInD2Light, findPermitsInGeojson, getPermits} from "../../lib/service/permits";
 import {dbTestBase, insertPermit} from "../db-testutil";
 import {DTDatabase} from "digitraffic-common/database/database";
 
@@ -9,8 +9,8 @@ const TEST_XML_PERMITS = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"
 describe("permits service tests", dbTestBase((db: DTDatabase) => {
     sinon.stub(PermitsApi.prototype, "getPermitsXml").returns(Promise.resolve(TEST_XML_PERMITS));
 
-    test("getExcavationPermits should filter invalid or null permit types", async () => {
-        const parsedPermits = await getExcavationPermits("123", "123");
+    test("getPermits should filter invalid or null permit types", async () => {
+        const parsedPermits = await getPermits("123", "123");
 
         expect(parsedPermits).toHaveLength(1);
     });
@@ -36,7 +36,7 @@ describe("permits service tests", dbTestBase((db: DTDatabase) => {
         expect(permits.situationPublicationLight.situationRecord).toHaveLength(0);
     });
 
-    test('findPfindPermitsInD2Lightermits - two permits', async() => {
+    test('findPermitsInD2Light - two permits', async() => {
         await insertPermit(db, 1, 'test');
         await insertPermit(db, 2, 'test2');
 

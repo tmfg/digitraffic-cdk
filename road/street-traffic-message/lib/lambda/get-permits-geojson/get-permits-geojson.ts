@@ -9,14 +9,14 @@ export const handler = async () => {
 
     const start = Date.now();
 
-    return PermitsService.findPermitsInD2Light().then(result => {
+    return PermitsService.findPermitsInGeojson().then(result => {
         return LambdaResponse.okJson(result);
     }).catch(error => {
-        console.error("method=ExcavationPermits.GetPermitsInD2Light " + error);
+        console.error("method=StreetTrafficMessage.GetPermitsGeoJson error " + error);
 
         return LambdaResponse.internalError();
     }).finally(() => {
-        console.info("method=ExcavationPermits.GetPermitsInD2Light tookMs=%d", (Date.now() - start));
+        console.info("method=StreetTrafficMessage.GetPermitsGeoJson tookMs=%d", (Date.now() - start));
     });
 };
 

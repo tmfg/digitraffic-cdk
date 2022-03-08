@@ -9,16 +9,16 @@ import {Duration} from "aws-cdk-lib";
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
         if (stack.configuration.enableCanaries) {
-            const urlRole = new DigitrafficCanaryRole(stack, 'ep-url');
-            const dbRole = new DigitrafficCanaryRole(stack, 'ep-db').withDatabaseAccess();
+            const urlRole = new DigitrafficCanaryRole(stack, 'stm-url');
+            const dbRole = new DigitrafficCanaryRole(stack, 'stm-db').withDatabaseAccess();
 
             //            DatabaseCanary.createV2(stack, dbRole, 'ep');
 
             UrlCanary.create(stack, urlRole, publicApi, {
-                name: 'ep-public',
+                name: 'stm-public',
                 schedule: Schedule.rate(Duration.minutes(30)),
                 alarm: {
-                    alarmName: 'ExcavationPermits-PublicAPI-Alarm',
+                    alarmName: 'STM-PublicAPI-Alarm',
                     topicArn: stack.configuration.alarmTopicArn,
                 },
             });

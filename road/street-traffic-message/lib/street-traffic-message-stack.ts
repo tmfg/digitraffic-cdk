@@ -4,7 +4,7 @@ import {Canaries} from "./canaries";
 import {PublicApi} from "./public-api";
 import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
 
-export class ExcavationPermitsStack extends DigitrafficStack {
+export class StreetTrafficMessageStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {
         super(scope, id, configuration);
 

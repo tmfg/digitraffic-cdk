@@ -15,7 +15,7 @@ export class InternalLambdas {
 
         return MonitoredDBFunction.create(stack, 'update-permits', lambdaEnvironment, {
             memorySize: 256,
-            functionName: 'ExcavationPermits-UpdatePermits-' + permitDomain,
+            functionName: 'StreetTrafficMessage-UpdatePermits-' + permitDomain,
         });
     }
 }

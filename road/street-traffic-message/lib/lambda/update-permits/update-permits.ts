@@ -15,6 +15,6 @@ export const handler = async () => {
 
         await UpdateService.updatePermits(secret.authKey, secret.url);
     } finally {
-        console.info("method=updatePermits.%s tookMs=%d", PERMIT_DOMAIN, (Date.now()-start));
+        console.info("method=StreetTrafficMessage.updatePermits.%s tookMs=%d", PERMIT_DOMAIN, (Date.now()-start));
     }
 };

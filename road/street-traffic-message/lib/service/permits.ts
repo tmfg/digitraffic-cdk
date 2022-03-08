@@ -4,30 +4,30 @@ import {PermitElement, PermitResponse} from "../model/permit-xml";
 import moment from "moment";
 import * as xml2js from 'xml2js';
 import {inDatabaseReadonly} from "digitraffic-common/database/database";
-import * as ExcavationPermitsDAO from "../db/excavation-permit";
+import * as PermitsDAO from "../db/permit";
 import {Geometry} from "geojson";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
-export async function getExcavationPermits(authKey: string, url: string): Promise<ApiPermit[]> {
+export async function getPermits(authKey: string, url: string): Promise<ApiPermit[]> {
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
     const jsonPermits = await xmlToJs(xmlPermits);
 
     return jsonPermits["wfs:FeatureCollection"]["gml:featureMember"]
-        .filter(permitElement => isValidExcavationPermit(permitElement))
+        .filter(permitElement => isValidPermit(permitElement))
         .map(permitElement => convertPermit(permitElement));
 }
 
 export function findPermitsInGeojson() {
     return inDatabaseReadonly(db => {
-        return ExcavationPermitsDAO.getActivePermitsGeojson(db);
+        return PermitsDAO.getActivePermitsGeojson(db);
     });
 }
 
 export function findPermitsInD2Light() {
     return inDatabaseReadonly(db => {
-        return ExcavationPermitsDAO.getActivePermits(db).then(permits => convertD2Light(permits));
+        return PermitsDAO.getActivePermits(db).then(permits => convertD2Light(permits));
     });
 }
 
@@ -93,11 +93,11 @@ function convertLocation(geometry: Geometry) {
     throw new Error("unknown geometry type " + JSON.stringify(geometry));
 }
 
-function isValidExcavationPermit(permitElement: PermitElement): boolean {
+function isValidPermit(permitElement: PermitElement): boolean {
     // for some reason, duplicate 0-id permits
     return permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null
     && permitElement["GIS:YlAlLuvat"]["GIS:Id"] !== '0'
-    && permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi"] !== 'Alueen tilapäinen käyttölupa';
+    && permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi"] !== 'Alueen tilapäinen käyttölupa'; // duplicates, disabled for now
 }
 
 function convertPermit(permitElement: PermitElement): ApiPermit {
@@ -131,6 +131,7 @@ function mapLupatyyppi(lupatyyppiKoodi: string) {
         case '2': // kaivulupa
             return PermitType.CONSTRUCTION_WORKS;
         case '41': // tilapäinen käyttölupa
+            return PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS;
         case '60': // käyttölupa tapahtuman järjestämiseen
             return PermitType.PUBLIC_EVENT;
         default:
