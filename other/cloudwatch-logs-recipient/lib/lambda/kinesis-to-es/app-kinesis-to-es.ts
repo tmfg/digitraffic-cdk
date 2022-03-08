@@ -39,15 +39,18 @@ export const handler: KinesisStreamHandler = function(event, context) {
 
         event.Records.forEach((record: KinesisStreamRecord) => {
             const recordBody = handleRecord(record, statistics);
-            batchBody += recordBody;
 
-            if (batchBody.length > MAX_BODY_SIZE) {
-                postToElastic(context, true, batchBody);
-                batchBody = "";
+            if (recordBody.trim().length > 0) {
+                batchBody += recordBody;
+
+                if (batchBody.length > MAX_BODY_SIZE) {
+                    postToElastic(context, true, batchBody);
+                    batchBody = "";
+                }
             }
         });
 
-        if (batchBody.length > 0) {
+        if (batchBody.trim().length > 0) { // trim here since transform() adds line breaks even to filtered records
             postToElastic(context, true, batchBody);
         }
     } catch (e) {
