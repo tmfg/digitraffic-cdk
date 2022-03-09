@@ -14,10 +14,10 @@ const STREET_TRAFFIC_MESSAGE_TAGS = ["Street Traffic Message(Beta)"];
 export class PublicApi {
     publicApi: DigitrafficRestApi;
 
-    private permitsD2LightResource: Resource;
-    private permitsGeojsonResource: Resource;
+    private messagesD2LightResource: Resource;
+    private messagesGeojsonResource: Resource;
 
-    private permitsGeoJsonModel: Model;
+    private messagesGeoJsonModel: Model;
 
     constructor(stack: DigitrafficStack) {
         this.publicApi = new DigitrafficRestApi(stack, 'StreetTrafficMessage-public', 'Street Traffic Message public API');
@@ -37,22 +37,22 @@ export class PublicApi {
         const stmResource = apiResource.addResource("street-traffic-message");
         const versionResource = stmResource.addResource("beta");
 
-        this.permitsGeojsonResource = versionResource.addResource("permits");
-        this.permitsD2LightResource = versionResource.addResource("permits.d2light");
+        this.messagesGeojsonResource = versionResource.addResource("messages");
+        this.messagesD2LightResource = versionResource.addResource("messages.d2light");
     }
 
     createModels(publicApi: DigitrafficRestApi) {
-        const permitModel = publicApi.addJsonModel("PermitModel", permitProperties);
-        const featureModel = publicApi.addJsonModel("PermitFeatureModel", featureSchema(getModelReference(permitModel.modelId, publicApi.restApiId)));
-        this.permitsGeoJsonModel = publicApi.addJsonModel("PermitsGeoJSONModel", geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
+        const messageModel = publicApi.addJsonModel("MessageModel", permitProperties);
+        const featureModel = publicApi.addJsonModel("MessageFeatureModel", featureSchema(getModelReference(messageModel.modelId, publicApi.restApiId)));
+        this.messagesGeoJsonModel = publicApi.addJsonModel("MessagesGeoJSONModel", geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
     }
 
     private createDocumentation() {
-        this.publicApi.documentResource(this.permitsGeojsonResource,
-            DocumentationPart.method(STREET_TRAFFIC_MESSAGE_TAGS, 'GetPermits GeoJSON', 'Return all permits in GeoJSON'));
+        this.publicApi.documentResource(this.messagesGeojsonResource,
+            DocumentationPart.method(STREET_TRAFFIC_MESSAGE_TAGS, 'GetMessages GeoJSON', 'Return all street traffic messages in GeoJSON'));
 
-        this.publicApi.documentResource(this.permitsD2LightResource,
-            DocumentationPart.method(STREET_TRAFFIC_MESSAGE_TAGS, 'GetPermits D2Light', 'Return all permits in D2Light'));
+        this.publicApi.documentResource(this.messagesD2LightResource,
+            DocumentationPart.method(STREET_TRAFFIC_MESSAGE_TAGS, 'GetMessages D2Light', 'Return all street traffic messages in D2Light'));
 
     }
 
@@ -64,10 +64,10 @@ export class PublicApi {
         });
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
-            this.permitsGeojsonResource.addMethod(httpMethod, integration, {
+            this.messagesGeojsonResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.permitsGeoJsonModel)),
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.messagesGeoJsonModel)),
                     corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 ],
             });
@@ -82,10 +82,10 @@ export class PublicApi {
         });
 
         ['GET', 'HEAD'].forEach((httpMethod) => {
-            this.permitsD2LightResource.addMethod(httpMethod, integration, {
+            this.messagesD2LightResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.permitsGeoJsonModel)),
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, this.messagesGeoJsonModel)),
                     corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 ],
             });

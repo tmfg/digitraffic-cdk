@@ -9,6 +9,12 @@ import {Geometry} from "geojson";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
+const PERMIT_TYPE_MAP: Record<string, PermitType> = {
+    '2': PermitType.CONSTRUCTION_WORKS,
+    '41': PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS,
+    '60': PermitType.PUBLIC_EVENT,
+};
+
 export async function getPermits(authKey: string, url: string): Promise<ApiPermit[]> {
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
@@ -94,10 +100,8 @@ function convertLocation(geometry: Geometry) {
 }
 
 function isValidPermit(permitElement: PermitElement): boolean {
-    // for some reason, duplicate 0-id permits
     return permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null
-    && permitElement["GIS:YlAlLuvat"]["GIS:Id"] !== '0'
-    && permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi"] !== 'Alueen tilapäinen käyttölupa'; // duplicates, disabled for now
+    && mapLupatyyppi(permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi_koodi"]) != null;
 }
 
 function convertPermit(permitElement: PermitElement): ApiPermit {
@@ -127,17 +131,13 @@ function convertSubject(permitType: PermitType, tarkoitus: string, nimi: string)
 }
 
 function mapLupatyyppi(lupatyyppiKoodi: string) {
-    switch (lupatyyppiKoodi) {
-        case '2': // kaivulupa
-            return PermitType.CONSTRUCTION_WORKS;
-        case '41': // tilapäinen käyttölupa
-            return PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS;
-        case '60': // käyttölupa tapahtuman järjestämiseen
-            return PermitType.PUBLIC_EVENT;
-        default:
-            console.info("unknown lupatyyppi koodi " + lupatyyppiKoodi);
-            return PermitType.OTHER;
+    const mappedType = PERMIT_TYPE_MAP[lupatyyppiKoodi];
+
+    if (lupatyyppiKoodi != '0' && mappedType == null) {
+        console.info("method=PermitsService unmapped lupatyyppi " + lupatyyppiKoodi);
     }
+
+    return mappedType;
 }
 
 function xmlToJs(xml: string): Promise<PermitResponse> {
