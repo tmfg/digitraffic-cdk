@@ -42,8 +42,8 @@ function convertD2Light(permits: DbPermit[]) {
         {
             "id": permit.id,
             "version": permit.version,
-            "creationTime": permit.createdAt,
-            "versionTime": permit.updatedAt,
+            "creationTime": permit.created,
+            "versionTime": permit.modified,
             "startTime": permit.effectiveFrom,
             "endTime": permit.effectiveTo,
             "type": permit.permitType,

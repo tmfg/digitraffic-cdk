@@ -27,8 +27,8 @@ export type DbPermit = {
     readonly geometry: Geometry
     readonly effectiveFrom: Date
     readonly effectiveTo?: Date
-    readonly createdAt: Date
-    readonly updatedAt: Date
+    readonly created: Date
+    readonly modified: Date
     readonly version: number
 }
 
@@ -71,12 +71,12 @@ export const permitProperties: JsonSchema = {
             format: 'date-time',
             description: 'Permit effective to',
         },
-        createdAt: {
+        created: {
             type: JsonSchemaType.INTEGER,
             format: 'date-time',
             description: 'Permit creation time',
         },
-        updatedAt: {
+        modified: {
             type: JsonSchemaType.INTEGER,
             format: 'date-time',
             description: 'Permit update time',
