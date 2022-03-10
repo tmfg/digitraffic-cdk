@@ -4,7 +4,7 @@ import {
     AwakeAiShipPredictability,
     AwakeAiShipVoyageSchedule,
 } from "../api/awake_ai_ship";
-import {DbETAShip} from "../db/timestamps";
+import {DbETAShip} from "../dao/timestamps";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {retry} from "digitraffic-common/utils/retry";
 import {AwakeAiPredictionType, AwakeAiShipStatus, AwakeAiZoneType, AwakeAiVoyageEtaPrediction} from "../api/awake_common";

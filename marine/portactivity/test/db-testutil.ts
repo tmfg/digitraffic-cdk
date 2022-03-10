@@ -1,10 +1,10 @@
 import {ApiTimestamp} from "../lib/model/timestamp";
-import {DbTimestamp} from "../lib/db/timestamps";
-import * as TimestampsDb from '../lib/db/timestamps';
+import {DbTimestamp} from "../lib/dao/timestamps";
+import * as TimestampsDb from '../lib/dao/timestamps';
 import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
-import {updatePilotages} from "../lib/db/pilotages";
+import {updatePilotages} from "../lib/dao/pilotages";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(

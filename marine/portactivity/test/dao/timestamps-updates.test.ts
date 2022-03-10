@@ -1,7 +1,7 @@
 import moment from 'moment';
 import {dbTestBase, findAll, insertPortAreaDetails, insertPortCall} from "../db-testutil";
 import {newTimestamp, newPortAreaDetails, newPortCall, PortAreaDetails, PortCall} from "../testdata";
-import * as TimestampsDb from "../../lib/db/timestamps";
+import * as TimestampsDb from "../../lib/dao/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {DTDatabase} from "digitraffic-common/database/database";
 

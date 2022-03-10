@@ -1,5 +1,5 @@
 import {dbTestBase, insertPilotage} from "../db-testutil";
-import {deletePilotages, findPortCallId, getTimestamps} from "../../lib/db/pilotages";
+import {deletePilotages, findPortCallId, getTimestamps} from "../../lib/dao/pilotages";
 import {Pilotage} from "../../lib/model/pilotage";
 import {Location} from "lib/model/timestamp";
 import {DTDatabase} from "digitraffic-common/database/database";

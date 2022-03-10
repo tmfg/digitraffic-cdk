@@ -6,7 +6,7 @@ import {
     AwakeAiETAShipApi,
 } from "../../lib/api/awake_ai_ship";
 import {AwakeAiETAShipService} from "../../lib/service/awake_ai_eta_ship";
-import {DbETAShip} from "../../lib/db/timestamps";
+import {DbETAShip} from "../../lib/dao/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
 import {

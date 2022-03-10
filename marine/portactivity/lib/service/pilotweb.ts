@@ -1,6 +1,6 @@
 import * as PilotwebAPI from "../api/pilotweb";
-import * as PilotagesDAO from "../db/pilotages";
-import * as TimestampDAO from '../db/timestamps';
+import * as PilotagesDAO from "../dao/pilotages";
+import * as TimestampDAO from '../dao/timestamps';
 import * as LocationConverter from './location-converter';
 
 import {ApiTimestamp, EventType, Location} from "../model/timestamp";
