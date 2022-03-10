@@ -2,8 +2,8 @@
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking} from "../lib/model/db-data";
 import moment from "moment";
 import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
-import {LineString, Position} from "geojson";
-import {getRandomNumber} from "digitraffic-common/test/testutils";
+import {Feature, Geometry, LineString, Point, Position} from "geojson";
+import {getRandomInteger, getRandomNumber} from "digitraffic-common/test/testutils";
 import {X_MAX, X_MIN, Y_MAX, Y_MIN} from "./testconstants";
 
 export function createDbDomainContract(contract : string, domain : string, dataLastUpdated?:Date) : DbDomainContract {
@@ -56,7 +56,7 @@ const KM_IN_Y = 0.00899321606;
  * @param coordinateCount
  * @param distBetweenPointsKm
  */
-export function createCoordinates(coordinateCount: number, distBetweenPointsKm=0.1) : Position[]  {
+export function createZigZagCoordinates(coordinateCount: number, distBetweenPointsKm=0.1) : Position[]  {
     // a = sqr(c^2/2)
     const distInXyKm = Math.sqrt(Math.pow(distBetweenPointsKm, 2)/2);
     const xAddition = KM_IN_X*distInXyKm;
@@ -77,17 +77,13 @@ export function createCoordinates(coordinateCount: number, distBetweenPointsKm=0
  * @param distBetweenPointsKm (default 0,1 km)
  */
 export function createLineStringGeometry(coordinateCount: number, distBetweenPointsKm=0.1) : LineString  {
-    const coordinates: Position[] = createCoordinates(coordinateCount, distBetweenPointsKm);
+    const coordinates: Position[] = createZigZagCoordinates(coordinateCount, distBetweenPointsKm);
     return createLineString(coordinates);
 }
 
-
 export function createLineStringGeometries(minCount: number, maxCount: number) : LineString[]  {
     return Array.from({length: getRandomNumber(minCount, maxCount)}, () => {
-        return createLineString([
-            [getRandomNumber(X_MIN, X_MAX), getRandomNumber(Y_MIN, Y_MAX)],
-            [getRandomNumber(X_MIN, X_MAX), getRandomNumber(Y_MIN, Y_MAX)],
-        ]);
+        return createLineStringGeometry(getRandomInteger(2, 10), 0.1);
     });
 }
 
@@ -97,5 +93,30 @@ export function createLineString(coordinates: Position[]) : LineString {
         type: "LineString",
         coordinates: coordinates,
     };
+}
+
+export function createFeatures(geometries: Geometry[]): Feature[] {
+    return geometries.map(g => {
+        return createFeature(g);
+    });
+}
+
+export function createFeature(geometry: Geometry): Feature {
+    return {
+        type: "Feature",
+        geometry: geometry,
+    } as Feature;
+}
+
+export function dateInPastMinutes(minutes: number) {
+    return moment().subtract(minutes, 'minutes').toDate();
+}
+
+export function addMinutes(reference: Date, minutes: number) {
+    return moment(reference).add(minutes, 'minutes').toDate();
+}
+
+export function createGeoJSONPoint(xy: Position): Point {
+    return new GeoJsonPoint(xy);
 }
 

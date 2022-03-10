@@ -3,9 +3,8 @@ import {distanceBetweenPositionsInKm} from "digitraffic-common/utils/geometry";
 import {MAX_SPEED_BETWEEN_TRACKINGS_KMH, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM, PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS} from "../constants";
 import {Position} from "geojson";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
-import {createHarjaId} from "./utils";
 import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
-
+import * as Utils from "./utils";
 
 /**
  * Splits work events to groups/distinct trackings by following rules:
@@ -75,19 +74,7 @@ function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkeven
 }
 
 export function isOverTimeLimit(previous: Date, next: Date) {
-    return countDiffMs(previous, next) > PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS;
-}
-
-export function countDiffMs(previous: Date, next: Date): number {
-    return next.getTime() - previous.getTime();
-}
-
-const DIVIDER_FOR_MS_TO_HOURS = 1000*60.0*60.0;
-
-export function calculateSpeedInKmH(distanceKm:number, diffMs:number): number {
-    const hours = diffMs / DIVIDER_FOR_MS_TO_HOURS;
-    const speed = distanceKm / hours;
-    return Number.isNaN(speed) ? 0 : speed;
+    return Utils.countDiffMs(previous, next) > PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS;
 }
 
 function isSameTasks(ioChannels1: ApiWorkeventIoDevice[], ioChannels2: ApiWorkeventIoDevice[]): boolean {
@@ -96,15 +83,7 @@ function isSameTasks(ioChannels1: ApiWorkeventIoDevice[], ioChannels2: ApiWorkev
     }
     const ioChannel1Strings = ioChennelsToStrings(ioChannels2);
     const ioChannel2Strings = ioChennelsToStrings(ioChannels2);
-    return hasBothStringArraysSameValues(ioChannel1Strings, ioChannel2Strings);
-}
-
-export function hasBothStringArraysSameValues(a: string[], b: string[]): boolean {
-    if (a.length === b.length) {
-        const bSet = new Set(b);
-        return a.every(value => bSet.has(value));
-    }
-    return false;
+    return Utils.hasBothStringArraysSameValues(ioChannel1Strings, ioChannel2Strings);
 }
 
 function ioChennelsToStrings(ioChannels : ApiWorkeventIoDevice[]): string[] {
@@ -132,11 +111,16 @@ export function isExtendingPreviousTracking(previousPosition: Position, nextPosi
         return false;
     }
     const distInKm = distanceBetweenPositionsInKm(previousPosition, nextPosition);
-    const diffInMs = countDiffMs(previousTime, nextTime);
-    const speedInKmH = calculateSpeedInKmH(distInKm, diffInMs);
+    const diffInMs = Utils.countDiffMs(previousTime, nextTime);
+    const speedInKmH = Utils.calculateSpeedInKmH(distInKm, diffInMs);
     if (distInKm > PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM) {
         return false;
     } else if (speedInKmH > MAX_SPEED_BETWEEN_TRACKINGS_KMH) {
+        return false;
+    } else if (!isFinite(speedInKmH) && distInKm > 0.05) {
+        // Simplification/saving resolution to db might move location of previous tracking's end point a bit and then when comparing
+        // it with next tracking's start point the result is infinity in speed. If point has moved significantly then consider as
+        // discontinuation to previous point
         return false;
     }
     return true;
@@ -151,14 +135,10 @@ export function getStartPosition(mt: DbMaintenanceTracking): Position {
 
 export function createDbWorkMachine(domainName: string, deviceId: number, deviceName: string): DbWorkMachine {
     return {
-        harjaUrakkaId: createHarjaId(domainName),
+        harjaUrakkaId: Utils.createHarjaId(domainName),
         harjaId: BigInt(deviceId),
         type: `domainName: ${domainName} / deviceId: ${deviceId} / deviceName: ${deviceName}`,
     };
-}
-
-export function areDistinctPositions(previous: Position, next: Position) {
-    return previous[0] !== next[0] || previous[1] !== next[1];
 }
 
 function cloneApiWorkeventWithNewTasks(prevEvent: ApiWorkevent, ioChannels: ApiWorkeventIoDevice[]) {

@@ -227,8 +227,8 @@ export function upsertWorkMachine(db: DTTransaction, data: DbWorkMachine) : Prom
 }
 
 
-const PS_FIND_LATEST_NOT_FINNISHED_TRACKING_FOR_WORK_MACHINE = new PreparedStatement({
-    name: 'PS_FIND_LATEST_TRACKING_FOR_WORK_MACHINE',
+const PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKING = new PreparedStatement({
+    name: 'PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_MACHINE_WITHOUT_NEXT',
     text: `
     select t.id
          , ST_AsGeoJSON(t.last_point) as last_point
@@ -241,13 +241,18 @@ const PS_FIND_LATEST_NOT_FINNISHED_TRACKING_FOR_WORK_MACHINE = new PreparedState
     where finished = false
       and domain = $1::text
       and work_machine_id = $2::bigint
+      and not exists(
+          select null
+          from maintenance_tracking other
+          where other.previous_tracking_id = t.id
+      )
     group by t.id, t.end_time
     order by t.end_time desc
     limit 1`,
 });
 
 export function findLatestNotFinishedTrackingForWorkMachine(db: DTDatabase, domainName: string, workMachineId: number) : Promise<DbLatestTracking | null> {
-    return db.oneOrNone(PS_FIND_LATEST_NOT_FINNISHED_TRACKING_FOR_WORK_MACHINE,
+    return db.oneOrNone(PS_FIND_LATEST_NOT_FINISHED_TRACKING_FOR_WORK_MACHINE_WITHOUT_NEXT_TRACKING,
         [domainName, workMachineId]);
 }
 

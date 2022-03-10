@@ -106,6 +106,10 @@ export function distanceBetweenPositionsInKm(pos1: Position, pos2: Position) {
     return distanceBetweenWGS84PointsInKm(pos1[0], pos1[1], pos2[0], pos2[1]);
 }
 
+export function areDistinctPositions(previous: Position, next: Position) {
+    return previous[0] !== next[0] || previous[1] !== next[1];
+}
+
 /**
  * Calculates distance between two GeoJSON points (WGS84)
  * @param pos1

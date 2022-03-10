@@ -1,4 +1,17 @@
 import crypto from "crypto";
+import {DbMaintenanceTracking} from "../model/db-data";
+
+export function dateFromIsoString(created: string): Date {
+    return new Date(created);
+}
+
+export function dateOrUndefinedFromIsoString(created?: string): Date|undefined {
+    if (!created) {
+        return undefined;
+    }
+    return new Date(created);
+}
+
 
 /**
  * Creates bigint hash value from given string
@@ -17,4 +30,31 @@ export function countEstimatedSizeOfMessage(message: object) {
         console.error(`method=utils.countEstimatedSizeOfMessage`, e);
     }
     return 0;
+}
+
+export function hasBothStringArraysSameValues(a: string[], b: string[]): boolean {
+    if (a.length === b.length) {
+        const bSet = new Set(b);
+        return a.every(value => bSet.has(value));
+    }
+    return false;
+}
+
+const DIVIDER_FOR_MS_TO_HOURS = 1000*60.0*60.0;
+
+export function calculateSpeedInKmH(distanceKm:number, diffMs:number): number {
+    const hours = diffMs / DIVIDER_FOR_MS_TO_HOURS;
+    const speed = distanceKm / hours;
+    return Number.isNaN(speed) ? 0 : speed;
+}
+
+export function countDiffMs(previous: Date, next: Date): number {
+    return next.getTime() - previous.getTime();
+}
+
+export function getTrackingStartPoint(tracking: DbMaintenanceTracking) {
+    if (tracking.line_string && tracking.line_string.coordinates.length) {
+        return tracking.line_string.coordinates[0];
+    }
+    return tracking.last_point.coordinates;
 }

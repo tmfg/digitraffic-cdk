@@ -13,32 +13,29 @@ import {AutoriUpdate} from "../../lib/service/autori-update";
 import {AutoriApi} from "../../lib/api/autori";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../../lib/model/autori-api-data";
 import * as sinon from "sinon";
-import {SinonStub} from "sinon";
-import {Feature, Geometry, LineString} from "geojson";
+import {Position} from "geojson";
 import * as utils from "../../lib/service/utils";
 import moment from "moment";
-import {randomString} from "digitraffic-common/test/testutils";
 import * as DataDb from "../../lib/db/data";
-import {getContractsWithSource} from "../../lib/db/data";
-import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../../lib/model/db-data";
+import {DbDomainContract, DbDomainTaskMapping} from "../../lib/model/db-data";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {DataType} from "digitraffic-common/database/last-updated";
-import {AUTORI_MAX_MINUTES_AT_ONCE, AUTORI_MAX_MINUTES_TO_HISTORY} from "../../lib/constants";
-import {UNKNOWN_TASK_NAME} from "../../lib/model/service-data";
+import {AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM, AUTORI_MAX_MINUTES_TO_HISTORY} from "../../lib/constants";
+import {UNKNOWN_TASK_NAME} from "../../lib/model/tracking-save-result";
 import {Asserter} from "digitraffic-common/test/asserter";
-import {createDbDomainContract, createLineStringGeometries, createTaskMapping} from "../testutil";
+import * as AutoriUtils from "../../lib/service/autori-utils";
+import {createLineString, createLineStringGeometries, createZigZagCoordinates} from "../testutil";
 import {
     AUTORI_OPERATION_BRUSHING,
     AUTORI_OPERATION_PAVING,
-    AUTORI_OPERATION_SALTING,
     CONTRACT_ID,
     DOMAIN_1,
     HARJA_BRUSHING,
     HARJA_PAVING,
     HARJA_SALTING,
     SOURCE_1,
-    VEHICLE_TYPE,
 } from "../testconstants";
+import * as AutoriTestutils from "../autori-testutil";
 
 const autoriUpdateService = createAutoriUpdateService();
 
@@ -53,104 +50,6 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         await truncate(db);
     });
 
-    test('getTasksForOperations', () => {
-        const taskMappings = [
-            // Map domain operations to harja tasks
-            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, AUTORI_OPERATION_BRUSHING, false),
-            createTaskMapping(DOMAIN_1, HARJA_PAVING, AUTORI_OPERATION_PAVING, true),
-            createTaskMapping(DOMAIN_1, HARJA_SALTING, AUTORI_OPERATION_SALTING, false),
-        ];
-
-        const tasks : string[] = autoriUpdateService.getTasksForOperations([AUTORI_OPERATION_BRUSHING, AUTORI_OPERATION_PAVING], taskMappings);
-
-        expect(tasks).toHaveLength(1);
-        expect(tasks).toContain(HARJA_BRUSHING);
-    });
-
-    test('getTasksForOperations duplicates', () => {
-        const taskMappings = [
-            // Map domain operations to harja tasks, map two operations to one task
-            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, AUTORI_OPERATION_BRUSHING, false),
-            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, AUTORI_OPERATION_PAVING, false),
-            createTaskMapping(DOMAIN_1, HARJA_SALTING, AUTORI_OPERATION_SALTING, false),
-        ];
-
-        const tasks : string[] = autoriUpdateService.getTasksForOperations([AUTORI_OPERATION_BRUSHING, AUTORI_OPERATION_PAVING], taskMappings);
-
-        expect(tasks).toHaveLength(1);
-        expect(tasks).toContain(HARJA_BRUSHING);
-    });
-
-    test('getLatestUpdatedDateForRouteData', () => {
-        const past1h = moment().subtract(1, 'hour').toDate();
-        const future1h = moment().add(1, 'hour').toDate();
-        const route : ApiRouteData[] = [createApiRouteData(past1h, []), createApiRouteData(future1h, [])];
-        const latest = autoriUpdateService.getLatestUpdatedDateForRouteData(route);
-        expect(latest).toEqual(future1h);
-    });
-
-    test('createDbWorkMachine', () => {
-        const wm : DbWorkMachine = autoriUpdateService.createDbWorkMachine(CONTRACT_ID, DOMAIN_1, VEHICLE_TYPE);
-        expect(wm.harjaUrakkaId).toEqual(utils.createHarjaId(CONTRACT_ID));
-        expect(wm.harjaId).toEqual(utils.createHarjaId(VEHICLE_TYPE));
-        expect(wm.type).toContain(CONTRACT_ID);
-        expect(wm.type).toContain(VEHICLE_TYPE);
-        expect(wm.type).toContain(DOMAIN_1);
-    });
-
-
-    test('createDbDomainContracts', () => {
-        const CONTRACT_1 = 'contract1';
-        const CONTRACT_2 = 'contract2';
-        const apiContracts : ApiContractData[] = [createApiContractData(CONTRACT_1), createApiContractData(CONTRACT_2)];
-        const contracts = autoriUpdateService.createDbDomainContracts(apiContracts, DOMAIN_1);
-        expect(contracts).toHaveLength(2);
-        expect(contracts.find(c => c.name == CONTRACT_1)?.contract).toEqual(apiContracts[0].id);
-        expect(contracts.find(c => c.name == CONTRACT_2)?.contract).toEqual(apiContracts[1].id);
-    });
-
-    test('createDbMaintenanceTracking', () => {
-        const workMachineId = 1;
-        const now = moment().toDate();
-        const geometries : LineString[] = createLineStringGeometries(2,5);
-        const route : ApiRouteData = createApiRouteData(now, geometries);
-        const dbContract = createDbDomainContract("contract-1", DOMAIN_1);
-        const trackings : DbMaintenanceTracking[] = autoriUpdateService.createDbMaintenanceTracking(workMachineId, route, dbContract, [HARJA_BRUSHING, HARJA_SALTING]);
-
-        // Expect all geometries to be found
-        expect(trackings.length).toEqual(geometries.length); // same as geometries count
-        geometries.forEach(g => {
-            const t : DbMaintenanceTracking | undefined = trackings.find(tr => tr.line_string?.coordinates[0][0] == g.coordinates[0][0]);
-            const ls = t?.line_string;
-            expect(ls?.coordinates[0][1]).toEqual(g.coordinates[0][1]);
-            console.info(`Found ${JSON.stringify(ls)}`);
-            expect(t?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(now));
-            expect(t?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(now));
-        });
-    });
-
-    test('createDbMaintenanceTracking empty tasks', () => {
-        const route : ApiRouteData = createApiRouteData(new Date(), createLineStringGeometries(2,5));
-        const dbContract = createDbDomainContract("contract-1", DOMAIN_1);
-        const trackings : DbMaintenanceTracking[] = autoriUpdateService.createDbMaintenanceTracking(1, route, dbContract, []);
-
-        expect(trackings.length).toEqual(0); // No tasks -> no trackings
-    });
-
-    test('createDbDomainTaskMappings', () => {
-        const operations = [createApiOperationData(AUTORI_OPERATION_BRUSHING, DOMAIN_1),createApiOperationData(AUTORI_OPERATION_PAVING, DOMAIN_1)];
-        const mappings : DbDomainTaskMapping[] = autoriUpdateService.createDbDomainTaskMappings(operations, DOMAIN_1);
-
-        expect(mappings.length).toEqual(2);
-        mappings.forEach((mapping, index) => {
-            expect(mapping.ignore).toEqual(true);
-            expect(mapping.domain).toEqual(DOMAIN_1);
-            expect(mapping.name).toEqual(UNKNOWN_TASK_NAME);
-            expect(mapping.original_id).toEqual(operations[index].id);
-        });
-    });
-
-
     test('resolveNextStartTimeForDataFetchFromHistory', () => {
         const lastUdated = moment().subtract(1, 'minutes').toDate();
         const contract = {
@@ -162,7 +61,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             name: "Urakka 1",
             source: "Foo / Bar",
         } as DbDomainContract;
-        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
+        const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
         expect(resolved).toEqual(lastUdated);
     });
 
@@ -180,7 +79,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             name: "Urakka 1",
             source: "Foo / Bar",
         } as DbDomainContract;
-        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
+        const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
         Asserter.assertToBeCloseTo(resolved.getTime(), shouldResolveTo.getTime(), 10000);
     });
 
@@ -195,7 +94,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             name: "Urakka 1",
             source: "Foo / Bar",
         } as DbDomainContract;
-        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
+        const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
         expect(resolved).toEqual(startDate);
     });
 
@@ -211,7 +110,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             name: "Urakka 1",
             source: "Foo / Bar",
         } as DbDomainContract;
-        const resolved = autoriUpdateService.resolveNextStartTimeForDataFetchFromHistory(contract);
+        const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
         console.info(`min ${fallBackMin} actual ${resolved.getTime()} max ${fallBackMax}`);
         expect(resolved.getTime()).toBeGreaterThanOrEqual(fallBackMin);
         expect(resolved.getTime()).toBeLessThanOrEqual(fallBackMax);
@@ -221,8 +120,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         await insertDomain(db, DOMAIN_1, SOURCE_1);
 
         const operations = [
-            createApiOperationData(AUTORI_OPERATION_BRUSHING, DOMAIN_1),
-            createApiOperationData(AUTORI_OPERATION_PAVING, DOMAIN_1),
+            AutoriTestutils.createApiOperationData(AUTORI_OPERATION_BRUSHING, DOMAIN_1),
+            AutoriTestutils.createApiOperationData(AUTORI_OPERATION_PAVING, DOMAIN_1),
         ];
         mockGetOperationsApiResponse(operations);
 
@@ -246,7 +145,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         );
 
         const operations = [
-            createApiOperationData(AUTORI_OPERATION_BRUSHING, DOMAIN_1),
+            AutoriTestutils.createApiOperationData(AUTORI_OPERATION_BRUSHING, DOMAIN_1),
         ];
         mockGetOperationsApiResponse(operations);
 
@@ -268,15 +167,15 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         const contract2Name = "Urakka 2";
         const contract1NewEndDate = moment().add(1, 'years').toDate();
         const contracts = [
-            createApiContractData(contract1Name, contract1NewEndDate),
-            createApiContractData(contract2Name),
+            AutoriTestutils.createApiContractData(contract1Name, contract1NewEndDate),
+            AutoriTestutils.createApiContractData(contract2Name),
         ];
         await insertDomain(db, DOMAIN_1, SOURCE_1);
 
         // Insert one exiting contract with endin date today
         const contract1 = contracts[0];
         await insertDomaindContract(
-            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, contract1.startDate,
+            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, utils.dateOrUndefinedFromIsoString(contract1.startDate),
             new Date(),
         );
 
@@ -322,19 +221,16 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
             db, HARJA_PAVING ,AUTORI_OPERATION_PAVING, DOMAIN_1, false,
         );
 
-        const contract = (await getContractsWithSource(db, DOMAIN_1))[0];
-
         // Create two routes, 2 days and 1 day old
-        const route2d: ApiRouteData = createApiRouteData(past2, createLineStringGeometries(1, 1), [AUTORI_OPERATION_BRUSHING]);
-        const route1d: ApiRouteData = createApiRouteData(past1, createLineStringGeometries(1, 1), [AUTORI_OPERATION_PAVING]);
+        const route2d: ApiRouteData = AutoriTestutils.createApiRouteData(past2, createLineStringGeometries(1, 1), [AUTORI_OPERATION_BRUSHING]);
+        const route1d: ApiRouteData = AutoriTestutils.createApiRouteData(past1, createLineStringGeometries(1, 1), [AUTORI_OPERATION_PAVING]);
 
         // Sub api to return those routes
-        const stub = getStubForGetNextRouteDataForContract();
-        mockGetNextRouteDataForContractApiResponse(stub, contract, past3, [route2d]);
-        mockGetNextRouteDataForContractApiResponse(stub, contract, past2, [route1d]);
-        mockGetNextRouteDataForContractApiResponse(stub, contract, past1, []);
-
-        // console.info(`Dates: ${past3.toISOString()} – ${past2.toISOString()} – ${past1.toISOString()}`);
+        // const stub = getStubForGetNextRouteDataForContract();
+        // mockGetNextRouteDataForContractApiResponse(stub, contract, past3, [route2d]);
+        // mockGetNextRouteDataForContractApiResponse(stub, contract, past2, [route1d]);
+        // mockGetNextRouteDataForContractApiResponse(stub, contract, past1, []);
+        mockGetWorkEventsApiResponse([route2d, route1d]);
         await autoriUpdateService.updateTrackingsForDomain(DOMAIN_1);
         const updateTime = Date.now();
         const trackings = await findAllTrackings(db, DOMAIN_1);
@@ -344,18 +240,60 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
         expect(olderTracking?.tasks.length).toEqual(1);
         expect(olderTracking?.tasks).toContain(HARJA_BRUSHING);
-        expect(olderTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past2));
-        expect(olderTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past2));
+        expect(olderTracking?.start_time).toEqual(AutoriTestutils.createTrackingStartTimeFromUpdatedTime(past2));
+        expect(olderTracking?.end_time).toEqual(AutoriTestutils.createTrackingEndTimeFromUpdatedTime(past2));
 
         expect(latestTracking?.tasks.length).toEqual(1);
         expect(latestTracking?.tasks).toContain(HARJA_PAVING);
-        expect(latestTracking?.start_time).toEqual(createTrackingStartTimeFromUpdatedTime(past1));
-        expect(latestTracking?.end_time).toEqual(createTrackingEndTimeFromUpdatedTime(past1));
+        expect(latestTracking?.start_time).toEqual(AutoriTestutils.createTrackingStartTimeFromUpdatedTime(past1));
+        expect(latestTracking?.end_time).toEqual(AutoriTestutils.createTrackingEndTimeFromUpdatedTime(past1));
 
         const checked = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED);
         const updated = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA);
         Asserter.assertToBeCloseTo(<number>checked?.getTime(), updateTime, 500);
         Asserter.assertToBeCloseTo(<number>updated?.getTime(), updateTime, 500);
+    });
+
+    test('updateTrackings and set previous reference', async () => {
+        const contractName = "Urakka 1";
+        const updated1 = moment().subtract(15, 'minutes').toDate();
+        const updated2 = moment(updated1).add(5, 'minutes').toDate();
+        const updated3 = moment().subtract(2, 'minutes').toDate();
+
+        await insertDomain(db, DOMAIN_1, SOURCE_1);
+        await insertDomaindContract(
+            db, DOMAIN_1, CONTRACT_ID, contractName, SOURCE_1, moment().subtract(1, 'months').toDate(),
+            moment().add(1, 'months').toDate(), updated1,
+        );
+        await insertDomaindTaskMapping(
+            db, HARJA_BRUSHING ,AUTORI_OPERATION_BRUSHING, DOMAIN_1, false,
+        );
+        await insertDomaindTaskMapping(
+            db, HARJA_PAVING ,AUTORI_OPERATION_PAVING, DOMAIN_1, false,
+        );
+
+        // Create two routes, 2 days and 1 day old
+        const coordinates: Position[] = createZigZagCoordinates(30, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        const coords1 = coordinates.slice(0, 10); //L:10 this end coordinate is the same
+        const coords2 = coordinates.slice(9, 14);//L:5 as the start coodinate here.
+        const coords3 = coordinates.slice(13, 30); //L:17 And here same for the previous one
+        const routes: ApiRouteData[] =
+               [AutoriTestutils.createApiRouteData(updated1, [createLineString(coords1)], [AUTORI_OPERATION_BRUSHING]),
+                   AutoriTestutils.createApiRouteData(updated2, [createLineString(coords2)], [AUTORI_OPERATION_BRUSHING]),
+                   AutoriTestutils.createApiRouteData(updated3, [createLineString(coords3)], [AUTORI_OPERATION_BRUSHING])];
+
+        mockGetWorkEventsApiResponse(routes);
+        await autoriUpdateService.updateTrackingsForDomain(DOMAIN_1);
+
+        const trackings = await findAllTrackings(db, DOMAIN_1);
+
+        expect(trackings.length).toEqual(3);
+        // TODO Warning:(295, 33) Error: expect(received).toEqual(expected) // deep equality Expected: null Received: 264
+        expect(trackings[0].id).toEqual(trackings[1].previous_tracking_id);
+        expect(trackings[1].id).toEqual(trackings[2].previous_tracking_id);
+        expect(trackings[0].line_string?.coordinates?.length).toEqual(10);
+        expect(trackings[1].line_string?.coordinates?.length).toEqual(5);
+        expect(trackings[2].line_string?.coordinates?.length).toEqual(17);
     });
 
     function mockGetOperationsApiResponse(response: ApiOperationData[]) {
@@ -366,67 +304,9 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         return sinon.stub(AutoriApi.prototype, 'getContracts').returns(Promise.resolve(response));
     }
 
-    function getStubForGetNextRouteDataForContract() : SinonStub {
-        return sinon.stub(AutoriApi.prototype, 'getNextRouteDataForContract');
-    }
-
-    function mockGetNextRouteDataForContractApiResponse(stub: SinonStub, contract : DbDomainContract, from: Date, response: ApiRouteData[]) {
-        console.info(`mock getNextRouteDataForContract ApiResponse ${contract.contract}, ${from.toISOString()}, ${AUTORI_MAX_MINUTES_AT_ONCE}`);
-        stub.withArgs(sinon.match({ contract: contract.contract }), from, AUTORI_MAX_MINUTES_AT_ONCE).returns(Promise.resolve(response));
-    }
-
-    function createApiContractData(name: string, endDate = moment().add(30, 'days').toDate()) : ApiContractData {
-        return {
-            id: randomString(),
-            name: name,
-            startDate: moment().subtract(30, 'days').toDate(),
-            endDate: endDate,
-        };
-    }
-
-    function createApiRouteData(updated : Date, geometries : Geometry[], operations:string[]=[AUTORI_OPERATION_BRUSHING, AUTORI_OPERATION_PAVING, AUTORI_OPERATION_SALTING]) : ApiRouteData {
-
-        const features : Feature[] = createApiRoutedataFeatures(geometries);
-        return {
-            vehicleType: VEHICLE_TYPE,
-            geography: {
-                features: features,
-                type: "FeatureCollection",
-            },
-            created: new Date(),
-            updated: updated,
-            id: randomString(),
-            startTime: createTrackingStartTimeFromUpdatedTime(updated),
-            endTime: createTrackingEndTimeFromUpdatedTime(updated),
-            operations: operations,
-        };
-    }
-
-    function createTrackingStartTimeFromUpdatedTime(updatedTime : Date) : Date {
-        return moment(updatedTime).subtract(5, 'minutes').toDate();
-    }
-
-    function createTrackingEndTimeFromUpdatedTime(updatedTime : Date) : Date {
-        return moment(updatedTime).subtract(1, 'minutes').toDate();
-    }
-
-    function createApiRoutedataFeatures(geometries : Geometry[]) : Feature[] {
-        return Array.from({length: geometries.length}, (_, i) => {
-            return {
-                type: "Feature",
-                geometry: geometries[i],
-                properties: {
-                    streetAddress: "Patukatu 1-10, Oulu",
-                    featureType: "StreetAddress",
-                },
-            };
-        });
-    }
-
-    function createApiOperationData(id : string, operationName : string) : ApiOperationData {
-        return {
-            id: id,
-            operationName: operationName,
-        };
+    function mockGetWorkEventsApiResponse(response: ApiRouteData[]) {
+        return sinon.stub(AutoriApi.prototype, 'getNextRouteDataForContract')
+            .withArgs(sinon.match.any, sinon.match.any, sinon.match.any)
+            .returns(Promise.resolve(response));
     }
 }));

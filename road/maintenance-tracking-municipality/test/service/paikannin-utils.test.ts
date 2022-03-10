@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import moment from "moment";
 import {getRandomInteger, randomString} from "digitraffic-common/test/testutils";
-import {areDistinctPositions, createDbWorkMachine, getTasksForOperations, groupEventsToIndividualTrackings} from "../../lib/service/paikannin-utils";
+import {createDbWorkMachine, getTasksForOperations, groupEventsToIndividualTrackings} from "../../lib/service/paikannin-utils";
 import {ApiWorkevent, ApiWorkeventIoDevice} from "../../lib/model/paikannin-api-data";
 import {createTaskMapping} from "../testutil";
 import {DbWorkMachine} from "../../lib/model/db-data";
@@ -165,13 +165,6 @@ describe('paikannin-utils-service-test', () => {
         // this shold be groupped to two trackings
         const groups = groupEventsToIndividualTrackings(events, subtractSecond(previous));
         expect(groups).toHaveLength(2);
-    });
-
-    test('areDistinctPositions', () => {
-        expect(areDistinctPositions([1,2],[1,2])).toBe(false);
-        expect(areDistinctPositions([1.1,2.2],[1.1,2.2])).toBe(false);
-        expect(areDistinctPositions([1,2.1],[1,2])).toBe(true);
-        expect(areDistinctPositions([1,2],[1,2.000000000000001])).toBe(true);
     });
 
     test('createDbWorkMachine', () => {

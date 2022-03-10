@@ -29,7 +29,7 @@ export class InternalLambdas {
             functionName: stack.configuration.shortName + '-' + domain,
             memorySize: 256,
             singleLambda: false,
-            timeout: 60,
+            timeout: 120,
             reservedConcurrentExecutions: 1,
         });
 
@@ -47,7 +47,7 @@ export class InternalLambdas {
             functionName: stack.configuration.shortName + '-' + domain,
             memorySize: 256,
             singleLambda: false,
-            timeout: 60,
+            timeout: 120,
             reservedConcurrentExecutions: 1,
         });
 

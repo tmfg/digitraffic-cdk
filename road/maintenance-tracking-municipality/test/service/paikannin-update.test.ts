@@ -25,9 +25,9 @@ import {ApiDevice, ApiIoChannel, ApiWorkevent, ApiWorkeventDevice, ApiWorkeventI
 import {getRandompId} from "maintenance-tracking/test/testdata";
 import {getRandomInteger} from "digitraffic-common/test/testutils";
 import * as DataDb from "../../lib/db/data";
-import {UNKNOWN_TASK_NAME} from "../../lib/model/service-data";
+import {UNKNOWN_TASK_NAME} from "../../lib/model/tracking-save-result";
 import moment from "moment";
-import {createCoordinates, createDbDomainContract, createLineString, createLineStringGeometry} from "../testutil";
+import {createDbDomainContract, createLineString, createLineStringGeometry, createZigZagCoordinates} from "../testutil";
 import {LineString} from "geojson";
 import {PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM} from "../../lib/constants";
 
@@ -153,7 +153,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
             db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHING.name, DOMAIN_1, false,
         );
 
-        const coords = createCoordinates(20, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        const coords = createZigZagCoordinates(20, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
         const coords1 = coords.slice(0,10);
         const coords2 = coords.slice(10);
 

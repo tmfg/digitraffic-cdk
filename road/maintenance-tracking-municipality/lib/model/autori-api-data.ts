@@ -3,18 +3,19 @@ import {FeatureCollection} from "geojson";
 export type ApiContractData = {
     readonly id: string,
     readonly name: string,
-    readonly startDate?: Date,
-    readonly endDate?: Date
+    readonly startDate?: string,
+    readonly endDate?: string
 }
 
 export type ApiRouteData = {
     readonly vehicleType?: string
-    readonly geography?: FeatureCollection,
-    readonly created?: Date,
-    readonly updated?: Date,
+    readonly user: string,
+    geography?: FeatureCollection,
+    readonly created?: string,
+    readonly updated?: string,
     readonly id: string,
-    readonly startTime: Date,
-    readonly endTime: Date,
+    readonly startTime: string,
+    readonly endTime: string,
     readonly operations: string[]
 }
 

@@ -1,7 +1,7 @@
 import {MaintenanceTrackingPaikanninSecret} from "../../model/maintenance-tracking-municipality-secret";
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
-import {TrackingSaveResult} from "../../model/service-data";
+import {TrackingSaveResult} from "../../model/tracking-save-result";
 import {PaikanninApi} from "../../api/paikannin";
 import {PaikanninUpdate} from "../../service/paikannin-update";
 import * as CommonUpdate from "../../service/common-update";

@@ -3,12 +3,12 @@ import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/dat
 import {AutoriApi} from "../api/autori";
 import moment from "moment";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
-import {countEstimatedSizeOfMessage, createHarjaId} from "./utils";
-import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
-import {AUTORI_MAX_MINUTES_AT_ONCE, AUTORI_MAX_MINUTES_TO_HISTORY} from "../constants";
-import {TrackingSaveResult, UNKNOWN_TASK_NAME} from "../model/service-data";
-import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
+import * as Utils from "./utils";
+import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/db-data";
+import {TrackingSaveResult} from "../model/tracking-save-result";
 import * as CommonUpdateService from "./common-update";
+import * as AutoriUtils from "./autori-utils";
+import {Position} from "geojson";
 
 export class AutoriUpdate {
 
@@ -26,7 +26,7 @@ export class AutoriUpdate {
     async updateContractsForDomain(domainName: string): Promise<number> {
 
         const apiContracts: ApiContractData[] = await this.api.getContracts();
-        const dbContracts: DbDomainContract[] = this.createDbDomainContracts(apiContracts, domainName);
+        const dbContracts: DbDomainContract[] = AutoriUtils.createDbDomainContracts(apiContracts, domainName);
 
         const dbIds: DbTextId[] = await inDatabase((db: DTDatabase) => {
             return DataDb.upsertContracts(db, dbContracts);
@@ -44,7 +44,7 @@ export class AutoriUpdate {
     async updateTaskMappingsForDomain(domainName: string): Promise<number> {
 
         const apiOperations: ApiOperationData[] = await this.api.getOperations();
-        const taskMappings: DbDomainTaskMapping[] = this.createDbDomainTaskMappings(apiOperations, domainName);
+        const taskMappings: DbDomainTaskMapping[] = AutoriUtils.createDbDomainTaskMappings(apiOperations, domainName);
 
         const dbIds: DbTextId[] = await inDatabase((db: DTDatabase) => {
             return DataDb.upsertTaskMappings(db, taskMappings);
@@ -53,7 +53,6 @@ export class AutoriUpdate {
         // Returns array [{"original_id":89},null,null,{"original_id":90}] -> nulls are conflicting ones not inserted
         return dbIds.filter(dbId => dbId && dbId.id != null).length;
     }
-
 
     /**
      * @param domainName Solution domain name ie. myprovider-helsinki
@@ -73,10 +72,10 @@ export class AutoriUpdate {
             });
 
             return Promise.allSettled(contracts.map((contract: DbDomainContract) => {
-                const start = this.resolveNextStartTimeForDataFetchFromHistory(contract);
+                const start = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
                 return this.updateContracTrackings(contract, taskMappings, start);
             })).then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
-                const summedResult = CommonUpdateService.sumResults(results);
+                const summedResult = CommonUpdateService.sumResultsFromPromises(results);
                 console.info(`method=AutoriUpdate.updateTrackingsForDomain domain=${domainName} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                 return summedResult;
             }).then((finalResult) => {
@@ -86,184 +85,6 @@ export class AutoriUpdate {
             console.error(`method=AutoriUpdate.updateTrackings domain=${domainName} Failed for all contracts`, error);
             throw error;
         }
-    }
-
-    getLatestUpdatedDateForRouteData(routeData: ApiRouteData[]): Date {
-        try {
-            const maxEpochMs = Math.max.apply(null, routeData.map(value => {
-                return new Date(value.updated || value.endTime).getTime();
-            }));
-            return new Date(maxEpochMs);
-        } catch (e) {
-            console.error(e);
-            throw e;
-        }
-    }
-
-    private saveTrackingsToDb(contract: DbDomainContract, routeDatas: ApiRouteData[], taskMappings: DbDomainTaskMapping[]): Promise<TrackingSaveResult> {
-        const start = Date.now();
-
-        return inDatabase((db: DTDatabase) => {
-            return Promise.allSettled(routeDatas.map(async (routeData: ApiRouteData) => {
-
-                // estimated message size
-                const messageSizeBytes = countEstimatedSizeOfMessage(routeData);
-
-                try {
-                    const machineId = await db.tx(tx => {
-                        const workMachine: DbWorkMachine = this.createDbWorkMachine(contract.contract, contract.domain, routeData.vehicleType);
-                        return DataDb.upsertWorkMachine(tx, workMachine);
-                    });
-                    console.debug(`DEBUG method=AutoriUpdate.saveTrackingsToDb upsertWorkMachine with id ${machineId.id}`);
-
-                    const tasks: string[] = this.getTasksForOperations(routeData.operations, taskMappings);
-                    const data: DbMaintenanceTracking[] = this.createDbMaintenanceTracking(machineId.id, routeData, contract, tasks);
-                    console.debug(`DEBUG method=AutoriUpdate.saveTrackingsToDb inserting ${data.length} trackings for machine ${machineId.id}`);
-                    return await db.tx(async tx => {
-                        await DataDb.upsertMaintenanceTrackings(tx, data);
-                        await DataDb.updateContractLastUpdated(tx, contract.domain, contract.contract, routeData.updated || routeData.endTime);
-                    }).then(() => {
-                        console.info(`method=AutoriUpdate.saveTrackingsToDb.upsert domain=${contract.domain} contract=${contract.contract} insertCount=${data.length} errors=0 total message sizeBytes=${messageSizeBytes} tookMs=${Date.now() - start}`);
-                        return TrackingSaveResult.createSaved(messageSizeBytes, data.length);
-                    }).catch((error) => {
-                        console.error(`method=AutoriUpdate.saveTrackingsToDb.upsert domain=${contract.domain} contract=${contract.contract} insertCount=0 errors=1 total message sizeBytes=${messageSizeBytes} tookMs=${Date.now() - start}`, error);
-                        return TrackingSaveResult.createError(messageSizeBytes);
-                    });
-                } catch (error) {
-                    console.error(`method=AutoriUpdate.saveTrackingsToDb failed for contract=${contract.contract} and domain=${contract.domain} for routeData ${routeData.id}`, error);
-                    return TrackingSaveResult.createError(messageSizeBytes);
-                }
-            })).then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
-                const summedResult = CommonUpdateService.sumResults(results);
-                console.info(`method=AutoriUpdate.saveTrackingsToDb domain=${contract.domain} contract=${contract.contract} count=${summedResult.saved} errors=${summedResult.errors} total message sizeBytes=${summedResult.sizeBytes} tookMs=${Date.now() - start}`);
-                return summedResult;
-            });
-        });
-    }
-
-    /**
-     * Find out from what time the data should be retrieved from history
-     * @param contract
-     */
-    resolveNextStartTimeForDataFetchFromHistory(contract: DbDomainContract): Date {
-        // Allowed to get last 5 min data, no further history, use max 7 min to have no gaps in data
-        const maxDate = moment().subtract(AUTORI_MAX_MINUTES_TO_HISTORY, 'minutes').toDate();
-
-        let resolvedTime = moment().subtract(AUTORI_MAX_MINUTES_TO_HISTORY, 'minutes').toDate();
-        if (contract.data_last_updated) {
-            console.debug(`DEBUG method=AutoriUpdate.resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.data_last_updated ${contract.data_last_updated.toISOString()}`);
-            resolvedTime = contract.data_last_updated;
-        } else if (contract.start_date) {
-            console.debug(`DEBUG method=AutoriUpdate.resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using contract.start_date ${contract.start_date.toISOString()}`);
-            resolvedTime = contract.start_date;
-        } else {
-            console.debug(`DEBUG method=AutoriUpdate.resolveContractLastUpdateTime contract=${contract.contract} and domain=${contract.domain} using -7, 'minutes' ${resolvedTime.toLocaleString()}`);
-        }
-
-        const result = new Date(Math.max(resolvedTime.getTime(), maxDate.getTime()));
-        console.debug(`DEBUG method=AutoriUpdate.resolveContractLastUpdateTime resolvedTime=${resolvedTime.toISOString()} maxDate=${maxDate.toISOString()}  result=${result.toISOString()} `);
-        return result;
-    }
-
-    createDbMaintenanceTracking(workMachineId: number, routeData: ApiRouteData, contract: DbDomainContract, harjaTasks: string[]): DbMaintenanceTracking[] {
-
-        if (harjaTasks.length === 0) {
-            console.info(`method=AutoriUpdate.createDbMaintenanceTracking domain=${contract.domain} contract=${contract.contract} No tasks for tracking api id ${routeData.id} -> no data to save`);
-            return [];
-        }
-
-        if (!routeData.geography) {
-            return [];
-        }
-
-        return routeData.geography.features.map((f) => {
-
-            let lastPoint: GeoJsonPoint;
-            let lineString: GeoJsonLineString | null = null;
-
-            if (f.geometry.type == "Point") {
-                lastPoint = new GeoJsonPoint(f.geometry.coordinates);
-            } else if (f.geometry.type == "LineString") {
-                lastPoint = new GeoJsonPoint(f.geometry.coordinates[f.geometry.coordinates.length - 1]);
-                lineString = new GeoJsonLineString(f.geometry.coordinates);
-            } else {
-                throw new Error(`Unsupported geometry type for maintenance tracking ${f.geometry.type}`);
-            }
-
-            /* eslint-disable camelcase */
-            return {
-                direction: undefined,
-                sending_time: routeData.created || new Date(),
-                start_time: routeData.startTime,
-                end_time: routeData.endTime,
-                last_point: lastPoint,
-                line_string: lineString,
-                sending_system: contract.domain,
-                work_machine_id: workMachineId,
-                tasks: harjaTasks,
-                domain: contract.domain,
-                contract: contract.contract,
-                message_original_id: routeData.id,
-                finished: true,
-            };
-            /* eslint-enable camelcase */
-        });
-    }
-
-    createDbWorkMachine(contractId: string, domainName: string, vehicleType?: string): DbWorkMachine {
-        return {
-            harjaUrakkaId: createHarjaId(contractId),
-            harjaId: createHarjaId(vehicleType || 'dummy'),
-            type: `domainName: ${domainName} / contractId: ${contractId} / vehicleType: ${vehicleType}`,
-        };
-    }
-
-    createDbDomainContracts(contracts: ApiContractData[], domainName: string): DbDomainContract[] {
-        return contracts.map(contract => (
-            /* eslint-disable camelcase */
-            {
-                domain: domainName,
-                contract: contract.id,
-                name: contract.name,
-                start_date: contract.startDate,
-                end_date: contract.endDate,
-                data_last_updated: undefined,
-                source: undefined,
-                /* eslint-enable camelcase */
-            }));
-    }
-
-    createDbDomainTaskMappings(operations: ApiOperationData[], domainName: string): DbDomainTaskMapping[] {
-        return operations.map(operation => (
-            /* eslint-disable camelcase */
-            {
-                name: UNKNOWN_TASK_NAME,
-                original_id: operation.id,
-                domain: domainName,
-                ignore: true,
-                /* eslint-enable camelcase */
-            }));
-    }
-
-    /**
-     * Map domain route operations to Harja tasks
-     * @param operations to map
-     * @param taskMappings mapping of tasks from database
-     */
-    getTasksForOperations(operations: string[], taskMappings: DbDomainTaskMapping[]): string[] {
-        if (operations === undefined) {
-            return [];
-        }
-
-        return operations.reduce(function (filtered: string[], operation) {
-            const taskMapping = taskMappings.find((mapping: DbDomainTaskMapping): boolean => {
-                return mapping.original_id == operation && !mapping.ignore;
-            });
-            if (taskMapping && !filtered.includes(taskMapping.name)) {
-                return filtered.concat(taskMapping.name);
-            }
-            return filtered;
-        }, []);
     }
 
     /**
@@ -277,8 +98,8 @@ export class AutoriUpdate {
      */
     private updateContracTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date): Promise<TrackingSaveResult> {
         console.info(`method=AutoriUpdate.updateContracTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`);
-        return this.api.getNextRouteDataForContract(contract, apiDataUpdatedFrom, AUTORI_MAX_MINUTES_AT_ONCE)
-            .then(this.saveContracRoutesAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
+        return this.api.getNextRouteDataForContract(contract, apiDataUpdatedFrom, moment().add(1, 'minutes').toDate())
+            .then(this.saveContracRouteDataAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
             .catch((error) => {
                 console.error(`method=AutoriUpdate.updateContracTrackings Error ${error}`);
                 return TrackingSaveResult.createError(0);
@@ -286,38 +107,87 @@ export class AutoriUpdate {
     }
 
     /**
-     * Method to update api routes to trackings
+     * Method to save api routes as trackings to db
      * @param contract witch trackings to update
      * @param taskMappings mappings for api tasks -> harja tasks
      * @param apiDataUpdatedFrom exclusive start time where to start asking for new data from api
      * @private
      */
-    private saveContracRoutesAsTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date) {
-        return (routeData: ApiRouteData[]): Promise<TrackingSaveResult> => {
+    private saveContracRouteDataAsTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date) {
+        return (originalRouteData: ApiRouteData[]): Promise<TrackingSaveResult> => {
+            const start = Date.now();
 
-            if (routeData.length === 0) {
-                console.info(`method=AutoriUpdate.saveContracRoutesAsTrackings No new data for contract=${contract.contract} after ${apiDataUpdatedFrom.toISOString()}`);
+            const fixedRouteData: ApiRouteData[] = AutoriUtils.fixApiRouteDatas(originalRouteData);
+
+            if (fixedRouteData.length === 0) {
+                console.info(`method=AutoriUpdate.saveContracRouteDataAsTrackings No new data for domain=${contract.domain} contract=${contract.contract} after ${apiDataUpdatedFrom.toISOString()}`);
                 return Promise.resolve(new TrackingSaveResult(0, 0, 0));
             }
 
-            // Estimated message size
-            const messageSizeBytes = countEstimatedSizeOfMessage(routeData);
-            return this.saveTrackingsToDb(contract, routeData, taskMappings)
-                .then((result: TrackingSaveResult) => {
-                    const latestUpdated = this.getLatestUpdatedDateForRouteData(routeData);
-                    // console.info(`getLatestUpdatedDateForRouteData: domain=${contract.domain} contract=${contract.contract} ${start.toISOString()}`);
-                    // Recursive call to update next route data after latestUpdated from api
-                    return this.updateContracTrackings(contract, taskMappings, latestUpdated)
-                        .then((nextResult: TrackingSaveResult) => {
-                            return result.sum(nextResult);
-                        }).catch((error) => {
-                            console.error(`method=AutoriUpdate.saveContracRoutesAsTrackings Error ${error}`);
-                            return result.addError(messageSizeBytes);
+            return inDatabase(async (db: DTDatabase) => {
+
+                const saveResults: TrackingSaveResult[] = [];
+                for (const routeData of fixedRouteData) {
+
+                    const messageSizeBytes = Utils.countEstimatedSizeOfMessage(routeData);
+
+                    try {
+                        const machineId: DbNumberId = await db.tx(tx => {
+                            const workMachine: DbWorkMachine = AutoriUtils.createDbWorkMachine(contract.contract, contract.domain, routeData.user, routeData.vehicleType);
+                            return DataDb.upsertWorkMachine(tx, workMachine);
                         });
-                }).catch((error) => {
-                    console.error(`method=AutoriUpdate.saveContracRoutesAsTrackings Error ${error}`);
-                    return TrackingSaveResult.createError(messageSizeBytes);
-                });
+                        console.debug(`DEBUG method=AutoriUpdate.saveContracRouteDataAsTrackings upsertWorkMachine with id ${machineId.id}`);
+
+                        const tasks: string[] = AutoriUtils.getTasksForOperations(routeData.operations, taskMappings);
+                        const tracking: DbMaintenanceTracking|null = AutoriUtils.createDbMaintenanceTracking(machineId.id, routeData, contract, tasks);
+
+                        const saveResult:TrackingSaveResult = tracking ?
+                            await this.saveMaintenanceTrackingAndUpdatePrevious(
+                                db, tracking, contract, machineId, messageSizeBytes, Utils.dateFromIsoString(routeData.updated || routeData.endTime),
+                            ):
+                            TrackingSaveResult.createSaved(messageSizeBytes,0);
+                        saveResults.push(saveResult);
+                    } catch (error) {
+                        console.error(`method=AutoriUpdate.saveContracRouteDataAsTrackings failed for contract=${contract.contract} and domain=${contract.domain} for routeData ${routeData.id}`, error);
+                        return TrackingSaveResult.createError(messageSizeBytes);
+                    }
+                }
+                const summedResult = CommonUpdateService.sumResults(saveResults);
+                console.info(`method=AutoriUpdate.saveContracRouteDataAsTrackings domain=${contract.domain} contract=${contract.contract} count=${summedResult.saved} errors=${summedResult.errors} total message sizeBytes=${summedResult.sizeBytes} tookMs=${Date.now() - start}`);
+                return summedResult;
+            });
         };
+    }
+
+    private async saveMaintenanceTrackingAndUpdatePrevious(
+        db: DTDatabase, tracking: DbMaintenanceTracking, contract: DbDomainContract, machineId: DbNumberId, messageSizeBytes: number, lastUpdated: Date,
+    ): Promise<TrackingSaveResult> {
+
+        const start = Date.now();
+        const previous: DbLatestTracking | null = await DataDb.findLatestNotFinishedTrackingForWorkMachine(db, contract.domain, machineId.id);
+
+        if (previous) {
+            console.info(`previous: ${JSON.stringify(previous)}\nnext: ${JSON.stringify(tracking)}`);
+        }
+
+        const trackingStartPosition: Position = Utils.getTrackingStartPoint(tracking);
+        if (previous && AutoriUtils.isExtendingPreviousTracking(JSON.parse(previous.last_point).coordinates, trackingStartPosition, previous.end_time, tracking.start_time)) {
+            await DataDb.markMaintenanceTrackingFinished(db, previous.id);
+            // If the task are the same, then set reference to previous tracking id
+            if (Utils.hasBothStringArraysSameValues(previous.tasks, tracking.tasks)) {
+                // eslint-disable-next-line camelcase
+                tracking.previous_tracking_id = previous.id;
+            }
+        }
+        return db.tx(async tx => {
+            await DataDb.insertMaintenanceTracking(tx, tracking);
+            await DataDb.updateContractLastUpdated(tx, contract.domain, contract.contract, lastUpdated);
+        }).then(() => {
+            console.info(`method=AutoriUpdate.saveMaintenanceTrackingAndUpdatePrevious domain=${contract.domain} contract=${contract.contract} insertCount=1 errors=0 total message sizeBytes=${messageSizeBytes} tookMs=${Date.now() - start}`);
+            return TrackingSaveResult.createSaved(messageSizeBytes);
+        }).catch((error) => {
+            console.error(`method=AutoriUpdate.saveMaintenanceTrackingAndUpdatePrevious domain=${contract.domain} contract=${contract.contract} insertCount=0 errors=1 total message sizeBytes=${messageSizeBytes} tookMs=${Date.now() - start}`, error);
+            return TrackingSaveResult.createError(messageSizeBytes);
+        });
     }
 }

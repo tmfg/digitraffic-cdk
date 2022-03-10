@@ -3,13 +3,14 @@ import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import moment from "moment";
 import {Position} from "geojson";
 import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
-import {TrackingSaveResult, UNKNOWN_TASK_NAME} from "../model/service-data";
+import {TrackingSaveResult, UNKNOWN_TASK_NAME} from "../model/tracking-save-result";
 import {PaikanninApi} from "../api/paikannin";
 import {ApiDevice, ApiWorkevent, ApiWorkeventDevice} from "../model/paikannin-api-data";
 import {PAIKANNIN_MAX_MINUTES_TO_HISTORY, PAIKANNIN_MIN_MINUTES_FROM_PRESENT} from "../constants";
 import * as CommonUpdateService from "./common-update";
 import * as PaikanninUtils from "./paikannin-utils";
-import {countEstimatedSizeOfMessage} from "./utils";
+import * as Utils from "./utils";
+import * as Geometry from "digitraffic-common/utils/geometry";
 
 export class PaikanninUpdate {
 
@@ -101,7 +102,7 @@ export class PaikanninUpdate {
                 return Promise.allSettled(events.map((device: ApiWorkeventDevice) => {
                     return this.updateApiDeviceTrackings(db, contract, taskMappings, device);
                 })).then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
-                    const summedResult = CommonUpdateService.sumResults(results);
+                    const summedResult = CommonUpdateService.sumResultsFromPromises(results);
                     console.info(`method=PaikanninUpdate.updateTrackingsForDomain domain=${domainName} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                     return summedResult;
                 }).then((finalResult) => {
@@ -148,7 +149,7 @@ export class PaikanninUpdate {
         return this.saveMaintenanceTrackings(db, contract, maintenanceTrackings, latest)
             .then(saveResult => {
 
-                const summedResult = new TrackingSaveResult(countEstimatedSizeOfMessage(result), saveResult.saved, saveResult.errors);
+                const summedResult = new TrackingSaveResult(Utils.countEstimatedSizeOfMessage(result), saveResult.saved, saveResult.errors);
                 console.info(`method=PaikanninUpdate.updateApiWorkeventDeviceTrackings domain=${contract.domain} workMachineId=${machineId.id} machineHarjaId=${workMachine.harjaId} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                 return summedResult;
             });
@@ -172,7 +173,7 @@ export class PaikanninUpdate {
                     // Append new end point only, if it's distinct from the current end point
                     // If tasks has changed that wont make a difference as also then
                     // the new tracking's start point is the previous tracking's end point
-                    if (PaikanninUtils.areDistinctPositions(previousEndPosition, nextStartPosition)) {
+                    if (Geometry.areDistinctPositions(previousEndPosition, nextStartPosition)) {
                         await DataDb.appendMaintenanceTrackingEndPointAndMarkFinished(
                             tx, latest.id, nextStartPosition, nextTracking.start_time, nextTracking.start_direction,
                         );
@@ -181,7 +182,7 @@ export class PaikanninUpdate {
                     }
 
                     // If the task are the same, then set reference to previous tracking id
-                    if (PaikanninUtils.hasBothStringArraysSameValues(latest.tasks, nextTracking.tasks)) {
+                    if (Utils.hasBothStringArraysSameValues(latest.tasks, nextTracking.tasks)) {
                         // eslint-disable-next-line camelcase
                         nextTracking.previous_tracking_id = latest.id;
                     }
@@ -194,14 +195,13 @@ export class PaikanninUpdate {
 
                 return DataDb.insertMaintenanceTracking(tx, mt)
                     .then(() => {
-                        // console.info(`method=PaikanninUpdate.updateTrackingsForDomain upsertMaintenanceTracking...${id}`);
                         return TrackingSaveResult.createSaved(0, 1);
                     }).catch(error => {
                         console.error(`method=PaikanninUpdate.saveMaintenanceTrackings error in upsertMaintenanceTracking`, error);
                         return TrackingSaveResult.createError(0);
                     });
             })).then(async (results: PromiseSettledResult<TrackingSaveResult>[]) => {
-                const summedResult = CommonUpdateService.sumResults(results);
+                const summedResult = CommonUpdateService.sumResultsFromPromises(results);
                 await DataDb.updateContractLastUpdated(tx, contract.domain, contract.domain, new Date());
                 console.info(`method=PaikanninUpdate.saveMaintenanceTrackings domain=${contract.domain} workMachineId=${machineId} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                 return summedResult;

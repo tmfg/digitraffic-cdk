@@ -3,7 +3,7 @@ import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secre
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
 import {AutoriUpdate} from "../../service/autori-update";
 import {AutoriApi} from "../../api/autori";
-import {TrackingSaveResult} from "../../model/service-data";
+import {TrackingSaveResult} from "../../model/tracking-save-result";
 import * as CommonUpdate from "../../service/common-update";
 
 const secretId = process.env.SECRET_ID as string;

@@ -2,8 +2,11 @@ export const MAX_TIME_BETWEEN_TRACKINGS_MS = 1000*60*5 + 1000*5;
 export const MAX_DISTANCE_BETWEEN_TRACKINGS_KM = 0.5; // 0,5 km
 export const MAX_SPEED_BETWEEN_TRACKINGS_KMH = 140; // 140 km/h
 
+export const AUTORI_MAX_TIME_BETWEEN_TRACKINGS_MS = 1000*60*5; // 5 min + 5s
+export const AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM = 0.5;
 export const AUTORI_MAX_MINUTES_TO_HISTORY = 7;
-export const AUTORI_MAX_MINUTES_AT_ONCE = 60;
+export const AUTORI_MAX_MINUTES_AT_ONCE = 30;
+
 
 // Paikannin sends data minimum every:
 // - 5 min
