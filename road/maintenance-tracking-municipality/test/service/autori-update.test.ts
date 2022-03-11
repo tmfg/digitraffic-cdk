@@ -16,7 +16,7 @@ import * as sinon from "sinon";
 import {Position} from "geojson";
 import * as utils from "../../lib/service/utils";
 import moment from "moment";
-import * as DataDb from "../../lib/db/data";
+import * as DataDb from "../../lib/dao/data";
 import {DbDomainContract, DbDomainTaskMapping} from "../../lib/model/db-data";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {DataType} from "digitraffic-common/database/last-updated";

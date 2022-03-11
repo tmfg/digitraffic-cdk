@@ -1,4 +1,4 @@
-import * as DataDb from "../db/data";
+import * as DataDb from "../dao/data";
 import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {AutoriApi} from "../api/autori";
 import moment from "moment";

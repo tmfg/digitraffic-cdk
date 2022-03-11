@@ -2,7 +2,7 @@
 import {dbTestBase, findAllTrackings, getDomain, insertDbDomaindContract, insertDomain, truncate} from "../db-testutil";
 import {DTDatabase} from "digitraffic-common/database/database";
 import moment from "moment";
-import * as DataDb from "../../lib/db/data";
+import * as DataDb from "../../lib/dao/data";
 import {DbMaintenanceTracking, DbNumberId, DbWorkMachine} from "../../lib/model/db-data";
 import * as TestUtils from "../testutil";
 import {Point} from "geojson";

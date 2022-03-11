@@ -24,7 +24,7 @@ import {
 import {ApiDevice, ApiIoChannel, ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice} from "../../lib/model/paikannin-api-data";
 import {getRandompId} from "maintenance-tracking/test/testdata";
 import {getRandomInteger} from "digitraffic-common/test/testutils";
-import * as DataDb from "../../lib/db/data";
+import * as DataDb from "../../lib/dao/data";
 import {UNKNOWN_TASK_NAME} from "../../lib/model/tracking-save-result";
 import moment from "moment";
 import {createDbDomainContract, createLineString, createLineStringGeometry, createZigZagCoordinates} from "../testutil";

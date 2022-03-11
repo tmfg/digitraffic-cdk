@@ -1,7 +1,7 @@
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {TrackingSaveResult} from "../model/tracking-save-result";
-import * as DbData from "../db/data";
+import * as DbData from "../dao/data";
 
 export function sumResultsFromPromises(results: PromiseSettledResult<TrackingSaveResult>[]): TrackingSaveResult {
     const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);

@@ -1,4 +1,4 @@
-import * as DataDb from "../db/data";
+import * as DataDb from "../dao/data";
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import moment from "moment";
 import {Position} from "geojson";
