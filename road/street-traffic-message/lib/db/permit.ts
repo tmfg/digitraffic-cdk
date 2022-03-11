@@ -12,7 +12,7 @@ const SQL_INSERT_PERMIT_OR_UPDATE_GEOMETRY = `INSERT INTO permit
     ON CONFLICT (source_id, source) 
     DO UPDATE 
     SET geometry=ST_Collect( ARRAY(SELECT (ST_Dump(geometry)).geom FROM permit WHERE source_id=$1 AND source=$2) 
-     || ST_Transform(ST_GeomFromGML($7), 4326));`
+     || ST_Transform(ST_GeomFromGML($7), 4326));`;
 
 const SQL_FIND_ALL_PERMITS_GEOJSON =
     `select json_build_object(
@@ -38,7 +38,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
 
 
 const SQL_FIND_ALL_PERMITS =
-    `select id, version, permit_type, permit_subject, ST_ForceCollection(geometry), effective_from, effective_to, created, modified
+    `select id, version, permit_type, permit_subject, ST_ForceCollection(geometry) as geometry, effective_from, effective_to, created, modified
      from permit`;
 
 const SQL_FIND_ALL_PERMIT_SOURCE_IDS = "SELECT source_id FROM permit";
@@ -66,7 +66,7 @@ const PS_FIND_ALL_SOURCE_IDS = new PreparedStatement({
 export function insertPermits(db: DTTransaction, permits: ApiPermit[]): Promise<null[]> {
     return Promise.all(permits
         .map(permit => db.none(PS_INSERT_PERMIT_OR_UPDATE_GEOMETRY,
-            [permit.sourceId, permit.source, permit.permitType, permit.permitSubject, permit.effectiveFrom, permit.effectiveTo, permit.gmlGeometryXmlString,])));
+            [permit.sourceId, permit.source, permit.permitType, permit.permitSubject, permit.effectiveFrom, permit.effectiveTo, permit.gmlGeometryXmlString])));
 }
 
 export function getActivePermitsGeojson(db: DTDatabase): Promise<FeatureCollection> {

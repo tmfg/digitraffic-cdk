@@ -5,7 +5,7 @@ import moment from "moment";
 import * as xml2js from 'xml2js';
 import {inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as PermitsDAO from "../db/permit";
-import {Geometry} from "geojson";
+import {Geometry, GeometryCollection, Point, Polygon} from "geojson";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
@@ -15,7 +15,7 @@ const PERMIT_TYPE_MAP: Record<string, PermitType> = {
     '60': PermitType.PUBLIC_EVENT,
 };
 
-export async function getPermits(authKey: string, url: string): Promise<ApiPermit[]> {
+export async function getPermitsFromSource(authKey: string, url: string): Promise<ApiPermit[]> {
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
     const jsonPermits = await xmlToJs(xmlPermits);
@@ -53,7 +53,7 @@ function convertD2Light(permits: DbPermit[]) {
             "sourceName": permit.source,
             "generalPublicComment": permit.permitSubject,
             "situationId": permit.id,
-            "location": convertLocation(permit.geometry),
+            "location": convertGeometryCollection(permit.geometry),
         }
     ));
 
@@ -71,29 +71,34 @@ function convertD2Light(permits: DbPermit[]) {
     };
 }
 
-function convertLocation(geometry: Geometry) {
-    if (geometry.type === 'Point') {
-        return {
-            coordinatesForDisplay: {
-                latitude: geometry.coordinates[1],
-                longitude: geometry.coordinates[0],
-            },
-        };
+function convertGeometryCollection(geometry: Geometry) {
+    if (geometry.type != 'GeometryCollection') {
+        throw new Error("GeometryCollection expected, got " + geometry.type);
     }
 
-    if (geometry.type === 'Polygon') {
-        return {
-            area: {
-                "gmlPolygon": [
-                    {
-                        "exterior": {
-                            "srsName": "ESPG:3011",
-                            "posList": geometry.coordinates.join(' '),
-                        },
-                    },
-                ],
+    const geometryCollection = geometry as GeometryCollection;
+
+    return {
+        area: geometryCollection.geometries.map(g => ({
+            gmlPolygon: {
+                exterior: {
+                    srsName: "ESPG:3011",
+                    posList: convertGeometry(g),
+                },
             },
-        };
+        })),
+    };
+}
+
+function convertGeometry(geometry: Geometry) {
+    if (geometry.type === 'Point') {
+        const point = geometry as Point;
+
+        return `${point.coordinates[0]} ${point.coordinates[1]}`;
+    } else if (geometry.type === 'Polygon') {
+        const polygon = geometry as Polygon;
+
+        return polygon.coordinates.join(' ');
     }
 
     throw new Error("unknown geometry type " + JSON.stringify(geometry));

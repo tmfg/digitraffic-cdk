@@ -1,6 +1,6 @@
 import * as sinon from 'sinon';
 import {PermitsApi} from "../../lib/api/permits";
-import {findPermitsInD2Light, findPermitsInGeojson, getPermits} from "../../lib/service/permits";
+import {findPermitsInD2Light, findPermitsInGeojson, getPermitsFromSource} from "../../lib/service/permits";
 import {dbTestBase, insertPermit, insertPermitOrUpdateGeometry} from "../db-testutil";
 import {DTDatabase} from "digitraffic-common/database/database";
 
@@ -10,7 +10,7 @@ describe("permits service tests", dbTestBase((db: DTDatabase) => {
     sinon.stub(PermitsApi.prototype, "getPermitsXml").returns(Promise.resolve(TEST_XML_PERMITS));
 
     test("getPermits filters permits with no effectiveFrom date", async () => {
-        const parsedPermits = await getPermits("123", "123");
+        const parsedPermits = await getPermitsFromSource("123", "123");
 
         expect(parsedPermits).toHaveLength(2);
     });
@@ -28,16 +28,14 @@ describe("permits service tests", dbTestBase((db: DTDatabase) => {
         const permits = await findPermitsInGeojson();
 
         expect(permits.features).toHaveLength(2);
+        expect(permits.features[0].geometry.type).toEqual("GeometryCollection");
     });
-
 
     test('findPermitsInGeojson - geometries from duplicates in GeometryCollection', async() => {
         await insertPermitOrUpdateGeometry(db, 'test', 'test', 'abc123');
         await insertPermitOrUpdateGeometry(db, 'test', 'test', 'abc123');
 
         const permits = await findPermitsInGeojson();
-
-        console.info("permits " + JSON.stringify(permits, null, 2));
 
         expect(permits.features).toHaveLength(1);
         expect(permits.features[0].geometry.type).toEqual("GeometryCollection");

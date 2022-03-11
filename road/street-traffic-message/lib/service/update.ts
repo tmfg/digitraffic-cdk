@@ -3,7 +3,7 @@ import * as permitsService from "./permits";
 import * as permitDb from "../db/permit";
 
 export async function updatePermits(authKey: string, url: string) {
-    const permitsInApi = await permitsService.getPermits(authKey, url);
+    const permitsInApi = await permitsService.getPermitsFromSource(authKey, url);
     const permitIdsInDb = await getAllPermitIdsFromDb();
 
     const idList = permitIdsInDb.map(row => row.source_id);
