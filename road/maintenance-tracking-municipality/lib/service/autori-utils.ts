@@ -296,7 +296,7 @@ export function createDbMaintenanceTracking(workMachineId: number, routeData: Ap
     /* eslint-disable camelcase */
     return {
         direction: undefined,
-        sending_time: Utils.dateFromIsoStringOptional(routeData.created) || new Date(),
+        sending_time: Utils.dateFromIsoString(routeData.created ?? new Date().toISOString()),
         start_time: Utils.dateFromIsoString(routeData.startTime),
         end_time: Utils.dateFromIsoString(routeData.endTime),
         last_point: lastPoint,

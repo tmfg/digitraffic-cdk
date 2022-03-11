@@ -15,17 +15,6 @@ describe('UtilsTests', () => {
         expect(parsed?.toISOString()).toEqual(ISO);
     });
 
-    test('dateFromIsoStringOptional', () => {
-        const parsed = Utils.dateFromIsoStringOptional(ISO);
-        expect(parsed).toBeDefined();
-        expect(parsed?.toISOString()).toEqual(ISO);
-    });
-
-    test('dateFromIsoStringOptional undefined', () => {
-        const ud = Utils.dateFromIsoStringOptional();
-        expect(ud).toBeUndefined();
-    });
-
     test('createHarjaId', () => {
         const id : bigint = Utils.createHarjaId('3330de39-9d1d-457b-a6fd-a800cf6e7f99');
         expect(id).toBe(BigInt('365522198665597071').valueOf());

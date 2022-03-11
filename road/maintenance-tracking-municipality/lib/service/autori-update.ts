@@ -143,7 +143,7 @@ export class AutoriUpdate {
 
                         const saveResult:TrackingSaveResult = tracking ?
                             await this.saveMaintenanceTrackingAndUpdatePrevious(
-                                db, tracking, contract, machineId, messageSizeBytes, Utils.dateFromIsoString(routeData.updated || routeData.endTime),
+                                db, tracking, contract, machineId, messageSizeBytes, Utils.dateFromIsoString(routeData.updated ?? routeData.endTime),
                             ):
                             TrackingSaveResult.createSaved(messageSizeBytes,0);
                         saveResults.push(saveResult);

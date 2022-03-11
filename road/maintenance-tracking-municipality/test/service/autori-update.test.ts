@@ -175,7 +175,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         // Insert one exiting contract with endin date today
         const contract1 = contracts[0];
         await insertDomaindContract(
-            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, utils.dateFromIsoStringOptional(contract1.startDate),
+            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, contract1.startDate ? utils.dateFromIsoString(contract1.startDate) : undefined,
             new Date(),
         );
 

@@ -6,14 +6,6 @@ export function dateFromIsoString(isoString: string): Date {
     return new Date(isoString);
 }
 
-export function dateFromIsoStringOptional(isoString?: string): Date|undefined {
-    if (!isoString) {
-        return undefined;
-    }
-    return new Date(isoString);
-}
-
-
 /**
  * Creates bigint hash value from given string
  * @param src
