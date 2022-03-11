@@ -8,11 +8,11 @@ import {Geometry} from "wkx";
 const SQL_INSERT_PERMIT_OR_UPDATE_GEOMETRY = `INSERT INTO permit
     (id, source_id, source, permit_type, permit_subject, effective_from, effective_to, created, modified, version, geometry)
     VALUES
-    (DEFAULT, $1, $2, $3, $4, $5, $6, NOW(), NOW(), DEFAULT, ST_Transform(ST_GeomFromGML($7), 4326))
+    (DEFAULT, $1, $2, $3, $4, $5, $6, NOW(), NOW(), DEFAULT, ST_ForceCollection(ST_Transform(ST_GeomFromGML($7), 4326)))
     ON CONFLICT (source_id, source) 
     DO UPDATE 
-    SET geometry=ST_Collect( ARRAY(SELECT (ST_Dump(geometry)).geom FROM permit WHERE source_id=$1 AND source=$2) 
-     || ST_Transform(ST_GeomFromGML($7), 4326));`;
+    SET geometry=ST_ForceCollection(ST_Collect(ARRAY(SELECT (ST_Dump(geometry)).geom FROM permit WHERE source_id=$1 AND source=$2) 
+     || ST_Transform(ST_GeomFromGML($7), 4326)))`;
 
 const SQL_FIND_ALL_PERMITS_GEOJSON =
     `select json_build_object(
@@ -20,7 +20,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
         'features', coalesce(json_agg(
              json_build_object(
                      'type', 'Feature',
-                     'geometry', ST_AsGeoJSON(ST_ForceCollection(geometry)::geometry)::json,
+                     'geometry', ST_AsGeoJSON(geometry::geometry)::json,
                      'properties', json_build_object(
                          'id', id,
                          'version', version,
@@ -38,7 +38,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
 
 
 const SQL_FIND_ALL_PERMITS =
-    `select id, version, permit_type, permit_subject, ST_ForceCollection(geometry) as geometry, effective_from, effective_to, created, modified
+    `select id, version, permit_type, permit_subject, geometry, effective_from, effective_to, created, modified
      from permit`;
 
 const SQL_FIND_ALL_PERMIT_SOURCE_IDS = "SELECT source_id FROM permit";
