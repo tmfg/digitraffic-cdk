@@ -48,10 +48,15 @@ describe('paikannin-utils-service-test', () => {
             createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, past),
         ];
 
-        // this shold be groupped to two as they are not in chronological order
+        // this shold be groupped to 1 as method will order them in chronological order
         const groups = groupEventsToIndividualTrackings(events, subtractSecond(past));
 
-        expect(groups).toHaveLength(2);
+        expect(groups).toHaveLength(1);
+        expect(groups[0][0].timestamp).toEqual(past);
+        expect(groups[0][1].timestamp).toEqual(now);
+        // original is not touched
+        expect(events[0].timestamp).toEqual(now);
+        expect(events[1].timestamp).toEqual(past);
     });
 
     test('groupEventsToIndividualTrackings - task changes', () => {

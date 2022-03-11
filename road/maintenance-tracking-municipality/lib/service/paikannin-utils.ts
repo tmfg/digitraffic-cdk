@@ -6,6 +6,8 @@ import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMach
 import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 import * as Utils from "./utils";
 
+const MIN_DATE = new Date(-8640000000000000);
+
 /**
  * Splits work events to groups/distinct trackings by following rules:
  * – events have over 5 minutes between them (PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS)
@@ -18,14 +20,19 @@ import * as Utils from "./utils";
  * @param events to handle
  * @param filterBeforeOrEquaTime if even time is this or before this, it will be ignored
  */
-export function groupEventsToIndividualTrackings(events: ApiWorkevent[], filterBeforeOrEquaTime?: Date): ApiWorkevent[][] {
-    const targetGroups : ApiWorkevent[][] = []; // initial array of arrays
+export function groupEventsToIndividualTrackings(events: ApiWorkevent[], filterBeforeOrEquaTime=MIN_DATE): ApiWorkevent[][] {
     // ascending order
-    // const ordered = events.sort((a, b) => (a.timestamp.getTime() < b.timestamp.getTime() ? -1 : 1));
-    return toEventGroups(targetGroups, events, filterBeforeOrEquaTime);
+    const ordered = events.slice().sort((a, b) => (a.timestamp.getTime() < b.timestamp.getTime() ? -1 : 1));
+    return toEventGroups(ordered, filterBeforeOrEquaTime);
 }
 
-function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkevent[], filterBeforeOrEquaTime?: Date): ApiWorkevent[][] {
+/**
+ * This modifies internally given sourceEvents array, so don't reuse it after calling this method
+ * @param sourceEvents
+ * @param filterBeforeOrEquaTime
+ * @param targetGroups
+ */
+function toEventGroups(sourceEvents: ApiWorkevent[], filterBeforeOrEquaTime: Date, targetGroups: ApiWorkevent[][]=[]): ApiWorkevent[][] {
     // Check we have events in array
     if (!sourceEvents.length) {
         return targetGroups;
@@ -38,7 +45,7 @@ function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkeven
 
     // If element is older than allowed throw it away
     if (filterBeforeOrEquaTime && nextEvent.timestamp.getTime() <= filterBeforeOrEquaTime.getTime() ) {
-        return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
+        return toEventGroups(sourceEvents, filterBeforeOrEquaTime, targetGroups);
     } else if (targetGroups.length > 0) {
         // Take prev event from groups and compare it to next
         const prevGroup: ApiWorkevent[] = targetGroups[targetGroups.length-1];
@@ -66,10 +73,10 @@ function toEventGroups(targetGroups: ApiWorkevent[][], sourceEvents: ApiWorkeven
             // Not extending previous tracking -> create new group
             targetGroups.push([nextEvent]);
         }
-        return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
+        return toEventGroups(sourceEvents, filterBeforeOrEquaTime, targetGroups);
     } else {
         targetGroups.push([nextEvent]); // create new group
-        return toEventGroups(targetGroups, sourceEvents, filterBeforeOrEquaTime);
+        return toEventGroups(sourceEvents, filterBeforeOrEquaTime, targetGroups);
     }
 }
 

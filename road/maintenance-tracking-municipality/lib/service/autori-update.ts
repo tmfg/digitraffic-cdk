@@ -73,7 +73,7 @@ export class AutoriUpdate {
 
             return Promise.allSettled(contracts.map((contract: DbDomainContract) => {
                 const start = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
-                return this.updateContracTrackings(contract, taskMappings, start);
+                return this.updateContractTrackings(contract, taskMappings, start);
             })).then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
                 const summedResult = CommonUpdateService.sumResultsFromPromises(results);
                 console.info(`method=AutoriUpdate.updateTrackingsForDomain domain=${domainName} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
@@ -96,12 +96,12 @@ export class AutoriUpdate {
      * @param apiDataUpdatedFrom exclusive start time where to start asking for new data from api
      * @private
      */
-    private updateContracTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date): Promise<TrackingSaveResult> {
-        console.info(`method=AutoriUpdate.updateContracTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`);
+    private updateContractTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date): Promise<TrackingSaveResult> {
+        console.info(`method=AutoriUpdate.updateContractTrackings domain=${contract.domain} contract=${contract.contract} getNextRouteDataForContract from ${apiDataUpdatedFrom.toISOString()}`);
         return this.api.getNextRouteDataForContract(contract, apiDataUpdatedFrom, moment().add(1, 'minutes').toDate())
-            .then(this.saveContracRouteDataAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
+            .then(this.saveContractRouteDataAsTrackings(contract, taskMappings, apiDataUpdatedFrom))
             .catch((error) => {
-                console.error(`method=AutoriUpdate.updateContracTrackings Error ${error}`);
+                console.error(`method=AutoriUpdate.updateContractTrackings Error ${error}`);
                 return TrackingSaveResult.createError(0);
             });
     }
@@ -113,14 +113,14 @@ export class AutoriUpdate {
      * @param apiDataUpdatedFrom exclusive start time where to start asking for new data from api
      * @private
      */
-    private saveContracRouteDataAsTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date) {
+    private saveContractRouteDataAsTrackings(contract: DbDomainContract, taskMappings: DbDomainTaskMapping[], apiDataUpdatedFrom: Date) {
         return (originalRouteData: ApiRouteData[]): Promise<TrackingSaveResult> => {
             const start = Date.now();
 
             const fixedRouteData: ApiRouteData[] = AutoriUtils.fixApiRouteDatas(originalRouteData);
 
             if (fixedRouteData.length === 0) {
-                console.info(`method=AutoriUpdate.saveContracRouteDataAsTrackings No new data for domain=${contract.domain} contract=${contract.contract} after ${apiDataUpdatedFrom.toISOString()}`);
+                console.info(`method=AutoriUpdate.saveContractRouteDataAsTrackings No new data for domain=${contract.domain} contract=${contract.contract} after ${apiDataUpdatedFrom.toISOString()}`);
                 return Promise.resolve(new TrackingSaveResult(0, 0, 0));
             }
 
@@ -136,7 +136,7 @@ export class AutoriUpdate {
                             const workMachine: DbWorkMachine = AutoriUtils.createDbWorkMachine(contract.contract, contract.domain, routeData.user, routeData.vehicleType);
                             return DataDb.upsertWorkMachine(tx, workMachine);
                         });
-                        console.debug(`DEBUG method=AutoriUpdate.saveContracRouteDataAsTrackings upsertWorkMachine with id ${machineId.id}`);
+                        console.debug(`DEBUG method=AutoriUpdate.saveContractRouteDataAsTrackings upsertWorkMachine with id ${machineId.id}`);
 
                         const tasks: string[] = AutoriUtils.getTasksForOperations(routeData.operations, taskMappings);
                         const tracking: DbMaintenanceTracking|null = AutoriUtils.createDbMaintenanceTracking(machineId.id, routeData, contract, tasks);
@@ -148,12 +148,12 @@ export class AutoriUpdate {
                             TrackingSaveResult.createSaved(messageSizeBytes,0);
                         saveResults.push(saveResult);
                     } catch (error) {
-                        console.error(`method=AutoriUpdate.saveContracRouteDataAsTrackings failed for contract=${contract.contract} and domain=${contract.domain} for routeData ${routeData.id}`, error);
-                        return TrackingSaveResult.createError(messageSizeBytes);
+                        console.error(`method=AutoriUpdate.saveContractRouteDataAsTrackings failed for contract=${contract.contract} and domain=${contract.domain} for routeData ${routeData.id}`, error);
+                        saveResults.push(TrackingSaveResult.createError(messageSizeBytes));
                     }
                 }
                 const summedResult = CommonUpdateService.sumResults(saveResults);
-                console.info(`method=AutoriUpdate.saveContracRouteDataAsTrackings domain=${contract.domain} contract=${contract.contract} count=${summedResult.saved} errors=${summedResult.errors} total message sizeBytes=${summedResult.sizeBytes} tookMs=${Date.now() - start}`);
+                console.info(`method=AutoriUpdate.saveContractRouteDataAsTrackings domain=${contract.domain} contract=${contract.contract} count=${summedResult.saved} errors=${summedResult.errors} total message sizeBytes=${summedResult.sizeBytes} tookMs=${Date.now() - start}`);
                 return summedResult;
             });
         };

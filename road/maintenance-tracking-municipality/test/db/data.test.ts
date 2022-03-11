@@ -65,13 +65,13 @@ describe('db-data-test', dbTestBase((db: DTDatabase) => {
         const trackingOlder: DbMaintenanceTracking  = TestUtils.createDbMaintenanceTracking(
             CONTRACT, WORKMACHINE_ID.id, startTime, endTimeOlder, TASKS , lastPoint,
         );
-        const trackingFinnished: DbMaintenanceTracking  = TestUtils.createDbMaintenanceTracking(
+        const trackingFinished: DbMaintenanceTracking  = TestUtils.createDbMaintenanceTracking(
             CONTRACT, WORKMACHINE_ID.id, startTime, endTime, TASKS , lastPoint,
         );
-        trackingFinnished.finished = true;
+        trackingFinished.finished = true;
 
         await db.tx(tx => {
-            return DataDb.upsertMaintenanceTrackings(tx, [trackingFinnished, trackingOlder]);
+            return DataDb.upsertMaintenanceTrackings(tx, [trackingFinished, trackingOlder]);
         });
 
         const latest = await DataDb.findLatestNotFinishedTrackingForWorkMachine(db, CONTRACT.domain, WORKMACHINE_ID.id);
@@ -85,13 +85,13 @@ describe('db-data-test', dbTestBase((db: DTDatabase) => {
         const endTime = moment(startTime).add(2, 'minutes').toDate();
         const lastPoint: Point = TestUtils.createGeoJSONPoint(POINT_START);
 
-        const trackingFinnished: DbMaintenanceTracking  = TestUtils.createDbMaintenanceTracking(
+        const trackingFinished: DbMaintenanceTracking  = TestUtils.createDbMaintenanceTracking(
             CONTRACT, WORKMACHINE_ID.id, startTime, endTime, TASKS , lastPoint,
         );
-        trackingFinnished.finished = true;
+        trackingFinished.finished = true;
 
         await db.tx(tx => {
-            return DataDb.upsertMaintenanceTrackings(tx, [trackingFinnished]);
+            return DataDb.upsertMaintenanceTrackings(tx, [trackingFinished]);
         });
 
         const latest = await DataDb.findLatestNotFinishedTrackingForWorkMachine(db, CONTRACT.domain, WORKMACHINE_ID.id);

@@ -175,7 +175,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         // Insert one exiting contract with endin date today
         const contract1 = contracts[0];
         await insertDomaindContract(
-            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, utils.dateOrUndefinedFromIsoString(contract1.startDate),
+            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, utils.dateFromIsoStringOptional(contract1.startDate),
             new Date(),
         );
 
@@ -289,8 +289,8 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
 
         expect(trackings.length).toEqual(3);
         // TODO Warning:(295, 33) Error: expect(received).toEqual(expected) // deep equality Expected: null Received: 264
-        expect(trackings[0].id).toEqual(trackings[1].previous_tracking_id);
-        expect(trackings[1].id).toEqual(trackings[2].previous_tracking_id);
+        expect(trackings[0].id).toBe(trackings[1].previous_tracking_id);
+        expect(trackings[1].id).toBe(trackings[2].previous_tracking_id);
         expect(trackings[0].line_string?.coordinates?.length).toEqual(10);
         expect(trackings[1].line_string?.coordinates?.length).toEqual(5);
         expect(trackings[2].line_string?.coordinates?.length).toEqual(17);

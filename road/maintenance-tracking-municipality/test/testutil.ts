@@ -95,12 +95,6 @@ export function createLineString(coordinates: Position[]) : LineString {
     };
 }
 
-export function createFeatures(geometries: Geometry[]): Feature[] {
-    return geometries.map(g => {
-        return createFeature(g);
-    });
-}
-
 export function createFeature(geometry: Geometry): Feature {
     return {
         type: "Feature",

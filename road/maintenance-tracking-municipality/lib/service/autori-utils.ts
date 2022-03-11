@@ -21,25 +21,25 @@ import {UNKNOWN_TASK_NAME} from "../model/tracking-save-result";
  * @param originalRouteData data to fix
  */
 export function fixApiRouteDatas(originalRouteData: ApiRouteData[]): ApiRouteData[] {
-    const sortedRouteData: ApiRouteData[] = originalRouteData.sort((a,b) => (Utils.dateFromIsoString(a.startTime).getTime() < Utils.dateFromIsoString(b.startTime).getTime() ? -1 : 1));
+
+    const sortedRouteData: ApiRouteData[] = originalRouteData.slice()
+        .sort((a,b) => (Utils.dateFromIsoString(a.startTime).getTime() < Utils.dateFromIsoString(b.startTime).getTime() ? -1 : 1));
     const fixedRouteData: ApiRouteData[] = [];
     sortedRouteData.forEach(routeData => {
         const result = fixApiRouteData(routeData);
-        if (result.length) {
-            fixedRouteData.push(...result);
-        }
+        fixedRouteData.push(...result);
     });
     return fixedRouteData;
 }
 
 function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
-    if (!routeData || !routeData.geography || !routeData.geography.features) {
+    if (!routeData?.geography?.features) {
         return [];
     }
 
     try {
-        const fixedFeatures : Feature[] = [];
-        const features: Array<Feature> = routeData.geography.features;
+        const fixedFeatures: Feature[] = [];
+        const features: Feature[] = routeData.geography.features;
         features.forEach(f => {
             if (f.geometry.type === "Point") {
                 fixedFeatures.push(f);
@@ -47,13 +47,11 @@ function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
                 console.error(`method=AutoriUtils.fixApiRouteData Not supported geometry type: ${f.geometry.type}`);
             } else {
                 const newFeatures: Feature[] = groupFeaturesToIndividualGeometries(f);
-                if (newFeatures.length) {
-                    fixedFeatures.push(...newFeatures);
-                }
+                fixedFeatures.push(...newFeatures);
             }
         });
-        return fixedFeatures.map(feature => {
-            return {
+        return fixedFeatures.map(feature => (
+            {
                 vehicleType: routeData.vehicleType,
                 user: routeData.user,
                 geography: {
@@ -66,8 +64,8 @@ function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
                 startTime: routeData.startTime,
                 endTime: routeData.endTime,
                 operations: routeData.operations,
-            };
-        });
+            }
+        ));
     } catch (e) {
         console.error(`method=AutoriUtils.fixApiRouteData failed`, e);
         // On error keep original
@@ -84,13 +82,12 @@ function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
  */
 export function groupFeaturesToIndividualGeometries(feature: Feature): Feature[] {
     try {
-        const targetGroups: Position[][] = []; // initial array of arrays
         if (feature.geometry.type === "Point") {
             return [feature];
         }
 
         const geom = <LineString>feature.geometry;
-        const positionGroups: Position[][] = toPositionGroups(targetGroups, geom.coordinates);
+        const positionGroups: Position[][] = toPositionGroups(geom.coordinates.slice());
 
         const newFeatures = positionGroups.map(positions => {
             const g: Geometry = positions.length == 1 ?
@@ -112,13 +109,18 @@ export function groupFeaturesToIndividualGeometries(feature: Feature): Feature[]
     }
 }
 
-
-function toPositionGroups(targetGeometries: Position[][], sourceGeometry: Position[]): Position[][] {
+/**
+ * This modifies internally given sourceGeometry array, so don't reuse it after calling this method.
+ * @param sourceGeometry
+ * @param targetGeometries
+ */
+function toPositionGroups(sourceGeometry: Position[], targetGeometries:Position[][]=[]): Position[][] {
     // Check we have events in array
     if (!sourceGeometry.length) {
         return targetGeometries;
     }
     // Take first element away from start of the array
+    // Here we modify the contents of sourceGeometry parameter array
     const nextPosition: Position | undefined = sourceGeometry.shift();
     if (!nextPosition) {
         return targetGeometries;
@@ -141,7 +143,7 @@ function toPositionGroups(targetGeometries: Position[][], sourceGeometry: Positi
     } else {
         targetGeometries.push([nextPosition]); // create new group
     }
-    return toPositionGroups(targetGeometries, sourceGeometry);
+    return toPositionGroups(sourceGeometry, targetGeometries);
 }
 
 export function isOverTimeLimit(previous: Date, next: Date) {
@@ -294,7 +296,7 @@ export function createDbMaintenanceTracking(workMachineId: number, routeData: Ap
     /* eslint-disable camelcase */
     return {
         direction: undefined,
-        sending_time: Utils.dateOrUndefinedFromIsoString(routeData.created) || new Date(),
+        sending_time: Utils.dateFromIsoStringOptional(routeData.created) || new Date(),
         start_time: Utils.dateFromIsoString(routeData.startTime),
         end_time: Utils.dateFromIsoString(routeData.endTime),
         last_point: lastPoint,

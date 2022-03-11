@@ -1,15 +1,16 @@
 import crypto from "crypto";
 import {DbMaintenanceTracking} from "../model/db-data";
+import {Position} from "geojson";
 
-export function dateFromIsoString(created: string): Date {
-    return new Date(created);
+export function dateFromIsoString(isoString: string): Date {
+    return new Date(isoString);
 }
 
-export function dateOrUndefinedFromIsoString(created?: string): Date|undefined {
-    if (!created) {
+export function dateFromIsoStringOptional(isoString?: string): Date|undefined {
+    if (!isoString) {
         return undefined;
     }
-    return new Date(created);
+    return new Date(isoString);
 }
 
 
@@ -23,9 +24,13 @@ export function createHarjaId(src: string): bigint {
     return BigInt('0x' + hex.substring(0, 15)).valueOf();
 }
 
-export function countEstimatedSizeOfMessage(message: object) {
+export function countEstimatedSizeOfMessage(message: object|string) {
+    if (!message) {
+        return 0;
+    }
     try {
-        return Buffer.byteLength(JSON.stringify(message)); // Just estimate of the size of new data
+        // Just estimate of the size of data
+        return Buffer.byteLength(typeof message === 'string' ? message : JSON.stringify(message));
     } catch (e) {
         console.error(`method=utils.countEstimatedSizeOfMessage`, e);
     }
@@ -33,11 +38,17 @@ export function countEstimatedSizeOfMessage(message: object) {
 }
 
 export function hasBothStringArraysSameValues(a: string[], b: string[]): boolean {
-    if (a.length === b.length) {
-        const bSet = new Set(b);
-        return a.every(value => bSet.has(value));
+    if ((a && !b) || (!a && b)) {
+        return false;
+    } else if (!a && !b) {
+        return true;
     }
-    return false;
+    const aSet = new Set(a);
+    const bSet = new Set(b);
+    if (aSet.size !== bSet.size) {
+        return false;
+    }
+    return Array.from(aSet).every(value => bSet.has(value));
 }
 
 const DIVIDER_FOR_MS_TO_HOURS = 1000*60.0*60.0;
@@ -52,7 +63,7 @@ export function countDiffMs(previous: Date, next: Date): number {
     return next.getTime() - previous.getTime();
 }
 
-export function getTrackingStartPoint(tracking: DbMaintenanceTracking) {
+export function getTrackingStartPoint(tracking: DbMaintenanceTracking): Position {
     if (tracking.line_string && tracking.line_string.coordinates.length) {
         return tracking.line_string.coordinates[0];
     }
