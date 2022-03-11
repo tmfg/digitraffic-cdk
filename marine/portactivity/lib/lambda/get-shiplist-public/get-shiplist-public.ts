@@ -1,4 +1,4 @@
-import {findByLocodePublicShiplist} from '../../db/shiplist-public';
+import {findByLocodePublicShiplist} from '../../dao/shiplist-public';
 import {DTDatabase, inDatabaseReadonly} from 'digitraffic-common/database/database';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";

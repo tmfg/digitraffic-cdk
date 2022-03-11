@@ -1,6 +1,6 @@
 import {AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType} from "../api/awake_ai_atx";
 import {ApiTimestamp, EventType} from "../model/timestamp";
-import * as TimestampDAO from '../db/timestamps';
+import * as TimestampDAO from '../dao/timestamps';
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import moment from 'moment-timezone';
 import {EventSource} from "../model/eventsource";

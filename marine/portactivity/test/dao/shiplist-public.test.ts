@@ -2,7 +2,7 @@ import moment from 'moment';
 import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import {EventType} from "../../lib/model/timestamp";
-import {findByLocodePublicShiplist} from "../../lib/db/shiplist-public";
+import {findByLocodePublicShiplist} from "../../lib/dao/shiplist-public";
 import {EventSource} from "../../lib/model/eventsource";
 import {DTDatabase} from "digitraffic-common/database/database";
 import {randomBoolean} from "digitraffic-common/test/testutils";
