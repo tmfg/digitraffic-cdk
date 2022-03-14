@@ -36,7 +36,7 @@ export type DbCsvData = {
 export const dataProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.ARRAY,
-    description: 'Counting Sites data',
+    description: 'Counting Site data',
     items: {
         type: JsonSchemaType.OBJECT,
         properties: {

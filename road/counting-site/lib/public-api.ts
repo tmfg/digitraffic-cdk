@@ -12,7 +12,7 @@ import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-commo
 import {counterProperties} from "./model/counter";
 import {DigitrafficStaticIntegration} from "digitraffic-common/aws/infra/api/static-integration";
 
-const COUNTING_SITE_TAGS = ["Counting site(Beta)"];
+const COUNTING_SITE_TAGS = ["Counting site"];
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
@@ -34,7 +34,7 @@ export class PublicApi {
     csvValuesResponseModel: Model;
 
     constructor(stack: DigitrafficStack) {
-        this.publicApi = new DigitrafficRestApi(stack, 'CountingSites-public', 'Counting Sites Public API');
+        this.publicApi = new DigitrafficRestApi(stack, 'CountingSite-public', 'Counting Site Public API');
         this.publicApi.createUsagePlan('CS Api Key', 'CS Usage Plan');
 
         this.createResources(this.publicApi);
@@ -86,7 +86,7 @@ export class PublicApi {
     createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
         const csResource = apiResource.addResource("counting-site");
-        const versionResource = csResource.addResource("beta");
+        const versionResource = csResource.addResource("v1");
 
         this.valuesResource = versionResource.addResource("values");
         this.csvValuesResource = versionResource.addResource("values.csv");

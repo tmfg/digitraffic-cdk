@@ -3,7 +3,7 @@ import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from 'aws-cdk-lib/aws-api
 export const domainsProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Counting Sites Domain',
+    description: 'Counting Site Domain',
     properties: {
         name: {
             type: JsonSchemaType.STRING,
@@ -31,7 +31,7 @@ export const domainsProperties: JsonSchema = {
 export const userTypesProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Counting Sites Usertype',
+    description: 'Counting Site Usertype',
     patternProperties: {
         ".*": {
             type: JsonSchemaType.STRING,
@@ -43,7 +43,7 @@ export const userTypesProperties: JsonSchema = {
 export const directionProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Counting Sites Directions',
+    description: 'Counting Site Directions',
     patternProperties: {
         ".*": {
             type: JsonSchemaType.STRING,

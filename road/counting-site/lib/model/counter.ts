@@ -30,7 +30,7 @@ export type DbCounter = {
 export const counterProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Counting Sites Metadata',
+    description: 'Counting Site Metadata',
     properties: {
         id: {
             type: JsonSchemaType.INTEGER,
