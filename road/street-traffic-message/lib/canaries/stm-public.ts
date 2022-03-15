@@ -12,8 +12,8 @@ import {FeatureCollection} from "geojson";
 
 const BASE_URL = "/prod/api/street-traffic-message/beta/";
 
-const PERMITS_GEOJSON_URL = BASE_URL + "permits";
-const PERMITS_D2LIGHT_URL = BASE_URL + "permits.d2light";
+const PERMITS_GEOJSON_URL = BASE_URL + "messages";
+const PERMITS_D2LIGHT_URL = BASE_URL + "messages.d2light";
 
 type D2LightMessage = {
     situationPublicationLight: {

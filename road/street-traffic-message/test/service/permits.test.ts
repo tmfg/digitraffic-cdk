@@ -40,8 +40,8 @@ describe("permits service tests", dbTestBase((db: DTDatabase) => {
             permitSubject: 'Kaukolämpö',
             effectiveFrom: new Date(Date.now()),
             effectiveTo: new Date(Date.now()),
-            gmlGeometryXmlString: "<gml:Point srsName=\"http://www.opengis.net/gml/srs/epsg.xml#3880\"> <gml:pos>26483500.000 6761970.000</gml:pos> </gml:Point>"
-        }
+            gmlGeometryXmlString: "<gml:Point srsName=\"http://www.opengis.net/gml/srs/epsg.xml#3880\"> <gml:pos>26483500.000 6761970.000</gml:pos> </gml:Point>",
+        };
         await insertPermitOrUpdateGeometry(db, apiPermit);
 
         apiPermit.gmlGeometryXmlString = "<gml:Point srsName=\"http://www.opengis.net/gml/srs/epsg.xml#3880\"> <gml:pos>25483500.000 6661970.000</gml:pos> </gml:Point>";
