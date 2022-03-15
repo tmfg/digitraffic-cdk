@@ -12,7 +12,7 @@ export class Canaries {
             const urlRole = new DigitrafficCanaryRole(stack, 'stm-url');
             const dbRole = new DigitrafficCanaryRole(stack, 'stm-db').withDatabaseAccess();
 
-            //            DatabaseCanary.createV2(stack, dbRole, 'ep');
+            DatabaseCanary.createV2(stack, dbRole, 'stm');
 
             UrlCanary.create(stack, urlRole, publicApi, {
                 name: 'stm-public',
