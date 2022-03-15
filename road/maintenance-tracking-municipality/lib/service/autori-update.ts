@@ -174,7 +174,7 @@ export class AutoriUpdate {
         if (previous && AutoriUtils.isExtendingPreviousTracking(JSON.parse(previous.last_point).coordinates, trackingStartPosition, previous.end_time, tracking.start_time)) {
             await DataDb.markMaintenanceTrackingFinished(db, previous.id);
             // If the task are the same, then set reference to previous tracking id
-            if (Utils.hasBothStringArraysSameValues(previous.tasks, tracking.tasks)) {
+            if (Utils.bothArraysHasSameValues(previous.tasks, tracking.tasks)) {
                 // eslint-disable-next-line camelcase
                 tracking.previous_tracking_id = previous.id;
             }

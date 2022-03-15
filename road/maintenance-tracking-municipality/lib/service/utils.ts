@@ -17,19 +17,39 @@ export function createHarjaId(src: string): bigint {
 }
 
 export function countEstimatedSizeOfMessage(message: object|string) {
-    if (!message) {
-        return 0;
-    }
-    try {
-        // Just estimate of the size of data
-        return Buffer.byteLength(typeof message === 'string' ? message : JSON.stringify(message));
-    } catch (e) {
-        console.error(`method=utils.countEstimatedSizeOfMessage`, e);
+    if (message) {
+        try {
+            // Just estimate of the size of data
+            return Buffer.byteLength(typeof message === 'string' ? message : JSON.stringify(message));
+        } catch (e) {
+            console.error(`method=utils.countEstimatedSizeOfMessage`, e);
+        }
     }
     return 0;
 }
 
-export function hasBothStringArraysSameValues(a: string[], b: string[]): boolean {
+/**
+ * Check if arrays have only elements that also exists also in other array.
+ * Individual element count doesn't matter.
+ * Function works only for primitive types and for other it just checks the reference to object.
+ *
+ * Some examples
+ * bothArraysHasSameValues( [a, b], [b, a] )    => true
+ * bothArraysHasSameValues( [a, a], [a, a, a] ) => true
+ * bothArraysHasSameValues( [a, b], [a] )       => false
+ *
+ * Object references:
+ * const o1 = { a: 1, b: 2};
+ * const o2 = { a: 1, b: 2};
+ * // Arrays has references to same objects
+ * bothArraysHasSameValues([o1], [o1]))         => true
+ * Arrays have references to different objects
+ * bothArraysHasSameValues([o1], [o2]))         => false
+ *
+ * @param a first array to compare
+ * @param b second array to compare
+ */
+export function bothArraysHasSameValues(a: unknown[], b: unknown[]): boolean {
     if ((a && !b) || (!a && b)) {
         return false;
     } else if (!a && !b) {

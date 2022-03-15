@@ -42,21 +42,28 @@ describe('UtilsTests', () => {
         /* eslint-enable */
     });
 
-    test('hasBothStringArraysSameValues', () => {
-        expect(Utils.hasBothStringArraysSameValues([], [])).toEqual(true);
-        expect(Utils.hasBothStringArraysSameValues(['a'], ['a'])).toEqual(true);
-        expect(Utils.hasBothStringArraysSameValues(['a'], ['a','a'])).toEqual(true);
-        expect(Utils.hasBothStringArraysSameValues(['a','a'], ['a','a'])).toEqual(true);
+    test('bothArraysHasSameValues', () => {
+        expect(Utils.bothArraysHasSameValues([], [])).toEqual(true);
+        expect(Utils.bothArraysHasSameValues(['a'], ['a'])).toEqual(true);
+        expect(Utils.bothArraysHasSameValues(['a'], ['a','a'])).toEqual(true);
+        expect(Utils.bothArraysHasSameValues(['a','a'], ['a','a'])).toEqual(true);
 
         /* eslint-disable */
-        expect(Utils.hasBothStringArraysSameValues(null!, null!)).toEqual(true);
-        expect(Utils.hasBothStringArraysSameValues(undefined!, undefined!)).toEqual(true);
-        expect(Utils.hasBothStringArraysSameValues(null!, undefined!)).toEqual(true);
-        expect(Utils.hasBothStringArraysSameValues(['a'], undefined!)).toEqual(false);
-        expect(Utils.hasBothStringArraysSameValues(['a'], null!)).toEqual(false);
+        expect(Utils.bothArraysHasSameValues(null!, null!)).toEqual(true);
+        expect(Utils.bothArraysHasSameValues(undefined!, undefined!)).toEqual(true);
+        expect(Utils.bothArraysHasSameValues(null!, undefined!)).toEqual(true);
+        expect(Utils.bothArraysHasSameValues(['a'], undefined!)).toEqual(false);
+        expect(Utils.bothArraysHasSameValues(['a'], null!)).toEqual(false);
         /* eslint-enable */
-        expect(Utils.hasBothStringArraysSameValues(['a','b'], ['a','a'])).toEqual(false);
-        expect(Utils.hasBothStringArraysSameValues(['a', 'a', 'a'], ['a', 'b', 'c'])).toEqual(false);
+        expect(Utils.bothArraysHasSameValues(['a','b'], ['a','a'])).toEqual(false);
+        expect(Utils.bothArraysHasSameValues(['a', 'a', 'a'], ['a', 'b', 'c'])).toEqual(false);
+
+        const o1 = { a: 1, b: 2};
+        const o2 = { a: 1, b: 2};
+        // Objects are references to same
+        expect(Utils.bothArraysHasSameValues([o1], [o1])).toEqual(true);
+        // Object's are not the same but the contents are the same
+        expect(Utils.bothArraysHasSameValues([o1], [o2])).toEqual(false);
 
     });
 

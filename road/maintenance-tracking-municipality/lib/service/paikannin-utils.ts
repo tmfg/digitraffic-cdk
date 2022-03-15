@@ -90,7 +90,7 @@ function isSameTasks(ioChannels1: ApiWorkeventIoDevice[], ioChannels2: ApiWorkev
     }
     const ioChannel1Strings = ioChennelsToStrings(ioChannels2);
     const ioChannel2Strings = ioChennelsToStrings(ioChannels2);
-    return Utils.hasBothStringArraysSameValues(ioChannel1Strings, ioChannel2Strings);
+    return Utils.bothArraysHasSameValues(ioChannel1Strings, ioChannel2Strings);
 }
 
 function ioChennelsToStrings(ioChannels : ApiWorkeventIoDevice[]): string[] {

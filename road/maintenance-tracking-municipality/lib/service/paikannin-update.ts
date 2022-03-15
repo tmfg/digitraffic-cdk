@@ -182,7 +182,7 @@ export class PaikanninUpdate {
                     }
 
                     // If the task are the same, then set reference to previous tracking id
-                    if (Utils.hasBothStringArraysSameValues(latest.tasks, nextTracking.tasks)) {
+                    if (Utils.bothArraysHasSameValues(latest.tasks, nextTracking.tasks)) {
                         // eslint-disable-next-line camelcase
                         nextTracking.previous_tracking_id = latest.id;
                     }
