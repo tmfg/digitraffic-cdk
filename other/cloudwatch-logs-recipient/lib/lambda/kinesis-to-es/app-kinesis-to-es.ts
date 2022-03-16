@@ -29,7 +29,7 @@ const endpointParts = endpoint.match(/^([^.]+)\.?([^.]*)\.?([^.]*)\.amazonaws\.c
 const region = endpointParts[2];
 const service = endpointParts[3];
 
-const MAX_BODY_SIZE = 4 * 1000 * 1000;
+const MAX_BODY_SIZE = 3 * 1000 * 1000;
 
 export const handler: KinesisStreamHandler = function(event, context) {
     const statistics = new Statistics();

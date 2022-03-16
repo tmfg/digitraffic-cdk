@@ -12,7 +12,7 @@ import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {ResultDomain} from "../model/domain";
 import {ResultUserTypes} from "../model/usertype";
 
-const BASE_URL = "/prod/api/counting-site/beta/";
+const BASE_URL = "/prod/api/counting-site/v1/";
 const USERTYPES_URL = BASE_URL + "user-types";
 const DOMAINS_URL = BASE_URL + "domains";
 const DIRECTIONS_URL = BASE_URL + "directions";

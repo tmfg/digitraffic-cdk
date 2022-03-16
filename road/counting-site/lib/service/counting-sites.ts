@@ -1,7 +1,7 @@
-import * as CounterDb from "../db/counter";
-import * as DataDb from "../db/data";
-import * as DomainDb from "../db/domain";
-import * as UserTypeDb from "../db/user-type";
+import * as CounterDAO from "../dao/counter";
+import * as DataDAO from "../dao/data";
+import * as DomainDAO from "../dao/domain";
+import * as UserTypeDAO from "../dao/user-type";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {ResultDomain} from "../model/domain";
 import {DbCsvData, ResponseData} from "../model/data";
@@ -10,13 +10,13 @@ import * as R from 'ramda';
 
 export function getUserTypes() {
     return inDatabaseReadonly(db => {
-        return UserTypeDb.findAllUserTypes(db);
+        return UserTypeDAO.findAllUserTypes(db);
     });
 }
 
 export function getDomains() {
     return inDatabaseReadonly(db => {
-        return DomainDb.findAllDomains(db);
+        return DomainDAO.findAllDomains(db);
     }).then(domains => domains.map(d => ({
         name: d.name,
         description: d.description,
@@ -27,7 +27,7 @@ export function getDomains() {
 
 export function getValuesForMonth(year: number, month: number, domainName: string, counterId: string): Promise<string> {
     return inDatabaseReadonly(db => {
-        return DataDb.findDataForMonth(
+        return DataDAO.findDataForMonth(
             db, year, month, domainName, counterId,
         );
     }).then(data => {
@@ -53,7 +53,7 @@ export function getValuesForMonth(year: number, month: number, domainName: strin
 
 export function findCounterValues(year?: number, month?: number, counterId = "", domainName = "") {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return DataDb.findValues(
+        return DataDAO.findValues(
             db,
             year || new Date().getUTCFullYear(),
             month || new Date().getUTCMonth() + 1,
@@ -71,7 +71,7 @@ export function findCounterValues(year?: number, month?: number, counterId = "",
 
 export function findCounters(domain = "", counterId = "") {
     return inDatabaseReadonly(db => {
-        return CounterDb.findCounters(db, domain, counterId);
+        return CounterDAO.findCounters(db, domain, counterId);
     });
 }
 

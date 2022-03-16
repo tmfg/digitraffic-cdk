@@ -1,7 +1,7 @@
 import {EcoCounterApi} from "../../lib/api/eco-counter";
 import {updateDataForDomain} from "../../lib/service/update";
 import {dbTestBase, insertCounter, insertDomain} from "../db-testutil";
-import {findValues} from "../../lib/db/data";
+import * as DataDAO from "../../lib/dao/data";
 
 import * as sinon from 'sinon';
 import {ApiData} from "../../lib/model/data";
@@ -21,7 +21,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
     }
 
     async function assertDataInDb(expected: number, counterId: string, fn?: Function) {
-        const data = await findValues(
+        const data = await DataDAO.findValues(
             db, 2015, 9, counterId, '',
         );
         expect(data).toHaveLength(expected);

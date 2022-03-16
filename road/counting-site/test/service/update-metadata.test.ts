@@ -1,7 +1,7 @@
 import {updateMetadataForDomain} from "../../lib/service/update";
 import {dbTestBase, insertCounter, insertDomain, withServer} from "../db-testutil";
 import {TestHttpServer} from "digitraffic-common/test/httpserver";
-import {findAllCountersForUpdateForDomain} from "../../lib/db/counter";
+import * as CounterDAO from "../../lib/dao/counter";
 import {URL_ALL_SITES} from "../../lib/api/eco-counter";
 import {DTDatabase} from "digitraffic-common/database/database";
 import {DbCounter} from "../../lib/model/counter";
@@ -14,7 +14,7 @@ describe('update tests', dbTestBase((db: DTDatabase) => {
     const EMPTY_DATA = JSON.stringify([]);
 
     async function assertCountersInDb(domain: string, expected: number, fn?: Function) {
-        const counters = await findAllCountersForUpdateForDomain(db, domain);
+        const counters = await CounterDAO.findAllCountersForUpdateForDomain(db, domain);
         expect(counters).toHaveLength(expected);
 
         if (fn) {

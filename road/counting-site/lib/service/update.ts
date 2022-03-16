@@ -1,5 +1,5 @@
-import * as CounterDb from "../db/counter";
-import * as DataDb from "../db/data";
+import * as CounterDAO from "../dao/counter";
+import * as DataDAO from "../dao/data";
 import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {EcoCounterApi} from "../api/eco-counter";
 import {ApiCounter, DbCounter} from "../model/counter";
@@ -18,9 +18,9 @@ export async function updateMetadataForDomain(domainName: string, apiKey: string
     return inDatabase(async db => {
         const updatedTimestamp = new Date();
 
-        await CounterDb.insertCounters(db, domainName, newCounters);
-        await CounterDb.removeCounters(db, removedCounters);
-        await CounterDb.updateCounters(db, updatedCounters);
+        await CounterDAO.insertCounters(db, domainName, newCounters);
+        await CounterDAO.removeCounters(db, removedCounters);
+        await CounterDAO.updateCounters(db, updatedCounters);
 
         if (newCounters.length > 0 || removedCounters.length > 0 || updatedCounters.length > 0) {
             await LastUpdatedDb.updateLastUpdated(db, DataType.COUNTING_SITES_METADATA, updatedTimestamp);
@@ -44,8 +44,8 @@ export async function updateDataForDomain(domainName: string, apiKey: string, ur
 
                 console.info("method=updateDataForDomain counter=%d updatedCount=%d", counter.id, data.length);
 
-                await DataDb.insertCounterValues(db, counter.id, counter.interval, data);
-                return CounterDb.updateCounterTimestamp(db, counter.id, endStamp.toDate());
+                await DataDAO.insertCounterValues(db, counter.id, counter.interval, data);
+                return CounterDAO.updateCounterTimestamp(db, counter.id, endStamp.toDate());
             }
 
             console.info("no need to update " + counter.id);
@@ -80,7 +80,7 @@ function compareCounters(countersInApi: Record<string, ApiCounter>, countersInDb
 
 async function getAllCountersFromDb(domain: string): Promise<Record<number, DbCounter>> {
     const counters = await inDatabaseReadonly( (db: DTDatabase) => {
-        return CounterDb.findAllCountersForUpdateForDomain(db, domain);
+        return CounterDAO.findAllCountersForUpdateForDomain(db, domain);
     }) as DbCounter[];
 
     return Object.fromEntries(counters
