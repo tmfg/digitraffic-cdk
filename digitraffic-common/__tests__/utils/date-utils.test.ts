@@ -15,4 +15,10 @@ describe('CommonDateUtilsTest', () => {
         const end = moment(start).add(1234, 'milliseconds').toDate();
         expect (CommonDateUtils.countDiffMs(start, end)).toEqual(1234);
     });
+
+    test('countDiffMs', () => {
+        const start = new Date();
+        const end = moment(start).add(1234, 'seconds').toDate();
+        expect (CommonDateUtils.countDiffInSeconds(start, end)).toEqual(1234);
+    });
 });
