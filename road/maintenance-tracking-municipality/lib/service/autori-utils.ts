@@ -1,18 +1,19 @@
+import * as CommonDateUtils from "digitraffic-common/utils/date-utils";
+import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 import * as GeometryUtils from "digitraffic-common/utils/geometry";
-import {
-    AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM,
-    AUTORI_MAX_MINUTES_TO_HISTORY,
-    AUTORI_MAX_TIME_BETWEEN_TRACKINGS_MS,
-    MAX_SPEED_BETWEEN_TRACKINGS_KMH,
-} from "../constants";
 import {Feature, Geometry, LineString, Position} from "geojson";
+import moment from "moment";
+import {
+    AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
+    AUTORI_MAX_MINUTES_TO_HISTORY,
+    AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH,
+    AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S,
+} from "../constants";
+import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
+import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
+import {UNKNOWN_TASK_NAME} from "../model/tracking-save-result";
 import * as Utils from "./utils";
 import {createHarjaId} from "./utils";
-import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
-import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
-import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
-import moment from "moment";
-import {UNKNOWN_TASK_NAME} from "../model/tracking-save-result";
 
 /**
  * This fixes:
@@ -23,7 +24,7 @@ import {UNKNOWN_TASK_NAME} from "../model/tracking-save-result";
 export function fixApiRouteDatas(originalRouteData: ApiRouteData[]): ApiRouteData[] {
 
     const sortedRouteData: ApiRouteData[] = originalRouteData.slice()
-        .sort((a,b) => (Utils.dateFromIsoString(a.startTime).getTime() < Utils.dateFromIsoString(b.startTime).getTime() ? -1 : 1));
+        .sort((a,b) =>  (CommonDateUtils.dateFromIsoString(a.startTime).getTime() < CommonDateUtils.dateFromIsoString(b.startTime).getTime() ? -1 : 1));
     const fixedRouteData: ApiRouteData[] = [];
     sortedRouteData.forEach(routeData => {
         const result = fixApiRouteData(routeData);
@@ -147,7 +148,7 @@ function toPositionGroups(sourceGeometry: Position[], targetGeometries:Position[
 }
 
 export function isOverTimeLimit(previous: Date, next: Date) {
-    return Utils.countDiffMs(previous, next) > AUTORI_MAX_TIME_BETWEEN_TRACKINGS_MS;
+    return CommonDateUtils.countDiffInSeconds(previous, next) > AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S;
 }
 
 /**
@@ -167,14 +168,14 @@ export function isExtendingPreviousTracking(previousPosition: Position, nextPosi
     if (previousTime && nextTime && isOverTimeLimit(previousTime, nextTime)) {
         return false;
     }
-    const distInKm = GeometryUtils.distanceBetweenPositionsInKm(previousPosition, nextPosition);
-    const diffInMs = previousTime && nextTime ? Utils.countDiffMs(previousTime, nextTime) : 0;
-    const speedInKmH = previousTime && nextTime ? Utils.calculateSpeedInKmH(distInKm, diffInMs) : 0;
-    if (distInKm > AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM) {
+    const distInM = GeometryUtils.distanceBetweenPositionsInM(previousPosition, nextPosition);
+    const diffInS = previousTime && nextTime ? CommonDateUtils.countDiffInSeconds(previousTime, nextTime) : 0;
+    const speedInKmH = previousTime && nextTime ? Utils.calculateSpeedInKmH(distInM, diffInS) : 0;
+    if (distInM > AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M) {
         return false;
-    } else if (isFinite(speedInKmH) && diffInMs > 0 && speedInKmH > MAX_SPEED_BETWEEN_TRACKINGS_KMH) {
+    } else if (isFinite(speedInKmH) && diffInS > 0 && speedInKmH > AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH) {
         return false;
-    } else if (!isFinite(speedInKmH) && distInKm > 0.05) {
+    } else if (!isFinite(speedInKmH) && distInM > 50) {
         // Simplification/saving resolution to db might move location of previous tracking's end point a bit and then when comparing
         // it with next tracking's start point the result is infinity in speed. If point has moved significantly then consider as
         // discontinuation to previous point
@@ -244,8 +245,8 @@ export function createDbDomainContracts(contracts: ApiContractData[], domainName
             domain: domainName,
             contract: contract.id,
             name: contract.name,
-            start_date: contract.startDate ? Utils.dateFromIsoString(contract.startDate) : undefined,
-            end_date: contract.endDate ? Utils.dateFromIsoString(contract.endDate) : undefined,
+            start_date: contract.startDate ? CommonDateUtils.dateFromIsoString(contract.startDate) : undefined,
+            end_date: contract.endDate ? CommonDateUtils.dateFromIsoString(contract.endDate) : undefined,
             data_last_updated: undefined,
             source: undefined,
             /* eslint-enable camelcase */
@@ -296,9 +297,9 @@ export function createDbMaintenanceTracking(workMachineId: number, routeData: Ap
     /* eslint-disable camelcase */
     return {
         direction: undefined,
-        sending_time: Utils.dateFromIsoString(routeData.created ?? new Date().toISOString()),
-        start_time: Utils.dateFromIsoString(routeData.startTime),
-        end_time: Utils.dateFromIsoString(routeData.endTime),
+        sending_time: CommonDateUtils.dateFromIsoString(routeData.created ?? new Date().toISOString()),
+        start_time: CommonDateUtils.dateFromIsoString(routeData.startTime),
+        end_time: CommonDateUtils.dateFromIsoString(routeData.endTime),
         last_point: lastPoint,
         line_string: lineString,
         sending_system: contract.domain,

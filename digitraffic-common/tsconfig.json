@@ -19,7 +19,8 @@
     "typeRoots": [
       "../node_modules/@types"
     ],
+    "esModuleInterop": true,
     "moduleResolution": "node",
-    "preserveSymlinks": true
+    "preserveSymlinks": true,
   }
 }

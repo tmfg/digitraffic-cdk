@@ -1,10 +1,15 @@
 /* eslint-disable camelcase */
-import moment from "moment";
 import {getRandomInteger, randomString} from "digitraffic-common/test/testutils";
-import {createDbWorkMachine, getTasksForOperations, groupEventsToIndividualTrackings} from "../../lib/service/paikannin-utils";
-import {ApiWorkevent, ApiWorkeventIoDevice} from "../../lib/model/paikannin-api-data";
-import {createTaskMapping} from "../testutil";
+import moment from "moment";
+import {PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S} from "../../lib/constants";
 import {DbWorkMachine} from "../../lib/model/db-data";
+import {ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice} from "../../lib/model/paikannin-api-data";
+import {
+    createDbWorkMachine,
+    filterEventsWithoutTasks,
+    getTasksForOperations,
+    groupEventsToIndividualTrackings,
+} from "../../lib/service/paikannin-utils";
 import * as Utils from "../../lib/service/utils";
 import {
     DOMAIN_1,
@@ -19,7 +24,7 @@ import {
     POINT_750M_FROM_START,
     POINT_START,
 } from "../testconstants";
-import {PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS} from "../../lib/constants";
+import {createApiRouteDataForEveryMinute, createLineStringGeometry, createTaskMapping} from "../testutil";
 
 describe('paikannin-utils-service-test', () => {
 
@@ -31,7 +36,7 @@ describe('paikannin-utils-service-test', () => {
             createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, now),
         ];
 
-        // this shold be groupped within task
+        // this should be groupped within task
         // - PAIKANNIN_OPERATION_BRUSHNG,
         // - PAIKANNIN_OPERATION_BRUSHNG+PAIKANNIN_OPERATION_PAVING and
         // - PAIKANNIN_OPERATION_PAVING
@@ -104,7 +109,7 @@ describe('paikannin-utils-service-test', () => {
     test('groupEventsToIndividualTrackings - events over 5 minute time limit', () => {
         // Create work events with over 5 min diff
         const now = new Date();
-        const over5Min = moment(now).subtract(PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS, 'milliseconds').subtract(1, 'seconds').toDate();
+        const over5Min = moment(now).subtract(PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S, 'seconds').subtract(1, 'seconds').toDate();
         const events: ApiWorkevent[] = [
             createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, over5Min),
             createWorkEvent([PAIKANNIN_OPERATION_BRUSHING.name], 1, now),
@@ -211,6 +216,44 @@ describe('paikannin-utils-service-test', () => {
 
         expect(tasks).toHaveLength(1);
         expect(tasks).toContain(HARJA_BRUSHING);
+    });
+
+    test('calculateSpeedIn_m_s', () => {
+        const result = Utils.calculateSpeedInMS(10, 0);
+        expect(result).toEqual(Infinity);
+        console.info(`r: ${result} r>0: ${result > 0} r<50: ${result < 50} isFinite(r): ${Number.isFinite(result)}`);
+
+        expect(Utils.calculateSpeedInMS(10, 1)).toEqual(10);
+
+        expect(Utils.calculateSpeedInMS(350, 7)).toEqual(50);
+    });
+
+
+    test('filterEventsWithoutTasks', () => {
+        const taskMappings = [
+            // Map domain operations to harja tasks, map two operations to one task
+            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHING.name, false),
+            createTaskMapping(DOMAIN_1, HARJA_SALTING, PAIKANNIN_OPERATION_SALTING.name, true),
+        ];
+
+        const device: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, new Date(), createLineStringGeometry(10, 200), [PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_SALTING]);
+        // Make every other event to be not mapped or ignored
+        device.workEvents.forEach((value, index) => {
+            if (index % 2 === 0) { // index is even
+                value.ioChannels.splice(0, value.ioChannels.length);
+                value.ioChannels.push(...[PAIKANNIN_OPERATION_SALTING, PAIKANNIN_OPERATION_PAVING]);
+            }
+        });
+
+        const resultDevice = filterEventsWithoutTasks([device], taskMappings)[0];
+
+        expect(resultDevice.deviceId).toEqual(device.deviceId);
+        expect(resultDevice.deviceName).toEqual(device.deviceName);
+        expect(resultDevice.workEvents.length).toEqual(device.workEvents.length/2);
+        resultDevice.workEvents.forEach(we => expect(we.ioChannels[0].name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name));
+
+
+
     });
 
 });

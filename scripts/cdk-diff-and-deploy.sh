@@ -59,7 +59,10 @@ read -p "Are you sure you wanna run: cdk ${OPERATION} ${STACK}? " -n 1 -r
 echo    # move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
+  echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   cdk ${OPERATION} ${STACK}
 fi
 
 set +x
+END=
+echo "End at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"

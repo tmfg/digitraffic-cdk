@@ -1,10 +1,12 @@
 /* eslint-disable camelcase */
-import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking} from "../lib/model/db-data";
-import moment from "moment";
+import {getRandomInteger, getRandomNumber} from "digitraffic-common/test/testutils";
 import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
 import {Feature, Geometry, LineString, Point, Position} from "geojson";
-import {getRandomInteger, getRandomNumber} from "digitraffic-common/test/testutils";
-import {X_MAX, X_MIN, Y_MAX, Y_MIN} from "./testconstants";
+import {cloneDeep} from 'lodash';
+import moment from "moment";
+import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking} from "../lib/model/db-data";
+import {ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice} from "../lib/model/paikannin-api-data";
+import {PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_PAVING, PAIKANNIN_OPERATION_SALTING, X_MAX, X_MIN, Y_MAX, Y_MIN} from "./testconstants";
 
 export function createDbDomainContract(contract : string, domain : string, dataLastUpdated?:Date) : DbDomainContract {
     return {
@@ -54,11 +56,11 @@ const KM_IN_Y = 0.00899321606;
 /**
  * Creates a zigzag of coordinates with given point distance (accuracy ~10m)
  * @param coordinateCount
- * @param distBetweenPointsKm
+ * @param distBetweenPointsM
  */
-export function createZigZagCoordinates(coordinateCount: number, distBetweenPointsKm=0.1) : Position[]  {
+export function createZigZagCoordinates(coordinateCount: number, distBetweenPointsM=100) : Position[]  {
     // a = sqr(c^2/2)
-    const distInXyKm = Math.sqrt(Math.pow(distBetweenPointsKm, 2)/2);
+    const distInXyKm = Math.sqrt(Math.pow(distBetweenPointsM/1000, 2)/2);
     const xAddition = KM_IN_X*distInXyKm;
     const yAddition = KM_IN_Y*distInXyKm;
     const x = getRandomNumber(X_MIN, X_MAX);
@@ -74,16 +76,16 @@ export function createZigZagCoordinates(coordinateCount: number, distBetweenPoin
 /**
  * Creates a zigzag linestring with given point distance (accuracy ~10m)
  * @param coordinateCount How many coordinates to generate
- * @param distBetweenPointsKm (default 0,1 km)
+ * @param distBetweenPointsM (default 100 m)
  */
-export function createLineStringGeometry(coordinateCount: number, distBetweenPointsKm=0.1) : LineString  {
-    const coordinates: Position[] = createZigZagCoordinates(coordinateCount, distBetweenPointsKm);
+export function createLineStringGeometry(coordinateCount: number, distBetweenPointsM=100) : LineString  {
+    const coordinates: Position[] = createZigZagCoordinates(coordinateCount, distBetweenPointsM);
     return createLineString(coordinates);
 }
 
 export function createLineStringGeometries(minCount: number, maxCount: number) : LineString[]  {
     return Array.from({length: getRandomNumber(minCount, maxCount)}, () => {
-        return createLineStringGeometry(getRandomInteger(2, 10), 0.1);
+        return createLineStringGeometry(getRandomInteger(2, 10), 100);
     });
 }
 
@@ -114,3 +116,29 @@ export function createGeoJSONPoint(xy: Position): Point {
     return new GeoJsonPoint(xy);
 }
 
+export function createApiRouteDataForEveryMinute(deviceId: number, endTime : Date, geometry : LineString, operations:ApiWorkeventIoDevice[]=[PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_PAVING, PAIKANNIN_OPERATION_SALTING]) : ApiWorkeventDevice {
+
+    // Update for every event + minute
+    const timeMoment = moment(endTime).subtract(geometry.coordinates.length, 'minutes');
+    const events: ApiWorkevent[] = geometry.coordinates.map(position => {
+        timeMoment.add(1, 'minutes');
+        return {
+            deviceId: deviceId,
+            heading: 0,
+            lon: position[0],
+            lat: position[1],
+            speed: 10,
+            altitude: 0,
+            deviceName: '' + deviceId,
+            timest: timeMoment.toISOString(),
+            ioChannels: cloneDeep(operations),
+            timestamp: timeMoment.toDate(),
+        };
+    });
+
+    return {
+        deviceId: deviceId,
+        deviceName: '' + deviceId,
+        workEvents: events,
+    };
+}

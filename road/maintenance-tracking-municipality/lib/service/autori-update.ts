@@ -1,14 +1,16 @@
-import * as DataDb from "../dao/data";
 import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
-import {AutoriApi} from "../api/autori";
+import * as CommonDateUtils from "digitraffic-common/utils/date-utils";
+import * as CommonUtils from "digitraffic-common/utils/utils";
+import {Position} from "geojson";
 import moment from "moment";
+import {AutoriApi} from "../api/autori";
+import * as DataDb from "../dao/data";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
-import * as Utils from "./utils";
 import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/db-data";
 import {TrackingSaveResult} from "../model/tracking-save-result";
-import * as CommonUpdateService from "./common-update";
 import * as AutoriUtils from "./autori-utils";
-import {Position} from "geojson";
+import * as CommonUpdateService from "./common-update";
+import * as Utils from "./utils";
 
 export class AutoriUpdate {
 
@@ -79,7 +81,9 @@ export class AutoriUpdate {
                 console.info(`method=AutoriUpdate.updateTrackingsForDomain domain=${domainName} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                 return summedResult;
             }).then((finalResult) => {
-                return CommonUpdateService.updateDataUpdated(finalResult);
+                return inDatabase((db: DTDatabase) => {
+                    return CommonUpdateService.updateDataUpdated(db, finalResult);
+                });
             });
         } catch (error) {
             console.error(`method=AutoriUpdate.updateTrackings domain=${domainName} Failed for all contracts`, error);
@@ -143,7 +147,7 @@ export class AutoriUpdate {
 
                         const saveResult:TrackingSaveResult = tracking ?
                             await this.saveMaintenanceTrackingAndUpdatePrevious(
-                                db, tracking, contract, machineId, messageSizeBytes, Utils.dateFromIsoString(routeData.updated ?? routeData.endTime),
+                                db, tracking, contract, machineId, messageSizeBytes, CommonDateUtils.dateFromIsoString(routeData.updated ?? routeData.endTime),
                             ):
                             TrackingSaveResult.createSaved(messageSizeBytes,0);
                         saveResults.push(saveResult);
@@ -174,7 +178,7 @@ export class AutoriUpdate {
         if (previous && AutoriUtils.isExtendingPreviousTracking(JSON.parse(previous.last_point).coordinates, trackingStartPosition, previous.end_time, tracking.start_time)) {
             await DataDb.markMaintenanceTrackingFinished(db, previous.id);
             // If the task are the same, then set reference to previous tracking id
-            if (Utils.bothArraysHasSameValues(previous.tasks, tracking.tasks)) {
+            if (CommonUtils.bothArraysHasSameValues(previous.tasks, tracking.tasks)) {
                 // eslint-disable-next-line camelcase
                 tracking.previous_tracking_id = previous.id;
             }

@@ -1,6 +1,14 @@
 /* eslint-disable camelcase */
+import {Asserter} from "digitraffic-common/test/asserter";
+import {LineString, Point} from "geojson";
 import moment from "moment";
+import {AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M, AUTORI_MAX_MINUTES_TO_HISTORY, AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S} from "../../lib/constants";
+import {ApiContractData, ApiRouteData} from "../../lib/model/autori-api-data";
+import {DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../../lib/model/db-data";
+import {UNKNOWN_TASK_NAME} from "../../lib/model/tracking-save-result";
 import * as AutoriUtils from "../../lib/service/autori-utils";
+import * as utils from "../../lib/service/utils";
+import * as AutoriTestutils from "../autori-testutil";
 
 import {
     AUTORI_OPERATION_BRUSHING,
@@ -25,16 +33,8 @@ import {
     createTaskMapping,
     createZigZagCoordinates,
 } from "../testutil";
-import {AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM, AUTORI_MAX_MINUTES_TO_HISTORY, AUTORI_MAX_TIME_BETWEEN_TRACKINGS_MS} from "../../lib/constants";
-import {Asserter} from "digitraffic-common/test/asserter";
-import {LineString, Point} from "geojson";
-import * as AutoriTestutils from "../autori-testutil";
-import {ApiContractData, ApiRouteData} from "../../lib/model/autori-api-data";
-import {DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../../lib/model/db-data";
-import {UNKNOWN_TASK_NAME} from "../../lib/model/tracking-save-result";
-import * as utils from "../../lib/service/utils";
 
-describe('paikannin-utils-service-test', () => {
+describe('autori-utils-service-test', () => {
 
     test('isExtendingPreviousTracking', () => {
         expect(AutoriUtils.isExtendingPreviousTracking(POINT_START, POINT_450M_FROM_START)).toEqual(true);
@@ -42,8 +42,8 @@ describe('paikannin-utils-service-test', () => {
     });
 
     test('fixApiRouteData', () => {
-        const coords1 = createZigZagCoordinates(10, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
-        const coords2 = createZigZagCoordinates(15, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        const coords1 = createZigZagCoordinates(10, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M-10);
+        const coords2 = createZigZagCoordinates(15, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M-10);
         const g1 = createLineString(coords1);
         const g2 = createLineString(coords2);
         const route = AutoriTestutils.createApiRouteData(new Date(), [g1, g2]);
@@ -57,7 +57,7 @@ describe('paikannin-utils-service-test', () => {
     });
 
     test('groupEventsToIndividualGeometries no change', () => {
-        const coords = createZigZagCoordinates(20, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        const coords = createZigZagCoordinates(20, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M-10);
         const f = createFeature(createLineString(coords));
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
@@ -66,7 +66,7 @@ describe('paikannin-utils-service-test', () => {
     });
 
     test('groupEventsToIndividualGeometries split when big jump', () => {
-        const ls = createLineStringGeometry(20, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        const ls = createLineStringGeometry(20, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M-10);
         ls.coordinates.splice(10, 2); // Delete 2 points to get a long jump in middle of tracking
         const f = createFeature(ls);
 
@@ -77,7 +77,7 @@ describe('paikannin-utils-service-test', () => {
     });
 
     test('groupEventsToIndividualGeometries split to point', () => {
-        const ls = createLineStringGeometry(20, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        const ls = createLineStringGeometry(20, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M-10);
         ls.coordinates.splice(1, 2); // After first location a long jump
         const f = createFeature(ls);
 
@@ -90,8 +90,8 @@ describe('paikannin-utils-service-test', () => {
 
     test('isOverTimeLimit', () => {
         const now = new Date();
-        const insideLimit = moment().add(AUTORI_MAX_TIME_BETWEEN_TRACKINGS_MS-1000, 'milliseconds').toDate();
-        const outsideLimit = moment().add(AUTORI_MAX_TIME_BETWEEN_TRACKINGS_MS+1000, 'milliseconds').toDate();
+        const insideLimit = moment().add(AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S-1, 'seconds').toDate();
+        const outsideLimit = moment().add(AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S+1, 'seconds').toDate();
         expect(AutoriUtils.isOverTimeLimit(now, insideLimit)).toBe(false);
         expect(AutoriUtils.isOverTimeLimit(now, outsideLimit)).toBe(true);
     });
@@ -162,7 +162,7 @@ describe('paikannin-utils-service-test', () => {
     test('createDbMaintenanceTracking', () => {
         const workMachineId = 1;
         const now = moment().toDate();
-        const geometry : LineString = createLineStringGeometry(10,0.1);
+        const geometry : LineString = createLineStringGeometry(10,100);
         const route : ApiRouteData = AutoriTestutils.createApiRouteData(now, [geometry]);
         const dbContract = createDbDomainContract("contract-1", DOMAIN_1);
         const tracking : DbMaintenanceTracking|null = AutoriUtils.createDbMaintenanceTracking(workMachineId, route, dbContract, [HARJA_BRUSHING, HARJA_SALTING]);

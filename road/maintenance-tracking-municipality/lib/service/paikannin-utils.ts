@@ -1,10 +1,42 @@
-import {ApiWorkevent, ApiWorkeventIoDevice} from "../model/paikannin-api-data";
-import {distanceBetweenPositionsInKm} from "digitraffic-common/utils/geometry";
-import {MAX_SPEED_BETWEEN_TRACKINGS_KMH, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM, PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS} from "../constants";
-import {Position} from "geojson";
-import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
+import * as CommonDateUtils from "digitraffic-common/utils/date-utils";
 import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
+import {distanceBetweenPositionsInM} from "digitraffic-common/utils/geometry";
+import * as CommonUtils from "digitraffic-common/utils/utils";
+import {Position} from "geojson";
+import * as Constants from "../constants";
+import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";
+import {ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice} from "../model/paikannin-api-data";
 import * as Utils from "./utils";
+
+/**
+ * Filtters ApiWorkeventDevice.workEvents those doesn't have valid operations that are mapped for domain.
+ * @param devices devices with events to filter
+ * @param taskMappings domain's task mappings
+ */
+export function filterEventsWithoutTasks(devices: ApiWorkeventDevice[], taskMappings: DbDomainTaskMapping[]): ApiWorkeventDevice[] {
+
+    const filteredDevicesEvents: ApiWorkeventDevice[] = [];
+
+    devices.forEach(device => {
+
+        const newWorkEvents: ApiWorkevent[] = device.workEvents.filter(we => {
+            const result = hasValidOperations(we.ioChannels, taskMappings);
+            if (!result) {
+                console.info(`method=PaikanninUtils.filterEventsWithoutTasks ${JSON.stringify(we.ioChannels)}`);
+            }
+            return result;
+        });
+        if (newWorkEvents) {
+            filteredDevicesEvents.push({
+                deviceId: device.deviceId,
+                deviceName: device.deviceName,
+                workEvents: newWorkEvents,
+            });
+        }
+    });
+    return filteredDevicesEvents;
+}
+
 
 const MIN_DATE = new Date(-8640000000000000);
 
@@ -12,7 +44,7 @@ const MIN_DATE = new Date(-8640000000000000);
  * Splits work events to groups/distinct trackings by following rules:
  * – events have over 5 minutes between them (PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS)
  * - events have over 0,5 km between them (PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM)
- * - events have computational speed over 140.0 km/h (MAX_SPEED_BETWEEN_TRACKINGS_KMH)
+ * - events have computational speed over 140.0 km/h (PAIKANNIN_MAX_SPEED_BETWEEN_TRACKINGS_KMH)
  * - events' tasks change
  * - events are not in chronological order
  * This wont check if work is transition run or not
@@ -59,7 +91,9 @@ function toEventGroups(sourceEvents: ApiWorkevent[], filterBeforeOrEquaTime: Dat
         // Not in chronological order
         if (prevTime.getTime() > nextTime.getTime()) {
             targetGroups.push([nextEvent]); // create new group form next event
-        } else if (isExtendingPreviousTracking(prevPosition, nextPosition, prevTime, nextTime)) {
+        } else if (isExtendingPreviousTracking(
+            prevPosition, nextPosition, prevTime, nextTime, isSameTasks(prevEvent.ioChannels, nextEvent.ioChannels),
+        )) {
             // Check if is continuing same task or has changed task between points
             if (isSameTasks(prevEvent.ioChannels, nextEvent.ioChannels)) {
                 prevGroup.push(nextEvent); // continue in previous group
@@ -81,7 +115,11 @@ function toEventGroups(sourceEvents: ApiWorkevent[], filterBeforeOrEquaTime: Dat
 }
 
 export function isOverTimeLimit(previous: Date, next: Date) {
-    return Utils.countDiffMs(previous, next) > PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_MS;
+    return CommonDateUtils.countDiffInSeconds(previous, next) > Constants.PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S;
+}
+
+export function isOverDistanceLimitInMeters(distanceInM: number) {
+    return distanceInM > Constants.PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M;
 }
 
 function isSameTasks(ioChannels1: ApiWorkeventIoDevice[], ioChannels2: ApiWorkeventIoDevice[]): boolean {
@@ -90,7 +128,7 @@ function isSameTasks(ioChannels1: ApiWorkeventIoDevice[], ioChannels2: ApiWorkev
     }
     const ioChannel1Strings = ioChennelsToStrings(ioChannels2);
     const ioChannel2Strings = ioChennelsToStrings(ioChannels2);
-    return Utils.bothArraysHasSameValues(ioChannel1Strings, ioChannel2Strings);
+    return CommonUtils.bothArraysHasSameValues(ioChannel1Strings, ioChannel2Strings);
 }
 
 function ioChennelsToStrings(ioChannels : ApiWorkeventIoDevice[]): string[] {
@@ -111,27 +149,70 @@ function ioChennelsToStrings(ioChannels : ApiWorkeventIoDevice[]): string[] {
  * @param nextPosition first position of next tracking
  * @param previousTime time of previous position
  * @param nextTime time of next position
-
+ * @param sameTasksForDebug Parameter only for debugging. Logs also this value if value is given.
  */
-export function isExtendingPreviousTracking(previousPosition: Position, nextPosition: Position, previousTime: Date, nextTime: Date): boolean {
+export function isExtendingPreviousTracking(
+    previousPosition: Position, nextPosition: Position, previousTime: Date, nextTime: Date, sameTasksForDebug?: boolean,
+): boolean {
     if (isOverTimeLimit(previousTime, nextTime)) {
+        console.info(`method=PaikanninUtils.isExtendingPreviousTracking FALSE isOverTimeLimit: ${CommonDateUtils.countDiffInSeconds(previousTime, nextTime)}` +
+                     ` > ${Constants.PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} ` +
+                     `positions: ${JSON.stringify(previousPosition)} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`);
         return false;
     }
-    const distInKm = distanceBetweenPositionsInKm(previousPosition, nextPosition);
-    const diffInMs = Utils.countDiffMs(previousTime, nextTime);
-    const speedInKmH = Utils.calculateSpeedInKmH(distInKm, diffInMs);
-    if (distInKm > PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM) {
+
+    const distInM = distanceBetweenPositionsInM(previousPosition, nextPosition);
+
+    if (isOverDistanceLimitInMeters(distInM)) {
+        console.info(`method=PaikanninUtils.isExtendingPreviousTracking FALSE isOverDistanceLimitInMeters ${distInM}[m] > ${Constants.PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M}[m] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(previousPosition)} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`);
         return false;
-    } else if (speedInKmH > MAX_SPEED_BETWEEN_TRACKINGS_KMH) {
+    }
+
+    const timeInSeconds = CommonDateUtils.countDiffInSeconds(previousTime, nextTime);
+    const speedInKmH = Utils.calculateSpeedInKmH(distInM, timeInSeconds);
+
+    // 1. Nopeus 65 - 50, etäisyy
+    // Jos nopeus max-joku ja aika alle limitin x niin ok
+
+    const DIST_550 = 550;
+    const DIST_200 = 200;
+    const DIST_50 = 50;
+
+    // dist > 50 && Speed is over limit or infinite => split
+    // dist > 550 m => split
+    // dist 550-200 && speed < 25 km/h => split
+    // dist 200-50 && speed < 5 km/h => split
+    // dist <= 50 => ok
+    if (distInM > DIST_50 && (speedInKmH > Constants.PAIKANNIN_MAX_SPEED_BETWEEN_TRACKINGS_KMH || !isFinite(speedInKmH))) {
+        // GPS accuracy and simplification/saving resolution to db might move location a bit and then when comparing
+        // it with next point the result is infinity/really high in speed. If point has moved significantly and speed is high
+        // then consider as a break to previous point
+        console.info(`method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_50}[m] && speedInKmH: ${speedInKmH}[km/h] > ${Constants.PAIKANNIN_MAX_SPEED_BETWEEN_TRACKINGS_KMH}[km/h] for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(previousPosition)} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`);
         return false;
-    } else if (!isFinite(speedInKmH) && distInKm > 0.05) {
-        // Simplification/saving resolution to db might move location of previous tracking's end point a bit and then when comparing
-        // it with next tracking's start point the result is infinity in speed. If point has moved significantly then consider as
-        // discontinuation to previous point
+    } else if (distInM > DIST_550) {
+        console.info(`method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_550}[m] && && ${speedInKmH}[km/h] for time: ${(timeInSeconds)}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(previousPosition)} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`);
         return false;
+    } else if (distInM > DIST_200) {
+        if (speedInKmH < 20) {
+            console.info(`method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_200}[m] && ${speedInKmH}[km/h] < 25 for time: ${(timeInSeconds)}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(previousPosition)} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`);
+            return false;
+        }
+    } else if (distInM > DIST_50) {
+        if (speedInKmH < 5) {
+            console.info(`method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_50}[m] && ${speedInKmH}[km/h] < 5 for time: ${(timeInSeconds)}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(previousPosition)} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`);
+            return false;
+        }
     }
     return true;
 }
+
+function getDebugForSameTasks(sameTasksForDebug?: boolean): string {
+    if (sameTasksForDebug === undefined || sameTasksForDebug === null) {
+        return "";
+    }
+    return `sameTasks: ${sameTasksForDebug}`;
+}
+
 
 export function getStartPosition(mt: DbMaintenanceTracking): Position {
     if (mt.line_string && mt.line_string.coordinates.length > 0) {
@@ -174,7 +255,7 @@ function cloneApiWorkeventWithNewTasks(prevEvent: ApiWorkevent, ioChannels: ApiW
  * @param taskMappings mapping of tasks from database
  */
 export function getTasksForOperations(operations: ApiWorkeventIoDevice[], taskMappings: DbDomainTaskMapping[]): string[] {
-    if (operations === undefined) {
+    if (!operations) {
         return [];
     }
 
@@ -187,6 +268,15 @@ export function getTasksForOperations(operations: ApiWorkeventIoDevice[], taskMa
         }
         return filtered;
     }, []);
+}
+
+/**
+ * Checks if operations contains valid mapped values.
+ * @param operations to check.
+ * @param taskMappings of domain.
+ */
+export function hasValidOperations(operations: ApiWorkeventIoDevice[], taskMappings: DbDomainTaskMapping[]): boolean {
+    return getTasksForOperations(operations, taskMappings).length > 0;
 }
 
 export function createLineStringFromEvents(events: ApiWorkevent[]) : GeoJsonLineString|null {

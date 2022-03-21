@@ -1,16 +1,17 @@
-import * as DataDb from "../dao/data";
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
-import moment from "moment";
+import * as Geometry from "digitraffic-common/utils/geometry";
+import * as CommonUtils from "digitraffic-common/utils/utils";
 import {Position} from "geojson";
-import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
-import {TrackingSaveResult, UNKNOWN_TASK_NAME} from "../model/tracking-save-result";
+import moment from "moment";
 import {PaikanninApi} from "../api/paikannin";
-import {ApiDevice, ApiWorkevent, ApiWorkeventDevice} from "../model/paikannin-api-data";
 import {PAIKANNIN_MAX_MINUTES_TO_HISTORY, PAIKANNIN_MIN_MINUTES_FROM_PRESENT} from "../constants";
+import * as DataDb from "../dao/data";
+import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbTextId, DbWorkMachine} from "../model/db-data";
+import {ApiDevice, ApiWorkevent, ApiWorkeventDevice} from "../model/paikannin-api-data";
+import {TrackingSaveResult, UNKNOWN_TASK_NAME} from "../model/tracking-save-result";
 import * as CommonUpdateService from "./common-update";
 import * as PaikanninUtils from "./paikannin-utils";
 import * as Utils from "./utils";
-import * as Geometry from "digitraffic-common/utils/geometry";
 
 export class PaikanninUpdate {
 
@@ -99,14 +100,16 @@ export class PaikanninUpdate {
 
                 const taskMappings: DbDomainTaskMapping[] = await DataDb.getTaskMappings(db, domainName);
 
-                return Promise.allSettled(events.map((device: ApiWorkeventDevice) => {
+                const eventsWithMappedTasks: ApiWorkeventDevice[] = PaikanninUtils.filterEventsWithoutTasks(events, taskMappings);
+
+                return Promise.allSettled(eventsWithMappedTasks.map((device: ApiWorkeventDevice) => {
                     return this.updateApiDeviceTrackings(db, contract, taskMappings, device);
                 })).then((results: PromiseSettledResult<TrackingSaveResult>[]) => {
                     const summedResult = CommonUpdateService.sumResultsFromPromises(results);
                     console.info(`method=PaikanninUpdate.updateTrackingsForDomain domain=${domainName} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                     return summedResult;
                 }).then((finalResult) => {
-                    return CommonUpdateService.updateDataUpdated(finalResult);
+                    return CommonUpdateService.updateDataUpdated(db, finalResult);
                 }).catch(error => {
                     console.error(`method=PaikanninUpdate.updateTrackingsForDomain failed domain=${domainName} tookMs=${Date.now() - timerStart}`, error);
                     throw error;
@@ -182,7 +185,7 @@ export class PaikanninUpdate {
                     }
 
                     // If the task are the same, then set reference to previous tracking id
-                    if (Utils.bothArraysHasSameValues(latest.tasks, nextTracking.tasks)) {
+                    if (CommonUtils.bothArraysHasSameValues(latest.tasks, nextTracking.tasks)) {
                         // eslint-disable-next-line camelcase
                         nextTracking.previous_tracking_id = latest.id;
                     }

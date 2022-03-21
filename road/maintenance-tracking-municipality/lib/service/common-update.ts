@@ -1,7 +1,7 @@
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
-import {TrackingSaveResult} from "../model/tracking-save-result";
 import * as DbData from "../dao/data";
+import {TrackingSaveResult} from "../model/tracking-save-result";
 
 export function sumResultsFromPromises(results: PromiseSettledResult<TrackingSaveResult>[]): TrackingSaveResult {
     const saved = results.reduce((acc, result) => acc + (result.status === 'fulfilled' ? result.value.saved : 0), 0);
@@ -17,16 +17,15 @@ export function sumResults(results: TrackingSaveResult[], messageSizeOverride?: 
     return new TrackingSaveResult(messageSizeOverride ? messageSizeOverride : sizeBytes, saved, errors);
 }
 
-export function updateDataUpdated(finalResult: TrackingSaveResult): Promise<TrackingSaveResult> {
-    return inDatabase(async (db: DTDatabase) => {
-        const now = new Date();
-        await LastUpdatedDb.updateLastUpdated(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, now);
-        if (finalResult.saved > 0) {
-            await LastUpdatedDb.updateLastUpdated(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA, now);
-        }
-    }).then(() => {
-        return finalResult;
-    });
+export function updateDataUpdated(db: DTDatabase, finalResult: TrackingSaveResult): Promise<TrackingSaveResult> {
+    const now = new Date();
+    return LastUpdatedDb.updateLastUpdated(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, now)
+        .then(() => {
+            if (finalResult.saved > 0) {
+                return LastUpdatedDb.updateLastUpdated(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA, now);
+            }
+            return;
+        }).then(() => (finalResult));
 }
 
 export function upsertDomain(domain: string): Promise<null> {

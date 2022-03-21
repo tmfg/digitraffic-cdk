@@ -1,4 +1,21 @@
 /* eslint-disable camelcase */
+import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
+import {DataType} from "digitraffic-common/database/last-updated";
+import {Asserter} from "digitraffic-common/test/asserter";
+import * as CommonDateUtils from "digitraffic-common/utils/date-utils";
+import {Position} from "geojson";
+import moment from "moment";
+import * as sinon from "sinon";
+import {AutoriApi} from "../../lib/api/autori";
+import {AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M, AUTORI_MAX_MINUTES_TO_HISTORY} from "../../lib/constants";
+import * as DataDb from "../../lib/dao/data";
+import {ApiContractData, ApiOperationData, ApiRouteData} from "../../lib/model/autori-api-data";
+import {DbDomainContract, DbDomainTaskMapping} from "../../lib/model/db-data";
+import {UNKNOWN_TASK_NAME} from "../../lib/model/tracking-save-result";
+import {AutoriUpdate} from "../../lib/service/autori-update";
+import * as AutoriUtils from "../../lib/service/autori-utils";
+import * as AutoriTestutils from "../autori-testutil";
 import {
     dbTestBase,
     findAllDomaindContracts,
@@ -8,23 +25,6 @@ import {
     insertDomaindTaskMapping,
     truncate,
 } from "../db-testutil";
-import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
-import {AutoriUpdate} from "../../lib/service/autori-update";
-import {AutoriApi} from "../../lib/api/autori";
-import {ApiContractData, ApiOperationData, ApiRouteData} from "../../lib/model/autori-api-data";
-import * as sinon from "sinon";
-import {Position} from "geojson";
-import * as utils from "../../lib/service/utils";
-import moment from "moment";
-import * as DataDb from "../../lib/dao/data";
-import {DbDomainContract, DbDomainTaskMapping} from "../../lib/model/db-data";
-import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
-import {DataType} from "digitraffic-common/database/last-updated";
-import {AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM, AUTORI_MAX_MINUTES_TO_HISTORY} from "../../lib/constants";
-import {UNKNOWN_TASK_NAME} from "../../lib/model/tracking-save-result";
-import {Asserter} from "digitraffic-common/test/asserter";
-import * as AutoriUtils from "../../lib/service/autori-utils";
-import {createLineString, createLineStringGeometries, createZigZagCoordinates} from "../testutil";
 import {
     AUTORI_OPERATION_BRUSHING,
     AUTORI_OPERATION_PAVING,
@@ -35,7 +35,7 @@ import {
     HARJA_SALTING,
     SOURCE_1,
 } from "../testconstants";
-import * as AutoriTestutils from "../autori-testutil";
+import {createLineString, createLineStringGeometries, createZigZagCoordinates} from "../testutil";
 
 const autoriUpdateService = createAutoriUpdateService();
 
@@ -175,7 +175,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         // Insert one exiting contract with endin date today
         const contract1 = contracts[0];
         await insertDomaindContract(
-            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, contract1.startDate ? utils.dateFromIsoString(contract1.startDate) : undefined,
+            db, DOMAIN_1, contract1.id, contract1.name, SOURCE_1, contract1.startDate ? CommonDateUtils.dateFromIsoString(contract1.startDate) : undefined,
             new Date(),
         );
 
@@ -273,7 +273,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         );
 
         // Create two routes, 2 days and 1 day old
-        const coordinates: Position[] = createZigZagCoordinates(30, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_KM-0.01);
+        const coordinates: Position[] = createZigZagCoordinates(30, AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M-10);
         const coords1 = coordinates.slice(0, 10); //L:10 this end coordinate is the same
         const coords2 = coordinates.slice(9, 14);//L:5 as the start coodinate here.
         const coords3 = coordinates.slice(13, 30); //L:17 And here same for the previous one
