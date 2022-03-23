@@ -264,6 +264,11 @@ function getKeyFigures(): KeyFigure[] {
             'type': 'field_agg',
         },
         {
+            'name': 'Top 10 digitraffic-users by bytes',
+            'query': '{ "aggs": { "top-users-by-bytes-sent": { "terms": { "field": "@fields.http_digitraffic_user.keyword", "order": { "total-bytes": "desc" }, "missing": "__missing__", "size": 10 }, "aggs": { "total-bytes": { "sum": { "field": "@fields.body_bytes_sent" } } } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
+            'type': 'field_agg',
+        },
+        {
             'name': 'Top 10 User Agents',
             'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_user_agent.keyword", "order": { "_count": "desc" }, "missing": "__missing__", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
             'type': 'field_agg',
