@@ -145,7 +145,14 @@ async function getKibanaResult(keyFigures: KeyFigure[], start: Date, end: Date, 
             const keyFigureResponse = await fetchDataFromEs(endpoint, query, '_search?size=0');
             const value: { [key: string]: any } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
-                value[bucket.key.split('"').join('').split("'").join('').split("\\").join("")] = bucket.doc_count; // remove illegal characters
+                value[removeIllegalChars(bucket.key)] = bucket.doc_count;
+            }
+            keyFigureResult.value = value;
+        } else if (keyFigure.type === 'sub_agg') {
+            const keyFigureResponse = await fetchDataFromEs(endpoint, query, '_search?size=0');
+            const value: { [key: string]: any } = {};
+            for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
+                value[removeIllegalChars(bucket.key)] = bucket.agg.value;
             }
             keyFigureResult.value = value;
         } else {
@@ -265,8 +272,8 @@ function getKeyFigures(): KeyFigure[] {
         },
         {
             'name': 'Top 10 digitraffic-users by bytes',
-            'query': '{ "aggs": { "top-users-by-bytes-sent": { "terms": { "field": "@fields.http_digitraffic_user.keyword", "order": { "total-bytes": "desc" }, "missing": "__missing__", "size": 10 }, "aggs": { "total-bytes": { "sum": { "field": "@fields.body_bytes_sent" } } } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
-            'type': 'field_agg',
+            'query': '{ "aggs": { "agg": { "terms": { "field": "@fields.http_digitraffic_user.keyword", "order": { "agg": "desc" }, "missing": "__missing__", "size": 10 }, "aggs": { "agg": { "sum": { "field": "@fields.body_bytes_sent" } } } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
+            'type': 'sub_agg',
         },
         {
             'name': 'Top 10 User Agents',
@@ -299,4 +306,8 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
     }
 
     return output;
+}
+
+function removeIllegalChars(bucketKey: string): string {
+    return bucketKey.split('"').join('').split("'").join('').split("\\").join("");
 }
