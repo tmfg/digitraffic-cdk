@@ -252,6 +252,14 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         const updated = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA);
         Asserter.assertToBeCloseTo(<number>checked?.getTime(), updateTime, 500);
         Asserter.assertToBeCloseTo(<number>updated?.getTime(), updateTime, 500);
+
+        // Check all coordinates has z value 0.5
+        trackings.forEach((value, i) => {
+            expect(value.last_point.coordinates[2]).toEqual(0.5);
+            value.line_string?.coordinates.forEach((c, i2) => {
+                expect(c[2]).toEqual(0.5);
+            });
+        });
     });
 
     test('updateTrackings and set previous reference', async () => {
@@ -293,6 +301,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         expect(trackings[1].id).toBe(trackings[2].previous_tracking_id);
         expect(trackings[0].line_string?.coordinates?.length).toEqual(10);
         expect(trackings[1].line_string?.coordinates?.length).toEqual(5);
+        expect(trackings[2].line_string?.coordinates?.length).toEqual(17);
         expect(trackings[2].line_string?.coordinates?.length).toEqual(17);
     });
 

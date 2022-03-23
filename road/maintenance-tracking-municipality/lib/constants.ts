@@ -1,3 +1,5 @@
+export const COORDINATE_PRECISION = 0.000001; // What is the precision of saved coordinates
+
 export const AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S = 60*5 + 5; // 5 min + 5s
 export const AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M = 500;
 export const AUTORI_MAX_MINUTES_TO_HISTORY = 7;

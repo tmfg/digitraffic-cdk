@@ -1,9 +1,10 @@
-import {PreparedStatement} from "pg-promise";
 import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
 import {SRID_WGS84} from "digitraffic-common/utils/geometry";
+import {Position} from "geojson";
+import {PreparedStatement} from "pg-promise";
+import {COORDINATE_PRECISION} from "../constants";
 
 import {DbDomainContract, DbDomainTaskMapping, DbLatestTracking, DbMaintenanceTracking, DbNumberId, DbTextId, DbWorkMachine} from "../model/db-data";
-import {Position} from "geojson";
 
 
 const PS_UPSERT_MAINTENANCE_TRACKING_DOMAIN = new PreparedStatement({
@@ -105,11 +106,12 @@ export function upsertTaskMappings(db: DTDatabase, dbTaskMapping: DbDomainTaskMa
 
 const PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED = new PreparedStatement({
     name: 'PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED',
+    // line_string => takes either previous value and append to it or if previous value is null, then take the last_point and append to it
     text: `UPDATE maintenance_tracking 
            SET finished = true,
                end_time = $2,
-               last_point = ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84})),
-               line_string = ST_MakeLine(coalesce(line_string, last_point), ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84}))),
+               last_point = ST_Snaptogrid(ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84})), ${COORDINATE_PRECISION}), 
+               line_string = ST_Snaptogrid(ST_MakeLine(coalesce(line_string, last_point), ST_Force3D(ST_SetSRID($3::geometry, ${SRID_WGS84}))), ${COORDINATE_PRECISION}),
                direction = $4
            WHERE finished = false
              AND id = $1`,
@@ -119,9 +121,8 @@ export function appendMaintenanceTrackingEndPointAndMarkFinished(
     db: DTDatabase | DTTransaction, id: number, endPosition: Position, endTime: Date, direction?: number,
 ) {
     return db.none(PS_UPDATE_MAINTENANCE_TRACKING_END_POINT_AND_MARK_FINISHED,
-        [id, endTime, `POINT(${endPosition[0]} ${endPosition[1]})`, direction]);
+        [id, endTime, `POINT(${endPosition[0]} ${endPosition[1]} ${(endPosition[2] !== undefined ? endPosition[2] : 0)})`, direction]);
 }
-
 
 const PS_MARK_MAINTENANCE_TRACKING_FINISHED = new PreparedStatement({
     name: 'PS_MARK_MAINTENANCE_TRACKING_FINISHED',
@@ -144,9 +145,9 @@ const PS_INSERT_MAINTENANCE_TRACKING = new PreparedStatement({
                line_string,
                work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id, previous_tracking_id)
            VALUES (
-               NEXTVAL('seq_maintenance_tracking'), $1, $2, 
-               ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID_WGS84})), 
-               ST_Simplify(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID_WGS84})), 0.00005, true), 
+               NEXTVAL('seq_maintenance_tracking'), $1, $2,
+               ST_Snaptogrid(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID_WGS84})), ${COORDINATE_PRECISION}),
+               ST_Snaptogrid(ST_Simplify(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID_WGS84})), 0.00005, true), ${COORDINATE_PRECISION}), 
                $5, $6, $7, $8, $9, $10, $11, $12, $13)
            RETURNING ID`,
 // Might come in use in future

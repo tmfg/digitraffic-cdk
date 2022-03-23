@@ -70,7 +70,7 @@ export function createZigZagCoordinates(coordinateCount: number, distBetweenPoin
         // Make linestring to go zigzag, so it wont be simplified
         const nextX = x + index * xAddition;
         const nextY = y + (even ? 0 : yAddition);
-        return [nextX, nextY];
+        return [nextX, nextY, 0.5];
     });
 }
 /**
@@ -112,8 +112,8 @@ export function addMinutes(reference: Date, minutes: number) {
     return moment(reference).add(minutes, 'minutes').toDate();
 }
 
-export function createGeoJSONPoint(xy: Position): Point {
-    return new GeoJsonPoint(xy);
+export function createGeoJSONPoint(xyz: Position): Point {
+    return new GeoJsonPoint(xyz);
 }
 
 export function createApiRouteDataForEveryMinute(deviceId: number, endTime : Date, geometry : LineString, operations:ApiWorkeventIoDevice[]=[PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_PAVING, PAIKANNIN_OPERATION_SALTING]) : ApiWorkeventDevice {
@@ -128,7 +128,7 @@ export function createApiRouteDataForEveryMinute(deviceId: number, endTime : Dat
             lon: position[0],
             lat: position[1],
             speed: 10,
-            altitude: 0,
+            altitude: position[2],
             deviceName: '' + deviceId,
             timest: timeMoment.toISOString(),
             ioChannels: cloneDeep(operations),

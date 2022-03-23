@@ -83,7 +83,7 @@ describe('autori-utils-service-test', () => {
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
         expect(groups.length).toEqual(2);
-        expect((<Point>groups[0].geometry).coordinates.length).toEqual(2); // Just point [x,y]
+        expect((<Point>groups[0].geometry).coordinates.length).toEqual(3); // Just point [x,y,z]
         expect(groups[0].geometry.type).toEqual('Point'); // Just point [x,y]
         expect((<LineString>groups[1].geometry).coordinates.length).toEqual(17);
     });

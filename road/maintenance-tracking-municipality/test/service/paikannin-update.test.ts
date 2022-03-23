@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import {DTDatabase} from "digitraffic-common/database/database";
 import {getRandomInteger} from "digitraffic-common/test/testutils";
+import {Position} from "geojson";
 import {getRandompId} from "maintenance-tracking/test/testdata";
 import moment from "moment";
 import * as sinon from "sinon";
@@ -184,6 +185,19 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
         expect(trackings[1].end_time).toEqual(end2);
 
         expect(trackings[0].id).toEqual(trackings[1].previous_tracking_id);
+
+        const prevEnd: Position = trackings[0].last_point.coordinates;
+        const prevLineStringEnd: Position|undefined = trackings[0].line_string?.coordinates[trackings[0].line_string?.coordinates.length-1];
+        const nextStart: Position|undefined = trackings[1].line_string?.coordinates[0];
+
+        // Check marked end poind is same as next start as it's extending previous one
+        expect(prevEnd[0]).toEqual(nextStart?.[0]);
+        expect(prevEnd[1]).toEqual(nextStart?.[1]);
+        expect(prevEnd[2]).toEqual(nextStart?.[2]);
+        // Check that linestring end poind is also the same as next start
+        expect(prevLineStringEnd?.[0]).toEqual(nextStart?.[0]);
+        expect(prevLineStringEnd?.[1]).toEqual(nextStart?.[1]);
+        expect(prevLineStringEnd?.[2]).toEqual(nextStart?.[2]);
     });
 
     function mockGetDevicesApiResponse(response: ApiDevice[]) {
