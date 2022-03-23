@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import {DTDatabase} from "digitraffic-common/database/database";
+import {Asserter} from "digitraffic-common/test/asserter";
 import {getRandomInteger} from "digitraffic-common/test/testutils";
 import {Position} from "geojson";
 import {getRandompId} from "maintenance-tracking/test/testdata";
@@ -28,6 +29,7 @@ import {
     PAIKANNIN_OPERATION_BRUSHING,
     PAIKANNIN_OPERATION_PAVING,
     PAIKANNIN_OPERATION_SALTING,
+    POINT_START,
 } from "../testconstants";
 import {
     createApiRouteDataForEveryMinute,
@@ -118,6 +120,33 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
 
         expect(trackings[0].line_string?.coordinates.length).toEqual(10);
         expect(trackings[1].line_string?.coordinates.length).toEqual(9);
+    });
+
+    test('updateTrackings invalid linestring', async () => {
+        await insertDomain(db, DOMAIN_1);
+        await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
+
+        await insertDomaindTaskMapping(
+            db, HARJA_BRUSHING , PAIKANNIN_OPERATION_BRUSHING.name, DOMAIN_1, false,
+        );
+        await insertDomaindTaskMapping(
+            db, HARJA_PAVING ,PAIKANNIN_OPERATION_PAVING.name, DOMAIN_1, false,
+        );
+
+        // Create one route with two equal points
+        const route: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, new Date(), createLineString([POINT_START, POINT_START]), [PAIKANNIN_OPERATION_BRUSHING]);
+
+        await mockGetWorkEventsApiResponse([route]);
+        await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
+
+        const trackings = await findAllTrackings(db, DOMAIN_1);
+
+        expect(trackings.length).toEqual(1);
+        // As soure linestring is two equal point's -> it's invalid and it should not be saved
+        expect(trackings[0].line_string).toBeNull();
+        Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[0],POINT_START[0], 0.000001);
+        Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[1],POINT_START[1], 0.000001);
+        expect(trackings[0].last_point.coordinates[2]).toEqual(0);
     });
 
     test('updateTrackings and split on big distance between points', async () => {

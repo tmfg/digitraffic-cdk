@@ -33,6 +33,7 @@ import {
     HARJA_BRUSHING,
     HARJA_PAVING,
     HARJA_SALTING,
+    POINT_START,
     SOURCE_1,
 } from "../testconstants";
 import {createLineString, createLineStringGeometries, createZigZagCoordinates} from "../testutil";
@@ -254,12 +255,38 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         Asserter.assertToBeCloseTo(<number>updated?.getTime(), updateTime, 500);
 
         // Check all coordinates has z value 0.5
-        trackings.forEach((value, i) => {
+        trackings.forEach(value => {
             expect(value.last_point.coordinates[2]).toEqual(0.5);
-            value.line_string?.coordinates.forEach((c, i2) => {
+            value.line_string?.coordinates.forEach(c => {
                 expect(c[2]).toEqual(0.5);
             });
         });
+    });
+
+    test('updateTrackings invalid linestring', async () => {
+        const contractName = "Urakka 1";
+        await insertDomain(db, DOMAIN_1, SOURCE_1);
+        await insertDomaindContract(
+            db, DOMAIN_1, CONTRACT_ID, contractName, SOURCE_1, new Date(),
+            moment().add(1, 'months').toDate(), new Date(),
+        );
+        await insertDomaindTaskMapping(
+            db, HARJA_BRUSHING ,AUTORI_OPERATION_BRUSHING, DOMAIN_1, false,
+        );
+
+        // Create one route with invalid linestring
+        const route: ApiRouteData = AutoriTestutils.createApiRouteData(new Date(), [createLineString([POINT_START, POINT_START])], [AUTORI_OPERATION_BRUSHING]);
+
+        mockGetWorkEventsApiResponse([route]);
+        await autoriUpdateService.updateTrackingsForDomain(DOMAIN_1);
+        const trackings = await findAllTrackings(db, DOMAIN_1);
+
+        expect(trackings.length).toEqual(1);
+        // As soure linestring is two equal point's -> it's invalid and it should not be saved
+        expect(trackings[0].line_string).toBeNull();
+        Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[0],POINT_START[0], 0.000001);
+        Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[1],POINT_START[1], 0.000001);
+        expect(trackings[0].last_point.coordinates[2]).toEqual(0);
     });
 
     test('updateTrackings and set previous reference', async () => {
