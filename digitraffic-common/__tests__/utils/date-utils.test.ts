@@ -10,6 +10,10 @@ describe('CommonDateUtilsTest', () => {
         expect(parsed?.toISOString()).toEqual(ISO);
     });
 
+    test('dateFromIsoString fails', () => {
+        expect(() => CommonDateUtils.dateFromIsoString(ISO + "foobar")).toThrowError();
+    });
+
     test('countDiffMs', () => {
         const start = new Date();
         const end = moment(start).add(1234, 'milliseconds').toDate();

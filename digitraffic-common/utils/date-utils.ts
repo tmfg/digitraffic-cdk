@@ -22,5 +22,9 @@ export function countDiffInSeconds(start: Date, end: Date): number {
  * @param isoString to convert
  */
 export function dateFromIsoString(isoString: string): Date {
-    return new Date(isoString);
+    const parsed = new Date(isoString);
+    if (!(parsed instanceof Date) || isNaN(parsed.getTime())) {
+        throw new Error(`Invalid ISO-DATE -string: ${isoString}`);
+    }
+    return parsed;
 }

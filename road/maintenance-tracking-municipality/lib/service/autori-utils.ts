@@ -5,6 +5,7 @@ import {Feature, Geometry, LineString, Position} from "geojson";
 import moment from "moment";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
+    AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M,
     AUTORI_MAX_MINUTES_TO_HISTORY,
     AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH,
     AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S,
@@ -175,7 +176,7 @@ export function isExtendingPreviousTracking(previousPosition: Position, nextPosi
         return false;
     } else if (isFinite(speedInKmH) && diffInS > 0 && speedInKmH > AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH) {
         return false;
-    } else if (!isFinite(speedInKmH) && distInM > 50) {
+    } else if (!isFinite(speedInKmH) && AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M > 50) {
         // Simplification/saving resolution to db might move location of previous tracking's end point a bit and then when comparing
         // it with next tracking's start point the result is infinity in speed. If point has moved significantly then consider as
         // discontinuation to previous point
