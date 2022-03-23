@@ -58,7 +58,7 @@ async function postToSlack(kibanaResults: KeyFigureResult[][]) {
 function createSlackMessage(keyFigureResults: KeyFigureResult[]) {
     let slackMessage = `\`${keyFigureResults[0].filter}\` aikavälillä: ${start.toISOString()} - ${end.toISOString()} \`\`\``;
     for (const result of keyFigureResults) {
-        if (result.type === 'field_agg') {
+        if (result.type === 'field_agg' || result.type === 'sub_agg') {
             slackMessage += `\n${result.name}\n`;
             for (const key of Object.keys(result.value)) {
                 slackMessage += formatSlackLine(key, numberFormatter(result.value[key], 1));
