@@ -54,6 +54,14 @@ def init_callbacks(dash_app, df, figures, logger):
         return table['columns'], table['data']
 
     @dash_app.callback(
+        [Output('output-table-top-10-users-by-bytes', 'columns'), Output('output-table-top-10-users-by-bytes', 'data')],
+        [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
+    )
+    def update_top_10_users_by_bytes(filter_date, liikennemuoto):
+        table = figures.top_10_users_by_bytes(date=filter_date, liikennemuoto=liikennemuoto)
+        return table['columns'], table['data']
+
+    @dash_app.callback(
         Output('output-graph-pie-identified-users', 'figure'),
         [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
     )
@@ -157,7 +165,6 @@ def create_layout(dash_app, df, figures, logger):
                 ], width=7)
             ]),
 
-
             html.H2(children="Käyttäjätiedot", style=dict(paddingTop="1em")),
 
             dbc.Row(children=[
@@ -175,6 +182,15 @@ def create_layout(dash_app, df, figures, logger):
                         value=liikennemuoto_default_value,
                     ),
                 ], width=3)
+            ], style=dict(marginBottom="3em")),
+
+            dbc.Row(children=[
+                dbc.Col(children=[
+                    html.H4(children="Kyselyt"),
+                ], width=6, align='center'),
+                dbc.Col(children=[
+                    html.H4(children="Data"),
+                ], width=6, align='center'),
             ]),
 
             dbc.Row(children=[
@@ -192,10 +208,25 @@ def create_layout(dash_app, df, figures, logger):
                     )
                 ], width=6, align='center'),
                 dbc.Col(children=[
+                    dash_table.DataTable(
+                        id='output-table-top-10-users-by-bytes',
+                        style_cell=dict(textAlign='left'),
+                        css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
+                        style_header=dict(
+                            backgroundColor='black',
+                            color='white',
+                            fontWeight='bold',
+                        ),
+                        data=[]
+                    )
+                ], width=6, align='top'),
+            ]),
+
+            dbc.Row(children=[
+                dbc.Col(children=[
                     dcc.Graph(id='output-graph-pie-identified-users')
                 ], width=6, align='center'),
             ]),
-
 
             html.H2(children="Year-on-year tiedot", style=dict(paddingTop="1em")),
 

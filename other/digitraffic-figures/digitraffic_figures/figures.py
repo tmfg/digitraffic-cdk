@@ -148,6 +148,69 @@ class Figures:
 
         return table
 
+    def top_10_users_by_bytes(self, date=None, liikennemuoto=None):
+        df = self.df
+        start = time.time()
+
+        if date is None:
+            date = df['from'].unique().max()
+
+        if liikennemuoto is None:
+            liikennemuoto = 'kaikki'
+
+        if df[(df['from'] == date) & (df['name'] == 'Top 10 digitraffic-users by bytes')].empty:
+            return dict(
+                columns=[{"name": '<ei tietoja valitulta ajalta>'}],
+                data=[]
+            )
+
+        data = df[
+            (df['from'] == date) &
+            (df['name'] == 'Top 10 digitraffic-users by bytes') &
+            (df['liikennemuoto'] == liikennemuoto) &
+            (df['request_uri'] == '') &
+            (df['value'] != '{}')
+            ]['value'].item()
+
+        total_data = df[
+            (df['name'] == 'Bytes out') &
+            (df['liikennemuoto'] == liikennemuoto) &
+            (df['request_uri'] == '') &
+            (df['from'] == date)
+            ]['value'].item()
+
+        if isinstance(data, str):
+            data = json.loads(data)
+
+        dt = pd.DataFrame.from_dict(data, orient='index', columns=['Data (Tt)'])
+
+        dt = dt.sort_values(by='Data (Tt)', ascending=False)
+        dt = dt.reset_index()
+        dt.index += 1
+        dt = dt.reset_index()
+        dt.rename(columns={'index': 'Käyttäjä', 'level_0': ''}, inplace=True)
+        dt.loc[dt['Käyttäjä'] == '', ['Käyttäjä']] = '<tyhjä>'
+        dt.loc[dt['Käyttäjä'] == '__missing__', ['Käyttäjä']] = '<tietue puuttuu>'
+
+        dt['Data-%'] = dt['Data (Tt)'].apply(lambda x: "{} %".format(round(x / total_data * 100, 2)))
+        dt['Data (Tt)'] = dt['Data (Tt)'].apply(lambda x: "{}".format(round(x / TERA, 2)))
+
+        use_columns = [
+            '',
+            'Käyttäjä',
+            'Data (Tt)',
+            'Data-%',
+        ]
+
+        table = dict(
+            columns=[dict(name=i, id=i) for i in use_columns],
+            data=dt.loc[:, use_columns].to_dict('records')
+        )
+
+        self.logger.info(f'method=Figures.top_10_users_by_bytes took={time.time() - start}')
+
+        return table
+
     def __year_on_year(self, a_type, texts, liikennemuoto=None, rounding=None):
         df = self.df
         start = time.time()
