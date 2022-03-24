@@ -142,7 +142,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
         const trackings = await findAllTrackings(db, DOMAIN_1);
 
         expect(trackings.length).toEqual(1);
-        // As soure linestring is two equal point's -> it's invalid and it should not be saved
+        // As source linestring is two equal point's -> it's invalid and it should not be saved
         expect(trackings[0].line_string).toBeNull();
         Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[0],POINT_START[0], 0.000001);
         Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[1],POINT_START[1], 0.000001);
