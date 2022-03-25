@@ -1,10 +1,10 @@
-import {MaintenanceTrackingPaikanninSecret} from "../../model/maintenance-tracking-municipality-secret";
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
-import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
-import {TrackingSaveResult} from "../../model/tracking-save-result";
 import {PaikanninApi} from "../../api/paikannin";
-import {PaikanninUpdate} from "../../service/paikannin-update";
+import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
+import {MaintenanceTrackingPaikanninSecret} from "../../model/maintenance-tracking-municipality-secret";
+import {TrackingSaveResult} from "../../model/tracking-save-result";
 import * as CommonUpdate from "../../service/common-update";
+import {PaikanninUpdate} from "../../service/paikannin-update";
 
 const secretId = process.env.SECRET_ID as string;
 const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] as string;
@@ -17,6 +17,7 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingPaikan
         const start = Date.now();
 
         if (!paikanninUpdateService) {
+            console.info(`method=MaintenanceTrackingMunicipality.paikanninUpdateData domain=${domainName} lambda was cold`);
             await doWithSecret(secretId, (secret: MaintenanceTrackingPaikanninSecret) => {
                 const paikanninApi = new PaikanninApi(secret.apikey, secret.url);
                 paikanninUpdateService = new PaikanninUpdate(paikanninApi);

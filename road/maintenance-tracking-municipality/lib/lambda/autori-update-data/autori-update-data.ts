@@ -1,9 +1,9 @@
-import {MaintenanceTrackingAutoriSecret} from "../../model/maintenance-tracking-municipality-secret";
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
-import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
-import {AutoriUpdate} from "../../service/autori-update";
 import {AutoriApi} from "../../api/autori";
+import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
+import {MaintenanceTrackingAutoriSecret} from "../../model/maintenance-tracking-municipality-secret";
 import {TrackingSaveResult} from "../../model/tracking-save-result";
+import {AutoriUpdate} from "../../service/autori-update";
 import * as CommonUpdate from "../../service/common-update";
 
 const secretId = process.env.SECRET_ID as string;
@@ -17,6 +17,7 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingAutori
         const start = Date.now();
 
         if (!autoriUpdateService) {
+            console.info(`method=MaintenanceTrackingMunicipality.autoriUpdateData domain=${domainName} lambda was cold`);
             await doWithSecret(secretId, (secret: MaintenanceTrackingAutoriSecret) => {
                 const autoriApi = new AutoriApi(secret.username, secret.password, secret.url);
                 autoriUpdateService = new AutoriUpdate(autoriApi);
