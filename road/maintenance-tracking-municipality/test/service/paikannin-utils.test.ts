@@ -269,6 +269,19 @@ describe('paikannin-utils-service-test', () => {
 
     });
 
+    test('filterEventsWithoutTasks to empty', () => {
+        const taskMappings = [
+            // Map domain operations to harja tasks, one accepted and ignored
+            createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHING.name, true),
+        ];
+        const deviceWithAllIgnoredTasks: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, new Date(), createLineStringGeometry(10, 200), [PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_SALTING]);
+
+        const resultDevices = filterEventsWithoutTasks([deviceWithAllIgnoredTasks], taskMappings);
+        // Result should be empty as device doesn't have a single event with mapped or accepted task
+        expect(resultDevices.length).toEqual(0);
+    });
+
+
 });
 
 function assertContainsEvents(events: ApiWorkevent[], ioChannels: string[]) {

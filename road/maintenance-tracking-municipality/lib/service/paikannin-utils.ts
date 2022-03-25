@@ -28,7 +28,7 @@ export function filterEventsWithoutTasks(devices: ApiWorkeventDevice[], taskMapp
                     return result;
                 }),
         };
-    }).filter(device => device.workEvents);
+    }).filter(device => device.workEvents.length > 0);
 }
 
 
