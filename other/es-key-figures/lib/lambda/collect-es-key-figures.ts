@@ -1,5 +1,6 @@
 import * as AWSx from "aws-sdk";
 import {fetchDataFromEs} from "./es-query";
+import {esQueries} from "../es_queries"
 import axios from 'axios';
 
 const AWS = AWSx as any;
@@ -239,53 +240,10 @@ async function getApiPaths(): Promise<{ transportType: string, paths: Set<string
 }
 
 function getKeyFigures(): KeyFigure[] {
-    return [
-        {
-            'name': 'Http req',
-            'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
-            'type': 'count',
-        },
-        {
-            'name': 'Http req 200',
-            'query': '{"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:* AND @fields.status:200","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
-            'type': 'count',
-        },
-        {
-            'name': 'Bytes out',
-            'query': '{"aggs":{"agg":{"sum":{"field":"@fields.body_bytes_sent"}}},"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
-            'type': 'agg',
-        },
-        {
-            'name': 'Unique IPs',
-            'query': '{"aggs":{"agg":{"cardinality":{"field":"@fields.remote_addr.keyword"}}},"query":{"bool":{"must":[{"query_string":{"query":"NOT log_line:* AND @transport_type:*","analyze_wildcard":true,"time_zone":"Europe/Helsinki"}}],"filter":[{"range":{"@timestamp":{"gte":"START_TIME","lte":"END_TIME","format":"strict_date_optional_time"}}}]}}}',
-            'type': 'agg',
-        },
-        {
-            'name': 'Top 10 Referers',
-            'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_referrer.keyword", "order": { "_count": "desc" }, "missing": "__missing__", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
-            'type': 'field_agg',
-        },
-        {
-            'name': 'Top 10 digitraffic-users',
-            'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_digitraffic_user.keyword", "order": { "_count": "desc" }, "missing": "__missing__", "size": 10} } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
-            'type': 'field_agg',
-        },
-        {
-            'name': 'Top 10 digitraffic-users by bytes',
-            'query': '{ "aggs": { "agg": { "terms": { "field": "@fields.http_digitraffic_user.keyword", "order": { "agg": "desc" }, "missing": "__missing__", "size": 10 }, "aggs": { "agg": { "sum": { "field": "@fields.body_bytes_sent" } } } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
-            'type': 'sub_agg',
-        },
-        {
-            'name': 'Top 10 User Agents',
-            'query': '{"aggs": { "agg": { "terms": { "field": "@fields.http_user_agent.keyword", "order": { "_count": "desc" }, "missing": "__missing__", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
-            'type': 'field_agg',
-        },
-        {
-            'name': 'Top 10 IPs',
-            'query': '{"aggs": { "agg": { "terms": { "field": "@fields.remote_addr.keyword", "size": 10 } } }, "query": { "bool": { "must": [ { "query_string": { "query": "NOT log_line:* AND @transport_type:*", "analyze_wildcard": true, "time_zone": "Europe/Helsinki" } } ], "filter": [ { "range": { "@timestamp": { "gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time" } } } ] } } }',
-            'type': 'field_agg',
-        },
-    ];
+    return esQueries.map(entry => {
+            return {...entry, query: JSON.stringify(entry.query)}
+        }
+    )
 }
 
 export async function getPaths(endpointUrl: string): Promise<Set<string>> {
@@ -309,5 +267,5 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
 }
 
 function removeIllegalChars(bucketKey: string): string {
-    return bucketKey.split('"').join('').split("'").join('').split("\\").join("");
+    return bucketKey.replace(/["'\\]/g, "");
 }
