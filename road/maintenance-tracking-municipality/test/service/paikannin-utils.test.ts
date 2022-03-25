@@ -231,28 +231,41 @@ describe('paikannin-utils-service-test', () => {
 
     test('filterEventsWithoutTasks', () => {
         const taskMappings = [
-            // Map domain operations to harja tasks, map two operations to one task
+            // Map domain operations to harja tasks, one accepted and ignored
             createTaskMapping(DOMAIN_1, HARJA_BRUSHING, PAIKANNIN_OPERATION_BRUSHING.name, false),
             createTaskMapping(DOMAIN_1, HARJA_SALTING, PAIKANNIN_OPERATION_SALTING.name, true),
         ];
 
-        const device: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, new Date(), createLineStringGeometry(10, 200), [PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_SALTING]);
-        // Make every other event to be not mapped or ignored
-        device.workEvents.forEach((value, index) => {
+        const deviceWithIgnoredTasks: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, new Date(), createLineStringGeometry(10, 200), [PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_SALTING]);
+        const deviceWithAcceptedTasks: ApiWorkeventDevice = createApiRouteDataForEveryMinute(2, new Date(), createLineStringGeometry(10, 200), [PAIKANNIN_OPERATION_BRUSHING, PAIKANNIN_OPERATION_SALTING]);
+        // Make deviceWithIgnoredTasks every other event to be not mapped or ignored -> They should be filtered out
+        deviceWithIgnoredTasks.workEvents.forEach((value, index) => {
             if (index % 2 === 0) { // index is even
+                // clear ioChannels and replace with ignored and not mapped values
                 value.ioChannels.splice(0, value.ioChannels.length);
                 value.ioChannels.push(...[PAIKANNIN_OPERATION_SALTING, PAIKANNIN_OPERATION_PAVING]);
             }
         });
 
-        const resultDevice = filterEventsWithoutTasks([device], taskMappings)[0];
+        const resultDevices = filterEventsWithoutTasks([deviceWithIgnoredTasks, deviceWithAcceptedTasks], taskMappings);
+        expect(resultDevices.length).toEqual(2);
 
-        expect(resultDevice.deviceId).toEqual(device.deviceId);
-        expect(resultDevice.deviceName).toEqual(device.deviceName);
-        expect(resultDevice.workEvents.length).toEqual(device.workEvents.length/2);
-        resultDevice.workEvents.forEach(we => expect(we.ioChannels[0].name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name));
+        // deviceWithIgnoredTasks has reduced workEvents as events without valid tasks has been filtered out
+        const resultDeviceWithFilteredEvents = resultDevices[0];
+        expect(resultDeviceWithFilteredEvents.deviceId).toEqual(deviceWithIgnoredTasks.deviceId);
+        expect(resultDeviceWithFilteredEvents.deviceName).toEqual(deviceWithIgnoredTasks.deviceName);
+        expect(resultDeviceWithFilteredEvents.workEvents.length).toEqual(deviceWithIgnoredTasks.workEvents.length/2);
+        resultDeviceWithFilteredEvents.workEvents.forEach(we => expect(we.ioChannels[0].name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name));
 
-
+        // deviceWithAcceptedTasks has all events untouched
+        const resultDeviceWithAcceptedTasks = resultDevices[1];
+        expect(resultDeviceWithAcceptedTasks.deviceId).toEqual(deviceWithAcceptedTasks.deviceId);
+        expect(resultDeviceWithAcceptedTasks.deviceName).toEqual(deviceWithAcceptedTasks.deviceName);
+        expect(resultDeviceWithAcceptedTasks.workEvents.length).toEqual(deviceWithAcceptedTasks.workEvents.length);
+        resultDeviceWithAcceptedTasks.workEvents.forEach(we => {
+            expect(we.ioChannels[0].name).toEqual(PAIKANNIN_OPERATION_BRUSHING.name);
+            expect(we.ioChannels[1].name).toEqual(PAIKANNIN_OPERATION_SALTING.name);
+        });
 
     });
 

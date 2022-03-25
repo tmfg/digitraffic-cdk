@@ -7,7 +7,7 @@ describe('CommonDateUtilsTest', () => {
 
     test('dateFromIsoString', () => {
         const parsed = CommonDateUtils.dateFromIsoString(ISO);
-        expect(parsed?.toISOString()).toEqual(ISO);
+        expect(parsed.toISOString()).toEqual(ISO);
     });
 
     test('dateFromIsoString fails', () => {

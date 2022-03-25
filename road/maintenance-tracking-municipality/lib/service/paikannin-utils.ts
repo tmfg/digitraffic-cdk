@@ -15,26 +15,20 @@ import * as Utils from "./utils";
  */
 export function filterEventsWithoutTasks(devices: ApiWorkeventDevice[], taskMappings: DbDomainTaskMapping[]): ApiWorkeventDevice[] {
 
-    const filteredDevicesEvents: ApiWorkeventDevice[] = [];
-
-    devices.forEach(device => {
-
-        const newWorkEvents: ApiWorkevent[] = device.workEvents.filter(we => {
-            const result = hasValidOperations(we.ioChannels, taskMappings);
-            if (!result) {
-                console.info(`method=PaikanninUtils.filterEventsWithoutTasks ${JSON.stringify(we.ioChannels)}`);
-            }
-            return result;
-        });
-        if (newWorkEvents) {
-            filteredDevicesEvents.push({
-                deviceId: device.deviceId,
-                deviceName: device.deviceName,
-                workEvents: newWorkEvents,
-            });
-        }
-    });
-    return filteredDevicesEvents;
+    return devices.map(device => {
+        return {
+            deviceId: device.deviceId,
+            deviceName: device.deviceName,
+            workEvents: device.workEvents
+                .filter(we => {
+                    const result = hasValidOperations(we.ioChannels, taskMappings);
+                    if (!result) {
+                        console.info(`method=PaikanninUtils.filterEventsWithoutTasks ${JSON.stringify(we.ioChannels)}`);
+                    }
+                    return result;
+                }),
+        };
+    }).filter(device => device.workEvents);
 }
 
 
