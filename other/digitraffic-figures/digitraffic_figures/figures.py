@@ -92,9 +92,8 @@ class Figures:
 
         return table
 
-    def top_10_users(self, date=None, liikennemuoto=None):
+    def top_users_table(self, query, comparison_query, sort_by_column, percentage_column, date=None, liikennemuoto=None):
         df = self.df
-        start = time.time()
 
         if date is None:
             date = df['from'].unique().max()
@@ -102,78 +101,22 @@ class Figures:
         if liikennemuoto is None:
             liikennemuoto = 'kaikki'
 
-        data = df[
-            (df['from'] == date) &
-            (df['name'] == 'Top 10 digitraffic-users') &
-            (df['liikennemuoto'] == liikennemuoto) &
-            (df['request_uri'] == '') &
-            (df['value'] != '{}')
-        ]['value'].item()
-
-        total_requests = df[
-            (df['name'] == 'Http req') &
-            (df['liikennemuoto'] == liikennemuoto) &
-            (df['request_uri'] == '') &
-            (df['from'] == date)
-        ]['value'].item()
-
-        if isinstance(data, str):
-            data = json.loads(data)
-
-        dt = pd.DataFrame.from_dict(data, orient='index', columns=['Kyselymäärä'])
-
-        dt = dt.sort_values(by='Kyselymäärä', ascending=False)
-        dt = dt.reset_index()
-        dt.index += 1
-        dt = dt.reset_index()
-        dt.rename(columns={'index': 'Käyttäjä', 'level_0': ''}, inplace=True)
-        dt.loc[dt['Käyttäjä'] == '', ['Käyttäjä']] = '<tyhjä>'
-        dt.loc[dt['Käyttäjä'] == '__missing__', ['Käyttäjä']] = '<tietue puuttuu>'
-
-        dt['Kyselymäärä-%'] = dt['Kyselymäärä'].apply(lambda x: "{} %".format(round(x/total_requests * 100, 2)))
-
-        use_columns = [
-            '',
-            'Käyttäjä',
-            'Kyselymäärä',
-            'Kyselymäärä-%',
-        ]
-
-        table = dict(
-            columns=[dict(name=i, id=i) for i in use_columns],
-            data=dt.loc[:, use_columns].to_dict('records')
-        )
-
-        self.logger.info(f'method=Figures.top_10_users took={time.time()-start}')
-
-        return table
-
-    def top_10_users_by_bytes(self, date=None, liikennemuoto=None):
-        df = self.df
-        start = time.time()
-
-        if date is None:
-            date = df['from'].unique().max()
-
-        if liikennemuoto is None:
-            liikennemuoto = 'kaikki'
-
-        if df[(df['from'] == date) & (df['name'] == 'Top 10 digitraffic-users by bytes')].empty:
+        if df[(df['from'] == date) & (df['name'] == query)].empty:
             return dict(
-                columns=[{"name": '<ei tietoja valitulta ajalta>'}],
+                columns=[{'name': '<ei tietoja valitulta ajalta>'}],
                 data=[]
             )
 
         data = df[
             (df['from'] == date) &
-            (df['name'] == 'Top 10 digitraffic-users by bytes') &
+            (df['name'] == query) &
             (df['liikennemuoto'] == liikennemuoto) &
             (df['request_uri'] == '') &
             (df['value'] != '{}')
             ]['value'].item()
 
-        total_data = df[
-            (df['name'] == 'Bytes out') &
+        total_amount = df[
+            (df['name'] == comparison_query) &
             (df['liikennemuoto'] == liikennemuoto) &
             (df['request_uri'] == '') &
             (df['from'] == date)
@@ -182,9 +125,9 @@ class Figures:
         if isinstance(data, str):
             data = json.loads(data)
 
-        dt = pd.DataFrame.from_dict(data, orient='index', columns=['Data (Tt)'])
+        dt = pd.DataFrame.from_dict(data, orient='index', columns=[sort_by_column])
 
-        dt = dt.sort_values(by='Data (Tt)', ascending=False)
+        dt = dt.sort_values(by=sort_by_column, ascending=False)
         dt = dt.reset_index()
         dt.index += 1
         dt = dt.reset_index()
@@ -192,22 +135,64 @@ class Figures:
         dt.loc[dt['Käyttäjä'] == '', ['Käyttäjä']] = '<tyhjä>'
         dt.loc[dt['Käyttäjä'] == '__missing__', ['Käyttäjä']] = '<tietue puuttuu>'
 
-        dt['Data-%'] = dt['Data (Tt)'].apply(lambda x: "{} %".format(round(x / total_data * 100, 2)))
-        dt['Data (Tt)'] = dt['Data (Tt)'].apply(lambda x: "{}".format(round(x / TERA, 2)))
+        dt[percentage_column] = dt[sort_by_column].apply(lambda x: "{} %".format(round(x/total_amount * 100, 2)))
 
-        use_columns = [
+        columns = [
             '',
             'Käyttäjä',
-            'Data (Tt)',
-            'Data-%',
+            sort_by_column,
+            percentage_column,
         ]
 
+        return dict(dt=dt, columns=columns)
+
+    def top_10_users_req(self, date=None, liikennemuoto=None):
+        start = time.time()
+
+        primary_value = 'Kyselymäärä'
+
+        table_data = self.top_users_table(query='Top 10 digitraffic-users',
+                                          comparison_query='Http req',
+                                          sort_by_column=primary_value,
+                                          percentage_column='Kyselymäärä-%',
+                                          date=date,
+                                          liikennemuoto=liikennemuoto)
+
+        if 'dt' not in table_data:
+            return table_data
+
         table = dict(
-            columns=[dict(name=i, id=i) for i in use_columns],
-            data=dt.loc[:, use_columns].to_dict('records')
+            columns=[dict(name=i, id=i) for i in table_data['columns']],
+            data=table_data['dt'].loc[:, table_data['columns']].to_dict('records')
         )
 
-        self.logger.info(f'method=Figures.top_10_users_by_bytes took={time.time() - start}')
+        self.logger.info(f'method=Figures.top_10_users_req took={time.time()-start}')
+
+        return table
+
+    def top_10_users_data(self, date=None, liikennemuoto=None):
+        start = time.time()
+
+        primary_value = 'Data (Tt)'
+
+        table_data = self.top_users_table(query='Top 10 digitraffic-users by bytes',
+                                          comparison_query='Bytes out',
+                                          sort_by_column=primary_value,
+                                          percentage_column='Data-%',
+                                          date=date,
+                                          liikennemuoto=liikennemuoto)
+
+        if 'dt' not in table_data:
+            return table_data
+
+        table_data['dt'][primary_value] = table_data['dt'][primary_value].apply(lambda x: "{}".format(round(x / TERA, 2)))
+
+        table = dict(
+            columns=[dict(name=i, id=i) for i in table_data['columns']],
+            data=table_data['dt'].loc[:, table_data['columns']].to_dict('records')
+        )
+
+        self.logger.info(f'method=Figures.top_10_users_data took={time.time() - start}')
 
         return table
 
@@ -275,7 +260,7 @@ class Figures:
 
         return self.__year_on_year('Http req', texts, liikennemuoto=liikennemuoto)
 
-    def identified_users(self, date=None, liikennemuoto=None):
+    def identified_users(self, query, comparison_query, date=None, liikennemuoto=None):
         df = self.df
         start = time.time()
 
@@ -286,17 +271,17 @@ class Figures:
             liikennemuoto = 'kaikki'
 
         # Haetaan tunnistamattomat käyttäjät
-        user_data = df[(df['name'] == 'Top 10 digitraffic-users') & (df['liikennemuoto'] == liikennemuoto) & (df['request_uri'] == '') & (df['value'] != '{}')]
+        user_data = df[(df['name'] == query) & (df['liikennemuoto'] == liikennemuoto) & (df['request_uri'] == '') & (df['value'] != '{}')]
         user_data = user_data.set_index('from')
         user_data['unidentified'] = user_data['value'].apply(parse_unidentified)
 
-        # Haetaan kyselyiden määrä yhteensä
-        all_requests = df[(df['name'] == 'Http req') & (df['liikennemuoto'] == liikennemuoto) & (df['request_uri'] == '')]
+        # Haetaan käsitellyn arvon määrä yhteensä
+        all_requests = df[(df['name'] == comparison_query) & (df['liikennemuoto'] == liikennemuoto) & (df['request_uri'] == '')]
         all_requests = all_requests.set_index('from')
         all_requests['all'] = all_requests['value']
         all_requests = all_requests[['aikaleima', 'all']]
 
-        # yhdistetään kyselyiden kokonaismäärä ja tunnistamattomat sekä lasketaan tunnistettujen määrä (kaikki - tunnistamattomat)
+        # yhdistetään kokonaismäärä ja tunnistamattomat sekä lasketaan tunnistettujen määrä (kaikki - tunnistamattomat)
         dff = pd.concat([user_data, all_requests], axis=1)
         dff['identified'] = dff['all'] - dff['unidentified']
         dff = dff.dropna()
@@ -304,6 +289,8 @@ class Figures:
 
         # haetaan viimeisimmän kuukauden tiedot piirakkaa varten
         data = dff[user_data['aikaleima'] == date].reset_index()[['identified', 'unidentified', 'change_in_time']]
+        if data.empty:
+            return {}
         change_in_time = data['change_in_time'].item()
         data = data[['identified', 'unidentified']]
         data = data.iloc[0].to_dict()

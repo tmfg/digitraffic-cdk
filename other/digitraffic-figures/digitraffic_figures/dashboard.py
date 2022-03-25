@@ -46,27 +46,40 @@ def init_callbacks(dash_app, df, figures, logger):
         return f'Keskimääräinen kasvuvauhti valitulla ajanjaksolla: {value} %'
 
     @dash_app.callback(
-        [Output('output-table-top-10-users', 'columns'), Output('output-table-top-10-users', 'data')],
+        [Output('output-table-top-10-users-req', 'columns'), Output('output-table-top-10-users-req', 'data')],
         [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
     )
-    def update_top_10_users(filter_date, liikennemuoto):
-        table = figures.top_10_users(date=filter_date, liikennemuoto=liikennemuoto)
+    def update_top_10_users_req(filter_date, liikennemuoto):
+        table = figures.top_10_users_req(date=filter_date, liikennemuoto=liikennemuoto)
         return table['columns'], table['data']
 
     @dash_app.callback(
-        [Output('output-table-top-10-users-by-bytes', 'columns'), Output('output-table-top-10-users-by-bytes', 'data')],
+        [Output('output-table-top-10-users-data', 'columns'), Output('output-table-top-10-users-data', 'data')],
         [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
     )
-    def update_top_10_users_by_bytes(filter_date, liikennemuoto):
-        table = figures.top_10_users_by_bytes(date=filter_date, liikennemuoto=liikennemuoto)
+    def update_top_10_users_data(filter_date, liikennemuoto):
+        table = figures.top_10_users_data(date=filter_date, liikennemuoto=liikennemuoto)
         return table['columns'], table['data']
 
     @dash_app.callback(
-        Output('output-graph-pie-identified-users', 'figure'),
+        Output('output-graph-pie-identified-users-req', 'figure'),
         [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
     )
-    def update_identified_users(filter_date, liikennemuoto):
-        return figures.identified_users(date=filter_date, liikennemuoto=liikennemuoto)
+    def update_identified_users_req(filter_date, liikennemuoto):
+        return figures.identified_users(query='Top 10 digitraffic-users',
+                                        comparison_query='Http req',
+                                        date=filter_date,
+                                        liikennemuoto=liikennemuoto)
+
+    @dash_app.callback(
+            Output('output-graph-pie-identified-users-data', 'figure'),
+            [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
+        )
+    def update_identified_users_data(filter_date, liikennemuoto):
+        return figures.identified_users(query='Top 10 digitraffic-users by bytes',
+                                       comparison_query='Bytes out',
+                                       date=filter_date,
+                                       liikennemuoto=liikennemuoto)
 
     @dash_app.callback(
         Output('output-graph-data-year-on-year', 'figure'),
@@ -182,21 +195,33 @@ def create_layout(dash_app, df, figures, logger):
                         value=liikennemuoto_default_value,
                     ),
                 ], width=3)
-            ], style=dict(marginBottom="3em")),
+            ], style=dict(marginBottom="1em")),
 
             dbc.Row(children=[
                 dbc.Col(children=[
                     html.H4(children="Kyselyt"),
+                    dash_table.DataTable(
+                        id='output-table-top-10-users-req',
+                        style_cell=dict(textAlign='left'),
+                        css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
+                        style_header=dict(
+                            backgroundColor='black',
+                            color='white',
+                            fontWeight='bold',
+                        ),
+                        data=[]
+                    )
                 ], width=6, align='center'),
+                dbc.Col(children=[
+                    dcc.Graph(id='output-graph-pie-identified-users-req')
+                ], width=6, align='center'),
+            ]),
+
+            dbc.Row(children=[
                 dbc.Col(children=[
                     html.H4(children="Data"),
-                ], width=6, align='center'),
-            ]),
-
-            dbc.Row(children=[
-                dbc.Col(children=[
                     dash_table.DataTable(
-                        id='output-table-top-10-users',
+                        id='output-table-top-10-users-data',
                         style_cell=dict(textAlign='left'),
                         css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
                         style_header=dict(
@@ -208,23 +233,7 @@ def create_layout(dash_app, df, figures, logger):
                     )
                 ], width=6, align='center'),
                 dbc.Col(children=[
-                    dash_table.DataTable(
-                        id='output-table-top-10-users-by-bytes',
-                        style_cell=dict(textAlign='left'),
-                        css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
-                        style_header=dict(
-                            backgroundColor='black',
-                            color='white',
-                            fontWeight='bold',
-                        ),
-                        data=[]
-                    )
-                ], width=6, align='top'),
-            ]),
-
-            dbc.Row(children=[
-                dbc.Col(children=[
-                    dcc.Graph(id='output-graph-pie-identified-users')
+                    dcc.Graph(id='output-graph-pie-identified-users-data')
                 ], width=6, align='center'),
             ]),
 
