@@ -1,10 +1,9 @@
-import {MarwisData, convertMarwis} from '../../lib/sensors/marwis';
-import {TeconerData, convertTeconer} from '../../lib/sensors/teconer';
-import {SensorDataPoint} from '../../lib/sensors/sensor';
+import {convertMarwis, MarwisData} from "../../lib/sensors/marwis";
+import {SensorDataPoint} from "../../lib/sensors/sensor";
+import {convertTeconer, TeconerData} from "../../lib/sensors/teconer";
 
-describe("road network condition tests", () => {
-    test("Marwis should have a function to normalize data", () => {
-describe("Road network condition", () => {
+describe("Sensors", () => {
+
     it("should convert data from marwis sensor to normalized form", () => {
         const marwisData: MarwisData = {
             Friction: [{ ts: 1646744459709, value: "0.46989601850509644" }, { ts: 1646744458690, value: "0.4712735116481781" }],
@@ -25,6 +24,7 @@ describe("Road network condition", () => {
     });
 
     it("should convert data from teconer sensor to normalized form", () => {
+        // const rawData: string = await fs.readFile(TECONER_SMALL_SAMPLE, { encoding: "utf-8" });
         const teconerData: TeconerData = {
             Friction: [{ ts: 1646744459709, value: "0.46989601850509644" }, { ts: 1646744458690, value: "0.4712735116481781" }],
             State: [{ ts: 1646744459709, value: "4" }, { ts: 1646744458690, value: "4" }],

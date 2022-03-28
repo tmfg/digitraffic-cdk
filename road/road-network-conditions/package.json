@@ -28,8 +28,14 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@types/geojson": "^7946.0.7",
+    "@types/ramda": "^0.28.2",
     "aws-cdk-lib": "*",
-    "digitraffic-common": "*"
+    "axios": "^0.26.1",
+    "digitraffic-common": "*",
+    "pg-native": "^3.0.0",
+    "pg-promise": "^10.11.1",
+    "ramda": "^0.28.0"
   },
   "externals": [
     "aws-sdk"
