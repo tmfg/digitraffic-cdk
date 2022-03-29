@@ -61,9 +61,93 @@ describe("Road network condition service", dbTestBase((db: DTDatabase) => {
 
         (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
 
-        return rcs.getDevices("", "")
+        return rcs.getDevicesFeatureCollection("", "")
             .then(d => expect(d).toEqual(expected))
             .then(() => expect(axios.get).toHaveBeenCalledWith(`/keli/laitetiedot?authKey=`));
+    });
+
+    it("should combine alarm, alarm types and device information", () => {
+        const devices = {
+            devices: [
+                {
+                    deviceId: "1000108",
+                    deviceName: "IRS - Vesijärvenkatu 9",
+                    deviceType: "IRS",
+                    coordinates: {latitude: 60.982431, longitude: 25.661484},
+                },
+            ],
+        };
+        const alarmTypes = {
+            alarmTypes: [
+                {alarmId: 1, alarmText: "Tienpinta pakkaselle"},
+                {alarmId: 2, alarmText: "Lumi alkaa kertyä tienpinnalle"},
+                {alarmId: 3, alarmText: "Kitkahälytys"},
+            ],
+        };
+        const alarms = [
+            {
+                created: "2022-01-17 10:36:00",
+                station: "1000108",
+                alarm: "1",
+            },
+            {
+                created: "2022-01-17 10:15:58",
+                station: "1000108",
+                alarm: "3",
+            },
+        ];
+
+        (axios.get as unknown as jest.Mock).mockImplementation((req) => {
+            const data =
+                req.includes("laitetiedot") ?
+                    devices :
+                    req.includes("halytykset") ?
+                        alarms :
+                        alarmTypes;
+
+            return Promise.resolve({
+                status: 200,
+                data,
+            });
+        });
+
+        const expected: FeatureCollection = {
+            type: "FeatureCollection",
+            features: [
+                {
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [60.982431, 25.661484],
+                    },
+                    properties: {
+                        created: "2022-01-17 10:36:00",
+                        alarmId: "1",
+                        alarmText: "Tienpinta pakkaselle",
+                        deviceId: "1000108",
+                        deviceName: "IRS - Vesijärvenkatu 9",
+                        deviceType: "IRS",
+                    },
+                },
+                {
+                    type: "Feature",
+                    geometry: {
+                        type: "Point",
+                        coordinates: [60.982431, 25.661484],
+                    },
+                    properties: {
+                        created: "2022-01-17 10:15:58",
+                        alarmId: "3",
+                        alarmText: "Kitkahälytys",
+                        deviceId: "1000108",
+                        deviceName: "IRS - Vesijärvenkatu 9",
+                        deviceType: "IRS",
+                    },
+                },
+            ],
+        };
+
+        expect(rcs.getFeatureCollection("", "")).resolves.toEqual(expected);
     });
 
     it ("should return error if api sends malformed data", () => {
@@ -82,7 +166,7 @@ describe("Road network condition service", dbTestBase((db: DTDatabase) => {
 
         (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
 
-        return expect(rcs.getDevices("", "")).rejects.toEqual(expected);
+        return expect(rcs.getDevicesFeatureCollection("", "")).rejects.toEqual(expected);
     });
 
     it("should fetch alarms", () => {
@@ -104,7 +188,7 @@ describe("Road network condition service", dbTestBase((db: DTDatabase) => {
             },
         ];
 
-        const expected = data.map(x => ({...x, alarm: parseInt(x.alarm, 10)}));
+        const expected = data;
 
         (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
 
@@ -138,7 +222,7 @@ describe("Road network condition service", dbTestBase((db: DTDatabase) => {
             ],
         };
 
-        const expected = data.alarmTypes;
+        const expected = data.alarmTypes.map(x => ({...x, alarmId: String(x.alarmId)}));
 
         (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
 

@@ -2,7 +2,7 @@
 export type Alarm = {
     readonly created: string;
     readonly station: string;
-    readonly alarm: number;
+    readonly alarm: string;
 }
 
 export type Alarms = ReadonlyArray<Alarm>
@@ -25,11 +25,7 @@ function alarmParser(x: unknown): Alarm {
             throw new Error("unable to parse alarm type");
         }
 
-        return {
-            created: maybeAlarm.created,
-            station: maybeAlarm.station,
-            alarm,
-        };
+        return maybeAlarm as Alarm;
     }
 
     throw new Error("unable to parse alarm");

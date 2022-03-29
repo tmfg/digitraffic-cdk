@@ -1,16 +1,16 @@
 
-type AlarmType = {
-    alarmId: number;
-    alarmText: string;
+export type AlarmType = {
+    readonly alarmId: string;
+    readonly alarmText: string;
 }
 
 type MaybeAlarmType = {
-    alarmId?: number;
-    alarmText?: string;
+    readonly alarmId?: number;
+    readonly alarmText?: string;
 }
 
 type MaybeAlarmTypes = {
-    alarmTypes?: Array<MaybeAlarmType>;
+    readonly alarmTypes?: Array<MaybeAlarmType>;
 }
 
 export type AlarmTypes = ReadonlyArray<AlarmType>;
@@ -20,7 +20,10 @@ function alarmTypeParser(x: unknown): AlarmType {
 
     if (('alarmId' in maybeAlarmType && typeof maybeAlarmType.alarmId === 'number') &&
         ('alarmText' in maybeAlarmType && typeof maybeAlarmType.alarmText === 'string')) {
-        return maybeAlarmType as AlarmType;
+        return {
+            alarmId: String(maybeAlarmType.alarmId),
+            alarmText: maybeAlarmType.alarmText,
+        };
     }
 
     throw new Error("unable to parse alarm type");
