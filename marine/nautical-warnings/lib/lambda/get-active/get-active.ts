@@ -1,15 +1,9 @@
-import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import * as NauticalWarningsService from "../../service/nautical-warnings";
-import {FeatureCollection} from "geojson";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 
-const secretId = process.env.SECRET_ID as string;
+const secretHolder = SecretHolder.create();
 
-export function handlerFn(doWithSecret: SecretFunction<DbSecret, void | FeatureCollection | null>) {
-    return doWithSecret(secretId, () => {
-        return NauticalWarningsService.getActiveWarnings();
-    });
-}
-
-export const handler = (): Promise<void | FeatureCollection | null> => {
-    return handlerFn(withDbSecret);
+export const handler = () => {
+    return secretHolder.setDatabaseCredentials()
+        .then(() => NauticalWarningsService.getActiveWarnings());
 };
