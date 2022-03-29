@@ -31,7 +31,7 @@ export class PublicApi {
 
     createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
-        const csResource = apiResource.addResource("nautical-warnings");
+        const csResource = apiResource.addResource("nautical-warning");
         const betaResource = csResource.addResource("beta");
         this.activeResource = betaResource.addResource("active");
         this.archivedResource = betaResource.addResource("archived");

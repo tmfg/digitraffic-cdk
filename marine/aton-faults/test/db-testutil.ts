@@ -40,6 +40,10 @@ function truncate(db: DTDatabase): Promise<null[]> {
     });
 }
 
+export function assertFaultCount(db: DTDatabase, count: number) {
+    db.one('select count(*) from aton_fault').then(x => expect(x.count).toEqual(count));
+}
+
 export function insert(db: DTDatabase, faults: DbFault[]): Promise<null[]> {
     return db.tx(t => {
         return t.batch(faults.map((f: DbFault): Promise<null> => {

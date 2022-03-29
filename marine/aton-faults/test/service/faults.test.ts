@@ -1,4 +1,5 @@
-import {FaultProps, findAllFaults, getFaultS124ById, saveFaults} from "../../lib/service/faults";
+import {FaultProps} from "../../lib/service/faults";
+import * as FaultsService from "../../lib/service/faults";
 import {newFault} from "../testdata";
 import {dbTestBase, insert, validateS124} from "../db-testutil";
 import {Language} from "digitraffic-common/types/language";
@@ -10,7 +11,7 @@ jest.setTimeout(30000);
 describe('faults', dbTestBase((db: DTDatabase) => {
 
     test('getFaults124ById - not found', async () => {
-        const nullFault = await getFaultS124ById(db, 666);
+        const nullFault = await FaultsService.getFaultS124ById(db, 666);
         expect(nullFault).toBeNull();
     });
 
@@ -23,7 +24,7 @@ describe('faults', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [fault]);
 
-        const faultS124 = await getFaultS124ById(db, fault.id);
+        const faultS124 = await FaultsService.getFaultS124ById(db, fault.id);
 
         if (!faultS124) {
             throw new Error('empty');
@@ -38,7 +39,7 @@ describe('faults', dbTestBase((db: DTDatabase) => {
         const fault = newFault();
         await insert(db, [fault]);
 
-        const faults = await findAllFaults(Language.FI, 10);
+        const faults = await FaultsService.findAllFaults(Language.FI, 10);
 
         expect(faults.features.length).toBe(1);
         const props = faults.features[0].properties as FaultProps;
@@ -53,9 +54,4 @@ describe('faults', dbTestBase((db: DTDatabase) => {
         expect(props.type).toBe(fault.aton_fault_type);
         expect(props.aton_type).toBe(fault.aton_type);
     });
-
-    test('saveFaults - empty', async () => {
-        await saveFaults('C_NA', []);
-    });
-
 }));

@@ -1,7 +1,7 @@
 import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import * as FaultsDB from "../db/faults";
 import * as S124Converter from "./s124-converter";
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
 import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
@@ -9,6 +9,8 @@ import {Feature, FeatureCollection, GeometryObject} from "geojson";
 import {createFeatureCollection} from "digitraffic-common/utils/geometry";
 import {Language} from "digitraffic-common/types/language";
 import {DbFault} from "../model/fault";
+
+export const ATON_DATA_TYPE = "ATON_FAULTS";
 
 export type FaultProps = {
     readonly id: number
@@ -39,8 +41,6 @@ export type FaultProps = {
     // eslint-disable-next-line camelcase
     readonly area_description: string
 }
-
-const ATON_DATA_TYPE = "ATON_FAULTS";
 
 export function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
@@ -77,23 +77,6 @@ export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
     });
     console.info("method=findFaultIdsForVoyagePlan tookMs=%d count=%d", Date.now() - start, faultIds.length);
     return faultIds;
-}
-
-export function saveFaults(domain: string, newFaults: Feature[]) {
-    const start = Date.now();
-    const validated = newFaults.filter(validate);
-
-    return inDatabase((db: DTDatabase) => {
-        return db.tx(t => {
-            return t.batch([
-                ...FaultsDB.updateFaults(db, domain, validated),
-                LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start)),
-            ]);
-        });
-    }).finally(() => {
-        const end = Date.now();
-        console.info("method=saveFaults updatedCount=%d tookMs=%d", newFaults.length, (end - start));
-    });
 }
 
 function convertFeature(fault: DbFault): Feature {
@@ -135,8 +118,4 @@ function convertFeature(fault: DbFault): Feature {
         properties: properties,
         geometry: <GeometryObject> geometry,
     };
-}
-
-function validate(fault: Feature): boolean {
-    return fault.properties?.FAULT_TYPE !== 'Kirjattu';
 }
