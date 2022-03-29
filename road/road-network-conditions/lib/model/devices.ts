@@ -1,3 +1,4 @@
+import * as R from "ramda";
 
 export type Coordinates = {
     latitude: number;
@@ -38,7 +39,12 @@ function deviceParser(x: unknown): Device {
             ("deviceName" in maybeDevice && typeof maybeDevice.deviceName === "string") &&
             ("deviceType" in maybeDevice && typeof maybeDevice.deviceType === "string")) {
 
-            return maybeDevice as Device;
+            const coordinates = R.pick(["latitude", "longitude"], maybeCoordinates) as Coordinates;
+
+            return {
+                coordinates,
+                ...R.pick(["deviceId", "deviceName", "deviceType"], maybeDevice),
+            } as Device;
         }
     }
 

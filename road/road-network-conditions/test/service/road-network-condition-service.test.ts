@@ -4,7 +4,7 @@ import * as rcs from "../../lib/service/road-network-conditions-service";
 import {FeatureCollection} from "geojson";
 import {findAlarmTypes, insertAlarmTypes} from "../../lib/db/alarms";
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
-import {AlarmTypes} from "../../lib/model/road-condition-alarm-types";
+import {AlarmTypes} from "../../lib/model/alarm-types";
 import {dbTestBase} from "../db-testutil";
 
 jest.mock('axios');

@@ -1,3 +1,4 @@
+import * as R from "ramda";
 
 export type Alarm = {
     readonly created: string;
@@ -25,7 +26,7 @@ function alarmParser(x: unknown): Alarm {
             throw new Error("unable to parse alarm type");
         }
 
-        return maybeAlarm as Alarm;
+        return R.pick(["created", "station", "alarm"], maybeAlarm) as Alarm;
     }
 
     throw new Error("unable to parse alarm");

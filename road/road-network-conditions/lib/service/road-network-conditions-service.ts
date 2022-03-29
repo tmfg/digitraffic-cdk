@@ -2,9 +2,9 @@ import {Feature, FeatureCollection} from "geojson";
 import * as R from "ramda";
 
 import {RoadConditionApi} from "../api/road-condition";
-import {Coordinates, Device, Devices} from "../model/road-condition-devices";
-import {Alarm, Alarms} from "../model/road-condition-alarms";
-import {AlarmType, AlarmTypes} from "../model/road-condition-alarm-types";
+import {Coordinates, Device, Devices} from "../model/devices";
+import {Alarm, Alarms} from "../model/alarms";
+import {AlarmType, AlarmTypes} from "../model/alarm-types";
 
 
 function makeFeatureCollection(xs: Array<Feature>): FeatureCollection {

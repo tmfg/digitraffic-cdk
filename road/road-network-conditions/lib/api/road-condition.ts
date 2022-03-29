@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {Devices, devicesParser} from "../model/road-condition-devices";
-import {Alarms, alarmsParser} from "../model/road-condition-alarms";
-import {alarmTypesParser, AlarmTypes} from "../model/road-condition-alarm-types";
+import {Devices, devicesParser} from "../model/devices";
+import {Alarms, alarmsParser} from "../model/alarms";
+import {alarmTypesParser, AlarmTypes} from "../model/alarm-types";
 
 export class RoadConditionApi {
     readonly authKey: string;
