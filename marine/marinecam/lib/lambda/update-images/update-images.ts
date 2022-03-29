@@ -1,39 +1,24 @@
-import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import * as ImageFetcher from "../../service/image-fetcher";
-import {MarinecamEnvKeys, MarinecamSecretKeys} from "../../keys";
-import {GenericSecret} from "digitraffic-common/aws/runtime/secrets/secret";
+import {MarinecamEnvKeys} from "../../keys";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {MarinecamSecret} from "../../model/secret";
 
-const secretId = process.env.SECRET_ID as string;
+const secretHolder = SecretHolder.create<MarinecamSecret>('mobile_server');
 const bucketName = process.env[MarinecamEnvKeys.BUCKET_NAME] as string;
 
-let imageServerUrl: string;
-let imageServerUsername: string;
-let imageServerPassword: string;
-let imageServerCertificate: string;
+export const handler = async () => {
+    return secretHolder.setDatabaseCredentials()
+        .then(() => secretHolder.get())
+        .then((secret: MarinecamSecret) => {
+            console.info("updating images from " + secret.url);
 
-export function handlerFn(doWithSecret: SecretFunction<GenericSecret>) {
-    return async () => {
-        if (!imageServerUrl) {
-            await doWithSecret(secretId, (secret: GenericSecret) => {
-                imageServerUrl = secret[MarinecamSecretKeys.IMAGE_SERVER_URL];
-                imageServerUsername = secret[MarinecamSecretKeys.IMAGE_SERVER_USERNAME];
-                imageServerPassword = secret[MarinecamSecretKeys.IMAGE_SERVER_PASSWORD];
-                imageServerCertificate = secret[MarinecamSecretKeys.IMAGE_SERVER_CERTIFICATE];
-            });
-        }
-
-        console.info("updating images from " + imageServerUrl);
-
-        try {
             return ImageFetcher.updateAllCameras(
-                imageServerUrl, imageServerUsername, imageServerPassword, bucketName, imageServerCertificate,
+                secret.url, secret.username, secret.password, bucketName, secret.certificate,
             );
-        } catch (error) {
+        })
+        .catch(error => {
             console.log("updateAllCameras failed with %s", error);
 
             return Promise.resolve();
-        }
-    };
-}
-
-export const handler = handlerFn(withDbSecret);
+        });
+};

@@ -15,7 +15,7 @@ export class MarinecamStack extends DigitrafficStack {
         InternalLambas.create(this, bucket);
         const privateApi = new PrivateApi(this, bucket);
 
-        new Canaries(this, privateApi.publicApi);
+        new Canaries(this, privateApi.restApi);
     }
 }
 
