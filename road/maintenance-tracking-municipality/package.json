@@ -1,0 +1,49 @@
+{
+  "name": "maintenance-tracking-municipality",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
+    "compile-canaries": "../../scripts/check-ts-files-exists-and-run.sh 'lib/canaries' 'esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node14'",
+    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
+    "watch": "tsc -w",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
+    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
+    "cdk": "cdk",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
+    "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
+    "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
+    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy",
+    "cdk-synth-road-test": "cdk synth MaintenanceTrackingMunicipalityRoadTest --no-staging > template-road-test.yaml",
+    "cdk-synth-road-prod": "cdk synth MaintenanceTrackingMunicipalityRoadProd --no-staging > template-road-prod.yaml"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "*",
+    "@types/aws-lambda": "*",
+    "@types/jest": "^26.0.22",
+    "@types/node": "*",
+    "@types/sinon": "^10.0.0",
+    "esbuild": "*",
+    "eslint": "*",
+    "jest": "^27.0.6",
+    "jest-junit": "^13.0.0",
+    "parallelshell": "3.0.1",
+    "sinon": "^11.1.2",
+    "ts-jest": "^27.0.4",
+    "typescript": "^4.1.3"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "*",
+    "axios": "^0.21.1",
+    "digitraffic-common": "*",
+    "pg-native": "*",
+    "pg-promise": "*"
+  },
+  "externals": [
+    "aws-sdk"
+  ]
+}

@@ -1,5 +1,5 @@
 {
-  "extends": "../tsconfig.json",
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "declaration": false,
     "strict": true,
@@ -17,10 +17,11 @@
     "experimentalDecorators": true,
     "strictPropertyInitialization":false,
     "typeRoots": [
-      "../node_modules/@types"
+      "./node_modules/@types",
+      "../../node_modules/@types"
     ],
     "esModuleInterop": true,
     "moduleResolution": "node",
-    "preserveSymlinks": true,
+    "preserveSymlinks": true
   }
 }

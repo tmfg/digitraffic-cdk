@@ -21,4 +21,9 @@ docker build -t eslint .
 docker run -v $(pwd):/data eslint
 ```
 
-Output of eslint in docker is written to file _eslint.html_. 
+Output of eslint in docker is written to file _eslint.html_.
+
+
+find . -name tsd -type d -exec rm -rf {} \;
+tai 
+find . -name tsd -type d -delete;

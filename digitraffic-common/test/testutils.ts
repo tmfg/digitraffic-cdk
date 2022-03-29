@@ -7,7 +7,7 @@ export function getRandomNumber(min: number , max: number) : number {
 }
 
 export function getRandomNumberAsString(min: number , max: number) : string {
-    return (Math.random() * (max - min) + min).toString();
+    return getRandomNumber(min, max).toString();
 }
 
 export function getRandomInteger(min: number , max: number) : number {
@@ -16,6 +16,10 @@ export function getRandomInteger(min: number , max: number) : number {
 
 export function getRandomIntegerAsString(min: number , max: number) : string {
     return Math.round(getRandomInteger(min, max)).toString();
+}
+
+export function getRandomBigInt(min: number , max: number) : bigint {
+    return BigInt(getRandomInteger(min, max));
 }
 
 export function randomBoolean(): boolean {

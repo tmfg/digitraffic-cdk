@@ -47,8 +47,10 @@ export class DigitrafficCanaryRole extends Role {
     }
 
     withDatabaseAccess(): DigitrafficCanaryRole {
-        this.addToPolicy(new PolicyStatement(DB_STATEMENT_PROPS));
-
+        // Won't work :(
+        // this.addToPolicy(new PolicyStatement(DB_STATEMENT_PROPS));
+        // Works
+        this.addManagedPolicy(ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole"));
         return this;
     }
 }

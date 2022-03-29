@@ -40,4 +40,9 @@ export abstract class Asserter {
             throw new Error(`Value ${value} was expected to be greater than ${expected}`);
         }
     }
+
+    static assertToBeCloseTo(value: number, expected: number, delta: number) {
+        expect(expected-value).toBeGreaterThanOrEqual(-1 * delta);
+        expect(expected-value).toBeLessThanOrEqual(delta);
+    }
 }
