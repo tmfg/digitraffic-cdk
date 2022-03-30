@@ -101,7 +101,8 @@ class Figures:
         if liikennemuoto is None:
             liikennemuoto = 'kaikki'
 
-        if df[(df['from'] == date) & (df['name'] == query)].empty:
+        if df[(df['from'] == date) & (df['name'] == query) & (df['liikennemuoto'] == liikennemuoto)].empty or df[
+            (df['from'] == date) & (df['name'] == comparison_query) & (df['liikennemuoto'] == liikennemuoto)].empty:
             return dict(
                 columns=[{'name': '<ei tietoja valitulta ajalta>'}],
                 data=[]
@@ -267,6 +268,9 @@ class Figures:
         if date is None:
             date = df['from'].unique().max()
 
+        if df[(df['from'] == date) & (df['name'] == query)].empty:
+            return {}
+
         if liikennemuoto is None:
             liikennemuoto = 'kaikki'
 
@@ -289,8 +293,6 @@ class Figures:
 
         # haetaan viimeisimmän kuukauden tiedot piirakkaa varten
         data = dff[user_data['aikaleima'] == date].reset_index()[['identified', 'unidentified', 'change_in_time']]
-        if data.empty:
-            return {}
         change_in_time = data['change_in_time'].item()
         data = data[['identified', 'unidentified']]
         data = data.iloc[0].to_dict()

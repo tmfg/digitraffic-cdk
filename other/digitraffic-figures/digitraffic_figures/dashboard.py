@@ -72,14 +72,14 @@ def init_callbacks(dash_app, df, figures, logger):
                                         liikennemuoto=liikennemuoto)
 
     @dash_app.callback(
-            Output('output-graph-pie-identified-users-data', 'figure'),
-            [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
-        )
+        Output('output-graph-pie-identified-users-data', 'figure'),
+        [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
+    )
     def update_identified_users_data(filter_date, liikennemuoto):
         return figures.identified_users(query='Top 10 digitraffic-users by bytes',
-                                       comparison_query='Bytes out',
-                                       date=filter_date,
-                                       liikennemuoto=liikennemuoto)
+                                        comparison_query='Bytes out',
+                                        date=filter_date,
+                                        liikennemuoto=liikennemuoto)
 
     @dash_app.callback(
         Output('output-graph-data-year-on-year', 'figure'),
