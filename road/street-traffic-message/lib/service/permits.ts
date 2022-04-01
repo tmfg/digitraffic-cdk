@@ -5,7 +5,7 @@ import moment from "moment";
 import * as xml2js from 'xml2js';
 import {inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as PermitsDAO from "../db/permit";
-import {Geometry, GeometryCollection, LineString, Point, Polygon} from "geojson";
+import {FeatureCollection, Geometry, GeometryCollection, LineString, Point, Polygon} from "geojson";
 import {createGmlLineString, positionToList} from "../../../../digitraffic-common/utils/geometry";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
@@ -22,6 +22,8 @@ const PERMIT_DETAILED_TYPE_MAP: Record<string, PermitDetailedType> = {
     [PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS] : PermitDetailedType.OTHER,
 };
 
+const ALLOWED_PERMIT_PROCESSING_STAGES = ["Lupa myönnetty", "Jatkolupa", "Alueen käyttölupa myönnetty"];
+
 export async function getPermitsFromSource(authKey: string, url: string): Promise<ApiPermit[]> {
     const api = new PermitsApi(url, PERMITS_PATH, authKey);
     const xmlPermits = await api.getPermitsXml();
@@ -33,8 +35,17 @@ export async function getPermitsFromSource(authKey: string, url: string): Promis
 }
 
 export function findPermitsInGeojson() {
-    return inDatabaseReadonly(db => {
-        return PermitsDAO.getActivePermitsGeojson(db);
+    return inDatabaseReadonly(async db => {
+        const geojsonPermits: FeatureCollection = await PermitsDAO.getActivePermitsGeojson(db);
+        // return a separate permit object for each geometry instead of a GeometryCollection in one object
+        const separateObjectsPerGeometry = geojsonPermits.features.flatMap(permit => {
+            const permitGeometryCollection = permit.geometry as GeometryCollection;
+            return permitGeometryCollection.geometries.flatMap(singleGeometry => {
+                    return {...permit, geometry: singleGeometry}
+                }
+            )
+        })
+        return {type: "FeatureCollection", features: separateObjectsPerGeometry};
     });
 }
 
@@ -157,7 +168,8 @@ function createGmlPolygon(geometry: Geometry) {
 
 function isValidPermit(permitElement: PermitElement): boolean {
     return permitElement["GIS:YlAlLuvat"]["GIS:VoimassaolonAlkamispaiva"] != null
-    && mapLupatyyppi(permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi_koodi"]) != null;
+        && ALLOWED_PERMIT_PROCESSING_STAGES.includes(permitElement["GIS:YlAlLuvat"]["GIS:Kasittelyvaihe"])
+        && mapLupatyyppi(permitElement["GIS:YlAlLuvat"]["GIS:Lupatyyppi_koodi"]) != null;
 }
 
 function convertPermit(permitElement: PermitElement): ApiPermit {

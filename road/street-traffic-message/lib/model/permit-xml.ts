@@ -9,6 +9,7 @@ export interface PermitElement {
         readonly "GIS:Id": string,
         readonly "GIS:Lupatyyppi": string,
         readonly "GIS:Lupatyyppi_koodi": string,
+        readonly "GIS:Kasittelyvaihe": string,
         readonly "GIS:VoimassaolonAlkamispaiva": string,
         readonly "GIS:VoimassaolonAlkamisaika": string,
         readonly "GIS:VoimassaolonPaattymispaiva": string,
