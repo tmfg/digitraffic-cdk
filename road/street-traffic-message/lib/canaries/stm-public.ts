@@ -1,12 +1,5 @@
-import {
-    ContentChecker,
-    ContentTypeChecker,
-    GeoJsonChecker,
-    HeaderChecker,
-    UrlChecker,
-} from "digitraffic-common/aws/infra/canaries/url-checker";
+import {ContentChecker, ContentTypeChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
 import {Asserter} from "digitraffic-common/test/asserter";
-import {constants} from "http2";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {FeatureCollection} from "geojson";
 

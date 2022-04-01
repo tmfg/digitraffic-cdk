@@ -119,6 +119,18 @@ export function distanceBetweenPositionsInM(pos1: Position, pos2: Position) {
     return distanceBetweenPositionsInKm(pos1, pos2) * 1000; // km -> m
 }
 
+export function polygonToList(positions: Position[][], precision = 8) {
+    return positions.map(p => lineStringToList(p, precision)).join(' ');
+}
+
+export function lineStringToList(positions: Position[], precision = 8) {
+    return positions.map(p => positionToList(p, precision)).join(' ');
+}
+
+export function positionToList(position: Position, precision = 8) {
+    return position.map(n => n.toPrecision(precision)).join(' ');
+}
+
 // Converts numeric degrees to radians
 function toRadians(angdeg:number) {
     return angdeg * DEGREES_TO_RADIANS;

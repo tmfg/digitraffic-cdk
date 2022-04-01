@@ -37,8 +37,8 @@ export async function updatePermits(authKey: string, url: string) {
     console.info("method=UpdateService.updatePermits count=%d insertCount=%d", permitsInApi.length, newPermits.length);
 }
 
-async function getAllPermitIdsFromDb(): Promise<Record<string, string>[]> {
-    return await inDatabaseReadonly((db: DTDatabase) => {
+function getAllPermitIdsFromDb(): Promise<Record<string, string>[]> {
+    return inDatabaseReadonly((db: DTDatabase) => {
         return permitDb.getAllPermitIds(db);
     });
 }

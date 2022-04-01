@@ -24,8 +24,7 @@ export function insertPermit(db: DTDatabase, id: number, subject: string) {
 
 export function insertPermitOrUpdateGeometry(db: DTDatabase, permit: ApiPermit) {
     return db.tx(async t => {
-        await t.none(
-            `INSERT INTO permit
+        await t.none(`INSERT INTO permit
              (id, source_id, source, permit_type, permit_subject, effective_from, effective_to, created, modified, version, geometry)
              VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, NOW(), NOW(), DEFAULT, ST_ForceCollection(ST_Transform(ST_GeomFromGML($7), 4326)))
              ON CONFLICT (source_id, source)
@@ -33,7 +32,7 @@ export function insertPermitOrUpdateGeometry(db: DTDatabase, permit: ApiPermit) 
                  SET geometry=ST_ForceCollection(ST_Collect(
                              ARRAY(SELECT (ST_Dump(geometry)).geom FROM permit WHERE source_id = $1 AND source = $2)
                              || ST_Transform(ST_GeomFromGML($7), 4326)))`,
-            [permit.sourceId, permit.source, permit.permitType, permit.permitSubject, permit.effectiveFrom,
-                permit.effectiveTo, permit.gmlGeometryXmlString]);
+        [permit.sourceId, permit.source, permit.permitType, permit.permitSubject, permit.effectiveFrom,
+            permit.effectiveTo, permit.gmlGeometryXmlString]);
     });
 }

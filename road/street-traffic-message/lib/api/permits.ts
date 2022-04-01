@@ -25,8 +25,6 @@ export class PermitsApi {
                 throw Error(`Query to ${this.path} failed`);
             }
             return resp.data;
-        } catch (error) {
-            throw error;
         } finally {
             console.info("method=getPermitsXml tookMs=%d", (Date.now() - start));
         }

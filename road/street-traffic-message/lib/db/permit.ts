@@ -20,7 +20,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
         'features', coalesce(json_agg(
              json_build_object(
                      'type', 'Feature',
-                     'geometry', ST_AsGeoJSON(geometry::geometry)::json,
+                     'geometry', ST_AsGeoJSON(ST_SNAPTOGRID(geometry, 0.00001)::geometry)::json,
                      'properties', json_build_object(
                          'id', id,
                          'version', version,

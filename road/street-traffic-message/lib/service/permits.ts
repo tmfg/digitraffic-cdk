@@ -5,7 +5,8 @@ import moment from "moment";
 import * as xml2js from 'xml2js';
 import {inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as PermitsDAO from "../db/permit";
-import {Geometry, GeometryCollection, Point, Polygon} from "geojson";
+import {Geometry, GeometryCollection, LineString, Point, Polygon} from "geojson";
+import {lineStringToList, polygonToList, positionToList} from "../../../../digitraffic-common/utils/geometry";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
@@ -38,67 +39,115 @@ export function findPermitsInD2Light() {
 }
 
 function convertD2Light(permits: DbPermit[]) {
-    const situationRecord = permits.map(permit => (
-        {
-            "id": permit.id,
-            "version": permit.version,
-            "creationTime": permit.created,
-            "versionTime": permit.modified,
-            "startTime": permit.effectiveFrom,
-            "endTime": permit.effectiveTo,
-            "type": permit.permitType,
-            "detailedTypeText": permit.permitSubject,
-            "severity": "Medium",
-            "safetyRelatedMessage": false,
-            "sourceName": permit.source,
-            "generalPublicComment": permit.permitSubject,
-            "situationId": permit.id,
-            "location": convertGeometryCollection(permit.geometry),
-        }
-    ));
+    const situationRecord = createSituationRecords(permits);
+    const publicationTime = new Date();
 
     return {
-        "modelBaseVersion": "3",
-        "situationPublicationLight": {
-            "lang": "fi",
-            "publicationTime": new Date(),
-            "publicationCreator": {
-                "country": "fi",
-                "nationalIdentifier": "Fintraffic",
+        modelBaseVersion: "3",
+        situationPublicationLight: {
+            lang: "fi",
+            publicationTime,
+            publicationCreator: {
+                country: "fi",
+                nationalIdentifier: "Fintraffic",
             },
             situationRecord,
         },
     };
 }
 
-function convertGeometryCollection(geometry: Geometry) {
+function createSituationRecords(permits: DbPermit[]) {
+    return permits.map(permit => ({
+        id: permit.id,
+        version: permit.version,
+        creationTime: permit.created,
+        versionTime: permit.modified,
+        startTime: permit.effectiveFrom,
+        endTime: permit.effectiveTo,
+        type: permit.permitType,
+        detailedType: '??',
+        detailedTypeText: '??',
+        severity: "Medium",
+        safetyRelatedMessage: false,
+        sourceName: permit.source,
+        generalPublicComment: permit.permitSubject,
+        situationId: permit.id,
+        location: createLocation(permit.geometry),
+    }));
+}
+
+function createLocation(geometry: Geometry) {
     if (geometry.type != 'GeometryCollection') {
         throw new Error("GeometryCollection expected, got " + geometry.type);
     }
 
     const geometryCollection = geometry as GeometryCollection;
 
-    return {
-        area: geometryCollection.geometries.map(g => ({
-            gmlPolygon: {
-                exterior: {
-                    srsName: "ESPG:3011",
-                    posList: convertGeometry(g),
-                },
-            },
-        })),
-    };
+    if (geometryCollection.geometries.length === 1) {
+        return convertGeometry(geometryCollection.geometries[0]);
+    }
+
+    return convertGeometry(geometryCollection);
 }
 
 function convertGeometry(geometry: Geometry) {
     if (geometry.type === 'Point') {
         const point = geometry as Point;
 
-        return `${point.coordinates[0]} ${point.coordinates[1]}`;
+        return {
+            locationDescription: 'Lahti',
+            coordinatesForDisplay: positionToList(point.coordinates),
+        };
+    } else if (geometry.type === 'LineString') {
+        const lineString = geometry as LineString;
+
+        return {
+            locationDescription: 'Lahti',
+            coordinatesForDisplay: '',
+            line: {
+                gmlLinearRing: lineStringToList(lineString.coordinates),
+            },
+        };
     } else if (geometry.type === 'Polygon') {
         const polygon = geometry as Polygon;
 
-        return polygon.coordinates.join(' ');
+        return {
+            locationDescription: 'Lahti',
+            coordinatesForDisplay: '',
+            area: {
+                gmlPolygon: [
+                    {
+                        exterior: polygonToList(polygon.coordinates),
+                    },
+                ],
+            },
+        };
+    } else if (geometry.type === 'GeometryCollection') {
+        const geometryCollection = geometry as GeometryCollection;
+
+        return {
+            locationDescription: 'Lahti',
+            coordinatesForDisplay: '',
+            area: {
+                gmlPolygon: [
+                    geometryCollection.geometries.map(g => createGmlPolygon(g)),
+                ],
+            },
+        };
+    }
+
+    throw new Error("unknown geometry type " + JSON.stringify(geometry));
+}
+
+function createGmlPolygon(geometry: Geometry) {
+    if (geometry.type === 'Point') {
+        return {
+            exterior : positionToList(geometry.coordinates),
+        };
+    } else if (geometry.type === 'Polygon') {
+        return {
+            exterior : polygonToList(geometry.coordinates),
+        };
     }
 
     throw new Error("unknown geometry type " + JSON.stringify(geometry));
