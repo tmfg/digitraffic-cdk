@@ -101,7 +101,7 @@ function createProcessVisMessagesLambda(
     const lambdaConf = defaultLambdaConfiguration({
         functionName: functionName,
         memorySize: 128,
-        timeout: 10,
+        timeout: 45,
         reservedConcurrentExecutions: 2,
         code: new AssetCode('dist/lambda/process-vis-messages'),
         handler: 'lambda-process-vis-messages.handler',
