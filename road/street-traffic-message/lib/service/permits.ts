@@ -1,12 +1,12 @@
 import {PermitsApi} from "../api/permits";
-import {ApiPermit, DbPermit, PermitType} from "../model/permit";
+import {ApiPermit, DbPermit, PermitDetailedType, PermitType} from "../model/permit";
 import {PermitElement, PermitResponse} from "../model/permit-xml";
 import moment from "moment";
 import * as xml2js from 'xml2js';
 import {inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as PermitsDAO from "../db/permit";
 import {Geometry, GeometryCollection, LineString, Point, Polygon} from "geojson";
-import {lineStringToList, polygonToList, positionToList} from "../../../../digitraffic-common/utils/geometry";
+import {createGmlLineString, positionToList} from "../../../../digitraffic-common/utils/geometry";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 
@@ -14,6 +14,12 @@ const PERMIT_TYPE_MAP: Record<string, PermitType> = {
     '2': PermitType.CONSTRUCTION_WORKS,
     '41': PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS,
     '60': PermitType.PUBLIC_EVENT,
+};
+
+const PERMIT_DETAILED_TYPE_MAP: Record<string, PermitDetailedType> = {
+    [PermitType.CONSTRUCTION_WORKS] : PermitDetailedType.CONSTRUCTION_WORKS,
+    [PermitType.PUBLIC_EVENT] : PermitDetailedType.OTHER,
+    [PermitType.GENERAL_INSTRUCTION_OR_MESSAGE_TO_ROAD_USERS] : PermitDetailedType.OTHER,
 };
 
 export async function getPermitsFromSource(authKey: string, url: string): Promise<ApiPermit[]> {
@@ -57,23 +63,29 @@ function convertD2Light(permits: DbPermit[]) {
 }
 
 function createSituationRecords(permits: DbPermit[]) {
-    return permits.map(permit => ({
-        id: permit.id,
-        version: permit.version,
-        creationTime: permit.created,
-        versionTime: permit.modified,
-        startTime: permit.effectiveFrom,
-        endTime: permit.effectiveTo,
-        type: permit.permitType,
-        detailedType: '??',
-        detailedTypeText: '??',
-        severity: "Medium",
-        safetyRelatedMessage: false,
-        sourceName: permit.source,
-        generalPublicComment: permit.permitSubject,
-        situationId: permit.id,
-        location: createLocation(permit.geometry),
-    }));
+    return permits.map(permit => {
+        const detailedType = PERMIT_DETAILED_TYPE_MAP[permit.permitType];
+
+        return {
+            id: permit.id,
+            version: permit.version,
+            creationTime: permit.created,
+            versionTime: permit.modified,
+            startTime: permit.effectiveFrom,
+            endTime: permit.effectiveTo,
+            type: permit.permitType,
+            detailedType: {
+                value: detailedType,
+            },
+            detailedTypeText: detailedType,
+            severity: "Medium",
+            safetyRelatedMessage: false,
+            sourceName: permit.source,
+            generalPublicComment: permit.permitSubject,
+            situationId: permit.id,
+            location: createLocation(permit.geometry),
+        };
+    });
 }
 
 function createLocation(geometry: Geometry) {
@@ -105,7 +117,7 @@ function convertGeometry(geometry: Geometry) {
             locationDescription: 'Lahti',
             coordinatesForDisplay: '',
             line: {
-                gmlLinearRing: lineStringToList(lineString.coordinates),
+                gmlLinearRing: createGmlLineString(geometry),
             },
         };
     } else if (geometry.type === 'Polygon') {
@@ -116,9 +128,7 @@ function convertGeometry(geometry: Geometry) {
             coordinatesForDisplay: '',
             area: {
                 gmlPolygon: [
-                    {
-                        exterior: polygonToList(polygon.coordinates),
-                    },
+                    createGmlPolygon(polygon),
                 ],
             },
         };
@@ -140,17 +150,9 @@ function convertGeometry(geometry: Geometry) {
 }
 
 function createGmlPolygon(geometry: Geometry) {
-    if (geometry.type === 'Point') {
-        return {
-            exterior : positionToList(geometry.coordinates),
-        };
-    } else if (geometry.type === 'Polygon') {
-        return {
-            exterior : polygonToList(geometry.coordinates),
-        };
-    }
-
-    throw new Error("unknown geometry type " + JSON.stringify(geometry));
+    return {
+        exterior: createGmlLineString(geometry),
+    };
 }
 
 function isValidPermit(permitElement: PermitElement): boolean {

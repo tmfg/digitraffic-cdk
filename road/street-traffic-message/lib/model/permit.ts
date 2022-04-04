@@ -18,6 +18,11 @@ export enum PermitType {
     OTHER = "other"
 }
 
+export enum PermitDetailedType {
+    CONSTRUCTION_WORKS = "constructionWorks",
+    OTHER = "other",
+}
+
 export type DbPermit = {
     readonly id: string
     readonly sourceId: string
