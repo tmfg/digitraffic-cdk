@@ -3,6 +3,7 @@ import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from
 import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from 'digitraffic-common/database/database';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
+    getDisplayableNameForEventSource,
     isPortnetTimestamp,
     mergeTimestamps,
 } from "../event-sourceutil";
@@ -115,7 +116,7 @@ export async function findAllTimestamps(locode?: string,
         recordTime:e.record_time.toISOString(),
         eventTimeConfidenceLower: e.event_time_confidence_lower,
         eventTimeConfidenceUpper: e.event_time_confidence_upper,
-        source: e.event_source,
+        source: getDisplayableNameForEventSource(e.event_source),
         sourceId: e.source_id,
         ship: {
             mmsi: e.ship_mmsi,
