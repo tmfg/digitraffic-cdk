@@ -6,7 +6,7 @@ import {MarinecamSecret} from "../../model/secret";
 const secretHolder = SecretHolder.create<MarinecamSecret>('mobile_server');
 const bucketName = process.env[MarinecamEnvKeys.BUCKET_NAME] as string;
 
-export const handler = async () => {
+export const handler = () => {
     return secretHolder.setDatabaseCredentials()
         .then(() => secretHolder.get())
         .then((secret: MarinecamSecret) => {
