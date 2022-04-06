@@ -35,7 +35,7 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingPaikan
 
             return paikanninUpdateService.updateTrackingsForDomain(domainName)
                 .then(savedResult => {
-                    console.info(`method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
+                    console.info(`method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} count=${savedResult.saved} errors=${savedResult.errors} sizeBytes=${savedResult.sizeBytes} tookMs=${(Date.now() - start)}`);
                     return savedResult;
                 });
         } catch (error) {
