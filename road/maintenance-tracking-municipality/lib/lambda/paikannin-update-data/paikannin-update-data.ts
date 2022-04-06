@@ -1,5 +1,4 @@
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 import {PaikanninApi} from "../../api/paikannin";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
 import {MaintenanceTrackingPaikanninSecret} from "../../model/maintenance-tracking-municipality-secret";
@@ -12,7 +11,6 @@ const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAM
 const domainPrefix = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX] as string;
 
 let paikanninUpdateService : PaikanninUpdate;
-const holder = SecretHolder.create<MaintenanceTrackingPaikanninSecret>(domainPrefix);
 
 export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingPaikanninSecret>) {
     return async () : Promise<TrackingSaveResult> => {
