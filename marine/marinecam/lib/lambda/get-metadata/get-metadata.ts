@@ -1,19 +1,15 @@
 import * as MetadataService from '../../service/metadata';
-
-import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 
-const secretId = process.env.SECRET_ID as string;
+const secretHolder = SecretHolder.create();
 
-export const handler = async () => {
-    try {
-        const cameras = await withDbSecret(secretId, () => {
-            return MetadataService.listAllCameras(['Saimaa']);
+export const handler = () => {
+    return secretHolder.setDatabaseCredentials()
+        .then(() => MetadataService.listAllCameras(['Saimaa']))
+        .then(cameras => LambdaResponse.ok(cameras))
+        .catch(e => {
+            console.error(e);
+            return LambdaResponse.internalError();
         });
-
-        return LambdaResponse.ok(cameras);
-    } catch (e) {
-        console.error(e);
-        return LambdaResponse.internalError();
-    }
 };

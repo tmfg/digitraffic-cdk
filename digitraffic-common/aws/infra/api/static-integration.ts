@@ -21,7 +21,7 @@ export class DigitrafficStaticIntegration extends MockIntegration {
     constructor(
         resource: Resource, mediaType: MediaType, response: string, enableCors = true, apiKeyRequired = true,
     ) {
-        const integrationResponse = DigitrafficStaticIntegration.createIntegrationResponse(JSON.stringify(response), mediaType, enableCors);
+        const integrationResponse = DigitrafficStaticIntegration.createIntegrationResponse(response, mediaType, enableCors);
 
         super({
             passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
@@ -31,9 +31,11 @@ export class DigitrafficStaticIntegration extends MockIntegration {
             integrationResponses: [integrationResponse],
         });
 
-        resource.addMethod("GET", this, {
-            apiKeyRequired,
-            methodResponses: [DigitrafficStaticIntegration.createMethodResponse(enableCors)],
+        ['GET', 'HEAD'].forEach((httpMethod) => {
+            resource.addMethod(httpMethod, this, {
+                apiKeyRequired,
+                methodResponses: [DigitrafficStaticIntegration.createMethodResponse(enableCors)],
+            });
         });
     }
 

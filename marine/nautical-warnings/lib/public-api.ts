@@ -31,7 +31,7 @@ export class PublicApi {
 
     createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
-        const csResource = apiResource.addResource("nautical-warnings");
+        const csResource = apiResource.addResource("nautical-warning");
         const betaResource = csResource.addResource("beta");
         this.activeResource = betaResource.addResource("active");
         this.archivedResource = betaResource.addResource("archived");
@@ -54,20 +54,24 @@ export class PublicApi {
         const activeIntegration = defaultIntegration(lambdaActive);
         const archivedIntegration = defaultIntegration(lambdaArchived);
 
-        this.activeResource.addMethod("GET", activeIntegration, {
-            apiKeyRequired: false,
-            methodResponses: [
-                corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geojsonModel)),
-                corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel)),
-            ],
+        ['GET', 'HEAD'].forEach(httpMethod => {
+            this.activeResource.addMethod(httpMethod, activeIntegration, {
+                apiKeyRequired: false,
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geojsonModel)),
+                    corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel)),
+                ],
+            });
         });
 
-        this.archivedResource.addMethod("GET", archivedIntegration, {
-            apiKeyRequired: false,
-            methodResponses: [
-                corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geojsonModel)),
-                corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel)),
-            ],
+        ['GET', 'HEAD'].forEach(httpMethod => {
+            this.archivedResource.addMethod(httpMethod, archivedIntegration, {
+                apiKeyRequired: false,
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_GEOJSON, this.geojsonModel)),
+                    corsMethod(methodResponse("500", MediaType.TEXT_PLAIN, this.geojsonModel)),
+                ],
+            });
         });
 
         this.publicApi.documentResource(this.activeResource, DocumentationPart.method(NAUTICAL_WARNINGS_TAGS, 'GetActiveNauticalWarnings', 'Return all active nautical warnings'));

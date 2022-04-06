@@ -1,6 +1,9 @@
-import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
 import {NauticalWarningsSecret} from "../../model/secret";
 import * as NauticalWarningsService from "../../service/nautical-warnings";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+
+const secretHolder = SecretHolder.create<NauticalWarningsSecret>('nauticalwarnings');
 
 const secretId = process.env.SECRET_ID as string;
 
@@ -12,6 +15,8 @@ export function handlerFn(doWithSecret: SecretFunction<NauticalWarningsSecret>) 
     });
 }
 
-export const handler = (): Promise<void> => {
-    return handlerFn(withDbSecret);
+export const handler = () => {
+    return secretHolder.setDatabaseCredentials()
+        .then(() => secretHolder.get())
+        .then(secret => NauticalWarningsService.updateNauticalWarnings(secret.url));
 };

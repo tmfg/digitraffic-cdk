@@ -26,13 +26,15 @@ import {Construct} from "constructs";
 export class PrivateApi {
     private readonly stack: DigitrafficStack;
     private readonly bucket: Bucket;
-    public readonly publicApi;
+    public readonly restApi;
 
     // authorizer protected
     private imageResource: Resource;
     private metadataResource: Resource;
 
     // api key protected Saimaa-images
+    private ibnetImageResource: Resource;
+    private ibnetMetadataResource: Resource;
     private apiImageResource: Resource;
     private apiMetadataResource: Resource;
 
@@ -40,18 +42,19 @@ export class PrivateApi {
         this.stack = stack;
         this.bucket = bucket;
 
-        this.publicApi = new DigitrafficRestApi(
+        this.restApi = new DigitrafficRestApi(
             stack, 'Marinecam-restricted', 'Marinecam restricted API', undefined, {
                 binaryMediaTypes: [
                     MediaType.IMAGE_JPEG,
                 ],
             },
         );
-        this.publicApi.createUsagePlan('Marinecam Api Key', 'Marinecam Usage Plan');
+        this.restApi.createUsagePlan('Marinecam Api Key', 'Marinecam Usage Plan');
+        this.restApi.createUsagePlan('Marinecam Api Key 2', 'Marinecam Usage Plan 2');
 
         const readImageRole = this.createReadImageRole();
 
-        add401Support(this.publicApi, stack);
+        add401Support(this.restApi, stack);
 
         this.createResourceTree();
 
@@ -93,26 +96,30 @@ export class PrivateApi {
     }
 
     createApikeyProtectedResources(readImageRole: Role) {
-        this.createImageResource(readImageRole);
-        this.createMetadataResource();
+        this.createImageResource(readImageRole, this.ibnetImageResource, this.apiImageResource);
+        this.createMetadataResource(this.ibnetMetadataResource, this.apiMetadataResource);
     }
 
     createResourceTree() {
         // old authorizer protected resources
-        const camerasResource = this.publicApi.root.addResource("cameras");
+        const camerasResource = this.restApi.root.addResource("cameras");
         const folderResource = camerasResource.addResource("{folderName}");
         this.imageResource = folderResource.addResource("{imageName}");
         this.metadataResource = camerasResource.addResource("metadata");
 
         // new api-key protected resources
-        const apiResource = this.publicApi.root.addResource("api");
+        const apiResource = this.restApi.root.addResource("api");
         const marinecamResource = apiResource.addResource("marinecam");
         const ibnetResource = marinecamResource.addResource("ibnet");
-        this.apiImageResource = ibnetResource.addResource("{imageName}");
-        this.apiMetadataResource = ibnetResource.addResource("metadata");
+        const marinecamCamerasResource = marinecamResource.addResource("cameras");
+
+        this.ibnetImageResource = ibnetResource.addResource("{imageName}");
+        this.ibnetMetadataResource = ibnetResource.addResource("metadata");
+        this.apiImageResource = marinecamCamerasResource.addResource("{imageName}");
+        this.apiMetadataResource = marinecamCamerasResource.addResource("metadata");
     }
 
-    createMetadataResource() {
+    createMetadataResource(...resources: Resource[]) {
         const metadataLambda = MonitoredDBFunction.create(this.stack, 'get-metadata');
 
         const metadataIntegration = defaultIntegration(metadataLambda, {
@@ -122,14 +129,14 @@ export class PrivateApi {
             ],
         });
 
-        this.apiMetadataResource.addMethod("GET", metadataIntegration, {
+        resources.forEach(resource => resource.addMethod("GET", metadataIntegration, {
             apiKeyRequired: true,
             methodResponses: [
                 corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, Model.EMPTY_MODEL)),
                 corsMethod(methodResponse("403", MediaType.TEXT_PLAIN, Model.ERROR_MODEL)),
                 corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, Model.ERROR_MODEL)),
             ],
-        });
+        }));
     }
 
     createListCamerasResource(authorizer: RequestAuthorizer) {
@@ -168,7 +175,7 @@ export class PrivateApi {
         return readImageRole;
     }
 
-    createImageResource(readImageRole: Role) {
+    createImageResource(readImageRole: Role, ...resources: Resource[]) {
         const getImageIntegration = new AwsIntegration({
             service: 's3',
             path: this.bucket.bucketName + '/images/Saimaa/{objectName}',
@@ -198,7 +205,7 @@ export class PrivateApi {
             },
         });
 
-        this.apiImageResource.addMethod("GET", getImageIntegration, {
+        resources.forEach(resource => resource.addMethod("GET", getImageIntegration, {
             apiKeyRequired: true,
             requestParameters: {
                 'method.request.path.imageName': true,
@@ -213,7 +220,7 @@ export class PrivateApi {
                 corsMethod(methodResponse("403", MediaType.TEXT_PLAIN, Model.ERROR_MODEL)),
                 corsMethod(methodResponse("404", MediaType.APPLICATION_JSON, Model.ERROR_MODEL)),
             ],
-        });
+        }));
     }
 
     createGetImageResource(authorizer: RequestAuthorizer, readImageRole: Role) {

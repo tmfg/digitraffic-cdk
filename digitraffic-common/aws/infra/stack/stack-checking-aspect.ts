@@ -122,7 +122,7 @@ export class StackCheckingAspect implements IAspect {
             const resource = node as CfnResource;
 
             if (!StackCheckingAspect.isValidPath(resource.pathPart)) {
-                Annotations.of(node).addError(`Path part ${resource.pathPart} needs to be in kebab-case`);
+                Annotations.of(node).addWarning(`Path part ${resource.pathPart} should be in kebab-case`);
             }
         } else if (node instanceof CfnMethod) {
             const method = node as CfnMethod;
@@ -135,7 +135,7 @@ export class StackCheckingAspect implements IAspect {
                     const name = split[3];
 
                     if (type === 'querystring' && !StackCheckingAspect.isValidQueryString(name)) {
-                        Annotations.of(node).addError(`Querystring ${name} needs to be in snake_case`);
+                        Annotations.of(node).addWarning(`Querystring ${name} should be in snake_case`);
                     }
                 });
             }

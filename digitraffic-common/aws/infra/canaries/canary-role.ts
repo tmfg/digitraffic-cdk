@@ -12,15 +12,6 @@ const BASE_POLICY_STATEMENT_PROPS: PolicyStatementProps = {
     resources: ["*"],
 };
 
-const DB_STATEMENT_PROPS: PolicyStatementProps = {
-    actions: [
-        "ec2:CreateNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DeleteNetworkInterface",
-    ],
-    resources: ["*"],
-};
-
 const CLOUDWATCH_STATEMENT_PROPS: PolicyStatementProps = {
     actions: [
         "cloudwatch:PutMetricData",

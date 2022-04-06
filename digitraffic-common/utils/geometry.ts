@@ -119,6 +119,39 @@ export function distanceBetweenPositionsInM(pos1: Position, pos2: Position) {
     return distanceBetweenPositionsInKm(pos1, pos2) * 1000; // km -> m
 }
 
+export function createGmlLineString(geometry: Geometry, srsName = 'EPSG:4326') {
+    const posList = createPosList(geometry);
+
+    return {
+        srsName,
+        posList,
+    };
+}
+
+function createPosList(geometry: Geometry) {
+    if (geometry.type === 'Point') {
+        return positionToList(geometry.coordinates);
+    } else if (geometry.type === 'LineString') {
+        return lineStringToList(geometry.coordinates);
+    } else if (geometry.type === 'Polygon') {
+        return polygonToList(geometry.coordinates);
+    }
+
+    throw new Error("unknown geometry type " + JSON.stringify(geometry));
+}
+
+function polygonToList(positions: Position[][], precision = 8) {
+    return positions.map(p => lineStringToList(p, precision)).join(' ');
+}
+
+function lineStringToList(positions: Position[], precision = 8) {
+    return positions.map(p => positionToList(p, precision)).join(' ');
+}
+
+export function positionToList(position: Position, precision = 8) {
+    return position.map(n => n.toPrecision(precision)).join(' ');
+}
+
 // Converts numeric degrees to radians
 function toRadians(angdeg:number) {
     return angdeg * DEGREES_TO_RADIANS;
