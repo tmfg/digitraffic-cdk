@@ -33,11 +33,11 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingAutori
 
             return autoriUpdateService.updateTrackingsForDomain(domainName)
                 .then(savedResult => {
-                    console.info(`method=MaintenanceTrackingMunicipality.autoriUpdateData domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
+                    console.info(`method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
                     return savedResult;
                 });
         } catch (error) {
-            console.error(`method=MaintenanceTrackingMunicipality.autoriUpdateData failed after ${(Date.now() - start)} ms`, error);
+            console.error(`method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} failed after ${(Date.now() - start)} ms`, error);
             throw error;
         }
     };

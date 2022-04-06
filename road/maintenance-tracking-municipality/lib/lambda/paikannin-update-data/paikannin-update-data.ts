@@ -1,4 +1,5 @@
 import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 import {PaikanninApi} from "../../api/paikannin";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
 import {MaintenanceTrackingPaikanninSecret} from "../../model/maintenance-tracking-municipality-secret";
@@ -11,6 +12,7 @@ const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAM
 const domainPrefix = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX] as string;
 
 let paikanninUpdateService : PaikanninUpdate;
+const holder = SecretHolder.create<MaintenanceTrackingPaikanninSecret>(domainPrefix);
 
 export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingPaikanninSecret>) {
     return async () : Promise<TrackingSaveResult> => {
@@ -33,11 +35,11 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingPaikan
 
             return paikanninUpdateService.updateTrackingsForDomain(domainName)
                 .then(savedResult => {
-                    console.info(`method=MaintenanceTrackingMunicipality.paikanninUpdateData domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
+                    console.info(`method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} count=${savedResult.saved} and errors=${savedResult.errors} tookMs=${(Date.now() - start)}`);
                     return savedResult;
                 });
         } catch (error) {
-            console.error(`method=MaintenanceTrackingMunicipality.paikanninUpdateData failed after ${(Date.now() - start)} ms`, error);
+            console.error(`method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} failed after ${(Date.now() - start)} ms`, error);
             throw error;
         }
     };
