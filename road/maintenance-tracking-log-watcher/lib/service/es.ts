@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as AWSx from "aws-sdk";
+
 const AWS = AWSx as any;
 
-export async function fetchAndParseDataFromEs(
+export function fetchAndParseDataFromEs(
     endpoint: AWS.Endpoint,
     region: string,
     index: string,
@@ -12,12 +14,12 @@ export async function fetchAndParseDataFromEs(
     return fetchDataFromEs(
         endpoint, region, index, path, fromISOString, toISOString,
     )
-        .then(async function(resultJsonObj) {
+        .then(function(resultJsonObj) {
             return parseDataToString(resultJsonObj);
         });
 }
 
-export async function fetchDataFromEs(
+export function fetchDataFromEs(
     endpoint: AWS.Endpoint,
     region: string,
     index: string,
@@ -47,7 +49,7 @@ export async function fetchDataFromEs(
                 httpResp.on("data", function (chunk: any) {
                     respBody += chunk;
                 });
-                httpResp.on("end", function (chunk: any) {
+                httpResp.on("end", function () {
                     resolve(JSON.parse(respBody));
                 });
             },

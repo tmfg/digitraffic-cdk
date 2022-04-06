@@ -1,9 +1,11 @@
 import * as AWSx from "aws-sdk";
 import {uploadToS3} from "digitraffic-common/aws/runtime/s3";
-const AWS = AWSx as any;
 import moment from 'moment-timezone';
 import * as esService from "../service/es";
 import * as snsService from "../service/sns";
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const AWS = AWSx as any;
 
 export const KEY_ES_ENDPOINT = 'ES_ENDPOINT';
 export const KEY_S3_BUCKET_NAME = 'S3_BUCKET_NAME';
@@ -24,24 +26,23 @@ export const handler = async (): Promise <void> => {
 
     try {
         const endpoint = new AWS.Endpoint(esEndpoint);
-        return await esService.fetchAndParseDataFromEs(
+        await esService.fetchAndParseDataFromEs(
             endpoint,
             region,
             index,
             path,
             fromISOString,
             toISOString,
-        )
-            .then(async function(resultLogLines) {
-                if (resultLogLines.length > 0) {
-                    const fileName = `maintenanceTracking-invalid-messages-${fromISOString}-${toISOString}.log`;
-                    console.info(`method=maintenanceTrackingLogWatcherHandler Upload file ${fileName} to S3 Bucket  ${s3BucketName}`);
-                    const title = `Illegal maintenance trackings on period ${fromISOString}-${toISOString}`;
-                    const log = `${title}\n\n${resultLogLines}`;
-                    uploadToS3(s3BucketName, log, fileName);
-                    return await snsService.sendEmail(log, snsTopicArn);
-                }
-            });
+        ).then(async function(resultLogLines) {
+            if (resultLogLines.length > 0) {
+                const fileName = `maintenanceTracking-invalid-messages-${fromISOString}-${toISOString}.log`;
+                console.info(`method=maintenanceTrackingLogWatcherHandler Upload file ${fileName} to S3 Bucket  ${s3BucketName}`);
+                const title = `Illegal maintenance trackings on period ${fromISOString}-${toISOString}`;
+                const log = `${title}\n\n${resultLogLines}`;
+                await uploadToS3(s3BucketName, log, fileName);
+                await snsService.sendEmail(log, snsTopicArn);
+            }
+        });
     } catch (error) {
         console.error(`method=maintenanceTrackingLogWatcherHandler Error in execution from ${fromISOString} to ${toISOString} error=${error}`);
         return Promise.reject(error);
