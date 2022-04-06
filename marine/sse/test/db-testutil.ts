@@ -1,23 +1,22 @@
-import {DbSseReport} from "../lib/db/sse-db";
+import {DTDatabase} from "digitraffic-common/database/database";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {IDatabase} from "pg-promise";
-import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import {DbSseReport} from "../lib/db/sse-db";
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
         fn, truncate, 'marine', 'marine', 'localhost:54321/marine',
     );
 }
 
-export async function truncate(db: IDatabase<any, any>): Promise<null> {
-    return db.tx(t => {
+export async function truncate(db: DTDatabase): Promise<void> {
+    await db.tx(t => {
         return t.batch([
             db.none('DELETE FROM sse_report'),
         ]);
     });
 }
 
-export function findAllSseReports(db: IDatabase<any, any>, siteId? :number): Promise<DbSseReport[]> {
+export function findAllSseReports(db: DTDatabase, siteId? :number): Promise<DbSseReport[]> {
     return db.tx(t => {
         return t.manyOrNone(`
             SELECT sse_report_id as "sseReportId",
@@ -40,11 +39,5 @@ export function findAllSseReports(db: IDatabase<any, any>, siteId? :number): Pro
             ${(siteId? "WHERE site_number=" + siteId : "")}
             ORDER BY site_number, sse_report_id
         `);
-    });
-}
-
-export function getUpdatedTimestamp(db: IDatabase<any, any>, datatype: string): Promise<Date | null> {
-    return db.tx(t => {
-        return LastUpdatedDB.getUpdatedTimestamp(t, datatype);
     });
 }

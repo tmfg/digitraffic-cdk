@@ -1,9 +1,10 @@
-import * as DbTestutil from "../db-testutil";
+import {DTDatabase} from "digitraffic-common/database/database";
+import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import * as SseDb from "../../lib/db/sse-db";
 import * as SSESchema from "../../lib/generated/tlsc-sse-reports-schema";
 import * as SseUpdateService from "../../lib/service/sse-update-service";
-import * as SseDb from "../../lib/db/sse-db";
+import * as DbTestutil from "../db-testutil";
 import * as Testdata from "../testdata";
-import {DTDatabase} from "digitraffic-common/database/database";
 
 describe('sse-update-service-test', DbTestutil.dbTestBase((db: DTDatabase) => {
 
@@ -16,9 +17,9 @@ describe('sse-update-service-test', DbTestutil.dbTestBase((db: DTDatabase) => {
 
         const sseReportsFromDb: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
         expect(sseReportsFromDb.length).toBe(sseReportsFromDbBefore.length + 1);
-        const lastUpdated = await DbTestutil.getUpdatedTimestamp(db, SseUpdateService.SSE_DATA_DATA_TYPE);
+        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, SseUpdateService.SSE_DATA_DATA_TYPE);
         const end = new Date();
-        expect(start <= lastUpdated! && lastUpdated! <= end).toBe(true);
+        expect(lastUpdated && start <= lastUpdated && lastUpdated <= end).toBe(true);
     });
 
     test('replace latest report', async () => {
@@ -46,9 +47,9 @@ describe('sse-update-service-test', DbTestutil.dbTestBase((db: DTDatabase) => {
 
         const sseReportsFromDb: SseDb.DbSseReport[] = await DbTestutil.findAllSseReports(db);
         expect(sseReportsFromDb.length).toBe(sseReportsFromDbBefore.length + 5);
-        const lastUpdated = await DbTestutil.getUpdatedTimestamp(db, SseUpdateService.SSE_DATA_DATA_TYPE);
+        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, SseUpdateService.SSE_DATA_DATA_TYPE);
         const end = new Date();
-        expect(start <= lastUpdated! && lastUpdated! <= end).toBe(true);
+        expect(lastUpdated && start <= lastUpdated && lastUpdated <= end).toBe(true);
     });
 }));
 

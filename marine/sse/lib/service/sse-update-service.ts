@@ -1,7 +1,7 @@
-import * as SseSchema from "../generated/tlsc-sse-reports-schema";
-import * as SseDb from "../db/sse-db";
 import {DTDatabase, inDatabase} from 'digitraffic-common/database/database';
 import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import * as SseDb from "../db/sse-db";
+import * as SseSchema from "../generated/tlsc-sse-reports-schema";
 
 export const SSE_DATA_DATA_TYPE = "SSE_DATA";
 
@@ -10,7 +10,7 @@ export type SseSaveResult = {
     readonly errors: number
 }
 
-export async function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<SseSaveResult> {
+export function saveSseData(sseReport: SseSchema.TheSSEReportRootSchema) : Promise<SseSaveResult> {
     return inDatabase(async (db: DTDatabase) => {
         let saved = 0;
         let errors = 0;
