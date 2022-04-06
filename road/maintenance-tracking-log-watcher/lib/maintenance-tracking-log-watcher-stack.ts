@@ -1,15 +1,15 @@
 import {Stack, StackProps} from 'aws-cdk-lib';
-import {Function,AssetCode} from 'aws-cdk-lib/aws-lambda';
-import {Construct} from "constructs";
-import {PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
-import {Props} from './app-props';
-import {Bucket, BlockPublicAccess} from "aws-cdk-lib/aws-s3";
-import {KEY_ES_ENDPOINT, KEY_S3_BUCKET_NAME, KEY_SNS_TOPIC_ARN} from "./lambda/maintenance-tracking-log-watcher";
-import {defaultLambdaConfiguration} from "digitraffic-common/aws/infra/stack/lambda-configs";
-import {Rule,Schedule} from 'aws-cdk-lib/aws-events';
+import {Rule, Schedule} from 'aws-cdk-lib/aws-events';
 import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
+import {PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
+import {AssetCode, Function} from 'aws-cdk-lib/aws-lambda';
+import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
+import {Construct} from "constructs";
+import {defaultLambdaConfiguration, LambdaEnvironment} from "digitraffic-common/aws/infra/stack/lambda-configs";
+import {Props} from './app-props';
+import {KEY_ES_ENDPOINT, KEY_S3_BUCKET_NAME, KEY_SNS_TOPIC_ARN} from "./lambda/maintenance-tracking-log-watcher";
 
 export class MaintenanceTrackingLogWatcherStack extends Stack {
 
@@ -72,7 +72,7 @@ function createLambdaTrigger(stack: Stack, lambdaFunction: Function) {
     rule.addTarget(new LambdaFunction(lambdaFunction));
 }
 
-function createWritePolicyToS3(s3BucketArn: any): PolicyStatement {
+function createWritePolicyToS3(s3BucketArn: string): PolicyStatement {
     const statement = new PolicyStatement();
     statement.addActions('s3:PutObject');
     statement.addActions('s3:PutObjectAcl');
@@ -88,7 +88,7 @@ function createWatchLogAndUploadToS3Lambda (
     stack: Stack,
 ): Function {
 
-    const environment: any = {};
+    const environment: LambdaEnvironment = {};
     environment[KEY_ES_ENDPOINT] = appProps.elasticSearchEndpoint;
     environment[KEY_S3_BUCKET_NAME] = s3Bucketname;
     environment[KEY_SNS_TOPIC_ARN] = topic.topicArn;
