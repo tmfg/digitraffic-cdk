@@ -46,6 +46,7 @@ export function create(secret: ISecret,
     const sendRouteQueue = new Queue(stack, sendRouteQueueName, {
         queueName: sendRouteQueueName,
         visibilityTimeout: Duration.seconds(60),
+        encryption: QueueEncryption.KMS_MANAGED,
         fifo: true, // prevent sending route plans twice
         deadLetterQueue: {
             maxReceiveCount: 3,
@@ -82,7 +83,7 @@ function createProcessVisMessagesScheduler(stack: Stack): Rule {
     const ruleName = 'VPGW-ProcessVisMessagesScheduler';
     return new Rule(stack, ruleName, {
         ruleName,
-        schedule: Schedule.expression('cron(*/1 * * * ? *)'), // every 1 minutes
+        schedule: Schedule.expression('cron(*/5 * * * ? *)'), // every 5 minutes
     });
 }
 
@@ -101,7 +102,7 @@ function createProcessVisMessagesLambda(
     const lambdaConf = defaultLambdaConfiguration({
         functionName: functionName,
         memorySize: 128,
-        timeout: 45,
+        timeout: 295, // almost 5 min
         reservedConcurrentExecutions: 2,
         code: new AssetCode('dist/lambda/process-vis-messages'),
         handler: 'lambda-process-vis-messages.handler',
