@@ -1,8 +1,8 @@
+import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
+import moment from "moment-timezone";
 import * as MaintenanceTrackingDB from "../db/maintenance-tracking-db";
 import {DbObservationData, Status} from "../db/maintenance-tracking-db";
-import {inDatabase} from "digitraffic-common/database/database";
-import {IDatabase} from "pg-promise";
-import moment from "moment-timezone";
+import {DbNumberId} from "../model/db-data";
 import {Havainto} from "../model/models";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -11,8 +11,8 @@ const crypto = require('crypto');
 const matchViestitunnisteRegex = /"viestintunniste"\s*:\s*{\s*"id"\s*:\s*[0-9]*\s*}\s*,/;
 
 export async function saveMaintenanceTrackingObservationData(observationDatas: DbObservationData[]): Promise<number> {
-    const a : [] = await inDatabase(async (db: IDatabase<any, any>) => {
-        return await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationDatas);
+    const a : (DbNumberId|null)[] = await inDatabase((db: DTDatabase) => {
+        return MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationDatas);
     });
     // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
     return a.filter(id => id != null).length;

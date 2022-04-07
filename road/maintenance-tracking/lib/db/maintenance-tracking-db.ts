@@ -1,5 +1,6 @@
-import {IDatabase} from "pg-promise";
+import {DTDatabase} from "digitraffic-common/database/database";
 import * as R from 'ramda';
+import {DbNumberId} from "../model/db-data";
 
 export enum Status {
     UNHANDLED = 'UNHANDLED',
@@ -47,14 +48,14 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
     RETURNING id
 `;
 
-export function insertMaintenanceTrackingObservationData(db: IDatabase<any, any>, observations: DbObservationData[]): Promise<any> {
+export function insertMaintenanceTrackingObservationData(db: DTDatabase, observations: DbObservationData[]): Promise<(DbNumberId|null)[]> {
     return db.tx(t => {
         return t.batch(observations.map(observation =>
             db.oneOrNone(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)));
     });
 }
 
-export function createInsertObservationValues(e: DbObservationData): any[] {
+export function createInsertObservationValues(e: DbObservationData): unknown[] {
     return [
         e.observationTime,
         e.sendingTime,

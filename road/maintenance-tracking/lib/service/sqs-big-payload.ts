@@ -1,8 +1,9 @@
-import { SqsProducer, SqsConsumer } from 'sns-sqs-big-payload';
-import * as MaintenanceTrackingDb from "../db/maintenance-tracking-db";
-import * as MaintenanceTrackingService from "./maintenance-tracking";
-import {TyokoneenseurannanKirjaus, Havainto} from "../model/models";
+import {SQS} from "aws-sdk";
 import moment from 'moment-timezone';
+import {SqsConsumer, SqsProducer} from 'sns-sqs-big-payload';
+import * as MaintenanceTrackingDb from "../db/maintenance-tracking-db";
+import {Havainto, TyokoneenseurannanKirjaus} from "../model/models";
+import * as MaintenanceTrackingService from "./maintenance-tracking";
 
 // https://github.com/aspecto-io/sns-sqs-big-payload#sqs-producer
 export function createSqsProducer(sqsQueueUrl : string, region : string, sqsBucketName : string) : SqsProducer {
@@ -31,13 +32,13 @@ export function createSqsConsumer(sqsQueueUrl : string, region : string, logFunc
             return JSON.parse(raw);
         },
         // Callback to handle message. Payload is parsed JSON object
-        handleMessage: async ({payload, message, s3PayloadMeta}) => {
+        handleMessage: ({payload, message, s3PayloadMeta}) => {
             return handleMessage(payload, message, s3PayloadMeta, logFunctionName);
         },
     });
 }
 
-export async function handleMessage(payload: TyokoneenseurannanKirjaus, message: any, s3PayloadMeta: S3PayloadMeta, logFunctionName: string) : Promise<void> {
+export async function handleMessage(payload: TyokoneenseurannanKirjaus, message: SQS.Message, s3PayloadMeta: S3PayloadMeta, logFunctionName: string) : Promise<void> {
     /*
     s3PayloadMeta:
     {

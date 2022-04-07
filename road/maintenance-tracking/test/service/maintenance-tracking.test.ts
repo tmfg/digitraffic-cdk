@@ -1,9 +1,9 @@
-import {createObservationsDbDatas, dbTestBase, findAllObservations, truncate} from "../db-testutil";
-import * as pgPromise from "pg-promise";
+import {DTDatabase} from "digitraffic-common/database/database";
 import {createMaintenanceTrackingMessageHash, saveMaintenanceTrackingObservationData} from "../../lib/service/maintenance-tracking";
+import {createObservationsDbDatas, dbTestBase, findAllObservations, truncate} from "../db-testutil";
 import {assertObservationData, getTrackingJsonWith3Observations} from "../testdata";
 
-describe('maintenance-tracking', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('maintenance-tracking', dbTestBase((db: DTDatabase) => {
 
     beforeEach(() => truncate(db));
 
