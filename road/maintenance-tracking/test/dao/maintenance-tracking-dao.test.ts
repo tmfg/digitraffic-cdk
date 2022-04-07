@@ -1,17 +1,16 @@
-import * as pgPromise from "pg-promise";
-import * as MaintenanceTrackingDB from "../../lib/dao/maintenance-tracking-dao";
+import {DTDatabase} from "digitraffic-common/database/database";
 import * as MaintenanceTrackingDb from "../../lib/dao/maintenance-tracking-dao";
 import * as DbTestutil from "../db-testutil";
 import * as TestData from "../testdata";
 
-describe('db-maintenance-tracking - inserts', DbTestutil.dbTestBase((db: pgPromise.IDatabase<any, any>) => {
+describe('db-maintenance-tracking - inserts', DbTestutil.dbTestBase((db: DTDatabase) => {
 
     test('insertMaintenanceTrackingData', async () => {
 
         const maintenanceTrackingDataJson = TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), TestData.getRandompId());
         const createdObservations = DbTestutil.createObservationsDbDatas(maintenanceTrackingDataJson);
 
-        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations);
+        await MaintenanceTrackingDb.insertMaintenanceTrackingObservationData(db, createdObservations);
 
         const fetchedObservations = await DbTestutil.findAllObservations(db);
         expect(fetchedObservations.length).toBe(3);
@@ -27,8 +26,8 @@ describe('db-maintenance-tracking - inserts', DbTestutil.dbTestBase((db: pgPromi
         const createdObservations1 = DbTestutil.createObservationsDbDatas(maintenanceTrackingDataJson1);
         const createdObservations2 = DbTestutil.createObservationsDbDatas(maintenanceTrackingDataJson2);
 
-        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations1);
-        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, createdObservations2);
+        await MaintenanceTrackingDb.insertMaintenanceTrackingObservationData(db, createdObservations1);
+        await MaintenanceTrackingDb.insertMaintenanceTrackingObservationData(db, createdObservations2);
 
         const fetchedObservations = await DbTestutil.findAllObservations(db);
         expect(fetchedObservations.length).toBe(6);
@@ -39,16 +38,16 @@ describe('db-maintenance-tracking - inserts', DbTestutil.dbTestBase((db: pgPromi
         const json = TestData.getTrackingJsonWith3Observations(TestData.getRandompId(), TestData.getRandompId());
         const observationData = DbTestutil.createObservationsDbDatas(json);
 
-        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationData);
+        await MaintenanceTrackingDb.insertMaintenanceTrackingObservationData(db, observationData);
         const fetchedTrackings1 = await DbTestutil.findAllObservations(db);
         expect(fetchedTrackings1.length).toBe(3);
 
-        await MaintenanceTrackingDB.insertMaintenanceTrackingObservationData(db, observationData);
+        await MaintenanceTrackingDb.insertMaintenanceTrackingObservationData(db, observationData);
         const fetchedTrackings2 = await DbTestutil.findAllObservations(db);
         expect(fetchedTrackings2.length).toBe(3);
     });
 
-    test('remove json from DbObservationData', async () => {
+    test('remove json from DbObservationData', () => {
         const json = '{ "a" : "b" }';
         const data : MaintenanceTrackingDb.DbObservationData[] = createDbObservationData();
         expect(data[0].json).toEqual(json);

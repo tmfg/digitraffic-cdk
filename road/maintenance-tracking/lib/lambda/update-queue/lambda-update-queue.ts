@@ -1,17 +1,21 @@
-import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
-import { SqsProducer } from 'sns-sqs-big-payload';
-import * as SqsBigPayload from "../../service/sqs-big-payload";
+import {APIGatewayEvent} from "aws-lambda/trigger/api-gateway-proxy";
+import {SqsProducer} from 'sns-sqs-big-payload';
 import {MaintenanceTrackingEnvKeys} from "../../keys";
+import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
+import * as SqsBigPayload from "../../service/sqs-big-payload";
+
 const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] as string;
 const sqsQueueUrl = process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] as string;
 const region = process.env.AWS_REGION as string;
 
 const sqsProducerInstance : SqsProducer = SqsBigPayload.createSqsProducer(sqsQueueUrl, region, sqsBucketName);
 
+export const handler: (apiGWRequest: APIGatewayEvent) => Promise<ResponseValue> = handlerFn(sqsProducerInstance);
+
 export function handlerFn(sqsProducer : SqsProducer) {
-    return async (apiGWRequest: any): Promise<any> => {
+    return async (apiGWRequest: APIGatewayEvent): Promise<ResponseValue> => {
         const start = Date.now();
-        console.info(`method=updateMaintenanceTrackingRequest bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl} and region: ${region}`);
+        console.info(`method=updateMaintenanceTrackingRequest bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl} and region: ${region} apiGWRequest type: ${typeof apiGWRequest}`);
         if (!apiGWRequest || !apiGWRequest.body) {
             console.error(`method=updateMaintenanceTrackingRequest Empty message`);
             return Promise.reject(invalidRequest("Empty message"));
@@ -34,16 +38,19 @@ export function handlerFn(sqsProducer : SqsProducer) {
     };
 }
 
-export const handler: (apiGWRequest: any) => Promise<any> = handlerFn(sqsProducerInstance);
+type ResponseValue = {
+    readonly statusCode: number,
+    readonly body: string
+}
 
-export function invalidRequest(msg: string): object {
+export function invalidRequest(msg: string): ResponseValue {
     return {
         statusCode: 400,
         body: `Invalid request: ${msg}`,
     };
 }
 
-export function ok(): object {
+export function ok(): ResponseValue {
     return {
         statusCode: 200,
         body: 'OK',

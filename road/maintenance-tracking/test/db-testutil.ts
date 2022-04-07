@@ -1,26 +1,26 @@
+import {DTDatabase} from "digitraffic-common/database/database";
 import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
 import moment from "moment-timezone";
-import {IDatabase} from "pg-promise";
 import {DbObservationData} from "../lib/dao/maintenance-tracking-dao";
 import {Havainto} from "../lib/model/models";
 import {convertToDbObservationData} from "../lib/service/maintenance-tracking";
 
 
-export function dbTestBase(fn: (db: IDatabase<any, any>) => any) {
+export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
         fn, truncate, 'road', 'road', 'localhost:54322/road',
     );
 }
 
-export async function truncate(db: IDatabase<any, any>): Promise<null> {
-    return db.tx(t => {
+export async function truncate(db: DTDatabase) {
+    await db.tx(t => {
         return t.batch([
-            db.none('DELETE FROM maintenance_tracking_observation_data'),
+            db.none(`DELETE FROM maintenance_tracking_observation_data WHERE created > '2000-01-01T00:00:00Z'`),
         ]);
     });
 }
 
-export function findAllObservations(db: IDatabase<any, any>): Promise<DbObservationData[]> {
+export function findAllObservations(db: DTDatabase): Promise<DbObservationData[]> {
     return db.tx(t => {
         return t.manyOrNone(`
             SELECT  id,
@@ -44,9 +44,7 @@ export function createObservationsDbDatas(jsonString : string) : DbObservationDa
     const trackingJson = JSON.parse(jsonString);
     const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
     const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma;
-    const observationDatas: DbObservationData[] =
-        trackingJson.havainnot.map(( havainto: Havainto ) => {
-            return convertToDbObservationData(havainto, sendingTime, sendingSystem, "https://s3Uri.com");
-        });
-    return observationDatas;
+    return trackingJson.havainnot.map(( havainto: Havainto ) => {
+        return convertToDbObservationData(havainto, sendingTime, sendingSystem, "https://s3Uri.com");
+    });
 }
