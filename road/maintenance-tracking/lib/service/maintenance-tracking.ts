@@ -1,7 +1,7 @@
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import moment from "moment-timezone";
-import * as MaintenanceTrackingDB from "../db/maintenance-tracking-db";
-import {DbObservationData, Status} from "../db/maintenance-tracking-db";
+import * as MaintenanceTrackingDB from "../dao/maintenance-tracking-dao";
+import {DbObservationData, Status} from "../dao/maintenance-tracking-dao";
 import {DbNumberId} from "../model/db-data";
 import {Havainto} from "../model/models";
 

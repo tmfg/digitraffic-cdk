@@ -1,7 +1,7 @@
 import {SQS} from "aws-sdk";
 import moment from 'moment-timezone';
 import {SqsConsumer, SqsProducer} from 'sns-sqs-big-payload';
-import * as MaintenanceTrackingDb from "../db/maintenance-tracking-db";
+import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao";
 import {Havainto, TyokoneenseurannanKirjaus} from "../model/models";
 import * as MaintenanceTrackingService from "./maintenance-tracking";
 

@@ -1,6 +1,6 @@
-import {DbObservationData} from "../lib/db/maintenance-tracking-db";
 import {getRandomIntegerAsString} from "digitraffic-common/test/testutils";
 import * as R from 'ramda';
+import {DbObservationData} from "../lib/dao/maintenance-tracking-dao";
 
 const ID_PLACEHOLDER = 'ID_PLACEHOLDER';
 const TK_PLACEHOLDER = 'TK_PLACEHOLDER';

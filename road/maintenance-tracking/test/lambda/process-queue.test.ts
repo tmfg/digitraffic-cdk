@@ -1,18 +1,19 @@
+import {SQSRecord} from "aws-lambda";
+import moment from 'moment-timezone';
+import * as pgPromise from "pg-promise";
+import * as sinon from 'sinon';
+import {SqsConsumer} from 'sns-sqs-big-payload';
+import {DbObservationData, Status} from "../../lib/dao/maintenance-tracking-dao";
 import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
+import * as LambdaProcessQueue from "../../lib/lambda/process-queue/process-queue";
+import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
+import {dbTestBase, findAllObservations} from "../db-testutil";
+import {getRandompId, getTrackingJsonWith3Observations, getTrackingJsonWith3ObservationsAndMissingSendingSystem} from "../testdata";
+
 const QUEUE = 'MaintenanceTrackingQueue';
 process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
 process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
 process.env.AWS_REGION = 'aws-region';
-import { SqsConsumer } from 'sns-sqs-big-payload';
-import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
-import * as pgPromise from "pg-promise";
-import {dbTestBase, findAllObservations} from "../db-testutil";
-import * as LambdaProcessQueue from "../../lib/lambda/process-queue/process-queue";
-import {SQSRecord} from "aws-lambda";
-import {getRandompId, getTrackingJsonWith3Observations, getTrackingJsonWith3ObservationsAndMissingSendingSystem} from "../testdata";
-import * as sinon from 'sinon';
-import moment from 'moment-timezone';
-import {DbObservationData, Status} from "../../lib/db/maintenance-tracking-db";
 
 function createSqsConsumerForTest() : SqsConsumer {
     return SqsBigPayload.createSqsConsumer(`${process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]}`, `${process.env.AWS_REGION}`, 'processMaintenanceTrackingQueueTest');
@@ -29,12 +30,10 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
     test('clone record', async () => {
         console.info("start");
-        const clone = LambdaProcessQueue.cloneRecordWithCamelAndPascal(
-            {
-                "messageId": "aaaa",
-                "Body": "test",
-            }
-        );
+        const clone = LambdaProcessQueue.cloneRecordWithCamelAndPascal({
+            "messageId": "aaaa",
+            "Body": "test",
+        });
         expect(clone.messageId).toEqual("aaaa");
         expect(clone.MessageId).toEqual("aaaa");
         expect(clone.body).toEqual("test");
@@ -54,14 +53,14 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const record : SQSRecord = createRecord(json);
 
         await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
-            Records: [record]
+            Records: [record],
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}]);
 
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(3);
 
         let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
-        for(const obs of allObservations) {
+        for (const obs of allObservations) {
             console.info(JSON.stringify(obs));
             const observationTime = moment(obs.observationTime).valueOf();
             expect(observationTime).toBeGreaterThan(prevObservationTime);
@@ -78,14 +77,14 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const record2 : SQSRecord = createRecord(json2);
 
         await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
-            Records: [record1, record2]
+            Records: [record1, record2],
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);
 
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(6);
 
         let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
-        for(const obs of allObservations) {
+        for (const obs of allObservations) {
             const observationTime = moment(obs.observationTime).valueOf();
             expect(observationTime).toBeGreaterThanOrEqual(prevObservationTime);
             prevObservationTime = observationTime;
@@ -98,7 +97,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const record : SQSRecord = createRecord(json);
 
         await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
-            Records: [record]
+            Records: [record],
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}]);
 
         const allObservations = await findAllObservations(db);
@@ -115,14 +114,14 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const validRecord : SQSRecord = createRecord(validJson);
 
         await expect(LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
-            Records: [invalidRecord, validRecord]
+            Records: [invalidRecord, validRecord],
         })).resolves.toMatchObject( [{"status": "fulfilled", "value": undefined}, {"status": "fulfilled", "value": undefined}]);
 
         const allObservations = await findAllObservations(db);
         expect(allObservations.length).toBe(3);
 
         let prevObservationTime = moment("2019-01-30T12:00:00+02:00").valueOf();
-        for(const obs of allObservations) {
+        for (const obs of allObservations) {
             const observationTime = moment(obs.observationTime).valueOf();
             expect(observationTime).toBeGreaterThan(prevObservationTime);
             prevObservationTime = observationTime;
@@ -135,7 +134,7 @@ describe('process-queue', dbTestBase((db: pgPromise.IDatabase<any, any>) => {
         const record : SQSRecord = createRecord(invalidJson);
 
         await LambdaProcessQueue.handlerFn(sqsClient, secretFn)({
-            Records: [record]
+            Records: [record],
         });
 
         const allObservations = await findAllObservations(db);
@@ -162,7 +161,7 @@ function createRecord(trackingJson = ''): SQSRecord {
         },
         eventSource: '',
         eventSourceARN: '',
-        awsRegion: ''
+        awsRegion: '',
     };
 }
 
@@ -184,7 +183,7 @@ function createDbObservationData() : DbObservationData[] {
             sendingSystem: 'System1',
             status: Status.UNHANDLED,
             hash: 'abcd',
-            s3Uri: 'URL'
+            s3Uri: 'URL',
         },{
             id: BigInt(1),
             observationTime: new Date(),
@@ -195,7 +194,7 @@ function createDbObservationData() : DbObservationData[] {
             sendingSystem: 'System1',
             status: Status.UNHANDLED,
             hash: 'abcd',
-            s3Uri: 'URL'
-        }
-    ]
+            s3Uri: 'URL',
+        },
+    ];
 }

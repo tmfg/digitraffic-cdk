@@ -1,8 +1,8 @@
-import * as MaintenanceTrackingDB from "../../lib/db/maintenance-tracking-db";
 import * as pgPromise from "pg-promise";
+import * as MaintenanceTrackingDB from "../../lib/dao/maintenance-tracking-dao";
+import * as MaintenanceTrackingDb from "../../lib/dao/maintenance-tracking-dao";
 import * as DbTestutil from "../db-testutil";
 import * as TestData from "../testdata";
-import * as MaintenanceTrackingDb from "../../lib/db/maintenance-tracking-db";
 
 describe('db-maintenance-tracking - inserts', DbTestutil.dbTestBase((db: pgPromise.IDatabase<any, any>) => {
 
@@ -72,7 +72,7 @@ function createDbObservationData() : MaintenanceTrackingDb.DbObservationData[] {
             sendingSystem: 'System1',
             status: MaintenanceTrackingDb.Status.UNHANDLED,
             hash: 'abcd',
-            s3Uri: 'URL'
+            s3Uri: 'URL',
         },{
             id: BigInt(1),
             observationTime: new Date(),
@@ -83,7 +83,7 @@ function createDbObservationData() : MaintenanceTrackingDb.DbObservationData[] {
             sendingSystem: 'System1',
             status: MaintenanceTrackingDb.Status.UNHANDLED,
             hash: 'abcd',
-            s3Uri: 'URL'
-        }
-    ]
+            s3Uri: 'URL',
+        },
+    ];
 }
