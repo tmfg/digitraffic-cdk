@@ -1,15 +1,15 @@
+import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
+process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
+process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = 'https://aws-queue-123';
+process.env.AWS_REGION = 'aws-region';
+
 import {APIGatewayEvent} from "aws-lambda/trigger/api-gateway-proxy";
 import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 import * as sinon from 'sinon';
 import {SqsProducer} from 'sns-sqs-big-payload';
-import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
 import * as LambdaUpdateQueue from "../../lib/lambda/update-queue/lambda-update-queue";
 import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
 import {getRandompId, getTrackingJsonWith3Observations} from "../testdata";
-
-process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
-process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = 'https://aws-queue-123';
-process.env.AWS_REGION = 'aws-region';
 
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
