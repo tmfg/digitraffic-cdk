@@ -11,7 +11,7 @@ import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "
 import nauticalWarningProperties from "./model/nautical-warnings-schema";
 import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
 
-const NAUTICAL_WARNINGS_TAGS = ['Nautical Warnings(Beta)'];
+const NAUTICAL_WARNINGS_TAGS = ['Nautical Warnings'];
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -32,9 +32,10 @@ export class PublicApi {
     createResources(publicApi: DigitrafficRestApi) {
         const apiResource = publicApi.root.addResource("api");
         const csResource = apiResource.addResource("nautical-warning");
-        const betaResource = csResource.addResource("beta");
-        this.activeResource = betaResource.addResource("active");
-        this.archivedResource = betaResource.addResource("archived");
+        const v1Resource = csResource.addResource("v1");
+        const warningsResource = v1Resource.addResource("warnings");
+        this.activeResource = warningsResource.addResource("active");
+        this.archivedResource = warningsResource.addResource("archived");
 
         const warningModel = addServiceModel('WarningModel', publicApi, nauticalWarningProperties);
         const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(warningModel.modelId, publicApi.restApiId)));

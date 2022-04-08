@@ -6,14 +6,14 @@ import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 export const handler = async () => {
     const checker = await UrlChecker.createV2();
 
-    await checker.expect200("/prod/api/nautical-warnings/beta/active",
+    await checker.expect200("/prod/api/nautical-warning/v1/warnings/active",
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
         GeoJsonChecker.validFeatureCollection((json: FeatureCollection) => {
             Asserter.assertLengthGreaterThan(json.features, 1);
             Asserter.assertGreaterThan(json.features[0]?.properties?.id, 0);
         }));
 
-    await checker.expect200("/prod/api/nautical-warnings/beta/archived",
+    await checker.expect200("/prod/api/nautical-warning/v1/warnings/archived",
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_GEOJSON),
         GeoJsonChecker.validFeatureCollection());
 
