@@ -5,7 +5,7 @@ import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = async (event: Record<string, string>) => {
+export const handler = (event: Record<string, string>) => {
     const start = Date.now();
     const language = getLanguage(event.language);
     const fixedInHours = getFixed(event.fixed_in_hours);

@@ -1,5 +1,5 @@
 import {GenericSecret, getSecret} from "./secret";
-import {checkExpectedSecretKeys, DatabaseEnvironmentKeys, DbSecret, RdsProxySecret} from "./dbsecret";
+import {checkExpectedSecretKeys, DatabaseEnvironmentKeys, DbSecret} from "./dbsecret";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const NodeTtl = require('node-ttl');
