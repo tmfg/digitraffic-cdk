@@ -26,7 +26,7 @@ export function fetchDataFromEs(
     path: string,
     fromISOString: string,
     toISOString: string,
-): Promise<any> {
+): Promise<ESResponse> {
     return new Promise((resolve, reject) => {
         const creds = new AWS.EnvironmentCredentials("AWS");
         const req = new AWS.HttpRequest(endpoint);
@@ -46,14 +46,14 @@ export function fetchDataFromEs(
             null,
             function (httpResp: any) {
                 let respBody = "";
-                httpResp.on("data", function (chunk: any) {
+                httpResp.on("data", function (chunk: string) {
                     respBody += chunk;
                 });
                 httpResp.on("end", function () {
                     resolve(JSON.parse(respBody));
                 });
             },
-            function (err: any) {
+            function (err: unknown) {
                 console.error("Error: " + err);
                 reject(err);
             });
@@ -96,15 +96,15 @@ export function getQuery(fromISOString: string, toISOString: string) {
  * Parse json messages from ES response to string
  * @param resultJsonObj Json object from elastic search
  */
-export function parseDataToString(resultJsonObj : any): string {
+export function parseDataToString(resultJsonObj: ESResponse): string {
 
-    if (!('hits' in resultJsonObj) || !('hits' in resultJsonObj.hits)) {
+    if (!('hits' in resultJsonObj) || !resultJsonObj.hits || !('hits' in resultJsonObj.hits)) {
         return "";
     }
     const hits = resultJsonObj.hits.hits;
 
     let messages = "";
-    hits.map( function(hit : any) {
+    hits.map( function(hit : ESResponseHit) {
         if (messages.length > 0) {
             messages += '\n\n';
         }
@@ -112,4 +112,18 @@ export function parseDataToString(resultJsonObj : any): string {
     });
     console.info("method=parseDataToString Result length: ", messages.length);
     return messages;
+}
+
+export type ESResponse = {
+    readonly hits: ESResponseHits
+}
+
+export type ESResponseHits = {
+    readonly hits: ESResponseHit[]
+}
+
+export type ESResponseHit = {
+    readonly _source: {
+        readonly message: string
+    }
 }

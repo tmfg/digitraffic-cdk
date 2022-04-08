@@ -26,7 +26,7 @@ export function handlerFn(sqsConsumer : SqsConsumer) : (event: SQSEvent) =>  Pro
 
         return Promise.allSettled(event.Records.map(async (record: SQSRecord) => {
             try {
-                // clone event as library uses PascalCase properties -> include properties in Camel- And PascalCase
+                // clone event as library uses PascalCase properties -> include properties in camelCase and PascalCase
                 const clone = cloneRecordWithCamelAndPascal(record);
                 await sqsConsumer.processMessage(clone, {deleteAfterProcessing: false}); // Delete is done by S3 lifecycle
                 return Promise.resolve();

@@ -11,7 +11,10 @@
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "cdk-diff-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test diff",
+    "cdk-deploy-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test deploy",
+    "cdk-synth-status-test": "cdk synth MaintenanceTrackingLogWatcherTest --no-staging > template-status-test.yaml"
   },
   "devDependencies": {
     "@types/aws-lambda": "*",

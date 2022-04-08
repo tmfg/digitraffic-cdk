@@ -1,4 +1,5 @@
 import {APIGatewayEvent} from "aws-lambda/trigger/api-gateway-proxy";
+import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 import * as sinon from 'sinon';
 import {SqsProducer} from 'sns-sqs-big-payload';
 import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
@@ -30,8 +31,8 @@ describe('update-queue', () => {
         const sqsClient: SqsProducer = createSqsProducerForTest();
         const sendMessageStub = sandbox.stub(sqsClient, 'sendJSON').returns(Promise.resolve());
 
-        await expect(() => LambdaUpdateQueue.handlerFn(sqsClient)(Object.assign({}, testEvent, { body: null })))
-            .rejects.toMatchObject(LambdaUpdateQueue.invalidRequest("Empty message"));
+        await expect(() => LambdaUpdateQueue.handlerFn(sqsClient)({...testEvent, body: null}))
+            .rejects.toMatchObject(LambdaResponse.badRequest("Empty message"));
 
         expect(sendMessageStub.notCalled).toBe(true);
     });
@@ -42,8 +43,8 @@ describe('update-queue', () => {
         const sqsClient: SqsProducer = createSqsProducerForTest();
         const sendMessageStub = sandbox.stub(sqsClient, 'sendJSON').returns(Promise.resolve());
 
-        await expect(LambdaUpdateQueue.handlerFn(sqsClient)(Object.assign({}, testEvent, { body: jsonString })))
-            .resolves.toMatchObject(LambdaUpdateQueue.ok());
+        await expect(LambdaUpdateQueue.handlerFn(sqsClient)({...testEvent, body: jsonString }))
+            .resolves.toMatchObject(LambdaResponse.ok("OK"));
 
         expect(sendMessageStub.calledWith(JSON.parse(jsonString))).toBe(true);
     });
@@ -53,8 +54,8 @@ describe('update-queue', () => {
         const sqsClient: SqsProducer = createSqsProducerForTest();
         const sendMessageStub = sandbox.stub(sqsClient, 'sendJSON');
 
-        await expect(() => LambdaUpdateQueue.handlerFn(sqsClient)(Object.assign({}, testEvent, { body: json })))
-            .rejects.toMatchObject(LambdaUpdateQueue.invalidRequest("Error while sending message to SQS: SyntaxError: Unexpected token i in JSON at position 0"));
+        await expect(() => LambdaUpdateQueue.handlerFn(sqsClient)({...testEvent, body: json }))
+            .rejects.toMatchObject(LambdaResponse.badRequest("Error while sending message to SQS: SyntaxError: Unexpected token i in JSON at position 0"));
 
         expect(sendMessageStub.notCalled).toBe(true);
     });

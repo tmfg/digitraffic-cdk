@@ -11,7 +11,7 @@
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "pretest": "json2ts -i lib/schemas/ -o lib/generated/",
-    "test": "jest --runInBand --detectOpenHandles",
+    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "cdk-diff-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",

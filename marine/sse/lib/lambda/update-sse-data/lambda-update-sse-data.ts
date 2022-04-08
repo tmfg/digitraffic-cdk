@@ -3,11 +3,12 @@ import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder
 import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/aws/types/errors";
 import * as SSE from "../../generated/tlsc-sse-reports-schema";
 import * as SseUpdateService from "../../service/sse-update-service";
+import {SseSaveResult} from "../../service/sse-update-service";
 
 const secretHolder = SecretHolder.create();
 
-export const handler = async (apiGWRequest: SSE.TheSSEReportRootSchema) => {
-    await secretHolder.setDatabaseCredentials();
+// export const handler = async (apiGWRequest: SSE.TheSSEReportRootSchema) => {
+export async function handler(apiGWRequest: SSE.TheSSEReportRootSchema) : Promise<SseSaveResult> {
     const start = Date.now();
 
     if (!apiGWRequest || !apiGWRequest.SSE_Reports) {
@@ -20,6 +21,8 @@ export const handler = async (apiGWRequest: SSE.TheSSEReportRootSchema) => {
         console.info(`DEBUG method=handler ${sseJsonStr}`);
 
         const messageSizeBytes = Buffer.byteLength(sseJsonStr);
+
+        await secretHolder.setDatabaseCredentials();
         const result = await SseUpdateService.saveSseData(apiGWRequest);
 
         const end = Date.now();
@@ -30,7 +33,7 @@ export const handler = async (apiGWRequest: SSE.TheSSEReportRootSchema) => {
         console.error(`method=updateSseData Error tookMs=${(end - start)} data: ${JSON.stringify(apiGWRequest)}`, e);
         throw errorJson(ERROR_MESSAGE, `Error while updating sse data. Error ${JSON.stringify(e)}`);
     }
-};
+}
 
 function errorJson(errorMessage : string, detailedMessage : string) : string {
     return JSON.stringify({
