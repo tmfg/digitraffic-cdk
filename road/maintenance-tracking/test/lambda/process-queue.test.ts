@@ -1,20 +1,20 @@
+import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
+const QUEUE = 'MaintenanceTrackingQueue';
+process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
+process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
+process.env.AWS_REGION = 'aws-region';
+
 import {SQSRecord} from "aws-lambda";
 import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 import {DTDatabase} from "digitraffic-common/database/database";
 import moment from 'moment-timezone';
 import * as sinon from 'sinon';
 import {SqsConsumer} from 'sns-sqs-big-payload';
-import {MaintenanceTrackingEnvKeys} from "../../lib/keys";
 import * as LambdaProcessQueue from "../../lib/lambda/process-queue/process-queue";
 import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
 import {dbTestBase, findAllObservations} from "../db-testutil";
 import {getRandompId, getTrackingJsonWith3Observations, getTrackingJsonWith3ObservationsAndMissingSendingSystem} from "../testdata";
 
-const QUEUE = 'MaintenanceTrackingQueue';
-process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = 'sqs-bucket-name';
-process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = `https://sqs.eu-west-1.amazonaws.com/123456789/${QUEUE}`;
-
-process.env.AWS_REGION = 'aws-region';
 
 
 function createSqsConsumerForTest() : SqsConsumer {
