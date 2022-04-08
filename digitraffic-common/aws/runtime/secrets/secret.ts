@@ -7,6 +7,9 @@ const smClient = new SecretsManager({
 
 export type GenericSecret = Record<string, string>;
 
+/**
+ @deprecated use SecretHolder & ProxyHolder
+ */
 export async function withSecret<Secret, Response>(secretId: string, fn: SecretToPromiseFunction<Secret, Response>): Promise<Response | void> {
     return fn(await getSecret(secretId));
 }

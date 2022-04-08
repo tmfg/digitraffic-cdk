@@ -1,5 +1,5 @@
 import {GenericSecret, getSecret} from "./secret";
-import {checkExpectedSecretKeys, DatabaseEnvironmentKeys, DbSecret} from "./dbsecret";
+import {checkExpectedSecretKeys, DatabaseEnvironmentKeys, DbSecret, RdsProxySecret} from "./dbsecret";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const NodeTtl = require('node-ttl');
@@ -78,6 +78,9 @@ export class SecretHolder<Secret> {
         return secret || this.secretCache.get(DEFAULT_SECRET_KEY);
     }
 
+    /**
+     * @deprecated Use ProxyHolder
+     */
     public async setDatabaseCredentials() {
         const secret = await this.getSecret<DbSecret>();
 

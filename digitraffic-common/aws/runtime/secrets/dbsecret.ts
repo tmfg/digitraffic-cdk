@@ -7,6 +7,13 @@ export interface DbSecret {
     readonly ro_host: string;
 }
 
+export interface RdsProxySecret {
+    readonly username: string
+    readonly password: string
+    readonly proxy_host: string
+    readonly proxy_ro_host: string
+}
+
 export enum DatabaseEnvironmentKeys {
     DB_USER = "DB_USER",
     DB_PASS = "DB_PASS",
@@ -48,6 +55,7 @@ export type EmptySecretFunction<Response = void> = SecretFunction<DbSecret, Resp
 /**
  * Run the given function with secret retrieved from Secrets Manager.  Also injects database-credentials into environment.
  *
+ * @deprecated use SecretHolder & ProxyHolder
  * @see SecretOptions
  *
  * @param {string} secretId

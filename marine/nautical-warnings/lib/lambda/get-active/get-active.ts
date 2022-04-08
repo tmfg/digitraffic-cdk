@@ -1,9 +1,9 @@
 import * as NauticalWarningsService from "../../service/nautical-warnings";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 
-const secretHolder = SecretHolder.create();
+const proxyHolder = ProxyHolder.create();
 
 export const handler = () => {
-    return secretHolder.setDatabaseCredentials()
+    return proxyHolder.setCredentials()
         .then(() => NauticalWarningsService.getActiveWarnings());
 };
