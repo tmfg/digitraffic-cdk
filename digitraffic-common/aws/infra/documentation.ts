@@ -10,6 +10,8 @@ import {CfnDocumentationPart, Resource} from "aws-cdk-lib/aws-apigateway";
  * @param description query parameter description
  * @param resource REST API resource
  * @param stack CloudFormation stack
+ *
+ * @deprecated Use DigitrafficRestApi.documentResource
  */
 export function addQueryParameterDescription(name: string,
     description: string,
