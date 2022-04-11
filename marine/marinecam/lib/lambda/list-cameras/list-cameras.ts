@@ -1,9 +1,9 @@
 import * as MetadataService from '../../service/metadata';
 
 import {Camera} from "../../model/camera";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {RdsHolder} from "digitraffic-common/aws/runtime/secrets/rds-holder";
 
-const proxyHolder = ProxyHolder.create();
+const rdsHolder = RdsHolder.create();
 
 const GROUP_SEPARATOR=',';
 
@@ -14,7 +14,7 @@ export const handler = (event: Record<string, string>) => {
         return Promise.resolve([] as Camera[]);
     }
 
-    return proxyHolder.setCredentials()
+    return rdsHolder.setCredentials()
         .then(() => MetadataService.listAllCameras(usersGroups));
 };
 

@@ -1,8 +1,11 @@
 import {SecretHolder} from "./secret-holder";
-import {DatabaseEnvironmentKeys, RdsProxySecret} from "./dbsecret";
+import {DatabaseEnvironmentKeys, RdsProxySecretKey, RdsProxySecret} from "./dbsecret";
 
-const RDS_PROXY_SECRET_KEYS = ['username', 'password', 'proxy_host', 'proxy_ro_host'];
+const RDS_PROXY_SECRET_KEYS = Object.values(RdsProxySecretKey);
 
+/**
+ * Holds credentials for RDS Proxy access.
+ */
 export class ProxyHolder {
     private readonly secretHolder;
 
