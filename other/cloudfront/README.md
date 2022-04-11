@@ -7,10 +7,26 @@ What you need before installing?
 4. Configuration props for that profile
 5. Log in to aws from command line
 
-Now you can deploy cloudfront with:
+Build
 
-cdk deploy
+    yarn run build
 
+Now you can deploy cloudfrontrun  with:
+
+    cdk deploy
+
+There is also commands like
+
+    yarn run cdk-diff-marine-test  
+    yarn run cdk-diff-marine-prod  
+    yarn run cdk-diff-road-test    
+    yarn run cdk-diff-road-prod
+
+    yarn run cdk-deploy-marine-test
+    yarn run cdk-deploy-marine-prod
+    yarn run cdk-deploy-road-test  
+    yarn run cdk-deploy-road-prod  
+    
 And after that?
 1. Check weathercam-bucket, you must give permission to created originAccessIdentity
 2. Route53, domain-names should be alias to created cloudfront distributions
