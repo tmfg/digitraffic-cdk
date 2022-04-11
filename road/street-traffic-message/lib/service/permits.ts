@@ -41,10 +41,9 @@ export function findPermitsInGeojson() {
         const separateObjectsPerGeometry = geojsonPermits.features.flatMap(permit => {
             const permitGeometryCollection = permit.geometry as GeometryCollection;
             return permitGeometryCollection.geometries.flatMap(singleGeometry => {
-                    return {...permit, geometry: singleGeometry}
-                }
-            )
-        })
+                return {...permit, geometry: singleGeometry};
+            });
+        });
         return {type: "FeatureCollection", features: separateObjectsPerGeometry};
     });
 }
@@ -122,8 +121,6 @@ function convertGeometry(geometry: Geometry) {
             coordinatesForDisplay: positionToList(point.coordinates),
         };
     } else if (geometry.type === 'LineString') {
-        const lineString = geometry as LineString;
-
         return {
             locationDescription: 'Lahti',
             coordinatesForDisplay: '',
