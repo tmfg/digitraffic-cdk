@@ -1,11 +1,11 @@
 import * as MetadataService from '../../service/metadata';
 import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 
-const secretHolder = SecretHolder.create();
+const proxyHolder = ProxyHolder.create();
 
 export const handler = () => {
-    return secretHolder.setDatabaseCredentials()
+    return proxyHolder.setCredentials()
         .then(() => MetadataService.listAllCameras(['Saimaa']))
         .then(cameras => LambdaResponse.ok(cameras))
         .catch(e => {

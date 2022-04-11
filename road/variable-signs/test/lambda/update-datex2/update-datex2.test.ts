@@ -1,10 +1,14 @@
-import {handlerFn, StatusCodeValue} from "../../../lib/lambda/update-datex2/update-datex2";
+import {handler, StatusCodeValue} from "../../../lib/lambda/update-datex2/update-datex2";
 import {dbTestBase} from "../../db-testutil";
 import {readFileSync} from 'fs';
 import * as VariableSignsService from '../../../lib/service/variable-signs';
-import {createSecretFunction} from "digitraffic-common/test/secret";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+
+const sinon = require("sinon");
 
 describe('lambda-update-datex2', dbTestBase(() => {
+    sinon.stub(ProxyHolder.prototype, 'setCredentials').returns(Promise.resolve());
+
     test('update_valid_datex2', async () => {
         await updateFile('valid_datex2.xml', 200);
 
@@ -40,7 +44,7 @@ describe('lambda-update-datex2', dbTestBase(() => {
 
 async function updateFile(filename: string, expectedStatusCode: number): Promise<StatusCodeValue> {
     const request = getRequest(filename);
-    const response = await handlerFn(createSecretFunction({}), request);
+    const response = await handler(request);
 
     expect(response!.statusCode).toBe(expectedStatusCode);
 

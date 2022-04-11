@@ -1,15 +1,15 @@
 import * as CountingSitesService from "../../service/counting-sites";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 
-const holder = SecretHolder.create();
+const proxyHolder = ProxyHolder.create();
 
-export const handler = async () => {
-    await holder.setDatabaseCredentials();
-
+export const handler = () => {
     const start = Date.now();
 
-    return CountingSitesService.getUserTypes().finally(() => {
-        console.info("method=CountingSites.GetUserTypes tookMs=%d", (Date.now() - start));
-    });
+    return proxyHolder.setCredentials()
+        .then(() => CountingSitesService.getUserTypes())
+        .finally(() => {
+            console.info("method=CountingSites.GetUserTypes tookMs=%d", (Date.now() - start));
+        });
 };
 

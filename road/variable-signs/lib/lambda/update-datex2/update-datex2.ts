@@ -1,31 +1,23 @@
 import {updateDatex2} from "../../service/variable-sign-updater";
-import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
-import {GenericSecret} from "digitraffic-common/aws/runtime/secrets/secret";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 
-const secretId = process.env.SECRET_ID as string;
+const proxyHolder = ProxyHolder.create();
 
 export type StatusCodeValue = {
     readonly statusCode: number;
 }
 
 export const handler = async (event: Record<string, string>) : Promise<StatusCodeValue | void> => {
-    return handlerFn(withDbSecret, event);
+    const datex2 = event.body;
+
+    if (datex2) {
+        console.info('DEBUG ' + datex2);
+
+        return proxyHolder.setCredentials()
+            .then(() => updateDatex2(datex2))
+            .catch(() => ({
+                statusCode: 500,
+            }));
+    }
+    return {statusCode:400};
 };
-
-export function handlerFn(withDbSecretFn: SecretFunction<GenericSecret, StatusCodeValue>, event: Record<string, string>): Promise<StatusCodeValue | void> {
-    return withDbSecretFn(secretId, async () => {
-        const datex2 = event.body;
-
-        if (datex2) {
-            console.info('DEBUG ' + datex2);
-
-            try {
-                return await updateDatex2(datex2);
-            } catch (e) {
-                return {statusCode: 500};
-            }
-        }
-
-        return {statusCode:400};
-    });
-}

@@ -1,16 +1,14 @@
-import {findActiveSignsDatex2} from "../../service/variable-signs";
-import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import * as VariableSignsService from "../../service/variable-signs";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 
-const secretId = process.env.SECRET_ID as string;
+const proxyHolder = ProxyHolder.create();
 
-export const handler = async () => {
+export const handler = () => {
     const start = Date.now();
 
-    try {
-        return await withDbSecret(secretId, () => {
-            return findActiveSignsDatex2();
+    return proxyHolder.setCredentials()
+        .then(() => VariableSignsService.findActiveSignsDatex2())
+        .finally(() => {
+            console.info("method=findActiveSignsDatex2 tookMs=%d", (Date.now()-start));
         });
-    } finally {
-        console.info("method=findActiveSignsDatex2 tookMs=%d", (Date.now()-start));
-    }
 };
