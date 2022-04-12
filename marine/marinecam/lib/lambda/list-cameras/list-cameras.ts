@@ -1,9 +1,9 @@
 import * as MetadataService from '../../service/metadata';
 
 import {Camera} from "../../model/camera";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {RdsHolder} from "digitraffic-common/aws/runtime/secrets/rds-holder";
 
-const secretHolder = SecretHolder.create();
+const rdsHolder = RdsHolder.create();
 
 const GROUP_SEPARATOR=',';
 
@@ -14,7 +14,7 @@ export const handler = (event: Record<string, string>) => {
         return Promise.resolve([] as Camera[]);
     }
 
-    return secretHolder.setDatabaseCredentials()
+    return rdsHolder.setCredentials()
         .then(() => MetadataService.listAllCameras(usersGroups));
 };
 

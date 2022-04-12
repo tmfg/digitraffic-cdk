@@ -1,18 +1,22 @@
 import {withSecret, withSecretAndPrefix} from "./secret";
 
-export interface DbSecret {
+export type DbSecret = {
     readonly username: string
     readonly password: string
     readonly host: string
-    readonly ro_host: string;
+    readonly ro_host: string
+};
+
+export enum RdsProxySecretKey {
+    username = "username", password = "password", proxy_host = "proxy_host", proxy_ro_host = "proxy_ro_host"
 }
 
-export interface RdsProxySecret {
-    readonly username: string
-    readonly password: string
-    readonly proxy_host: string
-    readonly proxy_ro_host: string
+export enum RdsSecretKey {
+    username = "username", password = "password", host = "host", ro_host = "ro_host"
 }
+
+export type RdsProxySecret = Record<RdsProxySecretKey, string>;
+export type RdsSecret = Record<RdsSecretKey, string>;
 
 export enum DatabaseEnvironmentKeys {
     DB_USER = "DB_USER",

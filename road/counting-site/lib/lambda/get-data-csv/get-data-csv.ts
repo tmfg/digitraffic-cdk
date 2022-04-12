@@ -1,13 +1,11 @@
 import * as CountingSitesService from "../../service/counting-sites";
 import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
 import {validate, ValuesQueryParameters} from "../../model/parameters";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 
-const holder = SecretHolder.create();
+const proxyHolder = ProxyHolder.create();
 
-export const handler = async (event: ValuesQueryParameters) => {
-    await holder.setDatabaseCredentials();
-
+export const handler = (event: ValuesQueryParameters) => {
     const start = Date.now();
 
     const validationError = validate(event);
@@ -20,13 +18,15 @@ export const handler = async (event: ValuesQueryParameters) => {
 
     const filename = `${year}-${month}.csv`;
 
-    return CountingSitesService.getValuesForMonth(year, month, event.domainName, event.counterId).then(data => {
-        return LambdaResponse.ok(data, filename);
-    }).catch(error => {
-        console.info("error " + error);
+    return proxyHolder.setCredentials()
+        .then(() => CountingSitesService.getValuesForMonth(year, month, event.domainName, event.counterId))
+        .then(data => {
+            return LambdaResponse.ok(data, filename);
+        }).catch(error => {
+            console.info("error " + error);
 
-        return LambdaResponse.internalError();
-    }).finally(() => {
-        console.info("method=CountingSites.GetCSVData tookMs=%d", (Date.now() - start));
-    });
+            return LambdaResponse.internalError();
+        }).finally(() => {
+            console.info("method=CountingSites.GetCSVData tookMs=%d", (Date.now() - start));
+        });
 };
