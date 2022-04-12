@@ -1,4 +1,5 @@
 import {Props} from './app-props';
+import {BucketDeployment, Source} from 'aws-cdk-lib/aws-s3-deployment';
 import * as InternalLambdas from './internal-lambdas';
 import {BlockPublicAccess, Bucket, HttpMethods} from "aws-cdk-lib/aws-s3";
 import {CanonicalUserPrincipal, Effect, PolicyStatement} from "aws-cdk-lib/aws-iam";
@@ -23,6 +24,12 @@ export class SwaggerJoinerStack extends DigitrafficStack {
                 allowedOrigins: ['*'],
                 allowedMethods: [HttpMethods.GET],
             }],
+        });
+
+        new BucketDeployment(this, 'SwaggerFiles', {
+            destinationBucket: bucket,
+            sources: [Source.asset('./resources')],
+            exclude: ['dt-swagger.js', 'version.txt'],
         });
 
         if (props.s3VpcEndpointId) {

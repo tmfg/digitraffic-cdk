@@ -84,7 +84,7 @@ export class StackCheckingAspect implements IAspect {
     }
 
     private checkFunction(node: IConstruct) {
-        if (node instanceof CfnFunction) {
+        if (node instanceof CfnFunction && !node.logicalId.includes('CDKBucketDeployment')) {
             const f = node as CfnFunction;
 
             if (!f.reservedConcurrentExecutions) {
