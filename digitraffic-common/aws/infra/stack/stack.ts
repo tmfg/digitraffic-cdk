@@ -34,6 +34,8 @@ export type StackConfiguration = {
     readonly trafficType: TrafficType;
     readonly production: boolean;
     readonly stackProps: StackProps;
+
+    readonly whitelistedResources?: string[];
 }
 
 export class DigitrafficStack extends Stack {
