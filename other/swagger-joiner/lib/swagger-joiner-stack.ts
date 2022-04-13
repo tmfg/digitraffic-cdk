@@ -29,6 +29,7 @@ export class SwaggerJoinerStack extends DigitrafficStack {
         new BucketDeployment(this, 'SwaggerFiles', {
             destinationBucket: bucket,
             sources: [Source.asset('./resources')],
+            destinationKeyPrefix: props.directory,
             exclude: ['dt-swagger.js', 'version.txt'],
         });
 
