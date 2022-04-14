@@ -23,6 +23,8 @@ export function truncate(db: DTDatabase) {
         return t.batch([
             db.none('delete from device'),
             db.none('delete from device_data_datex2'),
+            db.none('delete from device_data_row'),
+            db.none('delete from device_data'),
         ]);
     });
 

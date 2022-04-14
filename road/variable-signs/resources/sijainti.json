@@ -1,0 +1,23 @@
+{
+    "$schema": "http://json-schema.org/draft-03/schema#",
+    "id": "urn:tloik/sijainti",
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+        "tieosoite": {
+            "type": "string"
+        },
+        "ajosuunta": {
+            "type": "string"
+        },
+        "ajorata": {
+            "type": "string"
+        },
+        "n": {
+            "type": "number"
+        },
+        "e": {
+            "type": "number"
+        }
+    }
+}

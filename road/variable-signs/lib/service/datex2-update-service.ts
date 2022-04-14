@@ -1,7 +1,8 @@
 import * as DeviceDB from "../db/datex2";
 import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import {DTDatabase, DTTransaction, inDatabase} from "digitraffic-common/database/database";
-import {StatusCodeValue} from "../lambda/update-datex2/update-datex2";
+import {Situation} from "../model/situation";
+import {StatusCodeValue} from "../model/status-code-value";
 
 const REG_PAYLOAD = /<payloadPublication/g;
 
@@ -12,18 +13,12 @@ const DATEX2_OVERALL_STARTTIME_TAG_END = '</overallStartTime>';
 const DATEX2_VERSION_ATTRIBUTE = 'version=';
 const XML_TAG_START = '<?xml';
 
-export interface Situation {
-    readonly id: string,
-    readonly datex2: string,
-    readonly effect_date: Date
-}
-
 export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
     const start = Date.now();
     const timestamp = new Date(start);
 
     if (!validate(datex2)) {
-        return {statusCode: 400};
+        return StatusCodeValue.BAD_REQUEST;
     }
 
     const situations = parseSituations(datex2);
@@ -38,7 +33,7 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
             });
         });
 
-        return {statusCode: 200};
+        return StatusCodeValue.OK;
     } finally {
         console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (Date.now() - start));
     }
@@ -70,7 +65,7 @@ function parseSituation(datex2: string): Situation {
         id: parseId(datex2),
         datex2: datex2,
         // eslint-disable-next-line camelcase
-        effect_date: parseEffectDate(datex2),
+        effectDate: parseEffectDate(datex2),
     };
 }
 

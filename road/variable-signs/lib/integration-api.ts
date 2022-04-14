@@ -1,40 +1,57 @@
-import {LambdaIntegration, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
-import {Function} from 'aws-cdk-lib/aws-lambda';
+import {LambdaIntegration, Resource} from 'aws-cdk-lib/aws-apigateway';
 import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 
-export function create(stack: DigitrafficStack) {
-    const integrationApi = new DigitrafficRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API');
-    createUpdateRequestHandler(stack, integrationApi);
-    createUsagePlan(integrationApi, 'Integration API key', 'Integration Usage Plan');
-}
+export class IntegrationApi {
+    readonly restApi: DigitrafficRestApi;
+    private updateDatex2Resource: Resource;
+    private updateJsonDataResource: Resource;
+    private updateJsonMetadataResource: Resource;
 
-function createUpdateRequestHandler (stack: DigitrafficStack,
-    integrationApi: RestApi) {
-    const updateDatexV1Handler = createUpdateDatexV1(stack);
-    const integrationV1Root = createIntegrationV1Root(integrationApi);
+    constructor(stack: DigitrafficStack) {
+        this.restApi = new DigitrafficRestApi(stack, 'VariableSigns-Integration', 'Variable Signs integration API');
 
-    createIntegrationResource(integrationV1Root, updateDatexV1Handler);
-}
+        this.createResourcePaths();
+        this.createDatexV1Handler(stack);
+        this.createJsonDataV1Handler(stack);
+        this.createJsonMetadataV1Handler(stack);
 
-function createIntegrationV1Root(integrationApi: RestApi) {
-    const vsResource = integrationApi.root.addResource("variable-signs");
+        this.restApi.createUsagePlan('Integration API key', 'Integration Usage Plan');
+    }
 
-    return vsResource.addResource("v1");
-}
+    createResourcePaths() {
+        const vsResource = this.restApi.root.addResource("variable-signs");
+        const v1Resource = vsResource.addResource("v1");
 
-function createIntegrationResource(intergrationRoot: Resource, updateDatexV1Handler: Function) {
-    const updateDatex2Resource = intergrationRoot.addResource("update-datex2");
+        this.updateDatex2Resource = v1Resource.addResource("update-datex2");
+        this.updateJsonDataResource = v1Resource.addResource("update-data");
+        this.updateJsonMetadataResource = v1Resource.addResource("update-metadata");
+    }
 
-    updateDatex2Resource.addMethod("PUT", new LambdaIntegration(updateDatexV1Handler), {
-        apiKeyRequired: true,
-    });
-}
+    createDatexV1Handler(stack: DigitrafficStack) {
+        const updateDatexV1Handler = MonitoredDBFunction.create(stack, 'update-datex2', undefined, {
+            memorySize: 256,
+        });
 
-function createUpdateDatexV1(stack: DigitrafficStack): Function {
-    return MonitoredDBFunction.create(stack, 'update-datex2', undefined, {
-        memorySize: 256,
-    });
+        this.updateDatex2Resource.addMethod("PUT", new LambdaIntegration(updateDatexV1Handler), {
+            apiKeyRequired: true,
+        });
+    }
+
+    createJsonDataV1Handler(stack: DigitrafficStack) {
+        const updateJsonHandler = MonitoredDBFunction.create(stack, 'update-json-data');
+
+        this.updateJsonDataResource.addMethod("PUT", new LambdaIntegration(updateJsonHandler), {
+            apiKeyRequired: true,
+        });
+    }
+
+    private createJsonMetadataV1Handler(stack: DigitrafficStack) {
+        const updateJsonHandler = MonitoredDBFunction.create(stack, 'update-json-metadata');
+
+        this.updateJsonMetadataResource.addMethod("PUT", new LambdaIntegration(updateJsonHandler), {
+            apiKeyRequired: true,
+        });
+    }
 }

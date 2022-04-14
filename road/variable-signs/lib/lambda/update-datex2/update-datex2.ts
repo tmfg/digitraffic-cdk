@@ -1,11 +1,8 @@
-import {updateDatex2} from "../../service/variable-sign-updater";
+import * as Datex2UpdateService from "../../service/datex2-update-service";
 import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {StatusCodeValue} from "../../model/status-code-value";
 
 const proxyHolder = ProxyHolder.create();
-
-export type StatusCodeValue = {
-    readonly statusCode: number;
-}
 
 export const handler = async (event: Record<string, string>) : Promise<StatusCodeValue | void> => {
     const datex2 = event.body;
@@ -14,10 +11,9 @@ export const handler = async (event: Record<string, string>) : Promise<StatusCod
         console.info('DEBUG ' + datex2);
 
         return proxyHolder.setCredentials()
-            .then(() => updateDatex2(datex2))
-            .catch(() => ({
-                statusCode: 500,
-            }));
+            .then(() => Datex2UpdateService.updateDatex2(datex2))
+            .catch(() => StatusCodeValue.INTERNAL_ERROR);
     }
-    return {statusCode:400};
+
+    return StatusCodeValue.BAD_REQUEST;
 };
