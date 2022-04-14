@@ -36,6 +36,8 @@ export class SecretHolder<Secret> {
     private async initSecret() {
         const secretValue = await getSecret<Secret>(this.secretId);
 
+        console.info("refreshing secret " + this.secretId);
+
         this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
     }
 

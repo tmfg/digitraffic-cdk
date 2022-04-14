@@ -1,6 +1,8 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 import {withDbSecret} from "../../runtime/secrets/dbsecret";
 import {DTDatabase, inDatabaseReadonly} from "../../../database/database";
+import {ProxyHolder} from "../../runtime/secrets/proxy-holder";
+import {RdsHolder} from "../../runtime/secrets/rds-holder";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const synthetics = require('Synthetics');
@@ -76,11 +78,11 @@ const stepConfig = {
 };
 
 export class DatabaseChecker {
-    readonly secret: string;
+    credentialsFunction: (() => Promise<void>);
     checks: DatabaseCheck<BaseResponse>[];
 
-    constructor(secret: string) {
-        this.secret = secret;
+    private constructor(credentialsFunction: (() => Promise<void>)) {
+        this.credentialsFunction = credentialsFunction;
         this.checks = [];
 
         synthetics.getConfiguration()
@@ -90,8 +92,12 @@ export class DatabaseChecker {
             .withFailedCanaryMetric(true);
     }
 
-    static create() {
-        return new DatabaseChecker(process.env.SECRET_ID as string);
+    static createForProxy() {
+        return new DatabaseChecker(async () => new ProxyHolder(process.env.SECRET_ID as string).setCredentials());
+    }
+
+    static createForRds() {
+        return new DatabaseChecker(async () => new RdsHolder(process.env.SECRET_ID as string).setCredentials());
     }
 
     one(name: string, sql: string) {
@@ -126,21 +132,20 @@ export class DatabaseChecker {
             throw new Error('No checks');
         }
 
-        await withDbSecret(this.secret, async () => {
-            await inDatabaseReadonly(async (db: DTDatabase) => {
-                for (const check of this.checks) {
-                    console.info("canary checking sql " + check.sql);
+        await this.credentialsFunction();
+        await inDatabaseReadonly(async (db: DTDatabase) => {
+            for (const check of this.checks) {
+                console.info("canary checking sql " + check.sql);
 
-                    const value = await db.oneOrNone(check.sql);
-                    const checkFunction = () => {
-                        check.check(value);
-                    };
+                const value = await db.oneOrNone(check.sql);
+                const checkFunction = () => {
+                    check.check(value);
+                };
 
-                    synthetics.executeStep(check.name,
-                        checkFunction,
-                        stepConfig);
-                }
-            });
+                synthetics.executeStep(check.name,
+                    checkFunction,
+                    stepConfig);
+            }
         });
 
         if (this.checks.some(check => check.failed)) {

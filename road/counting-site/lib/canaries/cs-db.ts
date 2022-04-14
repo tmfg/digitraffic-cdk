@@ -2,7 +2,7 @@ import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-ch
 import {DataType} from "digitraffic-common/database/last-updated";
 
 export const handler = () => {
-    const checker = DatabaseChecker.create();
+    const checker = DatabaseChecker.createForProxy();
 
     checker.notEmpty('domains not empty',
         'select count(*) from counting_site_domain');

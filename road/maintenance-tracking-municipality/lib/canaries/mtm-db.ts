@@ -5,7 +5,7 @@ import {MaintenanceTrackingMunicipalityEnvKeys} from "../keys";
 const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] as string;
 
 export const handler = () => {
-    const checker = DatabaseChecker.create();
+    const checker = DatabaseChecker.createForProxy();
 
     checker.notEmpty(`domain ${domainName} is found`,
         `SELECT count(*) FROM maintenance_tracking_domain WHERE name = '${domainName}'`);

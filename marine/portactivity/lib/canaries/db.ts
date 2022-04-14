@@ -1,7 +1,7 @@
 import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
 
 export const handler = (): Promise<string> => {
-    const checker = DatabaseChecker.create();
+    const checker = DatabaseChecker.createForRds();
 
     checker.notEmpty("pilotages in last hour",
         "select count(*) from pilotage where schedule_updated > (current_timestamp - interval '1 hour')");

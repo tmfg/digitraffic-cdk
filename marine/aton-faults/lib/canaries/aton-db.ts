@@ -1,9 +1,7 @@
 import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
 
-const secretId = process.env.SECRET_ID as string;
-
 export const handler = () => {
-    const checker = new DatabaseChecker(secretId);
+    const checker = DatabaseChecker.createForRds();
 
     checker.notEmpty('states are not empty',
         'select count(*) from aton_fault_state');

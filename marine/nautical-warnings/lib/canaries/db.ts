@@ -2,7 +2,7 @@ import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-ch
 import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
 
 export const handler = () => {
-    const checker = DatabaseChecker.create();
+    const checker = DatabaseChecker.createForProxy();
 
     checker.one('active cache is not empty',
         `select count(*) from cached_json where cache_id = '${JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE}'`);

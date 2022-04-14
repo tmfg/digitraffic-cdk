@@ -2,7 +2,7 @@ import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-ch
 import {EventSource} from "../model/eventsource";
 
 export const handler = (): Promise<string> => {
-    const checker = DatabaseChecker.create();
+    const checker = DatabaseChecker.createForRds();
 
     checker.notEmpty('port call timestamps in last hour',
         "select count(*) from port_call_timestamp where record_time > (current_timestamp - interval '1 hour')");
