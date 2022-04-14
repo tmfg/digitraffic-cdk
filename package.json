@@ -17,19 +17,19 @@
   ],
   "resolutions": {
     "@types/aws-lambda": "8.10.85",
-    "aws-cdk-lib": "2.2.0",
-    "aws-sdk": "2.1046.0",
-    "constructs": "10.0.12",
-    "moment": "2.29.1",
+    "aws-cdk-lib": "2.20.0",
+    "aws-sdk": "2.1111.0",
+    "constructs": "10.0.110",
+    "moment": "2.29.2",
     "moment-timezone": "0.5.34",
     "pg-native": "3.0.0",
     "pg-promise": "10.11.1"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.3.1",
-    "@typescript-eslint/parser": "^5.3.1",
-    "esbuild": "^0.14.6",
-    "eslint": "^8.2.0",
-    "typescript": "^4.5.4"
+    "@typescript-eslint/parser": "^5.18.0",
+    "esbuild": "^0.14.34",
+    "eslint": "^8.13.0",
+    "typescript": "^4.6.3"
   }
 }

@@ -19,8 +19,8 @@ const sqsConsumerInstance : SqsConsumer = SqsBigPayload.createSqsConsumer(sqsQue
 export const handler: (e: SQSEvent) => Promise<PromiseSettledResult<void>> = middy(handlerFn(sqsConsumerInstance)).use(sqsPartialBatchFailureMiddleware());
 
 export function handlerFn(sqsConsumer : SqsConsumer) : (event: SQSEvent) =>  Promise<PromiseSettledResult<void>[]> {
-    return (event: SQSEvent) => {
-        secretHolder.setDatabaseCredentials();
+    return async (event: SQSEvent) => {
+        await secretHolder.setDatabaseCredentials();
 
         console.info(`method=processMaintenanceTrackingQueue Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`);
 
