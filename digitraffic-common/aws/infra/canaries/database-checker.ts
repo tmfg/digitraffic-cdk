@@ -1,5 +1,4 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-import {withDbSecret} from "../../runtime/secrets/dbsecret";
 import {DTDatabase, inDatabaseReadonly} from "../../../database/database";
 import {ProxyHolder} from "../../runtime/secrets/proxy-holder";
 import {RdsHolder} from "../../runtime/secrets/rds-holder";
@@ -93,11 +92,11 @@ export class DatabaseChecker {
     }
 
     static createForProxy() {
-        return new DatabaseChecker(async () => new ProxyHolder(process.env.SECRET_ID as string).setCredentials());
+        return new DatabaseChecker(() => new ProxyHolder(process.env.SECRET_ID as string).setCredentials());
     }
 
     static createForRds() {
-        return new DatabaseChecker(async () => new RdsHolder(process.env.SECRET_ID as string).setCredentials());
+        return new DatabaseChecker(() => new RdsHolder(process.env.SECRET_ID as string).setCredentials());
     }
 
     one(name: string, sql: string) {
