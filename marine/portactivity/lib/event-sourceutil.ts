@@ -25,8 +25,8 @@ const eventSourcePriorities = new Map<string, number>([
     [EventSource.PORT_HANKO, 100],
 ]);
 
-export const VTS_TIMESTAMP_TOO_OLD_HOURS = 3;
-export const VTS_TIMESTAMP_DIFF_HOURS = 3;
+export const VTS_TIMESTAMP_TOO_OLD_MINUTES = 60;
+export const VTS_TIMESTAMP_DIFF_MINUTES = 60;
 
 export function isPortnetTimestamp(timestamp: ApiTimestamp): boolean {
     return timestamp.source === EventSource.PORTNET;
@@ -56,16 +56,15 @@ type MergeableTimestamp = {
     readonly portcallId?: number | null
 }
 
-function timestampIsTooOld(timestamp: MergeableTimestamp) {
-    const diffHours = Math.ceil(moment.duration(moment().diff(moment(timestamp.recordTime))).asHours());
-    return diffHours >= VTS_TIMESTAMP_TOO_OLD_HOURS;
+function momentsDifferByMinutes(moment1: Moment, moment2: Moment, maxDiffMinutes: number) {
+    const diffMinutes = Math.ceil(moment.duration(moment1.diff(moment2)).asMinutes());
+    return diffMinutes >= maxDiffMinutes;
 }
 
-function timestampsDifferTooMuch(vtsTimestamp: MergeableTimestamp, awakeTimestamp: MergeableTimestamp) {
-    const diffHours = Math.ceil(moment.duration(moment(vtsTimestamp.eventTime).diff(moment(awakeTimestamp.eventTime))).asHours());
-    return diffHours >= VTS_TIMESTAMP_DIFF_HOURS;
-}
-
+/**
+ * Checks if certain types of timestamps from an equivalent source can be merged.
+ * @param timestamps
+ */
 export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTimestamp[] {
     let ret: MergeableTimestamp[] = timestamps;
 
@@ -73,21 +72,28 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
     const byPortcallId: MergeableTimestamp[][] = R.compose(R.values,
         R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString() + ts.eventType))(timestamps);
 
+    // Re-sort? Timestamp places can change after merging
     let needToSort = false;
 
+    // timestamps relating to specific port call
     for (const portcallTimestamps of byPortcallId) {
         let vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source));
+
+        // more than one calculated timestamp, check if they can be merged
         if (vtsAStamps.length > 1) {
+
+            // special handling for out-of-date or incorrect VTS timestamps
             const vtsTimestamp = ret.find(t => t.source === EventSource.SCHEDULES_CALCULATED);
             const awakeTimestamp = ret.find(t => t.source === EventSource.AWAKE_AI);
             if (vtsTimestamp && awakeTimestamp) {
-                if (timestampIsTooOld(vtsTimestamp) || timestampsDifferTooMuch(vtsTimestamp, awakeTimestamp)) {
-                    ret = ret.filter(t => t !== vtsTimestamp && t !== awakeTimestamp);
-                    ret.push(awakeTimestamp);
+                if (momentsDifferByMinutes(moment(), moment(vtsTimestamp.recordTime), VTS_TIMESTAMP_TOO_OLD_MINUTES) ||
+                    momentsDifferByMinutes(moment(vtsTimestamp.eventTime), moment(awakeTimestamp.eventTime), VTS_TIMESTAMP_DIFF_MINUTES)) {
+                    // remove only VTS timestamp
+                    ret = ret.filter(t => t !== vtsTimestamp);
                     vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source) && t !== vtsTimestamp);
                 }
             }
-            // build an average timestamp and discard the rest
+            // build an average timestamp from the calculated timestamps and discard the rest
             // use the source with the highest priority
             ret = ret.filter(t => !vtsAStamps.includes(t));
             const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source) as number), vtsAStamps)) as MergeableTimestamp;
@@ -98,6 +104,5 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
         }
     }
 
-    // re-sort as timestamp places can change after merging
     return needToSort ? R.sortBy((ts) => moment(ts.eventTime).valueOf(), ret) : ret;
 }

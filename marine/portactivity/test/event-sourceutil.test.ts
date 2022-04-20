@@ -1,6 +1,6 @@
 import {
     momentAverage,
-    mergeTimestamps, VTS_TIMESTAMP_TOO_OLD_HOURS, VTS_TIMESTAMP_DIFF_HOURS,
+    mergeTimestamps, VTS_TIMESTAMP_DIFF_MINUTES, VTS_TIMESTAMP_TOO_OLD_MINUTES,
 } from "../lib/event-sourceutil";
 import moment from "moment-timezone";
 import {newTimestamp} from "./testdata";
@@ -92,10 +92,10 @@ describe('event-sourceutil', () => {
         const portcallId = 1;
         const vtsTimestamp = newTimestamp({
             source: EventSource.SCHEDULES_CALCULATED,
-            recordTime: moment().subtract(VTS_TIMESTAMP_TOO_OLD_HOURS + getRandomInteger(0, 1000), 'hour').toDate(),
+            recordTime: moment().subtract(VTS_TIMESTAMP_TOO_OLD_MINUTES + getRandomInteger(0, 1000), 'minute').toDate(),
             portcallId,
         });
-        const awakeTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId });
+        const awakeTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId, eventTime: moment().toDate() });
         const timestamps = [
             vtsTimestamp,
             awakeTimestamp,
@@ -109,7 +109,7 @@ describe('event-sourceutil', () => {
         const awakeTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId });
         const vtsTimestamp = newTimestamp({
             source: EventSource.SCHEDULES_CALCULATED,
-            eventTime: moment(awakeTimestamp.eventTime).add(VTS_TIMESTAMP_DIFF_HOURS + getRandomInteger(0, 1000), 'hour').toDate(),
+            eventTime: moment(awakeTimestamp.eventTime).add(VTS_TIMESTAMP_DIFF_MINUTES + getRandomInteger(0, 1000), 'minute').toDate(),
             portcallId,
         });
         const timestamps = [
