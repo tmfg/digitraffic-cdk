@@ -46,6 +46,7 @@ export function handlerFn(event: ProxyLambdaRequest,
                     .map(ts => Object.assign(ts, {
                         source: ts.event_source,
                         eventTime: ts.event_time,
+                        recordTime: ts.record_time,
                         portcallId: ts.portcall_id,
                         eventType: ts.event_type,
                     }));

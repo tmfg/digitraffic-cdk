@@ -25,6 +25,9 @@ const eventSourcePriorities = new Map<string, number>([
     [EventSource.PORT_HANKO, 100],
 ]);
 
+export const VTS_TIMESTAMP_TOO_OLD_HOURS = 3;
+export const VTS_TIMESTAMP_DIFF_HOURS = 3;
+
 export function isPortnetTimestamp(timestamp: ApiTimestamp): boolean {
     return timestamp.source === EventSource.PORTNET;
 }
@@ -47,9 +50,20 @@ export function momentAverage(moments: Moment[]): string {
 
 type MergeableTimestamp = {
     readonly eventTime: string
+    readonly recordTime: string
     readonly source: string
     readonly eventType: EventType
     readonly portcallId?: number | null
+}
+
+function timestampIsTooOld(timestamp: MergeableTimestamp) {
+    const diffHours = Math.ceil(moment.duration(moment().diff(moment(timestamp.recordTime))).asHours());
+    return diffHours >= VTS_TIMESTAMP_TOO_OLD_HOURS;
+}
+
+function timestampsDifferTooMuch(vtsTimestamp: MergeableTimestamp, awakeTimestamp: MergeableTimestamp) {
+    const diffHours = Math.ceil(moment.duration(moment(vtsTimestamp.eventTime).diff(moment(awakeTimestamp.eventTime))).asHours());
+    return diffHours >= VTS_TIMESTAMP_DIFF_HOURS;
 }
 
 export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTimestamp[] {
@@ -62,8 +76,17 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
     let needToSort = false;
 
     for (const portcallTimestamps of byPortcallId) {
-        const vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source));
+        let vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source));
         if (vtsAStamps.length > 1) {
+            const vtsTimestamp = ret.find(t => t.source === EventSource.SCHEDULES_CALCULATED);
+            const awakeTimestamp = ret.find(t => t.source === EventSource.AWAKE_AI);
+            if (vtsTimestamp && awakeTimestamp) {
+                if (timestampIsTooOld(vtsTimestamp) || timestampsDifferTooMuch(vtsTimestamp, awakeTimestamp)) {
+                    ret = ret.filter(t => t !== vtsTimestamp && t !== awakeTimestamp);
+                    ret.push(awakeTimestamp);
+                    vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source) && t !== vtsTimestamp);
+                }
+            }
             // build an average timestamp and discard the rest
             // use the source with the highest priority
             ret = ret.filter(t => !vtsAStamps.includes(t));

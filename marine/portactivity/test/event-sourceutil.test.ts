@@ -1,12 +1,12 @@
 import {
     momentAverage,
-    mergeTimestamps,
+    mergeTimestamps, VTS_TIMESTAMP_TOO_OLD_HOURS, VTS_TIMESTAMP_DIFF_HOURS,
 } from "../lib/event-sourceutil";
 import moment from "moment-timezone";
 import {newTimestamp} from "./testdata";
 import {ApiTimestamp} from "../lib/model/timestamp";
 import {EventSource} from "../lib/model/eventsource";
-import {shuffle} from "digitraffic-common/test/testutils";
+import {getRandomInteger, shuffle} from "digitraffic-common/test/testutils";
 
 describe('event-sourceutil', () => {
 
@@ -46,16 +46,17 @@ describe('event-sourceutil', () => {
 
     test('mergeTimestamps - timestamps are sorted after merge', () => {
         const portcallId = 1;
-        const schedulesTimestamp = newTimestamp({ eventTime: new Date(1621623790702), source: EventSource.SCHEDULES_CALCULATED, portcallId });
-        const vtsTimestamp = newTimestamp({ eventTime: new Date(1620623590702), source: EventSource.AWAKE_AI, portcallId });
-        const portnetTimestamp = newTimestamp({ eventTime: new Date(1622623690702), source: EventSource.PORTNET, portcallId });
-        const vtsControlTimestamp = newTimestamp({ eventTime: new Date(1622623890702), source: EventSource.SCHEDULES_VTS_CONTROL, portcallId });
+        const portnetTime = moment();
+        const vtsTimestamp = newTimestamp({ eventTime: portnetTime.add(50, 'minute').toDate(), source: EventSource.SCHEDULES_CALCULATED, portcallId });
+        const awakeTimestamp = newTimestamp({ eventTime: portnetTime.add(45, 'minute').toDate(), source: EventSource.AWAKE_AI, portcallId });
+        const portnetTimestamp = newTimestamp({ eventTime: portnetTime.toDate(), source: EventSource.PORTNET, portcallId });
+        const vtsControlTimestamp = newTimestamp({ eventTime: portnetTime.add(55, 'minute').toDate(), source: EventSource.SCHEDULES_VTS_CONTROL, portcallId });
 
         const timestamps = shuffle([
             vtsControlTimestamp,
-            schedulesTimestamp,
-            portnetTimestamp,
             vtsTimestamp,
+            portnetTimestamp,
+            awakeTimestamp,
         ]);
 
         const merged = mergeTimestamps(timestamps);
@@ -86,5 +87,48 @@ describe('event-sourceutil', () => {
         expect(merged.ship).toMatchObject(schedulesTimestamp.ship);
         expect(merged.location).toMatchObject(schedulesTimestamp.location);
     });
+
+    test('mergeTimestamps - too old VTS timestamps are filtered', () => {
+        const portcallId = 1;
+        const vtsTimestamp = newTimestamp({
+            source: EventSource.SCHEDULES_CALCULATED,
+            recordTime: moment().subtract(VTS_TIMESTAMP_TOO_OLD_HOURS + getRandomInteger(0, 1000), 'hour').toDate(),
+            portcallId,
+        });
+        const awakeTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId });
+        const timestamps = [
+            vtsTimestamp,
+            awakeTimestamp,
+        ];
+
+        expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
+    });
+
+    test('mergeTimestamps - VTS timestamp differing too much from Awake timestamp is filtered', () => {
+        const portcallId = 1;
+        const awakeTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId });
+        const vtsTimestamp = newTimestamp({
+            source: EventSource.SCHEDULES_CALCULATED,
+            eventTime: moment(awakeTimestamp.eventTime).add(VTS_TIMESTAMP_DIFF_HOURS + getRandomInteger(0, 1000), 'hour').toDate(),
+            portcallId,
+        });
+        const timestamps = [
+            awakeTimestamp,
+            vtsTimestamp,
+        ];
+
+        expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
+    });
+
+    function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp) {
+        expect(mergedTimestamps.length).toBe(1);
+        const merged = mergedTimestamps[0];
+        expect(merged.portcallId).toBe(timestamp.portcallId);
+        expect(merged.source).toBe(timestamp.source);
+        expect(merged.eventType).toBe(timestamp.eventType);
+        expect(merged.recordTime).toBe(timestamp.recordTime);
+        expect(merged.ship).toMatchObject(timestamp.ship);
+        expect(merged.location).toMatchObject(timestamp.location);
+    }
 
 });

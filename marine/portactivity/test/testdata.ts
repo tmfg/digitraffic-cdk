@@ -55,6 +55,7 @@ export function newTimestamp(props?: {
     from?: string,
     portArea?: string,
     eventTime?: Date
+    recordTime?: Date
     eventType?: EventType
     eventTimeConfidenceLower?: string | null
     eventTimeConfidenceUpper?: string | null
@@ -64,8 +65,8 @@ export function newTimestamp(props?: {
 }): ApiTimestamp {
     // round off millis
     const eventTime = props?.eventTime ?? new Date();
+    const recordTime = props?.recordTime ?? new Date();
     eventTime.setMilliseconds(0);
-    const recordTime = new Date();
     recordTime.setMilliseconds(0);
 
     return {
