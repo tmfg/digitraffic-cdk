@@ -4,8 +4,7 @@ import {readFileSync} from 'fs';
 import * as VariableSignsService from '../../../lib/service/variable-signs';
 import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 import {StatusCodeValue} from "../../../lib/model/status-code-value";
-
-const sinon = require("sinon");
+import * as sinon from "sinon";
 
 describe('lambda-update-datex2', dbTestBase(() => {
     sinon.stub(ProxyHolder.prototype, 'setCredentials').returns(Promise.resolve());
@@ -47,9 +46,9 @@ async function updateFile(filename: string, expectedStatusCode: number): Promise
     const request = getRequest(filename);
     const response = await handler(request);
 
-    expect(response!.statusCode).toBe(expectedStatusCode);
+    expect(response.statusCode).toBe(expectedStatusCode);
 
-    return response!;
+    return response;
 }
 
 function getRequest(filename: string) {

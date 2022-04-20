@@ -1,5 +1,4 @@
 import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
-import {DataType} from "digitraffic-common/database/last-updated";
 
 export const handler = () => {
     const checker = DatabaseChecker.createForProxy();

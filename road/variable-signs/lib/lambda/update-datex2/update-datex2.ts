@@ -4,7 +4,7 @@ import {StatusCodeValue} from "../../model/status-code-value";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = async (event: Record<string, string>) : Promise<StatusCodeValue | void> => {
+export const handler = (event: Record<string, string>) => {
     const datex2 = event.body;
 
     if (datex2) {
@@ -15,5 +15,5 @@ export const handler = async (event: Record<string, string>) : Promise<StatusCod
             .catch(() => StatusCodeValue.INTERNAL_ERROR);
     }
 
-    return StatusCodeValue.BAD_REQUEST;
+    return Promise.resolve(StatusCodeValue.BAD_REQUEST);
 };

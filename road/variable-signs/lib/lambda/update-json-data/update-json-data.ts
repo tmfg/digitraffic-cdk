@@ -1,9 +1,10 @@
 import * as JsonUpdateService from "../../service/json-update-service";
 import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {StatusCodeValue} from "../../model/status-code-value";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = async (event: Record<string, string>) => {
+export const handler = (event: Record<string, string>) => {
     const jsonData = event.body;
 
     if (jsonData) {
@@ -11,9 +12,8 @@ export const handler = async (event: Record<string, string>) => {
 
         return proxyHolder.setCredentials()
             .then(() => JsonUpdateService.updateJsonData(JSON.parse(jsonData)))
-            .catch(() => ({
-                statusCode: 500,
-            }));
+            .catch(() => StatusCodeValue.INTERNAL_ERROR);
     }
-    return {statusCode:400};
+
+    return Promise.resolve(StatusCodeValue.BAD_REQUEST);
 };
