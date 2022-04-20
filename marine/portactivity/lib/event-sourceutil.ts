@@ -66,11 +66,11 @@ function momentsDifferByMinutes(moment1: Moment, moment2: Moment, maxDiffMinutes
  * @param timestamps
  */
 export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTimestamp[] {
-    let ret: MergeableTimestamp[] = timestamps;
+    let ret: MergeableTimestamp[] = R.clone(timestamps);
 
     // group by portcall id and event type
     const byPortcallId: MergeableTimestamp[][] = R.compose(R.values,
-        R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString() + ts.eventType))(timestamps);
+        R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString() + ts.eventType))(ret);
 
     // Re-sort? Timestamp places can change after merging
     let needToSort = false;
@@ -89,8 +89,8 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
                 if (momentsDifferByMinutes(moment(), moment(vtsTimestamp.recordTime), VTS_TIMESTAMP_TOO_OLD_MINUTES) ||
                     momentsDifferByMinutes(moment(vtsTimestamp.eventTime), moment(awakeTimestamp.eventTime), VTS_TIMESTAMP_DIFF_MINUTES)) {
                     // remove only VTS timestamp
-                    ret = ret.filter(t => t !== vtsTimestamp);
-                    vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source) && t !== vtsTimestamp);
+                    ret = ret.filter(t => !R.equals(t, vtsTimestamp));
+                    vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source) && !R.equals(t, vtsTimestamp));
                 }
             }
             // build an average timestamp from the calculated timestamps and discard the rest
