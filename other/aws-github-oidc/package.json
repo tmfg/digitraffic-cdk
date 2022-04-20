@@ -1,0 +1,23 @@
+{
+  "name": "digitraffic-aws-github-oidc",
+  "version": "0.1.0",
+  "bin": {
+    "aws-github-oidc": "bin/aws-github-oidc.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "test": "echo no tests for this project"
+  },
+  "devDependencies": {
+    "@types/node": "*",
+    "aws-cdk": "*",
+    "ts-node": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "*",
+    "constructs": "*",
+    "source-map-support": "*"
+  }
+}
