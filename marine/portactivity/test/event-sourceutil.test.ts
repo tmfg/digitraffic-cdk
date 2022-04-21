@@ -95,13 +95,11 @@ describe('event-sourceutil', () => {
             recordTime: moment().subtract(VTS_TIMESTAMP_TOO_OLD_MINUTES + getRandomInteger(0, 1000), 'minute').toDate(),
             portcallId,
         });
-        const awakeTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId, eventTime: moment().toDate() });
         const timestamps = [
             vtsTimestamp,
-            awakeTimestamp,
         ];
 
-        expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
+        expect(mergeTimestamps(timestamps).length).toBe(0);
     });
 
     test('mergeTimestamps - VTS timestamp differing too much from Awake timestamp is filtered', () => {
