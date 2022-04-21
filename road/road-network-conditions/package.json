@@ -10,6 +10,8 @@
     "test": "jest --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
+    "diff": "yarn compile-lambdas && cdk diff",
+    "deploy": "yarn compile-lambdas && cdk deploy",
     "nolambda": "nodemon -e ts --exec 'yarn compile-lambdas'"
   },
   "devDependencies": {

@@ -10,7 +10,10 @@ export class PublicApi {
         this.publicApi = new DigitrafficRestApi(stack, "RoadNetworkConditions-public", "Road Network Conditions Public API");
         this.publicApi.createUsagePlan("Road Network Conditions Api Key", "Road Network Conditions Usage Plan");
 
-        const resource = this.publicApi.root.addResource("api").addResource("v1");
+        const resource = this.publicApi.root
+            .addResource("api")
+            .addResource("road-network-conditions")
+            .addResource("beta");
 
         const prefix = "RoadNetworkConditions";
 
@@ -40,11 +43,10 @@ export class PublicApi {
             resource,
             "get-feature-collection",
             `${prefix}-GetFeatureCollection`,
-            "simple",
+            "feature-collection.geojson",
         );
         stack.grantSecret(alarmsLambda, devicesLambda, alarmTypesLambda, featureCollectionLambda);
     }
-
 
     createResource(stack: DigitrafficStack, resource: Resource, name: string, functionName: string, pathPart: string): MonitoredFunction {
         const env = stack.createLambdaEnvironment();

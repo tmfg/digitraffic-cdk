@@ -16,7 +16,7 @@ export async function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaRes
         statusCode: 200,
         body: JSON.stringify(result),
         headers: {
-            "content-type": MediaType.APPLICATION_JSON,
+            "content-type": MediaType.APPLICATION_GEOJSON,
         },
     };
 }
