@@ -84,7 +84,7 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
                 (awakeTimestamp && momentsDifferByMinutes(moment(vtsTimestamp.eventTime), moment(awakeTimestamp.eventTime), VTS_TIMESTAMP_DIFF_MINUTES))) {
                 // remove only VTS timestamp
                 ret = ret.filter(t => !R.equals(t, vtsTimestamp));
-                vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source) && !R.equals(t, vtsTimestamp));
+                vtsAStamps = vtsAStamps.filter(t => !R.equals(t, vtsTimestamp));
             }
         }
         // build an average timestamp from the calculated timestamps and discard the rest
