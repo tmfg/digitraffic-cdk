@@ -5,6 +5,48 @@ import {FeatureCollection} from "geojson";
 
 jest.mock('axios');
 
+const ALARM_TYPES = [
+    {alarmId: 1, alarmText: "Tienpinta pakkaselle"},
+    {alarmId: 2, alarmText: "Lumi alkaa kertyä tienpinnalle"},
+    {alarmId: 3, alarmText: "Kitkahälytys"},
+];
+
+const ALARMS = [
+    {
+        created: "2022-01-17 10:36:00",
+        station: "1000108",
+        alarm: "1",
+    },
+    {
+        created: "2022-01-17 10:15:58",
+        station: "1000108",
+        alarm: "3",
+    },
+];
+
+const DEVICE = {
+    deviceId: "1000108",
+    deviceName: "IRS - Vesijärvenkatu 9",
+    deviceType: "IRS",
+    coordinates: {latitude: 60.982431, longitude: 25.661484},
+};
+
+const DEVICES = [
+    {
+        deviceId: "4025",
+        deviceName: "LTI - Tie 12 Lahti, Kärpäsenmäki - ID4025",
+        deviceType: "Digitraffic",
+        coordinates: {latitude: 60.980391, longitude: 25.601004},
+    },
+    {
+        deviceId: "18005",
+        deviceName: "LTI - Kivistönmäki - ID18005",
+        deviceType: "Digitraffic",
+        coordinates: {latitude: 61.000532, longitude: 25.675391},
+    },
+    DEVICE,
+];
+
 describe("Road network condition service", () => {
 
     beforeEach(() => {
@@ -12,28 +54,7 @@ describe("Road network condition service", () => {
     });
 
     it("should fetch devices from the api", () => {
-        const data = {
-            devices: [
-                {
-                    deviceId: "4025",
-                    deviceName: "LTI - Tie 12 Lahti, Kärpäsenmäki - ID4025",
-                    deviceType: "Digitraffic",
-                    coordinates: {latitude: 60.980391, longitude: 25.601004},
-                },
-                {
-                    deviceId: "18005",
-                    deviceName: "LTI - Kivistönmäki - ID18005",
-                    deviceType: "Digitraffic",
-                    coordinates: {latitude: 61.000532, longitude: 25.675391},
-                },
-                {
-                    deviceId: "1000108",
-                    deviceName: "IRS - Vesijärvenkatu 9",
-                    deviceType: "IRS",
-                    coordinates: {latitude: 60.982431, longitude: 25.661484},
-                },
-            ],
-        };
+        const data = { devices: DEVICES };
 
         const expected: FeatureCollection = {
             type: "FeatureCollection",
@@ -42,12 +63,12 @@ describe("Road network condition service", () => {
                     type: "Feature",
                     geometry: {
                         type: "Point",
-                        coordinates: [60.982431, 25.661484],
+                        coordinates: [DEVICE.coordinates.latitude, DEVICE.coordinates.longitude],
                     },
                     properties: {
-                        deviceId: "1000108",
-                        deviceName: "IRS - Vesijärvenkatu 9",
-                        deviceType: "IRS",
+                        deviceId: DEVICE.deviceId,
+                        deviceName: DEVICE.deviceName,
+                        deviceType: DEVICE.deviceType,
                     },
                 },
             ],
@@ -62,34 +83,11 @@ describe("Road network condition service", () => {
 
     it("should combine alarm, alarm types and device information", () => {
         const devices = {
-            devices: [
-                {
-                    deviceId: "1000108",
-                    deviceName: "IRS - Vesijärvenkatu 9",
-                    deviceType: "IRS",
-                    coordinates: {latitude: 60.982431, longitude: 25.661484},
-                },
-            ],
+            devices: [DEVICE],
         };
-        const alarmTypes = {
-            alarmTypes: [
-                {alarmId: 1, alarmText: "Tienpinta pakkaselle"},
-                {alarmId: 2, alarmText: "Lumi alkaa kertyä tienpinnalle"},
-                {alarmId: 3, alarmText: "Kitkahälytys"},
-            ],
-        };
-        const alarms = [
-            {
-                created: "2022-01-17 10:36:00",
-                station: "1000108",
-                alarm: "1",
-            },
-            {
-                created: "2022-01-17 10:15:58",
-                station: "1000108",
-                alarm: "3",
-            },
-        ];
+
+        const alarmTypes = { alarmTypes: ALARM_TYPES };
+        const alarms = ALARMS;
 
         (axios.get as unknown as jest.Mock).mockImplementation((req) => {
             const data =
@@ -105,46 +103,39 @@ describe("Road network condition service", () => {
             });
         });
 
-        const expected: FeatureCollection = {
+        const dateMatcher = expect.stringMatching(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/);
+        const alarmIdMatcher = expect.stringMatching(/\d{1,2}/);
+        const alarmTextMatcher = expect.stringMatching(/\s+/);
+
+        const desiredFeatureCollection = {
             type: "FeatureCollection",
             features: [
                 {
                     type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [60.982431, 25.661484],
-                    },
                     properties: {
-                        created: "2022-01-17 10:36:00",
-                        alarmId: "1",
-                        alarmText: "Tienpinta pakkaselle",
-                        deviceId: "1000108",
-                        deviceName: "IRS - Vesijärvenkatu 9",
-                        deviceType: "IRS",
+                        created: dateMatcher,
+                        alarmId: alarmIdMatcher,
+                        alarmText: alarmTextMatcher,
+                        deviceId: DEVICE.deviceId,
                     },
                 },
                 {
                     type: "Feature",
-                    geometry: {
-                        type: "Point",
-                        coordinates: [60.982431, 25.661484],
-                    },
                     properties: {
-                        created: "2022-01-17 10:15:58",
-                        alarmId: "3",
-                        alarmText: "Kitkahälytys",
-                        deviceId: "1000108",
-                        deviceName: "IRS - Vesijärvenkatu 9",
-                        deviceType: "IRS",
+                        created: dateMatcher,
+                        alarmId: alarmIdMatcher,
+                        alarmText: alarmTextMatcher,
+                        deviceId: DEVICE.deviceId,
                     },
                 },
             ],
         };
 
-        expect(rcs.getFeatureCollection("", "")).resolves.toEqual(expected);
+        expect(rcs.getFeatureCollection("", "")).resolves.toMatchObject(desiredFeatureCollection);
     });
 
-    it("should work with alarms without devices", () => {
+    it("should work with alarms with unknown devices", () => {
+        // add unknown device to the device listing
         const devices = {
             devices: [
                 {
@@ -156,24 +147,9 @@ describe("Road network condition service", () => {
             ],
         };
         const alarmTypes = {
-            alarmTypes: [
-                {alarmId: 1, alarmText: "Tienpinta pakkaselle"},
-                {alarmId: 2, alarmText: "Lumi alkaa kertyä tienpinnalle"},
-                {alarmId: 3, alarmText: "Kitkahälytys"},
-            ],
+            alarmTypes: ALARM_TYPES,
         };
-        const alarms = [
-            {
-                created: "2022-01-17 10:36:00",
-                station: "1000108",
-                alarm: "1",
-            },
-            {
-                created: "2022-01-17 10:15:58",
-                station: "1000108",
-                alarm: "3",
-            },
-        ];
+        const alarms = ALARMS;
 
         (axios.get as unknown as jest.Mock).mockImplementation((req) => {
             const data =
@@ -198,6 +174,7 @@ describe("Road network condition service", () => {
     });
 
     it ("should return error if api sends malformed data", () => {
+        // incorrectly formatted device
         const data = {
             devices: [
                 {
@@ -217,23 +194,7 @@ describe("Road network condition service", () => {
     });
 
     it("should fetch alarms", () => {
-        const data = [
-            {
-                created: "2022-01-17 10:36:00",
-                station: "1000117",
-                alarm: "10",
-            },
-            {
-                created: "2022-01-17 10:15:58",
-                station: "1068",
-                alarm: "4",
-            },
-            {
-                created: "2022-01-17 03:19:28",
-                station: "1000120",
-                alarm: "5",
-            },
-        ];
+        const data = ALARMS;
 
         const expected = data;
 
@@ -245,6 +206,7 @@ describe("Road network condition service", () => {
     });
 
     it("should fail with malformed alarms", () => {
+        // incorrect alarm
         const data = [
             {
                 created: "2022-01-17 03:19:28",
@@ -262,11 +224,7 @@ describe("Road network condition service", () => {
 
     it("should fetch alarm type description", () => {
         const data = {
-            alarmTypes: [
-                {alarmId: 1, alarmText: "Tienpinta pakkaselle"},
-                {alarmId: 2, alarmText: "Lumi alkaa kertyä tienpinnalle"},
-                {alarmId: 3, alarmText: "Kitkahälytys"},
-            ],
+            alarmTypes: ALARM_TYPES,
         };
 
         const expected = data.alarmTypes.map(x => ({...x, alarmId: String(x.alarmId)}));
