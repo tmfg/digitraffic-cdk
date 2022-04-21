@@ -1,15 +1,15 @@
 import {SensorDataPoint} from "./sensor";
 
 type Entry = {
-    ts: number,
-    value: string,
+    readonly ts: number,
+    readonly value: string,
 }
 
 export type TeconerData = {
-    Friction: Entry[],
-    State: Entry[],
-    Latitude: Entry[],
-    Longitude: Entry[],
+    readonly Friction: Entry[],
+    readonly State: Entry[],
+    readonly Latitude: Entry[],
+    readonly Longitude: Entry[],
 }
 
 export function convertTeconer(device:string): (td: TeconerData) => SensorDataPoint[] {

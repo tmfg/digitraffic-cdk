@@ -1,6 +1,6 @@
 export const DOMAIN_PREFIX = "rcs";
 
 export type RoadNetworkConditionsSecret = {
-    apiKey: string,
-    url: string,
+    readonly apiKey: string,
+    readonly url: string,
 }

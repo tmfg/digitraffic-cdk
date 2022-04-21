@@ -4,11 +4,11 @@ export interface Sensor {
 }
 
 export type SensorDataPoint = {
-    device: string,
-    friction: number,
-    latitude: number,
-    longitude: number,
-    code: number,
-    state: string,
-    timestamp: number,
+    readonly device: string,
+    readonly friction: number,
+    readonly latitude: number,
+    readonly longitude: number,
+    readonly code: number,
+    readonly state: string,
+    readonly timestamp: number,
 }

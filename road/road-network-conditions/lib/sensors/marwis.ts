@@ -1,15 +1,15 @@
 import {SensorDataPoint} from "./sensor";
 
 type Entry = {
-    ts: number,
-    value: string,
+    readonly ts: number,
+    readonly value: string,
 }
 
 export type MarwisData = {
-    Friction: Entry[],
-    Road_Condition: Entry[],
-    lat: Entry[],
-    lon: Entry[],
+    readonly Friction: Entry[],
+    readonly Road_Condition: Entry[],
+    readonly lat: Entry[],
+    readonly lon: Entry[],
 }
 
 export function convertMarwis(device: string): (td: MarwisData) => SensorDataPoint[] {

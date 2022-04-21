@@ -1,8 +1,8 @@
 import * as R from "ramda";
 
 export type Coordinates = {
-    latitude: number;
-    longitude: number;
+    readonly latitude: number;
+    readonly longitude: number;
 }
 
 export type Device = {
