@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {DTDatabase} from "digitraffic-common/database/database";
-import {AlarmType, AlarmTypes, alarmTypesParser} from "../model/road-condition-alarm-types";
+import {AlarmType, AlarmTypes, alarmTypesParser} from "../model/alarm-types";
 
 const SQL_INSERT_ALARM_TYPE_VALUE =
     `insert into road_network_conditions_alarm_types("alarmId", "alarmText")

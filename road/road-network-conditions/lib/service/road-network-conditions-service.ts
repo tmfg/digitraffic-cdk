@@ -71,8 +71,14 @@ const combineAlarmsAndTypes = (alarmTypes: AlarmTypes) => (alarm: Alarm): Alarm 
     };
 };
 
-const withDevices = (devices: Devices) => (alarm: Alarm & AlarmType): Feature => {
+const withDevices = (devices: Devices) => (alarm: Alarm & AlarmType): Feature | null => {
     const device = devices.filter(d => d.deviceId === alarm.station)[0];
+
+    // If corresponding device is missing, return null.
+    // i.e. digitraffic devices have been removed from the device listing and not from alarms.
+    if (device === undefined || device === null) {
+        return null;
+    }
 
     const deviceProps = R.pick(["deviceId", "deviceName", "deviceType"], device);
     const alarmProps = R.pick(["alarmId", "alarmText", "created"], alarm);
@@ -89,10 +95,14 @@ export async function getFeatureCollection(apiKey: string, url: string): Promise
             getAlarmTypes(apiKey, url),
         ]);
 
-    const alarmsAndTypes: ReadonlyArray<Alarm & AlarmType> = alarms.map(combineAlarmsAndTypes(alarmTypes));
+    const alarmsAndAlarmTypes: ReadonlyArray<Alarm & AlarmType> = alarms.map(combineAlarmsAndTypes(alarmTypes));
+
+    const features = alarmsAndAlarmTypes
+        .map(withDevices(devices))
+        .filter(<T>(x: T | null | undefined): x is T => x !== null && x !== undefined);
 
     return {
         type: "FeatureCollection",
-        features: alarmsAndTypes.map(withDevices(devices)),
+        features,
     };
 }

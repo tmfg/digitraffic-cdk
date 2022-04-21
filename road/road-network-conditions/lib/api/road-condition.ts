@@ -12,19 +12,15 @@ export class RoadConditionApi {
         this.endpointUrl = endpointUrl;
     }
 
-    private getFromServer<T>(method: string, url: string): Promise<T> {
+    private getFromServer<T>(method: string, path: string): Promise<T> {
         const start = Date.now();
-        const serverUrl = `${this.endpointUrl}${url}?authKey=${this.authKey}`;
+        const serverUrl = `${this.endpointUrl}${path}?authKey=${this.authKey}`;
 
         console.info("sending request to " + serverUrl);
 
         return axios
             .get(serverUrl)
-            .then(response => {
-                console.log(`got response: ${JSON.stringify(response)}`);
-                return response;
-            })
-            .then(response => response.status === 200 ? response.data : Promise.reject(response.data))
+            .then(response => response.status === 200 ? response.data : Promise.reject(response))
             .catch(e => {
                 console.error(`error from ${serverUrl}`);
                 console.error(`method=${method} failed`);

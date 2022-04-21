@@ -6,12 +6,11 @@
     "build": "tsc",
     "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
     "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
-    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
-    "test": "jest --runInBand --detectOpenHandles",
+    "test": "jest --detectOpenHandles",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "nolambda": "nodemon -e ts --exec 'yarn compile-lambdas'"
   },
   "devDependencies": {
     "@aws-cdk/assert": "*",
@@ -24,6 +23,7 @@
     "eslint": "*",
     "jest": "^27.0.6",
     "jest-junit": "^13.0.0",
+    "nodemon": "^2.0.15",
     "ts-jest": "^27.0.4",
     "typescript": "*"
   },

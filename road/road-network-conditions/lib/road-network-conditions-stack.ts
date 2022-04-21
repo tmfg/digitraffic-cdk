@@ -1,5 +1,5 @@
 import {Construct} from "constructs";
-import {InternalLambdas} from "./internal-lambdas";
+import {PublicApi} from "./public-api";
 import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
 
 export class RoadNetworkConditionsStack extends DigitrafficStack {
@@ -7,6 +7,6 @@ export class RoadNetworkConditionsStack extends DigitrafficStack {
         super(scope, id, configuration);
 
         // 'this' reference must be passed to all child resources to keep them tied to this stack
-        new InternalLambdas(this);
+        new PublicApi(this);
     }
 }

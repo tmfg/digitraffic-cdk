@@ -2,16 +2,10 @@ import axios from "axios";
 
 import * as rcs from "../../lib/service/road-network-conditions-service";
 import {FeatureCollection} from "geojson";
-import {findAlarmTypes, insertAlarmTypes} from "../../lib/db/alarms";
-import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
-import {AlarmTypes} from "../../lib/model/alarm-types";
-import {dbTestBase} from "../db-testutil";
 
 jest.mock('axios');
 
-declare function _<T>(): T
-
-describe("Road network condition service", dbTestBase((db: DTDatabase) => {
+describe("Road network condition service", () => {
 
     beforeEach(() => {
         jest.resetAllMocks();
@@ -150,6 +144,59 @@ describe("Road network condition service", dbTestBase((db: DTDatabase) => {
         expect(rcs.getFeatureCollection("", "")).resolves.toEqual(expected);
     });
 
+    it("should work with alarms without devices", () => {
+        const devices = {
+            devices: [
+                {
+                    deviceId: "1337",
+                    deviceName: "IRS - Vesijärvenkatu 9",
+                    deviceType: "IRS",
+                    coordinates: {latitude: 60.982431, longitude: 25.661484},
+                },
+            ],
+        };
+        const alarmTypes = {
+            alarmTypes: [
+                {alarmId: 1, alarmText: "Tienpinta pakkaselle"},
+                {alarmId: 2, alarmText: "Lumi alkaa kertyä tienpinnalle"},
+                {alarmId: 3, alarmText: "Kitkahälytys"},
+            ],
+        };
+        const alarms = [
+            {
+                created: "2022-01-17 10:36:00",
+                station: "1000108",
+                alarm: "1",
+            },
+            {
+                created: "2022-01-17 10:15:58",
+                station: "1000108",
+                alarm: "3",
+            },
+        ];
+
+        (axios.get as unknown as jest.Mock).mockImplementation((req) => {
+            const data =
+                req.includes("laitetiedot") ?
+                    devices :
+                    req.includes("halytykset") ?
+                        alarms :
+                        alarmTypes;
+
+            return Promise.resolve({
+                status: 200,
+                data,
+            });
+        });
+
+        const expected: FeatureCollection = {
+            type: "FeatureCollection",
+            features: [],
+        };
+
+        expect(rcs.getFeatureCollection("", "")).resolves.toEqual(expected);
+    });
+
     it ("should return error if api sends malformed data", () => {
         const data = {
             devices: [
@@ -247,4 +294,4 @@ describe("Road network condition service", dbTestBase((db: DTDatabase) => {
 
         return expect(rcs.getAlarmTypes("", "")).rejects.toEqual(expected);
     });
-}));
+});
