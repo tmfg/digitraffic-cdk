@@ -1,28 +1,21 @@
 import * as R from "ramda";
+import {RecursivePartial} from "../util/utils";
 
 export type Coordinates = {
     readonly latitude: number;
     readonly longitude: number;
-}
+};
 
 export type Device = {
     readonly coordinates: Coordinates;
     readonly deviceId: string;
     readonly deviceName: string;
     readonly deviceType: string;
-}
+};
 
 export type Devices = ReadonlyArray<Device>;
 
-type MaybeDevice = {
-    readonly coordinates?: {
-        latitude?: number,
-        longitude?: number
-    };
-    readonly deviceId?: string;
-    readonly deviceName?: string;
-    readonly deviceType?: string;
-}
+type MaybeDevice = RecursivePartial<Device>;
 
 export type MaybeDevices = {
     readonly devices?: ReadonlyArray<MaybeDevice>;

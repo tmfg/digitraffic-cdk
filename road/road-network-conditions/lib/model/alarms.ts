@@ -4,15 +4,11 @@ export type Alarm = {
     readonly created: string;
     readonly station: string;
     readonly alarm: string;
-}
+};
 
-export type Alarms = ReadonlyArray<Alarm>
+export type Alarms = ReadonlyArray<Alarm>;
 
-type MaybeAlarm = {
-    readonly created?: string;
-    readonly station?: string;
-    readonly alarm?: string;
-}
+type MaybeAlarm = Partial<Alarm>;
 
 function alarmParser(x: unknown): Alarm {
     const maybeAlarm = x as MaybeAlarm;

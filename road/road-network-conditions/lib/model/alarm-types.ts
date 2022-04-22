@@ -2,16 +2,13 @@
 export type AlarmType = {
     readonly alarmId: string;
     readonly alarmText: string;
-}
+};
 
-type MaybeAlarmType = {
-    readonly alarmId?: number;
-    readonly alarmText?: string;
-}
+type MaybeAlarmType = Partial<AlarmType>;
 
 type MaybeAlarmTypes = {
-    readonly alarmTypes?: Array<MaybeAlarmType>;
-}
+    readonly alarmTypes?: ReadonlyArray<MaybeAlarmType>;
+};
 
 export type AlarmTypes = ReadonlyArray<AlarmType>;
 
