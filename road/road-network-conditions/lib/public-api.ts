@@ -59,6 +59,7 @@ export class PublicApi {
         const integration = new LambdaIntegration(lambda, { proxy: true });
         const getAlarmsResource = resource.addResource(pathPart);
         getAlarmsResource.addMethod("GET", integration, { apiKeyRequired: false });
+        getAlarmsResource.addMethod("HEAD", integration, { apiKeyRequired: false });
 
         return lambda;
     }
