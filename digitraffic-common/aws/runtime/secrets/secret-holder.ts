@@ -41,8 +41,8 @@ export class SecretHolder<Secret> {
         this.secretCache.push(DEFAULT_SECRET_KEY, secretValue);
     }
 
-    public static create<Secret>(prefix = DEFAULT_PREFIX, expectedKeys: string[] = []) {
-        return new SecretHolder<Secret>(process.env.SECRET_ID as string, prefix, expectedKeys);
+    public static create<S>(prefix = DEFAULT_PREFIX, expectedKeys: string[] = []) {
+        return new SecretHolder<S>(process.env.SECRET_ID as string, prefix, expectedKeys);
     }
 
     public async get(): Promise<Secret> {
@@ -62,7 +62,7 @@ export class SecretHolder<Secret> {
 
         for (const key in secret) {
             if (key.startsWith(prefix)) {
-                parsed[key.substring(skip)] = secret[key] as string;
+                parsed[key.substring(skip)] = secret[key];
             }
         }
 

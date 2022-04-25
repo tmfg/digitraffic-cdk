@@ -72,7 +72,7 @@ export class MonitoredFunction extends Function {
         functionProps: FunctionProps,
         props?: MonitoredFunctionProps): MonitoredFunction {
 
-        if (props == MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
+        if (props === MonitoredFunction.DISABLE_ALARMS && stack.configuration.production) {
             throw new Error(`Function ${functionProps.functionName} has DISABLE_ALARMS.  Remove before installing to production or define your own properties!`);
         }
 
@@ -141,16 +141,16 @@ export class MonitoredFunction extends Function {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
-            const timeout = functionProps.timeout as Duration;
+
             this.createAlarm(
                 scope,
                 this.metricDuration().with({statistic: 'max'}),
                 'Duration',
                 'Duration alarm',
-                `Duration has exceeded ${timeout.toSeconds()} seconds`,
+                `Duration has exceeded ${functionProps.timeout.toSeconds()} seconds`,
                 trafficType,
                 this.getAlarmActionForEnv(alarmSnsAction, warningSnsAction, production),
-                timeout.toMilliseconds(),
+                functionProps.timeout.toMilliseconds(),
                 1,
                 1,
                 ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,
@@ -161,16 +161,16 @@ export class MonitoredFunction extends Function {
             if (!functionProps.timeout) {
                 throw new Error('Timeout needs to be explicitly set');
             }
-            const timeout = functionProps.timeout as Duration;
+
             this.createAlarm(
                 scope,
                 this.metricDuration().with({statistic: 'max'}),
                 'Duration-Warning',
                 'Duration warning',
-                `Duration is 85 % of max ${timeout.toSeconds()} seconds`,
+                `Duration is 85 % of max ${functionProps.timeout.toSeconds()} seconds`,
                 trafficType,
                 warningSnsAction,
-                timeout.toMilliseconds() * 0.85,
+                functionProps.timeout.toMilliseconds() * 0.85,
                 1,
                 1,
                 ComparisonOperator.GREATER_THAN_OR_EQUAL_TO_THRESHOLD,

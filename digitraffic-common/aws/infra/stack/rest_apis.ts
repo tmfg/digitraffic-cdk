@@ -79,7 +79,7 @@ export class DigitrafficRestApi extends RestApi {
         const location: CfnDocumentationPart.LocationProperty = {
             type,
             path: resource.path,
-            name: type != 'METHOD' ? parameterName : undefined,
+            name: type !== 'METHOD' ? parameterName : undefined,
         };
 
         new CfnDocumentationPart(this.stack, resourceName, {

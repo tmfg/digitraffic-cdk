@@ -93,9 +93,9 @@ function addDLQAlarm(stack: DigitrafficStack, dlqName: string, dlq: Queue) {
     }).addAlarmAction(new SnsAction(stack.warningTopic));
 }
 
-function getDlqCode(bucketName: string): InlineCode {
+function getDlqCode(bName: string): InlineCode {
     const functionBody = DLQ_LAMBDA_CODE
-        .replace("__bucketName__", bucketName)
+        .replace("__bucketName__", bName)
         .replace("__upload__", uploadToS3.toString())
         .replace("__doUpload__", doUpload.toString())
         .replace("__handler__", createHandler().toString().substring(23)); // remove function handler() from signature
@@ -103,24 +103,24 @@ function getDlqCode(bucketName: string): InlineCode {
     return new InlineCode(functionBody);
 }
 
-async function uploadToS3(s3: S3, bucketName: string, body: string, objectName: string): Promise<void> {
+async function uploadToS3(s3: S3, bName: string, body: string, objectName: string): Promise<void> {
     try {
-        console.info('writing %s to %s', objectName, bucketName);
-        await doUpload(s3, bucketName, body, objectName);
+        console.info('writing %s to %s', objectName, bName);
+        await doUpload(s3, bName, body, objectName);
     } catch (error) {
         console.warn(error);
-        console.warn('method=uploadToS3 retrying upload to bucket %s', bucketName);
+        console.warn('method=uploadToS3 retrying upload to bucket %s', bName);
         try {
-            await doUpload(s3, bucketName, body, objectName);
+            await doUpload(s3, bName, body, objectName);
         } catch (e2) {
-            console.error('method=uploadToS3 failed retrying upload to bucket %s', bucketName);
+            console.error('method=uploadToS3 failed retrying upload to bucket %s', bName);
         }
     }
 }
 
-function doUpload(s3: S3, bucketName: string, Body: string, Key: string): Promise<ManagedUpload.SendData> {
+function doUpload(s3: S3, bName: string, Body: string, Key: string): Promise<ManagedUpload.SendData> {
     return s3.upload({
-        Bucket: bucketName, Body, Key,
+        Bucket: bName, Body, Key,
     }).promise();
 }
 

@@ -71,13 +71,11 @@ export class StackCheckingAspect implements IAspect {
 
     private checkStack(node: IConstruct) {
         if (node instanceof DigitrafficStack) {
-            const s = node as DigitrafficStack;
-
-            if ((s.stackName.includes('Test') || s.stackName.includes('Tst')) && s.configuration?.production) {
+            if ((node.stackName.includes('Test') || node.stackName.includes('Tst')) && node.configuration?.production) {
                 this.addAnnotation(node, ResourceType.stackName, 'Production is set for Test-stack');
             }
 
-            if ((s.stackName.includes('Prod') || s.stackName.includes('Prd')) && !s.configuration?.production) {
+            if ((node.stackName.includes('Prod') || node.stackName.includes('Prd')) && !node.configuration?.production) {
                 this.addAnnotation(node, ResourceType.stackName, 'Production is not set for Production-stack');
             }
         }
@@ -85,27 +83,25 @@ export class StackCheckingAspect implements IAspect {
 
     private checkFunction(node: IConstruct) {
         if (node instanceof CfnFunction) {
-            const f = node as CfnFunction;
-
-            if (!f.reservedConcurrentExecutions) {
+            if (!node.reservedConcurrentExecutions) {
                 this.addAnnotation(node, ResourceType.reservedConcurrentConcurrency, 'Function must have reservedConcurrentConcurrency');
-            } else if (f.reservedConcurrentExecutions > MAX_CONCURRENCY_LIMIT) {
+            } else if (node.reservedConcurrentExecutions > MAX_CONCURRENCY_LIMIT) {
                 this.addAnnotation(node, ResourceType.reservedConcurrentConcurrency, 'Function reservedConcurrentConcurrency too high!');
             }
 
-            if (!f.timeout) {
+            if (!node.timeout) {
                 this.addAnnotation(node, ResourceType.functionTimeout, 'Function must have timeout');
             }
 
-            if (!f.memorySize) {
+            if (!node.memorySize) {
                 this.addAnnotation(node, ResourceType.functionMemorySize, 'Function must have memorySize');
             }
 
-            if (f.runtime !== NODE_RUNTIME) {
-                this.addAnnotation(node, ResourceType.functionRuntime, 'wrong runtime ' + f.runtime);
+            if (node.runtime !== NODE_RUNTIME) {
+                this.addAnnotation(node, ResourceType.functionRuntime,'wrong runtime ' + node.runtime);
             }
 
-            if (this.configuration?.shortName && f.functionName && f.functionName.indexOf(this.configuration.shortName) != 0) {
+            if (this.configuration?.shortName && node.functionName && node.functionName.indexOf(this.configuration.shortName) != 0) {
                 this.addAnnotation(node, ResourceType.functionName, 'Function name does not begin with ' + this.configuration.shortName);
             }
         }
@@ -113,9 +109,7 @@ export class StackCheckingAspect implements IAspect {
 
     private checkTags(node: IConstruct) {
         if (node instanceof Stack) {
-            const s = node as Stack;
-
-            if (!s.tags.tagValues()[SOLUTION_KEY]) {
+            if (!node.tags.tagValues()[SOLUTION_KEY]) {
                 this.addAnnotation(node, ResourceType.tagSolution, 'Solution tag is missing');
             }
         }
@@ -123,8 +117,7 @@ export class StackCheckingAspect implements IAspect {
 
     private checkBucket(node: IConstruct) {
         if (node instanceof CfnBucket) {
-            const b = node as CfnBucket;
-            const c = b.publicAccessBlockConfiguration as CfnBucket.PublicAccessBlockConfigurationProperty;
+            const c = node.publicAccessBlockConfiguration as CfnBucket.PublicAccessBlockConfigurationProperty;
 
             if (c) {
                 if (!c.blockPublicAcls || !c.blockPublicPolicy || !c.ignorePublicAcls || !c.restrictPublicBuckets) {
@@ -153,14 +146,11 @@ export class StackCheckingAspect implements IAspect {
 
     private checkResourceCasing(node: IConstruct) {
         if (node instanceof CfnResource) {
-            const resource = node as CfnResource;
-
-            if (!StackCheckingAspect.isValidPath(resource.pathPart)) {
+            if (!StackCheckingAspect.isValidPath(node.pathPart)) {
                 this.addAnnotation(node, ResourceType.resourcePath, 'Path part should be in kebab-case');
             }
         } else if (node instanceof CfnMethod) {
-            const method = node as CfnMethod;
-            const integration = method.integration as IntegrationProperty;
+            const integration = node.integration as IntegrationProperty;
 
             if (integration && integration.requestParameters) {
                 Object.keys(integration.requestParameters).forEach(key => {
@@ -178,9 +168,7 @@ export class StackCheckingAspect implements IAspect {
 
     private checkQueueEncryption(node: IConstruct) {
         if (node instanceof CfnQueue) {
-            const queue = node as CfnQueue;
-
-            if (!queue.kmsMasterKeyId) {
+            if (!node.kmsMasterKeyId) {
                 this.addAnnotation(node, ResourceType.queueEncryption, 'Queue must have encryption enabled');
             }
         }
