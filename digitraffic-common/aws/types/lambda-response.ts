@@ -3,11 +3,11 @@ export class LambdaResponse<T> {
     readonly body: T;
     readonly fileName?: string;
 
-    static ok<T>(body: T, fileName?: string) {
+    static ok<S>(body: S, fileName?: string) {
         return this.create(200, body, fileName);
     }
 
-    static okJson<T>(json: T, fileName?: string) {
+    static okJson<S>(json: S, fileName?: string) {
         return this.create(200, JSON.stringify(json, null, 2), fileName);
     }
 
@@ -23,7 +23,7 @@ export class LambdaResponse<T> {
         return this.create(500, 'Internal error');
     }
 
-    static create<T>(status: number, body: T, fileName?: string): LambdaResponse<T> {
+    static create<S>(status: number, body: S, fileName?: string): LambdaResponse<S> {
         return { status, body, fileName };
     }
 }

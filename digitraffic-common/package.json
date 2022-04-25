@@ -14,11 +14,12 @@
     "typescript": "*"
   },
   "dependencies": {
-    "aws-cdk-lib": "*",
     "@aws-cdk/aws-synthetics-alpha": "^2.2.0-alpha.0",
-    "constructs": "*",
     "@types/geojson": "^7946.0.7",
+    "aws-cdk-lib": "*",
     "aws-sdk": "*",
+    "axios": "^0.21.1",
+    "constructs": "*",
     "change-case": "4.1.2",
     "digitraffic-common": "*",
     "geojson-validation": "^1.0.2",

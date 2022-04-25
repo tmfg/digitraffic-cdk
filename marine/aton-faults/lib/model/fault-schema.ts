@@ -1,6 +1,6 @@
 import apigateway = require('aws-cdk-lib/aws-apigateway');
 
-const faultsProperties: apigateway.JsonSchema = {
+export const faultsProperties: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
     description: 'ATON Faults GeoJson',
@@ -28,5 +28,3 @@ const faultsProperties: apigateway.JsonSchema = {
         },
     },
 };
-
-export default faultsProperties;

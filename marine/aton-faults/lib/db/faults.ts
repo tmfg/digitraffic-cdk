@@ -143,7 +143,7 @@ export function updateFaults(db: DTDatabase, domain: string, faults: Feature[]):
             p.FAULT_STATE,
             p.FAULT_TYPE,
             domain,
-            p.FAULT_FIXED == 1 ? true : false,
+            p.FAULT_FIXED === 1,
             p.TL_NUMERO,
             p.TL_NIMI_FI,
             p.TL_NIMI_SE,
