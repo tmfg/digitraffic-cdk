@@ -1,5 +1,5 @@
 import {Model, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
-import {default as FaultSchema} from './model/fault-schema';
+import {faultsSchema} from './model/fault-schema';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
 import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
@@ -16,7 +16,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
     publicApi.createUsagePlan('ATON Api Key', 'ATON Usage Plan');
 
-    const faultModel = publicApi.addJsonModel("FaultModel", FaultSchema);
+    const faultModel = publicApi.addJsonModel("FaultModel", faultsSchema);
     const featureModel = publicApi.addJsonModel("FeatureModel", featureSchema(getModelReference(faultModel.modelId, publicApi.restApiId)));
     const faultsModel = publicApi.addJsonModel("FaultsModel", geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
 
