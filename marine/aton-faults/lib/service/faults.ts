@@ -111,11 +111,11 @@ function convertFeature(fault: DbFault): Feature {
     };
 
     // convert geometry from db to geojson
-    const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex")).toGeoJSON();
+    const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex")).toGeoJSON() as GeometryObject;
 
     return {
         type: "Feature",
         properties: properties,
-        geometry: <GeometryObject> geometry,
+        geometry,
     };
 }

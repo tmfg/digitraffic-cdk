@@ -40,6 +40,7 @@
     "axios": "^0.21.1",
     "axios-retry": "^3.2.0",
     "constructs": "*",
+    "digitraffic-common": "*",
     "pg-native": "*",
     "pg-promise": "*",
     "xml2js": "^0.4.23"

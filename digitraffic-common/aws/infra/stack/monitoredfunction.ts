@@ -1,5 +1,5 @@
 import {Function, FunctionProps} from 'aws-cdk-lib/aws-lambda';
-import {Duration, Stack} from "aws-cdk-lib";
+import {Stack} from "aws-cdk-lib";
 import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
 import {DigitrafficStack} from "../stack/stack";

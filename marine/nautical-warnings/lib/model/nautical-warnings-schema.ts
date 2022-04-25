@@ -1,6 +1,6 @@
 import apigateway = require('aws-cdk-lib/aws-apigateway');
 
-const nauticalWarningProperties: apigateway.JsonSchema = {
+export const nauticalWarningSchema: apigateway.JsonSchema = {
     schema: apigateway.JsonSchemaVersion.DRAFT4,
     type: apigateway.JsonSchemaType.OBJECT,
     description: 'Nautical Warning GeoJson',
@@ -112,5 +112,3 @@ const nauticalWarningProperties: apigateway.JsonSchema = {
         },
     },
 };
-
-export default nauticalWarningProperties;

@@ -8,7 +8,7 @@ import {DigitrafficLogSubscriptions} from "digitraffic-common/aws/infra/stack/su
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
-import nauticalWarningProperties from "./model/nautical-warnings-schema";
+import {nauticalWarningSchema} from "./model/nautical-warnings-schema";
 import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
 
 const NAUTICAL_WARNINGS_TAGS = ['Nautical Warnings'];
@@ -37,7 +37,7 @@ export class PublicApi {
         this.activeResource = warningsResource.addResource("active");
         this.archivedResource = warningsResource.addResource("archived");
 
-        const warningModel = addServiceModel('WarningModel', publicApi, nauticalWarningProperties);
+        const warningModel = addServiceModel('WarningModel', publicApi, nauticalWarningSchema);
         const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(warningModel.modelId, publicApi.restApiId)));
         this.geojsonModel = addServiceModel('GeoJSONResponseModel', publicApi, geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId)));
         this.errorModel = publicApi.addModel('ErrorResponseModel', MessageModel);

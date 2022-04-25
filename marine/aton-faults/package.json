@@ -37,6 +37,8 @@
     "xsd-schema-validator": "^0.7.0"
   },
   "dependencies": {
+    "@middy/core": "^1.2.0",
+    "@middy/sqs-partial-batch-failure": "^1.2.0",
     "@turf/turf": "6.5.0",
     "@turf/boolean-intersects": "6.5.0",
     "@types/geojson": "^7946.0.7",

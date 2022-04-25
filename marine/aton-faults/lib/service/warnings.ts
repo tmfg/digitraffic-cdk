@@ -1,7 +1,6 @@
 import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as CachedDao from "digitraffic-common/database/cached";
-import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
 import * as turf from "@turf/turf";
 import {Feature, FeatureCollection} from "geojson";
 
@@ -9,7 +8,7 @@ const MAX_DISTANCE_NM = 15;
 
 export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<FeatureCollection|null> {
     const warnings = await inDatabaseReadonly((db: DTDatabase) => {
-        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
+        return CachedDao.getJsonFromCache(db, CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
     }) as FeatureCollection;
 
     if (!warnings) {
@@ -37,7 +36,7 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
  * @param id
  */
 export async function findWarning(db: DTDatabase, id: number): Promise<Feature|null> {
-    const warnings = await CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE) as FeatureCollection;
+    const warnings = await CachedDao.getJsonFromCache(db, CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE) as FeatureCollection;
 
     if (!warnings) {
         return null;
