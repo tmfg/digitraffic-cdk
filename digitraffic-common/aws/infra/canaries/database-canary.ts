@@ -26,15 +26,15 @@ export class DatabaseCanary extends DigitrafficCanary {
         secret.grantRead(this.role);
 
         // need to override vpc and security group, can't do this with cdk
-        const cfnCanary = this.node.defaultChild as CfnCanary;
+        if (this.node.defaultChild instanceof CfnCanary) {
+            const subnetIds = stack.vpc.privateSubnets.map(subnet => subnet.subnetId);
 
-        const subnetIds = stack.vpc.privateSubnets.map(subnet => subnet.subnetId);
-
-        cfnCanary.vpcConfig = {
-            vpcId: stack.vpc.vpcId,
-            securityGroupIds: [stack.lambdaDbSg.securityGroupId],
-            subnetIds: subnetIds,
-        };
+            this.node.defaultChild.vpcConfig = {
+                vpcId: stack.vpc.vpcId,
+                securityGroupIds: [stack.lambdaDbSg.securityGroupId],
+                subnetIds: subnetIds,
+            };
+        }
     }
 
     static create(stack: DigitrafficStack,

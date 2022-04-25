@@ -24,7 +24,8 @@
     "geojson-validation": "^1.0.2",
     "node-ttl": "^0.2.0",
     "pg-native": "*",
-    "pg-promise": "*"
+    "pg-promise": "*",
+    "sinon": "^11.1.2"
   },
   "externals": [
     "aws-sdk",

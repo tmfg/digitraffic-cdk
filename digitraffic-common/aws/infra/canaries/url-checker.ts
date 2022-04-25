@@ -64,7 +64,7 @@ export class UrlChecker {
             path: url,
         }};
 
-        return synthetics.executeHttpStep("Verify " + statusCode + "  for " + url.replace(/auth=.*/, ''),
+        return synthetics.executeHttpStep(`Verify ${statusCode} for ${url.replace(/auth=.*/, '')}`,
             requestOptions,
             callback);
     }
@@ -82,7 +82,7 @@ export class UrlChecker {
             path: url,
         }};
 
-        return synthetics.executeHttpStep("Verify 404 for " + url, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
+        return synthetics.executeHttpStep(`Verify 404 for ${url}`, requestOptions, validateStatusCodeAndContentType(404, MediaType.TEXT_PLAIN));
     }
 
     expect400(url: string): Promise<void> {
@@ -90,7 +90,7 @@ export class UrlChecker {
             path: url,
         }};
 
-        return synthetics.executeHttpStep("Verify 400 for " + url, requestOptions, validateStatusCodeAndContentType(400, MediaType.TEXT_PLAIN));
+        return synthetics.executeHttpStep(`Verify 400 for ${url}`, requestOptions, validateStatusCodeAndContentType(400, MediaType.TEXT_PLAIN));
     }
 
     expect403WithoutApiKey(url: string, mediaType?: MediaType): Promise<void> {
@@ -103,7 +103,7 @@ export class UrlChecker {
             headers: baseHeaders,
         }};
 
-        return synthetics.executeHttpStep("Verify 403 for " + url,
+        return synthetics.executeHttpStep(`Verify 403 for ${url}`,
             requestOptions,
             validateStatusCodeAndContentType(403, mediaType || MediaType.APPLICATION_JSON));
     }
