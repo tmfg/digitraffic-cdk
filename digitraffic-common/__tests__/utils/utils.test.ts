@@ -8,12 +8,11 @@ describe('CommonUtilsTest', () => {
         expect(CommonUtils.bothArraysHasSameValues(['a'], ['a', 'a'])).toEqual(true);
         expect(CommonUtils.bothArraysHasSameValues(['a', 'a'], ['a', 'a'])).toEqual(true);
 
-        /* eslint-disable */
-        expect(CommonUtils.bothArraysHasSameValues(null!, null!)).toEqual(true);
-        expect(CommonUtils.bothArraysHasSameValues(undefined!, undefined!)).toEqual(true);
-        expect(CommonUtils.bothArraysHasSameValues(null!, undefined!)).toEqual(true);
-        expect(CommonUtils.bothArraysHasSameValues(['a'], undefined!)).toEqual(false);
-        expect(CommonUtils.bothArraysHasSameValues(['a'], null!)).toEqual(false);
+        expect(CommonUtils.bothArraysHasSameValues(null, null)).toEqual(true);
+        expect(CommonUtils.bothArraysHasSameValues(undefined, undefined)).toEqual(true);
+        expect(CommonUtils.bothArraysHasSameValues(null, undefined)).toEqual(true);
+        expect(CommonUtils.bothArraysHasSameValues(['a'], undefined)).toEqual(false);
+        expect(CommonUtils.bothArraysHasSameValues(['a'], null)).toEqual(false);
         /* eslint-enable */
         expect(CommonUtils.bothArraysHasSameValues(['a', 'b'], ['a', 'a'])).toEqual(false);
         expect(CommonUtils.bothArraysHasSameValues(['a', 'a', 'a'], ['a', 'b', 'c'])).toEqual(false);

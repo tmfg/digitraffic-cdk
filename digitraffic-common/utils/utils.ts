@@ -19,7 +19,7 @@
  * @param a first array to compare
  * @param b second array to compare
  */
-export function bothArraysHasSameValues(a: unknown[], b: unknown[]): boolean {
+export function bothArraysHasSameValues(a: null|undefined|unknown[], b: null|undefined|unknown[]): boolean {
     if ((a && !b) || (!a && b)) {
         return false;
     } else if (!a && !b) {
