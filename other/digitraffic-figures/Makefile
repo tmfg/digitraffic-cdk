@@ -28,25 +28,25 @@ csv_to_db:
 	sed -e 's/\([^–]\)id,from,to,name,filter,query,value/\1/' < combined.csv > key_figures.csv
 	rm combined.csv
 	docker compose cp ./key_figures.csv db:/tmp/key_figures.csv
-	docker compose exec db mysql -u"${DB_USER}" -p"${DB_PASSWORD}" -e 'truncate key_figures;' ${DB_DATABASE}
-	docker compose exec db sh -c "mysql -uroot -p'"${DB_PASSWORD}"' -e 'SET GLOBAL local_infile=1';"
-	docker compose exec db sh -c "mysqlimport --ignore-lines=1 --fields-enclosed-by='"'"'"' --fields-terminated-by=',' --local=1 -uroot -p'"${DB_PASSWORD}"' ${DB_DATABASE} /tmp/key_figures.csv"
+	docker compose exec db mysql -u"${DOCKER_DB_USER}" -p"${DOCKER_DB_PASSWORD}" -e 'truncate key_figures;' ${DOCKER_DB_DATABASE}
+	docker compose exec db sh -c "mysql -uroot -p'"${DOCKER_DB_PASSWORD}"' -e 'SET GLOBAL local_infile=1';"
+	docker compose exec db sh -c "mysqlimport --ignore-lines=1 --fields-enclosed-by='"'"'"' --fields-terminated-by=',' --local=1 -uroot -p'"${DOCKER_DB_PASSWORD}"' ${DOCKER_DB_DATABASE} /tmp/key_figures.csv"
 	rm key_figures.csv
 
 start_db:
 	docker compose up -d
 
-run: export FLASK_APP=${FLASK_APP}
+run: export FLASK_APP=${DOCKER_FLASK_APP}
 run:
 	venv/bin/flask run
 
-dev: export FLASK_APP=${FLASK_APP}
+dev: export FLASK_APP=${DOCKER_FLASK_APP}
 dev: export FLASK_ENV=development
-dev: export DB_HOST=${DB_HOST}
-dev: export DB_PORT=${DB_PORT}
-dev: export DB_DATABASE=${DB_DATABASE}
-dev: export DB_USERNAME=${DB_USER}
-dev: export DB_PASSWORD=${DB_PASSWORD}
+dev: export DB_HOST=${DOCKER_DB_HOST}
+dev: export DB_PORT=${DOCKER_DB_PORT}
+dev: export DB_DATABASE=${DOCKER_DB_DATABASE}
+dev: export DB_USERNAME=${DOCKER_DB_USER}
+dev: export DB_PASSWORD=${DOCKER_DB_PASSWORD}
 dev:
 	venv/bin/flask run
 

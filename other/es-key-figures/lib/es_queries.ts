@@ -111,7 +111,7 @@ export const esQueries = [
                             "field": "@fields.http_digitraffic_user.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
-                            "size": 10
+                            "size": 20
                         }
                     }
                 },
@@ -130,7 +130,7 @@ export const esQueries = [
         type: 'field_agg',
     },
     {
-        name: 'Top 10 digitraffic-users by bytes',
+        name: 'Top digitraffic-users by bytes',
         query:
             {
                 "aggs": {
@@ -139,7 +139,7 @@ export const esQueries = [
                             "field": "@fields.http_digitraffic_user.keyword",
                             "order": {"agg": "desc"},
                             "missing": "__missing__",
-                            "size": 10
+                            "size": 20
                         }, "aggs": {"agg": {"sum": {"field": "@fields.body_bytes_sent"}}}
                     }
                 },

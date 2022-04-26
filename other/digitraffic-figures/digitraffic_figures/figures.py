@@ -147,7 +147,7 @@ class Figures:
 
         return dict(dt=dt, columns=columns)
 
-    def top_10_users_req(self, date=None, liikennemuoto=None):
+    def top_users_req(self, date=None, liikennemuoto=None):
         start = time.time()
 
         primary_value = 'Kyselymäärä'
@@ -167,16 +167,16 @@ class Figures:
             data=table_data['dt'].loc[:, table_data['columns']].to_dict('records')
         )
 
-        self.logger.info(f'method=Figures.top_10_users_req took={time.time()-start}')
+        self.logger.info(f'method=Figures.top_users_req took={time.time()-start}')
 
         return table
 
-    def top_10_users_data(self, date=None, liikennemuoto=None):
+    def top_users_data(self, date=None, liikennemuoto=None):
         start = time.time()
 
         primary_value = 'Data (Tt)'
 
-        table_data = self.top_users_table(query='Top 10 digitraffic-users by bytes',
+        table_data = self.top_users_table(query='Top digitraffic-users by bytes',
                                           comparison_query='Bytes out',
                                           sort_by_column=primary_value,
                                           percentage_column='Data-%',
@@ -193,7 +193,7 @@ class Figures:
             data=table_data['dt'].loc[:, table_data['columns']].to_dict('records')
         )
 
-        self.logger.info(f'method=Figures.top_10_users_data took={time.time() - start}')
+        self.logger.info(f'method=Figures.top_users_data took={time.time() - start}')
 
         return table
 
@@ -268,11 +268,11 @@ class Figures:
         if date is None:
             date = df['from'].unique().max()
 
-        if df[(df['from'] == date) & (df['name'] == query)].empty:
-            return {}
-
         if liikennemuoto is None:
             liikennemuoto = 'kaikki'
+
+        if df[(df['from'] == date) & (df['name'] == query) & (df['liikennemuoto'] == liikennemuoto)].empty:
+            return {}
 
         # Haetaan tunnistamattomat käyttäjät
         user_data = df[(df['name'] == query) & (df['liikennemuoto'] == liikennemuoto) & (df['request_uri'] == '') & (df['value'] != '{}')]
