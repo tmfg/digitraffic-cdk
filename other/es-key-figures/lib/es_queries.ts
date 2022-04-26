@@ -111,7 +111,7 @@ export const esQueries = [
                             "field": "@fields.http_digitraffic_user.keyword",
                             "order": {"_count": "desc"},
                             "missing": "__missing__",
-                            "size": 20
+                            "size": 100
                         }
                     }
                 },
@@ -139,7 +139,7 @@ export const esQueries = [
                             "field": "@fields.http_digitraffic_user.keyword",
                             "order": {"agg": "desc"},
                             "missing": "__missing__",
-                            "size": 20
+                            "size": 100
                         }, "aggs": {"agg": {"sum": {"field": "@fields.body_bytes_sent"}}}
                     }
                 },
