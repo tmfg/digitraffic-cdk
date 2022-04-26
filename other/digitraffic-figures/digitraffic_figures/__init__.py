@@ -3,6 +3,13 @@ import time
 from logging import config
 
 from flask import Flask
+from flask_wtf.csrf import CSRFProtect
+
+csrf = CSRFProtect()
+
+if os.getenv('DEV'):
+    from dotenv import load_dotenv
+    load_dotenv()
 
 
 def create_app(kwargs_flask=None, kwargs_dash=None):
@@ -15,6 +22,7 @@ def create_app(kwargs_flask=None, kwargs_dash=None):
         kwargs_dash = dict()
 
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
+    log_level = log_level if log_level in ['DEBUG', 'INFO'] else 'INFO'
 
     config.dictConfig({
         'version': 1,
@@ -22,19 +30,24 @@ def create_app(kwargs_flask=None, kwargs_dash=None):
             'format': '[%(asctime)s] %(levelname)s in %(module)s: %(message)s',
         }},
         'handlers': {'wsgi': {
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': '/tmp/wsgi.log',
+            'class': 'logging.StreamHandler',
+            'level': log_level,
             'formatter': 'default',
-            'maxBytes': 1024*1024
+            'stream': 'ext://sys.stdout',
         }},
         'root': {
             'level': log_level,
-            'handlers': ['wsgi']
+            'handlers': ['wsgi'],
         }
     })
 
     start_flask = time.time()
+
     app = Flask(__name__, instance_relative_config=False, **kwargs_flask)
+    # https://github.com/plotly/dash/issues/308#issuecomment-412653680
+    csrf._exempt_views.add('dash.dash.dispatch')
+    csrf.init_app(app)
+
     end_flask = time.time() - start_flask
 
     start_dashboard = time.time()

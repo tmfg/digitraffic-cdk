@@ -36,17 +36,12 @@ csv_to_db:
 start_db:
 	docker compose up -d
 
-run: export FLASK_APP=${FLASK_APP}
+dev: export FLASK_APP=digitraffic_figures
 run:
 	venv/bin/flask run
 
-dev: export FLASK_APP=${FLASK_APP}
-dev: export FLASK_ENV=development
-dev: export DB_HOST=${DB_HOST}
-dev: export DB_PORT=${DB_PORT}
-dev: export DB_DATABASE=${DB_DATABASE}
-dev: export DB_USERNAME=${DB_USER}
-dev: export DB_PASSWORD=${DB_PASSWORD}
+dev: export FLASK_APP=digitraffic_figures
+dev: export DEV=true
 dev:
 	venv/bin/flask run
 
