@@ -11,6 +11,7 @@ export class PublicApi {
 
     alarmsResource: Resource;
     devicesResource: Resource;
+    devicesGeojsonResource: Resource;
     alarmTypesResource: Resource;
     alarmsGeojsonResource: Resource;
 
@@ -27,6 +28,7 @@ export class PublicApi {
     createDocumentation() {
         this.publicApi.documentResource(this.alarmsResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarms", "Returns all alarms"));
         this.publicApi.documentResource(this.devicesResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetDevices", "Returns device information"));
+        this.publicApi.documentResource(this.devicesGeojsonResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetDevicesGeojson", "Returns device information in geojson format"));
         this.publicApi.documentResource(this.alarmTypesResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarmTypes", "Returns alarm types"));
         this.publicApi.documentResource(this.alarmsGeojsonResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarmsGeojson", "Returns geojson of alarm with alarm type and device information"));
     }
@@ -39,6 +41,7 @@ export class PublicApi {
 
         this.alarmsResource = resource.addResource("alarms");
         this.devicesResource = resource.addResource("devices");
+        this.devicesGeojsonResource = resource.addResource("devices.geojson");
         this.alarmTypesResource = resource.addResource("alarm-types");
         this.alarmsGeojsonResource = resource.addResource("alarms.geojson");
     }
@@ -58,6 +61,12 @@ export class PublicApi {
             "get-devices",
             `${prefix}-GetDevices`,
         );
+        const devicesGeojsonLambda = this.createResource(
+            stack,
+            this.devicesGeojsonResource,
+            "get-devices-geojson",
+            `${prefix}-GetDevicesGeojson`,
+        );
         const alarmTypesLambda = this.createResource(
             stack,
             this.alarmTypesResource,
@@ -70,7 +79,7 @@ export class PublicApi {
             "get-alarms-geojson",
             `${prefix}-GetAlarmsGeojson`,
         );
-        stack.grantSecret(alarmsLambda, devicesLambda, alarmTypesLambda, alarmsGeojsonLambda);
+        stack.grantSecret(alarmsLambda, devicesLambda, devicesGeojsonLambda, alarmTypesLambda, alarmsGeojsonLambda);
     }
 
     createResource(stack: DigitrafficStack, resource: Resource, name: string, functionName: string): MonitoredFunction {

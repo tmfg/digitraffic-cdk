@@ -40,9 +40,9 @@ export function getDevices(apiKey: string, url: string): Promise<Devices> {
         });
 }
 
-export function getDevicesFeatureCollection(apiKey: string, url: string): Promise<FeatureCollection> {
+export function getDevicesGeojson(apiKey: string, url: string): Promise<FeatureCollection> {
     return getDevices(apiKey, url)
-        .then(xs => xs.map(makeDeviceToGeoJSON))
+        .then(devices => devices.map(makeDeviceToGeoJSON))
         .then(makeFeatureCollection);
 }
 

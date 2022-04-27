@@ -74,9 +74,9 @@ describe("Road network condition service", () => {
             ],
         };
 
-        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
+        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({status: 200, data});
 
-        return rcs.getDevicesFeatureCollection("", "")
+        return rcs.getDevicesGeojson("", "")
             .then(d => expect(d).toEqual(expected))
             .then(() => expect(axios.get).toHaveBeenCalledWith(`/keli/laitetiedot?authKey=`));
     });
