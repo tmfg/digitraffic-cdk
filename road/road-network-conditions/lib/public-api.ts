@@ -38,14 +38,14 @@ export class PublicApi {
             `${prefix}-GetAlarmTypes`,
             "alarm-types",
         );
-        const featureCollectionLambda = this.createResource(
+        const alarmsGeojson = this.createResource(
             stack,
             resource,
-            "get-feature-collection",
-            `${prefix}-GetFeatureCollection`,
-            "feature-collection.geojson",
+            "get-alarms-geojson",
+            `${prefix}-GetAlarmsGeojson`,
+            "alarms.geojson",
         );
-        stack.grantSecret(alarmsLambda, devicesLambda, alarmTypesLambda, featureCollectionLambda);
+        stack.grantSecret(alarmsLambda, devicesLambda, alarmTypesLambda, alarmsGeojson);
     }
 
     createResource(stack: DigitrafficStack, resource: Resource, name: string, functionName: string, pathPart: string): MonitoredFunction {

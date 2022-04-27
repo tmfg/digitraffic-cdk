@@ -87,7 +87,7 @@ const withDevices = (devices: Devices) => (alarm: Alarm & AlarmType): Feature | 
     return makeGeoJson(props, device.coordinates);
 };
 
-export async function getFeatureCollection(apiKey: string, url: string): Promise<FeatureCollection> {
+export async function getAlarmsGeojson(apiKey: string, url: string): Promise<FeatureCollection> {
     const [devices, alarms, alarmTypes] =
         await Promise.all([
             getDevices(apiKey, url),

@@ -131,7 +131,7 @@ describe("Road network condition service", () => {
             ],
         };
 
-        expect(rcs.getFeatureCollection("", "")).resolves.toMatchObject(desiredFeatureCollection);
+        expect(rcs.getAlarmsGeojson("", "")).resolves.toMatchObject(desiredFeatureCollection);
     });
 
     it("should work with alarms with unknown devices", () => {
@@ -170,7 +170,7 @@ describe("Road network condition service", () => {
             features: [],
         };
 
-        expect(rcs.getFeatureCollection("", "")).resolves.toEqual(expected);
+        expect(rcs.getAlarmsGeojson("", "")).resolves.toEqual(expected);
     });
 
     it ("should return error if api sends malformed data", () => {

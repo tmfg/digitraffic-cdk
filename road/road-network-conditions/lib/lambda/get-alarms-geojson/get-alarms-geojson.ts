@@ -10,7 +10,7 @@ const holder = SecretHolder.create<RoadNetworkConditionsSecret>(DOMAIN_PREFIX);
 export async function handler(event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> {
     const secret = await holder.get();
 
-    const result: FeatureCollection = await rcs.getFeatureCollection(secret.apiKey, secret.url);
+    const result: FeatureCollection = await rcs.getAlarmsGeojson(secret.apiKey, secret.url);
 
     return {
         statusCode: 200,
