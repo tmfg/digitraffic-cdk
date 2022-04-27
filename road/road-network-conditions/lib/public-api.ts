@@ -2,53 +2,78 @@ import {LambdaIntegration, Resource, RestApi} from "aws-cdk-lib/aws-apigateway";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
+
+const ROAD_NETWORK_CONDITION_ALARMS_TAGS = ["Road Network Condition Alarms"];
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
+
+    alarmsResource: Resource;
+    devicesResource: Resource;
+    alarmTypesResource: Resource;
+    alarmsGeojsonResource: Resource;
 
     constructor(stack: DigitrafficStack) {
         this.publicApi = new DigitrafficRestApi(stack, "RoadNetworkConditions-public", "Road Network Conditions Public API");
         this.publicApi.createUsagePlan("Road Network Conditions Api Key", "Road Network Conditions Usage Plan");
 
+        this.createResources(stack);
+        this.createLambdaFunctions(stack);
+
+        this.createDocumentation();
+    }
+
+    createDocumentation() {
+        this.publicApi.documentResource(this.alarmsResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarms", "Returns all alarms"));
+        this.publicApi.documentResource(this.devicesResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetDevices", "Returns device information"));
+        this.publicApi.documentResource(this.alarmTypesResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarmTypes", "Returns alarm types"));
+        this.publicApi.documentResource(this.alarmsGeojsonResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarmsGeojson", "Returns geojson of alarm with alarm type and device information"));
+    }
+
+    createResources(stack: DigitrafficStack) {
         const resource = this.publicApi.root
             .addResource("api")
             .addResource("road-network-conditions")
             .addResource("beta");
 
+        this.alarmsResource = resource.addResource("alarms");
+        this.devicesResource = resource.addResource("devices");
+        this.alarmTypesResource = resource.addResource("alarm-types");
+        this.alarmsGeojsonResource = resource.addResource("alarms.geojson");
+    }
+
+    createLambdaFunctions(stack: DigitrafficStack) {
         const prefix = "RoadNetworkConditions";
 
         const alarmsLambda = this.createResource(
             stack,
-            resource,
+            this.alarmsResource,
             "get-alarms",
             `${prefix}-GetAlarms`,
-            "alarms",
         );
         const devicesLambda = this.createResource(
             stack,
-            resource,
+            this.devicesResource,
             "get-devices",
             `${prefix}-GetDevices`,
-            "devices",
         );
         const alarmTypesLambda = this.createResource(
             stack,
-            resource,
+            this.alarmTypesResource,
             "get-alarm-types",
             `${prefix}-GetAlarmTypes`,
-            "alarm-types",
         );
-        const alarmsGeojson = this.createResource(
+        const alarmsGeojsonLambda = this.createResource(
             stack,
-            resource,
+            this.alarmsGeojsonResource,
             "get-alarms-geojson",
             `${prefix}-GetAlarmsGeojson`,
-            "alarms.geojson",
         );
-        stack.grantSecret(alarmsLambda, devicesLambda, alarmTypesLambda, alarmsGeojson);
+        stack.grantSecret(alarmsLambda, devicesLambda, alarmTypesLambda, alarmsGeojsonLambda);
     }
 
-    createResource(stack: DigitrafficStack, resource: Resource, name: string, functionName: string, pathPart: string): MonitoredFunction {
+    createResource(stack: DigitrafficStack, resource: Resource, name: string, functionName: string): MonitoredFunction {
         const env = stack.createLambdaEnvironment();
 
         const lambda = MonitoredFunction.createV2(stack, name, env, {
@@ -57,9 +82,8 @@ export class PublicApi {
         });
 
         const integration = new LambdaIntegration(lambda, { proxy: true });
-        const getAlarmsResource = resource.addResource(pathPart);
-        getAlarmsResource.addMethod("GET", integration, { apiKeyRequired: false });
-        getAlarmsResource.addMethod("HEAD", integration, { apiKeyRequired: false });
+        resource.addMethod("GET", integration, { apiKeyRequired: false });
+        resource.addMethod("HEAD", integration, { apiKeyRequired: false });
 
         return lambda;
     }
