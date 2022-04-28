@@ -101,7 +101,7 @@ export class StackCheckingAspect implements IAspect {
                 this.addAnnotation(node, ResourceType.functionRuntime,'wrong runtime ' + node.runtime);
             }
 
-            if (this.configuration?.shortName && node.functionName && node.functionName.indexOf(this.configuration.shortName) != 0) {
+            if (this.configuration?.shortName && node.functionName && node.functionName.indexOf(this.configuration.shortName) !== 0) {
                 this.addAnnotation(node, ResourceType.functionName, 'Function name does not begin with ' + this.configuration.shortName);
             }
         }

@@ -38,7 +38,7 @@ function parseSecret<Secret>(secret: GenericSecret, prefix: string): Secret {
 
     for (const key in secret) {
         if (key.startsWith(prefix)) {
-            parsed[key.substring(skip)] = secret[key] as string;
+            parsed[key.substring(skip)] = secret[key];
         }
     }
 

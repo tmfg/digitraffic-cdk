@@ -206,7 +206,7 @@ export class ResponseChecker {
             }
 
             if (res.statusCode < 200 || res.statusCode > 299) {
-                throw new Error(res.statusCode + ' ' + res.statusMessage);
+                throw new Error(`${res.statusCode} ${res.statusMessage}`);
             }
 
             if (this.checkCors && !res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
@@ -250,7 +250,7 @@ export class ContentTypeChecker {
             }
 
             if (res.statusCode < 200 || res.statusCode > 299) {
-                throw new Error(res.statusCode + ' ' + res.statusMessage);
+                throw new Error(`${res.statusCode} ${res.statusMessage}`);
             }
 
             if (!res.headers[constants.HTTP2_HEADER_ACCESS_CONTROL_ALLOW_ORIGIN]) {
