@@ -11,6 +11,7 @@ dash-html-components==2.0.0
 dash-table==5.0.0
 Flask==2.0.2
 Flask-Compress==1.10.1
+Flask-WTF==1.0.1
 greenlet==1.1.2
 itsdangerous==2.0.1
 Jinja2==3.0.3
@@ -23,6 +24,7 @@ plotly==5.5.0
 pycparser==2.21
 PyMySQL==1.0.2
 python-dateutil==2.8.2
+python-dotenv==0.20.0
 pytz==2021.3
 s3transfer==0.5.0
 scikit-learn==1.0.2
@@ -33,3 +35,4 @@ tenacity==8.0.1
 threadpoolctl==3.0.0
 urllib3==1.26.8
 Werkzeug==2.0.2
+WTForms==3.0.1

@@ -1,6 +1,6 @@
 import axios, {AxiosError} from 'axios';
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {AwakeAiPredictedVoyage, AwakeAiShip} from "./awake_common";
+import {AwakeAiPredictedVoyage, AwakeAiPredictionType, AwakeAiShip} from "./awake_common";
 
 export enum AwakeAiPortResponseType {
     OK = 'OK',
@@ -37,7 +37,7 @@ export class AwakeAiETAPortApi {
     async getETAs(locode: string): Promise<AwakeAiPortResponse> {
         const start = Date.now();
         try {
-            const url = `${this.url}/port/${locode}/arrivals`;
+            const url = `${this.url}/port/${locode}/arrivals?predictionType=${AwakeAiPredictionType.ETA}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}`;
             console.info(`AwakeAiETAPortApi.getETAs calling URL ${url}`);
             const resp = await axios.get(url, {
                 headers: {

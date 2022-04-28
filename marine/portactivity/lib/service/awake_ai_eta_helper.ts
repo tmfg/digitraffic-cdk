@@ -1,4 +1,9 @@
-import {AwakeAiPredictionType, AwakeAiVoyageEtaPrediction, AwakeAiZoneType} from "../api/awake_common";
+import {
+    AwakeAiPredictionType,
+    AwakeAiVoyageEtaPrediction,
+    AwakeAiZoneType,
+    AwakeArrivalPortCallPrediction,
+} from "../api/awake_common";
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 
@@ -24,6 +29,17 @@ export function destinationIsFinnish(locode: string): boolean {
     return locode != null && locode.toLowerCase().startsWith('fi');
 }
 
+function portCallIdFromUrn(urn?: string): number | null {
+    if (!urn) {
+        return null;
+    }
+    const split = urn.split(':');
+    if (split.length < 4) {
+        throw new Error('Invalid URN: ' + urn);
+    }
+    return Number(split[3]);
+}
+
 export function predictionToTimestamp(
     prediction: AwakeAiVoyageEtaPrediction,
     source: EventSource,
@@ -32,6 +48,7 @@ export function predictionToTimestamp(
     imo: number,
     portArea?: string,
     portcallId?: number,
+    portCallPrediction?: AwakeArrivalPortCallPrediction,
 ): ApiTimestamp | null {
 
     // should always be ETA for ETA predictions but check just in case
@@ -68,7 +85,7 @@ export function predictionToTimestamp(
         source,
         eventTime: prediction.arrivalTime,
         recordTime: prediction.recordTime ?? new Date().toISOString(),
-        portcallId,
+        portcallId: portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
         eventType: prediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA,
     };
     console.info(`method=AwakeAiETAHelper.predictionToTimestamp created timestamp: ${JSON.stringify(timestamp)}'`);

@@ -15,23 +15,55 @@ export type AwakeAiShip = {
 export enum AwakeAiPredictionType {
     ETA = 'eta',
     TRAVEL_TIME = 'travel-time',
-    DESTINATION = 'destination'
+    DESTINATION = 'destination',
+    ARRIVAL_PORT_CALL = 'arrival-port-call',
 }
 
+/**
+ * Base and mixin types
+ */
 export type AwakeAiPrediction = {
-
     readonly predictionType: AwakeAiPredictionType
+}
 
-    // ISO 8601
-    readonly recordTime: string
-
-    readonly locode: string
-
+export type AwakeAiZonePrediction = AwakeAiPrediction & {
     readonly zoneType: AwakeAiZoneType
 }
 
-export type AwakeAiVoyageEtaPrediction = AwakeAiPrediction & {
+export type AwakeAiLocodePrediction = AwakeAiPrediction & {
+    // ISO 8601
+    readonly recordTime: string
 
+    // UN/LOCODE
+    readonly locode: string
+}
+
+/**
+ * Actual prediction types
+ */
+export type AwakeArrivalPortCallPrediction = AwakeAiPrediction & {
+    // UUID
+    readonly portCallId: string
+
+    // urn:awake:digitraffic-portcall:1234567890
+    readonly portCallUrn: string
+
+    // UN/LOCODE
+    readonly portCallLocode: string
+}
+
+export type AwakeAiDestinationPrediction = AwakeAiLocodePrediction
+
+export type AwakeAiTravelTimePrediction = AwakeAiLocodePrediction & AwakeAiZonePrediction & {
+    readonly zoneId: ['berth', 'pbp']
+
+    readonly zoneName: string
+
+    // integer, in seconds
+    readonly remainingTravelTime: number
+}
+
+export type AwakeAiVoyageEtaPrediction = AwakeAiLocodePrediction & AwakeAiZonePrediction & {
     // ISO 8601
     readonly arrivalTime: string
 }
