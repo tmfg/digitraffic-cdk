@@ -22,7 +22,7 @@ export class PublicApi {
         this.createResources(stack);
         this.createLambdaFunctions(stack);
 
-        this.createDocumentation();
+        // this.createDocumentation();
     }
 
     createDocumentation() {
