@@ -6,12 +6,14 @@ const proxyHolder = ProxyHolder.create();
 
 export const handler = (event: Record<string, string>) => {
     const jsonMetadata = event.body;
+    const start = Date.now();
 
     if (jsonMetadata) {
         console.info('DEBUG ' + jsonMetadata);
 
         return proxyHolder.setCredentials()
             .then(() => JsonUpdateService.updateJsonMetadata(JSON.parse(jsonMetadata)))
+            .finally(() => console.info("method=Lambda.UpdateJsonMetadata tookMs=%d", Date.now() - start))
             .catch(() => StatusCodeValue.INTERNAL_ERROR);
     }
 
