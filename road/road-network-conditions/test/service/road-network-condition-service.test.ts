@@ -47,14 +47,13 @@ const DEVICES = [
     DEVICE,
 ];
 
-describe("Road network condition service", () => {
-
+describe("Road network condition service devices", () => {
     beforeEach(() => {
         jest.resetAllMocks();
     });
 
     it("should fetch devices from the api", () => {
-        const data = { devices: DEVICES };
+        const data = {devices: DEVICES};
 
         const expected: FeatureCollection = {
             type: "FeatureCollection",
@@ -81,27 +80,82 @@ describe("Road network condition service", () => {
             .then(() => expect(axios.get).toHaveBeenCalledWith(`/keli/laitetiedot?authKey=`));
     });
 
+    it("should return error if api sends malformed data", () => {
+        // incorrectly formatted device
+        const data = {
+            devices: [
+                {
+                    fooId: "1000108",
+                    fooName: "IRS - Vesijärvenkatu 9",
+                    fooType: "IRS",
+                    coordinates: {latitude: 60.982431, longitude: 25.661484},
+                },
+            ],
+        };
+
+        const expected = new Error("unable to parse road condition device");
+
+        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({status: 200, data});
+
+        return expect(rcs.getDevicesGeojson("", "")).rejects.toEqual(expected);
+    });
+
+});
+
+describe("Road network condition service alarm types", () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
+
+    it("should fetch alarm type description", () => {
+        const data = {
+            alarmTypes: ALARM_TYPES,
+        };
+
+        const expected = data.alarmTypes.map(x => ({...x, alarmId: String(x.alarmId)}));
+
+        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({status: 200, data});
+
+        return rcs.getAlarmTypes("", "")
+            .then(d => expect(d).toEqual(expected))
+            .then(() => expect(axios.get).toHaveBeenCalledWith(`/keli/halytystyypit?authKey=`));
+    });
+
+    it("should fail with malformed alarm types", () => {
+        const data = {
+            alarmTypes: [
+                {
+                    unknown: "2022-01-17 03:19:28",
+                    alarm: "not-a-number",
+                },
+            ],
+        };
+
+        const expected = new Error("unable to parse alarm type");
+
+        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({status: 200, data});
+
+        return expect(rcs.getAlarmTypes("", "")).rejects.toEqual(expected);
+    });
+});
+
+describe("Road network condition service alarms", () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+    });
+
     it("should combine alarm, alarm types and device information", () => {
         const devices = {
             devices: [DEVICE],
         };
 
-        const alarmTypes = { alarmTypes: ALARM_TYPES };
+        const alarmTypes = {alarmTypes: ALARM_TYPES};
         const alarms = ALARMS;
 
-        (axios.get as unknown as jest.Mock).mockImplementation((req) => {
-            const data =
-                req.includes("laitetiedot") ?
-                    devices :
-                    req.includes("halytykset") ?
-                        alarms :
-                        alarmTypes;
-
-            return Promise.resolve({
-                status: 200,
-                data,
-            });
-        });
+        (axios.get as unknown as jest.Mock).mockImplementation((request) =>
+            Promise.resolve(
+                request.match(/laitetiedot/) ? {status: 200, data: devices} :
+                request.match(/halytykset/) ? {status: 200, data: alarms} : {status: 200, data: alarmTypes}));
 
         const dateMatcher = expect.stringMatching(/\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}/);
         const alarmIdMatcher = expect.stringMatching(/\d{1,2}/);
@@ -110,15 +164,6 @@ describe("Road network condition service", () => {
         const desiredFeatureCollection = {
             type: "FeatureCollection",
             features: [
-                {
-                    type: "Feature",
-                    properties: {
-                        created: dateMatcher,
-                        alarmId: alarmIdMatcher,
-                        alarmText: alarmTextMatcher,
-                        deviceId: DEVICE.deviceId,
-                    },
-                },
                 {
                     type: "Feature",
                     properties: {
@@ -151,19 +196,10 @@ describe("Road network condition service", () => {
         };
         const alarms = ALARMS;
 
-        (axios.get as unknown as jest.Mock).mockImplementation((req) => {
-            const data =
-                req.includes("laitetiedot") ?
-                    devices :
-                    req.includes("halytykset") ?
-                        alarms :
-                        alarmTypes;
-
-            return Promise.resolve({
-                status: 200,
-                data,
-            });
-        });
+        (axios.get as unknown as jest.Mock).mockImplementation((request) =>
+            Promise.resolve(
+                request.match(/laitetiedot/) ? {status: 200, data: devices} :
+                request.match(/halytykset/) ? {status: 200, data: alarms} : {status: 200, data: alarmTypes}));
 
         const expected: FeatureCollection = {
             type: "FeatureCollection",
@@ -173,32 +209,61 @@ describe("Road network condition service", () => {
         expect(rcs.getAlarmsGeojson("", "")).resolves.toEqual(expected);
     });
 
-    it ("should return error if api sends malformed data", () => {
-        // incorrectly formatted device
-        const data = {
-            devices: [
-                {
-                    fooId: "1000108",
-                    fooName: "IRS - Vesijärvenkatu 9",
-                    fooType: "IRS",
-                    coordinates: {latitude: 60.982431, longitude: 25.661484},
-                },
-            ],
-        };
+    it("should fetch alarms", () => {
+        const alarms = ALARMS;
+        const devices = {devices: [DEVICE]};
 
-        const expected = new Error("unable to parse road condition device");
+        const expected = [alarms[0]];
 
-        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
+        (axios.get as unknown as jest.Mock).mockImplementation((request) =>
+            Promise.resolve(request.match(/laitetiedot/)
+                ? {status: 200, data: devices}
+                : {status: 200, data: alarms}));
 
-        return expect(rcs.getDevicesFeatureCollection("", "")).rejects.toEqual(expected);
+        return rcs.getAlarms("", "")
+            .then(d => expect(d).toEqual(expected))
+            .then(() => expect(axios.get).toHaveBeenCalledWith(`/keli/halytykset?authKey=`));
     });
 
-    it("should fetch alarms", () => {
-        const data = ALARMS;
+    it("should not list alarms from digitraffic", () => {
+        const alarms = [
+            {created: "2022-04-17 03:17:33", station: "1000108", alarm: "2"},
+            {created: "2022-04-17 02:42:32", station: "4025", alarm: "1"},  // alarm from digitraffic device
+        ];
 
-        const expected = data;
+        const devices = {devices: DEVICES};
 
-        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
+        const expected = [{created: "2022-04-17 03:17:33", station: "1000108", alarm: "2"}];
+
+        (axios.get as unknown as jest.Mock).mockImplementation((request) =>
+            Promise.resolve(request.match(/laitetiedot/)
+                ? {status: 200, data: devices}
+                : {status: 200, data: alarms}));
+
+        return rcs.getAlarms("", "")
+            .then(d => expect(d).toEqual(expected))
+            .then(() => expect(axios.get).toHaveBeenCalledWith(`/keli/halytykset?authKey=`));
+    });
+
+    it("should filter old alarms", () => {
+        const devices = {devices: [{...DEVICE, deviceId: "4075"}, {...DEVICE, deviceId: "1005"}]};
+
+        const alarms = [
+            {created: "2022-04-26 22:02:01", station: "4075", alarm: "1"},
+            {created: "2022-04-17 03:17:33", station: "4075", alarm: "1"},  // should remove this data point
+            {created: "2022-04-17 02:17:33", station: "4075", alarm: "2"},  // should remove this data point
+            {created: "2022-04-17 02:42:32", station: "1005", alarm: "1"},
+        ];
+
+        const expected = [
+            {created: "2022-04-17 02:42:32", station: "1005", alarm: "1"},
+            {created: "2022-04-26 22:02:01", station: "4075", alarm: "1"},
+        ];
+
+        (axios.get as unknown as jest.Mock).mockImplementation((request) =>
+            Promise.resolve(request.match(/laitetiedot/)
+                ? {status: 200, data: devices}
+                : {status: 200, data: alarms}));
 
         return rcs.getAlarms("", "")
             .then(d => expect(d).toEqual(expected))
@@ -207,7 +272,7 @@ describe("Road network condition service", () => {
 
     it("should fail with malformed alarms", () => {
         // incorrect alarm
-        const data = [
+        const alarms = [
             {
                 created: "2022-01-17 03:19:28",
                 station: "1000120",
@@ -215,41 +280,20 @@ describe("Road network condition service", () => {
             },
         ];
 
-        const expected = new Error("unable to parse alarm type");
-
-        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
-
-        return expect(rcs.getAlarms("", "")).rejects.toEqual(expected);
-    });
-
-    it("should fetch alarm type description", () => {
-        const data = {
-            alarmTypes: ALARM_TYPES,
-        };
-
-        const expected = data.alarmTypes.map(x => ({...x, alarmId: String(x.alarmId)}));
-
-        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
-
-        return rcs.getAlarmTypes("", "")
-            .then(d => expect(d).toEqual(expected))
-            .then(() => expect(axios.get).toHaveBeenCalledWith(`/keli/halytystyypit?authKey=`));
-    });
-
-    it("should fail with malformed alarm types", () => {
-        const data = {
-            alarmTypes: [
-                {
-                    unknown: "2022-01-17 03:19:28",
-                    alarm: "not-a-number",
-                },
+        const devices = {
+            devices: [
+                {...DEVICE, deviceId: "1000120"},
             ],
         };
 
         const expected = new Error("unable to parse alarm type");
 
-        (axios.get as unknown as jest.Mock).mockResolvedValueOnce({ status: 200, data});
+        (axios.get as unknown as jest.Mock).mockImplementation((request) =>
+            Promise.resolve(request.match(/laitetiedot/)
+                ? {status: 200, data: devices}
+                : {status: 200, data: alarms}));
 
-        return expect(rcs.getAlarmTypes("", "")).rejects.toEqual(expected);
+        return expect(rcs.getAlarms("", "")).rejects.toEqual(expected);
     });
+
 });

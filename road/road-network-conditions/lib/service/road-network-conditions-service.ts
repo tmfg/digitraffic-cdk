@@ -30,6 +30,12 @@ function makeDeviceToGeoJSON(device: Device): Feature {
     return makeGeoJson(props, device.coordinates);
 }
 
+function sortAlarmsByCreated(alarms: Array<Alarm>): Array<Alarm> {
+    const clonedAlarms = R.clone(alarms);
+    clonedAlarms.sort((a, b) => a.created < b.created ? 0 : 1);
+    return clonedAlarms;
+}
+
 export function getDevices(apiKey: string, url: string): Promise<Devices> {
     const api = new RoadConditionApi(apiKey, url);
     return api.getDevices()
@@ -46,14 +52,29 @@ export function getDevicesGeojson(apiKey: string, url: string): Promise<FeatureC
         .then(makeFeatureCollection);
 }
 
-export function getAlarms(apiKey: string, url: string): Promise<Alarms> {
-    const api = new RoadConditionApi(apiKey, url);
-    return api.getAlarms()
-        .catch(e => {
+export async function getAlarms(apiKey: string, url: string): Promise<Alarms> {
+    function _getAlarms(): Promise<Alarms> {
+        const api = new RoadConditionApi(apiKey, url);
+        return api.getAlarms().catch(e => {
             console.error("method=road-network-conditions-service.getAlarms couldn't reach api", e);
             return Promise.reject(e);
         });
+    }
+
+    const [devices, alarms] = await Promise.all([
+        getDevices(apiKey, url),
+        _getAlarms(),
+    ]);
+
+    const deviceIds = devices.map(device => device.deviceId);
+
+    const nonDigitrafficAlarms = alarms.filter(alarm => deviceIds.includes(alarm.station));
+    const groupedByStationId = R.values(R.groupBy(R.prop("station"), nonDigitrafficAlarms));
+    return groupedByStationId
+        .map(sortAlarmsByCreated)
+        .flatMap(([alarm]) => alarm);
 }
+
 
 export function getAlarmTypes(apiKey: string, url: string): Promise<AlarmTypes> {
     const api = new RoadConditionApi(apiKey, url);
