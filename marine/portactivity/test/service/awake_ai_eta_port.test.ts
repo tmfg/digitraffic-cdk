@@ -3,6 +3,7 @@ import {AwakeAiETAPortService} from "../../lib/service/awake_ai_eta_port";
 import {AwakeAiETAPortApi, AwakeAiPortResponse, AwakeAiPortResponseType} from "../../lib/api/awake_ai_port";
 import {randomIMO, randomMMSI} from "../testdata";
 import {
+    AwakeAiPrediction,
     AwakeAiPredictionType,
     AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
@@ -13,10 +14,10 @@ import moment from "moment-timezone";
 
 describe('AwakeAiETAPortService(', () => {
 
-    test('getAwakeAiTimestamps - correct', async () => {
+    test('getAwakeAiTimestamps - correct needs to include port call prediction', async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        sinon.stub(api, 'getETAs').returns(Promise.resolve(createResponse()));
+        sinon.stub(api, 'getETAs').returns(Promise.resolve(createResponse({includePortCallPrediction: true})));
 
         const timestamps = await service.getAwakeAiTimestamps('FILOL');
 
@@ -85,7 +86,15 @@ function createResponse(options?: {
     arrivalTime?: Date,
     voyageStatus?: AwakeAiShipStatus,
     predictionType?: AwakeAiPredictionType,
+    includePortCallPrediction?: boolean,
 }): AwakeAiPortResponse {
+    const predictions: AwakeAiPrediction[] = [{
+        predictionType: options?.predictionType ?? AwakeAiPredictionType.ETA,
+        locode: 'FILOL',
+        zoneType: AwakeAiZoneType.BERTH,
+        recordTime: new Date().toISOString(),
+        arrivalTime: options?.arrivalTime ?? moment().add(25, 'hour').toISOString(),
+    } as AwakeAiVoyageEtaPrediction];
     return {
         type: AwakeAiPortResponseType.OK,
         schedule: [{
@@ -95,13 +104,7 @@ function createResponse(options?: {
             },
             voyage: {
                 voyageStatus: options?.voyageStatus ?? AwakeAiShipStatus.UNDER_WAY,
-                predictions: [{
-                    predictionType: options?.predictionType ?? AwakeAiPredictionType.ETA,
-                    locode: 'FILOL',
-                    zoneType: AwakeAiZoneType.BERTH,
-                    recordTime: new Date().toISOString(),
-                    arrivalTime: options?.arrivalTime ?? moment().add(25, 'hour').toISOString(),
-                } as AwakeAiVoyageEtaPrediction],
+                predictions: options?.includePortCallPrediction ? predictions.concat([{ predictionType: AwakeAiPredictionType.ARRIVAL_PORT_CALL }]) : predictions,
                 sequenceNo: 1,
             },
         }],
