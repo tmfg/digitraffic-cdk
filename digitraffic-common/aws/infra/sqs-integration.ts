@@ -78,7 +78,7 @@ export function attachQueueToApiGatewayResource(
             ],
 
         },
-        path: Aws.ACCOUNT_ID + '/' + queue.queueName,
+        path: `${Aws.ACCOUNT_ID}/${queue.queueName}`,
     });
     resource.addMethod('POST', sqsIntegration, {
         requestValidator,

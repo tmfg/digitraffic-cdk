@@ -249,7 +249,7 @@ function getKeyFigures(): KeyFigure[] {
 export async function getPaths(endpointUrl: string): Promise<Set<string>> {
     const resp = await axios.get(endpointUrl, {headers: {'accept-encoding': 'gzip'}});
 
-    if (resp.status != 200) {
+    if (resp.status !== 200) {
         console.error('Fetching faults failed: ' + resp.statusText);
 
         return new Set<string>();

@@ -7,7 +7,6 @@ import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
 import {createFeatureCollection, isValidGeoJson} from "digitraffic-common/utils/geometry";
 import {Geometry} from "wkx";
-import {DbDisruption} from "../db/disruptions";
 
 export const DISRUPTIONS_DATE_FORMAT = 'D.M.YYYY H:mm';
 const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
@@ -50,6 +49,7 @@ export function featureToDisruption(feature: Feature): SpatialDisruption {
     const props = feature.properties as any;
     return {
         Id: props.Id,
+        // eslint-disable-next-line camelcase
         Type_Id: props.Type_Id,
         StartDate: normalizeDisruptionDate(props.StartDate),
         EndDate: normalizeDisruptionDate(props.EndDate),
@@ -73,9 +73,10 @@ export function validateGeoJson(geoJson: GeoJSON) {
     }
 }
 
-export function convertFeature(disruption: DbDisruption): Feature {
+export function convertFeature(disruption: DisruptionsDB.DbDisruption): Feature {
     const properties: Disruption = {
         Id: disruption.id,
+        // eslint-disable-next-line camelcase
         Type_Id: disruption.type_id,
         StartDate: disruption.start_date,
         EndDate: disruption.end_date,
