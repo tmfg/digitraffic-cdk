@@ -88,67 +88,62 @@ function createSituationRecords(permits: DbPermit[]) {
                 value: detailedType,
             },
             detailedTypeText: detailedType,
-            severity: "Medium",
+            severity: "Unknown",
             safetyRelatedMessage: false,
             sourceName: permit.source,
             generalPublicComment: permit.permitSubject,
             situationId: permit.id,
-            location: createLocation(permit.geometry),
+            location: createLocation(permit),
         };
     });
 }
 
-function createLocation(geometry: Geometry) {
-    if (geometry.type != 'GeometryCollection') {
-        throw new Error("GeometryCollection expected, got " + geometry.type);
+function createLocation(permit: DbPermit) {
+    if (permit.geometry.type != 'GeometryCollection') {
+        throw new Error("GeometryCollection expected, got " + permit.geometry.type);
     }
 
-    const geometryCollection = geometry as GeometryCollection;
-
-    if (geometryCollection.geometries.length === 1) {
-        return convertGeometry(geometryCollection.geometries[0]);
+    if (permit.geometry.geometries.length === 1) {
+        return convertGeometry(permit.geometry.geometries[0], permit.centroid);
     }
 
-    return convertGeometry(geometryCollection);
+    return convertGeometry(permit.geometry, permit.centroid);
 }
 
-function convertGeometry(geometry: Geometry) {
-    if (geometry.type === 'Point') {
-        const point = geometry as Point;
+function convertGeometry(geometry: Geometry, centroid: Point) {
+    const locationDescription = 'Lahti';
+    const coordinatesForDisplay = positionToList(centroid.coordinates);
 
+    if (geometry.type === 'Point') {
         return {
-            locationDescription: 'Lahti',
-            coordinatesForDisplay: positionToList(point.coordinates),
+            locationDescription,
+            coordinatesForDisplay,
         };
     } else if (geometry.type === 'LineString') {
         return {
-            locationDescription: 'Lahti',
-            coordinatesForDisplay: '',
+            locationDescription,
+            coordinatesForDisplay,
             line: {
                 gmlLinearRing: createGmlLineString(geometry),
             },
         };
     } else if (geometry.type === 'Polygon') {
-        const polygon = geometry as Polygon;
-
         return {
-            locationDescription: 'Lahti',
-            coordinatesForDisplay: '',
+            locationDescription,
+            coordinatesForDisplay,
             area: {
                 gmlPolygon: [
-                    createGmlPolygon(polygon),
+                    createGmlPolygon(geometry),
                 ],
             },
         };
     } else if (geometry.type === 'GeometryCollection') {
-        const geometryCollection = geometry as GeometryCollection;
-
         return {
-            locationDescription: 'Lahti',
-            coordinatesForDisplay: '',
+            locationDescription,
+            coordinatesForDisplay,
             area: {
                 gmlPolygon: [
-                    geometryCollection.geometries.map(g => createGmlPolygon(g)),
+                    geometry.geometries.map(g => createGmlPolygon(g)),
                 ],
             },
         };

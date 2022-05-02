@@ -1,5 +1,5 @@
 import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
-import {Geometry} from "geojson";
+import {Geometry, Point} from "geojson";
 
 export type ApiPermit = {
     readonly sourceId: string
@@ -30,6 +30,7 @@ export type DbPermit = {
     readonly permitType: string
     readonly permitSubject: string
     readonly geometry: Geometry
+    readonly centroid: Point
     readonly effectiveFrom: Date
     readonly effectiveTo?: Date
     readonly created: Date

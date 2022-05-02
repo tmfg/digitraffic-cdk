@@ -1,7 +1,7 @@
 import {DTDatabase, DTTransaction} from "../../../../digitraffic-common/database/database";
 import {PreparedStatement} from "pg-promise";
 import {ApiPermit, DbPermit} from "../model/permit";
-import {FeatureCollection, Geometry as GeoJSONGeometry} from "geojson";
+import {FeatureCollection, Geometry as GeoJSONGeometry, Point} from "geojson";
 import {Geometry} from "wkx";
 
 // multiple geometries related to a single permit are contained inside otherwise duplicated fields in Lahti source data
@@ -38,7 +38,7 @@ const SQL_FIND_ALL_PERMITS_GEOJSON =
 
 
 const SQL_FIND_ALL_PERMITS =
-    `select id, version, permit_type, permit_subject, geometry, effective_from, effective_to, created, modified
+    `select id, version, permit_type, permit_subject, geometry, effective_from, effective_to, created, modified, ST_CENTROID(geometry) centroid
      from permit`;
 
 const SQL_FIND_ALL_PERMIT_SOURCE_IDS = "SELECT source_id FROM permit";
@@ -97,6 +97,7 @@ export function getActivePermits(db: DTDatabase): Promise<DbPermit[]> {
         permitType: result.permit_type,
         subject: result.subject,
         geometry: Geometry.parse(Buffer.from(result.geometry, "hex")).toGeoJSON() as GeoJSONGeometry,
+        centroid: Geometry.parse(Buffer.from(result.centroid, "hex")).toGeoJSON() as Point,
         effectiveFrom: result.effective_from,
         effectiveTo: result.effective_to,
         created: result.created,
