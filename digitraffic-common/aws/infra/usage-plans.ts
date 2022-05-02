@@ -1,12 +1,11 @@
 import {IApiKey, RestApi} from 'aws-cdk-lib/aws-apigateway';
 
 /**
- * TODO FIXME creates funny names for the api keys ie. Maintenance Tracking API Key will be Main-Main-RANDOMSTRING
- * Fix fill affect already used keys.
  * Creates an usage plan for a REST API with a single API key
  * @param api The REST API
  * @param apiKeyId Id for the API key, this is a surrogate id for CDK, not displayed anywhere
  * @param apiKeyName Name for the API key, this is displayed in the AWS Console
+ * @deprecated Creates randomized API key names, use createDefaultUsagePlan instead
  */
 export function createUsagePlan(api: RestApi, apiKeyId: string, apiKeyName: string): IApiKey {
     const apiKey = api.addApiKey(apiKeyId);
