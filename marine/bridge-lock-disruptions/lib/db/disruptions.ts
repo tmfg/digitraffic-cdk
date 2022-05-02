@@ -69,7 +69,7 @@ export function updateDisruptions(db: IDatabase<any, any>, disruptions: SpatialD
 
 export function deleteAllButDisruptions(db: IDatabase<any, any>,
     ids: number[]): Promise<any> {
-    if (ids.length == 0) {
+    if (ids.length === 0) {
         return db.tx(t => t.none('DELETE FROM bridgelock_disruption'));
     } else {
         return db.tx(t => t.none('DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)', ids));

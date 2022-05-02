@@ -56,7 +56,7 @@ export async function query(imo: string, url: string): Promise<string | null> {
         if (!instanceList) {
             console.info("empty instanceList!");
             return null;
-        } else if (instanceList.length == 1) {
+        } else if (instanceList.length === 1) {
             return instanceList[0].endpointUri;
         }
 
