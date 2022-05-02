@@ -23,7 +23,7 @@ export async function postDocument(
             },
         });
 
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             console.error(`method=postDocument returned status=${resp.status}, status text: ${resp.statusText}`);
             return Promise.reject();
         }
@@ -35,6 +35,7 @@ export async function postDocument(
         }
         return Promise.reject();
     }
+    return Promise.resolve();
 }
 
 export async function query(imo: string, url: string): Promise<string | null> {
@@ -43,7 +44,7 @@ export async function query(imo: string, url: string): Promise<string | null> {
 
     try {
         const resp = await axios.get(queryUrl);
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             console.error(`method=query returned status=${resp.status}, status text: ${resp.statusText}`);
             return Promise.reject();
         }
@@ -55,7 +56,7 @@ export async function query(imo: string, url: string): Promise<string | null> {
         if (!instanceList) {
             console.info("empty instanceList!");
             return null;
-        } else if (instanceList.length == 1) {
+        } else if (instanceList.length === 1) {
             return instanceList[0].endpointUri;
         }
 

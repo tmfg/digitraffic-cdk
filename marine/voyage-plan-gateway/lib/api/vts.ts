@@ -16,7 +16,7 @@ export class VtsApi {
                 'Content-Type': MediaType.APPLICATION_XML,
             },
         });
-        if (resp.status != 200) {
+        if (resp.status !== 200) {
             console.error(`method=uploadArea returned status=${resp.status}, status text: ${resp.statusText}`);
             throw new Error('Failed to send voyage plan to VTS');
         }

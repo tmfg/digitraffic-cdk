@@ -46,19 +46,40 @@ def init_callbacks(dash_app, df, figures, logger):
         return f'Keskimääräinen kasvuvauhti valitulla ajanjaksolla: {value} %'
 
     @dash_app.callback(
-        [Output('output-table-top-10-users', 'columns'), Output('output-table-top-10-users', 'data')],
-        [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
+        [Output('output-table-top-users-req', 'columns'), Output('output-table-top-users-req', 'data')],
+        [Input('input-table-top-users-date', 'value'), Input('input-table-top-users-liikennemuoto', 'value')]
     )
-    def update_top_10_users(filter_date, liikennemuoto):
-        table = figures.top_10_users(date=filter_date, liikennemuoto=liikennemuoto)
+    def update_top_users_req(filter_date, liikennemuoto):
+        table = figures.top_users_req(date=filter_date, liikennemuoto=liikennemuoto)
         return table['columns'], table['data']
 
     @dash_app.callback(
-        Output('output-graph-pie-identified-users', 'figure'),
-        [Input('input-table-top-10-users-date', 'value'), Input('input-table-top-10-users-liikennemuoto', 'value')]
+        [Output('output-table-top-users-data', 'columns'), Output('output-table-top-users-data', 'data')],
+        [Input('input-table-top-users-date', 'value'), Input('input-table-top-users-liikennemuoto', 'value')]
     )
-    def update_identified_users(filter_date, liikennemuoto):
-        return figures.identified_users(date=filter_date, liikennemuoto=liikennemuoto)
+    def update_top_users_data(filter_date, liikennemuoto):
+        table = figures.top_users_data(date=filter_date, liikennemuoto=liikennemuoto)
+        return table['columns'], table['data']
+
+    @dash_app.callback(
+        Output('output-graph-pie-identified-users-req', 'figure'),
+        [Input('input-table-top-users-date', 'value'), Input('input-table-top-users-liikennemuoto', 'value')]
+    )
+    def update_identified_users_req(filter_date, liikennemuoto):
+        return figures.identified_users(query='Top 10 digitraffic-users',
+                                        comparison_query='Http req',
+                                        date=filter_date,
+                                        liikennemuoto=liikennemuoto)
+
+    @dash_app.callback(
+        Output('output-graph-pie-identified-users-data', 'figure'),
+        [Input('input-table-top-users-date', 'value'), Input('input-table-top-users-liikennemuoto', 'value')]
+    )
+    def update_identified_users_data(filter_date, liikennemuoto):
+        return figures.identified_users(query='Top digitraffic-users by bytes',
+                                        comparison_query='Bytes out',
+                                        date=filter_date,
+                                        liikennemuoto=liikennemuoto)
 
     @dash_app.callback(
         Output('output-graph-data-year-on-year', 'figure'),
@@ -157,30 +178,30 @@ def create_layout(dash_app, df, figures, logger):
                 ], width=7)
             ]),
 
-
             html.H2(children="Käyttäjätiedot", style=dict(paddingTop="1em")),
 
             dbc.Row(children=[
                 dbc.Col(children=[
                     dcc.Dropdown(
-                        id='input-table-top-10-users-date',
+                        id='input-table-top-users-date',
                         options=top_10_users_date_options,
                         value=top_10_users_date_default_value,
                     ),
                 ], width=3),
                 dbc.Col(children=[
                     dcc.Dropdown(
-                        id='input-table-top-10-users-liikennemuoto',
+                        id='input-table-top-users-liikennemuoto',
                         options=liikennemuoto_options,
                         value=liikennemuoto_default_value,
                     ),
                 ], width=3)
-            ]),
+            ], style=dict(marginBottom="1em")),
 
             dbc.Row(children=[
                 dbc.Col(children=[
+                    html.H4(children="Kyselyt"),
                     dash_table.DataTable(
-                        id='output-table-top-10-users',
+                        id='output-table-top-users-req',
                         style_cell=dict(textAlign='left'),
                         css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
                         style_header=dict(
@@ -188,14 +209,35 @@ def create_layout(dash_app, df, figures, logger):
                             color='white',
                             fontWeight='bold',
                         ),
-                        data=[]
+                        data=[],
+                        page_size=10
                     )
                 ], width=6, align='center'),
                 dbc.Col(children=[
-                    dcc.Graph(id='output-graph-pie-identified-users')
+                    dcc.Graph(id='output-graph-pie-identified-users-req')
                 ], width=6, align='center'),
             ]),
 
+            dbc.Row(children=[
+                dbc.Col(children=[
+                    html.H4(children="Data"),
+                    dash_table.DataTable(
+                        id='output-table-top-users-data',
+                        style_cell=dict(textAlign='left'),
+                        css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
+                        style_header=dict(
+                            backgroundColor='black',
+                            color='white',
+                            fontWeight='bold',
+                        ),
+                        data=[],
+                        page_size=10
+                    )
+                ], width=6, align='center'),
+                dbc.Col(children=[
+                    dcc.Graph(id='output-graph-pie-identified-users-data')
+                ], width=6, align='center'),
+            ]),
 
             html.H2(children="Year-on-year tiedot", style=dict(paddingTop="1em")),
 

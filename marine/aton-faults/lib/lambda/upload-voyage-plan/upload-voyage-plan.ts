@@ -53,6 +53,7 @@ export function handlerFn(sqs: SQS, doWithSecret: SecretFunction<AtonSecret>): (
             const vpService = new VoyagePlanService(sqs, endpoint, sendS124QueueUrl);
             return vpService.handleVoyagePlan(voyagePlan);
         }
+        return Promise.resolve();
     };
 }
 

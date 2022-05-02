@@ -27,7 +27,7 @@ export class AreaVisibilityApi {
                     Accept: MediaType.APPLICATION_JSON,
                 },
             });
-            if (resp.status != 200) {
+            if (resp.status !== 200) {
                 console.error(`method=getVisibilityForArea returned status=${resp.status}`);
                 return Promise.reject();
             }
