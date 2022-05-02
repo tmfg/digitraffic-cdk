@@ -62,7 +62,7 @@ describe("Road network condition service devices", () => {
                     type: "Feature",
                     geometry: {
                         type: "Point",
-                        coordinates: [DEVICE.coordinates.latitude, DEVICE.coordinates.longitude],
+                        coordinates: [DEVICE.coordinates.longitude, DEVICE.coordinates.latitude],
                     },
                     properties: {
                         deviceId: DEVICE.deviceId,
