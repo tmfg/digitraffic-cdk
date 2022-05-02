@@ -18,6 +18,7 @@ export async function handler(event: DigitrafficRestApi): Promise<ProxyLambdaRes
         body: JSON.stringify(result),
         headers: {
             "content-type": MediaType.APPLICATION_GEOJSON,
+            "access-control-allow-origin": "*",
         },
     };
 }
