@@ -19,7 +19,7 @@ function makeGeoJson(props: Record<string, string>, coordinates: Coordinates): F
         type: "Feature",
         geometry: {
             type: "Point",
-            coordinates: [coordinates.latitude, coordinates.longitude],
+            coordinates: [coordinates.longitude, coordinates.latitude],
         },
         properties: props,
     };
