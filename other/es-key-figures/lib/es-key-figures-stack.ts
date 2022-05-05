@@ -9,7 +9,7 @@ import {Rule, Schedule} from 'aws-cdk-lib/aws-events';
 import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
 import {Peer, Port, SecurityGroup, Vpc} from "aws-cdk-lib/aws-ec2";
 import * as s3 from 'aws-cdk-lib/aws-s3';
-import {RuleTargetInput} from "aws-cdk-lib/aws-events/lib/input";
+import * as events from "aws-cdk-lib/aws-events";
 
 export interface Props {
     elasticSearchEndpoint: string;
@@ -90,25 +90,26 @@ export class EsKeyFiguresStack extends Stack {
                 SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook,
             },
         };
+        const lambdaFunction = new Function(this, functionName, lambdaConf);
         const rule = new Rule(this, 'collect *', {
             schedule: Schedule.expression('cron(0 3 1 * ? *)'),
         });
-        rule.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "*"})}));
+        rule.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "*"})}));
 
         const rule1 = new Rule(this, 'collect road', {
             schedule: Schedule.expression('cron(15 3 1 * ? *)'),
         });
-        rule1.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road"})}));
+        rule1.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road"})}));
 
         const rule2 = new Rule(this, 'collect rail', {
             schedule: Schedule.expression('cron(30 3 1 * ? *)'),
         });
-        rule2.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "rail"})}));
+        rule2.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "rail"})}));
 
         const rule3 = new Rule(this, 'collect marine', {
             schedule: Schedule.expression('cron(45 3 1 * ? *)'),
         });
-        rule3.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "marine"})}));
+        rule3.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "marine"})}));
     }
 
     private createCollectEsKeyFiguresLambda(esKeyFiguresProps: Props, vpc: Vpc, serverlessCluster: ServerlessCluster) {
