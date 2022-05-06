@@ -189,9 +189,6 @@ export class EsKeyFiguresStack extends Stack {
                 "PART": 2
             })
         }));
-
-
-        return target;
     }
 
     private createVpc(): Vpc {
