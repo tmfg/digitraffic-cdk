@@ -181,7 +181,7 @@ export class EsKeyFiguresStack extends Stack {
         }));
 
         const rule4 = new Rule(this, 'collect road 2', {
-            schedule: Schedule.expression('cron(0 4 1 * ? *)'),
+            schedule: Schedule.expression('cron(1 4 1 * ? *)'),
         });
         rule4.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {
             event: events.RuleTargetInput.fromObject({
