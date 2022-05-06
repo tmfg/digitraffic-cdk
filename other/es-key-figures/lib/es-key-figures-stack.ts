@@ -96,20 +96,25 @@ export class EsKeyFiguresStack extends Stack {
         });
         rule.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "*"})}));
 
-        const rule1 = new Rule(this, 'collect road', {
-            schedule: Schedule.expression('cron(15 3 1 * ? *)'),
-        });
-        rule1.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road"})}));
-
         const rule2 = new Rule(this, 'collect rail', {
-            schedule: Schedule.expression('cron(30 3 1 * ? *)'),
+            schedule: Schedule.expression('cron(15 3 1 * ? *)'),
         });
         rule2.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "rail"})}));
 
         const rule3 = new Rule(this, 'collect marine', {
-            schedule: Schedule.expression('cron(45 3 1 * ? *)'),
+            schedule: Schedule.expression('cron(30 3 1 * ? *)'),
         });
         rule3.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "marine"})}));
+
+        const rule1 = new Rule(this, 'collect road 1', {
+            schedule: Schedule.expression('cron(45 3 1 * ? *)'),
+        });
+        rule1.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road", "PART":1})}));
+
+        const rule4 = new Rule(this, 'collect road 2', {
+            schedule: Schedule.expression('cron(0 4 1 * ? *)'),
+        });
+        rule4.addTarget(new LambdaFunction(lambdaFunction, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road", "PART": 2})}));
     }
 
     private createCollectEsKeyFiguresLambda(esKeyFiguresProps: Props, vpc: Vpc, serverlessCluster: ServerlessCluster) {

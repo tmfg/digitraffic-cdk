@@ -105,8 +105,20 @@ function truncate(str: string, n: number): string {
     return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
 }
 
-export const handler = async (event: { TRANSPORT_TYPE: string; }): Promise<boolean> => {
+export const handler = async (event: { TRANSPORT_TYPE: string, PART: number; }): Promise<boolean> => {
     const apiPaths = (await getApiPaths()).filter(s => s.transportType === event.TRANSPORT_TYPE);
+
+    const pathsToProcess = [...apiPaths[0].paths]
+    const middleIndex = Math.ceil(pathsToProcess.length / 2);
+
+    const firstHalf = pathsToProcess.splice(0, middleIndex);
+    const secondHalf = pathsToProcess.splice(-middleIndex);
+
+    if (event.PART === 1) {
+        apiPaths[0].paths = new Set(firstHalf)
+    } else if (event.PART === 2) {
+        apiPaths[0].paths = new Set(secondHalf)
+    }
 
     console.info(`ES: ${process.env.ES_ENDPOINT}, MySQL: ${process.env.MYSQL_ENDPOINT},  Range: ${start} -> ${end}, Paths: ${apiPaths.map(s => `${s.transportType}, ${Array.from(s.paths).join(', ')}`)}`);
 
@@ -195,7 +207,10 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
 
         for (const kibanaResult of kibanaResults) {
             for (const result of kibanaResult) {
-                const sqlInsert = `INSERT INTO \`key_figures\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`) VALUES ('${start.toISOString().substr(0, 10)}', '${end.toISOString().substr(0, 10)}', '${result.query}', '${JSON.stringify(result.value)}','${result.name}', '${result.filter}');`;
+                const sqlInsert = `INSERT INTO \`key_figures\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
+                                   VALUES ('${start.toISOString().substr(0, 10)}', '${end.toISOString().substr(0, 10)}',
+                                           '${result.query}', '${JSON.stringify(result.value)}', '${result.name}',
+                                           '${result.filter}');`;
                 await query(sqlInsert);
             }
         }
