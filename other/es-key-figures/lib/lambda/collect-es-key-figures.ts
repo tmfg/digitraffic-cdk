@@ -124,7 +124,7 @@ export const handler = async (event: { TRANSPORT_TYPE: string, PART: number; }):
 
     const keyFigures = getKeyFigures();
 
-    const kibanaResults = await getKibanaResults(keyFigures, apiPaths);
+    const kibanaResults = await getKibanaResults(keyFigures, apiPaths, event);
     await persistToDatabase(kibanaResults);
     await postToSlack(kibanaResults);
 
@@ -178,12 +178,14 @@ async function getKibanaResult(keyFigures: KeyFigure[], start: Date, end: Date, 
     return output;
 }
 
-async function getKibanaResults(keyFigures: KeyFigure[], apiPaths: { transportType: string; paths: Set<string> }[]): Promise<KeyFigureResult[][]> {
+async function getKibanaResults(keyFigures: KeyFigure[], apiPaths: { transportType: string; paths: Set<string> }[], event: { TRANSPORT_TYPE: string, PART: number; }): Promise<KeyFigureResult[][]> {
     const kibanaResults = [];
 
-    for (const apiPath of apiPaths) {
-        console.info(`Running: ${apiPath.transportType}`);
-        kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType}`));
+    if (event.PART == null || event.PART === 1) {
+        for (const apiPath of apiPaths) {
+            console.info(`Running: ${apiPath.transportType}`);
+            kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType}`));
+        }
     }
 
     for (const apiPath of apiPaths) {
