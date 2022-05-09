@@ -92,7 +92,7 @@ export class EsKeyFiguresStack extends Stack {
         };
         const lambdaFunction = new Function(this, functionName, lambdaConf);
 
-        const rule = new Rule(this, 'create visualizations', {
+        const rule = new Rule(this, 'create visualizations dummy', {
             schedule: Schedule.expression('cron(0 5 1 * ? *)'),
         });
 
