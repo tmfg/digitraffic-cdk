@@ -1,0 +1,45 @@
+{
+  "name": "road-network-conditions",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
+    "watch": "tsc -w",
+    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "test": "jest --detectOpenHandles",
+    "cdk": "cdk",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "diff": "yarn compile-lambdas && cdk diff",
+    "deploy": "yarn compile-lambdas && cdk deploy",
+    "nolambda": "nodemon -e ts --exec 'yarn compile-lambdas'"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "*",
+    "@types/aws-lambda": "*",
+    "@types/jest": "^26.0.22",
+    "@types/node": "*",
+    "@typescript-eslint/eslint-plugin": "*",
+    "@typescript-eslint/parser": "*",
+    "esbuild": "*",
+    "eslint": "*",
+    "jest": "^27.0.6",
+    "jest-junit": "^13.0.0",
+    "nodemon": "^2.0.15",
+    "ts-jest": "^27.0.4",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "@types/geojson": "^7946.0.7",
+    "@types/ramda": "^0.28.2",
+    "aws-cdk-lib": "*",
+    "axios": "^0.26.1",
+    "digitraffic-common": "*",
+    "pg-native": "^3.0.0",
+    "pg-promise": "^10.11.1",
+    "ramda": "^0.28.0"
+  },
+  "externals": [
+    "aws-sdk"
+  ]
+}

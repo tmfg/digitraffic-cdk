@@ -105,14 +105,26 @@ function truncate(str: string, n: number): string {
     return (str.length > n) ? str.substr(0, n - 1) + '...' : str;
 }
 
-export const handler = async (event: { TRANSPORT_TYPE: string; }): Promise<boolean> => {
+export const handler = async (event: { TRANSPORT_TYPE: string, PART: number; }): Promise<boolean> => {
     const apiPaths = (await getApiPaths()).filter(s => s.transportType === event.TRANSPORT_TYPE);
+
+    const pathsToProcess = [...apiPaths[0].paths]
+    const middleIndex = Math.ceil(pathsToProcess.length / 2);
+
+    const firstHalf = pathsToProcess.splice(0, middleIndex);
+    const secondHalf = pathsToProcess.splice(-middleIndex);
+
+    if (event.PART === 1) {
+        apiPaths[0].paths = new Set(firstHalf)
+    } else if (event.PART === 2) {
+        apiPaths[0].paths = new Set(secondHalf)
+    }
 
     console.info(`ES: ${process.env.ES_ENDPOINT}, MySQL: ${process.env.MYSQL_ENDPOINT},  Range: ${start} -> ${end}, Paths: ${apiPaths.map(s => `${s.transportType}, ${Array.from(s.paths).join(', ')}`)}`);
 
     const keyFigures = getKeyFigures();
 
-    const kibanaResults = await getKibanaResults(keyFigures, apiPaths);
+    const kibanaResults = await getKibanaResults(keyFigures, apiPaths, event);
     await persistToDatabase(kibanaResults);
     await postToSlack(kibanaResults);
 
@@ -166,12 +178,14 @@ async function getKibanaResult(keyFigures: KeyFigure[], start: Date, end: Date, 
     return output;
 }
 
-async function getKibanaResults(keyFigures: KeyFigure[], apiPaths: { transportType: string; paths: Set<string> }[]): Promise<KeyFigureResult[][]> {
+async function getKibanaResults(keyFigures: KeyFigure[], apiPaths: { transportType: string; paths: Set<string> }[], event: { TRANSPORT_TYPE: string, PART: number; }): Promise<KeyFigureResult[][]> {
     const kibanaResults = [];
 
-    for (const apiPath of apiPaths) {
-        console.info(`Running: ${apiPath.transportType}`);
-        kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType}`));
+    if (event.PART == null || event.PART === 1) {
+        for (const apiPath of apiPaths) {
+            console.info(`Running: ${apiPath.transportType}`);
+            kibanaResults.push(await getKibanaResult(keyFigures, start, end, `@transport_type:${apiPath.transportType}`));
+        }
     }
 
     for (const apiPath of apiPaths) {
@@ -195,7 +209,10 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
 
         for (const kibanaResult of kibanaResults) {
             for (const result of kibanaResult) {
-                const sqlInsert = `INSERT INTO \`key_figures\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`) VALUES ('${start.toISOString().substr(0, 10)}', '${end.toISOString().substr(0, 10)}', '${result.query}', '${JSON.stringify(result.value)}','${result.name}', '${result.filter}');`;
+                const sqlInsert = `INSERT INTO \`key_figures\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
+                                   VALUES ('${start.toISOString().substr(0, 10)}', '${end.toISOString().substr(0, 10)}',
+                                           '${result.query}', '${JSON.stringify(result.value)}', '${result.name}',
+                                           '${result.filter}');`;
                 await query(sqlInsert);
             }
         }

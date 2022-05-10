@@ -164,7 +164,7 @@ const createDetailPage = async function (filter: string): Promise<string> {
 };
 
 const createIndex = async function (): Promise<string> {
-    const filters: { filter: string, filterValue: number }[] = await query("select distinct kf_outer.filter as filter, (select kf_inner.value from key_figures kf_inner where kf_inner.filter = kf_outer.filter and kf_inner.name = 'Http req' order by kf_inner.`from` desc limit 1) as filterValue from key_figures kf_outer  order by filterValue");
+    const filters: { filter: string, filterValue: number }[] = await query("select distinct kf_outer.filter as filter, (select kf_inner.value from key_figures kf_inner where kf_inner.filter = kf_outer.filter and kf_inner.name = 'Http req' order by kf_inner.`from` desc limit 1) as filterValue from key_figures kf_outer  order by filterValue desc");
     const filterHeader = '<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>';
 
     let roadFilterHtml = filterHeader;

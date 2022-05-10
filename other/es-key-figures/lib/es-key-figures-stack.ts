@@ -5,11 +5,11 @@ import {StringParameter} from 'aws-cdk-lib/aws-ssm';
 import {AnyPrincipal, PolicyStatement, Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {AssetCode, Function, Runtime} from 'aws-cdk-lib/aws-lambda';
+import * as events from 'aws-cdk-lib/aws-events';
 import {Rule, Schedule} from 'aws-cdk-lib/aws-events';
 import {LambdaFunction} from 'aws-cdk-lib/aws-events-targets';
 import {Peer, Port, SecurityGroup, Vpc} from "aws-cdk-lib/aws-ec2";
 import * as s3 from 'aws-cdk-lib/aws-s3';
-import {RuleTargetInput} from "aws-cdk-lib/aws-events/lib/input";
 
 export interface Props {
     elasticSearchEndpoint: string;
@@ -90,25 +90,15 @@ export class EsKeyFiguresStack extends Stack {
                 SLACK_WEBHOOK: esKeyFiguresProps.slackWebhook,
             },
         };
-        const rule = new Rule(this, 'collect *', {
-            schedule: Schedule.expression('cron(0 3 1 * ? *)'),
-        });
-        rule.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "*"})}));
+        const lambdaFunction = new Function(this, functionName, lambdaConf);
 
-        const rule1 = new Rule(this, 'collect road', {
-            schedule: Schedule.expression('cron(15 3 1 * ? *)'),
+        const rule = new Rule(this, 'create visualizations dummy', {
+            schedule: Schedule.expression('cron(0 5 1 * ? *)'),
         });
-        rule1.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "road"})}));
 
-        const rule2 = new Rule(this, 'collect rail', {
-            schedule: Schedule.expression('cron(30 3 1 * ? *)'),
-        });
-        rule2.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "rail"})}));
+        const target = new LambdaFunction(lambdaFunction);
+        rule.addTarget(target);
 
-        const rule3 = new Rule(this, 'collect marine', {
-            schedule: Schedule.expression('cron(45 3 1 * ? *)'),
-        });
-        rule3.addTarget(new LambdaFunction(new Function(this, functionName, lambdaConf), {event: RuleTargetInput.fromObject({"TRANSPORT_TYPE": "marine"})}));
     }
 
     private createCollectEsKeyFiguresLambda(esKeyFiguresProps: Props, vpc: Vpc, serverlessCluster: ServerlessCluster) {
@@ -165,14 +155,40 @@ export class EsKeyFiguresStack extends Stack {
         };
         const collectEsKeyFiguresLambda = new Function(this, functionName, lambdaConf);
 
-        const rule = new Rule(this, 'Rule', {
-            schedule: Schedule.expression('cron(0 1 1 * ? *)'),
+        const rule = new Rule(this, 'collect *', {
+            schedule: Schedule.expression('cron(0 3 1 * ? *)'),
         });
+        rule.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "*"})}));
 
-        const target = new LambdaFunction(collectEsKeyFiguresLambda);
-        rule.addTarget(target);
+        const rule2 = new Rule(this, 'collect rail', {
+            schedule: Schedule.expression('cron(15 3 1 * ? *)'),
+        });
+        rule2.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "rail"})}));
 
-        return target;
+        const rule3 = new Rule(this, 'collect marine', {
+            schedule: Schedule.expression('cron(30 3 1 * ? *)'),
+        });
+        rule3.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {event: events.RuleTargetInput.fromObject({"TRANSPORT_TYPE": "marine"})}));
+
+        const rule1 = new Rule(this, 'collect road 1', {
+            schedule: Schedule.expression('cron(45 3 1 * ? *)'),
+        });
+        rule1.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {
+            event: events.RuleTargetInput.fromObject({
+                "TRANSPORT_TYPE": "road",
+                "PART": 1
+            })
+        }));
+
+        const rule4 = new Rule(this, 'collect road 2', {
+            schedule: Schedule.expression('cron(1 4 1 * ? *)'),
+        });
+        rule4.addTarget(new LambdaFunction(collectEsKeyFiguresLambda, {
+            event: events.RuleTargetInput.fromObject({
+                "TRANSPORT_TYPE": "road",
+                "PART": 2
+            })
+        }));
     }
 
     private createVpc(): Vpc {
