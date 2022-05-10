@@ -1,8 +1,9 @@
 import {APIGateway} from "aws-sdk";
+import {GetExportRequest} from "aws-sdk/clients/apigateway";
 
 export function exportSwaggerApi(apiId: string) {
-    const params = {
-        exportType: 'swagger',
+    const params: GetExportRequest = {
+        exportType: 'oas30',
         restApiId: apiId,
         stageName: 'prod',
     };
