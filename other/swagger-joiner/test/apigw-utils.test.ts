@@ -17,7 +17,7 @@ describe('apigw-utils', () => {
         await exportSwaggerApi(apiId);
 
         expect(getExportStub.getCall(0).args[0]).toMatchObject({
-            exportType: 'swagger',
+            exportType: 'oas30',
             restApiId: apiId,
             stageName: 'prod',
         });
