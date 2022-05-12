@@ -5,7 +5,6 @@ export enum DataType {
     COUNTING_SITES_DATA="COUNTING_SITES_DATA",
     COUNTING_SITES_METADATA="COUNTING_SITES_METADATA",
     COUNTING_SITES_METADATA_CHECK="COUNTING_SITES_METADATA_CHECK",
-    MAINTENANCE_TRACKING_DATA="MAINTENANCE_TRACKING_DATA",
     MAINTENANCE_TRACKING_DATA_CHECKED="MAINTENANCE_TRACKING_DATA_CHECKED",
     PERMIT_DATA="PERMIT_DATA",
     PERMIT_DATA_CHECK="PERMIT_DATA_CHECK",
@@ -23,9 +22,9 @@ export function getLastUpdated(db: DTDatabase, datatype: DataType): Promise<Date
 
 export function updateLastUpdated(db: DTDatabase | DTTransaction, datatype: DataType, updated: Date): Promise<null> {
     return db.none(`insert into data_updated(id, data_type, updated)
-values(nextval('seq_data_updated'), $(datatype), $(updated))
-on conflict (data_type)
-do update set updated = $(updated)`,
+ values(nextval('seq_data_updated'), $(datatype), $(updated))
+ on conflict (data_type, version)
+ do update set updated = $(updated)`,
     { updated, datatype });
 }
 

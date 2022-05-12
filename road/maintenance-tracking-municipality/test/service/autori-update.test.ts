@@ -250,9 +250,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         expect(latestTracking?.end_time).toEqual(AutoriTestutils.createTrackingEndTimeFromUpdatedTime(past1));
 
         const checked = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED);
-        const updated = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA);
         Asserter.assertToBeCloseTo(<number>checked?.getTime(), updateTime, 500);
-        Asserter.assertToBeCloseTo(<number>updated?.getTime(), updateTime, 500);
 
         // Check all coordinates has z value 0.5
         trackings.forEach(value => {

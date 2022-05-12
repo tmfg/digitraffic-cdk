@@ -29,9 +29,6 @@ export const handler = () => {
     checker.notEmpty(`domain ${domainName} doesn't have unckecked task mappings`,
         `select count(*) from maintenance_tracking_domain_task_mapping WHERE domain = '${domainName}' AND info like ('%TODO%')`);
 
-    checker.notEmpty('data updated in last hour',
-        `SELECT count(*) from data_updated where data_type = '${DataType.MAINTENANCE_TRACKING_DATA}' and updated > now() - interval '1 hours'`);
-
     checker.notEmpty('data checked in last hour',
         `SELECT count(*) from data_updated where data_type = '${DataType.MAINTENANCE_TRACKING_DATA_CHECKED}' and updated > now() - interval '1 hours'`);
 
