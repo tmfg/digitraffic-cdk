@@ -19,13 +19,12 @@ export function sumResults(results: TrackingSaveResult[], messageSizeOverride?: 
 
 export function updateDataUpdated(db: DTDatabase, finalResult: TrackingSaveResult): Promise<TrackingSaveResult> {
     const now = new Date();
-    try {
-        return LastUpdatedDb.updateLastUpdated(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, now)
-            .then(() => (finalResult));
-    } catch (e) {
-        console.error(e);
-        throw e;
-    }
+    return LastUpdatedDb.updateLastUpdated(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, now)
+        .then(() => (finalResult))
+        .catch(e => {
+            console.error('method=updateDataUpdated failed', e);
+            throw e;
+        });
 }
 
 export function upsertDomain(domain: string): Promise<null> {
