@@ -109,7 +109,7 @@ export class PaikanninUpdate {
                     console.info(`method=PaikanninUpdate.updateTrackingsForDomain domain=${domainName} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                     return summedResult;
                 }).then((finalResult) => {
-                    return CommonUpdateService.updateDataUpdated(db, finalResult);
+                    return CommonUpdateService.updateDataUpdated(db, domainName, finalResult);
                 }).catch(error => {
                     console.error(`method=PaikanninUpdate.updateTrackingsForDomain failed domain=${domainName} tookMs=${Date.now() - timerStart}`, error);
                     throw error;

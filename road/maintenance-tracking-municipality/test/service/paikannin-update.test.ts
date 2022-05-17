@@ -1,5 +1,6 @@
 /* eslint-disable camelcase */
 import {DTDatabase} from "digitraffic-common/database/database";
+import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
 import {Asserter} from "digitraffic-common/test/asserter";
 import {getRandomInteger} from "digitraffic-common/test/testutils";
 import {Position} from "geojson";
@@ -120,6 +121,9 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
 
         expect(trackings[0].line_string?.coordinates.length).toEqual(10);
         expect(trackings[1].line_string?.coordinates.length).toEqual(9);
+
+        const checked = await LastUpdatedDb.getLastUpdatedWithVersion(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, DOMAIN_1);
+        Asserter.assertToBeCloseTo(<number>checked?.getTime(), past0.getTime(), 500);
     });
 
     test('updateTrackings invalid linestring', async () => {

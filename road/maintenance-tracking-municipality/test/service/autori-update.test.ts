@@ -1,7 +1,6 @@
 /* eslint-disable camelcase */
 import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
 import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
-import {DataType} from "digitraffic-common/database/last-updated";
 import {Asserter} from "digitraffic-common/test/asserter";
 import * as CommonDateUtils from "digitraffic-common/utils/date-utils";
 import {Position} from "geojson";
@@ -249,7 +248,7 @@ describe('autori-update-service-test', dbTestBase((db: DTDatabase) => {
         expect(latestTracking?.start_time).toEqual(AutoriTestutils.createTrackingStartTimeFromUpdatedTime(past1));
         expect(latestTracking?.end_time).toEqual(AutoriTestutils.createTrackingEndTimeFromUpdatedTime(past1));
 
-        const checked = await LastUpdatedDb.getLastUpdated(db, DataType.MAINTENANCE_TRACKING_DATA_CHECKED);
+        const checked = await LastUpdatedDb.getLastUpdatedWithVersion(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, DOMAIN_1);
         Asserter.assertToBeCloseTo(<number>checked?.getTime(), updateTime, 500);
 
         // Check all coordinates has z value 0.5

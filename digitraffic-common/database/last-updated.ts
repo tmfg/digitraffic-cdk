@@ -10,13 +10,21 @@ export enum DataType {
     PERMIT_DATA_CHECK="PERMIT_DATA_CHECK",
 }
 
+const UNSET_EXTENSION = '-';
+
 type UpdatedTimestamp = {
     updated: Date
 } | null;
 
 export function getLastUpdated(db: DTDatabase, datatype: DataType): Promise<Date | null> {
-    return db.oneOrNone("select updated from data_updated where data_type=$(datatype)", {
-        datatype: datatype,
+    return db.oneOrNone("select updated from data_updated where data_type=$(datatype) and version=$(version)", {
+        datatype: datatype, version: UNSET_EXTENSION,
+    }, (x: UpdatedTimestamp) => x?.updated || null);
+}
+
+export function getLastUpdatedWithVersion(db: DTDatabase, datatype: DataType, version: string): Promise<Date | null> {
+    return db.oneOrNone("SELECT updated FROM data_updated WHERE data_type=$(datatype) AND version=$(version)", {
+        datatype: datatype, version: version,
     }, (x: UpdatedTimestamp) => x?.updated || null);
 }
 
@@ -26,6 +34,14 @@ export function updateLastUpdated(db: DTDatabase | DTTransaction, datatype: Data
  on conflict (data_type, version)
  do update set updated = $(updated)`,
     { updated, datatype });
+}
+
+export function updateLastUpdatedWithVersion(db: DTDatabase | DTTransaction, datatype: DataType, version: string, updated: Date): Promise<null> {
+    return db.none(`insert into data_updated(id, data_type, version, updated)
+ values(nextval('seq_data_updated'), $(datatype), $(version), $(updated))
+ on conflict (data_type, version)
+ do update set updated = $(updated)`,
+    { updated, version, datatype });
 }
 
 export function getUpdatedTimestamp(db: DTDatabase, datatype: string): Promise<Date | null> {
@@ -41,4 +57,3 @@ on conflict (updated_name)
 do update set updated_time = $(date), updated_by = $(by)`,
     { date, datatype, by });
 }
-

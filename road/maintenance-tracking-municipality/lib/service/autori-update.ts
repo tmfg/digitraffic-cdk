@@ -82,7 +82,7 @@ export class AutoriUpdate {
                 return summedResult;
             }).then((finalResult) => {
                 return inDatabase((db: DTDatabase) => {
-                    return CommonUpdateService.updateDataUpdated(db, finalResult);
+                    return CommonUpdateService.updateDataUpdated(db, domainName, finalResult);
                 });
             });
         } catch (error) {
