@@ -87,6 +87,12 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
                 vtsAStamps = vtsAStamps.filter(t => !R.equals(t, vtsTimestamp));
             }
         }
+
+        // filter out any worse quality PRED estimates if VTS A estimates are available
+        if (vtsAStamps.length) {
+            ret = ret.filter(t => t.source !== EventSource.AWAKE_AI_PRED);
+        }
+
         // build an average timestamp from the calculated timestamps and discard the rest
         // use the source with the highest priority
         if (vtsAStamps.length > 1) {
