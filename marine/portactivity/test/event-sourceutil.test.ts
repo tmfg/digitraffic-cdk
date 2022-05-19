@@ -118,6 +118,18 @@ describe('event-sourceutil', () => {
         expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
     });
 
+    test('PRED timestamps are filtered out if VTS a timestamps are available', () => {
+        const portcallId = 1;
+        const awakeTimestamp = newTimestamp({ source: EventSource.AWAKE_AI, portcallId });
+        const predTimestamp = newTimestamp({ source: EventSource.AWAKE_AI_PRED, portcallId });
+        const timestamps = [
+            awakeTimestamp,
+            predTimestamp,
+        ];
+
+        expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
+    });
+
     function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp) {
         expect(mergedTimestamps.length).toBe(1);
         const merged = mergedTimestamps[0];
