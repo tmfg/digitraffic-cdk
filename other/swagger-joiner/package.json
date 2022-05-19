@@ -11,7 +11,15 @@
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "test": "jest --detectOpenHandles",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
+    "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
+    "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
+    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy",
+    "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
+    "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
+    "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
+    "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy"
   },
   "devDependencies": {
     "@types/aws-lambda": "*",

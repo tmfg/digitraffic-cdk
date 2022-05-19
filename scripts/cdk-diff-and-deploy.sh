@@ -13,7 +13,9 @@ do
   [[ "$FULL_ENV" = "$value" ]] && FOUND=true
 done
 
+# 1. road/marine
 ENV_TYPE=$(echo $FULL_ENV | cut -d '-' -f1)
+# 2. test/prod
 ENV_ENV=$(echo $FULL_ENV | cut -d '-' -f2)
 
 if [[ "${FOUND}"  != "true" ]] ;then
@@ -45,8 +47,8 @@ ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/bin/*-app.ts" )
 APP_TS=${ALL_TS_FILES_IN_BIN[0]}
 echo Found app config: $APP_TS
 
-# Get stack name
-STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${ENV_TYPE}" |  grep -i "${ENV_ENV}" |  cut -d "'" -f2)
+# Get stack name (take first match ie. grep -i 'new ' <the-file> | grep -i marineprod |  cut -d "'" -f2 | head -1
+STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${ENV_TYPE}${ENV_ENV}"  |  cut -d "'" -f2 | head -1)
 echo "Using Stack: ${STACK}"
 
 echo SCRIPT_DIR: ${SCRIPT_DIR}
