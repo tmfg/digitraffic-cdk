@@ -13,7 +13,11 @@
     "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
     "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
+    "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
+    "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
+    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy"
   },
   "devDependencies": {
     "@aws-cdk/assert": "*",

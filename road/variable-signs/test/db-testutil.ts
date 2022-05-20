@@ -19,15 +19,12 @@ export function setup(db: DTDatabase) {
 }
 
 export async function truncate(db: DTDatabase) {
-    return await db.tx(t => {
-        return t.batch([
-            db.none('delete from device'),
-            db.none('delete from device_data_datex2'),
-            db.none('delete from device_data_row'),
-            db.none('delete from device_data'),
-        ]);
+    await db.tx(async t => {
+        await t.none('delete from device');
+        await t.none('delete from device_data_datex2');
+        await t.none('delete from device_data_row');
+        await t.none('delete from device_data');
     });
-
 }
 
 

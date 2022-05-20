@@ -19,7 +19,7 @@ export function sumResults(results: TrackingSaveResult[], messageSizeOverride?: 
 
 export function updateDataUpdated(db: DTDatabase, domain: string, finalResult: TrackingSaveResult): Promise<TrackingSaveResult> {
     const now = new Date();
-    return LastUpdatedDb.updateLastUpdatedWithVersion(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, domain, now)
+    return LastUpdatedDb.updateLastUpdatedWithSubtype(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, domain, now)
         .then(() => (finalResult))
         .catch(e => {
             console.error('method=updateDataUpdated failed', e);

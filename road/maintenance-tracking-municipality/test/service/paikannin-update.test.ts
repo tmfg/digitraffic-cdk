@@ -122,7 +122,7 @@ describe('paikannin-update-service-test', dbTestBase((db: DTDatabase) => {
         expect(trackings[0].line_string?.coordinates.length).toEqual(10);
         expect(trackings[1].line_string?.coordinates.length).toEqual(9);
 
-        const checked = await LastUpdatedDb.getLastUpdatedWithVersion(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, DOMAIN_1);
+        const checked = await LastUpdatedDb.getLastUpdatedWithSubtype(db, LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED, DOMAIN_1);
         Asserter.assertToBeCloseTo(<number>checked?.getTime(), past0.getTime(), 500);
     });
 
