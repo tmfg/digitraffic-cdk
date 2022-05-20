@@ -56,7 +56,7 @@ export class PrivateApi {
 
         add401Support(this.restApi, stack);
 
-        this.createResourceTree();
+        this.createResourceTree(stack);
 
         if ((stack.configuration as MobileServerProps).enablePasswordProtectedApi) {
             const [userPool, userPoolClient] = this.createUserPool(stack);
@@ -100,23 +100,27 @@ export class PrivateApi {
         this.createMetadataResource(this.ibnetMetadataResource, this.apiMetadataResource);
     }
 
-    createResourceTree() {
+    createResourceTree(stack: DigitrafficStack) {
         // old authorizer protected resources
-        const camerasResource = this.restApi.root.addResource("cameras");
-        const folderResource = camerasResource.addResource("{folderName}");
-        this.imageResource = folderResource.addResource("{imageName}");
-        this.metadataResource = camerasResource.addResource("metadata");
+        if ((stack.configuration as MobileServerProps).enablePasswordProtectedApi) {
+            const camerasResource = this.restApi.root.addResource("cameras");
+            const folderResource = camerasResource.addResource("{folderName}");
+            this.imageResource = folderResource.addResource("{imageName}");
+            this.metadataResource = camerasResource.addResource("metadata");
+        }
 
         // new api-key protected resources
-        const apiResource = this.restApi.root.addResource("api");
-        const marinecamResource = apiResource.addResource("marinecam");
-        const ibnetResource = marinecamResource.addResource("ibnet");
-        const marinecamCamerasResource = marinecamResource.addResource("cameras");
+        if ((stack.configuration as MobileServerProps).enableKeyProtectedApi) {
+            const apiResource = this.restApi.root.addResource("api");
+            const marinecamResource = apiResource.addResource("marinecam");
+            const ibnetResource = marinecamResource.addResource("ibnet");
+            const marinecamCamerasResource = marinecamResource.addResource("cameras");
 
-        this.ibnetImageResource = ibnetResource.addResource("{imageName}");
-        this.ibnetMetadataResource = ibnetResource.addResource("metadata");
-        this.apiImageResource = marinecamCamerasResource.addResource("{imageName}");
-        this.apiMetadataResource = marinecamCamerasResource.addResource("metadata");
+            this.ibnetImageResource = ibnetResource.addResource("{imageName}");
+            this.ibnetMetadataResource = ibnetResource.addResource("metadata");
+            this.apiImageResource = marinecamCamerasResource.addResource("{imageName}");
+            this.apiMetadataResource = marinecamCamerasResource.addResource("metadata");
+        }
     }
 
     createMetadataResource(...resources: Resource[]) {
