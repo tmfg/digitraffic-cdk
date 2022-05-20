@@ -170,9 +170,9 @@ export class AutoriUpdate {
         const start = Date.now();
         const previous: DbLatestTracking | null = await DataDb.findLatestNotFinishedTrackingForWorkMachine(db, contract.domain, machineId.id);
 
-        if (previous) {
-            console.info(`previous: ${JSON.stringify(previous)}\nnext: ${JSON.stringify(tracking)}`);
-        }
+        // if (previous) {
+        //     console.info(`DEBUG previous: ${JSON.stringify(previous)}\nnext: ${JSON.stringify(tracking)}`);
+        // }
 
         const trackingStartPosition: Position = Utils.getTrackingStartPoint(tracking);
         if (previous && AutoriUtils.isExtendingPreviousTracking(JSON.parse(previous.last_point).coordinates, trackingStartPosition, previous.end_time, tracking.start_time)) {
