@@ -23,6 +23,7 @@ export function constructSwagger(spec: object) {
                 spec: ${JSON.stringify(spec)},
                 dom_id: '#swagger-ui',
                 deepLinking: true,
+                defaultModelRendering: 'model',
                 docExpansion: 'none',
                 presets: [
                     SwaggerUIBundle.presets.apis,
