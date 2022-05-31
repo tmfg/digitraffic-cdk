@@ -24,6 +24,7 @@ export function constructSwagger(spec: object) {
                 dom_id: '#swagger-ui',
                 deepLinking: true,
                 defaultModelRendering: 'model',
+                defaultModelExpandDepth: 6,
                 docExpansion: 'none',
                 presets: [
                     SwaggerUIBundle.presets.apis,
