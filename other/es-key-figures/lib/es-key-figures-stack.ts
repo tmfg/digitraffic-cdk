@@ -77,7 +77,7 @@ export class EsKeyFiguresStack extends Stack {
             functionName: functionName,
             code: new AssetCode('dist/lambda'),
             handler: 'create-visualizations.handler',
-            runtime: Runtime.NODEJS_10_X,
+            runtime: Runtime.NODEJS_14_X,
             timeout: Duration.minutes(15),
             logRetention: RetentionDays.ONE_YEAR,
             vpc: vpc,
