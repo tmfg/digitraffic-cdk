@@ -6,9 +6,9 @@ import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-a
 import {DbDomainContract} from "../model/db-data";
 import {MaintenanceTrackingAutoriSecret} from "../model/maintenance-tracking-municipality-secret";
 
-export const URL_CONTRACTS = '/contracts';
-export const URL_ROUTE = '/route';
-export const URL_OPERATIONS = '/route/types/operation\n';
+export const PATH_SUFFIX_CONTRACTS = 'contracts';
+export const PATH_SUFFIX_ROUTE = 'route';
+export const PATH_SUFFIX_ROUTE_OPERATIONS = 'route/types/operation\n';
 export const O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS = 3 * 60 * 1000; // 3 minute safety gap to get new token
 
 export class AutoriApi {
@@ -28,12 +28,12 @@ export class AutoriApi {
     /**
      *
      * @param method to log
-     * @param url url after domain. Ie. /api/contracts
+     * @param pathSuffix path after https://<server>/api/<productId>/. Ie. 'contracts'
      */
-    private async getFromServer<T>(method: string, url: string): Promise<T> {
+    private async getFromServer<T>(method: string, pathSuffix: string): Promise<T> {
         const start = Date.now();
         // https://<server>/api/<productId>/<action>
-        const serverUrl = `${this.secret.url}/api/${this.secret.productId}${url}`;
+        const serverUrl = `${this.secret.url}/api/${this.secret.productId}/${pathSuffix}`;
 
         console.info(`method=${method} Sending to url ${serverUrl}`);
 
@@ -73,11 +73,11 @@ export class AutoriApi {
     }
 
     public getContracts(): Promise<ApiContractData[]> {
-        return this.getFromServer<ApiContractData[]>('getContracts', URL_CONTRACTS);
+        return this.getFromServer<ApiContractData[]>('getContracts', PATH_SUFFIX_CONTRACTS);
     }
 
     public getOperations(): Promise<ApiOperationData[]> {
-        return this.getFromServer<ApiOperationData[]>('getOperations', URL_OPERATIONS);
+        return this.getFromServer<ApiOperationData[]>('getOperations', PATH_SUFFIX_ROUTE_OPERATIONS);
     }
 
     /**
@@ -105,7 +105,7 @@ export class AutoriApi {
         const toString = to.toISOString();
         const start = Date.now();
 
-        return this.getFromServer<ApiRouteData[]>(`getRouteDataForContract`, `${URL_ROUTE}?contract=${contract.contract}&changedStart=${fromString}&changedEnd=${toString}`)
+        return this.getFromServer<ApiRouteData[]>(`getRouteDataForContract`, `${PATH_SUFFIX_ROUTE}?contract=${contract.contract}&changedStart=${fromString}&changedEnd=${toString}`)
             .then(routeData => {
                 const end = Date.now();
                 console.debug(`DEBUG method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} startTime=${fromString} endTime=${toString} data count=${routeData.length} tookMs=${end-start}`);
@@ -125,11 +125,9 @@ export class AutoriApi {
     public getOAuthToken() : Promise<OAuthTokenResponse> {
         console.log(`method=getOAuthToken`);
 
-        if (typeof this.oAuthResponse != "undefined" &&
-            typeof this.oAuthExpires != "undefined" &&
-            this.oAuthExpires.getTime() > Date.now()) {
+        if (this.isAuthTokenActive()) {
             const expiresInS = Math.floor((this.oAuthExpires.getTime()-Date.now())/1000);
-            console.info(`method=getOAuthToken from cache expires in ${expiresInS} s and calculated limit is ${this.oAuthExpires.toISOString()}`);
+            console.info(`DEBUG method=getOAuthToken from cache expires in ${expiresInS} s and calculated limit is ${this.oAuthExpires.toISOString()}`);
             return Promise.resolve(this.oAuthResponse);
         }
 
@@ -163,6 +161,16 @@ export class AutoriApi {
                 console.error(msg);
                 throw new Error(msg);
             });
+    }
+
+    /**
+     * Checks if current auth token is still valid.
+     * @private
+     */
+    private isAuthTokenActive() : boolean {
+        return typeof this.oAuthResponse != "undefined" &&
+               typeof this.oAuthExpires != "undefined" &&
+               this.oAuthExpires.getTime() > Date.now();
     }
 }
 
