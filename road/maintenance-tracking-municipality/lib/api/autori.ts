@@ -168,8 +168,10 @@ export class AutoriApi {
      * @private
      */
     private isAuthTokenActive() : boolean {
-        return typeof this.oAuthResponse !== "undefined" &&
-               typeof this.oAuthExpires !== "undefined" &&
+        return this.oAuthResponse !== undefined &&
+               this.oAuthResponse !== null &&
+               this.oAuthExpires !== undefined &&
+               this.oAuthExpires !== null &&
                this.oAuthExpires.getTime() > Date.now();
     }
 }
