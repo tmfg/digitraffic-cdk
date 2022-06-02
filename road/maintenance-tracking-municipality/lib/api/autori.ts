@@ -35,7 +35,7 @@ export class AutoriApi {
         // https://<server>/api/<productId>/<action>
         const serverUrl = `${this.secret.url}/api/${this.secret.productId}/${pathSuffix}`;
 
-        console.info(`method=${method} Sending to url ${serverUrl}`);
+        console.info(`method=getFromServer.${method} Sending to url ${serverUrl}`);
 
         const token : OAuthTokenResponse = await this.getOAuthToken();
 
@@ -168,8 +168,8 @@ export class AutoriApi {
      * @private
      */
     private isAuthTokenActive() : boolean {
-        return typeof this.oAuthResponse != "undefined" &&
-               typeof this.oAuthExpires != "undefined" &&
+        return typeof this.oAuthResponse !== "undefined" &&
+               typeof this.oAuthExpires !== "undefined" &&
                this.oAuthExpires.getTime() > Date.now();
     }
 }
