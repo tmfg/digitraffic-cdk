@@ -38,11 +38,12 @@
   },
   "dependencies": {
     "aws-cdk-lib": "*",
-    "axios": "^0.21.1",
     "digitraffic-common": "*",
     "pg-native": "*",
     "pg-promise": "*",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "*",
+    "axios": "^0.21.1",
+    "query-string": "^7.1.1"
   },
   "externals": [
     "aws-sdk"

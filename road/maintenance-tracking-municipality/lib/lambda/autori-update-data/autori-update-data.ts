@@ -19,7 +19,7 @@ export function handlerFn(doWithSecret: SecretFunction<MaintenanceTrackingAutori
         if (!autoriUpdateService) {
             console.info(`method=MaintenanceTrackingMunicipality.autoriUpdateData domain=${domainName} lambda was cold`);
             await doWithSecret(secretId, (secret: MaintenanceTrackingAutoriSecret) => {
-                const autoriApi = new AutoriApi(secret.username, secret.password, secret.url);
+                const autoriApi = new AutoriApi(secret);
                 autoriUpdateService = new AutoriUpdate(autoriApi);
             }, {
                 prefix: domainPrefix,

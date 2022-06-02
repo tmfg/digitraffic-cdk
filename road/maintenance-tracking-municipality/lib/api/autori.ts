@@ -1,27 +1,28 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const queryString = require('query-string');
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
 import {DbDomainContract} from "../model/db-data";
+import {MaintenanceTrackingAutoriSecret} from "../model/maintenance-tracking-municipality-secret";
 
-export const URL_CONTRACTS = '/api/contracts';
-export const URL_ROUTE = '/api/route';
-export const URL_OPERATIONS = '/api/route/types/operation\n';
+export const URL_CONTRACTS = '/contracts';
+export const URL_ROUTE = '/route';
+export const URL_OPERATIONS = '/route/types/operation\n';
+export const O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS = 3 * 60 * 1000; // 3 minute safety gap to get new token
 
 export class AutoriApi {
-    readonly username: string;
-    readonly password: string;
-    readonly endpointUrl: string;
+
+    private secret: MaintenanceTrackingAutoriSecret;
+    private oAuthResponse: OAuthTokenResponse;
+    private oAuthExpires: Date;
 
     /**
-     * @param username Basic auth username
-     * @param password Basic auth password
-     * @param endpointUrl Enpoint url ie https://mydomain.com
+     * @param secret for the domain
      */
-    constructor(username: string, password: string, endpointUrl: string) {
-        this.username = username;
-        this.password = password;
-        this.endpointUrl = endpointUrl;
-        console.info(`AutoriApi using endpointUrl ${endpointUrl}`);
+    constructor(secret: MaintenanceTrackingAutoriSecret) {
+        this.secret = secret;
+        console.info(`method=AutoriApi using endpointUrl ${secret.url}`);
     }
 
     /**
@@ -31,20 +32,19 @@ export class AutoriApi {
      */
     private async getFromServer<T>(method: string, url: string): Promise<T> {
         const start = Date.now();
-        const serverUrl = `${this.endpointUrl}${url}`;
+        // https://<server>/api/<productId>/<action>
+        const serverUrl = `${this.secret.url}/api/${this.secret.productId}${url}`;
 
-        // console.info(`method=${method} Sending to url ${serverUrl}`);
+        console.info(`method=${method} Sending to url ${serverUrl}`);
+
+        const token : OAuthTokenResponse = await this.getOAuthToken();
 
         try {
             const resp : AxiosResponse = await axios.get(serverUrl, {
+                // OAuth 2.0 Authorization headers
                 headers: {
                     'accept': MediaType.APPLICATION_JSON,
-                },
-                // Axios looks for the `auth` option, and, if it is set, formats a
-                // basic auth header for you automatically.
-                auth: {
-                    username: this.username,
-                    password: this.password,
+                    'Authorization': `Bearer ${token.access_token}`,
                 },
             });
             if (resp.status !== 200) {
@@ -56,7 +56,7 @@ export class AutoriApi {
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError;
                 if (axiosError.response) {
-                    console.error(`method=getFromServer.${method} GET failed for ${serverUrl}. Error response code: ${axiosError.response.status} and message: ${axiosError.response.data}`);
+                    console.error(`method=getFromServer.${method} GET failed for ${serverUrl}. Error response code: ${axiosError.response.status} and message: ${JSON.stringify(axiosError.response.data)}`);
                 } else if (axiosError.request) {
                     console.error(`method=getFromServer.${method} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`);
                 } else {
@@ -64,7 +64,7 @@ export class AutoriApi {
                     console.error(`method=getFromServer.${method} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`);
                 }
             } else {
-                console.error(`method=getFromServer.${method} GET failed for ${serverUrl} outside axios. Error message: ${error}`);
+                console.error(`method=getFromServer.${method} GET failed for ${serverUrl} outside axios. Error message: ${JSON.stringify(error)}`);
             }
             return Promise.reject();
         } finally {
@@ -115,4 +115,57 @@ export class AutoriApi {
                 throw error;
             });
     }
+
+    /**
+     * Get OAuth 2.0 token
+     * https://docs.microsoft.com/en-us/azure/active-directory/develop/v2-oauth2-client-creds-grant-flow#first-%20case-access-token-request-with-a-shared-secret
+     *
+     * @private
+     */
+    public getOAuthToken() : Promise<OAuthTokenResponse> {
+        console.log(`method=getOAuthToken`);
+
+        if (typeof this.oAuthResponse != "undefined" &&
+            typeof this.oAuthExpires != "undefined" &&
+            this.oAuthExpires.getTime() > Date.now()) {
+            const expiresInS = Math.floor((this.oAuthExpires.getTime()-Date.now())/1000);
+            console.info(`method=getOAuthToken from cache expires in ${expiresInS} s and calculated limit is ${this.oAuthExpires.toISOString()}`);
+            return Promise.resolve(this.oAuthResponse);
+        }
+
+        const postData = {
+            // eslint-disable-next-line camelcase
+            client_id: this.secret.oAuthClientId,
+            scope: this.secret.oAuthScope,
+            // eslint-disable-next-line camelcase
+            client_secret: this.secret.oAuthClientSecret,
+            // eslint-disable-next-line camelcase
+            grant_type: 'client_credentials',
+        };
+
+        return axios.post(this.secret.oAuthTokenEndpoint, queryString.stringify(postData), {
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+        })
+            .then(response => {
+                this.oAuthResponse = response.data as OAuthTokenResponse;
+                // response has expires in seconds -> convert to ms
+                const expiresInMs = this.oAuthResponse.expires_in * 1000;
+                const oAuthExpiresEpochMs = (new Date().getTime()) + expiresInMs - O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS;
+                this.oAuthExpires = new Date(oAuthExpiresEpochMs);
+                console.info(`method=getOAuthToken new token expires in ${this.oAuthResponse.expires_in} s and calculated limit is ${this.oAuthExpires.toISOString()}`);
+                return this.oAuthResponse;
+            })
+            .catch(error => {
+                console.error(`method=getOAuthToken`, error);
+                throw error;
+            });
+    }
+}
+
+export type OAuthTokenResponse = {
+    readonly token_type: string,
+    readonly expires_in: number,
+    readonly access_token: string
 }
