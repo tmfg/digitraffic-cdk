@@ -158,13 +158,15 @@ export class AutoriApi {
                 return this.oAuthResponse;
             })
             .catch(error => {
-                console.error(`method=getOAuthToken`, error);
-                throw error;
+                // This will print i.e. "method=getOAuthToken failed, message: Request failed with status code 400, error: invalid_scope"
+                const msg = `method=getOAuthToken failed, message: ${error.message}, error: ${error.response.data.error}`;
+                console.error(msg);
+                throw new Error(msg);
             });
     }
 }
 
-export type OAuthTokenResponse = {
+type OAuthTokenResponse = {
     readonly token_type: string,
     readonly expires_in: number,
     readonly access_token: string
