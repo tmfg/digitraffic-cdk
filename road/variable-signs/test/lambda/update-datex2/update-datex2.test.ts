@@ -1,16 +1,17 @@
 import {handler} from "../../../lib/lambda/update-datex2/update-datex2";
-import {dbTestBase} from "../../db-testutil";
+import {dbTestBase, setup} from "../../db-testutil";
 import {readFileSync} from 'fs';
 import * as VariableSignsService from '../../../lib/service/variable-signs';
 import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
 import {StatusCodeValue} from "../../../lib/model/status-code-value";
 import * as sinon from "sinon";
 
-describe('lambda-update-datex2', dbTestBase(() => {
+describe('lambda-update-datex2', dbTestBase((db) => {
     sinon.stub(ProxyHolder.prototype, 'setCredentials').returns(Promise.resolve());
 
     test('update_valid_datex2', async () => {
         await updateFile('valid_datex2.xml', 200);
+        await setup(db);
 
         const datex2 = (await VariableSignsService.findActiveSignsDatex2()).body;
 
@@ -29,6 +30,7 @@ describe('lambda-update-datex2', dbTestBase(() => {
 
     test('insert_update', async () => {
         await updateFile('valid_datex2.xml', 200);
+        await setup(db);
 
         const oldDatex2 = (await VariableSignsService.findActiveSignsDatex2()).body;
         expect(oldDatex2).toMatch(/<overallStartTime>2020-02-19T14:45:02.013Z<\/overallStartTime>/);
