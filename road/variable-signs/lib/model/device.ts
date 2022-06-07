@@ -1,6 +1,7 @@
 export type DbDevice = {
     id: string
     updated_date: Date
+    deleted_date: Date
     type: string
     road_address: string
     direction: string

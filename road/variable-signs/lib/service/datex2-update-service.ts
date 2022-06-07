@@ -23,20 +23,18 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
 
     const situations = parseSituations(datex2);
 
-    try {
-        await inDatabase((db: DTDatabase) => {
-            return db.tx((tx: DTTransaction) => {
-                return tx.batch([
-                    ...DeviceDB.saveDatex2(tx, situations, timestamp),
-                    LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp),
-                ]);
-            });
+    await inDatabase((db: DTDatabase) => {
+        return db.tx((tx: DTTransaction) => {
+            return tx.batch([
+                ...DeviceDB.saveDatex2(tx, situations, timestamp),
+                LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp),
+            ]);
         });
-
-        return StatusCodeValue.OK;
-    } finally {
+    }).finally(() => {
         console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (Date.now() - start));
-    }
+    });
+
+    return StatusCodeValue.OK;
 }
 
 export function parseSituations(datex2: string): Situation[] {

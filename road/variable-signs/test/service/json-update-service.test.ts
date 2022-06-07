@@ -36,30 +36,55 @@ describe('json-update-service-tests', dbTestBase((db) => {
         const metadata: TloikMetatiedot = { laitteet: []};
         await JsonUpdateService.updateJsonMetadata(metadata);
 
-        assertDeviceCount(db, 0);
+        await assertActiveDeviceCount(db, 0);
     });
 
     test('update metadata - insert one device', async () => {
         const metadata: TloikMetatiedot = { laitteet: [TEST_DEVICE]};
         await JsonUpdateService.updateJsonMetadata(metadata);
 
-        assertDeviceCount(db, 1);
+        await assertActiveDeviceCount(db, 1);
     });
 
     test('update metadata - insert then update', async () => {
+        // first insert
         const metadata: TloikMetatiedot = { laitteet: [TEST_DEVICE]};
         await JsonUpdateService.updateJsonMetadata(metadata);
 
-        assertDeviceCount(db, 1);
+        await assertActiveDeviceCount(db, 1);
         const created = await getUpdatedDate(db, 'test');
 
         await new Promise(resolve => setTimeout(resolve, 1000));
 
+        // then update
         await JsonUpdateService.updateJsonMetadata(metadata);
         const updated = await getUpdatedDate(db, 'test');
 
-        assertDeviceCount(db, 1);
+        await assertActiveDeviceCount(db, 1);
         expect(updated.getTime()).toBeGreaterThan(created.getTime());
+    });
+
+    test('update metadata - insert then remove then insert', async () => {
+        // first insert
+        const metadata: TloikMetatiedot = { laitteet: [TEST_DEVICE]};
+        await JsonUpdateService.updateJsonMetadata(metadata);
+
+        await assertActiveDeviceCount(db, 1);
+        await assertDeletedDeviceCount(db, 0);
+
+        // then remove
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        await JsonUpdateService.updateJsonMetadata({ laitteet: [] });
+
+        await assertActiveDeviceCount(db, 0);
+        await assertDeletedDeviceCount(db, 1);
+
+        // then insert again
+        await JsonUpdateService.updateJsonMetadata(metadata);
+
+        await assertActiveDeviceCount(db, 1);
+        await assertDeletedDeviceCount(db, 0);
+
     });
 
     test('update data - empty', async () => {
@@ -78,13 +103,18 @@ describe('json-update-service-tests', dbTestBase((db) => {
 
 }));
 
-function assertDeviceCount(db: DTDatabase, expected: number) {
-    db.one('select count(*) from device')
+function assertActiveDeviceCount(db: DTDatabase, expected: number) {
+    return db.one('select count(*) from device where deleted_date is null')
+        .then(value => expect(value.count).toEqual(expected));
+}
+
+function assertDeletedDeviceCount(db: DTDatabase, expected: number) {
+    return db.one('select count(*) from device where deleted_date is not null')
         .then(value => expect(value.count).toEqual(expected));
 }
 
 function assertDeviceDataCount(db: DTDatabase, expected: number) {
-    db.one('select count(*) from device_data')
+    return db.one('select count(*) from device_data')
         .then(value => expect(value.count).toEqual(expected));
 }
 

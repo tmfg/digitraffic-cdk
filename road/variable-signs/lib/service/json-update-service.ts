@@ -34,13 +34,15 @@ export async function updateJsonMetadata(metadata: TloikMetatiedot): Promise<Sta
     const idMap = createLaiteIdMap(metadata);
 
     await inTransaction(async (db: DTTransaction) => {
-        const devices = await MetadataDb.getDevices(db, Object.keys(idMap));
-
-        const updatedCount = await updateDevices(db, devices, idMap);
+        const devices = await MetadataDb.getAllDevices(db);
+        const removedDevices: string[] = [];
+        const updatedCount = await updateDevices(db, devices, idMap, removedDevices);
         // updateDevices removes updated devices from idMap
         await MetadataDb.insertDevices(db, Object.values(idMap));
+        await MetadataDb.removeDevices(db, removedDevices);
 
-        console.info("method=JsonUpdateService.updateJsonMetadata updatedCount=%d insertCount=%d", updatedCount, Object.values(idMap).length);
+        console.info("method=JsonUpdateService.updateJsonMetadata removedCount=%d updatedCount=%d insertCount=%d",
+            removedDevices.length, updatedCount, Object.values(idMap).length);
     });
 
     return StatusCodeValue.OK;
@@ -54,20 +56,28 @@ function createLaiteIdMap(metatiedot: TloikMetatiedot) {
     return idMap;
 }
 
-async function updateDevices(db: DTTransaction, devices: DbDevice[], idMap: DeviceIdMap) {
+async function updateDevices(db: DTTransaction, devices: DbDevice[], idMap: DeviceIdMap, removedDevices: string[]) {
     let updatedCount = 0;
 
     for (const device of devices) {
         const apiDevice = idMap[device.id];
 
         if (apiDevice != null) {
+            // a device from the API was found to match device in DB
+            if (device.deleted_date != null) {
+                console.info("Updating deleted device %s", device.id);
+            }
+
             await MetadataDb.updateDevice(db, apiDevice);
 
             updatedCount++;
 
             delete idMap[device.id];
-        } else {
-            console.error("Could not find " + device.id);
+        } else if (device.deleted_date == null) {
+            // no device from the API was found to match device in DB, and the device in DB is not marked deleted
+            console.info("Removing device %s", device.id);
+
+            removedDevices.push(device.id);
         }
     }
 

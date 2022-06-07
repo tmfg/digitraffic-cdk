@@ -9,8 +9,6 @@ export const handler = (event: Record<string, string>) => {
     const start = Date.now();
 
     if (jsonMetadata) {
-        console.info('DEBUG ' + jsonMetadata);
-
         return proxyHolder.setCredentials()
             .then(() => JsonUpdateService.updateJsonMetadata(JSON.parse(jsonMetadata)))
             .finally(() => console.info("method=Lambda.UpdateJsonMetadata tookMs=%d", Date.now() - start))
