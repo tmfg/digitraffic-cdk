@@ -10,6 +10,7 @@ on:
 
 jobs:
   analyze:
+    if: github.event.repo.name == 'tmfg/digitraffic-cdk'
     name: Analyze
     runs-on: ubuntu-latest
     permissions:
