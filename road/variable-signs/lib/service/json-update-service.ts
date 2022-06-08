@@ -3,7 +3,7 @@ import {TloikTilatiedot} from "../model/tilatiedot";
 import * as MetadataDb from "../db/metadata";
 import * as DataDb from "../db/data";
 import {DbDevice} from "../model/device";
-import {DTTransaction, inTransaction} from "../../../../digitraffic-common/database/database";
+import {DTTransaction, inTransaction} from "digitraffic-common/database/database";
 import {StatusCodeValue} from "../model/status-code-value";
 
 type DeviceIdMap = Record<string, TloikLaite>;
@@ -35,8 +35,7 @@ export async function updateJsonMetadata(metadata: TloikMetatiedot): Promise<Sta
 
     await inTransaction(async (db: DTTransaction) => {
         const devices = await MetadataDb.getAllDevices(db);
-        const removedDevices: string[] = [];
-        const updatedCount = await updateDevices(db, devices, idMap, removedDevices);
+        const [updatedCount, removedDevices] = await updateDevices(db, devices, idMap);
         // updateDevices removes updated devices from idMap
         await MetadataDb.insertDevices(db, Object.values(idMap));
         await MetadataDb.removeDevices(db, removedDevices);
@@ -56,7 +55,8 @@ function createLaiteIdMap(metatiedot: TloikMetatiedot) {
     return idMap;
 }
 
-async function updateDevices(db: DTTransaction, devices: DbDevice[], idMap: DeviceIdMap, removedDevices: string[]) {
+async function updateDevices(db: DTTransaction, devices: DbDevice[], idMap: DeviceIdMap): Promise<[number, string[]]> {
+    const removedDevices: string[] = [];
     let updatedCount = 0;
 
     for (const device of devices) {
@@ -81,5 +81,5 @@ async function updateDevices(db: DTTransaction, devices: DbDevice[], idMap: Devi
         }
     }
 
-    return updatedCount;
+    return [updatedCount, removedDevices];
 }
