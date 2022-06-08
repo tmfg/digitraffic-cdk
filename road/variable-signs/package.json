@@ -39,6 +39,7 @@
   },
   "dependencies": {
     "aws-cdk-lib": "*",
+    "constructs": "*",
     "axios": "^0.21.1",
     "digitraffic-common": "*",
     "pg-native": "*",
