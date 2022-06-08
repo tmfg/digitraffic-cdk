@@ -15,7 +15,7 @@ jobs:
       run: yarn install
     - name: Run ESLint
       id: run-eslint
-      run: yarn run eslint . --ext .js,.jsx,.ts,.tsx --format html -o ./eslint-report.html
+      run: yarn run eslint . --ext .ts --format html -o ./eslint-report.html
       continue-on-error: true
     - name: Upload report
       uses: actions/upload-artifact@v3
