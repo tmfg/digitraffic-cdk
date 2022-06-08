@@ -5,6 +5,7 @@ on:
       - master
 jobs:
   Mirror-action:
+    if: github.event.repo.name != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-latest
     steps:
       - name: Mirror
