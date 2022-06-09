@@ -11,11 +11,11 @@ jobs:
       uses: actions/setup-node@v2
       with:
         node-version: '14'
-    - name: Install modules
-      run: yarn install
+    - name: Install ESLint
+      run: npm install eslint typescript @typescript-eslint/eslint-plugin @typescript-eslint/parser
     - name: Run ESLint
       id: run-eslint
-      run: yarn run eslint . --ext .ts --format html -o ./eslint-report.html
+      run: npx eslint . --ext .ts --format html -o ./eslint-report.html
       continue-on-error: true
     - name: Upload report
       uses: actions/upload-artifact@v3
