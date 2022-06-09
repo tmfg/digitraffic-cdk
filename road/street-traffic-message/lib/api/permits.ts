@@ -16,6 +16,7 @@ export class PermitsApi {
 
         try {
             const resp = await axios.get(`${this.apiUrl}${this.path}?authKey=${this.authKey}`, {
+                timeout: 10000,
                 headers: {
                     'Accept': 'application/xml',
                 },
