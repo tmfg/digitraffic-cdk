@@ -8,6 +8,10 @@ export const handler = (event: Record<string, string>) => {
     const start = Date.now();
     const counterId = event.counterId;
 
+    if (Number.isNaN(Number(counterId))) {
+        return Promise.resolve(LambdaResponse.notFound());
+    }
+
     return proxyHolder.setCredentials()
         .then(() => CountingSitesService.findCounters("", counterId))
         .then(featureCollection => {

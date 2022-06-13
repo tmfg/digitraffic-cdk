@@ -211,7 +211,7 @@ export class PublicApi {
                 'application/json': JSON.stringify({
                     counterId: "$util.escapeJavaScript($input.params('counter_id'))",
                     domainName: "$util.escapeJavaScript($input.params('domain_name'))",
-                    year: "$util.escapeJavaScript($input.params('domain_name'))",
+                    year: "$util.escapeJavaScript($input.params('year'))",
                     month: "$util.escapeJavaScript($input.params('month'))",
                 }),
             },

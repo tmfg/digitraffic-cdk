@@ -61,6 +61,8 @@ export const handler = async () => {
         ContentChecker.checkJson((json: DbData[]) => {
             Asserter.assertLengthGreaterThan(json, 10);
         }));
+    await checker.expect400(VALUES_URL + "?counter_id=4&year=2300&month=5");
+    await checker.expect400(VALUES_URL + "?counter_id=4&year=bad_input&month=5");
 
     // counters
     await checker.expect403WithoutApiKey(COUNTERS_URL + "?domain_name=Oulu");
@@ -82,10 +84,10 @@ export const handler = async () => {
     await checker.expect403WithoutApiKey(COUNTERS_URL + "/13");
     await checker.expect200(COUNTERS_URL + "/13", GeoJsonChecker.validFeatureCollection());
     await checker.expect404(COUNTERS_URL + "/999999");
+    await checker.expect404(COUNTERS_URL + "/bad_input");
 
     // csv values
     await checker.expect403WithoutApiKey(CSV_URL + "?year=2022&month=01&counter_id=15");
-    await checker.expect400(CSV_URL + "?year=2021");
     await checker.expect200(CSV_URL + "?year=2022&month=01&counter_id=15",
         ContentTypeChecker.checkContentType(MediaType.TEXT_CSV),
         HeaderChecker.checkHeaderExists(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
@@ -95,6 +97,9 @@ export const handler = async () => {
     await checker.expect200(CSV_URL + "?year=2022&month=01&counter_id=-21", ContentChecker.checkResponse(body => {
         Asserter.assertLength(body.split('\n'), 2); // just header
     }));
+    await checker.expect400(CSV_URL + "?year=2021");
+    await checker.expect400(CSV_URL + "?year=2021&month=34&counter_id=15");
+    await checker.expect400(CSV_URL + "?year=bad_input&month=3&counter_id=15");
 
     return checker.done();
 };
