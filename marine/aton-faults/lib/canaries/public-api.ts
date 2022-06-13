@@ -25,6 +25,8 @@ export const handler = async () => {
     }));
 
     await checker.expect403WithoutApiKey(API_PATH + "?language=fi");
+    await checker.expect400(API_PATH + "?fixed_in_hours=-2");
+    await checker.expect400(API_PATH + "?fixed_in_hours=12345567");
 
     return checker.done();
 };

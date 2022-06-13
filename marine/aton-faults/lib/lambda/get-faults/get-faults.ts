@@ -10,6 +10,10 @@ export const handler = (event: Record<string, string>) => {
     const language = getLanguage(event.language);
     const fixedInHours = getFixed(event.fixed_in_hours);
 
+    if (fixedInHours < 0 || fixedInHours > 24*100) {
+        return Promise.resolve(LambdaResponse.badRequest(`fixedInHours must be between 0 and 2400`));
+    }
+
     return proxyHolder.setCredentials()
         .then(() => FaultsService.findAllFaults(language, fixedInHours))
         .then(faults => {
@@ -22,7 +26,7 @@ export const handler = (event: Record<string, string>) => {
 };
 
 function isNotSet(value: string): boolean {
-    return (value == null || false || value.length === 0);
+    return (value == null || value.length === 0);
 }
 
 function getFixed(fixed: string): number {

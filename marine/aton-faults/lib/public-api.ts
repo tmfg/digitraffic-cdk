@@ -24,7 +24,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
     publicApi.documentResource(faultsResource, DocumentationPart.method(ATON_FAULTS_TAGS, 'GetActiveFaults', 'Return all active faults in GeoJSON'));
     publicApi.documentResource(faultsResource, DocumentationPart.queryParameter('language', 'Language: en, fi or sv (default en)'));
-    publicApi.documentResource(faultsResource, DocumentationPart.queryParameter('fixed_in_hours', 'Show faults that are unfixed or were fixed at most this many hours ago (default 7 days)'));
+    publicApi.documentResource(faultsResource, DocumentationPart.queryParameter('fixed_in_hours', 'Show faults that are unfixed or were fixed at most this many hours ago (default 7 days).  Must be between 0 and 2400'));
 
     return publicApi;
 }
