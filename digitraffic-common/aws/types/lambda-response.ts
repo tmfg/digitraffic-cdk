@@ -23,7 +23,7 @@ export class LambdaResponse<T> {
         return this.create(500, 'Internal error');
     }
 
-    static create<S>(status: number, body: S, fileName?: string): LambdaResponse<S> {
-        return { status, body, fileName };
+    static create<S>(status: number, body: S, fileName?: string): Promise<LambdaResponse<S>> {
+        return Promise.resolve({ status, body, fileName });
     }
 }
