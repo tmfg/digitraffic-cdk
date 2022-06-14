@@ -7,15 +7,15 @@ export const handler = (event: Record<string, string>) => {
     const text = event.text;
 
     try {
-        return Promise.resolve(LambdaResponse.ok(TextConverterService.convertTextToSvg(text)));
+        return LambdaResponse.ok(TextConverterService.convertTextToSvg(text));
     } catch (e) {
         // bad user input -> 400
         if (e instanceof InputError) {
-            return Promise.resolve(LambdaResponse.badRequest(e.message));
+            return LambdaResponse.badRequest(e.message);
         }
 
         // other errors -> 500
-        return Promise.resolve(LambdaResponse.internalError());
+        return LambdaResponse.internalError();
     } finally {
         console.info("method=getSignImageLambda tookMs=%d", (Date.now()-start));
     }

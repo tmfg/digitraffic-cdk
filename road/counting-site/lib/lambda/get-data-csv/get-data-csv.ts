@@ -10,7 +10,7 @@ export const handler = (event: ValuesQueryParameters) => {
 
     const validationError = validate(event);
     if (validationError) {
-        return Promise.resolve(LambdaResponse.badRequest(validationError));
+        return LambdaResponse.badRequest(validationError);
     }
 
     const year = event.year as number || new Date().getUTCFullYear();
