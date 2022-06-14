@@ -11,7 +11,7 @@ export const handler = (event: Record<string, string>) => {
     const fixedInHours = getFixed(event.fixed_in_hours);
 
     if (fixedInHours < 0 || fixedInHours > 24*100) {
-        return Promise.resolve(LambdaResponse.badRequest(`fixedInHours must be between 0 and 2400`));
+        return LambdaResponse.badRequest(`fixedInHours must be between 0 and 2400`);
     }
 
     return proxyHolder.setCredentials()
