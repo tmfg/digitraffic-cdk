@@ -10,24 +10,33 @@ import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredf
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 import {Resource} from 'aws-cdk-lib/aws-apigateway';
 
+const VARIABLE_SIGN_TAGS_V1 = ['Variable Sign V1'];
+
 export class PublicApi {
     readonly restApi: DigitrafficRestApi;
+
+    private apiResource: Resource;
     private datex2Resource: Resource;
     private imageResource: Resource;
+    private v1Datex2Resource: Resource;
+    private v1ImageResource: Resource;
 
     constructor(stack: DigitrafficStack) {
         this.restApi = new DigitrafficRestApi(stack, 'VariableSigns-public', 'Variable Signs public API');
 
         this.restApi.createUsagePlan( 'VariableSigns Api Key', 'VariableSigns Usage Plan');
 
-        this.createResourcePaths();
+        this.createOldResourcePaths();
+        this.createV1ResourcePaths();
         this.createDatex2Resource(stack);
+
         this.createDocumentation();
+        this.createV1Documentation();
     }
 
-    createResourcePaths() {
-        const apiResource = this.restApi.root.addResource("api");
-        const v1Resource = apiResource.addResource("v1");
+    createOldResourcePaths() {
+        this.apiResource = this.restApi.root.addResource("api");
+        const v1Resource = this.apiResource.addResource("v1");
         const vsResource = v1Resource.addResource("variable-signs");
 
         const imagesResource = vsResource.addResource("images");
@@ -36,12 +45,32 @@ export class PublicApi {
         this.imageResource = imagesResource.addResource("{text}");
     }
 
+    createV1ResourcePaths() {
+        const vsResource = this.apiResource.addResource("variable-sign");
+        const v1Resource = vsResource.addResource("v1");
+
+        const imagesResource = v1Resource.addResource("images");
+
+        this.v1Datex2Resource = vsResource.addResource("signs.datex2");
+        this.v1ImageResource = imagesResource.addResource("{text}");
+    }
+
     createDocumentation() {
+        // set deprecated?!
         this.restApi.documentResource(this.datex2Resource,
             DocumentationPart.method(DATA_V1_TAGS, 'GetDatex2', 'Return all variables signs as datex2'));
 
         this.restApi.documentResource(this.imageResource,
             DocumentationPart.method(DATA_V1_TAGS, 'GetImage', 'Generate svg-image from given text'),
+            DocumentationPart.queryParameter('text', 'formatted [text] from variable sign text rows, without the brackets'));
+    }
+
+    createV1Documentation() {
+        this.restApi.documentResource(this.v1Datex2Resource,
+            DocumentationPart.method(VARIABLE_SIGN_TAGS_V1, 'GetDatex2', 'Return all variables signs as datex2'));
+
+        this.restApi.documentResource(this.v1ImageResource,
+            DocumentationPart.method(VARIABLE_SIGN_TAGS_V1, 'GetImage', 'Generate svg-image from given text'),
             DocumentationPart.queryParameter('text', 'formatted [text] from variable sign text rows, without the brackets'));
     }
 
@@ -69,6 +98,14 @@ export class PublicApi {
                     corsMethod(methodResponse("500", MediaType.APPLICATION_XML, errorResponseModel)),
                 ],
             });
+
+            this.v1Datex2Resource.addMethod(httpMethod, getDatex2Integration, {
+                apiKeyRequired: true,
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.APPLICATION_XML, xmlModel)),
+                    corsMethod(methodResponse("500", MediaType.APPLICATION_XML, errorResponseModel)),
+                ],
+            });
         });
 
         const getImageIntegration = defaultIntegration(getImageLambda, {
@@ -81,15 +118,29 @@ export class PublicApi {
             },
             responses: [DigitrafficIntegrationResponse.ok(MediaType.IMAGE_SVG)],
         });
-        this.imageResource.addMethod("GET", getImageIntegration, {
-            apiKeyRequired: true,
-            requestParameters: {
-                'method.request.path.text': true,
-            },
-            methodResponses: [
-                corsMethod(methodResponse("200", MediaType.IMAGE_SVG, svgModel)),
-                corsMethod(methodResponse("400", MediaType.TEXT_PLAIN, errorResponseModel)),
-            ],
+
+        ['GET', 'HEAD'].forEach(httpMethod => {
+            this.imageResource.addMethod(httpMethod, getImageIntegration, {
+                apiKeyRequired: true,
+                requestParameters: {
+                    'method.request.path.text': true,
+                },
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.IMAGE_SVG, svgModel)),
+                    corsMethod(methodResponse("400", MediaType.TEXT_PLAIN, errorResponseModel)),
+                ],
+            });
+
+            this.v1ImageResource.addMethod(httpMethod, getImageIntegration, {
+                apiKeyRequired: true,
+                requestParameters: {
+                    'method.request.path.text': true,
+                },
+                methodResponses: [
+                    corsMethod(methodResponse("200", MediaType.IMAGE_SVG, svgModel)),
+                    corsMethod(methodResponse("400", MediaType.TEXT_PLAIN, errorResponseModel)),
+                ],
+            });
         });
     }
 }
