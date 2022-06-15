@@ -9,7 +9,7 @@ export const handler = (event: Record<string, string>) => {
     const counterId = event.counterId;
 
     if (Number.isNaN(Number(counterId))) {
-        return Promise.resolve(LambdaResponse.notFound());
+        return LambdaResponse.notFound();
     }
 
     return proxyHolder.setCredentials()

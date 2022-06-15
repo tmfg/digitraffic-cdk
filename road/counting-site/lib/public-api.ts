@@ -12,7 +12,7 @@ import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-commo
 import {counterProperties} from "./model/counter";
 import {DigitrafficStaticIntegration} from "digitraffic-common/aws/infra/api/static-integration";
 
-const COUNTING_SITE_TAGS = ["Counting site"];
+const COUNTING_SITE_TAGS_V1 = ["Counting site V1"];
 
 export class PublicApi {
     publicApi: DigitrafficRestApi;
@@ -52,21 +52,21 @@ export class PublicApi {
     }
 
     createDocumentation() {
-        this.publicApi.documentResource(this.userTypesResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetUserTypes', 'Return all user types'));
-        this.publicApi.documentResource(this.domainsResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDomains', 'Return all domains'));
-        this.publicApi.documentResource(this.directionsResource, DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDirections', 'Return all directions'));
+        this.publicApi.documentResource(this.userTypesResource, DocumentationPart.method(COUNTING_SITE_TAGS_V1, 'GetUserTypes', 'Return all user types'));
+        this.publicApi.documentResource(this.domainsResource, DocumentationPart.method(COUNTING_SITE_TAGS_V1, 'GetDomains', 'Return all domains'));
+        this.publicApi.documentResource(this.directionsResource, DocumentationPart.method(COUNTING_SITE_TAGS_V1, 'GetDirections', 'Return all directions'));
 
         this.publicApi.documentResource(this.countersResource,
-            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetCounters', 'Return all counters for domain'),
+            DocumentationPart.method(COUNTING_SITE_TAGS_V1, 'GetCounters', 'Return all counters for domain'),
             DocumentationPart.queryParameter('domain_name', 'Domain name'));
 
         this.publicApi.documentResource(this.counterResource,
-            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetCounter', 'Return single counter'),
+            DocumentationPart.method(COUNTING_SITE_TAGS_V1, 'GetCounter', 'Return single counter'),
             DocumentationPart.pathParameter('counter_id', 'Counter id'));
 
         this.publicApi.documentResource(
             this.valuesResource,
-            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetData', 'Return counter values.  If no year&month specified, current month will be used.'),
+            DocumentationPart.method(COUNTING_SITE_TAGS_V1, 'GetData', 'Return counter values.  If no year&month specified, current month will be used.'),
             DocumentationPart.queryParameter('counter_id', 'Counter id'),
             DocumentationPart.queryParameter('domain_name', 'Domain name'),
             DocumentationPart.queryParameter('year', 'Year'),
@@ -75,7 +75,7 @@ export class PublicApi {
 
         this.publicApi.documentResource(
             this.csvValuesResource,
-            DocumentationPart.method(COUNTING_SITE_TAGS, 'GetDataCSV', 'Return counter values in CSV. If no year&month specified, current month will be used'),
+            DocumentationPart.method(COUNTING_SITE_TAGS_V1, 'GetDataCSV', 'Return counter values in CSV. If no year&month specified, current month will be used'),
             DocumentationPart.queryParameter('counter_id', 'Counter id'),
             DocumentationPart.queryParameter('domain_name', 'Domain name'),
             DocumentationPart.queryParameter('year', 'Year'),
@@ -198,7 +198,7 @@ export class PublicApi {
     }
 
     createValuesEndpoint(stack: DigitrafficStack) {
-        const lambda = MonitoredDBFunction.create(stack, 'get-data');
+        const lambda = MonitoredDBFunction.create(stack, 'get-values');
 
         const integration = defaultIntegration(lambda, {
             requestParameters: {
@@ -239,7 +239,7 @@ export class PublicApi {
     }
 
     createCsvValuesEndpoint(stack: DigitrafficStack) {
-        const lambda = MonitoredDBFunction.create(stack, 'get-data-csv', undefined, {
+        const lambda = MonitoredDBFunction.create(stack, 'get-values-csv', undefined, {
             memorySize: 256,
         });
 
