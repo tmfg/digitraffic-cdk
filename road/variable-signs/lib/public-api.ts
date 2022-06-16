@@ -51,7 +51,7 @@ export class PublicApi {
 
         const imagesResource = v1Resource.addResource("images");
 
-        this.v1Datex2Resource = vsResource.addResource("signs.datex2");
+        this.v1Datex2Resource = v1Resource.addResource("signs.datex2");
         this.v1ImageResource = imagesResource.addResource("{text}");
     }
 
