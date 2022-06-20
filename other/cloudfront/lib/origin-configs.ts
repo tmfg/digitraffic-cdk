@@ -7,23 +7,23 @@ import {
     SourceConfiguration,
 } from 'aws-cdk-lib/aws-cloudfront';
 import {Bucket} from 'aws-cdk-lib/aws-s3';
-import {CFBehavior, CFDistribution, CFDomain, S3Domain} from "./app-props";
+import {CFBehavior, CFOrigin, CFDomain, S3Domain} from "./app-props";
 import {CfnDistribution} from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
 import {FunctionAssociation} from "aws-cdk-lib/aws-cloudfront/lib/function";
 import {LambdaHolder} from "./lambda-holder";
 
 export function createOriginConfig(stack: Stack,
-    distribution: CFDistribution,
-    oai: OriginAccessIdentity|null,
+    origin: CFOrigin,
+    oai: OriginAccessIdentity | null,
     lambdaMap: LambdaHolder)
     : SourceConfiguration {
-    if (distribution instanceof S3Domain) {
+    if (origin instanceof S3Domain) {
         if (!oai) {
             throw new Error('OAI was null! OAI is needed for S3 origin');
         }
-        const bucket = Bucket.fromBucketAttributes(stack, `ImportedBucketName-${distribution.s3BucketName}`, {
-            bucketArn: `arn:aws:s3:::${distribution.s3BucketName}`,
-            bucketRegionalDomainName: `${distribution.s3BucketName}.s3.eu-west-1.amazonaws.com`,
+        const bucket = Bucket.fromBucketAttributes(stack, `ImportedBucketName-${origin.s3BucketName}`, {
+            bucketArn: `arn:aws:s3:::${origin.s3BucketName}`,
+            bucketRegionalDomainName: `${origin.s3BucketName}.s3.eu-west-1.amazonaws.com`,
         });
 
         bucket.grantRead(oai as OriginAccessIdentity);
@@ -32,25 +32,25 @@ export function createOriginConfig(stack: Stack,
             s3OriginSource: {
                 s3BucketSource: bucket,
                 originAccessIdentity: oai as OriginAccessIdentity,
-                originPath: distribution.originPath,
+                originPath: origin.originPath,
             },
-            behaviors: createBehaviors(stack, distribution.behaviors, lambdaMap),
+            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap),
         };
-    } else if (distribution instanceof CFDomain) {
+    } else if (origin instanceof CFDomain) {
         return {
             customOriginSource: {
-                domainName: distribution.domainName as string,
-                httpPort: distribution.httpPort ?? 80,
-                httpsPort: distribution.httpsPort ?? 443,
-                originProtocolPolicy: distribution.originProtocolPolicy as OriginProtocolPolicy ?? OriginProtocolPolicy.HTTPS_ONLY,
-                originPath: distribution.originPath,
-                originHeaders: createOriginHeaders(distribution),
+                domainName: origin.domainName as string,
+                httpPort: origin.httpPort ?? 80,
+                httpsPort: origin.httpsPort ?? 443,
+                originProtocolPolicy: origin.originProtocolPolicy as OriginProtocolPolicy ?? OriginProtocolPolicy.HTTPS_ONLY,
+                originPath: origin.originPath,
+                originHeaders: createOriginHeaders(origin),
             },
-            behaviors: createBehaviors(stack, distribution.behaviors, lambdaMap),
+            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap),
         };
     }
 
-    throw new Error(`Unknown distribution type ` + distribution.constructor.name);
+    throw new Error(`Unknown distribution type ` + origin.constructor.name);
 }
 
 function createOriginHeaders(domain: CFDomain): { [key: string] : string } {

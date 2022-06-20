@@ -110,7 +110,7 @@ export class CFBehavior {
     }
 }
 
-export class CFDistribution {
+export class CFOrigin {
     behaviors: CFBehavior[];
 
     constructor(behaviors: CFBehavior[]) {
@@ -118,7 +118,7 @@ export class CFDistribution {
     }
 }
 
-export class CFDomain extends CFDistribution {
+export class CFDomain extends CFOrigin {
     domainName: string;
     originPath?: string;
     originProtocolPolicy?: string;
@@ -175,7 +175,7 @@ export class CFDomain extends CFDistribution {
     }
 }
 
-export class S3Domain extends CFDistribution {
+export class S3Domain extends CFOrigin {
     s3BucketName?: string;
     originPath?: string;
 
@@ -196,14 +196,15 @@ export class S3Domain extends CFDistribution {
     }
 }
 
-export type Props = {
+export type DistributionProps = {
     readonly originAccessIdentity?: boolean,
     readonly distributionName: string,
     readonly environmentName: string,
     readonly aliasNames: string[] | null,
     readonly acmCertRef: string | null,
     readonly aclRules?: WafRules,
-    readonly distributions: CFDistribution[]
+    readonly origins: CFOrigin[],
+    readonly disableShieldAdvanced?: boolean,
 }
 
 export type ElasticProps = {
@@ -221,7 +222,7 @@ export type StreamingLogProps = {
 export type CFProps = {
     readonly elasticProps: ElasticProps,
     readonly elasticAppName: string,
-    readonly props: Props[],
+    readonly distributions: DistributionProps[],
     readonly lambdaParameters?: CFLambdaParameters
 }
 

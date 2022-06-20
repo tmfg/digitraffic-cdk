@@ -3,7 +3,7 @@ import {CompositePrincipal, ManagedPolicy, PolicyStatement, Role, ServicePrincip
 import {Construct} from "constructs";
 import {Annotations, Aspects, Stack, StackProps} from "aws-cdk-lib";
 import {createOriginConfig} from "./origin-configs";
-import {CFDistribution, CFLambdaParameters, CFProps, ElasticProps, Props} from './app-props';
+import {CFOrigin, CFLambdaParameters, CFProps, ElasticProps, DistributionProps} from './app-props';
 import {
     createGzipRequirement,
     createHttpHeaders, createIndexHtml,
@@ -28,23 +28,23 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
-        this.validateDefaultBehaviors(cloudfrontProps.props);
+        this.validateDefaultBehaviors(cloudfrontProps.distributions);
 
-        const lambdaMap = this.createLambdaMap(cloudfrontProps.props, cloudfrontProps.lambdaParameters);
+        const lambdaMap = this.createLambdaMap(cloudfrontProps.distributions, cloudfrontProps.lambdaParameters);
         const writeToESROle = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
         const streamingConfig = createRealtimeLogging(this, writeToESROle, cloudfrontProps.elasticAppName, cloudfrontProps.elasticProps);
 
-        cloudfrontProps.props.forEach(p => this.createDistribution(
+        cloudfrontProps.distributions.forEach(p => this.createDistribution(
             p, writeToESROle, lambdaMap, streamingConfig, cloudfrontProps,
         ));
 
         Aspects.of(this).add(new StackCheckingAspect());
     }
 
-    validateDefaultBehaviors(props: Props[]) {
+    validateDefaultBehaviors(props: DistributionProps[]) {
         props.forEach(distribution => {
             // check default behaviors
-            const defaults = distribution.distributions.flatMap(d => d.behaviors)
+            const defaults = distribution.origins.flatMap(d => d.behaviors)
                 .filter(b => b.path === "*");
 
             if (defaults.length === 0) {
@@ -91,12 +91,12 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaRole;
     }
 
-    findLambdaTypes(props: Props[]) {
+    findLambdaTypes(props: DistributionProps[]) {
         const lambdaTypes = new Set();
         const functionTypes = new Set();
         const ipRestrictions = new Set<string>();
 
-        props.flatMap(p => p.distributions)
+        props.flatMap(p => p.origins)
             .flatMap(d => d.behaviors)
             .forEach(b => {
                 b.lambdaTypes.forEach(type => lambdaTypes.add(type));
@@ -109,7 +109,7 @@ export class CloudfrontCdkStack extends Stack {
         return {lambdaTypes, functionTypes, ipRestrictions};
     }
 
-    createLambdaMap(props: Props[], lParameters: CFLambdaParameters | undefined): LambdaHolder {
+    createLambdaMap(props: DistributionProps[], lParameters: CFLambdaParameters | undefined): LambdaHolder {
         const lambdaMap = new LambdaHolder();
 
         const types = this.findLambdaTypes(props);
@@ -160,17 +160,17 @@ export class CloudfrontCdkStack extends Stack {
     }
 
     createDistribution(
-        distributionProps: Props, role: Role, lambdaMap: LambdaHolder, streamingConfig: StreamingConfig, cloudfrontProps: CFProps,
+        distributionProps: DistributionProps, role: Role, lambdaMap: LambdaHolder, streamingConfig: StreamingConfig, cloudfrontProps: CFProps,
     ) {
         const oai = distributionProps.originAccessIdentity ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`) : null;
-        const originConfigs = distributionProps.distributions.map(d => createOriginConfig(this, d, oai, lambdaMap));
+        const originConfigs = distributionProps.origins.map(d => createOriginConfig(this, d, oai, lambdaMap));
         const distribution = createDistribution(
             this, distributionProps, originConfigs, role, cloudfrontProps, streamingConfig,
         );
 
         // cdk does not support viewerPolicy as it should
         // so collect map of policies and force them into cloudformation
-        const viewerPolicies = this.getViewerPolicies(distributionProps.distributions);
+        const viewerPolicies = this.getViewerPolicies(distributionProps.origins);
 
         if (Object.keys(viewerPolicies).length > 0) {
             const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
@@ -197,7 +197,7 @@ export class CloudfrontCdkStack extends Stack {
         }
     }
 
-    getViewerPolicies(domains: CFDistribution[]): ViewerPolicyMap {
+    getViewerPolicies(domains: CFOrigin[]): ViewerPolicyMap {
         const policyMap: ViewerPolicyMap = {};
 
         domains.forEach(d => {

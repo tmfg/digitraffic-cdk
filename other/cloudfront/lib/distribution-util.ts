@@ -1,11 +1,11 @@
 import {CloudFrontWebDistribution, SecurityPolicyProtocol, SourceConfiguration} from 'aws-cdk-lib/aws-cloudfront';
-import {CfnResource, Stack} from 'aws-cdk-lib';
+import {CfnResource, Stack, Tags} from 'aws-cdk-lib';
 import {Role} from 'aws-cdk-lib/aws-iam';
 import {CfnWebACL} from 'aws-cdk-lib/aws-wafv2';
 import {ViewerCertificate} from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
 import {createWebAcl} from "./acl/acl-creator";
-import {CFProps, Props} from './app-props';
+import {CFProps, DistributionProps} from './app-props';
 import {StreamingConfig} from "./streaming-util";
 
 export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
@@ -20,7 +20,7 @@ export function createViewerCertificate(acmCertificateArn: string, aliases: stri
 }
 
 
-function doCreateWebAcl(stack: Stack, props: Props): CfnWebACL | null {
+function doCreateWebAcl(stack: Stack, props: DistributionProps): CfnWebACL | null {
     if (props.aclRules) {
         return createWebAcl(stack, props.environmentName, props.aclRules);
     }
@@ -30,7 +30,7 @@ function doCreateWebAcl(stack: Stack, props: Props): CfnWebACL | null {
 
 export function createDistribution(
     stack: Stack,
-    distributionProps: Props,
+    distributionProps: DistributionProps,
     originConfigs: SourceConfiguration[],
     role: Role,
     cloudfrontProps: CFProps,
@@ -46,7 +46,7 @@ export function createDistribution(
 
 function createDistributionWithStreamingLogging(
     stack: Stack,
-    distributionProps: Props,
+    distributionProps: DistributionProps,
     originConfigs: SourceConfiguration[],
     viewerCertificate: ViewerCertificate | undefined,
     role: Role,
@@ -60,6 +60,10 @@ function createDistributionWithStreamingLogging(
         viewerCertificate,
         webACLId: webAcl?.attrArn,
     });
+
+    if (!distributionProps?.disableShieldAdvanced === true) {
+        Tags.of(distribution).add('EnableShieldAdvanced', 'true');
+    }
 
     addRealtimeLogging(
         stack, distribution, role, env, streamingConfig, originConfigs.length,
