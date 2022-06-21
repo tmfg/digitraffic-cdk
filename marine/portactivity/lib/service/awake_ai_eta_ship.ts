@@ -32,6 +32,13 @@ export class AwakeAiETAShipService {
         'FIRAU',
     ];
 
+    readonly publishAsETPDestinations = [
+        'FIRAU',
+        'FIKOK',
+        'FIKAS',
+        'FIPOR',
+    ];
+
     constructor(api: AwakeAiETAShipApi) {
         this.api = api;
     }
@@ -103,8 +110,8 @@ export class AwakeAiETAShipService {
                 }
             }
 
-            // allow pilot boarding area ETAs only for specific ports
-            if (etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA && !this.publishAsETBDestinations.includes(port)) {
+            // allow pilot boarding area ETAs (ETP) only for specific ports
+            if (etaPrediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA && !this.publishAsETPDestinations.includes(port)) {
                 console.warn(`method=AwakeAiETAShipService.handleSchedule ETP event for non-publishable LOCODE, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`);
                 return null;
             }
