@@ -14,8 +14,10 @@ export enum ShipTypes {
     CARGO = 70,
 }
 
-const VALID_SHIP_TYPES = `(${ShipTypes.CARGO})`;
 const SHIP_MOVING_INTERVAL = '2 MINUTE';
+
+export const SHIP_SPEED_THRESHOLD_KNOTS = 2;
+export const SHIP_SPEED_NOT_AVAILABLE = 102.3;
 
 const SQL_GET_AREA_TRAFFIC = `
     SELECT DISTINCT
@@ -28,7 +30,7 @@ const SQL_GET_AREA_TRAFFIC = `
     JOIN vessel_location vl ON ST_INTERSECTS(at.geometry, ST_MAKEPOINT(vl.x, vl.y))
     JOIN vessel v on vl.mmsi = v.mmsi 
     WHERE TO_TIMESTAMP(vl.timestamp_ext / 1000) >= (NOW() - INTERVAL '${SHIP_MOVING_INTERVAL}')
-    AND v.ship_type in ${VALID_SHIP_TYPES} 
+    AND (vl.sog > ${SHIP_SPEED_THRESHOLD_KNOTS} AND vl.sog != ${SHIP_SPEED_NOT_AVAILABLE})
 `.trim();
 
 const SQL_UPDATE_AREA_TRAFFIC_SENDTIME = `
