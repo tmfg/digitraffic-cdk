@@ -1,7 +1,6 @@
 import {handlerFn} from "../../lib/lambda/update-lights/update-lights";
 import {assertArea, dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
 import {createSecretFunction} from "digitraffic-common/test/secret";
-import {ShipTypes} from "../../lib/db/areatraffic";
 import {ShiplightSecret} from "../../lib/model/shiplight-secret";
 import * as sinon from "sinon";
 import {AreaVisibilityService} from "../../lib/service/areavisibility";
@@ -40,7 +39,7 @@ describe('update-lights', dbTestBase((db: DTDatabase) => {
         await insertAreaTraffic(
             db, areaId, 'testi1', durationInMinutes, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))",
         );
-        await insertVessel(db, 1, ShipTypes.CARGO); // CARGO will trigger
+        await insertVessel(db, 1);
         await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
 
         await handlerFn(createSecretFunction(secret), AreaVisibilityService, AreaLightsService);

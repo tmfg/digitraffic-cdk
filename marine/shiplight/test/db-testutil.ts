@@ -51,7 +51,7 @@ export async function insertVessel(db: DTDatabase, mmsi: number): Promise<void> 
 
 
 export async function insertVesselLocation(
-    db: DTDatabase, mmsi: number, timestamp: number, x: number, speed = 1,
+    db: DTDatabase, mmsi: number, timestamp: number, x: number, speed = 3,
 ): Promise<void> {
     await db.tx(async t => {
         await t.none('INSERT INTO vessel_location(mmsi,timestamp_ext,x,y,sog,cog,nav_stat,rot,pos_acc,raim,timestamp) ' +
