@@ -16,6 +16,7 @@ export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResu
             return inDatabase((db: DTDatabase) => {
                 return Promise.allSettled(event.Records.map(r => {
                     const timestamp = JSON.parse(r.body);
+                    const start = Date.now();
                     console.info('DEBUG method=processTimestampQueue processing timestamp', timestamp);
 
                     if (!validateTimestamp(timestamp)) {
@@ -33,6 +34,7 @@ export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResu
                     }).catch((error) => {
                         console.error('method=processTimestampQueue update failed', error);
                     });
+                    console.info(`DEBUG method=processTimestampQueue update tookMs=${Date.now() - start}`);
                     return saveTimestampPromise;
                 }));
             });
