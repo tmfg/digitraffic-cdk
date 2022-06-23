@@ -5,14 +5,10 @@ export class PermitsApi {
     readonly path: string;
     readonly authKey: string;
 
-    readonly genericError: string;
-
     constructor(apiUrl: string, path: string, authKey: string) {
         this.apiUrl = apiUrl;
         this.path = path;
         this.authKey = authKey;
-
-        this.genericError = `Query to ${this.path} failed`;
     }
 
     async getPermitsXml(): Promise<string> {
@@ -24,17 +20,17 @@ export class PermitsApi {
                 headers: {
                     'Accept': 'application/xml',
                 },
+                validateStatus: ((status: number) => {
+                    return status === 200
+                })
             });
-            if (resp.status !== 200) {
-                console.error(`method=getPermitsXml query to ${this.path} failed status ${resp.status}`);
-                throw Error(`${resp.status} ${resp.statusText}`);
-            }
+
             return resp.data;
         }
 
         catch (error: unknown) {
             if (error instanceof Error) {
-                throw Error(`${this.genericError} with: ${error.message}`);
+                throw Error(`Query to ${this.path} failed with: ${error.message}`);
             }
             throw error;
         }
