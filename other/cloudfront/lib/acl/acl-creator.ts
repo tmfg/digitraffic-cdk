@@ -143,7 +143,7 @@ function createAWSKnownBadInput(): CfnWebACL.RuleProperty {
 }
 
 function createAWSAntiSQLInjection(): CfnWebACL.RuleProperty {
-    return createRuleProperty("AWS-AWSManagedRulesSQLiRuleSet", 90, {
+    return createRuleProperty("AWS-AWSManagedRulesSQLiRuleSet", 100, {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
