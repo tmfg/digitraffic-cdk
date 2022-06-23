@@ -87,6 +87,8 @@ function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
         generatedRules.push(createRuleAWSCommonRuleSet());
         generatedRules.push(createAWSReputationList());
         generatedRules.push(createAWSKnownBadInput());
+        generatedRules.push(createAWSAntiSQLInjection());
+        generatedRules.push();
     }
 
     if (rules.withHeaderLimit) {
@@ -135,6 +137,17 @@ function createAWSKnownBadInput(): CfnWebACL.RuleProperty {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
                 name: "AWSManagedRulesKnownBadInputsRuleSet",
+            },
+        },
+    });
+}
+
+function createAWSAntiSQLInjection(): CfnWebACL.RuleProperty {
+    return createRuleProperty("AWS-AWSManagedRulesSQLiRuleSet", 90, {
+        statement: {
+            managedRuleGroupStatement: {
+                vendorName: "AWS",
+                name: "AWSManagedRulesSQLiRuleSet",
             },
         },
     });
