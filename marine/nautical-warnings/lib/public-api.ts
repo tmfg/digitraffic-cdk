@@ -1,6 +1,5 @@
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
 import {MessageModel} from "digitraffic-common/aws/infra/api/response";
 import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
 import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
@@ -11,7 +10,7 @@ import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "
 import {nauticalWarningSchema} from "./model/nautical-warnings-schema";
 import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
 
-const NAUTICAL_WARNINGS_TAGS = ['Nautical Warnings'];
+const NAUTICAL_WARNING_TAGS_V1 = ['Nautical Warning V1'];
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -22,8 +21,8 @@ export class PublicApi {
     errorModel: Model;
 
     constructor(stack: DigitrafficStack) {
-        this.publicApi = new DigitrafficRestApi(stack, 'NauticalWarnings-public', 'NauticalWarnings Public API');
-        this.apiKeyId = createUsagePlan(this.publicApi, 'NauticalWarnings Api Key', 'NauticalWarnings Usage Plan').keyId;
+        this.publicApi = new DigitrafficRestApi(stack, 'NauticalWarnings-public', 'NauticalWarning Public API');
+        this.apiKeyId = this.publicApi.createUsagePlanV2('NauticalWarning Api Key');
 
         this.createResources(this.publicApi);
         this.createEndpoint(stack);
@@ -75,7 +74,7 @@ export class PublicApi {
             });
         });
 
-        this.publicApi.documentResource(this.activeResource, DocumentationPart.method(NAUTICAL_WARNINGS_TAGS, 'GetActiveNauticalWarnings', 'Return all active nautical warnings'));
-        this.publicApi.documentResource(this.archivedResource, DocumentationPart.method(NAUTICAL_WARNINGS_TAGS, 'GetArchivedNauticalWarnings',  'Return all archived nautical warnings'));
+        this.publicApi.documentResource(this.activeResource, DocumentationPart.method(NAUTICAL_WARNING_TAGS_V1, 'GetActiveNauticalWarnings', 'Return all active nautical warnings'));
+        this.publicApi.documentResource(this.archivedResource, DocumentationPart.method(NAUTICAL_WARNING_TAGS_V1, 'GetArchivedNauticalWarnings',  'Return all archived nautical warnings'));
     }
 }
