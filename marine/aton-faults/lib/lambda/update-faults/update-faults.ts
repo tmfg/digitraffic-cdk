@@ -10,7 +10,7 @@ const integrations = envValue ? JSON.parse(envValue) as Integration[] : [];
 
 export const handler = () => {
     return proxyHolder.setCredentials()
-        .then(() => updateAllFaults());
+        .then(async () => await updateAllFaults());
 };
 
 async function updateAllFaults() {

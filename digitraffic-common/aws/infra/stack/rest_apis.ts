@@ -9,7 +9,7 @@ import {
 import {PolicyDocument, PolicyStatement, Effect, AnyPrincipal} from 'aws-cdk-lib/aws-iam';
 import {Construct} from "constructs";
 import {DigitrafficStack} from "./stack";
-import {createUsagePlan} from "../usage-plans";
+import {createDefaultUsagePlan, createUsagePlan} from "../usage-plans";
 import {ModelWithReference} from "../../types/model-with-reference";
 import {getModelReference} from "../../../utils/api-model";
 import {MediaType} from "../../types/mediatypes";
@@ -47,6 +47,14 @@ export class DigitrafficRestApi extends RestApi {
 
     createUsagePlan(apiKeyId: string, apiKeyName: string): string {
         const newKeyId = createUsagePlan(this, apiKeyId, apiKeyName).keyId;
+
+        this.apiKeyIds.push(newKeyId);
+
+        return newKeyId;
+    }
+
+    createUsagePlanV2(apiName: string): string {
+        const newKeyId = createDefaultUsagePlan(this, apiName).keyId;
 
         this.apiKeyIds.push(newKeyId);
 

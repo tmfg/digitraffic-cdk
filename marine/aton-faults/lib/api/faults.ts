@@ -1,5 +1,5 @@
 import axios, {AxiosResponse} from 'axios';
-import {Feature} from "geojson";
+import {FaultFeature} from "../model/fault";
 
 export class FaultsApi {
     private readonly endpointUrl: string;
@@ -8,7 +8,7 @@ export class FaultsApi {
         this.endpointUrl = endpointUrl;
     }
 
-    public getFaults(): Promise<Feature[]> {
+    public getFaults(): Promise<FaultFeature[]> {
         return this.getFaultsFromServer(this.endpointUrl).then(resp => {
             if (resp.status === 200) {
                 return resp.data.features;

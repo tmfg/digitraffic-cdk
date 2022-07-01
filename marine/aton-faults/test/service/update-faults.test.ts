@@ -3,47 +3,56 @@ import {DTDatabase} from "digitraffic-common/database/database";
 import * as UpdateFaultsService from "../../lib/service/update-faults";
 import * as sinon from "sinon";
 import {FaultsApi} from "../../lib/api/faults";
-import {Feature} from "geojson";
+import {FaultFeature} from "../../lib/model/fault";
 
 const sandbox = sinon.createSandbox();
 const FAULT_DOMAIN = 'C_NA';
 
-const FAULT_KIRJATTU : Feature = {
+const FAULT_KIRJATTU : FaultFeature = {
     type: 'Feature',
     geometry: {
         type: "Point",
         coordinates: [],
     },
     properties: {
-        FAULT_TYPE: 'Kirjattu',
+        ID:-2139947340,
+        FAULT_ENTRY_TIMESTAMP: "2022-03-10 02:53:21",
+        FAULT_FIXED_TIMESTAMP: null,
+        FAULT_STATE: "Avoin",
+        FAULT_TYPE: "Kirjattu",
+        TL_NUMERO: 75356,
+        TL_NIMI_FI: "H 10",
+        TL_NIMI_SE: "H 10",
+        TL_TYYPPI_FI: "Poiju",
+        VAYLA_JNRO: 5507,
+        VAYLA_NIMI_FI: "Haminan 12m väylä",
+        VAYLA_NIMI_SE: "Haminan 12m väylä",
+        MERIALUE_NRO: 5,
+        FAULT_FIXED: 0,
     },
 };
 
-const FAULT_OK : Feature = {
+const FAULT_OK : FaultFeature = {
     type: 'Feature',
     geometry: {
         type: "Point",
         coordinates: [10, 10],
     },
     properties: {
-        "ID":-2139947340,
-        "FAULT_ENTRY_TIMESTAMP":"2022-03-10 02:53:21",
-        "FAULT_FIXED_TIMESTAMP":null,
-        "FAULT_UTS":"2022-03-13 19:47:52",
-        "FAULT_STATE":"Avoin",
-        "FAULT_TYPE":"Valo pimeä",
-        "TL_NUMERO":75356,
-        "TL_NIMI_FI":"H 10",
-        "TL_NIMI_SE":"H 10",
-        "TL_TYYPPI_FI":"Poiju",
-        "TL_TYYPPI_SE":"Boj","VAYLA_JNRO":5507,
-        "VAYLA_NIMI_FI":"Haminan 12m väylä",
-        "VAYLA_NIMI_SE":"Haminan 12m väylä",
-        "VAYLA_SELOSTE":"Eteläisempi haara Kivileton lounaispuolelta ja pohjoisempi haara Rankin Kivikarin lounaispuolelta",
-        "MERIALUE_NRO":5,
-        "MERIALUE_SELITYS_FI":"Suomenlahti",
-        "MERIALUE_SELITYS_SE":"Finska viken",
-        "FAULT_FIXED":0,
+        ID:-2139947340,
+        FAULT_ENTRY_TIMESTAMP: "2022-03-10 02:53:21",
+        FAULT_FIXED_TIMESTAMP: null,
+        FAULT_STATE: "Avoin",
+        FAULT_TYPE: "Valo pimeä",
+        TL_NUMERO: 75356,
+        TL_NIMI_FI: "H 10",
+        TL_NIMI_SE: "H 10",
+        TL_TYYPPI_FI: "Poiju",
+        VAYLA_JNRO: 5507,
+        VAYLA_NIMI_FI: "Haminan 12m väylä",
+        VAYLA_NIMI_SE: "Haminan 12m väylä",
+        MERIALUE_NRO: 5,
+        FAULT_FIXED: 0,
     },
 };
 

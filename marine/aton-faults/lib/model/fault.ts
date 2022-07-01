@@ -1,3 +1,5 @@
+import {Feature, GeoJsonProperties, Geometry} from "geojson";
+
 export interface DbFault {
     readonly id: number
     readonly entry_timestamp: Date
@@ -25,3 +27,25 @@ export enum FaultState {
     Korjattu = 'Korjattu',
     Aiheeton = 'Aiheeton'
 }
+
+export type AtonProperties = {
+    readonly ID: number
+    readonly FAULT_TYPE: string
+    readonly FAULT_ENTRY_TIMESTAMP: string | null;
+    readonly FAULT_FIXED_TIMESTAMP: string | null;
+    readonly FAULT_STATE: string
+    readonly FAULT_FIXED: number
+
+    readonly TL_NUMERO: number
+    readonly TL_NIMI_SE: string
+    readonly TL_NIMI_FI: string
+    readonly TL_TYYPPI_FI: string
+
+    readonly VAYLA_JNRO: number
+    readonly VAYLA_NIMI_FI: string
+    readonly VAYLA_NIMI_SE: string
+
+    readonly MERIALUE_NRO: number
+}
+
+export type FaultFeature = Feature<Geometry, AtonProperties>;

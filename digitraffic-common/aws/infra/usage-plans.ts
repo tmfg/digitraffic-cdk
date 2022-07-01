@@ -25,7 +25,7 @@ export function createUsagePlan(api: RestApi, apiKeyId: string, apiKeyName: stri
  * @param api The REST API
  * @param apiName Name of the api. Will generate key: apiName + ' API Key' and plan: apiName + ' API Usage Plan'
  */
-export function createDefaultUsagePlan(api: RestApi, apiName: string) {
+export function createDefaultUsagePlan(api: RestApi, apiName: string): IApiKey {
     const apiKeyName = apiName + ' API Key';
     const usagePlanName = apiName + ' API Usage Plan';
     const apiKey = api.addApiKey(apiKeyName, { apiKeyName: apiKeyName });
@@ -36,4 +36,6 @@ export function createDefaultUsagePlan(api: RestApi, apiName: string) {
         stage: api.deploymentStage,
     });
     plan.addApiKey(apiKey);
+
+    return apiKey;
 }

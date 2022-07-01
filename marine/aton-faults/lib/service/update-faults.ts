@@ -4,6 +4,7 @@ import * as FaultsDB from "../db/faults";
 import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import {Feature} from "geojson";
 import {ATON_DATA_TYPE} from "./faults";
+import {FaultFeature} from "../model/fault";
 
 export async function updateFaults(url: string, domain: string) {
     const start = Date.now();
@@ -24,6 +25,10 @@ export async function updateFaults(url: string, domain: string) {
     });
 }
 
-function validate(fault: Feature): boolean {
+function validate(fault: FaultFeature): boolean {
+    if (fault.properties?.FAULT_TYPE === 'Aiheeton') {
+        console.info("Aiheeton id {}", fault.properties?.ID);
+    }
+
     return fault.properties?.FAULT_TYPE !== 'Kirjattu';
 }

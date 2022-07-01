@@ -9,7 +9,7 @@ import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 
-const ATON_FAULTS_TAGS = ['Aton Faults'];
+const ATON_FAULT_TAGS_V1 = ['Aton Fault V1'];
 
 export function create(stack: DigitrafficStack): DigitrafficRestApi {
     const publicApi = new DigitrafficRestApi(stack, 'ATON-public', 'ATON public API');
@@ -22,7 +22,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
     const faultsResource = createFaultsResource(stack, publicApi, faultsModel);
 
-    publicApi.documentResource(faultsResource, DocumentationPart.method(ATON_FAULTS_TAGS, 'GetActiveFaults', 'Return all active faults in GeoJSON'));
+    publicApi.documentResource(faultsResource, DocumentationPart.method(ATON_FAULT_TAGS_V1, 'GetActiveFaults', 'Return all active faults in GeoJSON'));
     publicApi.documentResource(faultsResource, DocumentationPart.queryParameter('language', 'Language: en, fi or sv (default en)'));
     publicApi.documentResource(faultsResource, DocumentationPart.queryParameter('fixed_in_hours', 'Show faults that are unfixed or were fixed at most this many hours ago (default 7 days).  Must be between 0 and 2400'));
 

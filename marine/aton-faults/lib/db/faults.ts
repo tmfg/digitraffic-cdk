@@ -1,7 +1,7 @@
 import {PreparedStatement} from "pg-promise";
 import {createGeometry} from "digitraffic-common/utils/geometry";
 import {LineString} from "wkx";
-import {DbFault} from "../model/fault";
+import {AtonProperties, DbFault, FaultFeature} from "../model/fault";
 import {Language} from "digitraffic-common/types/language";
 import {DTDatabase} from "digitraffic-common/database/database";
 import {Feature, GeoJsonProperties} from "geojson";
@@ -127,14 +127,14 @@ export function findFaultIdsByRoute(db: DTDatabase, route: LineString): Promise<
     return ids.then((result: DbFaultId[]) => result.map(r => Number(r.id)));
 }
 
-export function updateFaults(db: DTDatabase, domain: string, faults: Feature[]): Promise<null>[] {
+export function updateFaults(db: DTDatabase, domain: string, faults: FaultFeature[]): Promise<null>[] {
     const ps = new PreparedStatement({
         name: 'update-faults',
         text: UPSERT_FAULTS_SQL,
     });
 
     return faults.map(f => {
-        const p = f.properties as NonNullable<GeoJsonProperties>;
+        const p = f.properties;
 
         return db.none(ps, [
             p.ID,
