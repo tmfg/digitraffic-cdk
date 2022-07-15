@@ -3,6 +3,8 @@ import * as apigw from 'aws-cdk-lib/aws-apigateway';
 import * as route53 from 'aws-cdk-lib/aws-route53';
 import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as iam from 'aws-cdk-lib/aws-iam';
 import {SecurityGroup} from 'aws-cdk-lib/aws-ec2';
 import {Role} from 'aws-cdk-lib/aws-iam';
 import cdk = require('aws-cdk-lib');
@@ -16,7 +18,8 @@ interface StatisticsProps {
     readonly vpcName: string;
     readonly sgName: string;
     readonly roleArn: string;
-    readonly certificateArn: string
+    readonly certificateArn: string,
+    readonly visualizationsBucketArn: string,
     readonly figuresLambdaEnv: {
         readonly API_GATEWAY_BASE_PATH: string,
         readonly API_GATEWAY_STAGE_PATH: string,
@@ -47,19 +50,44 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
             role: Role.fromRoleArn(this, "digitraffic-figures-role", customProps.roleArn),
             architecture: lambda.Architecture.ARM_64,
             memorySize: 4096,
-            timeout: Duration.seconds(40),
+            timeout: Duration.seconds(45),
             environment: customProps.figuresLambdaEnv
         });
-
         const digitrafficFiguresLambdaIntegration = new apigw.LambdaIntegration(digitrafficFiguresFunction, {
             proxy: true
         });
+
+        const apiStatisticsBucket = s3.Bucket.fromBucketArn(this, "api-statistics-bucket", customProps.visualizationsBucketArn);
+        const apiStatisticsS3Integration = new apigw.AwsIntegration({
+            service: "s3",
+            integrationHttpMethod: "GET",
+            path: `${apiStatisticsBucket.bucketName}/index.html`,
+            options: {
+                credentialsRole: this.createS3ExecutionRole(apiStatisticsBucket),
+                integrationResponses: [{
+                    statusCode: "200",
+                    responseParameters: {
+                        'method.response.header.Content-Type': "'text/html'",
+                    },
+                }]
+            }
+        })
 
         const restApi = new apigw.RestApi(this, "digitraffic-statistics-api", {
             restApiName: "digitraffic-statistics-api",
             deployOptions: {
                 stageName: "prod"
             }
+        });
+
+        const digitrafficApiStatistics = restApi.root.addResource("digitraffic-api-statistics");
+        digitrafficApiStatistics.addMethod("GET", apiStatisticsS3Integration, {
+            methodResponses: [{
+                statusCode: "200",
+                responseParameters: {
+                    'method.response.header.Content-Type': true,
+                }
+            }]
         });
 
         const digitrafficMonthly = restApi.root.addResource("digitraffic-monthly",
@@ -91,4 +119,20 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
             ),
         });
     }
+
+    private createS3ExecutionRole(bucket: s3.IBucket) {
+        const executeRole = new iam.Role(this, "api-gateway-s3-assume-role", {
+            assumedBy: new iam.ServicePrincipal("apigateway.amazonaws.com"),
+            roleName: "digitraffic-statistics-apigw-s3-integration-role",
+        });
+        executeRole.addToPolicy(
+            new iam.PolicyStatement({
+                resources: [`${bucket.bucketArn}/*`],
+                actions: ["s3:GetObject"],
+            })
+        );
+        return executeRole;
+    }
 }
+
+
