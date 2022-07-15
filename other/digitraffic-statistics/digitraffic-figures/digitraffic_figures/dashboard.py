@@ -202,7 +202,13 @@ def create_layout(dash_app, df, figures, logger):
                     html.H4(children="Kyselyt"),
                     dash_table.DataTable(
                         id='output-table-top-users-req',
-                        style_cell=dict(textAlign='left'),
+                        style_cell={
+                            'textAlign':'left'
+                        },
+                        style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                        },
                         css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
                         style_header=dict(
                             backgroundColor='black',
@@ -223,7 +229,13 @@ def create_layout(dash_app, df, figures, logger):
                     html.H4(children="Data"),
                     dash_table.DataTable(
                         id='output-table-top-users-data',
-                        style_cell=dict(textAlign='left'),
+                        style_cell={
+                            'textAlign':'left'
+                        },
+                        style_data={
+                            'whiteSpace': 'normal',
+                            'height': 'auto',
+                        },
                         css=[{"selector": ".row", "rule": "margin: 0; display: block"}],
                         style_header=dict(
                             backgroundColor='black',
