@@ -1,0 +1,33 @@
+{
+  "name": "digitraffic-statistics",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "test": "jest --runInBand --detectOpenHandles",
+    "cdk": "cdk",
+    "synth-sam": "cdk synth --no-staging > template.yaml"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "*",
+    "@types/aws-lambda": "*",
+    "@types/jest": "^26.0.22",
+    "@types/node": "*",
+    "@typescript-eslint/eslint-plugin": "*",
+    "@typescript-eslint/parser": "*",
+    "eslint": "*",
+    "jest": "^27.0.6",
+    "jest-junit": "^13.0.0",
+    "ts-jest": "^27.0.4",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "*",
+    "digitraffic-common": "*"
+  },
+  "externals": [
+    "aws-sdk"
+  ]
+}
