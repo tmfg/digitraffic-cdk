@@ -5,12 +5,11 @@ import * as targets from 'aws-cdk-lib/aws-route53-targets';
 import * as acm from 'aws-cdk-lib/aws-certificatemanager';
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as iam from 'aws-cdk-lib/aws-iam';
-import {SecurityGroup} from 'aws-cdk-lib/aws-ec2';
-import {Role} from 'aws-cdk-lib/aws-iam';
-import cdk = require('aws-cdk-lib');
+import {Effect, Role} from 'aws-cdk-lib/aws-iam';
+import {SecurityGroup, Vpc} from 'aws-cdk-lib/aws-ec2';
 import {Construct} from "constructs";
 import {Duration} from "aws-cdk-lib";
-import {Vpc} from "aws-cdk-lib/aws-ec2";
+import cdk = require('aws-cdk-lib');
 
 const path = require('path');
 
@@ -20,6 +19,7 @@ interface StatisticsProps {
     readonly roleArn: string;
     readonly certificateArn: string,
     readonly visualizationsBucketArn: string,
+    readonly allowedIpAddresses: string[],
     readonly figuresLambdaEnv: {
         readonly API_GATEWAY_BASE_PATH: string,
         readonly API_GATEWAY_STAGE_PATH: string,
@@ -50,7 +50,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
             role: Role.fromRoleArn(this, "digitraffic-figures-role", customProps.roleArn),
             architecture: lambda.Architecture.ARM_64,
             memorySize: 4096,
-            timeout: Duration.seconds(45),
+            timeout: Duration.seconds(60),
             environment: customProps.figuresLambdaEnv
         });
         const digitrafficFiguresLambdaIntegration = new apigw.LambdaIntegration(digitrafficFiguresFunction, {
@@ -75,6 +75,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
 
         const restApi = new apigw.RestApi(this, "digitraffic-statistics-api", {
             restApiName: "digitraffic-statistics-api",
+            policy: this.createApiIpRestrictionPolicy(customProps.allowedIpAddresses),
             deployOptions: {
                 stageName: "prod"
             }
@@ -118,6 +119,30 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
                 new targets.ApiGatewayDomain(domainName)
             ),
         });
+    }
+
+    private createApiIpRestrictionPolicy(allowedIpAddresses) {
+        return new iam.PolicyDocument({
+            statements: [
+                new iam.PolicyStatement({
+                    effect: Effect.ALLOW,
+                    actions: ["execute-api:Invoke"],
+                    principals: [new iam.AnyPrincipal()],
+                    resources: ["*"]
+                }),
+                new iam.PolicyStatement({
+                    effect: Effect.DENY,
+                    actions: ["execute-api:Invoke"],
+                    conditions: {
+                        "NotIpAddress": {
+                            "aws:SourceIp": allowedIpAddresses
+                        }
+                    },
+                    principals: [new iam.AnyPrincipal()],
+                    resources: ["*"],
+                })
+            ]
+        })
     }
 
     private createS3ExecutionRole(bucket: s3.IBucket) {
