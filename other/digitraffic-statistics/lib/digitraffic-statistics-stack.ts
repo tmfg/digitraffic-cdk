@@ -2,17 +2,17 @@ import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as apigw from "aws-cdk-lib/aws-apigateway";
 import * as route53 from "aws-cdk-lib/aws-route53";
 import * as targets from "aws-cdk-lib/aws-route53-targets";
-import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as iam from "aws-cdk-lib/aws-iam";
-import {Peer, Port, SecurityGroup, Vpc} from "aws-cdk-lib/aws-ec2";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
+import * as ec2 from "aws-cdk-lib/aws-ec2";
 import {Construct} from "constructs";
 import {Duration} from "aws-cdk-lib";
 import cdk = require("aws-cdk-lib");
 
 const path = require("path");
 
-interface StatisticsProps {
+interface DigitrafficStatisticsProps {
     readonly vpcName: string;
     readonly dbSecretArn: string;
     readonly certificateArn: string,
@@ -32,23 +32,23 @@ interface StatisticsProps {
 
 export class DigitrafficStatisticsStack extends cdk.Stack {
 
-    constructor(scope: Construct, id: string, customProps: StatisticsProps, props?: cdk.StackProps) {
+    constructor(scope: Construct, id: string, customProps: DigitrafficStatisticsProps, props?: cdk.StackProps) {
         super(scope, id, props);
 
-        const vpc = Vpc.fromLookup(this, "EsKeyFiguresVPC", {
+        const vpc = ec2.Vpc.fromLookup(this, "EsKeyFiguresVPC", {
             vpcName: customProps.vpcName
         });
 
-        const digitrafficMonthlySg = new SecurityGroup(this, "digitraffic-monthly-sg", {
+        const digitrafficMonthlySg = new ec2.SecurityGroup(this, "digitraffic-monthly-sg", {
             vpc,
             allowAllOutbound: true,
             securityGroupName: "digitraffic-monthly-sg"
         });
 
-        const RDSEsKeyFiguresSG = SecurityGroup.fromLookupById(this, "es-key-figures-sg", customProps.rdsSgId);
-        RDSEsKeyFiguresSG.addIngressRule(
-            Peer.securityGroupId(digitrafficMonthlySg.securityGroupId),
-            Port.tcp(3306)
+        const rdsEsKeyFiguresSg = ec2.SecurityGroup.fromLookupById(this, "es-key-figures-sg", customProps.rdsSgId);
+        rdsEsKeyFiguresSg.addIngressRule(
+            ec2.Peer.securityGroupId(digitrafficMonthlySg.securityGroupId),
+            ec2.Port.tcp(3306)
         );
 
         const digitrafficMonthlyFunction = new lambda.DockerImageFunction(this, 'digitraffic-monthly', {
@@ -130,7 +130,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
         });
     }
 
-    private createApiIpRestrictionPolicy(allowedIpAddresses) {
+    private createApiIpRestrictionPolicy(allowedIpAddresses): iam.PolicyDocument {
         return new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
@@ -154,7 +154,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
         })
     }
 
-    private createDigitrafficMonthlyLambdaRole(dbSecretArn: string) {
+    private createDigitrafficMonthlyLambdaRole(dbSecretArn: string): iam.Role {
         const lambdaRole = new iam.Role(this, "digitraffic-monthly-lambda-role", {
             assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
             roleName: "digitraffic-monthly-lambda-role",
@@ -197,7 +197,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
         return lambdaRole;
     }
 
-    private createS3ExecutionRole(bucket: s3.IBucket) {
+    private createS3ExecutionRole(bucket: s3.IBucket): iam.Role {
         const executeRole = new iam.Role(this, "digitraffic-api-statistics-apigw-s3-integration-role", {
             assumedBy: new iam.ServicePrincipal("apigateway.amazonaws.com"),
             roleName: "digitraffic-api-statistics-apigw-s3-integration-role",
