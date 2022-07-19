@@ -130,7 +130,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
         });
     }
 
-    private createApiIpRestrictionPolicy(allowedIpAddresses): iam.PolicyDocument {
+    private createApiIpRestrictionPolicy(allowedIpAddresses: string[]): iam.PolicyDocument {
         return new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
