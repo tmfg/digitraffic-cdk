@@ -5,6 +5,7 @@ on:
 
 env:
   GH_PAGES_BRANCH: gh-pages
+  GH_PAGES_URL: https://psychic-telegram-8c228710.pages.github.io
 
 jobs:
   lint:
@@ -43,8 +44,8 @@ jobs:
         git push -f
 
     - name: Link to report in summary
-      run: echo "[ESLint report](https://solita-ijunnone.github.io/gh-pages-test/${GITHUB_REF##*/}/eslint-report.html)" >> $GITHUB_STEP_SUMMARY
-
+      run: echo "[ESLint report]($GH_PAGES_URL/${GITHUB_REF##*/}/eslint-report.html)" >> $GITHUB_STEP_SUMMARY
+      
     - name: Fail on ESLint errors
       if: steps.run-eslint.outcome != 'success'
       run: exit 1
