@@ -1,27 +1,49 @@
 name: ESLint
+
 on:
-  [push, pull_request]
+  [push]
+
+env:
+  GH_PAGES_BRANCH: gh-pages
+
 jobs:
   lint:
     runs-on: ubuntu-latest
+    
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+
     - name: Setup Node.js
       uses: actions/setup-node@v2
       with:
         node-version: '14'
+
     - name: Install ESLint
       run: npm install eslint typescript @typescript-eslint/eslint-plugin @typescript-eslint/parser
+
     - name: Run ESLint
       id: run-eslint
-      run: npx eslint . --ext .ts --format html -o ./eslint-report.html
+      run: npx eslint . --ext .js --format html -o ./${GITHUB_REF##*/}/eslint-report.html
       continue-on-error: true
-    - name: Upload report
-      uses: actions/upload-artifact@v3
-      with:
-        name: eslint-report.html
-        path: ./eslint-report.html
+
+    - name: Publish report on GitHub Pages
+      run: |
+        export CURRENT_BRANCH=${GITHUB_REF##*/}
+        git config --global user.email ""
+        git config --global user.name "Github Actions"
+        git add ./$CURRENT_BRANCH/eslint-report.html
+        git stash
+        git fetch
+        git switch $GH_PAGES_BRANCH
+        git rm ./$CURRENT_BRANCH/*
+        git stash pop
+        git commit -am "ESLint report for branch $CURRENT_BRANCH"
+        git push -f
+
+    - name: Link to report in summary
+      run: echo "[ESLint report](https://solita-ijunnone.github.io/gh-pages-test/${GITHUB_REF##*/}/eslint-report.html)" >> $GITHUB_STEP_SUMMARY
+
     - name: Fail on ESLint errors
       if: steps.run-eslint.outcome != 'success'
       run: exit 1
