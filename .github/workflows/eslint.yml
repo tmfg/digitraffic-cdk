@@ -33,6 +33,7 @@ jobs:
         git config --global user.email ""
         git config --global user.name "Github Actions"
         git add ./$CURRENT_BRANCH/eslint-report.html
+        git restore package.json
         git stash push -- $CURRENT_BRANCH/
         git fetch
         git switch $GH_PAGES_BRANCH
