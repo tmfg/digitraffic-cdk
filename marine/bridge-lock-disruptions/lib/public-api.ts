@@ -1,14 +1,12 @@
 import {IModel, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {default as DisruptionSchema} from './model/disruption-schema';
-import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
 import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
 import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
-import {databaseFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
-import {addTags, DocumentationPart} from "digitraffic-common/aws/infra/documentation";
+import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
 import {MediaType} from "digitraffic-common/aws/types/mediatypes";
 import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
 import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
@@ -40,18 +38,7 @@ export class PublicApi {
         disruptionsJsonModel: IModel,
         stack: DigitrafficStack): Function {
 
-        const functionName = 'BridgeLockDisruption-GetDisruptions';
-        const environment = stack.createDefaultLambdaEnvironment('BridgeLockDisruption');
-
-        const getDisruptionsLambda = MonitoredFunction.create(stack, functionName, databaseFunctionProps(
-            stack, environment, functionName, 'get-disruptions', {
-                timeout: 60,
-                reservedConcurrentExecutions: 3,
-            },
-        ));
-
-        stack.secret.grantRead(getDisruptionsLambda);
-
+        const getDisruptionsLambda = MonitoredDBFunction.create(stack, 'get-disruptions');
         const getDisruptionsIntegration = defaultIntegration(getDisruptionsLambda, {
             responses: [
                 DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
@@ -68,8 +55,6 @@ export class PublicApi {
                 });
             });
         });
-
-        new DigitrafficLogSubscriptions(stack, getDisruptionsLambda);
 
         return getDisruptionsLambda;
     }

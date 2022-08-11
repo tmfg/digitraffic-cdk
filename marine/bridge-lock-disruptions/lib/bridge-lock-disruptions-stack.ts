@@ -8,7 +8,7 @@ export class BridgeLockDisruptionsStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: Props) {
         super(scope, id, appProps);
 
-        InternalLambdas.create(this.secret, this);
+        InternalLambdas.create(this);
         new PublicApi(this);
     }
 }
