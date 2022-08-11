@@ -13,8 +13,9 @@ import {createDefaultUsagePlan, createUsagePlan} from "../usage-plans";
 import {ModelWithReference} from "../../types/model-with-reference";
 import {getModelReference} from "../../../utils/api-model";
 import {MediaType} from "../../types/mediatypes";
+import {DocumentationPart, DocumentationProperties} from "../documentation";
+
 import R = require('ramda');
-import {DocumentationPart} from "../documentation";
 
 export class DigitrafficRestApi extends RestApi {
     readonly apiKeyIds: string[];
@@ -82,7 +83,7 @@ export class DigitrafficRestApi extends RestApi {
     }
 
     private addDocumentationPart(
-        resource: Resource, parameterName: string, resourceName: string, type: string, properties: object,
+        resource: Resource, parameterName: string, resourceName: string, type: string, properties: DocumentationProperties,
     ) {
         const location: CfnDocumentationPart.LocationProperty = {
             type,

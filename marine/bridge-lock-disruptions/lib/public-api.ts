@@ -32,7 +32,7 @@ export class PublicApi {
         this.createResourcePaths(publicApi);
         this.createDisruptionsResource(publicApi, disruptionsModel, stack);
 
-        publicApi.documentResource(this.oldDisruptionsResource, DocumentationPart.method(['bridge-lock-disruptions'], 'getDisruptions', ''));
+        publicApi.documentResource(this.oldDisruptionsResource, DocumentationPart.method(['bridge-lock-disruptions'], 'getDisruptions', '').deprecated('Deprecated.  This will be removed in the future.'));
         publicApi.documentResource(this.disruptionsResource, DocumentationPart.method(BRIDGE_LOCK_DISRUPTION_TAGS_V1, 'getDisruptions', 'Return all waterway traffic disruptions'));
     }
 

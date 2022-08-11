@@ -84,15 +84,30 @@ export function addTagsAndSummary(
     addDocumentation(methodDescription, {tags, summary}, resource, stack);
 }
 
+export interface DocumentationProperties {
+    description?: string
+    tags?: string[]
+    summary?: string
+    deprecated?: boolean
+}
+
 export class DocumentationPart {
     readonly parameterName: string;
     readonly type: string;
-    readonly documentationProperties: object;
+    readonly documentationProperties: DocumentationProperties;
 
-    private constructor(parameterName: string, documentationProperties: object, type: string) {
+    private constructor(parameterName: string, documentationProperties: DocumentationProperties, type: string) {
         this.parameterName = parameterName;
         this.documentationProperties = documentationProperties;
         this.type = type;
+    }
+
+    deprecated(note: string): DocumentationPart {
+        // deprecated is not supported ATM: https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-known-issues.html
+        this.documentationProperties.deprecated = true;
+        this.documentationProperties.summary+= '. ' + note;
+
+        return this;
     }
 
     static queryParameter(parameterName: string, description: string) {
