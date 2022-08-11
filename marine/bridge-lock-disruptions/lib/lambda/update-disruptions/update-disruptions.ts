@@ -1,13 +1,14 @@
 import {fetchRemoteDisruptions, saveDisruptions} from "../../service/disruptions";
-import {withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
 
-export const handler = async () : Promise <any> => {
-    return handlerFn(withDbSecret);
+const proxyHolder = ProxyHolder.create();
+const secretHolder = SecretHolder.create();
+
+export const handler = async () : Promise<void> => {
+    return proxyHolder.setCredentials()
+        .then(() => secretHolder.get())
+        .then((secret: any) => fetchRemoteDisruptions(secret['waterwaydisturbances.url'] as string))
+        .then(distruptions => saveDisruptions(distruptions));
 };
 
-export function handlerFn(withDbSecretFn: (secretId: string, fn: (secret: any) => Promise<void>) => Promise<any>): Promise<any> {
-    return withDbSecretFn(process.env.SECRET_ID as string, async (secret: any) => {
-        const disruptions = await fetchRemoteDisruptions(secret['waterwaydisturbances.url'] as string);
-        await saveDisruptions(disruptions);
-    });
-}
