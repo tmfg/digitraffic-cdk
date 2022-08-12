@@ -49,13 +49,20 @@ export class AreaLightsApi {
         });
 
         return requestPromise
-            .then((response) => {
+            .then(response => {
                 console.info('method=updateLightsForArea successful');
                 return response.data;
             })
-            .catch((error) => {
-                console.error(`method=updateLightsForArea returned status=${error.status}`);
-                return Promise.reject(`API returned status ${error.status}`);
+            .catch(error => {
+                if (error.response) {
+                    console.error(`method=updateLightsForArea returned status=${error.response.status}`);
+                    return Promise.reject(`API returned status ${error.response.status}`);
+                } else if (error.request) {
+                    console.error(`method=updateLightsForArea ERROR with request: ${error.request}`);
+                    return Promise.reject(`Error with request ${error.request}`);
+                }
+                console.error(`method=updateLightsForArea ERROR: ${error}`);
+                return Promise.reject(`Unknown error ${error}`);
             })
             .finally(() => console.log(`method=updateLightsForArea tookMs=${Date.now() - start}`));
     }
