@@ -1,8 +1,8 @@
+import {Stack} from "aws-cdk-lib";
+import {Alarm, ComparisonOperator, Metric, TreatMissingData} from "aws-cdk-lib/aws-cloudwatch";
+import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {MQTTConfiguration} from "./app-props";
-import {Stack} from "aws-cdk-lib";
-import {Alarm, ComparisonOperator, Metric} from "aws-cdk-lib/aws-cloudwatch";
-import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 
 export class MqttMonitoring {
     private readonly stack: Stack;
@@ -43,6 +43,7 @@ export class MqttMonitoring {
             threshold,
             comparisonOperator,
             datapointsToAlarm: 2,
+            treatMissingData: TreatMissingData.IGNORE,
         });
 
         alarm.addAlarmAction(new SnsAction(this.alarmsTopic));
