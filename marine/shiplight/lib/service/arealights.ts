@@ -15,8 +15,7 @@ export class AreaLightsService {
      * @param areaTraffic
      */
     async updateLightsForArea(areaTraffic: AreaTraffic): Promise<void> {
-        // TODO hardcoded areaId for testing
-        const areaId = 10; // areaTraffic.areaId
+        const areaId = areaTraffic.areaId;
         console.info('method=updateLightsForArea area %d, duration %d, visibility %d',
             areaId,
             areaTraffic.durationInMinutes,

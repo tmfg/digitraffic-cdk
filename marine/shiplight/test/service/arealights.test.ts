@@ -55,7 +55,7 @@ describe('arealights service', () => {
 
     function createAreaTraffic(): AreaTraffic {
         return {
-            areaId: 10,
+            areaId: (Math.floor(Math.random() * 100) + 1) % 50,
             durationInMinutes: 45,
             visibilityInMeters: 5000,
         };

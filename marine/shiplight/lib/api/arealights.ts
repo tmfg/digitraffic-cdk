@@ -40,25 +40,30 @@ export class AreaLightsApi {
         this.apiKey = apiKey;
     }
 
-    async updateLightsForArea(request: AreaLightsBrightenRequest): Promise<AreaLightsBrightenResponse> {
+    updateLightsForArea(request: AreaLightsBrightenRequest): Promise<AreaLightsBrightenResponse> {
         const start = Date.now();
-        try {
-            const resp = await axios.post(this.url, request, {
-                headers: {
-                    'x-api-key': this.apiKey,
-                },
-            });
-            if (resp.status !== 200) {
-                console.error(`method=updateLightsForArea returned status=${resp.status}`);
-                return Promise.reject(`API returned status ${resp.status}`);
-            }
-            console.info('method=updateLightsForArea successful');
-            return Promise.resolve(resp.data);
-        } catch (error) {
-            console.error('method=updateLightsForArea failed');
-            throw new Error('Update lights for area failed');
-        } finally {
-            console.log(`method=updateLightsForArea tookMs=${Date.now() - start}`);
-        }
+
+        const requestPromise = axios.post(this.url, request, {
+            headers: { 'x-api-key': this.apiKey },
+            validateStatus: (status) => status === 200,
+        });
+
+        return requestPromise
+            .then(response => {
+                console.info('method=updateLightsForArea successful');
+                return response.data;
+            })
+            .catch(error => {
+                if (error.response) {
+                    console.error(`method=updateLightsForArea returned status=${error.response.status}`);
+                    return Promise.reject(`API returned status ${error.response.status}`);
+                } else if (error.request) {
+                    console.error(`method=updateLightsForArea ERROR with request: ${error.request}`);
+                    return Promise.reject(`Error with request ${error.request}`);
+                }
+                console.error(`method=updateLightsForArea ERROR: ${error}`);
+                return Promise.reject(`Unknown error ${error}`);
+            })
+            .finally(() => console.log(`method=updateLightsForArea tookMs=${Date.now() - start}`));
     }
 }
