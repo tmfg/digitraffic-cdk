@@ -31,7 +31,7 @@ export function create(stack: DigitrafficStack): DigitrafficRestApi {
 
 function createFaultsResource(stack: DigitrafficStack, publicApi: RestApi, faultsJsonModel: Model): Resource {
     const getFaultsLambda = MonitoredDBFunction.create(stack, 'get-faults', undefined, {
-        reservedConcurrentExecutions: 3,
+        reservedConcurrentExecutions: 4,
     });
 
     const apiResource = publicApi.root.addResource("api");
