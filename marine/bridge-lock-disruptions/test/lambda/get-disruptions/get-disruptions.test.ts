@@ -1,10 +1,12 @@
-import {handlerFn} from '../../../lib/lambda/get-disruptions/get-disruptions';
+import {handler} from '../../../lib/lambda/get-disruptions/get-disruptions';
 import {newDisruption} from "../../testdata";
 import {dbTestBase, insertDisruption} from "../../db-testutil";
-import {createEmptySecretFunction} from "digitraffic-common/test/secret";
 import {FeatureCollection} from "geojson";
+import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import * as sinon from "sinon";
 
 describe('lambda-get-disruptions', dbTestBase((db) => {
+    sinon.stub(ProxyHolder.prototype, 'setCredentials').returns(Promise.resolve());
 
     test('Get disruptions', async () => {
         const disruptions = Array.from({length: Math.floor(Math.random() * 10)}).map(() => {
@@ -12,7 +14,7 @@ describe('lambda-get-disruptions', dbTestBase((db) => {
         });
         await insertDisruption(db, disruptions);
 
-        const response = await handlerFn(createEmptySecretFunction<FeatureCollection>());
+        const response = await handler();
         const responseFeatureCollection = JSON.parse(response.body) as FeatureCollection;
 
         expect(responseFeatureCollection.features.length).toBe(disruptions.length);

@@ -1,5 +1,5 @@
-import {IDatabase} from "pg-promise";
 import {SpatialDisruption} from "../model/disruption";
+import {DTDatabase} from "digitraffic-common/database/database";
 
 export interface DbDisruption {
     id: number;
@@ -57,18 +57,17 @@ const SELECT_DISRUPTION_SQL = `
     FROM bridgelock_disruption
 `;
 
-export function findAll(db: IDatabase<any, any>): Promise<DbDisruption[]> {
+export function findAll(db: DTDatabase): Promise<DbDisruption[]> {
     return db.tx(t => t.manyOrNone(SELECT_DISRUPTION_SQL));
 }
 
-export function updateDisruptions(db: IDatabase<any, any>, disruptions: SpatialDisruption[]): Promise<any>[] {
+export function updateDisruptions(db: DTDatabase, disruptions: SpatialDisruption[]): Promise<null>[] {
     return disruptions.map(disruption => {
         return db.none(UPSERT_DISRUPTIONS_SQL, createEditObject(disruption));
     });
 }
 
-export function deleteAllButDisruptions(db: IDatabase<any, any>,
-    ids: number[]): Promise<any> {
+export function deleteAllButDisruptions(db: DTDatabase, ids: number[]): Promise<null> {
     if (ids.length === 0) {
         return db.tx(t => t.none('DELETE FROM bridgelock_disruption'));
     } else {
