@@ -22,6 +22,7 @@
   "dependencies": {
     "aws-cdk-lib": "*",
     "constructs": "*",
+    "digitraffic-common": "*",
     "@types/aws-lambda": "*",
     "aws-lambda": "^1.0.6"
   },

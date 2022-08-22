@@ -1,4 +1,9 @@
-import {CloudFrontWebDistribution, SecurityPolicyProtocol, SourceConfiguration} from 'aws-cdk-lib/aws-cloudfront';
+import {
+    CloudFrontWebDistribution,
+    HttpVersion,
+    SecurityPolicyProtocol,
+    SourceConfiguration,
+} from 'aws-cdk-lib/aws-cloudfront';
 import {CfnResource, Stack, Tags} from 'aws-cdk-lib';
 import {Role} from 'aws-cdk-lib/aws-iam';
 import {CfnWebACL} from 'aws-cdk-lib/aws-wafv2';
@@ -59,6 +64,7 @@ function createDistributionWithStreamingLogging(
         originConfigs,
         viewerCertificate,
         webACLId: webAcl?.attrArn,
+        httpVersion: HttpVersion.HTTP2_AND_3,
     });
 
     if (!distributionProps?.disableShieldAdvanced === true) {

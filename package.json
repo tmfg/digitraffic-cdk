@@ -13,18 +13,19 @@
     "digitraffic-common",
     "marine/*",
     "road/*",
+    "aviation/*",
     "other/*"
   ],
   "resolutions": {
-    "@types/aws-lambda": "8.10.85",
-    "aws-cdk-lib": "2.33.0",
-    "aws-sdk": "2.1120.0",
-    "constructs": "10.0.110",
+    "@types/aws-lambda": "8.10.102",
+    "aws-cdk-lib": "2.38.1",
+    "aws-sdk": "2.1198.0",
+    "constructs": "10.1.80",
     "moment": "2.29.2",
     "moment-timezone": "0.5.34",
     "pg-native": "3.0.0",
     "pg-promise": "10.11.1",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.21"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.3.1",
