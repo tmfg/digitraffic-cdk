@@ -1,0 +1,27 @@
+{
+  "name": "aviation-data",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc -w",
+    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
+    "cdk": "cdk",
+    "synth-sam": "cdk synth --no-staging > template.yaml"
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "*",
+    "@types/aws-lambda": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "*",
+    "aws-sdk": "*",
+    "constructs": "*",
+    "digitraffic-common": "*"
+  },
+  "externals": [
+    "aws-sdk"
+  ]
+}
