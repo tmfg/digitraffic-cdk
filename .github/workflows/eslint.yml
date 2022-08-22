@@ -25,7 +25,7 @@ jobs:
 
     - name: Run ESLint
       id: run-eslint
-      run: npx eslint . --ext .js --format html -o ./${GITHUB_REF##*/}/eslint-report.html
+      run: npx eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
       continue-on-error: true
 
     - name: Publish report on GitHub Pages
