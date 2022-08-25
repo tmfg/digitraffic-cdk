@@ -40,16 +40,15 @@ export class StatisticsApi {
     }
 
     private createDigitrafficMonthlyEndpoint(restApi: RestApi, digitrafficMonthlyLambdaIntegration: LambdaIntegration) {
-        restApi.root
-            .addResource("digitraffic-monthly",
+        const digitrafficMonthly = restApi.root.addResource("digitraffic-monthly",
             {
                 defaultIntegration: digitrafficMonthlyLambdaIntegration,
-            })
-            .addProxy({
+            });
+        digitrafficMonthly.addProxy({
             defaultIntegration: digitrafficMonthlyLambdaIntegration,
             anyMethod: true
         })
-            .addMethod("GET");
+        digitrafficMonthly.addMethod("GET");
     }
 
     private createApiIpRestrictionPolicy(allowedIpAddresses: string[]): iam.PolicyDocument {
