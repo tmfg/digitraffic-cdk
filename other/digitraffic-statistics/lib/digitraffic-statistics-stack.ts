@@ -46,7 +46,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
         const apigwDomainName = new apigw.DomainName(this, 'domain', {
             domainName: domainName,
             certificate: acm.Certificate.fromCertificateArn(this, "digitraffic-statistics-certificate", stack.statisticsProps.certificateArn),
-            endpointType: apigw.EndpointType.REGIONAL
+            endpointType: apigw.EndpointType.REGIONAL,
         });
         apigwDomainName.addBasePathMapping(statisticsApi.restApi,{stage: statisticsApi.restApi.deploymentStage});
 
@@ -56,9 +56,7 @@ export class DigitrafficStatisticsStack extends cdk.Stack {
         new route53.ARecord(this, "digitraffic-statistics-api-dns", {
             zone: zone,
             recordName: domainName,
-            target: route53.RecordTarget.fromAlias(
-                new targets.ApiGatewayDomain(apigwDomainName)
-            ),
+            target: route53.RecordTarget.fromAlias(new targets.ApiGatewayDomain(apigwDomainName)),
         });
     }
 }

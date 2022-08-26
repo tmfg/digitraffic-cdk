@@ -16,13 +16,13 @@ export class StatisticsIntegrations {
     constructor(stack: DigitrafficStatisticsStack) {
 
         const vpc = Vpc.fromLookup(stack, "EsKeyFiguresVPC", {
-            vpcName: stack.statisticsProps.vpcName
+            vpcName: stack.statisticsProps.vpcName,
         });
 
         const digitrafficMonthlySg = new SecurityGroup(stack, "digitraffic-monthly-sg", {
             vpc,
             allowAllOutbound: true,
-            securityGroupName: "digitraffic-monthly-sg"
+            securityGroupName: "digitraffic-monthly-sg",
         });
 
         this.createDbAccessIngressRule(stack, digitrafficMonthlySg);
@@ -34,10 +34,8 @@ export class StatisticsIntegrations {
 
     private createDbAccessIngressRule(stack: DigitrafficStatisticsStack, sg: SecurityGroup) {
         const rdsEsKeyFiguresSg = SecurityGroup.fromLookupById(stack, "es-key-figures-sg", stack.statisticsProps.rdsSgId);
-        rdsEsKeyFiguresSg.addIngressRule(
-            Peer.securityGroupId(sg.securityGroupId),
-            Port.tcp(3306)
-        );
+        rdsEsKeyFiguresSg.addIngressRule(Peer.securityGroupId(sg.securityGroupId),
+            Port.tcp(3306));
     }
 
     private createDigitrafficMonthlyLambdaIntegration(stack: DigitrafficStatisticsStack, vpc: IVpc, sg: SecurityGroup): LambdaIntegration {
@@ -50,11 +48,11 @@ export class StatisticsIntegrations {
             architecture: lambda.Architecture.ARM_64,
             memorySize: 4096,
             timeout: Duration.seconds(60),
-            environment: stack.statisticsProps.figuresLambdaEnv
+            environment: stack.statisticsProps.figuresLambdaEnv,
         });
 
         return new LambdaIntegration(digitrafficMonthlyFunction, {
-            proxy: true
+            proxy: true,
         });
     }
 
@@ -71,9 +69,9 @@ export class StatisticsIntegrations {
                     responseParameters: {
                         'method.response.header.Content-Type': "'text/html'",
                     },
-                }]
-            }
-        })
+                }],
+            },
+        });
     }
 
     private createS3ExecutionRole(stack: DigitrafficStatisticsStack, bucket: s3.IBucket): iam.Role {
@@ -81,12 +79,10 @@ export class StatisticsIntegrations {
             assumedBy: new iam.ServicePrincipal("apigateway.amazonaws.com"),
             roleName: "digitraffic-api-statistics-apigw-s3-integration-role",
         });
-        executeRole.addToPolicy(
-            new iam.PolicyStatement({
-                resources: [`${bucket.bucketArn}/*`],
-                actions: ["s3:GetObject"],
-            })
-        );
+        executeRole.addToPolicy(new iam.PolicyStatement({
+            resources: [`${bucket.bucketArn}/*`],
+            actions: ["s3:GetObject"],
+        }));
         return executeRole;
     }
 
@@ -95,39 +91,33 @@ export class StatisticsIntegrations {
             assumedBy: new iam.ServicePrincipal("lambda.amazonaws.com"),
             roleName: "digitraffic-monthly-lambda-role",
         });
-        lambdaRole.addToPolicy(
-            new iam.PolicyStatement({
-                effect: iam.Effect.ALLOW,
-                actions: [
-                    "ec2:CreateNetworkInterface",
-                    "logs:CreateLogStream",
-                    "ec2:DescribeNetworkInterfaces",
-                    "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams",
-                    "ec2:DeleteNetworkInterface",
-                    "logs:CreateLogGroup",
-                    "logs:PutLogEvents"
-                ],
-                resources: ["*"]
-            })
-        )
-        lambdaRole.addToPolicy(
-            new iam.PolicyStatement({
-                effect: iam.Effect.ALLOW,
-                actions: ["secretsmanager:GetSecretValue"],
-                resources: [stack.statisticsProps.dbSecretArn]
-            })
-        )
-        lambdaRole.addToPolicy(
-            new iam.PolicyStatement({
-                effect: iam.Effect.ALLOW,
-                actions: [
-                    "xray:PutTraceSegments",
-                    "xray:PutTelemetryRecords"
-                ],
-                resources: ["*"],
-            })
-        )
+        lambdaRole.addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: [
+                "ec2:CreateNetworkInterface",
+                "logs:CreateLogStream",
+                "ec2:DescribeNetworkInterfaces",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "ec2:DeleteNetworkInterface",
+                "logs:CreateLogGroup",
+                "logs:PutLogEvents",
+            ],
+            resources: ["*"],
+        }));
+        lambdaRole.addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: ["secretsmanager:GetSecretValue"],
+            resources: [stack.statisticsProps.dbSecretArn],
+        }));
+        lambdaRole.addToPolicy(new iam.PolicyStatement({
+            effect: iam.Effect.ALLOW,
+            actions: [
+                "xray:PutTraceSegments",
+                "xray:PutTelemetryRecords",
+            ],
+            resources: ["*"],
+        }));
         lambdaRole.addManagedPolicy(iam.ManagedPolicy.fromAwsManagedPolicyName("CloudWatchLambdaInsightsExecutionRolePolicy"));
 
         return lambdaRole;

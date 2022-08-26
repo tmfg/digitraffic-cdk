@@ -21,8 +21,8 @@ export class StatisticsApi {
             restApiName: "digitraffic-statistics-api",
             policy: this.createApiIpRestrictionPolicy(stack.statisticsProps.allowedIpAddresses),
             deployOptions: {
-                stageName: "prod"
-            }
+                stageName: "prod",
+            },
         });
     }
 
@@ -30,13 +30,13 @@ export class StatisticsApi {
         restApi.root
             .addResource("digitraffic-api-statistics")
             .addMethod("GET", apiStatisticsS3Integration, {
-            methodResponses: [{
-                statusCode: "200",
-                responseParameters: {
-                    'method.response.header.Content-Type': true,
-                }
-            }]
-        });
+                methodResponses: [{
+                    statusCode: "200",
+                    responseParameters: {
+                        'method.response.header.Content-Type': true,
+                    },
+                }],
+            });
     }
 
     private createDigitrafficMonthlyEndpoint(restApi: RestApi, digitrafficMonthlyLambdaIntegration: LambdaIntegration) {
@@ -46,8 +46,8 @@ export class StatisticsApi {
             });
         digitrafficMonthly.addProxy({
             defaultIntegration: digitrafficMonthlyLambdaIntegration,
-            anyMethod: true
-        })
+            anyMethod: true,
+        });
         digitrafficMonthly.addMethod("GET");
     }
 
@@ -58,21 +58,21 @@ export class StatisticsApi {
                     effect: iam.Effect.ALLOW,
                     actions: ["execute-api:Invoke"],
                     principals: [new iam.AnyPrincipal()],
-                    resources: ["*"]
+                    resources: ["*"],
                 }),
                 new iam.PolicyStatement({
                     effect: iam.Effect.DENY,
                     actions: ["execute-api:Invoke"],
                     conditions: {
                         "NotIpAddress": {
-                            "aws:SourceIp": allowedIpAddresses
-                        }
+                            "aws:SourceIp": allowedIpAddresses,
+                        },
                     },
                     principals: [new iam.AnyPrincipal()],
                     resources: ["*"],
-                })
-            ]
-        })
+                }),
+            ],
+        });
     }
 
 }
