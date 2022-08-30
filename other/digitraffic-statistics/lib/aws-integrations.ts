@@ -12,6 +12,7 @@ export class StatisticsIntegrations {
 
     readonly apiStatisticsS3Integration: AwsIntegration;
     readonly digitrafficMonthlyLambdaIntegration: LambdaIntegration;
+    readonly kibanaRedirectLambdaIntegration: LambdaIntegration;
 
     constructor(stack: DigitrafficStatisticsStack) {
 
@@ -29,6 +30,7 @@ export class StatisticsIntegrations {
 
         this.apiStatisticsS3Integration = this.createApiStatisticsS3Integration(stack);
         this.digitrafficMonthlyLambdaIntegration = this.createDigitrafficMonthlyLambdaIntegration(stack, vpc, digitrafficMonthlySg);
+        this.kibanaRedirectLambdaIntegration = this.createKibanaRedirectLambdaIntegration(stack);
 
     }
 
@@ -54,6 +56,16 @@ export class StatisticsIntegrations {
         return new LambdaIntegration(digitrafficMonthlyFunction, {
             proxy: true,
         });
+    }
+
+    private createKibanaRedirectLambdaIntegration(stack: DigitrafficStatisticsStack) {
+        const kibanaRedirectFunction = new lambda.Function(stack, "kibana-redirect", {
+            runtime: lambda.Runtime.NODEJS_14_X,
+            handler: "kibana-redirect.handler",
+            code: lambda.Code.fromAsset(path.join(__dirname, '/lambda')),
+            environment: stack.statisticsProps.kibanaLambdaEnv
+        });
+        return new LambdaIntegration(kibanaRedirectFunction);
     }
 
     private createApiStatisticsS3Integration(stack: DigitrafficStatisticsStack): AwsIntegration {

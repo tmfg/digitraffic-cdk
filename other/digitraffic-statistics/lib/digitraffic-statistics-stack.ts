@@ -24,6 +24,9 @@ interface DigitrafficStatisticsProps {
         readonly DB_SECRET_ARN: string,
         readonly SECRET: string
     }
+    readonly kibanaLambdaEnv: {
+        readonly KIBANA_URL: string
+    }
 }
 
 export class DigitrafficStatisticsStack extends cdk.Stack {

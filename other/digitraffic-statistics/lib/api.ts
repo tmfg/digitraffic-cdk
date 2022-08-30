@@ -14,6 +14,7 @@ export class StatisticsApi {
 
         this.createDigitrafficApiStatisticsEndPoint(this.restApi, integrations.apiStatisticsS3Integration);
         this.createDigitrafficMonthlyEndpoint(this.restApi, integrations.digitrafficMonthlyLambdaIntegration);
+        this.createKibanaRedirectEndpoint(this.restApi, integrations.kibanaRedirectLambdaIntegration);
     }
 
     private createRestApi(stack: DigitrafficStatisticsStack): RestApi {
@@ -33,7 +34,7 @@ export class StatisticsApi {
                 methodResponses: [{
                     statusCode: "200",
                     responseParameters: {
-                        'method.response.header.Content-Type': true,
+                        "method.response.header.Content-Type": true,
                     },
                 }],
             });
@@ -49,6 +50,21 @@ export class StatisticsApi {
             anyMethod: true,
         });
         digitrafficMonthly.addMethod("GET");
+    }
+
+    private createKibanaRedirectEndpoint(restApi: RestApi, kibanaRedirectLambdaIntegration: LambdaIntegration) {
+        const kibanaRedirect = restApi.root.addResource("kibana", {
+            defaultIntegration: kibanaRedirectLambdaIntegration,
+        });
+
+        kibanaRedirect.addMethod("GET", kibanaRedirectLambdaIntegration, {
+            methodResponses: [{
+                statusCode: "301",
+                responseParameters: {
+                    "method.response.header.Location": true,
+                },
+            }]
+        });
     }
 
     private createApiIpRestrictionPolicy(allowedIpAddresses: string[]): iam.PolicyDocument {
@@ -74,5 +90,4 @@ export class StatisticsApi {
             ],
         });
     }
-
 }
