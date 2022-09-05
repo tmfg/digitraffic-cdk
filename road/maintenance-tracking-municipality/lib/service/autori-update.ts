@@ -82,11 +82,11 @@ export class AutoriUpdate {
                 return summedResult;
             }).then((finalResult) => {
                 return inDatabase((db: DTDatabase) => {
-                    return CommonUpdateService.updateDataUpdated(db, domainName, finalResult);
+                    return CommonUpdateService.updateDataChecked(db, domainName, finalResult);
                 });
             });
         } catch (error) {
-            console.error(`method=AutoriUpdate.updateTrackings domain=${domainName} Failed for all contracts`, error);
+            console.error(`method=AutoriUpdate.updateTrackingsForDomain domain=${domainName} Failed for all contracts`, error);
             throw error;
         }
     }

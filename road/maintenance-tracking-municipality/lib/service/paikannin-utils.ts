@@ -120,15 +120,14 @@ function isSameTasks(ioChannels1: ApiWorkeventIoDevice[], ioChannels2: ApiWorkev
     if (ioChannels1.length != ioChannels2.length) {
         return false;
     }
-    const ioChannel1Strings = ioChennelsToStrings(ioChannels2);
-    const ioChannel2Strings = ioChennelsToStrings(ioChannels2);
+    const ioChannel1Strings = ioChannelsToStrings(ioChannels2);
+    const ioChannel2Strings = ioChannelsToStrings(ioChannels2);
     return CommonUtils.bothArraysHasSameValues(ioChannel1Strings, ioChannel2Strings);
 }
 
-function ioChennelsToStrings(ioChannels : ApiWorkeventIoDevice[]): string[] {
+function ioChannelsToStrings(ioChannels : ApiWorkeventIoDevice[]): string[] {
     return ioChannels.reduce(function (previousValue: string[], ioChannel) {
-        previousValue.concat(ioChannel.name);
-        return previousValue;
+        return previousValue.concat(ioChannel.name);
     }, []);
 }
 

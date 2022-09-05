@@ -260,6 +260,7 @@ export function createDbDomainTaskMappings(operations: ApiOperationData[], domai
         {
             name: UNKNOWN_TASK_NAME,
             original_id: operation.id,
+            // TODO original_name: operation.operationName,
             domain: domainName,
             ignore: true,
             /* eslint-enable camelcase */

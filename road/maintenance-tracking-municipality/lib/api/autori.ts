@@ -8,7 +8,7 @@ import {MaintenanceTrackingAutoriSecret} from "../model/maintenance-tracking-mun
 
 export const PATH_SUFFIX_CONTRACTS = 'contracts';
 export const PATH_SUFFIX_ROUTE = 'route';
-export const PATH_SUFFIX_ROUTE_OPERATIONS = 'route/types/operation\n';
+export const PATH_SUFFIX_ROUTE_OPERATIONS = 'route/types/operation';
 export const O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS = 3 * 60 * 1000; // 3 minute safety gap to get new token
 
 export class AutoriApi {
@@ -89,7 +89,8 @@ export class AutoriApi {
     public getNextRouteDataForContract( contract: DbDomainContract, from: Date, to: Date): Promise<ApiRouteData[]> {
         return this.getRouteDataForContract(contract, from, to)
             .catch(error => {
-                console.error(`method=getNextRouteDataForContract domain=${contract.domain} contract=${contract.contract} startTime=${from.toISOString()} endTime=${to.toISOString()} error: ${error}`);
+                console.error(`method=getNextRouteDataForContract domain=${contract.domain} contract=${contract.contract} `+
+                              `startTime=${from.toISOString()} endTime=${to.toISOString()} error: ${error}`);
                 throw error;
             });
     }
@@ -108,10 +109,12 @@ export class AutoriApi {
         return this.getFromServer<ApiRouteData[]>(`getRouteDataForContract`, `${PATH_SUFFIX_ROUTE}?contract=${contract.contract}&changedStart=${fromString}&changedEnd=${toString}`)
             .then(routeData => {
                 const end = Date.now();
-                console.debug(`DEBUG method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} startTime=${fromString} endTime=${toString} data count=${routeData.length} tookMs=${end-start}`);
+                console.debug(`DEBUG method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
+                              `startTime=${fromString} endTime=${toString} data count=${routeData.length} tookMs=${end-start}`);
                 return routeData;
             }).catch(error => {
-                console.error(`method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} startTime=${fromString} endTime=${toString} error: ${error}`);
+                console.error(`method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
+                              `startTime=${fromString} endTime=${toString} error: ${error}`);
                 throw error;
             });
     }

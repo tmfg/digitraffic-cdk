@@ -86,7 +86,7 @@ export class PaikanninUpdate {
 
                 if (!contract) {
                     console.info(`method=PaikanninUpdate.updateTrackingsForDomain No contract with source for domain=${domainName}`);
-                    return TrackingSaveResult.createSaved(0,0);
+                    return CommonUpdateService.updateDataChecked(db, domainName, TrackingSaveResult.createSaved(0,0));
                 }
 
                 // Don't get latest minute as data comes to api in "realtime"
@@ -109,7 +109,7 @@ export class PaikanninUpdate {
                     console.info(`method=PaikanninUpdate.updateTrackingsForDomain domain=${domainName} count=${summedResult.saved} errors=${summedResult.errors} tookMs=${Date.now() - timerStart}`);
                     return summedResult;
                 }).then((finalResult) => {
-                    return CommonUpdateService.updateDataUpdated(db, domainName, finalResult);
+                    return CommonUpdateService.updateDataChecked(db, domainName, finalResult);
                 }).catch(error => {
                     console.error(`method=PaikanninUpdate.updateTrackingsForDomain failed domain=${domainName} tookMs=${Date.now() - timerStart}`, error);
                     throw error;
