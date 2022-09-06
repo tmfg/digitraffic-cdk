@@ -82,7 +82,7 @@ export const handler = async () => {
     const swaggerFilename = 'dt-swagger.js';
     const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;
 
-    const swaggerSpecFilename = 'swagger-spec.json';
+    const swaggerSpecFilename = 'openapi.json';
     const swaggerSpecFilenameFinal = directory ? `${directory}/${swaggerSpecFilename}` : swaggerSpecFilename;
 
     await Promise.all([

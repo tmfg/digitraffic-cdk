@@ -1,6 +1,6 @@
 import * as AWSx from "aws-sdk";
 import {fetchDataFromEs} from "./es-query";
-import {esQueries} from "../es_queries"
+import {esQueries} from "../es_queries";
 import axios from 'axios';
 
 const AWS = AWSx as any;
@@ -223,9 +223,9 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
 }
 
 async function getApiPaths(): Promise<{ transportType: string, paths: Set<string> }[]> {
-    const railSwaggerPaths = await getPaths('https://rata.digitraffic.fi/swagger/swagger.json');
-    const roadSwaggerPaths = await getPaths('https://tie.digitraffic.fi/swagger/swagger-spec.json');
-    const marineSwaggerPaths = await getPaths('https://meri.digitraffic.fi/swagger/swagger-spec.json');
+    const railSwaggerPaths = await getPaths('https://rata.digitraffic.fi/swagger/openapi.json');
+    const roadSwaggerPaths = await getPaths('https://tie.digitraffic.fi/swagger/openapi.json');
+    const marineSwaggerPaths = await getPaths('https://meri.digitraffic.fi/swagger/openapi.json');
 
     railSwaggerPaths.add('/api/v2/graphql/');
     railSwaggerPaths.add('/api/v1/trains/history');
