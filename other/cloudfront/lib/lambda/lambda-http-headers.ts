@@ -15,7 +15,6 @@ exports.handler = (event: any, context: any, callback: any) => {
 
     if (request.method === 'GET') {
         addCorsHeaders(response);
-        addWeathercamImageLastModifiedHeaderFromXAmzMeta(response);
     }
 
     callback(null, response);
