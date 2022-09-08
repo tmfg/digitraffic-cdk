@@ -67,5 +67,5 @@ then
 fi
 
 set +x
-END=
+
 echo "End at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
