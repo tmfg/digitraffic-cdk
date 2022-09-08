@@ -7,7 +7,7 @@ import {CFOrigin, CFLambdaParameters, CFProps, ElasticProps, DistributionProps} 
 import {
     createGzipRequirement,
     createHttpHeaders, createIndexHtml,
-    createIpRestriction,
+    createIpRestriction, createWeathercamHttpHeaders,
     createWeathercamRedirect, FunctionType,
     LambdaType,
 } from "./lambda/lambda-creator";
@@ -131,6 +131,10 @@ export class CloudfrontCdkStack extends Stack {
                 lambdaMap.addLambda(LambdaType.WEATHERCAM_REDIRECT,
                     createWeathercamRedirect(this, edgeLambdaRole, lParameters.weathercamDomainName!, lParameters.weathercamHostName!));
             }
+        }
+
+        if (types.lambdaTypes.has(LambdaType.WEATHERCAM_HTTP_HEADERS)) {
+            lambdaMap.addLambda(LambdaType.WEATHERCAM_HTTP_HEADERS, createWeathercamHttpHeaders(this, edgeLambdaRole));
         }
 
         if (types.lambdaTypes.has(LambdaType.GZIP_REQUIREMENT)) {

@@ -7,7 +7,7 @@ import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
 const fs = require('fs');
 
 export enum LambdaType {
-    WEATHERCAM_REDIRECT, GZIP_REQUIREMENT, HTTP_HEADERS, IP_RESTRICTION
+    WEATHERCAM_REDIRECT, GZIP_REQUIREMENT, HTTP_HEADERS, IP_RESTRICTION, WEATHERCAM_HTTP_HEADERS
 }
 
 export enum FunctionType {
@@ -41,6 +41,13 @@ export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role) {
 
     return createFunction(stack, edgeLambdaRole, 'http-headers', body);
 }
+
+export function createWeathercamHttpHeaders(stack: Stack, edgeLambdaRole: Role) {
+    const body = readBodyWithVersion('dist/lambda/lambda-weathercam-http-headers.js');
+
+    return createFunction(stack, edgeLambdaRole, 'weathercam-http-headers', body);
+}
+
 
 export function createIndexHtml(stack: Stack, edgeLambdaRole: Role) {
     const body = readBodyWithVersion('lib/lambda/lambda-index-html.js');

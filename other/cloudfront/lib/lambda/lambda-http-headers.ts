@@ -1,4 +1,4 @@
-import {addCorsHeaders} from "../lambda-util";
+import {addCorsHeaders, addWeathercamImageLastModifiedHeaderFromXAmzMeta} from "../lambda-util";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
