@@ -15,6 +15,7 @@ if ALL_TIME_WITH_TREND:
     from sklearn.linear_model import LinearRegression
 
 TERA = pow(10, 12)
+GIGA = pow(10, 9)
 MILJ = pow(10, 6)
 
 
@@ -174,7 +175,7 @@ class Figures:
     def top_users_data(self, date=None, liikennemuoto=None):
         start = time.time()
 
-        primary_value = 'Data (Tt)'
+        primary_value = 'Data (Gt)'
 
         table_data = self.top_users_table(query='Top digitraffic-users by bytes',
                                           comparison_query='Bytes out',
@@ -186,7 +187,7 @@ class Figures:
         if 'dt' not in table_data:
             return table_data
 
-        table_data['dt'][primary_value] = table_data['dt'][primary_value].apply(lambda x: "{}".format(round(x / TERA, 2)))
+        table_data['dt'][primary_value] = table_data['dt'][primary_value].apply(lambda x: "{}".format(round(x / GIGA, 2)))
 
         table = dict(
             columns=[dict(name=i, id=i) for i in table_data['columns']],

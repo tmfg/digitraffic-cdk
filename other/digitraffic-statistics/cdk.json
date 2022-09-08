@@ -1,0 +1,3 @@
+{
+  "app": "npx node bin/digitraffic-statistics-app.js"
+}
