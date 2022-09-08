@@ -22,3 +22,17 @@ export function addCorsHeaders(response: Response) {
         value: 'DNT,X-CustomHeader,Keep-Alive,User-Agent,X-Requested-With,If-Modified-Since,Cache-Control,Content-Type,Content-Range,Range,Digitraffic-User',
     }];
 }
+
+const xAmzLastModifiedHeader = 'x-amz-meta-last-modified';
+const lastModifiedHeader = 'last-modified';
+
+export function addWeathercamImageLastModifiedHeaderFromXAmzMeta(response: Response) {
+    const responseHeaders = response.headers;
+    if (responseHeaders[xAmzLastModifiedHeader]) {
+        console.log(`DEBUG: ${JSON.stringify(responseHeaders[xAmzLastModifiedHeader])}\n`);
+        responseHeaders[lastModifiedHeader] = [{
+            key: lastModifiedHeader,
+            value: responseHeaders[xAmzLastModifiedHeader][0].value,
+        }];
+    }
+}

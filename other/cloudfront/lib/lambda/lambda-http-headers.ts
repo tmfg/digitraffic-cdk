@@ -1,4 +1,4 @@
-import {addCorsHeaders} from "../lambda-util";
+import {addCorsHeaders, addWeathercamImageLastModifiedHeaderFromXAmzMeta} from "../lambda-util";
 
 const VERSION_HEADERS = "EXT_VERSION";
 
@@ -15,6 +15,7 @@ exports.handler = (event: any, context: any, callback: any) => {
 
     if (request.method === 'GET') {
         addCorsHeaders(response);
+        addWeathercamImageLastModifiedHeaderFromXAmzMeta(response);
     }
 
     callback(null, response);
