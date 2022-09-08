@@ -34,7 +34,8 @@
     "axios": "^0.21.1",
     "paho-mqtt": "^1.1.0",
     "source-map-support": "^0.5.19",
-    "ws": "^7.4.1"
+    "ws": "^7.4.1",
+    "digitraffic-common": "*"
   },
   "externals": [
     "aws-sdk"
