@@ -2,7 +2,7 @@
 set -e # Fail on error
 
 # This script tries to delete given S3 bucket versioned or not
-ENVS=(road-test, road-prod, marine-test, marine-prod, status-test, status-prod, aviation-test, aviation-prod, rail-test, rail-prod)
+ENVS=(road-test road-prod rail-test rail-prod marine-test marine-prod status-test status-prod aviation-test aviation-prod)
 
 FULL_ENV=${1:-"NONE"}
 BUCKET=${2:-"NONE"}

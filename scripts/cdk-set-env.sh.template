@@ -10,12 +10,6 @@ ENV=${1:-"NONE"}
 AWS_DEFAULT_REGION=<SET AWS REGION HERE>
 
 case "$ENV" in
-  ("rail-prd"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("rail-test"):
-    AWS_PROFILE=<PROFILE>
-  ;;
   ("marine-prod"):
     AWS_PROFILE=<PROFILE>
   ;;
