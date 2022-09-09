@@ -43,7 +43,7 @@ async function getEnabledNodePingChecks(nodepingToken: string, subaccountId: str
     if (r.status !== 200) {
         throw new Error('Unable to fetch checks');
     }
-    const checks = Object.values(r.data) as NodePingCheck[];
+    const checks: NodePingCheck[] = Object.values(r.data);
     return checks.filter(c => c.enable === 'active');
 }
 

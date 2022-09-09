@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -e # Fail on error
 
-# This script ties to do diff of deploy for cdk stack in given environment
+# This script tries to do diff of deploy for cdk stack in given environment
 ENVS=(road-test road-prod marine-test marine-prod status-test status-prod)
 
 FULL_ENV=${1:-"NONE"}
@@ -67,5 +67,5 @@ then
 fi
 
 set +x
-END=
+
 echo "End at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"

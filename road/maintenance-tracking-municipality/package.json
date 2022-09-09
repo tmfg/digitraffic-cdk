@@ -43,7 +43,8 @@
     "pg-promise": "*",
     "source-map-support": "*",
     "axios": "^0.21.1",
-    "query-string": "^7.1.1"
+    "query-string": "^7.1.1",
+    "moment": "*"
   },
   "externals": [
     "aws-sdk"

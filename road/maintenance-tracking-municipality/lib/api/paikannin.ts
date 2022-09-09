@@ -47,12 +47,15 @@ export class PaikanninApi {
             if (axios.isAxiosError(error)) {
                 const axiosError = error as AxiosError;
                 if (axiosError.response) {
-                    console.error(`method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl}. Error response code: ${axiosError.response.status} and message: ${axiosError.response.data}`);
+                    console.error(`method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl}. ` +
+                                  `Error response code: ${axiosError.response.status} and message: ${axiosError.response.data}`);
                 } else if (axiosError.request) {
-                    console.error(`method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`);
+                    console.error(`method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl} with no response. ` +
+                                  `Error message: ${axiosError.message}`);
                 } else {
                     // Something happened in setting up the request that triggered an Error
-                    console.error(`method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`);
+                    console.error(`method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl} while setting up the request. ` +
+                                  `Error message: ${axiosError.message}`);
                 }
             } else {
                 console.error(`method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl} outside axios. Error message: ${error}`);
@@ -63,7 +66,6 @@ export class PaikanninApi {
         }
     }
 
-    // TODO update tasks to db with this data.
     public getDevices(): Promise<ApiDevice[]> {
         return this.getFromServer<ApiDevice[]>('getDevices', URL_DEVICES);
     }

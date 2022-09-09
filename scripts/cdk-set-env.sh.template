@@ -10,25 +10,37 @@ ENV=${1:-"NONE"}
 AWS_DEFAULT_REGION=<SET AWS REGION HERE>
 
 case "$ENV" in
-  ("road-test"):
+  ("rail-prd"):
     AWS_PROFILE=<PROFILE>
   ;;
-  ("road-prod"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("marine-test"):
+  ("rail-test"):
     AWS_PROFILE=<PROFILE>
   ;;
   ("marine-prod"):
     AWS_PROFILE=<PROFILE>
   ;;
-  ("status-test"):
+  ("marine-test"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("road-prod"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("road-test"):
     AWS_PROFILE=<PROFILE>
   ;;
   ("status-prod"):
     AWS_PROFILE=<PROFILE>
   ;;
-  (*) echo "Allowed parameter values are 'road-test', 'road-prod, 'marine-test', 'marine-prod', 'status-test' and 'status-prod"
+  ("status-test"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("aviation-pr0d"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("aviation-test"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  (*) echo "Allowed parameter values are 'rail-prd', 'rail-tst', 'marine-prod', 'marine-test', 'road-prod, 'road-test', 'status-test', 'status-prod, 'aviation-prd' and 'aviation-tst'"
   exit 1
   ;;
 esac

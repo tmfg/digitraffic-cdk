@@ -58,6 +58,7 @@ export class LambdaHolder {
             case LambdaType.GZIP_REQUIREMENT:
                 return LambdaEdgeEventType.ORIGIN_REQUEST;
             case LambdaType.HTTP_HEADERS:
+            case LambdaType.WEATHERCAM_HTTP_HEADERS:
                 return LambdaEdgeEventType.VIEWER_RESPONSE;
             default:
                 throw new Error('unknown lambdatype ' + lambdaType);

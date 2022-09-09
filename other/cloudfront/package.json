@@ -36,7 +36,8 @@
   "dependencies": {
     "aws-cdk-lib": "*",
     "p-limit": "3.1.0",
-    "source-map-support": "^0.5.19"
+    "source-map-support": "^0.5.19",
+    "digitraffic-common": "*"
   },
   "externals": [
     "aws-sdk"

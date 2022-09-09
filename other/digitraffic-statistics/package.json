@@ -1,0 +1,25 @@
+{
+  "name": "digitraffic-statistics",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "lint": "eslint lib/**/*.ts --fix",
+    "synth-sam": "cdk synth --no-staging > template.yaml"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "*",
+    "@types/node": "*",
+    "@typescript-eslint/eslint-plugin": "*",
+    "@typescript-eslint/parser": "*",
+    "eslint": "*",
+    "typescript": "*"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "*",
+    "digitraffic-common": "*"
+  },
+  "externals": [
+    "aws-sdk"
+  ]
+}

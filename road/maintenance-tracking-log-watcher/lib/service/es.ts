@@ -104,7 +104,7 @@ export function parseDataToString(resultJsonObj: ESResponse): string {
     const hits = resultJsonObj.hits.hits;
 
     let messages = "";
-    hits.map( function(hit : ESResponseHit) {
+    hits.forEach( function(hit : ESResponseHit) {
         if (messages.length > 0) {
             messages += '\n\n';
         }
