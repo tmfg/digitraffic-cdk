@@ -32,3 +32,4 @@ updateInDirectory digitraffic-common
 updateAllInDirectory other
 updateAllInDirectory road
 updateAllInDirectory marine
+updateAllInDirectory aviation
