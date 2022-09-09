@@ -13,8 +13,8 @@ export class MqttMonitoring {
         this.alarmsTopic = alarmsTopic;
 
         mqttConfigurations.forEach((mqtt: MQTTConfiguration) => {
-            const cpuLimit = mqtt.cpuLimit ?? 60;
-            const heapLimit = mqtt.heapLimit ?? 85;
+            const cpuLimit = mqtt.cpuLimit ?? 80;
+            const heapLimit = mqtt.heapLimit ?? 90;
             const networkLimit = mqtt.networkLimit ?? 50 * 1024*1024; // 50 MiB
 
             this.createAlarmForMetric('CPU', mqtt.brokerName, 'CpuUtilization', cpuLimit);
@@ -39,10 +39,10 @@ export class MqttMonitoring {
         const alarm = new Alarm(this.stack, alarmName, {
             alarmName,
             metric,
-            evaluationPeriods: 5,
+            evaluationPeriods: 6,
             threshold,
             comparisonOperator,
-            datapointsToAlarm: 2,
+            datapointsToAlarm: 4,
             treatMissingData: TreatMissingData.IGNORE,
         });
 
