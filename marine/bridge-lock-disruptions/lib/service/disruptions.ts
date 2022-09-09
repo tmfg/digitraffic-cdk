@@ -1,7 +1,7 @@
 import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
 import * as DisruptionsDB from "../db/disruptions";
 import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
-import {Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry} from "geojson";
+import {Feature, FeatureCollection, GeoJSON, GeoJsonProperties, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
@@ -46,7 +46,7 @@ export async function fetchRemoteDisruptions(endpointUrl: string) {
 }
 
 export function featureToDisruption(feature: Feature): SpatialDisruption {
-    const props = feature.properties as any;
+    const props = feature.properties as NonNullable<GeoJsonProperties>;
     return {
         Id: props.Id,
         // eslint-disable-next-line camelcase
@@ -85,7 +85,7 @@ export function convertFeature(disruption: DisruptionsDB.DbDisruption): Feature 
         DescriptionEn: disruption.description_en,
     };
     // convert geometry from db to geojson
-    const geometry = Geometry.parse(Buffer.from(disruption.geometry, "hex")).toGeoJSON() as GeoJSONGeometry;
+    const geometry = Geometry.parse(Buffer.from(disruption.geometry as any, "hex")).toGeoJSON() as GeoJSONGeometry;
     return {
         type: "Feature",
         properties,

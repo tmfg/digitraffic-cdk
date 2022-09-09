@@ -14,7 +14,7 @@ type ResponseCommand = {
     readonly OutputParams: {
         Param: ResponseParam[]
     }[];
-    readonly Items: any[];
+    readonly Items: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
     readonly Thumbnail?: string[];
 };
 

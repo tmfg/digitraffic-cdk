@@ -14,7 +14,7 @@ export type S124Member = {
             'gml:id' : string,
         },
         id: string,
-        geometry: any,
+        geometry: unknown,
         Subject?: {
             text: string,
         },

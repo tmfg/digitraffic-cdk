@@ -1,4 +1,4 @@
-import {Feature, GeoJsonProperties, Geometry} from "geojson";
+import {Feature, Geometry} from "geojson";
 
 export interface DbFault {
     readonly id: number

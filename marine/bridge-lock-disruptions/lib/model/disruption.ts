@@ -9,5 +9,5 @@ export interface Disruption {
 }
 
 export interface SpatialDisruption extends Disruption {
-    geometry: any
+    geometry: any // eslint-disable-line @typescript-eslint/no-explicit-any
 }

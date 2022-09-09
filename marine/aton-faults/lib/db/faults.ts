@@ -1,10 +1,9 @@
 import {PreparedStatement} from "pg-promise";
 import {createGeometry} from "digitraffic-common/utils/geometry";
 import {LineString} from "wkx";
-import {AtonProperties, DbFault, FaultFeature} from "../model/fault";
+import {DbFault, FaultFeature} from "../model/fault";
 import {Language} from "digitraffic-common/types/language";
 import {DTDatabase} from "digitraffic-common/database/database";
-import {Feature, GeoJsonProperties} from "geojson";
 
 import moment = require('moment-timezone');
 

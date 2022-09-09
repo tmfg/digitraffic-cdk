@@ -2,7 +2,6 @@ import {FaultsApi} from "../api/faults";
 import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
 import * as FaultsDB from "../db/faults";
 import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
-import {Feature} from "geojson";
 import {ATON_DATA_TYPE} from "./faults";
 import {FaultFeature} from "../model/fault";
 

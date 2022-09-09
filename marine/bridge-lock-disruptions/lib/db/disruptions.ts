@@ -6,7 +6,7 @@ export interface DbDisruption {
     type_id: number;
     start_date: Date;
     end_date: Date;
-    geometry: any;
+    geometry: any; // eslint-disable-line @typescript-eslint/no-explicit-any
     description_fi: string;
     description_sv?: string;
     description_en?: string;
