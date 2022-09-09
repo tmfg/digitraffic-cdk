@@ -6,7 +6,7 @@ import {GenericSecret} from "digitraffic-common/aws/runtime/secrets/secret";
 const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<GenericSecret>();
 
-export const handler = async () : Promise<void> => {
+export const handler = () : Promise<void> => {
     return proxyHolder.setCredentials()
         .then(() => secretHolder.get())
         .then((secret: GenericSecret) => fetchRemoteDisruptions(secret['waterwaydisturbances.url'] as string))

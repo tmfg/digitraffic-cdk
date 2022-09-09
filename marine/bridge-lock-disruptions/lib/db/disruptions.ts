@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {SpatialDisruption} from "../model/disruption";
 import {DTDatabase} from "digitraffic-common/database/database";
 

@@ -15,7 +15,7 @@ const disruptionsProperties: apigateway.JsonSchema = {
             type: apigateway.JsonSchemaType.NUMBER,
             description: 'Id of disturbance',
         },
-        Type_Id: {
+        Type_Id: { // eslint-disable-line camelcase
             type: apigateway.JsonSchemaType.NUMBER,
             description: TypeIdDescription,
         },

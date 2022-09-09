@@ -85,7 +85,7 @@ export function convertFeature(disruption: DisruptionsDB.DbDisruption): Feature 
         DescriptionEn: disruption.description_en,
     };
     // convert geometry from db to geojson
-    const geometry = Geometry.parse(Buffer.from(disruption.geometry as any, "hex")).toGeoJSON() as GeoJSONGeometry;
+    const geometry = Geometry.parse(Buffer.from(disruption.geometry, "hex")).toGeoJSON() as GeoJSONGeometry;
     return {
         type: "Feature",
         properties,

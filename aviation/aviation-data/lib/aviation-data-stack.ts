@@ -8,11 +8,11 @@ export class AviationDataStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: AviationDataProps) {
         super(scope, id, configuration);
 
-        const bucket = this.createBucket(configuration);
+        const bucket = this.createBucket();
         this.configureBucketCredentials(configuration, bucket);
     }
 
-    createBucket(configuration: AviationDataProps): Bucket {
+    createBucket(): Bucket {
         const bucket = new Bucket(this, 'aviation-data-bucket', {
             publicReadAccess: false,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
