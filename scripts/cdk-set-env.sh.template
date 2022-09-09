@@ -34,13 +34,19 @@ case "$ENV" in
   ("status-test"):
     AWS_PROFILE=<PROFILE>
   ;;
-  ("aviation-pr0d"):
+  ("aviation-prod"):
     AWS_PROFILE=<PROFILE>
   ;;
   ("aviation-test"):
     AWS_PROFILE=<PROFILE>
   ;;
-  (*) echo "Allowed parameter values are 'rail-prd', 'rail-tst', 'marine-prod', 'marine-test', 'road-prod, 'road-test', 'status-test', 'status-prod, 'aviation-prd' and 'aviation-tst'"
+  ("rail-prod"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  ("rail-test"):
+    AWS_PROFILE=<PROFILE>
+  ;;
+  (*) echo "Allowed parameter values are road-test, road-prod, marine-test, marine-prod, status-test, status-prod, aviation-test, aviation-prod, rail-test, rail-prod"
   exit 1
   ;;
 esac
