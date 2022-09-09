@@ -2,9 +2,9 @@
 set -e # Fail on error
 
 # Set here absolute root dir of cdk-properties /home/me/work/ci-props
-CDK_CONFIG_DIR=
+CDK_CONFIG_DIR=<TODO root dir of cdk-propeties in ci-project>
 
-# This script ties to do diff of deploy for cdk stack in given envifonment
+# This script tries to copy app configs between ci and cdk -projects
 OPERATIONS=(to-ci from-ci)
 
 OPERATION=${1:-"NONE"}

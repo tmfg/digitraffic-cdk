@@ -1,27 +1,16 @@
 #!/usr/bin/env bash
 set -e # Fail on error
 
-# This script tries to do diff of deploy for cdk stack in given environment
-ENVS=(road-test road-prod marine-test marine-prod status-test status-prod)
+# This script tries to do diff or deploy for cdk stack in given environment
+echo "Required parameters: <app>-<env> <diff|deploy>"
+echo "For example: road-test diff"
+echo
 
-FULL_ENV=${1:-"NONE"}
+SCRIPT_DIR=$(dirname "$0")
+. ${SCRIPT_DIR}/cdk-set-env.sh ${FULL_ENV}
+
+#FULL_ENV=${1:-"NONE"}
 OPERATION=${2:-"NONE"}
-
-FOUND=false
-for value in "${ENVS[@]}"
-do
-  [[ "$FULL_ENV" = "$value" ]] && FOUND=true
-done
-
-# 1. road/marine
-ENV_TYPE=$(echo $FULL_ENV | cut -d '-' -f1)
-# 2. test/prod
-ENV_ENV=$(echo $FULL_ENV | cut -d '-' -f2)
-
-if [[ "${FOUND}"  != "true" ]] ;then
-    echo "Invalid first parameter. Valid values are ${ENVS[@]/%/,}"
-    exit 1
-fi
 
 case "$OPERATION" in
   ("diff"):
@@ -30,15 +19,15 @@ case "$OPERATION" in
   ("deploy"):
     echo "Do cdk deploy"
   ;;
-  (*) echo "Invalid second parameter. Valid values are 'diff' and 'deploy'"
+  (*) echo "Invalid second parameter: ${OPERATION}."
+      echo "Valid values are 'diff' and 'deploy'"
+      echo
   exit 1
   ;;
 esac
 echo
 
-SCRIPT_DIR=$(dirname "$0")
-#echo "The script you are running has basename `basename "$0"`, dirname `dirname "$0"`"
-#echo "The present working directory is `pwd`"
+
 
 # Try to find app properties .ts -file in bin dir of working dir
 EXECUTE_DIR=$(pwd)
@@ -46,16 +35,10 @@ ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/bin/*-app.ts" )
 # Take first .ts file and assume it is the app config file
 APP_TS=${ALL_TS_FILES_IN_BIN[0]}
 echo Found app config: $APP_TS
-
+echo
 # Get stack name (take first match ie. grep -i 'new ' <the-file> | grep -i marineprod |  cut -d "'" -f2 | head -1
-STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${ENV_TYPE}${ENV_ENV}"  |  cut -d "'" -f2 | head -1)
+STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${DT_PROJECT}${DT_PROJECT_ENV}"  |  cut -d "'" -f2 | head -1)
 echo "Using Stack: ${STACK}"
-
-echo SCRIPT_DIR: ${SCRIPT_DIR}
-
-. ${SCRIPT_DIR}/cdk-set-env.sh ${FULL_ENV}
-env | grep AWS
-
 echo
 read -p "Are you sure you wanna run: cdk ${OPERATION} ${STACK}? " -n 1 -r
 echo    # move to a new line

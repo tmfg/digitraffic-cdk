@@ -1,52 +1,91 @@
 #!/usr/bin/env bash
 
-# Update correct values and rename to cdk-set-env.sh
+# TODO: Update correct values to every TODO
+# TODO: Rename script to: cdk-set-env.sh
+
 # Execute in shell:
 # . cdk-set-env.sh <env>
 
-# Set env
+# Read env
 ENV=${1:-"NONE"}
 
-AWS_DEFAULT_REGION=<SET AWS REGION HERE>
+# Default aws region
+AWS_DEFAULT_REGION=<TODO AWS REGION>
+
+# Disable the use of a pager.
+# https://docs.aws.amazon.com/cli/latest/userguide/cli-usage-pagination.html
+AWS_PAGER=""
+
+# Directory where script is called from
+EXECUTE_DIR=$(pwd)
+# Directory where script is located
+SCRIPT_DIR=$(dirname "$0")
+
+# Debug
+#echo EXECUTE_DIR: ${EXECUTE_DIR}
+#echo SCRIPT_DIR: ${SCRIPT_DIR}
 
 case "$ENV" in
-  ("marine-prod"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("marine-test"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("road-prod"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("road-test"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("status-prod"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("status-test"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("aviation-prod"):
-    AWS_PROFILE=<PROFILE>
-  ;;
-  ("aviation-test"):
-    AWS_PROFILE=<PROFILE>
-  ;;
   ("rail-prod"):
-    AWS_PROFILE=<PROFILE>
+    AWS_PROFILE=<TODO PROFILE>
   ;;
   ("rail-test"):
-    AWS_PROFILE=<PROFILE>
+    AWS_PROFILE=<TODO PROFILE>
   ;;
-  (*) echo "Allowed parameter values are road-test, road-prod, marine-test, marine-prod, status-test, status-prod, aviation-test, aviation-prod, rail-test, rail-prod"
+  ("marine-prod"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("marine-test"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("road-prod"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("road-test"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("status-prod"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("status-test"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("aviation-prod"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("aviation-test"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("mcp-prod"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  ("mcp-test"):
+    AWS_PROFILE=<TODO PROFILE>
+  ;;
+  (*) echo
+      echo "First parameter environment is required."
+      echo "Allowed values are rail-prod, rail-test, marine-prod, marine-test, road-prod, road-test, status-prod, status-test, aviation-prod, aviation-test, mcp-prod, mcp-test"
+      echo
   exit 1
   ;;
 esac
 
+
+# Parse parts of the env parameter
+# 1. rail/marine/road/status/aviation/mcp
+DT_PROJECT=$(echo ${ENV} | cut -d '-' -f1)
+# 2. test/prod
+DT_PROJECT_ENV=$(echo ${ENV} | cut -d '-' -f2)
+
 #set -v
+export DT_PROJECT
+export DT_PROJECT_ENV
 export AWS_PROFILE
 export AWS_DEFAULT_REGION
-#env | grep AWS
+export AWS_PAGER
+
+env | grep DT_
+env | grep AWS
+
+echo
 #set +v
