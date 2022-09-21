@@ -3,10 +3,6 @@ name: ESLint
 on:
   [push]
 
-env:
-  GH_PAGES_BRANCH: gh-pages
-  GH_PAGES_URL: https://psychic-telegram-8c228710.pages.github.io
-
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -28,23 +24,14 @@ jobs:
       run: npx eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
       continue-on-error: true
 
-    - name: Publish report on GitHub Pages
-      run: |
-        export CURRENT_BRANCH=${GITHUB_REF##*/}
-        git config --global user.email ""
-        git config --global user.name "Github Actions"
-        git add ./$CURRENT_BRANCH/eslint-report.html
-        git restore package.json
-        git stash push -- $CURRENT_BRANCH/
-        git fetch
-        git switch $GH_PAGES_BRANCH
-        git rm --ignore-unmatch ./$CURRENT_BRANCH/*
-        git stash pop
-        git commit -am "ESLint report for branch $CURRENT_BRANCH"
-        git push -f
-
-    - name: Link to report in summary
-      run: echo "[ESLint report]($GH_PAGES_URL/${GITHUB_REF##*/}/eslint-report.html)" >> $GITHUB_STEP_SUMMARY
+    - name : Publish report
+      uses: tmfg/digitraffic-actions@gh-pages-publish/v1
+      with:
+        GH_PAGES_BRANCH: gh-pages
+        GH_PAGES_URL: https://psychic-telegram-8c228710.pages.github.io
+        FILE_PATH: ${GITHUB_REF##*/}/eslint-report.html
+        COMMIT_MESSAGE: ESLint report for branch $CURRENT_BRANCH
+        LINK_TEXT: ESLint report
       
     - name: Fail on ESLint errors
       if: steps.run-eslint.outcome != 'success'
