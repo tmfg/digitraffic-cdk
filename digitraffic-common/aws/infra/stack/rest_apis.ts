@@ -79,7 +79,7 @@ export class DigitrafficRestApi extends RestApi {
     }
 
     private getModelWithReference(model: Model): ModelWithReference {
-        return R.assoc('modelReference', getModelReference(model.modelId, this.restApiId), model);
+        return R.assoc('modelReference', getModelReference(model.modelId, this.restApiId), model) as ModelWithReference;
     }
 
     private addDocumentationPart(
