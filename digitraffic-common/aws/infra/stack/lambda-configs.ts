@@ -36,14 +36,16 @@ declare interface DbProps {
 export function databaseFunctionProps(
     stack: DigitrafficStack, environment: LambdaEnvironment, lambdaName: string, simpleLambdaName: string, config?: FunctionParameters,
 ): FunctionProps {
+    const vpcSubnets = stack.vpc ? {
+        subnets: stack.vpc.privateSubnets,
+    } : undefined;
+
     return {...lambdaFunctionProps(
         stack, environment, lambdaName, simpleLambdaName, config,
     ), ...{
-        vpc: stack.vpc,
-        vpcSubnets: {
-            subnets: stack.vpc.privateSubnets,
-        },
-        securityGroup: stack.lambdaDbSg,
+        vpc: stack.vpc || undefined,
+        vpcSubnets,
+        securityGroup: stack.lambdaDbSg || undefined,
     }};
 }
 

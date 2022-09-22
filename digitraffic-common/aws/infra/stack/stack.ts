@@ -56,14 +56,18 @@ export class DigitrafficStack extends Stack {
 
         // VPC reference construction requires vpcId and availability zones
         // private subnets are used in Lambda configuration
-        this.vpc = Vpc.fromVpcAttributes(this, 'vpc', {
-            vpcId: configuration.vpcId,
-            privateSubnetIds: configuration.privateSubnetIds,
-            availabilityZones: configuration.availabilityZones,
-        });
+        if (configuration.vpcId) {
+            this.vpc = Vpc.fromVpcAttributes(this, 'vpc', {
+                vpcId: configuration.vpcId,
+                privateSubnetIds: configuration.privateSubnetIds,
+                availabilityZones: configuration.availabilityZones,
+            });
+        }
 
         // security group that allows Lambda database access
-        this.lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', configuration.lambdaDbSgId);
+        if (configuration.lambdaDbSgId) {
+            this.lambdaDbSg = SecurityGroup.fromSecurityGroupId(this, 'LambdaDbSG', configuration.lambdaDbSgId);
+        }
 
         this.alarmTopic = Topic.fromTopicArn(this,
             'AlarmTopic',
