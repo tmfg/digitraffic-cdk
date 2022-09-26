@@ -23,6 +23,10 @@ export class LambdaResponse<T> {
         return this.create(500, 'Internal error');
     }
 
+    static notImplemented() {
+        return this.create(501, 'Not implemented');
+    }
+
     static create<S>(status: number, body: S, fileName?: string): Promise<LambdaResponse<S>> {
         return Promise.resolve({ status, body, fileName });
     }

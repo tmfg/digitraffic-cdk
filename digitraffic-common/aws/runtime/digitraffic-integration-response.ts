@@ -12,6 +12,10 @@ export abstract class DigitrafficIntegrationResponse {
         return this.create("400", mediaType ?? MediaType.TEXT_PLAIN);
     }
 
+    static notImplemented(mediaType?: MediaType): IntegrationResponse {
+        return this.create("501", mediaType ?? MediaType.TEXT_PLAIN);
+    }
+
     static create(statusCode: string, mediaType: MediaType): IntegrationResponse {
         return {
             statusCode,

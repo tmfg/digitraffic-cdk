@@ -26,14 +26,16 @@ export function createSubscription(lambda: Function, lambdaName: string, logDest
 
 export class DigitrafficLogSubscriptions {
     constructor(stack: DigitrafficStack, ...lambdas: MonitoredFunction[]) {
-        lambdas.forEach(lambda => {
-            const filter = new CfnSubscriptionFilter(stack, `${lambda.givenName}LogsSubscription`, {
-                logGroupName: `/aws/lambda/${lambda.givenName}`,
-                filterPattern: '',
-                destinationArn: stack.configuration.logsDestinationArn,
-            });
+        if (stack.configuration.logsDestinationArn) {
+            lambdas.forEach(lambda => {
+                const filter = new CfnSubscriptionFilter(stack, `${lambda.givenName}LogsSubscription`, {
+                    logGroupName: `/aws/lambda/${lambda.givenName}`,
+                    filterPattern: '',
+                    destinationArn: stack.configuration.logsDestinationArn as string,
+                });
 
-            filter.node.addDependency(lambda);
-        });
+                filter.node.addDependency(lambda);
+            });
+        }
     }
 }

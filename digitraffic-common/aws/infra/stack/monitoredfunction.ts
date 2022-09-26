@@ -273,7 +273,10 @@ export class MonitoredDBFunction {
         const mf = MonitoredFunction.create(stack, functionName, functionProps, functionParameters);
 
         stack.grantSecret(mf);
-        new DigitrafficLogSubscriptions(stack, mf);
+
+        if (stack.configuration.logsDestinationArn) {
+            new DigitrafficLogSubscriptions(stack, mf);
+        }
 
         return mf;
     }

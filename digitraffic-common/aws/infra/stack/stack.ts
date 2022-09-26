@@ -20,16 +20,16 @@ export const SSM_KEY_ALARM_TOPIC = `${SSM_ROOT}${MONITORING_ROOT}/alarm-topic`;
 
 export type StackConfiguration = {
     readonly shortName?: string;
-    readonly secretId: string;
+    readonly secretId?: string;
     readonly alarmTopicArn: string;
     readonly warningTopicArn: string;
     readonly enableCanaries: boolean;
-    readonly logsDestinationArn: string;
+    readonly logsDestinationArn?: string;
 
-    readonly vpcId: string;
-    readonly lambdaDbSgId: string;
-    readonly privateSubnetIds: string[];
-    readonly availabilityZones: string[];
+    readonly vpcId?: string;
+    readonly lambdaDbSgId?: string;
+    readonly privateSubnetIds?: string[];
+    readonly availabilityZones?: string[];
 
     readonly trafficType: TrafficType;
     readonly production: boolean;
@@ -52,7 +52,9 @@ export class DigitrafficStack extends Stack {
 
         this.configuration = configuration;
 
-        this.secret = Secret.fromSecretNameV2(this, 'Secret', configuration.secretId);
+        if (configuration.secretId) {
+            this.secret = Secret.fromSecretNameV2(this, 'Secret', configuration.secretId);
+        }
 
         // VPC reference construction requires vpcId and availability zones
         // private subnets are used in Lambda configuration
@@ -60,7 +62,7 @@ export class DigitrafficStack extends Stack {
             this.vpc = Vpc.fromVpcAttributes(this, 'vpc', {
                 vpcId: configuration.vpcId,
                 privateSubnetIds: configuration.privateSubnetIds,
-                availabilityZones: configuration.availabilityZones,
+                availabilityZones: configuration.availabilityZones as string[],
             });
         }
 
@@ -87,8 +89,10 @@ export class DigitrafficStack extends Stack {
     }
 
     createDefaultLambdaEnvironment(dbApplication: string): DBLambdaEnvironment {
-        return {
+        return this.configuration.secretId ? {
             SECRET_ID: this.configuration.secretId,
+            DB_APPLICATION: dbApplication,
+        } : {
             DB_APPLICATION: dbApplication,
         };
     }

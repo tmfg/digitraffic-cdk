@@ -9,7 +9,7 @@ import {MonitoredFunctionAlarmProps} from "./monitoredfunction";
 export type LambdaEnvironment = Record<string, string>;
 
 export type DBLambdaEnvironment = LambdaEnvironment & {
-    SECRET_ID: string
+    SECRET_ID?: string
     DB_APPLICATION: string
 }
 
