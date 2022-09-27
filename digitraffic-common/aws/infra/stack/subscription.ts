@@ -12,7 +12,10 @@ import {MonitoredFunction} from "./monitoredfunction";
  * @param logDestinationArn Destination for streamed logs
  * @param stack CloudFormation stack
  */
-export function createSubscription(lambda: Function, lambdaName: string, logDestinationArn: string, stack: Construct): CfnSubscriptionFilter {
+export function createSubscription(lambda: Function, lambdaName: string, logDestinationArn: string | undefined, stack: Construct): CfnSubscriptionFilter | undefined {
+    if (logDestinationArn == undefined) {
+        return undefined;
+    }
     const filter = new CfnSubscriptionFilter(stack, `${lambdaName}LogsSubscription`, {
         logGroupName: `/aws/lambda/${lambdaName}`,
         filterPattern: '',
