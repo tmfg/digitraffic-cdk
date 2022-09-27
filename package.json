@@ -3,7 +3,7 @@
   "version": "1.1.0",
   "main": "index.js",
   "engines": {
-    "node": ">=14 <15",
+    "node": ">=14",
     "yarn": ">1.2 <2"
   },
   "repository": "git@github.com:tmfg/digitraffic-cdk.git",
