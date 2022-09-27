@@ -3,26 +3,32 @@ import {IFunction} from "aws-cdk-lib/aws-lambda";
 import {MediaType} from "../../types/mediatypes";
 import {DigitrafficIntegrationResponse} from "../../runtime/digitraffic-integration-response";
 
+type ParameterType = 'path' | 'querystring';
+
+interface ApiParameter {
+    type: ParameterType
+    name: string
+}
+
 export class DigitrafficIntegration {
     readonly lambda: IFunction;
     readonly mediaType: MediaType;
 
-    pathParameters: string[] = [];
-    queryParameters: string[] = [];
+    readonly parameters: ApiParameter[] = [];
 
     constructor(lambda: IFunction, mediaType = MediaType.TEXT_PLAIN) {
         this.lambda = lambda;
         this.mediaType = mediaType;
     }
 
-    addPathParameter(path: string): DigitrafficIntegration {
-        this.pathParameters.push(path);
+    addPathParameter(...names: string[]): DigitrafficIntegration {
+        names.forEach(name => this.parameters.push({type: 'path', name}));
 
         return this;
     }
 
-    addQueryParameter(parameter: string): DigitrafficIntegration {
-        this.queryParameters.push(parameter);
+    addQueryParameter(...names: string[]): DigitrafficIntegration {
+        names.forEach(name => this.parameters.push({type: 'querystring', name}));
 
         return this;
     }
@@ -33,8 +39,8 @@ export class DigitrafficIntegration {
         return new LambdaIntegration(this.lambda, {
             proxy: false,
             integrationResponses,
-            requestParameters: this.createRequestParameters(),
-            requestTemplates: this.createRequestTemplates(),
+            requestParameters: this.parameters.length == 0 ? undefined : this.createRequestParameters(),
+            requestTemplates: this.parameters.length == 0 ? undefined : this.createRequestTemplates(),
             passthroughBehavior: PassthroughBehavior.WHEN_NO_MATCH,
         });
     }
@@ -42,12 +48,8 @@ export class DigitrafficIntegration {
     createRequestParameters(): Record<string, string> {
         const requestParameters: Record<string, string> = {};
 
-        this.pathParameters.forEach((parameter: string) => {
-            requestParameters[`integration.request.path.${parameter}`] = `method.request.path.${parameter}`;
-        });
-
-        this.queryParameters.forEach((parameter: string) => {
-            requestParameters[`integration.request.querystring.${parameter}`] = `method.request.querystring.${parameter}`;
+        this.parameters.forEach((parameter: ApiParameter) => {
+            requestParameters[`integration.request.${parameter.type}.${parameter.name}`] = `method.request.${parameter.type}.${parameter.name}`;
         });
 
         return requestParameters;
@@ -56,12 +58,8 @@ export class DigitrafficIntegration {
     createRequestTemplates(): Record<string, string> {
         const requestJson: Record<string, string> = {};
 
-        this.pathParameters.forEach((parameter: string) => {
-            requestJson[parameter] = `$util.escapeJavaScript($input.params('${parameter}'))`;
-        });
-
-        this.queryParameters.forEach((parameter: string) => {
-            requestJson[parameter] = `$util.escapeJavaScript($input.params('${parameter}'))`;
+        this.parameters.forEach((parameter: ApiParameter) => {
+            requestJson[parameter.name] = `$util.escapeJavaScript($input.params('${parameter.name}'))`;
         });
 
         return {
