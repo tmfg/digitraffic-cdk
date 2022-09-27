@@ -82,9 +82,6 @@ export const handler = async () => {
     const swaggerFilename = 'dt-swagger.js';
     const swaggerFilenameFinal = directory ? `${directory}/${swaggerFilename}` : swaggerFilename;
 
-    const swaggerSpecFilenameOld = 'swagger-spec.json';
-    const swaggerSpecFilenameOldFinal = directory ? `${directory}/${swaggerSpecFilenameOld}` : swaggerSpecFilenameOld;
-
     const swaggerSpecFilename = 'openapi.json';
     const swaggerSpecFilenameFinal = directory ? `${directory}/${swaggerSpecFilename}` : swaggerSpecFilename;
 
@@ -96,13 +93,6 @@ export const handler = async () => {
             bucketName,
             JSON.stringify(merged),
             swaggerSpecFilenameFinal,
-            'private',
-            'application/json',
-        ),
-        uploadToS3(
-            bucketName,
-            JSON.stringify(merged),
-            swaggerSpecFilenameOldFinal,
             'private',
             'application/json',
         ),
