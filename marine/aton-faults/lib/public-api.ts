@@ -8,6 +8,7 @@ import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
 import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
 import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
 import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
+import {DigitrafficIntegration} from "digitraffic-common/aws/infra/api/integration";
 
 const ATON_FAULT_TAGS_V1 = ['Aton Fault V1'];
 
@@ -40,20 +41,10 @@ function createFaultsResource(stack: DigitrafficStack, publicApi: RestApi, fault
     const v1Resource = atonResource.addResource("v1");
     const faultsResource = v1Resource.addResource("faults");
 
-    const getFaultsIntegration = defaultIntegration(getFaultsLambda, {
-        requestParameters: {
-            'integration.request.querystring.language': 'method.request.querystring.language',
-            'integration.request.querystring.fixed_in_hours': 'method.request.querystring.fixed_in_hours',
-        },
-        requestTemplates: {
-            'application/json': JSON.stringify({
-                language: "$util.escapeJavaScript($input.params('language'))",
-                // eslint-disable-next-line camelcase
-                fixed_in_hours: "$util.escapeJavaScript($input.params('fixed_in_hours'))",
-            }),
-        },
-        responses: [DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_GEOJSON)],
-    });
+    const getFaultsIntegration = new DigitrafficIntegration(getFaultsLambda, MediaType.APPLICATION_GEOJSON)
+        .addQueryParameter('language')
+        .addQueryParameter('fixed_in_hours')
+        .build();
 
     ['GET', 'HEAD'].forEach(httpMethod => {
         faultsResource.addMethod(httpMethod, getFaultsIntegration, {
