@@ -20,11 +20,10 @@ export function createProcessQueueAndDlqLambda(
     dlqBucket: Bucket,
     sqsExtendedMessageBucketArn: string,
     props: AppProps,
-    secret: ISecret,
     stack: DigitrafficStack,
 ) {
     createProcessQueueLambda(
-        queueAndDLQ.queue, dlqBucket.urlForObject(), sqsExtendedMessageBucketArn, props, secret, stack,
+        queueAndDLQ.queue, dlqBucket.urlForObject(), sqsExtendedMessageBucketArn, props, stack,
     );
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, props, stack);
 }
@@ -34,15 +33,15 @@ function createProcessQueueLambda(
     dlqBucketUrl: string,
     sqsExtendedMessageBucketArn: string,
     appProps: AppProps,
-    secret: ISecret,
     stack: DigitrafficStack,
 ) {
 
     const role = createLambdaRoleWithReadS3Policy(stack, sqsExtendedMessageBucketArn);
     const functionName = "MaintenanceTracking-ProcessQueue";
+    const secret = stack.secret;
 
     const env: LambdaEnvironment = {};
-    env[MaintenanceTrackingEnvKeys.SECRET_ID] = appProps.secretId;
+    env[MaintenanceTrackingEnvKeys.SECRET_ID] = appProps.secretId == undefined ? "" : appProps.secretId;
     env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = appProps.sqsMessageBucketName;
     env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
 

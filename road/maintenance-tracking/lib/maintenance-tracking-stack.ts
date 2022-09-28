@@ -12,8 +12,6 @@ export class MaintenanceTrackingStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: AppProps) {
         super(scope, id, appProps);
 
-        const secret = Secret.fromSecretNameV2(this, 'MaintenanceTrackingSecret', appProps.secretId);
-
         const queueAndDLQ = Sqs.createQueue(this);
         // Create bucket with internal id DLQBucket, that is not going to AWS and must be unique
         const dlqBucket = new Bucket(this, 'DLQBucket', {
@@ -38,7 +36,7 @@ export class MaintenanceTrackingStack extends DigitrafficStack {
         IntegrationApi.createIntegrationApiAndHandlerLambda(queueAndDLQ.queue, sqsExtendedMessageBucket.bucketArn, appProps, this);
 
         InternalLambdas.createProcessQueueAndDlqLambda(
-            queueAndDLQ, dlqBucket, sqsExtendedMessageBucket.bucketArn, appProps, secret, this,
+            queueAndDLQ, dlqBucket, sqsExtendedMessageBucket.bucketArn, appProps, this,
         );
     }
 }
