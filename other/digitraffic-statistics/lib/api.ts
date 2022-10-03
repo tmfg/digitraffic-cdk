@@ -30,6 +30,7 @@ export class StatisticsApi {
     private createDigitrafficApiStatisticsEndPoint(restApi: RestApi, apiStatisticsS3Integration: AwsIntegration) {
         restApi.root
             .addResource("digitraffic-api-statistics")
+            .addResource("{key}")
             .addMethod("GET", apiStatisticsS3Integration, {
                 methodResponses: [{
                     statusCode: "200",
@@ -37,6 +38,9 @@ export class StatisticsApi {
                         "method.response.header.Content-Type": true,
                     },
                 }],
+                requestParameters: {
+                    "method.request.path.key": true,
+                }
             });
     }
 

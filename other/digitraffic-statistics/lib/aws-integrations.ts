@@ -73,7 +73,7 @@ export class StatisticsIntegrations {
         return new AwsIntegration({
             service: "s3",
             integrationHttpMethod: "GET",
-            path: `${apiStatisticsBucket.bucketName}/index.html`,
+            path: `${apiStatisticsBucket.bucketName}/{key}`,
             options: {
                 credentialsRole: this.createS3ExecutionRole(stack, apiStatisticsBucket),
                 integrationResponses: [{
@@ -82,6 +82,9 @@ export class StatisticsIntegrations {
                         'method.response.header.Content-Type': "'text/html'",
                     },
                 }],
+                requestParameters: {
+                    "integration.request.path.key": "method.request.path.key",
+                }
             },
         });
     }
@@ -92,7 +95,7 @@ export class StatisticsIntegrations {
             roleName: "digitraffic-api-statistics-apigw-s3-integration-role",
         });
         executeRole.addToPolicy(new iam.PolicyStatement({
-            resources: [`${bucket.bucketArn}/*`],
+            resources: [`${bucket.bucketArn}/*.html`],
             actions: ["s3:GetObject"],
         }));
         return executeRole;
