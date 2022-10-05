@@ -6,7 +6,7 @@ import moment from "moment-timezone";
 import {newTimestamp} from "./testdata";
 import {ApiTimestamp} from "../lib/model/timestamp";
 import {EventSource} from "../lib/model/eventsource";
-import {getRandomInteger, shuffle} from "digitraffic-common/test/testutils";
+import {getRandomInteger, shuffle} from "@digitraffic/common/test/testutils";
 
 describe('event-sourceutil', () => {
     test('momentAverage', () => {

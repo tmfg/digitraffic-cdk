@@ -2,7 +2,7 @@ import {dbTestBase, insertDisruption} from "../db-testutil";
 import {newDisruption} from "../testdata";
 import * as DisruptionsService from "../../lib/service/disruptions";
 import * as DisruptionsDb from '../../lib/db/disruptions';
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const testGeojson = require('../testdisruptions.json');

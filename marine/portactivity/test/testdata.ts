@@ -7,7 +7,7 @@ import {
 } from "../lib/api/awake_ai_atx";
 import {AwakeAiZoneType} from "../lib/api/awake_common";
 import { v4 as uuidv4 } from 'uuid';
-import {getRandomNumber} from "digitraffic-common/test/testutils";
+import {getRandomNumber} from "@digitraffic/common/test/testutils";
 
 // test file
 /* eslint-disable camelcase */

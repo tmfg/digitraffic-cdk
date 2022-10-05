@@ -1,5 +1,5 @@
 import {assertFaultCount, dbTestBase} from "../db-testutil";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import * as UpdateFaultsService from "../../lib/service/update-faults";
 import * as sinon from "sinon";
 import {FaultsApi} from "../../lib/api/faults";

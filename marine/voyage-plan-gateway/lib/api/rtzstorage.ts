@@ -1,4 +1,4 @@
-import * as S3Utils from "digitraffic-common/aws/runtime/s3";
+import * as S3Utils from "@digitraffic/common/aws/runtime/s3";
 
 export class RtzStorageApi {
 

@@ -1,6 +1,6 @@
 import {dbTestBase, insertCamera, insertCameraGroup} from "../db-testutil";
 import {getAllCameraIdsForGroup, getAllCameras, updateCameraMetadata} from "../../lib/db/metadata";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const GROUP_SAIMAA = 'Saimaa';
 const GROUP_LOIMAA = 'Loimaa';

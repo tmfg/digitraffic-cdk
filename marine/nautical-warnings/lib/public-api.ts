@@ -1,14 +1,14 @@
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {MessageModel} from "digitraffic-common/aws/infra/api/response";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {MessageModel} from "@digitraffic/common/aws/infra/api/response";
 import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficLogSubscriptions} from "digitraffic-common/aws/infra/stack/subscription";
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {DigitrafficLogSubscriptions} from "@digitraffic/common/aws/infra/stack/subscription";
+import {corsMethod, defaultIntegration, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {addServiceModel, featureSchema, geojsonSchema, getModelReference} from "@digitraffic/common/utils/api-model";
 import {nauticalWarningSchema} from "./model/nautical-warnings-schema";
-import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
+import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
 
 const NAUTICAL_WARNING_TAGS_V1 = ['Nautical Warning V1'];
 

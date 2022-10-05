@@ -1,7 +1,7 @@
 import {AssetCode, Runtime} from 'aws-cdk-lib/aws-lambda';
 import {Duration, Stack} from 'aws-cdk-lib';
-import {defaultLambdaConfiguration, LambdaEnvironment} from 'digitraffic-common/aws/infra/stack/lambda-configs';
-import {createSubscription, DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
+import {defaultLambdaConfiguration, LambdaEnvironment} from '@digitraffic/common/aws/infra/stack/lambda-configs';
+import {createSubscription, DigitrafficLogSubscriptions} from '@digitraffic/common/aws/infra/stack/subscription';
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {LambdaSubscription} from "aws-cdk-lib/aws-sns-subscriptions";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
@@ -16,8 +16,8 @@ import {ComparisonOperator, TreatMissingData} from "aws-cdk-lib/aws-cloudwatch";
 import {SnsAction} from "aws-cdk-lib/aws-cloudwatch-actions";
 import {Rule, Schedule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 
 export function create(secret: ISecret,
     notifyTopic: Topic,

@@ -39,10 +39,11 @@
     "typescript": "*"
   },
   "dependencies": {
-    "aws-cdk-lib": "*",
-    "constructs": "*",
+    "@digitraffic/common": "2022.10.5-1",
     "@middy/core": "^1.2.0",
     "@types/ramda": "0.27.44",
+    "aws-cdk-lib": "*",
+    "constructs": "*",
     "dtsgenerator": "^3.3.1",
     "moment": "*",
     "moment-timezone": "*",

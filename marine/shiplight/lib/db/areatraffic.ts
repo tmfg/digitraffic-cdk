@@ -1,5 +1,5 @@
 import {PreparedStatement} from 'pg-promise';
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 export type DbAreaTraffic = {
     readonly id: number

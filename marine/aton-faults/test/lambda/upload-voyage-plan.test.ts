@@ -4,11 +4,11 @@ import {newFaultWithGeometry, voyagePlan} from "../testdata";
 import {SQS} from "aws-sdk";
 import * as sinon from 'sinon';
 import {SinonStub} from 'sinon';
-import {BAD_REQUEST_MESSAGE} from "digitraffic-common/aws/types/errors";
+import {BAD_REQUEST_MESSAGE} from "@digitraffic/common/aws/types/errors";
 import {UploadVoyagePlanEvent} from "../../lib/model/upload-voyageplan-event";
 import {AtonSecret} from "../../lib/model/secret";
-import {createSecretFunction} from "digitraffic-common/test/secret";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {createSecretFunction} from "@digitraffic/common/test/secret";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const sandbox = sinon.createSandbox();
 

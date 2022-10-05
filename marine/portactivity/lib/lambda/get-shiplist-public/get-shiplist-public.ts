@@ -1,8 +1,8 @@
 import {findByLocodePublicShiplist} from '../../dao/shiplist-public';
-import {DTDatabase, inDatabaseReadonly} from 'digitraffic-common/database/database';
+import {DTDatabase, inDatabaseReadonly} from '@digitraffic/common/database/database';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
 import {SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
-import * as IdUtils from 'digitraffic-common/marine/id_utils';
+import * as IdUtils from '@digitraffic/common/marine/id_utils';
 import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {ProxyLambdaRequest, ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
 

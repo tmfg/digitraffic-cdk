@@ -1,4 +1,4 @@
-import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
+import {RtzVoyagePlan} from "@digitraffic/common/marine/rtz";
 import * as FaultsService from "./faults";
 import * as WarningsService from "./warnings";
 import {AWSError, SQS} from "aws-sdk";

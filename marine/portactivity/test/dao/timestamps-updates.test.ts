@@ -3,7 +3,7 @@ import {dbTestBase, findAll, insertPortAreaDetails, insertPortCall} from "../db-
 import {newTimestamp, newPortAreaDetails, newPortCall, PortAreaDetails, PortCall} from "../testdata";
 import * as TimestampsDb from "../../lib/dao/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
 

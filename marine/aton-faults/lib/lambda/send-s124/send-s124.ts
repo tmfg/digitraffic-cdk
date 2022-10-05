@@ -2,12 +2,12 @@ import * as FaultsService from "../../service/faults";
 import * as WarningsService from "../../service/warnings";
 import * as S124Converter from "../../service/s124-converter";
 import {VisService} from "../../service/vis";
-import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {S124Type, SendS124Event} from "../../model/upload-voyageplan-event";
 import {AtonSecret} from "../../model/secret";
-import {decodeBase64ToAscii} from "digitraffic-common/utils/base64";
+import {decodeBase64ToAscii} from "@digitraffic/common/utils/base64";
 import {SQSEvent} from "aws-lambda";
-import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
 import {Builder} from "xml2js";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

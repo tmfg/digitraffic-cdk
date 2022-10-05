@@ -1,6 +1,6 @@
 import {findAllDisruptions} from "../../service/disruptions";
-import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const proxyHolder = ProxyHolder.create();
 

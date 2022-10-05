@@ -1,7 +1,7 @@
 import * as FaultsService from "../../service/faults";
-import {Language} from "digitraffic-common/types/language";
-import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {Language} from "@digitraffic/common/types/language";
+import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const proxyHolder = ProxyHolder.create();
 

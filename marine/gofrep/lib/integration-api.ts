@@ -8,11 +8,11 @@ import {
     RestApi,
 } from 'aws-cdk-lib/aws-apigateway';
 import {Construct} from "constructs";
-import {add404Support, createDefaultPolicyDocument} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
+import {add404Support, createDefaultPolicyDocument} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {createUsagePlan} from "@digitraffic/common/aws/infra/usage-plans";
 import {FormalityResponseJson} from "./model/formality";
-import {databaseFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
-import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
+import {databaseFunctionProps} from "@digitraffic/common/aws/infra/stack/lambda-configs";
+import {createSubscription} from "@digitraffic/common/aws/infra/stack/subscription";
 import {
     defaultIntegration,
     getResponse,
@@ -20,12 +20,12 @@ import {
     RESPONSE_200_OK,
     RESPONSE_400_BAD_REQUEST,
     RESPONSE_500_SERVER_ERROR,
-} from "digitraffic-common/aws/infra/api/responses";
-import {addServiceModel} from "digitraffic-common/utils/api-model";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {MessageModel} from "digitraffic-common/aws/infra/api/response";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+} from "@digitraffic/common/aws/infra/api/responses";
+import {addServiceModel} from "@digitraffic/common/utils/api-model";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {MessageModel} from "@digitraffic/common/aws/infra/api/response";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
 import {EpcMessageSchema} from "./model/epcmessage_schema";
 
 export function create(stack: DigitrafficStack) {

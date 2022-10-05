@@ -2,8 +2,8 @@ import {dbTestBase, insert} from "../db-testutil";
 import {newTimestamp} from "../testdata";
 import * as TimestampsDb from "../../lib/dao/timestamps";
 import {DbTimestamp} from "../../lib/dao/timestamps";
-import {DTDatabase} from "digitraffic-common/database/database";
-import {shuffle} from "digitraffic-common/test/testutils";
+import {DTDatabase} from "@digitraffic/common/database/database";
+import {shuffle} from "@digitraffic/common/test/testutils";
 
 describe('db-timestamps - ordering', dbTestBase((db: DTDatabase) => {
 

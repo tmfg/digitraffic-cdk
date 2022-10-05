@@ -1,7 +1,7 @@
 import * as MetadataService from '../../service/metadata';
 
 import {Camera} from "../../model/camera";
-import {RdsHolder} from "digitraffic-common/aws/runtime/secrets/rds-holder";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
 const rdsHolder = RdsHolder.create();
 

@@ -2,7 +2,7 @@ import * as AwakeAiETAHelper from '../../lib/service/awake_ai_eta_helper';
 import {AwakeAiPredictionType, AwakeAiVoyageEtaPrediction, AwakeAiZoneType} from "../../lib/api/awake_common";
 import {EventSource} from "../../lib/model/eventsource";
 import {randomIMO, randomMMSI} from "../testdata";
-import {randomBoolean} from "digitraffic-common/test/testutils";
+import {randomBoolean} from "@digitraffic/common/test/testutils";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 
 describe('Awake.AI ETA helper', () => {

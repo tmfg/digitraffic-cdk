@@ -359,10 +359,10 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
-"@digitraffic/common@2022.10.5":
-  version "2022.10.5"
-  resolved "https://registry.yarnpkg.com/@digitraffic/common/-/common-2022.10.5.tgz#dce02f6e80f7e355cbec8292206c13959cc961f6"
-  integrity sha512-QA7nxLkGFuNiT2grq3o6yRpy/AZULFwOWt/6GbRJfZICBdyvXRe/5rPZeS8NNx9BRefsjIQ6h5IPE+jaTZMfjQ==
+"@digitraffic/common@2022.10.5-1":
+  version "2022.10.5-1"
+  resolved "https://registry.yarnpkg.com/@digitraffic/common/-/common-2022.10.5-1.tgz#ae11dda46f671c38326f566ce58b6edead94d315"
+  integrity sha512-8iaTDU/OgKLn1D7aNGhcIW7o+HcE6tUypuNDelhaKR7P4LAD3QXLPwQh8hV0XHTW1q519xmRVcfI3Gjx8v9TKw==
 
 "@esbuild/android-arm@0.15.10":
   version "0.15.10"

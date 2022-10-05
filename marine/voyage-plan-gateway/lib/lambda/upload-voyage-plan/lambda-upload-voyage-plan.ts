@@ -1,14 +1,14 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
+import {withSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
 import {VoyagePlanEnvKeys} from "../../keys";
 import * as VoyagePlansService from '../../service/voyageplans';
-import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
+import {RtzVoyagePlan} from "@digitraffic/common/marine/rtz";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";
 import {VtsApi} from "../../api/vts";
-import {SlackApi} from "digitraffic-common/utils/slack";
+import {SlackApi} from "@digitraffic/common/utils/slack";
 import {RtzStorageApi} from "../../api/rtzstorage";
-import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretFunction} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require('zlib');
 

@@ -2,7 +2,7 @@ import {SchedulesApi, SchedulesDirection, SchedulesResponse} from "../../lib/api
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";
 import moment from 'moment-timezone';
-import {getRandomNumber} from "digitraffic-common/test/testutils";
+import {getRandomNumber} from "@digitraffic/common/test/testutils";
 import {ports} from "../../lib/service/portareas";
 import {EventSource} from "../../lib/model/eventsource";
 import {SchedulesService} from "../../lib/service/schedules";

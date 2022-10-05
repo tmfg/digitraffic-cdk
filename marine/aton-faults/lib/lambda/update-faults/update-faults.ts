@@ -1,7 +1,7 @@
 import * as UpdateFaultsService from "../../service/update-faults";
 import {Integration} from "../../app-props";
 import {AtonEnvKeys} from "../../keys";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const proxyHolder = ProxyHolder.create();
 

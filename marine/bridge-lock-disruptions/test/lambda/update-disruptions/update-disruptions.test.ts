@@ -1,12 +1,12 @@
 import {handler} from '../../../lib/lambda/update-disruptions/update-disruptions';
 import {disruptionFeatures} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {TestHttpServer} from "@digitraffic/common/test/httpserver";
 import * as DisruptionsDb from '../../../lib/db/disruptions';
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import * as sinon from "sinon";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 
 const SERVER_PORT = 8089;
 

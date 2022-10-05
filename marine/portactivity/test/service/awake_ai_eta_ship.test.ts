@@ -15,7 +15,7 @@ import {
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
 } from "../../lib/api/awake_common";
-import {getRandomInteger, randomBoolean} from "digitraffic-common/test/testutils";
+import {getRandomInteger, randomBoolean} from "@digitraffic/common/test/testutils";
 import moment from 'moment-timezone';
 
 // test file

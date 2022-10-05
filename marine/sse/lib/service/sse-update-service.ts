@@ -1,5 +1,5 @@
-import {DTDatabase, inDatabase} from 'digitraffic-common/database/database';
-import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import {DTDatabase, inDatabase} from '@digitraffic/common/database/database';
+import * as LastUpdatedDB from "@digitraffic/common/database/last-updated";
 import * as SseDb from "../db/sse-db";
 import * as SseSchema from "../generated/tlsc-sse-reports-schema";
 

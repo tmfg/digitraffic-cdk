@@ -1,6 +1,6 @@
 import * as AreaTrafficService from '../../service/areatraffic';
 import {ShiplightEnvKeys} from "../../keys";
-import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {ShiplightSecret} from "../../model/shiplight-secret";
 import {AreaVisibilityApi} from "../../api/areavisibility";
 import {AreaVisibilityService} from "../../service/areavisibility";

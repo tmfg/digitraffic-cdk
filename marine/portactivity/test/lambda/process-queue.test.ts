@@ -3,9 +3,9 @@ import {handlerFn} from "../../lib/lambda/process-queue/process-queue";
 import {SQSRecord} from "aws-lambda";
 import {ApiTimestamp} from "../../lib/model/timestamp";
 import {newTimestamp} from "../testdata";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import * as R from 'ramda';
-import {createEmptySecretFunction} from "digitraffic-common/test/secret";
+import {createEmptySecretFunction} from "@digitraffic/common/test/secret";
 import {UpdatedTimestamp} from "../../lib/service/timestamps";
 
 // empty sec usage function for tests

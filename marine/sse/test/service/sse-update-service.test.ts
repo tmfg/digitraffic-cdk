@@ -1,5 +1,5 @@
-import {DTDatabase} from "digitraffic-common/database/database";
-import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import {DTDatabase} from "@digitraffic/common/database/database";
+import * as LastUpdatedDB from "@digitraffic/common/database/last-updated";
 import * as SseDb from "../../lib/db/sse-db";
 import * as SSESchema from "../../lib/generated/tlsc-sse-reports-schema";
 import * as SseUpdateService from "../../lib/service/sse-update-service";

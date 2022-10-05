@@ -1,4 +1,4 @@
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
 import * as MetadataDB from "../db/metadata";
 
 import {Camera} from "../model/camera";

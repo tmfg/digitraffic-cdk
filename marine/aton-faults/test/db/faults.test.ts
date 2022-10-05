@@ -4,10 +4,10 @@ import * as FaultsDb from '../../lib/db/faults';
 import {findAll} from '../../lib/db/faults';
 import {LineString, Point} from "wkx";
 import {FaultState} from "../../lib/model/fault";
-import {Language} from "digitraffic-common/types/language";
-import {getRandomNumber} from "digitraffic-common/test/testutils";
+import {Language} from "@digitraffic/common/types/language";
+import {getRandomNumber} from "@digitraffic/common/test/testutils";
 import moment from 'moment';
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('db-voyageplan-faults', dbTestBase((db: DTDatabase) => {
 

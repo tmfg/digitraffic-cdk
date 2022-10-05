@@ -1,4 +1,4 @@
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import {dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
 import {
     getAreaTraffic,

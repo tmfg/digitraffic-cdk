@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {SpatialDisruption} from "../model/disruption";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 export interface DbDisruption {
     id: number;

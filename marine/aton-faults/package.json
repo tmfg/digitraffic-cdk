@@ -37,6 +37,7 @@
     "xsd-schema-validator": "^0.7.0"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",
     "@turf/turf": "6.5.0",
@@ -46,7 +47,6 @@
     "aws-sdk": "*",
     "axios": "^0.21.1",
     "constructs": "*",
-    "digitraffic-common": "*",
     "moment": "*",
     "moment-timezone": "*",
     "parse-link-header": "^2.0.0",

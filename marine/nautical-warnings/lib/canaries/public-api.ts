@@ -1,7 +1,7 @@
-import {ContentTypeChecker, GeoJsonChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
+import {ContentTypeChecker, GeoJsonChecker, UrlChecker} from "@digitraffic/common/aws/infra/canaries/url-checker";
 import {FeatureCollection} from "geojson";
-import {Asserter} from "digitraffic-common/test/asserter";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {Asserter} from "@digitraffic/common/test/asserter";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 
 export const handler = async () => {
     const checker = await UrlChecker.createV2();

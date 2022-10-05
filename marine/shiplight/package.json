@@ -33,17 +33,17 @@
     "typescript": "*"
   },
   "dependencies": {
-    "aws-cdk-lib": "*",
-    "constructs": "*",
+    "@digitraffic/common": "2022.10.5-1",
     "@types/ramda": "0.27.44",
+    "aws-cdk-lib": "*",
     "axios": "^0.21.1",
+    "constructs": "*",
     "moment": "*",
     "moment-timezone": "*",
     "pg-native": "*",
     "pg-promise": "*",
     "ramda": "0.27.1",
     "source-map-support": "^0.5.19",
-    "uuid": "^8.3.1",
-    "digitraffic-common": "*"
+    "uuid": "^8.3.1"
   }
 }

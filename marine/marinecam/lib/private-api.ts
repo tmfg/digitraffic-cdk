@@ -9,17 +9,17 @@ import {
 import {UserPool, UserPoolClient} from "aws-cdk-lib/aws-cognito";
 import {Role, ServicePrincipal} from 'aws-cdk-lib/aws-iam';
 import {Bucket} from "aws-cdk-lib/aws-s3";
-import {createResponses} from "digitraffic-common/aws/infra/api/response";
-import {corsMethod, defaultIntegration, getResponse, methodResponse} from "digitraffic-common/aws/infra/api/responses";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
-import {BETA_TAGS} from "digitraffic-common/aws/types/tags";
-import {LambdaEnvironment, lambdaFunctionProps} from "digitraffic-common/aws/infra/stack/lambda-configs";
+import {createResponses} from "@digitraffic/common/aws/infra/api/response";
+import {corsMethod, defaultIntegration, getResponse, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {addTagsAndSummary} from "@digitraffic/common/aws/infra/documentation";
+import {BETA_TAGS} from "@digitraffic/common/aws/types/tags";
+import {LambdaEnvironment, lambdaFunctionProps} from "@digitraffic/common/aws/infra/stack/lambda-configs";
 import {MarinecamEnvKeys} from "./keys";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {add401Support, DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {MonitoredDBFunction, MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {add401Support, DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {MonitoredDBFunction, MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "@digitraffic/common/aws/runtime/digitraffic-integration-response";
 import {MobileServerProps} from "./app-props";
 import {Construct} from "constructs";
 

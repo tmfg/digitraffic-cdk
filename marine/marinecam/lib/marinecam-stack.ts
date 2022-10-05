@@ -1,6 +1,6 @@
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {Construct} from "constructs";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 import {MobileServerProps} from './app-props';
 import * as InternalLambas from './internal-lambdas';
 import {PrivateApi} from "./private-api";

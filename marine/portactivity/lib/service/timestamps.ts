@@ -1,6 +1,6 @@
 import * as TimestampsDB from '../dao/timestamps';
 import {DbTimestamp, DbTimestampIdAndLocode, DbETAShip, DbUpdatedTimestamp} from '../dao/timestamps';
-import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from 'digitraffic-common/database/database';
+import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from '@digitraffic/common/database/database';
 import {ApiTimestamp, Ship} from '../model/timestamp';
 import {
     getDisplayableNameForEventSource,

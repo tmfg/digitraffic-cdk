@@ -34,13 +34,13 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "aws-cdk-lib": "*",
     "amazon-cognito-identity-js": "5.2.4",
     "aws-sdk": "*",
     "axios": "^0.21.1",
     "axios-retry": "^3.2.0",
     "constructs": "*",
-    "digitraffic-common": "*",
     "pg-native": "*",
     "pg-promise": "*",
     "xml2js": "^0.4.23"

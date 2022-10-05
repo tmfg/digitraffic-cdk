@@ -1,7 +1,7 @@
 import axios from 'axios';
-import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
+import {withSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
 import {VoyagePlanEnvKeys} from "../../keys";
-import {ProxyLambdaRequest, ProxyLambdaResponse} from "digitraffic-common/aws/types/proxytypes";
+import {ProxyLambdaRequest, ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
 
 const secretId = process.env[VoyagePlanEnvKeys.SECRET_ID] as string;
 

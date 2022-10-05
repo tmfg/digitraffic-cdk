@@ -1,13 +1,13 @@
 import {handlerFn} from "../../lib/lambda/update-lights/update-lights";
 import {assertArea, dbTestBase, insertAreaTraffic, insertVessel, insertVesselLocation} from "../db-testutil";
-import {createSecretFunction} from "digitraffic-common/test/secret";
+import {createSecretFunction} from "@digitraffic/common/test/secret";
 import {ShiplightSecret} from "../../lib/model/shiplight-secret";
 import * as sinon from "sinon";
 import {AreaVisibilityService} from "../../lib/service/areavisibility";
 import {AreaVisibilityApi} from "../../lib/api/areavisibility";
 import {AreaLightsApi} from "../../lib/api/arealights";
 import {AreaLightsService} from "../../lib/service/arealights";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const secret: ShiplightSecret = {
     lightsControlEndpointUrl: 'test',

@@ -34,11 +34,12 @@
     "typescript": "*"
   },
   "dependencies": {
-    "aws-cdk-lib": "*",
-    "constructs": "*",
+    "@digitraffic/common": "2022.10.5-1",
     "@types/openlayers": "^4.6.17",
+    "aws-cdk-lib": "*",
     "aws-sdk": "*",
     "axios": "^0.21.1",
+    "constructs": "*",
     "crypto-js": "^4.0.0",
     "jsts": "2.6.2",
     "moment": "*",

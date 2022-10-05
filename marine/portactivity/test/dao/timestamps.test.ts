@@ -4,9 +4,9 @@ import {newPortAreaDetails, newPortCall, newTimestamp, newVessel} from "../testd
 import * as TimestampsDb from "../../lib/dao/timestamps";
 import {DbTimestamp} from "../../lib/dao/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import {EventSource} from "../../lib/model/eventsource";
-import {getRandomInteger} from "digitraffic-common/test/testutils";
+import {getRandomInteger} from "@digitraffic/common/test/testutils";
 
 const EVENT_SOURCE = 'TEST';
 

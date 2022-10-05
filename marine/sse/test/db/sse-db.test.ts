@@ -3,7 +3,7 @@ import * as Testdata from "../testdata";
 import * as SseUpdateService from "../../lib/service/sse-update-service";
 import * as SseDb from "../../lib/db/sse-db";
 import {TheItemsSchema} from "../../lib/generated/tlsc-sse-reports-schema";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('sse-db-test', DbTestutil.dbTestBase((db: DTDatabase) => {
 

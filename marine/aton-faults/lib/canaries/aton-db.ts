@@ -1,4 +1,4 @@
-import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
+import {DatabaseChecker} from "@digitraffic/common/aws/infra/canaries/database-checker";
 
 export const handler = () => {
     const checker = DatabaseChecker.createForRds();

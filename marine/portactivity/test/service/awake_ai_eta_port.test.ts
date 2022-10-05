@@ -9,7 +9,7 @@ import {
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
 } from "../../lib/api/awake_common";
-import {getRandomNumber, randomBoolean, shuffle} from "digitraffic-common/test/testutils";
+import {getRandomNumber, randomBoolean, shuffle} from "@digitraffic/common/test/testutils";
 import moment from "moment-timezone";
 
 describe('AwakeAiETAPortService(', () => {

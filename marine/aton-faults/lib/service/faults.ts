@@ -1,13 +1,13 @@
-import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import * as LastUpdatedDB from "@digitraffic/common/database/last-updated";
 import * as FaultsDB from "../db/faults";
 import * as S124Converter from "./s124-converter";
-import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
 import {Geometry, LineString, Point} from "wkx";
 import {Builder} from 'xml2js';
-import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
+import {RtzVoyagePlan} from "@digitraffic/common/marine/rtz";
 import {Feature, FeatureCollection, GeometryObject} from "geojson";
-import {createFeatureCollection} from "digitraffic-common/utils/geometry";
-import {Language} from "digitraffic-common/types/language";
+import {createFeatureCollection} from "@digitraffic/common/utils/geometry";
+import {Language} from "@digitraffic/common/types/language";
 import {DbFault} from "../model/fault";
 
 export const ATON_DATA_TYPE = "ATON_FAULTS";

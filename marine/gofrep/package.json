@@ -31,15 +31,15 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "aws-cdk-lib": "*",
-    "constructs": "*",
     "aws-sdk": "*",
     "axios": "^0.21.1",
+    "constructs": "*",
     "moment": "*",
     "moment-timezone": "*",
     "ramda": "0.27.1",
-    "source-map-support": "^0.5.19",
-    "digitraffic-common": "*"
+    "source-map-support": "^0.5.19"
   },
   "externals": [
     "aws-sdk"

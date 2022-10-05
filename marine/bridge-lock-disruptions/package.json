@@ -33,9 +33,10 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
+    "@types/geojson": "^7946.0.7",
     "aws-cdk-lib": "*",
     "constructs": "*",
-    "@types/geojson": "^7946.0.7",
     "aws-sdk": "*",
     "axios": "^0.21.1",
     "geojson-validation": "^1.0.2",
@@ -45,7 +46,6 @@
     "source-map-support": "^0.5.19",
     "wkx": "^0.5.0",
     "xml2js": "^0.4.23",
-    "moment": "*",
-    "digitraffic-common": "*"
+    "moment": "*"
   }
 }

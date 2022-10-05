@@ -1,9 +1,9 @@
 import {PreparedStatement} from "pg-promise";
-import {createGeometry} from "digitraffic-common/utils/geometry";
+import {createGeometry} from "@digitraffic/common/utils/geometry";
 import {LineString} from "wkx";
 import {DbFault, FaultFeature} from "../model/fault";
-import {Language} from "digitraffic-common/types/language";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {Language} from "@digitraffic/common/types/language";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 import moment = require('moment-timezone');
 

@@ -1,5 +1,5 @@
-import {DTDatabase} from "digitraffic-common/database/database";
-import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
+import {DTDatabase} from "@digitraffic/common/database/database";
+import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
 import {DbSseReport} from "../lib/db/sse-db";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {

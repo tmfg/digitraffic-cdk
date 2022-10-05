@@ -1,7 +1,7 @@
 import {Construct} from 'constructs';
 import * as IntegrationApi from './integration-api';
 import {AppProps} from './app-props';
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class SseStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: AppProps) {

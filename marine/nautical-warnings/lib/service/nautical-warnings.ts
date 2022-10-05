@@ -1,10 +1,10 @@
 import {NauticalWarningsApi} from "../api/nautical-warnings";
-import * as CachedDao from "digitraffic-common/database/cached";
-import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
-import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import * as CachedDao from "@digitraffic/common/database/cached";
+import {JSON_CACHE_KEY} from "@digitraffic/common/database/cached";
+import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
 import moment from "moment-timezone";
 import {Feature, FeatureCollection, GeoJsonProperties} from "geojson";
-import {isFeatureCollection} from "digitraffic-common/utils/geometry";
+import {isFeatureCollection} from "@digitraffic/common/utils/geometry";
 
 export function getActiveWarnings(): Promise<FeatureCollection | null> {
     return inDatabaseReadonly((db: DTDatabase) => {

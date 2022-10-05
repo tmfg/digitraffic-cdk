@@ -1,7 +1,7 @@
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {Scheduler} from "@digitraffic/common/aws/infra/scheduler";
 import {Function} from "aws-cdk-lib/aws-lambda";
-import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {MonitoredDBFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
 
 export class InternalLambdas {
     constructor(stack: DigitrafficStack) {

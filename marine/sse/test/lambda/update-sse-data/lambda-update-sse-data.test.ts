@@ -1,4 +1,4 @@
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import * as sinon from 'sinon';
 import * as LambdaUpdateSseData from "../../../lib/lambda/update-sse-data/lambda-update-sse-data";
 import * as SseUpdateService from "../../../lib/service/sse-update-service";

@@ -1,5 +1,5 @@
-import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
-import {JSON_CACHE_KEY} from "digitraffic-common/database/cached";
+import {DatabaseChecker} from "@digitraffic/common/aws/infra/canaries/database-checker";
+import {JSON_CACHE_KEY} from "@digitraffic/common/database/cached";
 
 export const handler = () => {
     const checker = DatabaseChecker.createForProxy();

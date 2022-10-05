@@ -2,7 +2,7 @@ import {dbTestBase, insertPilotage} from "../db-testutil";
 import {deletePilotages, findPortCallId, getTimestamps} from "../../lib/dao/pilotages";
 import {Pilotage} from "../../lib/model/pilotage";
 import {Location} from "lib/model/timestamp";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('db-pilotages-public', dbTestBase((db: DTDatabase) => {
     function createPilotage(): Pilotage {

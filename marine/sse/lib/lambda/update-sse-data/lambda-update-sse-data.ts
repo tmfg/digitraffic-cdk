@@ -1,6 +1,6 @@
 // import aws from 'aws-sdk';
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
-import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "digitraffic-common/aws/types/errors";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {BAD_REQUEST_MESSAGE, ERROR_MESSAGE} from "@digitraffic/common/aws/types/errors";
 import * as SSE from "../../generated/tlsc-sse-reports-schema";
 import * as SseUpdateService from "../../service/sse-update-service";
 import {SseSaveResult} from "../../service/sse-update-service";

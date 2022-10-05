@@ -3,7 +3,7 @@ import {
     TheConfidenceSchema, TheCoordLatitudeSchema, TheCoordLongitudeSchema, TheHeelAngleSchema, TheLastUpdateSchema,
     TheLightStatusSchema, TheSeastateSchema, TheSiteTypeSchema, TheTemperatureSchema, TheTrendSchema, TheWindwavedirSchema,
 } from "../generated/tlsc-sse-reports-schema";
-import {DTTransaction} from "digitraffic-common/database/database";
+import {DTTransaction} from "@digitraffic/common/database/database";
 
 export type DbSseReport = {
     readonly sseReportId?: bigint,

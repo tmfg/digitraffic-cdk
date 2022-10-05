@@ -3,11 +3,11 @@ import {handlerFn} from '../../lib/lambda/send-s124/send-s124';
 import {newFault} from "../testdata";
 import * as sinon from 'sinon';
 import {SQSEvent} from "aws-lambda";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {TestHttpServer} from "@digitraffic/common/test/httpserver";
 import {S124Type, SendS124Event} from "../../lib/model/upload-voyageplan-event";
-import {createSecretFunction} from "digitraffic-common/test/secret";
+import {createSecretFunction} from "@digitraffic/common/test/secret";
 import {AtonSecret} from "../../lib/model/secret";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;

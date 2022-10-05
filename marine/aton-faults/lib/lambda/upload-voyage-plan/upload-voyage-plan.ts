@@ -1,14 +1,14 @@
 import * as util from 'util';
 import * as xml2js from 'xml2js';
-import {RtzVoyagePlan} from "digitraffic-common/marine/rtz";
+import {RtzVoyagePlan} from "@digitraffic/common/marine/rtz";
 import {SQS} from "aws-sdk";
-import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
-import {BAD_REQUEST_MESSAGE} from "digitraffic-common/aws/types/errors";
+import {SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
+import {BAD_REQUEST_MESSAGE} from "@digitraffic/common/aws/types/errors";
 import {AtonEnvKeys} from "../../keys";
 import {VoyagePlanService} from "../../service/voyage-plan";
 import {UploadVoyagePlanEvent} from "../../model/upload-voyageplan-event";
 import {AtonSecret} from "../../model/secret";
-import {decodeBase64ToAscii} from "digitraffic-common/utils/base64";
+import {decodeBase64ToAscii} from "@digitraffic/common/utils/base64";
 import {VisService} from "../../service/vis";
 
 /**

@@ -4,7 +4,7 @@ import {DbDisruption} from "../../lib/db/disruptions";
 import * as DisruptionsDb from '../../lib/db/disruptions';
 import {Geometry} from "wkx";
 import {Geometry as GeoJSONGeometry} from "geojson";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('db-disruptions', dbTestBase((db: DTDatabase) => {
 

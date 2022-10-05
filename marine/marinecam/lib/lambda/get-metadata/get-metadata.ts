@@ -1,6 +1,6 @@
 import * as MetadataService from '../../service/metadata';
-import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
-import {RdsHolder} from "digitraffic-common/aws/runtime/secrets/rds-holder";
+import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
 const rdsHolder = RdsHolder.create();
 

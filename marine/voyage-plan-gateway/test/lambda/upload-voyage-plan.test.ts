@@ -3,7 +3,7 @@ import * as sinon from 'sinon';
 import moment from 'moment-timezone';
 import {VisMessageWithCallbackEndpoint} from "../../lib/model/vismessage";
 import {VtsApi} from "../../lib/api/vts";
-import {SlackApi} from "digitraffic-common/utils/slack";
+import {SlackApi} from "@digitraffic/common/utils/slack";
 import {RtzStorageApi} from "../../lib/api/rtzstorage";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const zlib = require('zlib');

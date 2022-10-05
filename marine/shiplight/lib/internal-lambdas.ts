@@ -1,7 +1,7 @@
-import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
+import {DigitrafficLogSubscriptions} from '@digitraffic/common/aws/infra/stack/subscription';
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {Scheduler} from "@digitraffic/common/aws/infra/scheduler";
 
 export function create(stack: DigitrafficStack) {
     const updateLambda = createUpdateLightsLambda(stack);

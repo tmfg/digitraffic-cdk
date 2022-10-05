@@ -13,7 +13,7 @@ import * as TimestampsService from "../../lib/service/timestamps";
 import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {EventSource} from "../../lib/model/eventsource";
 import * as R from "ramda";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('timestamps', dbTestBase((db: DTDatabase) => {
 

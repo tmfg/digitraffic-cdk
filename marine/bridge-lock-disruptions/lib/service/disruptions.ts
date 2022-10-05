@@ -1,11 +1,11 @@
-import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
+import * as LastUpdatedDB from "@digitraffic/common/database/last-updated";
 import * as DisruptionsDB from "../db/disruptions";
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
 import {Feature, FeatureCollection, GeoJSON, GeoJsonProperties, Geometry as GeoJSONGeometry} from "geojson";
 import {Disruption, SpatialDisruption} from "../model/disruption";
 import * as DisruptionsApi from '../api/disruptions';
 import moment from "moment";
-import {createFeatureCollection, isValidGeoJson} from "digitraffic-common/utils/geometry";
+import {createFeatureCollection, isValidGeoJson} from "@digitraffic/common/utils/geometry";
 import {Geometry} from "wkx";
 
 export const DISRUPTIONS_DATE_FORMAT = 'D.M.YYYY H:mm';

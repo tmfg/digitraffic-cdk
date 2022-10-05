@@ -1,8 +1,8 @@
 import * as ImageFetcher from "../../service/image-fetcher";
 import {MarinecamEnvKeys} from "../../keys";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import {MarinecamSecret} from "../../model/secret";
-import {RdsHolder} from "digitraffic-common/aws/runtime/secrets/rds-holder";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<MarinecamSecret>('mobile_server');

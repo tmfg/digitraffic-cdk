@@ -2,7 +2,7 @@ import {handler} from '../../../lib/lambda/get-disruptions/get-disruptions';
 import {newDisruption} from "../../testdata";
 import {dbTestBase, insertDisruption} from "../../db-testutil";
 import {FeatureCollection} from "geojson";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 import * as sinon from "sinon";
 
 describe('lambda-get-disruptions', dbTestBase((db) => {
