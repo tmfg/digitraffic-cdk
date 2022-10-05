@@ -2,11 +2,11 @@ import {Model, RequestValidator, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {Construct} from 'constructs';
 import {DigitrafficRestApi} from 'digitraffic-common/aws/infra/stack/rest_apis';
 import {Queue} from 'aws-cdk-lib/aws-sqs';
-import {attachQueueToApiGatewayResource} from "digitraffic-common/aws/infra/sqs-integration";
-import {addServiceModel, getModelReference} from "digitraffic-common/utils/api-model";
+import {attachQueueToApiGatewayResource} from "@digitraffic/common/aws/infra/sqs-integration";
+import {addServiceModel, getModelReference} from "@digitraffic/common/utils/api-model";
 import {createTimestampSchema, LocationSchema, ShipSchema} from "./model/timestamp-schema";
-import {addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {addTagsAndSummary, DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 
 export function create(queue: Queue,
     stack: DigitrafficStack): void {
@@ -25,7 +25,7 @@ export function create(queue: Queue,
 }
 
 function createUpdateTimestampResource(stack: Construct,
-    integrationApi: RestApi,
+    integrationApi: DigitrafficRestApi,
     queue: Queue,
     timestampModel: Model) {
     const apiResource = integrationApi.root.addResource('api');
@@ -48,13 +48,9 @@ function createUpdateTimestampResource(stack: Construct,
             'application/json': timestampModel,
         },
     );
-    addTagsAndSummary(
-        'UpdateTimestamp',
-        ['timestamps'],
-        'Updates a single ship timestamp',
-        timestampResource,
-        stack,
-    );
+
+    integrationApi.documentResource(timestampResource,
+        DocumentationPart.method(['timestamps'], 'UpdateTimestamp', 'Updates a single ship timestamp'));
 }
 
 function createUsagePlan(integrationApi: RestApi) {

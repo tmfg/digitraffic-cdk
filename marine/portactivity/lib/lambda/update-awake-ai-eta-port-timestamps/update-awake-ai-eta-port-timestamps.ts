@@ -1,6 +1,6 @@
-import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretFunction} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
-import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
+import {withSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
 import {SNSEvent} from "aws-lambda";
 import {sendMessage} from "../../service/queue-service";
 import {AwakeAiETAPortApi} from "../../api/awake_ai_port";

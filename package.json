@@ -18,6 +18,7 @@
   ],
   "resolutions": {
     "@types/aws-lambda": "8.10.102",
+    "@types/sinon": "^10.0.13",
     "aws-cdk-lib": "2.38.1",
     "aws-sdk": "2.1198.0",
     "constructs": "10.1.80",
@@ -25,6 +26,7 @@
     "moment-timezone": "0.5.34",
     "pg-native": "~3.0.1",
     "pg-promise": "10.11.1",
+    "sinon": "^14.0.1",
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {

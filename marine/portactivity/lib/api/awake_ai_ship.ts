@@ -1,5 +1,5 @@
 import axios, {AxiosError} from 'axios';
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {AwakeAiPredictedVoyage, AwakeAiShip} from "./awake_common";
 
 export enum AwakeAiShipResponseType {

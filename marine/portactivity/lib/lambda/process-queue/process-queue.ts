@@ -1,9 +1,9 @@
 import {saveTimestamp, UpdatedTimestamp} from "../../service/timestamps";
 import {validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
-import {EmptySecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {EmptySecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys} from "../../keys";
-import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const middy = require('@middy/core');

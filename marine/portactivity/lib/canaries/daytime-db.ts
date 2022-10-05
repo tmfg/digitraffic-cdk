@@ -1,4 +1,4 @@
-import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
+import {DatabaseChecker} from "@digitraffic/common/aws/infra/canaries/database-checker";
 import {EventSource} from "../model/eventsource";
 
 export const handler = (): Promise<string> => {

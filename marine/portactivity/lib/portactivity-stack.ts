@@ -8,7 +8,7 @@ import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget} from "aws-cdk-lib/aws-rds";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Canaries} from "./canaries";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class PortActivityStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: Props) {

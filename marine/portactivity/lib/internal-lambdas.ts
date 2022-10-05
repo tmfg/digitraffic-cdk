@@ -4,8 +4,8 @@ import {
     databaseFunctionProps,
     defaultLambdaConfiguration,
     LambdaEnvironment,
-} from 'digitraffic-common/aws/infra/stack/lambda-configs';
-import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
+} from '@digitraffic/common/aws/infra/stack/lambda-configs';
+import {DigitrafficLogSubscriptions} from '@digitraffic/common/aws/infra/stack/subscription';
 import {Queue} from "aws-cdk-lib/aws-sqs";
 import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
 import {Bucket} from "aws-cdk-lib/aws-s3";
@@ -17,11 +17,11 @@ import {Rule, Schedule} from "aws-cdk-lib/aws-events";
 import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
 import {LambdaSubscription} from "aws-cdk-lib/aws-sns-subscriptions";
 import {PortactivityEnvKeys} from "./keys";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 import {Props} from './app-props';
 import {Topic} from "aws-cdk-lib/aws-sns";
-import {Scheduler} from "digitraffic-common/aws/infra/scheduler";
+import {Scheduler} from "@digitraffic/common/aws/infra/scheduler";
 
 export function create(stack: DigitrafficStack,
     queueAndDLQ: QueueAndDLQ,

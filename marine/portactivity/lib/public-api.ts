@@ -8,19 +8,23 @@ import {
 } from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
-import {DigitrafficLogSubscriptions} from 'digitraffic-common/aws/infra/stack/subscription';
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
-import {MessageModel} from "digitraffic-common/aws/infra/api/response";
-import {addDefaultValidator, addServiceModel, createArraySchema, getModelReference} from "digitraffic-common/utils/api-model";
-import {addQueryParameterDescription, addTagsAndSummary} from "digitraffic-common/aws/infra/documentation";
-import {createUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
-import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
+import {corsMethod, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
+import {MessageModel} from "@digitraffic/common/aws/infra/api/response";
+import {
+    addDefaultValidator,
+    addServiceModel,
+    createArraySchema,
+    getModelReference
+} from "@digitraffic/common/utils/api-model";
+import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
+import {createUsagePlan} from "@digitraffic/common/aws/infra/usage-plans";
+import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
 import {TimestampMetadata} from './model/timestamp-metadata';
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {MonitoredDBFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
 import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
+import {DigitrafficIntegration} from "@digitraffic/common/aws/infra/api/integration";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -60,9 +64,7 @@ export class PublicApi {
         errorResponseModel: IModel,
         validator: RequestValidator,
     ): Function {
-        const environment = stack.createLambdaEnvironment();
-
-        const getTimestampsLambda = MonitoredFunction.createV2(stack, 'get-timestamps', environment, {
+        const getTimestampsLambda = MonitoredDBFunction.create(stack, 'get-timestamps', stack.createLambdaEnvironment(), {
             timeout: 10,
             reservedConcurrentExecutions: 20,
             errorAlarmProps: {
@@ -71,29 +73,9 @@ export class PublicApi {
             },
         });
 
-        stack.grantSecret(getTimestampsLambda);
-        new DigitrafficLogSubscriptions(stack, getTimestampsLambda);
-
-        const getTimestampsIntegration = defaultIntegration(getTimestampsLambda, {
-            requestParameters: {
-                'integration.request.querystring.locode': 'method.request.querystring.locode',
-                'integration.request.querystring.mmsi': 'method.request.querystring.mmsi',
-                'integration.request.querystring.imo': 'method.request.querystring.imo',
-                'integration.request.querystring.source': 'method.request.querystring.source',
-            },
-            requestTemplates: {
-                'application/json': JSON.stringify({
-                    locode: "$util.escapeJavaScript($input.params('locode'))",
-                    mmsi: "$util.escapeJavaScript($input.params('mmsi'))",
-                    imo: "$util.escapeJavaScript($input.params('imo'))",
-                    source: "$util.escapeJavaScript($input.params('source'))",
-                }),
-            },
-            responses: [
-                DigitrafficIntegrationResponse.ok(MediaType.APPLICATION_JSON),
-                DigitrafficIntegrationResponse.badRequest(),
-            ],
-        });
+        const getTimestampsIntegration = new DigitrafficIntegration(getTimestampsLambda, MediaType.APPLICATION_JSON)
+            .addQueryParameter('locode', 'mmsi', 'imo', 'source')
+            .build();
 
         const timestampResource = resource.addResource('timestamps');
         timestampResource.addMethod("GET", getTimestampsIntegration, {
@@ -113,30 +95,22 @@ export class PublicApi {
             ],
         });
 
-        addTagsAndSummary(
-            'GetTimestamps',
-            ['timestamps'],
-            'Retrieves ship timestamps by ship or port',
-            timestampResource,
-            stack,
-        );
-        addQueryParameterDescription('locode', 'Port LOCODE', timestampResource, stack);
-        addQueryParameterDescription('mmsi', 'Ship MMSI', timestampResource, stack);
-        addQueryParameterDescription('imo', 'Ship IMO', timestampResource, stack);
+        this.publicApi.documentResource(timestampResource,
+            DocumentationPart.method(['timestamps'], 'GetTimestamps', 'Retrieves ship timestamps by ship or port'),
+            DocumentationPart.queryParameter('locode', 'Port LOCODE'),
+            DocumentationPart.queryParameter('mmsi', 'Ship MMSI'),
+            DocumentationPart.queryParameter('imo', 'Ship IMO'),
+            DocumentationPart.queryParameter('source', 'Timestamp source'));
 
         return getTimestampsLambda;
     }
 
     createShiplistResource(stack: DigitrafficStack, publicApi: RestApi): Function {
-        const environment = stack.createLambdaEnvironment();
-
-        const lambda = MonitoredFunction.createV2(stack, 'get-shiplist-public', environment, {
+        const lambda = MonitoredDBFunction.create(stack, 'get-shiplist-public', stack.createLambdaEnvironment(), {
             functionName: 'PortActivity-PublicShiplist',
             timeout: 10,
             reservedConcurrentExecutions: 6,
         });
-
-        stack.grantSecret(lambda);
 
         const integration = new LambdaIntegration(lambda, {
             proxy: true,
@@ -147,15 +121,8 @@ export class PublicApi {
             apiKeyRequired: false,
         });
 
-        new DigitrafficLogSubscriptions(stack, lambda);
-
-        addTagsAndSummary(
-            'Shiplist',
-            ['shiplist'],
-            'Returns a list of ships as an HTML page',
-            shiplistResource,
-            stack,
-        );
+        this.publicApi.documentResource(shiplistResource,
+            DocumentationPart.method(['shiplist'], 'Shiplist', 'Returns a list of ships as an HTML page'));
 
         return lambda;
     }
@@ -188,12 +155,7 @@ export class PublicApi {
             }],
         });
 
-        addTagsAndSummary(
-            'Timestamp metadata',
-            ['metadata'],
-            'Returns timestamp related metadata',
-            metadataResource,
-            stack,
-        );
+        this.publicApi.documentResource(metadataResource,
+            DocumentationPart.method(['metadata'], 'Timestamp metadata', 'Returns timestamp related metadata'));
     }
 }

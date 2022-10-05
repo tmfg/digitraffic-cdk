@@ -1,4 +1,4 @@
-import {uploadToS3} from "digitraffic-common/aws/runtime/s3";
+import {uploadToS3} from "@digitraffic/common/aws/runtime/s3";
 
 export const BUCKET_NAME = 'BUCKET_NAME';
 const bucketName = process.env[BUCKET_NAME] as string;

@@ -3,7 +3,7 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../service/portareas";
 import moment from "moment";
 import {EventSource} from "../model/eventsource";
-import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
+import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
 
 // camels
 /* eslint-disable camelcase */

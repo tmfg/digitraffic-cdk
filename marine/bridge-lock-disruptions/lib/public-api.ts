@@ -21,7 +21,6 @@ export class PublicApi {
         const publicApi = this.createApi(stack);
 
         createUsagePlan(publicApi, 'BridgeLock Api Key', 'BridgeLock Usage Plan');
-        //        publicApi.createUsagePlanV2('BridgeLock');
 
         const disruptionModel = addServiceModel("DisruptionModel", publicApi, DisruptionSchema);
         const featureModel = addServiceModel("FeatureModel", publicApi, featureSchema(getModelReference(disruptionModel.modelId, publicApi.restApiId)));

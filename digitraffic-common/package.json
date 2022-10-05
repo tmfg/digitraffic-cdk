@@ -27,7 +27,7 @@
     "moment": "*",
     "pg-native": "*",
     "pg-promise": "*",
-    "sinon": "^11.1.2"
+    "sinon": "*"
   },
   "externals": [
     "aws-sdk",

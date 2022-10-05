@@ -1,7 +1,7 @@
 import {PreparedStatement} from "pg-promise";
 import {EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 export interface DbPublicShiplist {
     // eslint-disable-next-line camelcase

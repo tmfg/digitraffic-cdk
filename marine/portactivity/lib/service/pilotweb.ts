@@ -5,7 +5,7 @@ import * as LocationConverter from './location-converter';
 
 import {ApiTimestamp, EventType, Location} from "../model/timestamp";
 import {Pilotage} from "../model/pilotage";
-import {inDatabase, DTDatabase} from "digitraffic-common/database/database";
+import {inDatabase, DTDatabase} from "@digitraffic/common/database/database";
 import {EventSource} from "../model/eventsource";
 
 export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {

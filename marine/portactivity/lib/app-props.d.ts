@@ -1,5 +1,5 @@
 import {Duration} from "aws-cdk-lib";
-import {StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
+import {StackConfiguration} from "@digitraffic/common/aws/infra/stack/stack";
 
 export type Props = StackConfiguration & {
     readonly dlqBucketName: string

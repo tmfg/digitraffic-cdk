@@ -2,7 +2,7 @@ import {ports} from '../../service/portareas';
 import * as TimestampService from '../../service/timestamps';
 import {PortactivityEnvKeys} from "../../keys";
 import {SNS} from "aws-sdk";
-import {DbSecret, SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {DbSecret, SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import * as MessagingUtil from 'digitraffic-common/aws/runtime/messaging';
 import * as R from 'ramda';
 

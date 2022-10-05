@@ -23,7 +23,7 @@
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
     "@types/node": "*",
-    "@types/sinon": "^10.0.0",
+    "@types/sinon": "*",
     "@types/xml2js": "^0.4.8",
     "@typescript-eslint/eslint-plugin": "*",
     "@typescript-eslint/parser": "*",
@@ -34,7 +34,7 @@
     "jest-junit": "^13.0.0",
     "json-schema-to-typescript": "^10.1.4",
     "parallelshell": "3.0.1",
-    "sinon": "^11.1.2",
+    "sinon": "*",
     "ts-jest": "^27.0.4",
     "typescript": "*"
   },

@@ -66,6 +66,53 @@ function momentsDifferByMinutes(moment1: Moment, moment2: Moment, maxDiffMinutes
  * @param timestamps
  */
 export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTimestamp[] {
+   const ret: MergeableTimestamp[] = [];
+
+    // group by portcall id and event type
+    const byPortcallId: MergeableTimestamp[][] = R.compose(R.values,
+        R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString() + ts.eventType))(timestamps);
+
+    // timestamps relating to specific port call
+    for (const portcallTimestamps of byPortcallId) {
+        let addToList = [...portcallTimestamps];
+        let vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source));
+
+        // special handling for out-of-date or incorrect VTS timestamps
+        const vtsTimestamp = vtsAStamps.find(t => t.source === EventSource.SCHEDULES_CALCULATED);
+        if (vtsTimestamp) {
+            const awakeTimestamp = vtsAStamps.find(t => t.source === EventSource.AWAKE_AI);
+            if (momentsDifferByMinutes(moment(), moment(vtsTimestamp.recordTime), VTS_TIMESTAMP_TOO_OLD_MINUTES) ||
+                (awakeTimestamp && momentsDifferByMinutes(moment(vtsTimestamp.eventTime), moment(awakeTimestamp.eventTime), VTS_TIMESTAMP_DIFF_MINUTES))) {
+                // remove only VTS timestamp
+                addToList = addToList.filter(t => !R.equals(t, vtsTimestamp));
+                vtsAStamps = vtsAStamps.filter(t => !R.equals(t, vtsTimestamp));
+            }
+        }
+
+        // filter out any worse quality PRED estimates if VTS A estimates are available
+        if (vtsAStamps.length) {
+            addToList = addToList.filter(t => t.source !== EventSource.AWAKE_AI_PRED);
+        }
+
+        // build an average timestamp from the calculated timestamps and discard the rest
+        // use the source with the highest priority
+        if (vtsAStamps.length > 1) {
+            addToList = addToList.filter(t => !vtsAStamps.includes(t));
+            const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source) as number), vtsAStamps)) as MergeableTimestamp;
+            addToList.push({
+                ...highestPriority, ...{
+                    eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime))),
+                },
+            });
+        }
+
+        ret.push(...addToList);
+    }
+
+    return R.sortBy((ts) => moment(ts.eventTime).valueOf(), ret);
+}
+
+export function mergeTimestampsOld(timestamps: MergeableTimestamp[]): MergeableTimestamp[] {
     let ret: MergeableTimestamp[] = R.clone(timestamps);
 
     // group by portcall id and event type

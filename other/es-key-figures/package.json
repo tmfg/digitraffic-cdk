@@ -16,11 +16,11 @@
     "@aws-cdk/assert": "*",
     "@types/jest": "^26.0.22",
     "@types/node": "*",
-    "@types/sinon": "^10.0.0",
+    "@types/sinon": "*",
     "esbuild": "^0.8.36",
     "jest": "^27.0.6",
     "parallelshell": "3.0.1",
-    "sinon": "^11.1.2",
+    "sinon": "*",
     "ts-jest": "^27.0.4",
     "ts-node": "^8.10.2",
     "typescript": "*"

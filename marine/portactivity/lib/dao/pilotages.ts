@@ -1,7 +1,7 @@
 import {Location} from "../model/timestamp";
 import {PreparedStatement} from "pg-promise";
 import {Pilotage} from "../model/pilotage";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL = 'select id, schedule_updated from pilotage where state != \'FINISHED\'';
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({

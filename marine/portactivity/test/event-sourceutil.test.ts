@@ -9,7 +9,6 @@ import {EventSource} from "../lib/model/eventsource";
 import {getRandomInteger, shuffle} from "digitraffic-common/test/testutils";
 
 describe('event-sourceutil', () => {
-
     test('momentAverage', () => {
         const m1 = moment(1622549546737);
         const m2 = moment(1622549553609);
@@ -80,12 +79,7 @@ describe('event-sourceutil', () => {
 
         const merged = mergeTimestamps(timestamps)[0] as ApiTimestamp;
 
-        expect(merged.portcallId).toBe(schedulesTimestamp.portcallId);
-        expect(merged.source).toBe(schedulesTimestamp.source);
-        expect(merged.eventType).toBe(schedulesTimestamp.eventType);
-        expect(merged.recordTime).toBe(schedulesTimestamp.recordTime);
-        expect(merged.ship).toMatchObject(schedulesTimestamp.ship);
-        expect(merged.location).toMatchObject(schedulesTimestamp.location);
+        expectTimestamp(merged, schedulesTimestamp);
     });
 
     test('mergeTimestamps - too old VTS timestamps are filtered', () => {
@@ -133,12 +127,33 @@ describe('event-sourceutil', () => {
     function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp) {
         expect(mergedTimestamps.length).toBe(1);
         const merged = mergedTimestamps[0];
-        expect(merged.portcallId).toBe(timestamp.portcallId);
-        expect(merged.source).toBe(timestamp.source);
-        expect(merged.eventType).toBe(timestamp.eventType);
-        expect(merged.recordTime).toBe(timestamp.recordTime);
-        expect(merged.ship).toMatchObject(timestamp.ship);
-        expect(merged.location).toMatchObject(timestamp.location);
+        expectTimestamp(timestamp, merged);
     }
+
+    function expectTimestamp(actual: ApiTimestamp, expected: ApiTimestamp) {
+        expect(actual.portcallId).toBe(expected.portcallId);
+        expect(actual.source).toBe(expected.source);
+        expect(actual.eventType).toBe(expected.eventType);
+        expect(actual.recordTime).toBe(expected.recordTime);
+        expect(actual.ship).toMatchObject(expected.ship);
+        expect(actual.location).toMatchObject(expected.location);
+    }
+
+    test('PRED timestamps with multiple ships', () => {
+        const awakeTimestamp1 = newTimestamp({ source: EventSource.AWAKE_AI, portcallId: 1 });
+        const predTimestamp1 = newTimestamp({ source: EventSource.AWAKE_AI_PRED, portcallId: 1 });
+        const predTimestamp2 = newTimestamp({ source: EventSource.AWAKE_AI_PRED, portcallId: 2 });
+
+        const timestamps = [
+            awakeTimestamp1,
+            predTimestamp1,
+            predTimestamp2,
+        ];
+
+        const merged = mergeTimestamps(timestamps) as ApiTimestamp[];
+        expect(merged.length).toBe(2);
+        expectTimestamp(merged[0], awakeTimestamp1);
+        expectTimestamp(merged[1], predTimestamp2);
+    });
 
 });

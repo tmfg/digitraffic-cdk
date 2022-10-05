@@ -26,11 +26,11 @@
     "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/node": "*",
-    "@types/sinon": "^10.0.0",
+    "@types/sinon": "*",
     "aws-sdk": "*",
     "esbuild": "*",
     "parallelshell": "3.0.1",
-    "sinon": "^11.1.2",
+    "sinon": "*",
     "typescript": "*"
   },
   "dependencies": {

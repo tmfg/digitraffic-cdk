@@ -1,8 +1,8 @@
-import {SecretFunction} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretFunction} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {AwakeAiETAShipService} from "../../service/awake_ai_eta_ship";
 import {AwakeAiETAShipApi} from "../../api/awake_ai_ship";
-import {withSecret} from "digitraffic-common/aws/runtime/secrets/secret";
+import {withSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
 import {SNSEvent} from "aws-lambda";
 import {DbETAShip} from "../../dao/timestamps";
 import {sendMessage} from "../../service/queue-service";
