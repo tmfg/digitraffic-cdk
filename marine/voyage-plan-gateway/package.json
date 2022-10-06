@@ -34,7 +34,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.5-1",
+    "@digitraffic/common": "2022.10.6-1",
     "@types/openlayers": "^4.6.17",
     "aws-cdk-lib": "*",
     "aws-sdk": "*",

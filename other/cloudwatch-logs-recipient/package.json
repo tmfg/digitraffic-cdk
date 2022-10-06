@@ -26,7 +26,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.5-1",
+    "@digitraffic/common": "2022.10.6-1",
     "@types/aws-lambda": "*",
     "aws-cdk-lib": "*",
     "aws-lambda": "^1.0.6",

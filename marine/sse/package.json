@@ -39,7 +39,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.5-1",
+    "@digitraffic/common": "2022.10.6-1",
     "@middy/core": "^1.2.0",
     "@types/ramda": "0.27.44",
     "aws-cdk-lib": "*",

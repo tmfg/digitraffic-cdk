@@ -16,7 +16,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.5-1",
+    "@digitraffic/common": "2022.10.6-1",
     "aws-cdk-lib": "*",
     "aws-sdk": "*",
     "constructs": "*"

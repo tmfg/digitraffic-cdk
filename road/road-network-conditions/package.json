@@ -30,7 +30,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.5-1",
+    "@digitraffic/common": "2022.10.6-1",
     "@types/geojson": "^7946.0.7",
     "@types/ramda": "^0.28.2",
     "aws-cdk-lib": "*",
