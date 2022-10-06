@@ -33,6 +33,16 @@
     "@typescript-eslint/parser": "^5.18.0",
     "esbuild": "^0.14.34",
     "eslint": "^8.13.0",
+    "husky": ">=6",
+    "lint-staged": ">=10",
+    "prettier": "^2.7.1",
     "typescript": "^4.6.3"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --cache --fix",
+    "*.{js,ts,css,md,yml,yaml,json}": "prettier --write"
+  },
+  "scripts": {
+    "prepare": "husky install"
   }
 }
