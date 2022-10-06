@@ -1,13 +1,13 @@
 import {Props} from "./app-props";
-import {createIpRestrictionPolicyDocument} from "digitraffic-common/aws/infra/stack/rest_apis";
+import {createIpRestrictionPolicyDocument} from "@digitraffic/common/aws/infra/stack/rest_apis";
 import {EndpointType, LambdaIntegration, MethodLoggingLevel, Resource, RestApi} from "aws-cdk-lib/aws-apigateway";
-import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
+import {createSubscription} from "@digitraffic/common/aws/infra/stack/subscription";
 import {AssetCode, Function, Runtime} from "aws-cdk-lib/aws-lambda";
 import {Duration, Stack} from "aws-cdk-lib";
 import {KEY_APP} from "./lambda/mqtt-proxy-healthcheck/lambda-mqtt-proxy-healthcheck";
 import {RetentionDays} from "aws-cdk-lib/aws-logs";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {TrafficType} from "digitraffic-common/types/traffictype";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {TrafficType} from "@digitraffic/common/types/traffictype";
 import {ITopic} from "aws-cdk-lib/aws-sns";
 import {Construct} from "constructs";
 

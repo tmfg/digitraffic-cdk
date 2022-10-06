@@ -27,15 +27,15 @@
     "typescript": "*"
   },
   "dependencies": {
-    "aws-cdk-lib": "*",
-    "constructs": "*",
+    "@digitraffic/common": "2022.10.5-1",
     "@types/paho-mqtt": "^1.0.4",
+    "aws-cdk-lib": "*",
     "aws-sdk": "*",
     "axios": "^0.21.1",
+    "constructs": "*",
     "paho-mqtt": "^1.1.0",
     "source-map-support": "^0.5.19",
-    "ws": "^7.4.1",
-    "digitraffic-common": "*"
+    "ws": "^7.4.1"
   },
   "externals": [
     "aws-sdk"

@@ -4,7 +4,7 @@ import * as InternalLambdas from './internal-lambdas';
 import {BlockPublicAccess, Bucket, HttpMethods} from "aws-cdk-lib/aws-s3";
 import {CanonicalUserPrincipal, Effect, PolicyStatement} from "aws-cdk-lib/aws-iam";
 import {Construct} from "constructs";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class SwaggerJoinerStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, swaggerJoinerProps: Props) {

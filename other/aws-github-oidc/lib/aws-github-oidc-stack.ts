@@ -2,7 +2,7 @@ import {Duration, Stack, StackProps} from 'aws-cdk-lib';
 import {Construct} from 'constructs';
 import {Effect, OpenIdConnectProvider, PolicyStatement, Role, WebIdentityPrincipal} from "aws-cdk-lib/aws-iam";
 import {Function} from 'aws-cdk-lib/aws-lambda';
-import {TrafficType} from "digitraffic-common/types/traffictype";
+import {TrafficType} from "@digitraffic/common/types/traffictype";
 
 export type AwsGithubProps = {
     readonly roles: {

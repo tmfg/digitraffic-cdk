@@ -20,11 +20,11 @@
     "typescript": "*"
   },
   "dependencies": {
-    "aws-cdk-lib": "*",
-    "constructs": "*",
-    "digitraffic-common": "*",
+    "@digitraffic/common": "2022.10.5-1",
     "@types/aws-lambda": "*",
-    "aws-lambda": "^1.0.6"
+    "aws-cdk-lib": "*",
+    "aws-lambda": "^1.0.6",
+    "constructs": "*"
   },
   "externals": [
     "aws-sdk"

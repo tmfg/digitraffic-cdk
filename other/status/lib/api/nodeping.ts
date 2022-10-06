@@ -1,6 +1,6 @@
 import axios from "axios";
 import {EndpointHttpMethod, EndpointProtocol, MonitoredEndpoint} from "../app-props";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 
 const NODEPING_API = 'https://api.nodeping.com/api/1';
 

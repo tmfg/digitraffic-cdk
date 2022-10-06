@@ -4,7 +4,7 @@ import {UpdateStatusSecret} from "../secret";
 import {AppEndpoints} from "../model/app-endpoints";
 import {EndpointHttpMethod, MonitoredApp, MonitoredEndpoint} from "../app-props";
 import {DigitrafficApi} from "../api/digitraffic";
-import {TrafficType} from "digitraffic-common/types/traffictype";
+import {TrafficType} from "@digitraffic/common/types/traffictype";
 
 export async function getNodePingAndStatuspageComponentStatuses(secret: UpdateStatusSecret,
     statuspageApi: StatuspageApi,

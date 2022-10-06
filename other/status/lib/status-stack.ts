@@ -5,7 +5,7 @@ import * as InternalLambdas from './internal-lambdas';
 import * as HealthCheckProxyApi from './healthcheck-proxy-api';
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {StringParameter} from "aws-cdk-lib/aws-ssm";
-import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "digitraffic-common/aws/infra/stack/stack";
+import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class StatusStack extends Stack {
     constructor(scope: Construct, id: string, appProps: Props, props?: StackProps) {

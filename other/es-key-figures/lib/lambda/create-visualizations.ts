@@ -1,4 +1,4 @@
-import {uploadToS3} from "digitraffic-common/aws/runtime/s3";
+import {uploadToS3} from "@digitraffic/common/aws/runtime/s3";
 
 interface KeyFigure {
     filter: string

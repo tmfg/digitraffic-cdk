@@ -6,8 +6,8 @@ import {StringParameter} from "aws-cdk-lib/aws-ssm";
 import {Construct} from "constructs";
 import {RdsMonitoring} from "./rds-monitoring";
 import {MqttMonitoring} from "./mqtt-monitoring";
-import {StackCheckingAspect} from "digitraffic-common/aws/infra/stack/stack-checking-aspect";
-import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "digitraffic-common/aws/infra/stack/stack";
+import {StackCheckingAspect} from "@digitraffic/common/aws/infra/stack/stack-checking-aspect";
+import {SSM_KEY_ALARM_TOPIC, SSM_KEY_WARNING_TOPIC} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class MonitoringStack extends Stack {
     constructor(scope: Construct, id: string, configuration: MonitoringConfiguration) {

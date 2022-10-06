@@ -1,4 +1,4 @@
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 import {Construct} from "constructs";
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {PolicyStatement, User} from "aws-cdk-lib/aws-iam";

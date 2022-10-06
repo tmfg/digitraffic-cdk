@@ -2,7 +2,7 @@ import {config as AWSConfig} from "aws-sdk";
 import {default as axios, AxiosRequestConfig} from 'axios';
 import {constructSwagger, mergeApiDescriptions} from "../../swagger-utils";
 import {exportSwaggerApi} from "../../apigw-utils";
-import {uploadToS3} from 'digitraffic-common/aws/runtime/s3';
+import {uploadToS3} from '@digitraffic/common/aws/runtime/s3';
 
 export const KEY_BUCKET_NAME = 'BUCKET_NAME';
 export const KEY_REGION = 'REGION';
