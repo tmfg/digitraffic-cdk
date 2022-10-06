@@ -1,37 +1,36 @@
 name: ESLint
 
-on:
-  [push]
+on: [push]
 
 jobs:
   lint:
     runs-on: ubuntu-latest
-    
+
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: '14'
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
 
-    - name: Install ESLint
-      run: npm install eslint typescript @typescript-eslint/eslint-plugin @typescript-eslint/parser
+      - name: Install ESLint
+        run: npm install eslint typescript @typescript-eslint/eslint-plugin @typescript-eslint/parser eslint-config-prettier
 
-    - name: Run ESLint
-      id: run-eslint
-      run: npx eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
-      continue-on-error: true
+      - name: Run ESLint
+        id: run-eslint
+        run: npx eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
+        continue-on-error: true
 
-    - name : Publish report
-      uses: tmfg/digitraffic-actions@gh-pages-publish/v1
-      with:
-        GH_PAGES_BRANCH: gh-pages
-        FILE_PATH: ${GITHUB_REF##*/}/eslint-report.html
-        COMMIT_MESSAGE: ESLint report for branch $CURRENT_BRANCH
-        LINK_TEXT: ESLint report
-      
-    - name: Fail on ESLint errors
-      if: steps.run-eslint.outcome != 'success'
-      run: exit 1
+      - name: Publish report
+        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
+        with:
+          GH_PAGES_BRANCH: gh-pages
+          FILE_PATH: ${GITHUB_REF##*/}/eslint-report.html
+          COMMIT_MESSAGE: ESLint report for branch $CURRENT_BRANCH
+          LINK_TEXT: ESLint report
+
+      - name: Fail on ESLint errors
+        if: steps.run-eslint.outcome != 'success'
+        run: exit 1
