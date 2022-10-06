@@ -1,4 +1,4 @@
-import {mockSecret, stubSecretsManager} from "digitraffic-common/test/secrets-manager";
+import {mockSecret, stubSecretsManager} from "@digitraffic/common/test/secrets-manager";
 
 import * as sinon from 'sinon';
 
