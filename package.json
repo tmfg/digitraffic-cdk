@@ -40,7 +40,7 @@
     "typescript": "^4.6.3"
   },
   "lint-staged": {
-    "*.{js,ts}": "eslint --cache --fix",
+    "*.{js,ts}": "eslint --cache --exit-on-fatal-error",
     "*.{js,ts,css,md,yml,yaml,json}": "prettier --write"
   },
   "scripts": {
