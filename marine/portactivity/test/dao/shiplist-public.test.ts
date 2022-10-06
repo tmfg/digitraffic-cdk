@@ -9,6 +9,8 @@ import {randomBoolean} from "@digitraffic/common/test/testutils";
 
 describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
 
+    const DEFAULT_INTERVAL = 4*24;
+
     test('findByLocodePublicShiplist - ETA not returned if ATA exists', async () => {
         const locode = 'AA123';
         const portcallId = 1;
@@ -28,7 +30,7 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [timestamp1, timestamp2]);
 
-        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
 
         expect(foundTimestamps.length).toBe(1);
         expect(foundTimestamps[0].event_type).toBe(EventType.ATA);
@@ -52,7 +54,7 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [timestamp1, timestamp2]);
 
-        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
 
         expect(foundTimestamps.length).toBe(2);
         expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
@@ -78,7 +80,7 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [timestamp1, timestamp2]);
 
-        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
 
         expect(foundTimestamps.length).toBe(2);
         expect(foundTimestamps[0].event_type).toBe(EventType.ETA);
@@ -97,7 +99,7 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [timestamp]);
 
-        const foundTimestamps = await findByLocodePublicShiplist(db, locode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, locode, DEFAULT_INTERVAL);
 
         expect(foundTimestamps.length).toBe(1);
     });
@@ -116,7 +118,7 @@ describe('db-shiplist-public', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [timestamp]);
 
-        const foundTimestamps = await findByLocodePublicShiplist(db, fromLocode);
+        const foundTimestamps = await findByLocodePublicShiplist(db, fromLocode, DEFAULT_INTERVAL);
 
         expect(foundTimestamps.length).toBe(1);
     });

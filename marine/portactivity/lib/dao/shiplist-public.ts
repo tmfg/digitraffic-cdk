@@ -42,7 +42,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
                   END
           ) AND
         pe.event_time > NOW() - INTERVAL '1 HOURS' AND
-        pe.event_time < NOW() + INTERVAL '4 DAYS' AND
+        pe.event_time < NOW() + $2 * INTERVAL '1 HOUR' AND
         CASE WHEN pe.event_type = 'ETA'
         THEN NOT EXISTS(SELECT px.id FROM port_call_timestamp px WHERE px.portcall_id = pe.portcall_id AND px.event_type = 'ATA')
         ELSE TRUE
@@ -51,12 +51,11 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
     ORDER BY pe.event_time
 `;
 
-export function findByLocodePublicShiplist(db: DTDatabase,
-    locode: string): Promise<DbPublicShiplist[]> {
+export function findByLocodePublicShiplist(db: DTDatabase, locode: string, interval: number): Promise<DbPublicShiplist[]> {
     const ps = new PreparedStatement({
         name:'find-by-locode-public-shiplist',
         text: SELECT_BY_LOCODE_PUBLIC_SHIPLIST,
-        values: [locode],
+        values: [locode, interval],
     });
     return db.tx(t => t.manyOrNone(ps));
 }

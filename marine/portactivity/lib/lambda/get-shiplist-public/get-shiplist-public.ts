@@ -1,18 +1,17 @@
 import {findByLocodePublicShiplist} from '../../dao/shiplist-public';
 import {DTDatabase, inDatabaseReadonly} from '@digitraffic/common/database/database';
 import {getDisplayableNameForEventSource, mergeTimestamps} from "../../event-sourceutil";
-import {SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import * as IdUtils from '@digitraffic/common/marine/id_utils';
 import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {ProxyLambdaRequest, ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+
+const dbSecretHolder = SecretHolder.create();
+const secretHolder = SecretHolder.create<ShiplistSecret>('shiplist');
 
 export type ShiplistSecret = {
     readonly auth: string
 }
-
-export const handler = (event: ProxyLambdaRequest) => {
-    return handlerFn(event, withDbSecret);
-};
 
 function response(statusCode: number, message: string): Promise<ProxyLambdaResponse> {
     return Promise.resolve({
@@ -24,25 +23,28 @@ function response(statusCode: number, message: string): Promise<ProxyLambdaRespo
     });
 }
 
-export function handlerFn(event: ProxyLambdaRequest,
-    withDbSecretFn: SecretFunction<ShiplistSecret, ProxyLambdaResponse>): Promise<ProxyLambdaResponse | void> {
-    return withDbSecretFn(process.env.SECRET_ID as string, (secret: ShiplistSecret) => {
-        if (!event.queryStringParameters || !event.queryStringParameters.auth) {
-            return response(401, 'Missing authentication');
-        }
-        if (event.queryStringParameters.auth !== secret.auth) {
-            return response(403, 'Invalid authentication');
-        }
-        if (!event.queryStringParameters.locode) {
-            return response(400, 'Missing LOCODE');
-        }
-        if (!IdUtils.isValidLOCODE(event.queryStringParameters.locode)) {
-            return response(400, 'Invalid LOCODE');
-        }
+export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse | void> => {
+    return dbSecretHolder.setDatabaseCredentials()
+        .then(() => secretHolder.get())
+        .then((secret: ShiplistSecret) => {
+            if (!event.queryStringParameters || !event.queryStringParameters.auth) {
+                return response(401, 'Missing authentication');
+            }
+            if (event.queryStringParameters.auth !== secret.auth) {
+                return response(403, 'Invalid authentication');
+            }
+            if (!event.queryStringParameters.locode) {
+                return response(400, 'Missing LOCODE');
+            }
+            if (!IdUtils.isValidLOCODE(event.queryStringParameters.locode)) {
+                return response(400, 'Invalid LOCODE');
+            }
 
-        return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
-            const dbShiplist =
-                (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase()))
+            const interval = Number.parseInt(event.queryStringParameters?.interval || '4*24');
+
+            return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
+                const dbShiplist =
+                (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase(), interval))
                     .map(ts => Object.assign(ts, {
                         source: ts.event_source,
                         eventTime: ts.event_time,
@@ -50,18 +52,18 @@ export function handlerFn(event: ProxyLambdaRequest,
                         portcallId: ts.portcall_id,
                         eventType: ts.event_type,
                     }));
-            // don't overwrite source before merging as it utilizes source name in prioritizing
-            const shiplist = mergeTimestamps(dbShiplist).map(ts =>
-                Object.assign(ts, {
-                    source: getDisplayableNameForEventSource(ts.source),
-                }));
+                // don't overwrite source before merging as it utilizes source name in prioritizing
+                const shiplist = mergeTimestamps(dbShiplist).map(ts =>
+                    Object.assign(ts, {
+                        source: getDisplayableNameForEventSource(ts.source),
+                    }));
 
-            return {
-                statusCode: 200,
-                headers: {
-                    'Content-Type': 'text/html',
-                },
-                body:
+                return {
+                    statusCode: 200,
+                    headers: {
+                        'Content-Type': 'text/html',
+                    },
+                    body:
                     `
 <html>
 
@@ -304,9 +306,7 @@ export function handlerFn(event: ProxyLambdaRequest,
 
 </html>    
 `,
-            };
+                };
+            });
         });
-    }, {
-        prefix: 'shiplist',
-    });
-}
+};

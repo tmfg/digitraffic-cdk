@@ -14,7 +14,7 @@ import {
     addDefaultValidator,
     addServiceModel,
     createArraySchema,
-    getModelReference
+    getModelReference,
 } from "@digitraffic/common/utils/api-model";
 import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
 import {createUsagePlan} from "@digitraffic/common/aws/infra/usage-plans";
@@ -74,7 +74,9 @@ export class PublicApi {
         });
 
         const getTimestampsIntegration = new DigitrafficIntegration(getTimestampsLambda, MediaType.APPLICATION_JSON)
-            .addQueryParameter('locode', 'mmsi', 'imo', 'source')
+            .addQueryParameter(
+                'locode', 'mmsi', 'imo', 'source', 'interval',
+            )
             .build();
 
         const timestampResource = resource.addResource('timestamps');
@@ -85,6 +87,7 @@ export class PublicApi {
                 'method.request.querystring.mmsi': false,
                 'method.request.querystring.imo': false,
                 'method.request.querystring.source': false,
+                'method.request.querystring.interval': false,
             },
             requestValidator: validator,
             methodResponses: [
@@ -95,12 +98,15 @@ export class PublicApi {
             ],
         });
 
-        this.publicApi.documentResource(timestampResource,
+        this.publicApi.documentResource(
+            timestampResource,
             DocumentationPart.method(['timestamps'], 'GetTimestamps', 'Retrieves ship timestamps by ship or port'),
             DocumentationPart.queryParameter('locode', 'Port LOCODE'),
             DocumentationPart.queryParameter('mmsi', 'Ship MMSI'),
             DocumentationPart.queryParameter('imo', 'Ship IMO'),
-            DocumentationPart.queryParameter('source', 'Timestamp source'));
+            DocumentationPart.queryParameter('source', 'Timestamp source'),
+            DocumentationPart.queryParameter('interval', 'Time interval in hours(default 4*24)'),
+        );
 
         return getTimestampsLambda;
     }
