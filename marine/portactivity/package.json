@@ -46,7 +46,6 @@
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
     "constructs": "*",
-    "digitraffic-common": "*",
     "moment": "*",
     "moment-timezone": "*",
     "pg-native": "*",
