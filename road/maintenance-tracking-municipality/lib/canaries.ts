@@ -1,6 +1,6 @@
-import {DatabaseCanary} from "digitraffic-common/aws/infra/canaries/database-canary";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {DigitrafficCanaryRole} from "digitraffic-common/aws/infra/canaries/canary-role";
+import {DatabaseCanary} from "@digitraffic/common/aws/infra/canaries/database-canary";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {DigitrafficCanaryRole} from "@digitraffic/common/aws/infra/canaries/canary-role";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "./keys";
 
 export class Canaries {

@@ -1,7 +1,7 @@
-import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {DataType} from "digitraffic-common/database/last-updated";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
+import {DataType} from "@digitraffic/common/database/last-updated";
+import {TestHttpServer} from "@digitraffic/common/test/httpserver";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(

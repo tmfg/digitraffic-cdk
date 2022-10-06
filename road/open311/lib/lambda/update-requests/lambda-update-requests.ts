@@ -2,7 +2,7 @@ import {APIGatewayEvent} from 'aws-lambda';
 import {ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../../model/service-request";
 import * as RequestsService from "../../service/requests";
 import {invalidRequest} from "../../http-util";
-import {ProxyLambdaResponse} from "digitraffic-common/aws/types/proxytypes";
+import {ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
 
 // Full of underscores
 /* eslint-disable camelcase */

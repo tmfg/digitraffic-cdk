@@ -1,4 +1,4 @@
-import {DTTransaction} from "digitraffic-common/database/database";
+import {DTTransaction} from "@digitraffic/common/database/database";
 import {TloikLiikennemerkinTila, TloikRivi} from "../model/tilatiedot";
 
 const SQL_INSERT_DEVICE_DATA_ROW = `insert into device_data_row(id, device_data_id, screen, row_number, text)

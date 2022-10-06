@@ -3,7 +3,7 @@ import {Service, ServiceType} from "../lib/model/service";
 import {toServiceRequestWithExtensions} from "../lib/service/requests";
 import {ServiceRequestState} from "../lib/model/service-request-state";
 import {Subject} from "../lib/model/subject";
-import {randomString, shuffle} from "digitraffic-common/test/testutils";
+import {randomString, shuffle} from "@digitraffic/common/test/testutils";
 import {SubSubject} from "../lib/model/subsubject";
 import {Locale} from "../lib/model/locale";
 

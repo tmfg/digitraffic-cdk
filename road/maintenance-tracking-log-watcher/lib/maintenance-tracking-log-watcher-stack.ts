@@ -7,7 +7,7 @@ import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import * as sns from 'aws-cdk-lib/aws-sns';
 import * as subscriptions from 'aws-cdk-lib/aws-sns-subscriptions';
 import {Construct} from "constructs";
-import {defaultLambdaConfiguration, LambdaEnvironment} from "digitraffic-common/aws/infra/stack/lambda-configs";
+import {defaultLambdaConfiguration, LambdaEnvironment} from "@digitraffic/common/aws/infra/stack/lambda-configs";
 import {Props} from './app-props';
 import {KEY_ES_ENDPOINT, KEY_S3_BUCKET_NAME, KEY_SNS_TOPIC_ARN} from "./lambda/maintenance-tracking-log-watcher";
 

@@ -1,8 +1,8 @@
 import * as UpdateService from "../../service/update";
 import {CountingSitesEnvKeys} from "../../keys";
-import {SecretHolder} from "digitraffic-common/aws/runtime/secrets/secret-holder";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import {CountingSitesSecret} from "../../model/counting-sites-secret";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const domainName = process.env[CountingSitesEnvKeys.DOMAIN_NAME] as string;
 const domainPrefix = process.env[CountingSitesEnvKeys.DOMAIN_PREFIX] as string;

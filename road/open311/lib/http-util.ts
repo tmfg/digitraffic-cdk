@@ -1,4 +1,4 @@
-import {ProxyLambdaResponse} from "digitraffic-common/aws/types/proxytypes";
+import {ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
 
 export function invalidRequest(): ProxyLambdaResponse {
     return {statusCode: 400, body: 'Invalid request'};

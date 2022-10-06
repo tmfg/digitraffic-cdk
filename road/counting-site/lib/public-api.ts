@@ -1,16 +1,16 @@
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
 import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
-import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
+import {MonitoredDBFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {corsMethod, defaultIntegration, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
+import {DigitrafficIntegrationResponse} from "@digitraffic/common/aws/runtime/digitraffic-integration-response";
 import {directionProperties, domainsProperties, userTypesProperties} from "./model/metadata";
 import {dataProperties} from "./model/data";
-import {featureSchema, geojsonSchema, getModelReference} from "digitraffic-common/utils/api-model";
+import {featureSchema, geojsonSchema, getModelReference} from "@digitraffic/common/utils/api-model";
 import {counterProperties} from "./model/counter";
-import {DigitrafficStaticIntegration} from "digitraffic-common/aws/infra/api/static-integration";
+import {DigitrafficStaticIntegration} from "@digitraffic/common/aws/infra/api/static-integration";
 
 const COUNTING_SITE_TAGS_V1 = ["Counting site V1"];
 

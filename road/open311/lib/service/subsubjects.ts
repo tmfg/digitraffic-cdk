@@ -1,5 +1,5 @@
 import * as SubSubjectsDb from '../db/subsubjects';
-import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
 import {SubSubject} from "../model/subsubject";
 import {Locale} from "../model/locale";
 

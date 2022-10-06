@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {ResultUserTypes} from "../model/usertype";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const SQL_ALL_USER_TYPES = "select id, name from counting_site_user_type";
 

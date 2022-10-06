@@ -2,7 +2,7 @@ import {Construct} from "constructs";
 import {InternalLambdas} from "./internal-lambdas";
 import {Canaries} from "./canaries";
 import {PublicApi} from "./public-api";
-import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack, StackConfiguration} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class CountingSiteCdkStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {

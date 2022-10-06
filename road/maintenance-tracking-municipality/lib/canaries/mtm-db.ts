@@ -1,5 +1,5 @@
-import {DatabaseChecker} from "digitraffic-common/aws/infra/canaries/database-checker";
-import {DataType} from "digitraffic-common/database/last-updated";
+import {DatabaseChecker} from "@digitraffic/common/aws/infra/canaries/database-checker";
+import {DataType} from "@digitraffic/common/database/last-updated";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../keys";
 
 const domainName = process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME] as string;

@@ -38,10 +38,10 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "aws-cdk-lib": "*",
-    "constructs": "*",
     "axios": "^0.21.1",
-    "digitraffic-common": "*",
+    "constructs": "*",
     "pg-native": "*",
     "pg-promise": "*",
     "source-map-support": "^0.5.19"

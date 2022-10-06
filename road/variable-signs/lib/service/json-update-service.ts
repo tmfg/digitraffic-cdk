@@ -3,7 +3,7 @@ import {TloikTilatiedot} from "../model/tilatiedot";
 import * as MetadataDb from "../db/metadata";
 import * as DataDb from "../db/data";
 import {DbDevice} from "../model/device";
-import {DTTransaction, inTransaction} from "digitraffic-common/database/database";
+import {DTTransaction, inTransaction} from "@digitraffic/common/database/database";
 import {StatusCodeValue} from "../model/status-code-value";
 
 type DeviceIdMap = Record<string, TloikLaite>;

@@ -1,13 +1,13 @@
-import {addSimpleServiceModel} from "digitraffic-common/utils/api-model";
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
-import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
-import {DATA_V1_TAGS} from "digitraffic-common/aws/types/tags";
-import {MessageModel} from "digitraffic-common/aws/infra/api/response";
-import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DigitrafficIntegrationResponse} from "digitraffic-common/aws/runtime/digitraffic-integration-response";
+import {addSimpleServiceModel} from "@digitraffic/common/utils/api-model";
+import {corsMethod, defaultIntegration, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
+import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
+import {DATA_V1_TAGS} from "@digitraffic/common/aws/types/tags";
+import {MessageModel} from "@digitraffic/common/aws/infra/api/response";
+import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {MonitoredDBFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {DigitrafficIntegrationResponse} from "@digitraffic/common/aws/runtime/digitraffic-integration-response";
 import {Resource} from 'aws-cdk-lib/aws-apigateway';
 
 const VARIABLE_SIGN_TAGS_V1 = ['Variable Sign V1'];

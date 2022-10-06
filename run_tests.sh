@@ -7,7 +7,6 @@ set -e
 shopt -s nocasematch
 
 if [ -z "$1" ]; then
-  ./run_tests_common.sh
   ./run_tests_in.sh other
 elif [ $1 == 'marine' ]; then
   ./run_tests_in.sh marine

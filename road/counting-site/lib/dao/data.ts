@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {ApiData, DbCsvData, DbData} from "../model/data";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import {nullNumber, nullString} from "./counter";
 
 const SQL_INSERT_VALUES =

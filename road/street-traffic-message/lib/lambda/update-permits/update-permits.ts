@@ -1,7 +1,7 @@
-import {SecretHolder} from "../../../../../digitraffic-common/aws/runtime/secrets/secret-holder";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import * as UpdateService from "../../service/update";
 import {PermitsSecret} from "../../model/permits-secret";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const PERMIT_DOMAIN = process.env.PERMIT_DOMAIN as string;
 const proxyHolder = ProxyHolder.create();

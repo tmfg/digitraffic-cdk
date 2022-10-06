@@ -1,9 +1,9 @@
 import {handler} from '../../../lib/lambda/update-subsubjects/lambda-update-subsubjects';
 import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {TestHttpServer} from "@digitraffic/common/test/httpserver";
 import * as SubSubjectsDb from "../../../lib/db/subsubjects";
 import {Locale} from "../../../lib/model/locale";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const SERVER_PORT = 8091;
 

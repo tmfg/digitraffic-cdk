@@ -1,5 +1,5 @@
 import * as JsonUpdateService from "../../service/json-update-service";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 import {StatusCodeValue} from "../../model/status-code-value";
 
 const proxyHolder = ProxyHolder.create();

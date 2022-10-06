@@ -1,11 +1,11 @@
 import * as CounterDAO from "../dao/counter";
 import * as DataDAO from "../dao/data";
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
 import {EcoCounterApi} from "../api/eco-counter";
 import {ApiCounter, DbCounter} from "../model/counter";
 import moment from "moment";
-import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
-import {DataType} from "digitraffic-common/database/last-updated";
+import * as LastUpdatedDb from "@digitraffic/common/database/last-updated";
+import {DataType} from "@digitraffic/common/database/last-updated";
 
 export async function updateMetadataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
     const api = new EcoCounterApi(apiKey, url);

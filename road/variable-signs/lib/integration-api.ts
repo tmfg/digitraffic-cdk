@@ -1,7 +1,7 @@
 import {LambdaIntegration, Resource} from 'aws-cdk-lib/aws-apigateway';
-import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {MonitoredDBFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {MonitoredDBFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
 
 export class IntegrationApi {
     readonly restApi: DigitrafficRestApi;

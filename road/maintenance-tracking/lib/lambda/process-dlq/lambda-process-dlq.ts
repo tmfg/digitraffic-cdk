@@ -1,4 +1,4 @@
-import {uploadToS3} from "digitraffic-common/aws/runtime/s3";
+import {uploadToS3} from "@digitraffic/common/aws/runtime/s3";
 import {MaintenanceTrackingEnvKeys} from "../../keys";
 import {SQSEvent} from "aws-lambda";
 import {SQSRecord} from "aws-lambda/trigger/sqs";

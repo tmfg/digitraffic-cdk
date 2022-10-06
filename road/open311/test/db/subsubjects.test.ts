@@ -2,7 +2,7 @@ import * as SubSubjectsDb from "../../lib/db/subsubjects";
 import {newSubSubject} from "../testdata";
 import {dbTestBase} from "../db-testutil";
 import {Locale} from "../../lib/model/locale";
-import {shuffle} from "digitraffic-common/test/testutils";
+import {shuffle} from "@digitraffic/common/test/testutils";
 
 describe('db-subsubjects', dbTestBase((db) => {
 

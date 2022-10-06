@@ -1,4 +1,4 @@
-import {getRandomIntegerAsString} from "digitraffic-common/test/testutils";
+import {getRandomIntegerAsString} from "@digitraffic/common/test/testutils";
 import * as R from 'ramda';
 import {DbObservationData} from "../lib/dao/maintenance-tracking-dao";
 

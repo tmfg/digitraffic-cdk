@@ -1,6 +1,6 @@
 import {dbTestBase, insertCounter, insertData, insertDomain, insertLastUpdated} from "../db-testutil";
 import * as CountingSitesService from "../../lib/service/counting-sites";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('counting-sites service tests', dbTestBase((db: DTDatabase) => {
     const DOMAIN1 = 'DOMAIN1';

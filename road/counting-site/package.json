@@ -35,10 +35,10 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
     "csv-writer": "^1.6.0",
-    "digitraffic-common": "*",
     "geojson-validation": "^1.0.2",
     "pg-native": "*",
     "pg-promise": "*",

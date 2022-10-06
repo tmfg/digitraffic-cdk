@@ -1,10 +1,10 @@
 import {Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import * as lambda from 'aws-cdk-lib/aws-lambda';
-import {defaultLambdaConfiguration, LambdaEnvironment} from 'digitraffic-common/aws/infra/stack/lambda-configs';
-import {createRestApi} from 'digitraffic-common/aws/infra/stack/rest_apis';
+import {defaultLambdaConfiguration, LambdaEnvironment} from '@digitraffic/common/aws/infra/stack/lambda-configs';
+import {createRestApi} from '@digitraffic/common/aws/infra/stack/rest_apis';
 import {Queue} from 'aws-cdk-lib/aws-sqs';
-import {addDefaultValidator, addServiceModel} from "digitraffic-common/utils/api-model";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
+import {addDefaultValidator, addServiceModel} from "@digitraffic/common/utils/api-model";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
 
 import {
     createSchemaGeometriaSijainti,
@@ -16,12 +16,12 @@ import {
     Tunniste,
     Viivageometriasijainti,
 } from "./model/maintenance-tracking-schema";
-import {createDefaultUsagePlan} from "digitraffic-common/aws/infra/usage-plans";
-import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
+import {createDefaultUsagePlan} from "@digitraffic/common/aws/infra/usage-plans";
+import {createSubscription} from "@digitraffic/common/aws/infra/stack/subscription";
 import {AppProps} from "./app-props";
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 import {MaintenanceTrackingEnvKeys} from "./keys";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 import apigateway = require('aws-cdk-lib/aws-apigateway');
 import {Construct} from "constructs";
 

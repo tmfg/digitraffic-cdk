@@ -1,4 +1,4 @@
-import * as DateValidator from 'digitraffic-common/types/validator';
+import * as DateValidator from '@digitraffic/common/types/validator';
 
 export type ValuesQueryParameters = {
     month?: number;

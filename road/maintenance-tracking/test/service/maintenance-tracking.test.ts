@@ -1,4 +1,4 @@
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import {createMaintenanceTrackingMessageHash, saveMaintenanceTrackingObservationData} from "../../lib/service/maintenance-tracking";
 import {createObservationsDbDatas, dbTestBase, findAllObservations, truncate} from "../db-testutil";
 import {assertObservationData, getTrackingJsonWith3Observations} from "../testdata";

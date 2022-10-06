@@ -1,5 +1,5 @@
-import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
-import {SRID_WGS84} from "digitraffic-common/utils/geometry";
+import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
+import {SRID_WGS84} from "@digitraffic/common/utils/geometry";
 import {Position} from "geojson";
 import {PreparedStatement} from "pg-promise";
 import {COORDINATE_PRECISION} from "../constants";

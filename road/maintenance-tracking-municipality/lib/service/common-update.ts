@@ -1,5 +1,5 @@
-import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
-import * as LastUpdatedDb from "digitraffic-common/database/last-updated";
+import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
+import * as LastUpdatedDb from "@digitraffic/common/database/last-updated";
 import * as DbData from "../dao/data";
 import {TrackingSaveResult} from "../model/tracking-save-result";
 

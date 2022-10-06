@@ -1,6 +1,6 @@
 import * as CountingSitesService from "../../service/counting-sites";
-import {LambdaResponse} from "digitraffic-common/aws/types/lambda-response";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const proxyHolder = ProxyHolder.create();
 

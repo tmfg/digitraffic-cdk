@@ -1,9 +1,9 @@
 import {updateMetadataForDomain} from "../../lib/service/update";
 import {dbTestBase, insertCounter, insertDomain, withServer} from "../db-testutil";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {TestHttpServer} from "@digitraffic/common/test/httpserver";
 import * as CounterDAO from "../../lib/dao/counter";
 import {URL_ALL_SITES} from "../../lib/api/eco-counter";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import {DbCounter} from "../../lib/model/counter";
 
 const PORT = 8091;

@@ -1,4 +1,4 @@
-import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
 import moment from "moment-timezone";
 import * as MaintenanceTrackingDB from "../dao/maintenance-tracking-dao";
 import {DbObservationData, Status} from "../dao/maintenance-tracking-dao";

@@ -1,6 +1,6 @@
 import {Construct} from "constructs";
 import {InternalLambdas} from "./internal-lambdas";
-import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack, StackConfiguration} from "@digitraffic/common/aws/infra/stack/stack";
 import {Canaries} from "./canaries";
 
 export class MaintenanceTrackingMunicipalityCdkStack extends DigitrafficStack {

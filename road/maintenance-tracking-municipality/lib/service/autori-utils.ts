@@ -1,6 +1,6 @@
-import * as CommonDateUtils from "digitraffic-common/utils/date-utils";
-import {GeoJsonLineString, GeoJsonPoint} from "digitraffic-common/utils/geojson-types";
-import * as GeometryUtils from "digitraffic-common/utils/geometry";
+import * as CommonDateUtils from "@digitraffic/common/utils/date-utils";
+import {GeoJsonLineString, GeoJsonPoint} from "@digitraffic/common/utils/geojson-types";
+import * as GeometryUtils from "@digitraffic/common/utils/geometry";
 import {Feature, Geometry, LineString, Position} from "geojson";
 import moment from "moment";
 import {

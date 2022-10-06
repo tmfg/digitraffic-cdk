@@ -1,4 +1,4 @@
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import * as R from 'ramda';
 import {DbNumberId} from "../model/db-data";
 

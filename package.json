@@ -10,7 +10,6 @@
   "author": "Digitraffic <digitraffic@fintraffic.fi>",
   "private": true,
   "workspaces": [
-    "digitraffic-common",
     "marine/*",
     "road/*",
     "aviation/*",

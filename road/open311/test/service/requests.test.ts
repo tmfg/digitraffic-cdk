@@ -2,7 +2,7 @@ import * as RequestsService from "../../lib/service/requests";
 import {newServiceRequest} from "../testdata";
 import {dbTestBase, insertServiceRequest} from "../db-testutil";
 import {ServiceRequestWithExtensions} from "../../lib/model/service-request";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 // test file
 /* eslint-disable camelcase */

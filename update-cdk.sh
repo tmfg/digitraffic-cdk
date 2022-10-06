@@ -27,8 +27,6 @@ function updateAllInDirectory() {
   cd ..
 }
 
-updateInDirectory digitraffic-common
-
 updateAllInDirectory other
 updateAllInDirectory road
 updateAllInDirectory marine

@@ -1,6 +1,6 @@
 import {PreparedStatement} from "pg-promise";
 import {DbDomain} from "../model/domain";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const SQL_ALL_DOMAINS =
     `select name, description, added_timestamp, removed_timestamp

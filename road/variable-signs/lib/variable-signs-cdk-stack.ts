@@ -1,5 +1,5 @@
 import {Construct} from 'constructs';
-import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack, StackConfiguration} from "@digitraffic/common/aws/infra/stack/stack";
 import {IntegrationApi} from "./integration-api";
 import {PublicApi} from "./public-api";
 import {Canaries} from "./canaries";

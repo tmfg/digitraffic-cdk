@@ -1,4 +1,4 @@
-import {SecretFunction, withDbSecret} from "digitraffic-common/aws/runtime/secrets/dbsecret";
+import {SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {PaikanninApi} from "../../api/paikannin";
 import {MaintenanceTrackingMunicipalityEnvKeys} from "../../keys";
 import {MaintenanceTrackingPaikanninSecret} from "../../model/maintenance-tracking-municipality-secret";

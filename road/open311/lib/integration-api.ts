@@ -4,12 +4,12 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {EndpointType, LambdaIntegration} from "aws-cdk-lib/aws-apigateway";
 import {Construct} from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import {dbLambdaConfiguration} from 'digitraffic-common/aws/infra/stack/lambda-configs';
-import {createSubscription} from "digitraffic-common/aws/infra/stack/subscription";
-import {corsMethod, defaultIntegration, methodResponse} from "digitraffic-common/aws/infra/api/responses";
-import {addDefaultValidator} from "digitraffic-common/utils/api-model";
-import {MessageModel} from "digitraffic-common/aws/infra/api/response";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {dbLambdaConfiguration} from '@digitraffic/common/aws/infra/stack/lambda-configs';
+import {createSubscription} from "@digitraffic/common/aws/infra/stack/subscription";
+import {corsMethod, defaultIntegration, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
+import {addDefaultValidator} from "@digitraffic/common/utils/api-model";
+import {MessageModel} from "@digitraffic/common/aws/infra/api/response";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 
 export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
     const integrationApi = createApi(stack);

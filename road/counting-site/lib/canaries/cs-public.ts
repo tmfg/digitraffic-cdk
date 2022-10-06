@@ -4,11 +4,11 @@ import {
     GeoJsonChecker,
     HeaderChecker,
     UrlChecker,
-} from "digitraffic-common/aws/infra/canaries/url-checker";
+} from "@digitraffic/common/aws/infra/canaries/url-checker";
 import {DbData} from "../model/data";
-import {Asserter} from "digitraffic-common/test/asserter";
+import {Asserter} from "@digitraffic/common/test/asserter";
 import {constants} from "http2";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {ResultDomain} from "../model/domain";
 import {ResultUserTypes} from "../model/usertype";
 

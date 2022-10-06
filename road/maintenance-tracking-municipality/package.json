@@ -37,14 +37,14 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "aws-cdk-lib": "*",
-    "digitraffic-common": "*",
+    "axios": "^0.21.1",
+    "moment": "*",
     "pg-native": "*",
     "pg-promise": "*",
-    "source-map-support": "*",
-    "axios": "^0.21.1",
     "query-string": "^7.1.1",
-    "moment": "*"
+    "source-map-support": "*"
   },
   "externals": [
     "aws-sdk"

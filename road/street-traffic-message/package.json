@@ -38,9 +38,9 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
-    "digitraffic-common": "*",
     "moment": "*",
     "pg-promise": "*"
   },

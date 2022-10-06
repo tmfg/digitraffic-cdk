@@ -1,6 +1,6 @@
 import * as DeviceDB from "../db/datex2";
-import * as LastUpdatedDB from "digitraffic-common/database/last-updated";
-import {DTDatabase, DTTransaction, inDatabase} from "digitraffic-common/database/database";
+import * as LastUpdatedDB from "@digitraffic/common/database/last-updated";
+import {DTDatabase, DTTransaction, inDatabase} from "@digitraffic/common/database/database";
 import {Situation} from "../model/situation";
 import {StatusCodeValue} from "../model/status-code-value";
 

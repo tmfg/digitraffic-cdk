@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {dbTestBase, getDomain, insertDomain, truncate} from "../db-testutil";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import {DOMAIN_1} from "../testconstants";
 
 describe('common-update-service-test', dbTestBase((db: DTDatabase) => {

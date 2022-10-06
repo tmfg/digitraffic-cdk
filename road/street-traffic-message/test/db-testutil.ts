@@ -1,5 +1,5 @@
-import {dbTestBase as commonDbTestBase} from "digitraffic-common/test/db-testutils";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
+import {DTDatabase} from "@digitraffic/common/database/database";
 import {ApiPermit} from "../lib/model/permit";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {

@@ -1,6 +1,6 @@
 import {Construct} from "constructs";
 import {PublicApi} from "./public-api";
-import {DigitrafficStack, StackConfiguration} from "digitraffic-common/aws/infra/stack/stack";
+import {DigitrafficStack, StackConfiguration} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class RoadNetworkConditionsStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {

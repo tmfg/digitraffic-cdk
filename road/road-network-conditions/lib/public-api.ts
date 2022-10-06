@@ -1,8 +1,8 @@
 import {LambdaIntegration, Resource, RestApi} from "aws-cdk-lib/aws-apigateway";
-import {DigitrafficStack} from "digitraffic-common/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "digitraffic-common/aws/infra/stack/rest_apis";
-import {MonitoredFunction} from "digitraffic-common/aws/infra/stack/monitoredfunction";
-import {DocumentationPart} from "digitraffic-common/aws/infra/documentation";
+import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
 
 const ROAD_NETWORK_CONDITION_ALARMS_TAGS = ["Road Network Condition Alarms"];
 

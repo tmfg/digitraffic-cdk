@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import moment from "moment";
 import {Feature, Geometry} from "geojson";
-import {randomString} from "digitraffic-common/test/testutils";
+import {randomString} from "@digitraffic/common/test/testutils";
 import {AUTORI_OPERATION_BRUSHING, AUTORI_OPERATION_PAVING, AUTORI_OPERATION_SALTING, VEHICLE_TYPE} from "./testconstants";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../lib/model/autori-api-data";
 

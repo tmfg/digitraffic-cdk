@@ -2,7 +2,7 @@ import * as CounterDAO from "../dao/counter";
 import * as DataDAO from "../dao/data";
 import * as DomainDAO from "../dao/domain";
 import * as UserTypeDAO from "../dao/user-type";
-import {DTDatabase, inDatabaseReadonly} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
 import {ResultDomain} from "../model/domain";
 import {DbCsvData, ResponseData} from "../model/data";
 import {createObjectCsvStringifier} from 'csv-writer';

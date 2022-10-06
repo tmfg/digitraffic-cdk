@@ -1,9 +1,9 @@
 import {handler} from '../../../lib/lambda/update-states/lambda-update-states';
 import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "digitraffic-common/test/httpserver";
+import {TestHttpServer} from "@digitraffic/common/test/httpserver";
 import * as StatesDb from "../../../lib/db/states";
 import {Locale} from "../../../lib/model/locale";
-import {DTDatabase} from "digitraffic-common/database/database";
+import {DTDatabase} from "@digitraffic/common/database/database";
 
 const SERVER_PORT = 8089;
 

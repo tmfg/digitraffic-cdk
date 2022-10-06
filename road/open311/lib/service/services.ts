@@ -1,5 +1,5 @@
 import * as ServicesDb from '../db/services';
-import {DTDatabase, inDatabase} from "digitraffic-common/database/database";
+import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
 import {Service} from "../model/service";
 
 export function findAll(): Promise<Service[]> {

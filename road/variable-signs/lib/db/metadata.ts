@@ -1,5 +1,5 @@
 import {DbDevice} from "../model/device";
-import {DTTransaction} from "digitraffic-common/database/database";
+import {DTTransaction} from "@digitraffic/common/database/database";
 import {TloikLaite} from "../model/metatiedot";
 import {PreparedStatement} from "pg-promise";
 

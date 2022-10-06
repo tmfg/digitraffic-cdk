@@ -2,7 +2,7 @@ import {handler} from "../../../lib/lambda/update-datex2/update-datex2";
 import {dbTestBase, setup} from "../../db-testutil";
 import {readFileSync} from 'fs';
 import * as VariableSignsService from '../../../lib/service/variable-signs';
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 import {StatusCodeValue} from "../../../lib/model/status-code-value";
 import * as sinon from "sinon";
 

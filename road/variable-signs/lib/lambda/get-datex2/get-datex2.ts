@@ -1,5 +1,5 @@
 import * as VariableSignsService from "../../service/variable-signs";
-import {ProxyHolder} from "digitraffic-common/aws/runtime/secrets/proxy-holder";
+import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const proxyHolder = ProxyHolder.create();
 

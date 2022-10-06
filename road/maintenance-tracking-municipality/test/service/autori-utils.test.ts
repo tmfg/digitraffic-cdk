@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import {Asserter} from "digitraffic-common/test/asserter";
+import {Asserter} from "@digitraffic/common/test/asserter";
 import {LineString, Point} from "geojson";
 import moment from "moment";
 import {AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M, AUTORI_MAX_MINUTES_TO_HISTORY, AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S} from "../../lib/constants";

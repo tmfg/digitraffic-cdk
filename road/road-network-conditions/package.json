@@ -30,11 +30,11 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.10.5-1",
     "@types/geojson": "^7946.0.7",
     "@types/ramda": "^0.28.2",
     "aws-cdk-lib": "*",
     "axios": "^0.26.1",
-    "digitraffic-common": "*",
     "pg-native": "^3.0.0",
     "pg-promise": "^10.11.1",
     "ramda": "^0.28.0"

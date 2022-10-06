@@ -1,5 +1,5 @@
-import {ContentTypeChecker, UrlChecker} from "digitraffic-common/aws/infra/canaries/url-checker";
-import {MediaType} from "digitraffic-common/aws/types/mediatypes";
+import {ContentTypeChecker, UrlChecker} from "@digitraffic/common/aws/infra/canaries/url-checker";
+import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 
 const BASE_URL = "/prod/api/v1/variable-signs/";
 const IMAGES_URL = BASE_URL + "images/";

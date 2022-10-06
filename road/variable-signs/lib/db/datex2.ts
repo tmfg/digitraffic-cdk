@@ -1,5 +1,5 @@
 import {PreparedStatement} from "pg-promise";
-import {DTDatabase, DTTransaction} from "digitraffic-common/database/database";
+import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
 import {DbSituation, Situation} from "../model/situation";
 
 const SQL_INSERT_DATEX2 =
