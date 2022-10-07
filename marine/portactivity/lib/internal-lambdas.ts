@@ -19,7 +19,7 @@ import {LambdaSubscription} from "aws-cdk-lib/aws-sns-subscriptions";
 import {PortactivityEnvKeys} from "./keys";
 import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
 import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {Props} from './app-props';
+import {PortactivityConfiguration} from './app-props';
 import {Topic} from "aws-cdk-lib/aws-sns";
 import {Scheduler} from "@digitraffic/common/aws/infra/scheduler";
 
@@ -85,7 +85,7 @@ export function create(stack: DigitrafficStack,
         'PortActivity-UpdateAwakeETAShipScheduler',
         10,
         triggerAwakeAiETAShipTimestampsLambda);
-    if ((stack.configuration as Props).awakePortApi) {
+    if ((stack.configuration as PortactivityConfiguration).awakePortApi) {
         Scheduler.everyMinutes(stack,
             'PortActivity-UpdateAwakeETAPortScheduler',
             30,
@@ -103,7 +103,7 @@ export function create(stack: DigitrafficStack,
         'PortActivity-DeleteOldTimestampsScheduler',
         deleteOldTimestampsLambda);
 
-    if ((stack.configuration as Props).awakeATx) {
+    if ((stack.configuration as PortactivityConfiguration).awakeATx) {
         const updateAwakeAiATXTimestampsLambda = createUpdateAwakeAiATXTimestampsLambda(stack, queueAndDLQ.queue);
         const updateATXSchedulingRule = createATXScheduler(stack);
         updateATXSchedulingRule.addTarget(new LambdaFunction(updateAwakeAiATXTimestampsLambda));

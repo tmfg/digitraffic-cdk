@@ -25,6 +25,7 @@ import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {MonitoredDBFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
 import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
 import {DigitrafficIntegration} from "@digitraffic/common/aws/infra/api/integration";
+import {DigitrafficStaticIntegration} from "@digitraffic/common/aws/infra/api/static-integration";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -74,9 +75,7 @@ export class PublicApi {
         });
 
         const getTimestampsIntegration = new DigitrafficIntegration(getTimestampsLambda, MediaType.APPLICATION_JSON)
-            .addQueryParameter(
-                'locode', 'mmsi', 'imo', 'source', 'interval',
-            )
+            .addQueryParameter('locode', 'mmsi', 'imo', 'source')
             .build();
 
         const timestampResource = resource.addResource('timestamps');
@@ -87,7 +86,6 @@ export class PublicApi {
                 'method.request.querystring.mmsi': false,
                 'method.request.querystring.imo': false,
                 'method.request.querystring.source': false,
-                'method.request.querystring.interval': false,
             },
             requestValidator: validator,
             methodResponses: [
@@ -105,7 +103,6 @@ export class PublicApi {
             DocumentationPart.queryParameter('mmsi', 'Ship MMSI'),
             DocumentationPart.queryParameter('imo', 'Ship IMO'),
             DocumentationPart.queryParameter('source', 'Timestamp source'),
-            DocumentationPart.queryParameter('interval', 'Time interval in hours(default 4*24)'),
         );
 
         return getTimestampsLambda;
@@ -127,39 +124,25 @@ export class PublicApi {
             apiKeyRequired: false,
         });
 
-        this.publicApi.documentResource(shiplistResource,
-            DocumentationPart.method(['shiplist'], 'Shiplist', 'Returns a list of ships as an HTML page'));
+        this.publicApi.documentResource(
+            shiplistResource,
+            DocumentationPart.method(['shiplist'], 'Shiplist', 'Returns a list of ships as an HTML page'),
+            DocumentationPart.queryParameter('locode', 'Port LOCODE'),
+            DocumentationPart.queryParameter('mmsi', 'Ship MMSI'),
+            DocumentationPart.queryParameter('imo', 'Ship IMO'),
+            DocumentationPart.queryParameter('source', 'Timestamp source'),
+            DocumentationPart.queryParameter('interval', 'Time interval in hours(default 4*24)'),
+        );
 
         return lambda;
     }
 
-    createTimestampMetadataResource(stack: DigitrafficStack,
-        publicApi: RestApi,
-        resource: Resource) {
-
-        const integration = new MockIntegration({
-            passthroughBehavior: PassthroughBehavior.WHEN_NO_TEMPLATES,
-            requestTemplates: {
-                'application/json': `{
-                "statusCode": 200
-            }`,
-            },
-            integrationResponses: [{
-                statusCode: '200',
-                responseTemplates: {
-                    'application/json': JSON.stringify(TimestampMetadata),
-                },
-            }],
-        });
-
+    createTimestampMetadataResource(stack: DigitrafficStack, publicApi: RestApi, resource: Resource) {
         const metadataResource = resource.addResource('metadata');
 
-        metadataResource.addMethod("GET", integration, {
-            apiKeyRequired: false,
-            methodResponses: [{
-                statusCode: '200',
-            }],
-        });
+        new DigitrafficStaticIntegration(
+            metadataResource, MediaType.APPLICATION_JSON, JSON.stringify(TimestampMetadata), true, false,
+        );
 
         this.publicApi.documentResource(metadataResource,
             DocumentationPart.method(['metadata'], 'Timestamp metadata', 'Returns timestamp related metadata'));

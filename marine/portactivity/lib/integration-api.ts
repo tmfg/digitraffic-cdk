@@ -5,7 +5,7 @@ import {Queue} from 'aws-cdk-lib/aws-sqs';
 import {attachQueueToApiGatewayResource} from "@digitraffic/common/aws/infra/sqs-integration";
 import {addServiceModel, getModelReference} from "@digitraffic/common/utils/api-model";
 import {createTimestampSchema, LocationSchema, ShipSchema} from "./model/timestamp-schema";
-import {addTagsAndSummary, DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
+import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
 import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 
 export function create(queue: Queue,

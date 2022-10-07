@@ -3,7 +3,7 @@ import * as InternalLambdas from './internal-lambdas';
 import * as IntegrationApi from './integration-api';
 import * as Sqs from './sqs';
 import {PublicApi} from "./public-api";
-import {Props} from './app-props';
+import {PortactivityConfiguration} from './app-props';
 import {BlockPublicAccess, Bucket} from "aws-cdk-lib/aws-s3";
 import {DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget} from "aws-cdk-lib/aws-rds";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
@@ -11,14 +11,14 @@ import {Canaries} from "./canaries";
 import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
 
 export class PortActivityStack extends DigitrafficStack {
-    constructor(scope: Construct, id: string, appProps: Props) {
-        super(scope, id, appProps);
+    constructor(scope: Construct, id: string, config: PortactivityConfiguration) {
+        super(scope, id, config);
 
-        this.createRdsProxy(this.secret, appProps);
+        this.createRdsProxy(this.secret, config.dbClusterIdentifier);
 
         const queueAndDLQ = Sqs.createQueue(this);
         const dlqBucket = new Bucket(this, 'DLQBucket', {
-            bucketName: appProps.dlqBucketName,
+            bucketName: config.dlqBucketName,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         });
 
@@ -30,14 +30,14 @@ export class PortActivityStack extends DigitrafficStack {
         new Canaries(this, queueAndDLQ.dlq, publicApi);
 
         new Bucket(this, 'DocumentationBucket', {
-            bucketName: appProps.documentationBucketName,
+            bucketName: config.documentationBucketName,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         });
     }
 
-    createRdsProxy(secret: ISecret, appProps: Props) {
+    createRdsProxy(secret: ISecret, clusterIdentifier: string) {
         const cluster = DatabaseCluster.fromDatabaseClusterAttributes(this, 'DbCluster', {
-            clusterIdentifier: appProps.dbClusterIdentifier,
+            clusterIdentifier,
             engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
         });
 
