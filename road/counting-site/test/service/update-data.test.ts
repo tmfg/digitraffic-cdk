@@ -1,96 +1,100 @@
-import {EcoCounterApi} from "../../lib/api/eco-counter";
-import {updateDataForDomain} from "../../lib/service/update";
-import {dbTestBase, insertCounter, insertDomain} from "../db-testutil";
+import { EcoCounterApi } from "../../lib/api/eco-counter";
+import { updateDataForDomain } from "../../lib/service/update";
+import { dbTestBase, insertCounter, insertDomain } from "../db-testutil";
 import * as DataDAO from "../../lib/dao/data";
 
-import * as sinon from 'sinon';
-import {ApiData} from "../../lib/model/data";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import * as sinon from "sinon";
+import { ApiData } from "../../lib/model/data";
+import { DTDatabase } from "@digitraffic/common/database/database";
 
-const DOMAIN_NAME = 'TEST_DOMAIN';
+const DOMAIN_NAME = "TEST_DOMAIN";
 
-describe('update tests', dbTestBase((db: DTDatabase) => {
-    const EMPTY_DATA: ApiData[] = [];
+describe(
+    "update tests",
+    dbTestBase((db: DTDatabase) => {
+        const EMPTY_DATA: ApiData[] = [];
 
-    afterEach(() => {
-        sinon.restore();
-    });
+        afterEach(() => {
+            sinon.restore();
+        });
 
-    function mockApiResponse(response: ApiData[]) {
-        return sinon.stub(EcoCounterApi.prototype, 'getDataForSite').returns(Promise.resolve(response));
-    }
-
-    async function assertDataInDb(expected: number, counterId: string, fn?: Function) {
-        const data = await DataDAO.findValues(
-            db, 2015, 9, counterId, '',
-        );
-        expect(data).toHaveLength(expected);
-
-        if (fn) {
-            fn(data);
+        function mockApiResponse(response: ApiData[]) {
+            return sinon
+                .stub(EcoCounterApi.prototype, "getDataForSite")
+                .returns(Promise.resolve(response));
         }
-    }
 
-    test('updateDataForDomain - no counters', async () => {
-        await insertDomain(db, DOMAIN_NAME);
-        const counterApiResponse = mockApiResponse(EMPTY_DATA);
+        async function assertDataInDb(expected: number, counterId: string) {
+            const data = await DataDAO.findValues(db, 2015, 9, counterId, "");
+            expect(data).toHaveLength(expected);
+        }
 
-        await updateDataForDomain(DOMAIN_NAME, '', '');
+        test("updateDataForDomain - no counters", async () => {
+            await insertDomain(db, DOMAIN_NAME);
+            const counterApiResponse = mockApiResponse(EMPTY_DATA);
 
-        expect(counterApiResponse.callCount).toEqual(0);
-    });
+            await updateDataForDomain(DOMAIN_NAME, "", "");
 
-    test('updateDataForDomain - one counter no data', async () => {
-        await insertDomain(db, DOMAIN_NAME);
-        await insertCounter(db, 1, DOMAIN_NAME, 1);
-        const counterApiResponse = mockApiResponse(EMPTY_DATA);
+            expect(counterApiResponse.callCount).toEqual(0);
+        });
 
-        await updateDataForDomain(DOMAIN_NAME, '', '');
+        test("updateDataForDomain - one counter no data", async () => {
+            await insertDomain(db, DOMAIN_NAME);
+            await insertCounter(db, 1, DOMAIN_NAME, 1);
+            const counterApiResponse = mockApiResponse(EMPTY_DATA);
 
-        expect(counterApiResponse.callCount).toEqual(1);
-    });
+            await updateDataForDomain(DOMAIN_NAME, "", "");
 
-    const RESPONSE_DATA: ApiData[] = [
-        {
-            "date": "2015-09-25T05:00:00+0000",
-            "isoDate": new Date("2015-09-25T05:00:00+0200"),
-            "counts": 1,
-            "status": 1,
-        }];
+            expect(counterApiResponse.callCount).toEqual(1);
+        });
 
-    test('updateDataForDomain - one counter and data', async () => {
-        await insertDomain(db, DOMAIN_NAME);
-        await insertCounter(db, 1, DOMAIN_NAME, 1);
-        const counterApiResponse = mockApiResponse(RESPONSE_DATA);
+        const RESPONSE_DATA: ApiData[] = [
+            {
+                date: "2015-09-25T05:00:00+0000",
+                isoDate: new Date("2015-09-25T05:00:00+0200"),
+                counts: 1,
+                status: 1,
+            },
+        ];
 
-        await updateDataForDomain(DOMAIN_NAME, '', '');
+        test("updateDataForDomain - one counter and data", async () => {
+            await insertDomain(db, DOMAIN_NAME);
+            await insertCounter(db, 1, DOMAIN_NAME, 1);
+            const counterApiResponse = mockApiResponse(RESPONSE_DATA);
 
-        await assertDataInDb(1, "1");
-        expect(counterApiResponse.callCount).toEqual(1);
-    });
+            await updateDataForDomain(DOMAIN_NAME, "", "");
 
-    test('updateDataForDomain - one counter and data, last update week ago', async () => {
-        await insertDomain(db, DOMAIN_NAME);
-        await insertCounter(db, 1, DOMAIN_NAME, 1);
-        await db.any('update counting_site_counter set last_data_timestamp=now() - interval \'7 days\'');
-        const counterApiResponse = mockApiResponse(RESPONSE_DATA);
+            await assertDataInDb(1, "1");
+            expect(counterApiResponse.callCount).toEqual(1);
+        });
 
-        await updateDataForDomain(DOMAIN_NAME, '', '');
+        test("updateDataForDomain - one counter and data, last update week ago", async () => {
+            await insertDomain(db, DOMAIN_NAME);
+            await insertCounter(db, 1, DOMAIN_NAME, 1);
+            await db.any(
+                "update counting_site_counter set last_data_timestamp=now() - interval '7 days'"
+            );
+            const counterApiResponse = mockApiResponse(RESPONSE_DATA);
 
-        await assertDataInDb(1, "1");
-        expect(counterApiResponse.callCount).toEqual(1);
-    });
+            await updateDataForDomain(DOMAIN_NAME, "", "");
 
-    test('updateDataForDomain - one counter and data - no need to update', async () => {
-        await insertDomain(db, DOMAIN_NAME);
-        await insertCounter(db, 1, DOMAIN_NAME, 1);
-        await db.any('update counting_site_counter set last_data_timestamp=now()');
-        const counterApiResponse = mockApiResponse(RESPONSE_DATA);
+            await assertDataInDb(1, "1");
+            expect(counterApiResponse.callCount).toEqual(1);
+        });
 
-        await updateDataForDomain(DOMAIN_NAME, '', '');
+        test("updateDataForDomain - one counter and data - no need to update", async () => {
+            await insertDomain(db, DOMAIN_NAME);
+            await insertCounter(db, 1, DOMAIN_NAME, 1);
+            await db.any(
+                "update counting_site_counter set last_data_timestamp=now()"
+            );
+            const counterApiResponse = mockApiResponse(RESPONSE_DATA);
 
-        // timestamp said the data was just updated, so no new data was added
-        await assertDataInDb(0, "1");
-        expect(counterApiResponse.callCount).toEqual(0);
-    });
-}));
+            await updateDataForDomain(DOMAIN_NAME, "", "");
+
+            // timestamp said the data was just updated, so no new data was added
+            await assertDataInDb(0, "1");
+            expect(counterApiResponse.callCount).toEqual(0);
+        });
+    })
+);

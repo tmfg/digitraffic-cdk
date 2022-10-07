@@ -12,5 +12,5 @@
     "preserveSymlinks": true,
     "exactOptionalPropertyTypes": false
   },
-  "include": ["lib/**/*.ts"]
+  "include": ["bin/**/*.ts", "lib/**/*.ts"]
 }

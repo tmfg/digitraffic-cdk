@@ -5,7 +5,7 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
+    "lint": "eslint --cache .",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "echo no tests for this project"

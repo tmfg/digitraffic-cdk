@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "lint": "eslint lib/**/*.ts --fix",
+    "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
