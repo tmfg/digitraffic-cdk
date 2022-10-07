@@ -45,12 +45,11 @@ export const handler = async () => {
 
     const merged = mergeApiDescriptions(allApis);
 
-    delete merged.schemes; // always https
+    delete merged.security; // always https
     delete merged['x-amazon-apigateway-policy']; // implementation details
 
     if (host) {
-        merged.host = host;
-        delete merged.basePath;
+        merged.servers = [{url: host}];
     }
 
     if (title) {
@@ -62,7 +61,6 @@ export const handler = async () => {
     }
 
     if (removeSecurity === 'true') {
-        delete merged.securityDefinitions;
         for (const path in merged.paths) {
             for (const method in merged.paths[path]) {
                 delete merged.paths[path][method].security;
