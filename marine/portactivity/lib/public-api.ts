@@ -1,11 +1,4 @@
-import {
-    LambdaIntegration,
-    MockIntegration,
-    PassthroughBehavior,
-    RequestValidator,
-    Resource,
-    RestApi,
-} from 'aws-cdk-lib/aws-apigateway';
+import {LambdaIntegration, RequestValidator, Resource, RestApi,} from 'aws-cdk-lib/aws-apigateway';
 import {Function} from 'aws-cdk-lib/aws-lambda';
 import {createTimestampSchema, LocationSchema, ShipSchema} from './model/timestamp-schema';
 import {corsMethod, methodResponse} from "@digitraffic/common/aws/infra/api/responses";

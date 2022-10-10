@@ -95,7 +95,7 @@ describe('api-awake-ai-atx', () => {
         }));
         const api = new AwakeAiATXApi('', '', WebSocket);
 
-        await expect(async () => api.getATXs(10)).rejects.toThrow();
+        await expect(() => api.getATXs(10)).rejects.toThrow();
     });
 
 });

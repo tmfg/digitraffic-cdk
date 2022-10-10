@@ -359,6 +359,24 @@
   dependencies:
     "@jridgewell/trace-mapping" "0.3.9"
 
+"@digitraffic/common@2022.10.10-1":
+  version "2022.10.10-1"
+  resolved "https://registry.yarnpkg.com/@digitraffic/common/-/common-2022.10.10-1.tgz#494879e8a51c9f2b0f78717e3402dabb8cee42a0"
+  integrity sha512-oYYcQvED87WprTEq3xKOEjYXAx36TU8sDJYwPQQ0iGJnUYWTpm6vE8VnkcxoWexWw7eHa1Vd1gx5OEYXlKYfqA==
+  dependencies:
+    "@aws-cdk/aws-synthetics-alpha" "^2.27.0-alpha.0"
+    "@types/geojson" "^7946.0.7"
+    aws-cdk-lib "^2.43.1"
+    aws-sdk "^2.1225.0"
+    axios "^0.21.1"
+    change-case "4.1.2"
+    constructs "^10.1.116"
+    geojson-validation "^1.0.2"
+    moment "^2.29.4"
+    node-ttl "^0.2.0"
+    pg-native "^3.0.1"
+    pg-promise "^10.12.0"
+
 "@digitraffic/common@2022.10.6-1":
   version "2022.10.6-1"
   resolved "https://registry.yarnpkg.com/@digitraffic/common/-/common-2022.10.6-1.tgz#e9d8a100229c1d8a90abbab1943158488188e2be"
