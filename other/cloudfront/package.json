@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "postbuild": "esbuild lib/lambda/**/*.ts lib/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14; node dist/out/lib/lambda-versions",
+    "postbuild": "esbuild lib/lambda/**/*.ts lib/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14; ts-node lib/lambda-versions",
     "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
