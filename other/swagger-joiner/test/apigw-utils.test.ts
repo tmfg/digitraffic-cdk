@@ -1,57 +1,66 @@
-import {exportSwaggerApi, getDocumentationVersion, createDocumentationVersion} from "../lib/apigw-utils";
-import * as sinon from 'sinon';
-import * as AWS from 'aws-sdk';
+import {
+    exportSwaggerApi,
+    getDocumentationVersion,
+    createDocumentationVersion,
+} from "../lib/apigw-utils";
+import * as AWS from "aws-sdk";
 
-describe('apigw-utils', () => {
+const stubPromise = (x: unknown) => ({ promise: () => Promise.resolve() });
+const apiGWCreateDocumentationVersionStub = jest.fn(stubPromise);
+const apiGWGetDocumentationVersionsStub = jest.fn(stubPromise);
+const apiGWGetExportStub = jest.fn(stubPromise);
 
-    const sandbox = sinon.createSandbox();
-    afterEach(() => sandbox.restore());
+jest.mock("aws-sdk", () => {
+    return {
+        APIGateway: jest.fn(() => {
+            return {
+                getExport: apiGWGetExportStub,
+                getDocumentationVersions: apiGWGetDocumentationVersionsStub,
+                createDocumentationVersion: apiGWCreateDocumentationVersionStub,
+            };
+        }),
+    };
+});
 
-    test('exportSwaggerApi', async () => {
-        const apiId = 'some-api-id';
-        const getExportStub = sandbox.stub().returns({promise: () => new Promise<void>((resolve) => resolve())});
-        sandbox.stub(AWS, 'APIGateway').returns({
-            getExport: getExportStub,
-        });
+describe("apigw-utils", () => {
+    const apiGateway = new AWS.APIGateway();
+
+    test("exportSwaggerApi", async () => {
+        const apiId = "some-api-id";
 
         await exportSwaggerApi(apiId);
 
-        expect(getExportStub.getCall(0).args[0]).toMatchObject({
-            exportType: 'oas30',
+        expect(apiGWGetExportStub.mock.calls[0][0]).toMatchObject({
+            exportType: "oas30",
             restApiId: apiId,
-            stageName: 'prod',
+            stageName: "prod",
         });
     });
 
-    test('getDocumentationVersion', async () => {
-        const apiId = 'some-api-id';
-        const getDocumentationVersionsStub = sandbox.stub().returns({promise: () => new Promise<void>((resolve) => resolve())});
-        sandbox.stub(AWS, 'APIGateway').returns({
-            getDocumentationVersions: getDocumentationVersionsStub,
-        });
+    test("getDocumentationVersion", async () => {
+        const apiId = "some-api-id";
 
-        await getDocumentationVersion(apiId, new AWS.APIGateway());
+        await getDocumentationVersion(apiId, apiGateway);
 
-        expect(getDocumentationVersionsStub.getCall(0).args[0]).toMatchObject({
+        expect(
+            apiGWGetDocumentationVersionsStub.mock.calls[0][0]
+        ).toMatchObject({
             restApiId: apiId,
         });
     });
 
-    test('createDocumentationVersion', async () => {
-        const apiId = 'some-api-id';
+    test("createDocumentationVersion", async () => {
+        const apiId = "some-api-id";
         const docVersion = Math.ceil(10 * Math.random());
-        const createDocumentationVersionStub = sandbox.stub().returns({promise: () => new Promise<void>((resolve) => resolve())});
-        sandbox.stub(AWS, 'APIGateway').returns({
-            createDocumentationVersion: createDocumentationVersionStub,
-        });
 
-        await createDocumentationVersion(apiId, docVersion, new AWS.APIGateway());
+        await createDocumentationVersion(apiId, docVersion, apiGateway);
 
-        expect(createDocumentationVersionStub.getCall(0).args[0]).toMatchObject({
+        expect(
+            apiGWCreateDocumentationVersionStub.mock.calls[0][0]
+        ).toMatchObject({
             restApiId: apiId,
-            stageName: 'prod',
-            documentationVersion: (docVersion + 1).toString(),
+            stageName: "prod",
+            documentationVersion: `${docVersion + 1}`,
         });
     });
-
 });

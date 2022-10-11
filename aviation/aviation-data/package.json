@@ -6,7 +6,6 @@
     "build": "tsc",
     "watch": "tsc -w",
     "lint": "eslint --cache .",
-    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
