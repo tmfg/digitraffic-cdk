@@ -20,6 +20,11 @@ jobs:
       - name: Install ESLint
         run: yarn install --frozen-lock
 
+      - name: Derive appropriate SHAs for NX
+        uses: nrwl/nx-set-shas@v3
+        with:
+          main-branch-name: "master"
+
       - name: Lint affected
         id: lint-affected
         run: yarn lint:affected
@@ -32,6 +37,7 @@ jobs:
         continue-on-error: true
 
       - name: Publish report
+        if: steps.lint-affected.outcome != 'success'
         uses: tmfg/digitraffic-actions@gh-pages-publish/v1
         with:
           GH_PAGES_BRANCH: gh-pages
