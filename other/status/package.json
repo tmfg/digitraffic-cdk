@@ -9,6 +9,8 @@
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint --cache .",
+    "clean": "rimraf dist cdk.out",
+    "clean:force": "rimraf dist cdk.out node_modules",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles"

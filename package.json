@@ -36,9 +36,10 @@
     "eslint-config-prettier": "^8.5.0",
     "husky": ">=6",
     "lint-staged": ">=10",
+    "nx": "14.8.3",
     "prettier": "^2.7.1",
-    "typescript": "^4.7.4",
-    "nx": "14.8.3"
+    "rimraf": "^3.0.2",
+    "typescript": "^4.7.4"
   },
   "lint-staged": {
     "*.{js,ts,css,md,yml,yaml,json}": "prettier --write"
@@ -49,6 +50,8 @@
     "test:all": "nx run-many --target=test",
     "test:affected": "nx affected:test",
     "lint:affected": "nx affected:lint",
+    "clean:all": "nx run-many --target=clean",
+    "clean:all:force": "nx run-many --target=clean:force && rimraf node_modules",
     "prepare": "husky install"
   }
 }

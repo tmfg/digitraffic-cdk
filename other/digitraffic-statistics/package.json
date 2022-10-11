@@ -5,14 +5,13 @@
   "scripts": {
     "build": "tsc",
     "lint": "eslint --cache .",
+    "clean": "rimraf dist cdk.out",
+    "clean:force": "rimraf dist cdk.out node_modules",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
     "@types/aws-lambda": "*",
     "@types/node": "*",
-    "@typescript-eslint/eslint-plugin": "*",
-    "@typescript-eslint/parser": "*",
-    "eslint": "*",
     "typescript": "*"
   },
   "dependencies": {
