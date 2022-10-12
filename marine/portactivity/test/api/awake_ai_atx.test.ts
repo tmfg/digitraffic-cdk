@@ -1,82 +1,77 @@
-import {newAwakeATXMessage} from "../testdata";
+import { newAwakeATXMessage } from "../testdata";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const WebSocket = require('ws');
-jest.mock('ws');
 import {
     AwakeAiATXApi,
     AwakeAiATXEventType,
     SUBSCRIPTION_MESSAGE,
 } from "../../lib/api/awake_ai_atx";
 
-function NO_OP(): void {
-    // intentionally empty
-}
+const NO_OP = jest.fn();
 
-describe('api-awake-ai-atx', () => {
-
-    beforeEach(() => {
-        WebSocket.mockClear();
-    });
-
-    test('getATXs - no existing session subscribes to zone events', async () => {
+describe("api-awake-ai-atx", () => {
+    test("getATXs - no existing session subscribes to zone events", async () => {
         const sendMock = jest.fn();
-        WebSocket.mockImplementation(() => ({
+        const WebSocket = jest.fn().mockImplementation(() => ({
             on: (event: string, callback: () => void) => {
-                if (event === 'open') {
+                if (event === "open") {
                     callback();
                 }
             },
             send: sendMock,
             close: NO_OP,
         }));
-        const api = new AwakeAiATXApi('', '', WebSocket);
+        const api = new AwakeAiATXApi("", "", WebSocket);
 
         await api.getATXs(10);
 
-        expect(sendMock.mock.calls[0][0]).toEqual(JSON.stringify(SUBSCRIPTION_MESSAGE));
+        expect(sendMock.mock.calls[0][0]).toEqual(
+            JSON.stringify(SUBSCRIPTION_MESSAGE)
+        );
     });
 
-    test('getATXs - existing session resumes with subscription id', async () => {
+    test("getATXs - existing session resumes with subscription id", async () => {
         const sendMock = jest.fn();
-        const subscriptionId = 'foo';
-        WebSocket.mockImplementation(() => ({
+        const subscriptionId = "foo";
+        const WebSocket = jest.fn().mockImplementation(() => ({
             on: (event: string, callback: (str?: string) => void) => {
-                if (event === 'open') {
+                if (event === "open") {
                     callback();
-                } else if (event === 'message') {
-                    callback(JSON.stringify({
-                        subscriptionId,
-                        msgType: AwakeAiATXEventType.SUBSCRIPTION_STATUS,
-                    }));
+                } else if (event === "message") {
+                    callback(
+                        JSON.stringify({
+                            subscriptionId,
+                            msgType: AwakeAiATXEventType.SUBSCRIPTION_STATUS,
+                        })
+                    );
                 }
             },
             send: sendMock,
             close: NO_OP,
         }));
-        const api = new AwakeAiATXApi('', '', WebSocket);
+        const api = new AwakeAiATXApi("", "", WebSocket);
 
         await api.getATXs(10);
         await api.getATXs(10);
 
-        expect(sendMock.mock.calls[1][0]).toEqual(JSON.stringify(AwakeAiATXApi.createResumeMessage(subscriptionId)));
+        expect(sendMock.mock.calls[1][0]).toEqual(
+            JSON.stringify(AwakeAiATXApi.createResumeMessage(subscriptionId))
+        );
     });
 
-    test('getATXs - received ATxs', async () => {
+    test("getATXs - received ATxs", async () => {
         const atxMessage = newAwakeATXMessage();
-        const sendMock = jest.fn();
-        WebSocket.mockImplementation(() => ({
+        const WebSocket = jest.fn().mockImplementation(() => ({
             on: (event: string, callback: (str?: string) => void) => {
-                if (event === 'open') {
+                if (event === "open") {
                     callback();
-                } else if (event === 'message') {
+                } else if (event === "message") {
                     callback(JSON.stringify(atxMessage));
                 }
             },
-            send: sendMock,
+            send: jest.fn(),
             close: NO_OP,
         }));
-        const api = new AwakeAiATXApi('', '', WebSocket);
+        const api = new AwakeAiATXApi("", "", WebSocket);
 
         const atxs = await api.getATXs(10);
 
@@ -84,18 +79,18 @@ describe('api-awake-ai-atx', () => {
         expect(atxs[0]).toMatchObject(atxMessage);
     });
 
-    test('getATXs - error handling', async () => {
-        const sendMock = jest.fn();
-        WebSocket.mockImplementation(() => ({
-            on: () => {
-                throw new Error('test error');
+    test("getATXs - error handling", async () => {
+        const WebSocket = jest.fn().mockImplementation(() => ({
+            on: (event: unknown, callback: (str?: unknown) => void) => {
+                if (event === "error") {
+                    callback(new Error("test error"));
+                }
             },
-            send: sendMock,
+            send: jest.fn(),
             close: NO_OP,
         }));
-        const api = new AwakeAiATXApi('', '', WebSocket);
+        const api = new AwakeAiATXApi("", "", WebSocket);
 
-        await expect(() => api.getATXs(10)).rejects.toThrow();
+        await expect(api.getATXs(10)).rejects.toEqual("Error");
     });
-
 });
