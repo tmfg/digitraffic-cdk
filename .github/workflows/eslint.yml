@@ -5,7 +5,6 @@ on: [push]
 jobs:
   lint:
     runs-on: ubuntu-22.04
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -17,7 +16,7 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Install ESLint
+      - name: Install packages
         run: yarn install --frozen-lock
 
       - name: Derive appropriate SHAs for NX
@@ -30,20 +29,60 @@ jobs:
         run: yarn lint:affected
         continue-on-error: true
 
-      - name: Create ESLint report
-        id: create-report
-        run: yarn eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
-        continue-on-error: true
-
-      - name: Publish report
-        if: steps.create-report.outcome == 'success'
-        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
-        with:
-          GH_PAGES_BRANCH: gh-pages
-          FILE_PATH: ${GITHUB_REF##*/}/eslint-report.html
-          COMMIT_MESSAGE: ESLint report for branch $CURRENT_BRANCH
-          LINK_TEXT: ESLint report
-
       - name: Fail on ESLint errors
         if: steps.lint-affected.outcome != 'success'
         run: exit 1
+
+  create-reports:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+
+      - name: Install packages
+        run: yarn install --frozen-lock
+
+      - name: Derive appropriate SHAs for NX
+        uses: nrwl/nx-set-shas@v3
+        with:
+          main-branch-name: "master"
+
+      - name: Create ESLint reports from all project
+        if: ${{ github.ref_name }} == "master"
+        run: yarn eslint-report:all
+        continue-on-error: true
+
+      - name: Create ESLint reports for affected projects
+        if: ${{ github.ref_name }} != "master"
+        run: yarn eslint-report:affected
+        continue-on-error: true
+
+      - name: Find report files
+        id: reports
+        shell: python
+        run: |
+          import os
+          import os.path
+          from glob import glob
+          ref = os.environ["GITHUB_REF_NAME"]
+          reports = [_ for _ in glob("*/*/report.html") if "node_modules" not in _]
+          for r in reports:
+              dst = os.path.join(ref, r)
+              os.makedirs(os.path.dirname(dst))
+              os.rename(r, dst)
+
+      - name: Publish report
+        uses: tmfg/digitraffic-actions@gh-pages-publish/v1
+        with:
+          GH_PAGES_BRANCH: gh-pages
+          BULK: true
+          FILE_PATH: ${{ github.ref_name }}/
+          COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
+          LINK_TEXT: ESLint report for project

@@ -51,6 +51,7 @@
     "test:affected": "nx affected:test",
     "lint:affected": "nx affected:lint",
     "eslint-report:all": "nx run-many --target=eslint-report",
+    "eslint-report:affected": "nx affected:eslint-report",
     "clean:all": "nx run-many --target=clean",
     "clean:all:force": "nx run-many --target=clean:force && rimraf node_modules",
     "prepare": "husky install"
