@@ -31,13 +31,12 @@ jobs:
         continue-on-error: true
 
       - name: Create ESLint report
-        if: steps.lint-affected.outcome != 'success'
-        id: run-eslint
+        id: create-report
         run: yarn eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
         continue-on-error: true
 
       - name: Publish report
-        if: steps.lint-affected.outcome != 'success'
+        if: steps.create-report.outcome == 'success'
         uses: tmfg/digitraffic-actions@gh-pages-publish/v1
         with:
           GH_PAGES_BRANCH: gh-pages
