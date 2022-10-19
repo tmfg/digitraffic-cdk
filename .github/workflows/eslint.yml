@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout
@@ -33,7 +33,7 @@ jobs:
       - name: Create ESLint report
         if: steps.lint-affected.outcome != 'success'
         id: run-eslint
-        run: npx eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
+        run: yarn eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
         continue-on-error: true
 
       - name: Publish report
