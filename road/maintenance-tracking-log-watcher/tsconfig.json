@@ -1,8 +1,7 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "dist/out",
-    "exactOptionalPropertyTypes": false
+    "outDir": "dist/out"
   },
   "include": ["bin/**/*.ts", "lib/**/*.ts", "test/**/*.ts"]
 }

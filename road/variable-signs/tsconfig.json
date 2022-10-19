@@ -9,8 +9,7 @@
     "inlineSourceMap": false,
     "inlineSources": false,
     "strictPropertyInitialization": false,
-    "preserveSymlinks": true,
-    "exactOptionalPropertyTypes": false
+    "preserveSymlinks": true
   },
   "include": ["bin/**/*.ts", "lib/**/*.ts", "test/**/*.ts"]
 }
