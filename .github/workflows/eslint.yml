@@ -24,43 +24,15 @@ jobs:
         with:
           main-branch-name: "master"
 
-      - name: Lint affected
-        id: lint-affected
-        run: yarn lint:affected
-        continue-on-error: true
-
-      - name: Fail on ESLint errors
-        if: steps.lint-affected.outcome != 'success'
-        run: exit 1
-
-  create-reports:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "14"
-
-      - name: Install packages
-        run: yarn install --frozen-lock
-
-      - name: Derive appropriate SHAs for NX
-        uses: nrwl/nx-set-shas@v3
-        with:
-          main-branch-name: "master"
-
       - name: Create ESLint reports from all project
         if: ${{ github.ref_name == 'master' }}
+        id: report-all
         run: yarn eslint-report:all
         continue-on-error: true
 
       - name: Create ESLint reports for affected projects
         if: ${{ github.ref_name != 'master' }}
+        id: report-affected
         run: yarn eslint-report:affected
         continue-on-error: true
 
@@ -127,3 +99,7 @@ jobs:
           status = lambda x: "🟢" if x == "0 problems" else "🟠" if "0 errors" in x else "🔴"
           summary = [f"{status(s)} ESLint report for [{project(r)}](https://{org}.github.io/{repo}/{dst}) ({s})" for (r, dst, s) in reports_created]
           open(os.environ["GITHUB_STEP_SUMMARY"], "a").write("\n".join(summary))
+
+      - name: Fail on ESLint errors
+        run: |
+          if [[ "${{ steps.report-all.outcome }}" == "failure" || "${{ steps.report-affected.outcome }}" == "failure" ]]; then exit 1; else exit 0; fi
