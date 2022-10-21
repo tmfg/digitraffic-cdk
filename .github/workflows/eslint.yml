@@ -55,12 +55,12 @@ jobs:
           main-branch-name: "master"
 
       - name: Create ESLint reports from all project
-        if: ${{ github.ref_name }} == "master"
+        if: ${{ github.ref_name == 'master' }}
         run: yarn eslint-report:all
         continue-on-error: true
 
       - name: Create ESLint reports for affected projects
-        if: ${{ github.ref_name }} != "master"
+        if: ${{ github.ref_name != 'master' }}
         run: yarn eslint-report:affected
         continue-on-error: true
 
