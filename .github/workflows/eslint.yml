@@ -125,5 +125,5 @@ jobs:
           (org, repo) = os.environ["GITHUB_REPOSITORY"].split("/")
           project = lambda x: "/".join(x.split()[-1:])
           status = lambda x: "🟢" if x == "0 problems" else "🟠" if "0 errors" in x else "🔴"
-          summary = [f"[{status(s)} ESLint report for {project(r)} ({s})](https://{org}.github.io/{repo}/{r})" for (r, s) in reports_created]
+          summary = [f"{status(s)} ESLint report for [{project(r)}](https://{org}.github.io/{repo}/{r}) ({s})" for (r, s) in reports_created]
           open(os.environ["GITHUB_STEP_SUMMARY"], "a").write("\n".join(summary))
