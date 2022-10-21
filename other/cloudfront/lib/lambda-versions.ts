@@ -1,11 +1,9 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const fs = require('fs');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const path = require('path');
-const versionVariableName = 'CF_LAMBDA_VERSION';
+import * as fs from "node:fs/promises";
+import * as path from "node:path";
+const versionVariableName = "CF_LAMBDA_VERSION";
 
-async function* walk(dir: string): AsyncGenerator {
-    for await (const d of await fs.promises.opendir(dir)) {
+async function* walk(dir: string): AsyncGenerator<string> {
+    for await (const d of await fs.opendir(dir)) {
         const entry = path.join(dir, d.name);
         if (d.isDirectory()) {
             yield* walk(entry);
@@ -20,14 +18,19 @@ async function* walk(dir: string): AsyncGenerator {
     possible to version lambdas(new version needs changes in source code)
  */
 async function main() {
-    for await (const file of walk('dist/lambda')) {
-        let fileContent = fs.readFileSync(file).toString('utf-8');
+    for await (const file of walk("dist/lambda")) {
+        let fileContent = await fs.readFile(file, {
+            encoding: "utf-8",
+        });
         if (fileContent.includes(versionVariableName)) {
-            fileContent = fileContent.substring(0, fileContent.lastIndexOf('\n'));
+            fileContent = fileContent.substring(
+                0,
+                fileContent.lastIndexOf("\n")
+            );
         }
-        fileContent += `\nconst ${versionVariableName} = ${+new Date};`;
+        fileContent += `\nconst ${versionVariableName} = ${+new Date()};`;
 
-        fs.writeFileSync(file, fileContent);
+        await fs.writeFile(file, fileContent);
     }
 }
 

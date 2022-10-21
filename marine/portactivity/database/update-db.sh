@@ -10,6 +10,5 @@ docker build \
 
 docker run --rm \
 --name portactivity-db-updater \
---network=dnet1 \
 portactivity-db-updater \
 $COMMAND

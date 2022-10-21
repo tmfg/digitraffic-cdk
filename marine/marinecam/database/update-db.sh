@@ -10,6 +10,5 @@ docker build \
 
 docker run --rm \
 --name marinecam-db-updater \
---network=dnet1 \
 marinecam-db-updater \
 $COMMAND

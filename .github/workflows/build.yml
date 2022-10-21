@@ -6,12 +6,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
+        uses: actions/checkout@v3
         with:
-          node-version: '14'
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "14"
+
       - name: Install deps
-        run: ./install_all.sh
-      - name: Compile
-        run: ./build_all.sh
+        run: yarn install --frozen-lock
+
+      - name: Derive appropriate SHAs for NX
+        uses: nrwl/nx-set-shas@v3
+        with:
+          main-branch-name: "master"
+
+      - name: Compile affected
+        run: yarn build:affected

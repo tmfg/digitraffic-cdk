@@ -5,8 +5,9 @@
   "scripts": {
     "build": "tsc",
     "watch": "tsc -w",
-    "lint": "eslint lib/**/*.ts test/**/*.ts --fix",
-    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
+    "lint": "eslint --cache .",
+    "clean": "rimraf dist cdk.out",
+    "clean:force": "rimraf dist cdk.out node_modules",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
