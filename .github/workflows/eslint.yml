@@ -85,7 +85,7 @@ jobs:
           GH_PAGES_BRANCH: gh-pages
           FILE_PATH: ${{ github.ref_name }}/
           COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
-          SKIP_LINK: true
+          NO_SUMMARY: true
 
       - name: Create summary
         if: steps.publish-reports.outcome == 'success'
