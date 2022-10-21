@@ -53,7 +53,7 @@ export async function updateJsonMetadata(
             idMap
         );
         // updateDevices removes updated devices from idMap
-        await MetadataDb.insertDevices(db, Object.values(idMap));
+        await MetadataDb.insertDevices(db, [...idMap.values()]);
         await MetadataDb.removeDevices(db, removedDevices);
 
         console.info(

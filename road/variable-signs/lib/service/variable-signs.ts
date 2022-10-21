@@ -34,7 +34,7 @@ export function findActiveSignsDatex2() {
 }
 
 function createResponse(datex2: string[], lastUpdated: Date | null): string {
-    const publicationTime = lastUpdated || new Date();
+    const publicationTime = lastUpdated ?? new Date();
     const situations = datex2.join('\n');
 
     return DATEX2_TEMPLATE

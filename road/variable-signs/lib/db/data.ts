@@ -21,7 +21,7 @@ const SQL_INSERT_DEVICE_DATA = `insert into device_data(id, created_date, device
 values (nextval('device_data_id_seq'), current_timestamp, $1, $2, $3, $4, $5, $6)
 returning id`;
 
-type Identifiable = {
+interface Identifiable {
     id: number;
 };
 

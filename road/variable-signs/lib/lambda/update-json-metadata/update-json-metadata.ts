@@ -10,7 +10,7 @@ export const handler = (event: Record<string, string>) => {
     const start = Date.now();
 
     if (jsonMetadata) {
-        const metatiedot: TloikMetatiedot = JSON.parse(jsonMetadata);
+        const metatiedot = JSON.parse(jsonMetadata) as unknown as TloikMetatiedot;
 
         return proxyHolder
             .setCredentials()
