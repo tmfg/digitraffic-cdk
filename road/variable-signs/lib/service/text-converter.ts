@@ -99,8 +99,11 @@ function convertToSymbols(symbols: Symbols): TextSymbol[] {
 
     // and end symbol, if first symbol is starting borders
     if (symbolList[0].startsBorders()) {
-        const end = findSymbol(symbols.symbolType, 'END') as TextSymbol;
-        symbolList.push(end);
+        const end = findSymbol(symbols.symbolType, 'END');
+
+        if(end) {
+            symbolList.push(end);
+        }
     }
 
     return symbolList;
