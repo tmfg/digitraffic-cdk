@@ -1,4 +1,4 @@
-export type DbDevice = {
+export interface DbDevice {
     id: string;
     updated_date: Date;
     deleted_date: Date | null;
@@ -8,4 +8,4 @@ export type DbDevice = {
     carriageway: string;
     etrs_tm35fin_x: number;
     etrs_tm35fin_y: number;
-};
+}

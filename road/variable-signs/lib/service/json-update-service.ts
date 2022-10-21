@@ -9,7 +9,7 @@ import {
 } from "@digitraffic/common/database/database";
 import { StatusCodeValue } from "../model/status-code-value";
 
-type DeviceIdMap = Record<string, TloikLaite>;
+type DeviceIdMap = Map<string, TloikLaite>;
 
 export async function updateJsonData(
     tilatiedot: TloikTilatiedot
@@ -68,9 +68,9 @@ export async function updateJsonMetadata(
 }
 
 function createLaiteIdMap(metatiedot: TloikMetatiedot) {
-    const idMap: DeviceIdMap = {};
+    const idMap: DeviceIdMap = new Map();
 
-    metatiedot.laitteet.forEach((laite) => (idMap[laite.tunnus] = laite));
+    metatiedot.laitteet.forEach((laite) => idMap.set(laite.tunnus, laite));
 
     return idMap;
 }
@@ -84,9 +84,9 @@ async function updateDevices(
     let updatedCount = 0;
 
     for (const device of devices) {
-        const apiDevice = idMap[device.id];
+        const apiDevice = idMap.get(device.id);
 
-        if (apiDevice != null) {
+        if (apiDevice != undefined) {
             // a device from the API was found to match device in DB
             if (device.deleted_date != null) {
                 console.info("Updating deleted device %s", device.id);
@@ -96,7 +96,7 @@ async function updateDevices(
 
             updatedCount++;
 
-            delete idMap[device.id];
+            idMap.delete(device.id);
         } else if (device.deleted_date == null) {
             // no device from the API was found to match device in DB, and the device in DB is not marked deleted
             console.info("Removing device %s", device.id);

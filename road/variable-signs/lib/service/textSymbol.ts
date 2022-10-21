@@ -238,7 +238,7 @@ function addEnd(
     SYMBOL_CACHE[id] = new TextSymbol(width, svg, name, symbolType);
 }
 
-export function findSymbol(symbolType: SymbolType, name: string): TextSymbol {
+export function findSymbol(symbolType: SymbolType, name: string): TextSymbol | undefined {
     const symbolKey = symbolType + name.toUpperCase();
 
     return SYMBOL_CACHE[symbolKey];

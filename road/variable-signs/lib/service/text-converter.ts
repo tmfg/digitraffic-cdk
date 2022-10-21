@@ -95,11 +95,11 @@ function creteSvg(symbolList: TextSymbol[]): string {
 
 // convert given string-list to list of symbols, add end if needed
 function convertToSymbols(symbols: Symbols): TextSymbol[] {
-    const symbolList = symbols.symbols.map(s => findSymbol(symbols.symbolType, s));
-
+    const symbolList = symbols.symbols.map(s => findSymbol(symbols.symbolType, s)!);
+    
     // and end symbol, if first symbol is starting borders
     if (symbolList[0].startsBorders()) {
-        symbolList.push(findSymbol(symbols.symbolType, 'END'));
+        symbolList.push(findSymbol(symbols.symbolType, 'END')!);
     }
 
     return symbolList;
@@ -168,7 +168,7 @@ function getSymbol(text: string): string {
 function findSingleSymbol(text: string): string | null {
     const symbol = findSymbol(SymbolType.SINGLE, text.toUpperCase());
 
-    return symbol && symbol.isSingleSymbol() ? text : null;
+    return symbol?.isSingleSymbol() ? text : null;
 }
 
 interface Symbols {

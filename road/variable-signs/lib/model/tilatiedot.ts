@@ -1,8 +1,8 @@
-export type TloikTilatiedot = {
+export interface TloikTilatiedot {
     liikennemerkit: TloikLiikennemerkinTila[];
 }
 
-export type TloikLiikennemerkinTila = {
+export interface TloikLiikennemerkinTila {
     rivit: TloikRivi[];
     tunnus: string;
     nayttama?: string;
@@ -12,7 +12,7 @@ export type TloikLiikennemerkinTila = {
     luotettavuus: string;
 }
 
-export type TloikRivi = {
+export interface TloikRivi {
     naytto: number;
     rivi: number;
     teksti?: string;

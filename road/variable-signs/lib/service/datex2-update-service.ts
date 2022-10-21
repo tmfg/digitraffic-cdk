@@ -96,5 +96,5 @@ function validate(datex2: string): boolean {
 }
 
 function occurrences(string: string, regexp: RegExp): number {
-    return (string.match(regexp)||[]).length;
+    return (string.match(regexp) ?? []).length;
 }
