@@ -112,11 +112,11 @@ describe(
     })
 );
 
-type Countable = {
+interface Countable {
     count: number;
 };
 
-type UpdatedDate = {
+interface UpdatedDate {
     updated_date: Date;
 };
 
