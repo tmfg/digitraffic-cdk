@@ -1,9 +1,9 @@
 import * as TimestampsService from "../../service/timestamps";
-import {PortactivityEnvKeys} from "../../keys";
-import {withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+
+const secretHolder = SecretHolder.create();
 
 export function handler() {
-    return withDbSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async () => {
-        await TimestampsService.deleteOldTimestampsAndPilotages();
-    });
+    secretHolder.setDatabaseCredentials()
+        .then(async () => await TimestampsService.deleteOldTimestampsAndPilotages());
 }

@@ -1,32 +1,35 @@
-import {SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {sendMessage} from "../../service/queue-service";
 import {AwakeAiATXService} from "../../service/awake_ai_atx";
 import {AwakeAiATXApi} from "../../api/awake_ai_atx";
 import {Context} from "aws-lambda";
 import WebSocket from "ws";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 
 type UpdateAwakeAiATXTimestampsSecret = {
     readonly atxurl: string
     readonly atxauth: string
 }
 
+const expectedKeys = [
+    PortactivitySecretKeys.AWAKE_ATX_URL,
+    PortactivitySecretKeys.AWAKE_ATX_AUTH,
+];
+
+const dbSecretHolder = SecretHolder.create();
+const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>('awake', expectedKeys);
+
 let service: AwakeAiATXService;
 
 const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
 
-export function handlerFn(withDbSecretFn: SecretFunction<UpdateAwakeAiATXTimestampsSecret, void>,
-    AwakeAiATXServiceClass: new (api: AwakeAiATXApi) => AwakeAiATXService): (event: unknown, context: Context) => Promise<void> {
+export async function handler(event: unknown, context: Context) {
+    await dbSecretHolder.setDatabaseCredentials()
+        .then(() => secretHolder.get())
+        .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
 
-    return (event: unknown, context: Context) => {
-        const expectedKeys = [
-            PortactivitySecretKeys.AWAKE_ATX_URL,
-            PortactivitySecretKeys.AWAKE_ATX_AUTH,
-        ];
-
-        return withDbSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiATXTimestampsSecret): Promise<void> => {
             if (!service) {
-                service = new AwakeAiATXServiceClass(new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket));
+                service = new AwakeAiATXService(new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket));
             }
 
             // allow 1000 ms for SQS sends, this is a completely made up number
@@ -34,8 +37,6 @@ export function handlerFn(withDbSecretFn: SecretFunction<UpdateAwakeAiATXTimesta
             console.info('method=updateAwakeAiTimestampsLambda count=%d', timestamps.length);
 
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
-        }, {expectedKeys, prefix: 'awake'});
-    };
-}
+        });
 
-export const handler = handlerFn(withDbSecret, AwakeAiATXService);
+}

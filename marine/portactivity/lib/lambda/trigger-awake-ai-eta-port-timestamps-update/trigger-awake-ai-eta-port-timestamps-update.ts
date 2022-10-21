@@ -6,8 +6,12 @@ const publishTopic = process.env[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] as strin
 
 // TODO in the future, use ports list
 const ports = [
-    'FIKOK',
-    'FIRAU',
+    "FIKOK",
+    "FIRAU",
+    "FIOUL",
+    "FIKEM",
+    "FIKJO",
+    "FIUKI"
 ];
 
 export function handlerFn(sns: SNS) {

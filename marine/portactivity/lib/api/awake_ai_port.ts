@@ -41,7 +41,7 @@ export class AwakeAiETAPortApi {
             console.info(`AwakeAiETAPortApi.getETAs calling URL ${url}`);
             const resp = await axios.get(url, {
                 headers: {
-                    Authorization: this.apiKey,
+                    Authorization: `Bearer ${this.apiKey}`,
                     Accept: MediaType.APPLICATION_JSON,
                 },
             });
