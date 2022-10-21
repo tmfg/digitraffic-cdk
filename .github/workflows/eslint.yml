@@ -70,19 +70,60 @@ jobs:
         run: |
           import os
           import os.path
+          import json
           from glob import glob
+          from html.parser import HTMLParser
+
+          class ReportParser(HTMLParser):
+            def __init__(self):
+              super().__init__()
+              self.reset()
+              self.data = ""
+              self.state = ""
+            def handle_starttag(self, tag, attrs):
+              if self.state == "stop": return
+              if tag == "div":
+                for attr_name, attr_value in attrs:
+                  if attr_name == "id" and attr_value == "overview":
+                    self.state = "div-id-overview"
+              if self.state == "div-id-overview" and tag == "span":
+                self.state = "div-id-overview-span"
+            def handle_data(self, data):
+              if self.state == "div-id-overview-span":
+                self.data = data
+                self.state = "stop"
+          
           ref = os.environ["GITHUB_REF_NAME"]
           reports = [_ for _ in glob("*/*/report.html") if "node_modules" not in _]
+          reports_created = []
           for r in reports:
-              dst = os.path.join(ref, r)
-              os.makedirs(os.path.dirname(dst))
-              os.rename(r, dst)
+            parser = ReportParser()
+            parser.feed(open(r).read())
+            reports_created.append([r, parser.data])
+            dst = os.path.join(ref, r)
+            os.makedirs(os.path.dirname(dst))
+            print(f"moving file from: {r} to {dst}")
+            os.rename(r, dst)
+          open(os.environ["GITHUB_ENV"], "a").write(f"REPORTS_CREATED={json.dumps(reports_created)}")
 
       - name: Publish report
+        id: publish-reports
         uses: tmfg/digitraffic-actions@gh-pages-publish/v1
         with:
           GH_PAGES_BRANCH: gh-pages
-          BULK: true
           FILE_PATH: ${{ github.ref_name }}/
           COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
-          LINK_TEXT: ESLint report for project
+          SKIP_LINK: true
+
+      - name: Create summary
+        if: steps.publish-reports.outcome == 'success'
+        shell: python
+        run: |
+          import os
+          import json
+          reports_created = json.loads(os.environ["REPORTS_CREATED"])
+          (org, repo) = os.environ["GITHUB_REPOSITORY"].split("/")
+          project = lambda x: "/".join(x.split()[-1:])
+          status = lambda x: "🟢" if x == "0 problems" else "🟠" if "0 errors" in x else "🔴"
+          summary = [f"[{status(s)} ESLint report for {project(r)} ({s})](https://{org}.github.io/{repo}/{r})" for (r, s) in reports_created]
+          open(os.environ["GITHUB_STEP_SUMMARY"], "a").write("\n".join(summary))
