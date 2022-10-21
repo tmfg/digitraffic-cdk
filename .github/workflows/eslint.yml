@@ -5,7 +5,6 @@ on: [push]
 jobs:
   lint:
     runs-on: ubuntu-22.04
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -17,7 +16,7 @@ jobs:
         with:
           node-version: "14"
 
-      - name: Install ESLint
+      - name: Install packages
         run: yarn install --frozen-lock
 
       - name: Derive appropriate SHAs for NX
@@ -25,25 +24,82 @@ jobs:
         with:
           main-branch-name: "master"
 
-      - name: Lint affected
-        id: lint-affected
-        run: yarn lint:affected
+      - name: Create ESLint reports from all project
+        if: ${{ github.ref_name == 'master' }}
+        id: report-all
+        run: yarn eslint-report:all
         continue-on-error: true
 
-      - name: Create ESLint report
-        id: create-report
-        run: yarn eslint . --ext .ts --format html -o ./${GITHUB_REF##*/}/eslint-report.html
+      - name: Create ESLint reports for affected projects
+        if: ${{ github.ref_name != 'master' }}
+        id: report-affected
+        run: yarn eslint-report:affected
         continue-on-error: true
+
+      - name: Find report files
+        id: reports
+        shell: python
+        run: |
+          import os
+          import os.path
+          import json
+          from glob import glob
+          from html.parser import HTMLParser
+
+          class ReportParser(HTMLParser):
+            def __init__(self):
+              super().__init__()
+              self.reset()
+              self.data = ""
+              self.state = ""
+            def handle_starttag(self, tag, attrs):
+              if self.state == "stop": return
+              if tag == "div":
+                for attr_name, attr_value in attrs:
+                  if attr_name == "id" and attr_value == "overview":
+                    self.state = "div-id-overview"
+              if self.state == "div-id-overview" and tag == "span":
+                self.state = "div-id-overview-span"
+            def handle_data(self, data):
+              if self.state == "div-id-overview-span":
+                self.data = data
+                self.state = "stop"
+          
+          ref = os.environ["GITHUB_REF_NAME"]
+          reports = [_ for _ in glob("*/*/report.html") if "node_modules" not in _]
+          reports_created = []
+          for r in reports:
+            parser = ReportParser()
+            parser.feed(open(r).read())
+            dst = os.path.join(ref, r)
+            reports_created.append([r, dst, parser.data])
+            os.makedirs(os.path.dirname(dst))
+            print(f"moving file from: {r} to {dst}")
+            os.rename(r, dst)
+          open(os.environ["GITHUB_ENV"], "a").write(f"REPORTS_CREATED={json.dumps(reports_created)}")
 
       - name: Publish report
-        if: steps.create-report.outcome == 'success'
+        id: publish-reports
         uses: tmfg/digitraffic-actions@gh-pages-publish/v1
         with:
           GH_PAGES_BRANCH: gh-pages
-          FILE_PATH: ${GITHUB_REF##*/}/eslint-report.html
-          COMMIT_MESSAGE: ESLint report for branch $CURRENT_BRANCH
-          LINK_TEXT: ESLint report
+          FILE_PATH: ${{ github.ref_name }}/
+          COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
+          NO_SUMMARY: true
+
+      - name: Create summary
+        if: steps.publish-reports.outcome == 'success'
+        shell: python
+        run: |
+          import os
+          import json
+          reports_created = json.loads(os.environ["REPORTS_CREATED"])
+          (org, repo) = os.environ["GITHUB_REPOSITORY"].split("/")
+          project = lambda x: "/".join(x.split()[-1:])
+          status = lambda x: "🟢" if x == "0 problems" else "🟠" if "0 errors" in x else "🔴"
+          summary = [f"{status(s)} ESLint report for [{project(r)}](https://{org}.github.io/{repo}/{dst}) ({s})" for (r, dst, s) in reports_created]
+          open(os.environ["GITHUB_STEP_SUMMARY"], "a").write("\n".join(summary))
 
       - name: Fail on ESLint errors
-        if: steps.lint-affected.outcome != 'success'
-        run: exit 1
+        run: |
+          if [[ "${{ steps.report-all.outcome }}" == "failure" || "${{ steps.report-affected.outcome }}" == "failure" ]]; then exit 1; else exit 0; fi
