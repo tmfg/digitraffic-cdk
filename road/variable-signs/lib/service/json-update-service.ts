@@ -1,61 +1,85 @@
-import {TloikLaite, TloikMetatiedot} from "../model/metatiedot";
-import {TloikTilatiedot} from "../model/tilatiedot";
+import { TloikLaite, TloikMetatiedot } from "../model/metatiedot";
+import { TloikTilatiedot } from "../model/tilatiedot";
 import * as MetadataDb from "../db/metadata";
 import * as DataDb from "../db/data";
-import {DbDevice} from "../model/device";
-import {DTTransaction, inTransaction} from "@digitraffic/common/database/database";
-import {StatusCodeValue} from "../model/status-code-value";
+import { DbDevice } from "../model/device";
+import {
+    DTTransaction,
+    inTransaction,
+} from "@digitraffic/common/database/database";
+import { StatusCodeValue } from "../model/status-code-value";
 
 type DeviceIdMap = Record<string, TloikLaite>;
 
-export async function updateJsonData(tilatiedot: TloikTilatiedot): Promise<StatusCodeValue> {
-    console.info('DEBUG ' + JSON.stringify(tilatiedot));
+export async function updateJsonData(
+    tilatiedot: TloikTilatiedot
+): Promise<StatusCodeValue> {
+    console.info("DEBUG " + JSON.stringify(tilatiedot));
 
     await inTransaction((db: DTTransaction) => {
-        return Promise.all(tilatiedot.liikennemerkit.map(async lm => {
-            const id = await DataDb.insertDeviceData(db, lm);
+        return Promise.all(
+            tilatiedot.liikennemerkit.map(async (lm) => {
+                const id = await DataDb.insertDeviceData(db, lm);
 
-            if (lm.rivit) {
-                return Promise.all(lm.rivit.map(rivi => DataDb.insertDeviceDataRows(db, id, rivi)));
-            }
-
-            return Promise.resolve();
-        }));
+                return Promise.all(
+                    lm.rivit.map((rivi) =>
+                        DataDb.insertDeviceDataRows(db, id, rivi)
+                    )
+                );
+            })
+        );
     });
 
-    console.info("method=JsonUpdateService.updateJsonData updatedCount=%d", tilatiedot.liikennemerkit.length);
+    console.info(
+        "method=JsonUpdateService.updateJsonData updatedCount=%d",
+        tilatiedot.liikennemerkit.length
+    );
 
     return StatusCodeValue.OK;
 }
 
-export async function updateJsonMetadata(metadata: TloikMetatiedot): Promise<StatusCodeValue> {
-    console.info('DEBUG ' + JSON.stringify(metadata));
+export async function updateJsonMetadata(
+    metadata: TloikMetatiedot
+): Promise<StatusCodeValue> {
+    console.info("DEBUG " + JSON.stringify(metadata));
 
     const idMap = createLaiteIdMap(metadata);
 
     await inTransaction(async (db: DTTransaction) => {
         const devices = await MetadataDb.getAllDevices(db);
-        const [updatedCount, removedDevices] = await updateDevices(db, devices, idMap);
+        const [updatedCount, removedDevices] = await updateDevices(
+            db,
+            devices,
+            idMap
+        );
         // updateDevices removes updated devices from idMap
         await MetadataDb.insertDevices(db, Object.values(idMap));
         await MetadataDb.removeDevices(db, removedDevices);
 
-        console.info("method=JsonUpdateService.updateJsonMetadata removedCount=%d updatedCount=%d insertCount=%d",
-            removedDevices.length, updatedCount, Object.values(idMap).length);
+        console.info(
+            "method=JsonUpdateService.updateJsonMetadata removedCount=%d updatedCount=%d insertCount=%d",
+            removedDevices.length,
+            updatedCount,
+            Object.values(idMap).length
+        );
     });
 
     return StatusCodeValue.OK;
 }
 
 function createLaiteIdMap(metatiedot: TloikMetatiedot) {
-    const idMap : DeviceIdMap = {};
+    const idMap: DeviceIdMap = {};
 
-    metatiedot.laitteet.forEach(laite => idMap[laite.tunnus] = laite);
+    metatiedot.laitteet.forEach((laite) => (idMap[laite.tunnus] = laite));
 
     return idMap;
 }
 
-async function updateDevices(db: DTTransaction, devices: DbDevice[], idMap: DeviceIdMap): Promise<[number, string[]]> {
+async function updateDevices(
+    db: DTTransaction,
+    devices: DbDevice[],
+    idMap: DeviceIdMap
+): Promise<[number, string[]]> {
     const removedDevices: string[] = [];
     let updatedCount = 0;
 

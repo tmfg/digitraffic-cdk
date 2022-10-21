@@ -1,6 +1,7 @@
 import * as JsonUpdateService from "../../service/json-update-service";
-import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
-import {StatusCodeValue} from "../../model/status-code-value";
+import { ProxyHolder } from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
+import { StatusCodeValue } from "../../model/status-code-value";
+import { TloikMetatiedot } from "../../model/metatiedot";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -9,9 +10,17 @@ export const handler = (event: Record<string, string>) => {
     const start = Date.now();
 
     if (jsonMetadata) {
-        return proxyHolder.setCredentials()
-            .then(() => JsonUpdateService.updateJsonMetadata(JSON.parse(jsonMetadata)))
-            .finally(() => console.info("method=Lambda.UpdateJsonMetadata tookMs=%d", Date.now() - start))
+        const metatiedot: TloikMetatiedot = JSON.parse(jsonMetadata);
+
+        return proxyHolder
+            .setCredentials()
+            .then(() => JsonUpdateService.updateJsonMetadata(metatiedot))
+            .finally(() =>
+                console.info(
+                    "method=Lambda.UpdateJsonMetadata tookMs=%d",
+                    Date.now() - start
+                )
+            )
             .catch(() => StatusCodeValue.INTERNAL_ERROR);
     }
 
