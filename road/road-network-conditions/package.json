@@ -7,6 +7,7 @@
     "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
     "watch": "tsc -w",
     "lint": "eslint --cache .",
+    "eslint-report": "eslint . --format html -o report.html",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "test": "jest --detectOpenHandles",
