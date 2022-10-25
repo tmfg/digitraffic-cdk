@@ -3,7 +3,7 @@ export interface TloikTilatiedot {
 }
 
 export interface TloikLiikennemerkinTila {
-    rivit: TloikRivi[];
+    rivit?: TloikRivi[];
     tunnus: string;
     nayttama?: string;
     lisatieto?: string;

@@ -6,6 +6,7 @@ import {
     TloikLiikennemerkinTila,
     TloikTilatiedot,
 } from "../../lib/model/tilatiedot";
+import {Countable} from "@digitraffic/common/database/models";
 
 const TEST_DEVICE: TloikLaite = {
     tunnus: "test",
@@ -112,14 +113,6 @@ describe(
     })
 );
 
-interface Countable {
-    count: number;
-};
-
-interface UpdatedDate {
-    updated_date: Date;
-};
-
 function assertActiveDeviceCount(db: DTDatabase, expected: number) {
     return db
         .one("select count(*) from device where deleted_date is null")
@@ -141,5 +134,5 @@ function assertDeviceDataCount(db: DTDatabase, expected: number) {
 function getUpdatedDate(db: DTDatabase, id: string): Promise<Date> {
     return db
         .one("select updated_date from device where id = $1", [id])
-        .then((value: UpdatedDate) => value.updated_date);
+        .then((value: { updated_date: Date }) => value.updated_date);
 }

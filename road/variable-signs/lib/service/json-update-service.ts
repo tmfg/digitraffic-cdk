@@ -14,18 +14,18 @@ type DeviceIdMap = Map<string, TloikLaite>;
 export async function updateJsonData(
     tilatiedot: TloikTilatiedot
 ): Promise<StatusCodeValue> {
-    console.info("DEBUG " + JSON.stringify(tilatiedot));
+    console.info("DEBUG %s", JSON.stringify(tilatiedot));
 
-    await inTransaction((db: DTTransaction) => {
-        return Promise.all(
+    await inTransaction(async (db: DTTransaction) => {
+        await Promise.all(
             tilatiedot.liikennemerkit.map(async (lm) => {
                 const id = await DataDb.insertDeviceData(db, lm);
 
-                return Promise.all(
-                    lm.rivit.map((rivi) =>
+                return lm.rivit ? Promise.all(
+                    lm.rivit?.map((rivi) =>
                         DataDb.insertDeviceDataRows(db, id, rivi)
                     )
-                );
+                ) : Promise.resolve();
             })
         );
     });
