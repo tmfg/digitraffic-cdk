@@ -5,6 +5,7 @@ import {PortAreaDetails, PortCall, Vessel} from "./testdata";
 import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
 import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
 import {updatePilotages} from "../lib/dao/pilotages";
+import {Countable} from "@digitraffic/common/database/models";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(
@@ -14,7 +15,7 @@ export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
 
 export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: DTTransaction) => void) {
     return async (): Promise<void> => {
-        await db.tx(async (t: DTTransaction) => { await fn(t); });
+        return db.tx(t => { fn(t); });
     };
 }
 
@@ -51,7 +52,7 @@ export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> 
 }
 
 export async function getPilotagesCount(db: DTDatabase | DTTransaction): Promise<number> {
-    const ret = await db.tx(t => t.one('SELECT COUNT(*) FROM pilotage'));
+    const ret = await db.tx(t => t.one<Countable>('SELECT COUNT(*) FROM pilotage'));
     return ret.count;
 }
 
@@ -98,39 +99,36 @@ export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTime
 }
 
 export async function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel): Promise<void> {
-    await db.tx(t => {
-        t.none(`
-            INSERT INTO public.vessel(
-                mmsi,
-                timestamp,
-                name,
-                ship_type,
-                reference_point_a,
-                reference_point_b,
-                reference_point_c,
-                reference_point_d,
-                pos_type,
-                draught,
-                imo,
-                eta,
-                call_sign,
-                destination
-            ) VALUES (
-                $(mmsi),
-                $(timestamp),
-                $(name),
-                $(ship_type),
-                $(reference_point_a),
-                $(reference_point_b),
-                $(reference_point_c),
-                $(reference_point_d),
-                $(pos_type),
-                $(draught),
-                $(imo),
-                $(eta),
-                $(call_sign),
-                $(destination)
-            )
+    await db.tx(async t => {
+        await t.none(`
+            INSERT INTO public.vessel(mmsi,
+                                      timestamp,
+                                      name,
+                                      ship_type,
+                                      reference_point_a,
+                                      reference_point_b,
+                                      reference_point_c,
+                                      reference_point_d,
+                                      pos_type,
+                                      draught,
+                                      imo,
+                                      eta,
+                                      call_sign,
+                                      destination)
+            VALUES ($(mmsi),
+                    $(timestamp),
+                    $(name),
+                    $(ship_type),
+                    $(reference_point_a),
+                    $(reference_point_b),
+                    $(reference_point_c),
+                    $(reference_point_d),
+                    $(pos_type),
+                    $(draught),
+                    $(imo),
+                    $(eta),
+                    $(call_sign),
+                    $(destination))
         `, vessel);
     });
 }

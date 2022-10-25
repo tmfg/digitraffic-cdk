@@ -7,12 +7,12 @@ export enum S211TimeType {
     Requested = 'Requested'
 }
 
-type TimestampType = {
+interface TimestampType {
     readonly timeType: S211TimeType
     readonly stateCode: string
 }
 
-const metadata: { [key: string] : TimestampType } = {};
+const metadata: Record<string, TimestampType> = {};
 
 metadata[EventType.APC] = {
     timeType: S211TimeType.Actual,

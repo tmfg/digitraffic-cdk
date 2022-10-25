@@ -4,10 +4,12 @@ import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {SchedulesApi} from "../../api/schedules";
 import {SchedulesService} from "../../service/schedules";
 import {SecretFunction} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 
-const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
+const sqsQueueUrl = getEnv(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
 
-export type SchedulesSecret = {
+export interface SchedulesSecret {
     readonly "schedules.url": string
 }
 
@@ -15,11 +17,11 @@ let service: SchedulesService;
 
 export const handler = handlerFn(withSecret, SchedulesService, sendMessage);
 
-export function handlerFn(withDbSecretFn: SecretFunction<SchedulesSecret, void>,
+export function handlerFn(withDbSecretFn: SecretFunction<SchedulesSecret>,
     SchedulesServiceClass: { new(api: SchedulesApi): SchedulesService },
     sendMessageFn: (ts: unknown, sqsQueueUrl: string) => Promise<void>) {
     return () => {
-        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: SchedulesSecret) => {
+        return withDbSecretFn(SECRET_ID, async (secret: SchedulesSecret) => {
             if (!service) {
                 const schedulesUrl = secret[PortactivitySecretKeys.SCHEDULES_URL];
                 service = new SchedulesServiceClass(new SchedulesApi(schedulesUrl));

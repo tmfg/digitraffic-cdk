@@ -1,4 +1,4 @@
-export type PilotageRoute = {
+export interface PilotageRoute {
     readonly start: {
         readonly code: string,
         readonly berth?: {
@@ -13,7 +13,7 @@ export type PilotageRoute = {
     },
 }
 
-export type Pilotage = {
+export interface Pilotage {
     readonly id: number,
     readonly state: string,
     readonly vessel: {

@@ -55,7 +55,7 @@ export function createTimestampSchema(shipReference: string, locationReference: 
             eventType: {
                 type: JsonSchemaType.STRING,
                 enum: Object.keys(EventType),
-                description: `Event type: ${Object.keys(EventType)}`,
+                description: `Event type: ${Object.keys(EventType).toString()}`,
             },
             eventTime: {
                 type: JsonSchemaType.STRING,

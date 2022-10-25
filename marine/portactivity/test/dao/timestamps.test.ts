@@ -71,13 +71,13 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
     }
 
-    testFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1));
+    testFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo ?? - 1));
     testFound('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
     testFound('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
-    testFoundInFuture('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testFoundInFuture('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testFoundInFuture('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? - 1));
+    testFoundInFuture('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo ?? - 1));
     testFoundInFuture('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
     testFoundInFuture('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
@@ -93,8 +93,8 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
     }
 
-    testNotFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number + 1));
-    testNotFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number - 1));
+    testNotFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? - 1 + 1));
+    testNotFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo ?? - 1 - 1));
     testNotFound('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port + 'asdf'));
     testNotFound('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.source + 'asdf'));
 
@@ -118,8 +118,8 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
     }
 
-    testNewest('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testNewest('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testNewest('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1));
+    testNewest('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1));
     testNewest('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
     testNewest('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
@@ -135,8 +135,8 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
     }
 
-    testTooOld('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testTooOld('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testTooOld('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1));
+    testTooOld('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1));
     testTooOld('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
     testTooOld('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
@@ -152,8 +152,8 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
     }
 
-    testTooFarInTheFuture('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi as number));
-    testTooFarInTheFuture('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo as number));
+    testTooFarInTheFuture('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1));
+    testTooFarInTheFuture('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1));
     testTooFarInTheFuture('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port));
     testTooFarInTheFuture('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findBySource(db, timestamp.source));
 
@@ -308,7 +308,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId as number]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId ?? -1]);
 
         expect(ships.length).toBe(1);
     });
@@ -324,7 +324,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
         await insert(db, [ts]);
 
-        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId as number]);
+        const ships = await TimestampsDb.findVtsShipImosTooCloseToPortByPortCallId(db, [ts.portcallId ?? -1]);
 
         expect(ships.length).toBe(0);
     });
@@ -349,7 +349,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         const timestamp = newTimestamp({imo: 1, mmsi: 2});
         await createPortcall(timestamp);
 
-        const mmsi = await db.tx(t => TimestampsDb.findMmsiByImo(t, timestamp.ship.imo as number));
+        const mmsi = await db.tx(t => TimestampsDb.findMmsiByImo(t, timestamp.ship.imo ?? -1));
 
         expect(mmsi).toEqual(timestamp.ship.mmsi);
     });
@@ -374,7 +374,7 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         const timestamp = newTimestamp({imo: 1, mmsi: 2});
         await createPortcall(timestamp);
 
-        const imo = await db.tx(t => TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi as number));
+        const imo = await db.tx(t => TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi ?? -1));
 
         expect(imo).toEqual(timestamp.ship.imo);
     });
@@ -518,9 +518,9 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
     }
 
     function createPortcall(timestamp: ApiTimestamp) {
-        return db.tx(t => {
-            insertPortCall(t, newPortCall(timestamp));
-            insertPortAreaDetails(t, newPortAreaDetails(timestamp));
+        return db.tx(async t => {
+            await insertPortCall(t, newPortCall(timestamp));
+            await insertPortAreaDetails(t, newPortAreaDetails(timestamp));
         });
     }
 }));

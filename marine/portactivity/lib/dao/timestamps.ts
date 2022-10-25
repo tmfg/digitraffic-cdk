@@ -4,6 +4,7 @@ import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../service/portareas";
 import moment from "moment";
 import {EventSource} from "../model/eventsource";
 import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
+import {Countable, Identifiable} from "@digitraffic/common/database/models";
 
 // camels
 /* eslint-disable camelcase */
@@ -13,7 +14,7 @@ export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
 
 const OLD_TIMESTAMP_INTERVAL = '7 days';
 
-export type DbTimestamp = {
+export interface DbTimestamp {
     readonly event_type: EventType
     readonly event_time: Date
     readonly event_time_confidence_lower?: string
@@ -31,7 +32,7 @@ export type DbTimestamp = {
     readonly source_id?: string
 }
 
-export type DbETAShip = {
+export interface DbETAShip {
     readonly imo: number
     readonly locode: string
     readonly port_area_code?: string
@@ -39,18 +40,18 @@ export type DbETAShip = {
     readonly eta: string
 }
 
-export type DbUpdatedTimestamp = {
+export interface DbUpdatedTimestamp {
     readonly ship_mmsi: number
     readonly ship_imo: number
     readonly location_locode: string
 }
 
-export type DbTimestampIdAndLocode = {
+export interface DbTimestampIdAndLocode {
     readonly id: number
     readonly locode: string
 }
 
-export type DbImo = {
+export interface DbImo {
     readonly imo: number
 }
 
@@ -385,7 +386,7 @@ export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTi
 export function removeTimestamps(db: DTDatabase | DTTransaction, source: string, sourceIds: string[]): Promise<number[]> {
     if (sourceIds.length > 0) {
         return db.manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
-            .then(array => array.map(object => object.id));
+            .then((array: Identifiable<number>[]) => array.map(object => object.id));
     }
 
     return Promise.resolve([]);
@@ -479,36 +480,42 @@ export async function findPortcallId(
         text: FIND_PORTCALL_ID_SQL,
         values: [mmsi, imo, locode, eventType, eventTime],
     });
-    const ret = await db.oneOrNone(ps);
+    const ret = await db.oneOrNone<{port_call_id: number}>(ps);
     if (ret) {
         return ret.port_call_id;
     }
     return null;
 }
 
-export async function findMmsiByImo(db: DTDatabase | DTTransaction, imo: number): Promise<number | null> {
-    const mmsi = await db.oneOrNone(FIND_MMSI_BY_IMO_SQL, [imo]);
-    if (mmsi) {
-        return mmsi.mmsi as number;
+export async function findMmsiByImo(db: DTDatabase | DTTransaction, imo?: number): Promise<number | null> {
+    if(imo !== undefined) {
+        const mmsi = await db.oneOrNone<{mmsi: number}>(FIND_MMSI_BY_IMO_SQL, [imo]);
+        if (mmsi) {
+            return mmsi.mmsi;
+        }
     }
+
     return null;
 }
 
-export async function findImoByMmsi(db: DTDatabase | DTTransaction, mmsi: number): Promise<number | null> {
-    const imo = await db.oneOrNone(FIND_IMO_BY_MMSI_SQL, [mmsi]);
-    if (imo) {
-        return imo.imo as number;
+export async function findImoByMmsi(db: DTDatabase | DTTransaction, mmsi?: number): Promise<number | null> {
+    if(mmsi !== undefined) {
+        const imo = await db.oneOrNone<{imo: number}>(FIND_IMO_BY_MMSI_SQL, [mmsi]);
+        if (imo) {
+            return imo.imo;
+        }
     }
+
     return null;
 }
 
 export async function deleteOldTimestamps(db: DTTransaction): Promise<number> {
-    const ret = await db.one(DELETE_OLD_TIMESTAMPS_SQL);
+    const ret = await db.one<Countable>(DELETE_OLD_TIMESTAMPS_SQL);
     return ret.count;
 }
 
 export async function deleteOldPilotages(db: DTTransaction): Promise<number> {
-    const ret = await db.one(DELETE_OLD_PILOTAGES_SQL);
+    const ret = await db.one<Countable>(DELETE_OLD_PILOTAGES_SQL);
     return ret.count;
 }
 

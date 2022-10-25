@@ -1,9 +1,11 @@
 import {UrlChecker} from "@digitraffic/common/aws/infra/canaries/url-checker";
 import {getSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
 import {ShiplistSecret} from "../lambda/get-shiplist-public/get-shiplist-public";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {ENV_HOSTNAME, ENV_SECRET} from "@digitraffic/common/aws/infra/canaries/url-canary";
 
-const hostname = process.env.hostname as string;
-const secretId = process.env.secret as string;
+const hostname = getEnv(ENV_HOSTNAME);
+const secretId = getEnv(ENV_SECRET);
 
 export const handler = async (): Promise<string> => {
     const secret = await getSecret<ShiplistSecret>(secretId, 'shiplist');

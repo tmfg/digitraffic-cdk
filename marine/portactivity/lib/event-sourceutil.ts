@@ -2,6 +2,7 @@ import {ApiTimestamp, EventType} from "./model/timestamp";
 import * as R from "ramda";
 import moment, {Moment} from "moment-timezone";
 import {EventSource} from "./model/eventsource";
+import {getLast} from "@digitraffic/common/utils/utils";
 
 export const VTS_A = 'VTS A';
 export const VTS_O = 'VTS O';
@@ -33,7 +34,7 @@ export function isPortnetTimestamp(timestamp: ApiTimestamp): boolean {
 }
 
 export function getDisplayableNameForEventSource(eventSource: string): string {
-    return eventSourceMap.get(eventSource) || eventSource;
+    return eventSourceMap.get(eventSource) ?? eventSource;
 }
 
 const vtsASources: string[] = [];
@@ -48,7 +49,7 @@ export function momentAverage(moments: Moment[]): string {
     return moment(averageMillis).toISOString();
 }
 
-type MergeableTimestamp = {
+interface MergeableTimestamp {
     readonly eventTime: string
     readonly recordTime: string
     readonly source: string
@@ -70,7 +71,7 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
 
     // group by portcall id and event type
     const byPortcallId: MergeableTimestamp[][] = R.compose(R.values,
-        R.groupBy((ts: MergeableTimestamp) => (ts.portcallId as number).toString() + ts.eventType))(timestamps);
+        R.groupBy((ts: MergeableTimestamp) => (ts.portcallId ?? -1).toString() + ts.eventType))(timestamps);
 
     // timestamps relating to specific port call
     for (const portcallTimestamps of byPortcallId) {
@@ -98,7 +99,7 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
         // use the source with the highest priority
         if (vtsAStamps.length > 1) {
             addToList = addToList.filter(t => !vtsAStamps.includes(t));
-            const highestPriority = R.last(R.sortBy((ts => eventSourcePriorities.get(ts.source) as number), vtsAStamps)) as MergeableTimestamp;
+            const highestPriority = getLast(vtsAStamps, (ts => eventSourcePriorities.get(ts.source) ?? -1));
             addToList.push({
                 ...highestPriority, ...{
                     eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime))),

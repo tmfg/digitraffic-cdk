@@ -16,7 +16,7 @@ import {
 } from "../testdata";
 import moment from "moment-timezone";
 import * as TimestampsService from "../../lib/service/timestamps";
-import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
+import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import { EventSource } from "../../lib/model/eventsource";
 import * as R from "ramda";
 import { DTDatabase } from "@digitraffic/common/database/database";
@@ -159,10 +159,10 @@ describe(
         });
 
         test("saveTimestamp - no IMO not saved", async () => {
-            const timestamp = R.dissocPath(
+            const timestamp = R.dissocPath<ApiTimestamp>(
                 ["ship", "imo"],
                 newTimestamp()
-            ) as ApiTimestamp;
+            );
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
@@ -170,10 +170,10 @@ describe(
         });
 
         test("saveTimestamp - no MMSI not saved", async () => {
-            const timestamp = R.dissocPath(
+            const timestamp = R.dissocPath<ApiTimestamp>(
                 ["ship", "mmsi"],
                 newTimestamp()
-            ) as ApiTimestamp;
+            );
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
@@ -185,10 +185,10 @@ describe(
             const vessel = newVessel(timestamp);
             await insertVessel(db, vessel);
 
-            const timestamp2 = R.dissocPath(
+            const timestamp2 = R.dissocPath<ApiTimestamp>(
                 ["ship", "imo"],
                 timestamp
-            ) as ApiTimestamp;
+            );
             const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
             expect(ret?.location_locode).toBe(timestamp2.location.port);
@@ -201,10 +201,10 @@ describe(
             const vessel = newVessel(timestamp);
             await insertVessel(db, vessel);
 
-            const timestamp2 = R.dissocPath(
+            const timestamp2 = R.dissocPath<ApiTimestamp>(
                 ["ship", "mmsi"],
                 timestamp
-            ) as ApiTimestamp;
+            );
             const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
             expect(ret?.location_locode).toBe(timestamp.location.port);

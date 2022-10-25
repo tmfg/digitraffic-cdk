@@ -15,12 +15,12 @@ export enum EventType {
     APC = 'APC'
 }
 
-export type Ship = {
+export interface Ship {
     readonly mmsi?: number
     readonly imo?: number
 }
 
-export type Location = {
+export interface Location {
     readonly port: string
     readonly portArea?: string
     readonly from?: string
@@ -30,7 +30,7 @@ export type Location = {
     readonly shipSide?: string
 }
 
-export type ApiTimestamp = {
+export interface ApiTimestamp {
     readonly eventType: EventType
     readonly eventTime: string
     readonly eventTimeConfidenceLower?: string | null

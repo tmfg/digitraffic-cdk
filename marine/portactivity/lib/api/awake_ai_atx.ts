@@ -1,7 +1,7 @@
 import {WebSocket} from "ws";
 import {AwakeAiZoneType} from "./awake_common";
 
-type AwakeAiATXMessage = {
+interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType
 }
 
@@ -15,14 +15,14 @@ export enum AwakeATXZoneEventType {
     DEPARTURE = 'departure'
 }
 
-export type AwakeAISubscriptionMessage = AwakeAiATXMessage & {
+export interface AwakeAISubscriptionMessage extends AwakeAiATXMessage {
     /**
      * Subscription id, equivalent to session id
      */
     readonly subscriptionId: string
 }
 
-export type AwakeAIATXTimestampMessage = AwakeAiATXMessage & {
+export interface AwakeAIATXTimestampMessage extends AwakeAiATXMessage {
     /**
      * Possible value 'zone-event'
      */
@@ -115,13 +115,17 @@ export class AwakeAiATXApi {
         const atxs: AwakeAIATXTimestampMessage[] = [];
 
         webSocket.on('message', (messageRaw: string) => {
-            const message: AwakeAiATXMessage = JSON.parse(messageRaw);
-            if (message.msgType === AwakeAiATXEventType.SUBSCRIPTION_STATUS) {
-                this.subscriptionId = (message as AwakeAISubscriptionMessage).subscriptionId;
-            } else if (message.msgType === AwakeAiATXEventType.EVENT) {
-                atxs.push(message as AwakeAIATXTimestampMessage);
-            } else {
-                console.warn('method=getATXs Unknown message received %s', JSON.stringify(message));
+            const message = JSON.parse(messageRaw) as unknown as AwakeAiATXMessage;
+
+            switch(message.msgType) {
+                case AwakeAiATXEventType.SUBSCRIPTION_STATUS:
+                    this.subscriptionId = (message as AwakeAISubscriptionMessage).subscriptionId;
+                    break;
+                case AwakeAiATXEventType.EVENT:
+                    atxs.push(message as AwakeAIATXTimestampMessage);
+                    break;
+                default:
+                    console.warn('method=getATXs Unknown message received %s', JSON.stringify(message));
             }
         });
 

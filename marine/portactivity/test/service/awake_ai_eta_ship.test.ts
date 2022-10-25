@@ -114,7 +114,7 @@ describe('AwakeAiETAShipService', () => {
         const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (response.schedule as any).predictedVoyages = [];
         sinon.stub(api, 'getETA').returns(Promise.resolve(response));
 
@@ -128,7 +128,7 @@ describe('AwakeAiETAShipService', () => {
         const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-        /* eslint-disable @typescript-eslint/no-explicit-any */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (response.schedule as any).predictedVoyages[0].predictions = [];
         sinon.stub(api, 'getETA').returns(Promise.resolve(response));
 
@@ -142,7 +142,7 @@ describe('AwakeAiETAShipService', () => {
         const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip();
         const response = createVoyageResponse(ship.locode, ship.imo, 123456789);
-        /* eslint-disable @typescript-eslint/no-explicit-any */
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (response.schedule as any).predictedVoyages[0].predictions[0].locode;
         sinon.stub(api, 'getETA').returns(Promise.resolve(response));
 
@@ -306,7 +306,11 @@ function newDbETAShip(locode?: string, eta?: moment.Moment): DbETAShip {
     };
 }
 
-function awakeTimestampFromTimestamp(timestamp: ApiTimestamp, portArea?: string, eventType?: EventType): ApiTimestamp {
+function awakeTimestampFromTimestamp(timestamp: ApiTimestamp | undefined, portArea?: string, eventType?: EventType): ApiTimestamp {
+    if(timestamp == undefined) {
+        fail();
+    }
+
     return {
         ship: timestamp.ship,
         location: {...timestamp.location, portArea},
@@ -320,13 +324,15 @@ function awakeTimestampFromTimestamp(timestamp: ApiTimestamp, portArea?: string,
 function expectJustEta(ship: DbETAShip, voyageTimestamp: AwakeAiShipApiResponse, timestamps: ApiTimestamp[]) {
     expect(timestamps.length).toBe(1);
     const etaTimestamp = timestamps.find(ts => ts.eventType === EventType.ETA);
-    expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETA));
+
+    expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp, ship.port_area_code, EventType.ETA));
 }
 
 function expectEtaAndEtb(ship: DbETAShip, voyageTimestamp: AwakeAiShipApiResponse, timestamps: ApiTimestamp[]) {
     expect(timestamps.length).toBe(2);
     const etaTimestamp = timestamps.find(ts => ts.eventType === EventType.ETA);
     const etbTimestamp = timestamps.find(ts => ts.eventType === EventType.ETB);
-    expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETA));
-    expect(etbTimestamp).toMatchObject(awakeTimestampFromTimestamp(etbTimestamp as ApiTimestamp, ship.port_area_code, EventType.ETB));
+
+    expect(etaTimestamp).toMatchObject(awakeTimestampFromTimestamp(etaTimestamp, ship.port_area_code, EventType.ETA));
+    expect(etbTimestamp).toMatchObject(awakeTimestampFromTimestamp(etbTimestamp, ship.port_area_code, EventType.ETB));
 }

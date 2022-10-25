@@ -28,7 +28,7 @@ describe('AwakeAiETAPortService(', () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
         const voyageTimestamp = createResponse();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (voyageTimestamp as any).schedule = undefined;
         sinon.stub(api, 'getETAs').returns(Promise.resolve(voyageTimestamp));
 

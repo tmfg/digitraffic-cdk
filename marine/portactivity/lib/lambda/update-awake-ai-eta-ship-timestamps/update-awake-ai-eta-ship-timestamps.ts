@@ -7,24 +7,26 @@ import {SNSEvent} from "aws-lambda";
 import {DbETAShip} from "../../dao/timestamps";
 import {sendMessage} from "../../service/queue-service";
 import {UpdateAwakeAiTimestampsSecret} from "../../service/awake_ai_eta_helper";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 
 let service: AwakeAiETAShipService;
 
-const queueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
+const queueUrl = getEnv(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
 
 const expectedKeys = [
     PortactivitySecretKeys.AWAKE_URL,
     PortactivitySecretKeys.AWAKE_AUTH,
 ];
 
-export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSecret, void>,
+export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSecret>,
     AwakeAiETAServiceClass: new (api: AwakeAiETAShipApi) => AwakeAiETAShipService): (event: SNSEvent) => Promise<void> {
 
     return (event: SNSEvent) => {
         // always a single event, guaranteed by SNS
         const ships = JSON.parse(event.Records[0].Sns.Message) as DbETAShip[];
 
-        return withSecretFn(process.env.SECRET_ID as string, async (secret: UpdateAwakeAiTimestampsSecret): Promise<void> => {
+        return withSecretFn(SECRET_ID, async (secret: UpdateAwakeAiTimestampsSecret): Promise<void> => {
             if (!service) {
                 service = new AwakeAiETAServiceClass(new AwakeAiETAShipApi(secret["awake.voyagesurl"], secret["awake.voyagesauth"]));
             }

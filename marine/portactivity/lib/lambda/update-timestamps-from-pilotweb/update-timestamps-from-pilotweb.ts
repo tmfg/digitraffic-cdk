@@ -1,24 +1,29 @@
 import {sendMessage} from "../../service/queue-service";
-import {withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import * as PilotwebService from "../../service/pilotweb";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
-const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
+const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
-type PilotWebSecret = {
+interface PilotWebSecret {
     readonly 'pilotweb.url': string
     readonly 'pilotweb.auth': string
 }
 
+const secretHolder = SecretHolder.create<PilotWebSecret>("pilotweb");
+
 export const handler = function (): Promise<void> {
-    return withDbSecret(process.env[PortactivityEnvKeys.SECRET_ID] as string, async (secret: PilotWebSecret): Promise<void> => {
-        const pilotwebUrl = secret[PortactivitySecretKeys.PILOTWEB_URL];
-        const authHeader = secret[PortactivitySecretKeys.PILOTWEB_AUTH];
+    return secretHolder.setDatabaseCredentials()
+        .then(() => secretHolder.get())
+        .then(async secret => {
+            const pilotwebUrl = secret[PortactivitySecretKeys.PILOTWEB_URL];
+            const authHeader = secret[PortactivitySecretKeys.PILOTWEB_AUTH];
 
-        const timestamps = await PilotwebService.getMessagesFromPilotweb(pilotwebUrl, authHeader);
+            const timestamps = await PilotwebService.getMessagesFromPilotweb(pilotwebUrl, authHeader);
 
-        console.info("sending %d messages", timestamps.length);
+            console.info("sending %d messages", timestamps.length);
 
-        await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
-    });
+            await Promise.allSettled(timestamps.map(ts => sendMessage(ts, sqsQueueUrl)));
+        });
 };

@@ -59,7 +59,7 @@ export class AwakeAiATXService {
                     }
                 });
             return Promise.all(promises)
-                .then(timestamps => timestamps.filter(timestamp => timestamp != null).map(timestamp => timestamp as ApiTimestamp));
+                .then(timestamps => timestamps.filter(timestamp => timestamp != null) as ApiTimestamp[]);
         });
     }
 }

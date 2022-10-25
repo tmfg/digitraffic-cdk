@@ -4,6 +4,6 @@ import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holde
 const secretHolder = SecretHolder.create();
 
 export function handler() {
-    secretHolder.setDatabaseCredentials()
+    void secretHolder.setDatabaseCredentials()
         .then(async () => await TimestampsService.deleteOldTimestampsAndPilotages());
 }

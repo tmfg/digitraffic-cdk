@@ -12,8 +12,7 @@ import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {randomBoolean, shuffle} from "@digitraffic/common/test/testutils";
 import {EventSource} from "../../lib/model/eventsource";
 import {AwakeAiZoneType} from "../../lib/api/awake_common";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const ws = require('ws');
+import {WebSocket} from "ws";
 import {DTDatabase} from "@digitraffic/common/database/database";
 
 // test file
@@ -21,9 +20,14 @@ import {DTDatabase} from "@digitraffic/common/database/database";
 
 describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
 
+    function createAiATXApi() {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+        return new AwakeAiATXApi('', '', WebSocket);
+    }
+
     test('getATXs - no portcall found for ATx', async () => {
         const atxMessage = newAwakeATXMessage();
-        const api = new AwakeAiATXApi('', '', ws);
+        const api = createAiATXApi();
         sinon.stub(api, 'getATXs').returns(Promise.resolve([atxMessage]));
         const service = new AwakeAiATXService(api);
 
@@ -37,7 +41,8 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
         const atxMessage = newAwakeATXMessage({zoneEventType});
         const portcallId = 1;
         await createPortcall(atxMessage, portcallId);
-        const api = new AwakeAiATXApi('', '', ws);
+
+        const api = createAiATXApi();
         sinon.stub(api, 'getATXs').returns(Promise.resolve([atxMessage]));
         const service = new AwakeAiATXService(api);
 
@@ -65,7 +70,8 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
         const atxMessage = newAwakeATXMessage({zoneType: otherThanBerth[0]});
         const portcallId = 1;
         await createPortcall(atxMessage, portcallId);
-        const api = new AwakeAiATXApi('', '', ws);
+
+        const api = createAiATXApi();
         sinon.stub(api, 'getATXs').returns(Promise.resolve([atxMessage]));
         const service = new AwakeAiATXService(api);
 
@@ -75,8 +81,8 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
     });
 
     function createPortcall(atxMessage: AwakeAIATXTimestampMessage, portcallId: number) {
-        return db.tx(t => {
-            insertPortCall(t, {
+        return db.tx(async t => {
+            await insertPortCall(t, {
                 port_call_id: portcallId,
                 radio_call_sign: 'a',
                 radio_call_sign_type: 'fake',
@@ -86,7 +92,7 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
                 mmsi: atxMessage.mmsi,
                 imo_lloyds: atxMessage.imo,
             });
-            insertPortAreaDetails(t, {
+            await insertPortAreaDetails(t, {
                 port_call_id: portcallId,
                 port_area_details_id: someNumber(),
                 ata: moment().subtract(1, 'hour').toISOString(),

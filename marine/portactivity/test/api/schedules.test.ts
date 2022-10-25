@@ -1,10 +1,4 @@
-import {
-    SchedulesApi,
-    SchedulesDirection,
-    SchedulesResponse,
-    ScheduleTimetable,
-    Timestamp,
-} from "../../lib/api/schedules";
+import {SchedulesApi, SchedulesDirection, SchedulesResponse,} from "../../lib/api/schedules";
 import * as sinon from "sinon";
 import axios from "axios";
 
@@ -29,10 +23,15 @@ function verifyXmlResponse(resp: SchedulesResponse) {
     expect(s[0].$.UUID).toBe(uuid);
 
     expect(s[0].timetable.length).toBe(1);
-    const tt = s[0].timetable[0] as ScheduleTimetable;
+    const tt = s[0].timetable[0];
 
     expect(tt.eta?.length).toBe(1);
-    const eta = (tt.eta as Timestamp[])[0];
+
+    if(tt.eta == undefined) {
+        fail("missing eta!");
+    }
+
+    const eta = tt.eta[0];
     expect(eta.$.time).toBe(etaEventTime);
     expect(eta.$.uts).toBe(etaTimestamp);
 

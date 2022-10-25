@@ -3,6 +3,10 @@ import {EmptySecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime
 import * as IdUtils from '@digitraffic/common/marine/id_utils';
 import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
 import {ApiTimestamp} from "../../model/timestamp";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {PortactivityEnvKeys} from "../../keys";
+
+const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
 
 export const handler = (event: GetTimeStampsEvent) => {
     return handlerFn(event, withDbSecret);
@@ -10,7 +14,7 @@ export const handler = (event: GetTimeStampsEvent) => {
 
 export function handlerFn(event: GetTimeStampsEvent,
     withDbSecretFn: EmptySecretFunction<LambdaResponse<string | ApiTimestamp[]>>) {
-    return withDbSecretFn(process.env.SECRET_ID as string, async () => {
+    return withDbSecretFn(SECRET_ID, async () => {
         if (!event.locode && !event.mmsi && !event.imo && !event.source) {
             console.warn('method=getTimeStampsHandler no request params');
             return LambdaResponse.badRequest('Need LOCODE, MMSI or IMO');
@@ -37,7 +41,7 @@ export function handlerFn(event: GetTimeStampsEvent,
     });
 }
 
-type GetTimeStampsEvent = {
+interface GetTimeStampsEvent {
     readonly locode?: string
     readonly mmsi?: number
     readonly imo?: number

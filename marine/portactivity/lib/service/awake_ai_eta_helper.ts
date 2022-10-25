@@ -7,7 +7,7 @@ import {
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 
-export type UpdateAwakeAiTimestampsSecret = {
+export interface UpdateAwakeAiTimestampsSecret {
     readonly 'awake.voyagesurl': string
     readonly 'awake.voyagesauth': string
 }
@@ -26,7 +26,7 @@ export enum AwakeDataState {
 }
 
 export function destinationIsFinnish(locode: string): boolean {
-    return locode != null && locode.toLowerCase().startsWith('fi');
+    return locode?.toLowerCase().startsWith('fi');
 }
 
 function portCallIdFromUrn(urn?: string): number | null {
@@ -53,25 +53,25 @@ export function predictionToTimestamp(
 
     // should always be ETA for ETA predictions but check just in case
     if (prediction.predictionType !== AwakeAiPredictionType.ETA) {
-        console.warn(`method=AwakeAiETAHelper.handleSchedule state=${AwakeDataState.WRONG_PREDICTION_TYPE}, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
+        console.warn("method=AwakeAiETAHelper.handleSchedule state=%s, IMO: %d, LOCODE: %s, portcallid: %d", AwakeDataState.WRONG_PREDICTION_TYPE, imo, locode, portcallId);
         return null;
     }
 
     if (!prediction.arrivalTime) {
-        console.warn(`method=AwakeAiETAHelper.handleSchedule state=${AwakeDataState.NO_PREDICTED_ETA}, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
+        console.warn("method=AwakeAiETAHelper.handleSchedule state=%s, IMO: %d, LOCODE: %s, portcallid: %d", AwakeDataState.NO_PREDICTED_ETA, imo, locode, portcallId);
         return null;
     }
 
     if (!destinationIsFinnish(prediction.locode)) {
-        console.warn(`method=AwakeAiETAHelper.predictionToTimestamp state=${AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND}, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
+        console.warn("method=AwakeAiETAHelper.predictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d", AwakeDataState.PREDICTED_DESTINATION_OUTSIDE_FINLAND, imo, locode, portcallId);
         return null;
     }
 
     if (!prediction.recordTime) {
-        console.warn(`method=AwakeAiETAHelper.handleSchedule state=${AwakeDataState.NO_RECORD_TIME}, using current time, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
+        console.warn("method=AwakeAiETAHelper.handleSchedule state=%s, using current time, IMO: %d, LOCODE: %s, portcallid: %d", AwakeDataState.NO_RECORD_TIME, imo, locode, portcallId);
     }
 
-    console.info(`method=AwakeAiETAHelper.predictionToTimestamp prediction was valid, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId}`);
+    console.info("method=AwakeAiETAHelper.predictionToTimestamp prediction was valid, IMO: %d, LOCODE: %s, portcallid: %d", imo, locode, portcallId);
 
     const timestamp = {
         ship: {

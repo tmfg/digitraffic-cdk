@@ -28,11 +28,11 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
 }
 
 async function removeTimestamps(db: DTDatabase, pilotageIds: number[]) {
-    if (pilotageIds && pilotageIds.length > 0) {
+    if (pilotageIds.length > 0) {
         const sourceIds = pilotageIds.map(id => id.toString());
 
         const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EventSource.PILOTWEB, sourceIds);
-        console.log("DEBUG removed " + timestampsRemoved);
+        console.log("DEBUG removed %s", timestampsRemoved);
     }
 }
 
@@ -142,9 +142,9 @@ function findNewAndUpdated(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage
     const newAndUpdated = [] as Pilotage[];
 
     pilotages.forEach(p => {
-        const timestamp = idMap[p.id];
+        const timestamp = idMap.get(p.id);
         const updatedPilotage = timestamp && timestamp.toISOString() !== p.scheduleUpdated;
-        const newPilotage = !timestamp && p.state !== 'FINISHED';
+        const newPilotage = timestamp == undefined && p.state !== 'FINISHED';
 
         if (updatedPilotage || newPilotage) {
             newAndUpdated.push(p);
@@ -155,17 +155,15 @@ function findNewAndUpdated(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage
 }
 
 function findRemoved(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage[]): number[] {
-    const pilotageMap = {} as Record<number, Pilotage>;
+    const pilotageSet: Set<number> = new Set();
     const removed = [] as number[];
 
-    // construct id-map from pilotages(id -> pilotage)
-    pilotages.forEach(p => {
-        pilotageMap[p.id] = p;
-    });
+    // construct id-set from pilotages
+    pilotages.forEach(p => pilotageSet.add(p.id));
 
     Object.keys(idMap).forEach(key => {
         const id = Number.parseInt(key);
-        if (!pilotageMap[id]) {
+        if (!pilotageSet.has(id)) {
             removed.push(id);
         }
     });

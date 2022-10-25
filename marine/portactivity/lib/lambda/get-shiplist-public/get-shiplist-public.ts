@@ -9,7 +9,7 @@ import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holde
 const dbSecretHolder = SecretHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>('shiplist');
 
-export type ShiplistSecret = {
+export interface ShiplistSecret {
     readonly auth: string
 }
 
@@ -23,11 +23,11 @@ function response(statusCode: number, message: string): Promise<ProxyLambdaRespo
     });
 }
 
-export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse | void> => {
+export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
     return dbSecretHolder.setDatabaseCredentials()
         .then(() => secretHolder.get())
         .then((secret: ShiplistSecret) => {
-            if (!event.queryStringParameters || !event.queryStringParameters.auth) {
+            if (!event.queryStringParameters.auth) {
                 return response(401, 'Missing authentication');
             }
             if (event.queryStringParameters.auth !== secret.auth) {
@@ -40,11 +40,11 @@ export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse 
                 return response(400, 'Invalid LOCODE');
             }
 
-            const interval = Number.parseInt(event.queryStringParameters?.interval || '4*24');
+            const interval = Number.parseInt(event.queryStringParameters?.interval ?? '4*24');
 
             return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
                 const dbShiplist =
-                (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode as string).toUpperCase(), interval))
+                (await findByLocodePublicShiplist(db, (event.queryStringParameters.locode).toUpperCase(), interval))
                     .map(ts => Object.assign(ts, {
                         source: ts.event_source,
                         eventTime: ts.event_time,

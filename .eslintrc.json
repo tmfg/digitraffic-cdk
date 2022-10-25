@@ -20,5 +20,6 @@
     "@typescript-eslint/no-throw-literal": "error",
     "@typescript-eslint/no-explicit-any": "error",
     "@typescript-eslint/no-extraneous-class": "off"
-  }
+  },
+  "reportUnusedDisableDirectives": true
 }

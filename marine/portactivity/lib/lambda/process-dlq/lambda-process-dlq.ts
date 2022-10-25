@@ -1,9 +1,10 @@
 import {uploadToS3} from "@digitraffic/common/aws/runtime/s3";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {PortactivityEnvKeys} from "../../keys";
 
-export const BUCKET_NAME = 'BUCKET_NAME';
-const bucketName = process.env[BUCKET_NAME] as string;
+const bucketName = getEnv(PortactivityEnvKeys.BUCKET_NAME);
 
-type DlqEvent = {
+interface DlqEvent {
     readonly Records: {
         readonly body: string
     }[]

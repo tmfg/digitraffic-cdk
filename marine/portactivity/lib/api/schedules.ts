@@ -18,7 +18,7 @@ export class SchedulesApi {
         const start = Date.now();
         const fullUrl = this.createUrl(direction, calculated);
         console.info('method=getSchedulesTimestamp from URL=%s', fullUrl);
-        const resp = await axios.get(fullUrl);
+        const resp = await axios.get<string>(fullUrl);
         const parse = util.promisify(xml2js.parseString);
         console.info('method=getSchedulesTimestamp tookMs=%d', (Date.now() - start));
         return await parse(resp.data) as SchedulesResponse;

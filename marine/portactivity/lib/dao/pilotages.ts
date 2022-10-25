@@ -57,18 +57,20 @@ const FIND_PORTCALL_SQL = `
         LIMIT 1
 `;
 
-export type DbPilotageTimestamp = {
+export interface DbPilotageTimestamp {
     readonly id: number,
     readonly schedule_updated: Date
 }
 
-export type TimestampMap = {
-    [key: number]: Date
+interface DbPortcallId {
+    readonly port_call_id: number
 }
 
+export type TimestampMap = Map<number, Date>;
+
 export async function findPortCallId(db: DTDatabase, pilotage: Pilotage, location: Location): Promise<number|null> {
-    const p1 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.port]);
-    const p2 = await db.oneOrNone(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.from]);
+    const p1 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.port]);
+    const p2 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.from]);
 
     if (p1 && p2 && location.port !== location.from) {
         console.info("portcalls found for both %s and %s", location.port, location.from);
@@ -87,16 +89,16 @@ export async function findPortCallId(db: DTDatabase, pilotage: Pilotage, locatio
 }
 
 export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
-    const timestamps = await db.manyOrNone(GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS) as DbPilotageTimestamp[];
+    const timestamps = await db.manyOrNone<DbPilotageTimestamp>(GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS);
     const idMap = {} as TimestampMap;
 
-    timestamps.forEach(ts => idMap[ts.id] = ts.schedule_updated);
+    timestamps.forEach(ts => idMap.set(ts.id, ts.schedule_updated));
 
     return idMap;
 }
 
 export function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<unknown> {
-    if (pilotages && pilotages.length > 0) {
+    if (pilotages.length > 0) {
         return Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
             id: pilotage.id,
             vesselImo: pilotage.vessel.imo,
@@ -118,9 +120,9 @@ export function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<
     return Promise.resolve();
 }
 
-export function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<void[]> {
-    if (pilotageIds && pilotageIds.length > 0) {
-        return db.manyOrNone(DELETE_PILOTAGES_SQL, [pilotageIds]);
+export function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<number[]> {
+    if (pilotageIds.length > 0) {
+        return db.manyOrNone<number>(DELETE_PILOTAGES_SQL, [pilotageIds]);
     }
 
     return Promise.resolve([]);

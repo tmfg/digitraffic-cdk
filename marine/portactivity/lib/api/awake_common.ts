@@ -6,7 +6,7 @@ export enum AwakeAiZoneType {
     ANCHORAGE = 'anchorage'
 }
 
-export type AwakeAiShip = {
+export interface AwakeAiShip {
     readonly mmsi: number
     readonly imo: number
     readonly shipName?: string,
@@ -22,15 +22,15 @@ export enum AwakeAiPredictionType {
 /**
  * Base and mixin types
  */
-export type AwakeAiPrediction = {
+export interface AwakeAiPrediction {
     readonly predictionType: AwakeAiPredictionType
 }
 
-export type AwakeAiZonePrediction = AwakeAiPrediction & {
+export interface AwakeAiZonePrediction extends AwakeAiPrediction {
     readonly zoneType: AwakeAiZoneType
 }
 
-export type AwakeAiLocodePrediction = AwakeAiPrediction & {
+export interface AwakeAiLocodePrediction extends AwakeAiPrediction {
     // ISO 8601
     readonly recordTime: string
 
@@ -41,7 +41,7 @@ export type AwakeAiLocodePrediction = AwakeAiPrediction & {
 /**
  * Actual prediction types
  */
-export type AwakeArrivalPortCallPrediction = AwakeAiPrediction & {
+export interface AwakeArrivalPortCallPrediction extends AwakeAiPrediction {
     // UUID
     readonly portCallId: string
 
@@ -52,9 +52,9 @@ export type AwakeArrivalPortCallPrediction = AwakeAiPrediction & {
     readonly portCallLocode: string
 }
 
-export type AwakeAiDestinationPrediction = AwakeAiLocodePrediction
+export type AwakeAiDestinationPrediction = AwakeAiLocodePrediction;
 
-export type AwakeAiTravelTimePrediction = AwakeAiLocodePrediction & AwakeAiZonePrediction & {
+export interface AwakeAiTravelTimePrediction extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
     readonly zoneId: ['berth', 'pbp']
 
     readonly zoneName: string
@@ -63,7 +63,7 @@ export type AwakeAiTravelTimePrediction = AwakeAiLocodePrediction & AwakeAiZoneP
     readonly remainingTravelTime: number
 }
 
-export type AwakeAiVoyageEtaPrediction = AwakeAiLocodePrediction & AwakeAiZonePrediction & {
+export interface AwakeAiVoyageEtaPrediction extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
     // ISO 8601
     readonly arrivalTime: string
 }
@@ -75,14 +75,12 @@ export enum AwakeAiShipStatus {
     VESSEL_DATA_NOT_UPDATED = 'vessel_data_not_updated'
 }
 
-export type AwakeAiPredictedVoyage = {
-
+export interface AwakeAiPredictedVoyage {
     readonly voyageStatus: AwakeAiShipStatus
 
     /**
      * Voyage sequence number, 0 for current voyage.
      */
     readonly sequenceNo: number
-
     readonly predictions: AwakeAiPrediction[]
 }

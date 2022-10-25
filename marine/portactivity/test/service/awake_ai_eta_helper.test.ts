@@ -3,7 +3,7 @@ import {AwakeAiPredictionType, AwakeAiVoyageEtaPrediction, AwakeAiZoneType} from
 import {EventSource} from "../../lib/model/eventsource";
 import {randomIMO, randomMMSI} from "../testdata";
 import {randomBoolean} from "@digitraffic/common/test/testutils";
-import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
+import {EventType} from "../../lib/model/timestamp";
 
 describe('Awake.AI ETA helper', () => {
 
@@ -35,17 +35,20 @@ describe('Awake.AI ETA helper', () => {
             imo,
             portArea,
             portcallId,
-        ) as ApiTimestamp;
+        );
 
-        expect(ts.eventType).toBe(EventType.ETA);
-        expect(ts.ship.mmsi).toBe(mmsi);
-        expect(ts.ship.imo).toBe(imo);
-        expect(ts.recordTime).toBe(eta.recordTime);
-        expect(ts.eventTime).toBe(eta.arrivalTime);
-        expect(ts.source).toBe(source);
-        expect(ts.location.port).toBe(eta.locode);
-        expect(ts.location.portArea).toBe(portArea);
-        expect(ts.portcallId).toBe(portcallId);
+        expect(ts).not.toBeNull();
+        if(ts !== null) {
+            expect(ts.eventType).toBe(EventType.ETA);
+            expect(ts.ship.mmsi).toBe(mmsi);
+            expect(ts.ship.imo).toBe(imo);
+            expect(ts.recordTime).toBe(eta.recordTime);
+            expect(ts.eventTime).toBe(eta.arrivalTime);
+            expect(ts.source).toBe(source);
+            expect(ts.location.port).toBe(eta.locode);
+            expect(ts.location.portArea).toBe(portArea);
+            expect(ts.portcallId).toBe(portcallId);
+        }
     });
 
     test('predictionToTimestamp - wrong prediction type', () => {
@@ -66,7 +69,7 @@ describe('Awake.AI ETA helper', () => {
 
     test('predictionToTimestamp - no arrival time', () => {
         const eta: AwakeAiVoyageEtaPrediction = newETAPrediction();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (eta as any).arrivalTime = undefined;
 
         const ts = AwakeAiETAHelper.predictionToTimestamp(

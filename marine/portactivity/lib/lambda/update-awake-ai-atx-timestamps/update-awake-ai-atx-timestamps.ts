@@ -3,10 +3,11 @@ import {sendMessage} from "../../service/queue-service";
 import {AwakeAiATXService} from "../../service/awake_ai_atx";
 import {AwakeAiATXApi} from "../../api/awake_ai_atx";
 import {Context} from "aws-lambda";
-import WebSocket from "ws";
+import {WebSocket} from "ws";
 import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 
-type UpdateAwakeAiATXTimestampsSecret = {
+interface UpdateAwakeAiATXTimestampsSecret {
     readonly atxurl: string
     readonly atxauth: string
 }
@@ -19,9 +20,9 @@ const expectedKeys = [
 const dbSecretHolder = SecretHolder.create();
 const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>('awake', expectedKeys);
 
-let service: AwakeAiATXService;
+let service: AwakeAiATXService | null = null;
 
-const sqsQueueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
+const sqsQueueUrl = getEnv(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 export async function handler(event: unknown, context: Context) {
     await dbSecretHolder.setDatabaseCredentials()

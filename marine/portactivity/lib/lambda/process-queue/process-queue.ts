@@ -1,21 +1,24 @@
 import {saveTimestamp, UpdatedTimestamp} from "../../service/timestamps";
-import {validateTimestamp} from "../../model/timestamp";
+import {ApiTimestamp, validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
 import {EmptySecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys} from "../../keys";
 import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
 const middy = require('@middy/core');
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
 const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure');
 
 export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResult<void | UpdatedTimestamp | null>[]>) {
     return (event: SQSEvent) => {
-        return withDbSecretFn(process.env[PortactivityEnvKeys.SECRET_ID] as string, () => {
+        return withDbSecretFn(SECRET_ID, () => {
             return inDatabase((db: DTDatabase) => {
                 return Promise.allSettled(event.Records.map(r => {
-                    const timestamp = JSON.parse(r.body);
+                    const timestamp = JSON.parse(r.body) as ApiTimestamp;
                     const start = Date.now();
                     console.info('DEBUG method=processTimestampQueue processing timestamp', timestamp);
 
@@ -42,4 +45,5 @@ export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResu
     };
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
 export const handler: (e: SQSEvent) => Promise<PromiseSettledResult<unknown>> = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());

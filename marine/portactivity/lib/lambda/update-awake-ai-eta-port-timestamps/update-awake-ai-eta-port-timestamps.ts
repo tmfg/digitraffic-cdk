@@ -5,8 +5,9 @@ import {AwakeAiETAPortApi} from "../../api/awake_ai_port";
 import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import {AwakeAiETAPortService} from "../../service/awake_ai_eta_port";
 import {GenericSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 
-const queueUrl = process.env[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] as string;
+const queueUrl = getEnv(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 const expectedKeys = [
     PortactivitySecretKeys.AWAKE_URL,

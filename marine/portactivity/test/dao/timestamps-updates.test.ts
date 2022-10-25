@@ -169,12 +169,12 @@ describe('db-timestamps - updates', dbTestBase((db: DTDatabase) => {
         });
         const portCalls = portCallData.map(p => p[0]) as PortCall[];
         const portAreaDetails = portCallData.map(p => p[1]) as PortAreaDetails[];
-        await db.tx(t => {
+        await db.tx(async t => {
             for (const pc of portCalls) {
-                insertPortCall(t, pc);
+                await insertPortCall(t, pc);
             }
             for (const pad of portAreaDetails) {
-                insertPortAreaDetails(t, pad);
+                await insertPortAreaDetails(t, pad);
             }
         });
         return portAreaDetails;

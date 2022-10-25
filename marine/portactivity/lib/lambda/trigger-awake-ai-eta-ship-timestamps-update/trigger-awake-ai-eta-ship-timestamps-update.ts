@@ -5,13 +5,15 @@ import {SNS} from "aws-sdk";
 import {DbSecret, SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import * as MessagingUtil from '@digitraffic/common/aws/runtime/messaging';
 import * as R from 'ramda';
+import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 
-const publishTopic = process.env[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] as string;
+const publishTopic = getEnv(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 const CHUNK_SIZE = 10;
+const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
 
-export function handlerFn(withSecretFn: SecretFunction<DbSecret, void>, sns: SNS) {
+export function handlerFn(withSecretFn: SecretFunction<DbSecret>, sns: SNS) {
     return () => {
-        return withSecretFn(process.env.SECRET_ID as string, async (): Promise<void> => {
+        return withSecretFn(SECRET_ID, async (): Promise<void> => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
             console.info('method=triggerAwakeAiETAShipTimestampsUpdateHandler Triggering ETA ship update for count=%d ships',
                 ships.length);

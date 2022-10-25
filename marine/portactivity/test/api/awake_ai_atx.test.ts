@@ -24,6 +24,7 @@ describe("api-awake-ai-atx", () => {
 
         await api.getATXs(10);
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(sendMock.mock.calls[0][0]).toEqual(
             JSON.stringify(SUBSCRIPTION_MESSAGE)
         );
@@ -53,6 +54,7 @@ describe("api-awake-ai-atx", () => {
         await api.getATXs(10);
         await api.getATXs(10);
 
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(sendMock.mock.calls[1][0]).toEqual(
             JSON.stringify(AwakeAiATXApi.createResumeMessage(subscriptionId))
         );

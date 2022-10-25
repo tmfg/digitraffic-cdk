@@ -1,4 +1,4 @@
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {AwakeAiPredictedVoyage, AwakeAiPredictionType, AwakeAiShip} from "./awake_common";
 
@@ -11,12 +11,12 @@ export enum AwakeAiPortResponseType {
     UNKNOWN = 'UNKNOWN'
 }
 
-export type AwakeAiPortSchedule = {
+export interface AwakeAiPortSchedule {
     readonly ship: AwakeAiShip
     readonly voyage: AwakeAiPredictedVoyage
 }
 
-export type AwakeAiPortResponse = {
+export interface AwakeAiPortResponse {
     readonly type: AwakeAiPortResponseType
     readonly schedule?: AwakeAiPortSchedule[]
 }
@@ -47,11 +47,11 @@ export class AwakeAiETAPortApi {
             });
             return {
                 type: AwakeAiPortResponseType.OK,
-                schedule: resp.data,
+                schedule: resp.data as unknown as AwakeAiPortSchedule[],
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                return AwakeAiETAPortApi.handleError(error as AxiosError);
+                return AwakeAiETAPortApi.handleError(error);
             }
             throw error;
         } finally {

@@ -1,4 +1,4 @@
-import axios, {AxiosError} from 'axios';
+import axios from 'axios';
 import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {AwakeAiPredictedVoyage, AwakeAiShip} from "./awake_common";
 
@@ -11,7 +11,7 @@ export enum AwakeAiShipResponseType {
     UNKNOWN = 'UNKNOWN'
 }
 
-export type AwakeAiShipApiResponse = {
+export interface AwakeAiShipApiResponse {
     readonly type: AwakeAiShipResponseType
     readonly schedule?: AwakeAiShipVoyageSchedule
 }
@@ -22,12 +22,9 @@ export enum AwakeAiShipPredictability {
     SHIP_DATA_NOT_UPDATED = 'ship-data-not-updated'
 }
 
-export type AwakeAiShipVoyageSchedule = {
-
+export interface AwakeAiShipVoyageSchedule {
     readonly ship: AwakeAiShip
-
     readonly predictability: AwakeAiShipPredictability
-
     readonly predictedVoyages: AwakeAiPredictedVoyage[]
 }
 
@@ -61,11 +58,11 @@ export class AwakeAiETAShipApi {
             });
             return {
                 type: AwakeAiShipResponseType.OK,
-                schedule: resp.data,
+                schedule: resp.data as unknown as AwakeAiShipVoyageSchedule,
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                return AwakeAiETAShipApi.handleError(error as AxiosError);
+                return AwakeAiETAShipApi.handleError(error);
             }
             throw error;
         } finally {

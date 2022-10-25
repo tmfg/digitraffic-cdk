@@ -9,7 +9,6 @@ import {DigitrafficLogSubscriptions} from '@digitraffic/common/aws/infra/stack/s
 import {Queue} from "aws-cdk-lib/aws-sqs";
 import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
 import {Bucket} from "aws-cdk-lib/aws-s3";
-import {BUCKET_NAME} from "./lambda/process-dlq/lambda-process-dlq";
 import {RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {PolicyStatement} from "aws-cdk-lib/aws-iam";
@@ -191,7 +190,7 @@ function createProcessDLQLambda(dlqBucket: Bucket,
     stack: DigitrafficStack): MonitoredFunction {
 
     const environment: LambdaEnvironment = {};
-    environment[BUCKET_NAME] = dlqBucket.bucketName;
+    environment[PortactivityEnvKeys.BUCKET_NAME] = dlqBucket.bucketName;
 
     const functionName = "PortActivity-ProcessTimestampsDLQ";
     const processDLQLambda = MonitoredFunction.create(stack, functionName, {

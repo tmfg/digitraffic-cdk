@@ -12,7 +12,7 @@ import moment from 'moment-timezone';
 import {AwakeDataState, predictionToTimestamp} from "./awake_ai_eta_helper";
 import {EventSource} from "../model/eventsource";
 
-type AwakeAiETAResponseAndShip = {
+interface AwakeAiETAResponseAndShip {
     readonly response: AwakeAiShipApiResponse
     readonly ship: DbETAShip
     readonly diffHours: number
@@ -47,7 +47,7 @@ export class AwakeAiETAShipService {
         return Promise.allSettled(ships.map(this.getAwakeAiTimestamp.bind(this)))
             .then(responses =>
                 responses
-                    .reduce<Array<ApiTimestamp>>((acc, result) => {
+                    .reduce<ApiTimestamp[]>((acc, result) => {
                     const val = result.status === 'fulfilled' ? result.value : null;
                     if (!val) {
                         return acc;

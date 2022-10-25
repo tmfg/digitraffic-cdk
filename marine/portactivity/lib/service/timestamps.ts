@@ -18,7 +18,7 @@ export interface UpdatedTimestamp extends DbUpdatedTimestamp {
 
 export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<UpdatedTimestamp | null> {
     return db.tx(async t => {
-        const portcallId = timestamp.portcallId || (await TimestampsDB.findPortcallId(
+        const portcallId = timestamp.portcallId ?? (await TimestampsDB.findPortcallId(
             db,
             timestamp.location.port,
             timestamp.eventType,
@@ -38,7 +38,7 @@ export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<
         }
 
         // mmsi should exist in this case
-        const imo = timestamp.ship.imo || (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi as number));
+        const imo = timestamp.ship.imo ?? (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi));
         if (!imo) {
             console.warn(`method=saveTimestamp IMO not found for timestamp %s`, JSON.stringify(timestamp));
             // resolve so this gets removed from the queue
@@ -46,7 +46,7 @@ export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<
         }
 
         // imo should exist in this case
-        const mmsi = timestamp.ship.mmsi || (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo as number));
+        const mmsi = timestamp.ship.mmsi ?? (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo));
         if (!mmsi) {
             console.warn(`method=saveTimestamp MMSI not found for timestamp %s`, JSON.stringify(timestamp));
             // resolve so this gets removed from the queue
@@ -62,7 +62,7 @@ export function saveTimestamp(timestamp: ApiTimestamp, db: DTDatabase): Promise<
     });
 }
 
-export function saveTimestamps(timestamps: ApiTimestamp[]): Promise<Array<DbUpdatedTimestamp | null>> {
+export function saveTimestamps(timestamps: ApiTimestamp[]): Promise<(DbUpdatedTimestamp | null)[]> {
     return inDatabase((db: DTDatabase) => {
         return db.tx(t => t.batch(timestamps.map(timestamp => doSaveTimestamp(t, timestamp))));
     });
@@ -78,12 +78,12 @@ async function doSaveTimestamp(tx: DTTransaction,
 async function removeOldTimestamps(tx: DTTransaction,
     timestamp: ApiTimestamp): Promise<DbTimestampIdAndLocode[]> {
     let timestampsAnotherLocode: DbTimestampIdAndLocode[] = [];
-    if (isPortnetTimestamp(timestamp)) {
+    if (isPortnetTimestamp(timestamp) && timestamp.portcallId) {
         timestampsAnotherLocode = await TimestampsDB.findPortnetTimestampsForAnotherLocode(tx,
-            timestamp.portcallId as number,
+            timestamp.portcallId,
             timestamp.location.port);
         if (timestampsAnotherLocode.length) {
-            console.info(`method=doSaveTimestamp deleting timestamps with changed locode,timestamp ids: ${timestampsAnotherLocode.map(e => e.id)}`);
+            console.info(`method=doSaveTimestamp deleting timestamps with changed locode,timestamp ids: ${timestampsAnotherLocode.map(e => e.id).toString()}`);
             await tx.batch(timestampsAnotherLocode.map(e => TimestampsDB.deleteById(tx, e.id)));
         }
     }
@@ -133,19 +133,21 @@ export async function findAllTimestamps(locode?: string,
 }
 
 export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
-    console.info(`method=findETAShipsByLocode find for ${ports}`);
+    console.info(`method=findETAShipsByLocode find for ${ports.toString()}`);
 
     const startFindPortnetETAsByLocodes = Date.now();
     const portnetShips = await inDatabaseReadonly((db: DTDatabase) => {
         return TimestampsDB.findPortnetETAsByLocodes(db, ports);
     }).finally(() => {
         console.info('method=findPortnetETAsByLocodes tookMs=%d', (Date.now() - startFindPortnetETAsByLocodes));
-    }) as DbETAShip[];
+    });
 
     // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
     const shipsByImo = R.groupBy(s => s.imo.toString(), portnetShips);
     const newestShips = Object.values(shipsByImo).flatMap((ships) =>
-        R.head(R.sortBy((ship: DbETAShip) => moment(ship.eta).toDate(), ships)) as DbETAShip);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        R.head(R.sortBy((ship: DbETAShip) => moment(ship.eta).toDate(), ships))!);
+
     console.info('method=findPortnetETAsByLocodes ships count before newest ETA filtering %d, after newest ETA filtering %d',
         portnetShips.length, newestShips.length);
 
@@ -162,7 +164,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
             return newestShips.filter(s => !shipsTooCloseToPortImos.includes(s.imo));
         }).finally(() => {
             console.info('method=startFindVtsShipsTooCloseToPort tookMs=%d', (Date.now() - startFindVtsShipsTooCloseToPort));
-        }) as DbETAShip[];
+        });
     } else {
         return Promise.resolve([]);
     }
@@ -172,10 +174,10 @@ export function deleteOldTimestampsAndPilotages() {
     return inDatabase((db: DTDatabase) => {
         return db.tx(async t => {
             const deletedPilotagesCount = await TimestampsDB.deleteOldPilotages(t);
-            console.info(`method=TimestampsService.deleteOldTimestamps pilotages count=${deletedPilotagesCount}`);
+            console.info('method=TimestampsService.deleteOldTimestamps pilotages count=%d', deletedPilotagesCount);
 
             const deletedTimestampsCount = await TimestampsDB.deleteOldTimestamps(t);
-            console.info(`method=TimestampsService.deleteOldTimestamps timestamps count=${deletedTimestampsCount}`);
+            console.info('method=TimestampsService.deleteOldTimestamps timestamps count=%d', deletedTimestampsCount);
         });
     });
 }

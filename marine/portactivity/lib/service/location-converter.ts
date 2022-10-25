@@ -1,15 +1,13 @@
 import {Location} from "../model/timestamp";
 import {PilotageRoute} from "../model/pilotage";
 
-let pilotwebToPortnetLocodeMap: {[key: string]: string} = {};
+const pilotwebToPortnetLocodeMap: Record<string, string> = {};
 
 function needInit(): boolean {
     return Object.keys(pilotwebToPortnetLocodeMap).length === 0;
 }
 
 function initMap() {
-    pilotwebToPortnetLocodeMap = {};
-
     pilotwebToPortnetLocodeMap.FIKOY = 'FIKOK';
 
     pilotwebToPortnetLocodeMap.FIPIE = 'FIPRS';

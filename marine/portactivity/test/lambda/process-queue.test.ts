@@ -14,7 +14,9 @@ const NOOP_WITH_SECRET = createEmptySecretFunction<PromiseSettledResult<void | U
 describe('process-queue', dbTestBase((db: DTDatabase) => {
 
     test('no records', async () => {
-        await handlerFn(NOOP_WITH_SECRET);
+        await handlerFn(NOOP_WITH_SECRET)({
+            Records: [],
+        });
     });
 
     test('single valid record', async () => {

@@ -58,15 +58,15 @@ describe(
 
             const timestampMap = await getTimestamps(db);
 
-            expect(Object.keys(timestampMap)).toHaveLength(1);
-            expect(timestampMap[1]).toStrictEqual(now);
+            expect(timestampMap.keys()).toHaveLength(1);
+            expect(timestampMap.get(1)).toStrictEqual(now);
 
             // update it to finished, so it should not show up
             await insertPilotage(db, 1, "FINISHED", now);
 
             const timestampMap2 = await getTimestamps(db);
 
-            expect(Object.keys(timestampMap2)).toHaveLength(0);
+            expect(timestampMap2.keys()).toHaveLength(0);
         });
 
         test("deletePilotages - none", async () => {
@@ -88,7 +88,7 @@ describe(
 
             expect(deleted).toHaveLength(1);
             expect(Object.keys(timestampMap2)).toHaveLength(1);
-            expect(timestampMap2[2]).toStrictEqual(now);
+            expect(timestampMap2.get(2)).toStrictEqual(now);
         });
     })
 );

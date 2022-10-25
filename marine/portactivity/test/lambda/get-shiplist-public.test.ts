@@ -20,29 +20,31 @@ describe('get-shiplist-public', dbTestBase(() => {
         sinon.restore();
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    async function getResponse(request: any): Promise<ProxyLambdaResponse> {
+        return await handler(request as ProxyLambdaRequest);
+    }
+
     test('no auth - 401', async () => {
-        const response = await handler({queryStringParameters: {}} as ProxyLambdaRequest) as ProxyLambdaResponse;
+        const response = await getResponse({queryStringParameters: {}});
 
         expect(response.statusCode).toBe(401);
     });
 
     test('invalid auth - 403', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response = await handler({queryStringParameters: { auth: AUTH + 'foo'}} as any) as ProxyLambdaResponse;
+        const response = await getResponse({queryStringParameters: { auth: AUTH + 'foo'}});
 
         expect(response.statusCode).toBe(403);
     });
 
     test('no locode - 400', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response = await handler({queryStringParameters: { auth: AUTH}} as any) as ProxyLambdaResponse;
+        const response = await getResponse({queryStringParameters: { auth: AUTH}});
 
         expect(response.statusCode).toBe(400);
     });
 
     test('invalid locode - 400', async () => {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const response = await handler({queryStringParameters: { auth: AUTH, locode: 'FOO'}} as any) as ProxyLambdaResponse;
+        const response = await getResponse({queryStringParameters: { auth: AUTH, locode: 'FOO'}});
 
         expect(response.statusCode).toBe(400);
     });
