@@ -8,7 +8,7 @@ export async function updateAllCameras(
     url: string, username: string, password: string, bucketName: string, certificate: string,
 ) {
     const cameraIds = await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
-    console.info("DEBUG cameras " + cameraIds.length);
+    console.info("DEBUG cameras %d", cameraIds.length);
     const session = await loginToCameraServer(url, username, password, certificate);
     console.info("DEBUG login done");
 

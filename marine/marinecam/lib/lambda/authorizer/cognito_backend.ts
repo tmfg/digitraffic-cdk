@@ -1,9 +1,10 @@
 import {CognitoUserPool, CognitoUser, AuthenticationDetails, CognitoUserSession} from 'amazon-cognito-identity-js';
 import {MarinecamEnvKeys} from "../../keys";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
 const POOL_DATA = {
-    UserPoolId: process.env[MarinecamEnvKeys.USERPOOL_ID] as string,
-    ClientId: process.env[MarinecamEnvKeys.POOLCLIENT_ID] as string,
+    UserPoolId: envValue(MarinecamEnvKeys.USERPOOL_ID),
+    ClientId: envValue(MarinecamEnvKeys.POOLCLIENT_ID),
 };
 
 const userPool = new CognitoUserPool(POOL_DATA);
@@ -38,7 +39,7 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
                     resolve(null);
                 },
 
-                newPasswordRequired: (userAttributes) => {
+                newPasswordRequired: (userAttributes: object) => {
                     return changeUserPassword(cognitoUser, password, userAttributes);
                 },
             });
@@ -48,17 +49,13 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
     });
 }
 
-function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: object): Promise<CognitoUserSession | null> {
-    return new Promise(resolve => {
-        cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
-            onSuccess: (result: CognitoUserSession) => {
-                resolve(result);
-            },
-            onFailure: (result) => {
-                console.info("passwordchallenge failed:" + JSON.stringify(result));
-
-                resolve(null);
-            },
-        });
+function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: object) {
+    cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
+        onSuccess: (result) => {
+            console.info("passwordchallenge success: %s", JSON.stringify(result));
+        },
+        onFailure: (result) => {
+            console.info("passwordchallenge failed: %s", JSON.stringify(result));
+        },
     });
 }

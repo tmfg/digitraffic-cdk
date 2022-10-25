@@ -7,7 +7,7 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
     );
 }
 
-export function truncate(db: DTDatabase) {
+export function truncate(db: DTDatabase): Promise<void> {
     return db.tx(async t => {
         await t.none('DELETE FROM camera');
         await t.none('DELETE FROM camera_group');

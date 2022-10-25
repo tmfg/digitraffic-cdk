@@ -9,7 +9,7 @@ import {MobileServerProps} from "./app-props";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if (stack.configuration.enableCanaries) {
+        if (stack.configuration.stackFeatures?.enableCanaries) {
             const dbRole = new DigitrafficCanaryRole(stack, 'marinecam-db').withDatabaseAccess();
 
             if ((stack.configuration as MobileServerProps).enableKeyProtectedApi) {

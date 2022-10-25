@@ -6,8 +6,8 @@ import {
 } from "aws-lambda/trigger/api-gateway-authorizer";
 import {CognitoUserSession} from "amazon-cognito-identity-js";
 
-const EFFECT_ALLOW = 'Allow';
-const EFFECT_DENY = 'Deny';
+const EFFECT_ALLOW = "Allow";
+const EFFECT_DENY = "Deny";
 
 const KEY_COGNITO_GROUPS = "cognito:groups";
 
@@ -69,7 +69,7 @@ async function generatePolicy(group: string, username: string, password: string,
 
 function checkAuthorization(user: CognitoUserSession | null, group: string): string {
     if (user) {
-        const userGroups = user.getAccessToken().payload[KEY_COGNITO_GROUPS] as string[];
+        const userGroups = user.getAccessToken().payload[KEY_COGNITO_GROUPS] as string[] | null;
 
         if (group === 'metadata' || userGroups?.includes(group)) {
             return EFFECT_ALLOW;

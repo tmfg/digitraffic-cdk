@@ -16,7 +16,7 @@ export const handler = async () => {
     // ibnet-urls
     await checker.expect200(METADATA_IBNET_URL, jsonChecker.checkJson((cameras: Camera[]) => {
         assert.ok(cameras.length > 1);
-        assert.ok(cameras[0].id !== null);
+        assert.ok(cameras[0].id.length > 0);
     }));
     await checker.expect403WithoutApiKey(METADATA_IBNET_URL);
 
@@ -26,7 +26,7 @@ export const handler = async () => {
     // cameras-urls
     await checker.expect200(METADATA_CAMERAS_URL, jsonChecker.checkJson((cameras: Camera[]) => {
         assert.ok(cameras.length > 1);
-        assert.ok(cameras[0].id !== null);
+        assert.ok(cameras[0].id.length > 0);
     }));
     await checker.expect403WithoutApiKey(METADATA_CAMERAS_URL);
 

@@ -1,35 +1,22 @@
-import {Camera} from "../model/camera";
-
-const FIELD_ITEM = "Item";
-const FIELD_ITEMS = "Items";
-
-export type CommandResponse = {
+export interface CommandResponse {
     readonly Communication: {
         readonly Command: ResponseCommand[]
     }
-};
+}
 
-type ResponseCommand = {
-    readonly Result: string;
+interface ResponseCommand {
+    readonly Result: string
     readonly OutputParams: {
         Param: ResponseParam[]
-    }[];
-    readonly Items: any[]; // eslint-disable-line @typescript-eslint/no-explicit-any
-    readonly Thumbnail?: string[];
-};
+    }[]
+    readonly Items: any[] // eslint-disable-line @typescript-eslint/no-explicit-any
+    readonly Thumbnail?: string[]
+}
 
-type ResponseParam = {
+interface ResponseParam {
     "$": {
         Name: string
         Value: string
-    }
-};
-
-type CameraResponse = {
-    "$": {
-        Id: string;
-        Name: string;
-        Type: string;
     }
 }
 
@@ -42,7 +29,7 @@ export abstract class Command<T> {
         this.name = name;
     }
 
-    public addInputParameters(name: string, value: string): Command<T> {
+    public addInputParameters(name: string, value: string): this {
         this.inputParameters[name] = value;
 
         return this;
@@ -96,7 +83,7 @@ class DefaultCommand extends Command<void> {
 
 export class ConnectCommand extends Command<string> {
     constructor() {
-        super('Connect');
+        super("Connect");
     }
 
     public getResult(response: CommandResponse): string {
@@ -104,76 +91,62 @@ export class ConnectCommand extends Command<string> {
     }
 }
 
-export class GetAllCamerasCommand extends Command<Camera[]> {
+export class LoginCommand extends DefaultCommand {
     constructor() {
-        super('GetAllViewsAndCameras');
-    }
-
-    public getResult(response: CommandResponse): Camera[] {
-        const cameras = response.Communication.Command[0].Items[0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM][0][FIELD_ITEMS][0][FIELD_ITEM];
-
-        const info = cameras.map((c: CameraResponse) => {
-            return {
-                id: c.$.Id,
-                name: c.$.Name,
-                type: c.$.Type,
-            };
-        });
-
-        console.info(JSON.stringify(info, null, 3));
-
-        return info;
+        super("Login");
     }
 }
 
-export class LoginCommand extends DefaultCommand {
-    constructor() {
-        super('Login');
+function getFirstFromNullable<T>(array?: T[]): T {
+    if(!array) {
+        throw Error("array not set!");
     }
+
+    return array[0];
 }
 
 export class GetThumbnailCommand extends Command<string> {
     constructor() {
-        super('GetThumbnail');
+        super("GetThumbnail");
     }
 
     public getResult(response: CommandResponse): string {
-        return (response.Communication.Command[0].Thumbnail as string[])[0];
+        return getFirstFromNullable(response.Communication.Command[0].Thumbnail);
     }
 }
 
 export class GetThumbnailByTimeCommand extends Command<string> {
     constructor() {
-        super('GetThumbnailByTime');
+        super("GetThumbnailByTime");
     }
 
     public getResult(response: CommandResponse): string {
-        return (response.Communication.Command[0].Thumbnail as string[])[0];
+        return getFirstFromNullable(response.Communication.Command[0].Thumbnail);
     }
 }
 
 export class RequestStreamCommand extends Command<string> {
     constructor() {
-        super('RequestStream');
+        super("RequestStream");
     }
 
     public getResult(response: CommandResponse): string {
         const output = response.Communication.Command[0].OutputParams[0].Param;
 
-        const videoId = output.find(o => o.$.Name === 'VideoId');
+        const videoId = output.find(o => o.$.Name === "VideoId");
 
-        return videoId?.$?.Value || "";
+        return videoId?.$.Value ?? "";
     }
 }
 
 export class ChangeStreamCommand extends DefaultCommand {
     constructor() {
-        super('ChangeStream');
+        super("ChangeStream");
     }
 }
 
 export class CloseStreamCommand extends DefaultCommand {
     constructor() {
-        super('CloseStream');
+        super("CloseStream");
     }
 }

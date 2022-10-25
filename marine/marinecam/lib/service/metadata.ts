@@ -4,7 +4,7 @@ import * as MetadataDB from "../db/metadata";
 import {Camera} from "../model/camera";
 
 export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
-    console.info("method=listAllCameras for " + usersGroups);
+    console.info("method=listAllCameras for %s", usersGroups);
 
     const start = Date.now();
 
