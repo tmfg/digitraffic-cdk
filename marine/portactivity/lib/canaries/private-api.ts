@@ -1,9 +1,9 @@
 import {UrlChecker} from "@digitraffic/common/aws/infra/canaries/url-checker";
-import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 import {ENV_API_KEY, ENV_HOSTNAME} from "@digitraffic/common/aws/infra/canaries/url-canary";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
-const hostname = getEnv(ENV_HOSTNAME);
-const apiKeyId = getEnv(ENV_API_KEY);
+const hostname = envValue(ENV_HOSTNAME);
+const apiKeyId = envValue(ENV_API_KEY);
 
 export const handler = async (): Promise<string> => {
     const checker = await UrlChecker.create(hostname, apiKeyId);

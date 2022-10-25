@@ -5,11 +5,11 @@ import {SNS} from "aws-sdk";
 import {DbSecret, SecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import * as MessagingUtil from '@digitraffic/common/aws/runtime/messaging';
 import * as R from 'ramda';
-import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
-const publishTopic = getEnv(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
+const publishTopic = envValue(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 const CHUNK_SIZE = 10;
-const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
+const SECRET_ID = envValue(PortactivityEnvKeys.SECRET_ID);
 
 export function handlerFn(withSecretFn: SecretFunction<DbSecret>, sns: SNS) {
     return () => {

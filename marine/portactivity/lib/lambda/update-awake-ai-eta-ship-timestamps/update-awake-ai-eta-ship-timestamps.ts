@@ -7,12 +7,12 @@ import {SNSEvent} from "aws-lambda";
 import {DbETAShip} from "../../dao/timestamps";
 import {sendMessage} from "../../service/queue-service";
 import {UpdateAwakeAiTimestampsSecret} from "../../service/awake_ai_eta_helper";
-import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
 let service: AwakeAiETAShipService;
 
-const queueUrl = getEnv(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
-const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
+const queueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const SECRET_ID = envValue(PortactivityEnvKeys.SECRET_ID);
 
 const expectedKeys = [
     PortactivitySecretKeys.AWAKE_URL,

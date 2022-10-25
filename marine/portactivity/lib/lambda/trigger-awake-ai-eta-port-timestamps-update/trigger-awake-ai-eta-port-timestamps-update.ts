@@ -1,9 +1,9 @@
 import {PortactivityEnvKeys} from "../../keys";
 import {SNS} from "aws-sdk";
 import * as MessagingUtil from '@digitraffic/common/aws/runtime/messaging';
-import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
-const publishTopic = getEnv(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
+const publishTopic = envValue(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 
 // TODO in the future, use ports list
 const ports = [

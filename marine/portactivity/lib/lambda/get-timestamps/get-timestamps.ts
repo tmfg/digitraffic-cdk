@@ -3,10 +3,10 @@ import {EmptySecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime
 import * as IdUtils from '@digitraffic/common/marine/id_utils';
 import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
 import {ApiTimestamp} from "../../model/timestamp";
-import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
 import {PortactivityEnvKeys} from "../../keys";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
-const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
+const SECRET_ID = envValue(PortactivityEnvKeys.SECRET_ID);
 
 export const handler = (event: GetTimeStampsEvent) => {
     return handlerFn(event, withDbSecret);

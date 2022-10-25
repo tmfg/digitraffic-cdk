@@ -4,14 +4,11 @@ import {SQSEvent} from "aws-lambda";
 import {EmptySecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
 import {PortactivityEnvKeys} from "../../keys";
 import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
-import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
+import middy from "@middy/core";
+import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 
-const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
-const middy = require('@middy/core');
-// eslint-disable-next-line @typescript-eslint/no-var-requires, @typescript-eslint/no-unsafe-assignment
-const sqsPartialBatchFailureMiddleware = require('@middy/sqs-partial-batch-failure');
+const SECRET_ID = envValue(PortactivityEnvKeys.SECRET_ID);
 
 export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResult<void | UpdatedTimestamp | null>[]>) {
     return (event: SQSEvent) => {
@@ -45,5 +42,4 @@ export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResu
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-export const handler: (e: SQSEvent) => Promise<PromiseSettledResult<unknown>> = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());
+export const handler = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());

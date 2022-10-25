@@ -4,10 +4,10 @@ import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {SchedulesApi} from "../../api/schedules";
 import {SchedulesService} from "../../service/schedules";
 import {SecretFunction} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
-import {getEnv} from "aws-cdk-lib/custom-resources/lib/provider-framework/runtime/util";
+import {envValue} from "@digitraffic/common/aws/runtime/environment";
 
-const sqsQueueUrl = getEnv(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
-const SECRET_ID = getEnv(PortactivityEnvKeys.SECRET_ID);
+const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const SECRET_ID = envValue(PortactivityEnvKeys.SECRET_ID);
 
 export interface SchedulesSecret {
     readonly "schedules.url": string
