@@ -6,6 +6,7 @@ import {Context} from "aws-lambda";
 import {WebSocket} from "ws";
 import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import {envValue} from "@digitraffic/common/aws/runtime/environment";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
 interface UpdateAwakeAiATXTimestampsSecret {
     readonly atxurl: string
@@ -17,15 +18,15 @@ const expectedKeys = [
     PortactivitySecretKeys.AWAKE_ATX_AUTH,
 ];
 
-const dbSecretHolder = SecretHolder.create();
-const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>('awake', expectedKeys);
+const rdsHolder = RdsHolder.create();
+const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>("awake", expectedKeys);
 
 let service: AwakeAiATXService | null = null;
 
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 export async function handler(event: unknown, context: Context) {
-    await dbSecretHolder.setDatabaseCredentials()
+    await rdsHolder.setCredentials()
         .then(() => secretHolder.get())
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
 

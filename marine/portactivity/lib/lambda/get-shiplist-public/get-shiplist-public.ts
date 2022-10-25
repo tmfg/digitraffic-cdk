@@ -5,8 +5,9 @@ import * as IdUtils from '@digitraffic/common/marine/id_utils';
 import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
 import {ProxyLambdaRequest, ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
 import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
-const dbSecretHolder = SecretHolder.create();
+const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>('shiplist');
 
 export interface ShiplistSecret {
@@ -24,7 +25,7 @@ function response(statusCode: number, message: string): Promise<ProxyLambdaRespo
 }
 
 export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
-    return dbSecretHolder.setDatabaseCredentials()
+    return rdsHolder.setCredentials()
         .then(() => secretHolder.get())
         .then((secret: ShiplistSecret) => {
             if (!event.queryStringParameters.auth) {

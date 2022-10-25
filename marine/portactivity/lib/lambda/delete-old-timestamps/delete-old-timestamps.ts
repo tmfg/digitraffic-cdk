@@ -1,9 +1,9 @@
 import * as TimestampsService from "../../service/timestamps";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
-const secretHolder = SecretHolder.create();
+const rdsHolder = RdsHolder.create();
 
 export function handler() {
-    void secretHolder.setDatabaseCredentials()
+    void rdsHolder.setCredentials()
         .then(async () => await TimestampsService.deleteOldTimestampsAndPilotages());
 }

@@ -3,6 +3,7 @@ import * as PilotwebService from "../../service/pilotweb";
 import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
 import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import {envValue} from "@digitraffic/common/aws/runtime/environment";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
@@ -11,10 +12,11 @@ interface PilotWebSecret {
     readonly 'pilotweb.auth': string
 }
 
+const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<PilotWebSecret>("pilotweb");
 
 export const handler = function (): Promise<void> {
-    return secretHolder.setDatabaseCredentials()
+    return rdsHolder.setCredentials()
         .then(() => secretHolder.get())
         .then(async secret => {
             const pilotwebUrl = secret[PortactivitySecretKeys.PILOTWEB_URL];

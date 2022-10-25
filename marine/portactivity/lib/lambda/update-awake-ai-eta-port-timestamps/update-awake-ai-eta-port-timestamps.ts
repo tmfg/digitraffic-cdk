@@ -6,6 +6,7 @@ import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holde
 import {AwakeAiETAPortService} from "../../service/awake_ai_eta_port";
 import {GenericSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
 import {envValue} from "@digitraffic/common/aws/runtime/environment";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
 const queueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
@@ -14,13 +15,14 @@ const expectedKeys = [
     PortactivitySecretKeys.AWAKE_AUTH,
 ];
 
-const dbSecretHolder = SecretHolder.create<GenericSecret>("", expectedKeys);
+const rdsHolder = RdsHolder.create();
+const secretHolder = SecretHolder.create<GenericSecret>("", expectedKeys);
 
 let service: AwakeAiETAPortService
 
 export function handler(event: SNSEvent): Promise<void> {
-    return dbSecretHolder.setDatabaseCredentials()
-        .then(() => dbSecretHolder.get())
+    return rdsHolder.setCredentials()
+        .then(() => secretHolder.get())
         .then(async secret => {
             // always a single event, guaranteed by SNS
             const locode = event.Records[0].Sns.Message;
