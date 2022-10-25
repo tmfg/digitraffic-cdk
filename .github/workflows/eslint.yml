@@ -30,10 +30,20 @@ jobs:
         run: yarn eslint-report:all
         continue-on-error: true
 
+      - name: Find fork-point for affected runs
+        if: ${{ github.ref_name != 'master' }}
+        id: fork-point
+        run: |
+          echo -n "fork-point-sha=" >> $GITHUB_OUTPUT
+          git merge-base --fork-point origin/master HEAD >> $GITHUB_OUTPUT
+
       - name: Create ESLint reports for affected projects
         if: ${{ github.ref_name != 'master' }}
         id: report-affected
         run: yarn eslint-report:affected
+        env:
+          NX_BASE: ${{ steps.fork-point.outputs.fork-point-sha }}
+          NX_HEAD: HEAD
         continue-on-error: true
 
       - name: Find report files
@@ -64,7 +74,7 @@ jobs:
               if self.state == "div-id-overview-span":
                 self.data = data
                 self.state = "stop"
-          
+
           ref = os.environ["GITHUB_REF_NAME"]
           reports = [_ for _ in glob("*/*/report.html") if "node_modules" not in _]
           reports_created = []
@@ -86,6 +96,7 @@ jobs:
           FILE_PATH: ${{ github.ref_name }}/
           COMMIT_MESSAGE: ESLint report in branch $CURRENT_BRANCH
           NO_SUMMARY: true
+        continue-on-error: true
 
       - name: Create summary
         if: steps.publish-reports.outcome == 'success'
