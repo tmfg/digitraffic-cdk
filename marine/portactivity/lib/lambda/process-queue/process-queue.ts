@@ -15,11 +15,12 @@ export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResu
         return withDbSecretFn(SECRET_ID, () => {
             return inDatabase((db: DTDatabase) => {
                 return Promise.allSettled(event.Records.map(r => {
-                    const timestamp = JSON.parse(r.body) as ApiTimestamp;
+                    const partial = JSON.parse(r.body) as Partial<ApiTimestamp>;
                     const start = Date.now();
-                    console.info('DEBUG method=processTimestampQueue processing timestamp', timestamp);
+                    console.info('DEBUG method=processTimestampQueue processing timestamp', partial);
 
-                    if (!validateTimestamp(timestamp)) {
+                    const timestamp = validateTimestamp(partial);
+                    if (timestamp == null) {
                         console.warn('DEBUG method=processTimestampQueue timestamp did not pass validation');
                         // resolve so this gets removed from the queue
                         return Promise.resolve();

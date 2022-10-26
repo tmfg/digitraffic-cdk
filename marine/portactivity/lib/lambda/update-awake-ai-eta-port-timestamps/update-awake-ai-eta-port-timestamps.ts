@@ -18,7 +18,7 @@ const expectedKeys = [
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<GenericSecret>("", expectedKeys);
 
-let service: AwakeAiETAPortService
+let service: AwakeAiETAPortService | undefined;
 
 export function handler(event: SNSEvent): Promise<void> {
     return rdsHolder.setCredentials()

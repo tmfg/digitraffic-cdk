@@ -156,7 +156,7 @@ function findNewAndUpdated(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage
 
 function findRemoved(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage[]): number[] {
     const pilotageSet = new Set<number>();
-    const removed = [] as number[];
+    const removed: number[] = []
 
     // construct id-set from pilotages
     pilotages.forEach(p => pilotageSet.add(p.id));

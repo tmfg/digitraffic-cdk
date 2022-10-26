@@ -8,8 +8,8 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 
 export interface UpdateAwakeAiTimestampsSecret {
-    readonly "awake.voyagesurl": string
-    readonly "awake.voyagesauth": string
+    readonly voyagesurl: string
+    readonly voyagesauth: string
 }
 
 export enum AwakeDataState {
