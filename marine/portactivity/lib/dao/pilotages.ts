@@ -90,7 +90,7 @@ export async function findPortCallId(db: DTDatabase, pilotage: Pilotage, locatio
 
 export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
     const timestamps = await db.manyOrNone<DbPilotageTimestamp>(GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS);
-    const idMap = {} as TimestampMap;
+    const idMap: TimestampMap = new Map();
 
     timestamps.forEach(ts => idMap.set(ts.id, ts.schedule_updated));
 

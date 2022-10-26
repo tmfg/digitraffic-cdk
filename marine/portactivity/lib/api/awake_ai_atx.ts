@@ -6,13 +6,13 @@ interface AwakeAiATXMessage {
 }
 
 export enum AwakeAiATXEventType {
-    SUBSCRIPTION_STATUS = 'subscription-status',
-    EVENT = 'event'
+    SUBSCRIPTION_STATUS = "subscription-status",
+    EVENT = "event"
 }
 
 export enum AwakeATXZoneEventType {
-    ARRIVAL = 'arrival',
-    DEPARTURE = 'departure'
+    ARRIVAL = "arrival",
+    DEPARTURE = "departure"
 }
 
 export interface AwakeAISubscriptionMessage extends AwakeAiATXMessage {
@@ -85,10 +85,10 @@ export interface AwakeAIATXTimestampMessage extends AwakeAiATXMessage {
 }
 
 export const SUBSCRIPTION_MESSAGE = {
-    msgType: 'subscribe',
+    msgType: "subscribe",
     parameters: [{
-        eventType: 'zone-event',
-        countries: ['FI'],
+        eventType: "zone-event",
+        countries: ["FI"],
     }],
 };
 
@@ -105,16 +105,17 @@ export class AwakeAiATXApi {
     }
 
     getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
-        const webSocket = new this.WebSocketClass(this.url + this.apiKey);
+        const wsc = this.WebSocketClass;
+        const webSocket = new wsc(this.url + this.apiKey);
 
-        webSocket.on('open', () => {
+        webSocket.on("open", () => {
             const startMessage = this.subscriptionId ? AwakeAiATXApi.createResumeMessage(this.subscriptionId) : SUBSCRIPTION_MESSAGE;
             webSocket.send(JSON.stringify(startMessage));
         });
 
         const atxs: AwakeAIATXTimestampMessage[] = [];
 
-        webSocket.on('message', (messageRaw: string) => {
+        webSocket.on("message", (messageRaw: string) => {
             const message = JSON.parse(messageRaw) as unknown as AwakeAiATXMessage;
 
             switch(message.msgType) {
@@ -125,14 +126,14 @@ export class AwakeAiATXApi {
                     atxs.push(message as AwakeAIATXTimestampMessage);
                     break;
                 default:
-                    console.warn('method=getATXs Unknown message received %s', JSON.stringify(message));
+                    console.warn("method=getATXs Unknown message received %s", JSON.stringify(message));
             }
         });
 
         return new Promise((resolve, reject) => {
-            webSocket.on('error', (error) => {
-                console.error('method=getATXs error', error);
-                reject('Error');
+            webSocket.on("error", (error) => {
+                console.error("method=getATXs error", error);
+                reject("Error");
             });
             setTimeout(() => {
                 webSocket.close();
@@ -142,9 +143,9 @@ export class AwakeAiATXApi {
     }
 
     static createResumeMessage(subscriptionId: string): { msgType: string, resume: string } {
-        console.info('method=createResumeMessage Existing session found');
+        console.info("method=createResumeMessage Existing session found");
         return {
-            msgType: 'subscribe',
+            msgType: "subscribe",
             resume: subscriptionId,
         };
     }

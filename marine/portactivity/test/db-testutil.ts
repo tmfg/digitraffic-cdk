@@ -9,23 +9,23 @@ import {Countable} from "@digitraffic/common/database/models";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(
-        fn, truncate, 'portactivity', 'portactivity', 'localhost:54321/marine',
+        fn, truncate, "portactivity", "portactivity", "localhost:54321/marine",
     );
 }
 
-export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: DTTransaction) => void) {
-    return async (): Promise<void> => {
+export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: DTTransaction) => void): () => Promise<void> {
+    return () => {
         return db.tx(t => { fn(t); });
     };
 }
 
 export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
     await db.tx(async t => {
-        await t.none('DELETE FROM pilotage');
-        await t.none('DELETE FROM port_call_timestamp');
-        await t.none('DELETE FROM public.vessel');
-        await t.none('DELETE FROM public.port_area_details');
-        await t.none('DELETE FROM public.port_call');
+        await t.none("DELETE FROM pilotage");
+        await t.none("DELETE FROM port_call_timestamp");
+        await t.none("DELETE FROM public.vessel");
+        await t.none("DELETE FROM public.port_area_details");
+        await t.none("DELETE FROM public.port_call");
     });
 }
 
@@ -52,7 +52,7 @@ export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> 
 }
 
 export async function getPilotagesCount(db: DTDatabase | DTTransaction): Promise<number> {
-    const ret = await db.tx(t => t.one<Countable>('SELECT COUNT(*) FROM pilotage'));
+    const ret = await db.tx(t => t.one<Countable>("SELECT COUNT(*) FROM pilotage"));
     return ret.count;
 }
 
@@ -187,7 +187,7 @@ export function insertPilotage(
     return updatePilotages(db, [{
         id,
         vessel: {
-            name: 'test',
+            name: "test",
             imo: 1,
             mmsi: 1,
         },
@@ -195,14 +195,14 @@ export function insertPilotage(
         pilotBoardingTime: new Date().toISOString(),
         endTime: endTime?.toISOString() ?? new Date().toISOString(),
         scheduleUpdated: scheduleUpdated.toISOString(),
-        scheduleSource: 'test',
+        scheduleSource: "test",
         state,
         route: {
             start: {
-                code: 'START',
+                code: "START",
             },
             end: {
-                code: 'END',
+                code: "END",
             },
         },
     }]);

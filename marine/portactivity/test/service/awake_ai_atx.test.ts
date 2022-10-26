@@ -15,17 +15,15 @@ import {AwakeAiZoneType} from "../../lib/api/awake_common";
 import {WebSocket} from "ws";
 import {DTDatabase} from "@digitraffic/common/database/database";
 
-// test file
-/* eslint-disable camelcase */
+/* eslint-disable camelcase -- test code */
 
-describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
+describe("service Awake.AI ATx", dbTestBase((db: DTDatabase) => {
 
     function createAiATXApi() {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         return new AwakeAiATXApi('', '', WebSocket);
     }
 
-    test('getATXs - no portcall found for ATx', async () => {
+    test("getATXs - no portcall found for ATx", async () => {
         const atxMessage = newAwakeATXMessage();
         const api = createAiATXApi();
         sinon.stub(api, 'getATXs').returns(Promise.resolve([atxMessage]));
@@ -36,7 +34,7 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
         expect(timestamps.length).toBe(0);
     });
 
-    test('getATXs - ATx with portcall', async () => {
+    test("getATXs - ATx with portcall", async () => {
         const zoneEventType = randomBoolean() ? AwakeATXZoneEventType.ARRIVAL : AwakeATXZoneEventType.DEPARTURE;
         const atxMessage = newAwakeATXMessage({zoneEventType});
         const portcallId = 1;
@@ -65,7 +63,7 @@ describe('service Awake.AI ATx', dbTestBase((db: DTDatabase) => {
         expect(timestamps[0]).toMatchObject(expectedTimestamp);
     });
 
-    test('getATXs - ATx with portcall - other than berth events are filtered', async () => {
+    test("getATXs - ATx with portcall - other than berth events are filtered", async () => {
         const otherThanBerth = shuffle(Object.values(AwakeAiZoneType).filter(zone => zone !== AwakeAiZoneType.BERTH));
         const atxMessage = newAwakeATXMessage({zoneType: otherThanBerth[0]});
         const portcallId = 1;

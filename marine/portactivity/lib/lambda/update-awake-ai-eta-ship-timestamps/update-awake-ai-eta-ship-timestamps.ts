@@ -12,7 +12,6 @@ import {envValue} from "@digitraffic/common/aws/runtime/environment";
 let service: AwakeAiETAShipService;
 
 const queueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
-const SECRET_ID = envValue(PortactivityEnvKeys.SECRET_ID);
 
 const expectedKeys = [
     PortactivitySecretKeys.AWAKE_URL,
@@ -26,7 +25,7 @@ export function handlerFn(withSecretFn: SecretFunction<UpdateAwakeAiTimestampsSe
         // always a single event, guaranteed by SNS
         const ships = JSON.parse(event.Records[0].Sns.Message) as DbETAShip[];
 
-        return withSecretFn(SECRET_ID, async (secret: UpdateAwakeAiTimestampsSecret): Promise<void> => {
+        return withSecretFn(envValue(PortactivityEnvKeys.SECRET_ID), async (secret: UpdateAwakeAiTimestampsSecret): Promise<void> => {
             if (!service) {
                 service = new AwakeAiETAServiceClass(new AwakeAiETAShipApi(secret["awake.voyagesurl"], secret["awake.voyagesauth"]));
             }

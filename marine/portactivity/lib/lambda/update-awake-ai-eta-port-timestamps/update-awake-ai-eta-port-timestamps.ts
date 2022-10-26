@@ -33,8 +33,8 @@ export function handler(event: SNSEvent): Promise<void> {
             const timestamps = await service.getAwakeAiTimestamps(locode);
 
             const start = Date.now();
-            console.info(`method=updateAwakeAiETAPortTimestampsHandler Sending ${timestamps.length} timestamps to queue..`);
+            console.info("method=updateAwakeAiETAPortTimestampsHandler Sending %d timestamps to queue..", timestamps.length);
             await Promise.allSettled(timestamps.map(ts => sendMessage(ts, queueUrl)));
-            console.info('method=updateAwakeAiETAPortTimestampsHandler ..done in tookMs=%d', Date.now() - start);
+            console.info("method=updateAwakeAiETAPortTimestampsHandler ..done in tookMs=%d", Date.now() - start);
         });
 }

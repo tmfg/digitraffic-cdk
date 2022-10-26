@@ -19,7 +19,7 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
         const pilotageIds = await removeMissingPilotages(db, idMap, pilotages);
         const updated = await updateAllPilotages(db, idMap, pilotages);
 
-        console.info("DEBUG timestamps to remove " + JSON.stringify(pilotageIds));
+        console.info("DEBUG timestamps to remove %s", JSON.stringify(pilotageIds));
 
         await removeTimestamps(db, pilotageIds);
 
@@ -155,14 +155,13 @@ function findNewAndUpdated(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage
 }
 
 function findRemoved(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage[]): number[] {
-    const pilotageSet: Set<number> = new Set();
+    const pilotageSet = new Set<number>();
     const removed = [] as number[];
 
     // construct id-set from pilotages
     pilotages.forEach(p => pilotageSet.add(p.id));
 
-    Object.keys(idMap).forEach(key => {
-        const id = Number.parseInt(key);
+    [...idMap.keys()].forEach(id => {
         if (!pilotageSet.has(id)) {
             removed.push(id);
         }

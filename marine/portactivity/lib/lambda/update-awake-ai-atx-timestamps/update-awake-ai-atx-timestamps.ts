@@ -3,10 +3,12 @@ import {sendMessage} from "../../service/queue-service";
 import {AwakeAiATXService} from "../../service/awake_ai_atx";
 import {AwakeAiATXApi} from "../../api/awake_ai_atx";
 import {Context} from "aws-lambda";
-import {WebSocket} from "ws";
 import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 import {envValue} from "@digitraffic/common/aws/runtime/environment";
 import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
+
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires,  @typescript-eslint/no-unsafe-argument -- import won't work!
+const WebSocket = require("ws");
 
 interface UpdateAwakeAiATXTimestampsSecret {
     readonly atxurl: string

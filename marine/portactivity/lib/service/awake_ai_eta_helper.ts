@@ -8,25 +8,25 @@ import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 
 export interface UpdateAwakeAiTimestampsSecret {
-    readonly 'awake.voyagesurl': string
-    readonly 'awake.voyagesauth': string
+    readonly "awake.voyagesurl": string
+    readonly "awake.voyagesauth": string
 }
 
 export enum AwakeDataState {
-    OK = 'OK',
-    SHIP_NOT_UNDER_WAY = 'SHIP_NOT_UNDER_WAY',
-    WRONG_PREDICTION_TYPE = 'WRONG_PREDICTION_TYPE',
-    NO_PREDICTED_ETA = 'NO_PREDICTED_ETA',
-    NO_RECORD_TIME = 'NO_RECORD_TIME',
-    NO_PREDICTED_DESTINATION = 'NO_PREDICTED_DESTINATION',
-    PREDICTED_DESTINATION_OUTSIDE_FINLAND = 'PREDICTED_DESTINATION_OUTSIDE_FINLAND',
-    OVERRIDDEN_LOCODE = 'OVERRIDDEN_LOCODE',
-    DIFFERING_LOCODE= 'DIFFERING_LOCODE',
-    NO_ETA_TIMESTAMP = 'NO_ETA_TIMESTAMP',
+    OK = "OK",
+    SHIP_NOT_UNDER_WAY = "SHIP_NOT_UNDER_WAY",
+    WRONG_PREDICTION_TYPE = "WRONG_PREDICTION_TYPE",
+    NO_PREDICTED_ETA = "NO_PREDICTED_ETA",
+    NO_RECORD_TIME = "NO_RECORD_TIME",
+    NO_PREDICTED_DESTINATION = "NO_PREDICTED_DESTINATION",
+    PREDICTED_DESTINATION_OUTSIDE_FINLAND = "PREDICTED_DESTINATION_OUTSIDE_FINLAND",
+    OVERRIDDEN_LOCODE = "OVERRIDDEN_LOCODE",
+    DIFFERING_LOCODE= "DIFFERING_LOCODE",
+    NO_ETA_TIMESTAMP = "NO_ETA_TIMESTAMP",
 }
 
 export function destinationIsFinnish(locode: string): boolean {
-    return locode?.toLowerCase().startsWith('fi');
+    return locode?.toLowerCase().startsWith("fi");
 }
 
 function portCallIdFromUrn(urn?: string): number | null {
@@ -35,7 +35,7 @@ function portCallIdFromUrn(urn?: string): number | null {
     }
     const split = urn.split(':');
     if (split.length < 4) {
-        throw new Error('Invalid URN: ' + urn);
+        throw new Error("Invalid URN: " + urn);
     }
     return Number(split[3]);
 }
@@ -88,6 +88,6 @@ export function predictionToTimestamp(
         portcallId: portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
         eventType: prediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA,
     };
-    console.info(`method=AwakeAiETAHelper.predictionToTimestamp created timestamp: ${JSON.stringify(timestamp)}'`);
+    console.info("method=AwakeAiETAHelper.predictionToTimestamp created timestamp: %s", JSON.stringify(timestamp));
     return timestamp;
 }
