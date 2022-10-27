@@ -49,7 +49,7 @@ export function momentAverage(moments: Moment[]): string {
     return moment(averageMillis).toISOString();
 }
 
-interface MergeableTimestamp {
+export interface MergeableTimestamp {
     readonly eventTime: string
     readonly recordTime: string
     readonly source: string

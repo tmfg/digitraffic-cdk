@@ -93,8 +93,8 @@ describe('db-timestamps', dbTestBase((db: DTDatabase) => {
         });
     }
 
-    testNotFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? - 1 + 1));
-    testNotFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, timestamp.ship.imo ?? - 1 - 1));
+    testNotFound('findByMmsi', (timestamp: ApiTimestamp) => TimestampsDb.findByMmsi(db, (timestamp.ship.mmsi ?? - 1) + 1));
+    testNotFound('findByImo', (timestamp: ApiTimestamp) => TimestampsDb.findByImo(db, (timestamp.ship.imo ?? - 1) - 1));
     testNotFound('findByLocode', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.location.port + 'asdf'));
     testNotFound('findBySource', (timestamp: ApiTimestamp) => TimestampsDb.findByLocode(db, timestamp.source + 'asdf'));
 

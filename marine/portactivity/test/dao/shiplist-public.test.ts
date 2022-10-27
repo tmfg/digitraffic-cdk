@@ -117,7 +117,7 @@ describe(
             const foundTimestamps = await findByLocodePublicShiplist(
                 db,
                 locode,
-                DEFAULT_INTERVAL
+                DEFAULT_INTERVAL + 1
             );
 
             expect(foundTimestamps.length).toBe(1);

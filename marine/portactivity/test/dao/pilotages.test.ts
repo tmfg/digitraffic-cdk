@@ -49,7 +49,7 @@ describe(
         test("getTimestamps - empty", async () => {
             const timestampMap = await getTimestamps(db);
 
-            expect(Object.keys(timestampMap)).toHaveLength(0);
+            expect(timestampMap.size).toEqual(0);
         });
 
         test("getTimestamps - one", async () => {
@@ -58,7 +58,7 @@ describe(
 
             const timestampMap = await getTimestamps(db);
 
-            expect(timestampMap.keys()).toHaveLength(1);
+            expect(timestampMap.size).toEqual(1);
             expect(timestampMap.get(1)).toStrictEqual(now);
 
             // update it to finished, so it should not show up
@@ -66,7 +66,7 @@ describe(
 
             const timestampMap2 = await getTimestamps(db);
 
-            expect(timestampMap2.keys()).toHaveLength(0);
+            expect(timestampMap2.size).toEqual(0);
         });
 
         test("deletePilotages - none", async () => {
@@ -80,14 +80,14 @@ describe(
             await insertPilotage(db, 2, "ACTIVE", now);
 
             const timestampMap = await getTimestamps(db);
-            expect(Object.keys(timestampMap)).toHaveLength(2);
+            expect(timestampMap.size).toEqual(2);
 
             // delete one
             const deleted = await deletePilotages(db, [1]);
             const timestampMap2 = await getTimestamps(db);
 
             expect(deleted).toHaveLength(1);
-            expect(Object.keys(timestampMap2)).toHaveLength(1);
+            expect(timestampMap2.size).toEqual(1);
             expect(timestampMap2.get(2)).toStrictEqual(now);
         });
     })

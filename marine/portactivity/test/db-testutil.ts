@@ -6,6 +6,9 @@ import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testut
 import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
 import {updatePilotages} from "../lib/dao/pilotages";
 import {Countable} from "@digitraffic/common/database/models";
+import * as sinon from "sinon";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
+import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(
@@ -206,4 +209,9 @@ export function insertPilotage(
             },
         },
     }]);
+}
+
+export function mockSecrets<T>(secret: T) {
+    sinon.stub(RdsHolder.prototype, "setCredentials").resolves();
+    sinon.stub(SecretHolder.prototype, "get").resolves(secret);
 }
