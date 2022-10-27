@@ -30,7 +30,7 @@ jobs:
         id: fork-point
         run: |
           echo -n "fork-point-sha=" >> $GITHUB_OUTPUT
-          git merge-base --fork-point origin/master HEAD >> $GITHUB_OUTPUT
+          git merge-base origin/master HEAD >> $GITHUB_OUTPUT
 
       - name: Create ESLint reports for affected projects
         if: ${{ github.ref_name != 'master' }}
