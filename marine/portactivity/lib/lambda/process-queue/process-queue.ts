@@ -1,41 +1,39 @@
-import {saveTimestamp, UpdatedTimestamp} from "../../service/timestamps";
+import {saveTimestamp} from "../../service/timestamps";
 import {ApiTimestamp, validateTimestamp} from "../../model/timestamp";
 import {SQSEvent} from "aws-lambda";
-import {EmptySecretFunction, withDbSecret} from "@digitraffic/common/aws/runtime/secrets/dbsecret";
-import {PortactivityEnvKeys} from "../../keys";
 import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
-import {envValue} from "@digitraffic/common/aws/runtime/environment";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
+import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
-const SECRET_ID = envValue(PortactivityEnvKeys.SECRET_ID);
+const rdsHolder = RdsHolder.create();
 
-export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResult<void | UpdatedTimestamp | null>[]>) {
+export function handlerFn() {
     return (event: SQSEvent) => {
-        return withDbSecretFn(SECRET_ID, () => {
+        return rdsHolder.setCredentials().then(() => {
             return inDatabase((db: DTDatabase) => {
                 return Promise.allSettled(event.Records.map(r => {
                     const partial = JSON.parse(r.body) as Partial<ApiTimestamp>;
                     const start = Date.now();
-                    console.info('DEBUG method=processTimestampQueue processing timestamp', partial);
+                    console.info("DEBUG method=processTimestampQueue processing timestamp", partial);
 
                     const timestamp = validateTimestamp(partial);
                     if (timestamp == null) {
-                        console.warn('DEBUG method=processTimestampQueue timestamp did not pass validation');
+                        console.warn("DEBUG method=processTimestampQueue timestamp did not pass validation");
                         // resolve so this gets removed from the queue
                         return Promise.resolve();
                     }
                     const saveTimestampPromise = saveTimestamp(timestamp, db);
                     saveTimestampPromise.then(value => {
                         if (value) {
-                            console.log('DEBUG method=processTimestampQueue update successful');
+                            console.log("DEBUG method=processTimestampQueue update successful");
                         } else {
-                            console.log('DEBUG method=processTimestampQueue update conflict or failure');
+                            console.log("DEBUG method=processTimestampQueue update conflict or failure");
                         }
                     }).catch((error) => {
-                        console.error('method=processTimestampQueue update failed', error);
+                        console.error("method=processTimestampQueue update failed %s", error);
                     });
-                    console.info(`DEBUG method=processTimestampQueue update tookMs=${Date.now() - start}`);
+                    console.info("DEBUG method=processTimestampQueue update tookMs=%d", Date.now() - start);
                     return saveTimestampPromise;
                 }));
             });
@@ -43,4 +41,4 @@ export function handlerFn(withDbSecretFn: EmptySecretFunction<PromiseSettledResu
     };
 }
 
-export const handler = middy(handlerFn(withDbSecret)).use(sqsPartialBatchFailureMiddleware());
+export const handler = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());

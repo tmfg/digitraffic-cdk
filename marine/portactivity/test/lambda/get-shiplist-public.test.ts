@@ -11,11 +11,8 @@ const secret: ShiplistSecret = {
 
 describe("get-shiplist-public", dbTestBase(() => {
     beforeEach(() => {
-        mockSecrets(secret);
-    });
-
-    afterEach(() => {
         sinon.restore();
+        mockSecrets(secret);
     });
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

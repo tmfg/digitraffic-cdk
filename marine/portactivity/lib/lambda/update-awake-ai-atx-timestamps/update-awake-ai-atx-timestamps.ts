@@ -7,7 +7,7 @@ import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holde
 import {envValue} from "@digitraffic/common/aws/runtime/environment";
 import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires,  @typescript-eslint/no-unsafe-argument -- import won't work!
+// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires -- import won't work!
 const WebSocket = require("ws");
 
 interface UpdateAwakeAiATXTimestampsSecret {

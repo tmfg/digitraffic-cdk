@@ -15,8 +15,6 @@ import {AwakeAiZoneType} from "../../lib/api/awake_common";
 import {WebSocket} from "ws";
 import {DTDatabase} from "@digitraffic/common/database/database";
 
-/* eslint-disable camelcase -- test code */
-
 describe("service Awake.AI ATx", dbTestBase((db: DTDatabase) => {
 
     function createAiATXApi() {

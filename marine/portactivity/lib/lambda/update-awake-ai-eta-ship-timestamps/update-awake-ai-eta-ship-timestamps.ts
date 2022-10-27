@@ -1,10 +1,9 @@
-import {PortactivityEnvKeys, PortactivitySecretKeys} from "../../keys";
+import {PortactivityEnvKeys} from "../../keys";
 import {AwakeAiETAShipService} from "../../service/awake_ai_eta_ship";
 import {AwakeAiETAShipApi} from "../../api/awake_ai_ship";
 import {SNSEvent} from "aws-lambda";
 import {DbETAShip} from "../../dao/timestamps";
 import {sendMessage} from "../../service/queue-service";
-import {UpdateAwakeAiTimestampsSecret} from "../../service/awake_ai_eta_helper";
 import {envValue} from "@digitraffic/common/aws/runtime/environment";
 import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
 
@@ -12,9 +11,14 @@ let service: AwakeAiETAShipService | undefined;
 
 const queueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
+interface UpdateAwakeAiTimestampsSecret {
+    readonly voyagesurl: string
+    readonly voyagesauth: string
+}
+
 const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>("awake", [
-    PortactivitySecretKeys.AWAKE_URL,
-    PortactivitySecretKeys.AWAKE_AUTH,
+    "url",
+    "auth",
 ]);
 
 export const handler = (event: SNSEvent) => {

@@ -7,11 +7,6 @@ import {
 import {ApiTimestamp, EventType} from "../model/timestamp";
 import {EventSource} from "../model/eventsource";
 
-export interface UpdateAwakeAiTimestampsSecret {
-    readonly voyagesurl: string
-    readonly voyagesauth: string
-}
-
 export enum AwakeDataState {
     OK = "OK",
     SHIP_NOT_UNDER_WAY = "SHIP_NOT_UNDER_WAY",

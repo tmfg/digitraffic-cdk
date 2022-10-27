@@ -4,17 +4,11 @@ import {EventSource} from "../model/eventsource";
 import {DTDatabase} from "@digitraffic/common/database/database";
 
 export interface DbPublicShiplist {
-    // eslint-disable-next-line camelcase
     readonly event_type: EventType
-    // eslint-disable-next-line camelcase
     readonly event_time: string
-    // eslint-disable-next-line camelcase
     readonly event_source: string
-    // eslint-disable-next-line camelcase
     readonly record_time: string
-    // eslint-disable-next-line camelcase
     readonly ship_name: string
-    // eslint-disable-next-line camelcase
     readonly portcall_id: number
 }
 

@@ -99,7 +99,9 @@ export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTime
         // use the source with the highest priority
         if (vtsAStamps.length > 1) {
             addToList = addToList.filter(t => !vtsAStamps.includes(t));
-            const highestPriority = getLast(vtsAStamps, (ts => eventSourcePriorities.get(ts.source) ?? -1));
+
+            const highestPriority = getLast(vtsAStamps, ts => eventSourcePriorities.get(ts.source) ?? -1);
+
             addToList.push({
                 ...highestPriority, ...{
                     eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime))),

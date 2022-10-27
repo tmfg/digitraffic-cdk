@@ -18,9 +18,6 @@ import {
 import {getRandomInteger, randomBoolean} from "@digitraffic/common/test/testutils";
 import moment from 'moment-timezone';
 
-// test file
-/* eslint-disable camelcase */
-
 describe('AwakeAiETAShipService', () => {
 
     test('getAwakeAiTimestamps - creates both ETA and ETB only for FIRAU', async () => {
