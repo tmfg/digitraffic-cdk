@@ -20,6 +20,7 @@ jobs:
         run: yarn install --frozen-lock
 
       - name: Derive appropriate SHAs for NX
+        if: ${{ github.ref_name == 'master' }}
         uses: nrwl/nx-set-shas@v3
         with:
           main-branch-name: "master"
