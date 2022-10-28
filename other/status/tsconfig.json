@@ -4,5 +4,5 @@
     "outDir": "dist/out",
     "exactOptionalPropertyTypes": false
   },
-  "include": ["bin/**/*.ts", "lib/**/*.ts", "test/**/*.ts"]
+  "include": ["bin/**/*.ts", "lib/**/*.ts"]
 }

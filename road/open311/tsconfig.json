@@ -11,5 +11,5 @@
     "strictPropertyInitialization": false,
     "preserveSymlinks": true
   },
-  "include": ["bin/**/*.ts", "lib/**/*.ts", "test/**/*.ts"]
+  "include": ["bin/**/*.ts", "lib/**/*.ts"]
 }
