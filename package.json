@@ -13,7 +13,8 @@
     "marine/*",
     "road/*",
     "aviation/*",
-    "other/*"
+    "other/*",
+    "rail/*"
   ],
   "resolutions": {
     "@types/aws-lambda": "8.10.102",
