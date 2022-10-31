@@ -1,11 +1,11 @@
-import * as MetadataService from '../../service/metadata';
+import * as MetadataService from "../../service/metadata";
 
-import {Camera} from "../../model/camera";
-import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
+import { Camera } from "../../model/camera";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 
 const rdsHolder = RdsHolder.create();
 
-const GROUP_SEPARATOR=',';
+const GROUP_SEPARATOR = ",";
 
 export const handler = (event: Record<string, string>) => {
     const usersGroups = getUserGroups(event.groups);
@@ -14,7 +14,8 @@ export const handler = (event: Record<string, string>) => {
         return Promise.resolve([] as Camera[]);
     }
 
-    return rdsHolder.setCredentials()
+    return rdsHolder
+        .setCredentials()
         .then(() => MetadataService.listAllCameras(usersGroups));
 };
 
@@ -26,5 +27,5 @@ function getUserGroups(eventGroups: string): string[] {
 
     const withoutBraces = eventGroups.substring(1, eventGroups.length - 1);
 
-    return withoutBraces.split(GROUP_SEPARATOR).map(s => s.trim());
+    return withoutBraces.split(GROUP_SEPARATOR).map((s) => s.trim());
 }

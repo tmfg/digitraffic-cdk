@@ -1,7 +1,11 @@
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
+import {
+    DTDatabase,
+    inDatabase,
+    inDatabaseReadonly,
+} from "@digitraffic/common/dist/database/database";
 import * as MetadataDB from "../db/metadata";
 
-import {Camera} from "../model/camera";
+import { Camera } from "../model/camera";
 
 export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
     console.info("method=listAllCameras for %s", usersGroups);
@@ -13,11 +17,14 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
             return MetadataDB.getAllCameras(db, usersGroups);
         });
     } finally {
-        console.info("method=listAllCameras tookMs=%d", (Date.now() - start));
+        console.info("method=listAllCameras tookMs=%d", Date.now() - start);
     }
 }
 
-export function updateMetadataUpdated(cameraIds: string[], updated: Date): Promise<PromiseSettledResult<null>[]> {
+export function updateMetadataUpdated(
+    cameraIds: string[],
+    updated: Date
+): Promise<PromiseSettledResult<null>[]> {
     return inDatabase((db: DTDatabase) => {
         return MetadataDB.updateCameraMetadata(db, cameraIds, updated);
     });
