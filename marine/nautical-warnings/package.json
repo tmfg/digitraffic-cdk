@@ -4,19 +4,21 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
-    "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node14",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint --cache .",
     "eslint-report": "eslint . --format html -o report.html",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
+    "test_errors": "yarn test 2>&1 | grep 'FAIL'",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common"
   },
   "devDependencies": {
     "@types/aws-lambda": "*",
@@ -35,7 +37,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.6-1",
+    "@digitraffic/common": "2022.10.31-2",
     "@types/ramda": "0.27.44",
     "aws-cdk-lib": "*",
     "constructs": "*",

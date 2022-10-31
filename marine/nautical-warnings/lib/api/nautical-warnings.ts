@@ -1,11 +1,12 @@
 import axios from "axios";
 import axiosRetry from "axios-retry";
-import {FeatureCollection} from "geojson";
+import { FeatureCollection } from "geojson";
 
-const LAYER_ACTIVE = 'merivaroitus_julkaistu_dt';
-const LAYER_ARCHIVED = 'merivaroitus_arkistoitu_dt';
+const LAYER_ACTIVE = "merivaroitus_julkaistu_dt";
+const LAYER_ARCHIVED = "merivaroitus_arkistoitu_dt";
 
-axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay});
+// eslint-disable-next-line @typescript-eslint/unbound-method
+axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay });
 
 export class NauticalWarningsApi {
     private readonly baseUrl: string;
@@ -18,7 +19,7 @@ export class NauticalWarningsApi {
         return this.getWarnings(LAYER_ACTIVE);
     }
 
-    getArchivedWarnings():Promise<FeatureCollection> {
+    getArchivedWarnings(): Promise<FeatureCollection> {
         return this.getWarnings(LAYER_ARCHIVED);
     }
 
@@ -27,19 +28,22 @@ export class NauticalWarningsApi {
         const url = `${this.baseUrl}?crs=EPSG:4326&layer=${layer}`;
 
         try {
-            const resp = await axios.get(url);
+            const resp = await axios.get<FeatureCollection>(url);
 
             if (resp.status !== 200) {
-                console.error(`method=getWarnings returned status=${resp.status}`);
+                console.error(
+                    "method=getWarnings returned status=%d",
+                    resp.status
+                );
                 return Promise.reject(resp);
             }
             return Promise.resolve(resp.data);
         } catch (error) {
-            console.error(`error ${error} from ${url}`);
-            console.error('method=getWarnings failed');
+            console.error("error %s from %s", error, url);
+            console.error("method=getWarnings failed");
             return Promise.reject(error);
         } finally {
-            console.log(`method=getWarnings tookMs=${Date.now() - start}`);
+            console.log("method=getWarnings tookMs=%d", Date.now() - start);
         }
     }
 }

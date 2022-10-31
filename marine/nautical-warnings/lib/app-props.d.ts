@@ -1,3 +1,5 @@
-import {StackConfiguration} from "@digitraffic/common/aws/infra/stack/stack";
+import { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
-export type NauticalWarningConfiguration = StackConfiguration;
+export type NauticalWarningConfiguration = StackConfiguration & {
+    secretId: string;
+};

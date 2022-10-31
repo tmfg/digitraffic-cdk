@@ -1,20 +1,31 @@
-import {NauticalWarningsApi} from "../api/nautical-warnings";
-import * as CachedDao from "@digitraffic/common/database/cached";
-import {JSON_CACHE_KEY} from "@digitraffic/common/database/cached";
-import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
+import { NauticalWarningsApi } from "../api/nautical-warnings";
+import * as CachedDao from "@digitraffic/common/dist/database/cached";
+import { JSON_CACHE_KEY } from "@digitraffic/common/dist/database/cached";
+import {
+    DTDatabase,
+    DTTransaction,
+    inDatabase,
+    inDatabaseReadonly,
+} from "@digitraffic/common/dist/database/database";
 import moment from "moment-timezone";
-import {Feature, FeatureCollection, GeoJsonProperties} from "geojson";
-import {isFeatureCollection} from "@digitraffic/common/utils/geometry";
+import { Feature, FeatureCollection, GeoJsonProperties } from "geojson";
+import { isFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 
 export function getActiveWarnings(): Promise<FeatureCollection | null> {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
+        return CachedDao.getJsonFromCache(
+            db,
+            JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE
+        );
     });
 }
 
 export function getArchivedWarnings(): Promise<FeatureCollection | null> {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED);
+        return CachedDao.getJsonFromCache(
+            db,
+            JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED
+        );
     });
 }
 
@@ -27,18 +38,34 @@ export async function updateNauticalWarnings(url: string): Promise<void> {
     console.info("DEBUG archived " + JSON.stringify(archived, null, 2));
 
     await inDatabase((db: DTDatabase) => {
-        return db.tx(tx => {
+        return db.tx((tx) => {
             return Promise.allSettled([
-                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, active),
-                validateAndUpdate(tx, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED, archived),
+                validateAndUpdate(
+                    tx,
+                    JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE,
+                    active
+                ),
+                validateAndUpdate(
+                    tx,
+                    JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED,
+                    archived
+                ),
             ]);
         });
     });
 }
 
-function validateAndUpdate(tx: DTDatabase | DTTransaction, cacheKey: JSON_CACHE_KEY, featureCollection: FeatureCollection): Promise<null> {
+function validateAndUpdate(
+    tx: DTDatabase | DTTransaction,
+    cacheKey: JSON_CACHE_KEY,
+    featureCollection: FeatureCollection
+): Promise<null> {
     if (isFeatureCollection(featureCollection)) {
-        return CachedDao.updateCachedJson(tx, cacheKey, convert(featureCollection));
+        return CachedDao.updateCachedJson(
+            tx,
+            cacheKey,
+            convert(featureCollection)
+        );
     } else {
         console.info("DEBUG " + JSON.stringify(featureCollection, null, 2));
         console.error("invalid geojson for " + cacheKey);
@@ -47,18 +74,22 @@ function validateAndUpdate(tx: DTDatabase | DTTransaction, cacheKey: JSON_CACHE_
     return Promise.resolve(null);
 }
 
+type JsonProperties = Record<string, string | number>;
+
 function convert(original: FeatureCollection): FeatureCollection {
     original.features.forEach((f: Feature) => {
-        f.properties = convertProperties(f.properties as NonNullable<GeoJsonProperties>);
+        f.properties = convertProperties(
+            f.properties as NonNullable<JsonProperties>
+        );
     });
 
     return original;
 }
 
-const DATE_FORMAT_1 = 'DD.MM.YYYY HH:mm';
-const DATE_FORMAT_2 = 'YYYY-MM-DD HH:mm:ss';
+const DATE_FORMAT_1 = "DD.MM.YYYY HH:mm";
+const DATE_FORMAT_2 = "YYYY-MM-DD HH:mm:ss";
 
-function convertProperties(o: NonNullable<GeoJsonProperties>): GeoJsonProperties {
+function convertProperties(o: NonNullable<JsonProperties>): GeoJsonProperties {
     return {
         id: o.ID,
         areasFi: o.ALUEET_FI,
@@ -71,19 +102,25 @@ function convertProperties(o: NonNullable<GeoJsonProperties>): GeoJsonProperties
         contentsFi: o.SISALTO_FI,
         contentsSv: o.SISALTO_SV,
         contentsEn: o.SISALTO_EN,
-        creationTime: convertDate(o.PAIVAYS, DATE_FORMAT_1),
+        creationTime: convertDate(o.PAIVAYS as string, DATE_FORMAT_1),
         typeFi: o.TYYPPI_FI,
         typeSv: o.TYYPPI_SV,
         typeEn: o.TYYPPI_EN,
-        validityStartTime: convertDate(o.VOIMASSA_ALKAA, DATE_FORMAT_2),
-        validityEndTime: convertDate(o.VOIMASSA_PAATTYY, DATE_FORMAT_2),
+        validityStartTime: convertDate(
+            o.VOIMASSA_ALKAA as string,
+            DATE_FORMAT_2
+        ),
+        validityEndTime: convertDate(
+            o.VOIMASSA_PAATTYY as string,
+            DATE_FORMAT_2
+        ),
         tooltip: o.VALITTUKOHDE_TOOLTIP,
-        virtualNavaids: convertBoolean(o.VIRTUAALINENTURVALAITE),
-        navtex: convertBoolean(o.NAVTEX),
+        virtualNavaids: convertBoolean(o.VIRTUAALINENTURVALAITE as number),
+        navtex: convertBoolean(o.NAVTEX as number),
         navaidInfo: o.TURVALAITE_TXT,
         fairwayInfo: o.VAYLAALUE_TXT,
         navigationLineInfo: o.NAVIGOINTILINJA_TXT,
-        publishingTime: convertDate(o.ANTOPAIVA, DATE_FORMAT_1),
+        publishingTime: convertDate(o.ANTOPAIVA as string, DATE_FORMAT_1),
         notificator: o.TIEDOKSIANTAJA,
     };
 }
@@ -97,7 +134,7 @@ function convertDate(value: string, format: string): string | null {
         return null;
     }
 
-    const converted = moment.tz(value, format, 'Europe/Helsinki');
+    const converted = moment.tz(value, format, "Europe/Helsinki");
 
     if (!converted.isValid()) {
         console.info(value + " was not valid with " + format);

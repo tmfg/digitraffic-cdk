@@ -1,3 +1,3 @@
-export type NauticalWarningsSecret = {
-    readonly url: string
+export interface NauticalWarningsSecret {
+    readonly url: string;
 }

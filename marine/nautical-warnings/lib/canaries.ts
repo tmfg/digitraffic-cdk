@@ -1,36 +1,38 @@
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {DigitrafficCanaryRole} from "@digitraffic/common/aws/infra/canaries/canary-role";
-import {DatabaseCanary} from "@digitraffic/common/aws/infra/canaries/database-canary";
-import {UrlCanary} from "@digitraffic/common/aws/infra/canaries/url-canary";
-import {PublicApi} from "./public-api";
+import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
+import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
+import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
+import { PublicApi } from "./public-api";
+import { NauticalWarningsStack } from "./nautical-warnings-stack";
 
 export class Canaries {
-    constructor(stack: DigitrafficStack, publicApi: PublicApi) {
-        if (stack.configuration.enableCanaries) {
-            const urlRole = new DigitrafficCanaryRole(stack, 'nw-url');
-            const dbRole = new DigitrafficCanaryRole(stack, 'nw-db').withDatabaseAccess();
+    constructor(stack: NauticalWarningsStack, publicApi: PublicApi) {
+        if (stack.configuration.stackFeatures?.enableCanaries) {
+            const urlRole = new DigitrafficCanaryRole(stack, "nw-url");
+            const dbRole = new DigitrafficCanaryRole(
+                stack,
+                "nw-db"
+            ).withDatabaseAccess();
 
             new UrlCanary(stack, urlRole, {
-                name: 'nw-public-api',
+                name: "nw-public-api",
                 hostname: publicApi.publicApi.hostname(),
-                handler: 'public-api.handler',
+                handler: "public-api.handler",
                 alarm: {
-                    alarmName: 'NW-PublicAPI-Alarm',
+                    alarmName: "NW-PublicAPI-Alarm",
                     topicArn: stack.configuration.warningTopicArn,
                 },
                 apiKeyId: publicApi.apiKeyId,
             });
 
             new DatabaseCanary(stack, dbRole, stack.secret, {
-                name: 'nw-db',
+                name: "nw-db",
                 secret: stack.configuration.secretId,
-                handler: 'db.handler',
+                handler: "db.handler",
                 alarm: {
-                    alarmName: 'NW-Db-Alarm',
+                    alarmName: "NW-Db-Alarm",
                     topicArn: stack.configuration.warningTopicArn,
                 },
             });
-
         }
     }
 }
