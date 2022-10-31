@@ -3,5 +3,5 @@
   "compilerOptions": {
     "outDir": "dist/out"
   },
-  "include": ["lib/**/*.ts"]
+  "include": ["bin/**/*.ts", "lib/**/*.ts"]
 }
