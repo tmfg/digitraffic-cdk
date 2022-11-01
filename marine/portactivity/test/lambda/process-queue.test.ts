@@ -1,3 +1,5 @@
+process.env.SECRET_ID = "Test";
+
 import { dbTestBase, findAll, mockSecrets } from "../db-testutil";
 import { handlerFn } from "../../lib/lambda/process-queue/process-queue";
 import { SQSRecord } from "aws-lambda";

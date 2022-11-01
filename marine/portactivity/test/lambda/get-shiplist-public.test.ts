@@ -1,3 +1,5 @@
+process.env.SECRET_ID = "Test";
+
 import * as sinon from "sinon";
 import { dbTestBase, mockSecrets } from "../db-testutil";
 import {

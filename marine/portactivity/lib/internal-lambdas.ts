@@ -30,7 +30,7 @@ export function create(
     queueAndDLQ: QueueAndDLQ,
     dlqBucket: Bucket
 ) {
-    const cpqLambda = createProcessQueueLambda(queueAndDLQ.queue, stack);
+    createProcessQueueLambda(queueAndDLQ.queue, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stack);
 
     const awakeETAShipUpdateTopicName = "UpdateAwakeShipETA";

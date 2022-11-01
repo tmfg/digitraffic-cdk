@@ -36,8 +36,8 @@ export async function handler(event: unknown, context: Context) {
         .then(() => secretHolder.get())
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
             if (!service) {
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- import won't work!
                 service = new AwakeAiATXService(
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- import won't work!
                     new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket)
                 );
             }
