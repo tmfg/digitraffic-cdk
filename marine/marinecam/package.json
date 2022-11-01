@@ -36,7 +36,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.31-2",
+    "@digitraffic/common": "2022.11.1-1",
     "aws-cdk-lib": "*",
     "amazon-cognito-identity-js": "5.2.4",
     "aws-sdk": "*",
