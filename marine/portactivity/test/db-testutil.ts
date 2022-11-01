@@ -1,29 +1,41 @@
-import {ApiTimestamp} from "../lib/model/timestamp";
-import {DbTimestamp} from "../lib/dao/timestamps";
-import * as TimestampsDb from '../lib/dao/timestamps';
-import {PortAreaDetails, PortCall, Vessel} from "./testdata";
-import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
-import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
-import {updatePilotages} from "../lib/dao/pilotages";
-import {Countable} from "@digitraffic/common/database/models";
+import { ApiTimestamp } from "../lib/model/timestamp";
+import { DbTimestamp } from "../lib/dao/timestamps";
+import * as TimestampsDb from "../lib/dao/timestamps";
+import { PortAreaDetails, PortCall, Vessel } from "./testdata";
+import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
+import {
+    DTDatabase,
+    DTTransaction,
+} from "@digitraffic/common/dist/database/database";
+import { updatePilotages } from "../lib/dao/pilotages";
+import { Countable } from "@digitraffic/common/dist/database/models";
 import * as sinon from "sinon";
-import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(
-        fn, truncate, "portactivity", "portactivity", "localhost:54321/marine",
+        fn,
+        truncate,
+        "portactivity",
+        "portactivity",
+        "localhost:54321/marine"
     );
 }
 
-export function inTransaction(db: DTDatabase | DTTransaction, fn: (t: DTTransaction) => void): () => Promise<void> {
+export function inTransaction(
+    db: DTDatabase | DTTransaction,
+    fn: (t: DTTransaction) => void
+): () => Promise<void> {
     return () => {
-        return db.tx(t => { fn(t); });
+        return db.tx((t) => {
+            fn(t);
+        });
     };
 }
 
 export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
-    await db.tx(async t => {
+    await db.tx(async (t) => {
         await t.none("DELETE FROM pilotage");
         await t.none("DELETE FROM port_call_timestamp");
         await t.none("DELETE FROM public.vessel");
@@ -32,8 +44,10 @@ export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
     });
 }
 
-export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> {
-    return db.tx(t => {
+export function findAll(
+    db: DTDatabase | DTTransaction
+): Promise<DbTimestamp[]> {
+    return db.tx((t) => {
         return t.manyOrNone(`
         SELECT
             event_type,
@@ -54,15 +68,24 @@ export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> 
     });
 }
 
-export async function getPilotagesCount(db: DTDatabase | DTTransaction): Promise<number> {
-    const ret = await db.tx(t => t.one<Countable>("SELECT COUNT(*) FROM pilotage"));
+export async function getPilotagesCount(
+    db: DTDatabase | DTTransaction
+): Promise<number> {
+    const ret = await db.tx((t) =>
+        t.one<Countable>("SELECT COUNT(*) FROM pilotage")
+    );
     return ret.count;
 }
 
-export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[]): Promise<void> {
-    await db.tx(t => {
-        return t.batch(timestamps.map(e => {
-            return t.none(`
+export async function insert(
+    db: DTDatabase | DTTransaction,
+    timestamps: ApiTimestamp[]
+): Promise<void> {
+    await db.tx((t) => {
+        return t.batch(
+            timestamps.map((e) => {
+                return t.none(
+                    `
                 INSERT INTO port_call_timestamp(
                     event_type,
                     event_time,
@@ -96,14 +119,21 @@ export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTime
                     $14,
                     $15
                 )
-            `, TimestampsDb.createUpdateValues(e));
-        }));
+            `,
+                    TimestampsDb.createUpdateValues(e)
+                );
+            })
+        );
     });
 }
 
-export async function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel): Promise<void> {
-    await db.tx(async t => {
-        await t.none(`
+export async function insertVessel(
+    db: DTDatabase | DTTransaction,
+    vessel: Vessel
+): Promise<void> {
+    await db.tx(async (t) => {
+        await t.none(
+            `
             INSERT INTO public.vessel(mmsi,
                                       timestamp,
                                       name,
@@ -132,12 +162,18 @@ export async function insertVessel(db: DTDatabase | DTTransaction, vessel: Vesse
                     $(eta),
                     $(call_sign),
                     $(destination))
-        `, vessel);
+        `,
+            vessel
+        );
     });
 }
 
-export async function insertPortAreaDetails(db: DTTransaction | DTDatabase, p: PortAreaDetails): Promise<void> {
-    await db.none(`
+export async function insertPortAreaDetails(
+    db: DTTransaction | DTDatabase,
+    p: PortAreaDetails
+): Promise<void> {
+    await db.none(
+        `
         INSERT INTO public.port_area_details(
             port_area_details_id,
             port_call_id,
@@ -153,11 +189,17 @@ export async function insertPortAreaDetails(db: DTTransaction | DTDatabase, p: P
             $(ata),
             $(atd)
         )
-    `, p);
+    `,
+        p
+    );
 }
 
-export async function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall): Promise<void> {
-    await db.none(`
+export async function insertPortCall(
+    db: DTTransaction | DTDatabase,
+    p: PortCall
+): Promise<void> {
+    await db.none(
+        `
         INSERT INTO public.port_call(
             port_call_id,
             radio_call_sign,
@@ -177,7 +219,9 @@ export async function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall
             $(mmsi),
             $(imo_lloyds)
         )
-    `, p);
+    `,
+        p
+    );
 }
 
 export function insertPilotage(
@@ -185,30 +229,32 @@ export function insertPilotage(
     id: number,
     state: string,
     scheduleUpdated: Date,
-    endTime?: Date,
+    endTime?: Date
 ): Promise<unknown> {
-    return updatePilotages(db, [{
-        id,
-        vessel: {
-            name: "test",
-            imo: 1,
-            mmsi: 1,
-        },
-        vesselEta: new Date().toISOString(),
-        pilotBoardingTime: new Date().toISOString(),
-        endTime: endTime?.toISOString() ?? new Date().toISOString(),
-        scheduleUpdated: scheduleUpdated.toISOString(),
-        scheduleSource: "test",
-        state,
-        route: {
-            start: {
-                code: "START",
+    return updatePilotages(db, [
+        {
+            id,
+            vessel: {
+                name: "test",
+                imo: 1,
+                mmsi: 1,
             },
-            end: {
-                code: "END",
+            vesselEta: new Date().toISOString(),
+            pilotBoardingTime: new Date().toISOString(),
+            endTime: endTime?.toISOString() ?? new Date().toISOString(),
+            scheduleUpdated: scheduleUpdated.toISOString(),
+            scheduleSource: "test",
+            state,
+            route: {
+                start: {
+                    code: "START",
+                },
+                end: {
+                    code: "END",
+                },
             },
         },
-    }]);
+    ]);
 }
 
 export function mockSecrets<T>(secret: T) {

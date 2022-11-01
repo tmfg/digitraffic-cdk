@@ -12,24 +12,24 @@ import {
 import {
     corsMethod,
     methodResponse,
-} from "@digitraffic/common/aws/infra/api/responses";
-import { MessageModel } from "@digitraffic/common/aws/infra/api/response";
+} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addDefaultValidator,
     addServiceModel,
     createArraySchema,
     getModelReference,
-} from "@digitraffic/common/utils/api-model";
-import { DocumentationPart } from "@digitraffic/common/aws/infra/documentation";
-import { createUsagePlan } from "@digitraffic/common/aws/infra/usage-plans";
-import { DigitrafficRestApi } from "@digitraffic/common/aws/infra/stack/rest_apis";
+} from "@digitraffic/common/dist/utils/api-model";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { TimestampMetadata } from "./model/timestamp-metadata";
-import { DigitrafficStack } from "@digitraffic/common/aws/infra/stack/stack";
-import { MediaType } from "@digitraffic/common/aws/types/mediatypes";
-import { MonitoredDBFunction } from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { IModel } from "aws-cdk-lib/aws-apigateway/lib/model";
-import { DigitrafficIntegration } from "@digitraffic/common/aws/infra/api/integration";
-import { DigitrafficStaticIntegration } from "@digitraffic/common/aws/infra/api/static-integration";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
 
 export class PublicApi {
     readonly apiKeyId: string;

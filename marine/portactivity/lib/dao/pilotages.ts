@@ -1,11 +1,12 @@
-import {Location} from "../model/timestamp";
-import {PreparedStatement} from "pg-promise";
-import {Pilotage} from "../model/pilotage";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { Location } from "../model/timestamp";
+import { PreparedStatement } from "pg-promise";
+import { Pilotage } from "../model/pilotage";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL = 'select id, schedule_updated from pilotage where state != \'FINISHED\'';
+const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL =
+    "select id, schedule_updated from pilotage where state != 'FINISHED'";
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
-    name: 'get-active-pilotage-timestamps',
+    name: "get-active-pilotage-timestamps",
     text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL,
 });
 
@@ -29,7 +30,7 @@ on conflict(id) do update set
     end_berth = $(routeEndBerth)
 `;
 
-const DELETE_PILOTAGES_SQL =`
+const DELETE_PILOTAGES_SQL = `
     delete from pilotage
     where id in ($1:list)
     returning id
@@ -58,27 +59,47 @@ const FIND_PORTCALL_SQL = `
 `;
 
 export interface DbPilotageTimestamp {
-    readonly id: number,
-    readonly schedule_updated: Date
+    readonly id: number;
+    readonly schedule_updated: Date;
 }
 
 interface DbPortcallId {
-    readonly port_call_id: number
+    readonly port_call_id: number;
 }
 
 export type TimestampMap = Map<number, Date>;
 
-export async function findPortCallId(db: DTDatabase, pilotage: Pilotage, location: Location): Promise<number|null> {
-    const p1 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.port]);
-    const p2 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [pilotage.vessel.mmsi, pilotage.vessel.imo, location.from]);
+export async function findPortCallId(
+    db: DTDatabase,
+    pilotage: Pilotage,
+    location: Location
+): Promise<number | null> {
+    const p1 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [
+        pilotage.vessel.mmsi,
+        pilotage.vessel.imo,
+        location.port,
+    ]);
+    const p2 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [
+        pilotage.vessel.mmsi,
+        pilotage.vessel.imo,
+        location.from,
+    ]);
 
     if (p1 && p2 && location.port !== location.from) {
-        console.info("portcalls found for both %s and %s", location.port, location.from);
+        console.info(
+            "portcalls found for both %s and %s",
+            location.port,
+            location.from
+        );
         return p2.port_call_id;
     }
 
     if (!p1 && !p2) {
-        console.info("no portcalls found for %s or %s", location.port, location.from);
+        console.info(
+            "no portcalls found for %s or %s",
+            location.port,
+            location.from
+        );
     } else if (p1) {
         return p1.port_call_id;
     } else if (p2) {
@@ -89,38 +110,50 @@ export async function findPortCallId(db: DTDatabase, pilotage: Pilotage, locatio
 }
 
 export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
-    const timestamps = await db.manyOrNone<DbPilotageTimestamp>(GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS);
+    const timestamps = await db.manyOrNone<DbPilotageTimestamp>(
+        GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS
+    );
     const idMap: TimestampMap = new Map();
 
-    timestamps.forEach(ts => idMap.set(ts.id, ts.schedule_updated));
+    timestamps.forEach((ts) => idMap.set(ts.id, ts.schedule_updated));
 
     return idMap;
 }
 
-export function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<unknown> {
+export function updatePilotages(
+    db: DTDatabase,
+    pilotages: Pilotage[]
+): Promise<unknown> {
     if (pilotages.length > 0) {
-        return Promise.all(pilotages.map(pilotage => db.none(UPSERT_PILOTAGES_SQL, {
-            id: pilotage.id,
-            vesselImo: pilotage.vessel.imo,
-            vesselMmsi: pilotage.vessel.mmsi,
-            vesselEta: pilotage.vesselEta,
-            pilotBoardingTime: pilotage.pilotBoardingTime,
-            endTime: pilotage.endTime,
-            scheduleUpdated: pilotage.scheduleUpdated,
-            scheduleSource: pilotage.scheduleSource,
-            state: pilotage.state,
-            vesselName: pilotage.vessel.name,
-            routeStart: pilotage.route.start.code,
-            routeStartBerth: pilotage.route.start.berth?.code,
-            routeEnd: pilotage.route.end.code,
-            routeEndBerth: pilotage.route.end.berth?.code,
-        })));
+        return Promise.all(
+            pilotages.map((pilotage) =>
+                db.none(UPSERT_PILOTAGES_SQL, {
+                    id: pilotage.id,
+                    vesselImo: pilotage.vessel.imo,
+                    vesselMmsi: pilotage.vessel.mmsi,
+                    vesselEta: pilotage.vesselEta,
+                    pilotBoardingTime: pilotage.pilotBoardingTime,
+                    endTime: pilotage.endTime,
+                    scheduleUpdated: pilotage.scheduleUpdated,
+                    scheduleSource: pilotage.scheduleSource,
+                    state: pilotage.state,
+                    vesselName: pilotage.vessel.name,
+                    routeStart: pilotage.route.start.code,
+                    routeStartBerth: pilotage.route.start.berth?.code,
+                    routeEnd: pilotage.route.end.code,
+                    routeEndBerth: pilotage.route.end.berth?.code,
+                })
+            )
+        );
     }
 
     return Promise.resolve();
 }
 
-export function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<number[]> {
+export function deletePilotages(
+    db: DTDatabase,
+    pilotageIds: number[]
+): Promise<number[]> {
     if (pilotageIds.length > 0) {
         return db.manyOrNone<number>(DELETE_PILOTAGES_SQL, [pilotageIds]);
     }

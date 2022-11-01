@@ -1,55 +1,61 @@
-import {PreparedStatement} from "pg-promise";
-import {ApiTimestamp, EventType} from "../model/timestamp";
-import {DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES} from "../service/portareas";
+import { PreparedStatement } from "pg-promise";
+import { ApiTimestamp, EventType } from "../model/timestamp";
+import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES } from "../service/portareas";
 import moment from "moment";
-import {EventSource} from "../model/eventsource";
-import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
-import {Countable, Identifiable} from "@digitraffic/common/database/models";
+import { EventSource } from "../model/eventsource";
+import {
+    DTDatabase,
+    DTTransaction,
+} from "@digitraffic/common/dist/database/database";
+import {
+    Countable,
+    Identifiable,
+} from "@digitraffic/common/dist/database/models";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
 
-const OLD_TIMESTAMP_INTERVAL = '7 days';
+const OLD_TIMESTAMP_INTERVAL = "7 days";
 
 export interface DbTimestamp {
-    readonly event_type: EventType
-    readonly event_time: Date
-    readonly event_time_confidence_lower?: string
-    readonly event_time_confidence_lower_diff?: number
-    readonly event_time_confidence_upper?: string
-    readonly event_time_confidence_upper_diff?: number
-    readonly event_source: string
-    readonly record_time: Date
-    readonly ship_mmsi: number
-    readonly ship_imo: number
-    readonly location_locode: string
-    readonly location_portarea?: string
-    readonly location_from_locode?: string
-    readonly portcall_id?: number,
-    readonly source_id?: string
+    readonly event_type: EventType;
+    readonly event_time: Date;
+    readonly event_time_confidence_lower?: string;
+    readonly event_time_confidence_lower_diff?: number;
+    readonly event_time_confidence_upper?: string;
+    readonly event_time_confidence_upper_diff?: number;
+    readonly event_source: string;
+    readonly record_time: Date;
+    readonly ship_mmsi: number;
+    readonly ship_imo: number;
+    readonly location_locode: string;
+    readonly location_portarea?: string;
+    readonly location_from_locode?: string;
+    readonly portcall_id?: number;
+    readonly source_id?: string;
 }
 
 export interface DbETAShip {
-    readonly imo: number
-    readonly locode: string
-    readonly port_area_code?: string
-    readonly portcall_id: number
-    readonly eta: string
+    readonly imo: number;
+    readonly locode: string;
+    readonly port_area_code?: string;
+    readonly portcall_id: number;
+    readonly eta: string;
 }
 
 export interface DbUpdatedTimestamp {
-    readonly ship_mmsi: number
-    readonly ship_imo: number
-    readonly location_locode: string
+    readonly ship_mmsi: number;
+    readonly ship_imo: number;
+    readonly location_locode: string;
 }
 
 export interface DbTimestampIdAndLocode {
-    readonly id: number
-    readonly locode: string
+    readonly id: number;
+    readonly locode: string;
 }
 
 export interface DbImo {
-    readonly imo: number
+    readonly imo: number;
 }
 
 const INSERT_ESTIMATE_SQL = `
@@ -372,92 +378,117 @@ const DELETE_OLD_PILOTAGES_SQL = `
     ) SELECT COUNT(*) FROM deleted
 `.trim();
 
-export function updateTimestamp(db: DTDatabase | DTTransaction, timestamp: ApiTimestamp): Promise<DbUpdatedTimestamp | null> {
+export function updateTimestamp(
+    db: DTDatabase | DTTransaction,
+    timestamp: ApiTimestamp
+): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
-        name: 'update-timestamps',
+        name: "update-timestamps",
         text: INSERT_ESTIMATE_SQL,
     });
     return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
 
-export function removeTimestamps(db: DTDatabase | DTTransaction, source: string, sourceIds: string[]): Promise<number[]> {
+export function removeTimestamps(
+    db: DTDatabase | DTTransaction,
+    source: string,
+    sourceIds: string[]
+): Promise<number[]> {
     if (sourceIds.length > 0) {
-        return db.manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
-            .then((array: Identifiable<number>[]) => array.map(object => object.id));
+        return db
+            .manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
+            .then((array: Identifiable<number>[]) =>
+                array.map((object) => object.id)
+            );
     }
 
     return Promise.resolve([]);
 }
 
-export function findByLocode(db: DTDatabase,
-    locode: string): Promise<DbTimestamp[]> {
+export function findByLocode(
+    db: DTDatabase,
+    locode: string
+): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
-        name: 'find-by-locode',
+        name: "find-by-locode",
         text: SELECT_BY_LOCODE,
         values: [locode.toUpperCase()],
     });
-    return db.tx(t => t.manyOrNone(ps));
+    return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findByMmsi(db: DTDatabase,
-    mmsi: number): Promise<DbTimestamp[]> {
+export function findByMmsi(
+    db: DTDatabase,
+    mmsi: number
+): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
-        name: 'find-by-mmsi',
+        name: "find-by-mmsi",
         text: SELECT_BY_MMSI,
         values: [mmsi],
     });
-    return db.tx(t => t.manyOrNone(ps));
+    return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findByImo(db: DTDatabase,
-    imo: number): Promise<DbTimestamp[]> {
+export function findByImo(db: DTDatabase, imo: number): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
-        name: 'find-by-imo',
+        name: "find-by-imo",
         text: SELECT_BY_IMO,
         values: [imo],
     });
-    return db.tx(t => t.manyOrNone(ps));
+    return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findBySource(db: DTDatabase,
-    source: string): Promise<DbTimestamp[]> {
+export function findBySource(
+    db: DTDatabase,
+    source: string
+): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
-        name: 'find-by-source',
+        name: "find-by-source",
         text: SELECT_BY_SOURCE,
         values: [source],
     });
-    return db.tx(t => t.manyOrNone(ps));
+    return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findPortnetETAsByLocodes(db: DTDatabase,
-    locodes: string[]): Promise<DbETAShip[]> {
+export function findPortnetETAsByLocodes(
+    db: DTDatabase,
+    locodes: string[]
+): Promise<DbETAShip[]> {
     // Prepared statement use not possible due to dynamic IN-list
-    return db.tx(t => t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
+    return db.tx((t) =>
+        t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes])
+    );
 }
 
-export function findVtsShipImosTooCloseToPortByPortCallId(db: DTDatabase,
-    portcallIds: number[]): Promise<DbImo[]> {
+export function findVtsShipImosTooCloseToPortByPortCallId(
+    db: DTDatabase,
+    portcallIds: number[]
+): Promise<DbImo[]> {
     // Prepared statement use not possible due to dynamic IN-list
-    return db.tx(t => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [
-        portcallIds,
-    ]));
+    return db.tx((t) =>
+        t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds])
+    );
 }
 
-export function findPortnetTimestampsForAnotherLocode(db: DTDatabase | DTTransaction,
+export function findPortnetTimestampsForAnotherLocode(
+    db: DTDatabase | DTTransaction,
     portcallId: number,
-    locode: string): Promise<DbTimestampIdAndLocode[]> {
+    locode: string
+): Promise<DbTimestampIdAndLocode[]> {
     const ps = new PreparedStatement({
-        name: 'find-by-portcall-id-and-locode',
+        name: "find-by-portcall-id-and-locode",
         text: SELECT_BY_PORTCALL_ID_AND_LOCODE,
         values: [portcallId, locode],
     });
     return db.manyOrNone(ps);
 }
 
-export function deleteById(db: DTDatabase | DTTransaction,
-    id: number): Promise<null> {
+export function deleteById(
+    db: DTDatabase | DTTransaction,
+    id: number
+): Promise<null> {
     const ps = new PreparedStatement({
-        name: 'delete-by-id',
+        name: "delete-by-id",
         text: DELETE_BY_ID,
         values: [id],
     });
@@ -470,23 +501,29 @@ export async function findPortcallId(
     eventType: EventType,
     eventTime: Date,
     mmsi?: number,
-    imo?: number,
+    imo?: number
 ): Promise<number | null> {
     const ps = new PreparedStatement({
-        name: 'find-portcall-id',
+        name: "find-portcall-id",
         text: FIND_PORTCALL_ID_SQL,
         values: [mmsi, imo, locode, eventType, eventTime],
     });
-    const ret = await db.oneOrNone<{port_call_id: number}>(ps);
+    const ret = await db.oneOrNone<{ port_call_id: number }>(ps);
     if (ret) {
         return ret.port_call_id;
     }
     return null;
 }
 
-export async function findMmsiByImo(db: DTDatabase | DTTransaction, imo?: number): Promise<number | null> {
-    if(imo !== undefined) {
-        const mmsi = await db.oneOrNone<{mmsi: number}>(FIND_MMSI_BY_IMO_SQL, [imo]);
+export async function findMmsiByImo(
+    db: DTDatabase | DTTransaction,
+    imo?: number
+): Promise<number | null> {
+    if (imo !== undefined) {
+        const mmsi = await db.oneOrNone<{ mmsi: number }>(
+            FIND_MMSI_BY_IMO_SQL,
+            [imo]
+        );
         if (mmsi) {
             return mmsi.mmsi;
         }
@@ -495,9 +532,14 @@ export async function findMmsiByImo(db: DTDatabase | DTTransaction, imo?: number
     return null;
 }
 
-export async function findImoByMmsi(db: DTDatabase | DTTransaction, mmsi?: number): Promise<number | null> {
-    if(mmsi !== undefined) {
-        const imo = await db.oneOrNone<{imo: number}>(FIND_IMO_BY_MMSI_SQL, [mmsi]);
+export async function findImoByMmsi(
+    db: DTDatabase | DTTransaction,
+    mmsi?: number
+): Promise<number | null> {
+    if (mmsi !== undefined) {
+        const imo = await db.oneOrNone<{ imo: number }>(FIND_IMO_BY_MMSI_SQL, [
+            mmsi,
+        ]);
         if (imo) {
             return imo.imo;
         }
@@ -521,21 +563,28 @@ export function createUpdateValues(e: ApiTimestamp): unknown[] {
         e.eventType, // event_type
         moment(e.eventTime).toDate(), // event_time
         e.eventTimeConfidenceLower, // event_time_confidence_lower
-        (e.eventTimeConfidenceLower ? diffDuration(e.eventTime, e.eventTimeConfidenceLower) : undefined), // event_time_confidence_lower_diff
+        e.eventTimeConfidenceLower
+            ? diffDuration(e.eventTime, e.eventTimeConfidenceLower)
+            : undefined, // event_time_confidence_lower_diff
         e.eventTimeConfidenceUpper, // event_time_confidence_upper
-        (e.eventTimeConfidenceUpper ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper) : undefined), // event_time_confidence_upper_diff
+        e.eventTimeConfidenceUpper
+            ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper)
+            : undefined, // event_time_confidence_upper_diff
         e.source, // event_source
         moment(e.recordTime).toDate(), // record_time
         e.location.port, // location_locode
-        e.ship.mmsi && e.ship.mmsi !== 0 ? e.ship.mmsi : undefined,  // ship_mmsi
-        e.ship.imo && e.ship.imo !== 0 ? e.ship.imo : undefined,  // ship_imo,
+        e.ship.mmsi && e.ship.mmsi !== 0 ? e.ship.mmsi : undefined, // ship_mmsi
+        e.ship.imo && e.ship.imo !== 0 ? e.ship.imo : undefined, // ship_imo,
         e.portcallId,
         e.location.portArea,
         e.location.from,
-        e.sourceId,              // source_id
+        e.sourceId, // source_id
     ];
 }
 
 function diffDuration(eventTime: string, confLower: string): number {
-    return moment(eventTime).valueOf() - moment(eventTime).subtract(moment.duration(confLower)).valueOf();
+    return (
+        moment(eventTime).valueOf() -
+        moment(eventTime).subtract(moment.duration(confLower)).valueOf()
+    );
 }

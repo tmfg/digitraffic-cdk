@@ -1,27 +1,30 @@
-import * as AwakeAiETAHelper from '../../lib/service/awake_ai_eta_helper';
-import {AwakeAiPredictionType, AwakeAiVoyageEtaPrediction, AwakeAiZoneType} from "../../lib/api/awake_common";
-import {EventSource} from "../../lib/model/eventsource";
-import {randomIMO, randomMMSI} from "../testdata";
-import {randomBoolean} from "@digitraffic/common/test/testutils";
-import {EventType} from "../../lib/model/timestamp";
+import * as AwakeAiETAHelper from "../../lib/service/awake_ai_eta_helper";
+import {
+    AwakeAiPredictionType,
+    AwakeAiVoyageEtaPrediction,
+    AwakeAiZoneType,
+} from "../../lib/api/awake_common";
+import { EventSource } from "../../lib/model/eventsource";
+import { randomIMO, randomMMSI } from "../testdata";
+import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
+import { EventType } from "../../lib/model/timestamp";
 
-describe('Awake.AI ETA helper', () => {
-
-    test('destinationIsFinnish - correct', () => {
-        expect(AwakeAiETAHelper.destinationIsFinnish('FILOL')).toBe(true);
+describe("Awake.AI ETA helper", () => {
+    test("destinationIsFinnish - correct", () => {
+        expect(AwakeAiETAHelper.destinationIsFinnish("FILOL")).toBe(true);
     });
 
-    test('destinationIsFinnish - case insensitive', () => {
-        expect(AwakeAiETAHelper.destinationIsFinnish('fIlAn')).toBe(true);
+    test("destinationIsFinnish - case insensitive", () => {
+        expect(AwakeAiETAHelper.destinationIsFinnish("fIlAn")).toBe(true);
     });
 
-    test('destinationIsFinnish - not finnish', () => {
-        expect(AwakeAiETAHelper.destinationIsFinnish('SEFOO')).toBe(false);
+    test("destinationIsFinnish - not finnish", () => {
+        expect(AwakeAiETAHelper.destinationIsFinnish("SEFOO")).toBe(false);
     });
 
-    test('predictionToTimestamp - valid prediction', () => {
+    test("predictionToTimestamp - valid prediction", () => {
         const portcallId = 1;
-        const portArea = 'TEST';
+        const portArea = "TEST";
         const mmsi = randomMMSI();
         const imo = randomIMO();
         const source = EventSource.AWAKE_AI;
@@ -34,11 +37,11 @@ describe('Awake.AI ETA helper', () => {
             mmsi,
             imo,
             portArea,
-            portcallId,
+            portcallId
         );
 
         expect(ts).not.toBeNull();
-        if(ts !== null) {
+        if (ts !== null) {
             expect(ts.eventType).toBe(EventType.ETA);
             expect(ts.ship.mmsi).toBe(mmsi);
             expect(ts.ship.imo).toBe(imo);
@@ -51,9 +54,11 @@ describe('Awake.AI ETA helper', () => {
         }
     });
 
-    test('predictionToTimestamp - wrong prediction type', () => {
+    test("predictionToTimestamp - wrong prediction type", () => {
         const eta: AwakeAiVoyageEtaPrediction = newETAPrediction({
-            predictionType: randomBoolean() ? AwakeAiPredictionType.DESTINATION : AwakeAiPredictionType.TRAVEL_TIME,
+            predictionType: randomBoolean()
+                ? AwakeAiPredictionType.DESTINATION
+                : AwakeAiPredictionType.TRAVEL_TIME,
         });
 
         const ts = AwakeAiETAHelper.predictionToTimestamp(
@@ -61,13 +66,13 @@ describe('Awake.AI ETA helper', () => {
             EventSource.AWAKE_AI,
             eta.locode,
             randomMMSI(),
-            randomIMO(),
+            randomIMO()
         );
 
         expect(ts).toBeNull();
     });
 
-    test('predictionToTimestamp - no arrival time', () => {
+    test("predictionToTimestamp - no arrival time", () => {
         const eta: AwakeAiVoyageEtaPrediction = newETAPrediction();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (eta as any).arrivalTime = undefined;
@@ -77,12 +82,11 @@ describe('Awake.AI ETA helper', () => {
             EventSource.AWAKE_AI,
             eta.locode,
             randomMMSI(),
-            randomIMO(),
+            randomIMO()
         );
 
         expect(ts).toBeNull();
     });
-
 });
 
 /**
@@ -90,17 +94,19 @@ describe('Awake.AI ETA helper', () => {
  * @param options
  */
 function newETAPrediction(options?: {
-    predictionType?: AwakeAiPredictionType,
-    arrivalTime?: Date,
-    recordTime?: Date,
-    locode?: string,
-    zoneType?: AwakeAiZoneType,
+    predictionType?: AwakeAiPredictionType;
+    arrivalTime?: Date;
+    recordTime?: Date;
+    locode?: string;
+    zoneType?: AwakeAiZoneType;
 }): AwakeAiVoyageEtaPrediction {
     return {
         predictionType: options?.predictionType ?? AwakeAiPredictionType.ETA,
-        arrivalTime: options?.arrivalTime?.toISOString() ?? new Date().toISOString(),
-        recordTime: options?.recordTime?.toISOString() ?? new Date().toISOString(),
-        locode: options?.locode ?? 'FILOL',
+        arrivalTime:
+            options?.arrivalTime?.toISOString() ?? new Date().toISOString(),
+        recordTime:
+            options?.recordTime?.toISOString() ?? new Date().toISOString(),
+        locode: options?.locode ?? "FILOL",
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
     };
 }

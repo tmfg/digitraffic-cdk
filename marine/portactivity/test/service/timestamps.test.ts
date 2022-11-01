@@ -16,10 +16,10 @@ import {
 } from "../testdata";
 import moment from "moment-timezone";
 import * as TimestampsService from "../../lib/service/timestamps";
-import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
+import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { EventSource } from "../../lib/model/eventsource";
 import * as R from "ramda";
-import { DTDatabase } from "@digitraffic/common/database/database";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 describe(
     "timestamps",

@@ -17,7 +17,8 @@
     "test": "jest --detectOpenHandles --coverage --coverageDirectory=output/coverage/jest",
     "test_errors": "yarn test 2>&1 | grep 'FAIL'",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common"
   },
   "devDependencies": {
     "@types/aws-lambda": "*",
@@ -37,14 +38,15 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.25-1",
+    "@digitraffic/common": "2022.11.1-1",
     "@middy/core": "^1.2.0",
     "@middy/sqs-partial-batch-failure": "^1.2.0",
     "@types/amqplib": "^0.8.1",
     "@types/ramda": "0.27.44",
     "@types/ws": "^8.2.0",
     "amqplib": "^0.8.0",
-    "aws-cdk-lib": "*",
+    "aws-cdk-lib": "2.47.0",
+    "aws-sdk": "*",
     "axios": "^0.21.1",
     "constructs": "*",
     "moment": "*",

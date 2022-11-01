@@ -1,24 +1,28 @@
-import axios from 'axios';
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
-import {AwakeAiPredictedVoyage, AwakeAiPredictionType, AwakeAiShip} from "./awake_common";
+import axios from "axios";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import {
+    AwakeAiPredictedVoyage,
+    AwakeAiPredictionType,
+    AwakeAiShip,
+} from "./awake_common";
 
 export enum AwakeAiPortResponseType {
-    OK = 'OK',
-    PORT_NOT_FOUND = 'PORT_NOT_FOUND',
-    INVALID_LOCODE = 'INVALID_LOCODE',
-    SERVER_ERROR = 'SERVER_ERROR',
-    NO_RESPONSE = 'NO_RESPONSE',
-    UNKNOWN = 'UNKNOWN'
+    OK = "OK",
+    PORT_NOT_FOUND = "PORT_NOT_FOUND",
+    INVALID_LOCODE = "INVALID_LOCODE",
+    SERVER_ERROR = "SERVER_ERROR",
+    NO_RESPONSE = "NO_RESPONSE",
+    UNKNOWN = "UNKNOWN",
 }
 
 export interface AwakeAiPortSchedule {
-    readonly ship: AwakeAiShip
-    readonly voyage: AwakeAiPredictedVoyage
+    readonly ship: AwakeAiShip;
+    readonly voyage: AwakeAiPredictedVoyage;
 }
 
 export interface AwakeAiPortResponse {
-    readonly type: AwakeAiPortResponseType
-    readonly schedule?: AwakeAiPortSchedule[]
+    readonly type: AwakeAiPortResponseType;
+    readonly schedule?: AwakeAiPortSchedule[];
 }
 
 export class AwakeAiETAPortApi {
@@ -55,11 +59,15 @@ export class AwakeAiETAPortApi {
             }
             throw error;
         } finally {
-            console.log(`method=AwakeAiETAPortApi.getETAs tookMs=${Date.now() - start}`);
+            console.log(
+                `method=AwakeAiETAPortApi.getETAs tookMs=${Date.now() - start}`
+            );
         }
     }
 
-    static handleError(error: { response?: { status: number } }): AwakeAiPortResponse {
+    static handleError(error: {
+        response?: { status: number };
+    }): AwakeAiPortResponse {
         if (!error.response) {
             return {
                 type: AwakeAiPortResponseType.NO_RESPONSE,

@@ -1,12 +1,12 @@
-import {ApiTimestamp, EventType} from "./model/timestamp";
+import { ApiTimestamp, EventType } from "./model/timestamp";
 import * as R from "ramda";
-import moment, {Moment} from "moment-timezone";
-import {EventSource} from "./model/eventsource";
-import {getLast} from "@digitraffic/common/utils/utils";
+import moment, { Moment } from "moment-timezone";
+import { EventSource } from "./model/eventsource";
+import { getLast } from "@digitraffic/common/dist/utils/utils";
 
-export const VTS_A = 'VTS A';
-export const VTS_O = 'VTS O';
-export const PRED = 'PRED';
+export const VTS_A = "VTS A";
+export const VTS_O = "VTS O";
+export const PRED = "PRED";
 
 export const eventSourceMap = new Map<string, string>([
     [EventSource.PORTNET, "PNET"],
@@ -45,20 +45,28 @@ for (const entry of eventSourceMap.entries()) {
 }
 
 export function momentAverage(moments: Moment[]): string {
-    const averageMillis = R.reduce((acc, elem) => acc + elem.valueOf(), 0, moments) / moments.length;
+    const averageMillis =
+        R.reduce((acc, elem) => acc + elem.valueOf(), 0, moments) /
+        moments.length;
     return moment(averageMillis).toISOString();
 }
 
 export interface MergeableTimestamp {
-    readonly eventTime: string
-    readonly recordTime: string
-    readonly source: string
-    readonly eventType: EventType
-    readonly portcallId?: number | null
+    readonly eventTime: string;
+    readonly recordTime: string;
+    readonly source: string;
+    readonly eventType: EventType;
+    readonly portcallId?: number | null;
 }
 
-function momentsDifferByMinutes(moment1: Moment, moment2: Moment, maxDiffMinutes: number) {
-    const diffMinutes = Math.ceil(moment.duration(moment1.diff(moment2)).asMinutes());
+function momentsDifferByMinutes(
+    moment1: Moment,
+    moment2: Moment,
+    maxDiffMinutes: number
+) {
+    const diffMinutes = Math.ceil(
+        moment.duration(moment1.diff(moment2)).asMinutes()
+    );
     return diffMinutes >= maxDiffMinutes;
 }
 
@@ -66,45 +74,79 @@ function momentsDifferByMinutes(moment1: Moment, moment2: Moment, maxDiffMinutes
  * Checks if certain types of timestamps from an equivalent source can be merged.
  * @param timestamps
  */
-export function mergeTimestamps(timestamps: MergeableTimestamp[]): MergeableTimestamp[] {
+export function mergeTimestamps(
+    timestamps: MergeableTimestamp[]
+): MergeableTimestamp[] {
     const ret: MergeableTimestamp[] = [];
 
     // group by portcall id and event type
-    const byPortcallId: MergeableTimestamp[][] = R.compose(R.values,
-        R.groupBy((ts: MergeableTimestamp) => (ts.portcallId ?? -1).toString() + ts.eventType))(timestamps);
+    const byPortcallId: MergeableTimestamp[][] = R.compose(
+        R.values,
+        R.groupBy(
+            (ts: MergeableTimestamp) =>
+                (ts.portcallId ?? -1).toString() + ts.eventType
+        )
+    )(timestamps);
 
     // timestamps relating to specific port call
     for (const portcallTimestamps of byPortcallId) {
         let addToList = [...portcallTimestamps];
-        let vtsAStamps = portcallTimestamps.filter(t => vtsASources.includes(t.source));
+        let vtsAStamps = portcallTimestamps.filter((t) =>
+            vtsASources.includes(t.source)
+        );
 
         // special handling for out-of-date or incorrect VTS timestamps
-        const vtsTimestamp = vtsAStamps.find(t => t.source === EventSource.SCHEDULES_CALCULATED);
+        const vtsTimestamp = vtsAStamps.find(
+            (t) => t.source === EventSource.SCHEDULES_CALCULATED
+        );
         if (vtsTimestamp) {
-            const awakeTimestamp = vtsAStamps.find(t => t.source === EventSource.AWAKE_AI);
-            if (momentsDifferByMinutes(moment(), moment(vtsTimestamp.recordTime), VTS_TIMESTAMP_TOO_OLD_MINUTES) ||
-                (awakeTimestamp && momentsDifferByMinutes(moment(vtsTimestamp.eventTime), moment(awakeTimestamp.eventTime), VTS_TIMESTAMP_DIFF_MINUTES))) {
+            const awakeTimestamp = vtsAStamps.find(
+                (t) => t.source === EventSource.AWAKE_AI
+            );
+            if (
+                momentsDifferByMinutes(
+                    moment(),
+                    moment(vtsTimestamp.recordTime),
+                    VTS_TIMESTAMP_TOO_OLD_MINUTES
+                ) ||
+                (awakeTimestamp &&
+                    momentsDifferByMinutes(
+                        moment(vtsTimestamp.eventTime),
+                        moment(awakeTimestamp.eventTime),
+                        VTS_TIMESTAMP_DIFF_MINUTES
+                    ))
+            ) {
                 // remove only VTS timestamp
-                addToList = addToList.filter(t => !R.equals(t, vtsTimestamp));
-                vtsAStamps = vtsAStamps.filter(t => !R.equals(t, vtsTimestamp));
+                addToList = addToList.filter((t) => !R.equals(t, vtsTimestamp));
+                vtsAStamps = vtsAStamps.filter(
+                    (t) => !R.equals(t, vtsTimestamp)
+                );
             }
         }
 
         // filter out any worse quality PRED estimates if VTS A estimates are available
         if (vtsAStamps.length) {
-            addToList = addToList.filter(t => t.source !== EventSource.AWAKE_AI_PRED);
+            addToList = addToList.filter(
+                (t) => t.source !== EventSource.AWAKE_AI_PRED
+            );
         }
 
         // build an average timestamp from the calculated timestamps and discard the rest
         // use the source with the highest priority
         if (vtsAStamps.length > 1) {
-            addToList = addToList.filter(t => !vtsAStamps.includes(t));
+            addToList = addToList.filter((t) => !vtsAStamps.includes(t));
 
-            const highestPriority = getLast(vtsAStamps, ts => eventSourcePriorities.get(ts.source) ?? -1);
+            const highestPriority = getLast(
+                vtsAStamps,
+                (ts) => eventSourcePriorities.get(ts.source) ?? -1
+            );
 
             addToList.push({
-                ...highestPriority, ...{
-                    eventTime: momentAverage(vtsAStamps.map(ts => moment(ts.eventTime))),
+                ...highestPriority,
+                ...{
+                    eventTime: momentAverage(
+                        vtsAStamps.map((ts) => moment(ts.eventTime))
+                    ),
                 },
             });
         }

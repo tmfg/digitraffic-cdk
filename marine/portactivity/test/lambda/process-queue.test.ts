@@ -1,71 +1,87 @@
-import {dbTestBase, findAll, mockSecrets} from "../db-testutil";
-import {handlerFn} from "../../lib/lambda/process-queue/process-queue";
-import {SQSRecord} from "aws-lambda";
-import {ApiTimestamp} from "../../lib/model/timestamp";
-import {newTimestamp} from "../testdata";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { dbTestBase, findAll, mockSecrets } from "../db-testutil";
+import { handlerFn } from "../../lib/lambda/process-queue/process-queue";
+import { SQSRecord } from "aws-lambda";
+import { ApiTimestamp } from "../../lib/model/timestamp";
+import { newTimestamp } from "../testdata";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as R from "ramda";
 import * as sinon from "sinon";
 
-describe("process-queue", dbTestBase((db: DTDatabase) => {
-
-    beforeEach(() => {
-        sinon.restore();
-        mockSecrets({});
-    });
-
-    test("no records", async () => {
-        await handlerFn()({
-            Records: [],
-        });
-    });
-
-    test("single valid record", async () => {
-        const timestamp = newTimestamp();
-
-        await handlerFn()({
-            Records: [createRecord(timestamp)],
+describe(
+    "process-queue",
+    dbTestBase((db: DTDatabase) => {
+        beforeEach(() => {
+            sinon.restore();
+            mockSecrets({});
         });
 
-        const allTimestamps = await findAll(db);
-        expect(allTimestamps.length).toBe(1);
-    });
-
-    test("missing portcall id does not throw error", async () => {
-        const timestamp = R.omit(["portcallId"], newTimestamp());
-
-        await handlerFn()({
-            Records: [createRecord(timestamp)],
+        test("no records", async () => {
+            await handlerFn()({
+                Records: [],
+            });
         });
 
-        const allTimestamps = await findAll(db);
-        expect(allTimestamps.length).toBe(0);
-    });
+        test("single valid record", async () => {
+            const timestamp = newTimestamp();
 
-    test("single invalid record", async () => {
-        const timestamp = R.omit(["eventType"], newTimestamp()) as ApiTimestamp;
+            await handlerFn()({
+                Records: [createRecord(timestamp)],
+            });
 
-        await handlerFn()({
-            Records: [createRecord(timestamp)],
+            const allTimestamps = await findAll(db);
+            expect(allTimestamps.length).toBe(1);
         });
 
-        const allTimestamps = await findAll(db);
-        expect(allTimestamps.length).toBe(0);
-    });
+        test("missing portcall id does not throw error", async () => {
+            const timestamp = R.omit(["portcallId"], newTimestamp());
 
-    test("both valid & invalid records return fulfilled promises", async () => {
-        const validTimestamp = newTimestamp();
-        const invalidTimestamp = R.omit(["eventType"], newTimestamp()) as ApiTimestamp;
+            await handlerFn()({
+                Records: [createRecord(timestamp)],
+            });
 
-        const promises = await handlerFn()({
-            Records: [createRecord(validTimestamp), createRecord(invalidTimestamp)],
+            const allTimestamps = await findAll(db);
+            expect(allTimestamps.length).toBe(0);
         });
 
-        expect(promises.filter((p: PromiseSettledResult<unknown>) => p.status === "fulfilled")).toHaveLength(2);
-        const allTimestamps = await findAll(db);
-        expect(allTimestamps.length).toBe(1);
-    });
-}));
+        test("single invalid record", async () => {
+            const timestamp = R.omit(
+                ["eventType"],
+                newTimestamp()
+            ) as ApiTimestamp;
+
+            await handlerFn()({
+                Records: [createRecord(timestamp)],
+            });
+
+            const allTimestamps = await findAll(db);
+            expect(allTimestamps.length).toBe(0);
+        });
+
+        test("both valid & invalid records return fulfilled promises", async () => {
+            const validTimestamp = newTimestamp();
+            const invalidTimestamp = R.omit(
+                ["eventType"],
+                newTimestamp()
+            ) as ApiTimestamp;
+
+            const promises = await handlerFn()({
+                Records: [
+                    createRecord(validTimestamp),
+                    createRecord(invalidTimestamp),
+                ],
+            });
+
+            expect(
+                promises.filter(
+                    (p: PromiseSettledResult<unknown>) =>
+                        p.status === "fulfilled"
+                )
+            ).toHaveLength(2);
+            const allTimestamps = await findAll(db);
+            expect(allTimestamps.length).toBe(1);
+        });
+    })
+);
 
 function createRecord(timestamp: ApiTimestamp): SQSRecord {
     // none of these matter besides body

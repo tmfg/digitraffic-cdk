@@ -1,13 +1,19 @@
-import {AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType} from "../api/awake_ai_atx";
-import {ApiTimestamp, EventType} from "../model/timestamp";
-import * as TimestampDAO from '../dao/timestamps';
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
-import moment from 'moment-timezone';
-import {EventSource} from "../model/eventsource";
-import {AwakeAiZoneType} from "../api/awake_common";
+import {
+    AwakeAiATXApi,
+    AwakeAIATXTimestampMessage,
+    AwakeATXZoneEventType,
+} from "../api/awake_ai_atx";
+import { ApiTimestamp, EventType } from "../model/timestamp";
+import * as TimestampDAO from "../dao/timestamps";
+import {
+    DTDatabase,
+    inDatabase,
+} from "@digitraffic/common/dist/database/database";
+import moment from "moment-timezone";
+import { EventSource } from "../model/eventsource";
+import { AwakeAiZoneType } from "../api/awake_common";
 
 export class AwakeAiATXService {
-
     private readonly api: AwakeAiATXApi;
 
     constructor(api: AwakeAiATXApi) {
@@ -16,18 +22,28 @@ export class AwakeAiATXService {
 
     async getATXs(timeoutMillis: number): Promise<ApiTimestamp[]> {
         const atxs = await this.api.getATXs(timeoutMillis);
-        return inDatabase( (db: DTDatabase) => {
+        return inDatabase((db: DTDatabase) => {
             const promises = atxs
-                .filter(atx => atx.zoneType === AwakeAiZoneType.BERTH)
+                .filter((atx) => atx.zoneType === AwakeAiZoneType.BERTH)
                 .map(async (atx: AwakeAIATXTimestampMessage) => {
                     // pick the first supported LOCODE
                     if (atx.locodes.length > 1) {
-                        console.warn('method=getATXs More than one locode for timestamp! IMO %s locodes %s', atx.imo, atx.locodes);
+                        console.warn(
+                            "method=getATXs More than one locode for timestamp! IMO %s locodes %s",
+                            atx.imo,
+                            atx.locodes
+                        );
                     } else if (!atx.locodes.length) {
-                        console.error('method=getATXs No locode for timestamp! IMO %s', atx.imo);
+                        console.error(
+                            "method=getATXs No locode for timestamp! IMO %s",
+                            atx.imo
+                        );
                     }
-                    const port =  atx.locodes[0];
-                    const eventType = atx.zoneEventType == AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD;
+                    const port = atx.locodes[0];
+                    const eventType =
+                        atx.zoneEventType == AwakeATXZoneEventType.ARRIVAL
+                            ? EventType.ATA
+                            : EventType.ATD;
                     const eventTime = moment(atx.eventTimestamp).toDate();
                     const portcallId = await TimestampDAO.findPortcallId(
                         db,
@@ -35,7 +51,7 @@ export class AwakeAiATXService {
                         eventType,
                         eventTime,
                         atx.mmsi,
-                        atx.imo,
+                        atx.imo
                     );
 
                     if (portcallId) {
@@ -54,12 +70,20 @@ export class AwakeAiATXService {
                             portcallId,
                         } as ApiTimestamp;
                     } else {
-                        console.warn('method=getATXs no portcall found for %s IMO', atx.zoneEventType, atx.imo);
+                        console.warn(
+                            "method=getATXs no portcall found for %s IMO",
+                            atx.zoneEventType,
+                            atx.imo
+                        );
                         return null;
                     }
                 });
-            return Promise.all(promises)
-                .then(timestamps => timestamps.filter(timestamp => timestamp != null) as ApiTimestamp[]);
+            return Promise.all(promises).then(
+                (timestamps) =>
+                    timestamps.filter(
+                        (timestamp) => timestamp != null
+                    ) as ApiTimestamp[]
+            );
         });
     }
 }

@@ -1,15 +1,15 @@
-import {PreparedStatement} from "pg-promise";
-import {EventType} from "../model/timestamp";
-import {EventSource} from "../model/eventsource";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { PreparedStatement } from "pg-promise";
+import { EventType } from "../model/timestamp";
+import { EventSource } from "../model/eventsource";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export interface DbPublicShiplist {
-    readonly event_type: EventType
-    readonly event_time: string
-    readonly event_source: string
-    readonly record_time: string
-    readonly ship_name: string
-    readonly portcall_id: number
+    readonly event_type: EventType;
+    readonly event_time: string;
+    readonly event_source: string;
+    readonly record_time: string;
+    readonly ship_name: string;
+    readonly portcall_id: number;
 }
 
 const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
@@ -45,11 +45,15 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
     ORDER BY pe.event_time
 `;
 
-export function findByLocodePublicShiplist(db: DTDatabase, locode: string, interval: number): Promise<DbPublicShiplist[]> {
+export function findByLocodePublicShiplist(
+    db: DTDatabase,
+    locode: string,
+    interval: number
+): Promise<DbPublicShiplist[]> {
     const ps = new PreparedStatement({
-        name:'find-by-locode-public-shiplist',
+        name: "find-by-locode-public-shiplist",
         text: SELECT_BY_LOCODE_PUBLIC_SHIPLIST,
         values: [locode, interval],
     });
-    return db.tx(t => t.manyOrNone(ps));
+    return db.tx((t) => t.manyOrNone(ps));
 }

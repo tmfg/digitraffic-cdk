@@ -6,7 +6,7 @@ import {
 } from "../../lib/dao/pilotages";
 import { Pilotage } from "../../lib/model/pilotage";
 import { Location } from "../../lib/model/timestamp";
-import { DTDatabase } from "@digitraffic/common/database/database";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 describe(
     "db-pilotages-public",

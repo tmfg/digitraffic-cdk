@@ -1,20 +1,34 @@
-import {findByLocodePublicShiplist} from "../../dao/shiplist-public";
-import {DTDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
-import {getDisplayableNameForEventSource, mergeTimestamps, MergeableTimestamp} from "../../event-sourceutil";
-import * as IdUtils from "@digitraffic/common/marine/id_utils";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
-import {ProxyLambdaRequest, ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
-import {RdsHolder} from "@digitraffic/common/aws/runtime/secrets/rds-holder";
+import { findByLocodePublicShiplist } from "../../dao/shiplist-public";
+import {
+    DTDatabase,
+    inDatabaseReadonly,
+} from "@digitraffic/common/dist/database/database";
+import {
+    getDisplayableNameForEventSource,
+    mergeTimestamps,
+    MergeableTimestamp,
+} from "../../event-sourceutil";
+import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import {
+    ProxyLambdaRequest,
+    ProxyLambdaResponse,
+} from "@digitraffic/common/dist/aws/types/proxytypes";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>("shiplist");
 
 export interface ShiplistSecret {
-    readonly auth: string
+    readonly auth: string;
 }
 
-function response(statusCode: number, message: string, contentType = MediaType.TEXT_PLAIN): ProxyLambdaResponse {
+function response(
+    statusCode: number,
+    message: string,
+    contentType = MediaType.TEXT_PLAIN
+): ProxyLambdaResponse {
     return {
         statusCode,
         body: message,
@@ -25,13 +39,13 @@ function response(statusCode: number, message: string, contentType = MediaType.T
 }
 
 interface ShiplistParameters {
-    auth: string
-    locode: string
-    interval?: string
+    auth: string;
+    locode: string;
+    interval?: string;
 }
 
 class ValidationError extends Error {
-    statusCode: number
+    statusCode: number;
 
     constructor(statusCode: number, body: string) {
         super(body);
@@ -39,7 +53,10 @@ class ValidationError extends Error {
     }
 }
 
-function validateParameters(parameters: Partial<ShiplistParameters>, secret: ShiplistSecret): ShiplistParameters {
+function validateParameters(
+    parameters: Partial<ShiplistParameters>,
+    secret: ShiplistSecret
+): ShiplistParameters {
     if (!parameters.auth) {
         throw new ValidationError(401, "Missing authentication");
     }
@@ -56,46 +73,66 @@ function validateParameters(parameters: Partial<ShiplistParameters>, secret: Shi
     return {
         auth: parameters.auth,
         locode: parameters.locode,
-        interval: parameters.interval
-    }
+        interval: parameters.interval,
+    };
 }
 
-export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
-    return rdsHolder.setCredentials()
+export const handler = (
+    event: ProxyLambdaRequest
+): Promise<ProxyLambdaResponse> => {
+    return rdsHolder
+        .setCredentials()
         .then(() => secretHolder.get())
         .then((secret: ShiplistSecret) => {
-            const parameters = validateParameters(event.queryStringParameters, secret);
+            const parameters = validateParameters(
+                event.queryStringParameters,
+                secret
+            );
             const interval = Number.parseInt(parameters.interval ?? "4*24");
 
-            return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
-                const dbShiplist =
-                    (await findByLocodePublicShiplist(db, parameters.locode.toUpperCase(), interval))
-                        .map(ts => Object.assign(ts, {
+            return inDatabaseReadonly(
+                async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
+                    const dbShiplist = (
+                        await findByLocodePublicShiplist(
+                            db,
+                            parameters.locode.toUpperCase(),
+                            interval
+                        )
+                    ).map((ts) =>
+                        Object.assign(ts, {
                             source: ts.event_source,
                             eventTime: ts.event_time,
                             recordTime: ts.record_time,
                             portcallId: ts.portcall_id,
                             eventType: ts.event_type,
-                        }));
-                // don't overwrite source before merging as it utilizes source name in prioritizing
-                const shiplist = mergeTimestamps(dbShiplist).map(ts =>
-                    Object.assign(ts, {
-                        source: getDisplayableNameForEventSource(ts.source),
-                    }));
+                        })
+                    );
+                    // don't overwrite source before merging as it utilizes source name in prioritizing
+                    const shiplist = mergeTimestamps(dbShiplist).map((ts) =>
+                        Object.assign(ts, {
+                            source: getDisplayableNameForEventSource(ts.source),
+                        })
+                    );
 
-                return response(200, getPageSource(shiplist), MediaType.TEXT_HTML);
-            });
-        }).catch(error => {
+                    return response(
+                        200,
+                        getPageSource(shiplist),
+                        MediaType.TEXT_HTML
+                    );
+                }
+            );
+        })
+        .catch((error) => {
             if (error instanceof ValidationError) {
                 return response(error.statusCode, error.message);
             }
 
             return response(500, "internal error");
         });
-}
+};
 
 function getPageSource(shiplist: MergeableTimestamp[]) {
-                        return `
+    return `
 <html>
 
 <head>

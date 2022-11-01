@@ -1,33 +1,31 @@
 import moment from "moment";
-import {ApiTimestamp, EventType} from "../lib/model/timestamp";
+import { ApiTimestamp, EventType } from "../lib/model/timestamp";
 import {
     AwakeAiATXEventType,
     AwakeAIATXTimestampMessage,
     AwakeATXZoneEventType,
 } from "../lib/api/awake_ai_atx";
-import {AwakeAiZoneType} from "../lib/api/awake_common";
-import { v4 as uuidv4 } from 'uuid';
-import {getRandomNumber} from "@digitraffic/common/test/testutils";
+import { AwakeAiZoneType } from "../lib/api/awake_common";
+import { v4 as uuidv4 } from "uuid";
+import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
 
 export function newAwakeATXMessage(options?: {
-    zoneEventType?: AwakeATXZoneEventType,
-    zoneType?: AwakeAiZoneType,
-    locode?: string
+    zoneEventType?: AwakeATXZoneEventType;
+    zoneType?: AwakeAiZoneType;
+    locode?: string;
 }): AwakeAIATXTimestampMessage {
     return {
-        eventType: 'zone-event',
+        eventType: "zone-event",
         eventTimestamp: new Date().toISOString(),
         mmsi: 123456789,
         imo: 1234567,
-        zoneId: 'foo',
-        eventId: 'bar',
+        zoneId: "foo",
+        eventId: "bar",
         msgType: AwakeAiATXEventType.EVENT,
-        shipName: 'someship',
-        locodes: [
-            options?.locode ?? 'FILOL',
-        ],
+        shipName: "someship",
+        locodes: [options?.locode ?? "FILOL"],
         location: [53.2, 40.3],
-        zoneName: 'somezone',
+        zoneName: "somezone",
         zoneEventType: options?.zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
     };
@@ -46,19 +44,19 @@ export function randomMMSI() {
 }
 
 export function newTimestamp(props?: {
-    mmsi?: number,
-    imo?: number,
-    locode?: string,
-    from?: string,
-    portArea?: string,
-    eventTime?: Date
-    recordTime?: Date
-    eventType?: EventType
-    eventTimeConfidenceLower?: string | null
-    eventTimeConfidenceUpper?: string | null
-    source?: string,
-    sourceId?: string,
-    portcallId?: number
+    mmsi?: number;
+    imo?: number;
+    locode?: string;
+    from?: string;
+    portArea?: string;
+    eventTime?: Date;
+    recordTime?: Date;
+    eventType?: EventType;
+    eventTimeConfidenceLower?: string | null;
+    eventTimeConfidenceUpper?: string | null;
+    source?: string;
+    sourceId?: string;
+    portcallId?: number;
 }): ApiTimestamp {
     // round off millis
     const eventTime = props?.eventTime ?? new Date();
@@ -75,13 +73,13 @@ export function newTimestamp(props?: {
         eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? null,
         eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? null,
         ship: {
-            mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0,5)),
-            imo: props?.imo ?? Number(someNumber().toString().slice(0,5)),
+            mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0, 5)),
+            imo: props?.imo ?? Number(someNumber().toString().slice(0, 5)),
         },
         location: {
-            port: props?.locode ?? someNumber().toString().slice(0,5),
-            portArea: props?.portArea ?? someNumber().toString().slice(0,5),
-            from: props?.from ?? someNumber().toString().slice(0,5),
+            port: props?.locode ?? someNumber().toString().slice(0, 5),
+            portArea: props?.portArea ?? someNumber().toString().slice(0, 5),
+            from: props?.from ?? someNumber().toString().slice(0, 5),
         },
         portcallId: props?.portcallId ?? someNumber(),
     };
@@ -99,25 +97,26 @@ export function newVessel(timestamp: ApiTimestamp): Vessel {
         reference_point_d: 1,
         pos_type: 1,
         draught: 1,
-        imo: timestamp.ship.imo ?? - 1,
+        imo: timestamp.ship.imo ?? -1,
         eta: 1,
-        call_sign: 'a',
-        destination: 'b',
+        call_sign: "a",
+        destination: "b",
     };
 }
 
-export function newPortAreaDetails(timestamp: ApiTimestamp,
+export function newPortAreaDetails(
+    timestamp: ApiTimestamp,
     props?: {
-        eta?: Date,
-        etd?: Date,
-        ata?: Date,
-        atd?: Date,
-        portcallId?: number
-    }): PortAreaDetails {
-
+        eta?: Date;
+        etd?: Date;
+        ata?: Date;
+        atd?: Date;
+        portcallId?: number;
+    }
+): PortAreaDetails {
     return {
         port_area_details_id: Math.floor(Math.random() * 10000),
-        port_call_id: props?.portcallId ?? timestamp.portcallId ?? - 1,
+        port_call_id: props?.portcallId ?? timestamp.portcallId ?? -1,
         eta: props?.eta?.toISOString(),
         etd: props?.etd?.toISOString(),
         ata: props?.ata?.toISOString(),
@@ -125,11 +124,14 @@ export function newPortAreaDetails(timestamp: ApiTimestamp,
     };
 }
 
-export function newPortCall(timestamp: ApiTimestamp, portcallId?: number): PortCall {
+export function newPortCall(
+    timestamp: ApiTimestamp,
+    portcallId?: number
+): PortCall {
     return {
-        port_call_id: portcallId ?? timestamp.portcallId ?? - 1,
-        radio_call_sign: 'a',
-        radio_call_sign_type: 'fake',
+        port_call_id: portcallId ?? timestamp.portcallId ?? -1,
+        radio_call_sign: "a",
+        radio_call_sign_type: "fake",
         vessel_name: uuidv4(),
         port_call_timestamp: new Date(),
         port_to_visit: timestamp.location.port,
@@ -140,38 +142,38 @@ export function newPortCall(timestamp: ApiTimestamp, portcallId?: number): PortC
 
 // Types below used only in tests
 export interface Vessel {
-    readonly mmsi: number
-    readonly timestamp: number
-    readonly name: string
-    readonly ship_type: number
-    readonly reference_point_a: number
-    readonly reference_point_b: number
-    readonly reference_point_c: number
-    readonly reference_point_d: number
-    readonly pos_type: number
-    readonly draught: number
-    readonly imo: number
-    readonly eta: number
-    readonly call_sign: string
-    readonly destination: string
+    readonly mmsi: number;
+    readonly timestamp: number;
+    readonly name: string;
+    readonly ship_type: number;
+    readonly reference_point_a: number;
+    readonly reference_point_b: number;
+    readonly reference_point_c: number;
+    readonly reference_point_d: number;
+    readonly pos_type: number;
+    readonly draught: number;
+    readonly imo: number;
+    readonly eta: number;
+    readonly call_sign: string;
+    readonly destination: string;
 }
 
 export interface PortAreaDetails {
-    readonly port_area_details_id: number
-    readonly port_call_id: number
-    readonly eta?: string
-    readonly etd?: string
-    readonly ata?: string
-    readonly atd?: string
+    readonly port_area_details_id: number;
+    readonly port_call_id: number;
+    readonly eta?: string;
+    readonly etd?: string;
+    readonly ata?: string;
+    readonly atd?: string;
 }
 
 export interface PortCall {
-    readonly port_call_id: number
-    readonly radio_call_sign: string
-    readonly radio_call_sign_type: string
-    readonly vessel_name: string
-    readonly port_call_timestamp: Date
-    readonly port_to_visit: string
-    readonly mmsi: number
-    readonly imo_lloyds: number
+    readonly port_call_id: number;
+    readonly radio_call_sign: string;
+    readonly radio_call_sign_type: string;
+    readonly vessel_name: string;
+    readonly port_call_timestamp: Date;
+    readonly port_to_visit: string;
+    readonly mmsi: number;
+    readonly imo_lloyds: number;
 }
