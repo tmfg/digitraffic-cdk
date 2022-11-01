@@ -1,37 +1,35 @@
-import axios from 'axios';
+import axios from "axios";
 
-export type AreaLightsBrightenRequest = {
-
+export interface AreaLightsBrightenRequest {
     /**
      * Route id
      */
-    readonly routeId: number
+    readonly routeId: number;
 
     /**
      * Visibility in metres
      */
-    readonly visibility: number | null
+    readonly visibility: number | null;
 
     /**
      * Time to set the brightness on in minutes
      */
-    readonly time: number
+    readonly time: number;
 }
 
-export type AreaLightsBrightenResponse = {
+export interface AreaLightsBrightenResponse {
     /**
      * ATON numbers for successful lights set commands
      */
-    readonly LightsSetSentSuccessfully: number[]
+    readonly LightsSetSentSuccessfully: number[];
 
     /**
      * ATON numbers for failed lights set commands
      */
-    readonly LightsSetSentFailed: number[]
+    readonly LightsSetSentFailed: number[];
 }
 
 export class AreaLightsApi {
-
     private readonly url: string;
     private readonly apiKey: string;
 
@@ -40,30 +38,51 @@ export class AreaLightsApi {
         this.apiKey = apiKey;
     }
 
-    updateLightsForArea(request: AreaLightsBrightenRequest): Promise<AreaLightsBrightenResponse> {
+    updateLightsForArea(
+        request: AreaLightsBrightenRequest
+    ): Promise<AreaLightsBrightenResponse> {
         const start = Date.now();
 
-        const requestPromise = axios.post(this.url, request, {
-            headers: { 'x-api-key': this.apiKey },
-            validateStatus: (status) => status === 200,
-        });
+        const requestPromise = axios.post<AreaLightsBrightenResponse>(
+            this.url,
+            request,
+            {
+                headers: { "x-api-key": this.apiKey },
+                validateStatus: (status) => status === 200,
+            }
+        );
 
         return requestPromise
-            .then(response => {
-                console.info('method=updateLightsForArea successful');
+            .then((response) => {
+                console.info("method=updateLightsForArea successful");
                 return response.data;
             })
-            .catch(error => {
-                if (error.response) {
-                    console.error(`method=updateLightsForArea returned status=${error.response.status}`);
-                    return Promise.reject(`API returned status ${error.response.status}`);
-                } else if (error.request) {
-                    console.error(`method=updateLightsForArea ERROR with request: ${error.request}`);
-                    return Promise.reject(`Error with request ${error.request}`);
+            .catch((error) => {
+                if (axios.isAxiosError(error)) {
+                    if (error.response) {
+                        console.error(
+                            "method=updateLightsForArea returned status=%d",
+                            error.response.status
+                        );
+                        return Promise.reject(
+                            `API returned status ${error.response.status}`
+                        );
+                    } else if (error.request) {
+                        console.error(
+                            "method=updateLightsForArea ERROR with request: %s",
+                            error.request
+                        );
+                        return Promise.reject("Error with request");
+                    }
                 }
-                console.error(`method=updateLightsForArea ERROR: ${error}`);
-                return Promise.reject(`Unknown error ${error}`);
+                console.error("method=updateLightsForArea ERROR: %s", error);
+                return Promise.reject("Unknown error");
             })
-            .finally(() => console.log(`method=updateLightsForArea tookMs=${Date.now() - start}`));
+            .finally(() =>
+                console.log(
+                    "method=updateLightsForArea tookMs=%d",
+                    Date.now() - start
+                )
+            );
     }
 }

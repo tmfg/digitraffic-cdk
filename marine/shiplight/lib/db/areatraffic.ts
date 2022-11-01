@@ -1,20 +1,20 @@
-import {PreparedStatement} from 'pg-promise';
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { PreparedStatement } from "pg-promise";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-export type DbAreaTraffic = {
-    readonly id: number
-    readonly name: string
-    readonly brighten_duration_min: number
-    readonly brighten_sent?: Date
-    readonly brighten_end?: Date
+export interface DbAreaTraffic {
+    readonly id: number;
+    readonly name: string;
+    readonly brighten_duration_min: number;
+    readonly brighten_sent?: Date;
+    readonly brighten_end?: Date;
 }
 
 export enum ShipTypes {
-    FISHING= 30,
+    FISHING = 30,
     CARGO = 70,
 }
 
-const SHIP_MOVING_INTERVAL = '2 MINUTE';
+const SHIP_MOVING_INTERVAL = "2 MINUTE";
 
 export const SHIP_SPEED_THRESHOLD_KNOTS = 2;
 export const SHIP_SPEED_NOT_AVAILABLE = 102.3;
@@ -41,12 +41,12 @@ const SQL_UPDATE_AREA_TRAFFIC_SENDTIME = `
 `.trim();
 
 const PS_GET_AREA_TRAFFIC = new PreparedStatement({
-    name: 'get-area-traffic',
+    name: "get-area-traffic",
     text: SQL_GET_AREA_TRAFFIC,
 });
 
 const PS_UPDATE_AREA_TRAFFIC_SENDTIME = new PreparedStatement({
-    name: 'update-area-traffic-sendtime',
+    name: "update-area-traffic-sendtime",
     text: SQL_UPDATE_AREA_TRAFFIC_SENDTIME,
 });
 

@@ -1,15 +1,13 @@
-import axios from 'axios';
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import axios from "axios";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
-export type AreaVisibilityResponse = {
+export interface AreaVisibilityResponse {
     // ISO 8601
-    readonly lastUpdated?: string
-
-    readonly visibilityInMeters: number
+    readonly lastUpdated?: string;
+    readonly visibilityInMeters: number;
 }
 
 export class AreaVisibilityApi {
-
     private readonly url: string;
     private readonly token: string;
 
@@ -23,20 +21,26 @@ export class AreaVisibilityApi {
         try {
             const resp = await axios.get(`${this.url}/${area}`, {
                 headers: {
-                    'token': this.token,
+                    token: this.token,
                     Accept: MediaType.APPLICATION_JSON,
                 },
             });
             if (resp.status !== 200) {
-                console.error(`method=getVisibilityForArea returned status=${resp.status}`);
+                console.error(
+                    "method=getVisibilityForArea returned status=%d",
+                    resp.status
+                );
                 return Promise.reject();
             }
             return resp.data as AreaVisibilityResponse;
         } catch (error) {
-            console.error(`method=getVisibilityForArea failed`);
-            throw new Error('Getting visibility for area failed');
+            console.error("method=getVisibilityForArea failed");
+            throw new Error("Getting visibility for area failed");
         } finally {
-            console.log(`method=getVisibilityForArea tookMs=${Date.now() - start}`);
+            console.log(
+                "method=getVisibilityForArea tookMs=%d",
+                Date.now() - start
+            );
         }
     }
 }

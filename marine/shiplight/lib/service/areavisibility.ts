@@ -1,11 +1,10 @@
-import {AreaVisibilityApi} from "../api/areavisibility";
+import { AreaVisibilityApi } from "../api/areavisibility";
 
-type AreaVisibilityWrapper = {
-    readonly visibilityInMeters: number | null
+interface AreaVisibilityWrapper {
+    readonly visibilityInMeters: number | null;
 }
 
 export class AreaVisibilityService {
-
     private readonly api: AreaVisibilityApi;
 
     constructor(api: AreaVisibilityApi) {
@@ -20,10 +19,16 @@ export class AreaVisibilityService {
      * @param areaId Area id
      * @return Visibility for area in metres
      */
-    async getVisibilityForAreaInMetres(areaId: number): Promise<AreaVisibilityWrapper> {
+    async getVisibilityForAreaInMetres(
+        areaId: number
+    ): Promise<AreaVisibilityWrapper> {
         try {
-            const resp = await this.api.getVisibilityForArea('vaylavisi139');
-            console.info(`method=getVisibilityForAreaInMetres areaId: ${areaId} visibility: ${resp.visibilityInMeters} lastUpdated: ${resp.lastUpdated}`);
+            const resp = await this.api.getVisibilityForArea("vaylavisi139");
+            console.info(
+                `method=getVisibilityForAreaInMetres areaId: ${areaId} visibility: ${
+                    resp.visibilityInMeters
+                } lastUpdated: ${resp.lastUpdated ?? "null"}`
+            );
             return { visibilityInMeters: resp.visibilityInMeters };
         } catch (error) {
             // error logged at API level
