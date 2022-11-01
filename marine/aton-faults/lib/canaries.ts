@@ -1,25 +1,28 @@
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {UrlCanary} from "@digitraffic/common/aws/infra/canaries/url-canary";
-import {DatabaseCanary} from "@digitraffic/common/aws/infra/canaries/database-canary";
-import {DigitrafficCanaryRole} from "@digitraffic/common/aws/infra/canaries/canary-role";
-import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
+import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
+import { DigitrafficCanaryRole } from "@digitraffic/common/dist/aws/infra/canaries/canary-role";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if (stack.configuration.enableCanaries) {
-            const urlRole = new DigitrafficCanaryRole(stack, 'aton-url');
-            const dbRole = new DigitrafficCanaryRole(stack, 'aton-db').withDatabaseAccess();
+        if (stack.configuration.stackFeatures?.enableCanaries) {
+            const urlRole = new DigitrafficCanaryRole(stack, "aton-url");
+            const dbRole = new DigitrafficCanaryRole(
+                stack,
+                "aton-db"
+            ).withDatabaseAccess();
 
             UrlCanary.create(stack, urlRole, publicApi, {
-                name: 'aton-public',
-                handler: 'public-api.handler',
+                name: "aton-public",
+                handler: "public-api.handler",
                 alarm: {
-                    alarmName: 'ATON-PublicAPI-Alarm',
+                    alarmName: "ATON-PublicAPI-Alarm",
                     topicArn: stack.configuration.warningTopicArn,
                 },
             });
 
-            DatabaseCanary.createV2(stack, dbRole, 'aton');
+            DatabaseCanary.createV2(stack, dbRole, "aton");
         }
     }
 }

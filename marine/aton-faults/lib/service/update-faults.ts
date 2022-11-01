@@ -1,9 +1,12 @@
-import {FaultsApi} from "../api/faults";
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
+import { FaultsApi } from "../api/faults";
+import {
+    DTDatabase,
+    inDatabase,
+} from "@digitraffic/common/dist/database/database";
 import * as FaultsDB from "../db/faults";
-import * as LastUpdatedDB from "@digitraffic/common/database/last-updated";
-import {ATON_DATA_TYPE} from "./faults";
-import {FaultFeature} from "../model/fault";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { ATON_DATA_TYPE } from "./faults";
+import { FaultFeature } from "../model/fault";
 
 export async function updateFaults(url: string, domain: string) {
     const start = Date.now();
@@ -12,22 +15,30 @@ export async function updateFaults(url: string, domain: string) {
     const validated = newFaults.filter(validate);
 
     return inDatabase((db: DTDatabase) => {
-        return db.tx(t => {
+        return db.tx((t) => {
             return t.batch([
                 ...FaultsDB.updateFaults(db, domain, validated),
-                LastUpdatedDB.updateUpdatedTimestamp(db, ATON_DATA_TYPE, new Date(start)),
+                LastUpdatedDB.updateUpdatedTimestamp(
+                    db,
+                    ATON_DATA_TYPE,
+                    new Date(start)
+                ),
             ]);
         });
     }).finally(() => {
         const end = Date.now();
-        console.info("method=updateFaults updatedCount=%d tookMs=%d", newFaults.length, (end - start));
+        console.info(
+            "method=updateFaults updatedCount=%d tookMs=%d",
+            newFaults.length,
+            end - start
+        );
     });
 }
 
 function validate(fault: FaultFeature): boolean {
-    if (fault.properties?.FAULT_TYPE === 'Aiheeton') {
-        console.info("Aiheeton id {}", fault.properties?.ID);
+    if (fault.properties.FAULT_TYPE === "Aiheeton") {
+        console.info("Aiheeton id %s", fault.properties.ID);
     }
 
-    return fault.properties?.FAULT_TYPE !== 'Kirjattu';
+    return fault.properties.FAULT_TYPE !== "Kirjattu";
 }

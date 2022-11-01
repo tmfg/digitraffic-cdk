@@ -1,29 +1,44 @@
-import {RtzVoyagePlan} from "@digitraffic/common/marine/rtz";
-import {DTDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
-import * as CachedDao from "@digitraffic/common/database/cached";
+import { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
+import {
+    DTDatabase,
+    inDatabaseReadonly,
+} from "@digitraffic/common/dist/database/database";
+import * as CachedDao from "@digitraffic/common/dist/database/cached";
 import * as turf from "@turf/turf";
-import {Feature, FeatureCollection} from "geojson";
+import { Feature, FeatureCollection } from "geojson";
 
 const MAX_DISTANCE_NM = 15;
 
-export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<FeatureCollection|null> {
+export async function findWarningsForVoyagePlan(
+    voyagePlan: RtzVoyagePlan
+): Promise<FeatureCollection | null> {
     const warnings = await inDatabaseReadonly((db: DTDatabase) => {
-        return CachedDao.getJsonFromCache(db, CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
-    }) as FeatureCollection;
+        return CachedDao.getJsonFromCache<FeatureCollection>(
+            db,
+            CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE
+        );
+    });
 
     if (!warnings) {
         return null;
     }
 
-    const voyageLineString =
-        turf.lineString(voyagePlan.route.waypoints
-            .flatMap(w => w.waypoint.flatMap( wp => wp.position))
-            .map(p => [p.$.lon, p.$.lat]));
+    const voyageLineString = turf.lineString(
+        voyagePlan.route.waypoints
+            .flatMap((w) => w.waypoint.flatMap((wp) => wp.position))
+            .map((p) => [p.$.lon, p.$.lat])
+    );
 
     // filter out warnings not in the route
-    warnings.features = warnings.features.filter((f: Feature) => !turf.booleanDisjoint(turf.buffer(f.geometry, MAX_DISTANCE_NM, {
-        units: 'nauticalmiles',
-    }), voyageLineString));
+    warnings.features = warnings.features.filter(
+        (f: Feature) =>
+            !turf.booleanDisjoint(
+                turf.buffer(f.geometry, MAX_DISTANCE_NM, {
+                    units: "nauticalmiles",
+                }),
+                voyageLineString
+            )
+    );
 
     return warnings;
 }
@@ -35,13 +50,20 @@ export async function findWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Prom
  * @param db
  * @param id
  */
-export async function findWarning(db: DTDatabase, id: number): Promise<Feature|null> {
-    const warnings = await CachedDao.getJsonFromCache(db, CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE) as FeatureCollection;
+export async function findWarning(
+    db: DTDatabase,
+    id: number
+): Promise<Feature | null> {
+    const warnings = await CachedDao.getJsonFromCache<FeatureCollection>(
+        db,
+        CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE
+    );
 
     if (!warnings) {
         return null;
     }
 
-    return warnings.features.find((f: Feature) => f.properties?.id === id) || null;
+    return (
+        warnings.features.find((f: Feature) => f.properties?.id === id) ?? null
+    );
 }
-

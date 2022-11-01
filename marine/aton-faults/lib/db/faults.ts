@@ -1,19 +1,18 @@
-import {PreparedStatement} from "pg-promise";
-import {createGeometry} from "@digitraffic/common/utils/geometry";
-import {LineString} from "wkx";
-import {DbFault, FaultFeature} from "../model/fault";
-import {Language} from "@digitraffic/common/types/language";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { PreparedStatement } from "pg-promise";
+import { createGeometry } from "@digitraffic/common/dist/utils/geometry";
+import { LineString } from "wkx";
+import { DbFault, FaultFeature } from "../model/fault";
+import { Language } from "@digitraffic/common/dist/types/language";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-import moment = require('moment-timezone');
+import moment = require("moment-timezone");
 
 // 15 nautical miles
 const BUFFER_RADIUS_METERS = 27780;
 
 const langRex = /LANG/g;
 
-const ALL_FAULTS_JSON_SQL =
-    `select id,
+const ALL_FAULTS_JSON_SQL = `select id,
             entry_timestamp,
             fixed_timestamp,
             aton_fault_type.name_LANG aton_fault_type,
@@ -37,8 +36,7 @@ const ALL_FAULTS_JSON_SQL =
     and aton_fault.type = aton_fault_type.name_fi
     and aton_fault.aton_type_fi = aton_type.name_fi`;
 
-const UPSERT_FAULTS_SQL =
-    `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_sv, 
+const UPSERT_FAULTS_SQL = `insert into aton_fault(id, entry_timestamp, fixed_timestamp, state, type, domain, fixed, aton_id, aton_name_fi, aton_name_sv, 
     aton_type_fi, fairway_number, fairway_name_fi, fairway_name_sv, area_number, geometry)
     values($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
     on conflict(id)
@@ -81,8 +79,7 @@ const GET_FAULT_BY_ID = `
 // find faults that are relevant for ships
 // return only commercial & non-commercial ATON faults, not any other type of faults
 // transform given ship route (linestring) from wgs84 to etrs89 / tm35fin for metric buffering and then back to wgs84
-const FAULT_IDS_BY_AREA =
-    `select id
+const FAULT_IDS_BY_AREA = `select id
      from aton_fault, area, aton_fault_type, aton_type
      where domain in ('C_NA', 'NC_NA') 
      and aton_fault.area_number = area.area_number
@@ -102,37 +99,47 @@ const FAULT_IDS_BY_AREA =
 `;
 
 const PS_FAULT_BY_ID = new PreparedStatement({
-    name: 'get-fault-by-id',
+    name: "get-fault-by-id",
     text: GET_FAULT_BY_ID,
 });
 
 const PS_FAULT_IDS_BY_AREA = new PreparedStatement({
-    name: 'get-fault-ids-by-area',
+    name: "get-fault-ids-by-area",
     text: FAULT_IDS_BY_AREA,
 });
 
-export function getFaultById(db: DTDatabase, faultId: number): Promise<DbFault | null> {
+export function getFaultById(
+    db: DTDatabase,
+    faultId: number
+): Promise<DbFault | null> {
     return db.oneOrNone(PS_FAULT_BY_ID, [faultId]);
 }
 
 interface DbFaultId {
-    readonly id: string
+    readonly id: string;
 }
 
-export function findFaultIdsByRoute(db: DTDatabase, route: LineString): Promise<number[]> {
-    const ids = db.tx(t => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()));
+export function findFaultIdsByRoute(
+    db: DTDatabase,
+    route: LineString
+): Promise<number[]> {
+    const ids = db.tx((t) => t.manyOrNone(PS_FAULT_IDS_BY_AREA, route.toWkt()));
     // bigints are returned as string by pg-promise since they could overflow
     // however these are plain integers
-    return ids.then((result: DbFaultId[]) => result.map(r => Number(r.id)));
+    return ids.then((result: DbFaultId[]) => result.map((r) => Number(r.id)));
 }
 
-export function updateFaults(db: DTDatabase, domain: string, faults: FaultFeature[]): Promise<null>[] {
+export function updateFaults(
+    db: DTDatabase,
+    domain: string,
+    faults: FaultFeature[]
+): Promise<null>[] {
     const ps = new PreparedStatement({
-        name: 'update-faults',
+        name: "update-faults",
         text: UPSERT_FAULTS_SQL,
     });
 
-    return faults.map(f => {
+    return faults.map((f) => {
         const p = f.properties;
 
         return db.none(ps, [
@@ -156,21 +163,29 @@ export function updateFaults(db: DTDatabase, domain: string, faults: FaultFeatur
     });
 }
 
-export function findAll<T>(db: DTDatabase, language: Language, fixedInHours: number, conversion: (fault: DbFault) => T): Promise<T[]> {
-    const fixedLimit = moment().subtract(fixedInHours, 'hour').toDate();
+export function findAll<T>(
+    db: DTDatabase,
+    language: Language,
+    fixedInHours: number,
+    conversion: (fault: DbFault) => T
+): Promise<T[]> {
+    const fixedLimit = moment().subtract(fixedInHours, "hour").toDate();
     const ps = new PreparedStatement({
-        name: 'get-all-faults',
+        name: "get-all-faults",
         text: ALL_FAULTS_JSON_SQL.replace(langRex, language.toString()),
     });
 
-    return db.manyOrNone(ps, [fixedLimit])
-        .then(faults => faults.map(conversion));
+    return db
+        .manyOrNone(ps, [fixedLimit])
+        .then((faults) => faults.map(conversion));
 }
 
-function parseHelsinkiTime(date: string|null): Date|null {
+function parseHelsinkiTime(date: string | null): Date | null {
     if (date != null) {
         // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
-        return moment.tz(date, 'YYYY-MM-DD HH:mm:ss', 'Europe/Helsinki').toDate();
+        return moment
+            .tz(date, "YYYY-MM-DD HH:mm:ss", "Europe/Helsinki")
+            .toDate();
     }
 
     return null;

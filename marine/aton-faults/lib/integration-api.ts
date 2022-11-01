@@ -5,24 +5,24 @@ import {
     RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
-import { DigitrafficRestApi } from "@digitraffic/common/aws/infra/stack/rest_apis";
-import { createUsagePlan } from "@digitraffic/common/aws/infra/usage-plans";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
     defaultIntegration,
     methodResponse,
-} from "@digitraffic/common/aws/infra/api/responses";
-import { MediaType } from "@digitraffic/common/aws/types/mediatypes";
-import { MessageModel } from "@digitraffic/common/aws/infra/api/response";
+} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addQueryParameterDescription,
     addTagsAndSummary,
-} from "@digitraffic/common/aws/infra/documentation";
+} from "@digitraffic/common/dist/aws/infra/documentation";
 import { AtonEnvKeys } from "./keys";
-import { DigitrafficStack } from "@digitraffic/common/aws/infra/stack/stack";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
     MonitoredDBFunction,
     MonitoredFunction,
-} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 
 export function create(stack: DigitrafficStack, s124Queue: Queue) {

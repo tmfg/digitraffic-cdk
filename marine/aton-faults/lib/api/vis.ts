@@ -1,14 +1,14 @@
-import axios, {AxiosError} from 'axios';
-import {Agent} from 'https';
+import axios from "axios";
+import { Agent } from "https";
 
 export async function postDocument(
     faultS124: string,
     url: string,
     ca: string,
     clientCertificate: string,
-    privateKey: string,
+    privateKey: string
 ): Promise<void> {
-    console.info(`method=postDocument url=${url}`);
+    console.info("method=postDocument url=%d", url);
 
     // try-catch so axios won't log keys/certs
     try {
@@ -19,33 +19,45 @@ export async function postDocument(
                 key: privateKey,
             }),
             headers: {
-                'Content-Type': 'text/xml;charset=utf-8',
+                "Content-Type": "text/xml;charset=utf-8",
             },
         });
 
         if (resp.status !== 200) {
-            console.error(`method=postDocument returned status=${resp.status}, status text: ${resp.statusText}`);
+            console.error(
+                "method=postDocument returned status=%d, status text: %s",
+                resp.status,
+                resp.statusText
+            );
             return Promise.reject();
         }
     } catch (error) {
         // can't log error without exposing keys/certs
-        console.error('method=postDocument unexpected error');
+        console.error("method=postDocument unexpected error");
         if (axios.isAxiosError(error)) {
-            console.error((error as AxiosError).response?.data);
+            console.error(error.response?.data);
         }
         return Promise.reject();
     }
     return Promise.resolve();
 }
 
+interface InstanceUri {
+    readonly endpointUri: string;
+}
+
 export async function query(imo: string, url: string): Promise<string | null> {
     const queryUrl = `${url}/api/_search/serviceInstance?query=imo:${imo}`;
-    console.info(`method=query url=${queryUrl}`);
+    console.info("method=query url=%s", queryUrl);
 
     try {
-        const resp = await axios.get(queryUrl);
+        const resp = await axios.get<InstanceUri[] | undefined>(queryUrl);
         if (resp.status !== 200) {
-            console.error(`method=query returned status=${resp.status}, status text: ${resp.statusText}`);
+            console.error(
+                "method=query returned status=%d, status text: %s",
+                resp.status,
+                resp.statusText
+            );
             return Promise.reject();
         }
 
@@ -65,8 +77,7 @@ export async function query(imo: string, url: string): Promise<string | null> {
         return null;
     } catch (error) {
         // can't log error without exposing keys/certs
-        console.error('method=query unexpected error');
+        console.error("method=query unexpected error");
         return Promise.reject();
     }
-
 }

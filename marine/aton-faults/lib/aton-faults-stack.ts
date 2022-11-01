@@ -1,18 +1,18 @@
-import {Duration} from 'aws-cdk-lib';
-import {Construct} from "constructs";
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {DigitrafficSqsQueue} from "@digitraffic/common/aws/infra/sqs-queue";
-import * as InternalLambdas from './internal-lambdas';
-import * as IntegrationApi from './integration-api';
-import * as PublicApi from './public-api';
-import {Canaries} from "./canaries";
-import {AtonProps} from "./app-props";
+import { Duration } from "aws-cdk-lib";
+import { Construct } from "constructs";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficSqsQueue } from "@digitraffic/common/dist/aws/infra/sqs-queue";
+import * as InternalLambdas from "./internal-lambdas";
+import * as IntegrationApi from "./integration-api";
+import * as PublicApi from "./public-api";
+import { Canaries } from "./canaries";
+import { AtonProps } from "./app-props";
 
 export class AtonFaultsStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: AtonProps) {
         super(scope, id, configuration);
 
-        const s124Queue = DigitrafficSqsQueue.create(this, 'SendS124', {
+        const s124Queue = DigitrafficSqsQueue.create(this, "SendS124", {
             receiveMessageWaitTime: Duration.seconds(5),
             visibilityTimeout: Duration.seconds(60),
         });

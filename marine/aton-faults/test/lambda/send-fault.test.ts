@@ -1,60 +1,78 @@
-import {dbTestBase, insert, TEST_ATON_SECRET} from "../db-testutil";
-import {handlerFn} from '../../lib/lambda/send-s124/send-s124';
-import {newFault} from "../testdata";
-import * as sinon from 'sinon';
-import {SQSEvent} from "aws-lambda";
-import {TestHttpServer} from "@digitraffic/common/test/httpserver";
-import {S124Type, SendS124Event} from "../../lib/model/upload-voyageplan-event";
-import {createSecretFunction} from "@digitraffic/common/test/secret";
-import {AtonSecret} from "../../lib/model/secret";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { dbTestBase, insert, TEST_ATON_SECRET } from "../db-testutil";
+import { handlerFn } from "../../lib/lambda/send-s124/send-s124";
+import { newFault } from "../testdata";
+import * as sinon from "sinon";
+import { SQSEvent } from "aws-lambda";
+import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
+import {
+    S124Type,
+    SendS124Event,
+} from "../../lib/model/upload-voyageplan-event";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { SecretHolder } from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import { ProxyHolder } from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;
 
-describe('send-fault', dbTestBase((db: DTDatabase) => {
+describe(
+    "send-fault",
+    dbTestBase((db: DTDatabase) => {
+        beforeEach(() => {
+            sandbox
+                .stub(SecretHolder.prototype, "get")
+                .returns(Promise.resolve(TEST_ATON_SECRET));
+            sandbox
+                .stub(ProxyHolder.prototype, "setCredentials")
+                .returns(Promise.resolve());
+        });
 
-    afterEach(() => sandbox.restore());
+        afterEach(() => sandbox.restore());
 
-    test('faults are sent to endpoint', async () => {
-        const server = new TestHttpServer();
-        try {
-            let receivedData: string | undefined;
-            const fault = newFault({
-                geometry: {
-                    lat: 60.285807,
-                    lon: 27.321659,
-                },
-            });
-            await insert(db, [fault]);
-            const s124Event: SendS124Event = {
-                type: S124Type.FAULT,
-                id: fault.id,
-                callbackEndpoint: `http://localhost:${SERVER_PORT}/area`,
-            };
-            const withSecret = createSecretFunction<AtonSecret, void>(TEST_ATON_SECRET);
-            server.listen(SERVER_PORT, {
-                "/area": (url: string | undefined, data: string | undefined) => {
-                    receivedData = data;
-                    return '';
-                },
-            });
+        test("faults are sent to endpoint", async () => {
+            const server = new TestHttpServer();
+            try {
+                let receivedData: string | undefined;
+                const fault = newFault({
+                    geometry: {
+                        lat: 60.285807,
+                        lon: 27.321659,
+                    },
+                });
+                await insert(db, [fault]);
+                const s124Event: SendS124Event = {
+                    type: S124Type.FAULT,
+                    id: fault.id,
+                    callbackEndpoint: `http://localhost:${SERVER_PORT}/area`,
+                };
 
-            await handlerFn(withSecret)(createSqsEvent(s124Event));
+                server.listen(SERVER_PORT, {
+                    "/area": (
+                        url: string | undefined,
+                        data: string | undefined
+                    ) => {
+                        receivedData = data;
+                        return "";
+                    },
+                });
 
-            // TODO better assertion
-            expect(receivedData).toContain('S124:DataSet');
-        } finally {
-            server.close();
-        }
+                await handlerFn()(createSqsEvent(s124Event));
 
-    });
-}));
+                // TODO better assertion
+                expect(receivedData).toContain("S124:DataSet");
+            } finally {
+                server.close();
+            }
+        });
+    })
+);
 
 function createSqsEvent(sendFaultEvent: SendS124Event): SQSEvent {
     return {
-        Records: [{
-            body: JSON.stringify(sendFaultEvent),
-        }],
+        Records: [
+            {
+                body: JSON.stringify(sendFaultEvent),
+            },
+        ],
     } as SQSEvent;
 }

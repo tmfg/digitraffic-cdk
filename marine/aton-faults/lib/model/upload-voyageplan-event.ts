@@ -1,29 +1,30 @@
-export type UploadVoyagePlanEvent = {
+export interface UploadVoyagePlanEvent {
     /**
      * Endpoint URL for callback
      */
-    readonly callbackEndpoint?: string
+    readonly callbackEndpoint?: string;
 
     /**
      * The route in RTZ format
      */
-    readonly voyagePlan: string
+    readonly voyagePlan: string;
 }
 
 export enum S124Type {
-    WARNING, FAULT
+    WARNING,
+    FAULT,
 }
 
-export type SendS124Event = {
+export interface SendS124Event {
     /**
      * Endpoint URL for callback
      */
-    readonly callbackEndpoint: string
+    readonly callbackEndpoint: string;
 
     readonly type: S124Type;
 
     /**
      * Fault/Warning id
      */
-    readonly id: number
+    readonly id: number;
 }
