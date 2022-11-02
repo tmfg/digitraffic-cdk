@@ -1,5 +1,5 @@
-export type EpcMessage = {
+export interface EpcMessage {
     readonly EPCMessageHeader: {
-        readonly ShipMessageId: string
-    }
+        readonly ShipMessageId: string;
+    };
 }
