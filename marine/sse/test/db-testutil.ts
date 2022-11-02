@@ -1,23 +1,30 @@
-import {DTDatabase} from "@digitraffic/common/database/database";
-import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
-import {DbSseReport} from "../lib/db/sse-db";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
+import { DbSseReport } from "../lib/db/sse-db";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
-        fn, truncate, 'marine', 'marine', 'localhost:54321/marine',
+        fn,
+        truncate,
+        "marine",
+        "marine",
+        "localhost:54321/marine"
     );
 }
 
 export async function truncate(db: DTDatabase): Promise<void> {
-    await db.tx(t => {
-        return t.batch([
-            db.none('DELETE FROM sse_report'),
-        ]);
+    await db.tx((t) => {
+        return t.batch([db.none("DELETE FROM sse_report")]);
     });
 }
 
-export function findAllSseReports(db: DTDatabase, siteId? :number): Promise<DbSseReport[]> {
-    return db.tx(t => {
+export function findAllSseReports(
+    db: DTDatabase,
+    siteId?: number
+): Promise<DbSseReport[]> {
+    const where = siteId ? `WHERE site_number=${siteId}` : "";
+
+    return db.tx((t) => {
         return t.manyOrNone(`
             SELECT sse_report_id as "sseReportId",
                    created       as "created",
@@ -35,8 +42,7 @@ export function findAllSseReports(db: DTDatabase, siteId? :number): Promise<DbSs
                    longitude     as "longiture",
                    latitude      as "latitude",
                    site_type     as "siteType"
-            FROM sse_report
-            ${(siteId? "WHERE site_number=" + siteId : "")}
+            FROM sse_report ${where}
             ORDER BY site_number, sse_report_id
         `);
     });

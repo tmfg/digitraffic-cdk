@@ -1,17 +1,16 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
+import {
+    JsonSchema,
+    JsonSchemaType,
+    JsonSchemaVersion,
+} from "aws-cdk-lib/aws-apigateway";
 // Manually converted from json-schema
-
-// camels
-/* eslint-disable camelcase */
 
 export const Sse: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT7,
     type: JsonSchemaType.OBJECT,
     title: "The SSE Report Root Schema",
     additionalProperties: false,
-    required: [
-        "SSE_Reports",
-    ],
+    required: ["SSE_Reports"],
     properties: {
         SSE_Reports: {
             type: JsonSchemaType.ARRAY,
@@ -19,20 +18,13 @@ export const Sse: JsonSchema = {
             items: {
                 type: JsonSchemaType.OBJECT,
                 title: "The Items Schema",
-                required: [
-                    "Site",
-                    "SSE_Fields",
-                ],
+                required: ["Site", "SSE_Fields"],
                 properties: {
                     Site: {
                         type: JsonSchemaType.OBJECT,
                         title: "The Site Schema",
                         additionalProperties: true,
-                        required: [
-                            "SiteName",
-                            "SiteNumber",
-                            "SiteType",
-                        ],
+                        required: ["SiteName", "SiteNumber", "SiteType"],
                         properties: {
                             SiteName: {
                                 type: JsonSchemaType.STRING,
@@ -45,10 +37,7 @@ export const Sse: JsonSchema = {
                             },
                             SiteType: {
                                 type: JsonSchemaType.STRING,
-                                enum: [
-                                    "FIXED",
-                                    "FLOATING",
-                                ],
+                                enum: ["FIXED", "FLOATING"],
                                 title: "The SiteType Schema",
                             },
                         },
@@ -101,11 +90,7 @@ export const Sse: JsonSchema = {
                             },
                             Confidence: {
                                 type: JsonSchemaType.STRING,
-                                enum: [
-                                    "POOR",
-                                    "MODERATE",
-                                    "GOOD",
-                                ],
+                                enum: ["POOR", "MODERATE", "GOOD"],
                                 title: "The Confidence Schema",
                             },
                         },
@@ -126,11 +111,7 @@ export const Sse: JsonSchema = {
                             },
                             Light_Status: {
                                 type: JsonSchemaType.STRING,
-                                enum: [
-                                    "ON",
-                                    "OFF",
-                                    "ON_D",
-                                ],
+                                enum: ["ON", "OFF", "ON_D"],
                                 title: "The Light_status Schema",
                             },
                             Coord_Latitude: {

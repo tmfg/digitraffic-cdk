@@ -1,27 +1,36 @@
-import {PreparedStatement} from "pg-promise";
+import { PreparedStatement } from "pg-promise";
 import {
-    TheConfidenceSchema, TheCoordLatitudeSchema, TheCoordLongitudeSchema, TheHeelAngleSchema, TheLastUpdateSchema,
-    TheLightStatusSchema, TheSeastateSchema, TheSiteTypeSchema, TheTemperatureSchema, TheTrendSchema, TheWindwavedirSchema,
+    TheConfidenceSchema,
+    TheCoordLatitudeSchema,
+    TheCoordLongitudeSchema,
+    TheHeelAngleSchema,
+    TheLastUpdateSchema,
+    TheLightStatusSchema,
+    TheSeastateSchema,
+    TheSiteTypeSchema,
+    TheTemperatureSchema,
+    TheTrendSchema,
+    TheWindwavedirSchema,
 } from "../generated/tlsc-sse-reports-schema";
-import {DTTransaction} from "@digitraffic/common/database/database";
+import { DTTransaction } from "@digitraffic/common/dist/database/database";
 
-export type DbSseReport = {
-    readonly sseReportId?: bigint,
-    readonly created? : Date,
-    readonly latest? : boolean,
-    readonly siteNumber: number,
-    readonly siteName: string,
-    readonly lastUpdate: TheLastUpdateSchema,
-    readonly seaState: TheSeastateSchema,
-    readonly trend: TheTrendSchema,
-    readonly windWaveDir: TheWindwavedirSchema,
-    readonly confidence: TheConfidenceSchema,
-    readonly heelAngle?: TheHeelAngleSchema,
-    readonly lightStatus?: TheLightStatusSchema,
-    readonly temperature?: TheTemperatureSchema,
-    readonly longitude: TheCoordLongitudeSchema,
-    readonly latitude: TheCoordLatitudeSchema,
-    readonly siteType?: TheSiteTypeSchema
+export interface DbSseReport {
+    readonly sseReportId?: bigint;
+    readonly created?: Date;
+    readonly latest?: boolean;
+    readonly siteNumber: number;
+    readonly siteName: string;
+    readonly lastUpdate: TheLastUpdateSchema;
+    readonly seaState: TheSeastateSchema;
+    readonly trend: TheTrendSchema;
+    readonly windWaveDir: TheWindwavedirSchema;
+    readonly confidence: TheConfidenceSchema;
+    readonly heelAngle?: TheHeelAngleSchema;
+    readonly lightStatus?: TheLightStatusSchema;
+    readonly temperature?: TheTemperatureSchema;
+    readonly longitude: TheCoordLongitudeSchema;
+    readonly latitude: TheCoordLatitudeSchema;
+    readonly siteType?: TheSiteTypeSchema;
 }
 
 const UPDATE_LATEST_SITE_TO_FALSE_SQL = `
@@ -69,17 +78,23 @@ const INSERT_SSE_REPORT_SQL = `
 `;
 
 const psUpdateLatestSite = new PreparedStatement({
-    name: 'update-sse-report-latest-site',
+    name: "update-sse-report-latest-site",
     text: UPDATE_LATEST_SITE_TO_FALSE_SQL,
 });
 
-export function updateLatestSiteToFalse(db: DTTransaction, siteNumber: number): Promise<null> {
+export function updateLatestSiteToFalse(
+    db: DTTransaction,
+    siteNumber: number
+): Promise<null> {
     return db.none(psUpdateLatestSite, siteNumber);
 }
 
-export function insertSseReportData(db: DTTransaction, sseData: DbSseReport): Promise<null> {
+export function insertSseReportData(
+    db: DTTransaction,
+    sseData: DbSseReport
+): Promise<null> {
     const ps = new PreparedStatement({
-        name: 'update-sse-report',
+        name: "update-sse-report",
         text: INSERT_SSE_REPORT_SQL,
     });
     return db.none(ps, createInsertValuesArray(sseData));
