@@ -14,7 +14,7 @@
     "eslint-report": "eslint . --format html -o report.html",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "test": "jest --detectOpenHandles",
+    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
     "test_errors": "yarn test 2>&1 | grep 'FAIL'",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
@@ -36,7 +36,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.1-1",
+    "@digitraffic/common": "2022.11.2-1",
     "aws-cdk-lib": "*",
     "amazon-cognito-identity-js": "5.2.4",
     "aws-sdk": "*",
