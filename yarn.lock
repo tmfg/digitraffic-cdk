@@ -37,6 +37,11 @@
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-synthetics-alpha/-/aws-synthetics-alpha-2.47.0-alpha.0.tgz#177849edd8cbd05af8e18dea4a8605844d933fe5"
   integrity sha512-Piv/FwPKMf01NMiy34Y+iLi+ExJpJUL/d7VuNA7wcjIY9KbOV+7l9TeaU74FxvEKZK7M7C808z3Ace7S2jRJ/w==
 
+"@aws-cdk/aws-synthetics-alpha@2.50.0-alpha.0":
+  version "2.50.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/@aws-cdk/aws-synthetics-alpha/-/aws-synthetics-alpha-2.50.0-alpha.0.tgz#c93755b42b82b136b29e3f72ae31b4e405f5ab61"
+  integrity sha512-sZQOZFZIMGYbYXI/1M9wIF9GGPXgwPwj7fhTg1HvOb4gJpaZFg5ND5KbTQz2+kjrUyJ+nvaVSg8gipLDts15jQ==
+
 "@aws-cdk/aws-synthetics-alpha@^2.27.0-alpha.0":
   version "2.27.0-alpha.0"
   resolved "https://registry.yarnpkg.com/@aws-cdk/aws-synthetics-alpha/-/aws-synthetics-alpha-2.27.0-alpha.0.tgz#ecb5d5b3050cf5b0cbe7c72c0f27ee010b468e2e"
@@ -406,6 +411,24 @@
     "@aws-cdk/aws-synthetics-alpha" "2.47.0-alpha.0"
     "@types/geojson" "^7946.0.10"
     aws-cdk-lib "2.47.0"
+    aws-sdk "2.1241.0"
+    axios "^0.21.1"
+    change-case "4.1.2"
+    constructs "10.1.131"
+    geojson-validation "^1.0.2"
+    moment "^2.29.4"
+    node-ttl "^0.2.0"
+    pg-native "^3.0.1"
+    pg-promise "^10.12.0"
+
+"@digitraffic/common@2022.11.2-1":
+  version "2022.11.2-1"
+  resolved "https://registry.yarnpkg.com/@digitraffic/common/-/common-2022.11.2-1.tgz#dbaa107c1d6b5100d946850ec2a4c3d28b5f62db"
+  integrity sha512-NGnlECs5gs3fSfFqiBYIfNDJupj0eyISpuSKfVlMwX+aDSPkqSwwL/M2uTWJydO94/E6392TGD8/aBS9KtK9oA==
+  dependencies:
+    "@aws-cdk/aws-synthetics-alpha" "2.50.0-alpha.0"
+    "@types/geojson" "^7946.0.10"
+    aws-cdk-lib "2.50.0"
     aws-sdk "2.1241.0"
     axios "^0.21.1"
     change-case "4.1.2"
@@ -2536,7 +2559,7 @@ available-typed-arrays@^1.0.5:
   resolved "https://registry.yarnpkg.com/available-typed-arrays/-/available-typed-arrays-1.0.5.tgz#92f95616501069d07d10edb2fc37d3e1c65123b7"
   integrity sha512-DMD0KiN46eipeziST1LPP/STfDU0sufISXmjSgvVsoU2tqxctQeASejWcfNtxYKqETM1UxQ8sp2OrSBWpHY6sw==
 
-aws-cdk-lib@*, aws-cdk-lib@2.46.0, aws-cdk-lib@2.47.0, aws-cdk-lib@^2.43.1:
+aws-cdk-lib@*, aws-cdk-lib@2.46.0, aws-cdk-lib@2.47.0, aws-cdk-lib@2.50.0, aws-cdk-lib@^2.43.1:
   version "2.47.0"
   resolved "https://registry.yarnpkg.com/aws-cdk-lib/-/aws-cdk-lib-2.47.0.tgz#0f4f6adf2439caffd26686393a6e58ced3995833"
   integrity sha512-XnxA7FMhJljsj6OtMMDbUi5lPPYcrehAxqpui5b2Nv2cBWhiG7Wb5baOuQy7niyPhZEX03A4k0vYFas/nnB91g==
