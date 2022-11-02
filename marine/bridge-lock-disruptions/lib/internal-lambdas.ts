@@ -1,9 +1,9 @@
 import {
     MonitoredDBFunction,
     MonitoredFunction,
-} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/aws/infra/stack/stack";
-import { Scheduler } from "@digitraffic/common/aws/infra/scheduler";
+} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 
 export function create(stack: DigitrafficStack): MonitoredFunction {
     const environment = stack.createDefaultLambdaEnvironment(

@@ -4,23 +4,23 @@ import {
     corsMethod,
     defaultIntegration,
     methodResponse,
-} from "@digitraffic/common/aws/infra/api/responses";
+} from "@digitraffic/common/dist/aws/infra/api/responses";
 import {
     addServiceModel,
     featureSchema,
     geojsonSchema,
     getModelReference,
-} from "@digitraffic/common/utils/api-model";
-import { DocumentationPart } from "@digitraffic/common/aws/infra/documentation";
-import { MediaType } from "@digitraffic/common/aws/types/mediatypes";
-import { DigitrafficStack } from "@digitraffic/common/aws/infra/stack/stack";
+} from "@digitraffic/common/dist/utils/api-model";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
     MonitoredDBFunction,
     MonitoredFunction,
-} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
-import { DigitrafficIntegrationResponse } from "@digitraffic/common/aws/runtime/digitraffic-integration-response";
-import { DigitrafficRestApi } from "@digitraffic/common/aws/infra/stack/rest_apis";
-import { createUsagePlan } from "@digitraffic/common/aws/infra/usage-plans";
+} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficIntegrationResponse } from "@digitraffic/common/dist/aws/runtime/digitraffic-integration-response";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 
 const BRIDGE_LOCK_DISRUPTION_TAGS_V1 = ["Bridge Lock Disruption V1"];
 

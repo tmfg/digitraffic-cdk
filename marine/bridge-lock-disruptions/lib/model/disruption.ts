@@ -1,3 +1,5 @@
+import { Geometry } from "geojson";
+
 export interface Disruption {
     Id: number;
     Type_Id: number;
@@ -9,5 +11,5 @@ export interface Disruption {
 }
 
 export interface SpatialDisruption extends Disruption {
-    geometry: any // eslint-disable-line @typescript-eslint/no-explicit-any
+    geometry: Geometry;
 }

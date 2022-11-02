@@ -1,16 +1,21 @@
-/* eslint-disable camelcase */
-import {SpatialDisruption} from "../model/disruption";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { SpatialDisruption } from "../model/disruption";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { Geometry } from "geojson";
 
 export interface DbDisruption {
     id: number;
     type_id: number;
     start_date: Date;
     end_date: Date;
-    geometry: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+    geometry: string; // this is wkb when fetched from database
     description_fi: string;
     description_sv?: string;
     description_en?: string;
+}
+
+// save with actual GeoJSON
+interface DistruptionSaveObject extends Omit<DbDisruption, "geometry"> {
+    geometry: Geometry;
 }
 
 const UPSERT_DISRUPTIONS_SQL = `
@@ -59,24 +64,37 @@ const SELECT_DISRUPTION_SQL = `
 `;
 
 export function findAll(db: DTDatabase): Promise<DbDisruption[]> {
-    return db.tx(t => t.manyOrNone(SELECT_DISRUPTION_SQL));
+    return db.tx((t) => t.manyOrNone(SELECT_DISRUPTION_SQL));
 }
 
-export function updateDisruptions(db: DTDatabase, disruptions: SpatialDisruption[]): Promise<null>[] {
-    return disruptions.map(disruption => {
+export function updateDisruptions(
+    db: DTDatabase,
+    disruptions: SpatialDisruption[]
+): Promise<null>[] {
+    return disruptions.map((disruption) => {
         return db.none(UPSERT_DISRUPTIONS_SQL, createEditObject(disruption));
     });
 }
 
-export function deleteAllButDisruptions(db: DTDatabase, ids: number[]): Promise<null> {
+export function deleteAllButDisruptions(
+    db: DTDatabase,
+    ids: number[]
+): Promise<null> {
     if (ids.length === 0) {
-        return db.tx(t => t.none('DELETE FROM bridgelock_disruption'));
+        return db.tx((t) => t.none("DELETE FROM bridgelock_disruption"));
     } else {
-        return db.tx(t => t.none('DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)', ids));
+        return db.tx((t) =>
+            t.none(
+                "DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)",
+                ids
+            )
+        );
     }
 }
 
-export function createEditObject(disruption: SpatialDisruption): DbDisruption {
+export function createEditObject(
+    disruption: SpatialDisruption
+): DistruptionSaveObject {
     return {
         id: disruption.Id,
         type_id: disruption.Type_Id,
