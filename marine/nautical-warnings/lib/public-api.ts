@@ -18,6 +18,8 @@ import {
 } from "@digitraffic/common/dist/utils/api-model";
 import { nauticalWarningSchema } from "./model/nautical-warnings-schema";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { NauticalWarningConfiguration } from "./nautical-warnings-stack";
+import { Runtime } from "aws-cdk-lib/aws-lambda";
 
 const NAUTICAL_WARNING_TAGS_V1 = ["Nautical Warning V1"];
 
@@ -36,7 +38,8 @@ export class PublicApi {
             "NauticalWarning Public API"
         );
         this.apiKeyId = this.publicApi.createUsagePlanV2(
-            "NauticalWarning Api Key"
+            "NauticalWarning Api Key",
+            (stack.configuration as NauticalWarningConfiguration).apiKey
         );
 
         this.createResources(this.publicApi);
@@ -82,12 +85,14 @@ export class PublicApi {
         const lambdaActive = MonitoredFunction.createV2(
             stack,
             "get-active",
-            environment
+            environment,
+            { runtime: Runtime.NODEJS_16_X }
         );
         const lambdaArchived = MonitoredFunction.createV2(
             stack,
             "get-archived",
-            environment
+            environment,
+            { runtime: Runtime.NODEJS_16_X }
         );
 
         stack.grantSecret(lambdaActive, lambdaArchived);
