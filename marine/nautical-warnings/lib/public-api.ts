@@ -19,7 +19,6 @@ import {
 import { nauticalWarningSchema } from "./model/nautical-warnings-schema";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { NauticalWarningConfiguration } from "./nautical-warnings-stack";
-import { Runtime } from "aws-cdk-lib/aws-lambda";
 
 const NAUTICAL_WARNING_TAGS_V1 = ["Nautical Warning V1"];
 
@@ -85,14 +84,12 @@ export class PublicApi {
         const lambdaActive = MonitoredFunction.createV2(
             stack,
             "get-active",
-            environment,
-            { runtime: Runtime.NODEJS_16_X }
+            environment
         );
         const lambdaArchived = MonitoredFunction.createV2(
             stack,
             "get-archived",
-            environment,
-            { runtime: Runtime.NODEJS_16_X }
+            environment
         );
 
         stack.grantSecret(lambdaActive, lambdaArchived);
