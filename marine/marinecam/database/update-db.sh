@@ -10,5 +10,6 @@ docker build \
 
 docker run --rm \
 --name marinecam-db-updater \
+--network dbmarine \
 marinecam-db-updater \
 $COMMAND
