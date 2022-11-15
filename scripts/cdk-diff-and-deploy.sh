@@ -37,7 +37,8 @@ APP_TS=${ALL_TS_FILES_IN_BIN[0]}
 echo Found app config: $APP_TS
 echo
 # Get stack name (take first match ie. grep -i 'new ' <the-file> | grep -i marineprod |  cut -d "'" -f2 | head -1
-STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${DT_PROJECT}${DT_PROJECT_ENV}"  |  cut -d "'" -f2 | head -1)
+# sed replaces single quotes (old way) with double quotes (new way)
+STACK=$(grep -i 'new ' ${APP_TS} | grep -i "${DT_PROJECT}${DT_PROJECT_ENV}"  | gsed  "s/'/\"/g" |  cut -d '"' -f2 | head -1)
 echo "Using Stack: ${STACK}"
 echo
 read -p "Are you sure you wanna run: cdk ${OPERATION} ${STACK}? " -n 1 -r
