@@ -37,11 +37,12 @@ export class AwakeAiETAPortApi {
     /**
      * Queries the Awake.AI Voyages API for predictions
      * @param locode Destination LOCODE. If set, overrides destination prediction.
+     * @param maxSequenceNo Maximum number of preceding stops in multi-hop predictions.
      */
-    async getETAs(locode: string): Promise<AwakeAiPortResponse> {
+    async getETAs(locode: string, maxSequenceNo: number): Promise<AwakeAiPortResponse> {
         const start = Date.now();
         try {
-            const url = `${this.url}/port/${locode}/arrivals?predictionType=${AwakeAiPredictionType.ETA}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}`;
+            const url = `${this.url}/port/${locode}/arrivals?maxSequenceNo=${maxSequenceNo}&predictionType=${AwakeAiPredictionType.ETA}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}`;
             console.info(`AwakeAiETAPortApi.getETAs calling URL ${url}`);
             const resp = await axios.get(url, {
                 headers: {
