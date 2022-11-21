@@ -12,7 +12,6 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/node": "*",
     "esbuild": "^0.8.36",
     "parallelshell": "3.0.1",

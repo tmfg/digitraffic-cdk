@@ -13,7 +13,6 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "typescript": "*"
   },

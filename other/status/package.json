@@ -17,7 +17,6 @@
     "test": "jest --detectOpenHandles"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/node": "*",
     "@types/sinon": "*",

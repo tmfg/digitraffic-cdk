@@ -23,7 +23,6 @@
     "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
     "@types/node": "*",

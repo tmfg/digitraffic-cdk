@@ -21,7 +21,6 @@
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
     "@types/node": "*",

@@ -17,7 +17,6 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/crypto-js": "^4.0.1",
     "@types/jest": "^26.0.22",

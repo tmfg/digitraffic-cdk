@@ -18,7 +18,6 @@
     "nolambda": "nodemon -e ts --exec 'yarn compile-lambdas'"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
     "@types/node": "*",

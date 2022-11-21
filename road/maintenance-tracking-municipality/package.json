@@ -25,7 +25,6 @@
     "cdk-synth-road-prod": "cdk synth MaintenanceTrackingMunicipalityRoadProd --no-staging > template-road-prod.yaml"
   },
   "devDependencies": {
-    "@aws-cdk/assert": "*",
     "@types/aws-lambda": "*",
     "@types/jest": "^26.0.22",
     "@types/node": "*",
