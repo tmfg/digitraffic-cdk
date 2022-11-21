@@ -421,6 +421,24 @@
     pg-native "^3.0.1"
     pg-promise "^10.12.0"
 
+"@digitraffic/common@2022.11.11-1":
+  version "2022.11.11-1"
+  resolved "https://registry.yarnpkg.com/@digitraffic/common/-/common-2022.11.11-1.tgz#c2d971c68627fc7d47fd79893c40204411a04da6"
+  integrity sha512-P3Yb2i3M2Ct4kdmEay4F6iziASHCS5RjLwaZ5nqefWL2r+X2TSTcDT84ZZt7Kqq48o35uyvrC4emar68AQUkHQ==
+  dependencies:
+    "@aws-cdk/aws-synthetics-alpha" "2.50.0-alpha.0"
+    "@types/geojson" "^7946.0.10"
+    aws-cdk-lib "2.50.0"
+    aws-sdk "2.1241.0"
+    axios "^0.21.1"
+    change-case "4.1.2"
+    constructs "10.1.131"
+    geojson-validation "^1.0.2"
+    moment "^2.29.4"
+    node-ttl "^0.2.0"
+    pg-native "^3.0.1"
+    pg-promise "^10.12.0"
+
 "@digitraffic/common@2022.11.2-1":
   version "2022.11.2-1"
   resolved "https://registry.yarnpkg.com/@digitraffic/common/-/common-2022.11.2-1.tgz#dbaa107c1d6b5100d946850ec2a4c3d28b5f62db"

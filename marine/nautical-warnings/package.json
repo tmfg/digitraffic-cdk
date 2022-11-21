@@ -18,7 +18,11 @@
     "test_errors": "yarn test 2>&1 | grep 'FAIL'",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common"
+    "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
+    "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
+    "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
+    "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
+    "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy"
   },
   "devDependencies": {
     "@types/aws-lambda": "*",

@@ -66,7 +66,7 @@ export class PublicApi {
                 ["bridge-lock-disruptions"],
                 "getDisruptions",
                 ""
-            ).deprecated("Deprecated.  This will be removed in the future.")
+            ).deprecated("Deprecated. Will be removed after 2023-06-01.")
         );
         publicApi.documentResource(
             this.disruptionsResource,

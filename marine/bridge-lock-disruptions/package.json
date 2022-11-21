@@ -14,7 +14,11 @@
     "clean:force": "rimraf dist cdk.out node_modules",
     "test": "jest --runInBand --detectOpenHandles",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "cdk-diff-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
+    "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
+    "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
+    "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy"
   },
   "devDependencies": {
     "@aws-cdk/assert": "*",
@@ -33,7 +37,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.1-1",
+    "@digitraffic/common": "2022.11.11-1",
     "@types/geojson": "^7946.0.7",
     "aws-cdk-lib": "*",
     "constructs": "*",

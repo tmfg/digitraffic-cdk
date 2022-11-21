@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/digitraffic-cdk-private.iml" filepath="$PROJECT_DIR$/.idea/digitraffic-cdk-private.iml" />
       <module fileurl="file://$PROJECT_DIR$/../digitraffic-ci/digitraffic-ci.iml" filepath="$PROJECT_DIR$/../digitraffic-ci/digitraffic-ci.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../digitraffic-common-private/digitraffic-common-private.iml" filepath="$PROJECT_DIR$/../digitraffic-common-private/digitraffic-common-private.iml" />
     </modules>
   </component>
 </project>

@@ -10,5 +10,6 @@ docker build \
 
 docker run --rm \
 --name portactivity-db-updater \
+--network dbmarine \
 portactivity-db-updater \
 $COMMAND
