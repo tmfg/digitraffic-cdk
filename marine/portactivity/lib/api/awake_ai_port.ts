@@ -39,7 +39,7 @@ export class AwakeAiETAPortApi {
      * @param locode Destination LOCODE. If set, overrides destination prediction.
      * @param maxSequenceNo Maximum number of preceding stops in multi-hop predictions.
      */
-    async getETAs(locode: string, maxSequenceNo: number): Promise<AwakeAiPortResponse> {
+    async getETAs(locode: string, maxSequenceNo = 1): Promise<AwakeAiPortResponse> {
         const start = Date.now();
         try {
             const url = `${this.url}/port/${locode}/arrivals?maxSequenceNo=${maxSequenceNo}&predictionType=${AwakeAiPredictionType.ETA}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}`;

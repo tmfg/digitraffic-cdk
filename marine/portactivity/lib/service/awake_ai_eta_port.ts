@@ -19,7 +19,7 @@ export class AwakeAiETAPortService {
     }
 
     async getAwakeAiTimestamps(locode: string): Promise<ApiTimestamp[]> {
-        const resp = await this.api.getETAs(locode, 1);
+        const resp = await this.api.getETAs(locode);
 
         console.info(`method=AwakeAiETAPortService.getAwakeAiTimestamps Received ETA response: ${JSON.stringify(resp)}`);
 
