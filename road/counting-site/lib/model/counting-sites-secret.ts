@@ -1,4 +1,4 @@
-export type CountingSitesSecret = {
-    apiKey: string,
-    url: string
+export interface CountingSitesSecret {
+    apiKey: string;
+    url: string;
 }

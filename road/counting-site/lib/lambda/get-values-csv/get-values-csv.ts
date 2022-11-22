@@ -1,7 +1,7 @@
 import * as CountingSitesService from "../../service/counting-sites";
-import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
-import {validate, ValuesQueryParameters} from "../../model/parameters";
-import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { validate, ValuesQueryParameters } from "../../model/parameters";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -13,20 +13,33 @@ export const handler = (event: ValuesQueryParameters) => {
         return LambdaResponse.badRequest(validationError);
     }
 
-    const year = event.year as number || new Date().getUTCFullYear();
-    const month = event.month as number || new Date().getUTCMonth() + 1;
+    const year = event.year ?? new Date().getUTCFullYear();
+    const month = event.month ?? new Date().getUTCMonth() + 1;
 
     const filename = `${year}-${month}.csv`;
 
-    return proxyHolder.setCredentials()
-        .then(() => CountingSitesService.getValuesForMonth(year, month, event.domainName, event.counterId))
-        .then(data => {
+    return proxyHolder
+        .setCredentials()
+        .then(() =>
+            CountingSitesService.getValuesForMonth(
+                year,
+                month,
+                event.domain_name,
+                event.counter_id
+            )
+        )
+        .then((data) => {
             return LambdaResponse.ok(data, filename);
-        }).catch(error => {
-            console.info("error " + error);
+        })
+        .catch((error: Error) => {
+            console.info("error " + error.toString());
 
             return LambdaResponse.internalError();
-        }).finally(() => {
-            console.info("method=CountingSites.GetCSVData tookMs=%d", (Date.now() - start));
+        })
+        .finally(() => {
+            console.info(
+                "method=CountingSites.GetCSVData tookMs=%d",
+                Date.now() - start
+            );
         });
 };

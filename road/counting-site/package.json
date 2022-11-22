@@ -4,11 +4,11 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node14",
-    "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node14",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint --cache .",
     "eslint-report": "eslint . --format html -o report.html",
@@ -33,10 +33,10 @@
     "parallelshell": "3.0.1",
     "sinon": "*",
     "ts-jest": "^27.0.4",
-    "typescript": "*"
+    "typescript": "^4.7.4"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.6-1",
+    "@digitraffic/common": "2022.11.11-1",
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
     "csv-writer": "^1.6.0",

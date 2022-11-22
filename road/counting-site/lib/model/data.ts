@@ -1,61 +1,65 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
+import {
+    JsonSchema,
+    JsonSchemaType,
+    JsonSchemaVersion,
+} from "aws-cdk-lib/aws-apigateway";
 
-export type ApiData = {
-    readonly date: string
-    readonly isoDate: Date
-    readonly counts: number|null
-    readonly status: number|null
+export interface ApiData {
+    readonly date: string;
+    readonly isoDate: Date;
+    readonly counts: number | null;
+    readonly status: number | null;
 }
 
-export type DbData = {
+export interface DbData {
     readonly counter_id: number;
-    readonly data_timestamp: Date
-    readonly interval: number
-    readonly count: number
-    readonly status: number
+    readonly data_timestamp: Date;
+    readonly interval: number;
+    readonly count: number;
+    readonly status: number;
 }
 
-export type ResponseData = {
+export interface ResponseData {
     readonly counterId: number;
-    readonly dataTimestamp: Date
-    readonly interval: number
-    readonly count: number
-    readonly status: number
+    readonly dataTimestamp: Date;
+    readonly interval: number;
+    readonly count: number;
+    readonly status: number;
 }
 
-export type DbCsvData = {
-    readonly domain_name: string
-    readonly counter_name: string
-    readonly user_type: string
-    readonly data_timestamp: Date
-    readonly interval: number
-    readonly count: number
-    readonly status: number
+export interface DbCsvData {
+    readonly domain_name: string;
+    readonly counter_name: string;
+    readonly user_type: string;
+    readonly data_timestamp: Date;
+    readonly interval: number;
+    readonly count: number;
+    readonly status: number;
 }
 
 export const dataProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.ARRAY,
-    description: 'Counting Site data',
+    description: "Counting Site data",
     items: {
         type: JsonSchemaType.OBJECT,
         properties: {
             dataTimestamp: {
                 type: JsonSchemaType.STRING,
                 format: "date-time",
-                description: 'Data interval start',
+                description: "Data interval start",
             },
             interval: {
                 type: JsonSchemaType.NUMBER,
-                description: 'Interval length in minutes',
+                description: "Interval length in minutes",
             },
             count: {
                 type: JsonSchemaType.NUMBER,
-                description: 'Counter count',
+                description: "Counter count",
             },
             status: {
                 type: JsonSchemaType.NUMBER,
-                description: 'Counter status',
+                description: "Counter status",
             },
         },
     },

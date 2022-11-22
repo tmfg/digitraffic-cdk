@@ -1,11 +1,11 @@
-import axios from 'axios';
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
-import {ApiCounter} from "../model/counter";
-import {ApiData} from "../model/data";
-import {ApiChannel, ApiSite} from "../model/site";
+import axios from "axios";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { ApiCounter } from "../model/counter";
+import { ApiData } from "../model/data";
+import { ApiChannel, ApiSite } from "../model/site";
 
-export const URL_ALL_SITES = '/api/1.0/site';
-export const URL_SITE_DATA = '/api/1.0/data/site';
+export const URL_ALL_SITES = "/api/1.0/site";
+export const URL_SITE_DATA = "/api/1.0/data/site";
 
 export class EcoCounterApi {
     readonly token: string;
@@ -23,14 +23,16 @@ export class EcoCounterApi {
         console.info("sending to url " + serverUrl);
 
         try {
-            const resp = await axios.get(serverUrl, {
+            const resp = await axios.get<T>(serverUrl, {
                 headers: {
-                    'accept': MediaType.APPLICATION_JSON,
-                    'Authorization': this.token,
+                    accept: MediaType.APPLICATION_JSON,
+                    Authorization: this.token,
                 },
             });
             if (resp.status !== 200) {
-                console.error(`method=${method} returned status=${resp.status}`);
+                console.error(
+                    `method=${method} returned status=${resp.status}`
+                );
                 return Promise.reject();
             }
             return resp.data;
@@ -44,26 +46,42 @@ export class EcoCounterApi {
     }
 
     getSites(): Promise<ApiSite[]> {
-        return this.getFromServer('getSites', URL_ALL_SITES);
+        return this.getFromServer("getSites", URL_ALL_SITES);
     }
 
-    getDataForSite(siteId: number, interval: number, from: Date, to: Date): Promise<ApiData[]> {
+    getDataForSite(
+        siteId: number,
+        interval: number,
+        from: Date,
+        to: Date
+    ): Promise<ApiData[]> {
         const fromString = from.toISOString().substring(0, 19); // strip milliseconds
         const toString = to.toISOString().substring(0, 19);
-        const intervalString = interval === 60 ? 'hour' : `${interval}m`;
+        const intervalString = interval === 60 ? "hour" : `${interval}m`;
 
-        return this.getFromServer('getDataForSite', `${URL_SITE_DATA}/${siteId}?begin=${fromString}&end=${toString}&step=${intervalString}`);
+        return this.getFromServer(
+            "getDataForSite",
+            `${URL_SITE_DATA}/${siteId}?begin=${fromString}&end=${toString}&step=${intervalString}`
+        );
     }
 
     async getAllCounters(): Promise<Record<string, ApiCounter>> {
         const sites = await this.getSites();
 
-        const entries = sites.flatMap((site: ApiSite) => site.channels
-            .filter(this.validate)
-            .map((c: ApiChannel) => [c.id, {...c, ...{name: `${site.name} ${c.name}`}}]));
+        const entries = sites.flatMap((site: ApiSite) =>
+            site.channels
+                .filter((c) => this.validate(c))
+                .map((c: ApiChannel) => [
+                    c.id,
+                    {
+                        ...c,
+                        ...{ name: `${site.name} ${c.name}` },
+                    } as ApiCounter,
+                ])
+        );
 
         // and finally create object from entries with id as key and counter as value
-        return Object.fromEntries(entries);
+        return Object.fromEntries(entries) as Record<string, ApiCounter>;
     }
 
     validate(channel: ApiChannel): boolean {

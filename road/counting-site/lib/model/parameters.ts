@@ -1,15 +1,18 @@
-import * as DateValidator from '@digitraffic/common/types/validator';
+import * as DateValidator from "@digitraffic/common/dist/types/validator";
 
-export type ValuesQueryParameters = {
+export interface ValuesQueryParameters {
     month?: number;
     year?: number;
-    domainName: string;
-    counterId: string;
+    domain_name: string;
+    counter_id: string;
 }
 
 export function validate(parameters: ValuesQueryParameters): string | null {
-    if ((parameters.year && !parameters.month) || (parameters.month && !parameters.year)) {
-        return 'Both year and month are required';
+    if (
+        (parameters.year && !parameters.month) ||
+        (parameters.month && !parameters.year)
+    ) {
+        return "Both year and month are required";
     }
 
     if (parameters.year && !DateValidator.validateYear(parameters.year)) {
@@ -22,4 +25,3 @@ export function validate(parameters: ValuesQueryParameters): string | null {
 
     return null;
 }
-

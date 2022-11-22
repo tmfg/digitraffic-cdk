@@ -5,7 +5,7 @@ import * as DataDAO from "../../lib/dao/data";
 
 import * as sinon from "sinon";
 import { ApiData } from "../../lib/model/data";
-import { DTDatabase } from "@digitraffic/common/database/database";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 const DOMAIN_NAME = "TEST_DOMAIN";
 

@@ -1,8 +1,8 @@
-import {ApiCounter} from "./counter";
+import { ApiCounter } from "./counter";
 
 export type ApiChannel = ApiCounter;
 
-export type ApiSite = {
-    readonly channels: ApiChannel[]
-    readonly name: string
+export interface ApiSite {
+    readonly channels: ApiChannel[];
+    readonly name: string;
 }

@@ -1,11 +1,12 @@
 import * as UpdateService from "../../service/update";
-import {CountingSitesSecret} from "../../model/counting-sites-secret";
-import {CountingSitesEnvKeys} from "../../keys";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
-import {ProxyHolder} from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
+import { CountingSitesSecret } from "../../model/counting-sites-secret";
+import { CountingSitesEnvKeys } from "../../keys";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 
-const domainName = process.env[CountingSitesEnvKeys.DOMAIN_NAME] as string;
-const domainPrefix = process.env[CountingSitesEnvKeys.DOMAIN_PREFIX] as string;
+const domainName = envValue(CountingSitesEnvKeys.DOMAIN_NAME);
+const domainPrefix = envValue(CountingSitesEnvKeys.DOMAIN_PREFIX);
 
 const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<CountingSitesSecret>(domainPrefix);
@@ -13,10 +14,21 @@ const secretHolder = SecretHolder.create<CountingSitesSecret>(domainPrefix);
 export const handler = () => {
     const start = Date.now();
 
-    proxyHolder.setCredentials()
+    proxyHolder
+        .setCredentials()
         .then(() => secretHolder.get())
-        .then(secret => UpdateService.updateMetadataForDomain(domainName, secret.apiKey, secret.url))
+        .then((secret) =>
+            UpdateService.updateMetadataForDomain(
+                domainName,
+                secret.apiKey,
+                secret.url
+            )
+        )
         .finally(() => {
-            console.info("method=updateMetadata.%s tookMs=%d", domainName, (Date.now()-start));
+            console.info(
+                "method=updateMetadata.%s tookMs=%d",
+                domainName,
+                Date.now() - start
+            );
         });
 };

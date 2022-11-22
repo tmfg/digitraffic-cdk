@@ -5,10 +5,10 @@ import {
     insertDomain,
     withServer,
 } from "../db-testutil";
-import { TestHttpServer } from "@digitraffic/common/test/httpserver";
+import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as CounterDAO from "../../lib/dao/counter";
 import { URL_ALL_SITES } from "../../lib/api/eco-counter";
-import { DTDatabase } from "@digitraffic/common/database/database";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { DbCounter } from "../../lib/model/counter";
 
 const PORT = 8091;
@@ -23,7 +23,7 @@ describe(
         async function assertCountersInDb(
             domain: string,
             expected: number,
-            fn?: (x: Array<DbCounter>) => void
+            fn?: (x: DbCounter[]) => void
         ) {
             const counters = await CounterDAO.findAllCountersForUpdateForDomain(
                 db,
@@ -36,11 +36,11 @@ describe(
             }
         }
 
-        function withServerAllSites(
+        async function withServerAllSites(
             response: string,
-            fn: (server: TestHttpServer) => void
+            fn: (server: TestHttpServer) => Promise<void>
         ) {
-            return withServer(PORT, URL_ALL_SITES, response, fn);
+            return await withServer(PORT, URL_ALL_SITES, response, fn);
         }
 
         test("updateMetadataForDomain - empty", async () => {

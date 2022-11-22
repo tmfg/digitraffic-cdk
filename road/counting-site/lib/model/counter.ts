@@ -1,6 +1,10 @@
-import {JsonSchema, JsonSchemaType, JsonSchemaVersion} from "aws-cdk-lib/aws-apigateway";
+import {
+    JsonSchema,
+    JsonSchemaType,
+    JsonSchemaVersion,
+} from "aws-cdk-lib/aws-apigateway";
 
-export type ApiCounter = {
+export interface ApiCounter {
     readonly id: number;
     readonly domain: string;
     readonly name: string;
@@ -11,7 +15,7 @@ export type ApiCounter = {
     readonly sens: number;
 }
 
-export type DbCounter = {
+export interface DbCounter {
     readonly id: number;
     readonly site_id: number;
     readonly domain_name: string;
@@ -30,41 +34,41 @@ export type DbCounter = {
 export const counterProperties: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
-    description: 'Counting Site Metadata',
+    description: "Counting Site Metadata",
     properties: {
         id: {
             type: JsonSchemaType.INTEGER,
-            description: 'Counter id',
+            description: "Counter id",
         },
         name: {
             type: JsonSchemaType.STRING,
-            description: 'Counter name',
+            description: "Counter name",
         },
         domain: {
             type: JsonSchemaType.STRING,
-            description: 'Domain name',
+            description: "Domain name",
         },
         userType: {
             type: JsonSchemaType.INTEGER,
-            description: 'Counter type',
+            description: "Counter type",
         },
         interval: {
             type: JsonSchemaType.INTEGER,
-            description: 'Data recording interval in minutes',
+            description: "Data recording interval in minutes",
         },
         direction: {
             type: JsonSchemaType.INTEGER,
-            description: 'Counter direction',
+            description: "Counter direction",
         },
         lastDataTimestamp: {
             type: JsonSchemaType.STRING,
-            format: 'date-time',
-            description: 'Timestamp of last data',
+            format: "date-time",
+            description: "Timestamp of last data",
         },
         removedTimestamp: {
             type: JsonSchemaType.STRING,
-            format: 'date-time',
-            description: 'Removal timestamp',
+            format: "date-time",
+            description: "Removal timestamp",
         },
     },
 };
