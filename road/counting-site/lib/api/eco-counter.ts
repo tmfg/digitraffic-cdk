@@ -71,7 +71,7 @@ export class EcoCounterApi {
         const entries = sites.flatMap((site: ApiSite) =>
             site.channels
                 .filter((c) => this.validate(c))
-                .map((c: ApiChannel) => [
+                .map((c: ApiChannel): [ApiChannel["id"], ApiCounter] => [
                     c.id,
                     {
                         ...c,
