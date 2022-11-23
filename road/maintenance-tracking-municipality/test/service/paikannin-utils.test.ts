@@ -1,5 +1,5 @@
 /* eslint-disable camelcase */
-import {getRandomInteger, randomString} from "@digitraffic/common/test/testutils";
+import {getRandomInteger, randomString} from "@digitraffic/common/dist/test/testutils";
 import moment from "moment";
 import {PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S} from "../../lib/constants";
 import {DbWorkMachine} from "../../lib/model/db-data";

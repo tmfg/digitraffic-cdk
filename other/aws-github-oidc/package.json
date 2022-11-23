@@ -15,9 +15,9 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.6-1",
-    "aws-cdk-lib": "2.50.0",
-    "constructs": "10.1.160",
+    "@digitraffic/common": "2022.11.23-5",
+    "aws-cdk-lib": "2.51.1",
+    "constructs": "10.1.168",
     "source-map-support": "*"
   }
 }

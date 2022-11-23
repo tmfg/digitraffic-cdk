@@ -4,8 +4,8 @@ import * as InternalLambdas from './internal-lambdas';
 import * as ec2 from "aws-cdk-lib/aws-ec2";
 import {Construct} from "constructs";
 import {Aspects, Stack, StackProps, Tags} from "aws-cdk-lib";
-import {StackCheckingAspect} from "@digitraffic/common/aws/infra/stack/stack-checking-aspect";
-import {SOLUTION_KEY} from "@digitraffic/common/aws/infra/stack/stack";
+import {StackCheckingAspect} from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
+import {SOLUTION_KEY} from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class Open311Stack extends Stack {
     constructor(scope: Construct, id: string, open311Props: Props, props?: StackProps) {

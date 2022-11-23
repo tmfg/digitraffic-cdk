@@ -29,7 +29,7 @@
     "@types/node": "*",
     "@types/sinon": "*",
     "aws-cdk-lib": "*",
-    "aws-sdk": "2.1254.0",
+    "aws-sdk": "2.1260.0",
     "esbuild": "*",
     "jest": "^29.3.1",
     "parallelshell": "3.0.2",
@@ -37,9 +37,9 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.6-1",
-    "aws-cdk-lib": "2.50.0",
-    "constructs": "10.1.160",
+    "@digitraffic/common": "2022.11.23-5",
+    "aws-cdk-lib": "2.51.1",
+    "constructs": "10.1.168",
     "p-limit": "4.0.0",
     "source-map-support": "^0.5.19"
   },

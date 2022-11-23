@@ -1,13 +1,13 @@
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
-import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
+import {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
+import {DigitrafficRestApi} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import {DocumentationPart} from "@digitraffic/common/dist/aws/infra/documentation";
 import {Model, Resource} from "aws-cdk-lib/aws-apigateway";
-import {MonitoredDBFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
-import {corsMethod, defaultIntegration, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
-import {featureSchema, geojsonSchema, getModelReference} from "@digitraffic/common/utils/api-model";
+import {MonitoredDBFunction} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import {corsMethod, defaultIntegration, methodResponse} from "@digitraffic/common/dist/aws/infra/api/responses";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
+import {featureSchema, geojsonSchema, getModelReference} from "@digitraffic/common/dist/utils/api-model";
 import {permitProperties} from "./model/permit";
-import {DigitrafficIntegrationResponse} from "@digitraffic/common/aws/runtime/digitraffic-integration-response";
+import {DigitrafficIntegrationResponse} from "@digitraffic/common/dist/aws/runtime/digitraffic-integration-response";
 
 const STREET_TRAFFIC_MESSAGE_TAGS = ["Street Traffic Message(Beta)"];
 

@@ -13,7 +13,7 @@ import { SinonStub } from "sinon";
 import { BAD_REQUEST_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
 import { UploadVoyagePlanEvent } from "../../lib/model/upload-voyageplan-event";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { SecretHolder } from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 const sandbox = sinon.createSandbox();
 process.env[AtonEnvKeys.SEND_S124_QUEUE_URL] = "Value_for_test";

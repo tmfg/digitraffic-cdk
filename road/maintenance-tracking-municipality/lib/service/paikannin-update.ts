@@ -1,6 +1,6 @@
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
-import * as Geometry from "@digitraffic/common/utils/geometry";
-import * as CommonUtils from "@digitraffic/common/utils/utils";
+import {DTDatabase, inDatabase} from "@digitraffic/common/dist/database/database";
+import * as Geometry from "@digitraffic/common/dist/utils/geometry";
+import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import {Position} from "geojson";
 import moment from "moment";
 import {PaikanninApi} from "../api/paikannin";

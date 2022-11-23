@@ -1,15 +1,15 @@
 import {EndpointType, LambdaIntegration, MethodLoggingLevel, Resource, RestApi} from 'aws-cdk-lib/aws-apigateway';
 import {AssetCode} from 'aws-cdk-lib/aws-lambda';
 import {Stack} from "aws-cdk-lib";
-import {createSubscription} from "@digitraffic/common/aws/infra/stack/subscription";
-import {defaultLambdaConfiguration} from '@digitraffic/common/aws/infra/stack/lambda-configs';
+import {createSubscription} from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import {defaultLambdaConfiguration} from '@digitraffic/common/dist/aws/infra/stack/lambda-configs';
 import {VoyagePlanGatewayProps} from "./app-props";
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
-import {add404Support, createDefaultPolicyDocument} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {add404Support, createDefaultPolicyDocument} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import {VoyagePlanEnvKeys} from "./keys";
-import {createUsagePlan} from "@digitraffic/common/aws/infra/usage-plans";
-import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {createUsagePlan} from "@digitraffic/common/dist/aws/infra/usage-plans";
+import {MonitoredFunction} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export function create(secret: ISecret,
     props: VoyagePlanGatewayProps,

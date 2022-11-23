@@ -1,7 +1,7 @@
 import {PreparedStatement} from "pg-promise";
 import {SubSubject} from "../model/subsubject";
 import {Locale} from "../model/locale";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
 
 const DELETE_SUBSUBJECTS_PS = new PreparedStatement({
     name: 'delete-subsubjects',

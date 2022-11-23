@@ -5,7 +5,7 @@ import {
     NodePingCheckState,
     NodePingCheckType,
 } from "../../lib/api/nodeping";
-import {randomString} from "@digitraffic/common/test/testutils";
+import {randomString} from "@digitraffic/common/dist/test/testutils";
 import {EndpointHttpMethod, EndpointProtocol} from "../../lib/app-props";
 
 describe('NodePing API', () => {

@@ -1,5 +1,5 @@
-import {DTDatabase} from "@digitraffic/common/database/database";
-import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
+import {dbTestBase as commonDbTestBase} from "@digitraffic/common/dist/test/db-testutils";
 import moment from "moment-timezone";
 import {DbObservationData} from "../lib/dao/maintenance-tracking-dao";
 import {Havainto} from "../lib/model/models";

@@ -1,5 +1,12 @@
-import {findSymbol, InputSymbols, isValidSymbol, TextSymbol, SymbolType, getSymbolType} from "./textSymbol";
-import {InputError} from "@digitraffic/common/types/input-error";
+import {
+    findSymbol,
+    InputSymbols,
+    isValidSymbol,
+    TextSymbol,
+    SymbolType,
+    getSymbolType,
+} from "./textSymbol";
+import { InputError } from "@digitraffic/common/dist/types/input-error";
 
 const MAX_LENGTH = 30;
 
@@ -36,7 +43,7 @@ function checkSize(text: string) {
 }
 
 function checkUnderlines(text: string) {
-    const count = text.split('_').length - 1;
+    const count = text.split("_").length - 1;
 
     if (count > 1) {
         error(ERROR_ONE_UNDERSCORE);
@@ -48,12 +55,12 @@ function checkAndRemoveBrackets(text: string): string {
     const firstChar = text[0];
     const lastChar = text[text.length - 1];
 
-    const count1 = text.split('[').length - 1;
-    const count2 = text.split(']').length - 1;
+    const count1 = text.split("[").length - 1;
+    const count2 = text.split("]").length - 1;
 
-    if (firstChar === '[') {
+    if (firstChar === "[") {
         // ok, last char must be ]
-        if (lastChar !== ']') {
+        if (lastChar !== "]") {
             error(ERROR_TEXT_SYNTAX);
         } else if (count1 > 1 || count2 > 1) {
             error(ERROR_TEXT_SYNTAX);
@@ -79,15 +86,17 @@ function convert(text: string): string {
 // create svg from symbols
 function creteSvg(symbolList: TextSymbol[]): string {
     // first introduce symbols in svg, only once each
-    const symbolsText = Array.from(new Set(symbolList).values()).map((s) => s.getSvg()).join('\n');
+    const symbolsText = Array.from(new Set(symbolList).values())
+        .map((s) => s.getSvg())
+        .join("\n");
 
-    let useText = '';
-    let width= 0;
+    let useText = "";
+    let width = 0;
 
     // then use introduced symbols
     symbolList.forEach((symbol: TextSymbol) => {
-        useText+= `<use href="#${symbol.name}" x="${width}" y="0" width="${symbol.width}" height="32"/>\n`;
-        width+= symbol.width;
+        useText += `<use href="#${symbol.name}" x="${width}" y="0" width="${symbol.width}" height="32"/>\n`;
+        width += symbol.width;
     });
 
     return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} 32">\n${symbolsText}\n${useText}</svg>\n`;
@@ -95,13 +104,15 @@ function creteSvg(symbolList: TextSymbol[]): string {
 
 // convert given string-list to list of symbols, add end if needed
 function convertToSymbols(symbols: Symbols): TextSymbol[] {
-    const symbolList = symbols.symbols.map(s => findSymbol(symbols.symbolType, s)) as TextSymbol[];
+    const symbolList = symbols.symbols.map((s) =>
+        findSymbol(symbols.symbolType, s)
+    ) as TextSymbol[];
 
     // and end symbol, if first symbol is starting borders
     if (symbolList[0].startsBorders()) {
-        const end = findSymbol(symbols.symbolType, 'END');
+        const end = findSymbol(symbols.symbolType, "END");
 
-        if(end) {
+        if (end) {
             symbolList.push(end);
         }
     }
@@ -127,14 +138,14 @@ function findUsedSymbolTexts(text: string): Symbols {
     let symbolType = SymbolType.NORMAL;
 
     while (index < text.length) {
-        const mark = text.indexOf('_', index);
+        const mark = text.indexOf("_", index);
         let symbol;
         if (mark !== -1) {
             const symbolText = text.substring(index, mark + 1);
             symbolType = getSymbolType(symbolText.toUpperCase());
             symbol = getSymbol(symbolText.toUpperCase());
 
-            index = mark+1;
+            index = mark + 1;
         } else {
             symbol = text[index];
 
@@ -157,7 +168,11 @@ function findUsedSymbolTexts(text: string): Symbols {
     };
 }
 
-const BEGIN_SYMBOLS = [InputSymbols.ROAD.toString(), InputSymbols.DETOUR.toString(), InputSymbols.DIVERSION.toString()];
+const BEGIN_SYMBOLS = [
+    InputSymbols.ROAD.toString(),
+    InputSymbols.DETOUR.toString(),
+    InputSymbols.DIVERSION.toString(),
+];
 
 function getSymbol(text: string): string {
     if (text === InputSymbols.RAMP) {
@@ -176,6 +191,6 @@ function findSingleSymbol(text: string): string | null {
 }
 
 interface Symbols {
-    readonly symbolType: SymbolType,
-    readonly symbols: string[]
+    readonly symbolType: SymbolType;
+    readonly symbols: string[];
 }

@@ -5,8 +5,8 @@ process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = `https://sqs.eu-west-1.a
 process.env.AWS_REGION = 'aws-region';
 
 import {SQSRecord} from "aws-lambda";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import {SecretHolder} from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
 import moment from 'moment-timezone';
 import * as sinon from 'sinon';
 import {SqsConsumer} from 'sns-sqs-big-payload';

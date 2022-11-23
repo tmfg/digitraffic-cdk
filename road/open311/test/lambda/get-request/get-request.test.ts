@@ -1,7 +1,7 @@
 import {handler} from "../../../lib/lambda/get-request/lambda-get-request";
 import {newServiceRequest} from "../../testdata";
 import {dbTestBase, insertServiceRequest} from "../../db-testutil";
-import {NOT_FOUND_MESSAGE} from "@digitraffic/common/aws/types/errors";
+import {NOT_FOUND_MESSAGE} from "@digitraffic/common/dist/aws/types/errors";
 
 // test file
 /* eslint-disable camelcase */

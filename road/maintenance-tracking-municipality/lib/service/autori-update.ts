@@ -1,6 +1,6 @@
-import {DTDatabase, inDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
-import * as CommonDateUtils from "@digitraffic/common/utils/date-utils";
-import * as CommonUtils from "@digitraffic/common/utils/utils";
+import {DTDatabase, inDatabase, inDatabaseReadonly} from "@digitraffic/common/dist/database/database";
+import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
+import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import {Position} from "geojson";
 import moment from "moment";
 import {AutoriApi} from "../api/autori";

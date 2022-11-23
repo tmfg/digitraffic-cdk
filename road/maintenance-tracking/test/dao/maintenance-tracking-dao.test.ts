@@ -1,4 +1,4 @@
-import {DTDatabase} from "@digitraffic/common/database/database";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
 import * as MaintenanceTrackingDb from "../../lib/dao/maintenance-tracking-dao";
 import * as DbTestutil from "../db-testutil";
 import * as TestData from "../testdata";

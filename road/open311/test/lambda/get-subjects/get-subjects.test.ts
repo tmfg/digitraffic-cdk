@@ -3,7 +3,7 @@ import * as SubjectsDb from "../../../lib/db/subjects";
 import {newSubject} from "../../testdata";
 import {dbTestBase} from "../../db-testutil";
 import {Locale} from "../../../lib/model/locale";
-import {shuffle} from "@digitraffic/common/test/testutils";
+import {shuffle} from "@digitraffic/common/dist/test/testutils";
 
 describe('lambda-get-subjects', dbTestBase((db) => {
 

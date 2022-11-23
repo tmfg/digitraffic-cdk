@@ -1,5 +1,5 @@
 import {SQSEvent, SQSRecord} from "aws-lambda";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {SecretHolder} from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import {SqsConsumer} from 'sns-sqs-big-payload';
 import {MaintenanceTrackingEnvKeys} from "../../keys";
 import * as SqsBigPayload from "../../service/sqs-big-payload";

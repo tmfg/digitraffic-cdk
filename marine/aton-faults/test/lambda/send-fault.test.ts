@@ -9,8 +9,8 @@ import {
     SendS124Event,
 } from "../../lib/model/upload-voyageplan-event";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { SecretHolder } from "@digitraffic/common/aws/runtime/secrets/secret-holder";
-import { ProxyHolder } from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 
 const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;

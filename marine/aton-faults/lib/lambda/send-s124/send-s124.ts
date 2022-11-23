@@ -13,8 +13,8 @@ import {
 import { Builder } from "xml2js";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
-import { ProxyHolder } from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
-import { SecretHolder } from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 let visService: VisService | undefined;
 

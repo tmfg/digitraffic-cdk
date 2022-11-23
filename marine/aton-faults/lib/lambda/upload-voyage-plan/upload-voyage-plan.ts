@@ -10,7 +10,7 @@ import { AtonSecret } from "../../model/secret";
 import { decodeBase64ToAscii } from "@digitraffic/common/dist/utils/base64";
 import { VisService } from "../../service/vis";
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
-import { SecretHolder } from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.

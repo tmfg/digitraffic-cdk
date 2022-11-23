@@ -1,6 +1,6 @@
 import * as PermitsService from "../../service/permits";
-import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {LambdaResponse} from "@digitraffic/common/dist/aws/types/lambda-response";
+import {SecretHolder} from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 const holder = SecretHolder.create();
 

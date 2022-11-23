@@ -1,6 +1,6 @@
 import {handler} from '../../../lib/lambda/update-subjects/lambda-update-subjects';
 import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "@digitraffic/common/test/httpserver";
+import {TestHttpServer} from "@digitraffic/common/dist/test/httpserver";
 import * as SubjectsDb from "../../../lib/db/subjects";
 import {Locale} from "../../../lib/model/locale";
 

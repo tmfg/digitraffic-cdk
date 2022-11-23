@@ -1,8 +1,8 @@
-import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly, inTransaction} from "@digitraffic/common/database/database";
+import {DTDatabase, DTTransaction, inDatabase, inDatabaseReadonly, inTransaction} from "@digitraffic/common/dist/database/database";
 import * as permitsService from "./permits";
 import * as permitDb from "../db/permit";
-import * as LastUpdatedDb from "@digitraffic/common/database/last-updated";
-import {DataType} from "@digitraffic/common/database/last-updated";
+import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
+import {DataType} from "@digitraffic/common/dist/database/last-updated";
 
 export async function updatePermits(authKey: string, url: string) {
     const permitsInApi = await permitsService.getPermitsFromSource(authKey, url);

@@ -2,8 +2,8 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import {Duration} from 'aws-cdk-lib';
 import {ISecret} from "aws-cdk-lib/aws-secretsmanager";
 import {Construct} from "constructs";
-import {databaseFunctionProps, LambdaEnvironment} from '@digitraffic/common/aws/infra/stack/lambda-configs';
-import {createSubscription} from '@digitraffic/common/aws/infra/stack/subscription';
+import {databaseFunctionProps, LambdaEnvironment} from '@digitraffic/common/dist/aws/infra/stack/lambda-configs';
+import {createSubscription} from '@digitraffic/common/dist/aws/infra/stack/subscription';
 import {AppProps} from "./app-props";
 import {Queue} from "aws-cdk-lib/aws-sqs";
 import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
@@ -12,8 +12,8 @@ import {RetentionDays} from 'aws-cdk-lib/aws-logs';
 import {QueueAndDLQ} from "./sqs";
 import {ManagedPolicy, PolicyStatement, Role, ServicePrincipal} from "aws-cdk-lib/aws-iam";
 import {MaintenanceTrackingEnvKeys} from "./keys";
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
+import {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
+import {MonitoredFunction} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 
 export function createProcessQueueAndDlqLambda(
     queueAndDLQ: QueueAndDLQ,

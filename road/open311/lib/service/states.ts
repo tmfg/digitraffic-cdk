@@ -1,5 +1,5 @@
 import * as StatesDb from '../db/states';
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
+import {DTDatabase, inDatabase} from "@digitraffic/common/dist/database/database";
 import {ServiceRequestState} from "../model/service-request-state";
 import {Locale} from "../model/locale";
 

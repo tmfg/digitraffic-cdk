@@ -1,7 +1,7 @@
-import * as CommonDateUtils from "@digitraffic/common/utils/date-utils";
-import {GeoJsonLineString, GeoJsonPoint} from "@digitraffic/common/utils/geojson-types";
-import {distanceBetweenPositionsInM} from "@digitraffic/common/utils/geometry";
-import * as CommonUtils from "@digitraffic/common/utils/utils";
+import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
+import {GeoJsonLineString, GeoJsonPoint} from "@digitraffic/common/dist/utils/geojson-types";
+import {distanceBetweenPositionsInM} from "@digitraffic/common/dist/utils/geometry";
+import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import {Position} from "geojson";
 import * as Constants from "../constants";
 import {DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking, DbWorkMachine} from "../model/db-data";

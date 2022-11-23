@@ -1,5 +1,5 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
 import moment from "moment";
 import {ApiDevice, ApiWorkeventDevice} from "../model/paikannin-api-data";
 

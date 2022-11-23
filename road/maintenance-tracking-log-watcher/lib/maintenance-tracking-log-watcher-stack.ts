@@ -10,7 +10,7 @@ import { Construct } from "constructs";
 import {
     defaultLambdaConfiguration,
     LambdaEnvironment,
-} from "@digitraffic/common/aws/infra/stack/lambda-configs";
+} from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 import { Props } from "./app-props";
 import {
     KEY_ES_ENDPOINT,

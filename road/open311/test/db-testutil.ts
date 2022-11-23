@@ -1,7 +1,7 @@
 import {ServiceRequest} from "../lib/model/service-request";
 import * as RequestsDb from "../lib/db/requests";
-import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import {dbTestBase as commonDbTestBase} from "@digitraffic/common/dist/test/db-testutils";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(

@@ -1,5 +1,5 @@
 import {Client} from 'paho-mqtt';
-import {ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
+import {ProxyLambdaResponse} from "@digitraffic/common/dist/aws/types/proxytypes";
 
 export const KEY_APP = 'KEY_APP';
 

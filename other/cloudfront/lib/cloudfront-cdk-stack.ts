@@ -13,7 +13,7 @@ import {
 } from "./lambda/lambda-creator";
 import {createDistribution} from "./distribution-util";
 import {createRealtimeLogging, StreamingConfig} from "./streaming-util";
-import {StackCheckingAspect} from "@digitraffic/common/aws/infra/stack/stack-checking-aspect";
+import {StackCheckingAspect} from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import {LambdaHolder} from "./lambda-holder";
 
 type ViewerPolicyMap = {

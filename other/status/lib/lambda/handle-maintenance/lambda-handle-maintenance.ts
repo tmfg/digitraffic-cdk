@@ -1,7 +1,7 @@
 import axios from 'axios';
 import {SecretsManager} from 'aws-sdk';
 import {UpdateStatusSecret} from "../../secret";
-import {SlackApi} from "@digitraffic/common/utils/slack";
+import {SlackApi} from "@digitraffic/common/dist/utils/slack";
 
 let api: SlackApi;
 
