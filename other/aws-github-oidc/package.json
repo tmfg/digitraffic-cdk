@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@digitraffic/common": "2022.10.6-1",
-    "aws-cdk-lib": "*",
-    "constructs": "*",
+    "aws-cdk-lib": "2.50.0",
+    "constructs": "10.1.160",
     "source-map-support": "*"
   }
 }

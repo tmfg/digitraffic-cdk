@@ -11,18 +11,24 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 7
+
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: "14"
+          cache: "pnpm"
 
       - name: Install packages
-        run: yarn install --frozen-lock
+        run: pnpm install
 
       - name: Create ESLint reports from all project
         if: ${{ github.ref_name == 'master' }}
         id: report-all
-        run: yarn eslint-report:all
+        run: pnpm eslint-report:all
         continue-on-error: true
 
       - name: Find fork-point for affected runs
@@ -35,7 +41,7 @@ jobs:
       - name: Create ESLint reports for affected projects
         if: ${{ github.ref_name != 'master' }}
         id: report-affected
-        run: yarn eslint-report:affected
+        run: pnpm eslint-report:affected
         env:
           NX_BASE: ${{ steps.fork-point.outputs.fork-point-sha }}
           NX_HEAD: HEAD

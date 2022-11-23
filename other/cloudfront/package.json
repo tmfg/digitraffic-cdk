@@ -25,20 +25,22 @@
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy"
   },
   "devDependencies": {
-    "@types/aws-lambda": "*",
+    "@types/aws-lambda": "8.10.108",
     "@types/node": "*",
     "@types/sinon": "*",
     "aws-cdk-lib": "*",
-    "aws-sdk": "*",
+    "aws-sdk": "2.1254.0",
     "esbuild": "*",
-    "parallelshell": "3.0.1",
+    "jest": "^29.3.1",
+    "parallelshell": "3.0.2",
     "sinon": "*",
     "typescript": "*"
   },
   "dependencies": {
     "@digitraffic/common": "2022.10.6-1",
-    "aws-cdk-lib": "*",
-    "p-limit": "3.1.0",
+    "aws-cdk-lib": "2.50.0",
+    "constructs": "10.1.160",
+    "p-limit": "4.0.0",
     "source-map-support": "^0.5.19"
   },
   "externals": [

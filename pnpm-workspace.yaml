@@ -1,0 +1,6 @@
+packages:
+  - "marine/*"
+  - "road/*"
+  - "aviation/*"
+  - "other/*"
+  - "rail/*"

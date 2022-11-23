@@ -20,31 +20,31 @@
     "cdk-synth-status-test": "cdk synth MaintenanceTrackingLogWatcherTest --no-staging > template-status-test.yaml"
   },
   "devDependencies": {
-    "@types/aws-lambda": "*",
-    "@types/jest": "^26.0.22",
+    "@types/aws-lambda": "8.10.108",
+    "@types/jest": "^29.2.3",
     "@types/node": "*",
     "@types/sinon": "*",
     "@types/xml2js": "^0.4.8",
-    "aws-sdk": "*",
-    "esbuild": "^0.8.36",
-    "jest": "^27.0.6",
-    "jest-junit": "^13.0.0",
-    "node-fetch": "^2.6.1",
-    "parallelshell": "3.0.1",
+    "aws-sdk": "2.1254.0",
+    "esbuild": "^0.15.14",
+    "jest": "^29.3.1",
+    "jest-junit": "^14.0.1",
+    "node-fetch": "^3.3.0",
+    "parallelshell": "3.0.2",
     "sinon": "^14.0.1",
-    "ts-jest": "^27.0.4",
-    "ts-node": "^8.10.2",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
     "typescript": "*"
   },
   "dependencies": {
     "@digitraffic/common": "2022.10.6-1",
     "@types/node-fetch": "^2.5.7",
-    "aws-cdk-lib": "*",
-    "constructs": "*",
+    "aws-cdk-lib": "2.50.0",
+    "constructs": "10.1.160",
     "moment": "*",
-    "moment-timezone": "*",
+    "moment-timezone": "0.5.39",
     "source-map-support": "^0.5.19",
-    "uuid": "^8.3.1"
+    "uuid": "^9.0.0"
   },
   "externals": [
     "aws-sdk"
