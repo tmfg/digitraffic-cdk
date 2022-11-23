@@ -8,7 +8,7 @@
     "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint --cache .",
     "eslint-report": "eslint . --format html -o report.html",
