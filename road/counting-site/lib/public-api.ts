@@ -2,11 +2,6 @@ import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import {
-    corsMethod,
-    defaultIntegration,
-    methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import {
@@ -23,6 +18,7 @@ import {
 import { counterProperties } from "./model/counter";
 import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 
 const COUNTING_SITE_TAGS_V1 = ["Counting site V1"];
 
@@ -196,26 +192,19 @@ export class PublicApi {
     createUserTypesEndpoint(stack: DigitrafficStack) {
         const lambda = MonitoredDBFunction.create(stack, "get-user-types");
 
-        const integration = defaultIntegration(lambda);
+        const integration = new DigitrafficIntegration(
+            lambda,
+            MediaType.APPLICATION_JSON
+        ).build();
 
         ["GET", "HEAD"].forEach((httpMethod) => {
             this.userTypesResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_JSON,
-                            this.userTypesResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.userTypesResponseModel
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
@@ -224,26 +213,19 @@ export class PublicApi {
     createDomainsEndpoint(stack: DigitrafficStack) {
         const lambda = MonitoredDBFunction.create(stack, "get-domains");
 
-        const integration = defaultIntegration(lambda);
+        const integration = new DigitrafficIntegration(
+            lambda,
+            MediaType.APPLICATION_JSON
+        ).build();
 
         ["GET", "HEAD"].forEach((httpMethod) => {
             this.domainsResource.addMethod(httpMethod, integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_JSON,
-                            this.domainsResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.domainsResponseModel
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
@@ -266,20 +248,11 @@ export class PublicApi {
                     "method.request.querystring.domain_name": false,
                 },
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_GEOJSON,
-                            this.geoJsonResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.geoJsonResponseModel,
+                        MediaType.APPLICATION_GEOJSON
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
@@ -302,20 +275,11 @@ export class PublicApi {
                     "method.request.path.counterId": true,
                 },
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_GEOJSON,
-                            this.geoJsonResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.geoJsonResponseModel,
+                        MediaType.APPLICATION_GEOJSON
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
@@ -341,20 +305,10 @@ export class PublicApi {
                     "method.request.querystring.month": false,
                 },
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_JSON,
-                            this.jsonValuesResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.jsonValuesResponseModel
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
@@ -387,20 +341,11 @@ export class PublicApi {
                     "method.request.querystring.counter_id": false,
                 },
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.TEXT_CSV,
-                            this.csvValuesResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.csvValuesResponseModel,
+                        MediaType.TEXT_CSV
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_JSON,
-                            Model.EMPTY_MODEL
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });

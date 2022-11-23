@@ -17,6 +17,7 @@
     "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
+    "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
     "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
     "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
@@ -32,12 +33,12 @@
     "jest-junit": "^13.0.0",
     "parallelshell": "3.0.1",
     "sinon": "*",
-    "ts-jest": "^27.0.4",
-    "typescript": "^4.7.4"
+    "ts-jest": "^29.0.3",
+    "typescript": "^4.8.4"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.11-1",
-    "aws-cdk-lib": "*",
+    "@digitraffic/common": "2022.11.23-1",
+    "aws-cdk-lib": "2.51.1",
     "axios": "^0.21.1",
     "csv-writer": "^1.6.0",
     "geojson-validation": "^1.0.2",
