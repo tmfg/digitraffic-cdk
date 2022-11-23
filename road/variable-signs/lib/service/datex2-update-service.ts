@@ -1,17 +1,21 @@
 import * as DeviceDB from "../db/datex2";
-import * as LastUpdatedDB from "@digitraffic/common/database/last-updated";
-import {DTDatabase, DTTransaction, inDatabase} from "@digitraffic/common/database/database";
-import {Situation} from "../model/situation";
-import {StatusCodeValue} from "../model/status-code-value";
+import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import {
+    DTDatabase,
+    DTTransaction,
+    inDatabase,
+} from "@digitraffic/common/dist/database/database";
+import { Situation } from "../model/situation";
+import { StatusCodeValue } from "../model/status-code-value";
 
 const REG_PAYLOAD = /<payloadPublication/g;
 
-const DATEX2_SITUATION_TAG_START = '<situation ';
-const DATEX2_SITUATION_TAG_END = '</situation>';
-const DATEX2_OVERALL_STARTTIME_TAG_START = '<overallStartTime>';
-const DATEX2_OVERALL_STARTTIME_TAG_END = '</overallStartTime>';
-const DATEX2_VERSION_ATTRIBUTE = 'version=';
-const XML_TAG_START = '<?xml';
+const DATEX2_SITUATION_TAG_START = "<situation ";
+const DATEX2_SITUATION_TAG_END = "</situation>";
+const DATEX2_OVERALL_STARTTIME_TAG_START = "<overallStartTime>";
+const DATEX2_OVERALL_STARTTIME_TAG_END = "</overallStartTime>";
+const DATEX2_VERSION_ATTRIBUTE = "version=";
+const XML_TAG_START = "<?xml";
 
 export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
     const start = Date.now();
@@ -27,11 +31,19 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
         return db.tx((tx: DTTransaction) => {
             return tx.batch([
                 ...DeviceDB.saveDatex2(tx, situations, timestamp),
-                LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp),
+                LastUpdatedDB.updateLastUpdated(
+                    tx,
+                    LastUpdatedDB.DataType.VS_DATEX2,
+                    timestamp
+                ),
             ]);
         });
     }).finally(() => {
-        console.info("method=updateDatex2 updatedCount=%d tookMs=%d", situations.length, (Date.now() - start));
+        console.info(
+            "method=updateDatex2 updatedCount=%d tookMs=%d",
+            situations.length,
+            Date.now() - start
+        );
     });
 
     return StatusCodeValue.OK;
@@ -48,10 +60,20 @@ export function parseSituations(datex2: string): Situation[] {
         sitIndex = datex2.indexOf(DATEX2_SITUATION_TAG_START, index);
 
         if (sitIndex !== -1) {
-            const sitEndIndex = datex2.indexOf(DATEX2_SITUATION_TAG_END, sitIndex + DATEX2_SITUATION_TAG_START.length);
+            const sitEndIndex = datex2.indexOf(
+                DATEX2_SITUATION_TAG_END,
+                sitIndex + DATEX2_SITUATION_TAG_START.length
+            );
             index = sitEndIndex;
 
-            situations.push(parseSituation(datex2.substr(sitIndex, sitEndIndex - sitIndex + DATEX2_SITUATION_TAG_END.length)));
+            situations.push(
+                parseSituation(
+                    datex2.substring(
+                        sitIndex,
+                        sitEndIndex + DATEX2_SITUATION_TAG_END.length
+                    )
+                )
+            );
         }
     } while (sitIndex !== -1);
 
@@ -62,18 +84,19 @@ function parseSituation(datex2: string): Situation {
     return {
         id: parseId(datex2),
         datex2: datex2,
-        // eslint-disable-next-line camelcase
         effectDate: parseEffectDate(datex2),
     };
 }
 
 function parseId(datex2: string): string {
     const index = datex2.indexOf(DATEX2_VERSION_ATTRIBUTE);
-    return datex2.substring(15, index-2);
+    return datex2.substring(15, index - 2);
 }
 
 function parseEffectDate(datex2: string): Date {
-    const index = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) + DATEX2_OVERALL_STARTTIME_TAG_START.length;
+    const index =
+        datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
+        DATEX2_OVERALL_STARTTIME_TAG_START.length;
     const index2 = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_END, index);
     const dateString = datex2.substring(index, index2);
 
@@ -82,13 +105,13 @@ function parseEffectDate(datex2: string): Date {
 
 function validate(datex2: string): boolean {
     if (!datex2.includes(XML_TAG_START)) {
-        console.error('no xml-tag');
+        console.error("no xml-tag");
         return false;
     }
 
     const ppCount = occurrences(datex2, REG_PAYLOAD);
     if (ppCount !== 1) {
-        console.error('%d payloadPublications', ppCount);
+        console.error("%d payloadPublications", ppCount);
         return false;
     }
 

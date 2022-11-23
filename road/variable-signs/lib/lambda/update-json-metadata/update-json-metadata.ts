@@ -1,5 +1,5 @@
 import * as JsonUpdateService from "../../service/json-update-service";
-import { ProxyHolder } from "@digitraffic/common/aws/runtime/secrets/proxy-holder";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { StatusCodeValue } from "../../model/status-code-value";
 import { TloikMetatiedot } from "../../model/metatiedot";
 
@@ -10,7 +10,9 @@ export const handler = (event: Record<string, string>) => {
     const start = Date.now();
 
     if (jsonMetadata) {
-        const metatiedot = JSON.parse(jsonMetadata) as unknown as TloikMetatiedot;
+        const metatiedot = JSON.parse(
+            jsonMetadata
+        ) as unknown as TloikMetatiedot;
 
         return proxyHolder
             .setCredentials()

@@ -1,9 +1,12 @@
-import {ContentTypeChecker, UrlChecker} from "@digitraffic/common/aws/infra/canaries/url-checker";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {
+    ContentTypeChecker,
+    UrlChecker,
+} from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 const BASE_URL = "/prod/api/v1/variable-signs/";
 const IMAGES_URL = BASE_URL + "images/";
-const DATEX2_URL2= BASE_URL + "datex2";
+const DATEX2_URL2 = BASE_URL + "datex2";
 
 const V1_BASE = "/prod/api/variable-sign/v1";
 const V1_IMAGES = V1_BASE + "/images";
@@ -14,19 +17,31 @@ export const handler = async () => {
 
     // check datex2
     await checker.expect403WithoutApiKey(DATEX2_URL2);
-    await checker.expect200(DATEX2_URL2, ContentTypeChecker.checkContentType(MediaType.APPLICATION_XML));
+    await checker.expect200(
+        DATEX2_URL2,
+        ContentTypeChecker.checkContentType(MediaType.APPLICATION_XML)
+    );
 
     // check datex2 v1
     await checker.expect403WithoutApiKey(V1_DATEX2);
-    await checker.expect200(V1_DATEX2, ContentTypeChecker.checkContentType(MediaType.APPLICATION_XML));
+    await checker.expect200(
+        V1_DATEX2,
+        ContentTypeChecker.checkContentType(MediaType.APPLICATION_XML)
+    );
 
     // check valid image
     await checker.expect403WithoutApiKey(IMAGES_URL + "42");
-    await checker.expect200(IMAGES_URL + "42", ContentTypeChecker.checkContentType(MediaType.IMAGE_SVG));
+    await checker.expect200(
+        IMAGES_URL + "42",
+        ContentTypeChecker.checkContentType(MediaType.IMAGE_SVG)
+    );
 
     // check valid image v1
     await checker.expect403WithoutApiKey(V1_IMAGES + "/42");
-    await checker.expect200(V1_IMAGES + "/42", ContentTypeChecker.checkContentType(MediaType.IMAGE_SVG));
+    await checker.expect200(
+        V1_IMAGES + "/42",
+        ContentTypeChecker.checkContentType(MediaType.IMAGE_SVG)
+    );
 
     // check invalid image
     await checker.expect403WithoutApiKey(IMAGES_URL + "error");

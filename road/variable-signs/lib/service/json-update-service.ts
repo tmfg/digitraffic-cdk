@@ -6,7 +6,7 @@ import { DbDevice } from "../model/device";
 import {
     DTTransaction,
     inTransaction,
-} from "@digitraffic/common/database/database";
+} from "@digitraffic/common/dist/database/database";
 import { StatusCodeValue } from "../model/status-code-value";
 
 type DeviceIdMap = Map<string, TloikLaite>;
@@ -21,11 +21,13 @@ export async function updateJsonData(
             tilatiedot.liikennemerkit.map(async (lm) => {
                 const id = await DataDb.insertDeviceData(db, lm);
 
-                return lm.rivit ? Promise.all(
-                    lm.rivit?.map((rivi) =>
-                        DataDb.insertDeviceDataRows(db, id, rivi)
-                    )
-                ) : Promise.resolve();
+                return lm.rivit
+                    ? Promise.all(
+                          lm.rivit.map((rivi) =>
+                              DataDb.insertDeviceDataRows(db, id, rivi)
+                          )
+                      )
+                    : Promise.resolve();
             })
         );
     });

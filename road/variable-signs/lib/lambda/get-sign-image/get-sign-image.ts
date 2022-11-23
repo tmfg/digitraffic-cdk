@@ -1,6 +1,6 @@
 import * as TextConverterService from "../../service/text-converter";
-import {LambdaResponse} from "@digitraffic/common/aws/types/lambda-response";
-import {InputError} from "@digitraffic/common/types/input-error";
+import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
+import { InputError } from "@digitraffic/common/types/input-error";
 
 export const handler = (event: Record<string, string>) => {
     const start = Date.now();
@@ -17,6 +17,6 @@ export const handler = (event: Record<string, string>) => {
         // other errors -> 500
         return LambdaResponse.internalError();
     } finally {
-        console.info("method=getSignImageLambda tookMs=%d", (Date.now()-start));
+        console.info("method=getSignImageLambda tookMs=%d", Date.now() - start);
     }
 };
