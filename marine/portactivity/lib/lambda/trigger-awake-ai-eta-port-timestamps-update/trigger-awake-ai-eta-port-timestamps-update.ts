@@ -6,7 +6,7 @@ import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 const publishTopic = envValue(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 
 // TODO in the future, use ports list
-const ports = ["FIKOK", "FIRAU", "FIOUL", "FIKEM", "FIKJO", "FIUKI"];
+const ports = ["FIKOK", "FIRAU", "FIOUL", "FIKEM", "FIKJO", "FIUKI", "FIPOR"];
 
 export function handlerFn(sns: SNS) {
     return async () => {
