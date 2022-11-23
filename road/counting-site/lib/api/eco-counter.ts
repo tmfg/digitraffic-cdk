@@ -76,7 +76,7 @@ export class EcoCounterApi {
                     {
                         ...c,
                         ...{ name: `${site.name} ${c.name}` },
-                    } as ApiCounter,
+                    },
                 ])
         );
 
