@@ -81,7 +81,7 @@ export class EcoCounterApi {
         );
 
         // and finally create object from entries with id as key and counter as value
-        return Object.fromEntries(entries) as Record<string, ApiCounter>;
+        return Object.fromEntries(entries);
     }
 
     validate(channel: ApiChannel): boolean {
