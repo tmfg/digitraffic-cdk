@@ -13,9 +13,9 @@
     "test": "jest --detectOpenHandles",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "diff": "yarn compile-lambdas && cdk diff",
-    "deploy": "yarn compile-lambdas && cdk deploy",
-    "nolambda": "nodemon -e ts --exec 'yarn compile-lambdas'"
+    "diff": "pnpm compile-lambdas && pnpm dlx cdk@latest diff",
+    "deploy": "pnpm compile-lambdas && pnpm dlx cdk@latest deploy",
+    "nolambda": "nodemon -e ts --exec 'pnpm compile-lambdas'"
   },
   "devDependencies": {
     "@types/aws-lambda": "8.10.108",

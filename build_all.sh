@@ -3,4 +3,4 @@
 # Exit on any error
 set -ex
 
-yarn build:all
+pnpm build:all

@@ -15,7 +15,7 @@
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
-    "test_errors": "yarn test 2>&1 | grep 'FAIL'",
+    "test_errors": "pnpm test 2>&1 | grep 'FAIL'",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common"
