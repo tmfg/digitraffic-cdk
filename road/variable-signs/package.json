@@ -37,7 +37,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.23-1",
+    "@digitraffic/common": "2022.11.23-2",
     "aws-cdk-lib": "*",
     "axios": "^0.21.1",
     "constructs": "*",

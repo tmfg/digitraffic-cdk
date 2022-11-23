@@ -1,13 +1,8 @@
 import { addSimpleServiceModel } from "@digitraffic/common/utils/api-model";
-import {
-    corsMethod,
-    defaultIntegration,
-    methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";
-import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
@@ -141,10 +136,7 @@ export class PublicApi {
             getDatex2Lambda,
             MediaType.APPLICATION_XML
         ).build();
-        const errorResponseModel = this.restApi.addModel(
-            "MessageResponseModel",
-            MessageModel
-        );
+
         const xmlModel = addSimpleServiceModel("XmlModel", this.restApi);
         const svgModel = addSimpleServiceModel(
             "SvgModel",
@@ -156,19 +148,9 @@ export class PublicApi {
             this.datex2Resource.addMethod(httpMethod, getDatex2Integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_XML,
-                            xmlModel
-                        )
-                    ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_XML,
-                            errorResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        xmlModel,
+                        MediaType.APPLICATION_XML
                     ),
                 ],
             });
@@ -176,19 +158,9 @@ export class PublicApi {
             this.v1Datex2Resource.addMethod(httpMethod, getDatex2Integration, {
                 apiKeyRequired: true,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_XML,
-                            xmlModel
-                        )
-                    ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.APPLICATION_XML,
-                            errorResponseModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        xmlModel,
+                        MediaType.APPLICATION_XML
                     ),
                 ],
             });
@@ -208,16 +180,12 @@ export class PublicApi {
                     "method.request.path.text": true,
                 },
                 methodResponses: [
-                    corsMethod(
-                        methodResponse("200", MediaType.IMAGE_SVG, svgModel)
+                    DigitrafficMethodResponse.response200(
+                        svgModel,
+                        MediaType.IMAGE_SVG
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "400",
-                            MediaType.TEXT_PLAIN,
-                            errorResponseModel
-                        )
-                    ),
+                    DigitrafficMethodResponse.response400(),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
 
@@ -227,16 +195,12 @@ export class PublicApi {
                     "method.request.path.text": true,
                 },
                 methodResponses: [
-                    corsMethod(
-                        methodResponse("200", MediaType.IMAGE_SVG, svgModel)
+                    DigitrafficMethodResponse.response200(
+                        svgModel,
+                        MediaType.IMAGE_SVG
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "400",
-                            MediaType.TEXT_PLAIN,
-                            errorResponseModel
-                        )
-                    ),
+                    DigitrafficMethodResponse.response400(),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
