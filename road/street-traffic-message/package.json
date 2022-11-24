@@ -42,7 +42,8 @@
     "axios": "^1.2.0",
     "constructs": "10.1.168",
     "moment": "*",
-    "pg-promise": "10.15.2"
+    "pg-promise": "10.15.2",
+    "wkx": "^0.5.0"
   },
   "externals": [
     "aws-sdk"

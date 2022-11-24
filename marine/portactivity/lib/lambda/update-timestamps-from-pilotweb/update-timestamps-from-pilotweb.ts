@@ -4,10 +4,11 @@ import { PortactivityEnvKeys } from "../../keys";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
-interface PilotWebSecret {
+interface PilotWebSecret extends GenericSecret {
     readonly url: string;
     readonly auth: string;
 }

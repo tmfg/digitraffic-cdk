@@ -25,10 +25,12 @@
     "typescript": "*"
   },
   "dependencies": {
+    "@digitraffic/common": "2022.11.23-5",
     "@types/aws-lambda": "8.10.108",
     "@types/mysql": "^2.15.15",
     "aws-cdk-lib": "2.51.1",
     "aws-lambda": "^1.0.6",
+    "aws-sdk": "2.1260.0",
     "axios": "^1.2.0",
     "constructs": "10.1.168",
     "mysql": "^2.18.1",

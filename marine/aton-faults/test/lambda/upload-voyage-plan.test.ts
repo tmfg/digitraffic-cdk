@@ -17,6 +17,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 
 const sandbox = sinon.createSandbox();
 process.env[AtonEnvKeys.SEND_S124_QUEUE_URL] = "Value_for_test";
+process.env.SECRET_ID = "";
 
 import { handlerFn } from "../../lib/lambda/upload-voyage-plan/upload-voyage-plan";
 

@@ -1,7 +1,30 @@
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+
+jest.mock("@digitraffic/common/dist/aws/runtime/secrets/secret-holder", () => {
+    return {
+        SecretHolder: {
+            create: jest.fn(() => ({
+                get: jest.fn(() => Promise.resolve(TEST_ATON_SECRET)),
+            })),
+        },
+    };
+});
+
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+
+jest.mock("@digitraffic/common/dist/aws/runtime/secrets/proxy-holder", () => {
+    return {
+        ProxyHolder: {
+            create: jest.fn(() => ({
+                setCredentials: jest.fn(() => Promise.resolve()),
+            })),
+        },
+    };
+});
+
 import { dbTestBase, insert, TEST_ATON_SECRET } from "../db-testutil";
 import { handlerFn } from "../../lib/lambda/send-s124/send-s124";
 import { newFault } from "../testdata";
-import * as sinon from "sinon";
 import { SQSEvent } from "aws-lambda";
 import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import {
@@ -9,26 +32,11 @@ import {
     SendS124Event,
 } from "../../lib/model/upload-voyageplan-event";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-
-const sandbox = sinon.createSandbox();
 const SERVER_PORT = 30123;
 
 describe(
     "send-fault",
     dbTestBase((db: DTDatabase) => {
-        beforeEach(() => {
-            sandbox
-                .stub(SecretHolder.prototype, "get")
-                .returns(Promise.resolve(TEST_ATON_SECRET));
-            sandbox
-                .stub(ProxyHolder.prototype, "setCredentials")
-                .returns(Promise.resolve());
-        });
-
-        afterEach(() => sandbox.restore());
-
         test("faults are sent to endpoint", async () => {
             const server = new TestHttpServer();
             try {

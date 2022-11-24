@@ -41,7 +41,7 @@
     "axios": "^1.2.0",
     "constructs": "10.1.168",
     "crypto-js": "^4.0.0",
-    "jsts": "2.9.3",
+    "jsts": "2.7.2",
     "moment": "*",
     "moment-timezone": "0.5.39",
     "ramda": "0.28.0",
@@ -50,12 +50,5 @@
   },
   "externals": [
     "aws-sdk"
-  ],
-  "workspaces": {
-    "nohoist": [
-      "jsts",
-      "@types/jsts",
-      "@types/openlayers"
-    ]
-  }
+  ]
 }

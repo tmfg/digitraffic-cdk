@@ -4,13 +4,14 @@ import {
 } from "../../service/disruptions";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<DisturbancesSecret>(
     "waterwaydisturbances"
 );
 
-interface DisturbancesSecret {
+interface DisturbancesSecret extends GenericSecret {
     url: string;
 }
 

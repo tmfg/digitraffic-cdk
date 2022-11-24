@@ -7,10 +7,10 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-var-requires -- import won't work!
-const WebSocket = require("ws");
+import { WebSocket } from "ws";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
-interface UpdateAwakeAiATXTimestampsSecret {
+interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
     readonly atxurl: string;
     readonly atxauth: string;
 }
@@ -37,7 +37,6 @@ export async function handler(event: unknown, context: Context) {
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
             if (!service) {
                 service = new AwakeAiATXService(
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument -- import won't work!
                     new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket)
                 );
             }

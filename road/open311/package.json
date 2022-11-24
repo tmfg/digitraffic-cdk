@@ -39,6 +39,7 @@
     "constructs": "10.1.168",
     "pg-native": "*",
     "pg-promise": "10.15.2",
+    "spex": "^3.2.0",
     "source-map-support": "^0.5.19"
   },
   "externals": [

@@ -26,12 +26,16 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "8.10.108",
+    "@types/geojson": "^7946.0.7",
     "@types/jest": "^29.2.3",
+    "@types/lodash": "^4.14.190",
     "@types/node": "*",
     "@types/sinon": "*",
     "esbuild": "*",
     "jest": "^29.3.1",
     "jest-junit": "^15.0.0",
+    "lodash": "^4.17.21",
+    "maintenance-tracking": "workspace:maintenance-tracking@*",
     "parallelshell": "3.0.2",
     "sinon": "*",
     "ts-jest": "^29.0.3",
@@ -42,11 +46,13 @@
     "aws-cdk-lib": "2.51.1",
     "axios": "^1.2.0",
     "constructs": "10.1.168",
+    "geojson": "^0.5.0",
     "moment": "*",
     "pg-native": "*",
     "pg-promise": "10.15.2",
     "query-string": "^7.1.1",
-    "source-map-support": "*"
+    "source-map-support": "*",
+    "spex": "^3.2.0"
   },
   "externals": [
     "aws-sdk"

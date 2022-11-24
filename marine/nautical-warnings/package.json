@@ -26,6 +26,7 @@
   },
   "devDependencies": {
     "@types/aws-lambda": "8.10.108",
+    "@types/geojson": "^7946.0.7",
     "@types/jest": "^29.2.3",
     "@types/node": "*",
     "@types/sinon": "*",
