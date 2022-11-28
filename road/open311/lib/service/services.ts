@@ -1,6 +1,9 @@
-import * as ServicesDb from '../db/services';
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
-import {Service} from "../model/service";
+import * as ServicesDb from "../db/services";
+import {
+    DTDatabase,
+    inDatabase,
+} from "@digitraffic/common/dist/database/database";
+import { Service } from "../model/service";
 
 export function findAll(): Promise<Service[]> {
     return inDatabase((db: DTDatabase) => {
@@ -12,9 +15,13 @@ export function update(services: Service[]): Promise<void> {
     const start = Date.now();
     return inDatabase((db: DTDatabase) => {
         return ServicesDb.update(services, db);
-    }).then(a => {
+    }).then((a) => {
         const end = Date.now();
-        console.info("method=updateServices updatedCount=%d tookMs=%d", a.length, (end - start));
+        console.info(
+            "method=updateServices updatedCount=%d tookMs=%d",
+            a.length,
+            end - start
+        );
     });
 }
 

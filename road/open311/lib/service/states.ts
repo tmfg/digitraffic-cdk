@@ -1,7 +1,10 @@
-import * as StatesDb from '../db/states';
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
-import {ServiceRequestState} from "../model/service-request-state";
-import {Locale} from "../model/locale";
+import * as StatesDb from "../db/states";
+import {
+    DTDatabase,
+    inDatabase,
+} from "@digitraffic/common/dist/database/database";
+import { ServiceRequestState } from "../model/service-request-state";
+import { Locale } from "../model/locale";
 
 export function findAll(locale: Locale): Promise<ServiceRequestState[]> {
     return inDatabase((db: DTDatabase) => {
@@ -13,8 +16,12 @@ export function update(states: ServiceRequestState[]): Promise<void> {
     const start = Date.now();
     return inDatabase((db: DTDatabase) => {
         return StatesDb.update(states, db);
-    }).then(a => {
+    }).then((a) => {
         const end = Date.now();
-        console.info("method=updateStates updatedCount=%d tookMs=%d", a.length, (end - start));
+        console.info(
+            "method=updateStates updatedCount=%d tookMs=%d",
+            a.length,
+            end - start
+        );
     });
 }

@@ -11,13 +11,14 @@
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
   "devDependencies": {
-    "@types/aws-lambda": "*",
+    "@types/aws-lambda": "8.10.108",
     "@types/node": "*",
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.6-1",
-    "aws-cdk-lib": "*"
+    "@digitraffic/common": "2022.11.23-5",
+    "aws-cdk-lib": "2.51.1",
+    "constructs": "10.1.168"
   },
   "externals": [
     "aws-sdk"

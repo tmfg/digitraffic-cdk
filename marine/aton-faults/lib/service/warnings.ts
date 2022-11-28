@@ -5,6 +5,7 @@ import {
 } from "@digitraffic/common/dist/database/database";
 import * as CachedDao from "@digitraffic/common/dist/database/cached";
 import * as turf from "@turf/turf";
+import { lineString } from "@turf/helpers";
 import { Feature, FeatureCollection } from "geojson";
 
 const MAX_DISTANCE_NM = 15;
@@ -23,7 +24,7 @@ export async function findWarningsForVoyagePlan(
         return null;
     }
 
-    const voyageLineString = turf.lineString(
+    const voyageLineString = lineString(
         voyagePlan.route.waypoints
             .flatMap((w) => w.waypoint.flatMap((wp) => wp.position))
             .map((p) => [p.$.lon, p.$.lat])

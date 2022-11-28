@@ -1,8 +1,12 @@
-import {LambdaIntegration, Resource, RestApi} from "aws-cdk-lib/aws-apigateway";
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
-import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
-import {DocumentationPart} from "@digitraffic/common/aws/infra/documentation";
+import {
+    LambdaIntegration,
+    Resource,
+    RestApi,
+} from "aws-cdk-lib/aws-apigateway";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 
 const ROAD_NETWORK_CONDITION_ALARMS_TAGS = ["Road Network Condition Alarms"];
 
@@ -16,8 +20,15 @@ export class PublicApi {
     alarmsGeojsonResource: Resource;
 
     constructor(stack: DigitrafficStack) {
-        this.publicApi = new DigitrafficRestApi(stack, "RoadNetworkConditions-public", "Road Network Conditions Public API");
-        this.publicApi.createUsagePlan("Road Network Conditions Api Key", "Road Network Conditions Usage Plan");
+        this.publicApi = new DigitrafficRestApi(
+            stack,
+            "RoadNetworkConditions-public",
+            "Road Network Conditions Public API"
+        );
+        this.publicApi.createUsagePlan(
+            "Road Network Conditions Api Key",
+            "Road Network Conditions Usage Plan"
+        );
 
         this.createResources(stack);
         this.createLambdaFunctions(stack);
@@ -26,11 +37,46 @@ export class PublicApi {
     }
 
     createDocumentation() {
-        this.publicApi.documentResource(this.alarmsResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarms", "Returns all alarms"));
-        this.publicApi.documentResource(this.devicesResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetDevices", "Returns device information"));
-        this.publicApi.documentResource(this.devicesGeojsonResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetDevicesGeojson", "Returns device information in geojson format"));
-        this.publicApi.documentResource(this.alarmTypesResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarmTypes", "Returns alarm types"));
-        this.publicApi.documentResource(this.alarmsGeojsonResource, DocumentationPart.method(ROAD_NETWORK_CONDITION_ALARMS_TAGS, "GetAlarmsGeojson", "Returns geojson of alarm with alarm type and device information"));
+        this.publicApi.documentResource(
+            this.alarmsResource,
+            DocumentationPart.method(
+                ROAD_NETWORK_CONDITION_ALARMS_TAGS,
+                "GetAlarms",
+                "Returns all alarms"
+            )
+        );
+        this.publicApi.documentResource(
+            this.devicesResource,
+            DocumentationPart.method(
+                ROAD_NETWORK_CONDITION_ALARMS_TAGS,
+                "GetDevices",
+                "Returns device information"
+            )
+        );
+        this.publicApi.documentResource(
+            this.devicesGeojsonResource,
+            DocumentationPart.method(
+                ROAD_NETWORK_CONDITION_ALARMS_TAGS,
+                "GetDevicesGeojson",
+                "Returns device information in geojson format"
+            )
+        );
+        this.publicApi.documentResource(
+            this.alarmTypesResource,
+            DocumentationPart.method(
+                ROAD_NETWORK_CONDITION_ALARMS_TAGS,
+                "GetAlarmTypes",
+                "Returns alarm types"
+            )
+        );
+        this.publicApi.documentResource(
+            this.alarmsGeojsonResource,
+            DocumentationPart.method(
+                ROAD_NETWORK_CONDITION_ALARMS_TAGS,
+                "GetAlarmsGeojson",
+                "Returns geojson of alarm with alarm type and device information"
+            )
+        );
     }
 
     createResources(stack: DigitrafficStack) {
@@ -53,36 +99,47 @@ export class PublicApi {
             stack,
             this.alarmsResource,
             "get-alarms",
-            `${prefix}-GetAlarms`,
+            `${prefix}-GetAlarms`
         );
         const devicesLambda = this.createResource(
             stack,
             this.devicesResource,
             "get-devices",
-            `${prefix}-GetDevices`,
+            `${prefix}-GetDevices`
         );
         const devicesGeojsonLambda = this.createResource(
             stack,
             this.devicesGeojsonResource,
             "get-devices-geojson",
-            `${prefix}-GetDevicesGeojson`,
+            `${prefix}-GetDevicesGeojson`
         );
         const alarmTypesLambda = this.createResource(
             stack,
             this.alarmTypesResource,
             "get-alarm-types",
-            `${prefix}-GetAlarmTypes`,
+            `${prefix}-GetAlarmTypes`
         );
         const alarmsGeojsonLambda = this.createResource(
             stack,
             this.alarmsGeojsonResource,
             "get-alarms-geojson",
-            `${prefix}-GetAlarmsGeojson`,
+            `${prefix}-GetAlarmsGeojson`
         );
-        stack.grantSecret(alarmsLambda, devicesLambda, devicesGeojsonLambda, alarmTypesLambda, alarmsGeojsonLambda);
+        stack.grantSecret(
+            alarmsLambda,
+            devicesLambda,
+            devicesGeojsonLambda,
+            alarmTypesLambda,
+            alarmsGeojsonLambda
+        );
     }
 
-    createResource(stack: DigitrafficStack, resource: Resource, name: string, functionName: string): MonitoredFunction {
+    createResource(
+        stack: DigitrafficStack,
+        resource: Resource,
+        name: string,
+        functionName: string
+    ): MonitoredFunction {
         const env = stack.createLambdaEnvironment();
 
         const lambda = MonitoredFunction.createV2(stack, name, env, {

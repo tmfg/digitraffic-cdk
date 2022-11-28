@@ -1,10 +1,10 @@
-import {AssetCode, FunctionProps, Runtime} from 'aws-cdk-lib/aws-lambda';
-import {Duration} from 'aws-cdk-lib';
-import {createSubscription} from '@digitraffic/common/aws/infra/stack/subscription';
-import {Props} from './app-props';
-import {RetentionDays} from "aws-cdk-lib/aws-logs";
-import {PolicyStatement} from "aws-cdk-lib/aws-iam";
-import {Bucket} from "aws-cdk-lib/aws-s3";
+import { AssetCode, FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
+import { Duration } from "aws-cdk-lib";
+import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import { Props } from "./app-props";
+import { RetentionDays } from "aws-cdk-lib/aws-logs";
+import { PolicyStatement } from "aws-cdk-lib/aws-iam";
+import { Bucket } from "aws-cdk-lib/aws-s3";
 import {
     KEY_APIGW_APPS,
     KEY_APP_BETA_URL,
@@ -17,16 +17,14 @@ import {
     KEY_REMOVESECURITY,
     KEY_TITLE,
 } from "./lambda/update-swagger/lambda-update-swagger";
-import {KEY_APIGW_IDS} from "./lambda/update-api-documentation/lambda-update-api-documentation";
-import {Rule, Schedule} from "aws-cdk-lib/aws-events";
-import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
-import {MonitoredFunction} from "@digitraffic/common/aws/infra/stack/monitoredfunction";
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
-import {LambdaEnvironment} from "@digitraffic/common/aws/infra/stack/lambda-configs";
+import { KEY_APIGW_IDS } from "./lambda/update-api-documentation/lambda-update-api-documentation";
+import { Rule, Schedule } from "aws-cdk-lib/aws-events";
+import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
-export function create(stack: DigitrafficStack,
-    bucket: Bucket) {
-
+export function create(stack: DigitrafficStack, bucket: Bucket) {
     createUpdateSwaggerDescriptionsLambda(stack, bucket);
     createUpdateApiDocumentationLambda(stack);
 }
@@ -42,8 +40,8 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
     const lambdaConf: FunctionProps = {
         functionName: functionName,
         logRetention: RetentionDays.ONE_YEAR,
-        code: new AssetCode('dist/lambda/update-api-documentation'),
-        handler: 'lambda-update-api-documentation.handler',
+        code: new AssetCode("dist/lambda/update-api-documentation"),
+        handler: "lambda-update-api-documentation.handler",
         runtime: Runtime.NODEJS_14_X,
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1,
@@ -51,18 +49,35 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
         timeout: Duration.seconds(10),
     };
 
-    const updateDocsLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
+    const updateDocsLambda = MonitoredFunction.create(
+        stack,
+        functionName,
+        lambdaConf
+    );
 
     const statement = new PolicyStatement();
-    statement.addActions('apigateway:GET', 'apigateway:POST', 'apigateway:PUT', 'apigateway:PATCH');
-    statement.addResources('*');
+    statement.addActions(
+        "apigateway:GET",
+        "apigateway:POST",
+        "apigateway:PUT",
+        "apigateway:PATCH"
+    );
+    statement.addResources("*");
 
     updateDocsLambda.addToRolePolicy(statement);
 
-    createSubscription(updateDocsLambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(
+        updateDocsLambda,
+        functionName,
+        props.logsDestinationArn,
+        stack
+    );
 }
 
-function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: Bucket) {
+function createUpdateSwaggerDescriptionsLambda(
+    stack: DigitrafficStack,
+    bucket: Bucket
+) {
     const functionName = `${stack.stackName}-UpdateSwaggerDescriptions`;
     const props = stack.configuration as Props;
 
@@ -87,14 +102,14 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
         lambdaEnv[KEY_DESCRIPTION] = props.description;
     }
     if (props.removeSecurity) {
-        lambdaEnv[KEY_REMOVESECURITY] = 'true';
+        lambdaEnv[KEY_REMOVESECURITY] = "true";
     }
 
     const lambdaConf: FunctionProps = {
         functionName: functionName,
         logRetention: RetentionDays.ONE_YEAR,
-        code: new AssetCode('dist/lambda/update-swagger'),
-        handler: 'lambda-update-swagger.handler',
+        code: new AssetCode("dist/lambda/update-swagger"),
+        handler: "lambda-update-swagger.handler",
         runtime: Runtime.NODEJS_14_X,
         memorySize: 192,
         reservedConcurrentExecutions: 1,
@@ -102,19 +117,28 @@ function createUpdateSwaggerDescriptionsLambda(stack: DigitrafficStack, bucket: 
         timeout: Duration.seconds(10),
     };
 
-    const updateSwaggerLambda = MonitoredFunction.create(stack, functionName, lambdaConf);
+    const updateSwaggerLambda = MonitoredFunction.create(
+        stack,
+        functionName,
+        lambdaConf
+    );
 
     const statement = new PolicyStatement();
-    statement.addActions('apigateway:GET');
-    statement.addResources('*');
+    statement.addActions("apigateway:GET");
+    statement.addResources("*");
 
-    statement.addActions('s3:PutObject');
-    statement.addActions('s3:PutObjectAcl');
+    statement.addActions("s3:PutObject");
+    statement.addActions("s3:PutObjectAcl");
     statement.addResources(bucket.bucketArn);
 
     updateSwaggerLambda.addToRolePolicy(statement);
 
-    createSubscription(updateSwaggerLambda, functionName, props.logsDestinationArn, stack);
+    createSubscription(
+        updateSwaggerLambda,
+        functionName,
+        props.logsDestinationArn,
+        stack
+    );
 
     const ruleName = `${stack.stackName}-UpdateSwaggerRule`;
     const rule = new Rule(stack, ruleName, {

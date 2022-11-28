@@ -1,30 +1,39 @@
-import {ServiceRequest} from "../lib/model/service-request";
+import { ServiceRequest } from "../lib/model/service-request";
 import * as RequestsDb from "../lib/db/requests";
-import {dbTestBase as commonDbTestBase} from "@digitraffic/common/test/db-testutils";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
-        fn, truncate, 'road', 'road', 'localhost:54322/road',
+        fn,
+        truncate,
+        "road",
+        "road",
+        "localhost:54322/road"
     );
 }
 
-export function truncate(db: DTDatabase): Promise<null[]> {
-    return db.tx(t => {
-        return t.batch([
-            db.none('DELETE FROM open311_service_request'),
-            db.none('DELETE FROM open311_service_request_state'),
-            db.none('DELETE FROM open311_service'),
-            db.none('DELETE FROM open311_subject'),
-            db.none('DELETE FROM open311_subsubject'),
+export async function truncate(db: DTDatabase): Promise<void> {
+    await db.tx(async (t) => {
+        await t.batch([
+            db.none("DELETE FROM open311_service_request"),
+            db.none("DELETE FROM open311_service_request_state"),
+            db.none("DELETE FROM open311_service"),
+            db.none("DELETE FROM open311_subject"),
+            db.none("DELETE FROM open311_subsubject"),
         ]);
     });
 }
 
-export function insertServiceRequest(db: DTDatabase, serviceRequests: ServiceRequest[]): Promise<null[]> {
-    return db.tx(t => {
-        const queries: Promise<null>[] = serviceRequests.map(serviceRequest => {
-            return t.none(`INSERT INTO open311_service_request(
+export async function insertServiceRequest(
+    db: DTDatabase,
+    serviceRequests: ServiceRequest[]
+): Promise<void> {
+    await db.tx(async (t) => {
+        const queries: Promise<null>[] = serviceRequests.map(
+            (serviceRequest) => {
+                return t.none(
+                    `INSERT INTO open311_service_request(
                      service_request_id,
                      status,
                      status_notes,
@@ -73,8 +82,11 @@ export function insertServiceRequest(db: DTDatabase, serviceRequests: ServiceReq
                    $22,
                    $23,
                    $24,
-                   $25)`, RequestsDb.createEditObject(serviceRequest));
-        });
-        return t.batch(queries);
+                   $25)`,
+                    RequestsDb.createEditObject(serviceRequest)
+                );
+            }
+        );
+        await t.batch(queries);
     });
 }

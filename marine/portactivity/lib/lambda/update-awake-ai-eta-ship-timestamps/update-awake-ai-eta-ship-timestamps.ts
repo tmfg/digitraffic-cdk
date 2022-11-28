@@ -6,12 +6,13 @@ import { DbETAShip } from "../../dao/timestamps";
 import { sendMessage } from "../../service/queue-service";
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 let service: AwakeAiETAShipService | undefined;
 
 const queueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
-interface UpdateAwakeAiTimestampsSecret {
+interface UpdateAwakeAiTimestampsSecret extends GenericSecret {
     readonly voyagesurl: string;
     readonly voyagesauth: string;
 }

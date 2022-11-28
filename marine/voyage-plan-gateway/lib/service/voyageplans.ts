@@ -3,57 +3,62 @@ import {
     RtzSchedules,
     RtzVoyagePlan,
     RtzWaypoint,
-} from "@digitraffic/common/marine/rtz";
-import * as jsts from 'jsts';
-import moment, {Moment} from 'moment-timezone';
+} from "@digitraffic/common/dist/marine/rtz";
+import * as jsts from "jsts";
+import moment, { Moment } from "moment-timezone";
 import GeometryFactory = jsts.geom.GeometryFactory;
 
 const gf = new GeometryFactory();
 
 // roughly the Gulf of Finland, Bothnian Sea/Bay and Northern Baltic
-const SPATIAL_LIMITS = gf.createPolygon(gf.createLinearRing([
-    new jsts.geom.Coordinate(20.84, 68.82),
-    new jsts.geom.Coordinate(16.89, 61.70),
-    new jsts.geom.Coordinate(20.05, 58.01),
-    new jsts.geom.Coordinate(21.90, 58.62),
-    new jsts.geom.Coordinate(23.56, 59.02),
-    new jsts.geom.Coordinate(28.08, 59.23),
-    new jsts.geom.Coordinate(30.72, 59.59),
-    new jsts.geom.Coordinate(32.35, 63.10),
-    new jsts.geom.Coordinate(30.99, 67.94),
-    new jsts.geom.Coordinate(29.62, 70.40),
-    new jsts.geom.Coordinate(26.68, 71.28),
-    new jsts.geom.Coordinate(21.05, 69.78),
-    new jsts.geom.Coordinate(20.84, 68.82),
-]), []);
+const SPATIAL_LIMITS = gf.createPolygon(
+    gf.createLinearRing([
+        new jsts.geom.Coordinate(20.84, 68.82),
+        new jsts.geom.Coordinate(16.89, 61.7),
+        new jsts.geom.Coordinate(20.05, 58.01),
+        new jsts.geom.Coordinate(21.9, 58.62),
+        new jsts.geom.Coordinate(23.56, 59.02),
+        new jsts.geom.Coordinate(28.08, 59.23),
+        new jsts.geom.Coordinate(30.72, 59.59),
+        new jsts.geom.Coordinate(32.35, 63.1),
+        new jsts.geom.Coordinate(30.99, 67.94),
+        new jsts.geom.Coordinate(29.62, 70.4),
+        new jsts.geom.Coordinate(26.68, 71.28),
+        new jsts.geom.Coordinate(21.05, 69.78),
+        new jsts.geom.Coordinate(20.84, 68.82),
+    ]),
+    []
+);
 
 export enum ValidationError {
-    EMPTY_VOYAGE_PLAN = 'Empty or null voyage plan',
-    MISSING_ROUTE = 'Missing route element',
+    EMPTY_VOYAGE_PLAN = "Empty or null voyage plan",
+    MISSING_ROUTE = "Missing route element",
 
     // waypoints structure
-    MISSING_WAYPOINTS = 'Missing route waypoints',
-    MISSING_WAYPOINT = 'Missing waypoint element',
-    MISSING_POSITION = 'Missing position element',
-    NO_POSITION_ATTRIBUTES = 'No attributes in position element',
-    MISSING_LONGITUDE = 'Missing longitude attribute',
-    MISSING_LATITUDE = 'Missing latitude attribute',
+    MISSING_WAYPOINTS = "Missing route waypoints",
+    MISSING_WAYPOINT = "Missing waypoint element",
+    MISSING_POSITION = "Missing position element",
+    NO_POSITION_ATTRIBUTES = "No attributes in position element",
+    MISSING_LONGITUDE = "Missing longitude attribute",
+    MISSING_LATITUDE = "Missing latitude attribute",
 
     // waypoints content
-    COORDINATE_OUTSIDE_SPATIAL_LIMITS = 'Coordinate(s) outside spatial limits',
+    COORDINATE_OUTSIDE_SPATIAL_LIMITS = "Coordinate(s) outside spatial limits",
 
     // schedules
-    MISSING_SCHEDULES = 'Missing route schedules',
-    MISSING_SCHEDULE = 'Missing schedule element',
-    MISSING_SCHEDULE_ELEMENT = 'Missing scheduleElement element',
-    NO_SCHEDULE_ELEMENT_ATTRIBUTES = 'No attributes in scheduleElement',
-    NO_ETA_OR_ETD_ATTRIBUTES = 'No ETA or ETD attribute in scheduleElement',
+    MISSING_SCHEDULES = "Missing route schedules",
+    MISSING_SCHEDULE = "Missing schedule element",
+    MISSING_SCHEDULE_ELEMENT = "Missing scheduleElement element",
+    NO_SCHEDULE_ELEMENT_ATTRIBUTES = "No attributes in scheduleElement",
+    NO_ETA_OR_ETD_ATTRIBUTES = "No ETA or ETD attribute in scheduleElement",
 
     // schedules content
-    NO_FUTURE_TIMESTAMPS = 'No timestamps set in the future'
+    NO_FUTURE_TIMESTAMPS = "No timestamps set in the future",
 }
 
-export function validateStructure(voyagePlan?: RtzVoyagePlan): ValidationError[] {
+export function validateStructure(
+    voyagePlan?: RtzVoyagePlan
+): ValidationError[] {
     if (!voyagePlan) {
         return [ValidationError.EMPTY_VOYAGE_PLAN];
     }
@@ -61,33 +66,38 @@ export function validateStructure(voyagePlan?: RtzVoyagePlan): ValidationError[]
         return [ValidationError.MISSING_ROUTE];
     }
 
-    return validateWaypointsStructure(voyagePlan.route.waypoints)
-        .concat(validateSchedulesStructure(voyagePlan.route.schedules));
+    return validateWaypointsStructure(voyagePlan.route.waypoints).concat(
+        validateSchedulesStructure(voyagePlan.route.schedules)
+    );
 }
 
-export function validateWaypointsStructure(wps?: RtzWaypoint[]): ValidationError[] {
+export function validateWaypointsStructure(
+    wps?: RtzWaypoint[]
+): ValidationError[] {
     const validationErrors: ValidationError[] = [];
 
     if (!wps || !wps.length) {
         return [ValidationError.MISSING_WAYPOINTS];
     }
 
-    wps.forEach(wp => {
+    wps.forEach((wp) => {
         const w = wp.waypoint;
         if (!w || !w.length) {
             validationErrors.push(ValidationError.MISSING_WAYPOINT);
             return;
         }
-        w.forEach(wpElem => {
+        w.forEach((wpElem) => {
             const pos = wpElem.position;
             if (!pos || !pos.length) {
                 validationErrors.push(ValidationError.MISSING_POSITION);
                 return;
             }
-            pos.forEach(p => {
+            pos.forEach((p) => {
                 const posAttrs = p.$;
                 if (!posAttrs) {
-                    validationErrors.push(ValidationError.NO_POSITION_ATTRIBUTES);
+                    validationErrors.push(
+                        ValidationError.NO_POSITION_ATTRIBUTES
+                    );
                     return;
                 }
                 const lon = posAttrs.lon;
@@ -105,53 +115,67 @@ export function validateWaypointsStructure(wps?: RtzWaypoint[]): ValidationError
     return validationErrors;
 }
 
-export function validateSchedulesStructure(schedules?: RtzSchedules[]): ValidationError[] {
+export function validateSchedulesStructure(
+    schedules?: RtzSchedules[]
+): ValidationError[] {
     const validationErrors: ValidationError[] = [];
 
     if (!schedules || !schedules.length) {
-        console.warn('method=validateSchedulesStructure No schedules element');
+        console.warn("method=validateSchedulesStructure No schedules element");
         return [];
     }
 
-    schedules.forEach(scheds => {
+    schedules.forEach((scheds) => {
         if (!scheds) {
-            console.warn('method=validateSchedulesStructure Empty schedule element');
+            console.warn(
+                "method=validateSchedulesStructure Empty schedule element"
+            );
             return;
         }
         if (!scheds.schedule || !scheds.schedule.length) {
             //validationErrors.push(ValidationError.MISSING_SCHEDULE);
             return;
         }
-        scheds.schedule.forEach(sched => {
+        scheds.schedule.forEach((sched) => {
             if (sched.calculated && sched.calculated.length) {
-                sched.calculated.forEach(s => {
+                sched.calculated.forEach((s) => {
                     if (!s.scheduleElement || !s.scheduleElement.length) {
-                        console.warn('method=validateSchedulesStructure Missing schedule element');
+                        console.warn(
+                            "method=validateSchedulesStructure Missing schedule element"
+                        );
                         //    validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
                     }
-                    s.scheduleElement.forEach(se => {
+                    s.scheduleElement.forEach((se) => {
                         if (!se.$) {
-                            console.warn('method=validateSchedulesStructure No schedule element attributes');
+                            console.warn(
+                                "method=validateSchedulesStructure No schedule element attributes"
+                            );
                             //      validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                             return;
                         }
                         if (!se.$.eta && !se.$.etd) {
-                            console.warn('method=validateSchedulesStructure No schedule ETA/ETD attributes');
-                        //    validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
+                            console.warn(
+                                "method=validateSchedulesStructure No schedule ETA/ETD attributes"
+                            );
+                            //    validationErrors.push(ValidationError.NO_ETA_OR_ETD_ATTRIBUTES);
                         }
                     });
                 });
             } else if (sched.manual && sched.manual.length) {
-                sched.manual.forEach(s => {
+                sched.manual.forEach((s) => {
                     if (!s.scheduleElement || !s.scheduleElement.length) {
-                        console.warn('method=validateSchedulesStructure Missing schedule element');
+                        console.warn(
+                            "method=validateSchedulesStructure Missing schedule element"
+                        );
                         //validationErrors.push(ValidationError.MISSING_SCHEDULE_ELEMENT);
                         return;
                     }
-                    s.scheduleElement.forEach(se => {
+                    s.scheduleElement.forEach((se) => {
                         if (!se.$) {
-                            console.warn('method=validateSchedulesStructure No schedule element attributes');
+                            console.warn(
+                                "method=validateSchedulesStructure No schedule element attributes"
+                            );
                             //  validationErrors.push(ValidationError.NO_SCHEDULE_ELEMENT_ATTRIBUTES);
                             return;
                         }
@@ -165,30 +189,44 @@ export function validateSchedulesStructure(schedules?: RtzSchedules[]): Validati
 }
 
 export function validateContent(voyagePlan: RtzVoyagePlan): ValidationError[] {
-    return validateWaypointsContent(voyagePlan.route.waypoints)
-        .concat(validateSchedulesContent(voyagePlan.route.schedules));
+    return validateWaypointsContent(voyagePlan.route.waypoints).concat(
+        validateSchedulesContent(voyagePlan.route.schedules)
+    );
 }
 
-export function validateWaypointsContent(wps: RtzWaypoint[]): ValidationError[] {
+export function validateWaypointsContent(
+    wps: RtzWaypoint[]
+): ValidationError[] {
     const validationErrors: ValidationError[] = [];
     if (wps.length) {
         if (!anyWayPointInsideSpatialLimits(wps)) {
-            validationErrors.push(ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS);
+            validationErrors.push(
+                ValidationError.COORDINATE_OUTSIDE_SPATIAL_LIMITS
+            );
         }
     }
     return validationErrors;
 }
 
 function anyWayPointInsideSpatialLimits(rtzWaypoints: RtzWaypoint[]): boolean {
-    const points = rtzWaypoints.flatMap(waypoints =>
-        waypoints.waypoint.map(w =>
-            gf.createPoint(new jsts.geom.Coordinate(Number(w.position[0].$.lon), Number(w.position[0].$.lat)))));
-    return points.some(p => SPATIAL_LIMITS.contains(p));
+    const points = rtzWaypoints.flatMap((waypoints) =>
+        waypoints.waypoint.map((w) =>
+            gf.createPoint(
+                new jsts.geom.Coordinate(
+                    Number(w.position[0].$.lon),
+                    Number(w.position[0].$.lat)
+                )
+            )
+        )
+    );
+    return points.some((p) => SPATIAL_LIMITS.contains(p));
 }
 
-export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): ValidationError[] {
+export function validateSchedulesContent(
+    rtzSchedules?: RtzSchedules[]
+): ValidationError[] {
     if (!rtzSchedules) {
-        console.warn('method=validateSchedulesContent No schedules element');
+        console.warn("method=validateSchedulesContent No schedules element");
         return [];
     }
 
@@ -196,16 +234,20 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
 
     const now = moment();
 
-    rtzSchedules.forEach(schedules => {
+    rtzSchedules.forEach((schedules) => {
         if (!schedules) {
-            console.warn('method=validateSchedulesContent Empty schedule element');
+            console.warn(
+                "method=validateSchedulesContent Empty schedule element"
+            );
             return;
         }
-        schedules.schedule?.forEach(sched => {
+        schedules.schedule?.forEach((sched) => {
             if (sched?.calculated && sched?.calculated.length) {
                 if (!anyTimestampInFuture(sched.calculated[0], now)) {
                     //validationErrors.push(ValidationError.NO_FUTURE_TIMESTAMPS);
-                    console.warn('method=validateSchedulesContent No timestamps set in future');
+                    console.warn(
+                        "method=validateSchedulesContent No timestamps set in future"
+                    );
                     return;
                 }
             }
@@ -216,12 +258,15 @@ export function validateSchedulesContent(rtzSchedules?: RtzSchedules[]): Validat
 }
 
 function anyTimestampInFuture(schedule: RtzSchedule, now: Moment): boolean {
-    const timestamps: Moment[] = schedule.scheduleElement.reduce((acc, curr) => {
-        const eta = curr.$.eta != null ? [moment(curr.$.eta)] : [];
-        const etd = curr.$.etd != null ? [moment(curr.$.etd)] : [];
-        return acc.concat(eta, etd);
-    }, [] as Moment[]);
-    return timestamps.some(ts => validateTimestamp(ts, now));
+    const timestamps: Moment[] = schedule.scheduleElement.reduce(
+        (acc, curr) => {
+            const eta = curr.$.eta != null ? [moment(curr.$.eta)] : [];
+            const etd = curr.$.etd != null ? [moment(curr.$.etd)] : [];
+            return acc.concat(eta, etd);
+        },
+        [] as Moment[]
+    );
+    return timestamps.some((ts) => validateTimestamp(ts, now));
 }
 
 function validateTimestamp(timestamp: Moment, now: Moment): boolean {

@@ -1,30 +1,43 @@
-import {APIGatewayEvent} from 'aws-lambda';
-import {ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../../model/service-request";
+import { APIGatewayEvent } from "aws-lambda";
+import {
+    ServiceRequestWithExtensions,
+    ServiceRequestWithExtensionsDto,
+} from "../../model/service-request";
 import * as RequestsService from "../../service/requests";
-import {invalidRequest} from "../../http-util";
-import {ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
+import { invalidRequest } from "../../http-util";
+import { ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 
 // Full of underscores
 /* eslint-disable camelcase */
 
-export const handler = async (event: APIGatewayEvent): Promise<ProxyLambdaResponse> => {
+export const handler = async (
+    event: APIGatewayEvent
+): Promise<ProxyLambdaResponse> => {
     if (!event.body) {
         return invalidRequest();
     }
 
     const obj = JSON.parse(event.body);
-    const serviceRequests: ServiceRequestWithExtensionsDto[] = Array.isArray(obj) ? obj as ServiceRequestWithExtensionsDto[] : [obj];
+    const serviceRequests: ServiceRequestWithExtensionsDto[] = Array.isArray(
+        obj
+    )
+        ? (obj as ServiceRequestWithExtensionsDto[])
+        : [obj];
 
     if (serviceRequests.length === 0) {
         return invalidRequest();
     }
 
-    await RequestsService.update(serviceRequests.map(sr => toServiceRequestWithExtensions(sr)));
+    await RequestsService.update(
+        serviceRequests.map((sr) => toServiceRequestWithExtensions(sr))
+    );
 
-    return {statusCode: 200, body: 'Ok'};
+    return { statusCode: 200, body: "Ok" };
 };
 
-function toServiceRequestWithExtensions(r: ServiceRequestWithExtensionsDto): ServiceRequestWithExtensions {
+function toServiceRequestWithExtensions(
+    r: ServiceRequestWithExtensionsDto
+): ServiceRequestWithExtensions {
     return {
         service_request_id: r.service_request_id,
         status: r.status,

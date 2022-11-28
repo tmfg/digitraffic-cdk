@@ -1,23 +1,23 @@
-import {DTDatabase} from "@digitraffic/common/database/database";
-import * as R from 'ramda';
-import {DbNumberId} from "../model/db-data";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import * as R from "ramda";
+import { DbNumberId } from "../model/db-data";
 
 export enum Status {
-    UNHANDLED = 'UNHANDLED',
-    HANDLED = 'HANDLED',
-    ERROR = 'ERROR'
+    UNHANDLED = "UNHANDLED",
+    HANDLED = "HANDLED",
+    ERROR = "ERROR",
 }
 
 export interface DbObservationData {
-    readonly id?: bigint,
-    readonly observationTime: Date,
-    readonly sendingTime: Date,
-    readonly json: string,
-    readonly harjaWorkmachineId: number,
-    readonly harjaContractId: number,
-    readonly sendingSystem: string,
-    readonly status: Status,
-    readonly hash: string,
+    readonly id?: bigint;
+    readonly observationTime: Date;
+    readonly sendingTime: Date;
+    readonly json: string;
+    readonly harjaWorkmachineId: number;
+    readonly harjaContractId: number;
+    readonly sendingSystem: string;
+    readonly status: Status;
+    readonly hash: string;
     readonly s3Uri: string;
 }
 
@@ -48,10 +48,19 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
     RETURNING id
 `;
 
-export function insertMaintenanceTrackingObservationData(db: DTDatabase, observations: DbObservationData[]): Promise<(DbNumberId|null)[]> {
-    return db.tx(t => {
-        return t.batch(observations.map(observation =>
-            db.oneOrNone(UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL, observation)));
+export function insertMaintenanceTrackingObservationData(
+    db: DTDatabase,
+    observations: DbObservationData[]
+): Promise<(DbNumberId | null)[]> {
+    return db.tx((t) => {
+        return t.batch(
+            observations.map((observation) =>
+                db.oneOrNone(
+                    UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
+                    observation
+                )
+            )
+        );
     });
 }
 
@@ -69,6 +78,8 @@ export function createInsertObservationValues(e: DbObservationData): unknown[] {
     ];
 }
 
-export function cloneObservationsWithoutJson(datas: DbObservationData[]) : DbObservationData[] {
-    return R.map(R.assoc('json', '{...REMOVED...}'), datas);
+export function cloneObservationsWithoutJson(
+    datas: DbObservationData[]
+): DbObservationData[] {
+    return R.map(R.assoc("json", "{...REMOVED...}"), datas);
 }

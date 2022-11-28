@@ -1,11 +1,10 @@
-import {getRandomIntegerAsString} from "@digitraffic/common/test/testutils";
-import * as R from 'ramda';
-import {DbObservationData} from "../lib/dao/maintenance-tracking-dao";
+import { getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
+import * as R from "ramda";
+import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
 
-const ID_PLACEHOLDER = 'ID_PLACEHOLDER';
-const TK_PLACEHOLDER = 'TK_PLACEHOLDER';
-const TRACKING_JSON_WITH_3_OBSERVATIONS =
-        `{
+const ID_PLACEHOLDER = "ID_PLACEHOLDER";
+const TK_PLACEHOLDER = "TK_PLACEHOLDER";
+const TRACKING_JSON_WITH_3_OBSERVATIONS = `{
             "otsikko": {
                 "lahettaja": {
                     "jarjestelma": "Urakoitsijan järjestelmä",
@@ -94,17 +93,30 @@ const TRACKING_JSON_WITH_3_OBSERVATIONS =
             ]
         }`;
 
-export function getTrackingJsonWith3Observations(id: string, tyokoneId?: string): string {
+export function getTrackingJsonWith3Observations(
+    id: string,
+    tyokoneId?: string
+): string {
     if (tyokoneId) {
-        return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(new RegExp(ID_PLACEHOLDER, 'g'), id).replace(new RegExp(TK_PLACEHOLDER, 'g'), tyokoneId);
+        return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(
+            new RegExp(ID_PLACEHOLDER, "g"),
+            id
+        ).replace(new RegExp(TK_PLACEHOLDER, "g"), tyokoneId);
     }
-    return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(new RegExp(ID_PLACEHOLDER, 'g'), id).replace(new RegExp(TK_PLACEHOLDER, 'g'), '123456789');
+    return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(
+        new RegExp(ID_PLACEHOLDER, "g"),
+        id
+    ).replace(new RegExp(TK_PLACEHOLDER, "g"), "123456789");
 }
 
-export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(id: string, tyokoneId?: string): string {
+export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
+    id: string,
+    tyokoneId?: string
+): string {
     const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
     const trackingJson = JSON.parse(validJson);
-    if ( Math.round(Math.random()) > 0 ) { // -> rounds to 0 or 1
+    if (Math.round(Math.random()) > 0) {
+        // -> rounds to 0 or 1
         trackingJson.otsikko.lahettaja.jarjestelma = null;
     } else {
         delete trackingJson.otsikko.lahettaja.jarjestelma;
@@ -112,11 +124,18 @@ export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(id: stri
     return JSON.stringify(trackingJson);
 }
 
-export function assertObservationData(srcObservations: DbObservationData[], results: DbObservationData[]) {
+export function assertObservationData(
+    srcObservations: DbObservationData[],
+    results: DbObservationData[]
+) {
     results.forEach((resultObservation) => {
-        const resultObservationWithoutId = R.dissoc('id', resultObservation);
+        const resultObservationWithoutId = R.dissoc("id", resultObservation);
 
-        const foundSrcObservations = srcObservations.filter(o => o.observationTime.getTime() === resultObservationWithoutId.observationTime.getTime());
+        const foundSrcObservations = srcObservations.filter(
+            (o) =>
+                o.observationTime.getTime() ===
+                resultObservationWithoutId.observationTime.getTime()
+        );
         expect(foundSrcObservations.length).toBe(1);
 
         const srcObservation = foundSrcObservations[0];

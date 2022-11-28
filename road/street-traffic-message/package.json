@@ -8,7 +8,7 @@
     "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node14",
     "postbuild": "npm run compile-lambdas && npm run compile-canaries",
     "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node14",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint --cache .",
     "eslint-report": "eslint . --format html -o report.html",
@@ -23,25 +23,27 @@
     "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy"
   },
   "devDependencies": {
-    "@types/aws-lambda": "*",
+    "@types/aws-lambda": "8.10.108",
     "@types/geojson": "^7946.0.7",
-    "@types/jest": "^26.0.22",
+    "@types/jest": "^29.2.3",
     "@types/node": "*",
     "@types/sinon": "*",
     "@types/xml2js": "^0.4.8",
     "esbuild": "*",
-    "jest": "^27.0.6",
-    "jest-junit": "^13.0.0",
+    "jest": "^29.3.1",
+    "jest-junit": "^15.0.0",
     "sinon": "*",
-    "ts-jest": "^27.0.4",
+    "ts-jest": "^29.0.3",
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.10.6-1",
-    "aws-cdk-lib": "*",
-    "axios": "^0.21.1",
+    "@digitraffic/common": "2022.11.23-5",
+    "aws-cdk-lib": "2.51.1",
+    "axios": "^1.2.0",
+    "constructs": "10.1.168",
     "moment": "*",
-    "pg-promise": "*"
+    "pg-promise": "10.15.2",
+    "wkx": "^0.5.0"
   },
   "externals": [
     "aws-sdk"

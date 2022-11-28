@@ -1,10 +1,10 @@
-import {StackConfiguration} from "@digitraffic/common/aws/infra/stack/stack";
+import { StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export interface Props extends StackConfiguration {
     // Digitraffic application URL
     readonly appUrl?: string;
     // Digitraffic beta application URL
-    readonly betaAppUrl?: string
+    readonly betaAppUrl?: string;
     // API Gateway API ids
     readonly apiGwAppIds: string[];
     // log destination ARN
@@ -14,15 +14,15 @@ export interface Props extends StackConfiguration {
     // S3 VPC endpoint id
     readonly s3VpcEndpointId?: string;
     // Canonical User ID if the Swagger bucket is served through CloudFront
-    readonly cloudFrontCanonicalUser?: string
+    readonly cloudFrontCanonicalUser?: string;
     // Move generated files into a directory, instead of the bucket root
-    readonly directory?: string
+    readonly directory?: string;
     // Host to use as endpoint for HTTP calls from Swagger
-    readonly host?: string
+    readonly host?: string;
     // Swagger page title
-    readonly title?: string
+    readonly title?: string;
     // Swagger page description
-    readonly description?: string
+    readonly description?: string;
     // Remove security (e.g. API key) from imported Swagger descriptioin
-    readonly removeSecurity?: boolean
+    readonly removeSecurity?: boolean;
 }

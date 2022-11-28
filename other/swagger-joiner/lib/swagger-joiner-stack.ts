@@ -1,10 +1,14 @@
-import {Props} from './app-props';
-import {BucketDeployment, Source} from 'aws-cdk-lib/aws-s3-deployment';
-import * as InternalLambdas from './internal-lambdas';
-import {BlockPublicAccess, Bucket, HttpMethods} from "aws-cdk-lib/aws-s3";
-import {CanonicalUserPrincipal, Effect, PolicyStatement} from "aws-cdk-lib/aws-iam";
-import {Construct} from "constructs";
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import { Props } from "./app-props";
+import { BucketDeployment, Source } from "aws-cdk-lib/aws-s3-deployment";
+import * as InternalLambdas from "./internal-lambdas";
+import { BlockPublicAccess, Bucket, HttpMethods } from "aws-cdk-lib/aws-s3";
+import {
+    CanonicalUserPrincipal,
+    Effect,
+    PolicyStatement,
+} from "aws-cdk-lib/aws-iam";
+import { Construct } from "constructs";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class SwaggerJoinerStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, swaggerJoinerProps: Props) {
@@ -17,29 +21,31 @@ export class SwaggerJoinerStack extends DigitrafficStack {
     private createBucket() {
         const props = this.configuration as Props;
 
-        const bucket = new Bucket(this, 'SwaggerBucket', {
+        const bucket = new Bucket(this, "SwaggerBucket", {
             bucketName: props.bucketName,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-            cors: [{
-                allowedOrigins: ['*'],
-                allowedMethods: [HttpMethods.GET],
-            }],
+            cors: [
+                {
+                    allowedOrigins: ["*"],
+                    allowedMethods: [HttpMethods.GET],
+                },
+            ],
         });
 
-        new BucketDeployment(this, 'SwaggerFiles', {
+        new BucketDeployment(this, "SwaggerFiles", {
             destinationBucket: bucket,
-            sources: [Source.asset('./resources')],
+            sources: [Source.asset("./resources")],
             destinationKeyPrefix: props.directory,
-            exclude: ['dt-swagger.js', 'version.txt'],
+            exclude: ["dt-swagger.js", "version.txt"],
         });
 
         if (props.s3VpcEndpointId) {
             const getObjectStatement = new PolicyStatement({
                 effect: Effect.ALLOW,
-                actions: ['s3:GetObject'],
+                actions: ["s3:GetObject"],
                 conditions: {
                     StringEquals: {
-                        'aws:sourceVpce': props.s3VpcEndpointId,
+                        "aws:sourceVpce": props.s3VpcEndpointId,
                     },
                 },
                 resources: [`${bucket.bucketArn}/*`],
@@ -48,14 +54,18 @@ export class SwaggerJoinerStack extends DigitrafficStack {
             bucket.addToResourcePolicy(getObjectStatement);
         }
         if (props.cloudFrontCanonicalUser) {
-            bucket.addToResourcePolicy(new PolicyStatement({
-                effect: Effect.ALLOW,
-                actions: ['s3:GetObject'],
-                principals: [
-                    new CanonicalUserPrincipal(props.cloudFrontCanonicalUser),
-                ],
-                resources: [`${bucket.bucketArn}/*`],
-            }));
+            bucket.addToResourcePolicy(
+                new PolicyStatement({
+                    effect: Effect.ALLOW,
+                    actions: ["s3:GetObject"],
+                    principals: [
+                        new CanonicalUserPrincipal(
+                            props.cloudFrontCanonicalUser
+                        ),
+                    ],
+                    resources: [`${bucket.bucketArn}/*`],
+                })
+            );
         }
 
         return bucket;

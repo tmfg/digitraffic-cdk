@@ -1,6 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { FaultFeature } from "../model/fault";
-import { MediaType } from "@digitraffic/common/aws/types/mediatypes";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 interface ApiFeatures {
     features: FaultFeature[];

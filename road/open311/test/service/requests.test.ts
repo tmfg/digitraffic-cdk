@@ -1,62 +1,68 @@
 import * as RequestsService from "../../lib/service/requests";
-import {newServiceRequest} from "../testdata";
-import {dbTestBase, insertServiceRequest} from "../db-testutil";
-import {ServiceRequestWithExtensions} from "../../lib/model/service-request";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { newServiceRequest } from "../testdata";
+import { dbTestBase, insertServiceRequest } from "../db-testutil";
+import { ServiceRequestWithExtensions } from "../../lib/model/service-request";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 // test file
 /* eslint-disable camelcase */
 
-describe('requests-service', dbTestBase((db: DTDatabase) => {
+describe(
+    "requests-service",
+    dbTestBase((db: DTDatabase) => {
+        test("toServiceRequest", () => {
+            const originalSr = newServiceRequest();
 
-    test('toServiceRequest', () => {
-        const originalSr = newServiceRequest();
+            const convertedSr = RequestsService.toServiceRequest(originalSr);
+            deleteExtensionProps(originalSr);
 
-        const convertedSr = RequestsService.toServiceRequest(originalSr);
-        deleteExtensionProps(originalSr);
+            expect(convertedSr).toMatchObject(originalSr);
+        });
 
-        expect(convertedSr).toMatchObject(originalSr);
-    });
+        test("toServiceRequestWithExtensions", () => {
+            const originalSr = newServiceRequest();
 
-    test('toServiceRequestWithExtensions', () => {
-        const originalSr = newServiceRequest();
+            const convertedSr =
+                RequestsService.toServiceRequestWithExtensions(originalSr);
+            addNestedExtensionProps(originalSr);
+            deleteExtensionProps(originalSr);
 
-        const convertedSr = RequestsService.toServiceRequestWithExtensions(originalSr);
-        addNestedExtensionProps(originalSr);
-        deleteExtensionProps(originalSr);
+            expect(convertedSr).toMatchObject(originalSr);
+        });
 
-        expect(convertedSr).toMatchObject(originalSr);
-    });
+        test("findAll - no extensions", async () => {
+            const sr = newServiceRequest();
+            await insertServiceRequest(db, [sr]);
 
-    test('findAll - no extensions', async () => {
-        const sr = newServiceRequest();
-        await insertServiceRequest(db, [sr]);
+            const foundServiceRequests = await RequestsService.findAll(false);
 
-        const foundServiceRequests = await RequestsService.findAll(false);
+            expect(foundServiceRequests[0]).toMatchObject(
+                RequestsService.toServiceRequest(sr)
+            );
+        });
 
-        expect(foundServiceRequests[0]).toMatchObject(RequestsService.toServiceRequest(sr));
-    });
+        test("findAll - with extensions", async () => {
+            const sr = newServiceRequest();
+            await insertServiceRequest(db, [sr]);
 
-    test('findAll - with extensions', async () => {
-        const sr = newServiceRequest();
-        await insertServiceRequest(db, [sr]);
+            const foundServiceRequests = await RequestsService.findAll(true);
 
-        const foundServiceRequests = await RequestsService.findAll(true);
+            expect(foundServiceRequests[0]).toMatchObject(
+                RequestsService.toServiceRequestWithExtensions(sr)
+            );
+        });
 
-        expect(foundServiceRequests[0]).toMatchObject(RequestsService.toServiceRequestWithExtensions(sr));
-    });
+        test("delete", async () => {
+            const sr = newServiceRequest();
+            await insertServiceRequest(db, [sr]);
 
-    test('delete', async () => {
-        const sr = newServiceRequest();
-        await insertServiceRequest(db, [sr]);
+            await RequestsService.doDelete(sr.service_request_id);
+            const foundServiceRequests = await RequestsService.findAll(true);
 
-        await RequestsService.doDelete(sr.service_request_id);
-        const foundServiceRequests = await RequestsService.findAll(true);
-
-        expect(foundServiceRequests.length).toBe(0);
-    });
-
-}));
+            expect(foundServiceRequests.length).toBe(0);
+        });
+    })
+);
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addNestedExtensionProps(r: any) {

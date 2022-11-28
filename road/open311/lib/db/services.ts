@@ -1,17 +1,17 @@
-import {Service} from "../model/service";
-import {PreparedStatement} from "pg-promise";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { Service } from "../model/service";
+import { PreparedStatement } from "pg-promise";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 // Full of underscores
 /* eslint-disable camelcase */
 
 const DELETE_SERVICES_PS = new PreparedStatement({
-    name: 'delete-service',
-    text: 'DELETE FROM open311_service',
+    name: "delete-service",
+    text: "DELETE FROM open311_service",
 });
 
 const INSERT_SERVICE_PS = new PreparedStatement({
-    name: 'insert-service',
+    name: "insert-service",
     text: `INSERT INTO open311_service(
                service_code,
                service_name,
@@ -31,7 +31,7 @@ const INSERT_SERVICE_PS = new PreparedStatement({
 });
 
 const SELECT_SERVICES_PS = new PreparedStatement({
-    name: 'select-services',
+    name: "select-services",
     text: `SELECT service_code,
                   service_name,
                   description,
@@ -43,7 +43,7 @@ const SELECT_SERVICES_PS = new PreparedStatement({
 });
 
 const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
-    name: 'select-service-by-code',
+    name: "select-service-by-code",
     text: `SELECT service_code,
                   service_name,
                   description,
@@ -55,8 +55,8 @@ const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
 });
 
 const SELECT_SERVICE_CODES_PS = new PreparedStatement({
-    name: 'select-servicecodes',
-    text: 'SELECT service_code FROM open311_service',
+    name: "select-servicecodes",
+    text: "SELECT service_code FROM open311_service",
 });
 
 interface ServiceServiceCode {
@@ -64,26 +64,34 @@ interface ServiceServiceCode {
 }
 
 export function update(services: Service[], db: DTDatabase): Promise<null[]> {
-    return db.tx(t => {
+    return db.tx((t) => {
         t.none(DELETE_SERVICES_PS);
-        const queries: Promise<null>[] = services.map(service => {
+        const queries: Promise<null>[] = services.map((service) => {
             return t.none(INSERT_SERVICE_PS, createEditObject(service));
         });
         return t.batch(queries);
     });
 }
 
-export function findAllServiceCodes(db: DTDatabase): Promise<ServiceServiceCode[]> {
+export function findAllServiceCodes(
+    db: DTDatabase
+): Promise<ServiceServiceCode[]> {
     return db.manyOrNone(SELECT_SERVICE_CODES_PS);
 }
 
 export function findAll(db: DTDatabase): Promise<Service[]> {
-    return db.manyOrNone(SELECT_SERVICES_PS).then(requests => requests.map(r => toService(r)));
+    return db
+        .manyOrNone(SELECT_SERVICES_PS)
+        .then((requests) => requests.map((r) => toService(r)));
 }
 
-export function find(serviceRequestId: string,
-    db: DTDatabase): Promise<Service | null > {
-    return db.oneOrNone(SELECT_SERVICE_BY_CODE_PS, [serviceRequestId]).then(r => r == null ? null : toService(r));
+export function find(
+    serviceRequestId: string,
+    db: DTDatabase
+): Promise<Service | null> {
+    return db
+        .oneOrNone(SELECT_SERVICE_BY_CODE_PS, [serviceRequestId])
+        .then((r) => (r == null ? null : toService(r)));
 }
 
 function toService(s: Service): Service {
@@ -98,21 +106,23 @@ function toService(s: Service): Service {
     };
 }
 
-
 /**
  * Creates an object with all necessary properties for pg-promise
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createEditObject(service: Service): any[] {
-    const editObject = { ...{
-        service_code: undefined,
-        service_name: undefined,
-        description: undefined,
-        metadata: undefined,
-        type: undefined,
-        keywords: undefined,
-        group: undefined,
-    }, ...service};
+    const editObject = {
+        ...{
+            service_code: undefined,
+            service_name: undefined,
+            description: undefined,
+            metadata: undefined,
+            type: undefined,
+            keywords: undefined,
+            group: undefined,
+        },
+        ...service,
+    };
 
     // ordering is important!
     const ret = [];

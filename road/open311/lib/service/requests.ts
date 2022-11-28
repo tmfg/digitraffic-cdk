@@ -1,6 +1,18 @@
-import {doDelete as dbDelete, find as dbFind, findAll as dbFindAll, update as dbUpdate} from '../db/requests';
-import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
+import {
+    doDelete as dbDelete,
+    find as dbFind,
+    findAll as dbFindAll,
+    update as dbUpdate,
+} from "../db/requests";
+import {
+    ServiceRequest,
+    ServiceRequestWithExtensions,
+    ServiceRequestWithExtensionsDto,
+} from "../model/service-request";
+import {
+    DTDatabase,
+    inDatabase,
+} from "@digitraffic/common/dist/database/database";
 
 // Full of underscores
 /* eslint-disable camelcase */
@@ -9,21 +21,25 @@ export function findAll(extensions: boolean): Promise<ServiceRequest[]> {
     return inDatabase(async (db: DTDatabase) => {
         const requests = await dbFindAll(db);
         if (!extensions) {
-            return requests.map(r => toServiceRequest(r));
+            return requests.map((r) => toServiceRequest(r));
         } else {
-            return requests.map(r => toServiceRequestWithExtensions(r));
+            return requests.map((r) => toServiceRequestWithExtensions(r));
         }
     });
 }
 
-export function find(serviceRequestId: string,
-    extensions: boolean): Promise<ServiceRequest | null> {
+export function find(
+    serviceRequestId: string,
+    extensions: boolean
+): Promise<ServiceRequest | null> {
     return inDatabase(async (db: DTDatabase) => {
-        const r =  await dbFind(serviceRequestId, db);
+        const r = await dbFind(serviceRequestId, db);
         if (!r) {
             return null;
         }
-        return extensions ? toServiceRequestWithExtensions(r) : toServiceRequest(r);
+        return extensions
+            ? toServiceRequestWithExtensions(r)
+            : toServiceRequest(r);
     });
 }
 
@@ -33,22 +49,33 @@ export function doDelete(serviceRequestId: string): Promise<null> {
     });
 }
 
-export function update(requests: ServiceRequestWithExtensions[]): Promise<void> {
+export function update(
+    requests: ServiceRequestWithExtensions[]
+): Promise<void> {
     const start = Date.now();
     return inDatabase((db: DTDatabase) => {
         return dbUpdate(requests, db);
-    }).then(a => {
-        const end = Date.now();
-        console.info("method=updateRequests updatedCount=%d tookMs=%d", a.length, (end - start));
-    }).catch(error => {
-        console.error('method=updateRequests', requests);
-        throw error;
-    });
+    })
+        .then((a) => {
+            const end = Date.now();
+            console.info(
+                "method=updateRequests updatedCount=%d tookMs=%d",
+                a.length,
+                end - start
+            );
+        })
+        .catch((error) => {
+            console.error("method=updateRequests", requests);
+            throw error;
+        });
 }
 
-export function toServiceRequestWithExtensions(r: ServiceRequestWithExtensions): ServiceRequestWithExtensionsDto {
+export function toServiceRequestWithExtensions(
+    r: ServiceRequestWithExtensions
+): ServiceRequestWithExtensionsDto {
     return {
-        ...toServiceRequest(r), ...{
+        ...toServiceRequest(r),
+        ...{
             extended_attributes: {
                 status_id: r.status_id,
                 vendor_status: r.vendor_status,
@@ -63,7 +90,9 @@ export function toServiceRequestWithExtensions(r: ServiceRequestWithExtensions):
     };
 }
 
-export function toServiceRequest(r: ServiceRequestWithExtensions): ServiceRequest {
+export function toServiceRequest(
+    r: ServiceRequestWithExtensions
+): ServiceRequest {
     // destructuring is nicer to the eye but being explicit is safer in the long run
     return {
         service_request_id: r.service_request_id,

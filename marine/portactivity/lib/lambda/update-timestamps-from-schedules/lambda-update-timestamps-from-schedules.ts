@@ -5,13 +5,14 @@ import { SchedulesService } from "../../service/schedules";
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<SchedulesSecret>("schedules");
 
-export interface SchedulesSecret {
+export interface SchedulesSecret extends GenericSecret {
     readonly url: string;
 }
 

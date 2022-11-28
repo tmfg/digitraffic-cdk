@@ -1,9 +1,9 @@
-import {handler} from '../../../lib/lambda/update-subsubjects/lambda-update-subsubjects';
-import {dbTestBase} from "../../db-testutil";
-import {TestHttpServer} from "@digitraffic/common/test/httpserver";
+import { handler } from "../../../lib/lambda/update-subsubjects/lambda-update-subsubjects";
+import { dbTestBase } from "../../db-testutil";
+import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as SubSubjectsDb from "../../../lib/db/subsubjects";
-import {Locale} from "../../../lib/model/locale";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import { Locale } from "../../../lib/model/locale";
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 const SERVER_PORT = 8091;
 
@@ -11,41 +11,53 @@ process.env.ENDPOINT_USER = "some_user";
 process.env.ENDPOINT_PASS = "some_pass";
 process.env.ENDPOINT_URL = `http://localhost:${SERVER_PORT}`;
 
-describe('update-subsubjects', dbTestBase((db: DTDatabase) => {
+describe(
+    "update-subsubjects",
+    dbTestBase((db: DTDatabase) => {
+        test("update", async () => {
+            const server = new TestHttpServer();
+            server.listen(SERVER_PORT, {
+                "/subsubjects": (url) => {
+                    const locale = (
+                        (url as string).match(/\/.+=(.+)/) as string[]
+                    )[1];
+                    return fakeSubSubjects(locale);
+                },
+            });
 
-    test('update', async () => {
-        const server = new TestHttpServer();
-        server.listen(SERVER_PORT, {
-            "/subsubjects": (url) => {
-                const locale = ((url as string).match(/\/.+=(.+)/) as string[])[1];
-                return fakeSubSubjects(locale);
-            },
+            try {
+                const expectedId = 305;
+                await handler();
+
+                const foundSubSubjectsFi = await SubSubjectsDb.findAll(
+                    Locale.FINNISH,
+                    db
+                );
+                expect(foundSubSubjectsFi.length).toBe(1);
+                expect(foundSubSubjectsFi[0].id).toBe(expectedId);
+
+                const foundSubSubjectsSv = await SubSubjectsDb.findAll(
+                    Locale.SWEDISH,
+                    db
+                );
+                expect(foundSubSubjectsSv.length).toBe(1);
+                expect(foundSubSubjectsSv[0].id).toBe(expectedId);
+
+                const foundSubSubjectsEn = await SubSubjectsDb.findAll(
+                    Locale.ENGLISH,
+                    db
+                );
+                expect(foundSubSubjectsEn.length).toBe(1);
+                expect(foundSubSubjectsEn[0].id).toBe(expectedId);
+            } finally {
+                server.close();
+            }
         });
-
-        try {
-            const expectedId = 305;
-            await handler();
-
-            const foundSubSubjectsFi = await SubSubjectsDb.findAll(Locale.FINNISH, db);
-            expect(foundSubSubjectsFi.length).toBe(1);
-            expect(foundSubSubjectsFi[0].id).toBe(expectedId);
-
-            const foundSubSubjectsSv = await SubSubjectsDb.findAll(Locale.SWEDISH, db);
-            expect(foundSubSubjectsSv.length).toBe(1);
-            expect(foundSubSubjectsSv[0].id).toBe(expectedId);
-
-            const foundSubSubjectsEn = await SubSubjectsDb.findAll(Locale.ENGLISH, db);
-            expect(foundSubSubjectsEn.length).toBe(1);
-            expect(foundSubSubjectsEn[0].id).toBe(expectedId);
-        } finally {
-            server.close();
-        }
-    });
-
-}));
+    })
+);
 
 function fakeSubSubjects(locale?: string) {
-    if (locale == 'fi') {
+    if (locale == "fi") {
         return `
 <?xml version="1.0" encoding="UTF-8"?>
 <subsubjects>
@@ -58,7 +70,7 @@ function fakeSubSubjects(locale?: string) {
     </subsubject>
 </subsubjects>
 `;
-    } else if (locale == 'sv') {
+    } else if (locale == "sv") {
         return `
 <?xml version="1.0" encoding="UTF-8"?>
 <subsubjects>

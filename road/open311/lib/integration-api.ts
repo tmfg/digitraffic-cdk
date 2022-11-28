@@ -1,44 +1,45 @@
-import apigateway = require('aws-cdk-lib/aws-apigateway');
-import iam = require('aws-cdk-lib/aws-iam');
-import * as lambda from 'aws-cdk-lib/aws-lambda';
-import {EndpointType, LambdaIntegration} from "aws-cdk-lib/aws-apigateway";
-import {Construct} from "constructs";
+import apigateway = require("aws-cdk-lib/aws-apigateway");
+import iam = require("aws-cdk-lib/aws-iam");
+import * as lambda from "aws-cdk-lib/aws-lambda";
+import { EndpointType, LambdaIntegration } from "aws-cdk-lib/aws-apigateway";
+import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import {dbLambdaConfiguration} from '@digitraffic/common/aws/infra/stack/lambda-configs';
-import {createSubscription} from "@digitraffic/common/aws/infra/stack/subscription";
-import {corsMethod, defaultIntegration, methodResponse} from "@digitraffic/common/aws/infra/api/responses";
-import {addDefaultValidator} from "@digitraffic/common/utils/api-model";
-import {MessageModel} from "@digitraffic/common/aws/infra/api/response";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import { dbLambdaConfiguration } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import {
+    corsMethod,
+    defaultIntegration,
+    methodResponse,
+} from "@digitraffic/common/dist/aws/infra/api/responses";
+import { addDefaultValidator } from "@digitraffic/common/dist/utils/api-model";
+import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
-export function create(vpc: ec2.IVpc, lambdaDbSg: ec2.ISecurityGroup, stack: Construct, props: Props) {
+export function create(
+    vpc: ec2.IVpc,
+    lambdaDbSg: ec2.ISecurityGroup,
+    stack: Construct,
+    props: Props
+) {
     const integrationApi = createApi(stack);
-    createRequestsResource(
-        stack, integrationApi, vpc, lambdaDbSg, props,
-    );
+    createRequestsResource(stack, integrationApi, vpc, lambdaDbSg, props);
     createUsagePlan(integrationApi);
 }
 
 function createApi(stack: Construct) {
-    return new apigateway.RestApi(stack, 'Open311-integration', {
+    return new apigateway.RestApi(stack, "Open311-integration", {
         deployOptions: {
             loggingLevel: apigateway.MethodLoggingLevel.ERROR,
         },
-        restApiName: 'Open311 integration API',
+        restApiName: "Open311 integration API",
         endpointTypes: [EndpointType.REGIONAL],
         policy: new iam.PolicyDocument({
             statements: [
                 new iam.PolicyStatement({
                     effect: iam.Effect.ALLOW,
-                    actions: [
-                        "execute-api:Invoke",
-                    ],
-                    resources: [
-                        "*",
-                    ],
-                    principals: [
-                        new iam.AnyPrincipal(),
-                    ],
+                    actions: ["execute-api:Invoke"],
+                    resources: ["*"],
+                    principals: [new iam.AnyPrincipal()],
                 }),
             ],
         }),
@@ -50,20 +51,27 @@ function createRequestsResource(
     integrationApi: apigateway.RestApi,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props,
+    props: Props
 ) {
     const validator = addDefaultValidator(integrationApi);
     const apiResource = integrationApi.root.addResource("api");
     const v1Resource = apiResource.addResource("v1");
     const open311Resource = v1Resource.addResource("open311-integration");
     const requests = open311Resource.addResource("requests");
-    const messageResponseModel = integrationApi.addModel('MessageResponseModel', MessageModel);
-
-    createUpdateRequestHandler(
-        requests, stack, vpc, lambdaDbSg, props,
+    const messageResponseModel = integrationApi.addModel(
+        "MessageResponseModel",
+        MessageModel
     );
+
+    createUpdateRequestHandler(requests, stack, vpc, lambdaDbSg, props);
     createDeleteRequestHandler(
-        requests, messageResponseModel, validator, stack, vpc, lambdaDbSg, props,
+        requests,
+        messageResponseModel,
+        validator,
+        stack,
+        vpc,
+        lambdaDbSg,
+        props
     );
 }
 
@@ -72,18 +80,27 @@ function createUpdateRequestHandler(
     stack: Construct,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props,
+    props: Props
 ) {
-    const updateRequestsId = 'UpdateRequests';
-    const updateRequestsHandler = new lambda.Function(stack, updateRequestsId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: updateRequestsId,
-        code: new lambda.AssetCode('dist/lambda/update-requests'),
-        handler: 'lambda-update-requests.handler',
-    }));
+    const updateRequestsId = "UpdateRequests";
+    const updateRequestsHandler = new lambda.Function(
+        stack,
+        updateRequestsId,
+        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+            functionName: updateRequestsId,
+            code: new lambda.AssetCode("dist/lambda/update-requests"),
+            handler: "lambda-update-requests.handler",
+        })
+    );
     requests.addMethod("POST", new LambdaIntegration(updateRequestsHandler), {
         apiKeyRequired: true,
     });
-    createSubscription(updateRequestsHandler, updateRequestsId, props.logsDestinationArn, stack);
+    createSubscription(
+        updateRequestsHandler,
+        updateRequestsId,
+        props.logsDestinationArn,
+        stack
+    );
 }
 
 function createDeleteRequestHandler(
@@ -93,24 +110,32 @@ function createDeleteRequestHandler(
     stack: Construct,
     vpc: ec2.IVpc,
     lambdaDbSg: ec2.ISecurityGroup,
-    props: Props,
+    props: Props
 ) {
-    const deleteRequestId = 'DeleteRequest';
-    const deleteRequestHandler = new lambda.Function(stack, deleteRequestId, dbLambdaConfiguration(vpc, lambdaDbSg, props, {
-        functionName: deleteRequestId,
-        code: new lambda.AssetCode('dist/lambda/delete-request'),
-        handler: 'lambda-delete-request.handler',
-    }));
+    const deleteRequestId = "DeleteRequest";
+    const deleteRequestHandler = new lambda.Function(
+        stack,
+        deleteRequestId,
+        dbLambdaConfiguration(vpc, lambdaDbSg, props, {
+            functionName: deleteRequestId,
+            code: new lambda.AssetCode("dist/lambda/delete-request"),
+            handler: "lambda-delete-request.handler",
+        })
+    );
     const deleteRequestIntegration = defaultIntegration(deleteRequestHandler, {
         requestParameters: {
-            'integration.request.path.request_id': 'method.request.path.request_id',
-            'integration.request.querystring.extensions': 'method.request.querystring.extensions',
+            "integration.request.path.request_id":
+                "method.request.path.request_id",
+            "integration.request.querystring.extensions":
+                "method.request.querystring.extensions",
         },
         requestTemplates: {
-            'application/json': JSON.stringify({
+            "application/json": JSON.stringify({
                 // eslint-disable-next-line camelcase
-                request_id: "$util.escapeJavaScript($input.params('request_id'))",
-                extensions: "$util.escapeJavaScript($input.params('extensions'))",
+                request_id:
+                    "$util.escapeJavaScript($input.params('request_id'))",
+                extensions:
+                    "$util.escapeJavaScript($input.params('extensions'))",
             }),
         },
     });
@@ -119,21 +144,38 @@ function createDeleteRequestHandler(
         apiKeyRequired: true,
         requestValidator: validator,
         requestParameters: {
-            'method.request.path.request_id': true,
-            'method.request.querystring.extensions': false,
+            "method.request.path.request_id": true,
+            "method.request.querystring.extensions": false,
         },
         methodResponses: [
-            corsMethod(methodResponse("200", MediaType.APPLICATION_JSON, messageResponseModel)),
-            corsMethod(methodResponse("500", MediaType.APPLICATION_JSON, messageResponseModel)),
+            corsMethod(
+                methodResponse(
+                    "200",
+                    MediaType.APPLICATION_JSON,
+                    messageResponseModel
+                )
+            ),
+            corsMethod(
+                methodResponse(
+                    "500",
+                    MediaType.APPLICATION_JSON,
+                    messageResponseModel
+                )
+            ),
         ],
     });
-    createSubscription(deleteRequestHandler, deleteRequestId, props.logsDestinationArn, stack);
+    createSubscription(
+        deleteRequestHandler,
+        deleteRequestId,
+        props.logsDestinationArn,
+        stack
+    );
 }
 
 function createUsagePlan(integrationApi: apigateway.RestApi) {
-    const apiKey = integrationApi.addApiKey('Integration API key');
-    const plan = integrationApi.addUsagePlan('Integration Usage Plan', {
-        name: 'Integration Usage Plan',
+    const apiKey = integrationApi.addApiKey("Integration API key");
+    const plan = integrationApi.addUsagePlan("Integration Usage Plan", {
+        name: "Integration Usage Plan",
     });
     plan.addApiStage({
         stage: integrationApi.deploymentStage,

@@ -1,9 +1,8 @@
 import axios from "axios";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 export class VtsApi {
-
-    private readonly url: string
+    private readonly url: string;
 
     constructor(url: string) {
         this.url = url;
@@ -13,14 +12,15 @@ export class VtsApi {
         const start = Date.now();
         const resp = await axios.post(this.url, voyagePlan, {
             headers: {
-                'Content-Type': MediaType.APPLICATION_XML,
+                "Content-Type": MediaType.APPLICATION_XML,
             },
         });
         if (resp.status !== 200) {
-            console.error(`method=uploadArea returned status=${resp.status}, status text: ${resp.statusText}`);
-            throw new Error('Failed to send voyage plan to VTS');
+            console.error(
+                `method=uploadArea returned status=${resp.status}, status text: ${resp.statusText}`
+            );
+            throw new Error("Failed to send voyage plan to VTS");
         }
-        console.info(`method=sendVoyagePlan tookMs=${Date.now()-start}`);
+        console.info(`method=sendVoyagePlan tookMs=${Date.now() - start}`);
     }
-
 }
