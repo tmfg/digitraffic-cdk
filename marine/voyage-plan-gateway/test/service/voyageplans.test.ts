@@ -1,5 +1,5 @@
 import * as VoyagePlansService from '../../lib/service/voyageplans';
-import {randomBoolean} from "@digitraffic/common/test/testutils";
+import {randomBoolean} from "@digitraffic/common/dist/test/testutils";
 import moment from 'moment-timezone';
 import {ValidationError} from "../../lib/service/voyageplans";
 

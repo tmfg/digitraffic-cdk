@@ -3,7 +3,7 @@ import * as StatusService from '../../lib/service/status';
 import {NodePingApi, NodePingCheck, NodePingCheckState, NodePingCheckType} from "../../lib/api/nodeping";
 import {UpdateStatusSecret} from "../../lib/secret";
 import {StatuspageApi, StatuspageComponentStatus} from "../../lib/api/statuspage";
-import {randomString} from "@digitraffic/common/test/testutils";
+import {randomString} from "@digitraffic/common/dist/test/testutils";
 import {EndpointHttpMethod} from "../../lib/app-props";
 
 describe('status service', () => {

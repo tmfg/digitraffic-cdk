@@ -1,6 +1,7 @@
 How to install?
 
 What you need before installing?
+
 1. Domain name
 2. AWS Certificate for that domain name(this must be in us-east-1 region)
 3. Set AWS_PROFILE-env variable
@@ -9,24 +10,25 @@ What you need before installing?
 
 Build
 
-    yarn run build
+    pnpm run build
 
-Now you can deploy cloudfrontrun  with:
+Now you can deploy cloudfrontrun with:
 
-    cdk deploy
+    pnpm dlx cdk@latest deploy
 
 There is also commands like
 
-    yarn run cdk-diff-marine-test  
-    yarn run cdk-diff-marine-prod  
-    yarn run cdk-diff-road-test    
-    yarn run cdk-diff-road-prod
+    pnpm run cdk-diff-marine-test
+    pnpm run cdk-diff-marine-prod
+    pnpm run cdk-diff-road-test
+    pnpm run cdk-diff-road-prod
 
-    yarn run cdk-deploy-marine-test
-    yarn run cdk-deploy-marine-prod
-    yarn run cdk-deploy-road-test  
-    yarn run cdk-deploy-road-prod  
-    
+    pnpm run cdk-deploy-marine-test
+    pnpm run cdk-deploy-marine-prod
+    pnpm run cdk-deploy-road-test
+    pnpm run cdk-deploy-road-prod
+
 And after that?
+
 1. Check weathercam-bucket, you must give permission to created originAccessIdentity
 2. Route53, domain-names should be alias to created cloudfront distributions

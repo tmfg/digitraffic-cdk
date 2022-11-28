@@ -1,6 +1,6 @@
-import {ContentChecker, ContentTypeChecker, UrlChecker} from "@digitraffic/common/aws/infra/canaries/url-checker";
-import {Asserter} from "@digitraffic/common/test/asserter";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {ContentChecker, ContentTypeChecker, UrlChecker} from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
+import {Asserter} from "@digitraffic/common/dist/test/asserter";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
 import {FeatureCollection} from "geojson";
 
 const BASE_URL = "/prod/api/street-traffic-message/beta/";

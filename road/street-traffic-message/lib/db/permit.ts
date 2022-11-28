@@ -1,4 +1,4 @@
-import {DTDatabase, DTTransaction} from "@digitraffic/common/database/database";
+import {DTDatabase, DTTransaction} from "@digitraffic/common/dist/database/database";
 import {PreparedStatement} from "pg-promise";
 import {ApiPermit, DbPermit} from "../model/permit";
 import {FeatureCollection, Geometry as GeoJSONGeometry, Point} from "geojson";

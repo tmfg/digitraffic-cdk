@@ -1,6 +1,6 @@
 import {SQS} from "aws-sdk";
 import {VoyagePlanEnvKeys, VoyagePlanSecretKeys} from "../../keys";
-import {withSecret} from "@digitraffic/common/aws/runtime/secrets/secret";
+import {withSecret} from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import * as VisApi from '../../api/vis';
 import {VisMessageType} from "../../api/vis";
 import {VisMessageWithCallbackEndpoint} from "../../model/vismessage";

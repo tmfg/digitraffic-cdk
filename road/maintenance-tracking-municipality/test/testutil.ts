@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import {getRandomInteger, getRandomNumber} from "@digitraffic/common/test/testutils";
-import {GeoJsonLineString, GeoJsonPoint} from "@digitraffic/common/utils/geojson-types";
+import {getRandomInteger, getRandomNumber} from "@digitraffic/common/dist/test/testutils";
+import {GeoJsonLineString, GeoJsonPoint} from "@digitraffic/common/dist/utils/geojson-types";
 import {Feature, Geometry, LineString, Point, Position} from "geojson";
 import {cloneDeep} from 'lodash';
 import moment from "moment";

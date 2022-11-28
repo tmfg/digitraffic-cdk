@@ -1,5 +1,5 @@
 import {find} from "../../service/requests";
-import {NOT_FOUND_MESSAGE} from '@digitraffic/common/aws/types/errors';
+import {NOT_FOUND_MESSAGE} from '@digitraffic/common/dist/aws/types/errors';
 import {ServiceRequest} from "../../model/service-request";
 
 const stringTrueRegex = /true/;

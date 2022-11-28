@@ -5,15 +5,15 @@ Data is then readable from marine-web -application public api.
 
 ## Run build
 
-    yarn run build
-    yarn run all-watch
-    yarn run test
+    pnpm run build
+    pnpm run all-watch
+    pnpm run test
 
 ## Deploy to AWS
 
-* Show changes
-    * `yarn run cdk-diff-test` or 
-    * `yarn run cdk-diff-prod` 
-* Deploy
-    * `yarn run cdk-deploy-test` or 
-    * `yarn run cdk-deploy-prod`
+-   Show changes
+    -   `pnpm run cdk-diff-test` or
+    -   `pnpm run cdk-diff-prod`
+-   Deploy
+    -   `pnpm run cdk-deploy-test` or
+    -   `pnpm run cdk-deploy-prod`

@@ -1,5 +1,5 @@
 import * as AWSx from "aws-sdk";
-import {uploadToS3} from "@digitraffic/common/aws/runtime/s3";
+import {uploadToS3} from "@digitraffic/common/dist/aws/runtime/s3";
 import moment from 'moment-timezone';
 import * as esService from "../service/es";
 import * as snsService from "../service/sns";

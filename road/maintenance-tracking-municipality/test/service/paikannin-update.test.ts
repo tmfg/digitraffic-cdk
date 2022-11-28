@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
-import {DTDatabase} from "@digitraffic/common/database/database";
-import * as LastUpdatedDb from "@digitraffic/common/database/last-updated";
-import {Asserter} from "@digitraffic/common/test/asserter";
-import {getRandomInteger} from "@digitraffic/common/test/testutils";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
+import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
+import {Asserter} from "@digitraffic/common/dist/test/asserter";
+import {getRandomInteger} from "@digitraffic/common/dist/test/testutils";
 import {Position} from "geojson";
 import {getRandompId} from "maintenance-tracking/test/testdata";
 import moment from "moment";

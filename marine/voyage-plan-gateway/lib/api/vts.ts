@@ -1,5 +1,5 @@
 import axios from "axios";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
 
 export class VtsApi {
 

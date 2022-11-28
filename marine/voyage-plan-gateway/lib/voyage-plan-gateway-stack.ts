@@ -5,7 +5,7 @@ import * as PublicApi from './public-api';
 import {VoyagePlanGatewayProps} from "./app-props";
 import {Secret} from "aws-cdk-lib/aws-secretsmanager";
 import {Topic} from "aws-cdk-lib/aws-sns";
-import {DigitrafficStack} from "@digitraffic/common/aws/infra/stack/stack";
+import {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class VoyagePlanGatewayStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: VoyagePlanGatewayProps) {

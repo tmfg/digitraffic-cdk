@@ -1,10 +1,10 @@
-import {ProxyLambdaResponse} from "@digitraffic/common/aws/types/proxytypes";
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
-import {SecretHolder} from "@digitraffic/common/aws/runtime/secrets/secret-holder";
+import {ProxyLambdaResponse} from "@digitraffic/common/dist/aws/types/proxytypes";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
+import {SecretHolder} from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import * as rcs from "../../service/road-network-conditions-service";
 import {DOMAIN_PREFIX, RoadNetworkConditionsSecret} from "../../model/road-network-conditions-secret";
 import {Devices} from "../../model/devices";
-import {DigitrafficRestApi} from "@digitraffic/common/aws/infra/stack/rest_apis";
+import {DigitrafficRestApi} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 
 const holder = SecretHolder.create<RoadNetworkConditionsSecret>(DOMAIN_PREFIX);
 

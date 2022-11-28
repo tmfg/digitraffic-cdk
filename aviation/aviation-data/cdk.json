@@ -1,3 +1,3 @@
 {
-  "app": "npx ts-node bin/aviation-data-app.ts"
+  "app": "pnpm dlx ts-node bin/aviation-data-app.ts"
 }

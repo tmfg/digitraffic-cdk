@@ -3,10 +3,10 @@ import {ApiPermit, DbPermit, PermitDetailedType, PermitType} from "../model/perm
 import {PermitElement, PermitResponse} from "../model/permit-xml";
 import moment from "moment";
 import * as xml2js from 'xml2js';
-import {inDatabaseReadonly} from "@digitraffic/common/database/database";
+import {inDatabaseReadonly} from "@digitraffic/common/dist/database/database";
 import * as PermitsDAO from "../db/permit";
 import {FeatureCollection, Geometry, GeometryCollection, Point} from "geojson";
-import {createGmlLineString, positionToList} from "@digitraffic/common/utils/geometry";
+import {createGmlLineString, positionToList} from "@digitraffic/common/dist/utils/geometry";
 
 const PERMITS_PATH = "/api/v1/kartat/luvat/voimassa";
 

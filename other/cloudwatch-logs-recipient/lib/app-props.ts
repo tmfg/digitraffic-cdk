@@ -1,22 +1,22 @@
-import {FunctionProps} from "aws-cdk-lib/aws-lambda";
+import { FunctionProps } from "aws-cdk-lib/aws-lambda";
 
-export type Props = {
-    readonly accounts: Account[]
-    readonly elasticSearchEndpoint: string
-    readonly elasticSearchDomainArn: string
-    readonly errorEmail: string
+export interface Props {
+    readonly accounts: Account[];
+    readonly elasticSearchEndpoint: string;
+    readonly elasticSearchDomainArn: string;
+    readonly errorEmail: string;
     readonly lambdaConfig?: FunctionProps;
-    readonly warningTopicArn: string
-    readonly alarmTopicArn: string
+    readonly warningTopicArn: string;
+    readonly alarmTopicArn: string;
 }
 
-export type Account = {
+export interface Account {
     readonly accountNumber: string;
     readonly app: string;
     readonly env: string;
 }
 
-export type AppLogSubscription = {
-    readonly destinationArn: string,
-    readonly logGroupNames: string[]
+export interface AppLogSubscription {
+    readonly destinationArn: string;
+    readonly logGroupNames: string[];
 }

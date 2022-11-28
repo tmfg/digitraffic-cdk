@@ -1,4 +1,4 @@
-import {getRandomInteger} from "@digitraffic/common/test/testutils";
+import {getRandomInteger} from "@digitraffic/common/dist/test/testutils";
 import {Position} from "geojson";
 import {DbMaintenanceTracking} from "../../lib/model/db-data";
 import * as Utils from "../../lib/service/utils";

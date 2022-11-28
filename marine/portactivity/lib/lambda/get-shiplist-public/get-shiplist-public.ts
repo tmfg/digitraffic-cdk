@@ -16,11 +16,12 @@ import {
 } from "@digitraffic/common/dist/aws/types/proxytypes";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>("shiplist");
 
-export interface ShiplistSecret {
+export interface ShiplistSecret extends GenericSecret {
     readonly auth: string;
 }
 

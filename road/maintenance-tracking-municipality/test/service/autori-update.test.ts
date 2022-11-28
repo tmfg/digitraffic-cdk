@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
-import {DTDatabase, inDatabaseReadonly} from "@digitraffic/common/database/database";
-import * as LastUpdatedDb from "@digitraffic/common/database/last-updated";
-import {Asserter} from "@digitraffic/common/test/asserter";
-import * as CommonDateUtils from "@digitraffic/common/utils/date-utils";
+import {DTDatabase, inDatabaseReadonly} from "@digitraffic/common/dist/database/database";
+import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
+import {Asserter} from "@digitraffic/common/dist/test/asserter";
+import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import {Position} from "geojson";
 import moment from "moment";
 import * as sinon from "sinon";

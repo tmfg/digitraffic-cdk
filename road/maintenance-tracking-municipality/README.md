@@ -4,19 +4,19 @@ Maintenance tracking municipality integration fetches data from different domain
 
 ## Run build
 
-    `yarn run build`
-    `yarn run all-watch`
-    `yarn run test`
+    `pnpm run build`
+    `pnpm run all-watch`
+    `pnpm run test`
 
 ## Deploy to AWS
 
-* Show changes
-    * `yarn run cdk-diff-road-test` or 
-    * `yarn run cdk-diff-road-prod` 
-* Deploy
-    * `yarn run cdk-deploy-road-test` or 
-    * `yarn run cdk-deploy-road-prod`
-* 
-* Synthesize a CloudFormation template for local inspection (not required)
-    * `yarn run cdk-synth-road-test` or
-    * `yarn run cdk-synth-road-prod` 
+-   Show changes
+    -   `pnpm run cdk-diff-road-test` or
+    -   `pnpm run cdk-diff-road-prod`
+-   Deploy
+    -   `pnpm run cdk-deploy-road-test` or
+    -   `pnpm run cdk-deploy-road-prod`
+-
+-   Synthesize a CloudFormation template for local inspection (not required)
+    -   `pnpm run cdk-synth-road-test` or
+    -   `pnpm run cdk-synth-road-prod`

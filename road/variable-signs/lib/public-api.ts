@@ -1,4 +1,4 @@
-import { addSimpleServiceModel } from "@digitraffic/common/utils/api-model";
+import { addSimpleServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { DATA_V1_TAGS } from "@digitraffic/common/dist/aws/types/tags";

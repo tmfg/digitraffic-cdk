@@ -1,7 +1,7 @@
 import axios, {AxiosError, AxiosResponse} from 'axios';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const queryString = require('query-string');
-import {MediaType} from "@digitraffic/common/aws/types/mediatypes";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
 import {ApiContractData, ApiOperationData, ApiRouteData} from "../model/autori-api-data";
 import {DbDomainContract} from "../model/db-data";
 import {MaintenanceTrackingAutoriSecret} from "../model/maintenance-tracking-municipality-secret";

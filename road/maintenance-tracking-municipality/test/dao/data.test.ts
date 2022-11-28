@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {dbTestBase, findAllTrackings, getDomain, insertDbDomaindContract, insertDomain, truncate} from "../db-testutil";
-import {DTDatabase} from "@digitraffic/common/database/database";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
 import moment from "moment";
 import * as DataDb from "../../lib/dao/data";
 import {DbMaintenanceTracking, DbNumberId, DbWorkMachine} from "../../lib/model/db-data";

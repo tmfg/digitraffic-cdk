@@ -6,6 +6,7 @@
 set -ex
 
 # regenerate lockfile to clear unused dependencies
-rm -f yarn.lock
+pnpm clean:all:force
+rm -f pnpm-lock.yaml
 
-yarn install
+pnpm install

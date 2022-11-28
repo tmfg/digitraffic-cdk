@@ -1,3 +1,3 @@
 {
-  "app": "npx ts-node bin/bridge-lock-disruptions-app.ts"
+  "app": "pnpm dlx ts-node bin/bridge-lock-disruptions-app.ts"
 }

@@ -1,6 +1,6 @@
 import {doDelete as dbDelete, find as dbFind, findAll as dbFindAll, update as dbUpdate} from '../db/requests';
 import {ServiceRequest, ServiceRequestWithExtensions, ServiceRequestWithExtensionsDto} from "../model/service-request";
-import {DTDatabase, inDatabase} from "@digitraffic/common/database/database";
+import {DTDatabase, inDatabase} from "@digitraffic/common/dist/database/database";
 
 // Full of underscores
 /* eslint-disable camelcase */
