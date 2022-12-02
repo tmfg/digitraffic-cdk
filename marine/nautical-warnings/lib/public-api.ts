@@ -1,14 +1,12 @@
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
-import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import {
-    corsMethod,
-    defaultIntegration,
-    methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
+    DigitrafficMethodResponse,
+    MessageModel,
+} from "@digitraffic/common/dist/aws/infra/api/response";
+import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
     addServiceModel,
@@ -18,6 +16,7 @@ import {
 } from "@digitraffic/common/dist/utils/api-model";
 import { nauticalWarningSchema } from "./model/nautical-warnings-schema";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
 import { NauticalWarningConfiguration } from "./nautical-warnings-stack";
 
 const NAUTICAL_WARNING_TAGS_V1 = ["Nautical Warning V1"];
@@ -79,43 +78,30 @@ export class PublicApi {
     }
 
     createEndpoint(stack: DigitrafficStack) {
-        const environment = stack.createLambdaEnvironment();
-
-        const lambdaActive = MonitoredFunction.createV2(
+        const lambdaActive = MonitoredDBFunction.create(stack, "get-active");
+        const lambdaArchived = MonitoredDBFunction.create(
             stack,
-            "get-active",
-            environment
-        );
-        const lambdaArchived = MonitoredFunction.createV2(
-            stack,
-            "get-archived",
-            environment
+            "get-archived"
         );
 
-        stack.grantSecret(lambdaActive, lambdaArchived);
-        new DigitrafficLogSubscriptions(stack, lambdaActive, lambdaArchived);
-
-        const activeIntegration = defaultIntegration(lambdaActive);
-        const archivedIntegration = defaultIntegration(lambdaArchived);
+        const activeIntegration = new DigitrafficIntegration(
+            lambdaActive,
+            MediaType.APPLICATION_GEOJSON
+        ).build();
+        const archivedIntegration = new DigitrafficIntegration(
+            lambdaArchived,
+            MediaType.APPLICATION_GEOJSON
+        ).build();
 
         ["GET", "HEAD"].forEach((httpMethod) => {
             this.activeResource.addMethod(httpMethod, activeIntegration, {
                 apiKeyRequired: false,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_GEOJSON,
-                            this.geojsonModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.geojsonModel,
+                        MediaType.APPLICATION_GEOJSON
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.TEXT_PLAIN,
-                            this.geojsonModel
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
@@ -124,20 +110,11 @@ export class PublicApi {
             this.archivedResource.addMethod(httpMethod, archivedIntegration, {
                 apiKeyRequired: false,
                 methodResponses: [
-                    corsMethod(
-                        methodResponse(
-                            "200",
-                            MediaType.APPLICATION_GEOJSON,
-                            this.geojsonModel
-                        )
+                    DigitrafficMethodResponse.response200(
+                        this.geojsonModel,
+                        MediaType.APPLICATION_GEOJSON
                     ),
-                    corsMethod(
-                        methodResponse(
-                            "500",
-                            MediaType.TEXT_PLAIN,
-                            this.geojsonModel
-                        )
-                    ),
+                    DigitrafficMethodResponse.response500(),
                 ],
             });
         });
