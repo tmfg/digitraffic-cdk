@@ -1,5 +1,3 @@
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-
 jest.mock("@digitraffic/common/dist/aws/runtime/secrets/secret-holder", () => {
     return {
         SecretHolder: {
@@ -9,8 +7,6 @@ jest.mock("@digitraffic/common/dist/aws/runtime/secrets/secret-holder", () => {
         },
     };
 });
-
-import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 
 jest.mock("@digitraffic/common/dist/aws/runtime/secrets/proxy-holder", () => {
     return {

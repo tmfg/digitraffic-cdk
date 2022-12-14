@@ -1,10 +1,6 @@
 import { Model, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
 import { faultsSchema } from "./model/fault-schema";
 import {
-    corsMethod,
-    methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
-import {
     featureSchema,
     geojsonSchema,
     getModelReference,

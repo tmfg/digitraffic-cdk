@@ -30,9 +30,12 @@ describe("get-faults", () => {
         expect(response.status).toEqual(status);
 
         console.info("response %s", JSON.stringify(response, null, 2));
+        console.info("body %s", decodeBase64ToAscii(response.body));
 
         if (expected) {
-            const value: T = JSON.parse(decodeBase64ToAscii(response.body));
+            const value: T = JSON.parse(
+                decodeBase64ToAscii(response.body)
+            ) as unknown as T;
             expect(value).toEqual(expected);
         }
     }

@@ -6,7 +6,7 @@ import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/res
 
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if (stack.configuration.stackFeatures?.enableCanaries) {
+        if (stack.configuration.stackFeatures?.enableCanaries ?? true) {
             const urlRole = new DigitrafficCanaryRole(stack, "aton-url");
             const dbRole = new DigitrafficCanaryRole(
                 stack,

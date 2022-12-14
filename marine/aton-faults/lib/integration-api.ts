@@ -2,7 +2,6 @@ import {
     Model,
     PassthroughBehavior,
     Resource,
-    RestApi,
 } from "aws-cdk-lib/aws-apigateway";
 import { Construct } from "constructs";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
@@ -12,10 +11,7 @@ import {
     methodResponse,
 } from "@digitraffic/common/dist/aws/infra/api/responses";
 import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
-import {
-    addQueryParameterDescription,
-    addTagsAndSummary,
-} from "@digitraffic/common/dist/aws/infra/documentation";
+import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
 import { AtonEnvKeys } from "./keys";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import {
@@ -56,7 +52,7 @@ function createUploadVoyagePlanHandler(
     stack: DigitrafficStack,
     messageResponseModel: Model,
     s124Queue: Queue,
-    integrationApi: RestApi
+    integrationApi: DigitrafficRestApi
 ) {
     const handler = createHandler(stack, s124Queue);
 
@@ -65,6 +61,19 @@ function createUploadVoyagePlanHandler(
         .addResource("voyagePlans");
     createIntegrationResource(stack, messageResponseModel, resource, handler);
     s124Queue.grantSendMessages(handler);
+
+    integrationApi.documentResource(
+        resource,
+        DocumentationPart.method(
+            ["API"],
+            "ATON Faults",
+            "Upload voyage plan in RTZ format in HTTP POST body. Active ATON faults relevant to the voyage plan are sent back in S-124 format if the query parameter callbackEndpoint is supplied."
+        ),
+        DocumentationPart.queryParameter(
+            "callbackEndpoint",
+            "URL endpoint where S-124 ATON faults are sent"
+        )
+    );
 }
 
 function createIntegrationResource(
@@ -112,19 +121,6 @@ function createIntegrationResource(
             ),
         ],
     });
-    addQueryParameterDescription(
-        "callbackEndpoint",
-        "URL endpoint where S-124 ATON faults are sent",
-        resource,
-        stack
-    );
-    addTagsAndSummary(
-        "ATON Faults",
-        ["API"],
-        "Upload voyage plan in RTZ format in HTTP POST body. Active ATON faults relevant to the voyage plan are sent back in S-124 format if the query parameter callbackEndpoint is supplied.",
-        resource,
-        stack
-    );
 }
 
 function createHandler(
