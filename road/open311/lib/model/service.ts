@@ -1,11 +1,8 @@
 export enum ServiceType {
-    realtime = 'realtime',
-    batch = 'batch',
-    blackbox = 'blackbox'
+    realtime = "realtime",
+    batch = "batch",
+    blackbox = "blackbox",
 }
-
-// camels
-/* eslint-disable camelcase */
 
 export interface Service {
     service_code: string;

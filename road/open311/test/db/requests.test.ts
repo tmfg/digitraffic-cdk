@@ -4,9 +4,6 @@ import { dbTestBase, insertServiceRequest } from "../db-testutil";
 import { ServiceRequestStatus } from "../../lib/model/service-request";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-// test file
-/* eslint-disable camelcase */
-
 describe(
     "db-requests",
     dbTestBase((db: DTDatabase) => {
@@ -171,9 +168,7 @@ describe(
             await insertServiceRequest(db, [serviceRequest]);
 
             const updatingServiceRequest = Object.assign({}, serviceRequest);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             delete (updatingServiceRequest as any).long;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             delete (updatingServiceRequest as any).lat;
 
             await RequestsDb.update([updatingServiceRequest], db);
@@ -184,9 +179,7 @@ describe(
             await insertServiceRequest(db, [serviceRequest]);
 
             const updatingServiceRequest = Object.assign({}, serviceRequest);
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (updatingServiceRequest as any).long = "";
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (updatingServiceRequest as any).lat = "";
 
             await RequestsDb.update([updatingServiceRequest], db);
@@ -211,9 +204,7 @@ describe(
 
         test("Insert - null geometry doesn't fail", async () => {
             const serviceRequest = newServiceRequest();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             delete (serviceRequest as any).long;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             delete (serviceRequest as any).lat;
 
             await RequestsDb.update([serviceRequest], db);
@@ -221,9 +212,7 @@ describe(
 
         test("insert - invalid geometry is not saved", async () => {
             const serviceRequest = newServiceRequest();
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (serviceRequest as any).long = "";
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             (serviceRequest as any).lat = "";
 
             await RequestsDb.update([serviceRequest], db);

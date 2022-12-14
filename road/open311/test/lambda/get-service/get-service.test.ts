@@ -4,9 +4,6 @@ import * as ServicesService from "../../../lib/db/services";
 import { dbTestBase } from "../../db-testutil";
 import { NOT_FOUND_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
 
-// test file
-/* eslint-disable camelcase */
-
 describe(
     "lambda-get-service",
     dbTestBase((db) => {

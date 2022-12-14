@@ -1,41 +1,41 @@
-import {handler} from "../../../lib/lambda/get-requests/lambda-get-requests";
-import {newServiceRequest} from "../../testdata";
-import {dbTestBase, insertServiceRequest} from "../../db-testutil";
+import { handler } from "../../../lib/lambda/get-requests/lambda-get-requests";
+import { newServiceRequest } from "../../testdata";
+import { dbTestBase, insertServiceRequest } from "../../db-testutil";
 
-describe('lambda-get-requests', dbTestBase((db) => {
+describe(
+    "lambda-get-requests",
+    dbTestBase((db) => {
+        test("no service requests", async () => {
+            const response = await handler({ extensions: "false" });
 
-    test('no service requests', async () => {
-        const response = await handler({extensions: 'false'});
+            expect(response).toMatchObject([]);
+        });
 
-        expect(response).toMatchObject([]);
-    });
+        test("some service requests", async () => {
+            const serviceRequests = Array.from({
+                length: Math.floor(Math.random() * 10),
+            }).map(() => newServiceRequest());
+            await insertServiceRequest(db, serviceRequests);
 
-    test('some service requests', async () => {
-        const serviceRequests =
-            Array.from({length: Math.floor(Math.random() * 10)}).map(() => newServiceRequest());
-        await insertServiceRequest(db, serviceRequests);
+            const response = await handler({ extensions: "false" });
 
-        const response = await handler({extensions: 'false'});
+            expect(response.length).toBe(serviceRequests.length);
+        });
 
-        expect(response.length).toBe(serviceRequests.length);
-    });
+        test("extensions", async () => {
+            await insertServiceRequest(db, [newServiceRequest()]);
 
-    test('extensions', async () => {
-        await insertServiceRequest(db, [newServiceRequest()]);
+            const response = await handler({ extensions: "true" });
 
-        const response = await handler({extensions: 'true'});
+            expect((response[0] as any).extended_attributes).toBeDefined();
+        });
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        expect((response[0] as any).extended_attributes).toBeDefined();
-    });
+        test("no extensions", async () => {
+            await insertServiceRequest(db, [newServiceRequest()]);
 
-    test('no extensions', async () => {
-        await insertServiceRequest(db, [newServiceRequest()]);
+            const response = await handler({ extensions: "false" });
 
-        const response = await handler({extensions: 'false'});
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        expect((response[0] as any).extended_attributes).toBeUndefined();
-    });
-
-}));
+            expect((response[0] as any).extended_attributes).toBeUndefined();
+        });
+    })
+);

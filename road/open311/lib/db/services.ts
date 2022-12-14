@@ -2,9 +2,6 @@ import { Service } from "../model/service";
 import { PreparedStatement } from "pg-promise";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-// Full of underscores
-/* eslint-disable camelcase */
-
 const DELETE_SERVICES_PS = new PreparedStatement({
     name: "delete-service",
     text: "DELETE FROM open311_service",
@@ -12,22 +9,20 @@ const DELETE_SERVICES_PS = new PreparedStatement({
 
 const INSERT_SERVICE_PS = new PreparedStatement({
     name: "insert-service",
-    text: `INSERT INTO open311_service(
-               service_code,
-               service_name,
-               description,
-               metadata,
-               type,
-               keywords,
-               "group")
-           VALUES (
-               $1,
-               $2,
-               $3,
-               $4::boolean,
-               $5,
-               $6,
-               $7)`,
+    text: `INSERT INTO open311_service(service_code,
+                                       service_name,
+                                       description,
+                                       metadata,
+                                       type,
+                                       keywords,
+                                       "group")
+           VALUES ($1,
+                   $2,
+                   $3,
+                   $4::boolean,
+                   $5,
+                   $6,
+                   $7)`,
 });
 
 const SELECT_SERVICES_PS = new PreparedStatement({
@@ -39,7 +34,8 @@ const SELECT_SERVICES_PS = new PreparedStatement({
                   type,
                   keywords,
                   "group"
-           FROM open311_service ORDER BY service_code`,
+           FROM open311_service
+           ORDER BY service_code`,
 });
 
 const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
@@ -51,7 +47,8 @@ const SELECT_SERVICE_BY_CODE_PS = new PreparedStatement({
                   type,
                   keywords,
                   "group"
-           FROM open311_service WHERE service_code = $1`,
+           FROM open311_service
+           WHERE service_code = $1`,
 });
 
 const SELECT_SERVICE_CODES_PS = new PreparedStatement({
@@ -109,7 +106,6 @@ function toService(s: Service): Service {
 /**
  * Creates an object with all necessary properties for pg-promise
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function createEditObject(service: Service): any[] {
     const editObject = {
         ...{

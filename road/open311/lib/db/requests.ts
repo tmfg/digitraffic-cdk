@@ -5,9 +5,6 @@ import {
 import { PreparedStatement } from "pg-promise";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-// Full of underscores
-/* eslint-disable camelcase */
-
 type DbServiceRequest = ServiceRequestWithExtensions & {
     subsubject_id: number;
 };
@@ -213,7 +210,6 @@ function toServiceRequest(r: DbServiceRequest): ServiceRequestWithExtensions {
 /**
  * Creates an object with all necessary properties for pg-promise
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function createEditObject(
     serviceRequest: ServiceRequestWithExtensions
 ): any[] {
@@ -246,7 +242,6 @@ export function createEditObject(
 
     const editObjectWithLonLat =
         // DPO-1167 handle long/lat empty string
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         serviceRequest.long !== "" && serviceRequest.lat !== ""
             ? editObject
