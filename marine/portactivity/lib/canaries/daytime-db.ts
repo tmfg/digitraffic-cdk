@@ -13,7 +13,8 @@ export const handler = (): Promise<string> => {
         "Awake.AI ETA timestamps in last 3 hours",
         `select count(*) from port_call_timestamp
                 where record_time > (current_timestamp - interval '3 hour') AND
-                      event_source = '${EventSource.AWAKE_AI}'`
+                      event_source = '${EventSource.AWAKE_AI}' AND
+                      event_type = 'ETA'`
     );
 
     return checker.expect();
