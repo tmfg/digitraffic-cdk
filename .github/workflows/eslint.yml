@@ -23,7 +23,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install packages
-        run: pnpm install
+        run: pnpm install -r
 
       - name: Create ESLint reports from all project
         if: ${{ github.ref_name == 'master' }}
