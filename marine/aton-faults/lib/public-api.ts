@@ -15,6 +15,7 @@ import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 
 const ATON_FAULT_TAGS_V1 = ["Aton Fault V1"];
 
@@ -105,13 +106,12 @@ function createFaultsResource(
                 "method.request.querystring.fixed_in_hours": false,
             },
             methodResponses: [
-                corsMethod(
-                    methodResponse(
-                        "200",
-                        MediaType.APPLICATION_GEOJSON,
-                        faultsJsonModel
-                    )
+                DigitrafficMethodResponse.response200(
+                    faultsJsonModel,
+                    MediaType.APPLICATION_GEOJSON
                 ),
+                DigitrafficMethodResponse.response400(),
+                DigitrafficMethodResponse.response500(),
             ],
         });
     });

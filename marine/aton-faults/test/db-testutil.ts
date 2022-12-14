@@ -281,7 +281,7 @@ export function validateS124(faultS124: string) {
     );
 }
 
-export function dbTestBase(fn: (db: DTDatabase) => void) {
+export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(
         fn,
         truncate,

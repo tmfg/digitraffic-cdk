@@ -11,7 +11,6 @@ import {
     defaultIntegration,
     methodResponse,
 } from "@digitraffic/common/dist/aws/infra/api/responses";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addQueryParameterDescription,
@@ -24,6 +23,7 @@ import {
     MonitoredFunction,
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { Queue } from "aws-cdk-lib/aws-sqs";
+import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
 export function create(stack: DigitrafficStack, s124Queue: Queue) {
     const integrationApi = new DigitrafficRestApi(

@@ -39,7 +39,7 @@
     "xsd-schema-validator": "^0.7.0"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.23-5",
+    "@digitraffic/common": "2022.12.02-1",
     "@middy/core": "^3.6.2",
     "@middy/sqs-partial-batch-failure": "^3.6.2",
     "@turf/boolean-intersects": "6.5.0",
@@ -59,7 +59,8 @@
     "spex": "^3.2.0",
     "uuid": "^9.0.0",
     "wkx": "^0.5.0",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.4.23",
+    "zod": "3.19.1"
   },
   "externals": [
     "aws-sdk"

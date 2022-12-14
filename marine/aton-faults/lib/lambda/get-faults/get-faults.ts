@@ -2,50 +2,64 @@ import * as FaultsService from "../../service/faults";
 import { Language } from "@digitraffic/common/dist/types/language";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { RefinementCtx, z } from "zod";
 
 const proxyHolder = ProxyHolder.create();
 
-interface GetFaultsEvent {
-    language?: string;
-    fixed_in_hours?: string;
-}
+const GetFaultsSchema = z.object({
+    language: z.string().optional().default("EN").transform(getLanguage),
+    fixed_in_hours: z.string().optional().default("168").transform(getFixed),
+});
 
-export const handler = (event: GetFaultsEvent) => {
+export const handler = async (event: unknown): Promise<LambdaResponse> => {
     const start = Date.now();
-    const language = getLanguage(event.language);
-    const fixedInHours = getFixed(event.fixed_in_hours);
 
-    if (fixedInHours < 0 || fixedInHours > 24 * 100) {
-        return LambdaResponse.badRequest(
-            "fixedInHours must be between 0 and 2400"
-        );
+    try {
+        const getFaultsEvent = GetFaultsSchema.safeParse(event);
+
+        if (!getFaultsEvent.success) {
+            return LambdaResponse.badRequest(
+                JSON.stringify(getFaultsEvent.error.issues)
+            );
+        }
+
+        return proxyHolder
+            .setCredentials()
+            .then(() =>
+                FaultsService.findAllFaults(
+                    getFaultsEvent.data.language,
+                    getFaultsEvent.data.fixed_in_hours
+                )
+            )
+            .then((faults) => {
+                return LambdaResponse.okJson(faults);
+            })
+            .catch((error) => {
+                console.info("error " + error);
+                console.info("stack " + (error as Error).stack);
+
+                return LambdaResponse.internalError();
+            });
+    } finally {
+        console.info("method=findAllFaults tookMs=%d", Date.now() - start);
     }
-
-    return proxyHolder
-        .setCredentials()
-        .then(() => FaultsService.findAllFaults(language, fixedInHours))
-        .then((faults) => {
-            return LambdaResponse.okJson(faults);
-        })
-        .catch(() => {
-            return LambdaResponse.internalError();
-        })
-        .finally(() => {
-            console.info("method=findAllFaults tookMs=%d", Date.now() - start);
-        });
 };
 
-function isNotSet(value?: string): boolean {
-    return value == undefined || value.length === 0;
+function getFixed(fixed: string, ctx: RefinementCtx): number {
+    const value = Number(fixed);
+
+    if (value < 0 || value > 24 * 100 || Number.isNaN(value)) {
+        ctx.addIssue({
+            message: "fixedInHours must be between 0 and 2400",
+            code: z.ZodIssueCode.custom,
+        });
+
+        return z.NEVER;
+    }
+
+    return value;
 }
 
-function getFixed(fixed?: string): number {
-    return isNotSet(fixed) ? 7 * 24 : Number(fixed);
-}
-
-function getLanguage(lang?: string): Language {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion -- lang is defined
-    const langValue = isNotSet(lang) ? "EN" : lang!.toUpperCase();
-
-    return Language[langValue as keyof typeof Language] ?? Language.EN;
+function getLanguage(lang: string): Language {
+    return Language[lang.toUpperCase() as keyof typeof Language] ?? Language.EN;
 }

@@ -54,7 +54,7 @@ importers:
 
   marine/aton-faults:
     specifiers:
-      '@digitraffic/common': 2022.11.23-5
+      '@digitraffic/common': 2022.12.02-1
       '@middy/core': ^3.6.2
       '@middy/sqs-partial-batch-failure': ^3.6.2
       '@turf/boolean-intersects': 6.5.0
@@ -91,8 +91,9 @@ importers:
       wkx: ^0.5.0
       xml2js: ^0.4.23
       xsd-schema-validator: ^0.7.0
+      zod: 3.19.1
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_afjyf2xtphzfym26h2genucr3i
+      '@digitraffic/common': 2022.12.2-1_afjyf2xtphzfym26h2genucr3i
       '@middy/core': 3.6.2
       '@middy/sqs-partial-batch-failure': 3.6.2
       '@turf/boolean-intersects': 6.5.0
@@ -113,6 +114,7 @@ importers:
       uuid: 9.0.0
       wkx: 0.5.0
       xml2js: 0.4.23
+      zod: 3.19.1
     devDependencies:
       '@types/aws-lambda': 8.10.108
       '@types/jest': 29.2.3
@@ -292,7 +294,7 @@ importers:
 
   marine/nautical-warnings:
     specifiers:
-      '@digitraffic/common': 2022.11.23-5
+      '@digitraffic/common': 2022.12.02-1
       '@types/aws-lambda': 8.10.108
       '@types/geojson': ^7946.0.7
       '@types/jest': ^29.2.3
@@ -320,7 +322,7 @@ importers:
       ts-node: ^10.9.1
       typescript: ^4.7.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_afjyf2xtphzfym26h2genucr3i
+      '@digitraffic/common': 2022.12.2-1_afjyf2xtphzfym26h2genucr3i
       '@types/ramda': 0.28.20
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       axios: 1.2.0
@@ -1788,6 +1790,39 @@ packages:
 
   /@digitraffic/common/2022.11.23-5_afjyf2xtphzfym26h2genucr3i:
     resolution: {integrity: sha512-tQG6Mys2E1WGbuIOa4LVycT7Q60WhZ77LpZwp2uCY4UgRED2JgE+2fXh7itHtW1Z4yW+wCSEgtuQmGT3blv16w==}
+    engines: {node: '>=14 <17'}
+    peerDependencies:
+      '@aws-cdk/aws-synthetics-alpha': ^2.50.0-alpha.0
+      '@types/geojson': ^7946.0.10
+      aws-cdk-lib: ^2.51.1
+      aws-sdk: ^2.1241.0
+      axios: ^1.2.0
+      change-case: ^4.1.2
+      constructs: ^10.1.131
+      geojson-validation: ^1.0.2
+      moment: ^2.29.4
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^10.12.0
+      spex: ^3.0.0
+    dependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.50.0-alpha.0_mg7efayfissownndcsmr4oy4rq
+      '@types/geojson': 7946.0.10
+      aws-cdk-lib: 2.51.1_constructs@10.1.168
+      aws-sdk: 2.1260.0
+      axios: 1.2.0
+      change-case: 4.1.2
+      constructs: 10.1.168
+      geojson-validation: 1.0.2
+      moment: 2.29.4
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 10.15.2_pg-native@3.0.1
+      spex: 3.2.0
+    dev: false
+
+  /@digitraffic/common/2022.12.2-1_afjyf2xtphzfym26h2genucr3i:
+    resolution: {integrity: sha512-VScPq9WIjqxjeBWp83I4zcIS2/mQOlgSf7/P0mDk25m6hWIaEbmCULUXtkfHRQgQr21p5bW8aPvCj6u3mGK4dQ==}
     engines: {node: '>=14 <17'}
     peerDependencies:
       '@aws-cdk/aws-synthetics-alpha': ^2.50.0-alpha.0
@@ -8353,4 +8388,8 @@ packages:
   /yocto-queue/1.0.0:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
+    dev: false
+
+  /zod/3.19.1:
+    resolution: {integrity: sha512-LYjZsEDhCdYET9ikFu6dVPGp2YH9DegXjdJToSzD9rO6fy4qiRYFoyEYwps88OseJlPyl2NOe2iJuhEhL7IpEA==}
     dev: false
