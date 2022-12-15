@@ -22,7 +22,7 @@ jobs:
           cache: "pnpm"
 
       - name: Install deps
-        run: pnpm install -r
+        run: pnpm install
 
       - name: Derive appropriate SHAs for NX
         uses: nrwl/nx-set-shas@v3
