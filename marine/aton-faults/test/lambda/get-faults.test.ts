@@ -63,4 +63,12 @@ describe("get-faults", () => {
     test("handle - fixed_in_hours is not a number", async () => {
         await expectResponse({ fixed_in_hours: "rosebud" }, 400);
     });
+
+    test("handle - language FI", async () => {
+        await expectResponse({ language: "FI" }, 200, EMPTY_FEATURECOLLECTION);
+    });
+
+    test("handle - language XX", async () => {
+        await expectResponse({ language: "XX" }, 200, EMPTY_FEATURECOLLECTION);
+    });
 });

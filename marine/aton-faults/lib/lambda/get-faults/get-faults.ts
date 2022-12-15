@@ -11,7 +11,11 @@ const FIXED_IN_HOURS_ERROR = {
 };
 
 const GetFaultsSchema = z.object({
-    language: z.nativeEnum(Language).optional().default(Language.EN),
+    language: z
+        .nativeEnum(Language)
+        .catch(Language.EN)
+        .optional()
+        .default(Language.EN),
     fixed_in_hours: z.coerce
         .number()
         .gt(0, FIXED_IN_HOURS_ERROR)
