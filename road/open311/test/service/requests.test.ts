@@ -4,9 +4,6 @@ import { dbTestBase, insertServiceRequest } from "../db-testutil";
 import { ServiceRequestWithExtensions } from "../../lib/model/service-request";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-// test file
-/* eslint-disable camelcase */
-
 describe(
     "requests-service",
     dbTestBase((db: DTDatabase) => {
@@ -64,7 +61,6 @@ describe(
     })
 );
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 function addNestedExtensionProps(r: any) {
     r.extended_attributes = {
         status_id: r.status_id,
@@ -79,20 +75,12 @@ function addNestedExtensionProps(r: any) {
 }
 
 function deleteExtensionProps(r: ServiceRequestWithExtensions) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).status_id;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).vendor_status;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).title;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).service_object_id;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).service_object_type;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).media_urls;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).subject_id;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     delete (r as any).subSubject_id;
 }

@@ -3,9 +3,6 @@ import { newServiceRequest } from "../../testdata";
 import { dbTestBase, insertServiceRequest } from "../../db-testutil";
 import { NOT_FOUND_MESSAGE } from "@digitraffic/common/dist/aws/types/errors";
 
-// test file
-/* eslint-disable camelcase */
-
 describe(
     "lambda-get-request",
     dbTestBase((db) => {
@@ -27,7 +24,6 @@ describe(
                 extensions: "true",
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             expect((response as any).extended_attributes).toBeDefined();
         });
 
@@ -40,7 +36,6 @@ describe(
                 extensions: "false",
             });
 
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             expect((response as any).extended_attributes).toBeUndefined();
         });
     })

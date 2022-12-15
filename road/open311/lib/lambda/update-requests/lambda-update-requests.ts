@@ -7,9 +7,6 @@ import * as RequestsService from "../../service/requests";
 import { invalidRequest } from "../../http-util";
 import { ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 
-// Full of underscores
-/* eslint-disable camelcase */
-
 export const handler = async (
     event: APIGatewayEvent
 ): Promise<ProxyLambdaResponse> => {

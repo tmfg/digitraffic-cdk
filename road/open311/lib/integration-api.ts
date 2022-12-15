@@ -131,7 +131,6 @@ function createDeleteRequestHandler(
         },
         requestTemplates: {
             "application/json": JSON.stringify({
-                // eslint-disable-next-line camelcase
                 request_id:
                     "$util.escapeJavaScript($input.params('request_id'))",
                 extensions:

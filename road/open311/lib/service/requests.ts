@@ -14,9 +14,6 @@ import {
     inDatabase,
 } from "@digitraffic/common/dist/database/database";
 
-// Full of underscores
-/* eslint-disable camelcase */
-
 export function findAll(extensions: boolean): Promise<ServiceRequest[]> {
     return inDatabase(async (db: DTDatabase) => {
         const requests = await dbFindAll(db);

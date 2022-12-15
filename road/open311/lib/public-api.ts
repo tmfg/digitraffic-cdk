@@ -223,7 +223,6 @@ function createGetRequestIntegration(
         },
         requestTemplates: {
             "application/json": JSON.stringify({
-                // eslint-disable-next-line camelcase
                 request_id:
                     "$util.escapeJavaScript($input.params('request_id'))",
                 extensions:
@@ -562,7 +561,6 @@ function createGetServiceIntegration(
                 "method.request.path.service_id",
         },
         requestTemplates: {
-            // eslint-disable-next-line camelcase
             "application/json": JSON.stringify({
                 service_id:
                     "$util.escapeJavaScript($input.params('service_id'))",
