@@ -11,11 +11,7 @@ const FIXED_IN_HOURS_ERROR = {
 };
 
 const GetFaultsSchema = z.object({
-    language: z
-        .nativeEnum(Language)
-        .catch(Language.EN)
-        .optional()
-        .default(Language.EN),
+    language: z.string().optional().default("EN").transform(getLanguage),
     fixed_in_hours: z.coerce
         .number()
         .gt(0, FIXED_IN_HOURS_ERROR)
@@ -24,11 +20,13 @@ const GetFaultsSchema = z.object({
         .default(168),
 });
 
-export const handler = async (event: unknown): Promise<LambdaResponse> => {
+export const handler = async (
+    event: Record<string, string>
+): Promise<LambdaResponse> => {
     const start = Date.now();
 
     try {
-        const getFaultsEvent = GetFaultsSchema.parse(event);
+        const getFaultsEvent = GetFaultsSchema.parse(sanitizeEvent(event));
 
         return proxyHolder
             .setCredentials()
@@ -54,3 +52,16 @@ export const handler = async (event: unknown): Promise<LambdaResponse> => {
         console.info("method=findAllFaults tookMs=%d", Date.now() - start);
     }
 };
+
+function getLanguage(lang: string): Language {
+    return Language[lang.toUpperCase() as keyof typeof Language] ?? Language.EN;
+}
+
+/**
+ * Remove empty strings from the event
+ */
+function sanitizeEvent(event: Record<string, string>) {
+    return Object.fromEntries(
+        Object.entries(event).filter(([key, value]) => value != "")
+    );
+}
