@@ -4,7 +4,8 @@ import {
     inDatabaseReadonly,
 } from "@digitraffic/common/dist/database/database";
 import * as CachedDao from "@digitraffic/common/dist/database/cached";
-import * as turf from "@turf/turf";
+import booleanDisjoint from "@turf/boolean-disjoint";
+import buffer from "@turf/buffer";
 import { lineString } from "@turf/helpers";
 import { Feature, FeatureCollection } from "geojson";
 
@@ -33,8 +34,8 @@ export async function findWarningsForVoyagePlan(
     // filter out warnings not in the route
     warnings.features = warnings.features.filter(
         (f: Feature) =>
-            !turf.booleanDisjoint(
-                turf.buffer(f.geometry, MAX_DISTANCE_NM, {
+            !booleanDisjoint(
+                buffer(f.geometry, MAX_DISTANCE_NM, {
                     units: "nauticalmiles",
                 }),
                 voyageLineString

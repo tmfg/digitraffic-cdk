@@ -5,7 +5,7 @@ import {
 } from "@digitraffic/common/dist/database/database";
 import * as FaultsDB from "../db/faults";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-import { ATON_DATA_TYPE } from "./faults";
+import { ATON_FAULTS_CHECK } from "./faults";
 import { FaultFeature } from "../model/fault";
 
 export async function updateFaults(url: string, domain: string) {
@@ -20,7 +20,7 @@ export async function updateFaults(url: string, domain: string) {
                 ...FaultsDB.updateFaults(db, domain, validated),
                 LastUpdatedDB.updateUpdatedTimestamp(
                     db,
-                    ATON_DATA_TYPE,
+                    ATON_FAULTS_CHECK,
                     new Date(start)
                 ),
             ]);

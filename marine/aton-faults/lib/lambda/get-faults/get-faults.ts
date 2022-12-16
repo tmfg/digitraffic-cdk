@@ -62,6 +62,6 @@ function getLanguage(lang: string): Language {
  */
 function sanitizeEvent(event: Record<string, string>) {
     return Object.fromEntries(
-        Object.entries(event).filter(([key, value]) => value != "")
+        Object.entries(event).filter(([, value]) => value != "")
     );
 }

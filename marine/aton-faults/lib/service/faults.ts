@@ -13,7 +13,7 @@ import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry
 import { Language } from "@digitraffic/common/dist/types/language";
 import { DbFault } from "../model/fault";
 
-export const ATON_DATA_TYPE = "ATON_FAULTS";
+export const ATON_FAULTS_CHECK = "ATON_FAULTS_CHECK";
 
 export interface FaultProps {
     readonly id: number;
@@ -47,7 +47,7 @@ export function findAllFaults(
         );
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
             db,
-            ATON_DATA_TYPE
+            ATON_FAULTS_CHECK
         );
 
         return createFeatureCollection(features, lastUpdated);
