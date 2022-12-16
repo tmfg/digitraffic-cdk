@@ -6,7 +6,6 @@ import {
 } from "@digitraffic/common/dist/aws/infra/api/response";
 import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
     addServiceModel,
