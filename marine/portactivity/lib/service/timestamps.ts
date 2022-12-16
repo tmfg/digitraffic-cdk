@@ -1,8 +1,8 @@
 import * as TimestampsDB from "../dao/timestamps";
 import {
+    DbETAShip,
     DbTimestamp,
     DbTimestampIdAndLocode,
-    DbETAShip,
     DbUpdatedTimestamp,
 } from "../dao/timestamps";
 import {
@@ -215,13 +215,13 @@ export async function findETAShipsByLocode(
 
     // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
     const shipsByImo = R.groupBy((s) => s.imo.toString(), portnetShips);
-    const newestShips = Object.values(shipsByImo).flatMap(
-        (ships) =>
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const newestShips = Object.values(shipsByImo)
+        .flatMap((ships) =>
             R.head(
                 R.sortBy((ship: DbETAShip) => moment(ship.eta).toDate(), ships)
-            )!
-    );
+            )
+        )
+        .filter((ship): ship is DbETAShip => ship !== undefined);
 
     console.info(
         "method=findPortnetETAsByLocodes ships count before newest ETA filtering %d, after newest ETA filtering %d",
@@ -235,22 +235,22 @@ export async function findETAShipsByLocode(
             const shipsTooCloseToPortImos = (
                 await TimestampsDB.findVtsShipImosTooCloseToPortByPortCallId(
                     db,
-                    newestShips.map((s) => s.portcall_id)
+                    newestShips.map((ship) => ship.portcall_id)
                 )
-            ).map((s) => s.imo);
+            ).map((ship) => ship.imo);
             console.info(
                 "method=findETAShipsByLocode Ships too close to port",
                 shipsTooCloseToPortImos
             );
-            const filteredShips = newestShips.filter((s) =>
-                shipsTooCloseToPortImos.includes(s.imo)
+            const filteredShips = newestShips.filter((ship) =>
+                shipsTooCloseToPortImos.includes(ship.imo)
             );
             console.info(
                 "method=findETAShipsByLocode Did not fetch ETA for ships too close to port",
                 filteredShips
             );
             return newestShips.filter(
-                (s) => !shipsTooCloseToPortImos.includes(s.imo)
+                (ship) => !shipsTooCloseToPortImos.includes(ship.imo)
             );
         }).finally(() => {
             console.info(

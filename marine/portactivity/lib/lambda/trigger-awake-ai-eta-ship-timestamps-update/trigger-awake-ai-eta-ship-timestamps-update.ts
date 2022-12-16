@@ -2,11 +2,6 @@ import { ports } from "../../service/portareas";
 import * as TimestampService from "../../service/timestamps";
 import { PortactivityEnvKeys } from "../../keys";
 import { SNS } from "aws-sdk";
-import {
-    DbSecret,
-    SecretFunction,
-    withDbSecret,
-} from "@digitraffic/common/dist/aws/runtime/secrets/dbsecret";
 import * as MessagingUtil from "@digitraffic/common/dist/aws/runtime/messaging";
 import * as R from "ramda";
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
@@ -17,7 +12,7 @@ const CHUNK_SIZE = 10;
 
 const rdsHolder = RdsHolder.create();
 
-export function handlerFn(withSecretFn: SecretFunction<DbSecret>, sns: SNS) {
+export function handlerFn(sns: SNS) {
     return () => {
         return rdsHolder.setCredentials().then(async () => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
@@ -46,4 +41,4 @@ export function handlerFn(withSecretFn: SecretFunction<DbSecret>, sns: SNS) {
     };
 }
 
-export const handler = handlerFn(withDbSecret, new SNS());
+export const handler = handlerFn(new SNS());

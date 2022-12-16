@@ -18,7 +18,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
         pe.event_time,
         pe.event_source,
         pe.record_time,
-        COALESCE(v.name, pc.vessel_name, 'Unknown') as ship_name,
+        COALESCE(v.name, upper(pc.vessel_name), 'Unknown') as ship_name,
         pe.portcall_id
     FROM port_call_timestamp pe
     LEFT JOIN public.vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM public.vessel WHERE imo = v.imo)

@@ -10,10 +10,9 @@ import {
     ShipSchema,
 } from "./model/timestamp-schema";
 import {
-    corsMethod,
-    methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
-import { MessageModel } from "@digitraffic/common/dist/aws/infra/api/response";
+    DigitrafficMethodResponse,
+    MessageModel,
+} from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addDefaultValidator,
     addServiceModel,
@@ -135,16 +134,11 @@ export class PublicApi {
             },
             requestValidator: validator,
             methodResponses: [
-                corsMethod(
-                    methodResponse(
-                        "200",
-                        MediaType.APPLICATION_JSON,
-                        timestampsJsonModel
-                    )
+                DigitrafficMethodResponse.response200(
+                    timestampsJsonModel,
+                    MediaType.APPLICATION_JSON
                 ),
-                {
-                    statusCode: "400",
-                },
+                DigitrafficMethodResponse.response400(),
             ],
         });
 
