@@ -19,14 +19,13 @@ import {
 } from "@digitraffic/common/dist/test/testutils";
 import { EventSource } from "../../lib/model/eventsource";
 import { AwakeAiZoneType } from "../../lib/api/awake_common";
-import { WebSocket } from "ws";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 describe(
     "service Awake.AI ATx",
     dbTestBase((db: DTDatabase) => {
         function createAiATXApi() {
-            return new AwakeAiATXApi("", "", WebSocket);
+            return new AwakeAiATXApi("", "");
         }
 
         test("getATXs - no portcall found for ATx", async () => {

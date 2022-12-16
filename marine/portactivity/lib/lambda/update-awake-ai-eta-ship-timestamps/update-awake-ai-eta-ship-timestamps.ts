@@ -36,13 +36,14 @@ export const handler = (event: SNSEvent) => {
 
         const start = Date.now();
         console.info(
-            "method=updateAwakeAiETAShipTimestampsHandler Sending timestamps to queue.."
+            "method=updateAwakeAiETAShipTimestamps.handler count=%d",
+            timestamps.length
         );
         await Promise.allSettled(
             timestamps.map((ts) => sendMessage(ts, queueUrl))
         );
         console.info(
-            "method=updateAwakeAiETAShipTimestampsHandler ..done in tookMs=%d",
+            "method=updateAwakeAiETAShipTimestamps.handler tookMs=%d",
             Date.now() - start
         );
     });

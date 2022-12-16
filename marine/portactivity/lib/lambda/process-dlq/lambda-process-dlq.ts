@@ -13,7 +13,7 @@ interface DlqEvent {
 export const handler = async (event: DlqEvent): Promise<void> => {
     const millis = new Date().getTime();
     console.info(
-        `method=portactivityTimestampsProcessDLQ portCallDLQRecordsReceived=${event.Records.length}`
+        `method=portactivityTimestampsProcessDLQ.handler portCallDLQRecordsReceived=${event.Records.length}`
     );
     const uploads = event.Records.map((e, idx: number) =>
         uploadToS3(bucketName, e.body, `timestamp-${millis}-${idx}.json`)

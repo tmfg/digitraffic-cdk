@@ -26,7 +26,10 @@ export const handler = function (): Promise<void> {
                 secret.auth
             );
 
-            console.info("sending %d messages", timestamps.length);
+            console.info(
+                "method=updatePilotwebTimestamps.handler count=%d",
+                timestamps.length
+            );
 
             await Promise.allSettled(
                 timestamps.map((ts) => sendMessage(ts, sqsQueueUrl))

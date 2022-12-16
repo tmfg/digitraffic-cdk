@@ -6,8 +6,6 @@ import { Context } from "aws-lambda";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-
-import { WebSocket } from "ws";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
@@ -37,7 +35,7 @@ export async function handler(event: unknown, context: Context) {
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
             if (!service) {
                 service = new AwakeAiATXService(
-                    new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket)
+                    new AwakeAiATXApi(secret.atxurl, secret.atxauth)
                 );
             }
 
@@ -46,7 +44,7 @@ export async function handler(event: unknown, context: Context) {
                 context.getRemainingTimeInMillis() - 1000
             );
             console.info(
-                "method=updateAwakeAiTimestampsLambda count=%d",
+                "method=updateAwakeAiAtxTimestamps.handler count=%d",
                 timestamps.length
             );
 

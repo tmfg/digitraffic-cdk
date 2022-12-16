@@ -40,14 +40,14 @@ export function handler(event: SNSEvent): Promise<void> {
 
             const start = Date.now();
             console.info(
-                "method=updateAwakeAiETAPortTimestampsHandler Sending %d timestamps to queue..",
+                "method=updateAwakeAiETAPortTimestamps.handler count=%d",
                 timestamps.length
             );
             await Promise.allSettled(
                 timestamps.map((ts) => sendMessage(ts, queueUrl))
             );
             console.info(
-                "method=updateAwakeAiETAPortTimestampsHandler ..done in tookMs=%d",
+                "method=updateAwakeAiETAPortTimestamps.handler tookMs=%d",
                 Date.now() - start
             );
         });

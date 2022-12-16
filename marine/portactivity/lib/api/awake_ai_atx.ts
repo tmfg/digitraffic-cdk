@@ -1,132 +1,140 @@
-import {WebSocket} from "ws";
-import {AwakeAiZoneType} from "./awake_common";
+import { WebSocket } from "ws";
+import { AwakeAiZoneType } from "./awake_common";
 
 interface AwakeAiATXMessage {
-    msgType: AwakeAiATXEventType
+    msgType: AwakeAiATXEventType;
 }
 
 export enum AwakeAiATXEventType {
     SUBSCRIPTION_STATUS = "subscription-status",
-    EVENT = "event"
+    EVENT = "event",
 }
 
 export enum AwakeATXZoneEventType {
     ARRIVAL = "arrival",
-    DEPARTURE = "departure"
+    DEPARTURE = "departure",
 }
 
 export interface AwakeAISubscriptionMessage extends AwakeAiATXMessage {
     /**
      * Subscription id, equivalent to session id
      */
-    readonly subscriptionId: string
+    readonly subscriptionId: string;
 }
 
 export interface AwakeAIATXTimestampMessage extends AwakeAiATXMessage {
     /**
      * Possible value 'zone-event'
      */
-    readonly eventType: string
+    readonly eventType: string;
 
     /**
      * UTC string
      */
-    readonly eventTimestamp: string
+    readonly eventTimestamp: string;
 
     /**
      * UUID
      */
-    readonly eventId: string
+    readonly eventId: string;
 
     /**
      * Ship MMSI
      */
-    readonly mmsi: number
+    readonly mmsi: number;
 
     /**
      * Ship IMO
      */
-    readonly imo: number
+    readonly imo: number;
 
     /**
      * Ship name
      */
-    readonly shipName: string
+    readonly shipName: string;
 
     /**
      * Ship coordinates
      */
-    readonly location: [number, number]
+    readonly location: [number, number];
 
     /**
      * UUID
      */
-    readonly zoneId: string
+    readonly zoneId: string;
 
     /**
      * Type of zone for arrival/departure
      */
-    readonly zoneType: AwakeAiZoneType
+    readonly zoneType: AwakeAiZoneType;
 
     /**
      * Event type: arrival or departure
      */
-    readonly zoneEventType: AwakeATXZoneEventType
+    readonly zoneEventType: AwakeATXZoneEventType;
 
     /**
      * Zone name
      */
-    readonly zoneName: string
+    readonly zoneName: string;
 
     /**
      * Array of LOCODEs
      */
-    readonly locodes: string[]
+    readonly locodes: string[];
 }
 
 export const SUBSCRIPTION_MESSAGE = {
     msgType: "subscribe",
-    parameters: [{
-        eventType: "zone-event",
-        countries: ["FI"],
-    }],
+    parameters: [
+        {
+            eventType: "zone-event",
+            countries: ["FI"],
+        },
+    ],
 };
 
 export class AwakeAiATXApi {
     private readonly url: string;
     private readonly apiKey: string;
-    private readonly WebSocketClass: new (url: string) => WebSocket;
     private subscriptionId: string;
 
-    constructor(url: string, apiKey: string, WebSocketClass: new (url: string) => WebSocket) {
+    constructor(url: string, apiKey: string) {
         this.url = url;
         this.apiKey = apiKey;
-        this.WebSocketClass = WebSocketClass;
     }
 
     getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
-        const wsc = this.WebSocketClass;
-        const webSocket = new wsc(this.url + this.apiKey);
+        const webSocket = new WebSocket(this.url + this.apiKey);
 
         webSocket.on("open", () => {
-            const startMessage = this.subscriptionId ? AwakeAiATXApi.createResumeMessage(this.subscriptionId) : SUBSCRIPTION_MESSAGE;
+            const startMessage = this.subscriptionId
+                ? AwakeAiATXApi.createResumeMessage(this.subscriptionId)
+                : SUBSCRIPTION_MESSAGE;
             webSocket.send(JSON.stringify(startMessage));
         });
 
         const atxs: AwakeAIATXTimestampMessage[] = [];
 
         webSocket.on("message", (messageRaw: string) => {
-            const message = JSON.parse(messageRaw) as unknown as AwakeAiATXMessage;
+            const message = JSON.parse(
+                messageRaw
+            ) as unknown as AwakeAiATXMessage;
 
-            switch(message.msgType) {
+            switch (message.msgType) {
                 case AwakeAiATXEventType.SUBSCRIPTION_STATUS:
-                    this.subscriptionId = (message as AwakeAISubscriptionMessage).subscriptionId;
+                    this.subscriptionId = (
+                        message as AwakeAISubscriptionMessage
+                    ).subscriptionId;
                     break;
                 case AwakeAiATXEventType.EVENT:
                     atxs.push(message as AwakeAIATXTimestampMessage);
                     break;
                 default:
-                    console.warn("method=getATXs Unknown message received %s", JSON.stringify(message));
+                    console.warn(
+                        "method=getATXs Unknown message received %s",
+                        JSON.stringify(message)
+                    );
             }
         });
 
@@ -142,7 +150,10 @@ export class AwakeAiATXApi {
         });
     }
 
-    static createResumeMessage(subscriptionId: string): { msgType: string, resume: string } {
+    static createResumeMessage(subscriptionId: string): {
+        msgType: string;
+        resume: string;
+    } {
         console.info("method=createResumeMessage Existing session found");
         return {
             msgType: "subscribe",

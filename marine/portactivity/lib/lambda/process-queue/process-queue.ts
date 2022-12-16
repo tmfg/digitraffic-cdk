@@ -22,14 +22,14 @@ export function handlerFn() {
                         ) as Partial<ApiTimestamp>;
                         const start = Date.now();
                         console.info(
-                            "DEBUG method=processTimestampQueue processing timestamp",
+                            "DEBUG method=processTimestampQueue.handler processing timestamp",
                             partial
                         );
 
                         const timestamp = validateTimestamp(partial);
                         if (timestamp == null) {
                             console.warn(
-                                "DEBUG method=processTimestampQueue timestamp did not pass validation"
+                                "DEBUG method=processTimestampQueue.handler timestamp did not pass validation"
                             );
                             // resolve so this gets removed from the queue
                             return Promise.resolve();
@@ -42,22 +42,22 @@ export function handlerFn() {
                             .then((value) => {
                                 if (value) {
                                     console.log(
-                                        "DEBUG method=processTimestampQueue update successful"
+                                        "DEBUG method=processTimestampQueue.handler update successful"
                                     );
                                 } else {
                                     console.log(
-                                        "DEBUG method=processTimestampQueue update conflict or failure"
+                                        "DEBUG method=processTimestampQueue.handler update conflict or failure"
                                     );
                                 }
                             })
                             .catch((error) => {
                                 console.error(
-                                    "method=processTimestampQueue update failed %s",
+                                    "method=processTimestampQueue.handler update failed %s",
                                     error
                                 );
                             });
                         console.info(
-                            "DEBUG method=processTimestampQueue update tookMs=%d",
+                            "DEBUG method=processTimestampQueue.handler update tookMs=%d",
                             Date.now() - start
                         );
                         return saveTimestampPromise;

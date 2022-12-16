@@ -11,7 +11,7 @@ const ports = ["FIKOK", "FIRAU", "FIOUL", "FIKEM", "FIKJO", "FIUKI", "FIPOR"];
 export function handlerFn(sns: SNS) {
     return async () => {
         console.info(
-            "method=triggerAwakeAiETAPortTimestampsUpdateHandler Triggering ETA port update for count=%d ports",
+            "method=triggerAwakeAiETAPortTimestampsUpdate.handler Triggering ETA port update for count=%d ports",
             ports.length
         );
         for (const port of ports) {

@@ -35,7 +35,7 @@ export const handler = () => {
                 vtsControlTimestamps.concat(calculatedTimestamps);
 
             console.info(
-                "method=updateTimestampsFromSchedules count=%d",
+                "method=updateSchedulesTimestamps.handler count=%d",
                 timestamps.length
             );
 

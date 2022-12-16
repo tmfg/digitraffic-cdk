@@ -22,13 +22,13 @@ export function handlerFn(withSecretFn: SecretFunction<DbSecret>, sns: SNS) {
         return rdsHolder.setCredentials().then(async () => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
             console.info(
-                "method=triggerAwakeAiETAShipTimestampsUpdateHandler Triggering ETA ship update for count=%d ships",
+                "method=triggerAwakeAiETAShipTimestampsUpdate.handler Triggering ETA ship update for count=%d ships",
                 ships.length
             );
 
             for (const ship of ships) {
                 console.info(
-                    "method=triggerAwakeAiETATimestampsUpdateHandler Triggering ETA update for ship with IMO: %d, LOCODE: %s, portcallid: %d",
+                    "method=triggerAwakeAiETATimestampsUpdate.handler Triggering ETA update for ship with IMO: %d, LOCODE: %s, portcallid: %d",
                     ship.imo,
                     ship.locode,
                     ship.portcall_id
