@@ -105,7 +105,7 @@ function createProcessDLQLambda(
     const functionName = "MaintenanceTracking-ProcessDLQ";
 
     const processDLQLambda = MonitoredFunction.create(stack, functionName, {
-        runtime: lambda.Runtime.NODEJS_14_X,
+        runtime: lambda.Runtime.NODEJS_16_X,
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
         code: new lambda.AssetCode("dist/lambda/process-dlq"),
