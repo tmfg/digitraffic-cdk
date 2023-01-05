@@ -34,11 +34,11 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.23-5",
+    "@digitraffic/common": "2022.12.22-3",
     "@middy/core": "^3.6.2",
     "@middy/sqs-partial-batch-failure": "^3.6.2",
     "@types/ramda": "0.28.20",
-    "aws-cdk-lib": "2.51.1",
+    "aws-cdk-lib": "2.59.0",
     "aws-sdk": "2.1260.0",
     "constructs": "10.1.168",
     "dtsgenerator": "^3.3.1",

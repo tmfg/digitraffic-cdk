@@ -16,6 +16,7 @@ import {
     filterEventsWithoutTasks,
     getTasksForOperations,
     groupEventsToIndividualTrackings,
+    isOverTimeLimit,
 } from "../../lib/service/paikannin-utils";
 import * as Utils from "../../lib/service/utils";
 import {
@@ -267,6 +268,28 @@ describe("paikannin-utils-service-test", () => {
             subtractSecond(previous)
         );
         expect(groups).toHaveLength(2);
+    });
+
+    test("isOverTimeLimit", () => {
+        const now = new Date();
+        const insideLimit = moment()
+            .add(PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S - 1, "seconds")
+            .toDate();
+        const onLimit = moment(now)
+            .add(PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S, "seconds")
+            .toDate();
+        const outsideLimit = moment()
+            .add(PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S + 1, "seconds")
+            .toDate();
+        expect(isOverTimeLimit(now, insideLimit)).toBe(false);
+        expect(isOverTimeLimit(now, onLimit)).toEqual(false);
+        expect(isOverTimeLimit(now, outsideLimit)).toBe(true);
+    });
+
+    test("isOverTimeLimit in wrong order", () => {
+        const previous = new Date();
+        const next = moment(previous).subtract(1, "minutes").toDate();
+        expect(isOverTimeLimit(previous, next)).toEqual(true); //  next before previous
     });
 
     test("createDbWorkMachine", () => {

@@ -165,10 +165,17 @@ function toEventGroups(
     }
 }
 
+/**
+ * @param previous time of previous tracking end time
+ * @param next time of next tracking start time
+ * @return true if next brefore is after previous and time limit is not over
+ */
 export function isOverTimeLimit(previous: Date, next: Date) {
+    const diff = CommonDateUtils.countDiffInSeconds(previous, next);
     return (
+        diff < 0 ||
         CommonDateUtils.countDiffInSeconds(previous, next) >
-        Constants.PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S
+            Constants.PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S
     );
 }
 

@@ -977,7 +977,7 @@ importers:
 
   road/maintenance-tracking:
     specifiers:
-      '@digitraffic/common': 2022.11.23-5
+      '@digitraffic/common': 2022.12.22-3
       '@middy/core': ^3.6.2
       '@middy/sqs-partial-batch-failure': ^3.6.2
       '@types/aws-lambda': 8.10.108
@@ -985,7 +985,7 @@ importers:
       '@types/node': '*'
       '@types/ramda': 0.28.20
       '@types/sinon': '*'
-      aws-cdk-lib: 2.51.1
+      aws-cdk-lib: 2.59.0
       aws-sdk: 2.1260.0
       constructs: 10.1.168
       dtsgenerator: ^3.3.1
@@ -1005,11 +1005,11 @@ importers:
       ts-jest: ^29.0.3
       typescript: ^4.7.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_afjyf2xtphzfym26h2genucr3i
+      '@digitraffic/common': 2022.12.22-3_ugxyyfrpcte7p34yqsetob43ri
       '@middy/core': 3.6.2
       '@middy/sqs-partial-batch-failure': 3.6.2
       '@types/ramda': 0.28.20
-      aws-cdk-lib: 2.51.1_constructs@10.1.168
+      aws-cdk-lib: 2.59.0_constructs@10.1.168
       aws-sdk: 2.1260.0
       constructs: 10.1.168
       dtsgenerator: 3.16.1
@@ -1087,7 +1087,7 @@ importers:
 
   road/maintenance-tracking-municipality:
     specifiers:
-      '@digitraffic/common': 2022.11.23-5
+      '@digitraffic/common': 2022.12.22-3
       '@types/aws-lambda': 8.10.108
       '@types/geojson': ^7946.0.7
       '@types/jest': ^29.2.3
@@ -1114,7 +1114,7 @@ importers:
       ts-jest: ^29.0.3
       typescript: ^4.7.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_afjyf2xtphzfym26h2genucr3i
+      '@digitraffic/common': 2022.12.22-3_afjyf2xtphzfym26h2genucr3i
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       axios: 1.2.0
       constructs: 10.1.168
@@ -1344,11 +1344,30 @@ packages:
   /@aws-cdk/asset-awscli-v1/2.2.16:
     resolution: {integrity: sha512-xSz4m+F/lbbG/FpVI5ybcpbn5VylvaP3T5rtShLndZLRVY0nLkJ0jDn3zBT9d3ZqEInV+HcLSAMOe0ELWN9UKg==}
 
+  /@aws-cdk/asset-awscli-v1/2.2.49:
+    resolution: {integrity: sha512-Qd5bdLlC/sphWQQPNn7etKXWCh+fij7DWxtkIwvhhZ+LM6UEApGLS8sBLBQcRO2ZQdEuNb+zeClUy+3DNojfeg==}
+    dev: false
+
   /@aws-cdk/asset-kubectl-v20/2.1.1:
     resolution: {integrity: sha512-U1ntiX8XiMRRRH5J1IdC+1t5CE89015cwyt5U63Cpk0GnMlN5+h9WsWMlKlPXZR4rdq/m806JRlBMRpBUB2Dhw==}
 
   /@aws-cdk/asset-node-proxy-agent-v5/2.0.22:
     resolution: {integrity: sha512-gdR1CZjp2Y313NU1prmlj4mTH1clcCxnw23p0RP44qKy7MYq2kbf2WH2ZLQYelAQK78tLSzbI0jBPuYZu6eOyA==}
+
+  /@aws-cdk/asset-node-proxy-agent-v5/2.0.38:
+    resolution: {integrity: sha512-BBwAjORhuUkTGO3CxGS5Evcp5n20h9v06Sftn2R1DuSm8zIoUlPsNlI1HUk8XqYuoEI4aD7IKRQBLglv09ciJQ==}
+    dev: false
+
+  /@aws-cdk/aws-synthetics-alpha/2.50.0-alpha.0_afs5ouhq67np25acwdue7cuxrq:
+    resolution: {integrity: sha512-sZQOZFZIMGYbYXI/1M9wIF9GGPXgwPwj7fhTg1HvOb4gJpaZFg5ND5KbTQz2+kjrUyJ+nvaVSg8gipLDts15jQ==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      aws-cdk-lib: ^2.50.0
+      constructs: ^10.0.0
+    dependencies:
+      aws-cdk-lib: 2.59.0_constructs@10.1.168
+      constructs: 10.1.168
+    dev: false
 
   /@aws-cdk/aws-synthetics-alpha/2.50.0-alpha.0_mg7efayfissownndcsmr4oy4rq:
     resolution: {integrity: sha512-sZQOZFZIMGYbYXI/1M9wIF9GGPXgwPwj7fhTg1HvOb4gJpaZFg5ND5KbTQz2+kjrUyJ+nvaVSg8gipLDts15jQ==}
@@ -1842,6 +1861,72 @@ packages:
       '@aws-cdk/aws-synthetics-alpha': 2.50.0-alpha.0_mg7efayfissownndcsmr4oy4rq
       '@types/geojson': 7946.0.10
       aws-cdk-lib: 2.51.1_constructs@10.1.168
+      aws-sdk: 2.1260.0
+      axios: 1.2.0
+      change-case: 4.1.2
+      constructs: 10.1.168
+      geojson-validation: 1.0.2
+      moment: 2.29.4
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 10.15.2_pg-native@3.0.1
+      spex: 3.2.0
+    dev: false
+
+  /@digitraffic/common/2022.12.22-3_afjyf2xtphzfym26h2genucr3i:
+    resolution: {integrity: sha512-Fq9fvrhnvJ7rjmoqS5Q/XMegsq7LbzyW2d0XrGVKZM432FY089rG2IxDq8o7TREVTt0qwUbtx3wJsj6fB6SWQQ==}
+    engines: {node: '>=14 <17'}
+    peerDependencies:
+      '@aws-cdk/aws-synthetics-alpha': ^2.50.0-alpha.0
+      '@types/geojson': ^7946.0.10
+      aws-cdk-lib: ^2.51.1
+      aws-sdk: ^2.1241.0
+      axios: ^1.2.0
+      change-case: ^4.1.2
+      constructs: ^10.1.131
+      geojson-validation: ^1.0.2
+      moment: ^2.29.4
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^10.12.0
+      spex: ^3.0.0
+    dependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.50.0-alpha.0_mg7efayfissownndcsmr4oy4rq
+      '@types/geojson': 7946.0.10
+      aws-cdk-lib: 2.51.1_constructs@10.1.168
+      aws-sdk: 2.1260.0
+      axios: 1.2.0
+      change-case: 4.1.2
+      constructs: 10.1.168
+      geojson-validation: 1.0.2
+      moment: 2.29.4
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 10.15.2_pg-native@3.0.1
+      spex: 3.2.0
+    dev: false
+
+  /@digitraffic/common/2022.12.22-3_ugxyyfrpcte7p34yqsetob43ri:
+    resolution: {integrity: sha512-Fq9fvrhnvJ7rjmoqS5Q/XMegsq7LbzyW2d0XrGVKZM432FY089rG2IxDq8o7TREVTt0qwUbtx3wJsj6fB6SWQQ==}
+    engines: {node: '>=14 <17'}
+    peerDependencies:
+      '@aws-cdk/aws-synthetics-alpha': ^2.50.0-alpha.0
+      '@types/geojson': ^7946.0.10
+      aws-cdk-lib: ^2.51.1
+      aws-sdk: ^2.1241.0
+      axios: ^1.2.0
+      change-case: ^4.1.2
+      constructs: ^10.1.131
+      geojson-validation: ^1.0.2
+      moment: ^2.29.4
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^10.12.0
+      spex: ^3.0.0
+    dependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.50.0-alpha.0_afs5ouhq67np25acwdue7cuxrq
+      '@types/geojson': 7946.0.10
+      aws-cdk-lib: 2.59.0_constructs@10.1.168
       aws-sdk: 2.1260.0
       axios: 1.2.0
       change-case: 4.1.2
@@ -2997,6 +3082,28 @@ packages:
       punycode: 2.1.1
       semver: 7.3.8
       yaml: 1.10.2
+    bundledDependencies:
+      - '@balena/dockerignore'
+      - case
+      - fs-extra
+      - ignore
+      - jsonschema
+      - minimatch
+      - punycode
+      - semver
+      - yaml
+
+  /aws-cdk-lib/2.59.0_constructs@10.1.168:
+    resolution: {integrity: sha512-FT6QRsou8TibQcz/TqI3rEkB9EBVF5Om5lv9MXz/5qiKehWRbKZVX0I0l/SSAvGSmdTU5Pfr+WRBTk51oNMAdw==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      constructs: ^10.0.0
+    dependencies:
+      '@aws-cdk/asset-awscli-v1': 2.2.49
+      '@aws-cdk/asset-kubectl-v20': 2.1.1
+      '@aws-cdk/asset-node-proxy-agent-v5': 2.0.38
+      constructs: 10.1.168
+    dev: false
     bundledDependencies:
       - '@balena/dockerignore'
       - case

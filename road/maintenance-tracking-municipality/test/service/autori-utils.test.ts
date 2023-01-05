@@ -131,11 +131,21 @@ describe("autori-utils-service-test", () => {
         const insideLimit = moment()
             .add(AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S - 1, "seconds")
             .toDate();
+        const onLimit = moment(now)
+            .add(AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S, "seconds")
+            .toDate();
         const outsideLimit = moment()
             .add(AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S + 1, "seconds")
             .toDate();
         expect(AutoriUtils.isOverTimeLimit(now, insideLimit)).toBe(false);
+        expect(AutoriUtils.isOverTimeLimit(now, onLimit)).toEqual(false);
         expect(AutoriUtils.isOverTimeLimit(now, outsideLimit)).toBe(true);
+    });
+
+    test("isOverTimeLimit in wrong order", () => {
+        const previous = new Date();
+        const next = moment(previous).subtract(1, "minutes").toDate();
+        expect(AutoriUtils.isOverTimeLimit(previous, next)).toEqual(true); //  next before previous
     });
 
     test("getTasksForOperations", () => {

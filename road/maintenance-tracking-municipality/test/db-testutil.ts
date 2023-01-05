@@ -46,9 +46,10 @@ export function insertDomain(
 ): Promise<null> {
     return db.tx((t) => {
         return t.none(
-            `
-                insert into maintenance_tracking_domain(name, source)
-                values($1,$2)`,
+            `insert into maintenance_tracking_domain(name, source)
+                values($1,$2)
+                on conflict (name)
+                do nothing`,
             [domainName, source]
         );
     });
