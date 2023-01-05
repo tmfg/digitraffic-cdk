@@ -46,8 +46,8 @@ echo    # move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then
   echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
-  echo "cdk ${OPERATION} ${STACK}"
-  cdk ${OPERATION} ${STACK}
+  echo "pnpm dlx cdk@latest ${OPERATION} ${STACK}"
+  pnpm dlx cdk@latest ${OPERATION} ${STACK}
 fi
 
 set +x

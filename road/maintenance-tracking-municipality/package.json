@@ -43,7 +43,7 @@
   },
   "dependencies": {
     "@digitraffic/common": "2022.12.22-3",
-    "aws-cdk-lib": "2.51.1",
+    "aws-cdk-lib": "2.59.0",
     "axios": "^1.2.0",
     "constructs": "10.1.168",
     "geojson": "^0.5.0",
