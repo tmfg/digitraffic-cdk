@@ -15,6 +15,10 @@ export const handler = async (): Promise<string> => {
     await checker.expect403WithoutApiKey(
         "/prod/api/v1/timestamps?locode=FIHKO"
     );
+    await checker.expect200("/prod/api/v1/metadata/locodes");
+    await checker.expect403WithoutApiKey(
+        "/prod/api/v1/metadata/locodes"
+    );
 
     return checker.done();
 };

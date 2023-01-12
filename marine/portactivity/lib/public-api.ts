@@ -9,6 +9,7 @@ import {
     LocationSchema,
     ShipSchema,
 } from "./model/timestamp-schema";
+import { LocodeMetadataSchema } from "./model/locode-metadata";
 import {
     DigitrafficMethodResponse,
     MessageModel,
@@ -75,6 +76,11 @@ export class PublicApi {
             this.publicApi,
             createArraySchema(timestampModel, this.publicApi)
         );
+        const locodeMetadataModel = addServiceModel(
+            "LocodeMetadataModel",
+            this.publicApi,
+            LocodeMetadataSchema
+        );
         const errorResponseModel = this.publicApi.addModel(
             "MessageResponseModel",
             MessageModel
@@ -83,6 +89,7 @@ export class PublicApi {
         const resource = this.publicApi.root
             .addResource("api")
             .addResource("v1");
+        const metadataResource = resource.addResource("metadata");
 
         this.createTimestampsResource(
             stack,
@@ -91,8 +98,21 @@ export class PublicApi {
             errorResponseModel,
             validator
         );
+
         this.createShiplistResource(stack, this.publicApi);
-        this.createTimestampMetadataResource(stack, this.publicApi, resource);
+
+        this.createTimestampMetadataResource(
+            stack,
+            this.publicApi,
+            metadataResource
+        );
+
+        this.createLocodeMetadataResource(
+            stack,
+            this.publicApi,
+            metadataResource,
+            locodeMetadataModel
+        );
     }
 
     createTimestampsResource(
@@ -205,12 +225,13 @@ export class PublicApi {
     createTimestampMetadataResource(
         stack: DigitrafficStack,
         publicApi: RestApi,
-        resource: Resource
+        metadataResource: Resource
     ) {
-        const metadataResource = resource.addResource("metadata");
+        const timestampMetadataResource =
+            metadataResource.addResource("timestamps");
 
         new DigitrafficStaticIntegration(
-            metadataResource,
+            timestampMetadataResource,
             MediaType.APPLICATION_JSON,
             JSON.stringify(TimestampMetadata),
             true,
@@ -218,12 +239,56 @@ export class PublicApi {
         );
 
         this.publicApi.documentResource(
-            metadataResource,
+            timestampMetadataResource,
             DocumentationPart.method(
                 ["metadata"],
                 "Timestamp metadata",
                 "Returns timestamp related metadata"
             )
         );
+    }
+
+    createLocodeMetadataResource(
+        stack: DigitrafficStack,
+        publicApi: RestApi,
+        metadataResource: Resource,
+        locodeMetadataModel: IModel
+    ): MonitoredDBFunction {
+        const getLocodeMetadataLambda = MonitoredDBFunction.create(
+            stack,
+            "get-locode-metadata",
+            stack.createLambdaEnvironment(),
+            {
+                timeout: 10,
+                reservedConcurrentExecutions: 6,
+            }
+        );
+
+        const getLocodeMetadataIntegration = new DigitrafficIntegration(
+            getLocodeMetadataLambda,
+            MediaType.APPLICATION_JSON
+        ).build();
+
+        const locodeMetadataResource = metadataResource.addResource("locodes");
+        locodeMetadataResource.addMethod("GET", getLocodeMetadataIntegration, {
+            apiKeyRequired: true,
+            methodResponses: [
+                DigitrafficMethodResponse.response200(
+                    locodeMetadataModel,
+                    MediaType.APPLICATION_JSON
+                ),
+            ],
+        });
+
+        this.publicApi.documentResource(
+            locodeMetadataResource,
+            DocumentationPart.method(
+                ["metadata"],
+                "Locode metadata",
+                "Returns a list of LOCODEs with associated timestamp predictions in the data"
+            )
+        );
+
+        return getLocodeMetadataLambda;
     }
 }
