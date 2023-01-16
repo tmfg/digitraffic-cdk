@@ -3,6 +3,7 @@ import { AxiosRequestConfig, default as axios } from "axios";
 import { constructSwagger, mergeApiDescriptions } from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 export const KEY_BUCKET_NAME = "BUCKET_NAME";
 export const KEY_REGION = "REGION";
@@ -22,19 +23,23 @@ const apiRequestHeaders: AxiosRequestConfig = {
 };
 
 export const handler = async () => {
-    const bucketName = process.env[KEY_BUCKET_NAME] as string;
+    // mandatory props
+    const bucketName = getEnvVariable(KEY_BUCKET_NAME);
+    const region = getEnvVariable(KEY_REGION);
+    const apigatewayIds = JSON.parse(
+        getEnvVariable(KEY_APIGW_APPS)
+    ) as string[];
+
+    // may not be defined
     const appUrl = process.env[KEY_APP_URL];
     const appBetaUrl = process.env[KEY_APP_BETA_URL];
-    const apigatewayIds = JSON.parse(
-        process.env[KEY_APIGW_APPS] as string
-    ) as string[];
     const directory = process.env[KEY_DIRECTORY];
     const host = process.env[KEY_HOST];
     const title = process.env[KEY_TITLE];
     const description = process.env[KEY_DESCRIPTION];
     const removeSecurity = process.env[KEY_REMOVESECURITY];
 
-    AWSConfig.update({ region: process.env[KEY_REGION] as string });
+    AWSConfig.update({ region });
 
     const apiResponses = await Promise.all(apigatewayIds.map(exportSwaggerApi));
     const apis = apiResponses.map((resp) => JSON.parse(resp.body as string));
