@@ -1,6 +1,6 @@
-import {FunctionType, LambdaType} from "./lambda/lambda-creator";
-import {CloudFrontAllowedMethods} from "aws-cdk-lib/aws-cloudfront";
-import {WafRules} from "./acl/waf-rules";
+import { FunctionType, LambdaType } from "./lambda/lambda-creator";
+import { CloudFrontAllowedMethods } from "aws-cdk-lib/aws-cloudfront";
+import { WafRules } from "./acl/waf-rules";
 
 export class CFBehavior {
     readonly path: string;
@@ -136,7 +136,10 @@ export class CFDomain extends CFOrigin {
         return new CFDomain(domainName, CFBehavior.passAll());
     }
 
-    static apiGateway(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
+    static apiGateway(
+        domainName: string,
+        ...behaviors: CFBehavior[]
+    ): CFDomain {
         const domain = new CFDomain(domainName, ...behaviors);
 
         domain.originPath = "/prod";
@@ -144,7 +147,11 @@ export class CFDomain extends CFOrigin {
         return domain;
     }
 
-    static apiGatewayWithApiKey(domainName: string, apiKey: string, ...behaviors: CFBehavior[]): CFDomain {
+    static apiGatewayWithApiKey(
+        domainName: string,
+        apiKey: string,
+        ...behaviors: CFBehavior[]
+    ): CFDomain {
         const domain = this.apiGateway(domainName, ...behaviors);
 
         domain.apiKey = apiKey;
@@ -155,15 +162,18 @@ export class CFDomain extends CFOrigin {
     static nginx(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
         const domain = new CFDomain(domainName, ...behaviors);
 
-        domain.originProtocolPolicy = 'http-only';
+        domain.originProtocolPolicy = "http-only";
 
         return domain;
     }
 
     static mqtt(domainName: string) {
-        const domain = new CFDomain(domainName, CFBehavior.passAll("mqtt*").httpsOnly());
+        const domain = new CFDomain(
+            domainName,
+            CFBehavior.passAll("mqtt*").allowHttpAndHttps()
+        );
 
-        domain.originProtocolPolicy = 'https-only';
+        domain.originProtocolPolicy = "http-only";
 
         return domain;
     }
@@ -186,9 +196,10 @@ export class S3Domain extends CFOrigin {
     }
 
     static swagger(s3BucketName: string, path = "swagger/*"): S3Domain {
-        return this.s3(s3BucketName, CFBehavior.path(path)
-            .withCacheTtl(120)
-            .withIndexHtmlFunction());
+        return this.s3(
+            s3BucketName,
+            CFBehavior.path(path).withCacheTtl(120).withIndexHtmlFunction()
+        );
     }
 
     static s3(s3BucketName: string, ...behaviors: CFBehavior[]): S3Domain {
@@ -197,39 +208,39 @@ export class S3Domain extends CFOrigin {
 }
 
 export type DistributionProps = {
-    readonly originAccessIdentity?: boolean,
-    readonly distributionName: string,
-    readonly environmentName: string,
-    readonly aliasNames: string[] | null,
-    readonly acmCertRef: string | null,
-    readonly aclRules?: WafRules,
-    readonly origins: CFOrigin[],
-    readonly disableShieldAdvanced?: boolean,
-}
+    readonly originAccessIdentity?: boolean;
+    readonly distributionName: string;
+    readonly environmentName: string;
+    readonly aliasNames: string[] | null;
+    readonly acmCertRef: string | null;
+    readonly aclRules?: WafRules;
+    readonly origins: CFOrigin[];
+    readonly disableShieldAdvanced?: boolean;
+};
 
 export type ElasticProps = {
-    readonly streamingProps: StreamingLogProps,
-    readonly elasticDomain: string,
-    readonly elasticArn: string,
-}
+    readonly streamingProps: StreamingLogProps;
+    readonly elasticDomain: string;
+    readonly elasticArn: string;
+};
 
 export type StreamingLogProps = {
-    readonly memorySize?: number,
-    readonly batchSize?: number,
-    readonly maxBatchingWindow?: number
-}
+    readonly memorySize?: number;
+    readonly batchSize?: number;
+    readonly maxBatchingWindow?: number;
+};
 
 export type CFProps = {
-    readonly elasticProps: ElasticProps,
-    readonly elasticAppName: string,
-    readonly distributions: DistributionProps[],
-    readonly lambdaParameters?: CFLambdaParameters
-}
+    readonly elasticProps: ElasticProps;
+    readonly elasticAppName: string;
+    readonly distributions: DistributionProps[];
+    readonly lambdaParameters?: CFLambdaParameters;
+};
 
 export type CFLambdaParameters = {
-    readonly weathercamDomainName?: string,
-    readonly weathercamHostName?: string,
+    readonly weathercamDomainName?: string;
+    readonly weathercamHostName?: string;
     readonly ipRestrictions?: {
-        [key: string]: string,
-    },
-}
+        [key: string]: string;
+    };
+};
