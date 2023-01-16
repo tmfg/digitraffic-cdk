@@ -1,5 +1,5 @@
 import { config as AWSConfig } from "aws-sdk";
-import { default as axios, AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, default as axios } from "axios";
 import { constructSwagger, mergeApiDescriptions } from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
@@ -23,18 +23,16 @@ const apiRequestHeaders: AxiosRequestConfig = {
 
 export const handler = async () => {
     const bucketName = process.env[KEY_BUCKET_NAME] as string;
-    const appUrl = process.env[KEY_APP_URL] as string | undefined;
-    const appBetaUrl = process.env[KEY_APP_BETA_URL] as string | undefined;
+    const appUrl = process.env[KEY_APP_URL];
+    const appBetaUrl = process.env[KEY_APP_BETA_URL];
     const apigatewayIds = JSON.parse(
         process.env[KEY_APIGW_APPS] as string
     ) as string[];
-    const directory = process.env[KEY_DIRECTORY] as string | undefined;
-    const host = process.env[KEY_HOST] as string | undefined;
-    const title = process.env[KEY_TITLE] as string | undefined;
-    const description = process.env[KEY_DESCRIPTION] as string | undefined;
-    const removeSecurity = process.env[KEY_REMOVESECURITY] as
-        | string
-        | undefined;
+    const directory = process.env[KEY_DIRECTORY];
+    const host = process.env[KEY_HOST];
+    const title = process.env[KEY_TITLE];
+    const description = process.env[KEY_DESCRIPTION];
+    const removeSecurity = process.env[KEY_REMOVESECURITY];
 
     AWSConfig.update({ region: process.env[KEY_REGION] as string });
 
