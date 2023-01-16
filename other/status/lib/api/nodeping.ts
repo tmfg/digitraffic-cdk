@@ -25,7 +25,7 @@ export enum NodePingCheckType {
     WEBSOCKET = "WEBSOCKET",
 }
 
-export type NodePingCheck = {
+export interface NodePingCheck {
     readonly _id: string;
     readonly label: string;
     readonly type: NodePingCheckType;
@@ -37,7 +37,7 @@ export type NodePingCheck = {
         readonly threshold: number;
         readonly sendheaders: Record<string, string>;
     };
-};
+}
 
 export class NodePingApi {
     private readonly token: string;

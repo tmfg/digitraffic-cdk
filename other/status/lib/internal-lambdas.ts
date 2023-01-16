@@ -2,14 +2,14 @@ import { Duration, Stack } from "aws-cdk-lib";
 import { AssetCode, FunctionProps, Runtime } from "aws-cdk-lib/aws-lambda";
 import { RetentionDays } from "aws-cdk-lib/aws-logs";
 import { ISecret, Secret } from "aws-cdk-lib/aws-secretsmanager";
-import { Rule, Schedule } from "aws-cdk-lib/aws-events";
-import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { Props } from "./app-props";
 import { StatusEnvKeys } from "./keys";
 import { ITopic } from "aws-cdk-lib/aws-sns";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
+import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
 export function create(
     stack: Stack,
@@ -52,22 +52,20 @@ function createUpdateStatusesLambda(
     stack: Stack,
     props: Props
 ) {
-    const environment: any = {};
+    const environment: LambdaEnvironment = {};
     environment[StatusEnvKeys.APPS] = JSON.stringify(props.monitoredApps);
     environment[StatusEnvKeys.SECRET_ID] = props.secretsManagerSecretArn;
-    environment[StatusEnvKeys.CHECK_TIMEOUT_SECONDS] = String(
-        props.nodePingTimeoutSeconds
-    );
-    environment[StatusEnvKeys.INTERVAL_MINUTES] = String(
-        props.nodePingCheckInterval
-    );
+    environment[StatusEnvKeys.CHECK_TIMEOUT_SECONDS] =
+        props.nodePingTimeoutSeconds.toString();
+    environment[StatusEnvKeys.INTERVAL_MINUTES] =
+        props.nodePingCheckInterval.toString();
 
     const functionName = "Status-UpdateStatuses";
     const lambdaConf: FunctionProps = {
         functionName: functionName,
         code: new AssetCode("dist/lambda/update-status"),
         handler: "lambda-update-status.handler",
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment,
@@ -87,10 +85,7 @@ function createUpdateStatusesLambda(
 
     secret.grantRead(lambda);
 
-    const rule = new Rule(stack, "UpdateStatusesRule", {
-        schedule: Schedule.rate(Duration.hours(1)),
-    });
-    rule.addTarget(new LambdaFunction(lambda));
+    Scheduler.everyHour(stack, "UpdateStatusesRule", lambda);
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
@@ -107,7 +102,7 @@ function createHandleMaintenanceLambda(
         functionName: functionName,
         code: new AssetCode("dist/lambda/handle-maintenance"),
         handler: "lambda-handle-maintenance.handler",
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {
@@ -130,10 +125,7 @@ function createHandleMaintenanceLambda(
 
     secret.grantRead(lambda);
 
-    const rule = new Rule(stack, "HandleMaintenanceRule", {
-        schedule: Schedule.rate(Duration.minutes(1)),
-    });
-    rule.addTarget(new LambdaFunction(lambda));
+    Scheduler.everyMinute(stack, "HandleMaintenanceRule", lambda);
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }
@@ -150,7 +142,7 @@ function createCheckComponentStatesLambda(
         functionName: functionName,
         code: new AssetCode("dist/lambda/check-component-states"),
         handler: "lambda-check-component-states.handler",
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         timeout: Duration.seconds(props.defaultLambdaDurationSeconds),
         environment: {
@@ -173,10 +165,7 @@ function createCheckComponentStatesLambda(
 
     secret.grantRead(lambda);
 
-    const rule = new Rule(stack, "CheckComponentStatesRule", {
-        schedule: Schedule.rate(Duration.hours(1)),
-    });
-    rule.addTarget(new LambdaFunction(lambda));
+    Scheduler.everyHour(stack, "CheckComponentStatesRule", lambda);
 
     createSubscription(lambda, functionName, props.logsDestinationArn, stack);
 }

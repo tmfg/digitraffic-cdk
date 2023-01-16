@@ -11,12 +11,12 @@ export enum StatuspageComponentStatus {
     major_outage = "major_outage",
 }
 
-export type StatuspageComponent = {
+export interface StatuspageComponent {
     readonly name: string;
     readonly id: string;
     readonly group_id: string;
     readonly status: StatuspageComponentStatus;
-};
+}
 
 export class StatuspageApi {
     private readonly statuspagePageId: string;
@@ -29,7 +29,7 @@ export class StatuspageApi {
 
     async getStatuspageComponents(): Promise<StatuspageComponent[]> {
         console.log("Fetching Statuspage components");
-        const resp = await axios.get(
+        const resp = await axios.get<StatuspageComponent[]>(
             `${STATUSPAGE_API}/${this.statuspagePageId}/components`,
             {
                 headers: {
@@ -72,6 +72,5 @@ export class StatuspageApi {
             throw new Error("Unable to create Statuspage component");
         }
         console.log("..done");
-        return resp.data;
     }
 }
