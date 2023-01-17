@@ -1,12 +1,11 @@
-import { Duration } from "aws-cdk-lib";
-import * as InternalLambdas from "./internal-lambdas";
-import * as IntegrationApi from "./integration-api";
-import * as Sqs from "./sqs";
-import { AppProps } from "./app-props";
-import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
-import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Duration } from "aws-cdk-lib";
+import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
+import { AppProps } from "./app-props";
+import * as IntegrationApi from "./integration-api";
+import * as InternalLambdas from "./internal-lambdas";
+import * as Sqs from "./sqs";
 
 export class MaintenanceTrackingStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, appProps: AppProps) {
@@ -51,5 +50,8 @@ export class MaintenanceTrackingStack extends DigitrafficStack {
             appProps,
             this
         );
+
+        // Delete over 26 hours old trackings from db
+        InternalLambdas.createCleanMaintenanceTrackingDataLambda(this);
     }
 }

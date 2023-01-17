@@ -4,6 +4,7 @@ import moment from "moment-timezone";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
 import { Havainto } from "../lib/model/models";
 import { convertToDbObservationData } from "../lib/service/maintenance-tracking";
+import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
@@ -16,10 +17,19 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
 }
 
 export async function truncate(db: DTDatabase) {
-    await db.tx((t) => {
-        return t.batch([
+    await db.tx(async (t) => {
+        return await t.batch([
             db.none(
                 `DELETE FROM maintenance_tracking_observation_data WHERE created > '2000-01-01T00:00:00Z'`
+            ),
+            db.none(
+                `DELETE FROM maintenance_tracking WHERE created > '2000-01-01T00:00:00Z'`
+            ),
+            db.none(
+                `DELETE FROM maintenance_tracking_work_machine WHERE id >= 0`
+            ),
+            db.none(
+                `DELETE FROM maintenance_tracking_domain WHERE created > '2000-01-01T00:00:00Z'`
             ),
         ]);
     });
@@ -61,4 +71,101 @@ export function createObservationsDbDatas(
             "https://s3Uri.com"
         );
     });
+}
+
+const LAST_POINT = `{
+   "TYPE": "Point",
+   "coordinates": [100.0, 0.0]
+}`;
+const LINE_STRING = `{
+   "type": "LineString",
+   "coordinates": [
+     [100.0, 0.0],
+     [101.0, 1.0]
+   ]
+ }`;
+
+const COORDINATE_PRECISION = 0.000001;
+const INSERT_SQL = `
+            INSERT INTO maintenance_tracking(
+                id, sending_system, sending_time,
+                last_point,
+                line_string,
+                work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id, previous_tracking_id)
+            VALUES (
+                       NEXTVAL('seq_maintenance_tracking'), $1, $2,
+                       ST_Snaptogrid(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID_WGS84})), ${COORDINATE_PRECISION}),
+                       ST_Snaptogrid(ST_Simplify(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID_WGS84})), 0.00005, true), ${COORDINATE_PRECISION}),
+                       $5, $6, $7, $8, $9, $10, $11, $12, $13)
+            RETURNING ID
+`;
+
+export function insertMaintenanceTracking(
+    db: DTDatabase,
+    workMachineId: number,
+    endTime: Date,
+    previousTrackingId: number | null = null
+): Promise<number> {
+    return db.tx((t) => {
+        return t
+            .one(INSERT_SQL, [
+                "sending_system",
+                endTime, // sending_time
+                LAST_POINT,
+                LINE_STRING,
+                workMachineId,
+                new Date(endTime.getTime() - 1000 * 60 * 5), // start_time = end_time - 5 min,
+                endTime,
+                0, // direction
+                false, // finished
+                "state-roads", // domain
+                null, // contract
+                null, // message_original_id
+                previousTrackingId, // previous_tracking_id
+            ])
+            .then((value) => {
+                return value.id;
+            })
+            .catch((error) => {
+                console.error("method=upsertMaintenanceTracking failed", error);
+                throw error;
+            });
+    });
+}
+
+export function upsertWorkMachine(db: DTDatabase): Promise<number> {
+    return db
+        .tx((t) => {
+            return t.one(`
+            INSERT INTO maintenance_tracking_work_machine(id, harja_id, harja_urakka_id, type)
+            VALUES (NEXTVAL('seq_maintenance_tracking_work_machine'), 1, 1, 'Tiehöylä')
+            ON CONFLICT(harja_id, harja_urakka_id) DO
+                UPDATE SET type = 'Tiehöylä'
+            RETURNING id`);
+        })
+        .then((value) => value.id);
+}
+
+export function upsertDomain(db: DTDatabase, domain: string): Promise<null> {
+    return db.tx((t) => {
+        return t.none(
+            `
+            INSERT INTO maintenance_tracking_domain(name, source)
+            VALUES ($1, $2)
+            ON CONFLICT(name) do NOTHING`,
+            [domain, domain]
+        );
+    });
+}
+
+export function findAllTrackingIds(db: DTDatabase): Promise<number[]> {
+    return db
+        .tx((t) => {
+            return t.manyOrNone(`
+            SELECT  id
+            FROM maintenance_tracking
+            ORDER BY id
+       `);
+        })
+        .then((result) => result.map((value) => value.id));
 }

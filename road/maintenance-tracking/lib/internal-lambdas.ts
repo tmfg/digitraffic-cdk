@@ -1,6 +1,6 @@
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import { Duration } from "aws-cdk-lib";
-import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
+import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 import { Construct } from "constructs";
 import {
     databaseFunctionProps,
@@ -22,6 +22,31 @@ import {
 import { MaintenanceTrackingEnvKeys } from "./keys";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+
+export function createCleanMaintenanceTrackingDataLambda(
+    stack: DigitrafficStack
+): MonitoredFunction {
+    const environment = stack.createLambdaEnvironment();
+
+    const lambdaFunction = MonitoredFunction.createV2(
+        stack,
+        "clean-maintenance-tracking-data",
+        environment,
+        {
+            functionName:
+                stack.configuration.shortName + "-cleanMaintenanceTrackingData",
+            memorySize: 128,
+        }
+    );
+
+    Scheduler.everyHour(
+        stack,
+        `MaintenanceTracking-cleanMaintenanceTrackingDataEveryHour`,
+        lambdaFunction
+    );
+    stack.grantSecret(lambdaFunction);
+    return lambdaFunction;
+}
 
 export function createProcessQueueAndDlqLambda(
     queueAndDLQ: QueueAndDLQ,
@@ -109,7 +134,7 @@ function createProcessDLQLambda(
         logRetention: RetentionDays.ONE_YEAR,
         functionName: functionName,
         code: new lambda.AssetCode("dist/lambda/process-dlq"),
-        handler: "lambda-process-dlq.handler",
+        handler: "process-dlq.handler",
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1,
         timeout: Duration.seconds(10),

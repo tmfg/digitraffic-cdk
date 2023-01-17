@@ -2,6 +2,7 @@ import {
     DTDatabase,
     inDatabase,
 } from "@digitraffic/common/dist/database/database";
+import * as console from "console";
 import moment from "moment-timezone";
 import * as MaintenanceTrackingDB from "../dao/maintenance-tracking-dao";
 import { DbObservationData, Status } from "../dao/maintenance-tracking-dao";
@@ -25,6 +26,35 @@ export async function saveMaintenanceTrackingObservationData(
     });
     // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
     return a.filter((id) => id != null).length;
+}
+
+export async function cleanMaintenanceTrackingData(
+    hoursToKeep: number
+): Promise<void> {
+    return await inDatabase(async (db: DTDatabase) => {
+        return await MaintenanceTrackingDB.getOldestTrackingHours(db).then(
+            async (limitHours) => {
+                console.info(
+                    "method=cleanMaintenanceTrackingData oldestHours %d and hoursToKeep %d",
+                    limitHours,
+                    hoursToKeep
+                );
+
+                while (limitHours >= hoursToKeep) {
+                    console.info(
+                        "method=cleanMaintenanceTrackingData limitHours %d",
+                        limitHours
+                    );
+                    await MaintenanceTrackingDB.cleanMaintenanceTrackingData(
+                        db,
+                        limitHours
+                    );
+                    limitHours--;
+                }
+                return;
+            }
+        );
+    });
 }
 
 export function createMaintenanceTrackingMessageHash(
