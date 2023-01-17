@@ -1,6 +1,7 @@
 import { getRandomIntegerAsString } from "@digitraffic/common/dist/test/testutils";
 import * as R from "ramda";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
+import { TyokoneenseurannanKirjaus } from "../lib/model/models";
 
 const ID_PLACEHOLDER = "ID_PLACEHOLDER";
 const TK_PLACEHOLDER = "TK_PLACEHOLDER";
@@ -114,14 +115,10 @@ export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
     tyokoneId?: string
 ): string {
     const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
-    const trackingJson = JSON.parse(validJson);
-    if (Math.round(Math.random()) > 0) {
-        // -> rounds to 0 or 1
-        trackingJson.otsikko.lahettaja.jarjestelma = null;
-    } else {
-        delete trackingJson.otsikko.lahettaja.jarjestelma;
-    }
-    return JSON.stringify(trackingJson);
+    const trackingJson: TyokoneenseurannanKirjaus = JSON.parse(validJson);
+    return JSON.stringify(
+        R.dissocPath(["otsikko", "lahettaja", "jarjestelma"], trackingJson)
+    );
 }
 
 export function assertObservationData(

@@ -4,13 +4,9 @@ import { MaintenanceTrackingEnvKeys } from "../../keys";
 import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
 import * as SqsBigPayload from "../../service/sqs-big-payload";
 
-const sqsBucketName = process.env[
-    MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
-] as string;
-const sqsQueueUrl = process.env[
-    MaintenanceTrackingEnvKeys.SQS_QUEUE_URL
-] as string;
-const region = process.env.AWS_REGION as string;
+const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]!;
+const sqsQueueUrl = process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]!;
+const region = process.env.AWS_REGION!;
 
 const sqsProducerInstance: SqsProducer = SqsBigPayload.createSqsProducer(
     sqsQueueUrl,
@@ -28,7 +24,7 @@ export function handlerFn(sqsProducer: SqsProducer) {
         console.info(
             `method=updateMaintenanceTrackingRequest bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl} and region: ${region} apiGWRequest type: ${typeof apiGWRequest}`
         );
-        if (!apiGWRequest || !apiGWRequest.body) {
+        if (!apiGWRequest?.body) {
             console.error(
                 `method=updateMaintenanceTrackingRequest Empty message`
             );
@@ -66,10 +62,10 @@ export function handlerFn(sqsProducer: SqsProducer) {
     };
 }
 
-type ResponseValue = {
+interface ResponseValue {
     readonly statusCode: number;
     readonly body: string;
-};
+}
 
 export function invalidRequest(msg: string): ResponseValue {
     return {

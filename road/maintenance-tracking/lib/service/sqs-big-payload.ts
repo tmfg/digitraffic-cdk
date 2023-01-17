@@ -1,12 +1,16 @@
-import {SQS} from "aws-sdk";
-import moment from 'moment-timezone';
-import {SqsConsumer, SqsProducer} from 'sns-sqs-big-payload';
+import { SQS } from "aws-sdk";
+import moment from "moment-timezone";
+import { SqsConsumer, SqsProducer } from "sns-sqs-big-payload";
 import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao";
-import {Havainto, TyokoneenseurannanKirjaus} from "../model/models";
+import { Havainto, TyokoneenseurannanKirjaus } from "../model/models";
 import * as MaintenanceTrackingService from "./maintenance-tracking";
 
 // https://github.com/aspecto-io/sns-sqs-big-payload#sqs-producer
-export function createSqsProducer(sqsQueueUrl : string, region : string, sqsBucketName : string) : SqsProducer {
+export function createSqsProducer(
+    sqsQueueUrl: string,
+    region: string,
+    sqsBucketName: string
+): SqsProducer {
     return SqsProducer.create({
         queueUrl: sqsQueueUrl,
         region: region,
@@ -21,24 +25,37 @@ export function createSqsProducer(sqsQueueUrl : string, region : string, sqsBuck
 }
 
 // See https://github.com/aspecto-io/sns-sqs-big-payload/blob/master/docs/usage-in-lambda.md
-export function createSqsConsumer(sqsQueueUrl : string, region : string, logFunctionName : string) : SqsConsumer {
-
+export function createSqsConsumer(
+    sqsQueueUrl: string,
+    region: string,
+    logFunctionName: string
+): SqsConsumer {
     return SqsConsumer.create({
         queueUrl: sqsQueueUrl,
         region: region,
         getPayloadFromS3: true,
         // Parse JSON string payload to JSON object
-        parsePayload: (raw) => {
+        parsePayload: (raw: string) => {
             return JSON.parse(raw);
         },
         // Callback to handle message. Payload is parsed JSON object
-        handleMessage: ({payload, message, s3PayloadMeta}) => {
-            return handleMessage(payload, message, s3PayloadMeta, logFunctionName);
+        handleMessage: ({ payload, message, s3PayloadMeta }) => {
+            return handleMessage(
+                payload,
+                message,
+                s3PayloadMeta,
+                logFunctionName
+            );
         },
     });
 }
 
-export async function handleMessage(payload: TyokoneenseurannanKirjaus, message: SQS.Message, s3PayloadMeta: S3PayloadMeta, logFunctionName: string) : Promise<void> {
+export async function handleMessage(
+    payload: TyokoneenseurannanKirjaus,
+    message: SQS.Message,
+    s3PayloadMeta: S3PayloadMeta,
+    logFunctionName: string
+): Promise<void> {
     /*
     s3PayloadMeta:
     {
@@ -48,9 +65,13 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
         "Location": "https://<bucket>.s3.eu-west-1.amazonaws.com/abcdefg-hijklmn.json"
     }
     */
-    let s3Uri = '–';
-    if (s3PayloadMeta) {
-        console.info(`method=${logFunctionName} big-payload s3PayloadMeta: ${JSON.stringify(s3PayloadMeta)}`);
+    let s3Uri = "–";
+    if (s3PayloadMeta?.Location) {
+        console.info(
+            `method=${logFunctionName} big-payload s3PayloadMeta: ${JSON.stringify(
+                s3PayloadMeta
+            )}`
+        );
         s3Uri = s3PayloadMeta.Location;
     }
 
@@ -60,25 +81,50 @@ export async function handleMessage(payload: TyokoneenseurannanKirjaus, message:
     const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
 
     if (!trackingJson.otsikko.lahettaja.jarjestelma) {
-        console.warn(`method=${logFunctionName} observations sendingSystem is empty using UNKNOWN s3Uri=%s`, s3Uri);
+        console.warn(
+            `method=${logFunctionName} observations sendingSystem is empty using UNKNOWN s3Uri=%s`,
+            s3Uri
+        );
     }
 
-    const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma ?? 'UNKNOWN';
+    const sendingSystem =
+        trackingJson.otsikko.lahettaja.jarjestelma ?? "UNKNOWN";
     const observationDatas: MaintenanceTrackingDb.DbObservationData[] =
         trackingJson.havainnot.map((havainto: Havainto) =>
-            MaintenanceTrackingService.convertToDbObservationData(havainto, sendingTime, sendingSystem, s3Uri));
+            MaintenanceTrackingService.convertToDbObservationData(
+                havainto,
+                sendingTime,
+                sendingSystem,
+                s3Uri
+            )
+        );
 
     try {
         const start = Date.now();
-        const insertCount: number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(observationDatas);
+        const insertCount: number =
+            await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(
+                observationDatas
+            );
         const end = Date.now();
         console.info(
             `method=${logFunctionName} messageSendingTime=%s observations domain=harja insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
-            sendingTime.toISOString(), insertCount, observationDatas.length, (end - start), messageSizeBytes,
+            sendingTime.toISOString(),
+            insertCount,
+            observationDatas.length,
+            end - start,
+            messageSizeBytes
         );
     } catch (e) {
-        const clones =  MaintenanceTrackingDb.cloneObservationsWithoutJson(observationDatas);
-        console.error(`method=${logFunctionName} Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(clones)}`, e);
+        const clones =
+            MaintenanceTrackingDb.cloneObservationsWithoutJson(
+                observationDatas
+            );
+        console.error(
+            `method=${logFunctionName} Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(
+                clones
+            )}`,
+            e
+        );
         return Promise.reject(e);
     }
     return Promise.resolve();

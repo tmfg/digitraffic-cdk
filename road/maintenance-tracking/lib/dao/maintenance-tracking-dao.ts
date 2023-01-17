@@ -97,7 +97,16 @@ export function cleanMaintenanceTrackingData(
             [hoursToKeep]
         );
         // These should and must be run in given order https://github.com/vitaly-t/pg-promise/issues/307
-        t.batch([cleanUpQuery, deleteQuery]);
+        return t
+            .batch([cleanUpQuery, deleteQuery])
+            .then(() => Promise.resolve())
+            .catch((error) => {
+                console.error(
+                    "method=cleanMaintenanceTrackingData update failed %s",
+                    error
+                );
+                throw error;
+            });
     });
 }
 

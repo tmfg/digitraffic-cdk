@@ -1,4 +1,5 @@
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { TyokoneenseurannanKirjaus } from "../../lib/model/models";
 import {
     cleanMaintenanceTrackingData,
     createMaintenanceTrackingMessageHash,
@@ -104,7 +105,7 @@ describe(
         });
 
         test("createObservationHash should equals for same message", () => {
-            const tracking = JSON.parse(
+            const tracking: TyokoneenseurannanKirjaus = JSON.parse(
                 getTrackingJsonWith3Observations("1", "1")
             );
             expect(tracking.havainnot.length).toBe(3);
@@ -120,7 +121,7 @@ describe(
         });
 
         test("createObservationHash should differ for different message", () => {
-            const tracking = JSON.parse(
+            const tracking: TyokoneenseurannanKirjaus = JSON.parse(
                 getTrackingJsonWith3Observations("1", "1")
             );
             expect(tracking.havainnot.length).toBe(3);

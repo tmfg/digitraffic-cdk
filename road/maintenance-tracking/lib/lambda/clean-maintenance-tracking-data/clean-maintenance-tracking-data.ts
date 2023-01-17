@@ -9,7 +9,7 @@ export const handler = () => {
         .setCredentials()
         .then(() => {
             console.info("method=cleanMaintenanceTrackingDataLambda start");
-            cleanMaintenanceTrackingData(26); // Just to be sure 24h history is available
+            return cleanMaintenanceTrackingData(26); // Just to be sure 24h history is available
         })
         .finally(() => {
             console.info(

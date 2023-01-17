@@ -8,7 +8,6 @@ process.env.AWS_REGION = "aws-region";
 process.env.SECRET_ID = "";
 
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-
 import { SQSRecord } from "aws-lambda";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import moment from "moment-timezone";
@@ -16,7 +15,7 @@ import * as sinon from "sinon";
 import { SqsConsumer } from "sns-sqs-big-payload";
 import * as LambdaProcessQueue from "../../lib/lambda/process-queue/process-queue";
 import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
-import { dbTestBase, findAllObservations } from "../db-testutil";
+import { dbTestBase, findAllObservations, mockSecrets } from "../db-testutil";
 import {
     getRandompId,
     getTrackingJsonWith3Observations,
@@ -39,7 +38,10 @@ describe(
             .stub(SecretHolder.prototype, "setDatabaseCredentials")
             .returns(Promise.resolve());
 
-        afterEach(() => sandbox.restore());
+        beforeEach(() => {
+            sinon.restore();
+            mockSecrets({});
+        });
 
         const sqsClient: SqsConsumer = createSqsConsumerForTest();
 

@@ -1,10 +1,13 @@
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import moment from "moment-timezone";
+import * as sinon from "sinon";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
 import { Havainto } from "../lib/model/models";
 import { convertToDbObservationData } from "../lib/service/maintenance-tracking";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
@@ -19,16 +22,16 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
 export async function truncate(db: DTDatabase) {
     await db.tx(async (t) => {
         return await t.batch([
-            db.none(
+            t.none(
                 `DELETE FROM maintenance_tracking_observation_data WHERE created > '2000-01-01T00:00:00Z'`
             ),
-            db.none(
+            t.none(
                 `DELETE FROM maintenance_tracking WHERE created > '2000-01-01T00:00:00Z'`
             ),
-            db.none(
+            t.none(
                 `DELETE FROM maintenance_tracking_work_machine WHERE id >= 0`
             ),
-            db.none(
+            t.none(
                 `DELETE FROM maintenance_tracking_domain WHERE created > '2000-01-01T00:00:00Z'`
             ),
         ]);
@@ -168,4 +171,9 @@ export function findAllTrackingIds(db: DTDatabase): Promise<number[]> {
        `);
         })
         .then((result) => result.map((value) => value.id));
+}
+
+export function mockSecrets<T>(secret: T) {
+    sinon.stub(RdsHolder.prototype, "setCredentials").resolves();
+    sinon.stub(SecretHolder.prototype, "get").resolves(secret);
 }

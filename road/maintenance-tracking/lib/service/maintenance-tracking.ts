@@ -2,15 +2,12 @@ import {
     DTDatabase,
     inDatabase,
 } from "@digitraffic/common/dist/database/database";
-import * as console from "console";
 import moment from "moment-timezone";
 import * as MaintenanceTrackingDB from "../dao/maintenance-tracking-dao";
 import { DbObservationData, Status } from "../dao/maintenance-tracking-dao";
 import { DbNumberId } from "../model/db-data";
 import { Havainto } from "../model/models";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const crypto = require("crypto");
+import crypto from "crypto";
 
 const matchViestitunnisteRegex =
     /"viestintunniste"\s*:\s*{\s*"id"\s*:\s*[0-9]*\s*}\s*,/;
@@ -28,11 +25,11 @@ export async function saveMaintenanceTrackingObservationData(
     return a.filter((id) => id != null).length;
 }
 
-export async function cleanMaintenanceTrackingData(
+export function cleanMaintenanceTrackingData(
     hoursToKeep: number
 ): Promise<void> {
-    return await inDatabase(async (db: DTDatabase) => {
-        return await MaintenanceTrackingDB.getOldestTrackingHours(db).then(
+    return inDatabase(async (db: DTDatabase) => {
+        return MaintenanceTrackingDB.getOldestTrackingHours(db).then(
             async (limitHours) => {
                 console.info(
                     "method=cleanMaintenanceTrackingData oldestHours %d and hoursToKeep %d",
@@ -51,7 +48,7 @@ export async function cleanMaintenanceTrackingData(
                     );
                     limitHours--;
                 }
-                return;
+                return Promise.resolve();
             }
         );
     });
