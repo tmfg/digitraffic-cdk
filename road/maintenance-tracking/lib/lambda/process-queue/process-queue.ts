@@ -55,8 +55,8 @@ export function handlerFn(sqsConsumer: SqsConsumer) {
 }
 
 export function cloneRecordWithCamelAndPascal(
-    record: Record<string, string | number>
-): Record<string, string | number> {
+    record: Record<string, any>
+): Record<string, any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clone: Record<string, any> = {};
     for (const key in record) {
