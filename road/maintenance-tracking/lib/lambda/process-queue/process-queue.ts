@@ -55,13 +55,17 @@ export function handlerFn(sqsConsumer: SqsConsumer) {
 }
 
 export function cloneRecordWithCamelAndPascal(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     record: Record<string, any>
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
 ): Record<string, any> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clone: Record<string, any> = {};
     for (const key in record) {
         if (key in record) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             clone[key.charAt(0).toUpperCase() + key.substring(1)] = record[key];
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
             clone[key.charAt(0).toLowerCase() + key.substring(1)] = record[key];
         }
     }
