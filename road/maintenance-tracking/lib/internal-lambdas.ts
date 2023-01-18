@@ -22,13 +22,14 @@ import {
 import { MaintenanceTrackingEnvKeys } from "./keys";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 
 export function createCleanMaintenanceTrackingDataLambda(
     stack: DigitrafficStack
 ): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
 
-    const lambdaFunction = MonitoredFunction.createV2(
+    const lambdaFunction = MonitoredDBFunction.create(
         stack,
         "clean-maintenance-tracking-data",
         environment,
@@ -44,7 +45,7 @@ export function createCleanMaintenanceTrackingDataLambda(
         `MaintenanceTracking-cleanMaintenanceTrackingDataEveryHour`,
         lambdaFunction
     );
-    stack.grantSecret(lambdaFunction);
+
     return lambdaFunction;
 }
 

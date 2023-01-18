@@ -1,12 +1,16 @@
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { APIGatewayEvent } from "aws-lambda/trigger/api-gateway-proxy";
 import { SqsProducer } from "sns-sqs-big-payload";
 import { MaintenanceTrackingEnvKeys } from "../../keys";
+import { TyokoneenseurannanKirjaus } from "../../model/models";
 import * as MaintenanceTrackingService from "../../service/maintenance-tracking";
 import * as SqsBigPayload from "../../service/sqs-big-payload";
 
-const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]!;
-const sqsQueueUrl = process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]!;
-const region = process.env.AWS_REGION!;
+const sqsBucketName = getEnvVariable(
+    MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
+);
+const sqsQueueUrl = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL);
+const region = getEnvVariable("AWS_REGION");
 
 const sqsProducerInstance: SqsProducer = SqsBigPayload.createSqsProducer(
     sqsQueueUrl,
@@ -24,7 +28,7 @@ export function handlerFn(sqsProducer: SqsProducer) {
         console.info(
             `method=updateMaintenanceTrackingRequest bucketName=${sqsBucketName} sqsQueueUrl=${sqsQueueUrl} and region: ${region} apiGWRequest type: ${typeof apiGWRequest}`
         );
-        if (!apiGWRequest?.body) {
+        if (!apiGWRequest.body) {
             console.error(
                 `method=updateMaintenanceTrackingRequest Empty message`
             );
@@ -39,7 +43,9 @@ export function handlerFn(sqsProducer: SqsProducer) {
                 );
             // console.info(`method=updateMaintenanceTrackingRequest messageDeduplicationId: ${messageDeduplicationId} sizeBytes=${messageSizeBytes}`);
             // Will send message's body to S3 if it's larger than max SQS message size
-            const json = JSON.parse(apiGWRequest.body);
+            const json = JSON.parse(
+                apiGWRequest.body
+            ) as TyokoneenseurannanKirjaus;
             await sqsProducer.sendJSON(json);
             console.info(
                 `method=updateMaintenanceTrackingRequest sqs.sendMessage messageDeduplicationId: ${messageDeduplicationId} sizeBytes=${messageSizeBytes} count=1 tookMs=${
@@ -56,10 +62,19 @@ export function handlerFn(sqsProducer: SqsProducer) {
                 e
             );
             return Promise.reject(
-                invalidRequest(`Error while sending message to SQS: ${e}`)
+                invalidRequest(
+                    `Error while sending message to SQS: ${getErrorMessage(e)}`
+                )
             );
         }
     };
+}
+
+function getErrorMessage(maybeError: unknown) {
+    if (maybeError instanceof Error) {
+        return maybeError.name + ": " + maybeError.message;
+    }
+    return String(maybeError);
 }
 
 interface ResponseValue {

@@ -2,8 +2,11 @@ import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { MaintenanceTrackingEnvKeys } from "../../keys";
 import { SQSEvent } from "aws-lambda";
 import { SQSRecord } from "aws-lambda/trigger/sqs";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
-const bucketName = process.env[MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME]!;
+const bucketName = getEnvVariable(
+    MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME
+);
 
 export const handler = (event: SQSEvent) => {
     const iso = new Date().toISOString();

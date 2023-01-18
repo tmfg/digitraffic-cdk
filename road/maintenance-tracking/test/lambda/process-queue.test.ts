@@ -21,11 +21,12 @@ import {
     getTrackingJsonWith3Observations,
     getTrackingJsonWith3ObservationsAndMissingSendingSystem,
 } from "../testdata";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 function createSqsConsumerForTest(): SqsConsumer {
     return SqsBigPayload.createSqsConsumer(
-        `${process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]}`,
-        `${process.env.AWS_REGION}`,
+        getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL),
+        getEnvVariable("AWS_REGION"),
         "processMaintenanceTrackingQueueTest"
     );
 }
@@ -220,9 +221,9 @@ function createRecord(trackingJson = ""): SQSRecord {
     return {
         body: trackingJson,
         messageId: "",
-        receiptHandle: `s3://${
-            process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]
-        }/${QUEUE}/${getRandompId()}`,
+        receiptHandle: `s3://${getEnvVariable(
+            MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
+        )}/${QUEUE}/${getRandompId()}`,
         messageAttributes: {},
         md5OfBody: "",
         attributes: {

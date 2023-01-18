@@ -5,11 +5,14 @@ import * as SqsBigPayload from "../../service/sqs-big-payload";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
-const sqsBucketName = process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]!;
-const sqsQueueUrl = process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]!;
+const sqsBucketName = getEnvVariable(
+    MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
+);
+const sqsQueueUrl = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL);
 
-const region = process.env.AWS_REGION!;
+const region = getEnvVariable("AWS_REGION");
 const rdsHolder = RdsHolder.create();
 
 const sqsConsumerInstance: SqsConsumer = SqsBigPayload.createSqsConsumer(
@@ -51,10 +54,9 @@ export function handlerFn(sqsConsumer: SqsConsumer) {
     };
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function cloneRecordWithCamelAndPascal(
-    record: Record<string, any>
-): Record<string, any> {
+    record: Record<string, string | number>
+): Record<string, string | number> {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const clone: Record<string, any> = {};
     for (const key in record) {

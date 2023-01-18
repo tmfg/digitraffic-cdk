@@ -115,7 +115,7 @@ export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
     tyokoneId?: string
 ): string {
     const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
-    const trackingJson: TyokoneenseurannanKirjaus = JSON.parse(validJson);
+    const trackingJson = JSON.parse(validJson) as TyokoneenseurannanKirjaus;
     return JSON.stringify(
         R.dissocPath(["otsikko", "lahettaja", "jarjestelma"], trackingJson)
     );

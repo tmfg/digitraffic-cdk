@@ -4,6 +4,7 @@ import { SqsConsumer, SqsProducer } from "sns-sqs-big-payload";
 import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao";
 import { Havainto, TyokoneenseurannanKirjaus } from "../model/models";
 import * as MaintenanceTrackingService from "./maintenance-tracking";
+import * as R from "ramda";
 
 // https://github.com/aspecto-io/sns-sqs-big-payload#sqs-producer
 export function createSqsProducer(
@@ -24,6 +25,12 @@ export function createSqsProducer(
     });
 }
 
+interface SqsBigMessage {
+    payload: TyokoneenseurannanKirjaus;
+    message: SQS.Message;
+    s3PayloadMeta: S3PayloadMeta;
+}
+
 // See https://github.com/aspecto-io/sns-sqs-big-payload/blob/master/docs/usage-in-lambda.md
 export function createSqsConsumer(
     sqsQueueUrl: string,
@@ -36,14 +43,14 @@ export function createSqsConsumer(
         getPayloadFromS3: true,
         // Parse JSON string payload to JSON object
         parsePayload: (raw: string) => {
-            return JSON.parse(raw);
+            return JSON.parse(raw) as TyokoneenseurannanKirjaus;
         },
         // Callback to handle message. Payload is parsed JSON object
-        handleMessage: ({ payload, message, s3PayloadMeta }) => {
+        handleMessage: (message: SqsBigMessage) => {
             return handleMessage(
-                payload,
-                message,
-                s3PayloadMeta,
+                message.payload,
+                message.message,
+                message.s3PayloadMeta,
                 logFunctionName
             );
         },
@@ -53,7 +60,7 @@ export function createSqsConsumer(
 export async function handleMessage(
     payload: TyokoneenseurannanKirjaus,
     message: SQS.Message,
-    s3PayloadMeta: S3PayloadMeta,
+    s3PayloadMeta: S3PayloadMeta | undefined,
     logFunctionName: string
 ): Promise<void> {
     /*
@@ -87,8 +94,11 @@ export async function handleMessage(
         );
     }
 
-    const sendingSystem =
-        trackingJson.otsikko.lahettaja.jarjestelma ?? "UNKNOWN";
+    const sendingSystem = R.pathOr(
+        "UNKNOWN",
+        ["otsikko", "lahettaja", "jarjestelma"],
+        trackingJson
+    );
     const observationDatas: MaintenanceTrackingDb.DbObservationData[] =
         trackingJson.havainnot.map((havainto: Havainto) =>
             MaintenanceTrackingService.convertToDbObservationData(

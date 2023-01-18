@@ -105,9 +105,9 @@ describe(
         });
 
         test("createObservationHash should equals for same message", () => {
-            const tracking: TyokoneenseurannanKirjaus = JSON.parse(
+            const tracking = JSON.parse(
                 getTrackingJsonWith3Observations("1", "1")
-            );
+            ) as TyokoneenseurannanKirjaus;
             expect(tracking.havainnot.length).toBe(3);
             const observation = tracking.havainnot[0].havainto;
             const h1 = createMaintenanceTrackingMessageHash(
@@ -121,9 +121,9 @@ describe(
         });
 
         test("createObservationHash should differ for different message", () => {
-            const tracking: TyokoneenseurannanKirjaus = JSON.parse(
+            const tracking = JSON.parse(
                 getTrackingJsonWith3Observations("1", "1")
-            );
+            ) as TyokoneenseurannanKirjaus;
             expect(tracking.havainnot.length).toBe(3);
             const observation1 = tracking.havainnot[0].havainto;
             const observation2 = tracking.havainnot[1].havainto;
@@ -199,7 +199,9 @@ describe(
             ); // endTime inside 1h -> no delete
 
             const idsBeforeCleanup = await findAllTrackingIds(db);
-            console.info(`idsBeforeCleanup: ${idsBeforeCleanup}`);
+            console.info(
+                `idsBeforeCleanup: ${JSON.stringify(idsBeforeCleanup)}`
+            );
             expect(idsBeforeCleanup.length).toEqual(7);
             expect(idsBeforeCleanup.includes(id1)).toBe(true);
             expect(idsBeforeCleanup.includes(id2)).toBe(true);
@@ -212,7 +214,7 @@ describe(
             await cleanMaintenanceTrackingData(1);
 
             const idsAfterCleanup = await findAllTrackingIds(db);
-            console.info(`idsAfterCleanup: ${idsAfterCleanup}`);
+            console.info(`idsAfterCleanup: ${JSON.stringify(idsAfterCleanup)}`);
             expect(idsAfterCleanup.length).toEqual(3);
 
             expect(idsAfterCleanup.includes(id5)).toBe(true);

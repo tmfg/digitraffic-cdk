@@ -3,7 +3,7 @@ import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db
 import moment from "moment-timezone";
 import * as sinon from "sinon";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
-import { Havainto } from "../lib/model/models";
+import { Havainto, TyokoneenseurannanKirjaus } from "../lib/model/models";
 import { convertToDbObservationData } from "../lib/service/maintenance-tracking";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
@@ -63,7 +63,7 @@ export function createObservationsDbDatas(
     jsonString: string
 ): DbObservationData[] {
     // Parse JSON to get sending time
-    const trackingJson = JSON.parse(jsonString);
+    const trackingJson = JSON.parse(jsonString) as TyokoneenseurannanKirjaus;
     const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
     const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma;
     return trackingJson.havainnot.map((havainto: Havainto) => {
@@ -111,7 +111,7 @@ export function insertMaintenanceTracking(
 ): Promise<number> {
     return db.tx((t) => {
         return t
-            .one(INSERT_SQL, [
+            .one<{ id: number }>(INSERT_SQL, [
                 "sending_system",
                 endTime, // sending_time
                 LAST_POINT,
@@ -139,7 +139,7 @@ export function insertMaintenanceTracking(
 export function upsertWorkMachine(db: DTDatabase): Promise<number> {
     return db
         .tx((t) => {
-            return t.one(`
+            return t.one<{ id: number }>(`
             INSERT INTO maintenance_tracking_work_machine(id, harja_id, harja_urakka_id, type)
             VALUES (NEXTVAL('seq_maintenance_tracking_work_machine'), 1, 1, 'Tiehöylä')
             ON CONFLICT(harja_id, harja_urakka_id) DO
@@ -164,11 +164,11 @@ export function upsertDomain(db: DTDatabase, domain: string): Promise<null> {
 export function findAllTrackingIds(db: DTDatabase): Promise<number[]> {
     return db
         .tx((t) => {
-            return t.manyOrNone(`
-            SELECT  id
-            FROM maintenance_tracking
-            ORDER BY id
-       `);
+            return t.manyOrNone<{ id: number }>(`
+                SELECT  id
+                FROM maintenance_tracking
+                ORDER BY id
+           `);
         })
         .then((result) => result.map((value) => value.id));
 }
