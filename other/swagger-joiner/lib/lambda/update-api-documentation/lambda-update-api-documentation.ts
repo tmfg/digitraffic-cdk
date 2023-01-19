@@ -10,6 +10,11 @@ import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 export const KEY_APIGW_IDS = "APIGW_IDS";
 export const KEY_REGION = "REGION";
 
+interface ApiAndVersions {
+    readonly apiId: string;
+    readonly versions: ListOfDocumentationVersion;
+}
+
 export const handler = async () => {
     const apigatewayIds = JSON.parse(getEnvVariable(KEY_APIGW_IDS)) as string[];
 
@@ -20,15 +25,22 @@ export const handler = async () => {
         apigatewayIds.map((apiId) => getDocumentationVersion(apiId, apigw))
     );
     await Promise.all(
-        apisAndVersions.map((apiVersions) =>
-            createDocumentationVersion(
-                apiVersions.apiId,
-                getLatestVersion(
-                    apiVersions.result.items as ListOfDocumentationVersion
-                ),
-                apigw
+        apisAndVersions
+            .map((apiAndVersions) => ({
+                apiId: apiAndVersions.apiId,
+                versions: apiAndVersions.result.items,
+            }))
+            .filter(
+                (apiAndVersions): apiAndVersions is ApiAndVersions =>
+                    !!apiAndVersions.versions
             )
-        )
+            .map((apiAndVersions) =>
+                createDocumentationVersion(
+                    apiAndVersions.apiId,
+                    getLatestVersion(apiAndVersions.versions),
+                    apigw
+                )
+            )
     );
 };
 

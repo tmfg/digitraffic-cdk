@@ -85,7 +85,9 @@ function createUpdateSwaggerDescriptionsLambda(
     lambdaEnv[KEY_BUCKET_NAME] = bucket.bucketName;
     lambdaEnv[KEY_REGION] = stack.region;
     lambdaEnv[KEY_APIGW_APPS] = JSON.stringify(props.apiGwAppIds);
-    lambdaEnv[KEY_APP_URL] = props.appUrl as string;
+    if (props.appUrl) {
+        lambdaEnv[KEY_APP_URL] = props.appUrl;
+    }
     if (props.betaAppUrl) {
         lambdaEnv[KEY_APP_BETA_URL] = props.betaAppUrl;
     }

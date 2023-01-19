@@ -7,7 +7,7 @@ import {
     getEnvVariable,
     getEnvVariableOrElse,
 } from "@digitraffic/common/dist/utils/utils";
-import { z } from "zod";
+import { openapiSchema } from "../../model/openapi-schema";
 
 export const KEY_BUCKET_NAME = "BUCKET_NAME";
 export const KEY_REGION = "REGION";
@@ -25,28 +25,6 @@ const apiRequestHeaders: AxiosRequestConfig = {
         "Accept-Encoding": "gzip",
     },
 };
-
-const openapiSchema = z
-    .object({
-        openapi: z.string().regex(new RegExp("^3\\.0\\.\\d(-.+)?$")),
-        info: z.any(),
-        externalDocs: z.any().optional(),
-        servers: z.array(z.any()).optional(),
-        security: z.array(z.any()).optional(),
-        tags: z.array(z.any()).optional(),
-        paths: z.any(),
-        components: z.any().optional(),
-        "x-amazon-apigateway-policy": z
-            .object({
-                Version: z.string(),
-                Statement: z.array(z.any()),
-            })
-            .optional(),
-    })
-    .strict()
-    .describe(
-        "The description of OpenAPI v3.0.x documents, as defined by https://spec.openapis.org/oas/v3.0.3"
-    );
 
 export const handler = async () => {
     // should be defined in all stacks - throw error if undefined
@@ -73,17 +51,23 @@ export const handler = async () => {
     );
 
     const appApi = appUrl
-        ? openapiSchema.parse((await axios.get(appUrl, apiRequestHeaders)).data)
+        ? [
+              openapiSchema.parse(
+                  (await axios.get(appUrl, apiRequestHeaders)).data
+              ),
+          ]
         : [];
 
     const appBetaApi = appBetaUrl
-        ? openapiSchema.parse(
-              (await axios.get(appBetaUrl, apiRequestHeaders)).data
-          )
+        ? [
+              openapiSchema.parse(
+                  (await axios.get(appBetaUrl, apiRequestHeaders)).data
+              ),
+          ]
         : [];
 
     // order is crucial in order for beta for remain at the bottom
-    const allApis = [appBetaApi].concat(apis).concat([appApi]);
+    const allApis = appBetaApi.concat(apis).concat(appApi);
 
     const merged = mergeApiDescriptions(allApis);
 
