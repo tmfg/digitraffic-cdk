@@ -3,7 +3,11 @@ import { AxiosRequestConfig, default as axios } from "axios";
 import { constructSwagger, mergeApiDescriptions } from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import {
+    getEnvVariable,
+    getEnvVariableOrElse,
+} from "@digitraffic/common/dist/utils/utils";
+import { z } from "zod";
 
 export const KEY_BUCKET_NAME = "BUCKET_NAME";
 export const KEY_REGION = "REGION";
@@ -22,37 +26,64 @@ const apiRequestHeaders: AxiosRequestConfig = {
     },
 };
 
+const openapiSchema = z
+    .object({
+        openapi: z.string().regex(new RegExp("^3\\.0\\.\\d(-.+)?$")),
+        info: z.any(),
+        externalDocs: z.any().optional(),
+        servers: z.array(z.any()).optional(),
+        security: z.array(z.any()).optional(),
+        tags: z.array(z.any()).optional(),
+        paths: z.any(),
+        components: z.any().optional(),
+        "x-amazon-apigateway-policy": z
+            .object({
+                Version: z.string(),
+                Statement: z.array(z.any()),
+            })
+            .optional(),
+    })
+    .strict()
+    .describe(
+        "The description of OpenAPI v3.0.x documents, as defined by https://spec.openapis.org/oas/v3.0.3"
+    );
+
 export const handler = async () => {
-    // mandatory props
+    // should be defined in all stacks - throw error if undefined
     const bucketName = getEnvVariable(KEY_BUCKET_NAME);
     const region = getEnvVariable(KEY_REGION);
     const apigatewayIds = JSON.parse(
         getEnvVariable(KEY_APIGW_APPS)
     ) as string[];
 
-    // may not be defined
-    const appUrl = process.env[KEY_APP_URL];
-    const appBetaUrl = process.env[KEY_APP_BETA_URL];
-    const directory = process.env[KEY_DIRECTORY];
-    const host = process.env[KEY_HOST];
-    const title = process.env[KEY_TITLE];
-    const description = process.env[KEY_DESCRIPTION];
-    const removeSecurity = process.env[KEY_REMOVESECURITY];
+    // may not be defined in some stacks
+    const appUrl = getEnvVariableOrElse(KEY_APP_URL, undefined);
+    const appBetaUrl = getEnvVariableOrElse(KEY_APP_BETA_URL, undefined);
+    const directory = getEnvVariableOrElse(KEY_DIRECTORY, undefined);
+    const host = getEnvVariableOrElse(KEY_HOST, undefined);
+    const title = getEnvVariableOrElse(KEY_TITLE, undefined);
+    const description = getEnvVariableOrElse(KEY_DESCRIPTION, undefined);
+    const removeSecurity = getEnvVariableOrElse(KEY_REMOVESECURITY, undefined);
 
     AWSConfig.update({ region });
 
     const apiResponses = await Promise.all(apigatewayIds.map(exportSwaggerApi));
-    const apis = apiResponses.map((resp) => JSON.parse(resp.body as string));
+    const apis = apiResponses.map((resp) =>
+        openapiSchema.parse(JSON.parse(resp.body as string))
+    );
+
     const appApi = appUrl
-        ? (await axios.get(appUrl, apiRequestHeaders)).data
+        ? openapiSchema.parse((await axios.get(appUrl, apiRequestHeaders)).data)
         : [];
 
     const appBetaApi = appBetaUrl
-        ? [(await axios.get(appBetaUrl, apiRequestHeaders)).data]
+        ? openapiSchema.parse(
+              (await axios.get(appBetaUrl, apiRequestHeaders)).data
+          )
         : [];
 
     // order is crucial in order for beta for remain at the bottom
-    const allApis = appBetaApi.concat(apis).concat([appApi]);
+    const allApis = [appBetaApi].concat(apis).concat([appApi]);
 
     const merged = mergeApiDescriptions(allApis);
 
