@@ -8,7 +8,6 @@ process.env.AWS_REGION = "aws-region";
 process.env.SECRET_ID = "";
 
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-
 import { SQSRecord } from "aws-lambda";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import moment from "moment-timezone";
@@ -16,17 +15,18 @@ import * as sinon from "sinon";
 import { SqsConsumer } from "sns-sqs-big-payload";
 import * as LambdaProcessQueue from "../../lib/lambda/process-queue/process-queue";
 import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
-import { dbTestBase, findAllObservations } from "../db-testutil";
+import { dbTestBase, findAllObservations, mockSecrets } from "../db-testutil";
 import {
     getRandompId,
     getTrackingJsonWith3Observations,
     getTrackingJsonWith3ObservationsAndMissingSendingSystem,
 } from "../testdata";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 function createSqsConsumerForTest(): SqsConsumer {
     return SqsBigPayload.createSqsConsumer(
-        `${process.env[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL]}`,
-        `${process.env.AWS_REGION}`,
+        getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL),
+        getEnvVariable("AWS_REGION"),
         "processMaintenanceTrackingQueueTest"
     );
 }
@@ -39,7 +39,10 @@ describe(
             .stub(SecretHolder.prototype, "setDatabaseCredentials")
             .returns(Promise.resolve());
 
-        afterEach(() => sandbox.restore());
+        beforeEach(() => {
+            sinon.restore();
+            mockSecrets({});
+        });
 
         const sqsClient: SqsConsumer = createSqsConsumerForTest();
 
@@ -218,9 +221,9 @@ function createRecord(trackingJson = ""): SQSRecord {
     return {
         body: trackingJson,
         messageId: "",
-        receiptHandle: `s3://${
-            process.env[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME]
-        }/${QUEUE}/${getRandompId()}`,
+        receiptHandle: `s3://${getEnvVariable(
+            MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
+        )}/${QUEUE}/${getRandompId()}`,
         messageAttributes: {},
         md5OfBody: "",
         attributes: {

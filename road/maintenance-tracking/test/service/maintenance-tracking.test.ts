@@ -1,5 +1,7 @@
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { TyokoneenseurannanKirjaus } from "../../lib/model/models";
 import {
+    cleanMaintenanceTrackingData,
     createMaintenanceTrackingMessageHash,
     saveMaintenanceTrackingObservationData,
 } from "../../lib/service/maintenance-tracking";
@@ -7,7 +9,11 @@ import {
     createObservationsDbDatas,
     dbTestBase,
     findAllObservations,
+    findAllTrackingIds,
+    insertMaintenanceTracking,
     truncate,
+    upsertDomain,
+    upsertWorkMachine,
 } from "../db-testutil";
 import {
     assertObservationData,
@@ -101,7 +107,7 @@ describe(
         test("createObservationHash should equals for same message", () => {
             const tracking = JSON.parse(
                 getTrackingJsonWith3Observations("1", "1")
-            );
+            ) as TyokoneenseurannanKirjaus;
             expect(tracking.havainnot.length).toBe(3);
             const observation = tracking.havainnot[0].havainto;
             const h1 = createMaintenanceTrackingMessageHash(
@@ -117,7 +123,7 @@ describe(
         test("createObservationHash should differ for different message", () => {
             const tracking = JSON.parse(
                 getTrackingJsonWith3Observations("1", "1")
-            );
+            ) as TyokoneenseurannanKirjaus;
             expect(tracking.havainnot.length).toBe(3);
             const observation1 = tracking.havainnot[0].havainto;
             const observation2 = tracking.havainnot[1].havainto;
@@ -145,5 +151,79 @@ describe(
                 getTrackingJsonWith3Observations("1", "321")
             );
         });
+
+        test("cleanMaintenanceTrackingData", async () => {
+            const now = new Date();
+
+            const wMId = await upsertWorkMachine(db);
+            await upsertDomain(db, "state-roads");
+
+            const id1 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 60 * 3 + 1)
+            ); // endTime over 3h -> delete
+            const id2 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 60 * 2 + 1)
+            ); // endTime over 2h -> delete
+            const id3 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 70)
+            ); // endTime over 1h -> delete
+            const id4 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 65),
+                id3
+            ); // endTime over 1h -> delete
+            const id5 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 61),
+                id4
+            ); // endTime over 1h, but ref from id4 -> no delete
+            const id6 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 59),
+                id5
+            ); // endTime inside 1h -> no delete
+            const id7 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 55),
+                id6
+            ); // endTime inside 1h -> no delete
+
+            const idsBeforeCleanup = await findAllTrackingIds(db);
+            console.info(
+                `idsBeforeCleanup: ${JSON.stringify(idsBeforeCleanup)}`
+            );
+            expect(idsBeforeCleanup.length).toEqual(7);
+            expect(idsBeforeCleanup.includes(id1)).toBe(true);
+            expect(idsBeforeCleanup.includes(id2)).toBe(true);
+            expect(idsBeforeCleanup.includes(id3)).toBe(true);
+            expect(idsBeforeCleanup.includes(id4)).toBe(true);
+            expect(idsBeforeCleanup.includes(id5)).toBe(true);
+            expect(idsBeforeCleanup.includes(id6)).toBe(true);
+            expect(idsBeforeCleanup.includes(id7)).toBe(true);
+
+            await cleanMaintenanceTrackingData(1);
+
+            const idsAfterCleanup = await findAllTrackingIds(db);
+            console.info(`idsAfterCleanup: ${JSON.stringify(idsAfterCleanup)}`);
+            expect(idsAfterCleanup.length).toEqual(3);
+
+            expect(idsAfterCleanup.includes(id5)).toBe(true);
+            expect(idsAfterCleanup.includes(id6)).toBe(true);
+            expect(idsAfterCleanup.includes(id7)).toBe(true);
+        });
     })
 );
+
+function minusMinutes(time: Date, minutes: number) {
+    return new Date(time.getTime() - 1000 * 60 * minutes);
+}

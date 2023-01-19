@@ -7,9 +7,7 @@ import * as MaintenanceTrackingDB from "../dao/maintenance-tracking-dao";
 import { DbObservationData, Status } from "../dao/maintenance-tracking-dao";
 import { DbNumberId } from "../model/db-data";
 import { Havainto } from "../model/models";
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const crypto = require("crypto");
+import crypto from "crypto";
 
 const matchViestitunnisteRegex =
     /"viestintunniste"\s*:\s*{\s*"id"\s*:\s*[0-9]*\s*}\s*,/;
@@ -25,6 +23,35 @@ export async function saveMaintenanceTrackingObservationData(
     });
     // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
     return a.filter((id) => id != null).length;
+}
+
+export function cleanMaintenanceTrackingData(
+    hoursToKeep: number
+): Promise<void> {
+    return inDatabase(async (db: DTDatabase) => {
+        return MaintenanceTrackingDB.getOldestTrackingHours(db).then(
+            async (limitHours) => {
+                console.info(
+                    "method=cleanMaintenanceTrackingData oldestHours %d and hoursToKeep %d",
+                    limitHours,
+                    hoursToKeep
+                );
+
+                while (limitHours >= hoursToKeep) {
+                    console.info(
+                        "method=cleanMaintenanceTrackingData limitHours %d",
+                        limitHours
+                    );
+                    await MaintenanceTrackingDB.cleanMaintenanceTrackingData(
+                        db,
+                        limitHours
+                    );
+                    limitHours--;
+                }
+                return Promise.resolve();
+            }
+        );
+    });
 }
 
 export function createMaintenanceTrackingMessageHash(

@@ -150,7 +150,7 @@ function createUpdateRequestHandlerLambda(
         defaultLambdaConfiguration({
             functionName: lambdaFunctionName,
             code: new lambda.AssetCode("dist/lambda/update-queue"),
-            handler: "lambda-update-queue.handler",
+            handler: "update-queue.handler",
             reservedConcurrentExecutions: 100,
             timeout: 60,
             environment: lambdaEnv,
