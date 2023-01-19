@@ -16,6 +16,7 @@ import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/moni
 import { TrafficType } from "@digitraffic/common/dist/types/traffictype";
 import { ITopic } from "aws-cdk-lib/aws-sns";
 import { Construct } from "constructs";
+import { LambdaEnvironment } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
 
 export function create(
     stack: Stack,
@@ -72,7 +73,7 @@ function createMqttProxyResource(
 
     const assetCode = new AssetCode("dist/lambda/mqtt-proxy-healthcheck");
 
-    const env: any = {};
+    const env: LambdaEnvironment = {};
     env[KEY_APP] = app.toLowerCase();
 
     const lambda = new MonitoredFunction(
@@ -82,7 +83,7 @@ function createMqttProxyResource(
             functionName,
             code: assetCode,
             handler: "lambda-mqtt-proxy-healthcheck.handler",
-            runtime: Runtime.NODEJS_14_X,
+            runtime: Runtime.NODEJS_16_X,
             reservedConcurrentExecutions: 1,
             timeout: Duration.seconds(10),
             memorySize: 128,

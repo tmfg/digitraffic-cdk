@@ -45,7 +45,7 @@ async function getEnabledNodePingChecks(
     nodepingToken: string,
     subaccountId: string
 ): Promise<NodePingCheck[]> {
-    const r = await axios.get(
+    const r = await axios.get<NodePingCheck[]>(
         `${NODEPING_API}/checks?token=${nodepingToken}&customerid=${subaccountId}`,
         {
             timeout: DEFAULT_TIMEOUT_MS,
