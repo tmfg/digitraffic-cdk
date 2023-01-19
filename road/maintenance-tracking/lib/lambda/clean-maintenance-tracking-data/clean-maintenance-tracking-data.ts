@@ -8,7 +8,9 @@ export const handler = () => {
     proxyHolder
         .setCredentials()
         .then(() => {
-            console.info("method=cleanMaintenanceTrackingDataLambda start");
+            console.info(
+                "DEBUG method=cleanMaintenanceTrackingDataLambda start"
+            );
             return cleanMaintenanceTrackingData(26); // Just to be sure 24h history is available
         })
         .finally(() => {
