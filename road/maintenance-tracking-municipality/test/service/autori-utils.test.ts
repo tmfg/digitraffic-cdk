@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { LineString, Point } from "geojson";
 import moment from "moment";
@@ -76,13 +75,38 @@ describe("autori-utils-service-test", () => {
         expect(fixedRoute[0].geography?.features.length).toEqual(1);
         expect(fixedRoute[1].geography?.features.length).toEqual(1);
         expect(
-            (<LineString>fixedRoute[0].geography?.features[0].geometry)
+            (fixedRoute[0].geography?.features[0].geometry as LineString)
                 .coordinates.length
         ).toEqual(10);
         expect(
-            (<LineString>fixedRoute[1].geography?.features[0].geometry)
+            (fixedRoute[1].geography?.features[0].geometry as LineString)
                 .coordinates.length
         ).toEqual(15);
+    });
+
+    test("fixApiRouteData single", () => {
+        const coords1 = createZigZagCoordinates(
+            10,
+            AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M - 10
+        );
+
+        const g1 = createLineString(coords1);
+
+        const route = AutoriTestutils.createApiRouteData(new Date(), [g1]);
+
+        const fixedRoute = AutoriUtils.fixApiRouteDatas([route]);
+        expect(fixedRoute.length).toEqual(1);
+        expect(fixedRoute[0].geography?.features.length).toEqual(1);
+
+        expect(
+            (fixedRoute[0].geography?.features[0].geometry as LineString)
+                .coordinates.length
+        ).toEqual(10);
+    });
+
+    test("fixApiRouteData empty", () => {
+        const fixedRoute = AutoriUtils.fixApiRouteDatas([]);
+        expect(fixedRoute.length).toEqual(0);
     });
 
     test("groupEventsToIndividualGeometries no change", () => {
@@ -94,7 +118,9 @@ describe("autori-utils-service-test", () => {
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
         expect(groups.length).toEqual(1);
-        expect((<LineString>groups[0].geometry).coordinates.length).toEqual(20);
+        expect((groups[0].geometry as LineString).coordinates.length).toEqual(
+            20
+        );
     });
 
     test("groupEventsToIndividualGeometries split when big jump", () => {
@@ -107,8 +133,12 @@ describe("autori-utils-service-test", () => {
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
         expect(groups.length).toEqual(2);
-        expect((<LineString>groups[0].geometry).coordinates.length).toEqual(10);
-        expect((<LineString>groups[1].geometry).coordinates.length).toEqual(8);
+        expect((groups[0].geometry as LineString).coordinates.length).toEqual(
+            10
+        );
+        expect((groups[1].geometry as LineString).coordinates.length).toEqual(
+            8
+        );
     });
 
     test("groupEventsToIndividualGeometries split to point", () => {
@@ -121,9 +151,11 @@ describe("autori-utils-service-test", () => {
 
         const groups = AutoriUtils.groupFeaturesToIndividualGeometries(f);
         expect(groups.length).toEqual(2);
-        expect((<Point>groups[0].geometry).coordinates.length).toEqual(3); // Just point [x,y,z]
+        expect((groups[0].geometry as Point).coordinates.length).toEqual(3); // Just point [x,y,z]
         expect(groups[0].geometry.type).toEqual("Point"); // Just point [x,y]
-        expect((<LineString>groups[1].geometry).coordinates.length).toEqual(17);
+        expect((groups[1].geometry as LineString).coordinates.length).toEqual(
+            17
+        );
     });
 
     test("isOverTimeLimit", () => {
