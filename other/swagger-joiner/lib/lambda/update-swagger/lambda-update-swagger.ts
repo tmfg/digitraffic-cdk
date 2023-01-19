@@ -72,7 +72,6 @@ export const handler = async () => {
     const merged = mergeApiDescriptions(allApis);
 
     delete merged.security; // always https
-    delete merged["x-amazon-apigateway-policy"]; // implementation details
 
     if (host) {
         merged.servers = [{ url: host }];
