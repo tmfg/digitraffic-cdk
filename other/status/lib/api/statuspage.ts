@@ -65,7 +65,7 @@ export class StatuspageApi {
                 statuspageComponents = statuspageComponents.concat(resp.data);
             }
             page++;
-        } while (dataLength > 0);
+        } while (dataLength > 0 && page < 20); // page < 20 just to make sure we don't hang here forever in some error situation
 
         console.log(
             `method=getStatuspageComponents got ${statuspageComponents.length} components`
