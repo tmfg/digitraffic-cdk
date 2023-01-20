@@ -1,12 +1,5 @@
 import { mergeDeepLeft } from "ramda";
-
-export type ApiDescriptions = Record<string, unknown> & {
-    readonly info: {
-        description: string;
-        title: string;
-    };
-    readonly paths: Record<string, Record<string, Record<string, string>>>;
-};
+import { OpenApiSchema } from "./model/openapi-schema";
 
 export function constructSwagger(spec: object) {
     return `
@@ -45,8 +38,8 @@ export function constructSwagger(spec: object) {
         `;
 }
 
-export function mergeApiDescriptions(allApis: object[]): ApiDescriptions {
-    return allApis.reduce((acc, curr) =>
-        mergeDeepLeft(curr, acc)
-    ) as ApiDescriptions;
+export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
+    return allApis.reduce(
+        (acc, curr) => mergeDeepLeft(curr, acc) as OpenApiSchema
+    );
 }
