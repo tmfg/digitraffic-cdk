@@ -1,11 +1,6 @@
 import { IModel, Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
 import { default as DisruptionSchema } from "./model/disruption-schema";
 import {
-    corsMethod,
-    defaultIntegration,
-    methodResponse,
-} from "@digitraffic/common/dist/aws/infra/api/responses";
-import {
     addServiceModel,
     featureSchema,
     geojsonSchema,
@@ -18,7 +13,8 @@ import {
     MonitoredDBFunction,
     MonitoredFunction,
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficIntegrationResponse } from "@digitraffic/common/dist/aws/runtime/digitraffic-integration-response";
+import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
+import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 
@@ -58,15 +54,28 @@ export class PublicApi {
         );
 
         this.createResourcePaths(publicApi);
-        this.createDisruptionsResource(publicApi, disruptionsModel, stack);
+        const disruptionsLambda = this.createDisruptionsResource(
+            publicApi,
+            disruptionsModel,
+            stack
+        );
+
+        const sunsetDate = "2023-06-01";
+        this.createOldDisruptionsResource(
+            publicApi,
+            disruptionsModel,
+            stack,
+            disruptionsLambda,
+            sunsetDate
+        );
 
         publicApi.documentResource(
             this.oldDisruptionsResource,
             DocumentationPart.method(
                 ["bridge-lock-disruptions"],
                 "getDisruptions",
-                ""
-            ).deprecated("Deprecated. Will be removed after 2023-06-01.")
+                "Return all waterway traffic disruptions"
+            ).deprecated(`Will be removed after ${sunsetDate}`)
         );
         publicApi.documentResource(
             this.disruptionsResource,
@@ -87,37 +96,61 @@ export class PublicApi {
             stack,
             "get-disruptions"
         );
-        const getDisruptionsIntegration = defaultIntegration(
+        const getDisruptionsIntegration = new DigitrafficIntegration(
             getDisruptionsLambda,
-            {
-                responses: [
-                    DigitrafficIntegrationResponse.ok(
-                        MediaType.APPLICATION_JSON
-                    ),
-                ],
-            }
-        );
+            MediaType.APPLICATION_JSON
+        ).build();
 
         ["GET", "HEAD"].forEach((httpMethod) => {
-            [this.oldDisruptionsResource, this.disruptionsResource].forEach(
-                (resource) => {
-                    resource.addMethod(httpMethod, getDisruptionsIntegration, {
-                        apiKeyRequired: true,
-                        methodResponses: [
-                            corsMethod(
-                                methodResponse(
-                                    "200",
-                                    MediaType.APPLICATION_JSON,
-                                    disruptionsJsonModel
-                                )
-                            ),
-                        ],
-                    });
-                }
-            );
+            [this.disruptionsResource].forEach((resource) => {
+                resource.addMethod(httpMethod, getDisruptionsIntegration, {
+                    apiKeyRequired: true,
+                    methodResponses: [
+                        DigitrafficMethodResponse.response200(
+                            disruptionsJsonModel,
+                            MediaType.APPLICATION_JSON
+                        ),
+                    ],
+                });
+            });
         });
 
         return getDisruptionsLambda;
+    }
+
+    createOldDisruptionsResource(
+        publicApi: RestApi,
+        disruptionsJsonModel: IModel,
+        stack: DigitrafficStack,
+        lambda: MonitoredFunction,
+        sunset: string
+    ) {
+        const getDeprecatedDisruptionsIntegration = new DigitrafficIntegration(
+            lambda,
+            MediaType.APPLICATION_JSON,
+            sunset
+        ).build();
+
+        ["GET", "HEAD"].forEach((httpMethod) => {
+            [this.oldDisruptionsResource].forEach((resource) => {
+                resource.addMethod(
+                    httpMethod,
+                    getDeprecatedDisruptionsIntegration,
+                    {
+                        apiKeyRequired: true,
+                        methodResponses: [
+                            DigitrafficMethodResponse.response(
+                                "200",
+                                disruptionsJsonModel,
+                                MediaType.APPLICATION_JSON,
+                                false,
+                                true
+                            ),
+                        ],
+                    }
+                );
+            });
+        });
     }
 
     createResourcePaths(publicApi: RestApi) {

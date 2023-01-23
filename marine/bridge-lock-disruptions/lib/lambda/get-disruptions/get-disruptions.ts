@@ -4,7 +4,7 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = (): Promise<LambdaResponse<string>> => {
+export const handler = (): Promise<LambdaResponse> => {
     return proxyHolder
         .setCredentials()
         .then(() => findAllDisruptions())
