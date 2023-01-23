@@ -14,7 +14,7 @@ export interface MonitoredEndpoint {
     readonly url: string;
     readonly protocol: EndpointProtocol;
     readonly method?: EndpointHttpMethod;
-    readonly sendData?: any;
+    readonly sendData?: string;
 }
 
 export interface MonitoredApp {

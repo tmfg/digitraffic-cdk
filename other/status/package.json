@@ -13,6 +13,9 @@
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "cdk": "cdk",
+    "cdk-diff-status-prod": "../../scripts/cdk-diff-and-deploy.sh status-prod diff StatusStack",
+    "cdk-deploy-status-prod": "../../scripts/cdk-diff-and-deploy.sh status-prod deploy StatusStack",
+    "cdk-bootstrap-status-prod": "../../scripts/cdk-bootstrap.sh status-prod",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles"
   },

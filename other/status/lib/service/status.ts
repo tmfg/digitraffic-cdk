@@ -28,10 +28,10 @@ export async function getNodePingAndStatuspageComponentStatuses(
     ).filter((sc) => sc.group_id != null); // skip component group components
     const nodePingChecks = await nodePingApi.getNodepingChecks();
 
-    const statuspageCheckMap: { [label: string]: StatuspageComponent } = {};
+    const statuspageCheckMap: Record<string, StatuspageComponent> = {};
     statuspageComponents.forEach((sc) => (statuspageCheckMap[sc.name] = sc));
 
-    const nodePingCheckMap: { [label: string]: NodePingCheck } = {};
+    const nodePingCheckMap: Record<string, NodePingCheck> = {};
     nodePingChecks.forEach(
         (npc) => (nodePingCheckMap[removeApp(npc.label)] = npc)
     );
@@ -120,7 +120,10 @@ async function updateComponentsAndChecksForApp(
     const missingComponents = allEndpoints.filter(
         (e) => !statuspageComponentNames.includes(e)
     );
-    console.log("Missing components", missingComponents);
+    console.log(
+        "method=updateComponentsAndChecksForApp Missing components",
+        missingComponents
+    );
 
     // loop in order to preserve ordering
     for (const component of missingComponents) {
@@ -190,7 +193,7 @@ async function updateComponentsAndChecksForApp(
         await nodePingApi.createNodepingCheck(
             missingCheck,
             [
-                Object.keys(contact.addresses)[0] as string,
+                Object.keys(contact.addresses)[0],
                 secret.nodePingContactIdSlack1,
                 secret.nodePingContactIdSlack2,
             ],
@@ -229,6 +232,9 @@ export async function updateChecks(
     }
 }
 
+/**
+ * Updates checks for apps to NdePing and StatusPage
+ */
 export async function updateComponentsAndChecks(
     apps: MonitoredApp[],
     digitrafficApi: DigitrafficApi,

@@ -8,19 +8,28 @@ interface EndpointResponse {
     paths: string[];
 }
 
+/**
+ * Get endpoints form OpenApi spesification (OpenAPI Specification)
+ */
 export class DigitrafficApi {
     async getAppEndpoints(app: MonitoredApp): Promise<AppEndpoints> {
-        console.log("Fetching digitraffic endpoints");
+        console.log(
+            `method=getAppEndpoints Fetching digitraffic endpoints for ${app.name} from ${app.url}`
+        );
+        // Swagger url
         const resp = await axios.get<EndpointResponse>(app.url, {
             headers: {
                 "accept-encoding": "gzip",
             },
         });
         if (resp.status !== 200) {
-            throw new Error("Unable to fetch contacts");
+            throw new Error(
+                `method=getAppEndpoints Unable to fetch enpoints from ${app.url}`
+            );
         }
-        console.log("..done");
+        console.log(`method=getAppEndpoints done for ${app.name}`);
         const all = Object.keys(resp.data.paths).filter(
+            // Filter all api paths that needs path-parameter
             (p) => !p.includes("{")
         );
         const notBeta = all.filter((e) => !e.includes(BETA));

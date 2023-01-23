@@ -39,6 +39,23 @@ export interface NodePingCheck {
     };
 }
 
+interface NodePingCheckData {
+    customerid: string;
+    token: string;
+    label: string;
+    type: string;
+    target: string;
+    interval: number | undefined;
+    threshold: number | undefined;
+    enabled: boolean;
+    follow: boolean;
+    // sendheaders: { "digitraffic-user": string; "accept-encoding": string };
+    method: EndpointHttpMethod;
+    notifications: any[];
+    postdata?: string;
+    sendheaders: Record<string, string>;
+}
+
 export class NodePingApi {
     private readonly token: string;
     private readonly subAccountId: string;
@@ -58,14 +75,18 @@ export class NodePingApi {
     }
 
     async getNodepingContacts() {
-        console.log("Fetching NodePing contacts with token");
+        console.log(
+            "method=getNodepingContacts Fetching NodePing contacts with token"
+        );
         const resp = await axios.get(
             `${NODEPING_API}/contacts?token=${this.token}&customerid=${this.subAccountId}`
         );
         if (resp.status !== 200) {
-            throw new Error("Unable to fetch contacts");
+            throw new Error(
+                "method=getNodepingContacts Unable to fetch contacts"
+            );
         }
-        console.log("..done");
+        console.log("method=getNodepingContacts done");
         return resp.data;
     }
 
@@ -76,7 +97,10 @@ export class NodePingApi {
         statuspagePageId: string,
         statuspageComponentId: string
     ) {
-        console.log("Creating NodePing contact for endpoint %s", endpoint);
+        console.log(
+            "method=createNodepingContact Creating NodePing contact for endpoint %s",
+            endpoint
+        );
         const resp = await axios.post(`${NODEPING_API}/contacts`, {
             token: this.token,
             customerid: this.subAccountId,
@@ -97,21 +121,24 @@ export class NodePingApi {
             ],
         });
         if (resp.status !== 200) {
-            throw new Error("Unable to create contact");
+            throw new Error(
+                "method=createNodepingContact Unable to create contact " +
+                    endpoint
+            );
         }
-        console.log("..done");
+        console.log("method=createNodepingContact done " + endpoint);
     }
 
     async getNodepingChecks(): Promise<NodePingCheck[]> {
-        console.log("Fetching NodePing checks");
+        console.log("method=getNodepingChecks Fetching NodePing checks");
         const resp = await axios.get(
             `${NODEPING_API}/checks?token=${this.token}&customerid=${this.subAccountId}`
         );
         if (resp.status !== 200) {
-            throw new Error("Unable to fetch checks");
+            throw new Error("method=getNodepingChecks Unable to fetch checks");
         }
-        console.log("..done");
-        return Object.values(resp.data) as NodePingCheck[];
+        console.log("method=getNodepingChecks done");
+        return Object.values(resp.data);
     }
 
     async createNodepingCheck(
@@ -121,13 +148,16 @@ export class NodePingApi {
         appName: string,
         extraData?: MonitoredEndpoint
     ) {
-        console.log("Creating NodePing check for endpoint", endpoint);
+        console.log(
+            "method=createNodepingCheck Creating NodePing check for endpoint",
+            endpoint
+        );
         const notification: any = {};
         contactIds.forEach((contactId) => {
             notification[`${contactId}`] = { delay: 0, schedule: "All" };
         });
         const method = extraData?.method ?? EndpointHttpMethod.HEAD;
-        const data: any = {
+        const data: NodePingCheckData = {
             customerid: this.subAccountId,
             token: this.token,
             label: endpoint.includes(appName)
@@ -158,12 +188,14 @@ export class NodePingApi {
         });
         if (resp.status !== 200 || resp.data.error) {
             console.error(
-                "method=createNodepingCheck Unable to create check",
+                `method=createNodepingCheck Unable to create check for endpoint ${endpoint} with url ${data.target}`,
                 resp.data.error
             );
             throw new Error("Unable to create check");
         }
-        console.log("..done");
+        console.log(
+            `method=createNodepingCheck NodePing check for endpoint ${endpoint} with url ${data.target} done`
+        );
     }
 
     async updateNodepingCheck(
@@ -233,7 +265,6 @@ export class NodePingApi {
                 needsUpdate = true;
             }
 
-            // eslint-disable-next-line no-prototype-builtins
             const digitrafficUser = Object.entries(
                 check.parameters.sendheaders ?? {}
             ).find((e) => e[0].toLowerCase() === "digitraffic-user")?.[1];

@@ -6,7 +6,7 @@ import { SlackApi } from "@digitraffic/common/dist/utils/slack";
 let api: SlackApi;
 
 const NODEPING_API = "https://api.nodeping.com/api/1";
-const STATUSPAGE_URL = process.env.STATUSPAGE_URL as string;
+const STATUSPAGE_URL = process.env.STATUSPAGE_URL!;
 
 // Lambda is intended to be run every minute so the HTTP timeouts for the two HTTP requests should not exceed 1 min
 const DEFAULT_TIMEOUT_MS = 25000;
@@ -125,10 +125,13 @@ async function handleMaintenance(secret: UpdateStatusSecret) {
     }
 }
 
+/**
+ * Checks StatusPage maintenances and disables NodePing checks if maintenance is active
+ */
 export const handler = async () => {
     const secretObj = await smClient
         .getSecretValue({
-            SecretId: process.env.SECRET_ARN as string,
+            SecretId: process.env.SECRET_ARN!,
         })
         .promise();
     if (!secretObj.SecretString) {

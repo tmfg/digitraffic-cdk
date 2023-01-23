@@ -11,13 +11,14 @@ const smClient = new SecretsManager({
     region: process.env.AWS_REGION,
 });
 
-const secretId = process.env[StatusEnvKeys.SECRET_ID] as string;
-const apps = JSON.parse(
-    process.env[StatusEnvKeys.APPS] as string
-) as MonitoredApp[];
+const secretId = process.env[StatusEnvKeys.SECRET_ID]!;
+const apps = JSON.parse(process.env[StatusEnvKeys.APPS]!) as MonitoredApp[];
 const checkTimeout = Number(process.env[StatusEnvKeys.CHECK_TIMEOUT_SECONDS]);
 const checkInterval = Number(process.env[StatusEnvKeys.INTERVAL_MINUTES]);
 
+/**
+ * Updates StatusPage components and NodePing checks
+ */
 export const handler = async (): Promise<any> => {
     const secretObj = await smClient
         .getSecretValue({
