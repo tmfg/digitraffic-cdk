@@ -1,6 +1,10 @@
 import { config as AWSConfig } from "aws-sdk";
 import { AxiosRequestConfig, default as axios } from "axios";
-import { constructSwagger, mergeApiDescriptions } from "../../swagger-utils";
+import {
+    constructSwagger,
+    mergeApiDescriptions,
+    setDeprecatedPerMethod,
+} from "../../swagger-utils";
 import { exportSwaggerApi } from "../../apigw-utils";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import {
@@ -101,6 +105,10 @@ export const handler = async () => {
             }
         }
     }
+
+    // add "deprecated" fields where missing
+    // api gateway drops these fields from exported descriptions
+    setDeprecatedPerMethod(merged);
 
     const swaggerFilename = "dt-swagger.js";
     const swaggerFilenameFinal = directory
