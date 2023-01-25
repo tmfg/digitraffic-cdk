@@ -9,13 +9,11 @@ import { TrackingSaveResult } from "../../model/tracking-save-result";
 import { AutoriUpdate } from "../../service/autori-update";
 import * as CommonUpdate from "../../service/common-update";
 
-const secretId = process.env.SECRET_ID as string;
-const domainName = process.env[
-    MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME
-] as string;
-const domainPrefix = process.env[
-    MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX
-] as string;
+const secretId = process.env.SECRET_ID!;
+const domainName =
+    process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME]!;
+const domainPrefix =
+    process.env[MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX]!;
 
 let autoriUpdateService: AutoriUpdate;
 
@@ -57,6 +55,15 @@ export function handlerFn(
                         } tookMs=${Date.now() - start}`
                     );
                     return savedResult;
+                })
+                .catch((error) => {
+                    console.error(
+                        `method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} failed after ${
+                            Date.now() - start
+                        } ms`,
+                        error
+                    );
+                    throw error;
                 });
         } catch (error) {
             console.error(

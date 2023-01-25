@@ -1,6 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const queryString = require("query-string");
+import queryString from "query-string";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
     ApiContractData,
@@ -42,22 +41,30 @@ export class AutoriApi {
         const serverUrl = `${this.secret.url}/api/${this.secret.productId}/${pathSuffix}`;
 
         console.info(
-            `method=getFromServer.${method} Sending to url ${serverUrl}`
+            `method=AutoriApi.getFromServer.${method} Sending to url ${serverUrl}`
         );
 
         const token: OAuthTokenResponse = await this.getOAuthToken();
 
         try {
-            const resp: AxiosResponse = await axios.get(serverUrl, {
-                // OAuth 2.0 Authorization headers
-                headers: {
-                    accept: MediaType.APPLICATION_JSON,
-                    Authorization: `Bearer ${token.access_token}`,
-                },
-            });
+            const resp: AxiosResponse<T> = await axios
+                .get<T>(serverUrl, {
+                    // OAuth 2.0 Authorization headers
+                    headers: {
+                        accept: MediaType.APPLICATION_JSON,
+                        Authorization: `Bearer ${token.access_token}`,
+                    },
+                })
+                .catch((reason: AxiosError) => {
+                    throw new Error(
+                        `method=AutoriApi.getFromServer.${method} Sending to url ${serverUrl} failed. Error ${
+                            reason.code ? reason.code : ""
+                        } ${reason.message}`
+                    );
+                });
             if (resp.status !== 200) {
                 console.error(
-                    `method=getFromServer.${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`
+                    `method=AutoriApi.getFromServer.${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`
                 );
                 return Promise.reject();
             }
@@ -67,7 +74,7 @@ export class AutoriApi {
                 const axiosError = error as AxiosError;
                 if (axiosError.response) {
                     console.error(
-                        `method=getFromServer.${method} GET failed for ${serverUrl}. Error response code: ${
+                        `method=AutoriApi.getFromServer.${method} GET failed for ${serverUrl}. Error response code: ${
                             axiosError.response.status
                         } and message: ${JSON.stringify(
                             axiosError.response.data
@@ -75,17 +82,17 @@ export class AutoriApi {
                     );
                 } else if (axiosError.request) {
                     console.error(
-                        `method=getFromServer.${method} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`
+                        `method=AutoriApi.getFromServer.${method} GET failed for ${serverUrl} with no response. Error message: ${axiosError.message}`
                     );
                 } else {
                     // Something happened in setting up the request that triggered an Error
                     console.error(
-                        `method=getFromServer.${method} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`
+                        `method=AutoriApi.getFromServer.${method} GET failed for ${serverUrl} while setting up the request. Error message: ${axiosError.message}`
                     );
                 }
             } else {
                 console.error(
-                    `method=getFromServer.${method} GET failed for ${serverUrl} outside axios. Error message: ${JSON.stringify(
+                    `method=AutoriApi.getFromServer.${method} GET failed for ${serverUrl} outside axios. Error message: ${JSON.stringify(
                         error
                     )}`
                 );
@@ -93,7 +100,7 @@ export class AutoriApi {
             return Promise.reject();
         } finally {
             console.debug(
-                `method=getFromServer.${method} tookMs=${
+                `method=AutoriApi.getFromServer.${method} tookMs=${
                     Date.now() - start
                 } for ${serverUrl}`
             );
@@ -128,7 +135,7 @@ export class AutoriApi {
         return this.getRouteDataForContract(contract, from, to).catch(
             (error) => {
                 console.error(
-                    `method=getNextRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
+                    `method=AutoriApi.getNextRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
                         `startTime=${from.toISOString()} endTime=${to.toISOString()} error: ${error}`
                 );
                 throw error;
@@ -158,7 +165,7 @@ export class AutoriApi {
             .then((routeData) => {
                 const end = Date.now();
                 console.debug(
-                    `DEBUG method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
+                    `DEBUG method=AutoriApi.getRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
                         `startTime=${fromString} endTime=${toString} data count=${
                             routeData.length
                         } tookMs=${end - start}`
@@ -167,7 +174,7 @@ export class AutoriApi {
             })
             .catch((error) => {
                 console.error(
-                    `method=getRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
+                    `method=AutoriApi.getRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
                         `startTime=${fromString} endTime=${toString} error: ${error}`
                 );
                 throw error;
@@ -181,25 +188,24 @@ export class AutoriApi {
      * @private
      */
     public getOAuthToken(): Promise<OAuthTokenResponse> {
-        console.log(`method=getOAuthToken`);
+        console.log(`method=AutoriApi.getOAuthToken`);
 
         if (this.isAuthTokenActive()) {
             const expiresInS = Math.floor(
                 (this.oAuthExpires.getTime() - Date.now()) / 1000
             );
             console.info(
-                `DEBUG method=getOAuthToken from cache expires in ${expiresInS} s and calculated limit is ${this.oAuthExpires.toISOString()}`
+                `DEBUG method=AutoriApi.getOAuthToken from cache expires in ${expiresInS} s and calculated limit is ${this.oAuthExpires.toISOString()}`
             );
             return Promise.resolve(this.oAuthResponse);
         }
 
         const postData = {
-            // eslint-disable-next-line camelcase
             client_id: this.secret.oAuthClientId,
             scope: this.secret.oAuthScope,
-            // eslint-disable-next-line camelcase
+
             client_secret: this.secret.oAuthClientSecret,
-            // eslint-disable-next-line camelcase
+
             grant_type: "client_credentials",
         };
 
@@ -223,7 +229,7 @@ export class AutoriApi {
                     O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS;
                 this.oAuthExpires = new Date(oAuthExpiresEpochMs);
                 console.info(
-                    `method=getOAuthToken new token expires in ${
+                    `method=AutoriApi.getOAuthToken new token expires in ${
                         this.oAuthResponse.expires_in
                     } s and calculated limit is ${this.oAuthExpires.toISOString()}`
                 );
@@ -231,7 +237,7 @@ export class AutoriApi {
             })
             .catch((error) => {
                 // This will print i.e. "method=getOAuthToken failed, message: Request failed with status code 400, error: invalid_scope"
-                const msg = `method=getOAuthToken failed, message: ${error.message}, error: ${error.response.data.error}`;
+                const msg = `method=AutoriApi.getOAuthToken failed, message: ${error.message}, error: ${error.response.data.error}`;
                 console.error(msg);
                 throw new Error(msg);
             });
@@ -252,8 +258,8 @@ export class AutoriApi {
     }
 }
 
-type OAuthTokenResponse = {
+interface OAuthTokenResponse {
     readonly token_type: string;
     readonly expires_in: number;
     readonly access_token: string;
-};
+}

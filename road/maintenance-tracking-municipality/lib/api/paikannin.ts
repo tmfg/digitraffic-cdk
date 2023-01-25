@@ -34,12 +34,20 @@ export class PaikanninApi {
         );
 
         try {
-            const resp: AxiosResponse = await axios.get<T>(serverUrl, {
-                headers: {
-                    accept: MediaType.APPLICATION_JSON,
-                    API_KEY: this.apikey,
-                },
-            });
+            const resp: AxiosResponse<T> = await axios
+                .get<T>(serverUrl, {
+                    headers: {
+                        accept: MediaType.APPLICATION_JSON,
+                        API_KEY: this.apikey,
+                    },
+                })
+                .catch((reason: AxiosError) => {
+                    throw new Error(
+                        `method=PaikanninApi.${method} Sending to url ${serverUrl} failed. Error ${
+                            reason.code ? reason.code : ""
+                        } ${reason.message}`
+                    );
+                });
             if (resp.status !== 200) {
                 console.error(
                     `method=PaikanninApi.getFromServer.${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`
