@@ -17,6 +17,7 @@ import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/i
 import { DigitrafficMethodResponse } from "@digitraffic/common/dist/aws/infra/api/response";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
 import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
+import { ApiDeprecations } from "./api-deprecations";
 
 const BRIDGE_LOCK_DISRUPTION_TAGS_V1 = ["Bridge Lock Disruption V1"];
 
@@ -60,13 +61,12 @@ export class PublicApi {
             stack
         );
 
-        const sunsetDate = "2023-06-01";
         this.createOldDisruptionsResource(
             publicApi,
             disruptionsModel,
             stack,
             disruptionsLambda,
-            sunsetDate
+            ApiDeprecations.SUNSET_DATE_2023_06_01
         );
 
         publicApi.documentResource(
@@ -75,7 +75,7 @@ export class PublicApi {
                 ["bridge-lock-disruptions"],
                 "getDisruptions",
                 "Return all waterway traffic disruptions"
-            ).deprecated(`Will be removed after ${sunsetDate}`)
+            ).deprecated(ApiDeprecations.SUNSET_NOTE_2023_06_01)
         );
         publicApi.documentResource(
             this.disruptionsResource,
