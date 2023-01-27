@@ -135,7 +135,7 @@ importers:
 
   marine/bridge-lock-disruptions:
     specifiers:
-      '@digitraffic/common': 2023.01.23-3
+      '@digitraffic/common': 2023.01.26-1
       '@types/aws-lambda': 8.10.108
       '@types/geojson': ^7946.0.7
       '@types/jest': ^29.2.3
@@ -164,7 +164,7 @@ importers:
       wkx: ^0.5.0
       xml2js: ^0.4.23
     dependencies:
-      '@digitraffic/common': 2023.1.23-3_u2kkmhhppoc3ajboejyt4pbl5e
+      '@digitraffic/common': 2023.1.26-1_u2kkmhhppoc3ajboejyt4pbl5e
       '@types/geojson': 7946.0.10
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       aws-sdk: 2.1260.0
@@ -2149,8 +2149,8 @@ packages:
       spex: 3.2.0
     dev: false
 
-  /@digitraffic/common/2023.1.23-3_u2kkmhhppoc3ajboejyt4pbl5e:
-    resolution: {integrity: sha512-p5N+O4uQbPqVz8bLOQlZIOt30Yp/H1TQOy7KOEWFhxf2bDlXXBw99AIVQnp0RuyAx+VStPqbjNxoEqcSe/u5sg==}
+  /@digitraffic/common/2023.1.26-1_u2kkmhhppoc3ajboejyt4pbl5e:
+    resolution: {integrity: sha512-7LX5F6exRE2WZi41P0fjHcEu+5r7a9Qa2YSr7WJE9Wfx4cUVy6CxyoGpg+bHzCoVQIsheN2F1XMnTtw481ypQQ==}
     engines: {node: '>=14 <17'}
     peerDependencies:
       '@aws-cdk/aws-synthetics-alpha': ^2.50.0-alpha.0
