@@ -10,7 +10,7 @@ on:
 
 jobs:
   analyze:
-    if: github.event.repo.name == 'tmfg/digitraffic-cdk'
+    if: github.repository == 'tmfg/digitraffic-cdk'
     name: Analyze
     runs-on: ubuntu-latest
     
