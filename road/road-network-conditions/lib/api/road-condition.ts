@@ -1,7 +1,7 @@
-import axios from 'axios';
-import {Devices, devicesParser} from "../model/devices";
-import {Alarms, alarmsParser} from "../model/alarms";
-import {alarmTypesParser, AlarmTypes} from "../model/alarm-types";
+import axios from "axios";
+import { Devices, devicesParser } from "../model/devices";
+import { Alarms, alarmsParser } from "../model/alarms";
+import { alarmTypesParser, AlarmTypes } from "../model/alarm-types";
 
 export class RoadConditionApi {
     readonly authKey: string;
@@ -14,33 +14,44 @@ export class RoadConditionApi {
 
     private getFromServer<T>(method: string, path: string): Promise<T> {
         const start = Date.now();
-        const serverUrl = `${this.endpointUrl}${path}?authKey=${this.authKey}`;
+        const serverUrl = `${this.endpointUrl}${path}`;
 
         console.info("sending request to " + serverUrl);
 
         return axios
-            .get(serverUrl)
-            .then(response => response.status === 200 ? response.data : Promise.reject(response))
-            .catch(e => {
+            .get(`${serverUrl}?authKey=${this.authKey}`)
+            .then((response) =>
+                response.status === 200
+                    ? response.data
+                    : Promise.reject(response)
+            )
+            .catch((e) => {
                 console.error(`error from ${serverUrl}`);
                 console.error(`method=${method} failed`);
                 return Promise.reject(e);
             })
-            .finally(() => console.info(`method=${method} url=${serverUrl} tookMs=${Date.now() - start}`));
+            .finally(() =>
+                console.info(
+                    `method=${method} url="${serverUrl}" tookMs=${
+                        Date.now() - start
+                    }`
+                )
+            );
     }
 
     getDevices(): Promise<Devices> {
-        return this.getFromServer("GET", "/keli/laitetiedot")
-            .then(devicesParser);
+        return this.getFromServer("GET", "/keli/laitetiedot").then(
+            devicesParser
+        );
     }
 
     getAlarms(): Promise<Alarms> {
-        return this.getFromServer("GET", "/keli/halytykset")
-            .then(alarmsParser);
+        return this.getFromServer("GET", "/keli/halytykset").then(alarmsParser);
     }
 
     getAlarmTypes(): Promise<AlarmTypes> {
-        return this.getFromServer("GET", "/keli/halytystyypit")
-            .then(alarmTypesParser);
+        return this.getFromServer("GET", "/keli/halytystyypit").then(
+            alarmTypesParser
+        );
     }
 }
