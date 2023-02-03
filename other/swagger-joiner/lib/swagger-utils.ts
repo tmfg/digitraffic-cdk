@@ -44,18 +44,32 @@ export function mergeApiDescriptions(allApis: OpenApiSchema[]): OpenApiSchema {
     );
 }
 
-export function setDeprecatedPerMethod(apiDescription: OpenApiSchema) {
-    // set "deprecated: true" for method if text found in method summary
+function methodIsDeprecated(
+    apiDescription: OpenApiSchema,
+    path: string,
+    method: string
+): boolean {
     const deprecationTextMatcher = /(W|w)ill be removed/;
+    const headerMatcher =
+        /(headers.*deprecation.*sunset|headers.*sunset.*deprecation)/i;
+    return (
+        typeof apiDescription.paths[path][method].summary === "string" &&
+        (deprecationTextMatcher.test(
+            apiDescription.paths[path][method].summary as string
+        ) ||
+            headerMatcher.test(
+                JSON.stringify(apiDescription.paths[path][method])
+            ))
+    );
+}
+
+export function setDeprecatedPerMethod(apiDescription: OpenApiSchema) {
     Object.keys(apiDescription.paths).forEach((path) =>
         Object.keys(apiDescription.paths[path]).forEach((method) => {
+            // set deprecated: true if field does not exist and conditions are met
             if (
                 !("deprecated" in apiDescription.paths[path][method]) &&
-                typeof apiDescription.paths[path][method].summary ===
-                    "string" &&
-                deprecationTextMatcher.test(
-                    apiDescription.paths[path][method].summary as string
-                )
+                methodIsDeprecated(apiDescription, path, method)
             ) {
                 apiDescription.paths[path][method].deprecated = true;
             }

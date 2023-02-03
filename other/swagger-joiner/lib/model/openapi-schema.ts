@@ -66,7 +66,7 @@ export const openapiSchema = z
                     .strict()
             )
             .optional(),
-        paths: z.record(z.record(z.record(z.any()))),
+        paths: z.record(z.record(z.record(z.unknown()))),
         components: z
             .object({
                 schemas: z.record(z.any()).optional(),
