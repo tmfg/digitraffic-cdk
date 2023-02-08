@@ -3,7 +3,7 @@ botocore==1.23.42
 Brotli==1.0.9
 cffi==1.15.0
 click==8.0.3
-cryptography==36.0.1
+cryptography==39.0.1
 dash==2.0.0
 dash-bootstrap-components==1.0.2
 dash-core-components==2.0.0
