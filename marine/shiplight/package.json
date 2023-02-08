@@ -12,7 +12,7 @@
     "eslint-report": "eslint . --format html -o report.html",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "test": "jest --detectOpenHandles --forceExit --coverage --coverageDirectory=output/coverage/jest",
+    "test": "jest --detectOpenHandles --forceExit",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
