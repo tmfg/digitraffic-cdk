@@ -13,7 +13,7 @@ import {
 } from "@digitraffic/common/dist/database/models";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
-export const TIMESTAMPS_IN_THE_FUTURE = `NOW() + INTERVAL '3 DAYS'`;
+export const PORTNET_TIMESTAMPS_UPPER_LIMIT = `NOW() + INTERVAL '14 DAYS'`;
 
 const OLD_TIMESTAMP_INTERVAL = "7 days";
 
@@ -127,9 +127,13 @@ const SELECT_BY_LOCODE = `
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
                   END
           ) AND
-    pe.event_time > ${TIMESTAMPS_BEFORE} AND
-    pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
-    (pe.location_locode = $1 OR (pe.location_from_locode = $1 AND pe.event_source = '${EventSource.PILOTWEB}'))
+        pe.event_time > ${TIMESTAMPS_BEFORE} AND
+        CASE WHEN pe.event_source = '${EventSource.PORTNET}'
+            THEN pe.event_time < ${PORTNET_TIMESTAMPS_UPPER_LIMIT}
+            ELSE TRUE
+        END
+        AND
+        (pe.location_locode = $1 OR (pe.location_from_locode = $1 AND pe.event_source = '${EventSource.PILOTWEB}'))
     ORDER by pe.event_time
 `;
 
@@ -217,7 +221,11 @@ const SELECT_BY_MMSI = `
                   END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
-        pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
+        CASE WHEN pe.event_source = '${EventSource.PORTNET}'
+            THEN pe.event_time < ${PORTNET_TIMESTAMPS_UPPER_LIMIT}
+            ELSE TRUE
+        END 
+        AND
         pe.ship_mmsi = $1
     ORDER by pe.event_time
 `;
@@ -253,7 +261,11 @@ const SELECT_BY_IMO = `
                   END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
-        pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
+        CASE WHEN pe.event_source = '${EventSource.PORTNET}'
+            THEN pe.event_time < ${PORTNET_TIMESTAMPS_UPPER_LIMIT}
+            ELSE TRUE
+        END
+        AND
         pe.ship_imo = $1
     ORDER by pe.event_time
 `;
@@ -289,7 +301,11 @@ const SELECT_BY_SOURCE = `
                   END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
-        pe.event_time < ${TIMESTAMPS_IN_THE_FUTURE} AND
+        CASE WHEN pe.event_source = '${EventSource.PORTNET}'
+            THEN pe.event_time < ${PORTNET_TIMESTAMPS_UPPER_LIMIT}
+            ELSE TRUE
+        END
+        AND
         pe.event_source = $1
     ORDER by pe.event_time
 `;
