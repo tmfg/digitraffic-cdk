@@ -61,6 +61,7 @@ bin
 /.idea/workspace.xml
 /.idea/shelf/
 /.vscode/
+.nvmrc
 
 # flyway config for test, prod
 **/test/flyway.conf
