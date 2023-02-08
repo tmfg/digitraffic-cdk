@@ -54,7 +54,7 @@ export function fixApiRouteDatas(
 }
 
 function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
-    if (!routeData?.geography?.features) {
+    if (!routeData.geography?.features) {
         return [];
     }
 
@@ -110,7 +110,7 @@ export function groupFeaturesToIndividualGeometries(
             return [feature];
         }
 
-        const geom = <LineString>feature.geometry;
+        const geom = feature.geometry as LineString;
         const positionGroups: Position[][] = toPositionGroups(
             geom.coordinates.slice()
         );
@@ -243,7 +243,7 @@ export function isExtendingPreviousTracking(
         return false;
     } else if (
         !isFinite(speedInKmH) &&
-        AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M > 50
+        distInM > AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M
     ) {
         // Simplification/saving resolution to db might move location of previous tracking's end point a bit and then when comparing
         // it with next tracking's start point the result is infinity in speed. If point has moved significantly then consider as
@@ -262,7 +262,7 @@ export function getTasksForOperations(
     operations: string[],
     taskMappings: DbDomainTaskMapping[]
 ): string[] {
-    if (operations === undefined) {
+    if (operations.length < 1) {
         return [];
     }
 
@@ -340,8 +340,10 @@ export function createDbWorkMachine(
 ): DbWorkMachine {
     return {
         harjaUrakkaId: createHarjaId(contractId),
-        harjaId: createHarjaId(user + (vehicleType ? vehicleType : "")),
-        type: `domainName: ${domainName} / contractId: ${contractId} / user: ${user} vehicleType: ${vehicleType}`,
+        harjaId: createHarjaId(user + (vehicleType ?? "")),
+        type: `domainName: ${domainName} / contractId: ${contractId} / user: ${user} vehicleType: ${
+            vehicleType ?? ""
+        }`,
     };
 }
 
@@ -349,40 +351,32 @@ export function createDbDomainContracts(
     contracts: ApiContractData[],
     domainName: string
 ): DbDomainContract[] {
-    return contracts.map((contract) =>
-        /* eslint-disable camelcase */
-        ({
-            domain: domainName,
-            contract: contract.id,
-            name: contract.name,
-            start_date: contract.startDate
-                ? CommonDateUtils.dateFromIsoString(contract.startDate)
-                : undefined,
-            end_date: contract.endDate
-                ? CommonDateUtils.dateFromIsoString(contract.endDate)
-                : undefined,
-            data_last_updated: undefined,
-            source: undefined,
-            /* eslint-enable camelcase */
-        })
-    );
+    return contracts.map((contract) => ({
+        domain: domainName,
+        contract: contract.id,
+        name: contract.name,
+        start_date: contract.startDate
+            ? CommonDateUtils.dateFromIsoString(contract.startDate)
+            : undefined,
+        end_date: contract.endDate
+            ? CommonDateUtils.dateFromIsoString(contract.endDate)
+            : undefined,
+        data_last_updated: undefined,
+        source: undefined,
+    }));
 }
 
 export function createDbDomainTaskMappings(
     operations: ApiOperationData[],
     domainName: string
 ): DbDomainTaskMapping[] {
-    return operations.map((operation) =>
-        /* eslint-disable camelcase */
-        ({
-            name: UNKNOWN_TASK_NAME,
-            original_id: operation.id,
-            // TODO original_name: operation.operationName,
-            domain: domainName,
-            ignore: true,
-            /* eslint-enable camelcase */
-        })
-    );
+    return operations.map((operation) => ({
+        name: UNKNOWN_TASK_NAME,
+        original_id: operation.id,
+        // TODO original_name: operation.operationName,
+        domain: domainName,
+        ignore: true,
+    }));
 }
 
 export function createDbMaintenanceTracking(
@@ -398,7 +392,7 @@ export function createDbMaintenanceTracking(
         return null;
     }
 
-    if (!routeData.geography || !routeData.geography.features) {
+    if (!routeData.geography?.features) {
         console.info(
             `method=AutoriUpdate.createDbMaintenanceTracking No geography domain=${
                 contract.domain
@@ -417,22 +411,22 @@ export function createDbMaintenanceTracking(
 
     const f = routeData.geography.features[0];
     let lastPoint: GeoJsonPoint;
-    let lineString: GeoJsonLineString | null = null;
+    let geometry: GeoJsonPoint | GeoJsonLineString;
 
     if (f.geometry.type == "Point") {
         lastPoint = new GeoJsonPoint(f.geometry.coordinates);
+        geometry = lastPoint;
     } else if (f.geometry.type == "LineString") {
         lastPoint = new GeoJsonPoint(
             f.geometry.coordinates[f.geometry.coordinates.length - 1]
         );
-        lineString = new GeoJsonLineString(f.geometry.coordinates);
+        geometry = new GeoJsonLineString(f.geometry.coordinates);
     } else {
         throw new Error(
             `Unsupported geometry type for maintenance tracking ${f.geometry.type}`
         );
     }
 
-    /* eslint-disable camelcase */
     return {
         direction: undefined,
         sending_time: CommonDateUtils.dateFromIsoString(
@@ -441,7 +435,7 @@ export function createDbMaintenanceTracking(
         start_time: CommonDateUtils.dateFromIsoString(routeData.startTime),
         end_time: CommonDateUtils.dateFromIsoString(routeData.endTime),
         last_point: lastPoint,
-        line_string: lineString,
+        geometry: geometry,
         sending_system: contract.domain,
         work_machine_id: workMachineId,
         tasks: harjaTasks,
@@ -450,5 +444,4 @@ export function createDbMaintenanceTracking(
         message_original_id: routeData.id,
         finished: false,
     };
-    /* eslint-enable camelcase */
 }

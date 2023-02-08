@@ -1,11 +1,11 @@
-export const UNKNOWN_TASK_NAME = 'UNKNOWN';
+export const UNKNOWN_TASK_NAME = "UNKNOWN";
 
 export class TrackingSaveResult {
-    saved : number;
-    errors : number;
+    saved: number;
+    errors: number;
     sizeBytes: number;
 
-    static createSaved(sizeBytes: number, saved=1): TrackingSaveResult {
+    static createSaved(sizeBytes: number, saved = 1): TrackingSaveResult {
         return new TrackingSaveResult(sizeBytes, saved, 0);
     }
 
@@ -19,7 +19,7 @@ export class TrackingSaveResult {
         this.sizeBytes = sizeBytes;
     }
 
-    sum(other: TrackingSaveResult): TrackingSaveResult {
+    add(other: TrackingSaveResult): this {
         this.saved += other.saved;
         this.errors += other.errors;
         this.sizeBytes += other.sizeBytes;

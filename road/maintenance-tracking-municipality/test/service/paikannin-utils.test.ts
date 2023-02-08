@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import {
     getRandomInteger,
     randomString,
@@ -372,9 +371,9 @@ describe("paikannin-utils-service-test", () => {
         const result = Utils.calculateSpeedInMS(10, 0);
         expect(result).toEqual(Infinity);
         console.info(
-            `r: ${result} r>0: ${result > 0} r<50: ${
+            `r: ${result} r>0: ${(result > 0).toString()} r<50: ${(
                 result < 50
-            } isFinite(r): ${Number.isFinite(result)}`
+            ).toString()} isFinite(r): ${Number.isFinite(result).toString()}`
         );
 
         expect(Utils.calculateSpeedInMS(10, 1)).toEqual(10);
@@ -500,7 +499,7 @@ function assertContainsEvents(events: ApiWorkevent[], ioChannels: string[]) {
     const ioSet = new Set(ioChannels);
     events.forEach((value) => {
         expect(value.ioChannels).toHaveLength(ioSet.size);
-        value.ioChannels.every((io) => expect(ioSet.has(io.name)).toBe(true));
+        expect(value.ioChannels.every((io) => ioSet.has(io.name))).toBe(true);
     });
 }
 

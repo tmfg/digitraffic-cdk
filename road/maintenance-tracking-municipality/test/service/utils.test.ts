@@ -1,4 +1,5 @@
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
+import { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 import { Position } from "geojson";
 import { DbMaintenanceTracking } from "../../lib/model/db-data";
 import * as Utils from "../../lib/service/utils";
@@ -26,7 +27,7 @@ describe("UtilsTests", () => {
 
     test("countEstimatedSizeOfMessage", () => {
         const message = `{"message":"This is a message"}`;
-        const objectMessage = JSON.parse(message);
+        const objectMessage = JSON.parse(message) as Record<string, unknown>;
         const messageSize = Utils.countEstimatedSizeOfMessage(message);
         const objectMessageSize =
             Utils.countEstimatedSizeOfMessage(objectMessage);
@@ -48,8 +49,12 @@ describe("UtilsTests", () => {
     test("getTrackingStartPoint with line string", () => {
         const mt = createDbMaintenanceTracking(true);
         const start = Utils.getTrackingStartPoint(mt);
-        expect(start[0]).toEqual(mt.line_string?.coordinates[0][0]);
-        expect(start[1]).toEqual(mt.line_string?.coordinates[0][1]);
+        expect(start[0]).toEqual(
+            (mt.geometry as GeoJsonLineString).coordinates[0][0]
+        );
+        expect(start[1]).toEqual(
+            (mt.geometry as GeoJsonLineString).coordinates[0][1]
+        );
     });
 
     test("getTrackingStartPoint without line string", () => {
@@ -64,15 +69,14 @@ function createDbMaintenanceTracking(
     withLineString: boolean
 ): DbMaintenanceTracking {
     return {
-        /* eslint-disable */
         contract: "",
         domain: "",
         end_time: new Date(),
         finished: false,
         last_point: createGeoJSONPoint(END_POINT),
-        line_string: withLineString
+        geometry: withLineString
             ? createLineStringGeometry(getRandomInteger(5, 10), 100)
-            : null,
+            : createGeoJSONPoint(END_POINT),
         message_original_id: "",
         sending_system: "",
         sending_time: new Date(),

@@ -1,6 +1,5 @@
-/* eslint-disable camelcase */
-import { dbTestBase, getDomain, insertDomain, truncate } from "../db-testutil";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { dbTestBase, getDomain, insertDomain, truncate } from "../db-testutil";
 import { DOMAIN_1 } from "../testconstants";
 
 describe(

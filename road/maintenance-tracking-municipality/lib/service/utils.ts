@@ -1,7 +1,7 @@
 import crypto from "crypto";
-import {Position} from "geojson";
-import {DbMaintenanceTracking} from "../model/db-data";
-
+import { Position } from "geojson";
+import { DbMaintenanceTracking } from "../model/db-data";
+import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 
 /**
  * Creates bigint hash value from given string
@@ -10,14 +10,16 @@ import {DbMaintenanceTracking} from "../model/db-data";
 export function createHarjaId(src: string): bigint {
     const hex = crypto.createHash("sha256").update(src).digest("hex");
     // Postgres BigInt is 8 byte signed -> take first 7 1/2 bytes to be safe side for unsigned hex value
-    return BigInt('0x' + hex.substring(0, 15)).valueOf();
+    return BigInt("0x" + hex.substring(0, 15)).valueOf();
 }
 
-export function countEstimatedSizeOfMessage(message: object|string) {
+export function countEstimatedSizeOfMessage(message: string | object): number {
     if (message) {
         try {
             // Just estimate of the size of data
-            return Buffer.byteLength(typeof message === 'string' ? message : JSON.stringify(message));
+            return Buffer.byteLength(
+                typeof message === "string" ? message : JSON.stringify(message)
+            );
         } catch (e) {
             console.error(`method=utils.countEstimatedSizeOfMessage`, e);
         }
@@ -41,15 +43,26 @@ export function calculateSpeedInKmH(distanceM: number, timeS: number): number {
  * @param distanceM dinstance in meters
  * @param timeS time in seconds
  */
-export function calculateSpeedInMS(distanceM :number, timeS: number): number {
+export function calculateSpeedInMS(distanceM: number, timeS: number): number {
     return distanceM / timeS;
 }
 
-export function getTrackingStartPoint(tracking: DbMaintenanceTracking): Position {
-    if (tracking.line_string && tracking.line_string.coordinates.length) {
-        return tracking.line_string.coordinates[0];
+export function getTrackingStartPoint(
+    tracking: DbMaintenanceTracking
+): Position {
+    if (tracking.geometry instanceof GeoJsonPoint) {
+        return tracking.geometry.coordinates;
     }
-    return tracking.last_point.coordinates;
+    return tracking.geometry.coordinates[0];
+}
+
+export function getTrackingEndPoint(tracking: DbMaintenanceTracking): Position {
+    if (tracking.geometry instanceof GeoJsonPoint) {
+        return tracking.geometry.coordinates;
+    }
+    return tracking.geometry.coordinates[
+        tracking.geometry.coordinates.length - 1
+    ];
 }
 
 export function convertSpeedKmHToMS(speedInKmH: number): number {

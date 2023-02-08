@@ -1,5 +1,4 @@
 import axios, { AxiosError, AxiosResponse } from "axios";
-import queryString from "query-string";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import {
     ApiContractData,
@@ -8,7 +7,7 @@ import {
 } from "../model/autori-api-data";
 import { DbDomainContract } from "../model/db-data";
 import { MaintenanceTrackingAutoriSecret } from "../model/maintenance-tracking-municipality-secret";
-
+import { URLSearchParams } from "url";
 export const PATH_SUFFIX_CONTRACTS = "contracts";
 export const PATH_SUFFIX_ROUTE = "route";
 export const PATH_SUFFIX_ROUTE_OPERATIONS = "route/types/operation";
@@ -16,8 +15,7 @@ export const O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS = 3 * 60 * 1000; // 3 minute s
 
 export class AutoriApi {
     private secret: MaintenanceTrackingAutoriSecret;
-    private oAuthResponse: OAuthTokenResponse;
-    private oAuthExpires: Date;
+    private oAuthResponse: OAuthTokenResponse | undefined;
 
     /**
      * @param secret for the domain
@@ -64,7 +62,9 @@ export class AutoriApi {
                 });
             if (resp.status !== 200) {
                 console.error(
-                    `method=AutoriApi.getFromServer.${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`
+                    `method=AutoriApi.getFromServer.${method} returned status=${
+                        resp.status
+                    } data=${JSON.stringify(resp.data)} for ${serverUrl}`
                 );
                 return Promise.reject();
             }
@@ -136,7 +136,8 @@ export class AutoriApi {
             (error) => {
                 console.error(
                     `method=AutoriApi.getNextRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
-                        `startTime=${from.toISOString()} endTime=${to.toISOString()} error: ${error}`
+                        `startTime=${from.toISOString()} endTime=${to.toISOString()}`,
+                    error
                 );
                 throw error;
             }
@@ -175,7 +176,8 @@ export class AutoriApi {
             .catch((error) => {
                 console.error(
                     `method=AutoriApi.getRouteDataForContract domain=${contract.domain} contract=${contract.contract} ` +
-                        `startTime=${fromString} endTime=${toString} error: ${error}`
+                        `startTime=${fromString} endTime=${toString}`,
+                    error
                 );
                 throw error;
             });
@@ -190,12 +192,11 @@ export class AutoriApi {
     public getOAuthToken(): Promise<OAuthTokenResponse> {
         console.log(`method=AutoriApi.getOAuthToken`);
 
-        if (this.isAuthTokenActive()) {
-            const expiresInS = Math.floor(
-                (this.oAuthExpires.getTime() - Date.now()) / 1000
-            );
+        if (this.oAuthResponse?.isActive()) {
             console.info(
-                `DEBUG method=AutoriApi.getOAuthToken from cache expires in ${expiresInS} s and calculated limit is ${this.oAuthExpires.toISOString()}`
+                `DEBUG method=AutoriApi.getOAuthToken from cache expires in ${
+                    this.oAuthResponse.expires_in
+                } s and calculated limit is ${this.oAuthResponse.expires.toISOString()}`
             );
             return Promise.resolve(this.oAuthResponse);
         }
@@ -210,9 +211,9 @@ export class AutoriApi {
         };
 
         return axios
-            .post(
+            .post<Partial<OAuthTokenResponse>>(
                 this.secret.oAuthTokenEndpoint,
-                queryString.stringify(postData),
+                new URLSearchParams(postData).toString(),
                 {
                     headers: {
                         "Content-Type": "application/x-www-form-urlencoded",
@@ -220,46 +221,69 @@ export class AutoriApi {
                 }
             )
             .then((response) => {
-                this.oAuthResponse = response.data as OAuthTokenResponse;
-                // response has expires in seconds -> convert to ms
-                const expiresInMs = this.oAuthResponse.expires_in * 1000;
-                const oAuthExpiresEpochMs =
-                    new Date().getTime() +
-                    expiresInMs -
-                    O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS;
-                this.oAuthExpires = new Date(oAuthExpiresEpochMs);
+                this.oAuthResponse = OAuthTokenResponse.createFromAuthResponse(
+                    response.data
+                );
+                if (this.oAuthResponse === undefined) {
+                    throw new Error("Invalid OAuth token");
+                }
                 console.info(
                     `method=AutoriApi.getOAuthToken new token expires in ${
                         this.oAuthResponse.expires_in
-                    } s and calculated limit is ${this.oAuthExpires.toISOString()}`
+                    } s and calculated limit is ${this.oAuthResponse.expires.toISOString()}`
                 );
                 return this.oAuthResponse;
             })
-            .catch((error) => {
+            .catch((error: AxiosError) => {
                 // This will print i.e. "method=getOAuthToken failed, message: Request failed with status code 400, error: invalid_scope"
-                const msg = `method=AutoriApi.getOAuthToken failed, message: ${error.message}, error: ${error.response.data.error}`;
+                const msg = `method=AutoriApi.getOAuthToken failed, message: ${
+                    error.message
+                }, error: ${JSON.stringify(error.response?.data)}`;
                 console.error(msg);
                 throw new Error(msg);
             });
+    }
+}
+
+class OAuthTokenResponse {
+    readonly token_type: string;
+    readonly expires_in: number;
+    readonly expires: Date;
+    readonly access_token: string;
+
+    constructor(token_type: string, expires_in: number, access_token: string) {
+        this.token_type = token_type;
+        this.expires_in = expires_in;
+        this.access_token = access_token;
+        this.expires = new Date(
+            new Date().getTime() +
+                (expires_in * 1000 - O_AUTH_EXPIRATION_SAFETY_DELTA_IN_MS)
+        );
+    }
+
+    static createFromAuthResponse(
+        partialToken: Partial<OAuthTokenResponse>
+    ): OAuthTokenResponse | undefined {
+        if (
+            partialToken.token_type &&
+            partialToken.expires_in &&
+            partialToken.access_token
+        ) {
+            return new OAuthTokenResponse(
+                partialToken.token_type,
+                partialToken.expires_in,
+                partialToken.access_token
+            );
+        }
+
+        return undefined;
     }
 
     /**
      * Checks if current auth token is still valid.
      * @private
      */
-    private isAuthTokenActive(): boolean {
-        return (
-            this.oAuthResponse !== undefined &&
-            this.oAuthResponse !== null &&
-            this.oAuthExpires !== undefined &&
-            this.oAuthExpires !== null &&
-            this.oAuthExpires.getTime() > Date.now()
-        );
+    isActive() {
+        return this.expires.getTime() > Date.now();
     }
-}
-
-interface OAuthTokenResponse {
-    readonly token_type: string;
-    readonly expires_in: number;
-    readonly access_token: string;
 }

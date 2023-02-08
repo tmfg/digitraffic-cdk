@@ -50,7 +50,9 @@ export class PaikanninApi {
                 });
             if (resp.status !== 200) {
                 console.error(
-                    `method=PaikanninApi.getFromServer.${method} returned status=${resp.status} data=${resp.data} for ${serverUrl}`
+                    `method=PaikanninApi.getFromServer.${method} returned status=${
+                        resp.status
+                    } data=${JSON.stringify(resp.data)} for ${serverUrl}`
                 );
                 return Promise.reject(resp);
             }
@@ -61,7 +63,11 @@ export class PaikanninApi {
                 if (axiosError.response) {
                     console.error(
                         `method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl}. ` +
-                            `Error response code: ${axiosError.response.status} and message: ${axiosError.response.data}`
+                            `Error response code: ${
+                                axiosError.response.status
+                            } and message: ${JSON.stringify(
+                                axiosError.response.data
+                            )}`
                     );
                 } else if (axiosError.request) {
                     console.error(
@@ -77,7 +83,8 @@ export class PaikanninApi {
                 }
             } else {
                 console.error(
-                    `method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl} outside axios. Error message: ${error}`
+                    `method=PaikanninApi.getFromServer.${method} GET failed for ${serverUrl} outside axios.`,
+                    error
                 );
             }
             return Promise.reject();

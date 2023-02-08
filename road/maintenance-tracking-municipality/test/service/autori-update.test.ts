@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import {
     DTDatabase,
     inDatabaseReadonly,
@@ -6,6 +5,7 @@ import {
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
+import { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 import { Position } from "geojson";
 import moment from "moment";
 import * as sinon from "sinon";
@@ -357,16 +357,21 @@ describe(
                 LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED,
                 DOMAIN_1
             );
-            Asserter.assertToBeCloseTo(
-                <number>checked?.getTime(),
-                updateTime,
-                500
-            );
+
+            if (checked) {
+                Asserter.assertToBeCloseTo(checked.getTime(), updateTime, 500);
+            } else {
+                fail("checked was null");
+            }
 
             // Check all coordinates has z value 0.5
+            expect(trackings.length).toBe(2);
             trackings.forEach((value) => {
                 expect(value.last_point.coordinates[2]).toEqual(0.5);
-                value.line_string?.coordinates.forEach((c) => {
+                const coordinates = (value.geometry as GeoJsonLineString)
+                    .coordinates;
+                expect(coordinates.length).toBeGreaterThanOrEqual(1);
+                coordinates.forEach((c) => {
                     expect(c[2]).toEqual(0.5);
                 });
             });
@@ -406,7 +411,9 @@ describe(
 
             expect(trackings.length).toEqual(1);
             // As source linestring is two equal point's -> it's invalid and it should not be saved
-            expect(trackings[0].line_string).toBeNull();
+            expect(trackings[0].geometry).toBeTruthy();
+            expect(trackings[0].geometry).toEqual(trackings[0].last_point);
+
             Asserter.assertToBeCloseTo(
                 trackings[0].last_point.coordinates[0],
                 POINT_START[0],
@@ -487,10 +494,10 @@ describe(
             // TODO Warning:(295, 33) Error: expect(received).toEqual(expected) // deep equality Expected: null Received: 264
             expect(trackings[0].id).toBe(trackings[1].previous_tracking_id);
             expect(trackings[1].id).toBe(trackings[2].previous_tracking_id);
-            expect(trackings[0].line_string?.coordinates?.length).toEqual(10);
-            expect(trackings[1].line_string?.coordinates?.length).toEqual(5);
-            expect(trackings[2].line_string?.coordinates?.length).toEqual(17);
-            expect(trackings[2].line_string?.coordinates?.length).toEqual(17);
+            expect(trackings[0].geometry.coordinates.length).toEqual(10);
+            expect(trackings[1].geometry.coordinates.length).toEqual(5);
+            expect(trackings[2].geometry.coordinates.length).toEqual(17);
+            expect(trackings[2].geometry.coordinates.length).toEqual(17);
         });
 
         function mockGetOperationsApiResponse(response: ApiOperationData[]) {

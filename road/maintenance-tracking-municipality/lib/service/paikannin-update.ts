@@ -3,6 +3,7 @@ import {
     inDatabase,
 } from "@digitraffic/common/dist/database/database";
 import * as Geometry from "@digitraffic/common/dist/utils/geometry";
+import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import { Position } from "geojson";
 import moment from "moment";
@@ -72,7 +73,7 @@ export class PaikanninUpdate {
             (task) => ({
                 name: UNKNOWN_TASK_NAME,
                 domain: domainName,
-                // eslint-disable-next-line camelcase
+
                 original_id: task,
                 ignore: true,
             })
@@ -298,11 +299,11 @@ export class PaikanninUpdate {
                 ) {
                     const nextTracking: DbMaintenanceTracking =
                         maintenanceTrackings[0];
-                    const previousEndPosition: Position = JSON.parse(
-                        latest.last_point
+                    const previousEndPosition = (
+                        JSON.parse(latest.last_point) as GeoJsonPoint
                     ).coordinates;
                     const nextStartPosition: Position =
-                        PaikanninUtils.getStartPosition(nextTracking);
+                        Utils.getTrackingStartPoint(nextTracking);
                     if (
                         PaikanninUtils.isExtendingPreviousTracking(
                             previousEndPosition,
@@ -341,7 +342,6 @@ export class PaikanninUpdate {
                                 nextTracking.tasks
                             )
                         ) {
-                            // eslint-disable-next-line camelcase
                             nextTracking.previous_tracking_id = latest.id;
                         }
                     } else {

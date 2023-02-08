@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import {
     dbTestBase,
     findAllTrackings,
@@ -70,6 +69,7 @@ describe(
                     startTime,
                     endTimeOlder,
                     TASKS,
+                    lastPoint,
                     lastPoint
                 );
             const tracking: DbMaintenanceTracking =
@@ -79,6 +79,7 @@ describe(
                     startTime,
                     endTime,
                     TASKS,
+                    lastPoint,
                     lastPoint
                 );
 
@@ -114,6 +115,7 @@ describe(
                     startTime,
                     endTimeOlder,
                     TASKS,
+                    lastPoint,
                     lastPoint
                 );
             const trackingFinished: DbMaintenanceTracking =
@@ -123,6 +125,7 @@ describe(
                     startTime,
                     endTime,
                     TASKS,
+                    lastPoint,
                     lastPoint
                 );
             trackingFinished.finished = true;
@@ -157,6 +160,7 @@ describe(
                     startTime,
                     endTime,
                     TASKS,
+                    lastPoint,
                     lastPoint
                 );
             trackingFinished.finished = true;
@@ -185,6 +189,7 @@ describe(
                     TestUtils.dateInPastMinutes(5),
                     TestUtils.dateInPastMinutes(1),
                     TASKS,
+                    TestUtils.createGeoJSONPoint(POINT_START),
                     TestUtils.createGeoJSONPoint(POINT_START)
                 );
             const tracking2: DbMaintenanceTracking =
@@ -194,6 +199,7 @@ describe(
                     TestUtils.dateInPastMinutes(5),
                     TestUtils.dateInPastMinutes(1),
                     TASKS,
+                    TestUtils.createGeoJSONPoint(POINT_START),
                     TestUtils.createGeoJSONPoint(POINT_START)
                 );
             const finishedId = await db.tx(async (tx) => {
@@ -201,7 +207,7 @@ describe(
                     tracking1,
                     tracking2,
                 ]);
-                DataDb.markMaintenanceTrackingFinished(tx, ids[0].id);
+                await DataDb.markMaintenanceTrackingFinished(tx, ids[0].id);
                 return ids[0].id;
             });
 

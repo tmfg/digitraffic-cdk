@@ -35,15 +35,17 @@ export function filterEventsWithoutTasks(
                 deviceId: device.deviceId,
                 deviceName: device.deviceName,
                 workEvents: device.workEvents.filter((we) => {
+                    const operations =
+                        we.ioChannels.length > 0
+                            ? JSON.stringify(we.ioChannels)
+                            : undefined;
                     const result = hasValidOperations(
                         we.ioChannels,
                         taskMappings
                     );
-                    if (!result) {
+                    if (operations && !result) {
                         console.info(
-                            `method=PaikanninUtils.filterEventsWithoutTasks ${JSON.stringify(
-                                we.ioChannels
-                            )}`
+                            `method=PaikanninUtils.filterEventsWithoutTasks ${operations}`
                         );
                     }
                     return result;
@@ -102,10 +104,7 @@ function toEventGroups(
     }
 
     // If element is older than allowed throw it away
-    if (
-        filterBeforeOrEquaTime &&
-        nextEvent.timestamp.getTime() <= filterBeforeOrEquaTime.getTime()
-    ) {
+    if (nextEvent.timestamp.getTime() <= filterBeforeOrEquaTime.getTime()) {
         return toEventGroups(
             sourceEvents,
             filterBeforeOrEquaTime,
@@ -329,17 +328,10 @@ export function isExtendingPreviousTracking(
 }
 
 function getDebugForSameTasks(sameTasksForDebug?: boolean): string {
-    if (sameTasksForDebug === undefined || sameTasksForDebug === null) {
+    if (sameTasksForDebug === undefined) {
         return "";
     }
-    return `sameTasks: ${sameTasksForDebug}`;
-}
-
-export function getStartPosition(mt: DbMaintenanceTracking): Position {
-    if (mt.line_string && mt.line_string.coordinates.length > 0) {
-        return mt.line_string.coordinates[0];
-    }
-    return mt.last_point.coordinates;
+    return `sameTasks: ${sameTasksForDebug.toString()}`;
 }
 
 export function createDbWorkMachine(
@@ -386,7 +378,7 @@ export function getTasksForOperations(
     operations: ApiWorkeventIoDevice[],
     taskMappings: DbDomainTaskMapping[]
 ): string[] {
-    if (!operations) {
+    if (operations.length < 1) {
         return [];
     }
 
@@ -420,8 +412,8 @@ export function hasValidOperations(
 
 export function createLineStringFromEvents(
     events: ApiWorkevent[]
-): GeoJsonLineString | null {
-    if (!events || events.length < 2) {
+): GeoJsonPoint | GeoJsonLineString | null {
+    if (events.length < 1) {
         return null;
     }
     const lineStringCoordinates: Position[] = events.reduce(
@@ -449,7 +441,9 @@ export function createLineStringFromEvents(
         []
     );
 
-    if (lineStringCoordinates.length > 1) {
+    if (lineStringCoordinates.length == 1) {
+        return new GeoJsonPoint(lineStringCoordinates[0]);
+    } else if (lineStringCoordinates.length > 1) {
         return new GeoJsonLineString(lineStringCoordinates);
     }
     return null;
@@ -477,16 +471,19 @@ export function createDbMaintenanceTracking(
         lastEvent.lat,
         lastEvent.altitude,
     ]);
-    const lineString = createLineStringFromEvents(events);
-
+    const geometry: GeoJsonLineString | GeoJsonPoint | null =
+        createLineStringFromEvents(events);
+    if (!geometry) {
+        return null;
+    }
     return {
         // direction: 0,
-        /* eslint-disable camelcase */
+
         sending_time: lastEvent.timestamp,
         start_time: firstEvent.timestamp,
         end_time: lastEvent.timestamp,
         last_point: lastPoint,
-        line_string: lineString,
+        geometry: geometry,
         direction: lastEvent.heading,
         sending_system: contract.domain,
         work_machine_id: workMachineId,
@@ -497,6 +494,5 @@ export function createDbMaintenanceTracking(
         finished: true,
         // This is additional meta data, not saved to eb but used to update previous tracking
         start_direction: lastEvent.heading,
-        /* eslint-enable camelcase */
     };
 }

@@ -1,5 +1,6 @@
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { LineString, Point } from "geojson";
+import { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 import moment from "moment";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
@@ -325,12 +326,12 @@ describe("autori-utils-service-test", () => {
             );
 
         // Expect all geometries to be found
-        expect(tracking?.line_string?.coordinates.length).toEqual(
-            geometry.coordinates.length
-        ); // same as geometries count
+        expect(
+            (tracking?.geometry as GeoJsonLineString).coordinates.length
+        ).toEqual(geometry.coordinates.length); // same as geometries count
 
-        const ls = tracking?.line_string;
-        expect(ls?.coordinates[0][1]).toEqual(geometry.coordinates[0][1]);
+        const ls = tracking?.geometry as GeoJsonLineString;
+        expect(ls.coordinates[0][1]).toEqual(geometry.coordinates[0][1]);
         console.info(`Found ${JSON.stringify(ls)}`);
         expect(tracking?.start_time).toEqual(
             AutoriTestutils.createTrackingStartTimeFromUpdatedTime(now)

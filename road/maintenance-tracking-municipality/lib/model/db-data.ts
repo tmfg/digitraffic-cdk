@@ -1,7 +1,7 @@
 // eslint-disable camelcase
 import {
-    GeoJsonLineString,
     GeoJsonPoint,
+    GeoJsonLineString,
 } from "@digitraffic/common/dist/utils/geojson-types";
 
 export interface DbWorkMachine {
@@ -15,7 +15,7 @@ export interface DbMaintenanceTracking {
     readonly sending_system: string;
     readonly sending_time: Date;
     readonly last_point: GeoJsonPoint;
-    line_string: GeoJsonLineString | null;
+    geometry: GeoJsonPoint | GeoJsonLineString;
     readonly work_machine_id: number;
     start_time: Date;
     readonly end_time: Date;

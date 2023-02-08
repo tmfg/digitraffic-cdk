@@ -170,7 +170,7 @@ export function findAllTrackings(
             .manyOrNone(
                 `
                 select id, previous_tracking_id, sending_system, sending_time, 
-                       ST_AsGeoJSON(last_point::geometry)::json as last_point, ST_AsGeoJSON(line_string::geometry)::json as line_string, 
+                       ST_AsGeoJSON(last_point::geometry)::json as last_point, ST_AsGeoJSON(geometry::geometry)::json as geometry, 
                        work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id,
                        ARRAY_AGG(task.task) AS tasks
                 from maintenance_tracking tracking
@@ -180,7 +180,7 @@ export function findAllTrackings(
                 order by tracking.end_time`,
                 [domainName]
             )
-            .then((value) => {
+            .then((value: DbMaintenanceTracking[]) => {
                 return value;
             });
     });

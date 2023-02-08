@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import {
     getRandomInteger,
     getRandomNumber,
@@ -53,7 +52,7 @@ export function createDbMaintenanceTracking(
     endTime: Date,
     harjaTasks: string[],
     lastPoint: GeoJsonPoint,
-    lineString?: GeoJsonLineString
+    geometry: GeoJsonPoint | GeoJsonLineString
 ): DbMaintenanceTracking {
     return {
         direction: 0,
@@ -61,7 +60,7 @@ export function createDbMaintenanceTracking(
         start_time: startTime,
         end_time: endTime,
         last_point: lastPoint,
-        line_string: lineString ? lineString : null,
+        geometry: geometry,
         sending_system: contract.domain,
         work_machine_id: workMachineId,
         tasks: harjaTasks,
@@ -104,7 +103,7 @@ export function createZigZagCoordinates(
     const yAddition = KM_IN_Y * distInXyKm;
     const x = getRandomNumber(X_MIN, X_MAX);
     const y = getRandomNumber(Y_MIN, Y_MAX);
-    return [...Array(coordinateCount).keys()].map((i, index) => {
+    return Array.from({ length: coordinateCount }).map((i, index) => {
         const even: boolean = index % 2 == 0;
         // Make linestring to go zigzag, so it wont be simplified
         const nextX = x + index * xAddition;
@@ -120,7 +119,7 @@ export function createZigZagCoordinates(
 export function createLineStringGeometry(
     coordinateCount: number,
     distBetweenPointsM = 100
-): LineString {
+): GeoJsonLineString {
     const coordinates: Position[] = createZigZagCoordinates(
         coordinateCount,
         distBetweenPointsM
@@ -137,7 +136,7 @@ export function createLineStringGeometries(
     });
 }
 
-export function createLineString(coordinates: Position[]): LineString {
+export function createLineString(coordinates: Position[]): GeoJsonLineString {
     return {
         type: "LineString",
         coordinates: coordinates,
@@ -187,7 +186,7 @@ export function createApiRouteDataForEveryMinute(
             lat: position[1],
             speed: 10,
             altitude: position[2],
-            deviceName: "" + deviceId,
+            deviceName: deviceId.toString(),
             timest: timeMoment.toISOString(),
             ioChannels: cloneDeep(operations),
             timestamp: timeMoment.toDate(),
@@ -196,7 +195,7 @@ export function createApiRouteDataForEveryMinute(
 
     return {
         deviceId: deviceId,
-        deviceName: "" + deviceId,
+        deviceName: deviceId.toString(),
         workEvents: events,
     };
 }

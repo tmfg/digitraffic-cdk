@@ -6,6 +6,7 @@ import {
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import { Position } from "geojson";
+import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import moment from "moment";
 import { AutoriApi } from "../api/autori";
 import * as DataDb from "../dao/data";
@@ -45,16 +46,18 @@ export class AutoriUpdate {
         const dbContracts: DbDomainContract[] =
             AutoriUtils.createDbDomainContracts(apiContracts, domainName);
 
-        const dbIds: DbTextId[] = await inDatabase((db: DTDatabase) => {
-            return DataDb.upsertContracts(db, dbContracts);
-        });
+        const dbIds: (DbTextId | null)[] = await inDatabase(
+            (db: DTDatabase) => {
+                return DataDb.upsertContracts(db, dbContracts);
+            }
+        );
         console.info(
             `method=AutoriUpdate.updateContracts domain=${domainName} Insert return value: ${JSON.stringify(
                 dbIds
             )}`
         );
         // Returns array [{"id":89},null,null,{"id":90}] -> nulls are conflicting ones not inserted
-        return dbIds.filter((id) => id != null).length;
+        return dbIds.filter((dbId) => dbId?.id != null).length;
     }
 
     /**
@@ -68,16 +71,18 @@ export class AutoriUpdate {
         const taskMappings: DbDomainTaskMapping[] =
             AutoriUtils.createDbDomainTaskMappings(apiOperations, domainName);
 
-        const dbIds: DbTextId[] = await inDatabase((db: DTDatabase) => {
-            return DataDb.upsertTaskMappings(db, taskMappings);
-        });
+        const dbIds: (DbTextId | null)[] = await inDatabase(
+            (db: DTDatabase) => {
+                return DataDb.upsertTaskMappings(db, taskMappings);
+            }
+        );
         console.info(
             `method=AutoriUpdate.updateTasks domain=${domainName} Insert return value: ${JSON.stringify(
                 dbIds
             )}`
         );
         // Returns array [{"original_id":89},null,null,{"original_id":90}] -> nulls are conflicting ones not inserted
-        return dbIds.filter((dbId) => dbId && dbId.id != null).length;
+        return dbIds.filter((dbId) => dbId?.id != null).length;
     }
 
     /**
@@ -180,7 +185,8 @@ export class AutoriUpdate {
             )
             .catch((error) => {
                 console.error(
-                    `method=AutoriUpdate.updateContractTrackings Error ${error}`
+                    "method=AutoriUpdate.updateContractTrackings",
+                    error
                 );
                 return TrackingSaveResult.createError(0);
             });
@@ -318,7 +324,7 @@ export class AutoriUpdate {
         if (
             previous &&
             AutoriUtils.isExtendingPreviousTracking(
-                JSON.parse(previous.last_point).coordinates,
+                (JSON.parse(previous.last_point) as GeoJsonPoint).coordinates,
                 trackingStartPosition,
                 previous.end_time,
                 tracking.start_time
@@ -332,7 +338,6 @@ export class AutoriUpdate {
                     tracking.tasks
                 )
             ) {
-                // eslint-disable-next-line camelcase
                 tracking.previous_tracking_id = previous.id;
             }
         }

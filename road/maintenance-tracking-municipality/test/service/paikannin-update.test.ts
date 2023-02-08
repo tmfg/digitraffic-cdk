@@ -1,8 +1,8 @@
-/* eslint-disable camelcase */
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
+import { fail } from "assert";
 import { Position } from "geojson";
 import { getRandompId } from "maintenance-tracking/test/testdata";
 import moment from "moment";
@@ -22,6 +22,10 @@ import {
 } from "../../lib/model/paikannin-api-data";
 import { UNKNOWN_TASK_NAME } from "../../lib/model/tracking-save-result";
 import { PaikanninUpdate } from "../../lib/service/paikannin-update";
+import {
+    getTrackingEndPoint,
+    getTrackingStartPoint,
+} from "../../lib/service/utils";
 import {
     dbTestBase,
     findAllTrackings,
@@ -57,7 +61,7 @@ function createPaikanninUpdateService() {
 describe(
     "paikannin-update-service-test",
     dbTestBase((db: DTDatabase) => {
-        afterEach(async () => {
+        beforeEach(async () => {
             sinon.restore();
             await truncate(db);
         });
@@ -160,10 +164,10 @@ describe(
                     [PAIKANNIN_OPERATION_PAVING]
                 );
 
-            await mockGetWorkEventsApiResponse([route2d]);
+            mockGetWorkEventsApiResponse([route2d]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-            await sinon.restore();
-            await mockGetWorkEventsApiResponse([route1d]);
+            sinon.restore();
+            mockGetWorkEventsApiResponse([route1d]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
             const trackings = await findAllTrackings(db, DOMAIN_1);
@@ -172,19 +176,26 @@ describe(
             expect(trackings[0].end_time).toEqual(past10);
             expect(trackings[1].end_time).toEqual(past0);
 
-            expect(trackings[0].line_string?.coordinates.length).toEqual(10);
-            expect(trackings[1].line_string?.coordinates.length).toEqual(9);
+            expect(trackings[0].geometry.coordinates.length).toEqual(10);
+            expect(trackings[1].geometry.coordinates.length).toEqual(9);
 
             const checked = await LastUpdatedDb.getLastUpdatedWithSubtype(
                 db,
                 LastUpdatedDb.DataType.MAINTENANCE_TRACKING_DATA_CHECKED,
                 DOMAIN_1
             );
-            Asserter.assertToBeCloseTo(
-                <number>checked?.getTime(),
-                past0.getTime(),
-                700
-            );
+
+            expect(checked).toBeTruthy();
+
+            if (checked) {
+                Asserter.assertToBeCloseTo(
+                    checked.getTime(),
+                    past0.getTime(),
+                    700
+                );
+            } else {
+                fail("checked was null");
+            }
         });
 
         test("updateTrackings invalid linestring", async () => {
@@ -217,14 +228,16 @@ describe(
                 [PAIKANNIN_OPERATION_BRUSHING]
             );
 
-            await mockGetWorkEventsApiResponse([route]);
+            mockGetWorkEventsApiResponse([route]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
             const trackings = await findAllTrackings(db, DOMAIN_1);
 
             expect(trackings.length).toEqual(1);
-            // As source linestring is two equal point's -> it's invalid and it should not be saved
-            expect(trackings[0].line_string).toBeNull();
+            // As source linestring is two equal point's -> it's invalid and it should be saved as point
+            expect(trackings[0].geometry).toBeTruthy();
+            expect(trackings[0].geometry).toEqual(trackings[0].last_point);
+
             Asserter.assertToBeCloseTo(
                 trackings[0].last_point.coordinates[0],
                 POINT_START[0],
@@ -270,9 +283,9 @@ describe(
                 [PAIKANNIN_OPERATION_BRUSHING]
             );
 
-            await mockGetWorkEventsApiResponse([route]);
+            mockGetWorkEventsApiResponse([route]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-            await sinon.restore();
+            sinon.restore();
 
             const trackings = await findAllTrackings(db, DOMAIN_1);
 
@@ -282,8 +295,8 @@ describe(
             );
             expect(trackings[1].end_time).toEqual(end);
 
-            expect(trackings[0].line_string?.coordinates.length).toEqual(10);
-            expect(trackings[1].line_string?.coordinates.length).toEqual(10);
+            expect(trackings[0].geometry.coordinates.length).toEqual(10);
+            expect(trackings[1].geometry.coordinates.length).toEqual(10);
         });
 
         test("updateTrackings and continue previous", async () => {
@@ -325,10 +338,10 @@ describe(
                 [PAIKANNIN_OPERATION_BRUSHING]
             );
 
-            await mockGetWorkEventsApiResponse([route1]);
+            mockGetWorkEventsApiResponse([route1]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
-            await sinon.restore();
-            await mockGetWorkEventsApiResponse([route2]);
+            sinon.restore();
+            mockGetWorkEventsApiResponse([route2]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
             const trackings: DbMaintenanceTracking[] = await findAllTrackings(
@@ -344,21 +357,19 @@ describe(
             expect(trackings[0].id).toEqual(trackings[1].previous_tracking_id);
 
             const prevEnd: Position = trackings[0].last_point.coordinates;
-            const prevLineStringEnd: Position | undefined =
-                trackings[0].line_string?.coordinates[
-                    trackings[0].line_string?.coordinates.length - 1
-                ];
-            const nextStart: Position | undefined =
-                trackings[1].line_string?.coordinates[0];
+            const prevLineStringEnd: Position = getTrackingEndPoint(
+                trackings[0]
+            );
+            const nextStart: Position = getTrackingStartPoint(trackings[1]);
 
             // Check marked end poind is same as next start as it's extending previous one
-            expect(prevEnd[0]).toEqual(nextStart?.[0]);
-            expect(prevEnd[1]).toEqual(nextStart?.[1]);
-            expect(prevEnd[2]).toEqual(nextStart?.[2]);
+            expect(prevEnd[0]).toEqual(nextStart[0]);
+            expect(prevEnd[1]).toEqual(nextStart[1]);
+            expect(prevEnd[2]).toEqual(nextStart[2]);
             // Check that linestring end poind is also the same as next start
-            expect(prevLineStringEnd?.[0]).toEqual(nextStart?.[0]);
-            expect(prevLineStringEnd?.[1]).toEqual(nextStart?.[1]);
-            expect(prevLineStringEnd?.[2]).toEqual(nextStart?.[2]);
+            expect(prevLineStringEnd[0]).toEqual(nextStart[0]);
+            expect(prevLineStringEnd[1]).toEqual(nextStart[1]);
+            expect(prevLineStringEnd[2]).toEqual(nextStart[2]);
         });
 
         function mockGetDevicesApiResponse(response: ApiDevice[]) {
