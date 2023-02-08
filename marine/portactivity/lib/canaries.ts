@@ -75,7 +75,7 @@ export class Canaries {
                 },
             });
 
-            new DatabaseCanary(stack, urlRole, secret, {
+            new DatabaseCanary(stack, dbRole, secret, {
                 name: "pa",
                 secret: stack.configuration.secretId,
                 handler: "db.handler",
