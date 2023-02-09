@@ -8,6 +8,8 @@ from dash import dash_table
 from dash.dependencies import Input, Output
 import dash_bootstrap_components as dbc
 
+from datetime import timedelta
+
 import digitraffic_figures.data as data
 import digitraffic_figures.figures as fig
 
@@ -276,9 +278,9 @@ def create_layout(dash_app, df, figures, logger):
                         id='input-all-time-date-picker-range',
                         min_date_allowed=df['from'].min(),
                         max_date_allowed=df['from'].max(),
-                        initial_visible_month=df['from'].min(),
+                        initial_visible_month=df['from'].max() - timedelta(days=365),
                         display_format='DD.MM.YYYY',
-                        start_date=df['from'].min(),
+                        start_date=df['from'].max() - timedelta(days=365),
                         end_date=df['from'].max(),
                     )
                 ])

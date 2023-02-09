@@ -289,8 +289,9 @@ class Figures:
         # yhdistetään kokonaismäärä ja tunnistamattomat sekä lasketaan tunnistettujen määrä (kaikki - tunnistamattomat)
         dff = pd.concat([user_data, all_requests], axis=1)
         dff['identified'] = dff['all'] - dff['unidentified']
+        dff['identified_percentage'] = dff['identified'] / dff['all'] * 100
         dff = dff.dropna()
-        dff['change_in_time'] = dff['identified'].pct_change().apply(lambda x: round(x * 100, 2))  # Muutos edelliseen
+        dff['change_in_time'] = dff['identified_percentage'].diff().apply(lambda x: round(x, 2)) # Muutos edelliseen
 
         # haetaan viimeisimmän kuukauden tiedot piirakkaa varten
         data = dff[user_data['aikaleima'] == date].reset_index()[['identified', 'unidentified', 'change_in_time']]
@@ -299,7 +300,7 @@ class Figures:
         data = data.iloc[0].to_dict()
 
         fig = go.Figure(data=[go.Pie(
-            title='Tunnistettujen ja tunnistamattomien osuudet. Muutos: {} %'.format(change_in_time),
+            title='Tunnistettujen ja tunnistamattomien osuudet. Muutos: {prefix}{value} %-yksikköä'.format(prefix="+" if change_in_time >= 0 else "", value=change_in_time),
             labels=['Tunnistetut', 'Tunnistamattomat'],
             values=list(data.values()),
             marker=dict(colors=['#636efa', '#ef553b']),

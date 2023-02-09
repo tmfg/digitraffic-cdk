@@ -5,15 +5,15 @@ import pandas as pd
 import numpy as np
 
 import digitraffic_figures.secret_manager as secret_manager
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, text
 
 TEBI = pow(1024, 4)
 
-SQL_QUERY = """
+SQL_QUERY = text("""
     SELECT *
     FROM key_figures
     WHERE filter IN ('@transport_type:*', '@transport_type:rail', '@transport_type:road', '@transport_type:marine')
-"""
+""")
 
 def transport_type_in_fi(x):
     if x == 'marine':
