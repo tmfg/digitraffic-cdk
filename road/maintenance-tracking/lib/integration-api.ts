@@ -1,16 +1,23 @@
-import { Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
-import * as lambda from "aws-cdk-lib/aws-lambda";
-import {
-    defaultLambdaConfiguration,
-    LambdaEnvironment,
-} from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
+import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { Queue } from "aws-cdk-lib/aws-sqs";
+import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
 import {
     addDefaultValidator,
     addServiceModel,
 } from "@digitraffic/common/dist/utils/api-model";
-import { MonitoredFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import { Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
+import {
+    ManagedPolicy,
+    PolicyStatement,
+    Role,
+    ServicePrincipal,
+} from "aws-cdk-lib/aws-iam";
+import { Queue } from "aws-cdk-lib/aws-sqs";
+import { Construct } from "constructs";
+import { MaintenanceTrackingEnvKeys } from "./keys";
+import { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration";
 
 import {
     createSchemaGeometriaSijainti,
@@ -22,24 +29,12 @@ import {
     Tunniste,
     Viivageometriasijainti,
 } from "./model/maintenance-tracking-schema";
-import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { AppProps } from "./app-props";
-import {
-    ManagedPolicy,
-    PolicyStatement,
-    Role,
-    ServicePrincipal,
-} from "aws-cdk-lib/aws-iam";
-import { MaintenanceTrackingEnvKeys } from "./keys";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import apigateway = require("aws-cdk-lib/aws-apigateway");
-import { Construct } from "constructs";
 
 export function createIntegrationApiAndHandlerLambda(
     queue: Queue,
     sqsExtendedMessageBucketArn: string,
-    props: AppProps,
+    stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
 ) {
     const integrationApi = createRestApi(
@@ -58,7 +53,7 @@ export function createIntegrationApiAndHandlerLambda(
         apiResource,
         queue,
         sqsExtendedMessageBucketArn,
-        props,
+        stackConfiguration,
         stack
     );
     createDefaultUsagePlan(integrationApi, "Maintenance Tracking Integration");
@@ -129,14 +124,12 @@ function createUpdateRequestHandlerLambda(
     requests: apigateway.Resource,
     queue: Queue,
     sqsExtendedMessageBucketArn: string,
-    appProps: AppProps,
+    stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
 ) {
-    const lambdaFunctionName = "MaintenanceTracking-UpdateQueue";
-
-    const lambdaEnv: LambdaEnvironment = {};
+    const lambdaEnv = stack.createLambdaEnvironment();
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] =
-        appProps.sqsMessageBucketName;
+        stackConfiguration.sqsMessageBucketName;
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
 
     const lambdaRole = createLambdaRoleWithWriteToSqsAndS3Policy(
@@ -144,19 +137,17 @@ function createUpdateRequestHandlerLambda(
         queue.queueArn,
         sqsExtendedMessageBucketArn
     );
-    const updateRequestsHandler = MonitoredFunction.create(
+
+    const updateRequestsHandler = MonitoredFunction.createV2(
         stack,
-        lambdaFunctionName,
-        defaultLambdaConfiguration({
-            functionName: lambdaFunctionName,
-            code: new lambda.AssetCode("dist/lambda/update-queue"),
-            handler: "update-queue.handler",
+        "update-queue",
+        lambdaEnv,
+        {
             reservedConcurrentExecutions: 100,
             timeout: 60,
-            environment: lambdaEnv,
             role: lambdaRole,
             memorySize: 256,
-        })
+        }
     );
 
     requests.addMethod(
@@ -169,8 +160,8 @@ function createUpdateRequestHandlerLambda(
     // Create log subscription
     createSubscription(
         updateRequestsHandler,
-        lambdaFunctionName,
-        appProps.logsDestinationArn,
+        updateRequestsHandler.givenName,
+        stackConfiguration.logsDestinationArn,
         stack
     );
 }
@@ -199,6 +190,12 @@ function createLambdaRoleWithWriteToSqsAndS3Policy(
             "service-role/AWSLambdaBasicExecutionRole"
         )
     );
+    lambdaRole.addManagedPolicy(
+        ManagedPolicy.fromAwsManagedPolicyName(
+            "service-role/AWSLambdaVPCAccessExecutionRole"
+        )
+    );
+
     lambdaRole.addToPolicy(sqsPolicyStatement);
     lambdaRole.addToPolicy(s3PolicyStatement);
 

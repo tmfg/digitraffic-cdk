@@ -221,6 +221,45 @@ describe(
             expect(idsAfterCleanup.includes(id6)).toBe(true);
             expect(idsAfterCleanup.includes(id7)).toBe(true);
         });
+
+        test("cleanMaintenanceTrackingData all data is old", async () => {
+            const now = new Date();
+
+            const wMId = await upsertWorkMachine(db);
+            await upsertDomain(db, "state-roads");
+
+            await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 60 * 3 + 1)
+            ); // endTime over 3h -> delete
+            await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 60 * 2 + 1)
+            ); // endTime over 2h -> delete
+            await insertMaintenanceTracking(db, wMId, minusMinutes(now, 70)); // endTime over 1h -> delete
+            const id4 = await insertMaintenanceTracking(
+                db,
+                wMId,
+                minusMinutes(now, 65)
+            ); // endTime over 1h -> Should delete, but needs to leave one tracking/domain -> no delete
+
+            const idsBeforeCleanup = await findAllTrackingIds(db);
+            console.info(
+                `idsBeforeCleanup: ${JSON.stringify(idsBeforeCleanup)}`
+            );
+            expect(idsBeforeCleanup.length).toEqual(4);
+
+            await cleanMaintenanceTrackingData(1);
+
+            const idsAfterCleanup = await findAllTrackingIds(db);
+            console.info(`idsAfterCleanup: ${JSON.stringify(idsAfterCleanup)}`);
+            expect(idsAfterCleanup.length).toEqual(1);
+
+            // Latest tracking should exist
+            expect(idsAfterCleanup.includes(id4)).toBe(true);
+        });
     })
 );
 

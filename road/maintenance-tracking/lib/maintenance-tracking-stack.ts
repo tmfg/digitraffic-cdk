@@ -2,19 +2,23 @@ import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack
 import { Duration } from "aws-cdk-lib";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
-import { AppProps } from "./app-props";
 import * as IntegrationApi from "./integration-api";
 import * as InternalLambdas from "./internal-lambdas";
+import { MaintenanceTrackingStackConfiguration } from "./maintenance-tracking-stack-configuration";
 import * as Sqs from "./sqs";
 
 export class MaintenanceTrackingStack extends DigitrafficStack {
-    constructor(scope: Construct, id: string, appProps: AppProps) {
-        super(scope, id, appProps);
+    constructor(
+        scope: Construct,
+        id: string,
+        stackConfiguration: MaintenanceTrackingStackConfiguration
+    ) {
+        super(scope, id, stackConfiguration);
 
         const queueAndDLQ = Sqs.createQueue(this);
         // Create bucket with internal id DLQBucket, that is not going to AWS and must be unique
         const dlqBucket = new Bucket(this, "DLQBucket", {
-            bucketName: appProps.sqsDlqBucketName,
+            bucketName: stackConfiguration.sqsDlqBucketName,
             blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
         });
 
@@ -24,7 +28,7 @@ export class MaintenanceTrackingStack extends DigitrafficStack {
             "SqsExtendedMessageBucket",
             {
                 blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
-                bucketName: appProps.sqsMessageBucketName,
+                bucketName: stackConfiguration.sqsMessageBucketName,
                 lifecycleRules: [
                     {
                         enabled: true,
@@ -39,7 +43,7 @@ export class MaintenanceTrackingStack extends DigitrafficStack {
         IntegrationApi.createIntegrationApiAndHandlerLambda(
             queueAndDLQ.queue,
             sqsExtendedMessageBucket.bucketArn,
-            appProps,
+            stackConfiguration,
             this
         );
 
@@ -47,7 +51,7 @@ export class MaintenanceTrackingStack extends DigitrafficStack {
             queueAndDLQ,
             dlqBucket,
             sqsExtendedMessageBucket.bucketArn,
-            appProps,
+            stackConfiguration,
             this
         );
 

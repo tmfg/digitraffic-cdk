@@ -1,13 +1,13 @@
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
+import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
 import moment from "moment-timezone";
 import * as sinon from "sinon";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
 import { Havainto, TyokoneenseurannanKirjaus } from "../lib/model/models";
 import { convertToDbObservationData } from "../lib/service/maintenance-tracking";
-import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
     return commonDbTestBase(
@@ -20,22 +20,45 @@ export function dbTestBase(fn: (db: DTDatabase) => void) {
 }
 
 export async function truncate(db: DTDatabase) {
-    await db.tx(async (t) => {
-        return await t.batch([
-            t.none(
-                `DELETE FROM maintenance_tracking_observation_data WHERE created > '2000-01-01T00:00:00Z'`
-            ),
-            t.none(
-                `DELETE FROM maintenance_tracking WHERE created > '2000-01-01T00:00:00Z'`
-            ),
-            t.none(
-                `DELETE FROM maintenance_tracking_work_machine WHERE id >= 0`
-            ),
-            t.none(
-                `DELETE FROM maintenance_tracking_domain WHERE created > '2000-01-01T00:00:00Z'`
-            ),
-        ]);
-    });
+    try {
+        await db.tx(async (t) => {
+            return await t.batch([
+                await t.none(
+                    `DELETE
+                     FROM maintenance_tracking_observation_data
+                     WHERE created > '2000-01-01T00:00:00Z'`
+                ),
+                await t.none(
+                    `DELETE
+                     FROM maintenance_tracking
+                     WHERE created > '2000-01-01T00:00:00Z'`
+                ),
+                await t.none(
+                    `DELETE
+                     FROM maintenance_tracking_work_machine
+                     WHERE id >= 0`
+                ),
+                await t.none(
+                    `DELETE
+                     FROM maintenance_tracking_domain_task_mapping
+                     WHERE created > '2000-01-01T00:00:00Z'`
+                ),
+                await t.none(
+                    `DELETE
+                     FROM maintenance_tracking_domain_contract
+                     WHERE created > '2000-01-01T00:00:00Z'`
+                ),
+                await t.none(
+                    `DELETE
+                     FROM maintenance_tracking_domain
+                     WHERE created > '2000-01-01T00:00:00Z'`
+                ),
+            ]);
+        });
+    } catch (e) {
+        console.error("truncate failed", e);
+        throw e;
+    }
 }
 
 export function findAllObservations(
@@ -93,13 +116,13 @@ const INSERT_SQL = `
             INSERT INTO maintenance_tracking(
                 id, sending_system, sending_time,
                 last_point,
-                line_string,
-                work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id, previous_tracking_id)
+                geometry,
+                work_machine_id, start_time, end_time, direction, finished, domain, contract, message_original_id, previous_tracking_id, created)
             VALUES (
                        NEXTVAL('seq_maintenance_tracking'), $1, $2,
                        ST_Snaptogrid(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($3), ${SRID_WGS84})), ${COORDINATE_PRECISION}),
                        ST_Snaptogrid(ST_Simplify(ST_Force3D(ST_SetSRID(ST_GeomFromGeoJSON($4), ${SRID_WGS84})), 0.00005, true), ${COORDINATE_PRECISION}),
-                       $5, $6, $7, $8, $9, $10, $11, $12, $13)
+                       $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
             RETURNING ID
 `;
 
@@ -125,6 +148,7 @@ export function insertMaintenanceTracking(
                 null, // contract
                 null, // message_original_id
                 previousTrackingId, // previous_tracking_id
+                endTime, // created
             ])
             .then((value) => {
                 return value.id;

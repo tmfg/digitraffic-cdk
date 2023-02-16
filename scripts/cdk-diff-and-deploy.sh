@@ -54,7 +54,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
   echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "pnpm dlx cdk@latest ${OPERATION} ${STACK}"
-  pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug
+  pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=5
 fi
 
 set +x

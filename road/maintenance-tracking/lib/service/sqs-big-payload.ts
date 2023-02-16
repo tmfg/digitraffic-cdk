@@ -1,10 +1,28 @@
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SQS } from "aws-sdk";
 import moment from "moment-timezone";
+import * as R from "ramda";
 import { SqsConsumer, SqsProducer } from "sns-sqs-big-payload";
 import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao";
+import { MaintenanceTrackingEnvKeys } from "../keys";
 import { Havainto, TyokoneenseurannanKirjaus } from "../model/models";
 import * as MaintenanceTrackingService from "./maintenance-tracking";
-import * as R from "ramda";
+
+let sqsConsumerInstance: SqsConsumer | undefined;
+
+/**
+ * @param createNew should call create new instance of use old if it exists
+ */
+export function getSqsConsumerInstance(createNew = false) {
+    if (createNew || !sqsConsumerInstance) {
+        sqsConsumerInstance = createSqsConsumer(
+            getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL),
+            getEnvVariable("AWS_REGION"),
+            "processMaintenanceTrackingQueue"
+        );
+    }
+    return sqsConsumerInstance;
+}
 
 // https://github.com/aspecto-io/sns-sqs-big-payload#sqs-producer
 export function createSqsProducer(
@@ -32,7 +50,7 @@ interface SqsBigMessage {
 }
 
 // See https://github.com/aspecto-io/sns-sqs-big-payload/blob/master/docs/usage-in-lambda.md
-export function createSqsConsumer(
+function createSqsConsumer(
     sqsQueueUrl: string,
     region: string,
     logFunctionName: string

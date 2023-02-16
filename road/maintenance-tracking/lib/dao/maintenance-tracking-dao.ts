@@ -79,7 +79,11 @@ const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new PreparedStatement({
         DELETE
         FROM maintenance_tracking tgt
         WHERE end_time < (now() - $1 * INTERVAL '1 hour')
-          AND NOT EXISTS(SELECT NULL FROM maintenance_tracking t WHERE t.previous_tracking_id = tgt.id);
+          -- Delete only if there is no reference from later tracking to this row
+          AND NOT EXISTS(SELECT NULL FROM maintenance_tracking t WHERE t.previous_tracking_id = tgt.id)
+          -- Delete only, if there is at least one later tracking left to database. We need to leave at least one row/domain
+          -- to get last modified date for REST API
+          AND EXISTS(SELECT NULL FROM maintenance_tracking t WHERE t.domain = tgt.domain AND t.created > tgt.created);
 `,
 });
 
