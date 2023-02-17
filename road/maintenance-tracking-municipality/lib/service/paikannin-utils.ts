@@ -45,7 +45,7 @@ export function filterEventsWithoutTasks(
                     );
                     if (operations && !result) {
                         console.info(
-                            `method=PaikanninUtils.filterEventsWithoutTasks ${operations}`
+                            `DEBUG method=PaikanninUtils.filterEventsWithoutTasks ${operations}`
                         );
                     }
                     return result;
