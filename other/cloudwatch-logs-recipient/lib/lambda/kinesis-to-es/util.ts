@@ -1,26 +1,33 @@
-import {IncomingMessage} from "http";
-import {CloudWatchLogsDecodedData} from "aws-lambda";
+import { IncomingMessage } from "http";
+import { CloudWatchLogsDecodedData } from "aws-lambda";
 
 const nanValue = -1;
 
-export function getIndexName(appName: string, timestampFromEvent: number): string {
+export function getIndexName(
+    appName: string,
+    timestampFromEvent: number
+): string {
     const timestamp = new Date(timestampFromEvent);
 
     // index name format: app-YYYY.MM
     const timePart = [
-        timestamp.getUTCFullYear(),              // year
-        ('0' + (timestamp.getUTCMonth() + 1)).slice(-2),  // month
-    ].join('.');
+        timestamp.getUTCFullYear(), // year
+        ("0" + (timestamp.getUTCMonth() + 1)).slice(-2), // month
+    ].join(".");
 
     return `${appName}-${timePart}`;
 }
 
-export function buildFromMessage(message: string, enableJsonParse: boolean): any {
+export function buildFromMessage(
+    message: string,
+    enableJsonParse: boolean
+): any {
     if (skipElasticLogging(message)) {
         return {};
     }
 
-    const logLine = message.replace('[, ]', '[0.0,0.0]')
+    const logLine = message
+        .replace("[, ]", "[0.0,0.0]")
         .replace(/"Infinity"/gi, "-1")
         .replace(/Infinity/gi, "-1")
         .replace(/"null"/gi, "null");
@@ -52,9 +59,13 @@ function parseJson<T>(message: string): T | null {
         const parsedJson = JSON.parse(jsonSubString);
 
         // upstream_response_time can contain value: "0.008 : 0.132" and that cannot be parsed to float in ES -> sum it as single value
-        if ('@fields' in parsedJson && 'upstream_response_time' in parsedJson['@fields']) {
+        if (
+            "@fields" in parsedJson &&
+            "upstream_response_time" in parsedJson["@fields"]
+        ) {
             // eslint-disable-next-line camelcase
-            parsedJson['@fields'].upstream_response_time = parseUpstreamResponseTime(parsedJson);
+            parsedJson["@fields"].upstream_response_time =
+                parseUpstreamResponseTime(parsedJson);
         }
 
         return parsedJson;
@@ -64,8 +75,11 @@ function parseJson<T>(message: string): T | null {
 }
 
 function parseUpstreamResponseTime(parsedJson: any) {
-    if ( parsedJson['@fields'].upstream_response_time ) {
-        const sum = parsedJson['@fields'].upstream_response_time.split(":").reduce((prev: any, next: any) => prev + (+next), 0).toFixed(3);
+    if (parsedJson["@fields"].upstream_response_time) {
+        const sum = parsedJson["@fields"].upstream_response_time
+            .split(":")
+            .reduce((prev: any, next: any) => prev + +next, 0)
+            .toFixed(3);
         if (sum && !isNaN(+sum)) {
             return parseFloat(sum);
         }
@@ -118,25 +132,25 @@ export function isInfinity(num: number): boolean {
 }
 
 export function getFailedIds(failedItems: ItemStatus[]): string[] {
-    return failedItems.map(f => f.index._id);
+    return failedItems.map((f) => f.index._id);
 }
 
 export function isControlMessage(payload: CloudWatchLogsDecodedData): boolean {
-    return payload.messageType === 'CONTROL_MESSAGE';
+    return payload.messageType === "CONTROL_MESSAGE";
 }
 
 export function filterIds(body: string, ids: string[]): string {
-    const lines = body.split('\n');
+    const lines = body.split("\n");
     let newBody = "";
 
-    for (let i = 0;i < lines.length;i+= 2) {
+    for (let i = 0; i < lines.length; i += 2) {
         const indexLine = lines[i];
-        const logLine = lines[i+1];
+        const logLine = lines[i + 1];
 
         // ends with newline, so one empty line in the end
         if (indexLine.length > 0 && !containsIds(logLine, ids)) {
-            newBody+= indexLine + '\n';
-            newBody+= logLine + '\n';
+            newBody += indexLine + "\n";
+            newBody += logLine + "\n";
         }
     }
 
@@ -158,51 +172,61 @@ export type ItemStatus = {
         status: number;
         _id: string;
     };
-}
+};
 
 export type ESReturnValue = {
     success?: {
-        attemptedItems: number,
-        successfulItems: number
-        failedItems: number,
-    },
-    error?: {
-        statusCode: number,
-        responseBody: string,
-    },
-    failedItems?: ItemStatus[]
-}
-
-export function parseESReturnValue(response: IncomingMessage, responseBody: string): ESReturnValue {
-    const info = JSON.parse(responseBody);
-    let failedItems;
-    let success;
-    let error;
-
-    const statusCode = response.statusCode || -1;
-
-    if (statusCode >= 200 && statusCode < 299) {
-        failedItems = info.items.filter(function(x: ItemStatus) {
-            return x.index.status >= 300;
-        });
-
-        success = {
-            "attemptedItems": info.items.length,
-            "successfulItems": info.items.length - failedItems.length,
-            "failedItems": failedItems.length,
-        };
-    }
-
-    if (statusCode !== 200 || info.errors === true) {
-        error = {
-            "statusCode": statusCode,
-            "responseBody": responseBody,
-        };
-    }
-
-    return {
-        success: success,
-        error: error,
-        failedItems: failedItems,
+        attemptedItems: number;
+        successfulItems: number;
+        failedItems: number;
     };
+    error?: {
+        statusCode: number;
+        responseBody: string;
+    };
+    failedItems?: ItemStatus[];
+};
+
+export function parseESReturnValue(
+    response: IncomingMessage,
+    responseBody: string
+): ESReturnValue {
+    try {
+        const info = JSON.parse(responseBody);
+
+        let failedItems;
+        let success;
+        let error;
+
+        const statusCode = response.statusCode || -1;
+
+        if (statusCode >= 200 && statusCode < 299) {
+            failedItems = info.items.filter(function (x: ItemStatus) {
+                return x.index.status >= 300;
+            });
+
+            success = {
+                attemptedItems: info.items.length,
+                successfulItems: info.items.length - failedItems.length,
+                failedItems: failedItems.length,
+            };
+        }
+
+        if (statusCode !== 200 || info.errors === true) {
+            error = {
+                statusCode: statusCode,
+                responseBody: responseBody,
+            };
+        }
+
+        return {
+            success: success,
+            error: error,
+            failedItems: failedItems,
+        };
+    } catch (error) {
+        console.log("Could not parse " + responseBody);
+        console.log("Error: " + JSON.stringify(error, null, 2));
+        return {};
+    }
 }

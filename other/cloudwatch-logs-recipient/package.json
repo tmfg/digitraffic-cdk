@@ -18,22 +18,21 @@
   },
   "devDependencies": {
     "@types/jest": "^29.2.3",
-    "@types/node": "*",
-    "@types/sinon": "*",
+    "@types/node": "^18.13.0",
+    "@types/sinon": "^10.0.13",
     "esbuild": "*",
     "jest": "^29.3.1",
     "jest-junit": "^15.0.0",
     "parallelshell": "3.0.2",
     "sinon": "*",
     "ts-jest": "^29.0.3",
-    "typescript": "*"
+    "typescript": "4.9.5"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.23-5",
+    "@digitraffic/common": "2023.2.13-1",
     "@types/aws-lambda": "8.10.108",
-    "aws-cdk-lib": "2.51.1",
-    "aws-lambda": "^1.0.6",
-    "aws-sdk": "2.1260.0",
+    "aws-cdk-lib": "2.62.2",
+    "aws-sdk": "^2.1304.0",
     "constructs": "10.1.168",
     "source-map-support": "^0.5.19"
   },
