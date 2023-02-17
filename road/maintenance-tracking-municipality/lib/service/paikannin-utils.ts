@@ -37,7 +37,7 @@ export function filterEventsWithoutTasks(
                 workEvents: device.workEvents.filter((we) => {
                     const operations =
                         we.ioChannels.length > 0
-                            ? JSON.stringify(we.ioChannels)
+                            ? we.ioChannels.map((e) => e.name).toString()
                             : undefined;
                     const result = hasValidOperations(
                         we.ioChannels,
