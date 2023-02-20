@@ -42,7 +42,7 @@ function createUpdateApiDocumentationLambda(stack: DigitrafficStack) {
         logRetention: RetentionDays.ONE_YEAR,
         code: new AssetCode("dist/lambda/update-api-documentation"),
         handler: "lambda-update-api-documentation.handler",
-        runtime: Runtime.NODEJS_14_X,
+        runtime: Runtime.NODEJS_16_X,
         environment: lambdaEnv,
         reservedConcurrentExecutions: 1,
         memorySize: 128,
