@@ -1,8 +1,12 @@
-import {IVersion} from "aws-cdk-lib/aws-lambda";
+import { IVersion } from "aws-cdk-lib/aws-lambda";
 import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
-import {FunctionEventType, LambdaEdgeEventType, LambdaFunctionAssociation} from "aws-cdk-lib/aws-cloudfront";
-import {FunctionType, LambdaType} from "./lambda/lambda-creator";
-import {FunctionAssociation} from "aws-cdk-lib/aws-cloudfront/lib/function";
+import {
+    FunctionEventType,
+    LambdaEdgeEventType,
+    LambdaFunctionAssociation,
+} from "aws-cdk-lib/aws-cloudfront";
+import { FunctionType, LambdaType } from "./lambda/lambda-creator";
+import { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
 
 export class LambdaHolder {
     readonly lambdas: Record<number, IVersion> = {};
@@ -13,7 +17,10 @@ export class LambdaHolder {
         this.lambdas[lambdaType] = version;
     }
 
-    addFunction(functionType: FunctionType, cloudfrontFunction: Cloudfront.Function) {
+    addFunction(
+        functionType: FunctionType,
+        cloudfrontFunction: Cloudfront.Function
+    ) {
         this.functions[functionType] = cloudfrontFunction;
     }
 
@@ -42,16 +49,18 @@ export class LambdaHolder {
         };
     }
 
-    private static getFunctionEventType(functionType: FunctionType): FunctionEventType {
+    private static getFunctionEventType(
+        functionType: FunctionType
+    ): FunctionEventType {
         switch (functionType) {
             case FunctionType.INDEX_HTML:
                 return FunctionEventType.VIEWER_REQUEST;
-            default:
-                throw new Error('Unknown function type ' + functionType);
         }
     }
 
-    private static getLambdaEventType(lambdaType: LambdaType): LambdaEdgeEventType {
+    private static getLambdaEventType(
+        lambdaType: LambdaType
+    ): LambdaEdgeEventType {
         switch (lambdaType) {
             case LambdaType.WEATHERCAM_REDIRECT:
             case LambdaType.IP_RESTRICTION:
@@ -60,8 +69,6 @@ export class LambdaHolder {
             case LambdaType.HTTP_HEADERS:
             case LambdaType.WEATHERCAM_HTTP_HEADERS:
                 return LambdaEdgeEventType.VIEWER_RESPONSE;
-            default:
-                throw new Error('unknown lambdatype ' + lambdaType);
         }
     }
 }

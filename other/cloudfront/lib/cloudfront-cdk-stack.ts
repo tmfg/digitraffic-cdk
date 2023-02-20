@@ -34,13 +34,11 @@ import { createRealtimeLogging, StreamingConfig } from "./streaming-util";
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { LambdaHolder } from "./lambda-holder";
 
-type ViewerPolicyMap = {
-    [key: string]: string;
-};
+type ViewerPolicyMap = Record<string, string>;
 
-type MutablePolicy = {
+interface MutablePolicy {
     viewerProtocolPolicy: string;
-};
+}
 
 export class CloudfrontCdkStack extends Stack {
     constructor(
@@ -188,8 +186,8 @@ export class CloudfrontCdkStack extends Stack {
                     createWeathercamRedirect(
                         this,
                         edgeLambdaRole,
-                        lParameters.weathercamDomainName!,
-                        lParameters.weathercamHostName!
+                        lParameters.weathercamDomainName,
+                        lParameters.weathercamHostName
                     )
                 );
             }
@@ -284,10 +282,10 @@ export class CloudfrontCdkStack extends Stack {
             const distributionConfig =
                 cfnDistribution.distributionConfig as CfnDistribution.DistributionConfigProperty;
             const behaviors =
-                distributionConfig?.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
+                distributionConfig.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
 
             // handle all behaviors
-            behaviors?.forEach((cb: CfnDistribution.CacheBehaviorProperty) => {
+            behaviors.forEach((cb: CfnDistribution.CacheBehaviorProperty) => {
                 this.setViewerPolicy(cb, viewerPolicies, cb.pathPattern);
             });
 
@@ -319,7 +317,7 @@ export class CloudfrontCdkStack extends Stack {
         const policyMap: ViewerPolicyMap = {};
 
         domains.forEach((d) => {
-            d.behaviors?.forEach((b) => {
+            d.behaviors.forEach((b) => {
                 if (b.viewerProtocolPolicy != null) {
                     policyMap[b.path] = b.viewerProtocolPolicy;
                 }

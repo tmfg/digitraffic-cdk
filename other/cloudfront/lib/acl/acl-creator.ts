@@ -1,11 +1,11 @@
-import {CfnWebACL} from 'aws-cdk-lib/aws-wafv2';
-import {IResolvable, Stack} from 'aws-cdk-lib';
-import {WafRules} from "./waf-rules";
+import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
+import { IResolvable, Stack } from "aws-cdk-lib";
+import { WafRules } from "./waf-rules";
 
-const RESPONSEKEY_WITH_DIGITRAFFIC_USER = 'DT_429_KEY_WITH_HEADER';
-const RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER = 'DT_429_KEY_WITHOUT_HEADER';
+const RESPONSEKEY_WITH_DIGITRAFFIC_USER = "DT_429_KEY_WITH_HEADER";
+const RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER = "DT_429_KEY_WITHOUT_HEADER";
 
-const BLOCK_429_WITH_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
+const BLOCK_429_WITH_DIGITRAFFIC_ACTION: CfnWebACL.RuleActionProperty = {
     block: {
         customResponse: {
             responseCode: 429,
@@ -14,7 +14,7 @@ const BLOCK_429_WITH_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
     },
 };
 
-const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
+const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION: CfnWebACL.RuleActionProperty = {
     block: {
         customResponse: {
             responseCode: 429,
@@ -23,26 +23,36 @@ const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION : CfnWebACL.RuleActionProperty = {
     },
 };
 
-type RuleProperty = {
-    action?: CfnWebACL.RuleActionProperty,
-    statement: CfnWebACL.StatementProperty,
+interface RuleProperty {
+    action?: CfnWebACL.RuleActionProperty;
+    statement: CfnWebACL.StatementProperty;
 }
 
-function createRuleProperty(name: string, priority: number, rule: RuleProperty, overrideAction = true): CfnWebACL.RuleProperty {
-    return {...{
-        name,
-        priority,
-        visibilityConfig: {
-            sampledRequestsEnabled: true,
-            cloudWatchMetricsEnabled: true,
-            metricName: name,
+function createRuleProperty(
+    name: string,
+    priority: number,
+    rule: RuleProperty,
+    overrideAction = true
+): CfnWebACL.RuleProperty {
+    return {
+        ...{
+            name,
+            priority,
+            visibilityConfig: {
+                sampledRequestsEnabled: true,
+                cloudWatchMetricsEnabled: true,
+                metricName: name,
+            },
         },
-    }, ...rule, ...(overrideAction ? {overrideAction: {none: {}}} : {})};
+        ...rule,
+        ...(overrideAction ? { overrideAction: { none: {} } } : {}),
+    };
 }
 
-type CustomResponseBodies = {
-    [key: string]: (CfnWebACL.CustomResponseBodyProperty | IResolvable);
-};
+type CustomResponseBodies = Record<
+    string,
+    CfnWebACL.CustomResponseBodyProperty | IResolvable
+>;
 
 function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
     const customResponseBodies: CustomResponseBodies = {};
@@ -50,26 +60,30 @@ function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
     if (rules.withHeaderLimit) {
         customResponseBodies[RESPONSEKEY_WITH_DIGITRAFFIC_USER] = {
             content: `Request rate is limited to ${rules.withHeaderLimit} requests in a 5 minute window.`,
-            contentType: 'TEXT_PLAIN',
+            contentType: "TEXT_PLAIN",
         };
     }
     if (rules.withoutHeaderLimit) {
         customResponseBodies[RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER] = {
             content: `Request rate is limited to ${rules.withoutHeaderLimit} requests in a 5 minute window.`,
-            contentType: 'TEXT_PLAIN',
+            contentType: "TEXT_PLAIN",
         };
     }
 
     return customResponseBodies;
 }
 
-export function createWebAcl(stack: Stack, environment: string, rules: WafRules): CfnWebACL {
+export function createWebAcl(
+    stack: Stack,
+    environment: string,
+    rules: WafRules
+): CfnWebACL {
     const generatedRules = createRules(rules);
     const customResponseBodies = createCustomResponseBodies(rules);
 
     return new CfnWebACL(stack, `DefaultWebAcl-${environment}`, {
-        defaultAction: {allow: {}},
-        scope: 'CLOUDFRONT',
+        defaultAction: { allow: {} },
+        scope: "CLOUDFRONT",
         visibilityConfig: {
             cloudWatchMetricsEnabled: true,
             metricName: "WAF-Blocked",
@@ -92,17 +106,37 @@ function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
     }
 
     if (rules.withHeaderLimit) {
-        generatedRules.push(createRuleProperty("ThrottleRuleWithDigitrafficUser", 1, {
-            action: BLOCK_429_WITH_DIGITRAFFIC_ACTION,
-            statement: createThrottleStatement(rules.withHeaderLimit, true),
-        }, false));
+        generatedRules.push(
+            createRuleProperty(
+                "ThrottleRuleWithDigitrafficUser",
+                1,
+                {
+                    action: BLOCK_429_WITH_DIGITRAFFIC_ACTION,
+                    statement: createThrottleStatement(
+                        rules.withHeaderLimit,
+                        true
+                    ),
+                },
+                false
+            )
+        );
     }
 
     if (rules.withoutHeaderLimit) {
-        generatedRules.push(createRuleProperty("ThrottleRuleWithoutDigitrafficUser", 2, {
-            action: BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION,
-            statement: createThrottleStatement(rules.withoutHeaderLimit, false),
-        }, false));
+        generatedRules.push(
+            createRuleProperty(
+                "ThrottleRuleWithoutDigitrafficUser",
+                2,
+                {
+                    action: BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION,
+                    statement: createThrottleStatement(
+                        rules.withoutHeaderLimit,
+                        false
+                    ),
+                },
+                false
+            )
+        );
     }
 
     return generatedRules;
@@ -114,7 +148,11 @@ function createRuleAWSCommonRuleSet(): CfnWebACL.RuleProperty {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
                 name: "AWSManagedRulesCommonRuleSet",
-                excludedRules: [{name: 'NoUserAgent_HEADER'}, {name: 'SizeRestrictions_BODY'}, {name: 'GenericRFI_BODY'}],
+                excludedRules: [
+                    { name: "NoUserAgent_HEADER" },
+                    { name: "SizeRestrictions_BODY" },
+                    { name: "GenericRFI_BODY" },
+                ],
             },
         },
     });
@@ -153,20 +191,20 @@ function createAWSAntiSQLInjection(): CfnWebACL.RuleProperty {
     });
 }
 
-function createThrottleStatement(limit: number, headerMustBePresent: boolean): CfnWebACL.StatementProperty {
+function createThrottleStatement(
+    limit: number,
+    headerMustBePresent: boolean
+): CfnWebACL.StatementProperty {
     // this statement matches empty digitraffic-user -header
     const matchStatement: CfnWebACL.StatementProperty = {
         sizeConstraintStatement: {
-            comparisonOperator: headerMustBePresent ? 'GT' : 'GE',
+            comparisonOperator: headerMustBePresent ? "GT" : "GE",
             fieldToMatch: {
                 singleHeader: {
                     Name: "digitraffic-user",
                 },
             },
-            textTransformations: [
-                { priority: 0,
-                    type: 'NONE' },
-            ],
+            textTransformations: [{ priority: 0, type: "NONE" }],
             size: 0,
         } as CfnWebACL.SizeConstraintStatementProperty,
     };
@@ -176,14 +214,18 @@ function createThrottleStatement(limit: number, headerMustBePresent: boolean): C
 
     return {
         rateBasedStatement: {
-            aggregateKeyType: 'IP',
+            aggregateKeyType: "IP",
             limit: limit,
-            scopeDownStatement: headerMustBePresent ? matchStatement : notStatement(matchStatement),
+            scopeDownStatement: headerMustBePresent
+                ? matchStatement
+                : notStatement(matchStatement),
         },
     };
 }
 
-function notStatement(statement: CfnWebACL.StatementProperty): CfnWebACL.StatementProperty {
+function notStatement(
+    statement: CfnWebACL.StatementProperty
+): CfnWebACL.StatementProperty {
     return {
         notStatement: {
             statement,

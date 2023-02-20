@@ -1,18 +1,21 @@
 import { FunctionType, LambdaType } from "./lambda/lambda-creator";
-import { CloudFrontAllowedMethods } from "aws-cdk-lib/aws-cloudfront";
+import {
+    CloudFrontAllowedMethods,
+    OriginProtocolPolicy,
+} from "aws-cdk-lib/aws-cloudfront";
 import { WafRules } from "./acl/waf-rules";
 
 export class CFBehavior {
     readonly path: string;
     cacheTtl: number;
-    queryCacheKeys?: string[];
+    queryCacheKeys?: string[]; // this must allow undefined, as it has other meaning than empty array
     allowedMethods: CloudFrontAllowedMethods;
     viewerProtocolPolicy?: string;
     cacheHeaders: string[];
 
     // lambda-configs
-    readonly lambdaTypes: Set<LambdaType> = new Set();
-    readonly functionTypes: Set<FunctionType> = new Set();
+    readonly lambdaTypes: Set<LambdaType> = new Set<LambdaType>();
+    readonly functionTypes: Set<FunctionType> = new Set<FunctionType>();
 
     ipRestriction: string;
 
@@ -43,69 +46,69 @@ export class CFBehavior {
             .allowAllMethods();
     }
 
-    public withCacheTtl(ttl: number): CFBehavior {
+    public withCacheTtl(ttl: number): this {
         this.cacheTtl = ttl;
 
         return this;
     }
 
-    public withQueryCacheKeys(...keys: string[]): CFBehavior {
+    public withQueryCacheKeys(...keys: string[]): this {
         this.queryCacheKeys = keys;
 
         return this;
     }
 
-    public withCacheHeaders(...headers: string[]): CFBehavior {
+    public withCacheHeaders(...headers: string[]): this {
         this.cacheHeaders = headers;
 
         return this;
     }
 
-    public allowHttpAndHttps(): CFBehavior {
+    public allowHttpAndHttps(): this {
         this.viewerProtocolPolicy = "allow-all";
 
         return this;
     }
 
-    public httpsOnly(): CFBehavior {
+    public httpsOnly(): this {
         this.viewerProtocolPolicy = "https-only";
 
         return this;
     }
 
-    public withIpRestrictionLambda(restriction: string): CFBehavior {
+    public withIpRestrictionLambda(restriction: string): this {
         this.ipRestriction = restriction;
 
         return this;
     }
 
-    public withLambda(type: LambdaType): CFBehavior {
+    public withLambda(type: LambdaType): this {
         this.lambdaTypes.add(type);
 
         return this;
     }
 
-    public withFunction(type: FunctionType): CFBehavior {
+    public withFunction(type: FunctionType): this {
         this.functionTypes.add(type);
 
         return this;
     }
 
-    public allowAllMethods(): CFBehavior {
+    public allowAllMethods(): this {
         this.allowedMethods = CloudFrontAllowedMethods.ALL;
 
         return this;
     }
 
-    public withGzipRequirementLambda(): CFBehavior {
+    public withGzipRequirementLambda(): this {
         return this.withLambda(LambdaType.GZIP_REQUIREMENT);
     }
 
-    public withHttpHeadersLambda(): CFBehavior {
+    public withHttpHeadersLambda(): this {
         return this.withLambda(LambdaType.HTTP_HEADERS);
     }
 
-    public withIndexHtmlFunction(): CFBehavior {
+    public withIndexHtmlFunction(): this {
         return this.withFunction(FunctionType.INDEX_HTML);
     }
 }
@@ -121,7 +124,8 @@ export class CFOrigin {
 export class CFDomain extends CFOrigin {
     domainName: string;
     originPath?: string;
-    originProtocolPolicy?: string;
+    originProtocolPolicy: OriginProtocolPolicy =
+        OriginProtocolPolicy.HTTPS_ONLY;
     httpPort?: number;
     httpsPort?: number;
     apiKey?: string;
@@ -162,7 +166,7 @@ export class CFDomain extends CFOrigin {
     static nginx(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
         const domain = new CFDomain(domainName, ...behaviors);
 
-        domain.originProtocolPolicy = "http-only";
+        domain.originProtocolPolicy = OriginProtocolPolicy.HTTP_ONLY;
 
         return domain;
     }
@@ -173,7 +177,7 @@ export class CFDomain extends CFOrigin {
             CFBehavior.passAll("mqtt*").allowHttpAndHttps()
         );
 
-        domain.originProtocolPolicy = "http-only";
+        domain.originProtocolPolicy = OriginProtocolPolicy.HTTP_ONLY;
 
         return domain;
     }
@@ -186,8 +190,8 @@ export class CFDomain extends CFOrigin {
 }
 
 export class S3Domain extends CFOrigin {
-    s3BucketName?: string;
-    originPath?: string;
+    s3BucketName: string;
+    //    originPath?: string;
 
     constructor(s3BucketName: string, ...behaviors: CFBehavior[]) {
         super(behaviors);
@@ -207,40 +211,38 @@ export class S3Domain extends CFOrigin {
     }
 }
 
-export type DistributionProps = {
+export interface DistributionProps {
     readonly originAccessIdentity?: boolean;
     readonly distributionName: string;
     readonly environmentName: string;
-    readonly aliasNames: string[] | null;
+    readonly aliasNames: string[];
     readonly acmCertRef: string | null;
     readonly aclRules?: WafRules;
     readonly origins: CFOrigin[];
     readonly disableShieldAdvanced?: boolean;
-};
+}
 
-export type ElasticProps = {
+export interface ElasticProps {
     readonly streamingProps: StreamingLogProps;
     readonly elasticDomain: string;
     readonly elasticArn: string;
-};
+}
 
-export type StreamingLogProps = {
+export interface StreamingLogProps {
     readonly memorySize?: number;
     readonly batchSize?: number;
     readonly maxBatchingWindow?: number;
-};
+}
 
-export type CFProps = {
+export interface CFProps {
     readonly elasticProps: ElasticProps;
     readonly elasticAppName: string;
     readonly distributions: DistributionProps[];
     readonly lambdaParameters?: CFLambdaParameters;
-};
+}
 
-export type CFLambdaParameters = {
+export interface CFLambdaParameters {
     readonly weathercamDomainName?: string;
     readonly weathercamHostName?: string;
-    readonly ipRestrictions?: {
-        [key: string]: string;
-    };
-};
+    readonly ipRestrictions?: Record<string, string>;
+}
