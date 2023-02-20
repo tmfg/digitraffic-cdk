@@ -21,7 +21,7 @@ export function getIndexName(
 export function buildFromMessage(
     message: string,
     enableJsonParse: boolean
-): any {
+): unknown {
     if (skipElasticLogging(message)) {
         return {};
     }
@@ -159,7 +159,7 @@ export function filterIds(body: string, ids: string[]): string {
 
 function containsIds(line: string, ids: string[]): boolean {
     for (const id of ids) {
-        if (line.indexOf(id) !== -1) {
+        if (line.includes(id)) {
             return true;
         }
     }
@@ -167,14 +167,14 @@ function containsIds(line: string, ids: string[]): boolean {
     return false;
 }
 
-export type ItemStatus = {
+export interface ItemStatus {
     index: {
         status: number;
         _id: string;
     };
-};
+}
 
-export type ESReturnValue = {
+export interface ESReturnValue {
     success?: {
         attemptedItems: number;
         successfulItems: number;
@@ -185,20 +185,25 @@ export type ESReturnValue = {
         responseBody: string;
     };
     failedItems?: ItemStatus[];
-};
+}
+
+interface ESResponse {
+    items: ItemStatus[];
+    errors: boolean;
+}
 
 export function parseESReturnValue(
     response: IncomingMessage,
     responseBody: string
 ): ESReturnValue {
     try {
-        const info = JSON.parse(responseBody);
+        const info = JSON.parse(responseBody) as unknown as ESResponse;
 
         let failedItems;
         let success;
         let error;
 
-        const statusCode = response.statusCode || -1;
+        const statusCode = response.statusCode ?? -1;
 
         if (statusCode >= 200 && statusCode < 299) {
             failedItems = info.items.filter(function (x: ItemStatus) {
@@ -212,7 +217,7 @@ export function parseESReturnValue(
             };
         }
 
-        if (statusCode !== 200 || info.errors === true) {
+        if (statusCode !== 200 || info.errors) {
             error = {
                 statusCode: statusCode,
                 responseBody: responseBody,

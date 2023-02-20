@@ -32,7 +32,7 @@
     "@digitraffic/common": "2023.2.13-1",
     "@types/aws-lambda": "8.10.108",
     "aws-cdk-lib": "2.62.2",
-    "aws-sdk": "^2.1304.0",
+    "aws-sdk": "2.1260.0",
     "constructs": "10.1.235",
     "source-map-support": "^0.5.19"
   },
