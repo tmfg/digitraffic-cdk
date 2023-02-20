@@ -25,7 +25,7 @@ import { Statistics } from "./statistics";
 import { Account } from "../../app-props";
 import zlib from "zlib";
 
-const AWS = AWSx;
+const AWS = AWSx as any;
 
 const knownAccounts: Account[] = JSON.parse(
     process.env.KNOWN_ACCOUNTS as unknown as string
