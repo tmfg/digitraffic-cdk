@@ -1,8 +1,12 @@
 import { Duration, Stack } from "aws-cdk-lib";
-import { Function, InlineCode, Runtime } from "aws-cdk-lib/aws-lambda";
+import {
+    Function as AWSFunction,
+    InlineCode,
+    Runtime,
+} from "aws-cdk-lib/aws-lambda";
 import { Role } from "aws-cdk-lib/aws-iam";
 import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
-import * as fs from "fs";
+import * as fs from "node:fs";
 
 export enum LambdaType {
     WEATHERCAM_REDIRECT,
@@ -112,7 +116,7 @@ export function createFunction(
     functionName: string,
     functionBody: string
 ) {
-    const edgeFunction = new Function(stack, functionName, {
+    const edgeFunction = new AWSFunction(stack, functionName, {
         runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         code: new InlineCode(functionBody),

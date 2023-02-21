@@ -14,12 +14,12 @@ import { LambdaHolder } from "./lambda-holder";
 export function createOriginConfig(
     stack: Stack,
     origin: CFOrigin,
-    oai: OriginAccessIdentity | null,
+    oai: OriginAccessIdentity | undefined,
     lambdaMap: LambdaHolder
 ): SourceConfiguration {
     if (origin instanceof S3Domain) {
         if (!oai) {
-            throw new Error("OAI was null! OAI is needed for S3 origin");
+            throw new Error("OAI was undefined! OAI is needed for S3 origin");
         }
         const bucket = Bucket.fromBucketAttributes(
             stack,

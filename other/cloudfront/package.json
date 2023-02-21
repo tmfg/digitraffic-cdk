@@ -1,5 +1,5 @@
 {
-  "name": "cloudfront-cdk",
+  "name": "cloudfront",
   "version": "0.2.0",
   "private": true,
   "scripts": {
@@ -35,7 +35,7 @@
     "parallelshell": "3.0.2",
     "sinon": "*",
     "ts-node": "^10.9.1",
-    "typescript": "*"
+    "typescript": "4.9.5"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",

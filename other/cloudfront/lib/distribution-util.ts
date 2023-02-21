@@ -30,12 +30,12 @@ export function createViewerCertificate(
 function doCreateWebAcl(
     stack: Stack,
     props: DistributionProps
-): CfnWebACL | null {
+): CfnWebACL | undefined {
     if (props.aclRules) {
         return createWebAcl(stack, props.environmentName, props.aclRules);
     }
 
-    return null;
+    return undefined;
 }
 
 export function createDistribution(
@@ -72,7 +72,7 @@ function createDistributionWithStreamingLogging(
     originConfigs: SourceConfiguration[],
     viewerCertificate: ViewerCertificate | undefined,
     role: Role,
-    webAcl: CfnWebACL | null,
+    webAcl: CfnWebACL | undefined,
     streamingConfig: StreamingConfig
 ): CloudFrontWebDistribution {
     const env = distributionProps.environmentName;

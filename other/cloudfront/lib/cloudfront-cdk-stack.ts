@@ -257,7 +257,7 @@ export class CloudfrontCdkStack extends Stack {
                   this,
                   `${distributionProps.environmentName}-oai`
               )
-            : null;
+            : undefined;
         const originConfigs = distributionProps.origins.map((d) =>
             createOriginConfig(this, d, oai, lambdaMap)
         );

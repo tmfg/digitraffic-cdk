@@ -5,7 +5,7 @@ import {
     Runtime,
     StartingPosition,
     Tracing,
-    Function,
+    Function as AWSFunction,
 } from "aws-cdk-lib/aws-lambda";
 import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
 import { PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
@@ -124,7 +124,7 @@ function createKinesisConsumerLambda(
         encryption: QueueEncryption.KMS_MANAGED,
     });
 
-    const fn = new Function(stack, functionName, {
+    const fn = new AWSFunction(stack, functionName, {
         functionName: functionName,
         runtime: Runtime.NODEJS_16_X,
         handler: "lambda-stream-to-elastic.handler",
