@@ -11,6 +11,8 @@ import {
     SSM_KEY_ALARM_TOPIC,
     SSM_KEY_WARNING_TOPIC,
 } from "@digitraffic/common/dist/aws/infra/stack/stack";
+import { Route53Monitoring } from "./route53-monitoring";
+import { Route53MonitoringStack } from "./route53-monitoring-stack";
 
 export class MonitoringStack extends Stack {
     constructor(
@@ -44,6 +46,10 @@ export class MonitoringStack extends Stack {
         });
 
         this.createMonitorings(alarmsTopic, configuration);
+
+        this.addDependency(
+            new Route53MonitoringStack(scope, id, alarmsTopic, configuration)
+        );
 
         Aspects.of(this).add(new StackCheckingAspect());
     }

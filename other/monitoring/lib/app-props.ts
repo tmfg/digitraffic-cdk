@@ -1,16 +1,17 @@
-import {Environment} from "aws-cdk-lib";
+import { Environment } from "aws-cdk-lib";
 
-export type MonitoringConfiguration = {
-    readonly warningTopicEmail: string
-    readonly alarmTopicEmail: string
+export interface MonitoringConfiguration {
+    readonly warningTopicEmail: string;
+    readonly alarmTopicEmail: string;
 
     readonly db?: DBConfiguration;
     readonly mqtt?: MQTTConfiguration[];
+    readonly route53?: boolean;
 
     readonly env: Environment;
 }
 
-export type DBConfiguration = {
+export interface DBConfiguration {
     readonly dbClusterIdentifier: string;
     readonly cpuLimit: number;
     readonly writeIOPSLimit: number;
@@ -19,7 +20,7 @@ export type DBConfiguration = {
     readonly volumeReadIOPSLimit: number;
 }
 
-export type MQTTConfiguration = {
+export interface MQTTConfiguration {
     readonly brokerName: string;
     readonly cpuLimit?: number;
     readonly heapLimit?: number;
