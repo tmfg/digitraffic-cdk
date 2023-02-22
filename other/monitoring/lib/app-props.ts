@@ -6,7 +6,7 @@ export interface MonitoringConfiguration {
 
     readonly db?: DBConfiguration;
     readonly mqtt?: MQTTConfiguration[];
-    readonly route53?: boolean;
+    readonly route53?: Route53Configuration;
 
     readonly env: Environment;
 }
@@ -25,4 +25,8 @@ export interface MQTTConfiguration {
     readonly cpuLimit?: number;
     readonly heapLimit?: number;
     readonly networkLimit?: number;
+}
+
+export interface Route53Configuration {
+    readonly routeIds: string[];
 }

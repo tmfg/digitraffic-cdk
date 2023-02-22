@@ -11,7 +11,6 @@ import {
     SSM_KEY_ALARM_TOPIC,
     SSM_KEY_WARNING_TOPIC,
 } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { Route53Monitoring } from "./route53-monitoring";
 import { Route53MonitoringStack } from "./route53-monitoring-stack";
 
 export class MonitoringStack extends Stack {
@@ -47,6 +46,8 @@ export class MonitoringStack extends Stack {
 
         this.createMonitorings(alarmsTopic, configuration);
 
+        // another stack is created, even if you don't configure Route53-monitoring.
+        // this is to make sure the rules are removed when you change your configuration to not monitor Route53
         this.addDependency(
             new Route53MonitoringStack(scope, id, alarmsTopic, configuration)
         );
