@@ -15,7 +15,7 @@ interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
 
 const expectedKeys = [
     PortactivitySecretKeys.AWAKE_ATX_URL,
-    PortactivitySecretKeys.AWAKE_ATX_AUTH,
+    PortactivitySecretKeys.AWAKE_ATX_AUTH
 ];
 
 const rdsHolder = RdsHolder.create();
@@ -24,8 +24,6 @@ const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>(
     expectedKeys
 );
 
-let service: AwakeAiATXService | null = null;
-
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 export async function handler(event: unknown, context: Context) {
@@ -33,11 +31,9 @@ export async function handler(event: unknown, context: Context) {
         .setCredentials()
         .then(() => secretHolder.get())
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
-            if (!service) {
-                service = new AwakeAiATXService(
-                    new AwakeAiATXApi(secret.atxurl, secret.atxauth)
-                );
-            }
+            const service = new AwakeAiATXService(
+                new AwakeAiATXApi(secret.atxurl, secret.atxauth)
+            );
 
             // allow 1000 ms for SQS sends, this is a completely made up number
             const timestamps = await service.getATXs(

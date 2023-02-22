@@ -15,7 +15,7 @@ import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Rule, Schedule } from "aws-cdk-lib/aws-events";
 import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
 import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import { PortactivityEnvKeys } from "./keys";
+import { PortactivityEnvKeys, PortActivityParameterKeys } from "./keys";
 import {
     MonitoredDBFunction,
     MonitoredFunction,
@@ -348,6 +348,16 @@ function createUpdateAwakeAiATXTimestampsLambda(
     });
 
     queue.grantSendMessages(lambda);
+
+    const statement = new PolicyStatement();
+    statement.addActions("ssm:GetParameter");
+    statement.addActions("ssm:PutParameter");
+    statement.addResources(
+        `arn:aws:ssm:${stack.configuration.stackProps.env?.region ?? ""}:${
+            stack.configuration.stackProps.env?.account ?? ""
+        }:parameter/${PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID}`
+    );
+    lambda.addToRolePolicy(statement);
 
     return lambda;
 }
