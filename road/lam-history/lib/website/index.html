@@ -1,0 +1,803 @@
+<!doctype html>
+<html lang="fi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Datepicker CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/css/bootstrap-datepicker3.min.css" rel="stylesheet">
+    <!-- Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css" rel="stylesheet">
+
+    <style>
+      .fintraffic-header {
+        color: #fff;
+        background-color: #000;
+        padding: .5rem 1rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 44px;
+        font-family: "Public Sans",sans-serif;
+      }
+
+      #fintraffic-logo {
+        width: 106px;
+      }
+
+      #digitraffic-logo {
+        text-align: left;
+      }
+
+      .results tr[visible='false'],
+      .no-result{
+        display:none;
+      }
+
+      .results tr[visible='true']{
+        display:table-row;
+      }
+
+      .select-button {
+        display: none;
+      }
+
+      tr:hover .select-button {
+        display: inline-block;
+      }
+
+      .table-fixed tbody {
+        display: block;
+        height: 500px;
+        width: auto;
+        overflow-y: scroll;
+      }
+
+      .table-fixed tr {
+        width: auto;
+      }
+
+      .my-custom-scrollbar {
+        position: relative;
+        height: 510px;
+        overflow: auto;
+      }
+
+      .table-wrapper-scroll-y {
+        display: block;
+        position: relative;
+        height: 500px;
+        overflow: auto;
+      }
+
+      .loading_spinner {
+        visibility: hidden;
+      }
+    </style>
+    <title>LAM-tilastohaku</title>
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+  </head>
+  <body>
+  <header class="fintraffic-header">
+    <a href="https://www.fintraffic.fi">
+      <img id="fintraffic-logo" src="Fintraffic_vaakalogo_valkoinen.svg" alt="Fintraffic logo" />
+    </a>
+    <div id="digitraffic-logo">Digitraffic</div>
+  </header>
+    <form method="get" autocomplete="off" class="needs-validation" novalidate>
+      <div class="container d-grid gap-3">
+        <h1>LAM-tilastohaku</h1>
+
+        <label class="fw-bold">Aineisto<i class="bi bi-question-circle px-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Valitse haluamasi aineisto: ajoneuvojen määrä tai niiden keskinopeudet"></i></label>
+
+        <div class="form-group">
+          <select class="form-select" id="aineisto" name="api" required>
+            <option disabled selected value="">Valitse aineisto</option>
+          </select>
+          <div class="invalid-feedback">Aineiston valinta on pakollinen</div>
+        </div>
+
+        <label class="fw-bold">Raportti</label>
+
+        <div class="form-group">
+          <select class="form-select" id="summaustaso" name="tyyppi" required disabled>
+            <option disabled selected value="">Valitse raportin tarkkuus</option>
+          </select>
+          <div class="invalid-feedback">Raportin tarkkuuden valinta on pakollinen</div>
+        </div>
+      
+      <label class="fw-bold">Aika</label>
+
+      <div class="form-group">
+        <!-- pattern="^20[1-9][0-9]$|^20[1-9][0-9]-(0?[1-9]|[1-5][0-9])$|^20[1-9][0-9]-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$" -->
+        <label class="form-label" for="alkupaiva">Alkuaika</label>
+        <input type="text" class="form-select datepicker" id="alkupaiva" name="pvm" placeholder="Valitse aikavälin alku" required>
+        <div class="invalid-feedback">Aloitusaika on pakollinen</div>
+      </div>
+
+      <div class="form-group">
+        <!-- pattern="^20[1-9][0-9]$|^20[1-9][0-9]-(0?[1-9]|[1-5][0-9])$|^20[1-9][0-9]-(0?[1-9]|1[012])-(0?[1-9]|[12][0-9]|3[01])$" -->
+        <label for="loppupaiva">Loppuaika</label>
+        <input type="text" class="form-select datepicker" id="loppupaiva" name="loppu" placeholder="Valitse aikavälin loppu (valinnainen)">
+      </div>
+
+      <label class="fw-bold" for="pisteet">LAM-pisteet<i class="bi bi-question-circle px-1" data-bs-toggle="tooltip" data-bs-placement="top" title="Valitse haluamasi ryhmä: yksittäiset pisteet tai pistejoukot."></i></label>
+
+      <div class="form-group">
+        <input class="form-check-input" type="radio" name="lam_type" id="lam_type1" value="option1" checked>
+        <label class="form-check-label" for="lam_type1">Yksittäisten pisteiden valinta</label>
+        <div class="input-group mb-3">
+          <!-- Unique comma separated number list ^(?!.*\b(\d)\b.*\b\1\b)\d+(,\d+)*$ , or just number list ^\d+(,\d+)*$ -->
+          <input type="text" class="form-control" id="pisteet" name="piste" placeholder="LAM-pisteet" aria-describedby="button-addon1" pattern="^(?!.*\b(\d)\b.*\b\1\b)\d+(,\d+)*$" required >
+          <button class="btn btn-outline-secondary" type="button" id="button-addon1" onclick="modalPopup('pisteetTab')" data-bs-toggle="modal" data-bs-target="#exampleModal">Listaus</button>
+          <div class="invalid-feedback">Vähintään yksi piste on annettava</div>
+        </div>
+
+        <input class="form-check-input" type="radio" name="lam_type" id="lam_type2" value="option2">
+        <label class="form-check-label" for="lam_type2">Pistejoukkojen valinta</label>
+        <div class="input-group mb-3">
+          <!-- Unique comma separated number list ^(?!.*\b(\d)\b.*\b\1\b)\d+(,\d+)*$ , or just number list ^\d+(,\d+)*$ -->
+          <input type="text" class="form-control" id="pistejoukot" name="pistejoukko" placeholder="LAM-pistejoukot" aria-describedby="button-addon2" pattern="^(?!.*\b(\d)\b.*\b\1\b)\d+(,\d+)*$" required disabled>
+          <button class="btn btn-outline-secondary" type="button" id="button-addon2" onclick="modalPopup('pistejoukkoTab')" data-bs-toggle="modal" data-bs-target="#exampleModal" disabled>Listaus</button>
+          <div class="invalid-feedback">Vähintään yksi pistejoukko on annettava</div>
+        </div>
+      </div>
+      
+      <label class="fw-bold">Ajoneuvoluokat</label>
+
+      <div class="form-group">
+        <select class="form-control" id="luokat" name="ryhma" size="5" multiple required disabled>
+          <option disabled>Valitse ajoneuvoluokka (voit valita useampia)</option>
+        </select>
+        <div class="invalid-feedback">Vähintään yksi ryhmä on valittava</div>
+      </div>
+
+      <label class="fw-bold">Suunnat</label>
+
+        <div class="form-group">
+          <select class="form-control" id="suunta" name="suunta" size="3" multiple>
+            <option value="">Kaikki (suunnat summattuna)</option>
+            <option value="1">Suunta 1</option>
+            <option value="2">Suunta 2</option>
+          </select>
+        </div>
+
+        <label class="fw-bold">Kaistat</label>
+
+        <div class="form-group">
+          <select class="form-control" id="kaista" name="sisallytakaistat" size="2">
+            <option value="0">Ei - kaistat summattuna</option>
+            <option value="1">Kyllä - kaistat eriteltynä</option>
+          </select>
+        </div>
+
+        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+          <button type="reset" id="resetForm" class="btn btn-secondary"><i class="bi bi-trash px-2"></i>Tyhjennä lomake</button>
+          <button type="submit" class="btn btn-primary w-50">
+            <span class="spinner-border spinner-border-sm loading_spinner" role="status" aria-hidden="true"></span>
+            <i class="bi bi-cloud-arrow-down px-2"></i>Lataa tiedot (.CSV)
+            <span class="spinner-border spinner-border-sm loading_spinner" role="status" aria-hidden="true"></span>
+          </button>
+        </div>
+    </div>
+    </form>
+
+    <div class="modal" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">LAM-asemat</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+              <ul class="nav nav-tabs" id="asematTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link active" id="pisteetTab" data-bs-toggle="tab" data-bs-target="#pisteetContent" type="button" role="tab" aria-controls="pisteet" aria-selected="true">Yksittäiset mittauspisteet</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                  <button class="nav-link" id="pistejoukkoTab" data-bs-toggle="tab" data-bs-target="#pistejoukkoContent" type="button" role="tab" aria-controls="pistejoukot" aria-selected="false">Pistejoukot</button>
+                </li>
+              </ul>
+            <!--
+            <div class="spinner-border" style="width: 3rem; height: 3rem;" role="status">
+              <span class="sr-only"></span>
+            </div>
+            -->
+              <div class="tab-content" id="asematTabContent">
+                <div class="tab-pane show active" id="pisteetContent" role="tabpanel" aria-labelledby="pisteetTab">
+                  <p>
+                    <div class="form-group pull-right">
+                      <input type="text" class="search form-control" placeholder="Hae pisteitä">
+                    </div>
+                  </p>
+                  <p>
+                  <div class="table-responsive table-wrapper-scroll-y">
+                    <table class="table table-hover results" id="roadStations_t">
+                      <thead class="table-light">
+                      <tr>
+                        <th class="col-md-1">Piste</th>
+                        <th class="col-md-4">Nimi</th>
+                        <th class="col-md-2">Tie/Osa/Etäisyys</th>
+                        <th class="col-md-2">Kunta</th>
+                        <th class="col-md-3">Maakunta</th>
+                        <th class="col-md-1">&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        <th class="col-md-1">&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                      </tr>
+                      <tr class="warning no-result">
+                        <td colspan="7"><i class="fa fa-warning"></i>Ei hakutuloksia</td>
+                      </tr>
+                      </thead>
+                      <tbody />
+                    </table>
+                  </div>
+                  </p>
+                </div>
+                <div class="tab-pane" id="pistejoukkoContent" role="tabpanel" aria-labelledby="pistejoukkoTab">
+                  <p>
+                    <div class="table-responsive table-wrapper-scroll-y">
+                      <table class="table table-hover" id="pistejoukot_t">
+                        <thead class="table-light">
+                        <tr>
+                          <th class="col-md-2">Ryhmä</th>
+                          <th class="col-md-1">Joukko</th>
+                          <th class="col-md-5">Nimi</th>
+                          <th class="col-md-1">&nbsp;&nbsp;&nbsp;&nbsp;</th>
+                        </tr>
+                        </thead>
+                        <tbody />
+                      </table>
+                    </div>
+                  </p>
+                </div>
+              </div>
+              <p>
+                <!--
+                <span class="px-2">
+                  <input class="form-check-input" type="checkbox" value="" id="selectedOnly">
+                  <label class="form-check-label" for="selectedOnly">Näytä vain valitut pisteet</label>
+                </span>
+                -->
+                <span class="float-end">Valittuja pisteitä: <span id="selectedCounter" class="px-1">0</span></span>
+              </p>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-primary" id="removePiste" disabled>Poista valinnat</button>
+            <!--<button type="button" class="btn btn-primary" id="addPiste">Lisää valinnat</button>-->
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Sulje</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JQuery -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+    <!-- Bootstrap Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+
+    <!-- Datepicker + fi-local -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/js/bootstrap-datepicker.min.js" integrity="sha256-bqVeqGdJ7h/lYPq6xrPv/YGzMEb6dNxlfiTUHSgRCp8=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-datepicker@1.9.0/dist/locales/bootstrap-datepicker.fi.min.js" integrity="sha256-HSu7v16jTXxEQi9gV75imXU1A/Ltl0+HISw7Hz0oTdw=" crossorigin="anonymous"></script>
+
+    <script>
+      // TODO omaan tiedostoon
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl)
+      });
+
+      const time_formats = {
+        hour:   {level: 0, type: 'h',   format: 'date'},
+        date:   {level: 0, type: 'vrk', format: 'date'},
+        week:   {level: 0, type: 'vk',  format: 'week'},
+        month:  {level: 1, type: 'kk',  format: 'month'},
+        year:   {level: 2, type: 'v',   format: 'year'},
+        year_d: {level: 0, type: 'v',   format: 'date'},
+        viikko: 'viikko',
+        pvm:    'pvm'
+      };
+
+      const raaka_liikenne_tasot = [
+        {key: 'h', value: 'Tuntiliikenneraportti', tformat: time_formats.date},
+        {key: 'vrk', value: 'Vuorokausiraportti', tformat: time_formats.date, ignore: true},
+        {key: 'vk', value: 'Viikkoraportti', tformat: time_formats.week, ignore: true},
+        {key: 'kk', value: 'Kuukausiraportti', tformat: time_formats.month, ignore: true},
+        {key: 'v', value: 'Vuosiraportti', tformat: time_formats.year, ignore: true}
+      ];
+
+      const liikenne_tasot = {
+        h:    {key: 'h', value: 'Tuntiliikenneraportti', tformat: time_formats.hour},
+        vrk:  {key: 'vrk', value: 'Vuorokausiliikenneraportti', tformat: time_formats.date},
+        vk:   {key: 'vk', value: 'Viikkosummaraportti', tformat: time_formats.week},
+        kk:   {key: 'kk', value: 'Kuukausisummaraportti', tformat: time_formats.month},
+        v:    {key: 'v', value: 'Vuosisummaraportti', tformat: time_formats.year},
+        kvlv: {key: 'kvl', value: 'Keskimääräinen vuorokausiliikenne (vapaa aikaväli)', tformat: time_formats.year_d},
+        kvl:  {key: 'kvl', value: 'Vuoden keskimääräinen vuorokausiliikenne', tformat: time_formats.year},
+        kavlv:{key: 'kavl', value: 'Keskimääräinen arkivuorokausiliikenne (vapaa aikaväli)', tformat: time_formats.year_d},
+        kavl: {key: 'kavl', value: 'Vuoden Keskimääräinen arkivuorokausiliikenne', tformat: time_formats.year}
+      };
+
+      const knopeus_tasot = {
+        h:    {key: 'h', value: 'Tunnin keskinopeus', tformat: time_formats.hour},
+        vrk:  {key: 'vrk', value: 'Vuorokauden keskinopeus', tformat: time_formats.date},
+          vk:   {key: 'vk', value: 'Viikon keskinopeus', tformat: time_formats.week},
+          kk:   {key: 'kk', value: 'Kuukauden keskinopeus', tformat: time_formats.month},
+          v:    {key: 'v', value: 'Vuoden keskinopeus', tformat: time_formats.year}
+      };
+
+        const aineistot = {
+          liikennemaara: {
+            key: 'liikennemaara',
+            value: 'Liikennemäärät',
+            summaustasot: liikenne_tasot
+          },
+          raakaliikennemaara: {
+            key: 'raakaliikennemaara',
+            value: 'Raakadatahavainnot',
+            summaustasot: raaka_liikenne_tasot
+          },
+          keskinopeus: {
+            key: 'keskinopeus',
+            value: 'Keskinopeus',
+            summaustasot: knopeus_tasot
+          }
+        };
+
+        const ajoneuvot = [
+          {key: "(*):Kaikki", luokka: "kaikki", value: 'Kaikki (yhteensä)'},
+          {key: "(1,6,7,8):kevyet", luokka: "kevyet", value: 'Kevyet ajoneuvot (1,6,7,8)'},
+          {key: "(2,3,4,5,9):raskaat", luokka: "raskaat", value: 'Raskaat ajoneuvot (2,3,4,5,9)'},
+          {key: "1:1_ha_pa", luokka: "1", value: '1 Henkilö- tai pakettiauto'},
+          {key: "2:2_ka_ip", luokka: "2", value: '2 Kuorma-auto ilman perävaunua'},
+          {key: "3:3_la", luokka: "3", value: '3 Linja-autot'},
+          {key: "4:4_ka_pp", luokka: "4", value: '4 Kuorma-auto ja puoliperävaunu'},
+          {key: "5:5_ka_tp", luokka: "5", value: '5 Kuorma-auto ja täysperävaunu'},
+          {key: "6:6_ha_pk", luokka: "6", value: '6 Henkilöauto ja peräkärry'},
+          {key: "7:7_ha_av", luokka: "7", value: '7 Henkilöauto ja asuntovaunu'},
+          {key: "8:8_mp", luokka: "8", value: '8 Moottoripyörät ja mopot'},
+          {key: "9:9_hct", luokka: "9",  value: '9 High Capacity Truck'}
+        ];
+
+      const datepic_options = {
+          endDate: "+today",
+          daysOfWeekHighlighted: "0,6",
+          language: 'fi',
+          calendarWeeks: true,
+          clearBtn: true,
+          autoclose: true,
+          startDate: "2010-01-01",
+          startView: 0,
+          minViewMode: 0,
+          format: {
+            toDisplay: function (date, format, ilanguage) {
+              return formatDate(date, selected_item.summaustaso.tformat.format);
+            },
+            toValue: function (date, format, language) {
+              if (date.startsWith('+')) {
+                return new Date();
+              }
+
+              return new Date(date);
+            }
+          }
+      };
+
+        //const stationsUrl = "https://tie.digitraffic.fi/api/v3/metadata/tms-stations?lastUpdated=false&state=all";
+        const pistejoukotUrl = "pistejoukot.json";
+        const pisteetUrl = "pisteet.json";
+
+        const allowed_pisteJoukkoRyhmat = [61, 62, 65];
+        const excluded_pisteJoukot = [2048, 2049];
+
+        let selected_item = {aineisto: null, summaustaso: null};
+        let selected_list = 'roadStations_t';
+        let selected_suunta = [];
+
+        let lam_stations_loaded = false;
+        let pistejoukot_loaded = false;
+        let maakunnat_loaded = false;
+
+        let maakunnat = [];
+
+        async function modalPopup(selected) {
+          // Start spinner NOT USED
+
+          // TODO import
+          const [pisteet, joukot] = await Promise.all([fetch(pisteetUrl), fetch(pistejoukotUrl)]);
+
+          // Stop spinner NOT USED
+
+          // Build tables
+          if (!pistejoukot_loaded) {
+            pistejoukot(joukot);
+          }
+
+          if (!lam_stations_loaded) {
+            roadStations(pisteet);
+          }
+
+          // Show selected tab
+          $('#asematTab #' + selected).trigger('click');
+          //bootstrap.Tab.getInstance($('#asematTab #' + selected)).show();
+        }
+
+      async function roadStations() {
+        try {
+            // TODO arguments[0]?
+            const resp = await arguments[0].json();
+            const table = $('#roadStations_t > tbody:last-child');
+
+            for (const i in resp) {
+              const feature = resp[i];
+
+              table.append(
+                      $('<tr/>', {"id": "_" + feature.piste}).append([
+                        $('<td/>').text(feature.piste),
+                        $('<td/>').text(feature.nimi),
+                        $('<td/>').text(feature.tienro + " / " +
+                                feature.tieosa + " / " +
+                                feature.etaisyys
+                        ),
+                        $('<td/>').text(feature.laite_kunta),
+                        $('<td/>').text(maakunnat[feature.maakunta_id]),
+                        $('<td/>').append(
+                                $('<i/>', {
+                                  "class": "bi bi-question-circle select-button",
+                                  "data-bs-toggle": "tooltip",
+                                  "data-bs-placement": "top",
+                                  "title": "Keruun tila: " + feature.keruun_tila + "\n" +
+                                          "Aloitusaika: " + feature.alkuaika + "\n" +
+                                          "Päättymispäivä: " + feature.loppuaika + "\n" +
+                                          "ELY tunnus: " + feature.ely_id
+                                })
+                        ),
+                        $('<td/>').append(
+                                $('<i/>', {"class": "bi bi-check-circle select-button"})
+                        )
+                      ])
+              );
+            }
+
+            lam_stations_loaded = true;
+          } catch(e) {
+            console.log(e);
+            alert("LAM-asemien lataus epäonnistui!");
+          }
+      }
+
+      async function pistejoukot() {
+        try {
+            const resp = await arguments[0].json();
+            const table = $('#pistejoukot_t > tbody:last-child');
+
+            for (const i in resp) {
+              const ryhma = resp[i];
+
+              if (allowed_pisteJoukkoRyhmat.includes(ryhma.pistejoukkoryhma)) {
+                for (const j in ryhma.pistejoukot) {
+                  const joukko = ryhma.pistejoukot[j];
+
+                  if (!excluded_pisteJoukot.includes(joukko.pistejoukko)) {
+                    table.append(
+                            $('<tr/>', {"id": "_" + joukko.pistejoukko}).append([
+                              $('<td/>').text(j == 0 ? ryhma.nimi : ""),
+                              $('<td/>').text(joukko.pistejoukko),
+                              $('<td/>').text(joukko.nimi),
+                              $('<td/>').append(
+                                      $('<i/>', {"class": "bi bi-check-circle select-button"})
+                              )
+                            ])
+                    );
+                  }
+                }
+
+                if (ryhma.pistejoukkoryhma == 61) {
+                  buildMaakunnat(ryhma.pistejoukot);
+                }
+              }
+            }
+
+            pistejoukot_loaded = true;
+          } catch (e) {
+            console.log("Failed to parse pistejoukot", e);
+            alert("Pistejoukkojen lataus epäonnistui!");
+          }
+      }
+
+      function buildMaakunnat(pistejoukkoryhma) {
+        for (const i in pistejoukkoryhma) {
+          const maakunta = pistejoukkoryhma[i];
+
+          maakunnat[maakunta.nro] = maakunta.nimi;
+        }
+
+        maakunnat_loaded = true;
+      }
+
+      function formatDate(date, type) {
+        const d = date.getDate();
+        const m = date.getMonth() + 1; //Month from 0 to 11
+        const y = date.getFullYear();
+
+        let resp;
+
+        if (type === time_formats.year.format) {
+          resp = '' + y;
+        } else if (type === time_formats.month.format) {
+          resp = '' + y + '-' + (m <= 9 ? '0' + m : m);
+        } else if (type === time_formats.week.format) {
+          resp = '' + y + '-' + getWeekNumber(date);
+        } else {
+          resp = '' + y + '-' + (m <= 9 ? '0' + m : m) + '-' + (d <= 9 ? '0' + d : d);
+        }
+
+        return resp;
+      }
+
+      function getWeekNumber(dt) {
+        var tdt = new Date(dt.valueOf());
+        var dayn = (dt.getDay() + 6) % 7;
+
+        tdt.setDate(tdt.getDate() - dayn + 3);
+        var firstThursday = tdt.valueOf();
+
+        tdt.setMonth(0, 1);
+
+        if (tdt.getDay() !== 4) {
+          tdt.setMonth(0, 1 + ((4 - tdt.getDay()) + 7) % 7);
+        }
+
+        return 1 + Math.ceil((firstThursday - tdt) / 604800000);
+      }
+
+      function cleanOptions(select, offset) {
+          if (select) {
+              const i = offset ? offset : 0
+
+              // Remove old list if exists
+              while (select.options.length > i) {
+                  select.remove(i);
+              }
+          }
+      }
+
+      function createOptions(select, options, key) {
+          if (select) {
+            const optionKey = key || 'key';
+
+            for (const i in options) {
+              const option = document.createElement("option");
+              option.text = options[i].value;
+              option.value = options[i][optionKey];
+
+              if (options[i].disabled) {
+                option.disabled = true;
+              }
+
+              if (!options[i].ignore) {
+                select.options.add(option);
+              }
+            }
+
+            select.options[0].selected = true;
+          }
+      }
+
+      function updateDatepicker(viewLevel) {
+        datepic_options.startView = viewLevel;
+        datepic_options.minViewMode = viewLevel;
+
+        //$('.datepicker').disabled = false;
+        $('.datepicker').datepicker('destroy');
+        $('.datepicker').datepicker(datepic_options);
+        $('.datepicker').datepicker('update', '');
+      }
+
+      function getSummaustaso(summaustasot, selection) {
+        if (summaustasot) {
+          const selected = $(selection).val();
+
+          for (const i in summaustasot) {
+            if (summaustasot[i].key === selected) {
+              if (selected === liikenne_tasot.kvl.key || selected === liikenne_tasot.kavl.key) {
+                if (($(selection).find(":selected").text().includes('vapaa') &&
+                        (i === 'kvlv' || i === 'kavlv')) ||
+                        (i === 'kvl' || i === 'kavl')
+                ) {
+                  return summaustasot[i];
+                }
+              } else {
+                return summaustasot[i];
+              }
+            }
+          }
+        }
+
+        return null;
+      }
+
+      function getActiveTab() {
+        return $("ul#asematTab li.active")[0].activeElement;
+      }
+
+      function updateSelectedPisteet() {
+        const valitut = $('#' + selected_list + ' tr.table-active');
+        let pisteet = [];
+
+        valitut.each(function (index) {
+          pisteet.push($(this).attr('id').substring(1));
+        });
+
+        $(selected_list === "roadStations_t" ? "#pisteet" : "#pistejoukot").val(pisteet.join());
+        $("#selectedCounter").text(pisteet.length);
+
+        $('#removePiste').prop('disabled', pisteet.length == 0 ? 'disabled' : false);
+      }
+
+      $('input[name=lam_type]').on('change', function() {
+        $(this.id === 'lam_type1' ? "#pisteet, #button-addon1" : "#pistejoukot, #button-addon2").prop('disabled', false);
+        $(this.id === 'lam_type1' ? "#pistejoukot, #button-addon2" : "#pisteet, #button-addon1").prop('disabled', 'disabled');
+      });
+
+      // Piste is selected or removed
+      $("#roadStations_t tbody, #pistejoukot_t tbody").on('click', "tr", function () {
+        let selected = $(this);
+
+        if (selected.hasClass("table-active")) {
+          selected.removeClass("table-active");
+        } else {
+          selected.addClass("table-active");
+        }
+
+        updateSelectedPisteet();
+      });
+
+      // Clear all selected pisteet
+      $("#removePiste").on("click", function (e) {
+        $('#' + selected_list + ' tr.table-active').removeClass("table-active");
+
+        updateSelectedPisteet();
+      });
+
+      // Track tab changes
+      $('#asematTab button').on('shown.bs.tab', function () {
+        //selected_list = this.id === 'pisteetTab' ? 'roadStations_t' : 'pistejoukot_t';
+
+        if (this.id === 'pisteetTab') {
+          selected_list = 'roadStations_t';
+          $("#lam_type1").prop('checked', true).trigger('change');
+          //$('#pisteet').attr('name', 'piste');
+        } else {
+          selected_list = 'pistejoukot_t';
+          $("#lam_type2").prop('checked', true).trigger('change');
+          //$('#pisteet').attr('name', 'pistejoukko');
+        }
+
+        updateSelectedPisteet();
+      });
+
+      // Toggle show selected pisteet. Not implemented
+      $("#selectedOnly").change(function () {
+        console.log("toggle ", this.checked);
+      });
+
+        $("#suunta").change(function () {
+          const tmp = $(this).val();
+
+          if (selected_suunta.includes('')) {
+            if (tmp.includes('')) {
+              // All option was previously selected -> drop all option if exists
+              tmp.splice(0, 1);
+            }
+
+            selected_suunta =  tmp;
+          } else {
+            selected_suunta = tmp.includes('') ? [''] : tmp;
+          }
+
+          $(this).val(selected_suunta);
+        });
+
+      $("#aineisto").change(function () {
+          const summaustaso = document.getElementById("summaustaso");
+          summaustaso.disabled = false;
+
+          selected_item.aineisto = aineistot[$(this).val()];
+          selected_item.summaustaso = null;
+
+          // Clean current summaustaso options
+          cleanOptions(summaustaso, 1);
+
+          // Set new summaustaso options
+          createOptions(summaustaso, selected_item.aineisto.summaustasot);
+
+          // Reset datapickers
+          $('.datepicker').datepicker('destroy');
+      });
+
+      $("#summaustaso").change(function () {
+        const current_summaustaso = $(this).val();
+
+        const new_summaustaso = getSummaustaso(selected_item.aineisto.summaustasot, this);
+
+        // change date name-attribute value
+        $('#alkupaiva').attr('name', new_summaustaso.key === time_formats.week.type ? time_formats.viikko : time_formats.pvm);
+
+        // Update datepickers
+        updateDatepicker(new_summaustaso.tformat.level);
+
+        if (selected_item.summaustaso == null ||
+                (current_summaustaso === time_formats.hour.type && selected_item.summaustaso !== time_formats.hour.type) ||
+                (current_summaustaso !== time_formats.hour.type && selected_item.summaustaso === time_formats.hour.type)
+        ) {
+          // Update ajoneuvoluokat
+          const luokat = document.getElementById("luokat");
+          luokat.disabled = false;
+          luokat.name = current_summaustaso === time_formats.hour.type ? 'luokka' : 'ryhma';
+
+          cleanOptions(luokat, 1);
+          createOptions(luokat, ajoneuvot, current_summaustaso === time_formats.hour.type ? 'luokka' : 'key');
+        }
+
+        // Update new summaustaso
+        selected_item.summaustaso = new_summaustaso;
+      });
+
+        $(".search").keyup(function () {
+          const searchTerm = $(".search").val();
+          const searchSplit = searchTerm.replace(/ /g, "'):containsi('");
+
+          $.extend($.expr[':'], {'containsi': function(elem, i, match, array) {
+              return (elem.textContent || elem.innerText || '').toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+            }
+          });
+
+          $(".results tbody tr").not(":containsi('" + searchSplit + "')").each(function(e){
+            $(this).attr('visible','false');
+          });
+
+          $(".results tbody tr:containsi('" + searchSplit + "')").each(function(e){
+            $(this).attr('visible','true');
+          });
+
+          // Filter element count
+          const matchCount = $('.results tbody tr[visible="true"]').length;
+
+          if (matchCount == 0) {
+            $('.no-result').show();
+          } else {
+            $('.no-result').hide();
+          }
+        });
+
+        $(document).on('click', "#resetForm", function() {
+          // Form is reseted, just disable selections
+          $('#summaustaso').prop('disabled', 'disabled');
+          $('#luokat').prop('disabled', 'disabled');
+          $('.datepicker').datepicker('destroy');
+        });
+
+        const forms = document.querySelectorAll('.needs-validation');
+
+        // TODO forms.slice or forms.forEach
+        Array.prototype.slice.call(forms)
+              .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                  if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                  }
+
+                  form.classList.add('was-validated');
+                }, false)
+              });
+
+      (function() {
+        // Init aineistot
+        createOptions(document.getElementById("aineisto"), aineistot);
+      })();
+    </script>
+  </body>
+</html>

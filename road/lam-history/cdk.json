@@ -1,0 +1,3 @@
+{
+  "app": "pnpm dlx ts-node bin/lam-history-app.ts"
+}

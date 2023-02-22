@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 set -e # Fail on error
-
+CONCURRENCY=0
 # This script tries to do diff or deploy for cdk stack in given environment
 echo "Required parameters: <app>-<env> <diff|deploy> [stackName]"
 echo "For example: road-test diff"
@@ -54,7 +54,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]
 then
   echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo "pnpm dlx cdk@latest ${OPERATION} ${STACK}"
-  pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=5
+  pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
 fi
 
 set +x
