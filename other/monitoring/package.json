@@ -8,7 +8,7 @@
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "lint": "eslint --cache .",
-    "test": "echo no tests for this project",
+    "eslint-report": "eslint . --format html -o report.html",    "test": "echo no tests for this project",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml"
   },
