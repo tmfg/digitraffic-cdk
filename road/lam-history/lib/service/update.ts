@@ -1,7 +1,7 @@
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { S3 } from "aws-sdk";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import axios, { AxiosError } from "axios";
 
 export async function handleMetadataUpdate(
     url: string,
@@ -68,7 +68,7 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
         if (error instanceof AxiosError) {
             if (error.response) {
                 // error response
-                const response = error.response as AxiosResponse;
+                const response = error.response;
                 console.error(
                     "method=getFromServer url=%s failed with return code %d and data %s",
                     url,
