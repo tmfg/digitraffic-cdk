@@ -2,6 +2,7 @@ import { WebSocket } from "ws";
 import { AwakeAiZoneType } from "./awake_common";
 import { AWSError, SSM } from "aws-sdk";
 import { PortActivityParameterKeys } from "../keys";
+import * as URL from "url";
 
 interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType;
@@ -105,22 +106,32 @@ const isAWSError = (error: unknown): error is AWSError => {
 export class AwakeAiATXApi {
     private readonly url: string;
     private readonly apiKey: string;
+    private readonly webSocketClass: new (url: string | URL) => WebSocket;
+    private readonly ssm: SSM;
 
-    constructor(url: string, apiKey: string) {
+    constructor(
+        url: string,
+        apiKey: string,
+        webSocketClass: new (url: string | URL) => WebSocket,
+        ssm: SSM
+    ) {
         this.url = url;
         this.apiKey = apiKey;
+        this.webSocketClass = webSocketClass;
+        this.ssm = ssm;
     }
 
     async getATXs(
         timeoutMillis: number
     ): Promise<AwakeAIATXTimestampMessage[]> {
-        const ssm = new SSM();
         const ssmParams = {
             Name: PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
         };
+
         let subscriptionId: string | undefined;
+
         try {
-            const parameter = await ssm.getParameter(ssmParams).promise();
+            const parameter = await this.ssm.getParameter(ssmParams).promise();
             subscriptionId = parameter.Parameter?.Value;
         } catch (error: unknown | AWSError) {
             console.error(
@@ -130,7 +141,7 @@ export class AwakeAiATXApi {
             );
         }
 
-        const webSocket = new WebSocket(this.url + this.apiKey);
+        const webSocket = new this.webSocketClass(this.url + this.apiKey);
         webSocket.on("open", () => {
             const startMessage = subscriptionId
                 ? AwakeAiATXApi.createResumeMessage(subscriptionId)
@@ -150,14 +161,18 @@ export class AwakeAiATXApi {
                     const receivedSubscriptionId = (
                         message as AwakeAISubscriptionMessage
                     ).subscriptionId;
+
                     if (receivedSubscriptionId !== subscriptionId) {
-                        console.info(`method=getATXs Updating subscriptionId to ${receivedSubscriptionId}`);
-                        ssm.putParameter({
-                            ...ssmParams,
-                            Overwrite: true,
-                            Type: "String",
-                            Value: receivedSubscriptionId,
-                        })
+                        console.info(
+                            `method=getATXs Updating subscriptionId to ${receivedSubscriptionId}`
+                        );
+                        this.ssm
+                            .putParameter({
+                                ...ssmParams,
+                                Overwrite: true,
+                                Type: "String",
+                                Value: receivedSubscriptionId,
+                            })
                             .promise()
                             .catch((e) =>
                                 console.error(
@@ -169,6 +184,7 @@ export class AwakeAiATXApi {
                                 )
                             );
                     }
+
                     break;
                 }
                 case AwakeAiATXEventType.EVENT:

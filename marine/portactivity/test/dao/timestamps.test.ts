@@ -240,10 +240,13 @@ describe(
             description: string,
             fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
         ) {
-            test(`${description} - too far in the future`, async () => {
-                const timestamp = Object.assign(newTimestamp(), {
-                    eventTime: moment().add("4", "days").toISOString(), // enable filtering
-                });
+            test(`${description} - Portnet timestamp too far in the future`, async () => {
+                const timestamp = Object.assign(
+                    newTimestamp({ source: EventSource.PORTNET }),
+                    {
+                        eventTime: moment().add("15", "days").toISOString(), // enable filtering
+                    }
+                );
                 await insert(db, [timestamp]);
 
                 const foundTimestamp = await fn(timestamp);
