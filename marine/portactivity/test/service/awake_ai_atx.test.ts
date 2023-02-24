@@ -21,13 +21,12 @@ import { EventSource } from "../../lib/model/eventsource";
 import { AwakeAiZoneType } from "../../lib/api/awake_common";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { WebSocket } from "ws";
-import { SSM } from "aws-sdk";
 
 describe(
     "service Awake.AI ATx",
     dbTestBase((db: DTDatabase) => {
         function createAiATXApi() {
-            return new AwakeAiATXApi("", "", WebSocket, new SSM());
+            return new AwakeAiATXApi("", "", WebSocket);
         }
 
         test("getATXs - no portcall found for ATx", async () => {

@@ -1,33 +1,11 @@
-import { newAwakeATXMessage } from "../testdata";
-import * as AWS from "aws-sdk";
-import {
-    AwakeAiATXApi,
-    AwakeAiATXEventType,
-    SUBSCRIPTION_MESSAGE,
-} from "../../lib/api/awake_ai_atx";
+import {newAwakeATXMessage} from "../testdata";
+import * as API from "../../lib/api/awake_ai_atx";
 
 const NO_OP = jest.fn();
 
-const mockSSMData = jest.fn(() => ({
-    Parameter: {
-        Value: "abc",
-    },
-}));
-
-const mockSSM = {
-    getParameter: jest.fn(() => ({
-        promise: mockSSMData,
-    })),
-    putParameter: jest.fn(() => ({
-        promise: jest.fn(() => Promise.resolve()),
-    })),
-};
-
-jest.mock("aws-sdk", () => {
-    return {
-        SSM: jest.fn(() => mockSSM),
-    };
-});
+const mockSubscriptionId = "abc";
+jest.spyOn(API, "getFromParameterStore").mockResolvedValue(mockSubscriptionId);
+jest.spyOn(API, "putInParameterStore").mockImplementation(jest.fn());
 
 describe("api-awake-ai-atx", () => {
     test("getATXs - no existing session subscribes to zone events", async () => {
@@ -43,30 +21,21 @@ describe("api-awake-ai-atx", () => {
         }));
 
         // assume parameter store to not contain subscriptionId on first run
-        (AWS.SSM as unknown as jest.MockedFn<jest.Mock>).mockReturnValueOnce({
-            ...mockSSM,
-            getParameter: jest.fn(() => ({
-                promise: jest.fn(() => ({
-                    Parameter: {
-                        Value: undefined,
-                    },
-                })),
-            })),
-        });
+        (API.getFromParameterStore as unknown as jest.MockedFn<jest.Mock>).mockReturnValueOnce(undefined);
 
-        const api = new AwakeAiATXApi("", "", WebSocket, new AWS.SSM());
+        const api = new API.AwakeAiATXApi("", "", WebSocket);
 
         await api.getATXs(10);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(sendMock.mock.calls[0][0]).toEqual(
-            JSON.stringify(SUBSCRIPTION_MESSAGE)
+            JSON.stringify(API.SUBSCRIPTION_MESSAGE)
         );
     });
 
     test("getATXs - existing session resumes with subscription id", async () => {
         const sendMock = jest.fn();
-        const subscriptionId = mockSSMData().Parameter.Value;
+        const subscriptionId = mockSubscriptionId;
         const WebSocket = jest.fn().mockImplementation(() => ({
             on: (event: string, callback: (str?: string) => void) => {
                 if (event === "open") {
@@ -75,7 +44,7 @@ describe("api-awake-ai-atx", () => {
                     callback(
                         JSON.stringify({
                             subscriptionId,
-                            msgType: AwakeAiATXEventType.SUBSCRIPTION_STATUS,
+                            msgType: API.AwakeAiATXEventType.SUBSCRIPTION_STATUS,
                         })
                     );
                 }
@@ -83,14 +52,14 @@ describe("api-awake-ai-atx", () => {
             send: sendMock,
             close: NO_OP,
         }));
-        const api = new AwakeAiATXApi("", "", WebSocket, new AWS.SSM());
+        const api = new API.AwakeAiATXApi("", "", WebSocket);
 
         await api.getATXs(10);
         await api.getATXs(10);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
         expect(sendMock.mock.calls[1][0]).toEqual(
-            JSON.stringify(AwakeAiATXApi.createResumeMessage(subscriptionId))
+            JSON.stringify(API.AwakeAiATXApi.createResumeMessage(subscriptionId))
         );
     });
 
@@ -107,7 +76,7 @@ describe("api-awake-ai-atx", () => {
             send: jest.fn(),
             close: NO_OP,
         }));
-        const api = new AwakeAiATXApi("", "", WebSocket, new AWS.SSM());
+        const api = new API.AwakeAiATXApi("", "", WebSocket);
 
         const atxs = await api.getATXs(10);
 
@@ -125,12 +94,7 @@ describe("api-awake-ai-atx", () => {
             send: jest.fn(),
             close: NO_OP,
         }));
-        jest.mock("aws-sdk", () => {
-            return {
-                SSM: jest.fn(() => mockSSM),
-            };
-        });
-        const api = new AwakeAiATXApi("", "", WebSocket, new AWS.SSM());
+        const api = new API.AwakeAiATXApi("", "", WebSocket);
 
         await expect(api.getATXs(10)).rejects.toEqual("Error");
     });

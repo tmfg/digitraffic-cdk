@@ -8,7 +8,6 @@ import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import WebSocket from "ws";
-import { SSM } from "aws-sdk";
 
 interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
     readonly atxurl: string;
@@ -28,6 +27,9 @@ const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>(
 
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
+// allow 10000 ms for SQS sends, this is a completely made up number
+const SQS_SEND_TIME = 10000;
+
 export async function handler(event: unknown, context: Context) {
     await rdsHolder
         .setCredentials()
@@ -35,12 +37,11 @@ export async function handler(event: unknown, context: Context) {
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
             
             const service = new AwakeAiATXService(
-                new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket, new SSM())
+                new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket)
             );
 
-            // allow 10000 ms for SQS sends, this is a completely made up number
             const timestamps = await service.getATXs(
-                context.getRemainingTimeInMillis() - 10000
+                context.getRemainingTimeInMillis() - SQS_SEND_TIME
             );
             console.info(
                 "method=updateAwakeAiAtxTimestamps.handler count=%d",
