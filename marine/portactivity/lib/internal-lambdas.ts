@@ -338,7 +338,7 @@ function createUpdateAwakeAiATXTimestampsLambda(
         functionName,
         "update-awake-ai-atx-timestamps",
         {
-            timeout: 30,
+            timeout: 40,
         }
     );
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf, {

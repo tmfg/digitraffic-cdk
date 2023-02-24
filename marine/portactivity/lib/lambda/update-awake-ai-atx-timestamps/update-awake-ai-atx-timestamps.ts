@@ -38,9 +38,9 @@ export async function handler(event: unknown, context: Context) {
                 new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket, new SSM())
             );
 
-            // allow 1000 ms for SQS sends, this is a completely made up number
+            // allow 10000 ms for SQS sends, this is a completely made up number
             const timestamps = await service.getATXs(
-                context.getRemainingTimeInMillis() - 1000
+                context.getRemainingTimeInMillis() - 10000
             );
             console.info(
                 "method=updateAwakeAiAtxTimestamps.handler count=%d",
