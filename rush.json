@@ -1,0 +1,45 @@
+/**
+ * This is the main configuration file for Rush.
+ * For full documentation, please see https://rushjs.io
+ */
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+
+  /**
+   * (Required) This specifies the version of the Rush engine to be used in this repo.
+   * Rush's "version selector" feature ensures that the globally installed tool will
+   * behave like this release, regardless of which version is installed globally.
+   *
+   * The common/scripts/install-run-rush.js automation script also uses this version.
+   *
+   * NOTE: If you upgrade to a new major version of Rush, you should replace the "v5"
+   * path segment in the "$schema" field for all your Rush config files.  This will ensure
+   * correct error-underlining and tab-completion for editors such as VS Code.
+   */
+  "rushVersion": "5.93.1",
+
+  "pnpmVersion": "7.27.1",
+  "nodeSupportedVersionRange": ">=16.13.0 <17.0.0 || >=18.0.0 <19.0.0",
+  "ensureConsistentVersions": true,
+
+  "repository": {
+    "url": "https://github.com/fintraffic-vts/mcp-cdk",
+    "defaultBranch": "master",
+    "defaultRemote": "origin"
+  },
+
+  "allowedProjectTags": [ "internal", "cdk", "library" ],
+
+  "projects": [
+    {
+      "packageName": "@digitraffic-cdk/rig",
+      "projectFolder": "tools/digitraffic-rig",
+      "tags": ["internal"]
+    },
+    {
+      "packageName": "@digitraffic-cdk/toolchain",
+      "projectFolder": "tools/toolchain",
+      "tags": ["internal"]
+    }
+  ]
+}

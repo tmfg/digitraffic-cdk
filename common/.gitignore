@@ -1,0 +1,15 @@
+
+!/config/
+!/config/**/
+!/config/rush/*
+!/git-hooks/
+!/git-hooks/*
+!/scripts/
+!/scripts/*.js
+
+# Rush autoinstallers
+!/autoinstallers/
+!/autoinstallers/*/
+!/autoinstallers/*/.npmrc
+!/autoinstallers/*/package.json
+!/autoinstallers/*/pnpm-lock.yaml

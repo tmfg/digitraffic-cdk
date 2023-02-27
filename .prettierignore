@@ -1,2 +1,15 @@
+# Rush files
+common/changes
+common/scripts
+common/config
+CHANGELOG.*
+
+# Package manager files
 pnpm-lock.yaml
+shrinkwrap.json
 *.py
+
+# Build outputs
+dist
+
+*.md

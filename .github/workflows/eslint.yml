@@ -1,6 +1,6 @@
 name: ESLint
 
-on: [push]
+on: [workflow_dispatch]
 
 jobs:
   lint:
