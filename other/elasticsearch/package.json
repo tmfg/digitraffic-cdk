@@ -4,18 +4,19 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w",
+    "cdk": "cdk",
     "test": "echo no tests for this project",
-    "cdk": "cdk"
-  },
-  "devDependencies": {
-    "@types/node": "*",
-    "ts-node": "^10.9.1",
-    "typescript": "*"
+    "watch": "tsc -w"
   },
   "dependencies": {
     "aws-cdk-lib": "2.51.1",
     "constructs": "10.1.168",
     "source-map-support": "^0.5.19"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@types/node": "*",
+    "ts-node": "^10.9.1",
+    "typescript": "*"
   }
 }

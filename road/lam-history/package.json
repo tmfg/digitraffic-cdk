@@ -3,25 +3,33 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "build": "tsc",
     "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
+    "eslint-report": "eslint . --format html -o report.html",
+    "lint": "eslint --cache .",
     "test": "jest --detectOpenHandles --forceExit",
     "cdk": "cdk",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff LamHistoryTest",
     "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff LamHistoryProd",
     "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy LamHistoryTest",
-    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy LamHistoryProd"
+    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy LamHistoryProd",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@digitraffic/common": "2023.2.13-1",
+    "aws-cdk-lib": "2.62.2",
+    "aws-sdk": "2.1304.0",
+    "axios": "^1.2.0",
+    "constructs": "10.1.235"
   },
   "devDependencies": {
     "@aws-cdk/assert": "2.62.2",
+    "@digitraffic-cdk/toolchain": "workspace:*",
     "@types/aws-lambda": "8.10.108",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.14.2",
@@ -38,7 +46,7 @@
     "@digitraffic/common": "2023.2.13-1",
     "aws-cdk-lib": "2.62.2",
     "aws-sdk": "2.1304.0",
-    "axios": "^1.3.4",
+    "axios": "^1.2.0",
     "constructs": "10.1.235"
   }
 }

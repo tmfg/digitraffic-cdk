@@ -3,16 +3,15 @@
   "version": "0.2.0",
   "private": true,
   "scripts": {
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "build": "tsc",
     "postbuild": "esbuild lib/lambda/**/*.ts lib/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16; ts-node lib/lambda-versions",
-    "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
+    "cdk": "cdk",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "cdk": "cdk",
+    "eslint-report": "eslint . --format html -o report.html",
+    "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "echo no tests for this project",
     "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff CloudfrontRoadTest",
@@ -24,9 +23,18 @@
     "cdk-diff-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff CloudfrontMarineProd",
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy CloudfrontMarineProd",
     "cdk-diff-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test deploy CloudfrontStatusTest",
-    "cdk-deploy-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test diff CloudfrontStatusTest"
+    "cdk-deploy-status-test": "../../scripts/cdk-diff-and-deploy.sh status-test diff CloudfrontStatusTest",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@digitraffic/common": "2023.3.17-1",
+    "aws-cdk-lib": "2.62.2",
+    "constructs": "10.1.249",
+    "p-limit": "4.0.0",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
+    "@digitraffic-cdk/toolchain": "workspace:*",
     "@types/aws-lambda": "8.10.108",
     "@types/node": "*",
     "@types/sinon": "*",
@@ -37,13 +45,6 @@
     "sinon": "*",
     "ts-node": "^10.9.1",
     "typescript": "4.9.5"
-  },
-  "dependencies": {
-    "@digitraffic/common": "2023.3.17-1",
-    "aws-cdk-lib": "2.62.2",
-    "constructs": "10.1.249",
-    "p-limit": "4.0.0",
-    "source-map-support": "^0.5.19"
   },
   "externals": [
     "aws-sdk"

@@ -3,34 +3,18 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "build": "tsc",
     "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
+    "cdk": "cdk",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
+    "eslint-report": "eslint . --format html -o report.html",
+    "lint": "eslint --cache .",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles --forceExit",
-    "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
-  },
-  "devDependencies": {
-    "@types/aws-lambda": "8.10.108",
-    "@types/jest": "^29.2.3",
-    "@types/node": "*",
-    "@types/sinon": "*",
-    "@types/xml2js": "^0.4.8",
-    "aws-sdk": "2.1260.0",
-    "esbuild": "*",
-    "jest": "^29.3.1",
-    "jest-junit": "^15.0.0",
-    "parallelshell": "3.0.2",
-    "sinon": "*",
-    "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1",
-    "typescript": "*"
+    "watch": "tsc -w"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
@@ -46,5 +30,22 @@
     "source-map-support": "^0.5.19",
     "spex": "^3.2.0",
     "uuid": "^9.0.0"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@types/aws-lambda": "8.10.108",
+    "@types/jest": "^29.2.3",
+    "@types/node": "*",
+    "@types/sinon": "*",
+    "@types/xml2js": "^0.4.8",
+    "aws-sdk": "2.1260.0",
+    "esbuild": "*",
+    "jest": "^29.3.1",
+    "jest-junit": "^15.0.0",
+    "parallelshell": "3.0.2",
+    "sinon": "*",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "*"
   }
 }

@@ -6,18 +6,19 @@
   },
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w",
-    "test": "echo no tests for this project"
-  },
-  "devDependencies": {
-    "@types/node": "*",
-    "ts-node": "*",
-    "typescript": "*"
+    "test": "echo no tests for this project",
+    "watch": "tsc -w"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
     "aws-cdk-lib": "2.51.1",
     "constructs": "10.1.168",
     "source-map-support": "*"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@types/node": "*",
+    "ts-node": "*",
+    "typescript": "*"
   }
 }

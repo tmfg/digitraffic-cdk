@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-cdk-old.json",
   "compilerOptions": {
     "outDir": "dist/out",
     "resolveJsonModule": true,

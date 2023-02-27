@@ -3,26 +3,36 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
-    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
-    "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
+    "build": "tsc",
+    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "cdk": "cdk",
+    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy",
+    "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
+    "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
+    "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "test": "jest --runInBand --detectOpenHandles",
-    "cdk": "cdk",
+    "compile-canaries": "esbuild lib/canaries/*.ts --bundle --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "eslint-report": "eslint . --format html -o report.html",
+    "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "cdk-diff-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test diff",
-    "cdk-diff-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod diff",
-    "cdk-deploy-road-test": "../../scripts/cdk-diff-and-deploy.sh road-test deploy",
-    "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy"
+    "test": "jest --runInBand --detectOpenHandles",
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@digitraffic/common": "2022.11.23-5",
+    "aws-cdk-lib": "^2.51.1",
+    "axios": "^1.2.0",
+    "constructs": "10.1.168",
+    "pg-native": "*",
+    "pg-promise": "10.15.2",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
+    "@digitraffic-cdk/toolchain": "workspace:*",
     "@types/aws-lambda": "8.10.108",
     "@types/jest": "^29.2.3",
     "@types/node": "*",
@@ -36,15 +46,6 @@
     "spex": "^3.2.0",
     "ts-jest": "^29.0.3",
     "typescript": "*"
-  },
-  "dependencies": {
-    "@digitraffic/common": "2022.11.23-5",
-    "aws-cdk-lib": "^2.51.1",
-    "axios": "^1.2.0",
-    "constructs": "10.1.168",
-    "pg-native": "*",
-    "pg-promise": "10.15.2",
-    "source-map-support": "^0.5.19"
   },
   "externals": [
     "aws-sdk"

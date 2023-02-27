@@ -4,21 +4,22 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
+    "eslint-report": "eslint . --format html -o report.html",
+    "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml"
-  },
-  "devDependencies": {
-    "@types/aws-lambda": "8.10.108",
-    "@types/node": "*",
-    "typescript": "*"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
     "aws-cdk-lib": "2.51.1",
     "constructs": "10.1.168"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@types/aws-lambda": "8.10.108",
+    "@types/node": "*",
+    "typescript": "*"
   },
   "externals": [
     "aws-sdk"

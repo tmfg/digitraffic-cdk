@@ -3,20 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "build": "tsc",
     "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "watch": "tsc -w",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
+    "cdk": "cdk",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
+    "eslint-report": "eslint . --format html -o report.html",
+    "lint": "eslint --cache .",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest",
-    "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
+    "watch": "tsc -w"
+  },
+  "dependencies": {
+    "@digitraffic/common": "2023.2.13-1",
+    "@types/aws-lambda": "8.10.108",
+    "aws-cdk-lib": "2.62.2",
+    "aws-sdk": "^2.1318.0",
+    "constructs": "10.1.235",
+    "source-map-support": "^0.5.19"
   },
   "devDependencies": {
+    "@digitraffic-cdk/toolchain": "workspace:*",
     "@types/jest": "^29.4.0",
     "@types/node": "^18.14.0",
     "@types/sinon": "^10.0.13",
@@ -27,14 +36,6 @@
     "sinon": "*",
     "ts-jest": "^29.0.3",
     "typescript": "^4.9.5"
-  },
-  "dependencies": {
-    "@digitraffic/common": "2023.2.13-1",
-    "@types/aws-lambda": "8.10.108",
-    "aws-cdk-lib": "2.62.2",
-    "aws-sdk": "^2.1318.0",
-    "constructs": "10.1.235",
-    "source-map-support": "^0.5.19"
   },
   "externals": [
     "aws-sdk"
