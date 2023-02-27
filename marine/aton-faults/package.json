@@ -4,8 +4,8 @@
   "private": true,
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc",
-    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
+    "build": "tsc && pnpm postbuild",
+    "postbuild": "pnpm run compile-lambdas && pnpm run compile-canaries",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "clean": "rimraf dist cdk.out",

@@ -3,9 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc",
-    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
+    "all-watch": "parallelshell \"pnpm run watch\" \"pnpm run bundle-watch\"",
+    "build": "tsc && pnpm postbuild",
+    "postbuild": "pnpm run compile-lambdas && pnpm run compile-canaries",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "cdk-deploy-road-prod": "../../scripts/cdk-diff-and-deploy.sh road-prod deploy",

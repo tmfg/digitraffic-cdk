@@ -5,7 +5,7 @@
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "prebuild": "json2ts -i lib/schemas/ -o lib/generated/",
-    "build": "tsc",
+    "build": "pnpm prebuild && tsc && pnpm postbuild",
     "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",

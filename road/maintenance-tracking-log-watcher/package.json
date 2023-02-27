@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc",
+    "all-watch": "parallelshell \"pnpm run watch\" \"pnpm run bundle-watch\"",
+    "build": "tsc && pnpm postbuild",
     "postbuild": "esbuild lib/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
