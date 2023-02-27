@@ -11,7 +11,7 @@ echo "<app>-<env>: ${FULL_ENV}"
 SCRIPT_DIR=$(dirname "$0")
 . ${SCRIPT_DIR}/cdk-set-env.sh ${FULL_ENV}
 
-read -p "Are you sure you wanna run: cdk bootstrap for ${FULL_ENV}? " -n 1 -r
+read -p "Are you sure you wanna run: pnpm dlx cdk@latest bootstrap for ${FULL_ENV}? " -n 1 -r
 echo    # move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then

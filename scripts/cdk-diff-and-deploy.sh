@@ -45,10 +45,17 @@ else
     STACK=${STACK_NAME}
 fi
 
+
+if [ -z "${STACK}" ]
+then
+      echo "Could not find the stack for ${DT_PROJECT} ${DT_PROJECT_ENV}"
+exit 1;
+fi
+
 echo "Using Stack: ${STACK}"
 echo
 
-read -p "Are you sure you wanna run: cdk ${OPERATION} ${STACK}? " -n 1 -r
+read -p "Are you sure you wanna run: pnpm dlx cdk@latest ${OPERATION} ${STACK}? " -n 1 -r
 echo    # move to a new line
 if [[ $REPLY =~ ^[Yy]$ ]]
 then

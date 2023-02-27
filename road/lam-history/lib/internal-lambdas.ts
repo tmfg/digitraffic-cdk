@@ -50,6 +50,8 @@ function createDataUpdateLambda(
         environment,
         {
             singleLambda: true,
+            memorySize: 128,
+            reservedConcurrentExecutions: 10,
         }
     );
 }
