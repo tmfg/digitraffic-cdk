@@ -1,97 +1,59 @@
 name: ESLint
 
-on: [workflow_dispatch]
+on: [push]
+
+env:
+  CI_DIR: "ci"
 
 jobs:
-  lint:
+  generate-reports:
     if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-22.04
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+      - name: Git config user
+        uses: snow-actions/git-config-user@v1.0.0
         with:
-          fetch-depth: 0
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+          name: Digitraffic CI
+          email: digitraffic@solita.fi
+      - uses: actions/setup-node@v3
         with:
-          version: 7
+          node-version: 16
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: "16"
-          cache: "pnpm"
+      - name: Rush Install
+        run: node common/scripts/install-run-rush.js install
 
-      - name: Install packages
-        run: pnpm install -r
-
-      - name: Create ESLint reports from all project
-        if: ${{ github.ref_name == 'master' }}
-        id: report-all
-        run: pnpm eslint-report:all
-        continue-on-error: true
-
-      - name: Find fork-point for affected runs
-        if: ${{ github.ref_name != 'master' }}
-        id: fork-point
-        run: |
-          echo -n "fork-point-sha=" >> $GITHUB_OUTPUT
-          git merge-base origin/master HEAD >> $GITHUB_OUTPUT
-
-      - name: Create ESLint reports for affected projects
-        if: ${{ github.ref_name != 'master' }}
-        id: report-affected
-        run: pnpm eslint-report:affected
-        env:
-          NX_BASE: ${{ steps.fork-point.outputs.fork-point-sha }}
-          NX_HEAD: HEAD
-        continue-on-error: true
+      - name: Create eslint reports
+        run: node common/scripts/install-run-rush.js ci:eslint-report
 
       - name: Find report files
         id: reports
-        shell: python
-        run: |
-          import os
-          import os.path
-          import json
-          from glob import glob
-          from html.parser import HTMLParser
+        shell: sh
+        run: python ${{ env.CI_DIR }}/find-reports.py
 
-          class ReportParser(HTMLParser):
-            def __init__(self):
-              super().__init__()
-              self.reset()
-              self.data = ""
-              self.state = ""
-            def handle_starttag(self, tag, attrs):
-              if self.state == "stop": return
-              if tag == "div":
-                for attr_name, attr_value in attrs:
-                  if attr_name == "id" and attr_value == "overview":
-                    self.state = "div-id-overview"
-              if self.state == "div-id-overview" and tag == "span":
-                self.state = "div-id-overview-span"
-            def handle_data(self, data):
-              if self.state == "div-id-overview-span":
-                self.data = data
-                self.state = "stop"
+      - name: Archive reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: ${{ github.ref_name }}/
 
-          ref = os.environ["GITHUB_REF_NAME"]
-          reports = [_ for _ in glob("*/*/report.html") if "node_modules" not in _]
-          reports_created = []
-          for r in reports:
-            parser = ReportParser()
-            parser.feed(open(r).read())
-            dst = os.path.join(ref, r)
-            reports_created.append([r, dst, parser.data])
-            os.makedirs(os.path.dirname(dst))
-            print(f"moving file from: {r} to {dst}")
-            os.rename(r, dst)
-          open(os.environ["GITHUB_ENV"], "a").write(f"REPORTS_CREATED={json.dumps(reports_created)}")
+  publish:
+    needs: generate-reports
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Download reports
+        uses: actions/download-artifact@v3
+        with:
+          name: reports
+          path: ${{ github.ref_name }}/
+
+      - name: Create summary
+        shell: sh
+        run: python ${{ env.CI_DIR }}/create-summary.py
 
       - name: Publish report
-        id: publish-reports
         uses: tmfg/digitraffic-actions@gh-pages-publish/v1
         with:
           GH_PAGES_BRANCH: gh-pages
@@ -100,19 +62,25 @@ jobs:
           NO_SUMMARY: true
         continue-on-error: true
 
-      - name: Create summary
-        if: steps.publish-reports.outcome == 'success'
+      # gh-pages-publish changes to gh-pages branch, which doesn't have ci scripts.
+      - name: Fail on ESLint errors
         shell: python
         run: |
           import os
+          import sys
+          import os.path
           import json
-          reports_created = json.loads(os.environ["REPORTS_CREATED"])
-          (org, repo) = os.environ["GITHUB_REPOSITORY"].split("/")
-          project = lambda x: "/".join(x.split()[-1:])
-          status = lambda x: "🟢" if x == "0 problems" else "🟠" if "0 errors" in x else "🔴"
-          summary = [f"{status(s)} ESLint report for [{project(r)}](https://{org}.github.io/{repo}/{dst}) ({s})" for (r, dst, s) in reports_created]
-          open(os.environ["GITHUB_STEP_SUMMARY"], "a").write("\n".join(summary))
 
-      - name: Fail on ESLint errors
-        run: |
-          if [[ "${{ steps.report-all.outcome }}" == "failure" || "${{ steps.report-affected.outcome }}" == "failure" ]]; then exit 1; else exit 0; fi
+          reports_file = os.path.join(os.environ["GITHUB_REF_NAME"], "reports.json")
+          reports_created = json.loads(open(reports_file).read())
+          count_errors = 0
+
+          for report_path, _, status_line in reports_created:
+              if "0 errors" in status_line:
+                  print(f"No error in {report_path}. Continue")
+                  continue
+
+              print(f"Found error in {report_path}.")
+              count_errors = count_errors + 1
+
+          sys.exit(count_errors)

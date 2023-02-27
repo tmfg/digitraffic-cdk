@@ -5,12 +5,12 @@
   "scripts": {
     "build": "tsc",
     "cdk": "cdk",
+    "ci:eslint-report": "eslint . --format html -o report.html",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "deploy": "pnpm compile-lambdas && pnpm dlx cdk@latest deploy",
     "diff": "pnpm compile-lambdas && pnpm dlx cdk@latest diff",
-    "eslint-report": "eslint . --format html -o report.html",
     "lint": "eslint --cache .",
     "nolambda": "nodemon -e ts --exec 'pnpm compile-lambdas'",
     "synth-sam": "cdk synth --no-staging > template.yaml",
