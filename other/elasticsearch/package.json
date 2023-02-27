@@ -5,6 +5,7 @@
   "scripts": {
     "build": "tsc",
     "cdk": "cdk",
+    "ci:eslint-report": "",
     "test": "echo no tests for this project",
     "watch": "tsc -w"
   },

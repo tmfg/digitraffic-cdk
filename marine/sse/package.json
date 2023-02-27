@@ -13,7 +13,7 @@
     "cdk-deploy-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
     "cdk-diff-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod diff",
     "cdk-diff-test": "../../scripts/cdk-diff-and-deploy.sh marine-test diff",
-    "ci:eslint-report": "eslint . --format html -o report.html",
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out lib/generated",
     "clean:force": "rimraf dist cdk.out lib/generated node_modules",
     "lint": "eslint --cache .",

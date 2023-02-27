@@ -6,6 +6,7 @@
   },
   "scripts": {
     "build": "tsc",
+    "ci:eslint-report": "",
     "test": "echo no tests for this project",
     "watch": "tsc -w"
   },

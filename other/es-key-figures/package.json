@@ -8,6 +8,7 @@
     "postbuild": "esbuild lib/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "echo no tests for this project",
     "watch": "tsc -w"
