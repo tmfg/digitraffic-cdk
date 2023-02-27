@@ -20,7 +20,7 @@
 
   "pnpmVersion": "7.27.1",
   "nodeSupportedVersionRange": ">=16.13.0 <17.0.0 || >=18.0.0 <19.0.0",
-  "ensureConsistentVersions": true,
+  "ensureConsistentVersions": false,
 
   "repository": {
     "url": "https://github.com/fintraffic-vts/mcp-cdk",
