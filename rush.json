@@ -28,9 +28,179 @@
     "defaultRemote": "origin"
   },
 
-  "allowedProjectTags": [ "internal", "cdk", "library" ],
+  "allowedProjectTags": [
+    "internal",
+    "cdk",
+    "library",
+    "marine",
+    "rail",
+    "road",
+    "other",
+    "aviation"
+  ],
 
   "projects": [
+    // aviation
+    {
+      "packageName": "aviation-data",
+      "projectFolder": "aviation/aviation-data",
+      "tags": ["cdk", "aviation"]
+    },
+
+    // marine
+    {
+      "packageName": "aton-faults",
+      "projectFolder": "marine/aton-faults",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "bridge-lock-disruptions",
+      "projectFolder": "marine/bridge-lock-disruptions",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "gofrep",
+      "projectFolder": "marine/gofrep",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "marinecam",
+      "projectFolder": "marine/marinecam",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "nautical-warnings",
+      "projectFolder": "marine/nautical-warnings",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "portactivity",
+      "projectFolder": "marine/portactivity",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "shiplight",
+      "projectFolder": "marine/shiplight",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "sse-sea-state-estimate",
+      "projectFolder": "marine/sse",
+      "tags": ["cdk", "marine"]
+    },
+    {
+      "packageName": "voyage-plan-gateway",
+      "projectFolder": "marine/voyage-plan-gateway",
+      "tags": ["cdk", "marine"]
+    },
+
+    // other
+    {
+      "packageName": "digitraffic-aws-github-oidc",
+      "projectFolder": "other/aws-github-oidc",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "cloudfront",
+      "projectFolder": "other/cloudfront",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "cloudwatch-logs-recipient",
+      "projectFolder": "other/cloudwatch-logs-recipient",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "digitraffic-statistics",
+      "projectFolder": "other/digitraffic-statistics",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "elasticsearch",
+      "projectFolder": "other/elasticsearch",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "es-key-figures",
+      "projectFolder": "other/es-key-figures",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "monitoring",
+      "projectFolder": "other/monitoring",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "patchmanager-cdk",
+      "projectFolder": "other/patchmanager",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "status-cdk",
+      "projectFolder": "other/status",
+      "tags": ["cdk", "other"]
+    },
+    {
+      "packageName": "swagger-joiner",
+      "projectFolder": "other/swagger-joiner",
+      "tags": ["cdk", "other"]
+    },
+
+    // rail
+    {
+      "packageName": "rail-rata-cdk",
+      "projectFolder": "rail/rata",
+      "tags": ["cdk", "rail"]
+    },
+
+    // road
+    {
+      "packageName": "counting-sites",
+      "projectFolder": "road/counting-site",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "lam-history",
+      "projectFolder": "road/lam-history",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "maintenance-tracking",
+      "projectFolder": "road/maintenance-tracking",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "maintenance-tracking-watch",
+      "projectFolder": "road/maintenance-tracking-log-watcher",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "maintenance-tracking-municipality",
+      "projectFolder": "road/maintenance-tracking-municipality",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "open311-cdk",
+      "projectFolder": "road/open311",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "road-network-conditions",
+      "projectFolder": "road/road-network-conditions",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "street-traffic-messages",
+      "projectFolder": "road/street-traffic-message",
+      "tags": ["cdk", "road"]
+    },
+    {
+      "packageName": "variable-signs",
+      "projectFolder": "road/variable-signs",
+      "tags": ["cdk", "road"]
+    },
+
+    // internal
     {
       "packageName": "@digitraffic-cdk/rig",
       "projectFolder": "tools/rig",
