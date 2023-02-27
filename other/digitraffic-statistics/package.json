@@ -17,8 +17,10 @@
   },
   "devDependencies": {
     "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/eslint-config": "~3.2.0",
     "@types/aws-lambda": "8.10.108",
     "@types/node": "*",
+    "eslint": "~8.35.0",
     "typescript": "*"
   },
   "externals": [

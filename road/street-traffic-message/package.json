@@ -33,6 +33,7 @@
   },
   "devDependencies": {
     "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/eslint-config": "~3.2.0",
     "@types/aws-lambda": "8.10.108",
     "@types/geojson": "^7946.0.7",
     "@types/jest": "^29.2.3",
@@ -40,6 +41,7 @@
     "@types/sinon": "*",
     "@types/xml2js": "^0.4.8",
     "esbuild": "*",
+    "eslint": "~8.35.0",
     "jest": "^29.3.1",
     "jest-junit": "^15.0.0",
     "sinon": "*",
