@@ -1,7 +1,8 @@
 *
 
 !.gitignore
-!.eslintrc.cjs
+!.eslintrc.js
+!.eslintignore
 !.node-version
 
 !/.editorconfig
@@ -24,15 +25,17 @@
 !/common/*/
 !rush.json
 
-!road/
-!road/*/
-!rail/
-!rail/*/
+!aviation/
+!aviation/*/
+!lib/
+!lib/*/
 !marine/
 !marine/*/
 !other/
 !other/*/
+!rail/
+!rail/*/
+!road/
+!road/*/
 !tools/
 !tools/*/
-!lib/
-!lib/*/

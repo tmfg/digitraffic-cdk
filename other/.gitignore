@@ -1,0 +1,18 @@
+
+!/*/
+!/*/*.json
+
+# new format
+!/*/config/
+!/*/config/*.json
+!/*/src/
+!/*/src/**/
+!/*/src/**/*.ts
+
+# old format
+!/*/lib/
+!/*/lib/**/
+!/*/lib/**/*.ts
+!/*/test/
+!/*/test/**/
+!/*/test/**/*.ts
