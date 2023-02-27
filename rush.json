@@ -33,7 +33,7 @@
   "projects": [
     {
       "packageName": "@digitraffic-cdk/rig",
-      "projectFolder": "tools/digitraffic-rig",
+      "projectFolder": "tools/rig",
       "tags": ["internal"]
     },
     {

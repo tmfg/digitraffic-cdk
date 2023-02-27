@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig-default-nodenext.json",
+  "compilerOptions": {
+    "outDir": "../../../../dist/out"
+  },
+  "include": ["../../../../src/**/*.ts"]
+}

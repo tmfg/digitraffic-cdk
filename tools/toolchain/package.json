@@ -1,0 +1,15 @@
+{
+  "name": "@digitraffic-cdk/toolchain",
+  "version": "1.0.0",
+  "private": true,
+  "description": "digitraffic-cdk toolchain",
+  "type": "module",
+  "scripts": {
+    "build": "",
+    "ci:eslint-report": "",
+    "test": ""
+  },
+  "devDependencies": {
+    "eslint": "^8.34.0"
+  }
+}
