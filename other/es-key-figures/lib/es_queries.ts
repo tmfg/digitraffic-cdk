@@ -11,7 +11,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -29,7 +39,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -48,7 +68,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -67,7 +97,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -95,7 +135,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -123,7 +173,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -151,7 +211,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -179,7 +249,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
@@ -198,7 +278,17 @@ export const esQueries = [
                                 "analyze_wildcard": true,
                                 "time_zone": "Europe/Helsinki"
                             }
-                        }], "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
+                        }],
+                        "must_not":
+                            [
+                                {
+                                    "term": {
+                                        "skip_statistics": true
+                                    }
+                                }
+                            ]
+                        ,
+                        "filter": [{"range": {"@timestamp": {"gte": "START_TIME", "lte": "END_TIME", "format": "strict_date_optional_time"}}}]
                     }
                 }
             },
