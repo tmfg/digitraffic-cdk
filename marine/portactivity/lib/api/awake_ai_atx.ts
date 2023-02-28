@@ -3,6 +3,7 @@ import { AwakeAiZoneType } from "./awake_common";
 import { AWSError, SSM } from "aws-sdk";
 import * as URL from "url";
 import { PortActivityParameterKeys } from "../keys";
+import { PutParameterResult } from "aws-sdk/clients/ssm";
 
 interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType;
@@ -99,7 +100,7 @@ export const SUBSCRIPTION_MESSAGE = {
 
 const isAWSError = (error: unknown): error is AWSError => {
     return (
-        error !== null &&
+        !!error &&
         typeof error === "object" &&
         "code" in error &&
         "message" in error
@@ -115,7 +116,7 @@ export const getFromParameterStore = async (
     try {
         const parameter = await new SSM().getParameter(ssmParams).promise();
         return Promise.resolve(parameter.Parameter?.Value);
-    } catch (error: unknown | AWSError) {
+    } catch (error: unknown) {
         console.error(
             `method=getATXs ${
                 isAWSError(error) ? error.code : "Error"
@@ -125,23 +126,17 @@ export const getFromParameterStore = async (
     }
 };
 
-export const putInParameterStore = (name: string, value: string) => {
+export const putInParameterStore = (
+    name: string,
+    value: string
+): Promise<PutParameterResult | AWSError> => {
     const ssmParams = {
         Name: name,
         Overwrite: true,
         Type: "String",
         Value: value,
     };
-    new SSM()
-        .putParameter(ssmParams)
-        .promise()
-        .catch((e) =>
-            console.error(
-                `method=getATXs ${
-                    isAWSError(e) ? e.message : "Error updating Parameter Store"
-                }`
-            )
-        );
+    return new SSM().putParameter(ssmParams).promise();
 };
 
 export class AwakeAiATXApi {
@@ -187,15 +182,25 @@ export class AwakeAiATXApi {
                         message as AwakeAISubscriptionMessage
                     ).subscriptionId;
                     if (receivedSubscriptionId !== subscriptionId) {
-                        console.info(
-                            `method=getATXs Updating subscriptionId to ${receivedSubscriptionId}`
-                        );
                         putInParameterStore(
                             PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
                             receivedSubscriptionId
-                        );
+                        )
+                            .then(() =>
+                                console.info(
+                                    `method=getATXs Updated subscriptionId to ${receivedSubscriptionId}`
+                                )
+                            )
+                            .catch((e) =>
+                                console.error(
+                                    `method=getATXs ${
+                                        isAWSError(e)
+                                            ? e.message
+                                            : "Error updating Parameter Store"
+                                    }`
+                                )
+                            );
                     }
-
                     break;
                 }
                 case AwakeAiATXEventType.EVENT:

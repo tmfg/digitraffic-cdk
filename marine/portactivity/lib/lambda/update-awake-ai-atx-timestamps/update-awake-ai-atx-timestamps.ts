@@ -27,7 +27,9 @@ const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>(
 
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
-// allow 10000 ms for SQS sends, this is a completely made up number
+/**
+ * allow 10000 ms for SQS sends, this is a completely made up number
+ */
 const SQS_SEND_TIME = 10000;
 
 export async function handler(event: unknown, context: Context) {
