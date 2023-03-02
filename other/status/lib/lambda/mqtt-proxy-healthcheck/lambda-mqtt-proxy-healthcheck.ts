@@ -1,57 +1,56 @@
-import { Client } from "paho-mqtt";
 import { ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { setTimeout } from "timers/promises";
+import mqtt from "mqtt";
 
 export const KEY_APP = "KEY_APP";
-
-const APP = process.env[KEY_APP] as string;
+const PROTOCOL = "wss";
+const CLIENT_ID = "hc-proxy";
 
 /**
- * Paho MQTT requires a browser environment to run. Fake the required parts.
+ * timeout in milliseconds.
  */
-function fakeBrowserHack() {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    global.WebSocket = require("ws");
+const TIMEOUT = 8 * 1000;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (global as any).localStorage = {
-        store: {},
-        getItem: function (key: string) {
-            return this.store[key];
-        },
-        setItem: function (key: string, value: string) {
-            this.store[key] = value;
-        },
-        removeItem: function (key: string) {
-            delete this.store[key];
-        },
-    };
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (global as any).window = global;
-}
+const defaultOptions = {
+    port: 443,
+    username: "digitraffic",
+    password: "digitrafficPassword",
+    connectTimeout: TIMEOUT,
+};
+
+const getApp: () => string = () => getEnvVariable(KEY_APP);
+
+type ConnectionStatus = { type: "success" } | { type: "timeout" };
 
 export async function handler(): Promise<ProxyLambdaResponse> {
-    fakeBrowserHack();
+    const client = mqtt.connect(
+        `${PROTOCOL}://${getApp()}.digitraffic.fi/mqtt`,
+        {
+            ...defaultOptions,
+            clientId: CLIENT_ID,
+        }
+    );
 
-    const client = new Client(`${APP}.digitraffic.fi`, 61619, "hc-proxy");
+    const connectPromise = new Promise(
+        (resolve: (value: ConnectionStatus) => void) => {
+            client.on("connect", () => {
+                resolve({ type: "success" });
+            });
+        }
+    );
 
-    const promise = new Promise((resolve, reject) => {
-        client.connect({
-            onSuccess: resolve,
-            onFailure: reject,
-            useSSL: true,
-            userName: "digitraffic",
-            password: "digitrafficPassword",
-        });
+    const result: ConnectionStatus = await Promise.race([
+        connectPromise,
+        setTimeout(9000, { type: "timeout" } satisfies ConnectionStatus),
+    ]).finally(() => {
+        client.end();
     });
-    await promise;
 
     const resp = {
-        statusCode: client.isConnected() ? 200 : 500,
+        statusCode: result.type === "success" ? 200 : 500,
         body: "",
     };
-
-    client.disconnect();
 
     return resp;
 }
