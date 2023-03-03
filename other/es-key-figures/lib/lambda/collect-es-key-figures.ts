@@ -237,13 +237,15 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
 
     const CREATE_KEY_FIGURES_TABLE =
         "CREATE TABLE ?? ( `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `from` DATE NOT NULL, `to` DATE NOT NULL, `name` VARCHAR(100) NOT NULL,`filter` VARCHAR(1000) NOT NULL, `query` VARCHAR(1000) NOT NULL, `value` JSON NOT NULL, PRIMARY KEY (`id`))";
+    const CREATE_KEY_FIGURES_INDEX =
+        "CREATE INDEX filter_name_date ON ?? (`filter`, `name`, `from`, `to`);";
 
     try {
         const tables = await query("show tables");
 
         if ((tables as Record<string, unknown>[]).length === 0) {
             await query(CREATE_KEY_FIGURES_TABLE, [KEY_FIGURES_TABLE_NAME]);
-            await query("CREATE INDEX filter_name_date ON ?? (`filter`, `name`, `from`, `to`);", [KEY_FIGURES_TABLE_NAME]);
+            await query(CREATE_KEY_FIGURES_INDEX, [KEY_FIGURES_TABLE_NAME]);
         }
 
         const startIsoDate = startDate.toISOString().substring(0, 10);
@@ -256,6 +258,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
             );
             await query("DROP TABLE IF EXISTS ??", [DUPLICATES_TABLE_NAME]);
             await query(CREATE_KEY_FIGURES_TABLE, [DUPLICATES_TABLE_NAME]);
+            await query(CREATE_KEY_FIGURES_INDEX, [DUPLICATES_TABLE_NAME]);
             await insertFigures(kibanaResults, DUPLICATES_TABLE_NAME);
         } else {
             await insertFigures(kibanaResults, KEY_FIGURES_TABLE_NAME);
