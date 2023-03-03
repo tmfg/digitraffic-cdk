@@ -10,18 +10,17 @@ const CLIENT_ID = "hc-proxy";
 /**
  * timeout in milliseconds.
  */
-const TIMEOUT = 8 * 1000;
+const TIMEOUT = 9 * 1000;
 
 const defaultOptions = {
     port: 443,
     username: "digitraffic",
     password: "digitrafficPassword",
-    connectTimeout: TIMEOUT,
 };
 
 const getApp: () => string = () => getEnvVariable(KEY_APP);
 
-type ConnectionStatus = { type: "success" } | { type: "timeout" };
+type ConnectionStatus = "success" | "timeout";
 
 export async function handler(): Promise<ProxyLambdaResponse> {
     const client = mqtt.connect(
@@ -35,20 +34,20 @@ export async function handler(): Promise<ProxyLambdaResponse> {
     const connectPromise = new Promise(
         (resolve: (value: ConnectionStatus) => void) => {
             client.on("connect", () => {
-                resolve({ type: "success" });
+                resolve("success");
             });
         }
     );
 
     const result: ConnectionStatus = await Promise.race([
         connectPromise,
-        setTimeout(9000, { type: "timeout" } satisfies ConnectionStatus),
+        setTimeout<"timeout">(TIMEOUT, "timeout"),
     ]).finally(() => {
         client.end();
     });
 
     const resp = {
-        statusCode: result.type === "success" ? 200 : 500,
+        statusCode: result === "success" ? 200 : 500,
         body: "",
     };
 
