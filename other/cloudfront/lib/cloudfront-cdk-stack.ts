@@ -1,3 +1,5 @@
+import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
+import { Annotations, Aspects, Stack, StackProps } from "aws-cdk-lib";
 import {
     CfnDistribution,
     OriginAccessIdentity,
@@ -10,29 +12,29 @@ import {
     ServicePrincipal,
 } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
-import { Annotations, Aspects, Stack, StackProps } from "aws-cdk-lib";
-import { createOriginConfig } from "./origin-configs";
 import {
-    CFOrigin,
     CFLambdaParameters,
+    CFOrigin,
     CFProps,
-    ElasticProps,
     DistributionProps,
+    ElasticProps,
 } from "./app-props";
+import { createDistribution } from "./distribution-util";
+import { LambdaHolder } from "./lambda-holder";
 import {
     createGzipRequirement,
     createHttpHeaders,
     createIndexHtml,
     createIpRestriction,
+    createLamHeaders,
+    createLamRedirect,
     createWeathercamHttpHeaders,
     createWeathercamRedirect,
     FunctionType,
     LambdaType,
 } from "./lambda/lambda-creator";
-import { createDistribution } from "./distribution-util";
+import { createOriginConfig } from "./origin-configs";
 import { createRealtimeLogging, StreamingConfig } from "./streaming-util";
-import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
-import { LambdaHolder } from "./lambda-holder";
 
 type ViewerPolicyMap = Record<string, string>;
 
@@ -178,7 +180,7 @@ export class CloudfrontCdkStack extends Stack {
         if (types.lambdaTypes.has(LambdaType.WEATHERCAM_REDIRECT)) {
             if (!lParameters?.weathercamDomainName) {
                 throw new Error("Missing lambdaParameter weathercamDomainName");
-            } else if (!lParameters?.weathercamHostName) {
+            } else if (!lParameters.weathercamHostName) {
                 throw new Error("Missing lambdaParameter weathercamHostName");
             } else {
                 lambdaMap.addLambda(
@@ -212,6 +214,21 @@ export class CloudfrontCdkStack extends Stack {
                 LambdaType.HTTP_HEADERS,
                 createHttpHeaders(this, edgeLambdaRole)
             );
+        }
+
+        if (types.lambdaTypes.has(LambdaType.LAM_REDIRECT)) {
+            if (!lParameters?.smRef) {
+                throw new Error("Missing lambdaParameter smRef");
+            } else {
+                lambdaMap.addLambda(
+                    LambdaType.LAM_REDIRECT,
+                    createLamRedirect(this, edgeLambdaRole, lParameters.smRef)
+                );
+            }
+        }
+
+        if (types.lambdaTypes.has(LambdaType.LAM_HEADERS)) {
+            lambdaMap.addLambda(LambdaType.LAM_HEADERS, createLamHeaders(this, edgeLambdaRole));
         }
 
         if (types.functionTypes.has(FunctionType.INDEX_HTML)) {

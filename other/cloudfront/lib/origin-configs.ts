@@ -5,10 +5,10 @@ import {
     OriginAccessIdentity,
     SourceConfiguration,
 } from "aws-cdk-lib/aws-cloudfront";
-import { Bucket } from "aws-cdk-lib/aws-s3";
-import { CFBehavior, CFOrigin, CFDomain, S3Domain } from "./app-props";
 import { CfnDistribution } from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
 import { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
+import { Bucket } from "aws-cdk-lib/aws-s3";
+import { CFBehavior, CFDomain, CFOrigin, S3Domain } from "./app-props";
 import { LambdaHolder } from "./lambda-holder";
 
 export function createOriginConfig(
@@ -21,16 +21,21 @@ export function createOriginConfig(
         if (!oai) {
             throw new Error("OAI was undefined! OAI is needed for S3 origin");
         }
+
+        const domainName = origin.s3Domain ?? "s3.eu-west-1.amazonaws.com";
+
         const bucket = Bucket.fromBucketAttributes(
             stack,
             `ImportedBucketName-${origin.s3BucketName}`,
             {
                 bucketArn: `arn:aws:s3:::${origin.s3BucketName}`,
-                bucketRegionalDomainName: `${origin.s3BucketName}.s3.eu-west-1.amazonaws.com`,
+                bucketRegionalDomainName: `${origin.s3BucketName}.${domainName}`,
             }
         );
 
-        bucket.grantRead(oai);
+        if (origin.createOAI) {
+            bucket.grantRead(oai as OriginAccessIdentity);
+        }
 
         return {
             s3OriginSource: {
@@ -86,15 +91,15 @@ function createBehavior(
     //console.info('creating behavior %s with default %d', b.path, isDefaultBehavior);
     const headers = [...b.cacheHeaders];
 
-    if (b.viewerProtocolPolicy === "https-only") {
-        headers.push("Host");
-    }
-
     const forwardedValues: CfnDistribution.ForwardedValuesProperty = {
         headers,
         queryString: true,
         queryStringCacheKeys: b.queryCacheKeys,
     };
+
+    if (b.cacheHeaders != null) {
+        (forwardedValues.headers as string[]).push(...b.cacheHeaders);
+    }
 
     return {
         isDefaultBehavior,

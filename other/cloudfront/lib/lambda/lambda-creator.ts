@@ -1,12 +1,14 @@
 import { Duration, Stack } from "aws-cdk-lib";
+import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
+import { Role } from "aws-cdk-lib/aws-iam";
 import {
     Function as AWSFunction,
     InlineCode,
     Runtime,
+    Version,
 } from "aws-cdk-lib/aws-lambda";
-import { Role } from "aws-cdk-lib/aws-iam";
-import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
-import * as fs from "node:fs";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
+import fs from "node:fs";
 
 export enum LambdaType {
     WEATHERCAM_REDIRECT,
@@ -14,6 +16,8 @@ export enum LambdaType {
     HTTP_HEADERS,
     IP_RESTRICTION,
     WEATHERCAM_HTTP_HEADERS,
+    LAM_REDIRECT,
+    LAM_HEADERS,
 }
 
 export enum FunctionType {
@@ -27,10 +31,18 @@ function readBodyWithVersion(fileName: string) {
     return body.toString().replace(/EXT_VERSION/gi, versionString);
 }
 
-export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role) {
+export function createGzipRequirement(
+    stack: Stack,
+    edgeLambdaRole: Role
+): Version {
     const body = readBodyWithVersion("dist/lambda/lambda-gzip-requirement.js");
 
-    return createFunction(stack, edgeLambdaRole, "gzip-requirement", body);
+    return createVersionedFunction(
+        stack,
+        edgeLambdaRole,
+        "gzip-requirement",
+        body
+    );
 }
 
 export function createWeathercamRedirect(
@@ -38,14 +50,14 @@ export function createWeathercamRedirect(
     edgeLambdaRole: Role,
     domainName: string,
     hostName: string
-) {
+): Version {
     const body = readBodyWithVersion("dist/lambda/lambda-redirect.js");
     const functionBody = body
         .toString()
         .replace(/EXT_HOST_NAME/gi, hostName)
         .replace(/EXT_DOMAIN_NAME/gi, domainName);
 
-    return createFunction(
+    return createVersionedFunction(
         stack,
         edgeLambdaRole,
         "weathercam-redirect",
@@ -53,21 +65,21 @@ export function createWeathercamRedirect(
     );
 }
 
-export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role) {
+export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
     const body = readBodyWithVersion("dist/lambda/lambda-http-headers.js");
 
-    return createFunction(stack, edgeLambdaRole, "http-headers", body);
+    return createVersionedFunction(stack, edgeLambdaRole, "http-headers", body);
 }
 
 export function createWeathercamHttpHeaders(
     stack: Stack,
     edgeLambdaRole: Role
-) {
+): Version {
     const body = readBodyWithVersion(
         "dist/lambda/lambda-weathercam-http-headers.js"
     );
 
-    return createFunction(
+    return createVersionedFunction(
         stack,
         edgeLambdaRole,
         "weathercam-http-headers",
@@ -86,16 +98,42 @@ export function createIpRestriction(
     edgeLambdaRole: Role,
     path: string,
     ipList: string
-) {
+): Version {
     const body = readBodyWithVersion("dist/lambda/lambda-ip-restriction.js");
     const functionBody = body.toString().replace(/EXT_IP/gi, ipList);
 
-    return createFunction(
+    return createVersionedFunction(
         stack,
         edgeLambdaRole,
         `ip-restriction-${path}`,
         functionBody
     );
+}
+
+export function createLamRedirect(
+    stack: Stack,
+    edgeLambdaRole: Role,
+    smRef: string
+): Version {
+    const body = readBodyWithVersion("dist/lambda/lambda-lam-redirect.js");
+    const edgeLambda = createFunction(
+        stack,
+        edgeLambdaRole,
+        "lam-redirect",
+        body
+    );
+
+    // Allow read-access to secrets manager
+    const secret = Secret.fromSecretCompleteArn(stack, "Secret", smRef);
+    secret.grantRead(edgeLambda);
+
+    return edgeLambda.currentVersion;
+}
+
+export function createLamHeaders(stack: Stack, edgeLambdaRole: Role): Version {
+    const body = readBodyWithVersion("dist/lambda/lambda-lam-headers.js");
+
+    return createVersionedFunction(stack, edgeLambdaRole, "lam-headers", body);
 }
 
 export function createCloudfrontFunction(
@@ -115,7 +153,7 @@ export function createFunction(
     edgeLambdaRole: Role,
     functionName: string,
     functionBody: string
-) {
+): AWSFunction {
     const edgeFunction = new AWSFunction(stack, functionName, {
         runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
@@ -126,5 +164,15 @@ export function createFunction(
         timeout: Duration.seconds(2),
     });
 
-    return edgeFunction.currentVersion;
+    return edgeFunction;
+}
+
+export function createVersionedFunction(
+    stack: Stack,
+    edgeLambdaRole: Role,
+    functionName: string,
+    functionBody: string
+): Version {
+    return createFunction(stack, edgeLambdaRole, functionName, functionBody)
+        .currentVersion;
 }

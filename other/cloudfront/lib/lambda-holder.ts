@@ -65,7 +65,10 @@ export class LambdaHolder {
             case LambdaType.WEATHERCAM_REDIRECT:
             case LambdaType.IP_RESTRICTION:
             case LambdaType.GZIP_REQUIREMENT:
+            case LambdaType.LAM_REDIRECT:
                 return LambdaEdgeEventType.ORIGIN_REQUEST;
+            case LambdaType.LAM_HEADERS:
+                return LambdaEdgeEventType.ORIGIN_RESPONSE;
             case LambdaType.HTTP_HEADERS:
             case LambdaType.WEATHERCAM_HTTP_HEADERS:
                 return LambdaEdgeEventType.VIEWER_RESPONSE;

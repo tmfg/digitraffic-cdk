@@ -1,9 +1,9 @@
-import { FunctionType, LambdaType } from "./lambda/lambda-creator";
 import {
     CloudFrontAllowedMethods,
     OriginProtocolPolicy,
 } from "aws-cdk-lib/aws-cloudfront";
 import { WafRules } from "./acl/waf-rules";
+import { FunctionType, LambdaType } from "./lambda/lambda-creator";
 
 export class CFBehavior {
     readonly path: string;
@@ -190,8 +190,10 @@ export class CFDomain extends CFOrigin {
 }
 
 export class S3Domain extends CFOrigin {
-    s3BucketName: string;
-    //    originPath?: string;
+    s3BucketName?: string;
+    s3Domain?: string;
+    originPath?: string;
+    createOAI: boolean = true;
 
     constructor(s3BucketName: string, ...behaviors: CFBehavior[]) {
         super(behaviors);
@@ -208,6 +210,18 @@ export class S3Domain extends CFOrigin {
 
     static s3(s3BucketName: string, ...behaviors: CFBehavior[]): S3Domain {
         return new S3Domain(s3BucketName, ...behaviors);
+    }
+
+    static s3External(
+        s3BucketName: string,
+        s3Domain: string,
+        ...behaviors: CFBehavior[]
+    ): S3Domain {
+        const domain = new S3Domain(s3BucketName, ...behaviors);
+        domain.s3Domain = s3Domain;
+        domain.createOAI = false;
+
+        return domain;
     }
 }
 
@@ -245,4 +259,5 @@ export interface CFLambdaParameters {
     readonly weathercamDomainName?: string;
     readonly weathercamHostName?: string;
     readonly ipRestrictions?: Record<string, string>;
+    readonly smRef?: string;
 }
