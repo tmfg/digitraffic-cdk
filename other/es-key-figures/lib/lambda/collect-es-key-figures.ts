@@ -56,14 +56,16 @@ export interface KeyFigure {
 }
 
 export interface KeyFigureResult extends KeyFigure {
-    value: any;
+    value: unknown;
     filter: string;
 }
 
-export const handler = async (event: {
-    TRANSPORT_TYPE: string;
-    PART: number;
-}): Promise<boolean> => {
+export interface KeyFigureLambdaEvent {
+    readonly TRANSPORT_TYPE: string;
+    readonly PART?: number;
+}
+
+export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => {
     const apiPaths = (await getApiPaths()).filter(
         (s) => s.transportType === event.TRANSPORT_TYPE
     );
@@ -83,7 +85,7 @@ export const handler = async (event: {
     console.info(
         `ES: ${process.env.ES_ENDPOINT}, MySQL: ${
             process.env.MYSQL_ENDPOINT
-        },  Range: ${startDate} -> ${endDate}, Paths: ${apiPaths.map(
+        },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths.map(
             (s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`
         )}`
     );
@@ -93,7 +95,7 @@ export const handler = async (event: {
     const kibanaResults = await getKibanaResults(keyFigures, apiPaths, event);
     await persistToDatabase(kibanaResults);
 
-    return new Promise((resolve, reject) => resolve(true));
+    return Promise.resolve(true);
 };
 
 async function getKibanaResult(
@@ -138,7 +140,7 @@ async function getKibanaResult(
                 query,
                 "_search?size=0"
             );
-            const value: { [key: string]: any } = {};
+            const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
                 value[removeIllegalChars(bucket.key)] = bucket.doc_count;
             }
@@ -149,7 +151,7 @@ async function getKibanaResult(
                 query,
                 "_search?size=0"
             );
-            const value: { [key: string]: any } = {};
+            const value: { [key: string]: unknown } = {};
             for (const bucket of keyFigureResponse.aggregations.agg.buckets) {
                 value[removeIllegalChars(bucket.key)] = bucket.agg.value;
             }
@@ -167,11 +169,11 @@ async function getKibanaResult(
 async function getKibanaResults(
     keyFigures: KeyFigure[],
     apiPaths: { transportType: string; paths: Set<string> }[],
-    event: { TRANSPORT_TYPE: string; PART: number }
-): Promise<KeyFigureResult[][]> {
+    event: KeyFigureLambdaEvent
+): Promise<KeyFigureResult[]> {
     const kibanaResults = [];
 
-    if (event.PART == null || event.PART === 1) {
+    if (!event.PART || event.PART === 1) {
         for (const apiPath of apiPaths) {
             console.info(`Running: ${apiPath.transportType}`);
             kibanaResults.push(
@@ -199,7 +201,7 @@ async function getKibanaResults(
         }
     }
 
-    return kibanaResults;
+    return kibanaResults.flat();
 }
 
 async function getRowAmountWithDate(isoDate: string): Promise<number> {
@@ -212,7 +214,7 @@ async function getRowAmountWithDate(isoDate: string): Promise<number> {
         return Promise.resolve(
             (existingRowsFromDate as Record<string, unknown>[])[0][
                 resultKey
-                ] as number
+            ] as number
         );
     } catch (error: unknown) {
         console.error("Error querying database: ", error);
@@ -220,21 +222,19 @@ async function getRowAmountWithDate(isoDate: string): Promise<number> {
     }
 }
 
-async function insertFigures(kibanaResults: KeyFigureResult[][], tableName: string) {
-    for (const kibanaResult of kibanaResults) {
-        for (const result of kibanaResult) {
-            const insertKeyFigure = (tableName: string) =>
-                `INSERT INTO \`${tableName}\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
-                                   VALUES ('${startDate.toISOString().substring(0, 10)}', '${endDate.toISOString().substring(0, 10)}',
-                                           '${result.query}', '${JSON.stringify(result.value)}', '${result.name}',
-                                           '${result.filter}');`;
-            await query(insertKeyFigure(tableName));
-        }
+async function insertFigures(
+    kibanaResults: KeyFigureResult[],
+    tableName: string
+) {
+    for (const result of kibanaResults) {
+            // prettier-ignore
+            await query(`INSERT INTO \`${tableName}\` (\`from\`, \`to\`, \`query\`, \`value\`, \`name\`, \`filter\`)
+                         VALUES ('${startDate.toISOString().substring(0, 10)}', '${endDate.toISOString().substring(0, 10)}', '${result.query}',
+                                 '${JSON.stringify(result.value)}', '${result.name}', '${result.filter}');`);
     }
 }
 
-async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
-
+async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
     const CREATE_KEY_FIGURES_TABLE =
         "CREATE TABLE ?? ( `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `from` DATE NOT NULL, `to` DATE NOT NULL, `name` VARCHAR(100) NOT NULL,`filter` VARCHAR(1000) NOT NULL, `query` VARCHAR(1000) NOT NULL, `value` JSON NOT NULL, PRIMARY KEY (`id`))";
     const CREATE_KEY_FIGURES_INDEX =
@@ -250,7 +250,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
 
         const startIsoDate = startDate.toISOString().substring(0, 10);
         const existingRows = await getRowAmountWithDate(startIsoDate);
-        
+
         // save duplicate rows to a separate table if current results already exist in database
         if (existingRows > 0) {
             console.info(
@@ -263,7 +263,6 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[][]) {
         } else {
             await insertFigures(kibanaResults, KEY_FIGURES_TABLE_NAME);
         }
-
     } catch (error) {
         console.error("Error persisting: ", error);
         throw error;
