@@ -34,7 +34,7 @@ export function createOriginConfig(
         );
 
         if (origin.createOAI) {
-            bucket.grantRead(oai as OriginAccessIdentity);
+            bucket.grantRead(oai);
         }
 
         return {
@@ -96,10 +96,6 @@ function createBehavior(
         queryString: true,
         queryStringCacheKeys: b.queryCacheKeys,
     };
-
-    if (b.cacheHeaders != null) {
-        (forwardedValues.headers as string[]).push(...b.cacheHeaders);
-    }
 
     return {
         isDefaultBehavior,
