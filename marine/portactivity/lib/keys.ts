@@ -20,3 +20,7 @@ export enum PortactivitySecretKeys {
     AWAKE_ATX_URL = "atxurl",
     AWAKE_ATX_AUTH = "atxauth",
 }
+
+export enum PortActivityParameterKeys {
+    AWAKE_ATX_SUBSCRIPTION_ID = "AWAKE_ATX_SUBSCRIPTION_ID"
+}
