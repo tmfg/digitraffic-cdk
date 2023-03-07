@@ -129,7 +129,7 @@ export const getFromParameterStore = async (
 export const putInParameterStore = (
     name: string,
     value: string
-): Promise<PutParameterResult | AWSError> => {
+): Promise<PutParameterResult> => {
     const ssmParams = {
         Name: name,
         Overwrite: true,
