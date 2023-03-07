@@ -7,6 +7,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import WebSocket from "ws";
 
 interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
     readonly atxurl: string;
@@ -15,7 +16,7 @@ interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
 
 const expectedKeys = [
     PortactivitySecretKeys.AWAKE_ATX_URL,
-    PortactivitySecretKeys.AWAKE_ATX_AUTH,
+    PortactivitySecretKeys.AWAKE_ATX_AUTH
 ];
 
 const rdsHolder = RdsHolder.create();
@@ -24,24 +25,25 @@ const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>(
     expectedKeys
 );
 
-let service: AwakeAiATXService | null = null;
-
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+
+/**
+ * allow 10000 ms for SQS sends, this is a completely made up number
+ */
+const SQS_SEND_TIME = 10000;
 
 export async function handler(event: unknown, context: Context) {
     await rdsHolder
         .setCredentials()
         .then(() => secretHolder.get())
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
-            if (!service) {
-                service = new AwakeAiATXService(
-                    new AwakeAiATXApi(secret.atxurl, secret.atxauth)
-                );
-            }
+            
+            const service = new AwakeAiATXService(
+                new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket)
+            );
 
-            // allow 1000 ms for SQS sends, this is a completely made up number
             const timestamps = await service.getATXs(
-                context.getRemainingTimeInMillis() - 1000
+                context.getRemainingTimeInMillis() - SQS_SEND_TIME
             );
             console.info(
                 "method=updateAwakeAiAtxTimestamps.handler count=%d",

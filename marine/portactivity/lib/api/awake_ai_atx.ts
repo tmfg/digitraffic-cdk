@@ -1,5 +1,9 @@
 import { WebSocket } from "ws";
 import { AwakeAiZoneType } from "./awake_common";
+import { AWSError, SSM } from "aws-sdk";
+import * as URL from "url";
+import { PortActivityParameterKeys } from "../keys";
+import { PutParameterResult } from "aws-sdk/clients/ssm";
 
 interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType;
@@ -94,22 +98,73 @@ export const SUBSCRIPTION_MESSAGE = {
     ],
 };
 
+const isAWSError = (error: unknown): error is AWSError => {
+    return (
+        !!error &&
+        typeof error === "object" &&
+        "code" in error &&
+        "message" in error
+    );
+};
+
+export const getFromParameterStore = async (
+    name: string
+): Promise<string | undefined> => {
+    const ssmParams = {
+        Name: name,
+    };
+    try {
+        const parameter = await new SSM().getParameter(ssmParams).promise();
+        return Promise.resolve(parameter.Parameter?.Value);
+    } catch (error: unknown) {
+        console.error(
+            `method=getATXs ${
+                isAWSError(error) ? error.code : "Error"
+            } fetching from Parameter Store`
+        );
+        return Promise.reject();
+    }
+};
+
+export const putInParameterStore = (
+    name: string,
+    value: string
+): Promise<PutParameterResult> => {
+    const ssmParams = {
+        Name: name,
+        Overwrite: true,
+        Type: "String",
+        Value: value,
+    };
+    return new SSM().putParameter(ssmParams).promise();
+};
+
 export class AwakeAiATXApi {
     private readonly url: string;
     private readonly apiKey: string;
-    private subscriptionId: string;
+    private readonly webSocketClass: new (url: string | URL) => WebSocket;
 
-    constructor(url: string, apiKey: string) {
+    constructor(
+        url: string,
+        apiKey: string,
+        webSocketClass: new (url: string | URL) => WebSocket
+    ) {
         this.url = url;
         this.apiKey = apiKey;
+        this.webSocketClass = webSocketClass;
     }
 
-    getATXs(timeoutMillis: number): Promise<AwakeAIATXTimestampMessage[]> {
-        const webSocket = new WebSocket(this.url + this.apiKey);
+    async getATXs(
+        timeoutMillis: number
+    ): Promise<AwakeAIATXTimestampMessage[]> {
+        const subscriptionId = await getFromParameterStore(
+            PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID
+        );
 
+        const webSocket = new this.webSocketClass(this.url + this.apiKey);
         webSocket.on("open", () => {
-            const startMessage = this.subscriptionId
-                ? AwakeAiATXApi.createResumeMessage(this.subscriptionId)
+            const startMessage = subscriptionId
+                ? AwakeAiATXApi.createResumeMessage(subscriptionId)
                 : SUBSCRIPTION_MESSAGE;
             webSocket.send(JSON.stringify(startMessage));
         });
@@ -122,11 +177,32 @@ export class AwakeAiATXApi {
             ) as unknown as AwakeAiATXMessage;
 
             switch (message.msgType) {
-                case AwakeAiATXEventType.SUBSCRIPTION_STATUS:
-                    this.subscriptionId = (
+                case AwakeAiATXEventType.SUBSCRIPTION_STATUS: {
+                    const receivedSubscriptionId = (
                         message as AwakeAISubscriptionMessage
                     ).subscriptionId;
+                    if (receivedSubscriptionId !== subscriptionId) {
+                        putInParameterStore(
+                            PortActivityParameterKeys.AWAKE_ATX_SUBSCRIPTION_ID,
+                            receivedSubscriptionId
+                        )
+                            .then(() =>
+                                console.info(
+                                    `method=getATXs Updated subscriptionId to ${receivedSubscriptionId}`
+                                )
+                            )
+                            .catch((e) =>
+                                console.error(
+                                    `method=getATXs ${
+                                        isAWSError(e)
+                                            ? e.message
+                                            : "Error updating Parameter Store"
+                                    }`
+                                )
+                            );
+                    }
                     break;
+                }
                 case AwakeAiATXEventType.EVENT:
                     atxs.push(message as AwakeAIATXTimestampMessage);
                     break;
