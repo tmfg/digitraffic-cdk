@@ -1,4 +1,5 @@
 import {
+    AwakeAiPrediction,
     AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
@@ -33,6 +34,14 @@ function portCallIdFromUrn(urn?: string): number | null {
         throw new Error("Invalid URN: " + urn);
     }
     return Number(split[3]);
+}
+
+export function isDigitrafficEtaPrediction(prediction: AwakeAiPrediction): boolean {
+    return (
+        prediction.predictionType === AwakeAiPredictionType.ETA &&
+        !!prediction.metadata &&
+        prediction.metadata.source.includes("digitraffic-portcall")
+    );
 }
 
 export function predictionToTimestamp(

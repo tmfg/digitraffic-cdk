@@ -1,5 +1,7 @@
 import * as AwakeAiETAHelper from "../../lib/service/awake_ai_eta_helper";
+import { isDigitrafficEtaPrediction } from "../../lib/service/awake_ai_eta_helper";
 import {
+    AwakeAiMetadata,
     AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
@@ -87,6 +89,24 @@ describe("Awake.AI ETA helper", () => {
 
         expect(ts).toBeNull();
     });
+
+    test("isDigitrafficEtaPrediction - correct", () => {
+        const digitrafficEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
+            predictionType: AwakeAiPredictionType.ETA,
+            metadata: {
+                source: "urn:awake:digitraffic-portcall:2959158",
+            },
+        });
+        const awakeEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
+            predictionType: AwakeAiPredictionType.ETA,
+            metadata: {
+                source: "urn:awake:source:ai",
+            },
+        });
+
+        expect(isDigitrafficEtaPrediction(digitrafficEta)).toBe(true);
+        expect(isDigitrafficEtaPrediction(awakeEta)).toBe(false);
+    });
 });
 
 /**
@@ -98,6 +118,7 @@ function newETAPrediction(options?: {
     arrivalTime?: Date;
     recordTime?: Date;
     locode?: string;
+    metadata?: AwakeAiMetadata;
     zoneType?: AwakeAiZoneType;
 }): AwakeAiVoyageEtaPrediction {
     return {
@@ -107,6 +128,7 @@ function newETAPrediction(options?: {
         recordTime:
             options?.recordTime?.toISOString() ?? new Date().toISOString(),
         locode: options?.locode ?? "FILOL",
+        metadata: options?.metadata ?? { source: "abc" },
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
     };
 }

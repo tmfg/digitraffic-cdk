@@ -7,6 +7,7 @@ import {
 } from "../../lib/api/awake_ai_port";
 import { randomIMO, randomMMSI } from "../testdata";
 import {
+    AwakeAiMetadata,
     AwakeAiPrediction,
     AwakeAiPredictionType,
     AwakeAiShipStatus,
@@ -96,6 +97,24 @@ describe("AwakeAiETAPortService(", () => {
 
         expect(timestamps.length).toBe(0);
     });
+
+    test("getAwakeAiTimestamps - filter Digitraffic ETA predictions", async () => {
+        const api = createApi();
+        const service = new AwakeAiETAPortService(api);
+        const voyageTimestamp = createResponse({
+            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
+            predictionType: AwakeAiPredictionType.ETA,
+            includePortCallPrediction: true,
+            metadata: {
+                source: "urn:awake:digitraffic-portcall:2959158",
+            },
+        });
+        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+
+        const timestamps = await service.getAwakeAiTimestamps("FILOL");
+
+        expect(timestamps.length).toBe(0);
+    });
 });
 
 function createApi() {
@@ -107,6 +126,7 @@ function createResponse(options?: {
     voyageStatus?: AwakeAiShipStatus;
     predictionType?: AwakeAiPredictionType;
     includePortCallPrediction?: boolean;
+    metadata?: AwakeAiMetadata;
 }): AwakeAiPortResponse {
     const predictions: AwakeAiPrediction[] = [
         {
@@ -117,6 +137,7 @@ function createResponse(options?: {
             recordTime: new Date().toISOString(),
             arrivalTime:
                 options?.arrivalTime ?? moment().add(25, "hour").toISOString(),
+            metadata: options?.metadata ?? { source: "abc" }
         } as AwakeAiVoyageEtaPrediction,
     ];
     return {

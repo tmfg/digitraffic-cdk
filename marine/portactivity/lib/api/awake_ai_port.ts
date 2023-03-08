@@ -45,7 +45,7 @@ export class AwakeAiETAPortApi {
     ): Promise<AwakeAiPortResponse> {
         const start = Date.now();
         try {
-            const url = `${this.url}/port/${locode}/arrivals?maxSequenceNo=${maxSequenceNo}&predictionType=${AwakeAiPredictionType.ETA}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}`;
+            const url = `${this.url}/port/${locode}/arrivals?maxSequenceNo=${maxSequenceNo}&predictionType=${AwakeAiPredictionType.ETA}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}?predictionMetadata=true`;
             console.info(`AwakeAiETAPortApi.getETAs calling URL ${url}`);
             const resp = await axios.get(url, {
                 headers: {

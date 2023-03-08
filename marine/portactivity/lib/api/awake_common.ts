@@ -19,11 +19,16 @@ export enum AwakeAiPredictionType {
     ARRIVAL_PORT_CALL = "arrival-port-call",
 }
 
+export interface AwakeAiMetadata {
+    source: string
+}
+
 /**
  * Base and mixin types
  */
 export interface AwakeAiPrediction {
     readonly predictionType: AwakeAiPredictionType;
+    readonly metadata?: AwakeAiMetadata
 }
 
 export interface AwakeAiZonePrediction extends AwakeAiPrediction {
