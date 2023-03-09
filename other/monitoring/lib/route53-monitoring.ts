@@ -15,7 +15,7 @@ export class Route53Monitoring {
                 source: ["aws.route53"],
                 detail: {
                     requestParameters: {
-                        hostedZoneId: config.routeIds,
+                        hostedZoneId: config.zoneIds,
                     },
                 },
             },

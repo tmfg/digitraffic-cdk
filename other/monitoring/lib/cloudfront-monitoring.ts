@@ -48,7 +48,7 @@ export class CloudfrontMonitoring {
                         },
                     },
                     {
-                        expression: `ANOMALY_DETECTION_BAND(${metricId}, 3)`,
+                        expression: `ANOMALY_DETECTION_BAND(${metricId}, 2)`,
                         id: detectorId,
                     },
                 ],

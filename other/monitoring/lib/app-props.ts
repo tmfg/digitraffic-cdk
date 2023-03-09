@@ -29,7 +29,7 @@ export interface MQTTConfiguration {
 }
 
 export interface Route53Configuration {
-    readonly routeIds: string[];
+    readonly zoneIds: string[];
 }
 
 export interface CloudfrontConfiguration {
