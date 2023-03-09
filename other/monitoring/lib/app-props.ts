@@ -7,6 +7,7 @@ export interface MonitoringConfiguration {
     readonly db?: DBConfiguration;
     readonly mqtt?: MQTTConfiguration[];
     readonly route53?: Route53Configuration;
+    readonly cloudfront?: CloudfrontConfiguration;
 
     readonly env: Environment;
 }
@@ -29,4 +30,8 @@ export interface MQTTConfiguration {
 
 export interface Route53Configuration {
     readonly routeIds: string[];
+}
+
+export interface CloudfrontConfiguration {
+    readonly distributions: string[];
 }
