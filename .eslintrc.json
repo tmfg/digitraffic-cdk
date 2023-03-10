@@ -12,7 +12,7 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:@typescript-eslint/strict",
-    "plugin:you-dont-need-momentjs/recommended",
+    "plugin:@jkhaak-solita/you-dont-need-momentjs/recommended",
     "prettier"
   ],
   "rules": {
@@ -24,15 +24,15 @@
     "@typescript-eslint/no-extraneous-class": "off",
 
     // Let's start with warnings first. Defaults to error.
-    "you-dont-need-momentjs/add": "warn",
-    "you-dont-need-momentjs/subtract": "warn",
-    "you-dont-need-momentjs/no-dynamic-import-moment": "warn",
-    "you-dont-need-momentjs/no-import-moment": "warn",
-    "you-dont-need-momentjs/no-moment-constructor": "warn",
-    "you-dont-need-momentjs/no-require-moment": "warn",
-    "you-dont-need-momentjs/is-before": "warn",
-    "you-dont-need-momentjs/format": "warn",
-    "you-dont-need-momentjs/diff": "warn"
+    "@jkhaak-solita/you-dont-need-momentjs/add": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/subtract": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/no-dynamic-import-moment": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/no-import-moment": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/no-moment-constructor": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/no-require-moment": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/is-before": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/format": "warn",
+    "@jkhaak-solita/you-dont-need-momentjs/diff": "warn"
   },
   "reportUnusedDisableDirectives": true
 }

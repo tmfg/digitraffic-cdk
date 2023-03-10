@@ -18,7 +18,7 @@
     "test:all": "nx run-many --target=test"
   },
   "devDependencies": {
-    "@jkhaak-solita/eslint-plugin-you-dont-need-momentjs": "^1.6.0",
+    "@jkhaak-solita/eslint-plugin-you-dont-need-momentjs": "^1.6.2",
     "@typescript-eslint/eslint-plugin": "^5.53.0",
     "@typescript-eslint/parser": "^5.53.0",
     "esbuild": "^0.17.10",
