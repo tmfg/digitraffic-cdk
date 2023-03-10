@@ -24,11 +24,14 @@
     "@typescript-eslint/no-extraneous-class": "off",
 
     // Let's start with warnings first. Defaults to error.
+    "you-dont-need-momentjs/add": "warn",
+    "you-dont-need-momentjs/subtract": "warn",
     "you-dont-need-momentjs/no-dynamic-import-moment": "warn",
     "you-dont-need-momentjs/no-import-moment": "warn",
     "you-dont-need-momentjs/no-moment-constructor": "warn",
     "you-dont-need-momentjs/no-require-moment": "warn",
-    "you-dont-need-momentjs/no-moment-methods": "warn"
+    "you-dont-need-momentjs/is-before": "warn",
+    "you-dont-need-momentjs/diff": "warn"
   },
   "reportUnusedDisableDirectives": true
 }
