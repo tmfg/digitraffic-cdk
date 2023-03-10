@@ -31,6 +31,7 @@
     "you-dont-need-momentjs/no-moment-constructor": "warn",
     "you-dont-need-momentjs/no-require-moment": "warn",
     "you-dont-need-momentjs/is-before": "warn",
+    "you-dont-need-momentjs/format": "warn",
     "you-dont-need-momentjs/diff": "warn"
   },
   "reportUnusedDisableDirectives": true
