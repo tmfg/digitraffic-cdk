@@ -7,13 +7,13 @@ import {
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction,
 } from "../api/awake_common";
-import moment from "moment-timezone";
 import { AwakeAiETAPortApi, AwakeAiPortSchedule } from "../api/awake_ai_port";
 import {
     isDigitrafficEtaPrediction,
     predictionToTimestamp,
 } from "./awake_ai_eta_helper";
 import { EventSource } from "../model/eventsource";
+import { addHours, isBefore, parseJSON } from "date-fns";
 
 export class AwakeAiETAPortService {
     private readonly api: AwakeAiETAPortApi;
@@ -44,7 +44,10 @@ export class AwakeAiETAPortService {
         etaPrediction: AwakeAiVoyageEtaPrediction
     ): boolean {
         if (
-            moment(etaPrediction.arrivalTime).isBefore(moment().add(24, "hour"))
+            isBefore(
+                parseJSON(etaPrediction.arrivalTime),
+                addHours(new Date(), 24)
+            )
         ) {
             console.warn(
                 `method=AwakeAiETAPortService.getAwakeAiTimestamps arrival is closer than 24 hours, not persisting ETA: ${JSON.stringify(
@@ -125,7 +128,7 @@ export class AwakeAiETAPortService {
                         );
                     });
                 })
-                .filter((ts): ts is ApiTimestamp => ts != null)
+                .filter((ts): ts is ApiTimestamp => ts !== null)
         );
     }
 }

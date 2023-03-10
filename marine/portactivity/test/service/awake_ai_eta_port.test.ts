@@ -19,7 +19,7 @@ import {
     randomBoolean,
     shuffle,
 } from "@digitraffic/common/dist/test/testutils";
-import moment from "moment-timezone";
+import { addHours, subHours } from "date-fns";
 
 describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - correct needs to include port call prediction", async () => {
@@ -87,9 +87,10 @@ describe("AwakeAiETAPortService(", () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
         const voyageTimestamp = createResponse({
-            arrivalTime: moment()
-                .subtract(getRandomNumber(1, 23), "hour")
-                .toDate(),
+            arrivalTime: subHours(new Date(), getRandomNumber(1, 23)),
+            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
+            predictionType: AwakeAiPredictionType.ETA,
+            includePortCallPrediction: true,
         });
         sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
 
@@ -136,7 +137,7 @@ function createResponse(options?: {
             zoneType: AwakeAiZoneType.BERTH,
             recordTime: new Date().toISOString(),
             arrivalTime:
-                options?.arrivalTime ?? moment().add(25, "hour").toISOString(),
+                options?.arrivalTime?.toISOString() ?? addHours(new Date, 25).toISOString(),
             metadata: options?.metadata ?? { source: "abc" }
         } as AwakeAiVoyageEtaPrediction,
     ];

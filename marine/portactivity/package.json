@@ -50,6 +50,7 @@
     "aws-sdk": "2.1260.0",
     "axios": "^1.2.0",
     "constructs": "10.1.168",
+    "date-fns": "^2.29.3",
     "moment": "*",
     "moment-timezone": "0.5.39",
     "pg-native": "*",
