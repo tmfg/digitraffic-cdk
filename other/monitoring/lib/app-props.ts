@@ -33,5 +33,8 @@ export interface Route53Configuration {
 }
 
 export interface CloudfrontConfiguration {
-    readonly distributions: string[];
+    readonly distributions: {
+        readonly id: string,
+        readonly threshold?: number
+    }[];
 }

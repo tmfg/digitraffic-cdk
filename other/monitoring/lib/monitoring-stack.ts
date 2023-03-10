@@ -11,7 +11,7 @@ import {
     SSM_KEY_ALARM_TOPIC,
     SSM_KEY_WARNING_TOPIC,
 } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { GlobalMonitoringStack } from "./global-monitoring-stack";
+import { RegionMonitoringStack } from "./region-monitoring-stack";
 
 export class MonitoringStack extends Stack {
     constructor(
@@ -49,7 +49,7 @@ export class MonitoringStack extends Stack {
         // another stack is created for global monitorings, even if you don't configure them.
         // this is to make sure the rules are removed when you change your configuration to not monitor Route53 or cloudfront data
         this.addDependency(
-            new GlobalMonitoringStack(scope, id, alarmsTopic, configuration)
+            new RegionMonitoringStack(scope, id, alarmsTopic, configuration)
         );
 
         Aspects.of(this).add(new StackCheckingAspect());

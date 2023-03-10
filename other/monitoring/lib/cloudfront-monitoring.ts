@@ -14,13 +14,13 @@ export class CloudfrontMonitoring {
         const alarmNames: string[] = [];
 
         config.distributions.forEach((distribution) => {
-            const metricId = `bm_${distribution}`;
-            const detectorId = `detector_${distribution}`;
+            const metricId = `bm_${distribution.id}`;
+            const detectorId = `detector_${distribution.id}`;
 
-            const alarmName = `${distribution}-bytes-downloaded`;
+            const alarmName = `${distribution.id}-bytes-downloaded`;
             alarmNames.push(alarmName);
 
-            new CfnAlarm(stack, `${distribution}-BytesDownloadedAlarm`, {
+            new CfnAlarm(stack, `${distribution.id}-BytesDownloadedAlarm`, {
                 alarmName,
                 comparisonOperator: "LessThanLowerOrGreaterThanUpperThreshold",
                 datapointsToAlarm: 1,
@@ -35,7 +35,7 @@ export class CloudfrontMonitoring {
                                 dimensions: [
                                     {
                                         name: "DistributionId",
-                                        value: distribution,
+                                        value: distribution.id,
                                     },
                                     {
                                         name: "Region",
@@ -48,7 +48,7 @@ export class CloudfrontMonitoring {
                         },
                     },
                     {
-                        expression: `ANOMALY_DETECTION_BAND(${metricId}, 2)`,
+                        expression: `ANOMALY_DETECTION_BAND(${metricId}, ${distribution.threshold ?? 2})`,
                         id: detectorId,
                     },
                 ],

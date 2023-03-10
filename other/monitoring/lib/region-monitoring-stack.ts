@@ -6,16 +6,15 @@ import { CloudfrontMonitoring } from "./cloudfront-monitoring";
 import { Route53Monitoring } from "./route53-monitoring";
 
 /**
- * Creates a new stack for all monitoring that must be placed in us-east-1:
+ * Creates a new stack for all monitoring that must be placed in global region(us-east-1):
  * * Route53 changes for given zones
  * * Cloudfront alarms
  *
- * This is done in a different stack, because Route53-rules must be placed in us-east-1, and the
- * monitoring-stack is not placed there.
+ * This is done in a different stack, because the MonitoringStack in is not in the global region.
  *
  * TODO: Should we change the id?
  */
-export class GlobalMonitoringStack extends Stack {
+export class RegionMonitoringStack extends Stack {
     constructor(
         scope: Construct,
         id: string,
