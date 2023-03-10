@@ -21,7 +21,14 @@
     "@typescript-eslint/non-nullable-type-assertion-style": "error",
     "@typescript-eslint/no-throw-literal": "error",
     "@typescript-eslint/no-explicit-any": "error",
-    "@typescript-eslint/no-extraneous-class": "off"
+    "@typescript-eslint/no-extraneous-class": "off",
+
+    // Let's start with warnings first. Defaults to error.
+    "you-dont-need-momentjs/no-dynamic-import-moment": "warn",
+    "you-dont-need-momentjs/no-import-moment": "warn",
+    "you-dont-need-momentjs/no-moment-constructor": "warn",
+    "you-dont-need-momentjs/no-require-moment": "warn",
+    "you-dont-need-momentjs/no-moment-methods": "warn"
   },
   "reportUnusedDisableDirectives": true
 }
