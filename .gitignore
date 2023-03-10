@@ -83,3 +83,6 @@ marine/sse/lib/generated/tlsc-sse-reports-schema.d.ts
 
 # python
 *.pyc
+
+# monorepo specific
+!/.prettierrc.js
