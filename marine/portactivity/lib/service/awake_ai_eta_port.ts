@@ -13,7 +13,7 @@ import {
     predictionToTimestamp,
 } from "./awake_ai_eta_helper";
 import { EventSource } from "../model/eventsource";
-import { addHours, isBefore, parseJSON } from "date-fns";
+import { addHours, isBefore, parseISO } from "date-fns";
 
 export class AwakeAiETAPortService {
     private readonly api: AwakeAiETAPortApi;
@@ -45,8 +45,8 @@ export class AwakeAiETAPortService {
     ): boolean {
         if (
             isBefore(
-                parseJSON(etaPrediction.arrivalTime),
-                addHours(new Date(), 24)
+                parseISO(etaPrediction.arrivalTime),
+                addHours(Date.now(), 24)
             )
         ) {
             console.warn(

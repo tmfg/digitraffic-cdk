@@ -11,6 +11,9 @@ import { randomIMO, randomMMSI } from "../testdata";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { EventType } from "../../lib/model/timestamp";
 
+type portCallURN = `urn:${string}:${string}:${number}`;
+type awakeURN = `urn:${string}:${string}:${string}:${string}`;
+
 describe("Awake.AI ETA helper", () => {
     test("destinationIsFinnish - correct", () => {
         expect(AwakeAiETAHelper.destinationIsFinnish("FILOL")).toBe(true);
@@ -91,16 +94,18 @@ describe("Awake.AI ETA helper", () => {
     });
 
     test("isDigitrafficEtaPrediction - correct", () => {
+        const portCallSource: portCallURN = "urn:awake:digitraffic-portcall:2959158";
         const digitrafficEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
             predictionType: AwakeAiPredictionType.ETA,
             metadata: {
-                source: "urn:awake:digitraffic-portcall:2959158",
+                source: portCallSource,
             },
         });
+        const awakeSource: awakeURN = "urn:awake:source:ai:eta-prediction"
         const awakeEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
             predictionType: AwakeAiPredictionType.ETA,
             metadata: {
-                source: "urn:awake:source:ai",
+                source: awakeSource,
             },
         });
 

@@ -52,6 +52,7 @@ export class AwakeAiETAPortApi {
                     Authorization: this.apiKey,
                     Accept: MediaType.APPLICATION_JSON,
                 },
+                validateStatus: (status) => status == 200,
             });
             return {
                 type: AwakeAiPortResponseType.OK,
