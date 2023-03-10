@@ -5,14 +5,13 @@ import {
     AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
+    AwakeDigitrafficPortCallURN,
+    AwakeURN,
 } from "../../lib/api/awake_common";
 import { EventSource } from "../../lib/model/eventsource";
 import { randomIMO, randomMMSI } from "../testdata";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { EventType } from "../../lib/model/timestamp";
-
-type portCallURN = `urn:${string}:${string}:${number}`;
-type awakeURN = `urn:${string}:${string}:${string}:${string}`;
 
 describe("Awake.AI ETA helper", () => {
     test("destinationIsFinnish - correct", () => {
@@ -94,14 +93,15 @@ describe("Awake.AI ETA helper", () => {
     });
 
     test("isDigitrafficEtaPrediction - correct", () => {
-        const portCallSource: portCallURN = "urn:awake:digitraffic-portcall:2959158";
+        const digitrafficPortCallSource: AwakeDigitrafficPortCallURN =
+            "urn:awake:digitraffic-portcall:2959158";
         const digitrafficEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
             predictionType: AwakeAiPredictionType.ETA,
             metadata: {
-                source: portCallSource,
+                source: digitrafficPortCallSource,
             },
         });
-        const awakeSource: awakeURN = "urn:awake:source:ai:eta-prediction"
+        const awakeSource: AwakeURN = "urn:awake:source:ai:eta-prediction";
         const awakeEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
             predictionType: AwakeAiPredictionType.ETA,
             metadata: {
@@ -133,7 +133,7 @@ function newETAPrediction(options?: {
         recordTime:
             options?.recordTime?.toISOString() ?? new Date().toISOString(),
         locode: options?.locode ?? "FILOL",
-        metadata: options?.metadata ?? { source: "abc" },
+        metadata: options?.metadata,
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
     };
 }

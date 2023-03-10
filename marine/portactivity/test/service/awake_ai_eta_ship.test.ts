@@ -362,7 +362,7 @@ function createVoyageResponse(
         predictionType: AwakeAiPredictionType.ETA,
         arrivalTime: new Date().toISOString(),
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
-        metadata: options?.metadata ?? { source: "abc" },
+        metadata: options?.metadata,
     };
 
     return {

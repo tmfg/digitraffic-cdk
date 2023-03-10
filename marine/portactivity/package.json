@@ -39,7 +39,7 @@
     "typescript": "*"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.23-5",
+    "@digitraffic/common": "2023.03.10-1",
     "@middy/core": "^3.6.2",
     "@middy/sqs-partial-batch-failure": "^3.6.2",
     "@types/amqplib": "^0.10.0",

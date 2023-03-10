@@ -1,3 +1,5 @@
+import { URN } from "@digitraffic/common/dist/types/urn";
+
 export enum AwakeAiZoneType {
     VTS_AREA = "vts",
     PILOT_BOARDING_AREA = "pbp",
@@ -20,8 +22,13 @@ export enum AwakeAiPredictionType {
 }
 
 export interface AwakeAiMetadata {
-    source: string
+    source: AwakeURN | AwakeDigitrafficPortCallURN
 }
+
+type AwakeDigitrafficPortCallIDString = `digitraffic-portcall:${number}`;
+
+export type AwakeURN<AwakeIDString extends string = string> = URN<"awake", AwakeIDString>;
+export type AwakeDigitrafficPortCallURN = AwakeURN<AwakeDigitrafficPortCallIDString>;
 
 /**
  * Base and mixin types
@@ -51,7 +58,7 @@ export interface AwakeArrivalPortCallPrediction extends AwakeAiPrediction {
     readonly portCallId: string;
 
     // urn:awake:digitraffic-portcall:1234567890
-    readonly portCallUrn: string;
+    readonly portCallUrn: AwakeDigitrafficPortCallURN;
 
     // UN/LOCODE
     readonly portCallLocode: string;

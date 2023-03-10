@@ -4,6 +4,7 @@ import {
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction,
+    AwakeURN,
 } from "../api/awake_common";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { EventSource } from "../model/eventsource";
@@ -25,7 +26,7 @@ export function destinationIsFinnish(locode: string | undefined): boolean {
     return locode ? locode.toLowerCase().startsWith("fi") : false;
 }
 
-function portCallIdFromUrn(urn?: string): number | null {
+function portCallIdFromUrn(urn?: AwakeURN<string>): number | null {
     if (!urn) {
         return null;
     }

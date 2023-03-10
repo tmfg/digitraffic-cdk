@@ -138,7 +138,7 @@ function createResponse(options?: {
             recordTime: new Date().toISOString(),
             arrivalTime:
                 options?.arrivalTime?.toISOString() ?? addHours(new Date, 25).toISOString(),
-            metadata: options?.metadata ?? { source: "abc" }
+            metadata: options?.metadata
         } as AwakeAiVoyageEtaPrediction,
     ];
     return {
