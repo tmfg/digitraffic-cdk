@@ -48,9 +48,9 @@ export class AwakeAiETAShipApi {
     ): Promise<AwakeAiShipApiResponse> {
         const start = Date.now();
         try {
-            let url = `${this.url}/ship/${imo}`;
+            let url = `${this.url}/ship/${imo}?predictionMetadata=true`;
             if (locode) {
-                url += `?destination=${locode}`;
+                url += `&destination=${locode}`;
             }
             console.info(`AwakeAiETAShipApi.getETA calling URL ${url}`);
             const resp = await axios.get(url, {
@@ -58,6 +58,7 @@ export class AwakeAiETAShipApi {
                     Authorization: this.apiKey,
                     Accept: MediaType.APPLICATION_JSON,
                 },
+                validateStatus: (status) => status == 200,
             });
             return {
                 type: AwakeAiShipResponseType.OK,

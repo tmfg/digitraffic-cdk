@@ -9,7 +9,7 @@ export const handler = () => {
         .setCredentials()
         .then(async () => {
             const locodes = await MetadataService.getLocodesWithPredictions();
-            return LambdaResponse.ok(locodes);
+            return LambdaResponse.okJson(locodes);
         })
         .catch((error) => {
             console.error("method=getLocodeMetadata error", error);

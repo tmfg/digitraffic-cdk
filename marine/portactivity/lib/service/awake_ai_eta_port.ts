@@ -1,63 +1,134 @@
-import {ApiTimestamp} from "../model/timestamp";
+import { ApiTimestamp } from "../model/timestamp";
 import {
+    AwakeAiPrediction,
     AwakeAiPredictionType,
     AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
-    AwakeAiZoneType, AwakeArrivalPortCallPrediction,
+    AwakeAiZoneType,
+    AwakeArrivalPortCallPrediction,
 } from "../api/awake_common";
-import moment from 'moment-timezone';
-import {AwakeAiETAPortApi} from "../api/awake_ai_port";
-import {predictionToTimestamp} from "./awake_ai_eta_helper";
-import {EventSource} from "../model/eventsource";
+import { AwakeAiETAPortApi, AwakeAiPortSchedule } from "../api/awake_ai_port";
+import {
+    isDigitrafficEtaPrediction,
+    predictionToTimestamp,
+} from "./awake_ai_eta_helper";
+import { EventSource } from "../model/eventsource";
+import { addHours, isBefore, parseISO } from "date-fns";
 
 export class AwakeAiETAPortService {
-
     private readonly api: AwakeAiETAPortApi;
 
     constructor(api: AwakeAiETAPortApi) {
         this.api = api;
     }
 
+    private voyageIsUnderWay(schedule: AwakeAiPortSchedule): boolean {
+        return schedule.voyage.voyageStatus === AwakeAiShipStatus.UNDER_WAY;
+    }
+
+    private portCallExistsForVoyage(schedule: AwakeAiPortSchedule): boolean {
+        return schedule.voyage.predictions.some(
+            (prediction) =>
+                prediction.predictionType ===
+                AwakeAiPredictionType.ARRIVAL_PORT_CALL
+        );
+    }
+
+    private isEtaPrediction(
+        prediction: AwakeAiPrediction
+    ): prediction is AwakeAiVoyageEtaPrediction {
+        return prediction.predictionType === AwakeAiPredictionType.ETA;
+    }
+
+    private validateArrivalTime(
+        etaPrediction: AwakeAiVoyageEtaPrediction
+    ): boolean {
+        if (
+            isBefore(
+                parseISO(etaPrediction.arrivalTime),
+                addHours(Date.now(), 24)
+            )
+        ) {
+            console.warn(
+                `method=AwakeAiETAPortService.getAwakeAiTimestamps arrival is closer than 24 hours, not persisting ETA: ${JSON.stringify(
+                    etaPrediction
+                )}`
+            );
+            return false;
+        }
+        return true;
+    }
+
+    private getEtaPredictions(
+        voyagePredictions: AwakeAiPrediction[]
+    ): AwakeAiVoyageEtaPrediction[] {
+        return (
+            voyagePredictions
+                .filter(
+                    (prediction): prediction is AwakeAiVoyageEtaPrediction =>
+                        this.isEtaPrediction(prediction)
+                )
+                // filter out predictions originating from digitraffic portcall api
+                .filter(
+                    (etaPrediction) =>
+                        !isDigitrafficEtaPrediction(etaPrediction)
+                )
+                .filter(
+                    (etaPrediction) =>
+                        etaPrediction.zoneType === AwakeAiZoneType.BERTH
+                )
+        );
+    }
+
     async getAwakeAiTimestamps(locode: string): Promise<ApiTimestamp[]> {
         const resp = await this.api.getETAs(locode);
 
-        console.info(`method=AwakeAiETAPortService.getAwakeAiTimestamps Received ETA response: ${JSON.stringify(resp)}`);
+        console.info(
+            `method=AwakeAiETAPortService.getAwakeAiTimestamps Received ETA response: ${JSON.stringify(
+                resp
+            )}`
+        );
 
         if (!resp.schedule) {
-            console.warn(`method=AwakeAiETAPortService.getAwakeAiTimestamps no ETA received, state=${resp.type}`);
+            console.warn(
+                `method=AwakeAiETAPortService.getAwakeAiTimestamps no ETA received, state=${resp.type}`
+            );
             return [];
         }
 
-        return resp.schedule
-            // only ships under way
-            .filter(schedule => schedule.voyage.voyageStatus === AwakeAiShipStatus.UNDER_WAY)
-            // only ships with a port call id
-            .filter(schedule => schedule.voyage.predictions.find(p => p.predictionType === AwakeAiPredictionType.ARRIVAL_PORT_CALL) != null)
-            .flatMap(schedule => {
-                const etaPredictions = schedule.voyage.predictions
-                    .filter(p => p.predictionType === AwakeAiPredictionType.ETA)
-                    .filter(p => (p as AwakeAiVoyageEtaPrediction).zoneType === AwakeAiZoneType.BERTH) as AwakeAiVoyageEtaPrediction[];
-
-                // we can be sure that this exists because of the filter above
-                const portcallPrediction = schedule.voyage.predictions.find(p => p.predictionType === AwakeAiPredictionType.ARRIVAL_PORT_CALL) as AwakeArrivalPortCallPrediction;
-
-                return etaPredictions.map(eta => {
-                    if (moment(eta.arrivalTime).isBefore(moment().add(24, 'hour'))) {
-                        console.warn(`method=AwakeAiETAPortService.getAwakeAiTimestamps arrival is closer than 24 hours, not persisting ETA: ${JSON.stringify(eta)}`);
-                        return null;
-                    }
-                    return predictionToTimestamp(
-                        eta,
-                        EventSource.AWAKE_AI_PRED,
-                        locode,
-                        schedule.ship.mmsi,
-                        schedule.ship.imo,
-                        undefined,
-                        undefined,
-                        portcallPrediction,
+        return (
+            resp.schedule
+                // only ships under way
+                .filter((schedule) => this.voyageIsUnderWay(schedule))
+                // only ships with a port call id
+                .filter((schedule) => this.portCallExistsForVoyage(schedule))
+                .flatMap((schedule) => {
+                    const etaPredictions = this.getEtaPredictions(
+                        schedule.voyage.predictions
                     );
-                });
-            }).filter((ts): ts is ApiTimestamp => ts != null);
-    }
 
+                    // we can be sure that this exists because of the filter portCallExistsForVoyage
+                    const portcallPrediction = schedule.voyage.predictions.find(
+                        (p) =>
+                            p.predictionType ===
+                            AwakeAiPredictionType.ARRIVAL_PORT_CALL
+                    ) as AwakeArrivalPortCallPrediction;
+
+                    return etaPredictions.map((eta) => {
+                        if (!this.validateArrivalTime(eta)) return null;
+                        return predictionToTimestamp(
+                            eta,
+                            EventSource.AWAKE_AI_PRED,
+                            locode,
+                            schedule.ship.mmsi,
+                            schedule.ship.imo,
+                            undefined,
+                            undefined,
+                            portcallPrediction
+                        );
+                    });
+                })
+                .filter((ts): ts is ApiTimestamp => ts !== null)
+        );
+    }
 }

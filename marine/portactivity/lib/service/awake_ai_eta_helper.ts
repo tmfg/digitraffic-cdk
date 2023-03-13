@@ -1,8 +1,10 @@
 import {
+    AwakeAiPrediction,
     AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction,
+    AwakeURN,
 } from "../api/awake_common";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { EventSource } from "../model/eventsource";
@@ -24,7 +26,7 @@ export function destinationIsFinnish(locode: string | undefined): boolean {
     return locode ? locode.toLowerCase().startsWith("fi") : false;
 }
 
-function portCallIdFromUrn(urn?: string): number | null {
+function portCallIdFromUrn(urn?: AwakeURN<string>): number | null {
     if (!urn) {
         return null;
     }
@@ -33,6 +35,14 @@ function portCallIdFromUrn(urn?: string): number | null {
         throw new Error("Invalid URN: " + urn);
     }
     return Number(split[3]);
+}
+
+export function isDigitrafficEtaPrediction(prediction: AwakeAiPrediction): boolean {
+    return (
+        prediction.predictionType === AwakeAiPredictionType.ETA &&
+        !!prediction.metadata &&
+        prediction.metadata.source.includes("digitraffic-portcall")
+    );
 }
 
 export function predictionToTimestamp(

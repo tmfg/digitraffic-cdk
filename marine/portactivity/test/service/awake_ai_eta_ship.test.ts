@@ -1,15 +1,16 @@
 import * as sinon from "sinon";
 import {
+    AwakeAiETAShipApi,
     AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
     AwakeAiShipResponseType,
-    AwakeAiETAShipApi,
 } from "../../lib/api/awake_ai_ship";
 import { AwakeAiETAShipService } from "../../lib/service/awake_ai_eta_ship";
 import { DbETAShip } from "../../lib/dao/timestamps";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { EventSource } from "../../lib/model/eventsource";
 import {
+    AwakeAiMetadata,
     AwakeAiPredictionType,
     AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
@@ -322,6 +323,27 @@ describe("AwakeAiETAShipService", () => {
 
         expect(timestamps.length).toBe(0);
     });
+
+    test("getAwakeAiTimestamps - filter Digitraffic ETA predictions", async () => {
+        const api = createApi();
+        const service = new AwakeAiETAShipService(api);
+        const ship = newDbETAShip();
+        const voyageTimestamp = createVoyageResponse(
+            ship.locode,
+            ship.imo,
+            123456789,
+            {
+                metadata: {
+                    source: "urn:awake:digitraffic-portcall:2959158",
+                },
+            }
+        );
+        sinon.stub(api, "getETA").returns(Promise.resolve(voyageTimestamp));
+
+        const timestamps = await service.getAwakeAiTimestamps([ship]);
+
+        expect(timestamps.length).toBe(0);
+    });
 });
 
 function createVoyageResponse(
@@ -331,6 +353,7 @@ function createVoyageResponse(
     options?: {
         status?: AwakeAiShipStatus;
         zoneType?: AwakeAiZoneType;
+        metadata?: AwakeAiMetadata;
     }
 ): AwakeAiShipApiResponse {
     const etaPrediction: AwakeAiVoyageEtaPrediction = {
@@ -339,6 +362,7 @@ function createVoyageResponse(
         predictionType: AwakeAiPredictionType.ETA,
         arrivalTime: new Date().toISOString(),
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
+        metadata: options?.metadata,
     };
 
     return {

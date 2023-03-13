@@ -45,7 +45,7 @@ export const handler = (event: GetTimeStampsEvent) => {
                 event.imo,
                 event.source
             );
-            return LambdaResponse.ok(timestamps);
+            return LambdaResponse.okJson(timestamps);
         })
         .catch((error) => {
             console.error("method=getTimeStampsHandler error", error);

@@ -10,11 +10,15 @@ import { retry } from "@digitraffic/common/dist/utils/retry";
 import {
     AwakeAiPredictionType,
     AwakeAiShipStatus,
-    AwakeAiZoneType,
     AwakeAiVoyageEtaPrediction,
+    AwakeAiZoneType,
 } from "../api/awake_common";
 import moment from "moment-timezone";
-import { AwakeDataState, predictionToTimestamp } from "./awake_ai_eta_helper";
+import {
+    AwakeDataState,
+    isDigitrafficEtaPrediction,
+    predictionToTimestamp,
+} from "./awake_ai_eta_helper";
 import { EventSource } from "../model/eventsource";
 
 interface AwakeAiETAResponseAndShip {
@@ -201,8 +205,13 @@ export class AwakeAiETAShipService {
             return [];
         }
 
-        return eta.predictions.filter(
-            (p) => p.predictionType === AwakeAiPredictionType.ETA
-        ) as AwakeAiVoyageEtaPrediction[];
+        return (
+            eta.predictions
+                .filter((p) => p.predictionType === AwakeAiPredictionType.ETA)
+                // filter out predictions originating from digitraffic portcall api
+                .filter(
+                    (p) => !isDigitrafficEtaPrediction(p)
+                ) as AwakeAiVoyageEtaPrediction[]
+        );
     }
 }
