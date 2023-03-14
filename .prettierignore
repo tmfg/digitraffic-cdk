@@ -1,6 +1,9 @@
 # Rush files
 common/changes
-common/scripts
+common/scripts/install-run-rush-pnpm.js
+common/scripts/install-run-rush.js
+common/scripts/install-run-rushx.js
+common/scripts/install-run.js
 common/config
 CHANGELOG.*
 

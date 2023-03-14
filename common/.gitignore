@@ -4,8 +4,13 @@
 !/config/rush/*
 !/git-hooks/
 !/git-hooks/*
+!/lib/
+!/lib/*/
+!/lib/*/*.js
 !/scripts/
 !/scripts/*.js
+!/scripts/*.mjs
+!/scripts/*.sh
 
 # Rush autoinstallers
 !/autoinstallers/

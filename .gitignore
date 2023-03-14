@@ -3,13 +3,18 @@
 !.gitignore
 !.eslintrc.js
 !.eslintignore
-!.node-version
+# for creating empty directories
+!.git-create
 
 !/.editorconfig
 !/.gitattributes
+!/.node-version
 !/.prettierignore
 !/.prettierrc.js
 !/README.md
+
+!/.repo/
+!/.repo/*.default.json
 
 # Github
 !.github/

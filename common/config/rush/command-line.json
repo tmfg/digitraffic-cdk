@@ -20,6 +20,18 @@
       "shellCommand": "pretty-quick --staged"
     },
     {
+      "name": "repo:init",
+      "commandKind": "global",
+      "summary": "Used to initialize the repository",
+      "shellCommand": "common/scripts/run-with-zx.sh common/scripts/git-init-submodule.mjs"
+    },
+    {
+      "name": "repo:deinit",
+      "commandKind": "global",
+      "summary": "Used to deinitialize the repository",
+      "shellCommand": "git submodule deinit --all && rm .gitmodules"
+    },
+    {
       "name": "ci:eslint-report",
       "commandKind": "bulk",
       "summary": "Used by the Github Actions to create eslint report.",
