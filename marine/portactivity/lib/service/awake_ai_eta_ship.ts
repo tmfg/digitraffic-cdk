@@ -4,22 +4,18 @@ import {
     AwakeAiShipPredictability,
     AwakeAiShipVoyageSchedule,
 } from "../api/awake_ai_ship";
-import { DbETAShip } from "../dao/timestamps";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { retry } from "@digitraffic/common/dist/utils/retry";
-import {
-    AwakeAiPredictionType,
-    AwakeAiShipStatus,
-    AwakeAiVoyageEtaPrediction,
-    AwakeAiZoneType,
-} from "../api/awake_common";
+import {DbETAShip} from "../dao/timestamps";
+import {ApiTimestamp, EventType} from "../model/timestamp";
+import {retry} from "@digitraffic/common/dist/utils/retry";
+import {AwakeAiShipStatus, AwakeAiVoyageEtaPrediction, AwakeAiZoneType,} from "../api/awake_common";
 import moment from "moment-timezone";
 import {
     AwakeDataState,
+    isAwakeEtaPrediction,
     isDigitrafficEtaPrediction,
     predictionToTimestamp,
 } from "./awake_ai_eta_helper";
-import { EventSource } from "../model/eventsource";
+import {EventSource} from "../model/eventsource";
 
 interface AwakeAiETAResponseAndShip {
     readonly response: AwakeAiShipApiResponse;
@@ -62,7 +58,7 @@ export class AwakeAiETAShipService {
                         this.publishAsETBDestinations.includes(ts.location.port)
                     )
                     .filter((ts) => ts.eventType === EventType.ETA)
-                    .map((ts) => ({ ...ts, ...{ eventType: EventType.ETB } }));
+                    .map((ts) => ({...ts, ...{eventType: EventType.ETB}}));
 
                 return acc.concat(timestamps, etbs);
             }, [])
@@ -144,7 +140,7 @@ export class AwakeAiETAShipService {
                 // allow pilot boarding area ETAs (ETP) only for specific ports
                 if (
                     etaPrediction.zoneType ===
-                        AwakeAiZoneType.PILOT_BOARDING_AREA &&
+                    AwakeAiZoneType.PILOT_BOARDING_AREA &&
                     !this.publishAsETPDestinations.includes(port)
                 ) {
                     console.warn(
@@ -207,11 +203,16 @@ export class AwakeAiETAShipService {
 
         return (
             eta.predictions
-                .filter((p) => p.predictionType === AwakeAiPredictionType.ETA)
+                .filter(isAwakeEtaPrediction)
                 // filter out predictions originating from digitraffic portcall api
-                .filter(
-                    (p) => !isDigitrafficEtaPrediction(p)
-                ) as AwakeAiVoyageEtaPrediction[]
+                .filter((etaPrediction) => {
+                        if (isDigitrafficEtaPrediction(etaPrediction)) {
+                            console.warn(`method=AwakeAiETAShipService.getAwakeAiTimestamps received Digitraffic ETA prediction: ${JSON.stringify(etaPrediction)}`);
+                            return false;
+                        }
+                        return true;
+                    }
+                )
         );
     }
 }

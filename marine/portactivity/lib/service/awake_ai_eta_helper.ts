@@ -6,8 +6,8 @@ import {
     AwakeArrivalPortCallPrediction,
     AwakeURN,
 } from "../api/awake_common";
-import { ApiTimestamp, EventType } from "../model/timestamp";
-import { EventSource } from "../model/eventsource";
+import {ApiTimestamp, EventType} from "../model/timestamp";
+import {EventSource} from "../model/eventsource";
 
 export enum AwakeDataState {
     OK = "OK",
@@ -43,6 +43,12 @@ export function isDigitrafficEtaPrediction(prediction: AwakeAiPrediction): boole
         !!prediction.metadata &&
         prediction.metadata.source.includes("digitraffic-portcall")
     );
+}
+
+export function isAwakeEtaPrediction(
+    prediction: AwakeAiPrediction
+): prediction is AwakeAiVoyageEtaPrediction {
+    return prediction.predictionType === AwakeAiPredictionType.ETA;
 }
 
 export function predictionToTimestamp(

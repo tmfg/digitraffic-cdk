@@ -1,4 +1,4 @@
-import { ApiTimestamp } from "../model/timestamp";
+import {ApiTimestamp} from "../model/timestamp";
 import {
     AwakeAiPrediction,
     AwakeAiPredictionType,
@@ -7,13 +7,14 @@ import {
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction,
 } from "../api/awake_common";
-import { AwakeAiETAPortApi, AwakeAiPortSchedule } from "../api/awake_ai_port";
+import {AwakeAiETAPortApi, AwakeAiPortSchedule} from "../api/awake_ai_port";
 import {
+    isAwakeEtaPrediction,
     isDigitrafficEtaPrediction,
     predictionToTimestamp,
 } from "./awake_ai_eta_helper";
-import { EventSource } from "../model/eventsource";
-import { addHours, isBefore, parseISO } from "date-fns";
+import {EventSource} from "../model/eventsource";
+import {addHours, isBefore, parseISO} from "date-fns";
 
 export class AwakeAiETAPortService {
     private readonly api: AwakeAiETAPortApi;
@@ -32,12 +33,6 @@ export class AwakeAiETAPortService {
                 prediction.predictionType ===
                 AwakeAiPredictionType.ARRIVAL_PORT_CALL
         );
-    }
-
-    private isEtaPrediction(
-        prediction: AwakeAiPrediction
-    ): prediction is AwakeAiVoyageEtaPrediction {
-        return prediction.predictionType === AwakeAiPredictionType.ETA;
     }
 
     private validateArrivalTime(
@@ -64,14 +59,15 @@ export class AwakeAiETAPortService {
     ): AwakeAiVoyageEtaPrediction[] {
         return (
             voyagePredictions
-                .filter(
-                    (prediction): prediction is AwakeAiVoyageEtaPrediction =>
-                        this.isEtaPrediction(prediction)
-                )
+                .filter(isAwakeEtaPrediction)
                 // filter out predictions originating from digitraffic portcall api
-                .filter(
-                    (etaPrediction) =>
-                        !isDigitrafficEtaPrediction(etaPrediction)
+                .filter((etaPrediction) => {
+                        if (isDigitrafficEtaPrediction(etaPrediction)) {
+                            console.warn(`method=AwakeAiETAPortService.getAwakeAiTimestamps received Digitraffic ETA prediction: ${JSON.stringify(etaPrediction)}`);
+                            return false;
+                        }
+                        return true;
+                    }
                 )
                 .filter(
                     (etaPrediction) =>
