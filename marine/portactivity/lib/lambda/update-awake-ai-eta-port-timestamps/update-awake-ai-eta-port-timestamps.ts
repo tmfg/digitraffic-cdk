@@ -1,7 +1,7 @@
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
 import { SNSEvent } from "aws-lambda";
 import { sendMessage } from "../../service/queue-service";
-import { AwakeAiETAPortApi } from "../../api/awake_ai_port";
+import { AwakeAiPortApi } from "../../api/awake_ai_port";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { AwakeAiETAPortService } from "../../service/awake_ai_eta_port";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
@@ -30,7 +30,7 @@ export function handler(event: SNSEvent): Promise<void> {
 
             if (!service) {
                 service = new AwakeAiETAPortService(
-                    new AwakeAiETAPortApi(
+                    new AwakeAiPortApi(
                         secret["awake.voyagesurl"],
                         secret["awake.voyagesauth"]
                     )

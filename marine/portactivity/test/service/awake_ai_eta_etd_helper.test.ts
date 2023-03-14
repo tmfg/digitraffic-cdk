@@ -1,5 +1,4 @@
-import * as AwakeAiETAHelper from "../../lib/service/awake_ai_eta_helper";
-import { isDigitrafficEtaPrediction } from "../../lib/service/awake_ai_eta_helper";
+import * as AwakeAiETAHelper from "../../lib/service/awake_ai_eta_etd_helper";
 import {
     AwakeAiMetadata,
     AwakeAiPredictionType,
@@ -8,22 +7,22 @@ import {
     AwakeDigitrafficPortCallURN,
     AwakeURN,
 } from "../../lib/api/awake_common";
-import { EventSource } from "../../lib/model/eventsource";
-import { randomIMO, randomMMSI } from "../testdata";
-import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
-import { EventType } from "../../lib/model/timestamp";
+import {EventSource} from "../../lib/model/eventsource";
+import {randomIMO, randomMMSI} from "../testdata";
+import {randomBoolean} from "@digitraffic/common/dist/test/testutils";
+import {EventType} from "../../lib/model/timestamp";
 
 describe("Awake.AI ETA helper", () => {
     test("destinationIsFinnish - correct", () => {
-        expect(AwakeAiETAHelper.destinationIsFinnish("FILOL")).toBe(true);
+        expect(AwakeAiETAHelper.locodeIsFinnish("FILOL")).toBe(true);
     });
 
     test("destinationIsFinnish - case insensitive", () => {
-        expect(AwakeAiETAHelper.destinationIsFinnish("fIlAn")).toBe(true);
+        expect(AwakeAiETAHelper.locodeIsFinnish("fIlAn")).toBe(true);
     });
 
     test("destinationIsFinnish - not finnish", () => {
-        expect(AwakeAiETAHelper.destinationIsFinnish("SEFOO")).toBe(false);
+        expect(AwakeAiETAHelper.locodeIsFinnish("SEFOO")).toBe(false);
     });
 
     test("predictionToTimestamp - valid prediction", () => {
@@ -34,7 +33,7 @@ describe("Awake.AI ETA helper", () => {
         const source = EventSource.AWAKE_AI;
         const eta: AwakeAiVoyageEtaPrediction = newETAPrediction();
 
-        const ts = AwakeAiETAHelper.predictionToTimestamp(
+        const ts = AwakeAiETAHelper.etaPredictionToTimestamp(
             eta,
             source,
             eta.locode,
@@ -65,7 +64,7 @@ describe("Awake.AI ETA helper", () => {
                 : AwakeAiPredictionType.TRAVEL_TIME,
         });
 
-        const ts = AwakeAiETAHelper.predictionToTimestamp(
+        const ts = AwakeAiETAHelper.etaPredictionToTimestamp(
             eta,
             EventSource.AWAKE_AI,
             eta.locode,
@@ -81,7 +80,7 @@ describe("Awake.AI ETA helper", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (eta as any).arrivalTime = undefined;
 
-        const ts = AwakeAiETAHelper.predictionToTimestamp(
+        const ts = AwakeAiETAHelper.etaPredictionToTimestamp(
             eta,
             EventSource.AWAKE_AI,
             eta.locode,
@@ -109,8 +108,8 @@ describe("Awake.AI ETA helper", () => {
             },
         });
 
-        expect(isDigitrafficEtaPrediction(digitrafficEta)).toBe(true);
-        expect(isDigitrafficEtaPrediction(awakeEta)).toBe(false);
+        expect(AwakeAiETAHelper.isDigitrafficEtaPrediction(digitrafficEta)).toBe(true);
+        expect(AwakeAiETAHelper.isDigitrafficEtaPrediction(awakeEta)).toBe(false);
     });
 });
 

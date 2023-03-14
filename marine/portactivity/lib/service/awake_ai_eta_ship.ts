@@ -11,10 +11,10 @@ import {AwakeAiShipStatus, AwakeAiVoyageEtaPrediction, AwakeAiZoneType,} from ".
 import moment from "moment-timezone";
 import {
     AwakeDataState,
+    etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction,
-    predictionToTimestamp,
-} from "./awake_ai_eta_helper";
+} from "./awake_ai_eta_etd_helper";
 import {EventSource} from "../model/eventsource";
 
 interface AwakeAiETAResponseAndShip {
@@ -149,7 +149,7 @@ export class AwakeAiETAShipService {
                     return null;
                 }
 
-                return predictionToTimestamp(
+                return etaPredictionToTimestamp(
                     etaPrediction,
                     EventSource.AWAKE_AI,
                     ship.locode,
@@ -207,7 +207,7 @@ export class AwakeAiETAShipService {
                 // filter out predictions originating from digitraffic portcall api
                 .filter((etaPrediction) => {
                         if (isDigitrafficEtaPrediction(etaPrediction)) {
-                            console.warn(`method=AwakeAiETAShipService.getAwakeAiTimestamps received Digitraffic ETA prediction: ${JSON.stringify(etaPrediction)}`);
+                            console.warn(`method=AwakeAiETAShipService.getAwakeAiTimestamps received Digitraffic ETA prediction, IMO: ${schedule.ship.imo ?? schedule.ship.mmsi}, prediction: ${JSON.stringify(etaPrediction)}`);
                             return false;
                         }
                         return true;

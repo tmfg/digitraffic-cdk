@@ -1,7 +1,7 @@
 import * as sinon from "sinon";
 import { AwakeAiETAPortService } from "../../lib/service/awake_ai_eta_port";
 import {
-    AwakeAiETAPortApi,
+    AwakeAiPortApi,
     AwakeAiPortResponse,
     AwakeAiPortResponseType,
 } from "../../lib/api/awake_ai_port";
@@ -119,7 +119,7 @@ describe("AwakeAiETAPortService(", () => {
 });
 
 function createApi() {
-    return new AwakeAiETAPortApi("", "");
+    return new AwakeAiPortApi("", "");
 }
 
 function createResponse(options?: {

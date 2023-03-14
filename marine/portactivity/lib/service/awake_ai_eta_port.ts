@@ -1,30 +1,24 @@
 import {ApiTimestamp} from "../model/timestamp";
 import {
-    AwakeAiPrediction,
     AwakeAiPredictionType,
-    AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction,
 } from "../api/awake_common";
-import {AwakeAiETAPortApi, AwakeAiPortSchedule} from "../api/awake_ai_port";
+import {AwakeAiPortApi, AwakeAiPortSchedule} from "../api/awake_ai_port";
 import {
+    etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction,
-    predictionToTimestamp,
-} from "./awake_ai_eta_helper";
+} from "./awake_ai_eta_etd_helper";
 import {EventSource} from "../model/eventsource";
 import {addHours, isBefore, parseISO} from "date-fns";
 
 export class AwakeAiETAPortService {
-    private readonly api: AwakeAiETAPortApi;
+    private readonly api: AwakeAiPortApi;
 
-    constructor(api: AwakeAiETAPortApi) {
+    constructor(api: AwakeAiPortApi) {
         this.api = api;
-    }
-
-    private voyageIsUnderWay(schedule: AwakeAiPortSchedule): boolean {
-        return schedule.voyage.voyageStatus === AwakeAiShipStatus.UNDER_WAY;
     }
 
     private portCallExistsForVoyage(schedule: AwakeAiPortSchedule): boolean {
@@ -55,15 +49,15 @@ export class AwakeAiETAPortService {
     }
 
     private getEtaPredictions(
-        voyagePredictions: AwakeAiPrediction[]
+        schedule: AwakeAiPortSchedule
     ): AwakeAiVoyageEtaPrediction[] {
         return (
-            voyagePredictions
+            schedule.voyage.predictions
                 .filter(isAwakeEtaPrediction)
                 // filter out predictions originating from digitraffic portcall api
                 .filter((etaPrediction) => {
                         if (isDigitrafficEtaPrediction(etaPrediction)) {
-                            console.warn(`method=AwakeAiETAPortService.getAwakeAiTimestamps received Digitraffic ETA prediction: ${JSON.stringify(etaPrediction)}`);
+                            console.warn(`method=AwakeAiETAPortService.getAwakeAiTimestamps received Digitraffic ETA prediction, IMO: ${schedule.ship.imo ?? schedule.ship.mmsi}, prediction: ${JSON.stringify(etaPrediction)}`);
                             return false;
                         }
                         return true;
@@ -94,13 +88,11 @@ export class AwakeAiETAPortService {
 
         return (
             resp.schedule
-                // only ships under way
-                .filter((schedule) => this.voyageIsUnderWay(schedule))
                 // only ships with a port call id
                 .filter((schedule) => this.portCallExistsForVoyage(schedule))
                 .flatMap((schedule) => {
                     const etaPredictions = this.getEtaPredictions(
-                        schedule.voyage.predictions
+                        schedule
                     );
 
                     // we can be sure that this exists because of the filter portCallExistsForVoyage
@@ -112,7 +104,7 @@ export class AwakeAiETAPortService {
 
                     return etaPredictions.map((eta) => {
                         if (!this.validateArrivalTime(eta)) return null;
-                        return predictionToTimestamp(
+                        return etaPredictionToTimestamp(
                             eta,
                             EventSource.AWAKE_AI_PRED,
                             locode,

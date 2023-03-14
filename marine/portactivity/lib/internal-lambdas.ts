@@ -79,6 +79,12 @@ export function create(
             "PortActivity-UpdateAwakeAiETAPortTimestamps",
             "update-awake-ai-eta-port-timestamps"
         );
+    const updateAwakeAiETDPortTimestampsLambda =
+        createUpdateAwakeAiETDTimestampsLambda(
+            stack,
+            "PortActivity-UpdateAwakeAiETDPortTimestamps",
+            "update-awake-ai-etd-port-timestamps"
+        );
     const updateScheduleTimestampsLambda = createUpdateTimestampsFromSchedules(
         stack,
         queueAndDLQ.queue
@@ -91,6 +97,7 @@ export function create(
         triggerAwakeAiETAShipTimestampsLambda,
         updateAwakeAiETAShipTimestampsLambda,
         updateAwakeAiETAPortTimestampsLambda,
+        updateAwakeAiETDPortTimestampsLambda,
         updateScheduleTimestampsLambda,
         updateTimestampsFromPilotwebLambda,
         deleteOldTimestampsLambda
@@ -101,6 +108,7 @@ export function create(
         triggerAwakeAiETAPortTimestampsLambda,
         updateAwakeAiETAShipTimestampsLambda,
         updateAwakeAiETAPortTimestampsLambda,
+        updateAwakeAiETDPortTimestampsLambda,
         updateScheduleTimestampsLambda,
         updateTimestampsFromPilotwebLambda,
         deleteOldTimestampsLambda
@@ -321,6 +329,29 @@ function createUpdateAwakeAiETATimestampsLambda(
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     topic.addSubscription(new LambdaSubscription(lambda));
     queue.grantSendMessages(lambda);
+    return lambda;
+}
+
+function createUpdateAwakeAiETDTimestampsLambda(
+    stack: DigitrafficStack,
+    functionName: string,
+    lambdaName: string
+): MonitoredFunction {
+    const environment = stack.createLambdaEnvironment();
+    //environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
+    const lambdaConf = databaseFunctionProps(
+        stack,
+        environment,
+        functionName,
+        lambdaName,
+        {
+            timeout: 30,
+            reservedConcurrentExecutions: 14,
+        }
+    );
+    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
+    //topic.addSubscription(new LambdaSubscription(lambda));
+    //queue.grantSendMessages(lambda);
     return lambda;
 }
 

@@ -1,4 +1,4 @@
-import { URN } from "@digitraffic/common/dist/types/urn";
+import {URN} from "@digitraffic/common/dist/types/urn";
 
 export enum AwakeAiZoneType {
     VTS_AREA = "vts",
@@ -14,8 +14,14 @@ export interface AwakeAiShip {
     readonly shipName?: string;
 }
 
+export interface AwakeAiPredictionMetadata {
+    // urn
+    readonly source: string
+}
+
 export enum AwakeAiPredictionType {
     ETA = "eta",
+    ETD = "etd",
     TRAVEL_TIME = "travel-time",
     DESTINATION = "destination",
     ARRIVAL_PORT_CALL = "arrival-port-call",
@@ -35,7 +41,7 @@ export type AwakeDigitrafficPortCallURN = AwakeURN<AwakeDigitrafficPortCallIDStr
  */
 export interface AwakeAiPrediction {
     readonly predictionType: AwakeAiPredictionType;
-    readonly metadata?: AwakeAiMetadata
+    readonly metadata?: AwakeAiPredictionMetadata
 }
 
 export interface AwakeAiZonePrediction extends AwakeAiPrediction {
@@ -82,6 +88,13 @@ export interface AwakeAiVoyageEtaPrediction
         AwakeAiZonePrediction {
     // ISO 8601
     readonly arrivalTime: string;
+}
+
+export interface AwakeAiVoyageEtdPrediction
+    extends AwakeAiLocodePrediction,
+        AwakeAiZonePrediction {
+    // ISO 8601
+    readonly departureTime: string;
 }
 
 export enum AwakeAiShipStatus {
