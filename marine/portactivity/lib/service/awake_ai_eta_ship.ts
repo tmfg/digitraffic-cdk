@@ -207,7 +207,7 @@ export class AwakeAiETAShipService {
                 // filter out predictions originating from digitraffic portcall api
                 .filter((etaPrediction) => {
                         if (isDigitrafficEtaPrediction(etaPrediction)) {
-                            console.warn(`method=AwakeAiETAShipService.getAwakeAiTimestamps received Digitraffic ETA prediction: ${JSON.stringify(etaPrediction)}`);
+                            console.warn(`method=AwakeAiETAShipService.getAwakeAiTimestamps received Digitraffic ETA prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi} prediction: ${JSON.stringify(etaPrediction)}`);
                             return false;
                         }
                         return true;
