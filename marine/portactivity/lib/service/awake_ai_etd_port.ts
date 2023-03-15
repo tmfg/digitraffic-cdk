@@ -43,7 +43,7 @@ export class AwakeAiETDPortService {
                         .filter(isAwakeEtdPrediction)
                         .filter(etdPrediction => {
                             if (this.departureTimeInThePast(etdPrediction.departureTime)) {
-                                console.warn(`method=AwakeAiETDPortService.getAwakeAiTimestamps prediction departure time in the past, IMO: ${schedule.ship.imo ?? schedule.ship.mmsi}, prediction: ${JSON.stringify(etdPrediction)}`);
+                                console.warn(`method=AwakeAiETDPortService.getAwakeAiTimestamps ETD prediction event time in the past, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(etdPrediction)}`);
                                 return false
                             }
                             return true
@@ -52,7 +52,7 @@ export class AwakeAiETDPortService {
                         .filter(
                             (etdPrediction) => {
                                 if (isDigitrafficEtdPrediction(etdPrediction)) {
-                                    console.warn(`method=AwakeAiETDPortService.getAwakeAiTimestamps received Digitraffic ETD prediction, IMO: ${schedule.ship.imo ?? schedule.ship.mmsi}, prediction: ${JSON.stringify(etdPrediction)}`);
+                                    console.warn(`method=AwakeAiETDPortService.getAwakeAiTimestamps received Digitraffic ETD prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(etdPrediction)}`);
                                     return false;
                                 }
                                 return true;

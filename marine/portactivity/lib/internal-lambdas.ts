@@ -1,29 +1,29 @@
-import { AssetCode, Runtime } from "aws-cdk-lib/aws-lambda";
-import { Duration, Stack } from "aws-cdk-lib";
+import {AssetCode, Runtime} from "aws-cdk-lib/aws-lambda";
+import {Duration, Stack} from "aws-cdk-lib";
 import {
     databaseFunctionProps,
     defaultLambdaConfiguration,
     LambdaEnvironment,
 } from "@digitraffic/common/dist/aws/infra/stack/lambda-configs";
-import { DigitrafficLogSubscriptions } from "@digitraffic/common/dist/aws/infra/stack/subscription";
-import { Queue } from "aws-cdk-lib/aws-sqs";
-import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
-import { Bucket } from "aws-cdk-lib/aws-s3";
-import { RetentionDays } from "aws-cdk-lib/aws-logs";
-import { QueueAndDLQ } from "./sqs";
-import { PolicyStatement } from "aws-cdk-lib/aws-iam";
-import { Rule, Schedule } from "aws-cdk-lib/aws-events";
-import { LambdaFunction } from "aws-cdk-lib/aws-events-targets";
-import { LambdaSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import { PortactivityEnvKeys, PortActivityParameterKeys } from "./keys";
+import {DigitrafficLogSubscriptions} from "@digitraffic/common/dist/aws/infra/stack/subscription";
+import {Queue} from "aws-cdk-lib/aws-sqs";
+import {SqsEventSource} from "aws-cdk-lib/aws-lambda-event-sources";
+import {Bucket} from "aws-cdk-lib/aws-s3";
+import {RetentionDays} from "aws-cdk-lib/aws-logs";
+import {QueueAndDLQ} from "./sqs";
+import {PolicyStatement} from "aws-cdk-lib/aws-iam";
+import {Rule, Schedule} from "aws-cdk-lib/aws-events";
+import {LambdaFunction} from "aws-cdk-lib/aws-events-targets";
+import {LambdaSubscription} from "aws-cdk-lib/aws-sns-subscriptions";
+import {PortactivityEnvKeys, PortActivityParameterKeys} from "./keys";
 import {
     MonitoredDBFunction,
     MonitoredFunction,
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { PortactivityConfiguration } from "./app-props";
-import { Topic } from "aws-cdk-lib/aws-sns";
-import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
+import {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
+import {PortactivityConfiguration} from "./app-props";
+import {Topic} from "aws-cdk-lib/aws-sns";
+import {Scheduler} from "@digitraffic/common/dist/aws/infra/scheduler";
 
 export function create(
     stack: DigitrafficStack,
@@ -51,20 +51,35 @@ export function create(
             displayName: awakeETAPortUpdateTopicName,
         }
     );
+    const awakeETDPortUpdateTopicName = "UpdateAwakePortETD";
+    const triggerAwakeETDPortUpdateTopic = new Topic(
+        stack,
+        awakeETDPortUpdateTopicName,
+        {
+            topicName: awakeETDPortUpdateTopicName,
+            displayName: awakeETDPortUpdateTopicName,
+        }
+    );
     const triggerAwakeAiETAShipTimestampsLambda =
-        createTriggerAwakeAiETATimestampsLambda(
+        createTriggerAwakeAiETXTimestampsLambda(
             stack,
             triggerAwakeETAShipUpdateTopic,
             "trigger-awake-ai-eta-ship-timestamps-update"
         );
     const triggerAwakeAiETAPortTimestampsLambda =
-        createTriggerAwakeAiETATimestampsLambda(
+        createTriggerAwakeAiETXTimestampsLambda(
             stack,
             triggerAwakeETAPortUpdateTopic,
             "trigger-awake-ai-eta-port-timestamps-update"
         );
+    const triggerAwakeAiETDPortTimestampsLambda =
+        createTriggerAwakeAiETXTimestampsLambda(
+            stack,
+            triggerAwakeETDPortUpdateTopic,
+            "trigger-awake-ai-etd-port-timestamps-update"
+        );
     const updateAwakeAiETAShipTimestampsLambda =
-        createUpdateAwakeAiETATimestampsLambda(
+        createUpdateAwakeAiETXTimestampsLambda(
             stack,
             triggerAwakeETAShipUpdateTopic,
             queueAndDLQ.queue,
@@ -72,7 +87,7 @@ export function create(
             "update-awake-ai-eta-ship-timestamps"
         );
     const updateAwakeAiETAPortTimestampsLambda =
-        createUpdateAwakeAiETATimestampsLambda(
+        createUpdateAwakeAiETXTimestampsLambda(
             stack,
             triggerAwakeETAPortUpdateTopic,
             queueAndDLQ.queue,
@@ -80,8 +95,10 @@ export function create(
             "update-awake-ai-eta-port-timestamps"
         );
     const updateAwakeAiETDPortTimestampsLambda =
-        createUpdateAwakeAiETDTimestampsLambda(
+        createUpdateAwakeAiETXTimestampsLambda(
             stack,
+            triggerAwakeETDPortUpdateTopic,
+            queueAndDLQ.queue,
             "PortActivity-UpdateAwakeAiETDPortTimestamps",
             "update-awake-ai-etd-port-timestamps"
         );
@@ -106,6 +123,7 @@ export function create(
         stack,
         triggerAwakeAiETAShipTimestampsLambda,
         triggerAwakeAiETAPortTimestampsLambda,
+        triggerAwakeAiETDPortTimestampsLambda,
         updateAwakeAiETAShipTimestampsLambda,
         updateAwakeAiETAPortTimestampsLambda,
         updateAwakeAiETDPortTimestampsLambda,
@@ -126,6 +144,12 @@ export function create(
             "PortActivity-UpdateAwakeETAPortScheduler",
             30,
             triggerAwakeAiETAPortTimestampsLambda
+        );
+        Scheduler.everyMinutes(
+            stack,
+            "PortActivity-UpdateAwakeETDPortScheduler",
+            30,
+            triggerAwakeAiETDPortTimestampsLambda
         );
     }
     Scheduler.everyMinutes(
@@ -161,7 +185,7 @@ export function create(
     }
 }
 
-function createTriggerAwakeAiETATimestampsLambda(
+function createTriggerAwakeAiETXTimestampsLambda(
     stack: DigitrafficStack,
     topic: Topic,
     lambdaName: string
@@ -307,7 +331,7 @@ function createATXScheduler(stack: Stack): Rule {
     });
 }
 
-function createUpdateAwakeAiETATimestampsLambda(
+function createUpdateAwakeAiETXTimestampsLambda(
     stack: DigitrafficStack,
     topic: Topic,
     queue: Queue,
@@ -323,35 +347,12 @@ function createUpdateAwakeAiETATimestampsLambda(
         lambdaName,
         {
             timeout: 30,
-            reservedConcurrentExecutions: 14,
+            reservedConcurrentExecutions: 20,
         }
     );
     const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
     topic.addSubscription(new LambdaSubscription(lambda));
     queue.grantSendMessages(lambda);
-    return lambda;
-}
-
-function createUpdateAwakeAiETDTimestampsLambda(
-    stack: DigitrafficStack,
-    functionName: string,
-    lambdaName: string
-): MonitoredFunction {
-    const environment = stack.createLambdaEnvironment();
-    //environment[PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL] = queue.queueUrl;
-    const lambdaConf = databaseFunctionProps(
-        stack,
-        environment,
-        functionName,
-        lambdaName,
-        {
-            timeout: 30,
-            reservedConcurrentExecutions: 14,
-        }
-    );
-    const lambda = MonitoredFunction.create(stack, functionName, lambdaConf);
-    //topic.addSubscription(new LambdaSubscription(lambda));
-    //queue.grantSendMessages(lambda);
     return lambda;
 }
 
