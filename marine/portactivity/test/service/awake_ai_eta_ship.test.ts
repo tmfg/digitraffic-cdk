@@ -5,22 +5,19 @@ import {
     AwakeAiShipPredictability,
     AwakeAiShipResponseType,
 } from "../../lib/api/awake_ai_ship";
-import { AwakeAiETAShipService } from "../../lib/service/awake_ai_eta_ship";
-import { DbETAShip } from "../../lib/dao/timestamps";
-import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
-import { EventSource } from "../../lib/model/eventsource";
+import {AwakeAiETAShipService} from "../../lib/service/awake_ai_eta_ship";
+import {DbETAShip} from "../../lib/dao/timestamps";
+import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
 import {
-    AwakeAiMetadata,
+    AwakeAiPredictionMetadata,
     AwakeAiPredictionType,
     AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
 } from "../../lib/api/awake_common";
-import {
-    getRandomInteger,
-    randomBoolean,
-} from "@digitraffic/common/dist/test/testutils";
-import moment from "moment-timezone";
+import {getRandomInteger, randomBoolean,} from "@digitraffic/common/dist/test/testutils";
+import {EventSource} from "../../lib/model/eventsource";
+import {addHours} from "date-fns";
 
 describe("AwakeAiETAShipService", () => {
     test("getAwakeAiTimestamps - creates both ETA and ETB only for FIRAU", async () => {
@@ -62,7 +59,7 @@ describe("AwakeAiETAShipService", () => {
         const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip(
             "FIKEK",
-            moment().add(getRandomInteger(24, 100), "hour")
+            addHours(Date.now(), getRandomInteger(24, 100))
         );
         sinon
             .stub(api, "getETA")
@@ -82,7 +79,7 @@ describe("AwakeAiETAShipService", () => {
         const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip(
             "FIKEK",
-            moment().add(getRandomInteger(1, 23), "hour")
+            addHours(Date.now(), getRandomInteger(1, 23))
         );
         const voyageTimestamp = createVoyageResponse(
             "FILOL",
@@ -103,10 +100,9 @@ describe("AwakeAiETAShipService", () => {
         const mmsi = 123456789;
         const notUnderWayStatuses = [
             AwakeAiShipStatus.STOPPED,
-            AwakeAiShipStatus.NOT_PREDICTABLE,
-            AwakeAiShipStatus.VESSEL_DATA_NOT_UPDATED,
+            AwakeAiShipStatus.NOT_STARTED
         ];
-        const status = notUnderWayStatuses[Math.floor(Math.random() * 2) + 1]; // get random status
+        const status = notUnderWayStatuses[Math.floor(Math.random() * 2)]; // get random status
         sinon.stub(api, "getETA").returns(
             Promise.resolve(
                 createVoyageResponse(ship.locode, ship.imo, mmsi, {
@@ -259,7 +255,7 @@ describe("AwakeAiETAShipService", () => {
         const locode = "FIKEK";
         const api = createApi();
         const service = new AwakeAiETAShipService(api);
-        const ship = newDbETAShip(locode, moment().add(1, "hour"));
+        const ship = newDbETAShip(locode, addHours(Date.now(), 1));
         const getETAStub = sinon
             .stub(api, "getETA")
             .returns(
@@ -277,7 +273,7 @@ describe("AwakeAiETAShipService", () => {
         const locode = "FIKEK";
         const api = createApi();
         const service = new AwakeAiETAShipService(api);
-        const ship = newDbETAShip(locode, moment().add(25, "hour"));
+        const ship = newDbETAShip(locode, addHours(Date.now(), 25));
         const getETAStub = sinon
             .stub(api, "getETA")
             .returns(
@@ -353,7 +349,7 @@ function createVoyageResponse(
     options?: {
         status?: AwakeAiShipStatus;
         zoneType?: AwakeAiZoneType;
-        metadata?: AwakeAiMetadata;
+        metadata?: AwakeAiPredictionMetadata;
     }
 ): AwakeAiShipApiResponse {
     const etaPrediction: AwakeAiVoyageEtaPrediction = {
@@ -389,7 +385,7 @@ function createApi(): AwakeAiETAShipApi {
     return new AwakeAiETAShipApi("", "");
 }
 
-function newDbETAShip(locode?: string, eta?: moment.Moment): DbETAShip {
+function newDbETAShip(locode?: string, eta?: Date): DbETAShip {
     return {
         imo: 1234567,
         locode: locode ?? "FILOL",
@@ -397,7 +393,7 @@ function newDbETAShip(locode?: string, eta?: moment.Moment): DbETAShip {
         portcall_id: 123,
         eta:
             eta?.toISOString() ??
-            moment().add(getRandomInteger(1, 24), "hour").toISOString(),
+            addHours(Date.now(), getRandomInteger(1, 24)).toISOString()
     };
 }
 

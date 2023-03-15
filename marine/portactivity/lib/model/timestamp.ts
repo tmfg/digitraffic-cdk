@@ -1,4 +1,5 @@
 import moment from "moment";
+import {EventSource} from "./eventsource";
 
 export enum EventType {
     ATA = "ATA",
@@ -102,6 +103,10 @@ export function validateTimestamp(timestamp: Partial<ApiTimestamp>): ApiTimestam
     }
     if (timestamp.location.portArea && timestamp.location.portArea.length > 6) {
         console.warn("PortArea too long", timestamp);
+        return null;
+    }
+    if (timestamp.source === EventSource.AWAKE_AI_PRED && timestamp.eventType === EventType.ETD) {
+        console.warn("ETD prediction from Awake.AI - not persisting")
         return null;
     }
 

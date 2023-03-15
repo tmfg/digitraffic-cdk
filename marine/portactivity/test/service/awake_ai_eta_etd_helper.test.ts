@@ -1,6 +1,6 @@
 import * as AwakeAiETAHelper from "../../lib/service/awake_ai_eta_etd_helper";
 import {
-    AwakeAiMetadata,
+    AwakeAiPredictionMetadata,
     AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
@@ -122,7 +122,7 @@ function newETAPrediction(options?: {
     arrivalTime?: Date;
     recordTime?: Date;
     locode?: string;
-    metadata?: AwakeAiMetadata;
+    metadata?: AwakeAiPredictionMetadata;
     zoneType?: AwakeAiZoneType;
 }): AwakeAiVoyageEtaPrediction {
     return {

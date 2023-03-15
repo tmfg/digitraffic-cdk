@@ -14,11 +14,6 @@ export interface AwakeAiShip {
     readonly shipName?: string;
 }
 
-export interface AwakeAiPredictionMetadata {
-    // urn
-    readonly source: string
-}
-
 export enum AwakeAiPredictionType {
     ETA = "eta",
     ETD = "etd",
@@ -27,7 +22,7 @@ export enum AwakeAiPredictionType {
     ARRIVAL_PORT_CALL = "arrival-port-call",
 }
 
-export interface AwakeAiMetadata {
+export interface AwakeAiPredictionMetadata {
     source: AwakeURN | AwakeDigitrafficPortCallURN
 }
 
@@ -100,8 +95,7 @@ export interface AwakeAiVoyageEtdPrediction
 export enum AwakeAiShipStatus {
     UNDER_WAY = "underway",
     STOPPED = "stopped",
-    NOT_PREDICTABLE = "not_predictable",
-    VESSEL_DATA_NOT_UPDATED = "vessel_data_not_updated",
+    NOT_STARTED = "not-started"
 }
 
 export interface AwakeAiPredictedVoyage {

@@ -47,11 +47,10 @@ export class AwakeAiPortApi {
         locode: string,
         predictionType: AwakeAiPredictionType,
         maxSequenceNo = 1,
-        predictionMetadata = true
     ): Promise<AwakeAiPortResponse> {
         const start = Date.now();
         try {
-            const url = `${this.url}/port/${locode}/${resource}?maxSequenceNo=${maxSequenceNo}&predictionType=${predictionType}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}&predictionMetadata=${predictionMetadata.toString()}`;
+            const url = `${this.url}/port/${locode}/${resource}?maxSequenceNo=${maxSequenceNo}&predictionType=${predictionType}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}&predictionMetadata=true`;
             console.info(`AwakeAiETAPortApi.getETAs calling URL ${url}`);
             const resp = await axios.get(url, {
                 headers: {
@@ -77,11 +76,11 @@ export class AwakeAiPortApi {
     }
 
     async getETAs(locode: string, maxSequenceNo = 1) {
-        return this.getPredictions(AwakeAiPortResource.ARRIVALS, locode, AwakeAiPredictionType.ETA, maxSequenceNo, true);
+        return this.getPredictions(AwakeAiPortResource.ARRIVALS, locode, AwakeAiPredictionType.ETA, maxSequenceNo);
     }
 
     async getETDs(locode: string, maxSequenceNo = 1) {
-        return this.getPredictions(AwakeAiPortResource.DEPARTURES, locode, AwakeAiPredictionType.ETD, maxSequenceNo, true);
+        return this.getPredictions(AwakeAiPortResource.DEPARTURES, locode, AwakeAiPredictionType.ETD, maxSequenceNo);
     }
 
     static handleError(error: {

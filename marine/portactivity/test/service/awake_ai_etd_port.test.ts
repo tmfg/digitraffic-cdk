@@ -1,44 +1,64 @@
-import * as sinon from "sinon";
-import {AwakeAiETAPortService} from "../../lib/service/awake_ai_eta_port";
-import {AwakeAiPortApi, AwakeAiPortResponse, AwakeAiPortResponseType,} from "../../lib/api/awake_ai_port";
-import {randomIMO, randomMMSI} from "../testdata";
 import {
     AwakeAiPrediction,
     AwakeAiPredictionMetadata,
     AwakeAiPredictionType,
     AwakeAiShipStatus,
-    AwakeAiVoyageEtaPrediction,
-    AwakeAiZoneType,
+    AwakeAiVoyageEtdPrediction,
+    AwakeAiZoneType
 } from "../../lib/api/awake_common";
-import {getRandomNumber, randomBoolean,} from "@digitraffic/common/dist/test/testutils";
+import * as sinon from "sinon";
+import {AwakeAiPortApi, AwakeAiPortResponse, AwakeAiPortResponseType} from "../../lib/api/awake_ai_port";
 import {addHours, subHours} from "date-fns";
+import {randomIMO, randomMMSI} from "../testdata";
+import {AwakeAiETDPortService} from "../../lib/service/awake_ai_etd_port";
+import {getRandomNumber, randomBoolean,} from "@digitraffic/common/dist/test/testutils";
 
-describe("AwakeAiETAPortService(", () => {
-    test("getAwakeAiTimestamps - correct needs to include port call prediction", async () => {
+describe("AwakeAiETDPortService", () => {
+    test("getAwakeAiTimestamps - filter Digitraffic ETD predictions", async () => {
         const api = createApi();
-        const service = new AwakeAiETAPortService(api);
-        sinon
-            .stub(api, "getETAs")
-            .returns(
-                Promise.resolve(
-                    createResponse({includePortCallPrediction: true})
-                )
-            );
+        const service = new AwakeAiETDPortService(api);
+        const voyageTimestamp = createResponse({
+            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
+            predictionType: AwakeAiPredictionType.ETD,
+            metadata: {
+                source: "urn:awake:digitraffic-portcall:1234567",
+            },
+        });
+        sinon.stub(api, "getETDs").returns(Promise.resolve(voyageTimestamp));
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
-        expect(timestamps.length).toBe(1);
+        expect(timestamps.length).toBe(0);
     });
 
-    test("getAwakeAiTimestamps - no schedule", async () => {
+    test("getAwakeAiTimestamps - filter departure times in the past", async () => {
         const api = createApi();
-        const service = new AwakeAiETAPortService(api);
+        const service = new AwakeAiETDPortService(api);
         const voyageTimestamp = createResponse({
-            excludeSchedule: true,
-            includePortCallPrediction: true
+            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
+            predictionType: AwakeAiPredictionType.ETD,
+            departureTime: subHours(Date.now(), getRandomNumber(1, 23)),
+            metadata: {
+                source: "urn:awake:someidstring",
+            },
         });
+        sinon.stub(api, "getETDs").returns(Promise.resolve(voyageTimestamp));
 
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        const timestamps = await service.getAwakeAiTimestamps("FILOL");
+
+        expect(timestamps.length).toBe(0);
+    });
+
+
+    test("getAwakeAiTimestamps - filter non-ETD predictions", async () => {
+        const api = createApi();
+        const service = new AwakeAiETDPortService(api);
+        const voyageTimestamp = createResponse({
+            predictionType: randomBoolean()
+                ? AwakeAiPredictionType.ETA
+                : AwakeAiPredictionType.DESTINATION,
+        });
+        sinon.stub(api, "getETDs").returns(Promise.resolve(voyageTimestamp));
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -47,61 +67,25 @@ describe("AwakeAiETAPortService(", () => {
 
     test("getAwakeAiTimestamps - filter stopped voyages", async () => {
         const api = createApi();
-        const service = new AwakeAiETAPortService(api);
+        const service = new AwakeAiETDPortService(api);
         const voyageTimestamp = createResponse({
-            voyageStatus: AwakeAiShipStatus.STOPPED,
-            includePortCallPrediction: true
+            voyageStatus: AwakeAiShipStatus.STOPPED
         });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        sinon.stub(api, "getETDs").returns(Promise.resolve(voyageTimestamp));
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
         expect(timestamps.length).toBe(0);
     });
 
-    test("getAwakeAiTimestamps - non-ETA", async () => {
+    test("getAwakeAiTimestamps - no schedule", async () => {
         const api = createApi();
-        const service = new AwakeAiETAPortService(api);
+        const service = new AwakeAiETDPortService(api);
         const voyageTimestamp = createResponse({
-            predictionType: randomBoolean()
-                ? AwakeAiPredictionType.TRAVEL_TIME
-                : AwakeAiPredictionType.DESTINATION,
+            excludeSchedule: true
         });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
 
-        const timestamps = await service.getAwakeAiTimestamps("FILOL");
-
-        expect(timestamps.length).toBe(0);
-    });
-
-    test("getAwakeAiTimestamps - 24 hours or closer", async () => {
-        const api = createApi();
-        const service = new AwakeAiETAPortService(api);
-        const voyageTimestamp = createResponse({
-            arrivalTime: subHours(new Date(), getRandomNumber(1, 23)),
-            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
-            predictionType: AwakeAiPredictionType.ETA,
-            includePortCallPrediction: true,
-        });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
-
-        const timestamps = await service.getAwakeAiTimestamps("FILOL");
-
-        expect(timestamps.length).toBe(0);
-    });
-
-    test("getAwakeAiTimestamps - filter Digitraffic ETA predictions", async () => {
-        const api = createApi();
-        const service = new AwakeAiETAPortService(api);
-        const voyageTimestamp = createResponse({
-            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
-            predictionType: AwakeAiPredictionType.ETA,
-            includePortCallPrediction: true,
-            metadata: {
-                source: "urn:awake:digitraffic-portcall:2959158",
-            },
-        });
-        sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
+        sinon.stub(api, "getETDs").returns(Promise.resolve(voyageTimestamp));
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -114,7 +98,7 @@ function createApi() {
 }
 
 function createResponse(options?: {
-    arrivalTime?: Date;
+    departureTime?: Date;
     voyageStatus?: AwakeAiShipStatus;
     predictionType?: AwakeAiPredictionType;
     includePortCallPrediction?: boolean;
@@ -124,14 +108,14 @@ function createResponse(options?: {
     const predictions: AwakeAiPrediction[] = [
         {
             predictionType:
-                options?.predictionType ?? AwakeAiPredictionType.ETA,
+                options?.predictionType ?? AwakeAiPredictionType.ETD,
             locode: "FILOL",
             zoneType: AwakeAiZoneType.BERTH,
             recordTime: new Date().toISOString(),
-            arrivalTime:
-                options?.arrivalTime?.toISOString() ?? addHours(new Date, 25).toISOString(),
+            departureTime:
+                options?.departureTime?.toISOString() ?? addHours(new Date, 25).toISOString(),
             metadata: options?.metadata
-        } as AwakeAiVoyageEtaPrediction,
+        } as AwakeAiVoyageEtdPrediction,
     ];
     return {
         type: AwakeAiPortResponseType.OK,

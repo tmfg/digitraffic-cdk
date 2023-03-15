@@ -1,15 +1,11 @@
-import {
-    SchedulesApi,
-    SchedulesDirection,
-    SchedulesResponse,
-} from "../../lib/api/schedules";
-import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
-import { newTimestamp } from "../testdata";
-import moment from "moment-timezone";
-import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import { ports } from "../../lib/service/portareas";
-import { EventSource } from "../../lib/model/eventsource";
-import { SchedulesService } from "../../lib/service/schedules";
+import {SchedulesApi, SchedulesDirection, SchedulesResponse,} from "../../lib/api/schedules";
+import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
+import {newTimestamp} from "../testdata";
+import {getRandomNumber} from "@digitraffic/common/dist/test/testutils";
+import {ports} from "../../lib/service/portareas";
+import {EventSource} from "../../lib/model/eventsource";
+import {SchedulesService} from "../../lib/service/schedules";
+import {subHours, subMinutes} from "date-fns";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -160,9 +156,7 @@ describe("schedules", () => {
 
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
-            eventTime: moment()
-                .subtract(getRandomNumber(6, 9999), "minutes")
-                .toDate(),
+            eventTime: subHours(Date.now(), getRandomNumber(6, 9999)),
             locode,
         });
 
@@ -175,9 +169,7 @@ describe("schedules", () => {
 
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
-            eventTime: moment()
-                .subtract(getRandomNumber(1, 5), "minutes")
-                .toDate(),
+            eventTime: subMinutes(Date.now(), getRandomNumber(1, 5)),
             locode,
         });
 

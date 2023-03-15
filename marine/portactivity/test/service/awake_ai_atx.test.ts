@@ -1,26 +1,15 @@
-import moment from "moment-timezone";
-import { newAwakeATXMessage, someNumber } from "../testdata";
+import {newAwakeATXMessage, someNumber} from "../testdata";
 import * as sinon from "sinon";
-import {
-    AwakeAiATXApi,
-    AwakeAIATXTimestampMessage,
-    AwakeATXZoneEventType,
-} from "../../lib/api/awake_ai_atx";
-import { AwakeAiATXService } from "../../lib/service/awake_ai_atx";
-import {
-    dbTestBase,
-    insertPortAreaDetails,
-    insertPortCall,
-} from "../db-testutil";
-import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
-import {
-    randomBoolean,
-    shuffle,
-} from "@digitraffic/common/dist/test/testutils";
-import { EventSource } from "../../lib/model/eventsource";
-import { AwakeAiZoneType } from "../../lib/api/awake_common";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { WebSocket } from "ws";
+import {AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType,} from "../../lib/api/awake_ai_atx";
+import {AwakeAiATXService} from "../../lib/service/awake_ai_atx";
+import {dbTestBase, insertPortAreaDetails, insertPortCall,} from "../db-testutil";
+import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
+import {randomBoolean, shuffle,} from "@digitraffic/common/dist/test/testutils";
+import {EventSource} from "../../lib/model/eventsource";
+import {AwakeAiZoneType} from "../../lib/api/awake_common";
+import {DTDatabase} from "@digitraffic/common/dist/database/database";
+import {WebSocket} from "ws";
+import {addHours, subHours} from "date-fns";
 
 describe(
     "service Awake.AI ATx",
@@ -113,10 +102,10 @@ describe(
                 await insertPortAreaDetails(t, {
                     port_call_id: portcallId,
                     port_area_details_id: someNumber(),
-                    ata: moment().subtract(1, "hour").toISOString(),
-                    atd: moment().subtract(1, "hour").toISOString(),
-                    eta: moment().add(1, "hour").toISOString(),
-                    etd: moment().add(1, "hour").toISOString(),
+                    ata: subHours(Date.now(), 1).toISOString(),
+                    atd: subHours(Date.now(), 1).toISOString(),
+                    eta: addHours(Date.now(), 1).toISOString(),
+                    etd: addHours(Date.now(), 1).toISOString(),
                 });
             });
         }

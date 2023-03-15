@@ -5,6 +5,7 @@ import {
     etdPredictionToTimestamp,
     isAwakeEtdPrediction,
     isDigitrafficEtdPrediction,
+    voyageIsNotStopped,
 } from "./awake_ai_eta_etd_helper";
 import {EventSource} from "../model/eventsource";
 import {isBefore, parseISO} from "date-fns";
@@ -38,6 +39,8 @@ export class AwakeAiETDPortService {
 
         return (
             resp.schedule
+                // filter out stopped voyages
+                .filter(voyageIsNotStopped)
                 .flatMap((schedule) => {
                     const etdPredictions = schedule.voyage.predictions
                         .filter(isAwakeEtdPrediction)

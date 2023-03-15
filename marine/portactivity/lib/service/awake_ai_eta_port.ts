@@ -10,6 +10,7 @@ import {
     etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction,
+    voyageIsNotStopped
 } from "./awake_ai_eta_etd_helper";
 import {EventSource} from "../model/eventsource";
 import {addHours, isBefore, parseISO} from "date-fns";
@@ -90,6 +91,8 @@ export class AwakeAiETAPortService {
             resp.schedule
                 // only ships with a port call id
                 .filter((schedule) => this.portCallExistsForVoyage(schedule))
+                // filter out stopped voyages
+                .filter(voyageIsNotStopped)
                 .flatMap((schedule) => {
                     const etaPredictions = this.getEtaPredictions(
                         schedule

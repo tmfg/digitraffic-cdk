@@ -1,35 +1,23 @@
-import {
-    LambdaIntegration,
-    RequestValidator,
-    Resource,
-    RestApi,
-} from "aws-cdk-lib/aws-apigateway";
-import {
-    createTimestampSchema,
-    LocationSchema,
-    ShipSchema,
-} from "./model/timestamp-schema";
-import { LocodeMetadataSchema } from "./model/locode-metadata";
-import {
-    DigitrafficMethodResponse,
-    MessageModel,
-} from "@digitraffic/common/dist/aws/infra/api/response";
+import {LambdaIntegration, RequestValidator, Resource, RestApi,} from "aws-cdk-lib/aws-apigateway";
+import {createTimestampSchema, LocationSchema, ShipSchema,} from "./model/timestamp-schema";
+import {LocodeMetadataSchema} from "./model/locode-metadata";
+import {DigitrafficMethodResponse, MessageModel,} from "@digitraffic/common/dist/aws/infra/api/response";
 import {
     addDefaultValidator,
     addServiceModel,
     createArraySchema,
     getModelReference,
 } from "@digitraffic/common/dist/utils/api-model";
-import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
-import { createUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { TimestampMetadata } from "./model/timestamp-metadata";
-import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
-import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
-import { IModel } from "aws-cdk-lib/aws-apigateway/lib/model";
-import { DigitrafficIntegration } from "@digitraffic/common/dist/aws/infra/api/integration";
-import { DigitrafficStaticIntegration } from "@digitraffic/common/dist/aws/infra/api/static-integration";
+import {DocumentationPart} from "@digitraffic/common/dist/aws/infra/documentation";
+import {createUsagePlan} from "@digitraffic/common/dist/aws/infra/usage-plans";
+import {DigitrafficRestApi} from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
+import {TimestampMetadata} from "./model/timestamp-metadata";
+import {DigitrafficStack} from "@digitraffic/common/dist/aws/infra/stack/stack";
+import {MediaType} from "@digitraffic/common/dist/aws/types/mediatypes";
+import {MonitoredDBFunction} from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
+import {IModel} from "aws-cdk-lib/aws-apigateway/lib/model";
+import {DigitrafficIntegration} from "@digitraffic/common/dist/aws/infra/api/integration";
+import {DigitrafficStaticIntegration} from "@digitraffic/common/dist/aws/infra/api/static-integration";
 
 export class PublicApi {
     readonly apiKeyId: string;
@@ -188,7 +176,7 @@ export class PublicApi {
             stack.createLambdaEnvironment(),
             {
                 functionName: "PortActivity-PublicShiplist",
-                timeout: 10,
+                timeout: 28,
                 reservedConcurrentExecutions: 6,
             }
         );

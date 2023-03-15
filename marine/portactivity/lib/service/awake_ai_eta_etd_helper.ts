@@ -1,6 +1,7 @@
 import {
     AwakeAiPrediction,
     AwakeAiPredictionType,
+    AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageEtdPrediction,
     AwakeAiZoneType,
@@ -33,29 +34,6 @@ export function isPortcallPrediction(
     prediction: AwakeAiPrediction
 ): prediction is AwakeArrivalPortCallPrediction {
     return !!prediction && "portCallUrn" in prediction;
-}
-
-export function portCallExistsForSchedule(
-    schedule: AwakeAiPortSchedule
-): boolean {
-    return (
-        schedule.voyage.predictions.find(
-            (p) => p.predictionType === AwakeAiPredictionType.ARRIVAL_PORT_CALL
-        ) != null
-    );
-}
-
-export function digitrafficPortCallExistsForSchedule(
-    schedule: AwakeAiPortSchedule
-): boolean {
-    return (
-        schedule.voyage.predictions.find(
-            (p) =>
-                p.predictionType === AwakeAiPredictionType.ARRIVAL_PORT_CALL &&
-                isPortcallPrediction(p) &&
-                p.portCallUrn.includes("digitraffic-portcall")
-        ) !== null
-    );
 }
 
 function portCallIdFromUrn(urn?: AwakeURN<string>): number | null {
@@ -95,6 +73,11 @@ export function isDigitrafficEtdPrediction(prediction: AwakeAiPrediction): boole
         !!prediction.metadata &&
         prediction.metadata.source.includes("digitraffic-portcall")
     );
+}
+
+export function voyageIsNotStopped(schedule: AwakeAiPortSchedule): boolean {
+    return schedule.voyage.voyageStatus !== AwakeAiShipStatus.STOPPED
+        && (schedule.voyage.voyageStatus === AwakeAiShipStatus.UNDER_WAY || schedule.voyage.voyageStatus === AwakeAiShipStatus.NOT_STARTED)
 }
 
 export function etaPredictionToTimestamp(

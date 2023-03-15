@@ -1,13 +1,12 @@
-import moment from "moment";
-import { ApiTimestamp, EventType } from "../lib/model/timestamp";
+import {ApiTimestamp, EventType} from "../lib/model/timestamp";
 import {
     AwakeAiATXEventType,
     AwakeAIATXTimestampMessage,
     AwakeATXZoneEventType,
 } from "../lib/api/awake_ai_atx";
-import { AwakeAiZoneType } from "../lib/api/awake_common";
-import { v4 as uuidv4 } from "uuid";
-import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import {AwakeAiZoneType} from "../lib/api/awake_common";
+import {v4 as uuidv4} from "uuid";
+import {getRandomNumber} from "@digitraffic/common/dist/test/testutils";
 
 export function newAwakeATXMessage(options?: {
     zoneEventType?: AwakeATXZoneEventType;
@@ -66,8 +65,8 @@ export function newTimestamp(props?: {
 
     return {
         eventType: props?.eventType ?? EventType.ATB,
-        eventTime: moment(eventTime).toISOString(),
-        recordTime: moment(recordTime).toISOString(),
+        eventTime: eventTime.toISOString(),
+        recordTime: recordTime.toISOString(),
         source: props?.source ?? someNumber().toString(),
         sourceId: props?.sourceId ?? someNumber().toString(),
         eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? null,
