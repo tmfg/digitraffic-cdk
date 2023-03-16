@@ -1,24 +1,15 @@
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { Annotations, Aspects, Stack, StackProps } from "aws-cdk-lib";
-import {
-    CfnDistribution,
-    OriginAccessIdentity,
-} from "aws-cdk-lib/aws-cloudfront";
+import { CfnDistribution, OriginAccessIdentity } from "aws-cdk-lib/aws-cloudfront";
 import {
     CompositePrincipal,
     ManagedPolicy,
     PolicyStatement,
     Role,
-    ServicePrincipal,
+    ServicePrincipal
 } from "aws-cdk-lib/aws-iam";
 import { Construct } from "constructs";
-import {
-    CFLambdaParameters,
-    CFOrigin,
-    CFProps,
-    DistributionProps,
-    ElasticProps,
-} from "./app-props";
+import { CFLambdaParameters, CFOrigin, CFProps, DistributionProps, ElasticProps } from "./app-props";
 import { createDistribution } from "./distribution-util";
 import { LambdaHolder } from "./lambda-holder";
 import {
@@ -31,7 +22,7 @@ import {
     createWeathercamHttpHeaders,
     createWeathercamRedirect,
     FunctionType,
-    LambdaType,
+    LambdaType
 } from "./lambda/lambda-creator";
 import { createOriginConfig } from "./origin-configs";
 import { createRealtimeLogging, StreamingConfig } from "./streaming-util";
@@ -43,12 +34,7 @@ interface MutablePolicy {
 }
 
 export class CloudfrontCdkStack extends Stack {
-    constructor(
-        scope: Construct,
-        id: string,
-        cloudfrontProps: CFProps,
-        props?: StackProps
-    ) {
+    constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
         this.validateDefaultBehaviors(cloudfrontProps.distributions);
@@ -57,45 +43,43 @@ export class CloudfrontCdkStack extends Stack {
             cloudfrontProps.distributions,
             cloudfrontProps.lambdaParameters
         );
-        const writeToESROle = this.createWriteToESRole(
-            this,
-            cloudfrontProps.elasticProps
-        );
-        const streamingConfig = createRealtimeLogging(
-            this,
-            writeToESROle,
-            cloudfrontProps.elasticAppName,
-            cloudfrontProps.elasticProps
-        );
+
+        const distributionLogConfigArn = this.getLogConfigArn(cloudfrontProps);
 
         cloudfrontProps.distributions.forEach((p) =>
-            this.createDistribution(
-                p,
-                writeToESROle,
-                lambdaMap,
-                streamingConfig,
-                cloudfrontProps
-            )
+            this.createDistribution(p, lambdaMap, distributionLogConfigArn)
         );
 
         Aspects.of(this).add(new StackCheckingAspect());
     }
 
+    getLogConfigArn(cloudfrontProps: CFProps): string {
+        if (cloudfrontProps.realtimeLogConfigArn) {
+            return cloudfrontProps.realtimeLogConfigArn;
+        }
+
+        const writeToESRole = this.createWriteToESRole(this, cloudfrontProps.elasticProps as ElasticProps);
+
+        return (
+            cloudfrontProps.realtimeLogConfigArn ??
+            createRealtimeLogging(
+                this,
+                writeToESRole,
+                cloudfrontProps.elasticAppName as string,
+                cloudfrontProps.elasticProps as ElasticProps
+            ).loggingConfig.attrArn
+        );
+    }
+
     validateDefaultBehaviors(props: DistributionProps[]) {
         props.forEach((distribution) => {
             // check default behaviors
-            const defaults = distribution.origins
-                .flatMap((d) => d.behaviors)
-                .filter((b) => b.path === "*");
+            const defaults = distribution.origins.flatMap((d) => d.behaviors).filter((b) => b.path === "*");
 
             if (defaults.length === 0) {
-                Annotations.of(this).addError(
-                    "no defaults for " + distribution.distributionName
-                );
+                Annotations.of(this).addError("no defaults for " + distribution.distributionName);
             } else if (defaults.length > 1) {
-                Annotations.of(this).addError(
-                    "multiple defaults for " + distribution.distributionName
-                );
+                Annotations.of(this).addError("multiple defaults for " + distribution.distributionName);
                 console.error("defaults:%s", defaults);
             }
         });
@@ -104,7 +88,7 @@ export class CloudfrontCdkStack extends Stack {
     createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
         const lambdaRole = new Role(stack, `WriteToElasticRole`, {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-            roleName: `WriteToElasticRole`,
+            roleName: `WriteToElasticRole`
         });
         lambdaRole.addToPolicy(
             new PolicyStatement({
@@ -114,12 +98,9 @@ export class CloudfrontCdkStack extends Stack {
                     "es:DescribeElasticsearchDomainConfig",
                     "es:ESHttpPost",
                     "es:ESHttpPut",
-                    "es:ESHttpGet",
+                    "es:ESHttpGet"
                 ],
-                resources: [
-                    elasticProps.elasticArn,
-                    `${elasticProps.elasticArn}/*`,
-                ],
+                resources: [elasticProps.elasticArn, `${elasticProps.elasticArn}/*`]
             })
         );
         lambdaRole.addToPolicy(
@@ -129,9 +110,9 @@ export class CloudfrontCdkStack extends Stack {
                     "logs:CreateLogStream",
                     "logs:PutLogEvents",
                     "logs:DescribeLogGroups",
-                    "logs:DescribeLogStreams",
+                    "logs:DescribeLogStreams"
                 ],
-                resources: ["arn:aws:logs:*:*:*"],
+                resources: ["arn:aws:logs:*:*:*"]
             })
         );
 
@@ -157,10 +138,7 @@ export class CloudfrontCdkStack extends Stack {
         return { lambdaTypes, functionTypes, ipRestrictions };
     }
 
-    createLambdaMap(
-        props: DistributionProps[],
-        lParameters: CFLambdaParameters | undefined
-    ): LambdaHolder {
+    createLambdaMap(props: DistributionProps[], lParameters: CFLambdaParameters | undefined): LambdaHolder {
         const lambdaMap = new LambdaHolder();
 
         const types = this.findLambdaTypes(props);
@@ -171,10 +149,8 @@ export class CloudfrontCdkStack extends Stack {
                 new ServicePrincipal("edgelambda.amazonaws.com")
             ),
             managedPolicies: [
-                ManagedPolicy.fromAwsManagedPolicyName(
-                    "service-role/AWSLambdaBasicExecutionRole"
-                ),
-            ],
+                ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
+            ]
         });
 
         if (types.lambdaTypes.has(LambdaType.WEATHERCAM_REDIRECT)) {
@@ -203,17 +179,11 @@ export class CloudfrontCdkStack extends Stack {
         }
 
         if (types.lambdaTypes.has(LambdaType.GZIP_REQUIREMENT)) {
-            lambdaMap.addLambda(
-                LambdaType.GZIP_REQUIREMENT,
-                createGzipRequirement(this, edgeLambdaRole)
-            );
+            lambdaMap.addLambda(LambdaType.GZIP_REQUIREMENT, createGzipRequirement(this, edgeLambdaRole));
         }
 
         if (types.lambdaTypes.has(LambdaType.HTTP_HEADERS)) {
-            lambdaMap.addLambda(
-                LambdaType.HTTP_HEADERS,
-                createHttpHeaders(this, edgeLambdaRole)
-            );
+            lambdaMap.addLambda(LambdaType.HTTP_HEADERS, createHttpHeaders(this, edgeLambdaRole));
         }
 
         if (types.lambdaTypes.has(LambdaType.LAM_REDIRECT)) {
@@ -232,10 +202,7 @@ export class CloudfrontCdkStack extends Stack {
         }
 
         if (types.functionTypes.has(FunctionType.INDEX_HTML)) {
-            lambdaMap.addFunction(
-                FunctionType.INDEX_HTML,
-                createIndexHtml(this, edgeLambdaRole)
-            );
+            lambdaMap.addFunction(FunctionType.INDEX_HTML, createIndexHtml(this, edgeLambdaRole));
         }
 
         // handle ip restrictions
@@ -245,17 +212,10 @@ export class CloudfrontCdkStack extends Stack {
             if (ipRestrictions && ipRestrictions[key]) {
                 lambdaMap.addRestriction(
                     key,
-                    createIpRestriction(
-                        this,
-                        edgeLambdaRole,
-                        key,
-                        ipRestrictions[key]
-                    )
+                    createIpRestriction(this, edgeLambdaRole, key, ipRestrictions[key])
                 );
             } else {
-                throw new Error(
-                    "missing lambdaParameter ip restriction " + key
-                );
+                throw new Error("missing lambdaParameter ip restriction " + key);
             }
         });
 
@@ -264,42 +224,26 @@ export class CloudfrontCdkStack extends Stack {
 
     createDistribution(
         distributionProps: DistributionProps,
-        role: Role,
         lambdaMap: LambdaHolder,
-        streamingConfig: StreamingConfig,
-        cloudfrontProps: CFProps
+        realtimeLogConfigArn: string
     ) {
         const oai = distributionProps.originAccessIdentity
-            ? new OriginAccessIdentity(
-                  this,
-                  `${distributionProps.environmentName}-oai`
-              )
+            ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`)
             : undefined;
         const originConfigs = distributionProps.origins.map((d) =>
             createOriginConfig(this, d, oai, lambdaMap)
         );
-        const distribution = createDistribution(
-            this,
-            distributionProps,
-            originConfigs,
-            role,
-            cloudfrontProps,
-            streamingConfig
-        );
+        const distribution = createDistribution(this, distributionProps, originConfigs, realtimeLogConfigArn);
 
         // cdk does not support viewerPolicy as it should
         // so collect map of policies and force them into cloudformation
-        const viewerPolicies = this.getViewerPolicies(
-            distributionProps.origins
-        );
+        const viewerPolicies = this.getViewerPolicies(distributionProps.origins);
 
         if (Object.keys(viewerPolicies).length > 0) {
-            const cfnDistribution = distribution.node
-                .defaultChild as CfnDistribution;
+            const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
             const distributionConfig =
                 cfnDistribution.distributionConfig as CfnDistribution.DistributionConfigProperty;
-            const behaviors =
-                distributionConfig.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
+            const behaviors = distributionConfig.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
 
             // handle all behaviors
             behaviors.forEach((cb: CfnDistribution.CacheBehaviorProperty) => {
@@ -325,8 +269,7 @@ export class CloudfrontCdkStack extends Stack {
         const viewerProtocolPolicy = viewerPolicyMap[pathPattern];
 
         if (viewerProtocolPolicy) {
-            (behavior as MutablePolicy).viewerProtocolPolicy =
-                viewerProtocolPolicy;
+            (behavior as MutablePolicy).viewerProtocolPolicy = viewerProtocolPolicy;
         }
     }
 
