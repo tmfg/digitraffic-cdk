@@ -1,17 +1,17 @@
 import * as sinon from "sinon";
-import {AwakeAiETAPortService} from "../../lib/service/awake_ai_eta_port";
-import {AwakeAiPortApi, AwakeAiPortResponse, AwakeAiPortResponseType,} from "../../lib/api/awake_ai_port";
-import {randomIMO, randomMMSI} from "../testdata";
+import { AwakeAiETAPortService } from "../../lib/service/awake_ai_eta_port";
+import { AwakeAiPortApi, AwakeAiPortResponse } from "../../lib/api/awake_ai_port";
 import {
     AwakeAiPrediction,
     AwakeAiPredictionMetadata,
     AwakeAiPredictionType,
-    AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
-    AwakeAiZoneType,
+    AwakeAiVoyageStatus,
+    AwakeAiZoneType
 } from "../../lib/api/awake_common";
-import {getRandomNumber, randomBoolean,} from "@digitraffic/common/dist/test/testutils";
-import {addHours, subHours} from "date-fns";
+import { getRandomNumber, randomBoolean } from "@digitraffic/common/dist/test/testutils";
+import { addHours, subHours } from "date-fns";
+import { createAwakeAiPortResponse } from "./awake_ai_etx_port_testutil";
 
 describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - correct needs to include port call prediction", async () => {
@@ -19,11 +19,7 @@ describe("AwakeAiETAPortService(", () => {
         const service = new AwakeAiETAPortService(api);
         sinon
             .stub(api, "getETAs")
-            .returns(
-                Promise.resolve(
-                    createResponse({includePortCallPrediction: true})
-                )
-            );
+            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: true })));
 
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
@@ -33,7 +29,7 @@ describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - no schedule", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        const voyageTimestamp = createResponse({
+        const voyageTimestamp = createEtaResponse({
             excludeSchedule: true,
             includePortCallPrediction: true
         });
@@ -48,8 +44,8 @@ describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - filter stopped voyages", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        const voyageTimestamp = createResponse({
-            voyageStatus: AwakeAiShipStatus.STOPPED,
+        const voyageTimestamp = createEtaResponse({
+            voyageStatus: AwakeAiVoyageStatus.STOPPED,
             includePortCallPrediction: true
         });
         sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
@@ -62,10 +58,10 @@ describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - non-ETA", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        const voyageTimestamp = createResponse({
+        const voyageTimestamp = createEtaResponse({
             predictionType: randomBoolean()
                 ? AwakeAiPredictionType.TRAVEL_TIME
-                : AwakeAiPredictionType.DESTINATION,
+                : AwakeAiPredictionType.DESTINATION
         });
         sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
 
@@ -77,11 +73,11 @@ describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - 24 hours or closer", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        const voyageTimestamp = createResponse({
+        const voyageTimestamp = createEtaResponse({
             arrivalTime: subHours(new Date(), getRandomNumber(1, 23)),
-            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
+            voyageStatus: AwakeAiVoyageStatus.UNDER_WAY,
             predictionType: AwakeAiPredictionType.ETA,
-            includePortCallPrediction: true,
+            includePortCallPrediction: true
         });
         sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
 
@@ -93,13 +89,13 @@ describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - filter Digitraffic ETA predictions", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
-        const voyageTimestamp = createResponse({
-            voyageStatus: AwakeAiShipStatus.UNDER_WAY,
+        const voyageTimestamp = createEtaResponse({
+            voyageStatus: AwakeAiVoyageStatus.UNDER_WAY,
             predictionType: AwakeAiPredictionType.ETA,
             includePortCallPrediction: true,
             metadata: {
-                source: "urn:awake:digitraffic-portcall:2959158",
-            },
+                source: "urn:awake:digitraffic-portcall:2959158"
+            }
         });
         sinon.stub(api, "getETAs").returns(Promise.resolve(voyageTimestamp));
 
@@ -113,9 +109,9 @@ function createApi() {
     return new AwakeAiPortApi("", "");
 }
 
-function createResponse(options?: {
+function createEtaResponse(options?: {
     arrivalTime?: Date;
-    voyageStatus?: AwakeAiShipStatus;
+    voyageStatus?: AwakeAiVoyageStatus;
     predictionType?: AwakeAiPredictionType;
     includePortCallPrediction?: boolean;
     excludeSchedule?: boolean;
@@ -123,41 +119,17 @@ function createResponse(options?: {
 }): AwakeAiPortResponse {
     const predictions: AwakeAiPrediction[] = [
         {
-            predictionType:
-                options?.predictionType ?? AwakeAiPredictionType.ETA,
+            predictionType: options?.predictionType ?? AwakeAiPredictionType.ETA,
             locode: "FILOL",
             zoneType: AwakeAiZoneType.BERTH,
             recordTime: new Date().toISOString(),
-            arrivalTime:
-                options?.arrivalTime?.toISOString() ?? addHours(new Date, 25).toISOString(),
+            arrivalTime: options?.arrivalTime?.toISOString() ?? addHours(new Date(), 25).toISOString(),
             metadata: options?.metadata
-        } as AwakeAiVoyageEtaPrediction,
+        } as AwakeAiVoyageEtaPrediction
     ];
-    return {
-        type: AwakeAiPortResponseType.OK,
-        ...(!options?.excludeSchedule &&
-            {
-                schedule: [
-                    {
-                        ship: {
-                            imo: randomIMO(),
-                            mmsi: randomMMSI(),
-                        },
-                        voyage: {
-                            voyageStatus:
-                                options?.voyageStatus ?? AwakeAiShipStatus.UNDER_WAY,
-                            predictions: options?.includePortCallPrediction
-                                ? predictions.concat([
-                                    {
-                                        predictionType:
-                                        AwakeAiPredictionType.ARRIVAL_PORT_CALL,
-                                    },
-                                ])
-                                : predictions,
-                            sequenceNo: 1,
-                        },
-                    },
-                ]
-            }),
-    };
+    return createAwakeAiPortResponse(predictions, {
+        voyageStatus: options?.voyageStatus,
+        includePortCallPrediction: options?.includePortCallPrediction,
+        excludeSchedule: options?.excludeSchedule
+    });
 }

@@ -1,14 +1,14 @@
-import {AwakeAiPortApi} from "../api/awake_ai_port";
-import {ApiTimestamp} from "../model/timestamp";
-import {AwakeAiZoneType,} from "../api/awake_common";
+import { AwakeAiPortApi } from "../api/awake_ai_port";
+import { ApiTimestamp } from "../model/timestamp";
+import { AwakeAiZoneType } from "../api/awake_common";
 import {
     etdPredictionToTimestamp,
     isAwakeEtdPrediction,
     isDigitrafficEtdPrediction,
-    voyageIsNotStopped,
-} from "./awake_ai_eta_etd_helper";
-import {EventSource} from "../model/eventsource";
-import {isBefore, parseISO} from "date-fns";
+    voyageUnderwayOrNotStarted
+} from "./awake_ai_etx_helper";
+import { EventSource } from "../model/eventsource";
+import { isBefore, parseISO } from "date-fns";
 
 export class AwakeAiETDPortService {
     private readonly api: AwakeAiPortApi;
@@ -25,9 +25,7 @@ export class AwakeAiETDPortService {
         const resp = await this.api.getETDs(locode);
 
         console.info(
-            `method=AwakeAiETDPortService.getAwakeAiTimestamps Received ETD response: ${JSON.stringify(
-                resp
-            )}`
+            `method=AwakeAiETDPortService.getAwakeAiTimestamps Received ETD response: ${JSON.stringify(resp)}`
         );
 
         if (!resp.schedule) {
@@ -40,32 +38,38 @@ export class AwakeAiETDPortService {
         return (
             resp.schedule
                 // filter out stopped voyages
-                .filter(voyageIsNotStopped)
+                .filter(voyageUnderwayOrNotStarted)
                 .flatMap((schedule) => {
                     const etdPredictions = schedule.voyage.predictions
                         .filter(isAwakeEtdPrediction)
-                        .filter(etdPrediction => {
+                        .filter((etdPrediction) => {
                             if (this.departureTimeInThePast(etdPrediction.departureTime)) {
-                                console.warn(`method=AwakeAiETDPortService.getAwakeAiTimestamps ETD prediction event time in the past, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(etdPrediction)}`);
-                                return false
+                                console.warn(
+                                    `method=AwakeAiETDPortService.getAwakeAiTimestamps ETD prediction event time in the past, IMO: ${
+                                        schedule.ship.imo
+                                    }, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
+                                        etdPrediction
+                                    )}`
+                                );
+                                return false;
                             }
-                            return true
+                            return true;
                         })
                         // filter out predictions originating from digitraffic portcall api
-                        .filter(
-                            (etdPrediction) => {
-                                if (isDigitrafficEtdPrediction(etdPrediction)) {
-                                    console.warn(`method=AwakeAiETDPortService.getAwakeAiTimestamps received Digitraffic ETD prediction, IMO: ${schedule.ship.imo}, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(etdPrediction)}`);
-                                    return false;
-                                }
-                                return true;
+                        .filter((etdPrediction) => {
+                            if (isDigitrafficEtdPrediction(etdPrediction)) {
+                                console.warn(
+                                    `method=AwakeAiETDPortService.getAwakeAiTimestamps received Digitraffic ETD prediction, IMO: ${
+                                        schedule.ship.imo
+                                    }, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
+                                        etdPrediction
+                                    )}`
+                                );
+                                return false;
                             }
-                        )
-                        .filter(
-                            (etdPrediction) =>
-                                etdPrediction.zoneType ===
-                                AwakeAiZoneType.BERTH
-                        )
+                            return true;
+                        })
+                        .filter((etdPrediction) => etdPrediction.zoneType === AwakeAiZoneType.BERTH);
 
                     return etdPredictions.map((etdPrediction) => {
                         return etdPredictionToTimestamp(

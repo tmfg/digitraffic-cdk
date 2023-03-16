@@ -2,19 +2,17 @@ import { PortactivityEnvKeys } from "../../keys";
 import { SNS } from "aws-sdk";
 import * as MessagingUtil from "@digitraffic/common/dist/aws/runtime/messaging";
 import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
+import { ETA_PORTS } from "../../model/awake_etx_ports";
 
 const publishTopic = envValue(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
-
-// TODO in the future, use ports list
-const ports = ["FIKOK", "FIRAU", "FIOUL", "FIKEM", "FIKJO", "FIUKI", "FIPOR"];
 
 export function handlerFn(sns: SNS) {
     return async () => {
         console.info(
             "method=triggerAwakeAiETAPortTimestampsUpdate.handler Triggering ETA port update for count=%d ports",
-            ports.length
+            ETA_PORTS.length
         );
-        for (const port of ports) {
+        for (const port of ETA_PORTS) {
             await MessagingUtil.snsPublish(port, publishTopic, sns);
         }
     };

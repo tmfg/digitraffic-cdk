@@ -1,11 +1,11 @@
-import {SchedulesApi, SchedulesDirection, SchedulesResponse,} from "../../lib/api/schedules";
-import {ApiTimestamp, EventType} from "../../lib/model/timestamp";
-import {newTimestamp} from "../testdata";
-import {getRandomNumber} from "@digitraffic/common/dist/test/testutils";
-import {ports} from "../../lib/service/portareas";
-import {EventSource} from "../../lib/model/eventsource";
-import {SchedulesService} from "../../lib/service/schedules";
-import {subHours, subMinutes} from "date-fns";
+import { SchedulesApi, SchedulesDirection, SchedulesResponse } from "../../lib/api/schedules";
+import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
+import { newTimestamp } from "../testdata";
+import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import { ports } from "../../lib/service/portareas";
+import { EventSource } from "../../lib/model/eventsource";
+import { SchedulesService } from "../../lib/service/schedules";
+import { subHours, subMinutes } from "date-fns";
 
 const uuid = "123123123";
 const vesselName = "TEST";
@@ -42,34 +42,21 @@ describe("schedules", () => {
             const api = createApi();
             const getSchedulesTimestampsSpy = jest
                 .spyOn(api, "getSchedulesTimestamps")
-                .mockImplementation(() =>
-                    Promise.resolve(createSchedulesResponse(1, false, false))
-                );
+                .mockImplementation(() => Promise.resolve(createSchedulesResponse(1, false, false)));
             const service = new SchedulesService(api);
 
             await serviceFn(service);
 
             expect(getSchedulesTimestampsSpy).toHaveBeenCalledTimes(2);
-            expect(getSchedulesTimestampsSpy).toHaveBeenNthCalledWith(
-                1,
-                SchedulesDirection.EAST,
-                calculated
-            );
-            expect(getSchedulesTimestampsSpy).toHaveBeenNthCalledWith(
-                2,
-                SchedulesDirection.WEST,
-                calculated
-            );
+            expect(getSchedulesTimestampsSpy).toHaveBeenNthCalledWith(1, SchedulesDirection.EAST, calculated);
+            expect(getSchedulesTimestampsSpy).toHaveBeenNthCalledWith(2, SchedulesDirection.WEST, calculated);
         });
     }
 
     test("SchedulesService.schedulesToTimestamps - under VTS control - [x] ETA [ ] ETD", () => {
         const api = createApi();
         const service = new SchedulesService(api);
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(3, true, false),
-            false
-        );
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, false), false);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach((ts) => verifyStructure(ts, EventType.ETA, false));
@@ -79,10 +66,7 @@ describe("schedules", () => {
         const api = createApi();
         const service = new SchedulesService(api);
 
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(3, false, true),
-            false
-        );
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, false, true), false);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach((ts) => verifyStructure(ts, EventType.ETD, false));
@@ -92,10 +76,7 @@ describe("schedules", () => {
         const api = createApi();
         const service = new SchedulesService(api);
 
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(3, true, true),
-            false
-        );
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, true), false);
 
         expect(timestamps.length).toBe(6);
         timestamps
@@ -110,10 +91,7 @@ describe("schedules", () => {
         const api = createApi();
         const service = new SchedulesService(api);
 
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(3, true, false),
-            true
-        );
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, false), true);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach((ts) => verifyStructure(ts, EventType.ETA, true));
@@ -123,10 +101,7 @@ describe("schedules", () => {
         const api = createApi();
         const service = new SchedulesService(api);
 
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(3, false, true),
-            true
-        );
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, false, true), true);
 
         expect(timestamps.length).toBe(3);
         timestamps.forEach((ts) => verifyStructure(ts, EventType.ETD, true));
@@ -136,10 +111,7 @@ describe("schedules", () => {
         const api = createApi();
         const service = new SchedulesService(api);
 
-        const timestamps = service.schedulesToTimestamps(
-            createSchedulesResponse(3, true, true),
-            true
-        );
+        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, true), true);
 
         expect(timestamps.length).toBe(6);
         timestamps
@@ -157,7 +129,7 @@ describe("schedules", () => {
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: subHours(Date.now(), getRandomNumber(6, 9999)),
-            locode,
+            locode
         });
 
         expect(service.filterTimestamps([etd]).length).toBe(0);
@@ -170,18 +142,14 @@ describe("schedules", () => {
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: subMinutes(Date.now(), getRandomNumber(1, 5)),
-            locode,
+            locode
         });
 
         expect(service.filterTimestamps([etd]).length).toBe(1);
     });
 });
 
-function createSchedulesResponse(
-    schedules: number,
-    eta: boolean,
-    etd: boolean
-): SchedulesResponse {
+function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean): SchedulesResponse {
     return {
         schedules: {
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -191,17 +159,17 @@ function createSchedulesResponse(
                     {
                         destination: [
                             {
-                                $: { locode, destination, portfacility },
-                            },
+                                $: { locode, destination, portfacility }
+                            }
                         ],
                         eta: eta
                             ? [
                                   {
                                       $: {
                                           time: etaEventTime,
-                                          uts: etaTimestamp,
-                                      },
-                                  },
+                                          uts: etaTimestamp
+                                      }
+                                  }
                               ]
                             : undefined,
                         etd: etd
@@ -209,12 +177,12 @@ function createSchedulesResponse(
                                   {
                                       $: {
                                           time: etdEventTime,
-                                          uts: etdTimestamp,
-                                      },
-                                  },
+                                          uts: etdTimestamp
+                                      }
+                                  }
                               ]
-                            : undefined,
-                    },
+                            : undefined
+                    }
                 ],
                 vessel: [
                     {
@@ -222,12 +190,12 @@ function createSchedulesResponse(
                             vesselName,
                             callsign,
                             mmsi,
-                            imo,
-                        },
-                    },
-                ],
-            })),
-        },
+                            imo
+                        }
+                    }
+                ]
+            }))
+        }
     };
 }
 
@@ -235,24 +203,12 @@ function createApi() {
     return new SchedulesApi("");
 }
 
-function verifyStructure(
-    ts: ApiTimestamp,
-    eventType: EventType.ETA | EventType.ETD,
-    calculated: boolean
-) {
+function verifyStructure(ts: ApiTimestamp, eventType: EventType.ETA | EventType.ETD, calculated: boolean) {
     expect(ts.ship.mmsi).toBe(Number(mmsi));
     expect(ts.ship.imo).toBe(Number(imo));
     expect(ts.location.port).toBe(locode);
     expect(ts.eventType).toBe(eventType);
-    expect(ts.eventTime).toBe(
-        eventType == EventType.ETA ? etaEventTime : etdEventTime
-    );
-    expect(ts.recordTime).toBe(
-        eventType == EventType.ETA ? etaTimestamp : etdTimestamp
-    );
-    expect(ts.source).toBe(
-        calculated
-            ? EventSource.SCHEDULES_CALCULATED
-            : EventSource.SCHEDULES_VTS_CONTROL
-    );
+    expect(ts.eventTime).toBe(eventType == EventType.ETA ? etaEventTime : etdEventTime);
+    expect(ts.recordTime).toBe(eventType == EventType.ETA ? etaTimestamp : etdTimestamp);
+    expect(ts.source).toBe(calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL);
 }

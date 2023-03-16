@@ -1,16 +1,17 @@
-import * as AwakeAiETAHelper from "../../lib/service/awake_ai_eta_etd_helper";
+import * as AwakeAiETAHelper from "../../lib/service/awake_ai_etx_helper";
+import { isPortcallPrediction } from "../../lib/service/awake_ai_etx_helper";
 import {
     AwakeAiPredictionMetadata,
     AwakeAiPredictionType,
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
     AwakeDigitrafficPortCallURN,
-    AwakeURN,
+    AwakeURN
 } from "../../lib/api/awake_common";
-import {EventSource} from "../../lib/model/eventsource";
-import {randomIMO, randomMMSI} from "../testdata";
-import {randomBoolean} from "@digitraffic/common/dist/test/testutils";
-import {EventType} from "../../lib/model/timestamp";
+import { EventSource } from "../../lib/model/eventsource";
+import { randomIMO, randomMMSI } from "../testdata";
+import { randomBoolean } from "@digitraffic/common/dist/test/testutils";
+import { EventType } from "../../lib/model/timestamp";
 
 describe("Awake.AI ETA helper", () => {
     test("destinationIsFinnish - correct", () => {
@@ -61,7 +62,7 @@ describe("Awake.AI ETA helper", () => {
         const eta: AwakeAiVoyageEtaPrediction = newETAPrediction({
             predictionType: randomBoolean()
                 ? AwakeAiPredictionType.DESTINATION
-                : AwakeAiPredictionType.TRAVEL_TIME,
+                : AwakeAiPredictionType.TRAVEL_TIME
         });
 
         const ts = AwakeAiETAHelper.etaPredictionToTimestamp(
@@ -97,19 +98,39 @@ describe("Awake.AI ETA helper", () => {
         const digitrafficEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
             predictionType: AwakeAiPredictionType.ETA,
             metadata: {
-                source: digitrafficPortCallSource,
-            },
+                source: digitrafficPortCallSource
+            }
         });
         const awakeSource: AwakeURN = "urn:awake:source:ai:eta-prediction";
         const awakeEta: AwakeAiVoyageEtaPrediction = newETAPrediction({
             predictionType: AwakeAiPredictionType.ETA,
             metadata: {
-                source: awakeSource,
-            },
+                source: awakeSource
+            }
         });
 
         expect(AwakeAiETAHelper.isDigitrafficEtaPrediction(digitrafficEta)).toBe(true);
         expect(AwakeAiETAHelper.isDigitrafficEtaPrediction(awakeEta)).toBe(false);
+    });
+
+    test("isPortcallPrediction - correct", () => {
+        const awakeEtaPrediction = newETAPrediction();
+        const awakePortCallPredictionNoType = newETAPrediction({
+            portCallUrn: "urn:awake:digitraffic-portcall:1234567"
+        });
+        const awakePortCallPredictionInvalidUrn = newETAPrediction({
+            predictionType: AwakeAiPredictionType.ARRIVAL_PORT_CALL,
+            portCallUrn: "urn:awake:some-other-portcall:1234567" as AwakeDigitrafficPortCallURN
+        });
+        const awakePortCallPrediction = newETAPrediction({
+            predictionType: AwakeAiPredictionType.ARRIVAL_PORT_CALL,
+            portCallUrn: "urn:awake:digitraffic-portcall:1234567"
+        });
+
+        expect(isPortcallPrediction(awakeEtaPrediction)).toEqual(false);
+        expect(isPortcallPrediction(awakePortCallPredictionNoType)).toEqual(false);
+        expect(isPortcallPrediction(awakePortCallPredictionInvalidUrn)).toEqual(false);
+        expect(isPortcallPrediction(awakePortCallPrediction)).toEqual(true);
     });
 });
 
@@ -124,15 +145,15 @@ function newETAPrediction(options?: {
     locode?: string;
     metadata?: AwakeAiPredictionMetadata;
     zoneType?: AwakeAiZoneType;
+    portCallUrn?: AwakeDigitrafficPortCallURN;
 }): AwakeAiVoyageEtaPrediction {
     return {
         predictionType: options?.predictionType ?? AwakeAiPredictionType.ETA,
-        arrivalTime:
-            options?.arrivalTime?.toISOString() ?? new Date().toISOString(),
-        recordTime:
-            options?.recordTime?.toISOString() ?? new Date().toISOString(),
+        arrivalTime: options?.arrivalTime?.toISOString() ?? new Date().toISOString(),
+        recordTime: options?.recordTime?.toISOString() ?? new Date().toISOString(),
         locode: options?.locode ?? "FILOL",
         metadata: options?.metadata,
         zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
+        ...(options?.portCallUrn && { portCallUrn: options.portCallUrn })
     };
 }

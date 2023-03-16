@@ -1,16 +1,17 @@
 import {
     AwakeAiPrediction,
     AwakeAiPredictionType,
-    AwakeAiShipStatus,
     AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageEtdPrediction,
+    AwakeAiVoyageStatus,
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction,
     AwakeURN,
+    digitrafficPortCallString
 } from "../api/awake_common";
-import {ApiTimestamp, EventType} from "../model/timestamp";
-import {EventSource} from "../model/eventsource";
-import {AwakeAiPortSchedule} from "../api/awake_ai_port";
+import { ApiTimestamp, EventType } from "../model/timestamp";
+import { EventSource } from "../model/eventsource";
+import { AwakeAiPortSchedule } from "../api/awake_ai_port";
 
 export enum AwakeDataState {
     OK = "OK",
@@ -23,20 +24,25 @@ export enum AwakeDataState {
     PREDICTED_LOCATION_OUTSIDE_FINLAND = "PREDICTED_LOCATION_OUTSIDE_FINLAND",
     OVERRIDDEN_LOCODE = "OVERRIDDEN_LOCODE",
     DIFFERING_LOCODE = "DIFFERING_LOCODE",
-    NO_ETA_TIMESTAMP = "NO_ETA_TIMESTAMP",
+    NO_ETA_TIMESTAMP = "NO_ETA_TIMESTAMP"
 }
 
 export function locodeIsFinnish(locode: string | undefined): boolean {
-    return locode ? locode.toLowerCase().startsWith("fi") : false;
+    return !!locode && locode.toLowerCase().startsWith("fi");
 }
 
 export function isPortcallPrediction(
     prediction: AwakeAiPrediction
 ): prediction is AwakeArrivalPortCallPrediction {
-    return !!prediction && "portCallUrn" in prediction;
+    return (
+        !!prediction &&
+        prediction.predictionType === AwakeAiPredictionType.ARRIVAL_PORT_CALL &&
+        "portCallUrn" in prediction &&
+        (prediction as AwakeArrivalPortCallPrediction).portCallUrn.includes(digitrafficPortCallString)
+    );
 }
 
-function portCallIdFromUrn(urn?: AwakeURN<string>): number | null {
+function portCallIdFromUrn(urn?: AwakeURN): number | null {
     if (!urn) {
         return null;
     }
@@ -63,7 +69,7 @@ export function isDigitrafficEtaPrediction(prediction: AwakeAiPrediction): boole
     return (
         prediction.predictionType === AwakeAiPredictionType.ETA &&
         !!prediction.metadata &&
-        prediction.metadata.source.includes("digitraffic-portcall")
+        prediction.metadata.source.includes(digitrafficPortCallString)
     );
 }
 
@@ -71,13 +77,15 @@ export function isDigitrafficEtdPrediction(prediction: AwakeAiPrediction): boole
     return (
         prediction.predictionType === AwakeAiPredictionType.ETD &&
         !!prediction.metadata &&
-        prediction.metadata.source.includes("digitraffic-portcall")
+        prediction.metadata.source.includes(digitrafficPortCallString)
     );
 }
 
-export function voyageIsNotStopped(schedule: AwakeAiPortSchedule): boolean {
-    return schedule.voyage.voyageStatus !== AwakeAiShipStatus.STOPPED
-        && (schedule.voyage.voyageStatus === AwakeAiShipStatus.UNDER_WAY || schedule.voyage.voyageStatus === AwakeAiShipStatus.NOT_STARTED)
+export function voyageUnderwayOrNotStarted(schedule: AwakeAiPortSchedule): boolean {
+    return (
+        schedule.voyage.voyageStatus === AwakeAiVoyageStatus.UNDER_WAY ||
+        schedule.voyage.voyageStatus === AwakeAiVoyageStatus.NOT_STARTED
+    );
 }
 
 export function etaPredictionToTimestamp(
@@ -144,21 +152,17 @@ export function etaPredictionToTimestamp(
     const timestamp: ApiTimestamp = {
         ship: {
             mmsi,
-            imo,
+            imo
         },
         location: {
             port: locode,
-            portArea,
+            portArea
         },
         source,
         eventTime: prediction.arrivalTime,
         recordTime: prediction.recordTime ?? new Date().toISOString(),
-        portcallId:
-            portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
-        eventType:
-            prediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA
-                ? EventType.ETP
-                : EventType.ETA,
+        portcallId: portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
+        eventType: prediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA
     };
     console.info(
         "method=AwakeAiPredictionHelper.etaPredictionToTimestamp created timestamp: %s",
@@ -230,18 +234,17 @@ export function etdPredictionToTimestamp(
     const timestamp: ApiTimestamp = {
         ship: {
             mmsi,
-            imo,
+            imo
         },
         location: {
             port: locode,
-            portArea,
+            portArea
         },
         source,
         eventTime: prediction.departureTime,
         recordTime: prediction.recordTime ?? new Date().toISOString(),
-        portcallId:
-            portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
-        eventType: EventType.ETD,
+        portcallId: portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
+        eventType: EventType.ETD
     };
     console.info(
         "method=AwakeAiPredictionHelper.etdPredictionToTimestamp created timestamp: %s",
