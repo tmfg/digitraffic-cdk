@@ -42,9 +42,9 @@ export function isPortcallPrediction(
     );
 }
 
-function portCallIdFromUrn(urn?: AwakeURN): number | null {
+function portCallIdFromUrn(urn?: AwakeURN): number | undefined {
     if (!urn) {
-        return null;
+        return undefined;
     }
     const split = urn.split(":");
     if (split.length < 4) {
@@ -97,7 +97,7 @@ export function etaPredictionToTimestamp(
     portArea?: string,
     portcallId?: number,
     portCallPrediction?: AwakeArrivalPortCallPrediction
-): ApiTimestamp | null {
+): ApiTimestamp | undefined {
     // should always be ETA for ETA predictions but check just in case
     if (prediction.predictionType !== AwakeAiPredictionType.ETA) {
         console.warn(
@@ -107,7 +107,7 @@ export function etaPredictionToTimestamp(
             locode,
             portcallId
         );
-        return null;
+        return undefined;
     }
 
     if (!prediction.arrivalTime) {
@@ -118,7 +118,7 @@ export function etaPredictionToTimestamp(
             locode,
             portcallId
         );
-        return null;
+        return undefined;
     }
 
     if (!locodeIsFinnish(prediction.locode)) {
@@ -129,7 +129,7 @@ export function etaPredictionToTimestamp(
             locode,
             portcallId
         );
-        return null;
+        return undefined;
     }
 
     if (!prediction.recordTime) {
@@ -180,7 +180,7 @@ export function etdPredictionToTimestamp(
     portArea?: string,
     portcallId?: number,
     portCallPrediction?: AwakeArrivalPortCallPrediction
-): ApiTimestamp | null {
+): ApiTimestamp | undefined {
     if (prediction.predictionType !== AwakeAiPredictionType.ETD) {
         console.warn(
             "method=AwakeAiPredictionHelper.etdPredictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d",
@@ -189,7 +189,7 @@ export function etdPredictionToTimestamp(
             locode,
             portcallId
         );
-        return null;
+        return undefined;
     }
 
     if (!prediction.departureTime) {
@@ -200,7 +200,7 @@ export function etdPredictionToTimestamp(
             locode,
             portcallId
         );
-        return null;
+        return undefined;
     }
 
     if (!locodeIsFinnish(prediction.locode)) {
@@ -211,7 +211,7 @@ export function etdPredictionToTimestamp(
             locode,
             portcallId
         );
-        return null;
+        return undefined;
     }
 
     if (!prediction.recordTime) {

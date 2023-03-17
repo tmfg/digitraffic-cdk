@@ -7,7 +7,7 @@ import {
 import { DbETAShip } from "../dao/timestamps";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { retry } from "@digitraffic/common/dist/utils/retry";
-import { AwakeAiVoyageStatus, AwakeAiVoyageEtaPrediction, AwakeAiZoneType } from "../api/awake_common";
+import { AwakeAiVoyageEtaPrediction, AwakeAiVoyageStatus, AwakeAiZoneType } from "../api/awake_common";
 import moment from "moment-timezone";
 import {
     AwakeDataState,
@@ -39,7 +39,7 @@ export class AwakeAiETAShipService {
     getAwakeAiTimestamps(ships: DbETAShip[]): Promise<ApiTimestamp[]> {
         return Promise.allSettled(ships.map(this.getAwakeAiTimestamp.bind(this))).then((responses) =>
             responses.reduce<ApiTimestamp[]>((acc, result) => {
-                const val = result.status === "fulfilled" ? result.value : null;
+                const val = result.status === "fulfilled" ? result.value : undefined;
                 if (!val) {
                     return acc;
                 }
@@ -67,7 +67,7 @@ export class AwakeAiETAShipService {
         // if less than 24 hours to ship's arrival, set destination LOCODE explicitly for ETA request
         const diffEtaToNow = moment(ship.eta).diff(moment());
         const diffHours = moment.duration(diffEtaToNow).asHours();
-        const locode = diffHours < 24 ? ship.locode : null;
+        const locode = diffHours < 24 ? ship.locode : undefined;
 
         const response = await retry(() => this.api.getETA(ship.imo, locode), 1);
 
@@ -109,7 +109,7 @@ export class AwakeAiETAShipService {
                         console.warn(
                             `method=AwakeAiETAShipService.handleSchedule state=${AwakeDataState.DIFFERING_LOCODE} not persisting, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`
                         );
-                        return null;
+                        return undefined;
                     } else if (this.overriddenDestinations.includes(ship.locode)) {
                         // less than 24 hours to ship arrival and port call LOCODE is in list of overridden destinations
                         // don't trust predicted destination, override destination with port call LOCODE
@@ -128,7 +128,7 @@ export class AwakeAiETAShipService {
                     console.warn(
                         `method=AwakeAiETAShipService.handleSchedule ETP event for non-publishable LOCODE, IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`
                     );
-                    return null;
+                    return undefined;
                 }
 
                 return etaPredictionToTimestamp(
@@ -141,7 +141,7 @@ export class AwakeAiETAShipService {
                     ship.portcall_id
                 );
             })
-            .filter((ts): ts is ApiTimestamp => ts != null);
+            .filter((ts): ts is ApiTimestamp => !!ts);
     }
 
     private getETAPredictions(schedule: AwakeAiShipVoyageSchedule): AwakeAiVoyageEtaPrediction[] {

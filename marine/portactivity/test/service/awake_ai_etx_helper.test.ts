@@ -44,8 +44,8 @@ describe("Awake.AI ETA helper", () => {
             portcallId
         );
 
-        expect(ts).not.toBeNull();
-        if (ts !== null) {
+        expect(ts).not.toBeFalsy();
+        if (ts) {
             expect(ts.eventType).toBe(EventType.ETA);
             expect(ts.ship.mmsi).toBe(mmsi);
             expect(ts.ship.imo).toBe(imo);
@@ -73,7 +73,7 @@ describe("Awake.AI ETA helper", () => {
             randomIMO()
         );
 
-        expect(ts).toBeNull();
+        expect(ts).toBeUndefined();
     });
 
     test("predictionToTimestamp - no arrival time", () => {
@@ -89,7 +89,7 @@ describe("Awake.AI ETA helper", () => {
             randomIMO()
         );
 
-        expect(ts).toBeNull();
+        expect(ts).toBeUndefined();
     });
 
     test("isDigitrafficEtaPrediction - correct", () => {

@@ -89,7 +89,7 @@ export class AwakeAiETAPortService {
                     ) as AwakeArrivalPortCallPrediction;
 
                     return etaPredictions.map((eta) => {
-                        if (!this.validateArrivalTime(eta)) return null;
+                        if (!this.validateArrivalTime(eta)) return undefined;
                         return etaPredictionToTimestamp(
                             eta,
                             EventSource.AWAKE_AI_PRED,
@@ -102,7 +102,7 @@ export class AwakeAiETAPortService {
                         );
                     });
                 })
-                .filter((ts): ts is ApiTimestamp => ts !== null)
+                .filter((ts): ts is ApiTimestamp => !!ts)
         );
     }
 }

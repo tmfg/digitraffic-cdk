@@ -83,7 +83,7 @@ export class AwakeAiETDPortService {
                         );
                     });
                 })
-                .filter((ts): ts is ApiTimestamp => ts !== null)
+                .filter((ts): ts is ApiTimestamp => !!ts)
         );
     }
 }
