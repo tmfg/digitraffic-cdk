@@ -3,7 +3,7 @@ name: ESLint
 on: [push]
 
 env:
-  CI_DIR: "ci"
+  CI_DIR: "common/scripts/ci"
 
 jobs:
   generate-reports:

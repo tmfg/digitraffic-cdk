@@ -13,17 +13,11 @@
 !/.prettierrc.js
 !/README.md
 
-!/.repo/
-!/.repo/*.default.json
-
 # Github
 !.github/
 !.github/**/
 !.github/workflows/**/**.yml
 !.github/CODEOWNERS
-
-!ci/
-!ci/*.py
 
 # Rush
 !/common/

@@ -4,7 +4,7 @@ const _ = require("../lib/lodash/lodash");
 
 async function getRepoFile(name, type = "default") {
     try {
-        return await fs.readJson(`.repo/${name}.${type}.json`);
+        return await fs.readJson(`common/config/repo/${name}.${type}.json`);
     } catch (_) {
         return {};
     }
