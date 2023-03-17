@@ -32,6 +32,7 @@
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
+    "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "~3.2.0",
     "@types/aws-lambda": "8.10.108",
@@ -42,14 +43,14 @@
     "@types/sinon": "*",
     "@types/xml2js": "^0.4.8",
     "esbuild": "^0.15.15",
-    "eslint": "~8.35.0",
+    "eslint": "~8.34.0",
     "jest": "^29.3.1",
     "jest-junit": "^15.0.0",
     "parallelshell": "3.0.2",
     "sinon": "*",
     "ts-jest": "^29.0.3",
     "ts-node": "^10.9.1",
-    "typescript": "*"
+    "typescript": "~4.8.4"
   },
   "externals": [
     "aws-sdk"

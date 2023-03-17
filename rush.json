@@ -248,7 +248,12 @@
       "tags": ["cdk", "road"]
     },
 
-    // internal
+    // internal / tools
+    {
+      "packageName": "@digitraffic-cdk/eslint-config",
+      "projectFolder": "tools/eslint-config",
+      "tags": ["internal"]
+    },
     {
       "packageName": "@digitraffic-cdk/rig",
       "projectFolder": "tools/rig",

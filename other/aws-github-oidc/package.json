@@ -17,11 +17,12 @@
     "source-map-support": "*"
   },
   "devDependencies": {
+    "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "~3.2.0",
     "@types/node": "*",
-    "eslint": "~8.35.0",
+    "eslint": "~8.34.0",
     "ts-node": "*",
-    "typescript": "*"
+    "typescript": "~4.8.4"
   }
 }
