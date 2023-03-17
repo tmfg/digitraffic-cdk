@@ -184,7 +184,7 @@ export class AwakeAiETAShipService {
                         console.warn(
                             `method=AwakeAiETAShipService.getAwakeAiTimestamps received Digitraffic ETA prediction, IMO: ${
                                 schedule.ship.imo
-                            }, MMSI: ${schedule.ship.mmsi} prediction: ${JSON.stringify(etaPrediction)}`
+                            }, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(etaPrediction)}`
                         );
                         return false;
                     }

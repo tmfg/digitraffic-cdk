@@ -87,7 +87,7 @@ export function createWeathercamHttpHeaders(
     );
 }
 
-export function createIndexHtml(stack: Stack, edgeLambdaRole: Role) {
+export function createIndexHtml(stack: Stack) {
     const body = readBodyWithVersion("lib/lambda/lambda-index-html.js");
 
     return createCloudfrontFunction(stack, "index-html", body);
@@ -126,7 +126,6 @@ export function createLamRedirect(
     // Allow read-access to secrets manager
     const secret = Secret.fromSecretCompleteArn(stack, "Secret", smRef);
     secret.grantRead(edgeLambda);
-
     return edgeLambda.currentVersion;
 }
 
@@ -141,11 +140,9 @@ export function createCloudfrontFunction(
     functionName: string,
     functionBody: string
 ) {
-    const cloudfrontFunction = new Cloudfront.Function(stack, functionName, {
+    return new Cloudfront.Function(stack, functionName, {
         code: Cloudfront.FunctionCode.fromInline(functionBody),
     });
-
-    return cloudfrontFunction;
 }
 
 export function createFunction(
@@ -154,7 +151,7 @@ export function createFunction(
     functionName: string,
     functionBody: string
 ): AWSFunction {
-    const edgeFunction = new AWSFunction(stack, functionName, {
+    return new AWSFunction(stack, functionName, {
         runtime: Runtime.NODEJS_16_X,
         memorySize: 128,
         code: new InlineCode(functionBody),
@@ -163,8 +160,6 @@ export function createFunction(
         reservedConcurrentExecutions: 10,
         timeout: Duration.seconds(2),
     });
-
-    return edgeFunction;
 }
 
 export function createVersionedFunction(

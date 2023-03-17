@@ -228,13 +228,16 @@ export class CloudfrontCdkStack extends Stack {
         }
 
         if (types.lambdaTypes.has(LambdaType.LAM_HEADERS)) {
-            lambdaMap.addLambda(LambdaType.LAM_HEADERS, createLamHeaders(this, edgeLambdaRole));
+            lambdaMap.addLambda(
+                LambdaType.LAM_HEADERS,
+                createLamHeaders(this, edgeLambdaRole)
+            );
         }
 
         if (types.functionTypes.has(FunctionType.INDEX_HTML)) {
             lambdaMap.addFunction(
                 FunctionType.INDEX_HTML,
-                createIndexHtml(this, edgeLambdaRole)
+                createIndexHtml(this)
             );
         }
 

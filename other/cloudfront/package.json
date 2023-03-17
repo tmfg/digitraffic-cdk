@@ -30,8 +30,7 @@
     "@types/aws-lambda": "8.10.108",
     "@types/node": "*",
     "@types/sinon": "*",
-    "aws-cdk-lib": "*",
-    "aws-sdk": "2.1260.0",
+    "aws-sdk": "2.1304.0",
     "esbuild": "*",
     "jest": "^29.3.1",
     "parallelshell": "3.0.2",
@@ -40,9 +39,9 @@
     "typescript": "4.9.5"
   },
   "dependencies": {
-    "@digitraffic/common": "2022.11.23-5",
-    "aws-cdk-lib": "2.51.1",
-    "constructs": "10.1.168",
+    "@digitraffic/common": "2023.3.17-1",
+    "aws-cdk-lib": "2.62.2",
+    "constructs": "10.1.249",
     "p-limit": "4.0.0",
     "source-map-support": "^0.5.19"
   },
