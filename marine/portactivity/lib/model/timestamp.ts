@@ -1,4 +1,5 @@
 import moment from "moment";
+import { EventSource } from "./eventsource";
 
 export enum EventType {
     ATA = "ATA",
@@ -16,31 +17,31 @@ export enum EventType {
 }
 
 export interface Ship {
-    readonly mmsi?: number
-    readonly imo?: number
+    readonly mmsi?: number;
+    readonly imo?: number;
 }
 
 export interface Location {
-    readonly port: string
-    readonly portArea?: string
-    readonly from?: string
-    readonly terminal?: string
-    readonly berth?: string
-    readonly berthPosition?: string
-    readonly shipSide?: string
+    readonly port: string;
+    readonly portArea?: string;
+    readonly from?: string;
+    readonly terminal?: string;
+    readonly berth?: string;
+    readonly berthPosition?: string;
+    readonly shipSide?: string;
 }
 
 export interface ApiTimestamp {
-    readonly eventType: EventType
-    readonly eventTime: string
-    readonly eventTimeConfidenceLower?: string | null
-    readonly eventTimeConfidenceUpper?: string | null
-    readonly recordTime: string
-    readonly source: string
-    readonly ship: Ship
-    readonly location: Location
-    readonly portcallId?: number | null
-    readonly sourceId?: string | null
+    readonly eventType: EventType;
+    readonly eventTime: string;
+    readonly eventTimeConfidenceLower?: string | null;
+    readonly eventTimeConfidenceUpper?: string | null;
+    readonly recordTime: string;
+    readonly source: string;
+    readonly ship: Ship;
+    readonly location: Location;
+    readonly portcallId?: number | null;
+    readonly sourceId?: string | null;
 }
 
 export function validateTimestamp(timestamp: Partial<ApiTimestamp>): ApiTimestamp | null {
@@ -56,11 +57,19 @@ export function validateTimestamp(timestamp: Partial<ApiTimestamp>): ApiTimestam
         console.warn("Invalid eventTime for timestamp", timestamp);
         return null;
     }
-    if (timestamp.eventTimeConfidenceLower != null && timestamp.eventTimeConfidenceLower !== moment.duration(timestamp.eventTimeConfidenceLower).toISOString()) {
+    if (
+        timestamp.eventTimeConfidenceLower != null &&
+        timestamp.eventTimeConfidenceLower !==
+            moment.duration(timestamp.eventTimeConfidenceLower).toISOString()
+    ) {
         console.warn("Invalid eventTimeConfidenceLower for timestamp", timestamp);
         return null;
     }
-    if (timestamp.eventTimeConfidenceUpper != null && timestamp.eventTimeConfidenceUpper !== moment.duration(timestamp.eventTimeConfidenceUpper).toISOString()) {
+    if (
+        timestamp.eventTimeConfidenceUpper != null &&
+        timestamp.eventTimeConfidenceUpper !==
+            moment.duration(timestamp.eventTimeConfidenceUpper).toISOString()
+    ) {
         console.warn("Invalid eventTimeConfidenceUpper for timestamp", timestamp);
         return null;
     }
@@ -104,6 +113,10 @@ export function validateTimestamp(timestamp: Partial<ApiTimestamp>): ApiTimestam
         console.warn("PortArea too long", timestamp);
         return null;
     }
+    if (timestamp.source === EventSource.AWAKE_AI_PRED && timestamp.eventType === EventType.ETD) {
+        console.warn("ETD prediction from Awake.AI - not persisting");
+        return null;
+    }
 
     return {
         eventType: timestamp.eventType,
@@ -115,6 +128,6 @@ export function validateTimestamp(timestamp: Partial<ApiTimestamp>): ApiTimestam
         ship: timestamp.ship,
         location: timestamp.location,
         portcallId: timestamp.portcallId,
-        sourceId: timestamp.sourceId,
+        sourceId: timestamp.sourceId
     };
 }

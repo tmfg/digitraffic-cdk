@@ -8,7 +8,7 @@ export enum AwakeAiShipResponseType {
     INVALID_SHIP_ID = "INVALID_SHIP_ID",
     SERVER_ERROR = "SERVER_ERROR",
     NO_RESPONSE = "NO_RESPONSE",
-    UNKNOWN = "UNKNOWN",
+    UNKNOWN = "UNKNOWN"
 }
 
 export interface AwakeAiShipApiResponse {
@@ -19,7 +19,7 @@ export interface AwakeAiShipApiResponse {
 export enum AwakeAiShipPredictability {
     PREDICTABLE = "predictable",
     NOT_PREDICTABLE = "not-predictable",
-    SHIP_DATA_NOT_UPDATED = "ship-data-not-updated",
+    SHIP_DATA_NOT_UPDATED = "ship-data-not-updated"
 }
 
 export interface AwakeAiShipVoyageSchedule {
@@ -42,10 +42,7 @@ export class AwakeAiETAShipApi {
      * @param imo Ship IMO
      * @param locode Destination LOCODE. If set, overrides destination prediction.
      */
-    async getETA(
-        imo: number,
-        locode: string | null
-    ): Promise<AwakeAiShipApiResponse> {
+    async getETA(imo: number, locode?: string): Promise<AwakeAiShipApiResponse> {
         const start = Date.now();
         try {
             let url = `${this.url}/ship/${imo}?predictionMetadata=true`;
@@ -56,13 +53,13 @@ export class AwakeAiETAShipApi {
             const resp = await axios.get(url, {
                 headers: {
                     Authorization: this.apiKey,
-                    Accept: MediaType.APPLICATION_JSON,
+                    Accept: MediaType.APPLICATION_JSON
                 },
-                validateStatus: (status) => status == 200,
+                validateStatus: (status) => status == 200
             });
             return {
                 type: AwakeAiShipResponseType.OK,
-                schedule: resp.data as unknown as AwakeAiShipVoyageSchedule,
+                schedule: resp.data as unknown as AwakeAiShipVoyageSchedule
             };
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -70,36 +67,32 @@ export class AwakeAiETAShipApi {
             }
             throw error;
         } finally {
-            console.log(
-                `method=AwakeAiETAShipApi.getETA tookMs=${Date.now() - start}`
-            );
+            console.log(`method=AwakeAiETAShipApi.getETA tookMs=${Date.now() - start}`);
         }
     }
 
-    static handleError(error: {
-        response?: { status: number };
-    }): AwakeAiShipApiResponse {
+    static handleError(error: { response?: { status: number } }): AwakeAiShipApiResponse {
         if (!error.response) {
             return {
-                type: AwakeAiShipResponseType.NO_RESPONSE,
+                type: AwakeAiShipResponseType.NO_RESPONSE
             };
         }
         switch (error.response.status) {
             case 404:
                 return {
-                    type: AwakeAiShipResponseType.SHIP_NOT_FOUND,
+                    type: AwakeAiShipResponseType.SHIP_NOT_FOUND
                 };
             case 422:
                 return {
-                    type: AwakeAiShipResponseType.INVALID_SHIP_ID,
+                    type: AwakeAiShipResponseType.INVALID_SHIP_ID
                 };
             case 500:
                 return {
-                    type: AwakeAiShipResponseType.SERVER_ERROR,
+                    type: AwakeAiShipResponseType.SERVER_ERROR
                 };
             default:
                 return {
-                    type: AwakeAiShipResponseType.UNKNOWN,
+                    type: AwakeAiShipResponseType.UNKNOWN
                 };
         }
     }
