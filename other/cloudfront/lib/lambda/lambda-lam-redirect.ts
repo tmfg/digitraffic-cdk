@@ -1,22 +1,16 @@
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import {
-    setEnvVariable,
-    setSecretOverideAwsRegionEnv,
-} from "@digitraffic/common/dist/utils/utils";
+import { setEnvVariable, setSecretOverideAwsRegionEnv } from "@digitraffic/common/dist/utils/utils";
 import {
     CloudFrontRequestEvent,
     CloudFrontRequestResult,
     CloudFrontResultResponse,
     Context,
     CloudFrontRequestHandler,
-    CloudFrontRequestCallback,
+    CloudFrontRequestCallback
 } from "aws-lambda";
 
-import queryStringHelper, {
-    ParsedUrlQuery,
-    ParsedUrlQueryInput,
-} from "querystring";
+import queryStringHelper, { ParsedUrlQuery, ParsedUrlQueryInput } from "querystring";
 import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 
 setEnvVariable(EnvKeys.SECRET_ID, "road");
@@ -55,15 +49,13 @@ export const handler: CloudFrontRequestHandler = async (
                 if (request.origin?.s3) {
                     request.origin.s3.domainName = secret.s3DomainTmsRawOngoing;
                 } else {
-                    throw new Error(
-                        "method=tmsHistoryHandler type=raw Empty request.origin.s3!"
-                    );
+                    throw new Error("method=tmsHistoryHandler type=raw Empty request.origin.s3!");
                 }
                 request.headers.host = [
                     {
                         key: "host",
-                        value: secret.s3DomainTmsRawOngoing,
-                    },
+                        value: secret.s3DomainTmsRawOngoing
+                    }
                 ];
             }
         }
@@ -76,15 +68,13 @@ export const handler: CloudFrontRequestHandler = async (
         // This is for the SnowLake request and GET works with webpage address (/ui/tms/history) and with api-url.
         // Index.html has been set to do GET to /api/tms/v1/history. Without it, it will default to do get to webpage address.
     } else if (
-        (request.uri.includes("/ui/tms/history") ||
-            request.uri.includes("/api/tms/v1/history")) &&
+        (request.uri.includes("/ui/tms/history") || request.uri.includes("/api/tms/v1/history")) &&
         request.querystring.length
     ) {
         const newQuery = parseQuery(request.querystring);
         if (!newQuery.length) {
             throw new Error(
-                "method=tmsHistoryHandler Empty query string! querystring: " +
-                    request.querystring
+                "method=tmsHistoryHandler Empty query string! querystring: " + request.querystring
             );
         }
 
@@ -103,11 +93,11 @@ export const handler: CloudFrontRequestHandler = async (
                     "x-api-key": [
                         {
                             key: "x-api-key",
-                            value: secret.snowflakeApikey,
-                        },
-                    ],
-                },
-            },
+                            value: secret.snowflakeApikey
+                        }
+                    ]
+                }
+            }
         };
 
         // host is not allowed in CF custom headers
@@ -124,10 +114,7 @@ export const handler: CloudFrontRequestHandler = async (
 
         // Redirect /ui/tms/history and /ui/tms/history/index.html requests to root /ui/tms/history/.
         // Then other resources from the webpage are also found under the root.
-    } else if (
-        request.uri.endsWith("/ui/tms/history") ||
-        request.uri.includes("/ui/tms/history/index.")
-    ) {
+    } else if (request.uri.endsWith("/ui/tms/history") || request.uri.includes("/ui/tms/history/index.")) {
         //Generate HTTP redirect response to a different landing page that is root.
         const redirectResponse: CloudFrontResultResponse = {
             status: "301",
@@ -136,16 +123,16 @@ export const handler: CloudFrontRequestHandler = async (
                 location: [
                     {
                         key: "Location",
-                        value: "/ui/tms/history/",
-                    },
+                        value: "/ui/tms/history/"
+                    }
                 ],
                 "cache-control": [
                     {
                         key: "Cache-Control",
-                        value: "max-age=300",
-                    },
-                ],
-            },
+                        value: "max-age=300"
+                    }
+                ]
+            }
         };
 
         console.log(
@@ -218,9 +205,7 @@ function getApiPath(query: string): string {
         return `/${api}`;
     }
     throw new Error(
-        `method=tmsHistoryHandler.getApiPath api not a string: ${
-            api?.toString() ?? "undefined"
-        }`
+        `method=tmsHistoryHandler.getApiPath api not a string: ${api?.toString() ?? "undefined"}`
     );
 }
 
@@ -231,14 +216,11 @@ function parseQuery(query: string): string {
 
     const q = queryStringHelper.parse(query) as QueryParams;
 
-    if (
-        !q.api ||
-        !q.tyyppi ||
-        (!q.piste && !q.pistejoukko) ||
-        (!q.pvm && !q.viikko)
-    ) {
+    if (!q.api || !q.tyyppi || (!q.piste && !q.pistejoukko) || (!q.pvm && !q.viikko)) {
         console.log(
-            "method=tmsHistoryHandler.parseQuery invalid input: missing items"
+            `method=tmsHistoryHandler.parseQuery invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${JSON.stringify(
+                q
+            )}`
         );
         return "";
     }
@@ -250,9 +232,7 @@ function parseQuery(query: string): string {
     } else if (q.viikko) {
         resp.viikko = q.viikko;
     } else {
-        console.log(
-            "method=tmsHistoryHandler.parseQuery invalid input: no date"
-        );
+        console.log("method=tmsHistoryHandler.parseQuery invalid input: no date");
         return "";
     }
 
@@ -269,9 +249,7 @@ function parseQuery(query: string): string {
     } else if (q.pistejoukko) {
         resp.pistejoukko = q.pistejoukko;
     } else {
-        console.log(
-            "method=tmsHistoryHandler.parseQuery invalid input: no piste/pistejoukko"
-        );
+        console.log("method=tmsHistoryHandler.parseQuery invalid input: no piste/pistejoukko");
         return "";
     }
 

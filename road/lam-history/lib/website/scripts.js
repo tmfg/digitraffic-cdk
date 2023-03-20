@@ -1,6 +1,4 @@
-const tooltipTriggerList = [].slice.call(
-    document.querySelectorAll('[data-bs-toggle="tooltip"]')
-);
+const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
 const tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
     return new bootstrap.Tooltip(tooltipTriggerEl);
 });
@@ -13,7 +11,7 @@ const time_formats = {
     year: { level: 2, type: "v", format: "year" },
     year_d: { level: 0, type: "v", format: "date" },
     viikko: "viikko",
-    pvm: "pvm",
+    pvm: "pvm"
 };
 
 const raaka_liikenne_tasot = [
@@ -22,26 +20,26 @@ const raaka_liikenne_tasot = [
         key: "vrk",
         value: "Vuorokausiraportti",
         tformat: time_formats.date,
-        ignore: true,
+        ignore: true
     },
     {
         key: "vk",
         value: "Viikkoraportti",
         tformat: time_formats.week,
-        ignore: true,
+        ignore: true
     },
     {
         key: "kk",
         value: "Kuukausiraportti",
         tformat: time_formats.month,
-        ignore: true,
+        ignore: true
     },
     {
         key: "v",
         value: "Vuosiraportti",
         tformat: time_formats.year,
-        ignore: true,
-    },
+        ignore: true
+    }
 ];
 
 const liikenne_tasot = {
@@ -49,35 +47,35 @@ const liikenne_tasot = {
     vrk: {
         key: "vrk",
         value: "Vuorokausiliikenneraportti",
-        tformat: time_formats.date,
+        tformat: time_formats.date
     },
     vk: { key: "vk", value: "Viikkosummaraportti", tformat: time_formats.week },
     kk: {
         key: "kk",
         value: "Kuukausisummaraportti",
-        tformat: time_formats.month,
+        tformat: time_formats.month
     },
     v: { key: "v", value: "Vuosisummaraportti", tformat: time_formats.year },
     kvlv: {
         key: "kvl",
         value: "Keskimääräinen vuorokausiliikenne (vapaa aikaväli)",
-        tformat: time_formats.year_d,
+        tformat: time_formats.year_d
     },
     kvl: {
         key: "kvl",
         value: "Vuoden keskimääräinen vuorokausiliikenne",
-        tformat: time_formats.year,
+        tformat: time_formats.year
     },
     kavlv: {
         key: "kavl",
         value: "Keskimääräinen arkivuorokausiliikenne (vapaa aikaväli)",
-        tformat: time_formats.year_d,
+        tformat: time_formats.year_d
     },
     kavl: {
         key: "kavl",
         value: "Vuoden Keskimääräinen arkivuorokausiliikenne",
-        tformat: time_formats.year,
-    },
+        tformat: time_formats.year
+    }
 };
 
 const knopeus_tasot = {
@@ -85,33 +83,33 @@ const knopeus_tasot = {
     vrk: {
         key: "vrk",
         value: "Vuorokauden keskinopeus",
-        tformat: time_formats.date,
+        tformat: time_formats.date
     },
     vk: { key: "vk", value: "Viikon keskinopeus", tformat: time_formats.week },
     kk: {
         key: "kk",
         value: "Kuukauden keskinopeus",
-        tformat: time_formats.month,
+        tformat: time_formats.month
     },
-    v: { key: "v", value: "Vuoden keskinopeus", tformat: time_formats.year },
+    v: { key: "v", value: "Vuoden keskinopeus", tformat: time_formats.year }
 };
 
 const aineistot = {
     liikennemaara: {
         key: "liikennemaara",
         value: "Liikennemäärät",
-        summaustasot: liikenne_tasot,
+        summaustasot: liikenne_tasot
     },
     raakaliikennemaara: {
         key: "raakaliikennemaara",
         value: "Raakadatahavainnot",
-        summaustasot: raaka_liikenne_tasot,
+        summaustasot: raaka_liikenne_tasot
     },
     keskinopeus: {
         key: "keskinopeus",
         value: "Keskinopeus",
-        summaustasot: knopeus_tasot,
-    },
+        summaustasot: knopeus_tasot
+    }
 };
 
 const ajoneuvot = [
@@ -119,12 +117,12 @@ const ajoneuvot = [
     {
         key: "(1,6,7,8):kevyet",
         luokka: "kevyet",
-        value: "Kevyet ajoneuvot (1,6,7,8)",
+        value: "Kevyet ajoneuvot (1,6,7,8)"
     },
     {
         key: "(2,3,4,5,9):raskaat",
         luokka: "raskaat",
-        value: "Raskaat ajoneuvot (2,3,4,5,9)",
+        value: "Raskaat ajoneuvot (2,3,4,5,9)"
     },
     { key: "1:1_ha_pa", luokka: "1", value: "1 Henkilö- tai pakettiauto" },
     { key: "2:2_ka_ip", luokka: "2", value: "2 Kuorma-auto ilman perävaunua" },
@@ -134,7 +132,7 @@ const ajoneuvot = [
     { key: "6:6_ha_pk", luokka: "6", value: "6 Henkilöauto ja peräkärry" },
     { key: "7:7_ha_av", luokka: "7", value: "7 Henkilöauto ja asuntovaunu" },
     { key: "8:8_mp", luokka: "8", value: "8 Moottoripyörät ja mopot" },
-    { key: "9:9_hct", luokka: "9", value: "9 High Capacity Truck" },
+    { key: "9:9_hct", luokka: "9", value: "9 High Capacity Truck" }
 ];
 
 const datepic_options = {
@@ -157,8 +155,8 @@ const datepic_options = {
             }
 
             return new Date(date);
-        },
-    },
+        }
+    }
 };
 
 const pistejoukotUrl = "pistejoukot.json";
@@ -178,10 +176,7 @@ let maakunnat_loaded = false;
 let maakunnat = [];
 
 async function modalPopup(selected) {
-    const [pisteet, pistejoukot] = await Promise.all([
-        fetch(pisteetUrl),
-        fetch(pistejoukotUrl),
-    ]);
+    const [pisteet, pistejoukot] = await Promise.all([fetch(pisteetUrl), fetch(pistejoukotUrl)]);
 
     // Build tables
     if (!pistejoukot_loaded) {
@@ -208,13 +203,7 @@ async function lamAsemat(pisteet) {
                 $("<tr/>", { id: "_" + feature.piste }).append([
                     $("<td/>").text(feature.piste),
                     $("<td/>").text(feature.nimi),
-                    $("<td/>").text(
-                        feature.tienro +
-                            " / " +
-                            feature.tieosa +
-                            " / " +
-                            feature.etaisyys
-                    ),
+                    $("<td/>").text(feature.tienro + " / " + feature.tieosa + " / " + feature.etaisyys),
                     $("<td/>").text(feature.laite_kunta),
                     $("<td/>").text(maakunnat[feature.maakunta_id]),
                     $("<td/>").append(
@@ -233,12 +222,10 @@ async function lamAsemat(pisteet) {
                                 feature.loppuaika +
                                 "\n" +
                                 "ELY tunnus: " +
-                                feature.ely_id,
+                                feature.ely_id
                         })
                     ),
-                    $("<td/>").append(
-                        $("<i/>", { class: "bi bi-check-circle select-button" })
-                    ),
+                    $("<td/>").append($("<i/>", { class: "bi bi-check-circle select-button" }))
                 ])
             );
         }
@@ -264,18 +251,16 @@ async function lamPistejoukot(pistejoukot) {
 
                     if (!excluded_pisteJoukot.includes(joukko.pistejoukko)) {
                         table.append(
-                            $("<tr/>", { id: "_" + joukko.pistejoukko }).append(
-                                [
-                                    $("<td/>").text(j == 0 ? ryhma.nimi : ""),
-                                    $("<td/>").text(joukko.pistejoukko),
-                                    $("<td/>").text(joukko.nimi),
-                                    $("<td/>").append(
-                                        $("<i/>", {
-                                            class: "bi bi-check-circle select-button",
-                                        })
-                                    ),
-                                ]
-                            )
+                            $("<tr/>", { id: "_" + joukko.pistejoukko }).append([
+                                $("<td/>").text(j == 0 ? ryhma.nimi : ""),
+                                $("<td/>").text(joukko.pistejoukko),
+                                $("<td/>").text(joukko.nimi),
+                                $("<td/>").append(
+                                    $("<i/>", {
+                                        class: "bi bi-check-circle select-button"
+                                    })
+                                )
+                            ])
                         );
                     }
                 }
@@ -317,13 +302,7 @@ function formatDate(date, type) {
     } else if (type === time_formats.week.format) {
         resp = "" + y + "-" + getWeekNumber(date);
     } else {
-        resp =
-            "" +
-            y +
-            "-" +
-            (m <= 9 ? "0" + m : m) +
-            "-" +
-            (d <= 9 ? "0" + d : d);
+        resp = "" + y + "-" + (m <= 9 ? "0" + m : m) + "-" + (d <= 9 ? "0" + d : d);
     }
 
     return resp;
@@ -394,15 +373,9 @@ function getSummaustaso(summaustasot, selection) {
 
         for (const i in summaustasot) {
             if (summaustasot[i].key === selected) {
-                if (
-                    selected === liikenne_tasot.kvl.key ||
-                    selected === liikenne_tasot.kavl.key
-                ) {
+                if (selected === liikenne_tasot.kvl.key || selected === liikenne_tasot.kavl.key) {
                     if (
-                        ($(selection)
-                            .find(":selected")
-                            .text()
-                            .includes("vapaa") &&
+                        ($(selection).find(":selected").text().includes("vapaa") &&
                             (i === "kvlv" || i === "kavlv")) ||
                         i === "kvl" ||
                         i === "kavl"
@@ -431,48 +404,37 @@ function updateSelectedPisteet() {
         pisteet.push($(this).attr("id").substring(1));
     });
 
-    $(selected_list === "roadStations_t" ? "#pisteet" : "#pistejoukot").val(
-        pisteet.join()
-    );
+    $(selected_list === "roadStations_t" ? "#pisteet" : "#pistejoukot").val(pisteet.join());
     $("#selectedCounter").text(pisteet.length);
 
-    $("#removePiste").prop(
-        "disabled",
-        pisteet.length == 0 ? "disabled" : false
-    );
+    $("#removePiste").prop("disabled", pisteet.length == 0 ? "disabled" : false);
 }
 
 // Init page controls
 $(function () {
     $("input[name=lam_type]").on("change", function () {
-        $(
-            this.id === "lam_type1"
-                ? "#pisteet, #button-addon1"
-                : "#pistejoukot, #button-addon2"
-        ).prop("disabled", false);
-        $(
-            this.id === "lam_type1"
-                ? "#pistejoukot, #button-addon2"
-                : "#pisteet, #button-addon1"
-        ).prop("disabled", "disabled");
+        $(this.id === "lam_type1" ? "#pisteet, #button-addon1" : "#pistejoukot, #button-addon2").prop(
+            "disabled",
+            false
+        );
+        $(this.id === "lam_type1" ? "#pistejoukot, #button-addon2" : "#pisteet, #button-addon1").prop(
+            "disabled",
+            "disabled"
+        );
     });
 
     // Piste is selected or removed
-    $("#roadStations_t tbody, #pistejoukot_t tbody").on(
-        "click",
-        "tr",
-        function () {
-            let selected = $(this);
+    $("#roadStations_t tbody, #pistejoukot_t tbody").on("click", "tr", function () {
+        let selected = $(this);
 
-            if (selected.hasClass("table-active")) {
-                selected.removeClass("table-active");
-            } else {
-                selected.addClass("table-active");
-            }
-
-            updateSelectedPisteet();
+        if (selected.hasClass("table-active")) {
+            selected.removeClass("table-active");
+        } else {
+            selected.addClass("table-active");
         }
-    );
+
+        updateSelectedPisteet();
+    });
 
     // Clear all selected pisteet
     $("#removePiste").on("click", function (e) {
@@ -540,44 +502,39 @@ $(function () {
     $("#summaustaso").change(function () {
         const current_summaustaso = $(this).val();
 
-        const new_summaustaso = getSummaustaso(
-            selected_item.aineisto.summaustasot,
-            this
-        );
+        const new_summaustaso = getSummaustaso(selected_item.aineisto.summaustasot, this);
 
         // change date name-attribute value
         $("#alkupaiva").attr(
             "name",
-            new_summaustaso.key === time_formats.week.type
-                ? time_formats.viikko
-                : time_formats.pvm
+            new_summaustaso.key === time_formats.week.type ? time_formats.viikko : time_formats.pvm
         );
 
         // Update datepickers
         updateDatepicker(new_summaustaso.tformat.level);
-
+        // Request URL: https://tie-test.digitraffic.fi/api/tms/v1/history?api=liikennemaara&tyyppi=vrk&pvm=2023-03-01&loppu=&lam_type=option1&piste=1
+        //              https://tie-test.digitraffic.fi/api/tms/v1/history?api=liikennemaara&tyyppi=vrk&pvm=2023-03-01&loppu=&lam_type=option1&piste=1&luokka=1&suunta=1&sisallytakaistat=0
+        console.info("time_formats.hour.type:        " + time_formats.hour.type);
+        console.info("selected_item.summaustaso:     " + selected_item.summaustaso);
+        console.info("selected_item.summaustaso.key: " + selected_item.summaustaso?.key);
+        console.info("current_summaustaso:           " + current_summaustaso);
         if (
             selected_item.summaustaso == null ||
             (current_summaustaso === time_formats.hour.type &&
-                selected_item.summaustaso !== time_formats.hour.type) ||
+                selected_item.summaustaso.key !== time_formats.hour.type) ||
             (current_summaustaso !== time_formats.hour.type &&
-                selected_item.summaustaso === time_formats.hour.type)
+                selected_item.summaustaso.key === time_formats.hour.type)
         ) {
             // Update ajoneuvoluokat
             const luokat = document.getElementById("luokat");
             luokat.disabled = false;
-            luokat.name =
-                current_summaustaso === time_formats.hour.type
-                    ? "luokka"
-                    : "ryhma";
+            luokat.name = current_summaustaso === time_formats.hour.type ? "luokka" : "ryhma";
 
             cleanOptions(luokat, 1);
             createOptions(
                 luokat,
                 ajoneuvot,
-                current_summaustaso === time_formats.hour.type
-                    ? "luokka"
-                    : "key"
+                current_summaustaso === time_formats.hour.type ? "luokka" : "key"
             );
         }
 
@@ -596,7 +553,7 @@ $(function () {
                         .toLowerCase()
                         .indexOf((match[3] || "").toLowerCase()) >= 0
                 );
-            },
+            }
         });
 
         $(".results tbody tr")
@@ -605,9 +562,7 @@ $(function () {
                 $(this).attr("visible", "false");
             });
 
-        $(".results tbody tr:containsi('" + searchSplit + "')").each(function (
-            e
-        ) {
+        $(".results tbody tr:containsi('" + searchSplit + "')").each(function (e) {
             $(this).attr("visible", "true");
         });
 
