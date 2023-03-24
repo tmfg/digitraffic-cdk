@@ -1,21 +1,32 @@
-import { SecretsManager } from "aws-sdk";
-import queryStringHelper, {
-    ParsedUrlQuery,
-    ParsedUrlQueryInput,
-} from "querystring";
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { setEnvVariable, setSecretOverideAwsRegionEnv } from "@digitraffic/common/dist/utils/utils";
+import {
+    CloudFrontRequestEvent,
+    CloudFrontRequestResult,
+    CloudFrontResultResponse,
+    Context,
+    CloudFrontRequestHandler,
+    CloudFrontRequestCallback
+} from "aws-lambda";
 
-type GenericSecret = Record<string, string>;
+import queryStringHelper, { ParsedUrlQuery, ParsedUrlQueryInput } from "querystring";
+import { EnvKeys } from "@digitraffic/common/dist/aws/runtime/environment";
 
-// Set region manually to eu-west-1 (edge lambda is us-west-1)
-const smClient = new SecretsManager({
-    region: "eu-west-1",
-});
+setEnvVariable(EnvKeys.SECRET_ID, "road");
+// Set region for secret reading manually to eu-west-1 as edge lambda is in us-west-1 or "random" region at runtime
+setSecretOverideAwsRegionEnv("eu-west-1");
+const secretHolder = SecretHolder.create<LamSecrets>("tms-history");
 
-exports.handler = async (event: any, context: any, callback: any) => {
+export const handler: CloudFrontRequestHandler = async (
+    event: CloudFrontRequestEvent,
+    _: Context,
+    callback: CloudFrontRequestCallback
+): Promise<CloudFrontRequestResult> => {
     const { request } = event.Records[0].cf;
 
     console.log(
-        "method=tmsHistoryHandler request.uri: %s, request: %o, region: %s",
+        "method=tmsHistoryHandler uri=%s, request=%o, region=%s",
         request.uri,
         request,
         process.env.AWS_REGION
@@ -34,12 +45,17 @@ exports.handler = async (event: any, context: any, callback: any) => {
 
             if (!isNaN(year) && year > 21) {
                 // Change origin
-                let s3DomainLamRaw = (
-                    await getSecret<LamSecrets>("road", "tms-history")
-                ).s3DomainTmsRawOngoing;
-                request.origin.s3.domainName = s3DomainLamRaw;
-                request.headers["host"] = [
-                    { key: "host", value: s3DomainLamRaw },
+                const secret = await secretHolder.get();
+                if (request.origin?.s3) {
+                    request.origin.s3.domainName = secret.s3DomainTmsRawOngoing;
+                } else {
+                    throw new Error("method=tmsHistoryHandler type=raw Empty request.origin.s3!");
+                }
+                request.headers.host = [
+                    {
+                        key: "host",
+                        value: secret.s3DomainTmsRawOngoing
+                    }
                 ];
             }
         }
@@ -47,32 +63,26 @@ exports.handler = async (event: any, context: any, callback: any) => {
         console.log(
             "method=tmsHistoryHandler type=raw fix request uri=%s, host=%o",
             request.uri,
-            request.headers["host"]
+            request.headers.host
         );
         // This is for the SnowLake request and GET works with webpage address (/ui/tms/history) and with api-url.
         // Index.html has been set to do GET to /api/tms/v1/history. Without it, it will default to do get to webpage address.
     } else if (
-        (request.uri.includes("/ui/tms/history") ||
-            request.uri.includes("/api/tms/v1/history")) &&
+        (request.uri.includes("/ui/tms/history") || request.uri.includes("/api/tms/v1/history")) &&
         request.querystring.length
     ) {
         const newQuery = parseQuery(request.querystring);
         if (!newQuery.length) {
             throw new Error(
-                "Empty query string! querystring: " + request.querystring
+                "method=tmsHistoryHandler Empty query string! querystring: " + request.querystring
             );
         }
-        // To snowflake
-        const apikey = (await getSecret<LamSecrets>("road", "tms-history"))
-            .apikey;
 
-        const snowflakeDomain = (
-            await getSecret<LamSecrets>("road", "tms-history")
-        ).snowflakeDomain;
+        const secret: LamSecrets = await secretHolder.get();
 
         request.origin = {
             custom: {
-                domainName: snowflakeDomain,
+                domainName: secret.snowflakeDomain,
                 port: 443,
                 protocol: "https",
                 path: "/prod",
@@ -80,56 +90,60 @@ exports.handler = async (event: any, context: any, callback: any) => {
                 readTimeout: 20,
                 keepaliveTimeout: 5,
                 customHeaders: {
-                    "x-api-key": [{ key: "x-api-key", value: apikey }],
-                },
-            },
+                    "x-api-key": [
+                        {
+                            key: "x-api-key",
+                            value: secret.snowflakeApikey
+                        }
+                    ]
+                }
+            }
         };
 
         // host is not allowed in CF custom headers
-        request.headers["host"] = [{ key: "host", value: snowflakeDomain }];
+        request.headers.host = [{ key: "host", value: secret.snowflakeDomain }];
 
         request.uri = getApiPath(request.querystring);
         request.querystring = newQuery;
         console.log(
-            "method=tmsHistoryHandler type=snowflake request uri=%s, host=%o",
+            "method=tmsHistoryHandler type=snowflake request uri=%s, queryString=%s host=%o",
             request.uri,
-            request.headers["host"]
+            request.querystring,
+            request.headers.host
         );
 
         // Redirect /ui/tms/history and /ui/tms/history/index.html requests to root /ui/tms/history/.
         // Then other resources from the webpage are also found under the root.
-    } else if (
-        request.uri.endsWith("/ui/tms/history") ||
-        request.uri.includes("/ui/tms/history/index.")
-    ) {
+    } else if (request.uri.endsWith("/ui/tms/history") || request.uri.includes("/ui/tms/history/index.")) {
         //Generate HTTP redirect response to a different landing page that is root.
-        const redirectResponse = {
+        const redirectResponse: CloudFrontResultResponse = {
             status: "301",
             statusDescription: "Moved Permanently",
             headers: {
                 location: [
                     {
                         key: "Location",
-                        value: "/ui/tms/history/",
-                    },
+                        value: "/ui/tms/history/"
+                    }
                 ],
                 "cache-control": [
                     {
                         key: "Cache-Control",
-                        value: "max-age=300",
-                    },
-                ],
-            },
+                        value: "max-age=300"
+                    }
+                ]
+            }
         };
 
         console.log(
             "method=tmsHistoryHandler type=redirectToWebpage request uri=%s, host=%o response status: %s location: %s",
             request.uri,
-            request.headers["host"],
+            request.headers.host,
             redirectResponse.status,
-            JSON.stringify(redirectResponse.headers.location)
+            JSON.stringify(redirectResponse.headers?.location)
         );
         callback(null, redirectResponse);
+        return redirectResponse;
         // This is for the webpage and it's resources
     } else if (request.uri.includes("/ui/tms/history/")) {
         // Adjust uri path to match root of bucket
@@ -143,58 +157,20 @@ exports.handler = async (event: any, context: any, callback: any) => {
         console.log(
             "method=tmsHistoryHandler type=webpage request uri=%s, host=%o",
             request.uri,
-            request.headers["host"]
+            request.headers.host
         );
     }
 
-    // If nothing matches, return request unchanged
+    console.log("method=tmsHistoryHandler return request %o", request);
     callback(null, request);
+    return request;
 };
 
-interface LamSecrets {
-    apikey: string;
+interface LamSecrets extends GenericSecret {
+    snowflakeApikey: string;
     s3DomainTmsRawOngoing: string; // Data from year 2022 onwards
     s3DomainTmsRawHistory: string; // Data before year 2022
     snowflakeDomain: string;
-}
-
-async function getSecret<LamSecrets>(
-    secretId: string,
-    prefix = ""
-): Promise<LamSecrets> {
-    const secretObj = await smClient
-        .getSecretValue({
-            SecretId: secretId,
-        })
-        .promise();
-
-    if (!secretObj.SecretString) {
-        throw new Error("No secret found!");
-    }
-
-    const secret = JSON.parse(secretObj.SecretString);
-
-    if (prefix === "") {
-        return secret;
-    }
-
-    return parseSecret(secret, `${prefix}.`);
-}
-
-function parseSecret<LamSecrets>(
-    secret: GenericSecret,
-    prefix: string
-): LamSecrets {
-    const parsed: GenericSecret = {};
-    const skip = prefix.length;
-
-    for (const key in secret) {
-        if (key.startsWith(prefix)) {
-            parsed[key.substring(skip)] = secret[key];
-        }
-    }
-
-    return parsed as unknown as LamSecrets;
 }
 
 interface QueryParams extends ParsedUrlQuery {
@@ -224,7 +200,13 @@ interface ResponseParams extends ParsedUrlQueryInput {
 }
 
 function getApiPath(query: string): string {
-    return "/" + queryStringHelper.parse(query).api;
+    const api = queryStringHelper.parse(query).api;
+    if (typeof api === "string") {
+        return `/${api}`;
+    }
+    throw new Error(
+        `method=tmsHistoryHandler.getApiPath api not a string: ${api?.toString() ?? "undefined"}`
+    );
 }
 
 function parseQuery(query: string): string {
@@ -234,14 +216,11 @@ function parseQuery(query: string): string {
 
     const q = queryStringHelper.parse(query) as QueryParams;
 
-    if (
-        !q.api ||
-        !q.tyyppi ||
-        (!q.piste && !q.pistejoukko) ||
-        (!q.pvm && !q.viikko)
-    ) {
+    if (!q.api || !q.tyyppi || (!q.piste && !q.pistejoukko) || (!q.pvm && !q.viikko)) {
         console.log(
-            "method=tmsHistoryHandler.parseQuery invalid input: missing items"
+            `method=tmsHistoryHandler.parseQuery invalid input: missing items. Should have api, tyyppi, piste|pistejoukko, pvm|viikko. Was: ${JSON.stringify(
+                q
+            )}`
         );
         return "";
     }
@@ -253,9 +232,7 @@ function parseQuery(query: string): string {
     } else if (q.viikko) {
         resp.viikko = q.viikko;
     } else {
-        console.log(
-            "method=tmsHistoryHandler.parseQuery invalid input: no date"
-        );
+        console.log("method=tmsHistoryHandler.parseQuery invalid input: no date");
         return "";
     }
 
@@ -272,9 +249,7 @@ function parseQuery(query: string): string {
     } else if (q.pistejoukko) {
         resp.pistejoukko = q.pistejoukko;
     } else {
-        console.log(
-            "method=tmsHistoryHandler.parseQuery invalid input: no piste/pistejoukko"
-        );
+        console.log("method=tmsHistoryHandler.parseQuery invalid input: no piste/pistejoukko");
         return "";
     }
 
@@ -303,6 +278,6 @@ function parseQuery(query: string): string {
     return queryStringHelper.stringify(resp);
 }
 
-function getValue(input: string | string[], delimiter: string = ","): string {
+function getValue(input: string | string[], delimiter = ","): string {
     return Array.isArray(input) ? input.join(delimiter) : input;
 }

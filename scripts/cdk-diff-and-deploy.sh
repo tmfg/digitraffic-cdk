@@ -30,6 +30,17 @@ esac
 echo
 
 
+# Usage: requireCmd <command> '<install command>'
+# Example: requireCmd git 'brew install git'
+# Example open jdk 11: requireCmd $(/usr/libexec/java_home -v 11.0)/bin/java 'brew tap AdoptOpenJDK/openjdk && brew cask install adoptopenjdk11'
+requireCmd() {
+    cmd=$1
+    shift
+    command -v "${cmd}" >/dev/null 2>&1 || { echo >&2 "I require command ${cmd} is not installed.  Installing."; eval "$@"; }
+}
+# We need gsed command
+requireCmd gsed 'brew install gnu-sed'
+
 # Try to find app properties .ts -file in bin dir of working dir
 EXECUTE_DIR=$(pwd)
 ALL_TS_FILES_IN_BIN=( "$EXECUTE_DIR/bin/*-app.ts" )
@@ -55,13 +66,46 @@ fi
 echo "Using Stack: ${STACK}"
 echo
 
-read -p "Are you sure you wanna run: pnpm dlx cdk@latest ${OPERATION} ${STACK}? " -n 1 -r
-echo    # move to a new line
-if [[ $REPLY =~ ^[Yy]$ ]]
+DO_OPERATION=false
+if [[ "${OPERATION}" == "diff" ]]; then
+    DO_OPERATION=true
+else
+    read -p "Are you sure you wanna run: pnpm dlx cdk@latest ${OPERATION} ${STACK}? " -n 1 -r
+    echo    # move to a new line
+    if [[ $REPLY =~ ^[Yy]$ ]]
+    then
+        DO_OPERATION=true
+    fi
+fi
+
+if [[ "${DO_OPERATION}" == true ]]
 then
   echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+  echo
   echo "pnpm dlx cdk@latest ${OPERATION} ${STACK}"
-  pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+  echo
+
+  if [[ "${OPERATION}" == "diff" ]]
+  then
+      # pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
+      # Use script too capture command output and save it to file
+      script /tmp/cdk_out.txt pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+
+      read -p "Do you wanna see formatted diff in browser? " -n 1 -r
+      echo    # move to a new line
+      if [[ $REPLY =~ ^[Yy]$ ]]
+      then
+        SKIP_LINES_PATTERN="pnpm\|dlx-\|Downloading"
+        # first egrep takes lines without green, gsed removes ansi colour codes and last grep removes unwanted lines
+        egrep -v '\x1b\[32m' /tmp/cdk_out.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > /tmp/cdk_old.txt
+        # first egrep takes lines without red, gsed removes ansi colour codes and last grep removes unwanted lines
+        egrep -v '\x1b\[31m' /tmp/cdk_out.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > /tmp/cdk_new.txt
+        # Make a diff with full context and convert it to html
+        diff -u -U 1000000 /tmp/cdk_old.txt /tmp/cdk_new.txt | pnpm dlx diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
+      fi
+    else
+        pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+    fi
 fi
 
 set +x

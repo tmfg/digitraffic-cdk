@@ -5,7 +5,7 @@ export enum AwakeAiZoneType {
     PILOT_BOARDING_AREA = "pbp",
     PORT_AREA = "portarea",
     BERTH = "berth",
-    ANCHORAGE = "anchorage",
+    ANCHORAGE = "anchorage"
 }
 
 export interface AwakeAiShip {
@@ -16,26 +16,27 @@ export interface AwakeAiShip {
 
 export enum AwakeAiPredictionType {
     ETA = "eta",
+    ETD = "etd",
     TRAVEL_TIME = "travel-time",
     DESTINATION = "destination",
-    ARRIVAL_PORT_CALL = "arrival-port-call",
+    ARRIVAL_PORT_CALL = "arrival-port-call"
 }
 
-export interface AwakeAiMetadata {
-    source: AwakeURN | AwakeDigitrafficPortCallURN
+export interface AwakeAiPredictionMetadata {
+    source: AwakeURN | AwakeDigitrafficPortCallURN;
 }
 
-type AwakeDigitrafficPortCallIDString = `digitraffic-portcall:${number}`;
-
+export const digitrafficPortCallString = "digitraffic-portcall";
+type DigitrafficPortCallID = `${typeof digitrafficPortCallString}:${number}`;
 export type AwakeURN<AwakeIDString extends string = string> = URN<"awake", AwakeIDString>;
-export type AwakeDigitrafficPortCallURN = AwakeURN<AwakeDigitrafficPortCallIDString>;
+export type AwakeDigitrafficPortCallURN = AwakeURN<DigitrafficPortCallID>;
 
 /**
  * Base and mixin types
  */
 export interface AwakeAiPrediction {
     readonly predictionType: AwakeAiPredictionType;
-    readonly metadata?: AwakeAiMetadata
+    readonly metadata?: AwakeAiPredictionMetadata;
 }
 
 export interface AwakeAiZonePrediction extends AwakeAiPrediction {
@@ -66,9 +67,7 @@ export interface AwakeArrivalPortCallPrediction extends AwakeAiPrediction {
 
 export type AwakeAiDestinationPrediction = AwakeAiLocodePrediction;
 
-export interface AwakeAiTravelTimePrediction
-    extends AwakeAiLocodePrediction,
-        AwakeAiZonePrediction {
+export interface AwakeAiTravelTimePrediction extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
     readonly zoneId: ["berth", "pbp"];
 
     readonly zoneName: string;
@@ -77,22 +76,24 @@ export interface AwakeAiTravelTimePrediction
     readonly remainingTravelTime: number;
 }
 
-export interface AwakeAiVoyageEtaPrediction
-    extends AwakeAiLocodePrediction,
-        AwakeAiZonePrediction {
+export interface AwakeAiVoyageEtaPrediction extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
     // ISO 8601
     readonly arrivalTime: string;
 }
 
-export enum AwakeAiShipStatus {
+export interface AwakeAiVoyageEtdPrediction extends AwakeAiLocodePrediction, AwakeAiZonePrediction {
+    // ISO 8601
+    readonly departureTime: string;
+}
+
+export enum AwakeAiVoyageStatus {
     UNDER_WAY = "underway",
     STOPPED = "stopped",
-    NOT_PREDICTABLE = "not_predictable",
-    VESSEL_DATA_NOT_UPDATED = "vessel_data_not_updated",
+    NOT_STARTED = "not-started"
 }
 
 export interface AwakeAiPredictedVoyage {
-    readonly voyageStatus: AwakeAiShipStatus;
+    readonly voyageStatus: AwakeAiVoyageStatus;
 
     /**
      * Voyage sequence number, 0 for current voyage.

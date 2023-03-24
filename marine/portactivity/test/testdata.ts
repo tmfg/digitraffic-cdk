@@ -1,9 +1,8 @@
-import moment from "moment";
 import { ApiTimestamp, EventType } from "../lib/model/timestamp";
 import {
     AwakeAiATXEventType,
     AwakeAIATXTimestampMessage,
-    AwakeATXZoneEventType,
+    AwakeATXZoneEventType
 } from "../lib/api/awake_ai_atx";
 import { AwakeAiZoneType } from "../lib/api/awake_common";
 import { v4 as uuidv4 } from "uuid";
@@ -27,7 +26,7 @@ export function newAwakeATXMessage(options?: {
         location: [53.2, 40.3],
         zoneName: "somezone",
         zoneEventType: options?.zoneEventType ?? AwakeATXZoneEventType.ARRIVAL,
-        zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH,
+        zoneType: options?.zoneType ?? AwakeAiZoneType.BERTH
     };
 }
 
@@ -66,22 +65,22 @@ export function newTimestamp(props?: {
 
     return {
         eventType: props?.eventType ?? EventType.ATB,
-        eventTime: moment(eventTime).toISOString(),
-        recordTime: moment(recordTime).toISOString(),
+        eventTime: eventTime.toISOString(),
+        recordTime: recordTime.toISOString(),
         source: props?.source ?? someNumber().toString(),
         sourceId: props?.sourceId ?? someNumber().toString(),
         eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? null,
         eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? null,
         ship: {
             mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0, 5)),
-            imo: props?.imo ?? Number(someNumber().toString().slice(0, 5)),
+            imo: props?.imo ?? Number(someNumber().toString().slice(0, 5))
         },
         location: {
             port: props?.locode ?? someNumber().toString().slice(0, 5),
             portArea: props?.portArea ?? someNumber().toString().slice(0, 5),
-            from: props?.from ?? someNumber().toString().slice(0, 5),
+            from: props?.from ?? someNumber().toString().slice(0, 5)
         },
-        portcallId: props?.portcallId ?? someNumber(),
+        portcallId: props?.portcallId ?? someNumber()
     };
 }
 
@@ -100,7 +99,7 @@ export function newVessel(timestamp: ApiTimestamp): Vessel {
         imo: timestamp.ship.imo ?? -1,
         eta: 1,
         call_sign: "a",
-        destination: "b",
+        destination: "b"
     };
 }
 
@@ -120,14 +119,11 @@ export function newPortAreaDetails(
         eta: props?.eta?.toISOString(),
         etd: props?.etd?.toISOString(),
         ata: props?.ata?.toISOString(),
-        atd: props?.atd?.toISOString(),
+        atd: props?.atd?.toISOString()
     };
 }
 
-export function newPortCall(
-    timestamp: ApiTimestamp,
-    portcallId?: number
-): PortCall {
+export function newPortCall(timestamp: ApiTimestamp, portcallId?: number): PortCall {
     return {
         port_call_id: portcallId ?? timestamp.portcallId ?? -1,
         radio_call_sign: "a",
@@ -136,7 +132,7 @@ export function newPortCall(
         port_call_timestamp: new Date(),
         port_to_visit: timestamp.location.port,
         mmsi: timestamp.ship.mmsi ?? someNumber(),
-        imo_lloyds: timestamp.ship.imo ?? someNumber(),
+        imo_lloyds: timestamp.ship.imo ?? someNumber()
     };
 }
 

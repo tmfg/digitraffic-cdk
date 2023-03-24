@@ -176,7 +176,6 @@ export class CFDomain extends CFOrigin {
 export class S3Domain extends CFOrigin {
     s3BucketName: string;
     s3Domain?: string;
-    originPath?: string;
     createOAI = true;
 
     constructor(s3BucketName: string, ...behaviors: CFBehavior[]) {
