@@ -1,7 +1,4 @@
-import {
-    CloudFrontAllowedMethods,
-    OriginProtocolPolicy,
-} from "aws-cdk-lib/aws-cloudfront";
+import { CloudFrontAllowedMethods, OriginProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
 import { WafRules } from "./acl/waf-rules";
 import { FunctionType, LambdaType } from "./lambda/lambda-creator";
 
@@ -41,9 +38,7 @@ export class CFBehavior {
     }
 
     static passAll(path = "*", ...cacheHeaders: string[]): CFBehavior {
-        return new CFBehavior(path)
-            .withCacheHeaders(...cacheHeaders)
-            .allowAllMethods();
+        return new CFBehavior(path).withCacheHeaders(...cacheHeaders).allowAllMethods();
     }
 
     public withCacheTtl(ttl: number): this {
@@ -124,8 +119,7 @@ export class CFOrigin {
 export class CFDomain extends CFOrigin {
     domainName: string;
     originPath?: string;
-    originProtocolPolicy: OriginProtocolPolicy =
-        OriginProtocolPolicy.HTTPS_ONLY;
+    originProtocolPolicy: OriginProtocolPolicy = OriginProtocolPolicy.HTTPS_ONLY;
     httpPort?: number;
     httpsPort?: number;
     apiKey?: string;
@@ -140,10 +134,7 @@ export class CFDomain extends CFOrigin {
         return new CFDomain(domainName, CFBehavior.passAll());
     }
 
-    static apiGateway(
-        domainName: string,
-        ...behaviors: CFBehavior[]
-    ): CFDomain {
+    static apiGateway(domainName: string, ...behaviors: CFBehavior[]): CFDomain {
         const domain = new CFDomain(domainName, ...behaviors);
 
         domain.originPath = "/prod";
@@ -151,11 +142,7 @@ export class CFDomain extends CFOrigin {
         return domain;
     }
 
-    static apiGatewayWithApiKey(
-        domainName: string,
-        apiKey: string,
-        ...behaviors: CFBehavior[]
-    ): CFDomain {
+    static apiGatewayWithApiKey(domainName: string, apiKey: string, ...behaviors: CFBehavior[]): CFDomain {
         const domain = this.apiGateway(domainName, ...behaviors);
 
         domain.apiKey = apiKey;
@@ -172,10 +159,7 @@ export class CFDomain extends CFOrigin {
     }
 
     static mqtt(domainName: string) {
-        const domain = new CFDomain(
-            domainName,
-            CFBehavior.passAll("mqtt*").allowHttpAndHttps()
-        );
+        const domain = new CFDomain(domainName, CFBehavior.passAll("mqtt*").allowHttpAndHttps());
 
         domain.originProtocolPolicy = OriginProtocolPolicy.HTTP_ONLY;
 
@@ -201,21 +185,14 @@ export class S3Domain extends CFOrigin {
     }
 
     static swagger(s3BucketName: string, path = "swagger/*"): S3Domain {
-        return this.s3(
-            s3BucketName,
-            CFBehavior.path(path).withCacheTtl(120).withIndexHtmlFunction()
-        );
+        return this.s3(s3BucketName, CFBehavior.path(path).withCacheTtl(120).withIndexHtmlFunction());
     }
 
     static s3(s3BucketName: string, ...behaviors: CFBehavior[]): S3Domain {
         return new S3Domain(s3BucketName, ...behaviors);
     }
 
-    static s3External(
-        s3BucketName: string,
-        s3Domain: string,
-        ...behaviors: CFBehavior[]
-    ): S3Domain {
+    static s3External(s3BucketName: string, s3Domain: string, ...behaviors: CFBehavior[]): S3Domain {
         const domain = new S3Domain(s3BucketName, ...behaviors);
         domain.s3Domain = s3Domain;
         domain.createOAI = false;
@@ -248,8 +225,9 @@ export interface StreamingLogProps {
 }
 
 export interface CFProps {
-    readonly elasticProps: ElasticProps;
-    readonly elasticAppName: string;
+    readonly realtimeLogConfigArn?: string;
+    readonly elasticProps?: ElasticProps;
+    readonly elasticAppName?: string;
     readonly distributions: DistributionProps[];
     readonly lambdaParameters?: CFLambdaParameters;
 }
