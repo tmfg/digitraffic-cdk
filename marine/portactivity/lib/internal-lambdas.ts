@@ -217,7 +217,8 @@ function createUpdateTimestampsFromSchedules(stack: DigitrafficStack, queue: Que
 
 function createProcessQueueLambda(queue: Queue, stack: DigitrafficStack): MonitoredFunction {
     const processQueueLambda = MonitoredDBFunction.create(stack, "process-queue", undefined, {
-        timeout: 10,
+        memorySize: 256,
+        timeout: 20,
         reservedConcurrentExecutions: 10
     });
 
