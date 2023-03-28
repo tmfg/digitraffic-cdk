@@ -3,14 +3,8 @@ import { ApiTimestamp, EventType } from "../model/timestamp";
 import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES } from "../service/portareas";
 import moment from "moment";
 import { EventSource } from "../model/eventsource";
-import {
-    DTDatabase,
-    DTTransaction,
-} from "@digitraffic/common/dist/database/database";
-import {
-    Countable,
-    Identifiable,
-} from "@digitraffic/common/dist/database/models";
+import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
+import { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const PORTNET_TIMESTAMPS_UPPER_LIMIT = `NOW() + INTERVAL '14 DAYS'`;
@@ -400,7 +394,7 @@ export function updateTimestamp(
 ): Promise<DbUpdatedTimestamp | null> {
     const ps = new PreparedStatement({
         name: "update-timestamps",
-        text: INSERT_ESTIMATE_SQL,
+        text: INSERT_ESTIMATE_SQL
     });
     return db.oneOrNone(ps, createUpdateValues(timestamp));
 }
@@ -413,34 +407,26 @@ export function removeTimestamps(
     if (sourceIds.length > 0) {
         return db
             .manyOrNone(REMOVE_TIMESTAMPS_SQL, [source, sourceIds])
-            .then((array: Identifiable<number>[]) =>
-                array.map((object) => object.id)
-            );
+            .then((array: Identifiable<number>[]) => array.map((object) => object.id));
     }
 
     return Promise.resolve([]);
 }
 
-export function findByLocode(
-    db: DTDatabase,
-    locode: string
-): Promise<DbTimestamp[]> {
+export function findByLocode(db: DTDatabase, locode: string): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
         name: "find-by-locode",
         text: SELECT_BY_LOCODE,
-        values: [locode.toUpperCase()],
+        values: [locode.toUpperCase()]
     });
     return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findByMmsi(
-    db: DTDatabase,
-    mmsi: number
-): Promise<DbTimestamp[]> {
+export function findByMmsi(db: DTDatabase, mmsi: number): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
         name: "find-by-mmsi",
         text: SELECT_BY_MMSI,
-        values: [mmsi],
+        values: [mmsi]
     });
     return db.tx((t) => t.manyOrNone(ps));
 }
@@ -449,31 +435,23 @@ export function findByImo(db: DTDatabase, imo: number): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
         name: "find-by-imo",
         text: SELECT_BY_IMO,
-        values: [imo],
+        values: [imo]
     });
     return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findBySource(
-    db: DTDatabase,
-    source: string
-): Promise<DbTimestamp[]> {
+export function findBySource(db: DTDatabase, source: string): Promise<DbTimestamp[]> {
     const ps = new PreparedStatement({
         name: "find-by-source",
         text: SELECT_BY_SOURCE,
-        values: [source],
+        values: [source]
     });
     return db.tx((t) => t.manyOrNone(ps));
 }
 
-export function findPortnetETAsByLocodes(
-    db: DTDatabase,
-    locodes: string[]
-): Promise<DbETAShip[]> {
+export function findPortnetETAsByLocodes(db: DTDatabase, locodes: string[]): Promise<DbETAShip[]> {
     // Prepared statement use not possible due to dynamic IN-list
-    return db.tx((t) =>
-        t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes])
-    );
+    return db.tx((t) => t.manyOrNone(SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE, [locodes]));
 }
 
 export function findVtsShipImosTooCloseToPortByPortCallId(
@@ -481,9 +459,7 @@ export function findVtsShipImosTooCloseToPortByPortCallId(
     portcallIds: number[]
 ): Promise<DbImo[]> {
     // Prepared statement use not possible due to dynamic IN-list
-    return db.tx((t) =>
-        t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds])
-    );
+    return db.tx((t) => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds]));
 }
 
 export function findPortnetTimestampsForAnotherLocode(
@@ -494,19 +470,16 @@ export function findPortnetTimestampsForAnotherLocode(
     const ps = new PreparedStatement({
         name: "find-by-portcall-id-and-locode",
         text: SELECT_BY_PORTCALL_ID_AND_LOCODE,
-        values: [portcallId, locode],
+        values: [portcallId, locode]
     });
     return db.manyOrNone(ps);
 }
 
-export function deleteById(
-    db: DTDatabase | DTTransaction,
-    id: number
-): Promise<null> {
+export function deleteById(db: DTDatabase | DTTransaction, id: number): Promise<null> {
     const ps = new PreparedStatement({
         name: "delete-by-id",
         text: DELETE_BY_ID,
-        values: [id],
+        values: [id]
     });
     return db.none(ps);
 }
@@ -518,50 +491,45 @@ export async function findPortcallId(
     eventTime: Date,
     mmsi?: number,
     imo?: number
-): Promise<number | null> {
+): Promise<number | undefined> {
     const ps = new PreparedStatement({
         name: "find-portcall-id",
         text: FIND_PORTCALL_ID_SQL,
-        values: [mmsi, imo, locode, eventType, eventTime],
+        values: [mmsi, imo, locode, eventType, eventTime]
     });
     const ret = await db.oneOrNone<{ port_call_id: number }>(ps);
     if (ret) {
         return ret.port_call_id;
     }
-    return null;
+    return undefined;
 }
 
 export async function findMmsiByImo(
     db: DTDatabase | DTTransaction,
     imo?: number
-): Promise<number | null> {
-    if (imo !== undefined) {
-        const mmsi = await db.oneOrNone<{ mmsi: number }>(
-            FIND_MMSI_BY_IMO_SQL,
-            [imo]
-        );
-        if (mmsi) {
+): Promise<number | undefined> {
+    if (imo) {
+        const mmsi = await db.oneOrNone<{ mmsi: number }>(FIND_MMSI_BY_IMO_SQL, [imo]);
+        if (mmsi?.mmsi) {
             return mmsi.mmsi;
         }
     }
 
-    return null;
+    return undefined;
 }
 
 export async function findImoByMmsi(
     db: DTDatabase | DTTransaction,
     mmsi?: number
-): Promise<number | null> {
-    if (mmsi !== undefined) {
-        const imo = await db.oneOrNone<{ imo: number }>(FIND_IMO_BY_MMSI_SQL, [
-            mmsi,
-        ]);
-        if (imo) {
+): Promise<number | undefined> {
+    if (mmsi) {
+        const imo = await db.oneOrNone<{ imo: number }>(FIND_IMO_BY_MMSI_SQL, [mmsi]);
+        if (imo?.imo) {
             return imo.imo;
         }
     }
 
-    return null;
+    return undefined;
 }
 
 export async function deleteOldTimestamps(db: DTTransaction): Promise<number> {
@@ -578,14 +546,10 @@ export function createUpdateValues(e: ApiTimestamp): unknown[] {
     return [
         e.eventType, // event_type
         moment(e.eventTime).toDate(), // event_time
-        e.eventTimeConfidenceLower, // event_time_confidence_lower
-        e.eventTimeConfidenceLower
-            ? diffDuration(e.eventTime, e.eventTimeConfidenceLower)
-            : undefined, // event_time_confidence_lower_diff
-        e.eventTimeConfidenceUpper, // event_time_confidence_upper
-        e.eventTimeConfidenceUpper
-            ? diffDuration(e.eventTime, e.eventTimeConfidenceUpper)
-            : undefined, // event_time_confidence_upper_diff
+        e.eventTimeConfidenceLower,
+        e.eventTimeConfidenceLowerDiff ? Math.floor(e.eventTimeConfidenceLowerDiff) : undefined,
+        e.eventTimeConfidenceUpper,
+        e.eventTimeConfidenceUpperDiff ? Math.ceil(e.eventTimeConfidenceUpperDiff) : undefined,
         e.source, // event_source
         moment(e.recordTime).toDate(), // record_time
         e.location.port, // location_locode
@@ -594,13 +558,6 @@ export function createUpdateValues(e: ApiTimestamp): unknown[] {
         e.portcallId,
         e.location.portArea,
         e.location.from,
-        e.sourceId, // source_id
+        e.sourceId // source_id
     ];
-}
-
-function diffDuration(eventTime: string, confLower: string): number {
-    return (
-        moment(eventTime).valueOf() -
-        moment(eventTime).subtract(moment.duration(confLower)).valueOf()
-    );
 }

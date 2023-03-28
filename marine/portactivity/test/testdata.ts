@@ -51,8 +51,10 @@ export function newTimestamp(props?: {
     eventTime?: Date;
     recordTime?: Date;
     eventType?: EventType;
-    eventTimeConfidenceLower?: string | null;
-    eventTimeConfidenceUpper?: string | null;
+    eventTimeConfidenceLowerDiff?: number;
+    eventTimeConfidenceUpperDiff?: number;
+    eventTimeConfidenceLower?: string;
+    eventTimeConfidenceUpper?: string;
     source?: string;
     sourceId?: string;
     portcallId?: number;
@@ -69,8 +71,10 @@ export function newTimestamp(props?: {
         recordTime: recordTime.toISOString(),
         source: props?.source ?? someNumber().toString(),
         sourceId: props?.sourceId ?? someNumber().toString(),
-        eventTimeConfidenceLower: props?.eventTimeConfidenceLower ?? null,
-        eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper ?? null,
+        eventTimeConfidenceLowerDiff: props?.eventTimeConfidenceLowerDiff,
+        eventTimeConfidenceUpperDiff: props?.eventTimeConfidenceUpperDiff,
+        eventTimeConfidenceLower: props?.eventTimeConfidenceLower,
+        eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper,
         ship: {
             mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0, 5)),
             imo: props?.imo ?? Number(someNumber().toString().slice(0, 5))

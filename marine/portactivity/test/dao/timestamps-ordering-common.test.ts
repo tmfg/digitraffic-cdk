@@ -13,8 +13,7 @@ describe(
             "locode",
             { locode },
             () => locode,
-            (identifier: string | number) =>
-                TimestampsDb.findByLocode(db, identifier as string)
+            (identifier: string | number) => TimestampsDb.findByLocode(db, identifier as string)
         );
 
         const mmsi = 123;
@@ -22,8 +21,7 @@ describe(
             "mmsi",
             { mmsi },
             () => mmsi,
-            (identifier: string | number) =>
-                TimestampsDb.findByMmsi(db, identifier as number)
+            (identifier: string | number) => TimestampsDb.findByMmsi(db, identifier as number)
         );
 
         const imo = 123;
@@ -31,8 +29,7 @@ describe(
             "imo",
             { imo },
             () => imo,
-            (identifier: string | number) =>
-                TimestampsDb.findByImo(db, identifier as number)
+            (identifier: string | number) => TimestampsDb.findByImo(db, identifier as number)
         );
 
         /**
@@ -60,7 +57,7 @@ describe(
                             locode: testLocode,
                             source: "source1",
                             eventTimeConfidenceLower: "PT4H",
-                            eventTimeConfidenceUpper: "PT10H",
+                            eventTimeConfidenceUpper: "PT10H"
                         },
                         idProp
                     )
@@ -72,7 +69,7 @@ describe(
                             locode: testLocode,
                             source: "source2",
                             eventTimeConfidenceLower: "PT1H",
-                            eventTimeConfidenceUpper: "PT10H",
+                            eventTimeConfidenceUpper: "PT10H"
                         },
                         idProp
                     )
@@ -84,16 +81,12 @@ describe(
                             locode: testLocode,
                             source: "source3",
                             eventTimeConfidenceLower: "PT8H",
-                            eventTimeConfidenceUpper: "PT10H",
+                            eventTimeConfidenceUpper: "PT10H"
                         },
                         idProp
                     )
                 );
-                const timestamps = shuffle([
-                    timestampSource1,
-                    timestampSource2,
-                    timestampSource3,
-                ]);
+                const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
                 await insert(db, timestamps);
 
                 const foundTimestamps = await fetchMethod(getIdProp());
@@ -114,7 +107,7 @@ describe(
                             locode: testLocode,
                             source: "source1",
                             eventTimeConfidenceLower: "PT10H",
-                            eventTimeConfidenceUpper: "PT4H",
+                            eventTimeConfidenceUpper: "PT4H"
                         },
                         idProp
                     )
@@ -126,7 +119,7 @@ describe(
                             locode: testLocode,
                             source: "source2",
                             eventTimeConfidenceLower: "PT10H",
-                            eventTimeConfidenceUpper: "PT2H",
+                            eventTimeConfidenceUpper: "PT2H"
                         },
                         idProp
                     )
@@ -138,16 +131,12 @@ describe(
                             locode: testLocode,
                             source: "source3",
                             eventTimeConfidenceLower: "PT18H",
-                            eventTimeConfidenceUpper: "PT8H",
+                            eventTimeConfidenceUpper: "PT8H"
                         },
                         idProp
                     )
                 );
-                const timestamps = shuffle([
-                    timestampSource1,
-                    timestampSource2,
-                    timestampSource3,
-                ]);
+                const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
                 await insert(db, timestamps);
 
                 const foundTimestamps = await fetchMethod(getIdProp());
@@ -169,7 +158,7 @@ describe(
                             locode: testLocode,
                             source: "source1",
                             eventTimeConfidenceLower: "PT10H",
-                            eventTimeConfidenceUpper: "PT4H",
+                            eventTimeConfidenceUpper: "PT4H"
                         },
                         idProp
                     )
@@ -182,7 +171,7 @@ describe(
                             locode: testLocode,
                             source: "source2",
                             eventTimeConfidenceLower: "PT10H",
-                            eventTimeConfidenceUpper: "PT2H",
+                            eventTimeConfidenceUpper: "PT2H"
                         },
                         idProp
                     )
@@ -195,16 +184,12 @@ describe(
                             locode: testLocode,
                             source: "source3",
                             eventTimeConfidenceLower: "PT18H",
-                            eventTimeConfidenceUpper: "PT8H",
+                            eventTimeConfidenceUpper: "PT8H"
                         },
                         idProp
                     )
                 );
-                const timestamps = shuffle([
-                    timestampSource1,
-                    timestampSource2,
-                    timestampSource3,
-                ]);
+                const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
                 await insert(db, timestamps);
 
                 const foundTimestamps = await fetchMethod(getIdProp());
@@ -225,7 +210,7 @@ describe(
                             locode: testLocode,
                             source: "source1",
                             eventTimeConfidenceLower: "PT10H",
-                            eventTimeConfidenceUpper: "PT4H",
+                            eventTimeConfidenceUpper: "PT4H"
                         },
                         idProp
                     )
@@ -236,8 +221,7 @@ describe(
                             mmsi: testMmsi,
                             locode: testLocode,
                             source: "source2",
-                            eventTimeConfidenceLower: null,
-                            eventTimeConfidenceUpper: "PT29H",
+                            eventTimeConfidenceUpper: "PT29H"
                         },
                         idProp
                     )
@@ -249,16 +233,12 @@ describe(
                             locode: testLocode,
                             source: "source3",
                             eventTimeConfidenceLower: "PT18H",
-                            eventTimeConfidenceUpper: "PT8H",
+                            eventTimeConfidenceUpper: "PT8H"
                         },
                         idProp
                     )
                 );
-                const timestamps = shuffle([
-                    timestampSource1,
-                    timestampSource2,
-                    timestampSource3,
-                ]);
+                const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
                 await insert(db, timestamps);
 
                 const foundTimestamps = await fetchMethod(getIdProp());
@@ -277,7 +257,7 @@ describe(
                             locode: testLocode,
                             source: "source1",
                             eventTimeConfidenceLower: "PT10H",
-                            eventTimeConfidenceUpper: "PT4H",
+                            eventTimeConfidenceUpper: "PT4H"
                         },
                         idProp
                     )
@@ -288,8 +268,7 @@ describe(
                             mmsi: testMmsi,
                             locode: testLocode,
                             source: "source2",
-                            eventTimeConfidenceLower: "PT29H",
-                            eventTimeConfidenceUpper: null,
+                            eventTimeConfidenceLower: "PT29H"
                         },
                         idProp
                     )
@@ -301,16 +280,12 @@ describe(
                             locode: testLocode,
                             source: "source3",
                             eventTimeConfidenceLower: "PT18H",
-                            eventTimeConfidenceUpper: "PT8H",
+                            eventTimeConfidenceUpper: "PT8H"
                         },
                         idProp
                     )
                 );
-                const timestamps = shuffle([
-                    timestampSource1,
-                    timestampSource2,
-                    timestampSource3,
-                ]);
+                const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
                 await insert(db, timestamps);
 
                 const foundTimestamps = await fetchMethod(getIdProp());
@@ -329,7 +304,7 @@ describe(
                             locode: testLocode,
                             source: "source1",
                             eventTimeConfidenceLower: "PT10H",
-                            eventTimeConfidenceUpper: "PT4H",
+                            eventTimeConfidenceUpper: "PT4H"
                         },
                         idProp
                     )
@@ -339,9 +314,7 @@ describe(
                         {
                             mmsi: testMmsi,
                             locode: testLocode,
-                            source: "source2",
-                            eventTimeConfidenceLower: null,
-                            eventTimeConfidenceUpper: null,
+                            source: "source2"
                         },
                         idProp
                     )
@@ -353,16 +326,12 @@ describe(
                             locode: testLocode,
                             source: "source3",
                             eventTimeConfidenceLower: "PT18H",
-                            eventTimeConfidenceUpper: "PT8H",
+                            eventTimeConfidenceUpper: "PT8H"
                         },
                         idProp
                     )
                 );
-                const timestamps = shuffle([
-                    timestampSource1,
-                    timestampSource2,
-                    timestampSource3,
-                ]);
+                const timestamps = shuffle([timestampSource1, timestampSource2, timestampSource3]);
                 await insert(db, timestamps);
 
                 const foundTimestamps = await fetchMethod(getIdProp());

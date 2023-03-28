@@ -1,12 +1,9 @@
 import { ApiTimestamp } from "../lib/model/timestamp";
-import { DbTimestamp } from "../lib/dao/timestamps";
 import * as TimestampsDb from "../lib/dao/timestamps";
+import { DbTimestamp } from "../lib/dao/timestamps";
 import { PortAreaDetails, PortCall, Vessel } from "./testdata";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
-import {
-    DTDatabase,
-    DTTransaction,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import { updatePilotages } from "../lib/dao/pilotages";
 import { Countable } from "@digitraffic/common/dist/database/models";
 import * as sinon from "sinon";
@@ -14,13 +11,7 @@ import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-hold
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "portactivity",
-        "portactivity",
-        "localhost:54321/marine"
-    );
+    return commonDbTestBase(fn, truncate, "portactivity", "portactivity", "localhost:54321/marine");
 }
 
 export function inTransaction(
@@ -44,9 +35,7 @@ export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
     });
 }
 
-export function findAll(
-    db: DTDatabase | DTTransaction
-): Promise<DbTimestamp[]> {
+export function findAll(db: DTDatabase | DTTransaction): Promise<DbTimestamp[]> {
     return db.tx((t) => {
         return t.manyOrNone(`
         SELECT
@@ -68,22 +57,16 @@ export function findAll(
     });
 }
 
-export async function getPilotagesCount(
-    db: DTDatabase | DTTransaction
-): Promise<number> {
-    const ret = await db.tx((t) =>
-        t.one<Countable>("SELECT COUNT(*) FROM pilotage")
-    );
+export async function getPilotagesCount(db: DTDatabase | DTTransaction): Promise<number> {
+    const ret = await db.tx((t) => t.one<Countable>("SELECT COUNT(*) FROM pilotage"));
     return ret.count;
 }
 
-export async function insert(
-    db: DTDatabase | DTTransaction,
-    timestamps: ApiTimestamp[]
-): Promise<void> {
+export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTimestamp[]): Promise<void> {
     await db.tx((t) => {
         return t.batch(
             timestamps.map((e) => {
+                //console.log(JSON.stringify(e, null, 2));
                 return t.none(
                     `
                 INSERT INTO port_call_timestamp(
@@ -127,10 +110,7 @@ export async function insert(
     });
 }
 
-export async function insertVessel(
-    db: DTDatabase | DTTransaction,
-    vessel: Vessel
-): Promise<void> {
+export async function insertVessel(db: DTDatabase | DTTransaction, vessel: Vessel): Promise<void> {
     await db.tx(async (t) => {
         await t.none(
             `
@@ -194,10 +174,7 @@ export async function insertPortAreaDetails(
     );
 }
 
-export async function insertPortCall(
-    db: DTTransaction | DTDatabase,
-    p: PortCall
-): Promise<void> {
+export async function insertPortCall(db: DTTransaction | DTDatabase, p: PortCall): Promise<void> {
     await db.none(
         `
         INSERT INTO public.port_call(
@@ -237,7 +214,7 @@ export function insertPilotage(
             vessel: {
                 name: "test",
                 imo: 1,
-                mmsi: 1,
+                mmsi: 1
             },
             vesselEta: new Date().toISOString(),
             pilotBoardingTime: new Date().toISOString(),
@@ -247,13 +224,13 @@ export function insertPilotage(
             state,
             route: {
                 start: {
-                    code: "START",
+                    code: "START"
                 },
                 end: {
-                    code: "END",
-                },
-            },
-        },
+                    code: "END"
+                }
+            }
+        }
     ]);
 }
 

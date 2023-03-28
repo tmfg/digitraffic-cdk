@@ -1,28 +1,17 @@
-import moment from "moment";
-import {
-    dbTestBase,
-    findAll,
-    insertPortAreaDetails,
-    insertPortCall,
-} from "../db-testutil";
-import {
-    newTimestamp,
-    newPortAreaDetails,
-    newPortCall,
-    PortAreaDetails,
-    PortCall,
-} from "../testdata";
+import { dbTestBase, findAll, insertPortAreaDetails, insertPortCall } from "../db-testutil";
+import { newPortAreaDetails, newPortCall, newTimestamp, PortAreaDetails, PortCall } from "../testdata";
 import * as TimestampsDb from "../../lib/dao/timestamps";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
 
 describe(
     "db-timestamps - updates",
     dbTestBase((db: DTDatabase) => {
         test("updateTimestamp - properties", async () => {
             const timestamp = newTimestamp({
-                eventTimeConfidenceLower: "PT1H",
-                eventTimeConfidenceUpper: "PT4H",
+                eventTimeConfidenceLowerDiff: -1000,
+                eventTimeConfidenceUpperDiff: 1000
             });
 
             await TimestampsDb.updateTimestamp(db, timestamp);
@@ -34,66 +23,43 @@ describe(
             expect(e.location_portarea).toBe(timestamp.location.portArea);
             expect(e.location_from_locode).toBe(timestamp.location.from);
             expect(e.event_source).toBe(timestamp.source);
-            expect(moment(e.record_time).toISOString()).toBe(
-                timestamp.recordTime
-            );
-            expect(moment(e.event_time).toISOString()).toBe(
-                timestamp.eventTime
-            );
+            expect(e.record_time.toISOString()).toBe(timestamp.recordTime);
+            expect(e.event_time.toISOString()).toBe(timestamp.eventTime);
             expect(e.event_type).toBe(timestamp.eventType);
-            expect(e.event_time_confidence_lower).toBe(
-                timestamp.eventTimeConfidenceLower
-            );
-            expect(e.event_time_confidence_lower_diff).toBe(
-                moment(timestamp.eventTime).valueOf() -
-                    moment(timestamp.eventTime)
-                        .subtract(
-                            moment.duration(timestamp.eventTimeConfidenceLower)
-                        )
-                        .valueOf()
-            );
-            expect(e.event_time_confidence_upper).toBe(
-                timestamp.eventTimeConfidenceUpper
-            );
-            expect(e.event_time_confidence_upper_diff).toBe(
-                moment(timestamp.eventTime)
-                    .add(moment.duration(timestamp.eventTimeConfidenceUpper))
-                    .valueOf() - moment(timestamp.eventTime).valueOf()
-            );
+            expect(e.event_time_confidence_lower).toBe(timestamp.eventTimeConfidenceLower ?? null);
+            expect(e.event_time_confidence_lower_diff).toBe(timestamp.eventTimeConfidenceLowerDiff ?? null);
+            expect(e.event_time_confidence_upper).toBe(timestamp.eventTimeConfidenceUpper ?? null);
+            expect(e.event_time_confidence_upper_diff).toBe(timestamp.eventTimeConfidenceUpperDiff ?? null);
         });
 
         test("updateTimestamp - mmsi", async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 ship: {
                     mmsi: 123,
-                    imo: undefined,
-                },
+                    imo: undefined
+                }
             });
 
-            await expect(() =>
-                TimestampsDb.updateTimestamp(db, timestamp)
-            ).rejects.toThrow();
+            await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
         });
 
         test("updateTimestamp - imo", async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 ship: {
                     mmsi: undefined,
-                    imo: 456,
-                },
+                    imo: 456
+                }
             });
 
-            await expect(() =>
-                TimestampsDb.updateTimestamp(db, timestamp)
-            ).rejects.toThrow();
+            await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
         });
 
         test("updateTimestamp - both ids", async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 ship: {
                     mmsi: 123,
-                    imo: 456,
-                },
+                    imo: 456
+                }
             });
 
             await TimestampsDb.updateTimestamp(db, timestamp);
@@ -117,7 +83,7 @@ describe(
             const values = TimestampsDb.createUpdateValues(
                 newTimestamp({
                     mmsi: 0,
-                    imo,
+                    imo
                 })
             );
 
@@ -130,7 +96,7 @@ describe(
             const values = TimestampsDb.createUpdateValues(
                 newTimestamp({
                     mmsi,
-                    imo: 0,
+                    imo: 0
                 })
             );
 
@@ -141,7 +107,7 @@ describe(
         test("portcall id - supplied", async () => {
             const portcallId = 123;
             const timestamp = newTimestamp({
-                portcallId,
+                portcallId
             });
 
             await TimestampsDb.updateTimestamp(db, timestamp);
@@ -150,16 +116,16 @@ describe(
         });
 
         test("findPortcallId - by nearest time", async () => {
-            const eventTime = moment();
+            const eventTime = new Date();
             const timestamp = newTimestamp({
                 eventType: EventType.ETA,
-                eventTime: eventTime.toDate(),
+                eventTime
             });
             const portAreaDetails = await generatePortCalls(timestamp);
             const nearestTimestamp = // sort by nearest time
                 portAreaDetails.sort((a, b) => {
-                    const aDiff = Math.abs(moment(a.eta).diff(eventTime));
-                    const bDiff = Math.abs(moment(b.eta).diff(eventTime));
+                    const aDiff = a.eta ? Math.abs(differenceInMilliseconds(parseISO(a.eta), eventTime)) : 0;
+                    const bDiff = b.eta ? Math.abs(differenceInMilliseconds(parseISO(b.eta), eventTime)) : 0;
                     return aDiff - bDiff;
                 })[0];
 
@@ -167,7 +133,7 @@ describe(
                 db,
                 timestamp.location.port,
                 timestamp.eventType,
-                moment(timestamp.eventTime).toDate(),
+                parseISO(timestamp.eventTime),
                 timestamp.ship.mmsi,
                 timestamp.ship.imo
             );
@@ -176,10 +142,9 @@ describe(
         });
 
         test("findPortcallId - not found", async () => {
-            const eventTime = moment();
             const timestamp = newTimestamp({
                 eventType: EventType.ETA,
-                eventTime: eventTime.toDate(),
+                eventTime: new Date()
             });
             await generatePortCalls(timestamp);
 
@@ -187,37 +152,29 @@ describe(
                 db,
                 "NOT_FOUND",
                 timestamp.eventType,
-                moment(timestamp.eventTime).toDate(),
+                parseISO(timestamp.eventTime),
                 123,
                 456
             );
 
-            expect(portcallId).toBeNull();
+            expect(portcallId).toBeUndefined();
         });
 
-        async function generatePortCalls(
-            timestamp: ApiTimestamp
-        ): Promise<PortAreaDetails[]> {
+        async function generatePortCalls(timestamp: ApiTimestamp): Promise<PortAreaDetails[]> {
             // cumbersome way to generate a number range
-            const portCallData = [
-                ...new Set([
-                    ...Array(5 + Math.floor(Math.random() * 10)).keys(),
-                ]),
-            ].map((i) => {
-                const portcallId = i + 1;
-                const pc = newPortCall(timestamp, portcallId);
-                const pac = newPortAreaDetails(timestamp, {
-                    portcallId: portcallId,
-                    eta: moment(timestamp.eventTime)
-                        .add(1 + Math.floor(Math.random() * 100), "minutes")
-                        .toDate(),
-                });
-                return [pc, pac];
-            });
+            const portCallData = [...new Set([...Array(5 + Math.floor(Math.random() * 10)).keys()])].map(
+                (i) => {
+                    const portcallId = i + 1;
+                    const pc = newPortCall(timestamp, portcallId);
+                    const pac = newPortAreaDetails(timestamp, {
+                        portcallId: portcallId,
+                        eta: addMinutes(parseISO(timestamp.eventTime), 1 + Math.floor(Math.random() * 100))
+                    });
+                    return [pc, pac];
+                }
+            );
             const portCalls = portCallData.map((p) => p[0]) as PortCall[];
-            const portAreaDetails = portCallData.map(
-                (p) => p[1]
-            ) as PortAreaDetails[];
+            const portAreaDetails = portCallData.map((p) => p[1]) as PortAreaDetails[];
             await db.tx(async (t) => {
                 for (const pc of portCalls) {
                     await insertPortCall(t, pc);

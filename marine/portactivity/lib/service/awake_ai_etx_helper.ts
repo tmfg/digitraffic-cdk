@@ -9,7 +9,7 @@ import {
     AwakeURN,
     digitrafficPortCallString
 } from "../api/awake_common";
-import { ApiTimestamp, EventType } from "../model/timestamp";
+import { ApiTimestamp, EventType, Location, Ship } from "../model/timestamp";
 import { EventSource } from "../model/eventsource";
 import { AwakeAiPortSchedule } from "../api/awake_ai_port";
 
@@ -149,25 +149,16 @@ export function etaPredictionToTimestamp(
         portcallId
     );
 
-    const timestamp: ApiTimestamp = {
-        ship: {
-            mmsi,
-            imo
-        },
-        location: {
-            port: locode,
-            portArea
-        },
+    const timestamp = createApiTimestamp(
+        { mmsi, imo },
+        { port: locode, portArea },
+        prediction,
+        prediction.arrivalTime,
+        prediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA,
         source,
-        eventTime: prediction.arrivalTime,
-        recordTime: prediction.recordTime ?? new Date().toISOString(),
-        portcallId: portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
-        eventType: prediction.zoneType === AwakeAiZoneType.PILOT_BOARDING_AREA ? EventType.ETP : EventType.ETA
-    };
-    console.info(
-        "method=AwakeAiPredictionHelper.etaPredictionToTimestamp created timestamp: %s",
-        JSON.stringify(timestamp)
+        portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn)
     );
+
     return timestamp;
 }
 
@@ -231,24 +222,36 @@ export function etdPredictionToTimestamp(
         portcallId
     );
 
-    const timestamp: ApiTimestamp = {
-        ship: {
-            mmsi,
-            imo
-        },
-        location: {
-            port: locode,
-            portArea
-        },
+    const timestamp = createApiTimestamp(
+        { mmsi, imo },
+        { port: locode, portArea },
+        prediction,
+        prediction.departureTime,
+        EventType.ETD,
         source,
-        eventTime: prediction.departureTime,
-        recordTime: prediction.recordTime ?? new Date().toISOString(),
-        portcallId: portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn),
-        eventType: EventType.ETD
-    };
-    console.info(
-        "method=AwakeAiPredictionHelper.etdPredictionToTimestamp created timestamp: %s",
-        JSON.stringify(timestamp)
+        portcallId ?? portCallIdFromUrn(portCallPrediction?.portCallUrn)
     );
     return timestamp;
+}
+
+function createApiTimestamp(
+    ship: Ship,
+    location: Location,
+    prediction: AwakeAiVoyageEtaPrediction | AwakeAiVoyageEtdPrediction,
+    eventTime: string,
+    eventType: EventType,
+    source: string,
+    portcallId?: number
+): ApiTimestamp {
+    return {
+        ship,
+        location,
+        source,
+        eventTime,
+        recordTime: prediction.recordTime ?? new Date().toISOString(),
+        portcallId,
+        eventType,
+        eventTimeConfidenceLowerDiff: prediction.metadata?.errorQuantiles?.q10,
+        eventTimeConfidenceUpperDiff: prediction.metadata?.errorQuantiles?.q90
+    };
 }

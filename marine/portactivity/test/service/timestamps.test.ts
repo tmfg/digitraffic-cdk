@@ -6,20 +6,16 @@ import {
     insertPilotage,
     insertPortAreaDetails,
     insertPortCall,
-    insertVessel,
+    insertVessel
 } from "../db-testutil";
-import {
-    newPortAreaDetails,
-    newPortCall,
-    newTimestamp,
-    newVessel,
-} from "../testdata";
+import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata";
 import moment from "moment-timezone";
 import * as TimestampsService from "../../lib/service/timestamps";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { EventSource } from "../../lib/model/eventsource";
 import * as R from "ramda";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { subDays } from "date-fns";
 
 describe(
     "timestamps",
@@ -33,7 +29,6 @@ describe(
                 undefined,
                 undefined
             );
-
             expect(timestamps.length).toBe(1);
             expect(timestamps[0]).toMatchObject(timestamp);
         });
@@ -82,26 +77,21 @@ describe(
             await TimestampsService.saveTimestamp(timestamp, db);
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
-            expect(ret).toBeNull();
+            expect(ret).toBeUndefined();
         });
 
         test("saveTimestamp - Portnet timestamp with same portcallid, same locode is not replaced ", async () => {
             const olderTimestamp = newTimestamp({
                 locode: "FIRAU",
-                source: "Portnet",
+                source: "Portnet"
             });
             const newerTimestamp = {
                 ...olderTimestamp,
-                eventTime: moment(olderTimestamp.eventTime)
-                    .add(1, "hours")
-                    .toISOString(),
+                eventTime: moment(olderTimestamp.eventTime).add(1, "hours").toISOString()
             };
 
             await TimestampsService.saveTimestamp(olderTimestamp, db);
-            const ret = await TimestampsService.saveTimestamp(
-                newerTimestamp,
-                db
-            );
+            const ret = await TimestampsService.saveTimestamp(newerTimestamp, db);
 
             expect(ret?.locodeChanged).toBe(false);
             expect((await findAll(db)).length).toBe(2);
@@ -110,44 +100,26 @@ describe(
         test("saveTimestamp - Portnet timestamp with same portcallid, different locode is replaced ", async () => {
             const olderTimestamp = newTimestamp({
                 locode: "FIHKO",
-                source: "Portnet",
+                source: "Portnet"
             });
             const newerTimestamp = {
                 ...olderTimestamp,
-                location: { port: "FIRAU" },
+                location: { port: "FIRAU" }
             };
 
             await TimestampsService.saveTimestamp(olderTimestamp, db);
-            const ret = await TimestampsService.saveTimestamp(
-                newerTimestamp,
-                db
-            );
+            const ret = await TimestampsService.saveTimestamp(newerTimestamp, db);
 
             expect(ret?.locodeChanged).toBe(true);
-            expect(
-                (
-                    await TimestampsService.findAllTimestamps(
-                        olderTimestamp.location.port
-                    )
-                ).length
-            ).toBe(0);
-            expect(
-                (
-                    await TimestampsService.findAllTimestamps(
-                        newerTimestamp.location.port
-                    )
-                ).length
-            ).toBe(1);
+            expect((await TimestampsService.findAllTimestamps(olderTimestamp.location.port)).length).toBe(0);
+            expect((await TimestampsService.findAllTimestamps(newerTimestamp.location.port)).length).toBe(1);
         });
 
         test("saveTimestamps - multiple updates", async () => {
             const timestamp1 = newTimestamp();
             const timestamp2 = newTimestamp();
 
-            const ret = await TimestampsService.saveTimestamps([
-                timestamp1,
-                timestamp2,
-            ]);
+            const ret = await TimestampsService.saveTimestamps([timestamp1, timestamp2]);
 
             expect(ret[0]?.location_locode).toBe(timestamp1.location.port);
             expect(ret[0]?.ship_mmsi).toBe(timestamp1.ship.mmsi);
@@ -159,25 +131,19 @@ describe(
         });
 
         test("saveTimestamp - no IMO not saved", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(
-                ["ship", "imo"],
-                newTimestamp()
-            );
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "imo"], newTimestamp());
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
-            expect(ret).toBeNull();
+            expect(ret).toBeUndefined();
         });
 
         test("saveTimestamp - no MMSI not saved", async () => {
-            const timestamp = R.dissocPath<ApiTimestamp>(
-                ["ship", "mmsi"],
-                newTimestamp()
-            );
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp());
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
-            expect(ret).toBeNull();
+            expect(ret).toBeUndefined();
         });
 
         test("saveTimestamp - imo from vessel", async () => {
@@ -185,10 +151,7 @@ describe(
             const vessel = newVessel(timestamp);
             await insertVessel(db, vessel);
 
-            const timestamp2 = R.dissocPath<ApiTimestamp>(
-                ["ship", "imo"],
-                timestamp
-            );
+            const timestamp2 = R.dissocPath<ApiTimestamp>(["ship", "imo"], timestamp);
             const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
             expect(ret?.location_locode).toBe(timestamp2.location.port);
@@ -201,10 +164,7 @@ describe(
             const vessel = newVessel(timestamp);
             await insertVessel(db, vessel);
 
-            const timestamp2 = R.dissocPath<ApiTimestamp>(
-                ["ship", "mmsi"],
-                timestamp
-            );
+            const timestamp2 = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
             const ret = await TimestampsService.saveTimestamp(timestamp2, db);
 
             expect(ret?.location_locode).toBe(timestamp.location.port);
@@ -220,14 +180,14 @@ describe(
                 locode,
                 eventType: EventType.ETA,
                 eventTime: moment().add(1, "hours").toDate(),
-                source: EventSource.PORTNET,
+                source: EventSource.PORTNET
             });
             const eta2 = newTimestamp({
                 imo,
                 locode,
                 eventType: EventType.ETA,
                 eventTime: moment().add(2, "hours").toDate(),
-                source: EventSource.PORTNET,
+                source: EventSource.PORTNET
             });
             await insertPortCall(db, newPortCall(eta1));
             await insertPortCall(db, newPortCall(eta2));
@@ -235,9 +195,7 @@ describe(
             await insertPortAreaDetails(db, newPortAreaDetails(eta2));
             await insert(db, [eta1, eta2]);
 
-            const ships = await TimestampsService.findETAShipsByLocode([
-                locode,
-            ]);
+            const ships = await TimestampsService.findETAShipsByLocode([locode]);
 
             expect(ships.length).toBe(1);
         });
@@ -251,14 +209,14 @@ describe(
                 locode: locode1,
                 eventType: EventType.ETA,
                 eventTime: moment().add(1, "hours").toDate(),
-                source: EventSource.PORTNET,
+                source: EventSource.PORTNET
             });
             const eta2 = newTimestamp({
                 imo,
                 locode: locode2,
                 eventType: EventType.ETA,
                 eventTime: moment().add(2, "hours").toDate(),
-                source: EventSource.PORTNET,
+                source: EventSource.PORTNET
             });
             await insertPortCall(db, newPortCall(eta1));
             await insertPortCall(db, newPortCall(eta2));
@@ -266,10 +224,7 @@ describe(
             await insertPortAreaDetails(db, newPortAreaDetails(eta2));
             await insert(db, [eta1, eta2]);
 
-            const ships = await TimestampsService.findETAShipsByLocode([
-                locode1,
-                locode2,
-            ]);
+            const ships = await TimestampsService.findETAShipsByLocode([locode1, locode2]);
 
             expect(ships.length).toBe(1);
             expect(ships[0].locode).toBe(locode1);
@@ -282,14 +237,14 @@ describe(
                 locode,
                 eventType: EventType.ETA,
                 eventTime: moment().add(1, "hours").toDate(),
-                source: EventSource.PORTNET,
+                source: EventSource.PORTNET
             });
             const eta2 = newTimestamp({
                 imo: 654321,
                 locode,
                 eventType: EventType.ETA,
                 eventTime: moment().add(2, "hours").toDate(),
-                source: EventSource.PORTNET,
+                source: EventSource.PORTNET
             });
             await insertPortCall(db, newPortCall(eta1));
             await insertPortCall(db, newPortCall(eta2));
@@ -297,19 +252,17 @@ describe(
             await insertPortAreaDetails(db, newPortAreaDetails(eta2));
             await insert(db, [eta1, eta2]);
 
-            const ships = await TimestampsService.findETAShipsByLocode([
-                locode,
-            ]);
+            const ships = await TimestampsService.findETAShipsByLocode([locode]);
 
             expect(ships.length).toBe(2);
         });
 
         test("deleteOldTimestampsAndPilotages - deletes both old timestamps and pilotages", async () => {
-            const olderThanAWeek = moment().subtract(7, "day").toDate();
+            const olderThanAWeek = subDays(Date.now(), 7);
             await insert(db, [
                 newTimestamp({
-                    eventTime: olderThanAWeek,
-                }),
+                    eventTime: olderThanAWeek
+                })
             ]);
             await insertPilotage(db, 1, "ACTIVE", new Date(), olderThanAWeek);
 
