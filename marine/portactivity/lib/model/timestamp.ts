@@ -46,6 +46,24 @@ export interface ApiTimestamp {
     readonly sourceId?: string;
 }
 
+export interface PublicApiShip extends Omit<Ship, "mmsi" | "imo"> {
+    readonly mmsi?: number | null;
+    readonly imo?: number | null;
+}
+
+export interface PublicApiLocation extends Omit<Location, "portArea" | "from"> {
+    readonly portArea?: string | null;
+    readonly from?: string | null;
+}
+
+export interface PublicApiTimestamp
+    extends Omit<ApiTimestamp, "portcallId" | "sourceId" | "ship" | "location"> {
+    readonly portcallId?: number | null;
+    readonly sourceId?: string | null;
+    readonly ship: PublicApiShip;
+    readonly location: PublicApiLocation;
+}
+
 export function validateTimestamp(timestamp: Partial<ApiTimestamp>): ApiTimestamp | undefined {
     if (!timestamp.eventType || !Object.values(EventType).includes(timestamp.eventType)) {
         console.warn("Invalid eventType for timestamp", timestamp);

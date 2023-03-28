@@ -6,7 +6,7 @@ import {
     inDatabase,
     inDatabaseReadonly
 } from "@digitraffic/common/dist/database/database";
-import { ApiTimestamp, Ship } from "../model/timestamp";
+import { ApiTimestamp, PublicApiTimestamp, Ship } from "../model/timestamp";
 import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
 import { Port } from "./portareas";
 import moment from "moment-timezone";
@@ -118,10 +118,10 @@ export async function findAllTimestamps(
     mmsi?: number,
     imo?: number,
     source?: string
-): Promise<ApiTimestamp[]> {
+): Promise<PublicApiTimestamp[]> {
     const start = Date.now();
 
-    const timestamps: ApiTimestamp[] = await inDatabaseReadonly(async (db: DTDatabase) => {
+    const timestamps: PublicApiTimestamp[] = await inDatabaseReadonly(async (db: DTDatabase) => {
         if (locode) {
             return TimestampsDB.findByLocode(db, locode);
         } else if (mmsi && !imo) {
@@ -137,8 +137,8 @@ export async function findAllTimestamps(
         .finally(() => {
             console.info("method=findAllTimestamps tookMs=%d", Date.now() - start);
         })
-        .then((tss: DbTimestamp[]) => tss.map(dbTimestampToApiTimestamp));
-    return mergeTimestamps(timestamps) as ApiTimestamp[];
+        .then((tss: DbTimestamp[]) => tss.map(dbTimestampToPublicApiTimestamp));
+    return mergeTimestamps(timestamps) as PublicApiTimestamp[];
 }
 
 export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
@@ -208,7 +208,7 @@ export function deleteOldTimestampsAndPilotages() {
     });
 }
 
-function dbTimestampToApiTimestamp(ts: DbTimestamp): ApiTimestamp {
+function dbTimestampToPublicApiTimestamp(ts: DbTimestamp): PublicApiTimestamp {
     return {
         eventType: ts.event_type,
         eventTime: ts.event_time.toISOString(),
