@@ -30,7 +30,11 @@ describe(
                 undefined
             );
             expect(timestamps.length).toBe(1);
-            expect(timestamps[0]).toMatchObject(timestamp);
+            expect(timestamps[0]).toMatchObject({
+                ...timestamp,
+                eventTimeConfidenceLowerDiff: null,
+                eventTimeConfidenceUpperDiff: null
+            });
         });
 
         test("findAllTimestamps - mmsi", async () => {
@@ -44,7 +48,11 @@ describe(
             );
 
             expect(timestamps.length).toBe(1);
-            expect(timestamps[0]).toMatchObject(timestamp);
+            expect(timestamps[0]).toMatchObject({
+                ...timestamp,
+                eventTimeConfidenceLowerDiff: null,
+                eventTimeConfidenceUpperDiff: null
+            });
         });
 
         test("findAllTimestamps - imo", async () => {
@@ -58,7 +66,11 @@ describe(
             );
 
             expect(timestamps.length).toBe(1);
-            expect(timestamps[0]).toMatchObject(timestamp);
+            expect(timestamps[0]).toMatchObject({
+                ...timestamp,
+                eventTimeConfidenceLowerDiff: null,
+                eventTimeConfidenceUpperDiff: null
+            });
         });
 
         test("saveTimestamp - no conflict returns updated", async () => {

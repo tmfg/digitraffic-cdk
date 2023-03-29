@@ -55,12 +55,14 @@ export function createTimestampSchema(shipReference: string, locationReference: 
                 description: "Event time in ISO 8601 date format"
             },
             eventTimeConfidenceLowerDiff: {
-                type: [JsonSchemaType.NUMBER],
-                description: "Event time confidence, lower bound in seconds."
+                type: [JsonSchemaType.NUMBER, JsonSchemaType.NULL],
+                description:
+                    "Event time 80% confidence interval, lower bound in seconds as difference from eventTime."
             },
             eventTimeConfidenceUpperDiff: {
-                type: [JsonSchemaType.NUMBER],
-                description: "Event time confidence, upper bound in seconds."
+                type: [JsonSchemaType.NUMBER, JsonSchemaType.NULL],
+                description:
+                    "Event time 80% confidence interval, upper bound in seconds as difference from eventTime."
             },
             recordTime: {
                 type: JsonSchemaType.STRING,

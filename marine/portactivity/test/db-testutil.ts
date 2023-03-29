@@ -66,7 +66,6 @@ export async function insert(db: DTDatabase | DTTransaction, timestamps: ApiTime
     await db.tx((t) => {
         return t.batch(
             timestamps.map((e) => {
-                //console.log(JSON.stringify(e, null, 2));
                 return t.none(
                     `
                 INSERT INTO port_call_timestamp(

@@ -57,89 +57,99 @@ export interface PublicApiLocation extends Omit<Location, "portArea" | "from"> {
 }
 
 export interface PublicApiTimestamp
-    extends Omit<ApiTimestamp, "portcallId" | "sourceId" | "ship" | "location"> {
+    extends Omit<
+        ApiTimestamp,
+        | "eventTimeConfidenceLower"
+        | "eventTimeConfidenceUpper"
+        | "eventTimeConfidenceLowerDiff"
+        | "eventTimeConfidenceUpperDiff"
+        | "portcallId"
+        | "sourceId"
+        | "ship"
+        | "location"
+    > {
+    readonly eventTimeConfidenceLower?: string | null;
+    readonly eventTimeConfidenceUpper?: string | null;
+    readonly eventTimeConfidenceLowerDiff?: number | null;
+    readonly eventTimeConfidenceUpperDiff?: number | null;
     readonly portcallId?: number | null;
     readonly sourceId?: string | null;
     readonly ship: PublicApiShip;
     readonly location: PublicApiLocation;
 }
 
-export function validateTimestamp(timestamp: Partial<ApiTimestamp>): ApiTimestamp | undefined {
+export function validateTimestamp(timestamp: Partial<ApiTimestamp>): timestamp is ApiTimestamp {
     if (!timestamp.eventType || !Object.values(EventType).includes(timestamp.eventType)) {
         console.warn("Invalid eventType for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!timestamp.eventTime) {
         console.warn("Missing eventTime for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!moment(timestamp.eventTime).isValid()) {
         console.warn("Invalid eventTime for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!timestamp.recordTime) {
         console.warn("Missing recordTime for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!moment(timestamp.recordTime).isValid()) {
         console.warn("Invalid recordTime for timestamp", timestamp);
-        return undefined;
-    }
-    if (timestamp.eventTimeConfidenceLowerDiff && isNaN(Number(timestamp.eventTimeConfidenceLowerDiff))) {
-        console.warn("Invalid eventTimeConfidenceLowerDiff for timestamp", timestamp);
-        return undefined;
-    }
-    if (timestamp.eventTimeConfidenceUpperDiff && isNaN(Number(timestamp.eventTimeConfidenceUpperDiff))) {
-        console.warn("Invalid eventTimeConfidenceUpperDiff for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!timestamp.source) {
         console.warn("Missing source for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!timestamp.ship) {
         console.warn("Missing ship info for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!timestamp.ship.mmsi && !timestamp.ship.imo) {
         console.warn("Both MMSI and IMO are missing for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!timestamp.location) {
         console.warn("Missing location info for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (!timestamp.location.port) {
         console.warn("Missing port for timestamp", timestamp);
-        return undefined;
+        return false;
     }
     if (timestamp.location.port.length > 5) {
         console.warn("Locode too long", timestamp);
-        return undefined;
+        return false;
     }
     if (timestamp.location.from && timestamp.location.from.length > 5) {
         console.warn("From locode too long", timestamp);
-        return undefined;
+        return false;
     }
     if (timestamp.location.portArea && timestamp.location.portArea.length > 6) {
         console.warn("PortArea too long", timestamp);
-        return undefined;
+        return false;
     }
     if (timestamp.source === EventSource.AWAKE_AI_PRED && timestamp.eventType === EventType.ETD) {
         console.warn("ETD prediction from Awake.AI - not persisting");
-        return undefined;
+        return false;
+    }
+    if (timestamp.eventTimeConfidenceLowerDiff && isNaN(Number(timestamp.eventTimeConfidenceLowerDiff))) {
+        console.warn("eventTimeConfidenceLowerDiff is not a number", timestamp);
+        return false;
+    }
+    if (timestamp.eventTimeConfidenceUpperDiff && isNaN(Number(timestamp.eventTimeConfidenceUpperDiff))) {
+        console.warn("eventTimeConfidenceUpperDiff is not a number", timestamp);
+        return false;
+    }
+    if (
+        timestamp.eventTimeConfidenceLowerDiff &&
+        timestamp.eventTimeConfidenceUpperDiff &&
+        timestamp.eventTimeConfidenceLowerDiff > timestamp.eventTimeConfidenceUpperDiff
+    ) {
+        console.warn("Lower bound of confidence interval is greater than upper bound", timestamp);
     }
 
-    return {
-        eventType: timestamp.eventType,
-        eventTime: timestamp.eventTime,
-        eventTimeConfidenceLowerDiff: timestamp.eventTimeConfidenceLowerDiff,
-        eventTimeConfidenceUpperDiff: timestamp.eventTimeConfidenceUpperDiff,
-        recordTime: timestamp.recordTime,
-        source: timestamp.source,
-        ship: timestamp.ship,
-        location: timestamp.location,
-        portcallId: timestamp.portcallId,
-        sourceId: timestamp.sourceId
-    };
+    return true;
 }

@@ -73,7 +73,7 @@ describe(
             test(`${description} - found 71 h in the future`, async () => {
                 const timestamp = Object.assign(newTimestamp(), {
                     recordTime: new Date().toISOString(), // avoid filtering,
-                    eventTime: addHours(new Date(), 71)
+                    eventTime: addHours(new Date(), 71).toISOString()
                 });
                 await insert(db, [timestamp]);
 

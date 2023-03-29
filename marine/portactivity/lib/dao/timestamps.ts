@@ -1,10 +1,10 @@
 import { PreparedStatement } from "pg-promise";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { DEFAULT_SHIP_APPROACH_THRESHOLD_MINUTES } from "../service/portareas";
-import moment from "moment";
 import { EventSource } from "../model/eventsource";
 import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import { Countable, Identifiable } from "@digitraffic/common/dist/database/models";
+import { parseISO } from "date-fns";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const PORTNET_TIMESTAMPS_UPPER_LIMIT = `NOW() + INTERVAL '14 DAYS'`;
@@ -545,13 +545,13 @@ export async function deleteOldPilotages(db: DTTransaction): Promise<number> {
 export function createUpdateValues(e: ApiTimestamp): unknown[] {
     return [
         e.eventType, // event_type
-        moment(e.eventTime).toDate(), // event_time
+        parseISO(e.eventTime), // event_time
         e.eventTimeConfidenceLower,
         e.eventTimeConfidenceLowerDiff ? Math.floor(e.eventTimeConfidenceLowerDiff) : undefined,
         e.eventTimeConfidenceUpper,
         e.eventTimeConfidenceUpperDiff ? Math.ceil(e.eventTimeConfidenceUpperDiff) : undefined,
         e.source, // event_source
-        moment(e.recordTime).toDate(), // record_time
+        parseISO(e.recordTime), // record_time
         e.location.port, // location_locode
         e.ship.mmsi && e.ship.mmsi !== 0 ? e.ship.mmsi : undefined, // ship_mmsi
         e.ship.imo && e.ship.imo !== 0 ? e.ship.imo : undefined, // ship_imo,

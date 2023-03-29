@@ -227,7 +227,7 @@ function dbTimestampToPublicApiTimestamp(ts: DbTimestamp): PublicApiTimestamp {
         portcallId: ts.portcall_id,
         eventTimeConfidenceLower: ts.event_time_confidence_lower ?? undefined,
         eventTimeConfidenceUpper: ts.event_time_confidence_upper ?? undefined,
-        eventTimeConfidenceLowerDiff: ts.event_time_confidence_lower_diff ?? undefined,
-        eventTimeConfidenceUpperDiff: ts.event_time_confidence_upper_diff ?? undefined
+        eventTimeConfidenceLowerDiff: ts.event_time_confidence_lower_diff,
+        eventTimeConfidenceUpperDiff: ts.event_time_confidence_upper_diff
     };
 }
