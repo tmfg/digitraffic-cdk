@@ -126,6 +126,8 @@ class Figures:
 
         if isinstance(data, str):
             data = json.loads(data)
+            data['__missing__'] += data['']
+            del data['']
 
         dt = pd.DataFrame.from_dict(data, orient='index', columns=[sort_by_column])
 
@@ -134,7 +136,7 @@ class Figures:
         dt.index += 1
         dt = dt.reset_index()
         dt.rename(columns={'index': 'Käyttäjä', 'level_0': ''}, inplace=True)
-        dt.loc[dt['Käyttäjä'] == '', ['Käyttäjä']] = '<tyhjä>'
+
         dt.loc[dt['Käyttäjä'] == '__missing__', ['Käyttäjä']] = '<tietue puuttuu>'
 
         dt[percentage_column] = dt[sort_by_column].apply(lambda x: "{} %".format(round(x/total_amount * 100, 2)))
