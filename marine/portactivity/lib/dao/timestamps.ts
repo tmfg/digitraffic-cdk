@@ -546,10 +546,10 @@ export function createUpdateValues(e: ApiTimestamp): unknown[] {
     return [
         e.eventType, // event_type
         parseISO(e.eventTime), // event_time
-        e.eventTimeConfidenceLower,
-        e.eventTimeConfidenceLowerDiff ? Math.floor(e.eventTimeConfidenceLowerDiff) : undefined,
-        e.eventTimeConfidenceUpper,
-        e.eventTimeConfidenceUpperDiff ? Math.ceil(e.eventTimeConfidenceUpperDiff) : undefined,
+        undefined, // event_time_confidence_lower
+        e.eventTimeConfidenceLowerDiff ? Math.floor(e.eventTimeConfidenceLowerDiff) : undefined, // event_time_confidence_lower_diff
+        undefined, // event_time_confidence_upper
+        e.eventTimeConfidenceUpperDiff ? Math.ceil(e.eventTimeConfidenceUpperDiff) : undefined, // event_time_confidence_upper_diff
         e.source, // event_source
         parseISO(e.recordTime), // record_time
         e.location.port, // location_locode

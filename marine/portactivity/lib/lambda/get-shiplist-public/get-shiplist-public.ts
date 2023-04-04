@@ -1,22 +1,13 @@
 import { findByLocodePublicShiplist } from "../../dao/shiplist-public";
-import {
-    DTDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import {
-    getDisplayableNameForEventSource,
-    mergeTimestamps,
-    MergeableTimestamp,
-} from "../../event-sourceutil";
+import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import { getDisplayableNameForEventSource, mergeTimestamps } from "../../event-sourceutil";
 import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import {
-    ProxyLambdaRequest,
-    ProxyLambdaResponse,
-} from "@digitraffic/common/dist/aws/types/proxytypes";
+import { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { PublicApiTimestamp } from "../../model/timestamp";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<ShiplistSecret>("shiplist");
@@ -34,8 +25,8 @@ function response(
         statusCode,
         body: message,
         headers: {
-            "content-type": contentType,
-        },
+            "content-type": contentType
+        }
     };
 }
 
@@ -74,54 +65,43 @@ function validateParameters(
     return {
         auth: parameters.auth,
         locode: parameters.locode,
-        interval: parameters.interval,
+        interval: parameters.interval
     };
 }
 
-export const handler = (
-    event: ProxyLambdaRequest
-): Promise<ProxyLambdaResponse> => {
+export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse> => {
     return rdsHolder
         .setCredentials()
         .then(() => secretHolder.get())
         .then((secret: ShiplistSecret) => {
-            const parameters = validateParameters(
-                event.queryStringParameters,
-                secret
-            );
+            const parameters = validateParameters(event.queryStringParameters, secret);
             const interval = Number.parseInt(parameters.interval ?? "4*24");
 
-            return inDatabaseReadonly(
-                async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
-                    const dbShiplist = (
-                        await findByLocodePublicShiplist(
-                            db,
-                            parameters.locode.toUpperCase(),
-                            interval
-                        )
-                    ).map((ts) =>
-                        Object.assign(ts, {
-                            source: ts.event_source,
-                            eventTime: ts.event_time,
-                            recordTime: ts.record_time,
-                            portcallId: ts.portcall_id,
-                            eventType: ts.event_type,
-                        })
-                    );
-                    // don't overwrite source before merging as it utilizes source name in prioritizing
-                    const shiplist = mergeTimestamps(dbShiplist).map((ts) =>
-                        Object.assign(ts, {
-                            source: getDisplayableNameForEventSource(ts.source),
-                        })
-                    );
+            return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
+                const dbShiplist = (
+                    await findByLocodePublicShiplist(db, parameters.locode.toUpperCase(), interval)
+                ).map((ts) =>
+                    Object.assign(ts, {
+                        source: ts.event_source,
+                        eventTime: ts.event_time,
+                        recordTime: ts.record_time,
+                        portcallId: ts.portcall_id,
+                        eventType: ts.event_type,
+                        ship: {},
+                        location: {
+                            port: parameters.locode.toUpperCase()
+                        }
+                    })
+                );
+                // don't overwrite source before merging as it utilizes source name in prioritizing
+                const shiplist = mergeTimestamps(dbShiplist).map((ts) =>
+                    Object.assign(ts, {
+                        source: getDisplayableNameForEventSource(ts.source)
+                    })
+                );
 
-                    return response(
-                        200,
-                        getPageSource(shiplist),
-                        MediaType.TEXT_HTML
-                    );
-                }
-            );
+                return response(200, getPageSource(shiplist), MediaType.TEXT_HTML);
+            });
         })
         .catch((error) => {
             if (error instanceof ValidationError) {
@@ -132,7 +112,7 @@ export const handler = (
         });
 };
 
-function getPageSource(shiplist: MergeableTimestamp[]) {
+function getPageSource(shiplist: PublicApiTimestamp[]) {
     return `
 <html>
 

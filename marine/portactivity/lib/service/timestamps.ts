@@ -138,7 +138,7 @@ export async function findAllTimestamps(
             console.info("method=findAllTimestamps tookMs=%d", Date.now() - start);
         })
         .then((tss: DbTimestamp[]) => tss.map(dbTimestampToPublicApiTimestamp));
-    return mergeTimestamps(timestamps) as PublicApiTimestamp[];
+    return mergeTimestamps(timestamps);
 }
 
 export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
@@ -225,8 +225,6 @@ function dbTimestampToPublicApiTimestamp(ts: DbTimestamp): PublicApiTimestamp {
             from: ts.location_from_locode
         },
         portcallId: ts.portcall_id,
-        eventTimeConfidenceLower: ts.event_time_confidence_lower ?? undefined,
-        eventTimeConfidenceUpper: ts.event_time_confidence_upper ?? undefined,
         eventTimeConfidenceLowerDiff: ts.event_time_confidence_lower_diff,
         eventTimeConfidenceUpperDiff: ts.event_time_confidence_upper_diff
     };

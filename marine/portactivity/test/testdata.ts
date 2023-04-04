@@ -53,8 +53,6 @@ export function newTimestamp(props?: {
     eventType?: EventType;
     eventTimeConfidenceLowerDiff?: number;
     eventTimeConfidenceUpperDiff?: number;
-    eventTimeConfidenceLower?: string;
-    eventTimeConfidenceUpper?: string;
     source?: string;
     sourceId?: string;
     portcallId?: number;
@@ -73,8 +71,6 @@ export function newTimestamp(props?: {
         sourceId: props?.sourceId ?? someNumber().toString(),
         eventTimeConfidenceLowerDiff: props?.eventTimeConfidenceLowerDiff,
         eventTimeConfidenceUpperDiff: props?.eventTimeConfidenceUpperDiff,
-        eventTimeConfidenceLower: props?.eventTimeConfidenceLower,
-        eventTimeConfidenceUpper: props?.eventTimeConfidenceUpper,
         ship: {
             mmsi: props?.mmsi ?? Number(someNumber().toString().slice(0, 5)),
             imo: props?.imo ?? Number(someNumber().toString().slice(0, 5))

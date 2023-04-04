@@ -26,9 +26,7 @@ describe(
             expect(e.record_time.toISOString()).toBe(timestamp.recordTime);
             expect(e.event_time.toISOString()).toBe(timestamp.eventTime);
             expect(e.event_type).toBe(timestamp.eventType);
-            expect(e.event_time_confidence_lower).toBe(timestamp.eventTimeConfidenceLower ?? null);
             expect(e.event_time_confidence_lower_diff).toBe(timestamp.eventTimeConfidenceLowerDiff ?? null);
-            expect(e.event_time_confidence_upper).toBe(timestamp.eventTimeConfidenceUpper ?? null);
             expect(e.event_time_confidence_upper_diff).toBe(timestamp.eventTimeConfidenceUpperDiff ?? null);
         });
 

@@ -1,5 +1,6 @@
 import moment from "moment";
 import { EventSource } from "./eventsource";
+import { NullableOptional } from "@digitraffic/common/dist/types/nullable";
 
 export enum EventType {
     ATA = "ATA",
@@ -34,49 +35,22 @@ export interface Location {
 export interface ApiTimestamp {
     readonly eventType: EventType;
     readonly eventTime: string;
-    readonly eventTimeConfidenceLower?: string;
-    readonly eventTimeConfidenceUpper?: string;
-    readonly eventTimeConfidenceLowerDiff?: number;
-    readonly eventTimeConfidenceUpperDiff?: number;
     readonly recordTime: string;
     readonly source: string;
     readonly ship: Ship;
     readonly location: Location;
+    readonly eventTimeConfidenceLowerDiff?: number;
+    readonly eventTimeConfidenceUpperDiff?: number;
     readonly portcallId?: number;
     readonly sourceId?: string;
 }
 
-export interface PublicApiShip extends Omit<Ship, "mmsi" | "imo"> {
-    readonly mmsi?: number | null;
-    readonly imo?: number | null;
-}
-
-export interface PublicApiLocation extends Omit<Location, "portArea" | "from"> {
-    readonly portArea?: string | null;
-    readonly from?: string | null;
-}
-
-export interface PublicApiTimestamp
-    extends Omit<
-        ApiTimestamp,
-        | "eventTimeConfidenceLower"
-        | "eventTimeConfidenceUpper"
-        | "eventTimeConfidenceLowerDiff"
-        | "eventTimeConfidenceUpperDiff"
-        | "portcallId"
-        | "sourceId"
-        | "ship"
-        | "location"
-    > {
-    readonly eventTimeConfidenceLower?: string | null;
-    readonly eventTimeConfidenceUpper?: string | null;
-    readonly eventTimeConfidenceLowerDiff?: number | null;
-    readonly eventTimeConfidenceUpperDiff?: number | null;
-    readonly portcallId?: number | null;
-    readonly sourceId?: string | null;
-    readonly ship: PublicApiShip;
-    readonly location: PublicApiLocation;
-}
+export type PublicApiTimestamp = NullableOptional<
+    Omit<ApiTimestamp, "ship" | "location"> & {
+        ship: NullableOptional<Ship>;
+        location: NullableOptional<Location>;
+    }
+>;
 
 export function validateTimestamp(timestamp: Partial<ApiTimestamp>): timestamp is ApiTimestamp {
     if (!timestamp.eventType || !Object.values(EventType).includes(timestamp.eventType)) {

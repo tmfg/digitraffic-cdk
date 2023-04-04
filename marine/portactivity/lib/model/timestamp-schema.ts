@@ -7,11 +7,11 @@ export const ShipSchema: JsonSchema = {
     description: "PortActivity timestamps ship schema",
     properties: {
         mmsi: {
-            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING, JsonSchemaType.NULL],
+            type: [JsonSchemaType.NUMBER, JsonSchemaType.NULL],
             description: "MMSI"
         },
         imo: {
-            type: [JsonSchemaType.NUMBER, JsonSchemaType.STRING, JsonSchemaType.NULL],
+            type: [JsonSchemaType.NUMBER, JsonSchemaType.NULL],
             description: "IMO"
         }
     }
@@ -71,6 +71,10 @@ export function createTimestampSchema(shipReference: string, locationReference: 
             source: {
                 type: JsonSchemaType.STRING,
                 description: "Event source"
+            },
+            sourceId: {
+                type: [JsonSchemaType.STRING, JsonSchemaType.NULL],
+                description: "ID in source system"
             },
             ship: {
                 ref: shipReference
