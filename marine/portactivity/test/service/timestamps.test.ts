@@ -9,13 +9,12 @@ import {
     insertVessel
 } from "../db-testutil";
 import { newPortAreaDetails, newPortCall, newTimestamp, newVessel } from "../testdata";
-import moment from "moment-timezone";
 import * as TimestampsService from "../../lib/service/timestamps";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { EventSource } from "../../lib/model/eventsource";
 import * as R from "ramda";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { subDays } from "date-fns";
+import { addHours, parseISO, subDays } from "date-fns";
 
 describe(
     "timestamps",
@@ -99,7 +98,7 @@ describe(
             });
             const newerTimestamp = {
                 ...olderTimestamp,
-                eventTime: moment(olderTimestamp.eventTime).add(1, "hours").toISOString()
+                eventTime: addHours(parseISO(olderTimestamp.eventTime), 1).toISOString()
             };
 
             await TimestampsService.saveTimestamp(olderTimestamp, db);
@@ -191,14 +190,14 @@ describe(
                 imo,
                 locode,
                 eventType: EventType.ETA,
-                eventTime: moment().add(1, "hours").toDate(),
+                eventTime: addHours(Date.now(), 1),
                 source: EventSource.PORTNET
             });
             const eta2 = newTimestamp({
                 imo,
                 locode,
                 eventType: EventType.ETA,
-                eventTime: moment().add(2, "hours").toDate(),
+                eventTime: addHours(Date.now(), 2),
                 source: EventSource.PORTNET
             });
             await insertPortCall(db, newPortCall(eta1));
@@ -220,14 +219,14 @@ describe(
                 imo,
                 locode: locode1,
                 eventType: EventType.ETA,
-                eventTime: moment().add(1, "hours").toDate(),
+                eventTime: addHours(Date.now(), 1),
                 source: EventSource.PORTNET
             });
             const eta2 = newTimestamp({
                 imo,
                 locode: locode2,
                 eventType: EventType.ETA,
-                eventTime: moment().add(2, "hours").toDate(),
+                eventTime: addHours(Date.now(), 2),
                 source: EventSource.PORTNET
             });
             await insertPortCall(db, newPortCall(eta1));
@@ -248,14 +247,14 @@ describe(
                 imo: 123456,
                 locode,
                 eventType: EventType.ETA,
-                eventTime: moment().add(1, "hours").toDate(),
+                eventTime: addHours(Date.now(), 1),
                 source: EventSource.PORTNET
             });
             const eta2 = newTimestamp({
                 imo: 654321,
                 locode,
                 eventType: EventType.ETA,
-                eventTime: moment().add(2, "hours").toDate(),
+                eventTime: addHours(Date.now(), 2),
                 source: EventSource.PORTNET
             });
             await insertPortCall(db, newPortCall(eta1));

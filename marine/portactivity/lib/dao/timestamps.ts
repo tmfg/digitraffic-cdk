@@ -34,7 +34,7 @@ export interface DbETAShip {
     readonly locode: string;
     readonly port_area_code?: string;
     readonly portcall_id: number;
-    readonly eta: string;
+    readonly eta: Date;
 }
 
 export interface DbUpdatedTimestamp {

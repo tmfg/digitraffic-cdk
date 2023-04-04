@@ -9,9 +9,9 @@ import {
 import { ApiTimestamp, PublicApiTimestamp, Ship } from "../model/timestamp";
 import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
 import { Port } from "./portareas";
-import moment from "moment-timezone";
 import * as R from "ramda";
 import { EventSource } from "../model/eventsource";
+import { parseISO } from "date-fns";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean;
@@ -28,7 +28,7 @@ export function saveTimestamp(
                 db,
                 timestamp.location.port,
                 timestamp.eventType,
-                moment(timestamp.eventTime).toDate(),
+                parseISO(timestamp.eventTime),
                 timestamp.ship.mmsi,
                 timestamp.ship.imo
             ));
@@ -154,7 +154,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
     // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
     const shipsByImo = R.groupBy((s) => s.imo.toString(), portnetShips);
     const newestShips = Object.values(shipsByImo)
-        .flatMap((ships) => R.head(R.sortBy((ship: DbETAShip) => moment(ship.eta).toDate(), ships)))
+        .flatMap((ships) => R.head(R.sortBy((ship: DbETAShip) => ship.eta, ships)))
         .filter((ship): ship is DbETAShip => ship !== undefined);
 
     console.info(
