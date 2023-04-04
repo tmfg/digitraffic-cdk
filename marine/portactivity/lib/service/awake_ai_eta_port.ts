@@ -22,12 +22,6 @@ export class AwakeAiETAPortService {
         this.api = api;
     }
 
-    private portCallExistsForVoyage(schedule: AwakeAiPortSchedule): boolean {
-        return schedule.voyage.predictions.some(
-            (prediction) => prediction.predictionType === AwakeAiPredictionType.ARRIVAL_PORT_CALL
-        );
-    }
-
     private validateArrivalTime(etaPrediction: AwakeAiVoyageEtaPrediction): boolean {
         if (isBefore(parseISO(etaPrediction.arrivalTime), addHours(Date.now(), 24))) {
             console.warn(
@@ -76,17 +70,14 @@ export class AwakeAiETAPortService {
 
         return (
             resp.schedule
-                // only ships with a port call id
-                .filter((schedule) => this.portCallExistsForVoyage(schedule))
                 // filter out stopped voyages
                 .filter(voyageUnderwayOrNotStarted)
                 .flatMap((schedule) => {
                     const etaPredictions = this.getEtaPredictions(schedule);
 
-                    // we can be sure that this exists because of the filter portCallExistsForVoyage
                     const portcallPrediction = schedule.voyage.predictions.find(
                         (p) => p.predictionType === AwakeAiPredictionType.ARRIVAL_PORT_CALL
-                    ) as AwakeArrivalPortCallPrediction;
+                    ) as AwakeArrivalPortCallPrediction | undefined;
 
                     return etaPredictions.map((eta) => {
                         if (!this.validateArrivalTime(eta)) return undefined;
