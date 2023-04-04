@@ -21,7 +21,7 @@ const creds = new AWS.EnvironmentCredentials("AWS");
 const COMPRESS_OPTIONS = {
     level: 8,
     memLevel: 9,
-    chunkSize: 1024 * 16 * 1024,
+    chunkSize: 1024 * 16 * 1024
 };
 
 // fields contains all the selected log fields in the order specified in loggint-utils.ts CLOUDFRONT_STREAMING_LOG_FIELDS
@@ -36,14 +36,15 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
     const requestProtocol = fields[6];
     const requestUri = fields[7];
     const edgeLocation = fields[8];
-    const timeTaken = fields[9];
-    const httpVersion = fields[10];
-    const userAgent = fields[11];
-    const referrer = fields[12];
-    const forwardedFor = fields[13];
-    const resultType = fields[14];
-    const acceptEncoding = fields[15];
-    const headers = fields[16];
+    const edgeRequestId = fields[9];
+    const timeTaken = fields[10];
+    const httpVersion = fields[11];
+    const userAgent = fields[12];
+    const referrer = fields[13];
+    const forwardedFor = fields[14];
+    const resultType = fields[15];
+    const acceptEncoding = fields[16];
+    const headers = fields[17];
 
     const digitrafficUser = findHeaderValue("digitraffic-user", headers);
     const host = findHeaderValue("host", headers);
@@ -51,6 +52,7 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
 
     return {
         "@timestamp": timestamp,
+        "@edge_request_id": edgeRequestId,
         "@edge_location": edgeLocation,
         "@transport_type": application,
         "@app": `${application}-cloudfront`,
@@ -72,8 +74,8 @@ async function convertFieldNamesAndFormats(fields: string[]): Promise<any> {
             upstream_response_time: +timeToFirstByte,
             http_digitraffic_user: digitrafficUser,
             accept_encoding: acceptEncoding,
-            http_x_forwarded_proto: xForwardedProto,
-        },
+            http_x_forwarded_proto: xForwardedProto
+        }
     };
 }
 
@@ -99,19 +101,17 @@ function createIndexName(): string {
 export const handler = async (event: KinesisStreamEvent) => {
     try {
         const action = {
-            index: { _index: createIndexName(), _type: "_doc" },
+            index: { _index: createIndexName(), _type: "_doc" }
         } as any;
 
         //        console.log('using action ' + JSON.stringify(action));
 
-        const recordTransformPromises = event.Records.map(
-            async (record: KinesisStreamRecord) => transformRecord(record)
+        const recordTransformPromises = event.Records.map(async (record: KinesisStreamRecord) =>
+            transformRecord(record)
         );
 
         const data = await Promise.all(recordTransformPromises);
-        const returnValue = await sendMessageToEs(
-            createBulkMessage(action, data)
-        );
+        const returnValue = await sendMessageToEs(createBulkMessage(action, data));
 
         if (returnValue.length < 200) {
             console.log("return value " + returnValue);
@@ -150,11 +150,7 @@ function sendMessageToEs(message: string): Promise<any> {
     const signer = new AWS.Signers.V4(request, "es");
     signer.addAuthorization(creds, new Date());
 
-    console.log(
-        "sending POST to es unCompressedSize=%d requestSize=%d",
-        message.length,
-        request.body.length
-    );
+    console.log("sending POST to es unCompressedSize=%d requestSize=%d", message.length, request.body.length);
 
     const client = new AWS.NodeHttpClient();
     return new Promise((resolve, reject) => {
