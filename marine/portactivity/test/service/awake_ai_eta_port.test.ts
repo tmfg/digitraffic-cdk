@@ -91,6 +91,30 @@ describe("AwakeAiETAPortService(", () => {
 
         expect(timestamps.length).toBe(0);
     });
+
+    test("getAwakeAiTimestamps - correct with port call prediction", async () => {
+        const api = createApi();
+        const service = new AwakeAiETAPortService(api);
+        sinon
+            .stub(api, "getETAs")
+            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: true })));
+
+        const timestamps = await service.getAwakeAiTimestamps("FILOL");
+
+        expect(timestamps.length).toBe(1);
+    });
+
+    test("getAwakeAiTimestamps - correct without port call prediction", async () => {
+        const api = createApi();
+        const service = new AwakeAiETAPortService(api);
+        sinon
+            .stub(api, "getETAs")
+            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: false })));
+
+        const timestamps = await service.getAwakeAiTimestamps("FILOL");
+
+        expect(timestamps.length).toBe(1);
+    });
 });
 
 function createApi() {
