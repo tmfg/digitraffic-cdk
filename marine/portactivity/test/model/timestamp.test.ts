@@ -1,10 +1,9 @@
-import {validateTimestamp} from "../../lib/model/timestamp";
-import {newTimestamp} from "../testdata";
+import { validateTimestamp } from "../../lib/model/timestamp";
+import { newTimestamp } from "../testdata";
 
 describe("timestamp model", () => {
-
     test("validateTimestamp - ok", () => {
-        expect(validateTimestamp(newTimestamp())).toBeDefined();
+        expect(validateTimestamp(newTimestamp())).toEqual(true);
     });
 
     test("validateTimestamp - missing eventType", () => {
@@ -13,7 +12,7 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp as any).eventType;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - missing eventTime", () => {
@@ -22,7 +21,7 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp as any).eventTime;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - invalid eventTime", () => {
@@ -31,34 +30,25 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (timestamp as any).eventTime = "123456-qwerty";
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
-    test("validateTimestamp - invalid eventTimeConfidenceLower", () => {
+    test("validateTimestamp - invalid eventTimeConfidenceLowerDiff", () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (timestamp as any).eventTimeConfidenceLower = "PT1Hasdf";
+        (timestamp as any).eventTimeConfidenceLowerDiff = "PT1Hasdf";
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
-    test("validateTimestamp - invalid eventTimeConfidenceUpper", () => {
+    test("validateTimestamp - invalid eventTimeConfidenceUpperDiff", () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (timestamp as any).eventTimeConfidenceUpper = "PT1Hasdf";
+        (timestamp as any).eventTimeConfidenceUpperDiff = "PT1Hasdf";
 
-        expect(validateTimestamp(timestamp)).toBeNull();
-    });
-
-    test("validateTimestamp - invalid eventTimeConfidenceUpper", () => {
-        const timestamp = newTimestamp();
-
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (timestamp as any).eventTimeConfidenceUpper = "PT1Hasdf";
-
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - missing recordTime", () => {
@@ -67,7 +57,7 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp as any).recordTime;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - invalid recordTime", () => {
@@ -76,7 +66,7 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         (timestamp as any).recordTime = "123456-qwerty";
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - missing source", () => {
@@ -85,16 +75,16 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp as any).source;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
-    test('validateTimestamp - missing ship', () => {
+    test("validateTimestamp - missing ship", () => {
         const timestamp = newTimestamp();
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp as any).ship;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - missing mmsi & imo", () => {
@@ -105,7 +95,7 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp.ship as any).imo;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - missing location", () => {
@@ -114,7 +104,7 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp as any).location;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
     test("validateTimestamp - missing port", () => {
@@ -123,7 +113,16 @@ describe("timestamp model", () => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
         delete (timestamp.location as any).port;
 
-        expect(validateTimestamp(timestamp)).toBeNull();
+        expect(validateTimestamp(timestamp)).toEqual(false);
     });
 
+    test("validateTimestamp - invalid confidence interval", () => {
+        const timestamp = newTimestamp({
+            eventTimeConfidenceLowerDiff: -1000
+        });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (timestamp as any).eventTimeConfidenceUpperDiff = "123456-qwerty";
+
+        expect(validateTimestamp(timestamp)).toEqual(false);
+    });
 });

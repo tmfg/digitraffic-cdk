@@ -11,8 +11,8 @@ import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import {
     AwakeAiPredictionMetadata,
     AwakeAiPredictionType,
-    AwakeAiVoyageStatus,
     AwakeAiVoyageEtaPrediction,
+    AwakeAiVoyageStatus,
     AwakeAiZoneType
 } from "../../lib/api/awake_common";
 import { getRandomInteger, randomBoolean } from "@digitraffic/common/dist/test/testutils";
@@ -337,7 +337,7 @@ function newDbETAShip(locode?: string, eta?: Date): DbETAShip {
         locode: locode ?? "FILOL",
         port_area_code: "FOO",
         portcall_id: 123,
-        eta: eta?.toISOString() ?? addHours(Date.now(), getRandomInteger(1, 24)).toISOString()
+        eta: eta ?? addHours(Date.now(), getRandomInteger(1, 24))
     };
 }
 

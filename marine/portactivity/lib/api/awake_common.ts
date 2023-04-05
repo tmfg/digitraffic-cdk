@@ -23,10 +23,19 @@ export enum AwakeAiPredictionType {
 }
 
 export interface AwakeAiPredictionMetadata {
-    source: AwakeURN | AwakeDigitrafficPortCallURN;
+    readonly source: AwakeURN | AwakeDigitrafficPortCallURN;
+    readonly errorQuantiles?: AwakeAiConfidenceIntervals;
+}
+
+export interface AwakeAiConfidenceIntervals {
+    readonly q10: number;
+    readonly q25: number;
+    readonly q75: number;
+    readonly q90: number;
 }
 
 export const digitrafficPortCallString = "digitraffic-portcall";
+
 type DigitrafficPortCallID = `${typeof digitrafficPortCallString}:${number}`;
 export type AwakeURN<AwakeIDString extends string = string> = URN<"awake", AwakeIDString>;
 export type AwakeDigitrafficPortCallURN = AwakeURN<DigitrafficPortCallID>;
