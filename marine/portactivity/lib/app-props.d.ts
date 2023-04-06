@@ -12,5 +12,5 @@ export type PortactivityConfiguration = StackConfiguration & {
     readonly dbClusterIdentifier: string;
     readonly documentationBucketName: string;
     readonly awakeATx: boolean;
-    readonly awakePortApi: boolean;
+    readonly awakeETD: boolean;
 };

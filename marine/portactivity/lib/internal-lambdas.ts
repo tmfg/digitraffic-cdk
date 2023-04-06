@@ -115,13 +115,13 @@ export function create(stack: DigitrafficStack, queueAndDLQ: QueueAndDLQ, dlqBuc
         10,
         triggerAwakeAiETAShipTimestampsLambda
     );
-    if ((stack.configuration as PortactivityConfiguration).awakePortApi) {
-        Scheduler.everyMinutes(
-            stack,
-            "PortActivity-UpdateAwakeETAPortScheduler",
-            30,
-            triggerAwakeAiETAPortTimestampsLambda
-        );
+    Scheduler.everyMinutes(
+        stack,
+        "PortActivity-UpdateAwakeETAPortScheduler",
+        30,
+        triggerAwakeAiETAPortTimestampsLambda
+    );
+    if ((stack.configuration as PortactivityConfiguration).awakeETD) {
         Scheduler.everyMinutes(
             stack,
             "PortActivity-UpdateAwakeETDPortScheduler",
