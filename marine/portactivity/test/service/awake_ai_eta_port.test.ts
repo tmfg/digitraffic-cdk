@@ -14,18 +14,6 @@ import { addHours, subHours } from "date-fns";
 import { createAwakeAiPortResponse } from "./awake_ai_etx_port_testutil";
 
 describe("AwakeAiETAPortService(", () => {
-    test("getAwakeAiTimestamps - correct needs to include port call prediction", async () => {
-        const api = createApi();
-        const service = new AwakeAiETAPortService(api);
-        sinon
-            .stub(api, "getETAs")
-            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: true })));
-
-        const timestamps = await service.getAwakeAiTimestamps("FILOL");
-
-        expect(timestamps.length).toBe(1);
-    });
-
     test("getAwakeAiTimestamps - no schedule", async () => {
         const api = createApi();
         const service = new AwakeAiETAPortService(api);
@@ -102,6 +90,30 @@ describe("AwakeAiETAPortService(", () => {
         const timestamps = await service.getAwakeAiTimestamps("FILOL");
 
         expect(timestamps.length).toBe(0);
+    });
+
+    test("getAwakeAiTimestamps - correct with port call prediction", async () => {
+        const api = createApi();
+        const service = new AwakeAiETAPortService(api);
+        sinon
+            .stub(api, "getETAs")
+            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: true })));
+
+        const timestamps = await service.getAwakeAiTimestamps("FILOL");
+
+        expect(timestamps.length).toBe(1);
+    });
+
+    test("getAwakeAiTimestamps - correct without port call prediction", async () => {
+        const api = createApi();
+        const service = new AwakeAiETAPortService(api);
+        sinon
+            .stub(api, "getETAs")
+            .returns(Promise.resolve(createEtaResponse({ includePortCallPrediction: false })));
+
+        const timestamps = await service.getAwakeAiTimestamps("FILOL");
+
+        expect(timestamps.length).toBe(1);
     });
 });
 
