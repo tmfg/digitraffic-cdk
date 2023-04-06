@@ -43,7 +43,8 @@ export function saveTimestamp(
                 return undefined;
             } else {
                 console.info(
-                    "method=saveTimestamp portcall id not found but persisting because source is: ${EventSource.AWAKE_AI_PRED}, timestamp: %s",
+                    "method=saveTimestamp portcall id not found but persisting because source is: %s, timestamp: %s",
+                    EventSource.AWAKE_AI_PRED,
                     JSON.stringify(timestamp)
                 );
             }

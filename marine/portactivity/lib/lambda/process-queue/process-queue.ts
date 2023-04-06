@@ -14,14 +14,16 @@ export function handlerFn() {
             return inDatabase((db: DTDatabase) => {
                 return Promise.allSettled(
                     event.Records.map((r) => {
-                        const timestamp = JSON.parse(r.body) as Partial<ApiTimestamp>;
+                        const partial = JSON.parse(r.body) as Partial<ApiTimestamp>;
                         const start = Date.now();
                         console.info(
                             "DEBUG method=processTimestampQueue.handler processing timestamp",
-                            timestamp
+                            partial
                         );
 
-                        if (!validateTimestamp(timestamp)) {
+                        const timestamp = validateTimestamp(partial);
+
+                        if (!timestamp) {
                             console.warn(
                                 "DEBUG method=processTimestampQueue.handler timestamp did not pass validation"
                             );
