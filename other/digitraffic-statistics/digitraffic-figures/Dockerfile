@@ -1,12 +1,12 @@
 ARG FUNCTION_DIR="/function"
 
-ARG PYTHON_VERSION=3.9.10
+ARG PYTHON_VERSION=3.11
 
 FROM arm64v8/python:${PYTHON_VERSION}-slim as build-image
 
 RUN apt-get update \
     && apt-get install -y \
-        build-essential libcurl4-openssl-dev default-libmysqlclient-dev
+    build-essential libcurl4-openssl-dev default-libmysqlclient-dev
 
 ARG FUNCTION_DIR
 
