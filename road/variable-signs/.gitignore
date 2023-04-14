@@ -15,8 +15,10 @@
 !/lib/
 !/lib/**/
 !/lib/**/*.ts
-!/lib/schemas/*.json
-/lib/generated
+!/resources/
+!/resources/**/
+!/resources/**/*.json
+!/resources/**/*.xsd
 !/test/
 !/test/**/
 !/test/**/*.ts

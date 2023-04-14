@@ -12,11 +12,16 @@
 
 !/config/
 !/config/*.json
+!/database/
+!/database/Dockerfile
+!/database/**/
+!/database/**/*.sql
+!/database/**/*.md
+!/database/**/*.sh
+!/database/**/*.conf
 !/lib/
 !/lib/**/
 !/lib/**/*.ts
-!/lib/schemas/*.json
-/lib/generated
 !/test/
 !/test/**/
 !/test/**/*.ts

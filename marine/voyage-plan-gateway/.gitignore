@@ -9,14 +9,13 @@
 !/*.json
 !/*.md
 !/*.sh
+!/*.xsd
 
 !/config/
 !/config/*.json
 !/lib/
 !/lib/**/
 !/lib/**/*.ts
-!/lib/schemas/*.json
-/lib/generated
 !/test/
 !/test/**/
 !/test/**/*.ts

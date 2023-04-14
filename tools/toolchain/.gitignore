@@ -1,4 +1,6 @@
-!/*/
+*
+
+!/includes/
 !/includes/*.json
 
 !/*.json

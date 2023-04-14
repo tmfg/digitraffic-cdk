@@ -1,33 +1,35 @@
 *
 
 !.gitignore
-!.eslintrc.js
-!.eslintignore
-# for creating empty directories
-!.git-create
 
 !/.editorconfig
 !/.gitattributes
 !/.node-version
 !/.prettierignore
 !/.prettierrc.js
-!/README.md
+!/*.md
+!/*.sh
+!/*.py
+!/Dockerfile
+!/LICENCE
+!/rush.json
 
-# Github
-!.github/
-!.github/**/
-!.github/workflows/**/**.yml
-!.github/CODEOWNERS
+# for creating empty directories
+!.git-create
 
-# Rush
-!/common/
-!/common/*/
-!rush.json
+!/scripts/
+!/scripts/*.sh
+!/scripts/*.template
+!/scripts/*.md
 
+!/lib/
+!/lib/*/
+!/tools/
+!/tools/*/
+
+# Project folders
 !aviation/
 !aviation/*/
-!lib/
-!lib/*/
 !marine/
 !marine/*/
 !other/
@@ -36,5 +38,8 @@
 !rail/*/
 !road/
 !road/*/
-!tools/
-!tools/*/
+
+# Github
+!.github/**/
+!.github/workflows/**/**.yml
+!.github/CODEOWNERS

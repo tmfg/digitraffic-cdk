@@ -1,6 +1,7 @@
+*
+
 !/config/
 !/config/**/
-!/config/repo/
 !/config/repo/*.default.json
 !/config/rush/*
 !/git-hooks/
@@ -10,9 +11,9 @@
 !/lib/*/*.js
 !/scripts/
 !/scripts/**/
-!/scripts/**/*.py
 !/scripts/**/*.js
 !/scripts/**/*.mjs
+!/scripts/**/*.py
 !/scripts/**/*.sh
 
 # Rush autoinstallers

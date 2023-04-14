@@ -15,8 +15,7 @@
 !/lib/
 !/lib/**/
 !/lib/**/*.ts
-!/lib/schemas/*.json
-/lib/generated
+!/lib/**/*.js
 !/test/
 !/test/**/
 !/test/**/*.ts
