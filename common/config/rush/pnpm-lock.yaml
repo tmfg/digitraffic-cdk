@@ -441,10 +441,10 @@ importers:
 
   ../../marine/portactivity:
     specifiers:
-      '@aws-cdk/aws-synthetics-alpha': 2.51.1-alpha.0
+      '@aws-cdk/aws-synthetics-alpha': 2.70.0-alpha.0
       '@digitraffic-cdk/eslint-config': workspace:*
       '@digitraffic-cdk/toolchain': workspace:*
-      '@digitraffic/common': 2023.03.10-1
+      '@digitraffic/common': 2023.4.4-1
       '@middy/core': ^3.6.2
       '@middy/sqs-partial-batch-failure': ^3.6.2
       '@rushstack/eslint-config': ~3.2.0
@@ -458,10 +458,10 @@ importers:
       '@types/ws': ^8.2.0
       '@types/xml2js': ^0.4.8
       amqplib: ^0.10.3
-      aws-cdk-lib: 2.51.1
-      aws-sdk: 2.1260.0
-      axios: ^1.2.0
-      constructs: 10.1.168
+      aws-cdk-lib: 2.70.0
+      aws-sdk: ^2.1343.0
+      axios: ^1.3.4
+      constructs: ^10.1.292
       date-fns: ^2.29.3
       esbuild: ^0.15.15
       eslint: ~8.34.0
@@ -481,17 +481,17 @@ importers:
       typescript: ~4.8.4
       uuid: ^9.0.0
     dependencies:
-      '@digitraffic/common': 2023.3.10-1_izejsjwftmvs6njohejjov4wpm
+      '@digitraffic/common': 2023.4.4-1_hp6u2fqs3jnctqm5yrnimpb57u
       '@middy/core': 3.6.2
       '@middy/sqs-partial-batch-failure': 3.6.2
       '@types/amqplib': 0.10.1
       '@types/ramda': 0.28.20
       '@types/ws': 8.5.4
       amqplib: 0.10.3
-      aws-cdk-lib: 2.51.1_constructs@10.1.168
-      aws-sdk: 2.1260.0
+      aws-cdk-lib: 2.70.0_constructs@10.1.310
+      aws-sdk: 2.1358.0
       axios: 1.3.4
-      constructs: 10.1.168
+      constructs: 10.1.310
       date-fns: 2.29.3
       moment: 2.29.4
       moment-timezone: 0.5.39
@@ -502,7 +502,7 @@ importers:
       spex: 3.2.0
       uuid: 9.0.0
     devDependencies:
-      '@aws-cdk/aws-synthetics-alpha': 2.51.1-alpha.0_mg7efayfissownndcsmr4oy4rq
+      '@aws-cdk/aws-synthetics-alpha': 2.70.0-alpha.0_ksyfrqcijl635olvdlh7eke6qm
       '@digitraffic-cdk/eslint-config': link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain': link:../../tools/toolchain
       '@rushstack/eslint-config': 3.2.0_vvbfoh7ci2jjuy6alapehrh2ri
@@ -737,7 +737,7 @@ importers:
       ts-node: '*'
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_thnxbjdgkwhoh6uxocsn6jdxsm
+      '@digitraffic/common': 2022.11.23-5_jsjurltftmscnktukvogilvzfi
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       constructs: 10.1.168
       source-map-support: 0.5.21
@@ -754,14 +754,14 @@ importers:
     specifiers:
       '@digitraffic-cdk/eslint-config': workspace:*
       '@digitraffic-cdk/toolchain': workspace:*
-      '@digitraffic/common': 2022.11.23-5
+      '@digitraffic/common': 2023.3.17-1
       '@rushstack/eslint-config': ~3.2.0
       '@types/aws-lambda': 8.10.108
       '@types/node': '*'
       '@types/sinon': '*'
-      aws-cdk-lib: 2.51.1
-      aws-sdk: 2.1260.0
-      constructs: 10.1.168
+      aws-cdk-lib: 2.62.2
+      aws-sdk: 2.1304.0
+      constructs: 10.1.249
       esbuild: '*'
       eslint: ~8.34.0
       jest: ^29.3.1
@@ -772,9 +772,9 @@ importers:
       ts-node: ^10.9.1
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_3a6yv2dtfxuothmx3x43qm6b7e
-      aws-cdk-lib: 2.51.1_constructs@10.1.168
-      constructs: 10.1.168
+      '@digitraffic/common': 2023.3.17-1_qypbm2lfjtqgngshk4bauud7he
+      aws-cdk-lib: 2.62.2_constructs@10.1.249
+      constructs: 10.1.249
       p-limit: 4.0.0
       source-map-support: 0.5.21
     devDependencies:
@@ -784,7 +784,7 @@ importers:
       '@types/aws-lambda': 8.10.108
       '@types/node': 18.14.2
       '@types/sinon': 10.0.13
-      aws-sdk: 2.1260.0
+      aws-sdk: 2.1304.0
       esbuild: 0.17.10
       eslint: 8.34.0
       jest: 29.4.3_jboh4c3iv3wxuja4m36ecyac7e
@@ -851,7 +851,7 @@ importers:
       eslint: ~8.34.0
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_thnxbjdgkwhoh6uxocsn6jdxsm
+      '@digitraffic/common': 2022.11.23-5_jsjurltftmscnktukvogilvzfi
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       constructs: 10.1.168
     devDependencies:
@@ -958,7 +958,7 @@ importers:
       ts-node: ^10.9.1
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2023.2.13-1_k4dytwxxpqljzt7uirkkd4ao64
+      '@digitraffic/common': 2023.2.13-1_nfbvflvtbxxrv7cdvutlxynb5m
       '@types/aws-lambda': 8.10.108
       aws-cdk-lib: 2.62.2_constructs@10.1.235
       constructs: 10.1.235
@@ -1017,7 +1017,6 @@ importers:
       jest-junit: ^15.0.0
       mqtt: ^4.3.7
       parallelshell: 3.0.2
-      querystring: 0.2.1
       sinon: '*'
       source-map-support: ^0.5.19
       ts-jest: ^29.0.3
@@ -1046,7 +1045,6 @@ importers:
       jest: 29.4.3_jboh4c3iv3wxuja4m36ecyac7e
       jest-junit: 15.0.0
       parallelshell: 3.0.2
-      querystring: 0.2.1
       sinon: 15.0.1
       ts-jest: 29.0.5_5q5apsp7cjvhelazj63qsfgnzm
       ts-node: 10.9.1_ur2zvwswnidelmfyip32ggl2ny
@@ -1163,7 +1161,7 @@ importers:
       ts-jest: ^29.0.3
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_thnxbjdgkwhoh6uxocsn6jdxsm
+      '@digitraffic/common': 2022.11.23-5_jsjurltftmscnktukvogilvzfi
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       axios: 1.3.4
       constructs: 10.1.168
@@ -1198,7 +1196,7 @@ importers:
       '@aws-cdk/assert': 2.62.2
       '@digitraffic-cdk/eslint-config': workspace:*
       '@digitraffic-cdk/toolchain': workspace:*
-      '@digitraffic/common': workspace:*
+      '@digitraffic/common': 2023.2.13-1
       '@rushstack/eslint-config': ~3.2.0
       '@types/aws-lambda': 8.10.108
       '@types/jest': ^29.4.0
@@ -1217,7 +1215,7 @@ importers:
       ts-jest: ^29.0.5
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': link:../../lib/digitraffic-common
+      '@digitraffic/common': 2023.2.13-1_jblf4wlklcdudrj77f6ismei3a
       aws-cdk-lib: 2.62.2_constructs@10.1.235
       aws-sdk: 2.1304.0
       axios: 1.3.4
@@ -1398,7 +1396,7 @@ importers:
       ts-jest: ^29.0.5
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.12.22-3_pzi5k2ov3qim6zdtt5tkedpsym
+      '@digitraffic/common': 2022.12.22-3_eqyvigmydmhnnawpzbzwck3evq
       aws-cdk-lib: 2.59.0_constructs@10.1.168
       axios: 1.3.4
       constructs: 10.1.168
@@ -1458,7 +1456,7 @@ importers:
       ts-node: ^10.9.1
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_thnxbjdgkwhoh6uxocsn6jdxsm
+      '@digitraffic/common': 2022.11.23-5_jsjurltftmscnktukvogilvzfi
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       axios: 1.3.4
       constructs: 10.1.168
@@ -1511,7 +1509,7 @@ importers:
       ts-jest: ^29.0.3
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_thnxbjdgkwhoh6uxocsn6jdxsm
+      '@digitraffic/common': 2022.11.23-5_jsjurltftmscnktukvogilvzfi
       '@types/geojson': 7946.0.10
       '@types/ramda': 0.28.20
       aws-cdk-lib: 2.51.1_constructs@10.1.168
@@ -1561,7 +1559,7 @@ importers:
       typescript: ~4.8.4
       wkx: ^0.5.0
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_thnxbjdgkwhoh6uxocsn6jdxsm
+      '@digitraffic/common': 2022.11.23-5_jsjurltftmscnktukvogilvzfi
       aws-cdk-lib: 2.51.1_constructs@10.1.168
       axios: 1.3.4
       constructs: 10.1.168
@@ -1613,7 +1611,7 @@ importers:
       ts-jest: ^29.0.3
       typescript: ~4.8.4
     dependencies:
-      '@digitraffic/common': 2022.11.23-5_w3ldjqcwpb5dyd3w4whyt3vbe4
+      '@digitraffic/common': 2022.11.23-5_v3me747n5y7qo4rots6wbc6vbu
       aws-cdk-lib: 2.62.2_constructs@10.1.168
       axios: 1.3.4
       constructs: 10.1.168
@@ -1703,11 +1701,17 @@ packages:
       jest: 29.4.3_@types+node@18.14.2
     dev: true
 
+  /@aws-cdk/asset-awscli-v1/2.2.139:
+    resolution: {integrity: sha512-PGRtKbDfI8BmLEik4awqe/u02GKhpdyYvgI6XWGvSyn2qx+f4rVmyLqM2wiFI8wFWFt6YBAQaegKJS1cEZVe2A==}
+
   /@aws-cdk/asset-awscli-v1/2.2.83:
     resolution: {integrity: sha512-IQ7dk6O+gai13F1BEAUUduZ8McyCm7PvLn0yjYMwsp1AO/vqr/ADIPDDRaKBoFpou7pz0FjNzUF/ZRKILHZgzA==}
 
   /@aws-cdk/asset-kubectl-v20/2.1.1:
     resolution: {integrity: sha512-U1ntiX8XiMRRRH5J1IdC+1t5CE89015cwyt5U63Cpk0GnMlN5+h9WsWMlKlPXZR4rdq/m806JRlBMRpBUB2Dhw==}
+
+  /@aws-cdk/asset-node-proxy-agent-v5/2.0.115:
+    resolution: {integrity: sha512-MJ5/tMBOo6m7Bazs5TqEijIZNo4DH9NOAuv6mXjFT9k1yNAdOAr0imzG9L3uk2JpSmKrGRDSPRkrJFOszNtSaw==}
 
   /@aws-cdk/asset-node-proxy-agent-v5/2.0.69:
     resolution: {integrity: sha512-JQyTalBYQXGIK+SaLzMdeNfpjcMU+W3aeIaWiwKmgdkCjcRph0r0v0s+GePDigVUoh6sigSqPdNC1pRMOdOiYA==}
@@ -1745,16 +1749,6 @@ packages:
       constructs: 10.1.168
     dev: false
 
-  /@aws-cdk/aws-synthetics-alpha/2.51.1-alpha.0_mg7efayfissownndcsmr4oy4rq:
-    resolution: {integrity: sha512-YW4RdPZfjjjA9SNZXuI00LbjDzk/vsqgnd4PCzNUWXZaCkJmwP2MYrIcoupqsUtHN2n2wZu/brwqnqir5DgZKA==}
-    engines: {node: '>= 14.15.0'}
-    peerDependencies:
-      aws-cdk-lib: ^2.51.1
-      constructs: ^10.0.0
-    dependencies:
-      aws-cdk-lib: 2.51.1_constructs@10.1.168
-      constructs: 10.1.168
-
   /@aws-cdk/aws-synthetics-alpha/2.62.2-alpha.0_v2nfsrfoqkfcz7qv6hndiv2rga:
     resolution: {integrity: sha512-hwT6T6jZde31za7IPvWPru6HNTB7SAPwniq0ggnVwLIR3k+M1yTo/ggEhNgF0hU4wdvdA9zopU08DSDtQjegLQ==}
     engines: {node: '>= 14.15.0'}
@@ -1764,6 +1758,27 @@ packages:
     dependencies:
       aws-cdk-lib: 2.62.2_constructs@10.1.235
       constructs: 10.1.235
+
+  /@aws-cdk/aws-synthetics-alpha/2.62.2-alpha.0_zxc4avautggegyxhacqydawcwq:
+    resolution: {integrity: sha512-hwT6T6jZde31za7IPvWPru6HNTB7SAPwniq0ggnVwLIR3k+M1yTo/ggEhNgF0hU4wdvdA9zopU08DSDtQjegLQ==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      aws-cdk-lib: ^2.62.2
+      constructs: ^10.0.0
+    dependencies:
+      aws-cdk-lib: 2.62.2_constructs@10.1.249
+      constructs: 10.1.249
+    dev: false
+
+  /@aws-cdk/aws-synthetics-alpha/2.70.0-alpha.0_ksyfrqcijl635olvdlh7eke6qm:
+    resolution: {integrity: sha512-peQuh8s8HjTiaQvg94823fJh8p1xKiQQKMqrWN9MGyBs52i51CieHf1q/UNYVwRsDnt7Iq38XFsNFbYuJEjUUg==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      aws-cdk-lib: ^2.70.0
+      constructs: ^10.0.0
+    dependencies:
+      aws-cdk-lib: 2.70.0_constructs@10.1.310
+      constructs: 10.1.310
 
   /@aws-cdk/cfnspec/2.62.2:
     resolution: {integrity: sha512-/Fohjzce9FCb+fGFev8J4rHOFvdRgQbnMPIshlSaYSTAXLDBkX6CCb+WjeI6Lo8nTbTTvRQiCDTnnDgKPzz8OA==}
@@ -2201,7 +2216,7 @@ packages:
       spex: 3.2.0
     dev: false
 
-  /@digitraffic/common/2022.11.23-5_thnxbjdgkwhoh6uxocsn6jdxsm:
+  /@digitraffic/common/2022.11.23-5_jsjurltftmscnktukvogilvzfi:
     resolution: {integrity: sha512-tQG6Mys2E1WGbuIOa4LVycT7Q60WhZ77LpZwp2uCY4UgRED2JgE+2fXh7itHtW1Z4yW+wCSEgtuQmGT3blv16w==}
     engines: {node: '>=14 <17'}
     peerDependencies:
@@ -2222,7 +2237,7 @@ packages:
       '@aws-cdk/aws-synthetics-alpha': 2.50.0-alpha.0_mg7efayfissownndcsmr4oy4rq
       '@types/geojson': 7946.0.10
       aws-cdk-lib: 2.51.1_constructs@10.1.168
-      aws-sdk: 2.1323.0
+      aws-sdk: 2.1358.0
       axios: 1.3.4
       change-case: 4.1.2
       constructs: 10.1.168
@@ -2234,7 +2249,7 @@ packages:
       spex: 3.2.0
     dev: false
 
-  /@digitraffic/common/2022.11.23-5_w3ldjqcwpb5dyd3w4whyt3vbe4:
+  /@digitraffic/common/2022.11.23-5_v3me747n5y7qo4rots6wbc6vbu:
     resolution: {integrity: sha512-tQG6Mys2E1WGbuIOa4LVycT7Q60WhZ77LpZwp2uCY4UgRED2JgE+2fXh7itHtW1Z4yW+wCSEgtuQmGT3blv16w==}
     engines: {node: '>=14 <17'}
     peerDependencies:
@@ -2255,7 +2270,7 @@ packages:
       '@aws-cdk/aws-synthetics-alpha': 2.50.0-alpha.0_f376n4lxzhycn5cfls4kuqgkaa
       '@types/geojson': 7946.0.10
       aws-cdk-lib: 2.62.2_constructs@10.1.168
-      aws-sdk: 2.1323.0
+      aws-sdk: 2.1358.0
       axios: 1.3.4
       change-case: 4.1.2
       constructs: 10.1.168
@@ -2300,7 +2315,7 @@ packages:
       spex: 3.2.0
     dev: false
 
-  /@digitraffic/common/2022.12.22-3_pzi5k2ov3qim6zdtt5tkedpsym:
+  /@digitraffic/common/2022.12.22-3_eqyvigmydmhnnawpzbzwck3evq:
     resolution: {integrity: sha512-Fq9fvrhnvJ7rjmoqS5Q/XMegsq7LbzyW2d0XrGVKZM432FY089rG2IxDq8o7TREVTt0qwUbtx3wJsj6fB6SWQQ==}
     engines: {node: '>=14 <17'}
     peerDependencies:
@@ -2321,7 +2336,7 @@ packages:
       '@aws-cdk/aws-synthetics-alpha': 2.50.0-alpha.0_afs5ouhq67np25acwdue7cuxrq
       '@types/geojson': 7946.0.10
       aws-cdk-lib: 2.59.0_constructs@10.1.168
-      aws-sdk: 2.1323.0
+      aws-sdk: 2.1358.0
       axios: 1.3.4
       change-case: 4.1.2
       constructs: 10.1.168
@@ -2461,8 +2476,8 @@ packages:
       pg-promise: 10.15.2_pg-native@3.0.1
     dev: false
 
-  /@digitraffic/common/2023.3.10-1_izejsjwftmvs6njohejjov4wpm:
-    resolution: {integrity: sha512-G9mDO8mMFXmfUUdyIm6kBenDFYV6Pa0E6vM9F8X3PB6MK/TY8xM5Xpmu+07ci49XPRj9lYdF+WnsIUdaG6aTHA==}
+  /@digitraffic/common/2023.2.13-1_nfbvflvtbxxrv7cdvutlxynb5m:
+    resolution: {integrity: sha512-fynRznl1NHWnPS1evnbp3kLi4jENIVAfIajAvZZyla4V8XhtQzHITDn02OLcSZrLszJ+tm6nhe49W3k8HUwLoQ==}
     engines: {node: '>=14 <17'}
     peerDependencies:
       '@aws-cdk/aws-synthetics-alpha': 2.62.2-alpha.0
@@ -2478,14 +2493,77 @@ packages:
       pg-native: ^3.0.1
       pg-promise: ^10.12.0
     dependencies:
-      '@aws-cdk/aws-synthetics-alpha': 2.51.1-alpha.0_mg7efayfissownndcsmr4oy4rq
+      '@aws-cdk/aws-synthetics-alpha': 2.62.2-alpha.0_v2nfsrfoqkfcz7qv6hndiv2rga
       '@types/geojson': 7946.0.10
-      aws-cdk-lib: 2.51.1_constructs@10.1.168
-      aws-sdk: 2.1260.0
+      aws-cdk-lib: 2.62.2_constructs@10.1.235
+      aws-sdk: 2.1358.0
       axios: 1.3.4
       change-case: 4.1.2
-      constructs: 10.1.168
+      constructs: 10.1.235
       geojson-validation: 1.0.2
+      moment: 2.29.4
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 10.15.2_pg-native@3.0.1
+    dev: false
+
+  /@digitraffic/common/2023.3.17-1_qypbm2lfjtqgngshk4bauud7he:
+    resolution: {integrity: sha512-Zuu1tqGhG3FTCLMvRxG4ZYc1L3GeXbc7UWdsdeK6hlOzvm4IfHSK0DOwwBHPB7S/z8kXG/gJsZtO4YDnRSBU8A==}
+    engines: {node: '>=14 <17'}
+    peerDependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.62.2-alpha.0
+      '@types/geojson': ^7946.0.10
+      aws-cdk-lib: 2.62.2
+      aws-sdk: ^2.1304.0
+      axios: ^1.2.6
+      change-case: ^4.1.2
+      constructs: ^10.1.235
+      geojson-validation: ^1.0.2
+      moment: ^2.29.4
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^10.12.0
+    dependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.62.2-alpha.0_zxc4avautggegyxhacqydawcwq
+      '@types/geojson': 7946.0.10
+      aws-cdk-lib: 2.62.2_constructs@10.1.249
+      aws-sdk: 2.1304.0
+      axios: 1.3.4
+      change-case: 4.1.2
+      constructs: 10.1.249
+      geojson-validation: 1.0.2
+      moment: 2.29.4
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 10.15.2_pg-native@3.0.1
+    dev: false
+
+  /@digitraffic/common/2023.4.4-1_hp6u2fqs3jnctqm5yrnimpb57u:
+    resolution: {integrity: sha512-qoaGQw2Hn9ZaIwbtr03vAzXOR6gpJCe4lCX2ttkvVqusqr30ZwTfS+oU6734Wa5mSRFUNzPBSUGN7XRjRz9l7A==}
+    engines: {node: '>=14 <17'}
+    peerDependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.70.0-alpha.0
+      '@types/geojson': ^7946.0.10
+      aws-cdk-lib: 2.70.0
+      aws-sdk: ^2.1343.0
+      axios: ^1.3.4
+      change-case: ^4.1.2
+      constructs: ^10.1.292
+      geojson-validation: ^1.0.2
+      moment: ^2.29.4
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^10.12.0
+    dependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.70.0-alpha.0_ksyfrqcijl635olvdlh7eke6qm
+      '@types/geojson': 7946.0.10
+      aws-cdk-lib: 2.70.0_constructs@10.1.310
+      aws-sdk: 2.1358.0
+      axios: 1.3.4
+      change-case: 4.1.2
+      constructs: 10.1.310
+      geojson-validation: 1.0.2
+      lodash: 4.17.21
       moment: 2.29.4
       node-ttl: 0.2.0
       pg-native: 3.0.1
@@ -4233,6 +4311,7 @@ packages:
       punycode: 2.3.0
       semver: 7.3.8
       yaml: 1.10.2
+    dev: false
     bundledDependencies:
       - '@balena/dockerignore'
       - case
@@ -4336,11 +4415,54 @@ packages:
       - semver
       - yaml
 
+  /aws-cdk-lib/2.62.2_constructs@10.1.249:
+    resolution: {integrity: sha512-ynyoEFQckICFJzbUd89pWjol3GGbxRF05E8BCPEyy++vLHJZdqaJxRL4REl4lrdznnkb1kvxtBSGg4cOkR4o3w==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      constructs: ^10.0.0
+    dependencies:
+      '@aws-cdk/asset-awscli-v1': 2.2.83
+      '@aws-cdk/asset-kubectl-v20': 2.1.1
+      '@aws-cdk/asset-node-proxy-agent-v5': 2.0.115
+      constructs: 10.1.249
+    dev: false
+    bundledDependencies:
+      - '@balena/dockerignore'
+      - case
+      - fs-extra
+      - ignore
+      - jsonschema
+      - minimatch
+      - punycode
+      - semver
+      - yaml
+
+  /aws-cdk-lib/2.70.0_constructs@10.1.310:
+    resolution: {integrity: sha512-q/Go/3VERycIMJp3LfVtjRCLnIJHXJ0gfev5qM5yPyuvoDgZaKuaGA54T0IebgXDyZzS6We3j/DhuP/nPR8sPw==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      constructs: ^10.0.0
+    dependencies:
+      '@aws-cdk/asset-awscli-v1': 2.2.139
+      '@aws-cdk/asset-kubectl-v20': 2.1.1
+      '@aws-cdk/asset-node-proxy-agent-v5': 2.0.115
+      constructs: 10.1.310
+    bundledDependencies:
+      - '@balena/dockerignore'
+      - case
+      - fs-extra
+      - ignore
+      - jsonschema
+      - minimatch
+      - punycode
+      - semver
+      - yaml
+
   /aws-lambda/1.0.7:
     resolution: {integrity: sha512-9GNFMRrEMG5y3Jvv+V4azWvc+qNWdWLTjDdhf/zgMlz8haaaLWv0xeAIWxz9PuWUBawsVxy0zZotjCdR3Xq+2w==}
     hasBin: true
     dependencies:
-      aws-sdk: 2.1323.0
+      aws-sdk: 2.1358.0
       commander: 3.0.2
       js-yaml: 3.14.1
       watchpack: 2.4.0
@@ -4375,7 +4497,6 @@ packages:
       util: 0.12.5
       uuid: 8.0.0
       xml2js: 0.4.19
-    dev: false
 
   /aws-sdk/2.1323.0:
     resolution: {integrity: sha512-GoLwk2SuG9A6eWgc1mGmm548dklheDmkeptHRw2RhCvq2GZqlc4AzStFUjUURy4O4NQmd2ZiQIoeseue4RwurA==}
@@ -4391,6 +4512,22 @@ packages:
       util: 0.12.5
       uuid: 8.0.0
       xml2js: 0.4.19
+
+  /aws-sdk/2.1358.0:
+    resolution: {integrity: sha512-ZolqFlnm0mDNgub7FGrVi7r5A1rw+58zZziKhlis3IxOtIpHdx4BQU5pH4htAMuD0Ct557p/dC/wmnZH/1Rc9Q==}
+    engines: {node: '>= 10.0.0'}
+    dependencies:
+      buffer: 4.9.2
+      events: 1.1.1
+      ieee754: 1.1.13
+      jmespath: 0.16.0
+      querystring: 0.2.0
+      sax: 1.2.1
+      url: 0.10.3
+      util: 0.12.5
+      uuid: 8.0.0
+      xml2js: 0.5.0
+    dev: false
 
   /axios-retry/3.4.0:
     resolution: {integrity: sha512-VdgaP+gHH4iQYCCNUWF2pcqeciVOdGrBBAYUfTY+wPcO5Ltvp/37MLFNCmJKo7Gj3SHvCSdL8ouI1qLYJN3liA==}
@@ -4821,9 +4958,19 @@ packages:
   /constructs/10.1.168:
     resolution: {integrity: sha512-tVFGDyqy6g1r+4/teAdBQayzy/UmkA1xm+eKvZ+h/Qs5P/C+IKUiwiwFNXCEFvinwuE1k2Oe6EvNjASjnYw9Zw==}
     engines: {node: '>= 14.17.0'}
+    dev: false
 
   /constructs/10.1.235:
     resolution: {integrity: sha512-d4YdcNyV0Id3rjsIuges4vCY1u4yGcr6SSx3OYtQG87NMOLpRCdibNAaWfj8pWJNqm7WHBc6bjfd8WX2nsEJjA==}
+    engines: {node: '>= 14.17.0'}
+
+  /constructs/10.1.249:
+    resolution: {integrity: sha512-xttf/MWHfvMyOjg88CYymlC7RZCP7kF6knA1xtJgDfhvel11uYUhomEGxuQiqy6BOvKyKxJUBaGl8jfp8s1MLA==}
+    engines: {node: '>= 14.17.0'}
+    dev: false
+
+  /constructs/10.1.310:
+    resolution: {integrity: sha512-hfw9zaXmdPItWbDyeL9MaCxjB77W0FSfPvN5N9uKXtXRLHJHk5EJx2NtGPNNf4po1YanrZTCpp6rxpkP3nQkGw==}
     engines: {node: '>= 14.17.0'}
 
   /convert-source-map/1.9.0:
@@ -8143,7 +8290,6 @@ packages:
 
   /sax/1.2.4:
     resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}
-    dev: false
 
   /semver/5.7.1:
     resolution: {integrity: sha512-sauaDf/PZdVgrLTNYHRtpXa1iRiKcaebiKQ1BJdpQlWH2lCvexQdX55snPFyK7QzpudqbCI0qXFfOasHdyNDGQ==}
@@ -8959,11 +9105,19 @@ packages:
   /xml2js/0.4.19:
     resolution: {integrity: sha512-esZnJZJOiJR9wWKMyuvSE1y6Dq5LCuJanqhxslH2bxM6duahNZ+HMpCLhBQGZkbX6xRf8x1Y2eJlgt2q3qo49Q==}
     dependencies:
-      sax: 1.2.1
+      sax: 1.2.4
       xmlbuilder: 9.0.7
 
   /xml2js/0.4.23:
     resolution: {integrity: sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==}
+    engines: {node: '>=4.0.0'}
+    dependencies:
+      sax: 1.2.4
+      xmlbuilder: 11.0.1
+    dev: false
+
+  /xml2js/0.5.0:
+    resolution: {integrity: sha512-drPFnkQJik/O+uPKpqSgr22mpuFHqKdbS835iAQrUC73L2F5WkboIRd63ai/2Yg6I1jzifPFKH2NTK+cfglkIA==}
     engines: {node: '>=4.0.0'}
     dependencies:
       sax: 1.2.4
