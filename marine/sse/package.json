@@ -5,9 +5,9 @@
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
     "prebuild": "json2ts -i lib/schemas/ -o lib/generated/",
-    "build": "pnpm prebuild && tsc && pnpm postbuild",
+    "build": "npm run prebuild && tsc && npm run postbuild",
     "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "cdk-deploy-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy",
     "cdk-deploy-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",

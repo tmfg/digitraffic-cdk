@@ -1,5 +1,5 @@
 {
-  "app": "pnpm dlx ts-node --prefer-ts-exts bin/aws-github-oidc.ts",
+  "app": "npx ts-node --prefer-ts-exts bin/aws-github-oidc.ts",
   "watch": {
     "include": ["**"],
     "exclude": [

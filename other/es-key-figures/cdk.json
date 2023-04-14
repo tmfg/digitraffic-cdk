@@ -1,5 +1,5 @@
 {
-  "app": "pnpm dlx ts-node bin/es-key-figures.ts",
+  "app": "npx ts-node bin/es-key-figures.ts",
   "context": {
     "@aws-cdk/aws-rds:lowercaseDbIdentifier": false
   }

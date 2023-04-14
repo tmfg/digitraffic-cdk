@@ -4,9 +4,9 @@
   "private": true,
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc && pnpm postbuild",
-    "postbuild": "pnpm run compile-lambdas && pnpm run compile-canaries",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "build": "tsc && npm run postbuild",
+    "postbuild": "npm run compile-lambdas && npm run compile-canaries",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "cdk-deploy-marine-prod": "../../scripts/cdk-diff-and-deploy.sh marine-prod deploy",
     "cdk-deploy-marine-test": "../../scripts/cdk-diff-and-deploy.sh marine-test deploy",
@@ -21,7 +21,7 @@
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles --forceExit",
-    "test_errors": "pnpm test 2>&1 | grep 'FAIL'",
+    "test_errors": "npm test 2>&1 | grep 'FAIL'",
     "watch": "tsc -w"
   },
   "dependencies": {

@@ -9,10 +9,10 @@
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "deploy": "pnpm compile-lambdas && pnpm dlx cdk@latest deploy",
-    "diff": "pnpm compile-lambdas && pnpm dlx cdk@latest diff",
+    "deploy": "npm compile-lambdas && npx cdk@latest deploy",
+    "diff": "npm compile-lambdas && npx cdk@latest diff",
     "lint": "eslint --cache .",
-    "nolambda": "nodemon -e ts --exec 'pnpm compile-lambdas'",
+    "nolambda": "nodemon -e ts --exec 'npm compile-lambdas'",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest --detectOpenHandles",
     "watch": "tsc -w"

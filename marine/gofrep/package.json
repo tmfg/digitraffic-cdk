@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc && pnpm postbuild",
+    "build": "tsc && npm run postbuild",
     "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
