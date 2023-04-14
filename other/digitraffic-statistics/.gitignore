@@ -3,7 +3,9 @@
 !.eslintignore
 !.eslintrc.json
 !.gitignore
-!*.json
+!cdk.json
+!tsconfig.json
+!package.json
 
 !lib/
 !lib/**/
