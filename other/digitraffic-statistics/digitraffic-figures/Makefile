@@ -24,6 +24,8 @@ clean_docker:
 	${docker_compose} kill && ${docker_compose} rm -f
 
 csv_to_db:
+	${docker_compose} create flyway
+	${docker_compose} run --rm flyway
 	cat data/key_figures/*.csv > combined.csv
 	sed -e 's/\([^–]\)id,from,to,name,filter,query,value/\1/' < combined.csv > key_figures.csv
 	rm combined.csv
@@ -34,7 +36,7 @@ csv_to_db:
 	rm key_figures.csv
 
 start_db:
-	${docker_compose} up -d
+	${docker_compose} up -d db
 
 dev: export FLASK_APP=digitraffic_figures
 run:
