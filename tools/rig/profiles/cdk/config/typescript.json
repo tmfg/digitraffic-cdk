@@ -4,18 +4,11 @@
 {
   "$schema": "https://developer.microsoft.com/json-schemas/heft/typescript.schema.json",
 
-  "additionalModuleKindsToEmit": [
-    {
-      "moduleKind": "commonjs",
-      "outFolderName": "dist-commonjs"
-    }
-  ],
-
   /**
    * Specifies the intermediary folder that tests will use.  Because Jest uses the
    * Node.js runtime to execute tests, the module format must be CommonJS.
    *
    * The default value is "lib".
    */
-  "emitFolderNameForTests": "dist-commonjs"
+  "emitFolderNameForTests": "dist/out"
 }

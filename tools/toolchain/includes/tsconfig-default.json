@@ -1,16 +1,16 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    "lib": ["es2021"],
+    "lib": ["es2022"],
     "types": ["heft-jest", "node"],
-    "module": "CommonJS",
+    "module": "commonjs",
+    "target": "es2022",
     "sourceMap": true,
-    "target": "es2021",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "moduleResolution": "nodenext",
+    "moduleResolution": "node",
     "allowUnusedLabels": false,
     "allowUnreachableCode": false,
     "exactOptionalPropertyTypes": true,
@@ -21,8 +21,10 @@
     "noUncheckedIndexedAccess": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "importsNotUsedAsValues": "error",
-    "checkJs": true
+    // Enable when migrating to 5.0
+    // "verbatimModuleSyntax": true,
+    "checkJs": true,
+    "importsNotUsedAsValues": "error"
   },
   "exclude": ["../../../../node_modules", "../../../../dist"]
 }
