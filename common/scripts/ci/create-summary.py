@@ -10,7 +10,7 @@ def get_project(x):
 def get_status_light(eslint_report_status):
     if eslint_report_status == "0 problems":
         return "🟢"
-    elif "0 errors" in eslint_report_status:
+    elif "(0 errors" in eslint_report_status:
         return "🟠"
 
     return "🔴"
