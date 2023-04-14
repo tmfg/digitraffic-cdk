@@ -15,7 +15,7 @@ list_outdated:
 	venv/bin/pip list --outdated
 
 update_outdated:
-	venv/bin/pip list --outdated --format=freeze | cut -d"=" -f 1 | xargs -I"{}" venv/bin/pip install -U "{}"
+	venv/bin/pip list --outdated --format=json | jq -r '.[].name' | xargs -I"{}" venv/bin/pip install -U "{}"
 
 freeze_venv:
 	venv/bin/pip freeze > requirements.txt

@@ -135,11 +135,7 @@ def init_callbacks(dash_app, df, figures, logger):
 
 
 def create_top_10_users_date_options(df):
-    nanosecond = 1e9
-    dates = [
-        datetime.datetime.utcfromtimestamp(i.astype(int) / nanosecond)
-        for i in df["from"].unique()
-    ]
+    dates = [i for i in df["from"].unique()]
 
     options = [dict(label=i.strftime("%Y-%m-%d"), value=i) for i in dates]
     options.reverse()
