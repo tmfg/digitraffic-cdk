@@ -1,8 +1,8 @@
-version: '3.1'
+version: "3.1"
 
 services:
   db:
-    image: mysql:latest
+    image: mysql:8.0.32-debian
     command: --default-authentication-plugin=mysql_native_password
     ports:
       - "${DB_PORT}:3306"
@@ -18,7 +18,7 @@ services:
       - 8080:8080
 
   flyway:
-    image: flyway/flyway
+    image: flyway/flyway:9.16.1-alpine
     command: "-url=jdbc:mysql://db/${DB_DATABASE}?allowPublicKeyRetrieval=true -password=${DB_PASSWORD} -user=${DB_USER} -connectRetries=60 migrate"
     volumes:
       - ./dbfigures/sql:/flyway/sql

@@ -1,6 +1,6 @@
 include .env
 
-python := python3.9
+python := python3.11
 
 create_venv:
 	$(python) -m virtualenv venv
@@ -15,26 +15,28 @@ list_outdated:
 	venv/bin/pip list --outdated
 
 update_outdated:
-	venv/bin/pip list --outdated --format=freeze | cut -d"=" -f 1 | xargs -I"{}" venv/bin/pip install -U "{}"
+	venv/bin/pip list --outdated --format=json | jq -r '.[].name' | xargs -I"{}" venv/bin/pip install -U "{}"
 
 freeze_venv:
 	venv/bin/pip freeze > requirements.txt
 
 clean_docker:
-	docker compose kill && docker compose rm -f
+	${docker_compose} kill && ${docker_compose} rm -f
 
 csv_to_db:
+	${docker_compose} create flyway
+	${docker_compose} run --rm flyway
 	cat data/key_figures/*.csv > combined.csv
 	sed -e 's/\([^–]\)id,from,to,name,filter,query,value/\1/' < combined.csv > key_figures.csv
 	rm combined.csv
-	docker compose cp ./key_figures.csv db:/tmp/key_figures.csv
-	docker compose exec db mysql -u"${DB_USER}" -p"${DB_PASSWORD}" -e 'truncate key_figures;' ${DB_DATABASE}
-	docker compose exec db sh -c "mysql -uroot -p'"${DB_PASSWORD}"' -e 'SET GLOBAL local_infile=1';"
-	docker compose exec db sh -c "mysqlimport --ignore-lines=1 --fields-enclosed-by='"'"'"' --fields-terminated-by=',' --local=1 -uroot -p'"${DB_PASSWORD}"' ${DB_DATABASE} /tmp/key_figures.csv"
+	${docker_compose} cp ./key_figures.csv db:/tmp/key_figures.csv
+	${docker_compose} exec db mysql -u"${DB_USER}" -p"${DB_PASSWORD}" -e 'truncate key_figures;' ${DB_DATABASE}
+	${docker_compose} exec db sh -c "mysql -uroot -p'"${DB_PASSWORD}"' -e 'SET GLOBAL local_infile=1';"
+	${docker_compose} exec db sh -c "mysqlimport --ignore-lines=1 --fields-enclosed-by='"'"'"' --fields-terminated-by=',' --local=1 -uroot -p'"${DB_PASSWORD}"' ${DB_DATABASE} /tmp/key_figures.csv"
 	rm key_figures.csv
 
 start_db:
-	docker compose up -d
+	${docker_compose} up -d db
 
 dev: export FLASK_APP=digitraffic_figures
 run:
