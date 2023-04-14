@@ -6,7 +6,7 @@ on:
     branches: ["master"]
 jobs:
   build:
-    if: github.repository != "tmfg/digitraffic-cdk"
+    if: github.repository != 'tmfg/digitraffic-cdk'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
