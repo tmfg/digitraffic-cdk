@@ -1,88 +1,45 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
+*
 
-# Runtime data
-pids
-*.pid
-*.seed
-*.pid.lock
+!.gitignore
 
-# Dependency directories
-node_modules/
-jspm_packages/
-
-# TypeScript v1 declaration files
-typings/
-
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Output of 'npm pack'
-*.tgz
-
-# Yarn Integrity file
-.yarn-integrity
-
-# dotenv environment variables file
-.env
-
-# Configured env script
-**/cdk-set-env.sh
-**/copy-app-config.sh
-**/copy-transport-type-config.sh
-
-# build
-*.js
-!jest.config.js
-tsd/
-node_modules
-template.yaml
-.cache/
-target/
-dist/
-coverage/
-
-# CDK asset staging directory
-.cdk.staging
-cdk.out
-
-# config
-bin
-/.idea/workspace.xml
-/.idea/shelf/
-/.vscode/
-.nvmrc
-
-# flyway config for test, prod
-**/test/flyway.conf
-**/prod/flyway.conf
-.idea
-
-# test rersults
-junit.xml
-/bin/
-/marine/bin/
-/road/bin/
-marine/shiplight/output
-common/output
-digitraffic-common/output
-
-marine/sse/lib/generated/tlsc-sse-reports-schema.d.ts
-/road/counting-sites/output/
-**/private/
-
-# python
-*.pyc
-
-# monorepo specific
+!/.editorconfig
+!/.gitattributes
+!/.node-version
+!/.prettierignore
 !/.prettierrc.js
+!/*.md
+!/*.sh
+!/*.py
+!/Dockerfile
+!/LICENCE
+!/rush.json
+
+# for creating empty directories
+!.git-create
+
+!/scripts/
+!/scripts/*.sh
+!/scripts/*.template
+!/scripts/*.md
+
+!/lib/
+!/lib/*/
+!/tools/
+!/tools/*/
+
+# Project folders
+!aviation/
+!aviation/*/
+!marine/
+!marine/*/
+!other/
+!other/*/
+!rail/
+!rail/*/
+!road/
+!road/*/
+
+# Github
+!.github/**/
+!.github/workflows/**/**.yml
+!.github/CODEOWNERS

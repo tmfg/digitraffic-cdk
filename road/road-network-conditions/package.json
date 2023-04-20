@@ -4,29 +4,18 @@
   "private": true,
   "scripts": {
     "build": "tsc",
-    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "watch": "tsc -w",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
+    "cdk": "cdk",
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "test": "jest --detectOpenHandles",
-    "cdk": "cdk",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "deploy": "npm compile-lambdas && npx cdk@latest deploy",
+    "diff": "npm compile-lambdas && npx cdk@latest diff",
+    "lint": "eslint --cache .",
+    "nolambda": "nodemon -e ts --exec 'npm compile-lambdas'",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "diff": "pnpm compile-lambdas && pnpm dlx cdk@latest diff",
-    "deploy": "pnpm compile-lambdas && pnpm dlx cdk@latest deploy",
-    "nolambda": "nodemon -e ts --exec 'pnpm compile-lambdas'"
-  },
-  "devDependencies": {
-    "@types/aws-lambda": "8.10.108",
-    "@types/jest": "^29.2.3",
-    "@types/node": "*",
-    "esbuild": "*",
-    "jest": "^29.3.1",
-    "jest-junit": "^15.0.0",
-    "nodemon": "^2.0.15",
-    "ts-jest": "^29.0.3",
-    "typescript": "*"
+    "test": "jest --detectOpenHandles",
+    "watch": "tsc -w"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
@@ -38,6 +27,21 @@
     "pg-native": "^3.0.0",
     "pg-promise": "10.15.2",
     "ramda": "^0.28.0"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/eslint-config": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/eslint-config": "~3.2.0",
+    "@types/aws-lambda": "8.10.108",
+    "@types/jest": "^29.2.3",
+    "@types/node": "*",
+    "esbuild": "*",
+    "eslint": "~8.34.0",
+    "jest": "^29.3.1",
+    "jest-junit": "^15.0.0",
+    "nodemon": "^2.0.15",
+    "ts-jest": "^29.0.3",
+    "typescript": "~4.8.4"
   },
   "externals": [
     "aws-sdk"

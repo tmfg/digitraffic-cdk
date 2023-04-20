@@ -3,26 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "postbuild": "esbuild lib/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "test": "echo no tests for this project",
+    "build": "tsc && npm run postbuild",
+    "postbuild": "esbuild lib/lambda/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.2.3",
-    "@types/node": "*",
-    "@types/sinon": "*",
-    "esbuild": "^0.15.15",
-    "jest": "^29.3.1",
-    "parallelshell": "3.0.2",
-    "sinon": "*",
-    "ts-jest": "^29.0.3",
-    "ts-node": "^10.9.1",
-    "typescript": "*"
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
+    "test": "echo no tests for this project",
+    "watch": "tsc -w"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
@@ -35,6 +24,22 @@
     "constructs": "10.1.168",
     "mysql": "^2.18.1",
     "source-map-support": "^0.5.19"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/eslint-config": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/eslint-config": "~3.2.0",
+    "@types/jest": "^29.2.3",
+    "@types/node": "*",
+    "@types/sinon": "*",
+    "esbuild": "^0.15.15",
+    "eslint": "~8.34.0",
+    "jest": "^29.3.1",
+    "parallelshell": "3.0.2",
+    "sinon": "*",
+    "ts-jest": "^29.0.3",
+    "ts-node": "^10.9.1",
+    "typescript": "~4.8.4"
   },
   "externals": [
     "aws-sdk"

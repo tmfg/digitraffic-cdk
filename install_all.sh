@@ -3,4 +3,4 @@
 # exit on any error
 set -ex
 
-pnpm install --frozen-lockfile
+rush update
