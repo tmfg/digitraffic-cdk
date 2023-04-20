@@ -4,6 +4,7 @@ import * as TimestampsDb from "../../lib/dao/timestamps";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
+import * as R from "ramda";
 
 describe(
     "db-timestamps - updates",
@@ -74,6 +75,40 @@ describe(
             await TimestampsDb.updateTimestamp(db, timestamp);
 
             expect((await findAll(db)).length).toBe(1);
+        });
+
+        test("updateTimestamp - mmsi updated for existing timestamp if previously null", async () => {
+            const imo1 = 123;
+            const imo2 = 345;
+            const timestamp1 = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo: imo1 }));
+            const timestamp2 = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo: imo2 }));
+
+            await TimestampsDb.updateTimestamp(db, timestamp1);
+            await TimestampsDb.updateTimestamp(db, timestamp2);
+
+            const timestamps = await findAll(db);
+
+            expect(timestamps.length).toEqual(2);
+            expect(timestamps.find((timestamp) => timestamp.ship_imo === imo1)?.ship_mmsi).toBeNull();
+            expect(timestamps.find((timestamp) => timestamp.ship_imo === imo2)?.ship_mmsi).toBeNull();
+
+            const updatedTimestamp1 = {
+                ...timestamp1,
+                ship: {
+                    ...timestamp1.ship,
+                    mmsi: 321
+                }
+            };
+
+            await TimestampsDb.updateTimestamp(db, updatedTimestamp1);
+
+            const updatedTimestamps = await findAll(db);
+
+            expect(updatedTimestamps.length).toEqual(2);
+            expect(updatedTimestamps.find((timestamp) => timestamp.ship_imo === imo1)?.ship_mmsi).toEqual(
+                updatedTimestamp1.ship.mmsi
+            );
+            expect(updatedTimestamps.find((timestamp) => timestamp.ship_imo === imo2)?.ship_mmsi).toBeNull();
         });
 
         test("createUpdateValues - mmsi 0", () => {

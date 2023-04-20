@@ -50,7 +50,7 @@ export function saveTimestamp(
             }
         }
 
-        // do not persist timestamp if no imo
+        // do not persist timestamp if no imo is found
         const imo = timestamp.ship.imo ?? (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi));
         if (!imo) {
             console.warn(
