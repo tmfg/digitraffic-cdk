@@ -8,7 +8,7 @@
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "compile-lambdas": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "compile-lambdas": "esbuild lib/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
     "deploy": "npm compile-lambdas && npx cdk@latest deploy",
     "diff": "npm compile-lambdas && npx cdk@latest diff",
     "lint": "eslint --cache .",
