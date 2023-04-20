@@ -87,7 +87,9 @@ export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse>
                         recordTime: ts.record_time,
                         portcallId: ts.portcall_id,
                         eventType: ts.event_type,
-                        ship: {},
+                        ship: {
+                            imo: ts.ship_imo
+                        },
                         location: {
                             port: parameters.locode.toUpperCase()
                         }

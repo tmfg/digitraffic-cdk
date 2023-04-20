@@ -30,7 +30,7 @@ describe(
             expect(e.event_time_confidence_upper_diff).toBe(timestamp.eventTimeConfidenceUpperDiff ?? null);
         });
 
-        test("updateTimestamp - mmsi", async () => {
+        test("updateTimestamp - imo undefined, mmsi exists, timestamp is rejected", async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 ship: {
                     mmsi: 123,
@@ -41,7 +41,7 @@ describe(
             await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
         });
 
-        test("updateTimestamp - imo", async () => {
+        test("updateTimestamp - imo exists, mmsi undefined, timestamp is saved", async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 ship: {
                     mmsi: undefined,
@@ -49,7 +49,7 @@ describe(
                 }
             });
 
-            await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
+            await expect(TimestampsDb.updateTimestamp(db, timestamp)).resolves.not.toThrow();
         });
 
         test("updateTimestamp - both ids", async () => {

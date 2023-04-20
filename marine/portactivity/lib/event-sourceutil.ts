@@ -1,8 +1,8 @@
-import { ApiTimestamp, EventType, PublicApiTimestamp } from "./model/timestamp";
+import { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
 import * as R from "ramda";
-import moment, { Moment } from "moment-timezone";
 import { EventSource } from "./model/eventsource";
 import { getLast } from "@digitraffic/common/dist/utils/utils";
+import { differenceInMinutes, parseISO } from "date-fns";
 
 export const VTS_A = "VTS A";
 export const VTS_O = "VTS O";
@@ -44,21 +44,13 @@ for (const entry of eventSourceMap.entries()) {
     }
 }
 
-export function momentAverage(moments: Moment[]): string {
-    const averageMillis = R.reduce((acc, elem) => acc + elem.valueOf(), 0, moments) / moments.length;
-    return moment(averageMillis).toISOString();
+export function dateAverage(dates: Date[]): string {
+    const averageMillis = dates.reduce((acc, curr) => acc + curr.valueOf(), 0) / dates.length;
+    return new Date(averageMillis).toISOString();
 }
 
-export interface MergeableTimestamp {
-    readonly eventTime: string;
-    readonly recordTime: string;
-    readonly source: string;
-    readonly eventType: EventType;
-    readonly portcallId?: number | null;
-}
-
-function momentsDifferByMinutes(moment1: Moment, moment2: Moment, maxDiffMinutes: number) {
-    const diffMinutes = Math.ceil(moment.duration(moment1.diff(moment2)).asMinutes());
+function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number) {
+    const diffMinutes = differenceInMinutes(date1, date2, { roundingMethod: "ceil" });
     return diffMinutes >= maxDiffMinutes;
 }
 
@@ -85,15 +77,15 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
         if (vtsTimestamp) {
             const awakeTimestamp = vtsAStamps.find((t) => t.source === EventSource.AWAKE_AI);
             if (
-                momentsDifferByMinutes(
-                    moment(),
-                    moment(vtsTimestamp.recordTime),
+                datesDifferByMinutes(
+                    new Date(),
+                    parseISO(vtsTimestamp.recordTime),
                     VTS_TIMESTAMP_TOO_OLD_MINUTES
                 ) ||
                 (awakeTimestamp &&
-                    momentsDifferByMinutes(
-                        moment(vtsTimestamp.eventTime),
-                        moment(awakeTimestamp.eventTime),
+                    datesDifferByMinutes(
+                        parseISO(vtsTimestamp.eventTime),
+                        parseISO(awakeTimestamp.eventTime),
                         VTS_TIMESTAMP_DIFF_MINUTES
                     ))
             ) {
@@ -118,7 +110,7 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
             addToList.push({
                 ...highestPriority,
                 ...{
-                    eventTime: momentAverage(vtsAStamps.map((ts) => moment(ts.eventTime)))
+                    eventTime: dateAverage(vtsAStamps.map((ts) => parseISO(ts.eventTime)))
                 }
             });
         }
@@ -126,5 +118,5 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
         ret.push(...addToList);
     }
 
-    return R.sortBy((ts) => moment(ts.eventTime).valueOf(), ret);
+    return R.sortBy((ts) => parseISO(ts.eventTime).valueOf(), ret);
 }

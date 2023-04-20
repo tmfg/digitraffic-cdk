@@ -5,13 +5,14 @@ export const ShipSchema: JsonSchema = {
     schema: JsonSchemaVersion.DRAFT4,
     type: JsonSchemaType.OBJECT,
     description: "PortActivity timestamps ship schema",
+    required: ["imo"],
     properties: {
         mmsi: {
             type: [JsonSchemaType.NUMBER, JsonSchemaType.NULL],
             description: "MMSI"
         },
         imo: {
-            type: [JsonSchemaType.NUMBER, JsonSchemaType.NULL],
+            type: [JsonSchemaType.NUMBER],
             description: "IMO"
         }
     }

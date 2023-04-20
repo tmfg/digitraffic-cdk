@@ -19,7 +19,7 @@ export enum EventType {
 
 export interface Ship {
     readonly mmsi?: number;
-    readonly imo?: number;
+    readonly imo: number;
 }
 
 export interface Location {

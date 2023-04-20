@@ -8,7 +8,6 @@ import { DbETAShip } from "../dao/timestamps";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { retry } from "@digitraffic/common/dist/utils/retry";
 import { AwakeAiVoyageEtaPrediction, AwakeAiVoyageStatus, AwakeAiZoneType } from "../api/awake_common";
-import moment from "moment-timezone";
 import {
     AwakeDataState,
     etaPredictionToTimestamp,
@@ -16,6 +15,7 @@ import {
     isDigitrafficEtaPrediction
 } from "./awake_ai_etx_helper";
 import { EventSource } from "../model/eventsource";
+import { differenceInHours } from "date-fns";
 
 interface AwakeAiETAResponseAndShip {
     readonly response: AwakeAiShipApiResponse;
@@ -65,8 +65,7 @@ export class AwakeAiETAShipService {
         const start = Date.now();
 
         // if less than 24 hours to ship's arrival, set destination LOCODE explicitly for ETA request
-        const diffEtaToNow = moment(ship.eta).diff(moment());
-        const diffHours = moment.duration(diffEtaToNow).asHours();
+        const diffHours = differenceInHours(ship.eta, Date.now(), { roundingMethod: "floor" });
         const locode = diffHours < 24 ? ship.locode : undefined;
 
         const response = await retry(() => this.api.getETA(ship.imo, locode), 1);

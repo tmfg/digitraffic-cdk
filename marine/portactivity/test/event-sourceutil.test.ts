@@ -1,23 +1,17 @@
 import {
-    momentAverage,
+    dateAverage,
     mergeTimestamps,
     VTS_TIMESTAMP_DIFF_MINUTES,
-    VTS_TIMESTAMP_TOO_OLD_MINUTES,
+    VTS_TIMESTAMP_TOO_OLD_MINUTES
 } from "../lib/event-sourceutil";
-import moment from "moment-timezone";
 import { newTimestamp } from "./testdata";
 import { ApiTimestamp } from "../lib/model/timestamp";
 import { EventSource } from "../lib/model/eventsource";
-import {
-    getRandomInteger,
-    shuffle,
-} from "@digitraffic/common/dist/test/testutils";
+import { getRandomInteger, shuffle } from "@digitraffic/common/dist/test/testutils";
+import { addMinutes, parseISO, subMinutes } from "date-fns";
 
 describe("event-sourceutil", () => {
-    function expectSingleTimestamp(
-        mergedTimestamps: ApiTimestamp[],
-        timestamp: ApiTimestamp
-    ) {
+    function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp) {
         expect(mergedTimestamps.length).toBe(1);
         const merged = mergedTimestamps[0];
         expectTimestamp(timestamp, merged);
@@ -32,11 +26,11 @@ describe("event-sourceutil", () => {
         expect(actual.location).toMatchObject(expected.location);
     }
 
-    test("momentAverage", () => {
-        const m1 = moment(1622549546737);
-        const m2 = moment(1622549553609);
+    test("dateAverage", () => {
+        const m1 = new Date(1622549546737);
+        const m2 = new Date(1622549553609);
 
-        const average = momentAverage([m1, m2]);
+        const average = dateAverage([m1, m2]);
 
         expect(average).toBe("2021-06-01T12:12:30.173Z");
     });
@@ -46,9 +40,9 @@ describe("event-sourceutil", () => {
         const timestamps = [
             newTimestamp({
                 source: EventSource.SCHEDULES_CALCULATED,
-                portcallId,
+                portcallId
             }),
-            newTimestamp({ source: EventSource.AWAKE_AI, portcallId }),
+            newTimestamp({ source: EventSource.AWAKE_AI, portcallId })
         ];
 
         const merged = mergeTimestamps(timestamps);
@@ -61,10 +55,10 @@ describe("event-sourceutil", () => {
         const timestamps = [
             newTimestamp({
                 source: EventSource.SCHEDULES_CALCULATED,
-                portcallId,
+                portcallId
             }),
             newTimestamp({ source: EventSource.PORTNET, portcallId }),
-            newTimestamp({ source: EventSource.AWAKE_AI, portcallId }),
+            newTimestamp({ source: EventSource.AWAKE_AI, portcallId })
         ];
 
         const merged = mergeTimestamps(timestamps);
@@ -75,33 +69,29 @@ describe("event-sourceutil", () => {
     test("mergeTimestamps - timestamps are sorted after merge", () => {
         const portcallId = 1;
 
-        const vtsTime = moment();
-        const portnetTime = moment().add(50, "minute");
-        const vtsCTime = moment().add(55, "minutes");
+        const vtsTime = new Date();
+        const portnetTime = addMinutes(Date.now(), 50);
+        const vtsCTime = addMinutes(Date.now(), 55);
 
         const vtsTimestamp = newTimestamp({
-            eventTime: vtsTime.toDate(),
+            eventTime: vtsTime,
             source: EventSource.SCHEDULES_CALCULATED,
-            portcallId,
+            portcallId
         });
         const portnetTimestamp = newTimestamp({
-            eventTime: portnetTime.toDate(),
+            eventTime: portnetTime,
             source: EventSource.PORTNET,
-            portcallId,
+            portcallId
         });
         const vtsControlTimestamp = newTimestamp({
-            eventTime: vtsCTime.toDate(),
+            eventTime: vtsCTime,
             source: EventSource.SCHEDULES_VTS_CONTROL,
-            portcallId,
+            portcallId
         });
 
         let index = 5;
         while (index-- > 0) {
-            const timestamps = shuffle([
-                vtsControlTimestamp,
-                vtsTimestamp,
-                portnetTimestamp,
-            ]);
+            const timestamps = shuffle([vtsControlTimestamp, vtsTimestamp, portnetTimestamp]);
 
             const merged = mergeTimestamps(timestamps);
 
@@ -116,15 +106,15 @@ describe("event-sourceutil", () => {
         const portcallId = 1;
         const schedulesTimestamp = newTimestamp({
             source: EventSource.SCHEDULES_VTS_CONTROL,
-            portcallId,
+            portcallId
         });
         const teqplayTimestamp = newTimestamp({
             source: EventSource.AWAKE_AI,
-            portcallId,
+            portcallId
         });
         const vtsTimestamp = newTimestamp({
             source: EventSource.AWAKE_AI,
-            portcallId,
+            portcallId
         });
         const timestamps = [teqplayTimestamp, schedulesTimestamp, vtsTimestamp];
 
@@ -138,13 +128,8 @@ describe("event-sourceutil", () => {
         const portcallId = 1;
         const vtsTimestamp = newTimestamp({
             source: EventSource.SCHEDULES_CALCULATED,
-            recordTime: moment()
-                .subtract(
-                    VTS_TIMESTAMP_TOO_OLD_MINUTES + getRandomInteger(0, 1000),
-                    "minute"
-                )
-                .toDate(),
-            portcallId,
+            recordTime: subMinutes(Date.now(), VTS_TIMESTAMP_TOO_OLD_MINUTES + getRandomInteger(0, 1000)),
+            portcallId
         });
         const timestamps = [vtsTimestamp];
 
@@ -155,56 +140,48 @@ describe("event-sourceutil", () => {
         const portcallId = 1;
         const awakeTimestamp = newTimestamp({
             source: EventSource.AWAKE_AI,
-            portcallId,
+            portcallId
         });
         const vtsTimestamp = newTimestamp({
             source: EventSource.SCHEDULES_CALCULATED,
-            eventTime: moment(awakeTimestamp.eventTime)
-                .add(
-                    VTS_TIMESTAMP_DIFF_MINUTES + getRandomInteger(0, 1000),
-                    "minute"
-                )
-                .toDate(),
-            portcallId,
+            eventTime: addMinutes(
+                parseISO(awakeTimestamp.eventTime),
+                VTS_TIMESTAMP_DIFF_MINUTES + getRandomInteger(0, 1000)
+            ),
+            portcallId
         });
         const timestamps = [awakeTimestamp, vtsTimestamp];
 
-        expectSingleTimestamp(
-            mergeTimestamps(timestamps) as ApiTimestamp[],
-            awakeTimestamp
-        );
+        expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
     });
 
     test("PRED timestamps are filtered out if VTS a timestamps are available", () => {
         const portcallId = 1;
         const awakeTimestamp = newTimestamp({
             source: EventSource.AWAKE_AI,
-            portcallId,
+            portcallId
         });
         const predTimestamp = newTimestamp({
             source: EventSource.AWAKE_AI_PRED,
-            portcallId,
+            portcallId
         });
         const timestamps = [awakeTimestamp, predTimestamp];
 
-        expectSingleTimestamp(
-            mergeTimestamps(timestamps) as ApiTimestamp[],
-            awakeTimestamp
-        );
+        expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
     });
 
     test("PRED timestamps with multiple ships", () => {
         const awakeTimestamp1 = newTimestamp({
             source: EventSource.AWAKE_AI,
-            portcallId: 1,
+            portcallId: 1
         });
         const predTimestamp1 = newTimestamp({
             source: EventSource.AWAKE_AI_PRED,
-            portcallId: 1,
+            portcallId: 1
         });
         const predTimestamp2 = newTimestamp({
             source: EventSource.AWAKE_AI_PRED,
-            portcallId: 2,
+            portcallId: 2
         });
 
         const timestamps = [awakeTimestamp1, predTimestamp1, predTimestamp2];
