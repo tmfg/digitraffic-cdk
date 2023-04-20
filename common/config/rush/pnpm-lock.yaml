@@ -141,7 +141,7 @@ importers:
       typescript: ~4.8.4
       uuid: ^9.0.0
       wkx: ^0.5.0
-      xml2js: ^0.4.23
+      xml2js: ^0.5.0
       xsd-schema-validator: ^0.7.0
       zod: '3.20'
     dependencies:
@@ -165,7 +165,7 @@ importers:
       spex: 3.2.0
       uuid: 9.0.0
       wkx: 0.5.0
-      xml2js: 0.4.23
+      xml2js: 0.5.0
       zod: 3.20.6
     devDependencies:
       '@digitraffic-cdk/eslint-config': link:../../tools/eslint-config
@@ -222,7 +222,7 @@ importers:
       ts-node: ^10.9.1
       typescript: ~4.8.4
       wkx: ^0.5.0
-      xml2js: ^0.4.23
+      xml2js: ^0.5.0
     dependencies:
       '@digitraffic/common': 2023.1.26-1_3a6yv2dtfxuothmx3x43qm6b7e
       '@types/geojson': 7946.0.10
@@ -238,7 +238,7 @@ importers:
       source-map-support: 0.5.21
       spex: 3.2.0
       wkx: 0.5.0
-      xml2js: 0.4.23
+      xml2js: 0.5.0
     devDependencies:
       '@digitraffic-cdk/eslint-config': link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain': link:../../tools/toolchain
@@ -342,7 +342,7 @@ importers:
       ts-jest: ^29.0.3
       ts-node: ^10.9.1
       typescript: ~4.8.4
-      xml2js: ^0.4.23
+      xml2js: ^0.5.0
     dependencies:
       '@digitraffic/common': 2022.11.23-5_3a6yv2dtfxuothmx3x43qm6b7e
       amazon-cognito-identity-js: 6.0.1
@@ -353,7 +353,7 @@ importers:
       constructs: 10.1.168
       pg-native: 3.0.1
       pg-promise: 10.15.2_pg-native@3.0.1
-      xml2js: 0.4.23
+      xml2js: 0.5.0
     devDependencies:
       '@digitraffic-cdk/eslint-config': link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain': link:../../tools/toolchain
@@ -687,7 +687,7 @@ importers:
       ts-jest: ^29.0.3
       ts-node: ^10.9.1
       typescript: ~4.8.4
-      xml2js: ^0.4.23
+      xml2js: ^0.5.0
     dependencies:
       '@digitraffic/common': 2022.11.23-5_3a6yv2dtfxuothmx3x43qm6b7e
       '@types/openlayers': 4.6.18
@@ -701,7 +701,7 @@ importers:
       moment-timezone: 0.5.39
       ramda: 0.28.0
       source-map-support: 0.5.21
-      xml2js: 0.4.23
+      xml2js: 0.5.0
     devDependencies:
       '@digitraffic-cdk/eslint-config': link:../../tools/eslint-config
       '@digitraffic-cdk/toolchain': link:../../tools/toolchain
@@ -9125,14 +9125,6 @@ packages:
     dependencies:
       sax: 1.2.4
       xmlbuilder: 9.0.7
-
-  /xml2js/0.4.23:
-    resolution: {integrity: sha512-ySPiMjM0+pLDftHgXY4By0uswI3SPKLDw/i3UXbnO8M/p28zqexCUoPmQFrYD+/1BzhGJSs2i1ERWKJAtiLrug==}
-    engines: {node: '>=4.0.0'}
-    dependencies:
-      sax: 1.2.4
-      xmlbuilder: 11.0.1
-    dev: false
 
   /xml2js/0.5.0:
     resolution: {integrity: sha512-drPFnkQJik/O+uPKpqSgr22mpuFHqKdbS835iAQrUC73L2F5WkboIRd63ai/2Yg6I1jzifPFKH2NTK+cfglkIA==}

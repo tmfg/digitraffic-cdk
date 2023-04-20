@@ -30,7 +30,7 @@
     "constructs": "10.1.168",
     "pg-native": "*",
     "pg-promise": "10.15.2",
-    "xml2js": "^0.4.23"
+    "xml2js": "^0.5.0"
   },
   "devDependencies": {
     "@digitraffic-cdk/eslint-config": "workspace:*",
