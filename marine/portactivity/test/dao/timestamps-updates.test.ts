@@ -77,38 +77,46 @@ describe(
             expect((await findAll(db)).length).toBe(1);
         });
 
-        test("updateTimestamp - mmsi updated for existing timestamp if previously null", async () => {
-            const imo1 = 123;
-            const imo2 = 345;
-            const timestamp1 = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo: imo1 }));
-            const timestamp2 = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo: imo2 }));
+        test("updateTimestamp - mmsi values for same imo", async () => {
+            const imo = 123;
 
-            await TimestampsDb.updateTimestamp(db, timestamp1);
-            await TimestampsDb.updateTimestamp(db, timestamp2);
+            const mmsi1 = 345;
+            const mmsi2 = 678;
 
-            const timestamps = await findAll(db);
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo }));
 
-            expect(timestamps.length).toEqual(2);
-            expect(timestamps.find((timestamp) => timestamp.ship_imo === imo1)?.ship_mmsi).toBeNull();
-            expect(timestamps.find((timestamp) => timestamp.ship_imo === imo2)?.ship_mmsi).toBeNull();
-
-            const updatedTimestamp1 = {
-                ...timestamp1,
+            const updatedTimestamp = {
+                ...timestamp,
                 ship: {
-                    ...timestamp1.ship,
-                    mmsi: 321
+                    ...timestamp.ship,
+                    mmsi: mmsi1
                 }
             };
 
-            await TimestampsDb.updateTimestamp(db, updatedTimestamp1);
+            const againUpdatedTimestamp = {
+                ...timestamp,
+                ship: {
+                    ...timestamp.ship,
+                    mmsi: mmsi2
+                }
+            };
 
-            const updatedTimestamps = await findAll(db);
+            await TimestampsDb.updateTimestamp(db, timestamp);
+            await TimestampsDb.updateTimestamp(db, updatedTimestamp);
+            await TimestampsDb.updateTimestamp(db, againUpdatedTimestamp);
 
-            expect(updatedTimestamps.length).toEqual(2);
-            expect(updatedTimestamps.find((timestamp) => timestamp.ship_imo === imo1)?.ship_mmsi).toEqual(
-                updatedTimestamp1.ship.mmsi
-            );
-            expect(updatedTimestamps.find((timestamp) => timestamp.ship_imo === imo2)?.ship_mmsi).toBeNull();
+            const timestamps = await findAll(db);
+
+            expect(timestamps.length).toEqual(3);
+            expect(
+                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === null)
+            ).toBeDefined();
+            expect(
+                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === mmsi1)
+            ).toBeDefined();
+            expect(
+                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === mmsi2)
+            ).toBeDefined();
         });
 
         test("createUpdateValues - mmsi 0", () => {

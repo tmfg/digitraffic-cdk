@@ -87,10 +87,7 @@ const INSERT_ESTIMATE_SQL = `
            $14,
            $15
     )
-    ON CONFLICT(ship_imo, event_source, location_locode, event_type, event_time, record_time, portcall_id) DO UPDATE
-    SET ship_mmsi = excluded.ship_mmsi
-        WHERE excluded.ship_mmsi IS NOT NULL AND
-        port_call_timestamp.ship_mmsi IS NULL        
+    ON CONFLICT(ship_mmsi, ship_imo, event_source, location_locode, event_type, event_time, record_time, portcall_id) DO NOTHING      
         RETURNING ship_mmsi, ship_imo, location_locode
 `;
 
