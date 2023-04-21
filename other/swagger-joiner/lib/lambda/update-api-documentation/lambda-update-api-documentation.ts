@@ -1,9 +1,5 @@
 import { APIGateway, config as AWSConfig } from "aws-sdk";
-import * as R from "ramda";
-import {
-    createDocumentationVersion,
-    getDocumentationVersion,
-} from "../../apigw-utils";
+import { createDocumentationVersion, getDocumentationVersion } from "../../apigw-utils";
 import { ListOfDocumentationVersion } from "aws-sdk/clients/apigateway";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
@@ -28,12 +24,9 @@ export const handler = async () => {
         apisAndVersions
             .map((apiAndVersions) => ({
                 apiId: apiAndVersions.apiId,
-                versions: apiAndVersions.result.items,
+                versions: apiAndVersions.result.items
             }))
-            .filter(
-                (apiAndVersions): apiAndVersions is ApiAndVersions =>
-                    !!apiAndVersions.versions
-            )
+            .filter((apiAndVersions): apiAndVersions is ApiAndVersions => !!apiAndVersions.versions)
             .map((apiAndVersions) =>
                 createDocumentationVersion(
                     apiAndVersions.apiId,
@@ -50,9 +43,6 @@ export function getLatestVersion(versions: ListOfDocumentationVersion): number {
     }
 
     const versionNumbers = versions.map((v) => Number(v.version));
-    const versionNumbersDesc = R.sort(
-        (a: number, b: number) => b - a,
-        versionNumbers
-    );
-    return versionNumbersDesc[0];
+    versionNumbers.sort().reverse();
+    return versionNumbers[0];
 }
