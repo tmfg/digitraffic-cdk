@@ -485,6 +485,7 @@ importers:
       spex: ^3.3.0
       ts-jest: ^29.1.0
       ts-node: ^10.9.1
+      types-ramda: ~0.29.1
       typescript: ~4.9.5
       uuid: ^9.0.0
     dependencies:
@@ -527,6 +528,7 @@ importers:
       sinon: 15.0.4
       ts-jest: 29.1.0_5iisdnh4o7rusdz332vt5xfnwy
       ts-node: 10.9.1_xurvhcgxvpyq6nmqpc66yjq5ka
+      types-ramda: 0.29.1
       typescript: 4.9.5
 
   ../../marine/shiplight:
@@ -1082,11 +1084,11 @@ importers:
       source-map-support: ^0.5.21
       ts-jest: ^29.1.0
       ts-node: ^10.9.1
+      types-ramda: ~0.29.1
       typescript: ~4.9.5
       zod: 3.21.4
     dependencies:
       '@digitraffic/common': 2023.1.18-2_vrfvzpacrmt53jmft3qh33mmiu
-      '@types/ramda': 0.29.0
       aws-cdk-lib: 2.76.0_constructs@10.2.2
       aws-sdk: 2.1362.0
       axios: 1.3.6
@@ -1101,6 +1103,7 @@ importers:
       '@types/aws-lambda': 8.10.114
       '@types/jest': 29.5.1
       '@types/node': 18.15.13
+      '@types/ramda': 0.29.0
       '@types/sinon': 10.0.14
       esbuild: 0.17.17
       eslint: 8.38.0
@@ -1110,6 +1113,7 @@ importers:
       sinon: 15.0.4
       ts-jest: 29.1.0_5iisdnh4o7rusdz332vt5xfnwy
       ts-node: 10.9.1_xurvhcgxvpyq6nmqpc66yjq5ka
+      types-ramda: 0.29.1
       typescript: 4.9.5
 
   ../../rail/rata:
@@ -1166,6 +1170,7 @@ importers:
       ramda: ~0.29.0
       sinon: 15.0.4
       ts-jest: ^29.1.0
+      types-ramda: ~0.29.1
       typescript: ~4.9.5
     dependencies:
       '@digitraffic/common': 2022.11.23-5_oct5bvtldz3ckpls7iwkwkeodq
@@ -1196,6 +1201,7 @@ importers:
       parallelshell: 3.0.2
       sinon: 15.0.4
       ts-jest: 29.1.0_5iisdnh4o7rusdz332vt5xfnwy
+      types-ramda: 0.29.1
       typescript: 4.9.5
 
   ../../road/lam-history:
@@ -1277,6 +1283,7 @@ importers:
       source-map-support: ^0.5.21
       spex: ^3.3.0
       ts-jest: ^29.1.0
+      types-ramda: ~0.29.1
       typescript: ~4.9.5
     dependencies:
       '@digitraffic/common': 2023.2.13-1_yl5arxfi6jyc6mu4rkcg4fc3o4
@@ -1310,6 +1317,7 @@ importers:
       parallelshell: 3.0.2
       sinon: 15.0.4
       ts-jest: 29.1.0_5iisdnh4o7rusdz332vt5xfnwy
+      types-ramda: 0.29.1
       typescript: 4.9.5
 
   ../../road/maintenance-tracking-log-watcher:
@@ -1514,6 +1522,7 @@ importers:
       pg-promise: ^11.4.3
       ramda: ~0.29.0
       ts-jest: ^29.1.0
+      types-ramda: ~0.29.1
       typescript: ~4.9.5
     dependencies:
       '@digitraffic/common': 2022.11.23-5_oct5bvtldz3ckpls7iwkwkeodq
@@ -1538,6 +1547,7 @@ importers:
       jest-junit: 16.0.0
       nodemon: 2.0.22
       ts-jest: 29.1.0_5iisdnh4o7rusdz332vt5xfnwy
+      types-ramda: 0.29.1
       typescript: 4.9.5
 
   ../../road/street-traffic-message:
