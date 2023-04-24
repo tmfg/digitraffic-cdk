@@ -102,7 +102,7 @@ export class AwakeAiETAShipService {
                 // use ETA prediction LOCODE by default
                 let port: string = etaPrediction.locode;
 
-                if (etaPrediction.locode != ship.locode) {
+                if (etaPrediction.locode !== ship.locode) {
                     if (diffHours >= 24) {
                         // 24 hours or more to ship arrival and LOCODE doesn't match, ignore this
                         console.warn(

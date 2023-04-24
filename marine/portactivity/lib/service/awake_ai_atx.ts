@@ -1,14 +1,7 @@
-import {
-    AwakeAiATXApi,
-    AwakeAIATXTimestampMessage,
-    AwakeATXZoneEventType,
-} from "../api/awake_ai_atx";
+import { AwakeAiATXApi, AwakeAIATXTimestampMessage, AwakeATXZoneEventType } from "../api/awake_ai_atx";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import * as TimestampDAO from "../dao/timestamps";
-import {
-    DTDatabase,
-    inDatabase,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import moment from "moment-timezone";
 import { EventSource } from "../model/eventsource";
 import { AwakeAiZoneType } from "../api/awake_common";
@@ -34,16 +27,11 @@ export class AwakeAiATXService {
                             atx.locodes
                         );
                     } else if (!atx.locodes.length) {
-                        console.error(
-                            "method=getATXs No locode for timestamp! IMO %s",
-                            atx.imo
-                        );
+                        console.error("method=getATXs No locode for timestamp! IMO %s", atx.imo);
                     }
                     const port = atx.locodes[0];
                     const eventType =
-                        atx.zoneEventType == AwakeATXZoneEventType.ARRIVAL
-                            ? EventType.ATA
-                            : EventType.ATD;
+                        atx.zoneEventType === AwakeATXZoneEventType.ARRIVAL ? EventType.ATA : EventType.ATD;
                     const eventTime = moment(atx.eventTimestamp).toDate();
                     const portcallId = await TimestampDAO.findPortcallId(
                         db,
@@ -62,12 +50,12 @@ export class AwakeAiATXService {
                             source: EventSource.AWAKE_AI,
                             ship: {
                                 imo: atx.imo,
-                                mmsi: atx.mmsi,
+                                mmsi: atx.mmsi
                             },
                             location: {
-                                port,
+                                port
                             },
-                            portcallId,
+                            portcallId
                         } as ApiTimestamp;
                     } else {
                         console.warn(
@@ -79,10 +67,7 @@ export class AwakeAiATXService {
                     }
                 });
             return Promise.all(promises).then(
-                (timestamps) =>
-                    timestamps.filter(
-                        (timestamp) => timestamp != null
-                    ) as ApiTimestamp[]
+                (timestamps) => timestamps.filter((timestamp) => !!timestamp) as ApiTimestamp[]
             );
         });
     }

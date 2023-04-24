@@ -5,33 +5,21 @@ import * as LocationConverter from "./location-converter";
 
 import { ApiTimestamp, EventType, Location } from "../model/timestamp";
 import { Pilotage } from "../model/pilotage";
-import {
-    inDatabase,
-    DTDatabase,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../model/eventsource";
 
-export async function getMessagesFromPilotweb(
-    host: string,
-    authHeader: string
-): Promise<ApiTimestamp[]> {
+export async function getMessagesFromPilotweb(host: string, authHeader: string): Promise<ApiTimestamp[]> {
     const message = await PilotwebAPI.getMessages(host, authHeader);
     const pilotages = JSON.parse(message) as Pilotage[];
 
-    console.log(
-        "method=PortActivity.GetMessages source=Pilotweb receivedCount=%d",
-        pilotages.length
-    );
+    console.log("method=PortActivity.GetMessages source=Pilotweb receivedCount=%d", pilotages.length);
 
     return inDatabase(async (db: DTDatabase) => {
         const idMap = await PilotagesDAO.getTimestamps(db);
         const pilotageIds = await removeMissingPilotages(db, idMap, pilotages);
         const updated = await updateAllPilotages(db, idMap, pilotages);
 
-        console.info(
-            "DEBUG timestamps to remove %s",
-            JSON.stringify(pilotageIds)
-        );
+        console.info("DEBUG timestamps to remove %s", JSON.stringify(pilotageIds));
 
         await removeTimestamps(db, pilotageIds);
 
@@ -43,11 +31,7 @@ async function removeTimestamps(db: DTDatabase, pilotageIds: number[]) {
     if (pilotageIds.length > 0) {
         const sourceIds = pilotageIds.map((id) => id.toString());
 
-        const timestampsRemoved = await TimestampDAO.removeTimestamps(
-            db,
-            EventSource.PILOTWEB,
-            sourceIds
-        );
+        const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EventSource.PILOTWEB, sourceIds);
         console.log("DEBUG removed %s", timestampsRemoved);
     }
 }
@@ -80,56 +64,42 @@ async function removeMissingPilotages(
     return removedIds;
 }
 
-async function convertUpdatedTimestamps(
-    db: DTDatabase,
-    newAndUpdated: Pilotage[]
-): Promise<ApiTimestamp[]> {
+async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[]): Promise<ApiTimestamp[]> {
     return (
         await Promise.all(
-            newAndUpdated.map(
-                async (p: Pilotage): Promise<ApiTimestamp | null> => {
-                    const base = createApiTimestamp(p);
+            newAndUpdated.map(async (p: Pilotage): Promise<ApiTimestamp | null> => {
+                const base = createApiTimestamp(p);
 
-                    if (base) {
-                        const location = LocationConverter.convertLocation(
-                            p.route
-                        );
-                        const portcallId = await getPortCallId(db, p, location);
+                if (base) {
+                    const location = LocationConverter.convertLocation(p.route);
+                    const portcallId = await getPortCallId(db, p, location);
 
-                        if (portcallId) {
-                            return {
-                                ...base,
-                                ...{
-                                    recordTime: p.scheduleUpdated,
-                                    source: EventSource.PILOTWEB,
-                                    sourceId: p.id.toString(),
-                                    ship: {
-                                        mmsi: p.vessel.mmsi,
-                                        imo: p.vessel.imo,
-                                    },
-                                    location,
-                                    portcallId,
+                    if (portcallId) {
+                        return {
+                            ...base,
+                            ...{
+                                recordTime: p.scheduleUpdated,
+                                source: EventSource.PILOTWEB,
+                                sourceId: p.id.toString(),
+                                ship: {
+                                    mmsi: p.vessel.mmsi,
+                                    imo: p.vessel.imo
                                 },
-                            } as ApiTimestamp;
-                        }
-
-                        console.info(
-                            "skipping pilotage %d, missing portcallId",
-                            p.id
-                        );
+                                location,
+                                portcallId
+                            }
+                        } as ApiTimestamp;
                     }
-                    return null;
+
+                    console.info("skipping pilotage %d, missing portcallId", p.id);
                 }
-            )
+                return null;
+            })
         )
-    ).filter((x) => x != null) as ApiTimestamp[];
+    ).filter((x) => !!x) as ApiTimestamp[];
 }
 
-function getPortCallId(
-    db: DTDatabase,
-    p: Pilotage,
-    location: Location
-): Promise<number | null> {
+function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | null> {
     if (p.portnetPortCallId) {
         return Promise.resolve(p.portnetPortCallId);
     }
@@ -140,40 +110,34 @@ function getPortCallId(
 }
 
 function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | null {
-    const eventTime = getMaxDate(
-        pilotage.vesselEta,
-        pilotage.pilotBoardingTime
-    ).toISOString();
+    const eventTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime).toISOString();
 
     if (pilotage.state === "ESTIMATE" || pilotage.state === "NOTICE") {
         return {
             eventType: EventType.RPS,
-            eventTime,
+            eventTime
         };
     } else if (pilotage.state === "ORDER") {
         return {
             eventType: EventType.PPS,
-            eventTime,
+            eventTime
         };
     } else if (pilotage.state === "ACTIVE") {
         return {
             eventType: EventType.APS,
-            eventTime: pilotage.vesselEta,
+            eventTime: pilotage.vesselEta
         };
     } else if (pilotage.state === "FINISHED") {
         return {
             eventType: EventType.APC,
-            eventTime: pilotage.endTime,
+            eventTime: pilotage.endTime
         };
     }
 
     return null;
 }
 
-function getMaxDate(
-    date1string: string,
-    date2string: string | undefined
-): Date {
+function getMaxDate(date1string: string, date2string: string | undefined): Date {
     const date1 = new Date(date1string);
 
     if (date2string) {
@@ -187,17 +151,13 @@ function getMaxDate(
     return date1;
 }
 
-function findNewAndUpdated(
-    idMap: PilotagesDAO.TimestampMap,
-    pilotages: Pilotage[]
-): Pilotage[] {
+function findNewAndUpdated(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage[]): Pilotage[] {
     const newAndUpdated = [] as Pilotage[];
 
     pilotages.forEach((p) => {
         const timestamp = idMap.get(p.id);
-        const updatedPilotage =
-            timestamp && timestamp.toISOString() !== p.scheduleUpdated;
-        const newPilotage = timestamp == undefined && p.state !== "FINISHED";
+        const updatedPilotage = timestamp && timestamp.toISOString() !== p.scheduleUpdated;
+        const newPilotage = !timestamp && p.state !== "FINISHED";
 
         if (updatedPilotage || newPilotage) {
             newAndUpdated.push(p);
@@ -207,10 +167,7 @@ function findNewAndUpdated(
     return newAndUpdated;
 }
 
-function findRemoved(
-    idMap: PilotagesDAO.TimestampMap,
-    pilotages: Pilotage[]
-): number[] {
+function findRemoved(idMap: PilotagesDAO.TimestampMap, pilotages: Pilotage[]): number[] {
     const pilotageSet = new Set<number>();
     const removed: number[] = [];
 
