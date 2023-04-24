@@ -364,8 +364,8 @@ const FIND_PORTCALL_ID_SQL = `
 
 const FIND_MMSI_BY_IMO_SQL = `
     SELECT COALESCE(
-        (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE imo = $1),
-        (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE imo_lloyds = $1)
+        (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY timestamp DESC) FROM public.vessel WHERE imo = $1 AND mmsi > 0),
+        (SELECT DISTINCT FIRST_VALUE(mmsi) OVER (ORDER BY port_call_timestamp DESC) FROM public.port_call WHERE imo_lloyds = $1 AND mmsi > 0)
     ) AS mmsi
 `.trim();
 
