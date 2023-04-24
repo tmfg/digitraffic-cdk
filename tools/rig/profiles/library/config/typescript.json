@@ -1,0 +1,14 @@
+/**
+ * Configures the TypeScript plugin for Heft.  This plugin also manages linting.
+ */
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/heft/typescript.schema.json",
+
+  /**
+   * Specifies the intermediary folder that tests will use.  Because Jest uses the
+   * Node.js runtime to execute tests, the module format must be CommonJS.
+   *
+   * The default value is "lib".
+   */
+  "emitFolderNameForTests": "dist"
+}

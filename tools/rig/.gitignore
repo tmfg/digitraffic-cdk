@@ -1,0 +1,11 @@
+*
+
+!package.json
+
+!includes/
+!includes/**/
+!includes/**/*.json
+
+!profiles/
+!profiles/**/
+!profiles/**/*.json

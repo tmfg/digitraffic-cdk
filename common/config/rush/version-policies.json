@@ -1,0 +1,36 @@
+/**
+ * This is configuration file is used for advanced publishing configurations with Rush.
+ * More documentation is available on the Rush website: https://rushjs.io
+ */
+
+/**
+ * A list of version policy definitions.  A "version policy" is a custom package versioning
+ * strategy that affects "rush change", "rush version", and "rush publish".  The strategy applies
+ * to a set of projects that are specified using the "versionPolicyName" field in rush.json.
+ */
+[
+  {
+    /**
+     * (Required) Indicates the kind of version policy being defined ("lockStepVersion" or "individualVersion").
+     *
+     * The "individualVersion" mode specifies that the projects will use "individual versioning".
+     * This is the typical NPM model where each package has an independent version number
+     * and CHANGELOG.md file.  Although a single CI definition is responsible for publishing the
+     * packages, they otherwise don't have any special relationship.  The version bumping will
+     * depend on how developers answer the "rush change" questions for each package that
+     * is changed.
+     */
+    "definitionName": "individualVersion",
+  
+    "policyName": "DigitrafficCommon",
+    
+    /**
+     * (Optional) When publishing is managed by Rush, by default the "rush change" command will
+     * request changes for any projects that are modified by a pull request. These change entries
+     * will produce a CHANGELOG.md file. If you author your CHANGELOG.md manually or announce updates
+     * in some other way, set "exemptFromRushChange" to true to tell "rush change" to ignore the projects
+     * belonging to this version policy.
+     */
+    "exemptFromRushChange": true
+  }
+]

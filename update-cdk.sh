@@ -5,6 +5,8 @@
 # exit on any error
 set -ex
 
+rush 
+
 PACKAGE=${1:-@aws-cdk}
 
 function updateInDirectory() {

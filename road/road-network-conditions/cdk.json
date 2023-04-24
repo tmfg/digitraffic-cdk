@@ -1,3 +1,3 @@
 {
-  "app": "pnpm dlx ts-node --prefer-ts-exts bin/road-network-conditions-app.ts"
+  "app": "npx ts-node --prefer-ts-exts bin/road-network-conditions-app.ts"
 }

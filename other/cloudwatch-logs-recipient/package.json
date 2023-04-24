@@ -3,38 +3,42 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "build": "tsc",
-    "postbuild": "esbuild lib/lambda/**/*.ts --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "watch": "tsc -w",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc pnpm dlx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "lint": "eslint --cache .",
-    "eslint-report": "eslint . --format html -o report.html",
+    "build": "tsc && npm run postbuild",
+    "postbuild": "esbuild lib/lambda/**/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "cdk": "cdk",
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
+    "lint": "eslint --cache .",
+    "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "jest",
-    "cdk": "cdk",
-    "synth-sam": "cdk synth --no-staging > template.yaml"
-  },
-  "devDependencies": {
-    "@types/jest": "^29.4.0",
-    "@types/node": "^18.14.0",
-    "@types/sinon": "^10.0.13",
-    "esbuild": "^0.17.9",
-    "jest": "^29.4.3",
-    "jest-junit": "^15.0.0",
-    "parallelshell": "3.0.2",
-    "sinon": "*",
-    "ts-jest": "^29.0.3",
-    "typescript": "^4.9.5"
+    "watch": "tsc -w"
   },
   "dependencies": {
     "@digitraffic/common": "2023.2.13-1",
-    "@types/aws-lambda": "8.10.108",
-    "aws-cdk-lib": "2.62.2",
-    "aws-sdk": "^2.1318.0",
-    "constructs": "10.1.235",
-    "source-map-support": "^0.5.19"
+    "@types/aws-lambda": "~8.10.114",
+    "aws-cdk-lib": "~2.76.0",
+    "aws-sdk": "~2.1362.0",
+    "constructs": "10.2.2",
+    "source-map-support": "^0.5.21"
+  },
+  "devDependencies": {
+    "@digitraffic-cdk/eslint-config": "workspace:*",
+    "@digitraffic-cdk/toolchain": "workspace:*",
+    "@rushstack/eslint-config": "^3.2.0",
+    "@types/jest": "^29.5.1",
+    "@types/node": "18.15.13",
+    "@types/sinon": "10.0.14",
+    "esbuild": "0.17.17",
+    "eslint": "~8.38.0",
+    "jest": "^29.5.0",
+    "jest-junit": "^16.0.0",
+    "parallelshell": "3.0.2",
+    "sinon": "15.0.4",
+    "ts-jest": "^29.1.0",
+    "typescript": "~4.9.5"
   },
   "externals": [
     "aws-sdk"
