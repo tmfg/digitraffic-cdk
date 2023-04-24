@@ -1,5 +1,8 @@
 import axios from "axios";
 
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
+
 export interface AreaLightsBrightenRequest {
     /**
      * Route id
@@ -38,51 +41,47 @@ export class AreaLightsApi {
         this.apiKey = apiKey;
     }
 
-    updateLightsForArea(
-        request: AreaLightsBrightenRequest
-    ): Promise<AreaLightsBrightenResponse> {
+    updateLightsForArea(request: AreaLightsBrightenRequest): Promise<AreaLightsBrightenResponse> {
         const start = Date.now();
 
-        const requestPromise = axios.post<AreaLightsBrightenResponse>(
-            this.url,
-            request,
-            {
-                headers: { "x-api-key": this.apiKey },
-                validateStatus: (status) => status === 200,
-            }
-        );
+        const requestPromise = axios.post<AreaLightsBrightenResponse>(this.url, request, {
+            headers: { "x-api-key": this.apiKey },
+            validateStatus: (status) => status === 200
+        });
 
         return requestPromise
             .then((response) => {
-                console.info("method=updateLightsForArea successful");
                 return response.data;
             })
             .catch((error) => {
                 if (axios.isAxiosError(error)) {
                     if (error.response) {
-                        console.error(
-                            "method=updateLightsForArea returned status=%d",
-                            error.response.status
-                        );
-                        return Promise.reject(
-                            `API returned status ${error.response.status}`
-                        );
+                        logger.error({
+                            method: "AreaLightsApi.updateLightsForArea",
+                            message: "failed",
+                            status: error.response.status
+                        });
+
+                        return Promise.reject(`API returned status ${error.response.status}`);
                     } else if (error.request) {
-                        console.error(
-                            "method=updateLightsForArea ERROR with request: %s",
-                            error.request
-                        );
+                        logger.error({
+                            method: "AreaLightsApi.updateLightsForArea",
+                            message: "error with request",
+                            details: JSON.stringify(error.request)
+                        });
                         return Promise.reject("Error with request");
                     }
                 }
-                console.error("method=updateLightsForArea ERROR: %s", error);
+
+                logException(logger, error as Error);
+
                 return Promise.reject("Unknown error");
             })
-            .finally(() =>
-                console.log(
-                    "method=updateLightsForArea tookMs=%d",
-                    Date.now() - start
-                )
-            );
+            .finally(() => {
+                logger.info({
+                    method: "AreaLightsApi.updateLightsForArea",
+                    tookMs: Date.now() - start
+                });
+            });
     }
 }

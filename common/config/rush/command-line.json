@@ -20,6 +20,12 @@
       "shellCommand": "pretty-quick --staged"
     },
     {
+      "name": "repo:check-dependencies",
+      "commandKind": "global",
+      "summary": "Checks if dependencies are declared correctly",
+      "shellCommand": "common/scripts/run-with-zx.sh common/scripts/check-dependencies.mjs"
+    },
+    {
       "name": "repo:init",
       "commandKind": "global",
       "summary": "Used to initialize the repository",

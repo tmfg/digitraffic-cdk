@@ -5,9 +5,6 @@ module.exports = {
         {
             files: ["*.ts", "*.tsx"],
             rules: {
-                // Use KLH instead of console logging
-                "no-console": "error",
-
                 // DT rules
                 "deprecation/deprecation": "warn",
                 "@typescript-eslint/no-non-null-assertion": "error",
@@ -122,9 +119,6 @@ module.exports = {
                 "*.test.tsx"
             ],
             rules: {
-                // Allow console logging in unit tests
-                "no-console": "off",
-
                 "@typescript-eslint/no-explicit-any": "warn",
 
                 // typescript-eslint/strict

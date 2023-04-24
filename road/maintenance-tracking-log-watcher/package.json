@@ -21,7 +21,6 @@
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
-    "@types/node-fetch": "^2.6.3",
     "aws-cdk-lib": "~2.76.0",
     "constructs": "10.2.2",
     "moment": "^2.29.4",
@@ -36,6 +35,7 @@
     "@types/aws-lambda": "~8.10.114",
     "@types/jest": "^29.5.1",
     "@types/node": "18.15.13",
+    "@types/node-fetch": "^2.6.3",
     "@types/sinon": "10.0.14",
     "@types/xml2js": "^0.4.11",
     "aws-sdk": "~2.1362.0",

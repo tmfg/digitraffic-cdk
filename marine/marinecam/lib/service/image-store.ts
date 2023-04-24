@@ -1,26 +1,28 @@
 import { S3 } from "aws-sdk";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ManagedUpload } from "aws-sdk/lib/s3/managed_upload";
 import { writeFile } from "fs/promises";
 
 const BASE64 = "base64";
 
-export function storeImage(
-    cameraId: string,
-    image: string,
-    bucketName: string
-) {
+export function storeImage(cameraId: string, image: string, bucketName: string) {
     const imageName = `${cameraId}.jpg`;
 
-    console.info("storing image %s to s3 with size %d", cameraId, image.length);
+    logger.info({
+        method: "ImageStore.storeImage",
+        message: `Storing image ${cameraId} with size ${image.length}`
+    });
 
     // for local testing
     if (bucketName === "") {
-        console.info("storing image %s locally!", cameraId);
-        // store to s3
-
+        logger.info({
+            method: "ImageStore.storeImage",
+            message: `Storing image ${cameraId} locally!`
+        });
         return writeFile(imageName, image, BASE64);
     } else {
+        // store to s3
         const keyName = `images/Saimaa/${imageName}`;
 
         const buffer = Buffer.from(image, BASE64);
@@ -42,7 +44,7 @@ export function uploadToS3(
             Key: filename,
             ACL: "private",
             CacheControl: "max-age=120",
-            ContentType: MediaType.IMAGE_JPEG,
+            ContentType: MediaType.IMAGE_JPEG
         })
         .promise();
 }

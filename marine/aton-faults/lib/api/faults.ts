@@ -1,6 +1,8 @@
 import axios, { AxiosResponse } from "axios";
 import { FaultFeature } from "../model/fault";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 interface ApiFeatures {
     features: FaultFeature[];
@@ -20,43 +22,38 @@ export class FaultsApi {
                     return resp.data.features;
                 }
 
-                console.error("Fetching faults failed: %s", resp.statusText);
+                logger.error({
+                    method: "FaultsApi.getFaults",
+                    message: "Fetching faults failed",
+                    customDetails: resp.statusText
+                });
 
                 return resp.data.features;
             })
             .catch((error) => {
-                if (axios.isAxiosError(error)) {
-                    console.error("fetching failed with %d", error.code);
-                    console.error(error.message);
-                } else {
-                    console.error("error %s", error);
-                }
+                logException(logger, error);
 
                 return [];
             });
     }
 
-    private getFaultsFromServer(
-        url: string
-    ): Promise<AxiosResponse<ApiFeatures>> {
+    private getFaultsFromServer(url: string): Promise<AxiosResponse<ApiFeatures>> {
         const start = Date.now();
-
-        console.info("getFaultsFromServer: getting faults from " + url);
 
         return axios
             .get<ApiFeatures>(url, {
                 timeout: 10000,
                 headers: {
-                    Accept: MediaType.APPLICATION_JSON,
-                },
+                    Accept: MediaType.APPLICATION_JSON
+                }
             })
             .then((response) => {
                 const end = Date.now();
-                console.info(
-                    "method=FaultsApi.getFaultsFromServer faultCount=%d tookMs=%d",
-                    response.data.features.length,
-                    end - start
-                );
+                logger.info({
+                    method: "FaultsApi.getFaultsFromServer",
+                    tookMs: end - start,
+                    customFaultCount: response.data.features.length
+                });
                 return response;
             });
     }

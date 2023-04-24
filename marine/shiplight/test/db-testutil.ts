@@ -3,13 +3,7 @@ import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ShipTypes } from "../lib/db/areatraffic";
 
 export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "marine",
-        "marine",
-        "localhost:54321/marine"
-    );
+    return commonDbTestBase(fn, truncate, "marine", "marine", "localhost:54321/marine");
 }
 
 interface Area {
@@ -17,16 +11,11 @@ interface Area {
     brighten_end?: Date;
 }
 
-export async function assertArea(
-    db: DTDatabase,
-    id: number,
-    duration?: number
-) {
+export async function assertArea(db: DTDatabase, id: number, duration?: number) {
     const area = await db.tx((t) => {
-        return t.oneOrNone<Area | null>(
-            "select brighten_sent,brighten_end from areatraffic where id = $1",
-            [id]
-        );
+        return t.oneOrNone<Area | null>("select brighten_sent,brighten_end from areatraffic where id = $1", [
+            id
+        ]);
     });
 
     if (duration) {
@@ -58,10 +47,7 @@ export async function insertAreaTraffic(
     });
 }
 
-export async function insertVessel(
-    db: DTDatabase,
-    mmsi: number
-): Promise<void> {
+export async function insertVessel(db: DTDatabase, mmsi: number): Promise<void> {
     await db.tx(async (t) => {
         await t.none(
             "INSERT INTO vessel(mmsi,timestamp,name,ship_type,reference_point_a,reference_point_b,reference_point_c,reference_point_d,pos_type,draught,imo,eta) " +
@@ -88,11 +74,9 @@ export async function insertVesselLocation(
 }
 
 async function truncate(db: DTDatabase): Promise<void> {
-    await db.tx((t) => {
-        return t.batch([
-            t.none("DELETE FROM areatraffic"),
-            t.none("DELETE FROM vessel_location"),
-            t.none("DELETE FROM vessel"),
-        ]);
+    await db.tx(async (t) => {
+        await t.none("DELETE FROM areatraffic");
+        await t.none("DELETE FROM vessel_location");
+        await t.none("DELETE FROM vessel");
     });
 }

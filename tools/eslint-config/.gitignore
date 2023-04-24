@@ -1,5 +1,5 @@
 *
 
 !/profile/
-!/profile/default.js
+!/profile/*.js
 !/package.json

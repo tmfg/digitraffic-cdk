@@ -3,18 +3,23 @@ import { MarinecamEnvKeys } from "../../keys";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { MarinecamSecret } from "../../model/secret";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<MarinecamSecret>("mobile_server");
-const bucketName = envValue(MarinecamEnvKeys.BUCKET_NAME);
+const bucketName = getEnvVariable(MarinecamEnvKeys.BUCKET_NAME);
 
 export const handler = () => {
     return rdsHolder
         .setCredentials()
         .then(() => secretHolder.get())
         .then((secret: MarinecamSecret) => {
-            console.info("updating images from %s", secret.url);
+            logger.info({
+                method: "UpdateImages.handler",
+                message: "updating images from " + secret.url
+            });
 
             return ImageFetcher.updateAllCameras(
                 secret.url,
@@ -25,7 +30,7 @@ export const handler = () => {
             );
         })
         .catch((error: Error) => {
-            console.log("updateAllCameras failed with %s", error);
+            logException(logger, error);
 
             return Promise.resolve();
         });

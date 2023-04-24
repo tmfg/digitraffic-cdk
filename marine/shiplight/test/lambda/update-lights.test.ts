@@ -6,9 +6,8 @@ import {
     dbTestBase,
     insertAreaTraffic,
     insertVessel,
-    insertVesselLocation,
+    insertVesselLocation
 } from "../db-testutil";
-import { createSecretFunction } from "@digitraffic/common/dist/test/secret";
 import { ShiplightSecret } from "../../lib/model/shiplight-secret";
 import * as sinon from "sinon";
 import { AreaVisibilityService } from "../../lib/service/areavisibility";
@@ -16,13 +15,18 @@ import { AreaVisibilityApi } from "../../lib/api/areavisibility";
 import { AreaLightsApi } from "../../lib/api/arealights";
 import { AreaLightsService } from "../../lib/service/arealights";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 
 const secret: ShiplightSecret = {
     lightsControlEndpointUrl: "test",
     lightsControlApiKey: "test",
     visibilityEndpointUrl: "test",
-    visibilityApiKey: "test",
+    visibilityApiKey: "test"
 };
+
+jest.spyOn(ProxyHolder.prototype, "setCredentials").mockImplementation(() => Promise.resolve());
+jest.spyOn(SecretHolder.prototype, "get").mockImplementation(() => Promise.resolve(secret));
 
 describe(
     "update-lights",
@@ -30,29 +34,23 @@ describe(
         afterEach(() => sinon.verifyAndRestore());
 
         test("no areas", async () => {
-            await handlerFn(
-                createSecretFunction(secret),
-                AreaVisibilityService,
-                AreaLightsService
-            );
+            await handlerFn(AreaVisibilityService, AreaLightsService);
         });
 
         test("update lights with visibility", async () => {
             const durationInMinutes = 12;
             const areaId = 4;
             const visibilityInMeters = 1000;
-            sinon
-                .stub(AreaVisibilityApi.prototype, "getVisibilityForArea")
-                .returns(
-                    Promise.resolve({
-                        lastUpdated: new Date().toISOString(),
-                        visibilityInMeters,
-                    })
-                );
+            sinon.stub(AreaVisibilityApi.prototype, "getVisibilityForArea").returns(
+                Promise.resolve({
+                    lastUpdated: new Date().toISOString(),
+                    visibilityInMeters
+                })
+            );
             sinon.stub(AreaLightsApi.prototype, "updateLightsForArea").returns(
                 Promise.resolve({
                     LightsSetSentFailed: [],
-                    LightsSetSentSuccessfully: [],
+                    LightsSetSentSuccessfully: []
                 })
             );
             await insertAreaTraffic(
@@ -65,11 +63,7 @@ describe(
             await insertVessel(db, 1);
             await insertVesselLocation(db, 1, Date.now(), 1); // x = 1, in the polygon
 
-            await handlerFn(
-                createSecretFunction(secret),
-                AreaVisibilityService,
-                AreaLightsService
-            );
+            await handlerFn(AreaVisibilityService, AreaLightsService);
 
             await assertArea(db, areaId, durationInMinutes);
         });

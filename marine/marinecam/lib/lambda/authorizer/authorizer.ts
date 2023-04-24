@@ -5,13 +5,14 @@ import {
     Callback,
     Context,
     PolicyDocument,
-    Statement,
+    Statement
 } from "aws-lambda";
 import {
     APIGatewayRequestAuthorizerEvent,
-    APIGatewayRequestAuthorizerEventHeaders,
+    APIGatewayRequestAuthorizerEventHeaders
 } from "aws-lambda/trigger/api-gateway-authorizer";
 import { CognitoUserSession } from "amazon-cognito-identity-js";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const EFFECT_ALLOW = "Allow";
 const EFFECT_DENY = "Deny";
@@ -29,14 +30,9 @@ export const handler = async function (
         callback("Unauthorized");
     } else {
         const group = getGroupFromPath(event.path);
-        const policy = await generatePolicy(
-            group,
-            result[0],
-            result[1],
-            event.methodArn
-        );
+        const policy = await generatePolicy(group, result[0], result[1], event.methodArn);
 
-        console.log("policy " + JSON.stringify(policy));
+        logger.debug(policy);
 
         callback(null, policy);
     }
@@ -44,14 +40,12 @@ export const handler = async function (
 
 function parseAuthentication(
     headers: APIGatewayRequestAuthorizerEventHeaders | null
-): [string, string] | null {
-    if (!headers || !headers.authorization) {
-        return null;
+): [string, string] | undefined {
+    if (!headers?.authorization) {
+        return undefined;
     } else {
         const encodedCreds = headers.authorization.split(" ")[1];
-        const plainCreds = Buffer.from(encodedCreds, "base64")
-            .toString()
-            .split(":");
+        const plainCreds = Buffer.from(encodedCreds, "base64").toString().split(":");
 
         return [plainCreds[0], plainCreds[1]];
     }
@@ -73,35 +67,28 @@ async function generatePolicy(
     const statementOne: Statement = {
         Action: "execute-api:Invoke",
         Effect: effect,
-        Resource: methodArn,
+        Resource: methodArn
     };
 
     const policyDocument: PolicyDocument = {
         Version: "2012-10-17",
-        Statement: [statementOne],
+        Statement: [statementOne]
     };
 
     const context = {
-        groups: JSON.stringify(
-            user ? user.getAccessToken().payload[KEY_COGNITO_GROUPS] : []
-        ),
+        groups: JSON.stringify(user ? user.getAccessToken().payload[KEY_COGNITO_GROUPS] : [])
     };
 
     return {
         principalId: "user",
         policyDocument,
-        context,
+        context
     } as AuthResponse;
 }
 
-function checkAuthorization(
-    user: CognitoUserSession | null,
-    group: string
-): string {
+function checkAuthorization(user: CognitoUserSession | null, group: string): string {
     if (user) {
-        const userGroups = user.getAccessToken().payload[KEY_COGNITO_GROUPS] as
-            | string[]
-            | null;
+        const userGroups = user.getAccessToken().payload[KEY_COGNITO_GROUPS] as string[] | null;
 
         if (group === "metadata" || userGroups?.includes(group)) {
             return EFFECT_ALLOW;

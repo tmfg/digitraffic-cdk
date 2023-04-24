@@ -1,6 +1,7 @@
 import { AreaLightsApi } from "../api/arealights";
 import { AreaTraffic } from "../model/areatraffic";
 import { retry, RetryLogError } from "@digitraffic/common/dist/utils/retry";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class AreaLightsService {
     private readonly api: AreaLightsApi;
@@ -15,25 +16,25 @@ export class AreaLightsService {
      */
     async updateLightsForArea(areaTraffic: AreaTraffic): Promise<void> {
         const areaId = areaTraffic.areaId;
-        console.info(
-            "method=updateLightsForArea area %d, duration %d, visibility %d",
-            areaId,
-            areaTraffic.durationInMinutes,
-            areaTraffic.visibilityInMeters
-        );
+
+        logger.info({
+            method: "ArealightsService.updateLightsForArea",
+            duration: areaTraffic.durationInMinutes,
+            visibility: areaTraffic.visibilityInMeters?.toString()
+        });
 
         await retry(
             async () => {
                 const response = await this.api.updateLightsForArea({
                     routeId: areaId,
                     visibility: areaTraffic.visibilityInMeters,
-                    time: areaTraffic.durationInMinutes,
+                    time: areaTraffic.durationInMinutes
                 });
                 if (response.LightsSetSentFailed.length) {
-                    console.warn(
-                        "method=updateLightsForArea LightsSetSentFailed: %s",
-                        response.LightsSetSentFailed.join(", ")
-                    );
+                    logger.warn({
+                        method: "ArealightsService.updateLightsForArea",
+                        message: `LightsSetSentFailed : ${response.LightsSetSentFailed.join(", ")}`
+                    });
                 }
             },
             2,

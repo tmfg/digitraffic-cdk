@@ -1,3 +1,5 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import axios from "axios";
 import axiosRetry from "axios-retry";
 import { FeatureCollection } from "geojson";
@@ -31,19 +33,23 @@ export class NauticalWarningsApi {
             const resp = await axios.get<FeatureCollection>(url);
 
             if (resp.status !== 200) {
-                console.error(
-                    "method=getWarnings returned status=%d",
-                    resp.status
-                );
+                logger.error({
+                    method: "NauticalWarningsApi.getWarnings",
+                    status: resp.status
+                });
+
                 return Promise.reject(resp);
             }
             return Promise.resolve(resp.data);
         } catch (error) {
-            console.error("error %s from %s", error, url);
-            console.error("method=getWarnings failed");
+            logException(logger, error as Error);
+
             return Promise.reject(error);
         } finally {
-            console.log("method=getWarnings tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "NauticalWarningsApi.getWarnings",
+                tookMs: Date.now() - start
+            });
         }
     }
 }

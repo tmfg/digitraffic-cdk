@@ -1,3 +1,4 @@
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import * as VisApi from "../api/vis";
 
 export class VisService {
@@ -6,12 +7,7 @@ export class VisService {
     private readonly privateKey: string;
     private readonly serviceRegistryUrl: string;
 
-    constructor(
-        ca: string,
-        clientCertificate: string,
-        privateKey: string,
-        serviceRegistryUrl = ""
-    ) {
+    constructor(ca: string, clientCertificate: string, privateKey: string, serviceRegistryUrl = "") {
         this.ca = ca;
         this.clientCertificate = clientCertificate;
         this.privateKey = privateKey;
@@ -22,15 +18,12 @@ export class VisService {
         const start = Date.now();
 
         try {
-            await VisApi.postDocument(
-                faultS124,
-                url,
-                this.ca,
-                this.clientCertificate,
-                this.privateKey
-            );
+            await VisApi.postDocument(faultS124, url, this.ca, this.clientCertificate, this.privateKey);
         } finally {
-            console.info("method=sendFault tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "VisService.sendFault",
+                tookMs: Date.now() - start
+            });
         }
     }
 
@@ -38,15 +31,12 @@ export class VisService {
         const start = Date.now();
 
         try {
-            await VisApi.postDocument(
-                warningS124,
-                url,
-                this.ca,
-                this.clientCertificate,
-                this.privateKey
-            );
+            await VisApi.postDocument(warningS124, url, this.ca, this.clientCertificate, this.privateKey);
         } finally {
-            console.info("method=sendWarning tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "VisService.sendWarning",
+                tookMs: Date.now() - start
+            });
         }
     }
 
@@ -56,7 +46,10 @@ export class VisService {
         try {
             return await VisApi.query(imo, this.serviceRegistryUrl);
         } finally {
-            console.info("method=queryMrsForImo tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "VisService.queryCallBackForImo",
+                tookMs: Date.now() - start
+            });
         }
     }
 }

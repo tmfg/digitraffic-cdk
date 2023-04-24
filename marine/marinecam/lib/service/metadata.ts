@@ -1,14 +1,15 @@
-import {
-    DTDatabase,
-    inDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+
 import * as MetadataDB from "../db/metadata";
 
 import { Camera } from "../model/camera";
 
 export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
-    console.info("method=listAllCameras for %s", usersGroups);
+    logger.info({
+        method: "MetadataService.listAllCameras",
+        message: "listing for " + usersGroups.toString()
+    });
 
     const start = Date.now();
 
@@ -17,7 +18,10 @@ export async function listAllCameras(usersGroups: string[]): Promise<Camera[]> {
             return MetadataDB.getAllCameras(db, usersGroups);
         });
     } finally {
-        console.info("method=listAllCameras tookMs=%d", Date.now() - start);
+        logger.info({
+            method: "MetadataService.listAllCameras",
+            tookMs: Date.now() - start
+        });
     }
 }
 

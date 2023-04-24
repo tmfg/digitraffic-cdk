@@ -1,12 +1,9 @@
 import * as DeviceDB from "../db/datex2";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-import {
-    DTDatabase,
-    DTTransaction,
-    inDatabase,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, DTTransaction, inDatabase } from "@digitraffic/common/dist/database/database";
 import { Situation } from "../model/situation";
 import { StatusCodeValue } from "../model/status-code-value";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const REG_PAYLOAD = /<payloadPublication/g;
 
@@ -31,19 +28,15 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
         return db.tx((tx: DTTransaction) => {
             return tx.batch([
                 ...DeviceDB.saveDatex2(tx, situations, timestamp),
-                LastUpdatedDB.updateLastUpdated(
-                    tx,
-                    LastUpdatedDB.DataType.VS_DATEX2,
-                    timestamp
-                ),
+                LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp)
             ]);
         });
     }).finally(() => {
-        console.info(
-            "method=updateDatex2 updatedCount=%d tookMs=%d",
-            situations.length,
-            Date.now() - start
-        );
+        logger.info({
+            method: "Datex2UpdateService.updateDatex2",
+            tookMs: Date.now() - start,
+            customUpdatedCount: situations.length
+        });
     });
 
     return StatusCodeValue.OK;
@@ -67,12 +60,7 @@ export function parseSituations(datex2: string): Situation[] {
             index = sitEndIndex;
 
             situations.push(
-                parseSituation(
-                    datex2.substring(
-                        sitIndex,
-                        sitEndIndex + DATEX2_SITUATION_TAG_END.length
-                    )
-                )
+                parseSituation(datex2.substring(sitIndex, sitEndIndex + DATEX2_SITUATION_TAG_END.length))
             );
         }
     } while (sitIndex !== -1);
@@ -84,7 +72,7 @@ function parseSituation(datex2: string): Situation {
     return {
         id: parseId(datex2),
         datex2: datex2,
-        effectDate: parseEffectDate(datex2),
+        effectDate: parseEffectDate(datex2)
     };
 }
 
@@ -95,8 +83,7 @@ function parseId(datex2: string): string {
 
 function parseEffectDate(datex2: string): Date {
     const index =
-        datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) +
-        DATEX2_OVERALL_STARTTIME_TAG_START.length;
+        datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_START) + DATEX2_OVERALL_STARTTIME_TAG_START.length;
     const index2 = datex2.indexOf(DATEX2_OVERALL_STARTTIME_TAG_END, index);
     const dateString = datex2.substring(index, index2);
 
@@ -105,13 +92,20 @@ function parseEffectDate(datex2: string): Date {
 
 function validate(datex2: string): boolean {
     if (!datex2.includes(XML_TAG_START)) {
-        console.error("no xml-tag");
+        logger.error({
+            method: "Datex2UpdateService.validate",
+            message: "no xml-tag"
+        });
         return false;
     }
 
     const ppCount = occurrences(datex2, REG_PAYLOAD);
     if (ppCount !== 1) {
-        console.error("%d payloadPublications", ppCount);
+        logger.error({
+            method: "Datex2UpdateService.validate",
+            message: `${ppCount} payloadPublications`
+        });
+
         return false;
     }
 

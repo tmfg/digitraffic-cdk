@@ -1,4 +1,5 @@
 import { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import * as FaultsService from "./faults";
 import * as WarningsService from "./warnings";
 import { AWSError, SQS } from "aws-sdk";
@@ -22,41 +23,39 @@ export class VoyagePlanService {
         await this.sendWarningsForVoyagePlan(voyagePlan);
     }
 
-    private async sendFaultsForVoyagePlan(
-        voyagePlan: RtzVoyagePlan
-    ): Promise<void> {
-        const faultIds = await FaultsService.findFaultIdsForVoyagePlan(
-            voyagePlan
-        );
+    private async sendFaultsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<void> {
+        const faultIds = await FaultsService.findFaultIdsForVoyagePlan(voyagePlan);
 
-        console.info("sending %d faults", faultIds.length);
+        logger.info({
+            method: "VoyagePlanService.sendFaultsForVoyagePlan",
+            customCount: faultIds.length
+        });
 
         for (const id of faultIds) {
             await this.sendSqs(this.sendS124QueueUrl, {
                 type: S124Type.FAULT,
                 id,
-                callbackEndpoint: this.callbackEndpoint,
+                callbackEndpoint: this.callbackEndpoint
             });
         }
 
         return Promise.resolve();
     }
 
-    private async sendWarningsForVoyagePlan(
-        voyagePlan: RtzVoyagePlan
-    ): Promise<void> {
-        const warnings = await WarningsService.findWarningsForVoyagePlan(
-            voyagePlan
-        );
+    private async sendWarningsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<void> {
+        const warnings = await WarningsService.findWarningsForVoyagePlan(voyagePlan);
 
         if (warnings?.features) {
-            console.info("sending %d warnings", warnings.features.length);
+            logger.info({
+                method: "VoyagePlanService.sendWarningsForVoyagePlan",
+                customCount: warnings.features.length
+            });
 
             for (const feature of warnings.features) {
                 await this.sendSqs(this.sendS124QueueUrl, {
                     type: S124Type.WARNING,
                     id: feature.properties?.id as number,
-                    callbackEndpoint: this.callbackEndpoint,
+                    callbackEndpoint: this.callbackEndpoint
                 });
             }
         }
@@ -69,7 +68,7 @@ export class VoyagePlanService {
         return this.sqs
             .sendMessage({
                 MessageBody: JSON.stringify(event),
-                QueueUrl,
+                QueueUrl
             })
             .promise();
     }

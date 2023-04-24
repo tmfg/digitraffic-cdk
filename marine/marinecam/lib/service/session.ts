@@ -1,7 +1,8 @@
-import axios, {AxiosRequestConfig, AxiosResponse} from 'axios';
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
 import * as https from "https";
 import util from "util";
-import {parseString} from "xml2js";
+import { parseString } from "xml2js";
 import axiosRetry from "axios-retry";
 import {
     ChangeStreamCommand,
@@ -12,15 +13,16 @@ import {
     GetThumbnailByTimeCommand,
     GetThumbnailCommand,
     LoginCommand,
-    RequestStreamCommand,
+    RequestStreamCommand
 } from "./command";
 
 axiosRetry(axios, {
     retryCondition: (error) => {
-        console.info("DEBUG retry for %s", error.code);
+        logger.debug(`retry for ${error.code ?? "<undefined>"}`);
+
         return true;
     },
-    retryDelay: (retry) => 1000  + retry * 3000,
+    retryDelay: (retry) => 1000 + retry * 3000
 });
 
 const COMPR_LEVEL = "70";
@@ -31,7 +33,7 @@ const COMMUNICATION_URL_PART = "/Communication";
 const VIDEO_URL_PART = "/Video/";
 
 const agent = new https.Agent({
-    rejectUnauthorized: false,
+    rejectUnauthorized: false
 });
 
 const parse = util.promisify(parseString);
@@ -53,7 +55,7 @@ export class Session {
 
         if (acceptSelfSignedCertificate) {
             this.agent = new https.Agent({
-                rejectUnauthorized: false,
+                rejectUnauthorized: false
             });
         } else {
             if (!certificate) {
@@ -62,13 +64,13 @@ export class Session {
 
             this.agent = new https.Agent({
                 rejectUnauthorized: false,
-                cert: certificate,
+                cert: certificate
             });
         }
     }
 
     post<T>(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return axios.post<T>(url, xml, {...configuration, ...{ httpsAgent: agent, timeout: 3000 }});
+        return axios.post<T>(url, xml, { ...configuration, ...{ httpsAgent: agent, timeout: 3000 } });
     }
 
     async sendMessage<T>(command: Command<T>): Promise<T> {
@@ -83,7 +85,7 @@ export class Session {
             throw Error("sendMessage failed " + JSON.stringify(resp));
         }
 
-        const response: CommandResponse = await parse(resp.data) as CommandResponse;
+        const response: CommandResponse = (await parse(resp.data)) as CommandResponse;
         command.checkError(response);
 
         //        console.info("response " + JSON.stringify(response, null, 2));
@@ -160,12 +162,15 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async getFrameFromStream(videoId: string): Promise<string|null> {
+    async getFrameFromStream(videoId: string): Promise<string | null> {
         const streamUrl = this.videoUrl + videoId;
 
-        console.info("posting to %s", streamUrl);
+        logger.info({
+            method: "SessionService.getFrameFromStream",
+            message: "posting to " + streamUrl
+        });
 
-        const response = await this.post<ArrayBuffer>(streamUrl, '', {responseType: "arraybuffer"});
+        const response = await this.post<ArrayBuffer>(streamUrl, "", { responseType: "arraybuffer" });
 
         // format is uuid(16) timestamp(8) datasize(4) headersize(2) headerExtension(2)...
         const buffer = Buffer.from(response.data);
@@ -182,8 +187,7 @@ export class Session {
     }
 
     closeStream(videoId: string): Promise<void> {
-        const command = new CloseStreamCommand()
-            .addInputParameters("VideoId", videoId);
+        const command = new CloseStreamCommand().addInputParameters("VideoId", videoId);
 
         return this.sendMessage(command);
     }

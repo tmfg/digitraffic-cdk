@@ -1,16 +1,14 @@
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import * as FaultsDB from "../db/faults";
 import * as S124Converter from "./s124-converter";
-import {
-    DTDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { Geometry, LineString, Point } from "wkx";
 import { Builder } from "xml2js";
 import { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
 import { Feature, FeatureCollection, GeometryObject } from "geojson";
 import { createFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import { Language } from "@digitraffic/common/dist/types/language";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { DbFault } from "../model/fault";
 
 export const ATON_FAULTS_CHECK = "ATON_FAULTS_CHECK";
@@ -34,30 +32,16 @@ export interface FaultProps {
     readonly area_description: string;
 }
 
-export function findAllFaults(
-    language: Language,
-    fixedInHours: number
-): Promise<FeatureCollection> {
+export function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
-        const features = await FaultsDB.findAll(
-            db,
-            language,
-            fixedInHours,
-            convertFeature
-        );
-        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(
-            db,
-            ATON_FAULTS_CHECK
-        );
+        const features = await FaultsDB.findAll(db, language, fixedInHours, convertFeature);
+        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_FAULTS_CHECK);
 
         return createFeatureCollection(features, lastUpdated);
     });
 }
 
-export async function getFaultS124ById(
-    db: DTDatabase,
-    faultId: number
-): Promise<string | null> {
+export async function getFaultS124ById(db: DTDatabase, faultId: number): Promise<string | null> {
     const start = Date.now();
     const fault = await FaultsDB.getFaultById(db, faultId);
 
@@ -68,13 +52,14 @@ export async function getFaultS124ById(
 
         return new Builder().buildObject(S124Converter.convertFault(fault));
     } finally {
-        console.info("method=getFaultS124ById tookMs=%d", Date.now() - start);
+        logger.info({
+            method: "FaultsService.getFaultS124ById",
+            tookMs: Date.now() - start
+        });
     }
 }
 
-export async function findFaultIdsForVoyagePlan(
-    voyagePlan: RtzVoyagePlan
-): Promise<number[]> {
+export async function findFaultIdsForVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<number[]> {
     const start = Date.now();
     const voyageLineString = new LineString(
         voyagePlan.route.waypoints
@@ -84,11 +69,11 @@ export async function findFaultIdsForVoyagePlan(
     const faultIds = await inDatabaseReadonly((db: DTDatabase) => {
         return FaultsDB.findFaultIdsByRoute(db, voyageLineString);
     });
-    console.info(
-        "method=findFaultIdsForVoyagePlan tookMs=%d count=%d",
-        Date.now() - start,
-        faultIds.length
-    );
+    logger.info({
+        method: "FaultsService.findFaultIdsForVoyagePlan",
+        tookMs: Date.now() - start,
+        customCount: faultIds.length
+    });
     return faultIds;
 }
 
@@ -109,17 +94,15 @@ function convertFeature(fault: DbFault): Feature {
         fairway_name_fi: fault.fairway_name_fi,
         fairway_name_sv: fault.fairway_name_sv,
         area_number: fault.area_number,
-        area_description: fault.area_description,
+        area_description: fault.area_description
     };
 
     // convert geometry from db to geojson
-    const geometry = Geometry.parse(
-        Buffer.from(fault.geometry, "hex")
-    ).toGeoJSON() as GeometryObject;
+    const geometry = Geometry.parse(Buffer.from(fault.geometry, "hex")).toGeoJSON() as GeometryObject;
 
     return {
         type: "Feature",
         properties: properties,
-        geometry,
+        geometry
     };
 }

@@ -15,8 +15,6 @@
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
-    "@types/aws-lambda": "~8.10.114",
-    "@types/mysql": "^2.15.15",
     "aws-cdk-lib": "~2.76.0",
     "aws-lambda": "^1.0.6",
     "aws-sdk": "~2.1362.0",
@@ -29,7 +27,9 @@
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.2.0",
+    "@types/aws-lambda": "~8.10.114",
     "@types/jest": "^29.5.1",
+    "@types/mysql": "^2.15.15",
     "@types/node": "18.15.13",
     "@types/sinon": "10.0.14",
     "esbuild": "0.17.17",

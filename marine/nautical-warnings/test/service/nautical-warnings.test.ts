@@ -1,12 +1,13 @@
-import {
-    dbTestBase,
-    insertActiveWarnings,
-    insertArchivedWarnings,
-} from "../db-testutil";
+import { dbTestBase, insertActiveWarnings, insertArchivedWarnings } from "../db-testutil";
 import {
     getActiveWarnings,
     getArchivedWarnings,
     updateNauticalWarnings,
+    convertDate,
+    DATETIME_FORMAT_1,
+    DATE_FORMAT_1,
+    DATETIME_FORMAT_2,
+    DATE_FORMAT_2
 } from "../../lib/service/nautical-warnings";
 import * as sinon from "sinon";
 import { NauticalWarningsApi } from "../../lib/api/nautical-warnings";
@@ -21,7 +22,7 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [21.3027205128331, 61.144639955157004],
+                coordinates: [21.3027205128331, 61.144639955157004]
             },
             properties: {
                 ID: 20624,
@@ -52,16 +53,15 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_ALKAA: null,
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
-                VALITTUKOHDE_TOOLTIP:
-                    "TL:3500 Kylmäpihlaja, Merimajakka [Vahvistettu]",
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VALITTUKOHDE_TOOLTIP: "TL:3500 Kylmäpihlaja, Merimajakka [Vahvistettu]",
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [21.4424804047364, 60.471819169784396],
+                coordinates: [21.4424804047364, 60.471819169784396]
             },
             properties: {
                 ID: 20623,
@@ -92,14 +92,14 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
                 VALITTUKOHDE_TOOLTIP: null,
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [21.307077341961, 62.245033592936096],
+                coordinates: [21.307077341961, 62.245033592936096]
             },
             properties: {
                 ID: 20622,
@@ -130,16 +130,15 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_ALKAA: "2021-10-13 05:40:00",
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
-                VALITTUKOHDE_TOOLTIP:
-                    "TL:7282 Båtskär alempi, Linjamerkki [Vahvistettu]",
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VALITTUKOHDE_TOOLTIP: "TL:7282 Båtskär alempi, Linjamerkki [Vahvistettu]",
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [21.097760897608396, 60.534556736433494],
+                coordinates: [21.097760897608396, 60.534556736433494]
             },
             properties: {
                 ID: 20602,
@@ -153,8 +152,7 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 TYYPPI_EN: "LOCAL WARNING",
                 TYYPPI_FI: "LOCAL WARNING",
                 TYYPPI_SV: "LOCAL WARNING",
-                SISALTO_EN:
-                    "\r\nLEADINGLIGHT JURMO REAR NR 3132\r\nIN POS 60-32.1 N 021-05.9 E\r\nUNLIT",
+                SISALTO_EN: "\r\nLEADINGLIGHT JURMO REAR NR 3132\r\nIN POS 60-32.1 N 021-05.9 E\r\nUNLIT",
                 SISALTO_FI:
                     "\r\nLINJAMERKKI JURMO YLEMPI NR 3132\r\nPAIKASSA 60-32.1 N 021-05.9 E\r\nVALO EI TOIMI",
                 SISALTO_SV:
@@ -170,16 +168,15 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_ALKAA: null,
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
-                VALITTUKOHDE_TOOLTIP:
-                    "TL:3132 Jurmo ylempi, Linjamerkki [Vahvistettu]",
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VALITTUKOHDE_TOOLTIP: "TL:3132 Jurmo ylempi, Linjamerkki [Vahvistettu]",
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [25.6153615119869, 60.2156614213976],
+                coordinates: [25.6153615119869, 60.2156614213976]
             },
             properties: {
                 ID: 20504,
@@ -210,16 +207,15 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_ALKAA: null,
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
-                VALITTUKOHDE_TOOLTIP:
-                    "TL:36 Havsudden ylempi, Linjamerkki [Vahvistettu]",
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VALITTUKOHDE_TOOLTIP: "TL:36 Havsudden ylempi, Linjamerkki [Vahvistettu]",
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [24.4347596329857, 65.26428690371449],
+                coordinates: [24.4347596329857, 65.26428690371449]
             },
             properties: {
                 ID: 20502,
@@ -233,8 +229,7 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 TYYPPI_EN: "LOCAL WARNING",
                 TYYPPI_FI: "LOCAL WARNING",
                 TYYPPI_SV: "LOCAL WARNING",
-                SISALTO_EN:
-                    "\r\nEDGEMARK KIISLA NR 84515\r\nIN POS 65-15,8 N 024-26,1 E\r\nUNLIT",
+                SISALTO_EN: "\r\nEDGEMARK KIISLA NR 84515\r\nIN POS 65-15,8 N 024-26,1 E\r\nUNLIT",
                 SISALTO_FI:
                     "\r\nREUNAMERKKI KIISLA NR 84515\r\nPAIKASSA 65-15,8 N 024-26,1 E\r\nVALO EI TOIMI",
                 SISALTO_SV:
@@ -250,16 +245,15 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_ALKAA: null,
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
-                VALITTUKOHDE_TOOLTIP:
-                    "TL:84515 Kiisla, Vasenreunamerkki [Vahvistettu]",
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VALITTUKOHDE_TOOLTIP: "TL:84515 Kiisla, Vasenreunamerkki [Vahvistettu]",
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [23.9177522375164, 59.674936679796595],
+                coordinates: [23.9177522375164, 59.674936679796595]
             },
             properties: {
                 ID: 20382,
@@ -290,14 +284,14 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
                 VALITTUKOHDE_TOOLTIP: null,
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [24.523243688471396, 65.661375797369],
+                coordinates: [24.523243688471396, 65.661375797369]
             },
             properties: {
                 ID: 19682,
@@ -328,14 +322,14 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
                 VALITTUKOHDE_TOOLTIP: null,
-                VIRTUAALINENTURVALAITE: 0,
-            },
+                VIRTUAALINENTURVALAITE: 0
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [25.222537221394298, 60.176385091448296],
+                coordinates: [25.222537221394298, 60.176385091448296]
             },
             properties: {
                 ID: 18402,
@@ -366,14 +360,14 @@ const TEST_ACTIVE_WARNINGS_VALID: FeatureCollection = {
                 VOIMASSA_PAATTYY: null,
                 NAVIGOINTILINJA_TXT: null,
                 VALITTUKOHDE_TOOLTIP: null,
-                VIRTUAALINENTURVALAITE: 0,
-            },
-        },
-    ],
+                VIRTUAALINENTURVALAITE: 0
+            }
+        }
+    ]
 };
 const TEST_ARCHIVED_WARNINGS_VALID: FeatureCollection = {
     type: "FeatureCollection",
-    features: [],
+    features: []
 };
 
 describe(
@@ -417,6 +411,40 @@ describe(
 
             const archived = await getArchivedWarnings();
             expect(archived).toEqual(TEST_ARCHIVED_WARNINGS_VALID);
+        });
+
+        test("convertDate - null", () => {
+            expect(convertDate(null, DATETIME_FORMAT_2)).toBeNull();
+        });
+
+        test("convertDate - empty", () => {
+            expect(convertDate("", DATETIME_FORMAT_2)).toBeNull();
+        });
+
+        test("convertDate - invalid format", () => {
+            expect(convertDate("abcd", DATETIME_FORMAT_2)).toEqual("Invalid date");
+        });
+
+        test("convertDate - valid format 1", () => {
+            expect(convertDate("2021-10-13 14:15:00", DATETIME_FORMAT_2)).toEqual(
+                "2021-10-13T14:15:00+03:00"
+            );
+        });
+
+        test("convertDate - multiple - valid format 1", () => {
+            expect(convertDate("2021-10-13 14:15:00", DATE_FORMAT_2, DATETIME_FORMAT_2)).toEqual(
+                "2021-10-13T14:15:00+03:00"
+            );
+        });
+
+        test("convertDate - valid format 2", () => {
+            expect(convertDate("5.4.2012 14:15", DATETIME_FORMAT_1)).toEqual("2012-04-05T14:15:00+03:00");
+        });
+
+        test("convertDate - multiple - valid format 2", () => {
+            expect(convertDate("5.4.2012 14:15", DATE_FORMAT_1, DATETIME_FORMAT_1)).toEqual(
+                "2012-04-05T14:15:00+03:00"
+            );
         });
     })
 );

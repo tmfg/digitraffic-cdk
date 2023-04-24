@@ -1,13 +1,17 @@
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import axios from "axios";
 import { Feature, Geometry } from "geojson";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-export async function getDisruptions(
-    endpointUrl: string
-): Promise<DisruptionFeature[]> {
+export async function getDisruptions(endpointUrl: string): Promise<DisruptionFeature[]> {
     const resp = await getDisruptionsFromServer(endpointUrl);
     if (resp.status !== 200) {
-        console.error("Fetching disruptions failed: %s", resp.statusText);
+        logger.error({
+            method: "DisruptionsApi.getDisruptions",
+            message: "Fetching disruptions failed",
+            code: resp.status,
+            details: resp.statusText
+        });
         throw new Error("Fetching disruptions failed");
     }
     return resp.data.features;
@@ -35,16 +39,16 @@ export function getDisruptionsFromServer(url: string) {
     return axios
         .get<ApiFeatures>(url, {
             headers: {
-                Accept: MediaType.APPLICATION_JSON,
-            },
+                Accept: MediaType.APPLICATION_JSON
+            }
         })
         .then((a) => {
-            const end = Date.now();
-            console.info(
-                "method=getDisruptionsFromServer disruptionCount=%d tookMs=%d",
-                a.data.features.length,
-                end - start
-            );
+            logger.info({
+                method: "DisruptionsApi.getDisruptionsFromServer",
+                count: a.data.features.length,
+                tookMs: Date.now() - start
+            });
+
             return a;
         });
 }

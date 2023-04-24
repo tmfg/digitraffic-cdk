@@ -2,14 +2,15 @@ import {
     CognitoUserPool,
     CognitoUser,
     AuthenticationDetails,
-    CognitoUserSession,
+    CognitoUserSession
 } from "amazon-cognito-identity-js";
 import { MarinecamEnvKeys } from "../../keys";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const POOL_DATA = {
-    UserPoolId: envValue(MarinecamEnvKeys.USERPOOL_ID),
-    ClientId: envValue(MarinecamEnvKeys.POOLCLIENT_ID),
+    UserPoolId: getEnvVariable(MarinecamEnvKeys.USERPOOL_ID),
+    ClientId: getEnvVariable(MarinecamEnvKeys.POOLCLIENT_ID)
 };
 
 const userPool = new CognitoUserPool(POOL_DATA);
@@ -17,19 +18,16 @@ const userPool = new CognitoUserPool(POOL_DATA);
 function createCognitoUser(username: string) {
     const userData = {
         Username: username,
-        Pool: userPool,
+        Pool: userPool
     };
 
     return new CognitoUser(userData);
 }
 
-export function loginUser(
-    username: string,
-    password: string
-): Promise<CognitoUserSession | null> {
+export function loginUser(username: string, password: string): Promise<CognitoUserSession | null> {
     const authDetails = new AuthenticationDetails({
         Username: username,
-        Password: password,
+        Password: password
     });
 
     const cognitoUser = createCognitoUser(username);
@@ -42,46 +40,44 @@ export function loginUser(
                 },
 
                 onFailure: (result) => {
-                    console.info(
-                        "authenticateUser failed:" + JSON.stringify(result)
-                    );
+                    logger.info({
+                        method: "CognitoBackend.loginUser",
+                        message: "authenticateUser failed",
+                        details: JSON.stringify(result)
+                    });
 
                     resolve(null);
                 },
 
                 newPasswordRequired: (userAttributes: object) => {
-                    return changeUserPassword(
-                        cognitoUser,
-                        password,
-                        userAttributes
-                    );
-                },
+                    return changeUserPassword(cognitoUser, password, userAttributes);
+                }
             });
         } catch (error) {
-            console.info(
-                "error from authenticateUser:" + JSON.stringify(error)
-            );
+            logger.error({
+                method: "CognitoBackend.loginUser",
+                message: "authenticateUser failed",
+                details: JSON.stringify(error)
+            });
         }
     });
 }
 
-function changeUserPassword(
-    cognitoUser: CognitoUser,
-    newPassword: string,
-    userAttributes: object
-) {
+function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: object) {
     cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
         onSuccess: (result) => {
-            console.info(
-                "passwordchallenge success: %s",
-                JSON.stringify(result)
-            );
+            logger.info({
+                method: "CognitoBackend.changeUserPassword",
+                message: "success",
+                details: JSON.stringify(result)
+            });
         },
         onFailure: (result) => {
-            console.info(
-                "passwordchallenge failed: %s",
-                JSON.stringify(result)
-            );
-        },
+            logger.info({
+                method: "CognitoBackend.changeUserPassword",
+                message: "failure",
+                details: JSON.stringify(result)
+            });
+        }
     });
 }

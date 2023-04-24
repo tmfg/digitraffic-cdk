@@ -1,5 +1,7 @@
 import axios from "axios";
 import { Agent } from "https";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export async function postDocument(
     faultS124: string,
@@ -8,7 +10,10 @@ export async function postDocument(
     clientCertificate: string,
     privateKey: string
 ): Promise<void> {
-    console.info("method=postDocument url=%d", url);
+    logger.info({
+        method: "VisApi.postDocument",
+        customUrl: url
+    });
 
     // try-catch so axios won't log keys/certs
     try {
@@ -16,27 +21,24 @@ export async function postDocument(
             httpsAgent: new Agent({
                 ca,
                 cert: clientCertificate,
-                key: privateKey,
+                key: privateKey
             }),
             headers: {
-                "Content-Type": "text/xml;charset=utf-8",
-            },
+                "Content-Type": "text/xml;charset=utf-8"
+            }
         });
 
         if (resp.status !== 200) {
-            console.error(
-                "method=postDocument returned status=%d, status text: %s",
-                resp.status,
-                resp.statusText
-            );
+            logger.error({
+                method: "VisApi.postDocument",
+                customStatus: resp.status,
+                customText: resp.statusText
+            });
             return Promise.reject();
         }
     } catch (error) {
-        // can't log error without exposing keys/certs
-        console.error("method=postDocument unexpected error");
-        if (axios.isAxiosError(error)) {
-            console.error(error.response?.data);
-        }
+        logException(logger, error);
+
         return Promise.reject();
     }
     return Promise.resolve();
@@ -48,36 +50,43 @@ interface InstanceUri {
 
 export async function query(imo: string, url: string): Promise<string | null> {
     const queryUrl = `${url}/api/_search/serviceInstance?query=imo:${imo}`;
-    console.info("method=query url=%s", queryUrl);
+    logger.info({
+        method: "VisApi.query",
+        customUrl: queryUrl
+    });
 
     try {
         const resp = await axios.get<InstanceUri[] | undefined>(queryUrl);
         if (resp.status !== 200) {
-            console.error(
-                "method=query returned status=%d, status text: %s",
-                resp.status,
-                resp.statusText
-            );
+            logger.error({
+                method: "VisApi.query",
+                customStatus: resp.status,
+                customText: resp.statusText
+            });
             return Promise.reject();
         }
-
-        //        console.info("DEBUG " + JSON.stringify(resp.data, null, 2));
 
         const instanceList = resp.data;
 
         if (!instanceList) {
-            console.info("empty instanceList!");
+            logger.info({
+                method: "VisApi.query",
+                message: "empty instanceList!"
+            });
             return null;
         } else if (instanceList.length === 1) {
             return instanceList[0].endpointUri;
         }
 
-        console.info("instancelist length %d!", instanceList.length);
+        logger.info({
+            method: "VisApi.query",
+            message: `instancelist length ${instanceList.length}`
+        });
 
         return null;
     } catch (error) {
-        // can't log error without exposing keys/certs
-        console.error("method=query unexpected error");
+        logException(logger, error);
+
         return Promise.reject();
     }
 }

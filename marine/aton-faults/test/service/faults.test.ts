@@ -20,21 +20,18 @@ describe(
             const fault = newFault({
                 geometry: {
                     lat: 60.285807,
-                    lon: 27.321659,
-                },
+                    lon: 27.321659
+                }
             });
             await insert(db, [fault]);
 
-            const faultS124 = await FaultsService.getFaultS124ById(
-                db,
-                fault.id
-            );
+            const faultS124 = await FaultsService.getFaultS124ById(db, fault.id);
 
             if (!faultS124) {
                 throw new Error("empty");
             }
 
-            console.info(faultS124);
+            //console.info(faultS124);
 
             validateS124(faultS124);
         });
@@ -51,12 +48,8 @@ describe(
             expect(props.area_number).toBe(fault.area_number);
             expect(props.aton_id).toBe(fault.aton_id);
             expect(props.domain).toBe(fault.domain);
-            expect(props.entry_timestamp.toISOString()).toBe(
-                fault.entry_timestamp.toISOString()
-            );
-            expect(props.fixed_timestamp?.toISOString()).toBe(
-                fault.fixed_timestamp?.toISOString()
-            );
+            expect(props.entry_timestamp.toISOString()).toBe(fault.entry_timestamp.toISOString());
+            expect(props.fixed_timestamp?.toISOString()).toBe(fault.fixed_timestamp?.toISOString());
             expect(props.fairway_number).toBe(fault.fairway_number);
             expect(props.state).toBe(fault.state);
             expect(props.type).toBe(fault.aton_fault_type);

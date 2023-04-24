@@ -1,4 +1,5 @@
 import { AreaVisibilityApi } from "../api/areavisibility";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 interface AreaVisibilityWrapper {
     readonly visibilityInMeters: number | null;
@@ -19,16 +20,16 @@ export class AreaVisibilityService {
      * @param areaId Area id
      * @return Visibility for area in metres
      */
-    async getVisibilityForAreaInMetres(
-        areaId: number
-    ): Promise<AreaVisibilityWrapper> {
+    async getVisibilityForAreaInMetres(areaId: number): Promise<AreaVisibilityWrapper> {
         try {
             const resp = await this.api.getVisibilityForArea("vaylavisi139");
-            console.info(
-                `method=getVisibilityForAreaInMetres areaId: ${areaId} visibility: ${
-                    resp.visibilityInMeters
-                } lastUpdated: ${resp.lastUpdated ?? "null"}`
-            );
+
+            logger.info({
+                method: "AreavisibilityService.getVisibilityForAreaInMetres",
+                message: `got visibility ${resp.visibilityInMeters} for area ${areaId}`,
+                lastUpdated: resp.lastUpdated
+            });
+
             return { visibilityInMeters: resp.visibilityInMeters };
         } catch (error) {
             // error logged at API level

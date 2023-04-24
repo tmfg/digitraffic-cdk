@@ -1,6 +1,8 @@
 import { findAllDisruptions } from "../../service/disruptions";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -10,7 +12,8 @@ export const handler = (): Promise<LambdaResponse> => {
         .then(() => findAllDisruptions())
         .then((disruptions) => LambdaResponse.ok(JSON.stringify(disruptions)))
         .catch((error: Error) => {
-            console.error("method=getDisruptionsHandler error", error);
+            logException(logger, error, true);
+
             return LambdaResponse.internalError();
         });
 };

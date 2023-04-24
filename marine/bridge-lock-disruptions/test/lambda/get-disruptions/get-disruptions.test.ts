@@ -10,13 +10,11 @@ import * as sinon from "sinon";
 describe(
     "lambda-get-disruptions",
     dbTestBase((db) => {
-        sinon
-            .stub(ProxyHolder.prototype, "setCredentials")
-            .returns(Promise.resolve());
+        sinon.stub(ProxyHolder.prototype, "setCredentials").returns(Promise.resolve());
 
         test("Get disruptions", async () => {
             const disruptions = Array.from({
-                length: Math.floor(Math.random() * 10),
+                length: Math.floor(Math.random() * 10)
             }).map(() => {
                 return newDisruption();
             });
@@ -24,12 +22,10 @@ describe(
 
             const response = await handler();
             const responseFeatureCollection = JSON.parse(
-                response.body
+                Buffer.from(response.body, "base64").toString()
             ) as FeatureCollection;
 
-            expect(responseFeatureCollection.features.length).toBe(
-                disruptions.length
-            );
+            expect(responseFeatureCollection.features.length).toBe(disruptions.length);
         });
     })
 );

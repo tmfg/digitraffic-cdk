@@ -18,7 +18,6 @@
   },
   "dependencies": {
     "@digitraffic/common": "2023.2.13-1",
-    "@types/aws-lambda": "~8.10.114",
     "aws-cdk-lib": "~2.76.0",
     "aws-sdk": "~2.1362.0",
     "constructs": "10.2.2",
@@ -28,6 +27,7 @@
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.2.0",
+    "@types/aws-lambda": "~8.10.114",
     "@types/jest": "^29.5.1",
     "@types/node": "18.15.13",
     "@types/sinon": "10.0.14",

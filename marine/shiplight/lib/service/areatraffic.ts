@@ -1,15 +1,15 @@
-import {
-    DTDatabase,
-    inDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as AreaTrafficDb from "../db/areatraffic";
 import { DbAreaTraffic } from "../db/areatraffic";
 import { AreaTraffic } from "../model/areatraffic";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export async function updateAreaTrafficSendTime(areaId: number) {
     return inDatabase((db: DTDatabase) => {
-        console.info("updating area %d", areaId);
+        logger.info({
+            method: "AreatrafficService.updateAreaTrafficSendTime",
+            message: `updating area ${areaId}`
+        });
         return AreaTrafficDb.updateAreaTrafficSendTime(db, areaId);
     });
 }
@@ -20,26 +20,29 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
         const areas = await AreaTrafficDb.getAreaTraffic(db);
 
-        console.info("method=getAreaTraffic count=%d", areas.length);
+        logger.info({
+            method: "AreatrafficService.getAreaTraffic",
+            count: areas.length
+        });
 
-        areas.forEach((area) =>
-            console.info("method=getAreaTraffic sourceId=%d", area.id)
-        );
+        areas.forEach((area) => {
+            logger.info({
+                method: "AreatrafficService.getAreaTraffic",
+                message: `sourceId ${area.id}`
+            });
+        });
 
         return areas.filter(needToBrighten).map((area) => ({
             areaId: area.id,
             durationInMinutes: area.brighten_duration_min,
-            visibilityInMeters: null,
+            visibilityInMeters: null
         }));
     });
 }
 
 export function needToBrighten(area: DbAreaTraffic): boolean {
     // if lights have never been brightened or brightening has already ended(calculated with a bit of overlap)
-    return (
-        area.brighten_end == null ||
-        isEndTimeBeforeNow(area.brighten_end.getTime())
-    );
+    return area.brighten_end == null || isEndTimeBeforeNow(area.brighten_end.getTime());
 }
 
 function isEndTimeBeforeNow(endTime: number): boolean {

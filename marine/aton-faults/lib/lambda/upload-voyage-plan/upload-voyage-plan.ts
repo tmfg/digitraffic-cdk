@@ -9,8 +9,9 @@ import { UploadVoyagePlanEvent } from "../../model/upload-voyageplan-event";
 import { AtonSecret } from "../../model/secret";
 import { decodeBase64ToAscii } from "@digitraffic/common/dist/utils/base64";
 import { VisService } from "../../service/vis";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 /**
  * Implementation for the Sea Traffic Management (STM) Voyage Information Service (VIS) uploadVoyagePlan interface.
@@ -18,7 +19,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
  */
 
 const secretHolder = SecretHolder.create<AtonSecret>("aton");
-const sendS124QueueUrl = envValue(AtonEnvKeys.SEND_S124_QUEUE_URL);
+const sendS124QueueUrl = getEnvVariable(AtonEnvKeys.SEND_S124_QUEUE_URL);
 
 let visService: VisService | undefined;
 
@@ -27,18 +28,11 @@ async function getVisService(): Promise<VisService> {
         const clientCertificate = decodeSecretValue(secret.certificate);
         const privateKey = decodeSecretValue(secret.privatekey);
         const caCert = decodeSecretValue(secret.ca);
-        return new VisService(
-            caCert,
-            clientCertificate,
-            privateKey,
-            secret.serviceRegistryUrl
-        );
+        return new VisService(caCert, clientCertificate, privateKey, secret.serviceRegistryUrl);
     });
 }
 
-export function handlerFn(
-    sqs: SQS
-): (event: UploadVoyagePlanEvent) => Promise<void> {
+export function handlerFn(sqs: SQS): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function (event: UploadVoyagePlanEvent): Promise<void> {
         if (!visService) {
             visService = await getVisService();
@@ -46,25 +40,28 @@ export function handlerFn(
 
         let voyagePlan: RtzVoyagePlan;
         try {
-            console.info("DEBUG voyageplan " + event.voyagePlan);
+            logger.debug(event.voyagePlan);
 
             const parseXml = util.promisify(xml2js.parseString);
             voyagePlan = (await parseXml(event.voyagePlan)) as RtzVoyagePlan;
         } catch (error) {
-            console.error("UploadVoyagePlan XML parsing failed", error);
+            logger.error({
+                method: "UpdateVoyagePlan.handler",
+                message: "UploadVoyagePlan XML parsing failed",
+                customDetails: JSON.stringify(error)
+            });
             return Promise.reject(BAD_REQUEST_MESSAGE);
         }
 
         const endpoint = await getEndpointUrl(event, voyagePlan, visService);
         //send faults to given callback endpoint, if present
         if (!endpoint) {
-            console.info("no endpoint url!");
+            logger.info({
+                method: "UpdateVoyagePlan.handler",
+                message: "no endpoint url!"
+            });
         } else {
-            const vpService = new VoyagePlanService(
-                sqs,
-                endpoint,
-                sendS124QueueUrl
-            );
+            const vpService = new VoyagePlanService(sqs, endpoint, sendS124QueueUrl);
             return vpService.handleVoyagePlan(voyagePlan);
         }
         return Promise.resolve();
@@ -86,14 +83,15 @@ async function getEndpointUrl(
     visService: VisService
 ): Promise<string> {
     if (event.callbackEndpoint) {
-        console.info("Using callback endpoint from event!");
+        logger.info({
+            method: "UpdateVoyagePlan.getEndpointUrl",
+            message: "Using callback endpoint from event!"
+        });
         return event.callbackEndpoint;
     }
 
     try {
-        const url = await visService.queryCallBackForImo(
-            voyagePlan.route.routeInfo[0].$.vesselIMO
-        );
+        const url = await visService.queryCallBackForImo(voyagePlan.route.routeInfo[0].$.vesselIMO);
 
         return url ? `${url}/area` : "";
     } catch (e) {

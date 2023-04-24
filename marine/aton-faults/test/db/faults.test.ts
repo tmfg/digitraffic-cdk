@@ -6,8 +6,8 @@ import { LineString, Point } from "wkx";
 import { FaultState } from "../../lib/model/fault";
 import { Language } from "@digitraffic/common/dist/types/language";
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
-import moment from "moment";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { addHours } from "date-fns";
 
 describe(
     "db-voyageplan-faults",
@@ -16,13 +16,10 @@ describe(
             const fault = newFault({
                 geometry: {
                     lat: 60.285807,
-                    lon: 27.321659,
-                },
+                    lon: 27.321659
+                }
             });
-            const route = new LineString([
-                new Point(27.024842, 60.524496),
-                new Point(27.224842, 59.900138),
-            ]);
+            const route = new LineString([new Point(27.024842, 60.524496), new Point(27.224842, 59.900138)]);
 
             await insert(db, [fault]);
 
@@ -34,13 +31,10 @@ describe(
             const fault = newFault({
                 geometry: {
                     lat: 60.177569,
-                    lon: 27.502246,
-                },
+                    lon: 27.502246
+                }
             });
-            const route = new LineString([
-                new Point(27.029835, 60.474496),
-                new Point(27.224842, 60.400138),
-            ]);
+            const route = new LineString([new Point(27.029835, 60.474496), new Point(27.224842, 60.400138)]);
 
             await insert(db, [fault]);
 
@@ -52,37 +46,32 @@ describe(
             const faultAvoin = newFault({
                 geometry: {
                     lat: 60.474497,
-                    lon: 27.029836,
+                    lon: 27.029836
                 },
-                state: FaultState.Avoin,
+                state: FaultState.Avoin
             });
             const faultKirjattu = newFault({
                 geometry: {
                     lat: 60.474498,
-                    lon: 27.029837,
+                    lon: 27.029837
                 },
-                state: FaultState.Kirjattu,
+                state: FaultState.Kirjattu
             });
             const faultAiheeton = newFault({
                 geometry: {
                     lat: 60.474499,
-                    lon: 27.029838,
+                    lon: 27.029838
                 },
-                state: FaultState.Aiheeton,
+                state: FaultState.Aiheeton
             });
-            const route = new LineString([
-                new Point(27.029835, 60.474496),
-                new Point(27.224842, 60.400138),
-            ]);
+            const route = new LineString([new Point(27.029835, 60.474496), new Point(27.224842, 60.400138)]);
 
             await insert(db, [faultAvoin, faultKirjattu, faultAiheeton]);
 
             const faultIds = await FaultsDb.findFaultIdsByRoute(db, route);
             expect(faultIds.length).toBe(2);
             expect(faultIds.find((id) => id == faultAvoin.id)).not.toBeNull();
-            expect(
-                faultIds.find((id) => id == faultKirjattu.id)
-            ).not.toBeNull();
+            expect(faultIds.find((id) => id == faultKirjattu.id)).not.toBeNull();
         });
 
         test("getFaultById - found", async () => {
@@ -110,9 +99,7 @@ describe(
         });
 
         test("findAllFaults - multiple", async () => {
-            const faults = Array.from({ length: getRandomNumber(1, 10) }).map(
-                () => newFault()
-            );
+            const faults = Array.from({ length: getRandomNumber(1, 10) }).map(() => newFault());
             await insert(db, faults);
 
             const foundFaults = await findAll(db, Language.FI, 10, (f) => f);
@@ -122,7 +109,7 @@ describe(
 
         test("findAllFaults - fixed in hours", async () => {
             const fault = newFault({
-                fixedTimestamp: moment().add(3, "hour").toDate(),
+                fixedTimestamp: addHours(Date.now(), 3)
             });
             await insert(db, [fault]);
 
