@@ -62,7 +62,10 @@ export function saveTimestamp(
         }
 
         // mmsi is allowed to be undefined if imo exists
-        const mmsi = timestamp.ship.mmsi ?? (await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo));
+        const mmsi =
+            timestamp.ship.mmsi && timestamp.ship.mmsi > 0
+                ? timestamp.ship.mmsi
+                : await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo);
         if (!mmsi) {
             console.warn("method=saveTimestamp MMSI not found for timestamp %s", JSON.stringify(timestamp));
         }
