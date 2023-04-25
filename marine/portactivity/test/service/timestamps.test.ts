@@ -141,7 +141,7 @@ describe(
             expect(ret[1]?.ship_imo).toBe(timestamp2.ship.imo);
         });
 
-        test("saveTimestamp - no IMO not saved", async () => {
+        test("saveTimestamp - no IMO, timestamp not saved", async () => {
             const timestamp = R.dissocPath<ApiTimestamp>(["ship", "imo"], newTimestamp());
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
@@ -149,12 +149,12 @@ describe(
             expect(ret).toBeUndefined();
         });
 
-        test("saveTimestamp - no MMSI not saved", async () => {
+        test("saveTimestamp - no MMSI but IMO exists, timestamp saved", async () => {
             const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp());
 
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
-            expect(ret).toBeUndefined();
+            expect(ret).toBeDefined();
         });
 
         test("saveTimestamp - imo from vessel", async () => {

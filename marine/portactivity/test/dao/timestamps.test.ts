@@ -14,6 +14,7 @@ import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../../lib/model/eventsource";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
+import * as R from "ramda";
 
 const EVENT_SOURCE = "TEST";
 
@@ -246,6 +247,19 @@ describe(
             expect(foundTimestamp.length).toBe(2);
         });
 
+        test("findByImo - null mmsi", async () => {
+            const imo = 1234567;
+            const timestamp = newTimestamp({ imo });
+            const timestampNullMmsi = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
+
+            await insert(db, [timestamp, timestampNullMmsi]);
+
+            const foundTimestamps = await TimestampsDb.findByImo(db, imo);
+
+            expect(foundTimestamps.length).toBe(2);
+            expect(foundTimestamps.find((ts) => ts.ship_mmsi === null)).toBeDefined();
+        });
+
         test("findByLocode - two sources", async () => {
             const locode = "AA111";
             const timestampSource1 = Object.assign(newTimestamp({ locode }), {
@@ -258,6 +272,19 @@ describe(
 
             const foundTimestamp = await TimestampsDb.findByLocode(db, locode);
             expect(foundTimestamp.length).toBe(2);
+        });
+
+        test("findByLocode - null mmsi", async () => {
+            const locode = "AA111";
+            const timestamp = newTimestamp({ locode });
+            const timestampNullMmsi = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
+
+            await insert(db, [timestamp, timestampNullMmsi]);
+
+            const foundTimestamps = await TimestampsDb.findByLocode(db, locode);
+
+            expect(foundTimestamps.length).toBe(2);
+            expect(foundTimestamps.find((ts) => ts.ship_mmsi === null)).toBeDefined();
         });
 
         test("findByLocode - from not used when timestamp is not Pilotweb", async () => {
@@ -487,6 +514,19 @@ describe(
             const imo = await db.tx((t) => TimestampsDb.findImoByMmsi(t, timestamp.ship.mmsi ?? -1));
 
             expect(imo).toEqual(timestamp.ship.imo);
+        });
+
+        test("findBySource - null mmsi", async () => {
+            const source = "Portnet";
+            const timestamp = newTimestamp({ source });
+            const timestampNullMmsi = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
+
+            await insert(db, [timestamp, timestampNullMmsi]);
+
+            const foundTimestamps = await TimestampsDb.findBySource(db, source);
+
+            expect(foundTimestamps.length).toBe(2);
+            expect(foundTimestamps.find((ts) => ts.ship_mmsi === null)).toBeDefined();
         });
 
         function findPortcallIdTest(

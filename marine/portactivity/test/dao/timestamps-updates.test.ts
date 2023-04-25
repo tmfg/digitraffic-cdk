@@ -4,6 +4,7 @@ import * as TimestampsDb from "../../lib/dao/timestamps";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { addMinutes, differenceInMilliseconds, parseISO } from "date-fns";
+import * as R from "ramda";
 
 describe(
     "db-timestamps - updates",
@@ -30,7 +31,7 @@ describe(
             expect(e.event_time_confidence_upper_diff).toBe(timestamp.eventTimeConfidenceUpperDiff ?? null);
         });
 
-        test("updateTimestamp - mmsi", async () => {
+        test("updateTimestamp - imo undefined, mmsi exists, timestamp is rejected", async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 ship: {
                     mmsi: 123,
@@ -41,7 +42,7 @@ describe(
             await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
         });
 
-        test("updateTimestamp - imo", async () => {
+        test("updateTimestamp - imo exists, mmsi undefined, timestamp is saved", async () => {
             const timestamp = Object.assign(newTimestamp(), {
                 ship: {
                     mmsi: undefined,
@@ -49,7 +50,7 @@ describe(
                 }
             });
 
-            await expect(() => TimestampsDb.updateTimestamp(db, timestamp)).rejects.toThrow();
+            await expect(TimestampsDb.updateTimestamp(db, timestamp)).resolves.not.toThrow();
         });
 
         test("updateTimestamp - both ids", async () => {
@@ -74,6 +75,48 @@ describe(
             await TimestampsDb.updateTimestamp(db, timestamp);
 
             expect((await findAll(db)).length).toBe(1);
+        });
+
+        test("updateTimestamp - mmsi values for same imo", async () => {
+            const imo = 123;
+
+            const mmsi1 = 345;
+            const mmsi2 = 678;
+
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo }));
+
+            const updatedTimestamp = {
+                ...timestamp,
+                ship: {
+                    ...timestamp.ship,
+                    mmsi: mmsi1
+                }
+            };
+
+            const againUpdatedTimestamp = {
+                ...timestamp,
+                ship: {
+                    ...timestamp.ship,
+                    mmsi: mmsi2
+                }
+            };
+
+            await TimestampsDb.updateTimestamp(db, timestamp);
+            await TimestampsDb.updateTimestamp(db, updatedTimestamp);
+            await TimestampsDb.updateTimestamp(db, againUpdatedTimestamp);
+
+            const timestamps = await findAll(db);
+
+            expect(timestamps.length).toEqual(3);
+            expect(
+                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === null)
+            ).toBeDefined();
+            expect(
+                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === mmsi1)
+            ).toBeDefined();
+            expect(
+                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === mmsi2)
+            ).toBeDefined();
         });
 
         test("createUpdateValues - mmsi 0", () => {

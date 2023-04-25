@@ -10,6 +10,7 @@ export interface DbPublicShiplist {
     readonly record_time: string;
     readonly ship_name: string;
     readonly portcall_id: number;
+    readonly ship_imo: number;
 }
 
 const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
@@ -19,7 +20,8 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
         pe.event_source,
         pe.record_time,
         COALESCE(v.name, upper(pc.vessel_name), 'Unknown') as ship_name,
-        pe.portcall_id
+        pe.portcall_id,
+        pe.ship_imo
     FROM port_call_timestamp pe
     LEFT JOIN public.vessel v on v.imo = pe.ship_imo AND v.timestamp = (SELECT MAX(timestamp) FROM public.vessel WHERE imo = v.imo)
     LEFT JOIN public.port_call pc on pc.imo_lloyds = pe.ship_imo
@@ -53,7 +55,7 @@ export function findByLocodePublicShiplist(
     const ps = new PreparedStatement({
         name: "find-by-locode-public-shiplist",
         text: SELECT_BY_LOCODE_PUBLIC_SHIPLIST,
-        values: [locode, interval],
+        values: [locode, interval]
     });
     return db.tx((t) => t.manyOrNone(ps));
 }
