@@ -114,7 +114,9 @@ const SELECT_BY_LOCODE = `
               SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
-                  px.ship_mmsi = pe.ship_mmsi AND
+                  CASE WHEN px.ship_mmsi IS NOT NULL AND pe.ship_mmsi IS NOT NULL
+                  THEN px.ship_mmsi = pe.ship_mmsi
+                  ELSE px.ship_imo = pe.ship_imo END AND
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
@@ -207,7 +209,9 @@ const SELECT_BY_MMSI = `
               SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
-                  px.ship_mmsi = pe.ship_mmsi AND
+                  CASE WHEN px.ship_mmsi IS NOT NULL AND pe.ship_mmsi IS NOT NULL
+                  THEN px.ship_mmsi = pe.ship_mmsi
+                  ELSE px.ship_imo = pe.ship_imo END AND
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
@@ -247,7 +251,9 @@ const SELECT_BY_IMO = `
               SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
-                  px.ship_mmsi = pe.ship_mmsi AND
+                  CASE WHEN px.ship_mmsi IS NOT NULL AND pe.ship_mmsi IS NOT NULL
+                  THEN px.ship_mmsi = pe.ship_mmsi
+                  ELSE px.ship_imo = pe.ship_imo END AND
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
@@ -287,7 +293,9 @@ const SELECT_BY_SOURCE = `
               SELECT MAX(px.record_time) FROM port_call_timestamp px
               WHERE px.event_type = pe.event_type AND
                   px.location_locode = pe.location_locode AND
-                  px.ship_mmsi = pe.ship_mmsi AND
+                  CASE WHEN px.ship_mmsi IS NOT NULL AND pe.ship_mmsi IS NOT NULL
+                  THEN px.ship_mmsi = pe.ship_mmsi
+                  ELSE px.ship_imo = pe.ship_imo END AND
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
