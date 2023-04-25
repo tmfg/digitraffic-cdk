@@ -83,8 +83,8 @@ export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse>
                 ).map((ts) =>
                     Object.assign(ts, {
                         source: ts.event_source,
-                        eventTime: ts.event_time,
-                        recordTime: ts.record_time,
+                        eventTime: ts.event_time.toISOString(),
+                        recordTime: ts.record_time.toISOString(),
                         portcallId: ts.portcall_id,
                         eventType: ts.event_type,
                         ship: {

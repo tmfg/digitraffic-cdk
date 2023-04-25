@@ -5,9 +5,9 @@ import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
 export interface DbPublicShiplist {
     readonly event_type: EventType;
-    readonly event_time: string;
+    readonly event_time: Date;
     readonly event_source: string;
-    readonly record_time: string;
+    readonly record_time: Date;
     readonly ship_name: string;
     readonly portcall_id: number;
     readonly ship_imo: number;
