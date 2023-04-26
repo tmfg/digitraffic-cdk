@@ -1,6 +1,5 @@
-import { findByLocodePublicShiplist } from "../../dao/shiplist-public";
+import { getShiplist } from "../../service/shiplist";
 import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
-import { getDisplayableNameForEventSource, mergeTimestamps } from "../../event-sourceutil";
 import * as IdUtils from "@digitraffic/common/dist/marine/id_utils";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { ProxyLambdaRequest, ProxyLambdaResponse } from "@digitraffic/common/dist/aws/types/proxytypes";
@@ -78,29 +77,7 @@ export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse>
             const interval = Number.parseInt(parameters.interval ?? "4*24");
 
             return inDatabaseReadonly(async (db: DTDatabase): Promise<ProxyLambdaResponse> => {
-                const dbShiplist = (
-                    await findByLocodePublicShiplist(db, parameters.locode.toUpperCase(), interval)
-                ).map((ts) =>
-                    Object.assign(ts, {
-                        source: ts.event_source,
-                        eventTime: ts.event_time.toISOString(),
-                        recordTime: ts.record_time.toISOString(),
-                        portcallId: ts.portcall_id,
-                        eventType: ts.event_type,
-                        ship: {
-                            imo: ts.ship_imo
-                        },
-                        location: {
-                            port: parameters.locode.toUpperCase()
-                        }
-                    })
-                );
-                // don't overwrite source before merging as it utilizes source name in prioritizing
-                const shiplist = mergeTimestamps(dbShiplist).map((ts) =>
-                    Object.assign(ts, {
-                        source: getDisplayableNameForEventSource(ts.source)
-                    })
-                );
+                const shiplist = await getShiplist(db, parameters.locode, interval);
 
                 return response(200, getPageSource(shiplist), MediaType.TEXT_HTML);
             });
