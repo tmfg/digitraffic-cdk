@@ -12,13 +12,15 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
     const message = await PilotwebAPI.getMessages(host, authHeader);
     const pilotages = JSON.parse(message) as Pilotage[];
 
-    console.log("method=PortActivity.GetMessages source=Pilotweb receivedCount=%d", pilotages.length);
+    console.info("method=getMessagesFromPilotweb source=Pilotweb receivedCount=%d", pilotages.length);
+    console.info("DEBUG pilotages received: %s", pilotages);
 
     return inDatabase(async (db: DTDatabase) => {
         const idMap = await PilotagesDAO.getTimestamps(db);
         const pilotageIds = await removeMissingPilotages(db, idMap, pilotages);
         const updated = await updateAllPilotages(db, idMap, pilotages);
 
+        console.info("DEBUG updated pilotages: %s", JSON.stringify(updated));
         console.info("DEBUG timestamps to remove %s", JSON.stringify(pilotageIds));
 
         await removeTimestamps(db, pilotageIds);
