@@ -13,7 +13,7 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
     const pilotages = JSON.parse(message) as Pilotage[];
 
     console.info("method=getMessagesFromPilotweb source=Pilotweb receivedCount=%d", pilotages.length);
-    console.info("DEBUG pilotages received: %s", pilotages);
+    console.info("DEBUG pilotages received: %s", JSON.stringify(pilotages));
 
     return inDatabase(async (db: DTDatabase) => {
         const idMap = await PilotagesDAO.getTimestamps(db);
