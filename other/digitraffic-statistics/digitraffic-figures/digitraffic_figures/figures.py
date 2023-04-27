@@ -159,8 +159,9 @@ class Figures:
 
         if isinstance(data, str):
             data = json.loads(data)
-            data["__missing__"] += data[""]
-            del data[""]
+            if "" in data:
+                data["__missing__"] += data[""]
+                del data[""]
 
         dt = pd.DataFrame.from_dict(data, orient="index", columns=[sort_by_column])
 
