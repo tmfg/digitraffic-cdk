@@ -35,8 +35,10 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
         return proxyHolder
             .setCredentials()
             .then(() => FaultsService.findAllFaults(getFaultsEvent.language, getFaultsEvent.fixed_in_hours))
-            .then((faults) => {
-                return LambdaResponse.okJson(faults);
+            .then(([faults, lastUpdated]) => {
+                return lastUpdated
+                    ? LambdaResponse.okJson(faults).withTimestamp(lastUpdated)
+                    : LambdaResponse.okJson(faults);
             });
     } catch (error) {
         if (error instanceof ZodError) {

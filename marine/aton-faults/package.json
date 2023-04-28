@@ -20,7 +20,7 @@
     "watch": "tsc -w"
   },
   "dependencies": {
-    "@digitraffic/common": "2023.4.3-1",
+    "@digitraffic/common": "2023.4.28-1",
     "@middy/core": "^4.3.1",
     "@middy/sqs-partial-batch-failure": "^4.3.1",
     "@turf/boolean-disjoint": "^6.5.0",

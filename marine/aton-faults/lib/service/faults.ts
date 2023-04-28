@@ -32,12 +32,15 @@ export interface FaultProps {
     readonly area_description: string;
 }
 
-export function findAllFaults(language: Language, fixedInHours: number): Promise<FeatureCollection> {
+export function findAllFaults(
+    language: Language,
+    fixedInHours: number
+): Promise<[FeatureCollection, Date | null]> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
         const features = await FaultsDB.findAll(db, language, fixedInHours, convertFeature);
         const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, ATON_FAULTS_CHECK);
 
-        return createFeatureCollection(features, lastUpdated);
+        return [createFeatureCollection(features, lastUpdated), lastUpdated];
     });
 }
 
