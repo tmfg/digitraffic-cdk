@@ -35,7 +35,11 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
         return areas.filter(needToBrighten).map((area) => ({
             areaId: area.id,
             durationInMinutes: area.brighten_duration_min,
-            visibilityInMeters: null
+            visibilityInMeters: null,
+            ship: {
+                name: area.ship_name,
+                mmsi: area.ship_mmsi
+            }
         }));
     });
 }
