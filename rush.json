@@ -168,6 +168,12 @@
       "tags": ["cdk", "other"]
     },
     {
+      "packageName": "opensearch-monitors",
+      "projectFolder": "other/opensearch-monitors",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
+      "tags": ["cdk", "other"]
+    },
+    {
       "packageName": "patchmanager-cdk",
       "projectFolder": "other/patchmanager",
       "tags": ["cdk", "other"]
