@@ -9,7 +9,10 @@ export interface DbAreaTraffic {
     readonly brighten_end?: Date;
 }
 
-export type DbAreaTrafficResult = DbAreaTraffic & { readonly ship_mmsi: number; readonly ship_name: string };
+export interface DbAreaTrafficResult extends DbAreaTraffic {
+    readonly ship_mmsi: number;
+    readonly ship_name: string;
+}
 
 export enum ShipTypes {
     FISHING = 30,

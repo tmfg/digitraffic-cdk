@@ -1,6 +1,6 @@
 import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as AreaTrafficDb from "../db/areatraffic";
-import { DbAreaTraffic } from "../db/areatraffic";
+import { DbAreaTraffic, DbAreaTrafficResult } from "../db/areatraffic";
 import { AreaTraffic } from "../model/areatraffic";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -32,23 +32,27 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
             });
         });
 
-        return areas.filter(needToBrighten).map((area) => ({
-            areaId: area.id,
-            durationInMinutes: area.brighten_duration_min,
-            visibilityInMeters: null,
-            ship: {
-                name: area.ship_name,
-                mmsi: area.ship_mmsi
-            }
-        }));
+        return areas.filter(needToBrighten).map(dbAreaTrafficResultToAreaTraffic);
     });
 }
 
 export function needToBrighten(area: DbAreaTraffic): boolean {
     // if lights have never been brightened or brightening has already ended(calculated with a bit of overlap)
-    return area.brighten_end == null || isEndTimeBeforeNow(area.brighten_end.getTime());
+    return !area.brighten_end || isEndTimeBeforeNow(area.brighten_end.getTime());
 }
 
 function isEndTimeBeforeNow(endTime: number): boolean {
     return endTime < Date.now() + BRIGHTEN_OVERLAP_INTERVAL_MILLIS;
+}
+
+function dbAreaTrafficResultToAreaTraffic(result: DbAreaTrafficResult): AreaTraffic {
+    return {
+        areaId: result.id,
+        durationInMinutes: result.brighten_duration_min,
+        visibilityInMeters: null,
+        ship: {
+            name: result.ship_name,
+            mmsi: result.ship_mmsi
+        }
+    };
 }
