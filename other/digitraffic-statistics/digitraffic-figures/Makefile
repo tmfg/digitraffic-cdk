@@ -7,6 +7,7 @@ create_venv:
 
 install_venv:
 	venv/bin/pip install -r requirements.txt
+	venv/bin/python -m pip install --upgrade pip
 
 clean_venv:
 	rm -rf venv
@@ -15,6 +16,7 @@ list_outdated:
 	venv/bin/pip list --outdated
 
 update_outdated:
+	venv/bin/python -m pip install --upgrade pip
 	venv/bin/pip list --outdated --format=json | jq -r '.[].name' | xargs -I"{}" venv/bin/pip install -U "{}"
 
 freeze_venv:
