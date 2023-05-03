@@ -9,12 +9,7 @@ import numpy as np
 from plotly import express as px
 from plotly import graph_objects as go
 
-ALL_TIME_WITH_TREND = (
-    True if os.getenv("APP_ALL_TIME_WITH_TREND", "DISABLE") == "ENABLE" else False
-)
-
-if ALL_TIME_WITH_TREND:
-    from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import LinearRegression
 
 TERA = pow(10, 12)
 GIGA = pow(10, 9)
@@ -420,22 +415,21 @@ class Figures:
             color="liikennemuoto",
         )
 
-        if ALL_TIME_WITH_TREND:
-            bytes_combined = data[data["liikennemuoto"] == "kaikki"]
-            reg = LinearRegression().fit(
-                bytes_combined["days_from_start"].values.reshape(-1, 1),
-                np.log(bytes_combined[texts["values"]]),
+        bytes_combined = data[data["liikennemuoto"] == "kaikki"]
+        reg = LinearRegression().fit(
+            bytes_combined["days_from_start"].values.reshape(-1, 1),
+            np.log(bytes_combined[texts["values"]]),
+        )
+        bytes_combined["trend"] = np.exp(
+            reg.predict(bytes_combined["days_from_start"].to_numpy().reshape(-1, 1))
+        )
+        fig.add_trace(
+            go.Scatter(
+                name="Logaritminen trendi",
+                x=bytes_combined.index,
+                y=bytes_combined["trend"],
             )
-            bytes_combined["trend"] = np.exp(
-                reg.predict(bytes_combined["days_from_start"].to_numpy().reshape(-1, 1))
-            )
-            fig.add_trace(
-                go.Scatter(
-                    name="Logaritminen trendi",
-                    x=bytes_combined.index,
-                    y=bytes_combined["trend"],
-                )
-            )
+        )
 
         self.logger.info(
             f"method=Figures.__all_time_data type={a_type} took={time.time()-start}"
