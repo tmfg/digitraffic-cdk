@@ -20,7 +20,8 @@ export class AreaLightsService {
         logger.info({
             method: "ArealightsService.updateLightsForArea",
             duration: areaTraffic.durationInMinutes,
-            visibility: areaTraffic.visibilityInMeters?.toString()
+            visibility: areaTraffic.visibilityInMeters?.toString(),
+            mmsi: areaTraffic.ship.mmsi
         });
 
         await retry(
@@ -28,7 +29,9 @@ export class AreaLightsService {
                 const response = await this.api.updateLightsForArea({
                     routeId: areaId,
                     visibility: areaTraffic.visibilityInMeters,
-                    time: areaTraffic.durationInMinutes
+                    time: areaTraffic.durationInMinutes,
+                    MMSI: areaTraffic.ship.mmsi.toString(),
+                    shipName: areaTraffic.ship.name
                 });
                 if (response.LightsSetSentFailed.length) {
                     logger.warn({

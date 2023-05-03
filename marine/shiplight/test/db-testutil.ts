@@ -47,12 +47,12 @@ export async function insertAreaTraffic(
     });
 }
 
-export async function insertVessel(db: DTDatabase, mmsi: number): Promise<void> {
+export async function insertVessel(db: DTDatabase, mmsi: number, shipName = "test_vessel"): Promise<void> {
     await db.tx(async (t) => {
         await t.none(
             "INSERT INTO vessel(mmsi,timestamp,name,ship_type,reference_point_a,reference_point_b,reference_point_c,reference_point_d,pos_type,draught,imo,eta) " +
                 "values ($1, $2, $3, $4, 1,1,1,1,1,1,1,1)",
-            [mmsi, Date.now(), "test", ShipTypes.CARGO]
+            [mmsi, Date.now(), shipName, ShipTypes.CARGO]
         );
     });
 }
