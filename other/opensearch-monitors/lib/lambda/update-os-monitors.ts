@@ -7,12 +7,7 @@ import { OSMonitor } from "../monitor/monitor";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
-
-export enum EnvKeys {
-    ROLE = "ROLE",
-    OS_HOST = "OS_HOST",
-    OS_VPC_ENDPOINT = "OS_VPC_ENDPOINT"
-}
+import { EnvKeys } from "../env";
 
 const ROLE_ARN = getEnvVariable(EnvKeys.ROLE);
 const OS_HOST = getEnvVariable(EnvKeys.OS_HOST);

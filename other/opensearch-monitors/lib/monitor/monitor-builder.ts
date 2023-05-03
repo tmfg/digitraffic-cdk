@@ -159,7 +159,7 @@ export class OsMonitorBuilder {
         return this;
     }
 
-    moreThan(threshold: number): this {
+    moreThan(threshold: number = 0): this {
         this.trigger = triggerWhenLinesFound(
             this.name,
             this.destinations,
