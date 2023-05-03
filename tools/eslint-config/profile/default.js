@@ -102,8 +102,9 @@ module.exports = {
             }
         },
         {
-            // CDK has some quirks and thus shoudn't
+            // CDK has some quirks and thus shouldn't apply all the rules against them.
             files: [
+                "bin/**/*.ts",
                 "*.cdk.ts",
 
                 // old way
