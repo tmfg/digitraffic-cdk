@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && npm run postbuild",
     "postbuild": "npm run compile-lambdas",
     "cdk": "pnpm dlx cdk@latest",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
