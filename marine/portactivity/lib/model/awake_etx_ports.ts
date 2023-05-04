@@ -1,8 +1,18 @@
 // lists of ports for which ETA and ETD predictions should be fetched from Voyages port API
 
-export const ETA_PORTS = ["FIKOK", "FIRAU", "FIOUL", "FIKEM", "FIKJO", "FIUKI", "FIPOR"] as const;
+import { Locode } from "./locode";
 
-export const ETD_PORTS = [
+export const ETA_PORTS: readonly Locode[] = [
+    "FIKOK",
+    "FIRAU",
+    "FIOUL",
+    "FIKEM",
+    "FIKJO",
+    "FIUKI",
+    "FIPOR"
+] as const;
+
+export const ETD_PORTS: readonly Locode[] = [
     "FIHEL",
     "FIHKO",
     "FIKEM",
