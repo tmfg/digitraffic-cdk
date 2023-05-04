@@ -6,11 +6,7 @@ import { Stack } from "aws-cdk-lib/core/lib/stack";
 import { CloudfrontConfiguration } from "./app-props";
 
 export class CloudfrontMonitoring {
-    constructor(
-        stack: Stack,
-        alarmsTopic: Topic,
-        config: CloudfrontConfiguration
-    ) {
+    constructor(stack: Stack, alarmsTopic: Topic, config: CloudfrontConfiguration) {
         const alarmNames: string[] = [];
 
         config.distributions.forEach((distribution) => {
@@ -20,6 +16,7 @@ export class CloudfrontMonitoring {
             const alarmName = `${distribution.id}-bytes-downloaded`;
             alarmNames.push(alarmName);
 
+            // eslint-disable-next-line no-new
             new CfnAlarm(stack, `${distribution.id}-BytesDownloadedAlarm`, {
                 alarmName,
                 comparisonOperator: "LessThanLowerOrGreaterThanUpperThreshold",
@@ -35,37 +32,38 @@ export class CloudfrontMonitoring {
                                 dimensions: [
                                     {
                                         name: "DistributionId",
-                                        value: distribution.id,
+                                        value: distribution.id
                                     },
                                     {
                                         name: "Region",
-                                        value: "Global",
-                                    },
-                                ],
+                                        value: "Global"
+                                    }
+                                ]
                             },
                             period: 60 * 60,
-                            stat: "Average",
-                        },
+                            stat: "Average"
+                        }
                     },
                     {
                         expression: `ANOMALY_DETECTION_BAND(${metricId}, ${distribution.threshold ?? 2})`,
-                        id: detectorId,
-                    },
+                        id: detectorId
+                    }
                 ],
-                thresholdMetricId: detectorId,
+                thresholdMetricId: detectorId
             });
         });
 
         // our topic is in another region, so can't put it as alarmAction in CfnAlarm.
         // so we create a rule that listens to this alarm state changes and sends notification to our topic
+        // eslint-disable-next-line no-new
         new Rule(stack, "Cloudfront-bytes-rule", {
             eventPattern: {
                 source: ["aws.cloudwatch"],
                 detail: {
-                    alarmName: alarmNames,
-                },
+                    alarmName: alarmNames
+                }
             },
-            targets: [new SnsTopic(alarmsTopic)],
+            targets: [new SnsTopic(alarmsTopic)]
         });
     }
 }

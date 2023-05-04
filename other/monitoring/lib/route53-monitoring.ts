@@ -5,21 +5,18 @@ import { Topic } from "aws-cdk-lib/aws-sns";
 import { Route53Configuration } from "./app-props";
 
 export class Route53Monitoring {
-    constructor(
-        stack: Stack,
-        alarmsTopic: Topic,
-        config: Route53Configuration
-    ) {
+    constructor(stack: Stack, alarmsTopic: Topic, config: Route53Configuration) {
+        // eslint-disable-next-line no-new
         new Rule(stack, "Route53Rule", {
             eventPattern: {
                 source: ["aws.route53"],
                 detail: {
                     requestParameters: {
-                        hostedZoneId: config.zoneIds,
-                    },
-                },
+                        hostedZoneId: config.zoneIds
+                    }
+                }
             },
-            targets: [new SnsTopic(alarmsTopic)],
+            targets: [new SnsTopic(alarmsTopic)]
         });
     }
 }

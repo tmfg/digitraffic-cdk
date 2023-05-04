@@ -5,7 +5,6 @@ export interface MonitoringConfiguration {
     readonly alarmTopicEmail: string;
 
     readonly db?: DBConfiguration;
-    readonly mqtt?: MQTTConfiguration[];
     readonly route53?: Route53Configuration;
     readonly cloudfront?: CloudfrontConfiguration;
 
@@ -21,20 +20,13 @@ export interface DBConfiguration {
     readonly volumeReadIOPSLimit: number;
 }
 
-export interface MQTTConfiguration {
-    readonly brokerName: string;
-    readonly cpuLimit?: number;
-    readonly heapLimit?: number;
-    readonly networkLimit?: number;
-}
-
 export interface Route53Configuration {
     readonly zoneIds: string[];
 }
 
 export interface CloudfrontConfiguration {
     readonly distributions: {
-        readonly id: string,
-        readonly threshold?: number
+        readonly id: string;
+        readonly threshold?: number;
     }[];
 }
