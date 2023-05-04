@@ -1,49 +1,102 @@
-import { dbTestBase, insertPilotage } from "../db-testutil";
-import {
-    deletePilotages,
-    findPortCallId,
-    getTimestamps,
-} from "../../lib/dao/pilotages";
+import { dbTestBase, insertPilotage, insertPortCall } from "../db-testutil";
+import { deletePilotages, findPortCallId, getTimestamps } from "../../lib/dao/pilotages";
 import { Pilotage } from "../../lib/model/pilotage";
 import { Location } from "../../lib/model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { newPortCall, newTimestamp } from "../testdata";
+import { subHours } from "date-fns";
 
 describe(
     "db-pilotages-public",
     dbTestBase((db: DTDatabase) => {
-        function createPilotage(): Pilotage {
+        function createPilotage(mmsi = 123, start = "ABC", end = "DEF"): Pilotage {
             return {
                 id: 1,
                 state: "TEST",
                 vessel: {
                     name: "test",
-                    mmsi: 123,
+                    mmsi: 123
                 },
                 route: {
                     start: {
-                        code: "ABC",
+                        code: start
                     },
                     end: {
-                        code: "DEF",
-                    },
+                        code: end
+                    }
                 },
                 vesselEta: "",
                 endTime: "",
                 scheduleSource: "test",
-                scheduleUpdated: "",
+                scheduleUpdated: ""
             };
         }
 
-        function createLocation(): Location {
+        function createLocation(port = "ABC", from = "DEF"): Location {
             return {
-                port: "ABC",
+                port,
+                from
             };
         }
 
         test("findPortCallId - empty", async () => {
             const pilotage = createPilotage();
             const location = createLocation();
-            await findPortCallId(db, pilotage, location);
+            expect(await findPortCallId(db, pilotage, location)).toBeUndefined();
+        });
+
+        test("findPortCallId - found when portcall not older than 36 hours", async () => {
+            const portcallId = 1234567;
+            const mmsi = 123;
+            const locode = "FIABC";
+            const portcall = newPortCall(
+                newTimestamp({ mmsi, locode }),
+                portcallId,
+                subHours(Date.now(), 35)
+            );
+            await insertPortCall(db, portcall);
+
+            const pilotage = createPilotage(mmsi, locode);
+            const location = createLocation(locode);
+
+            const foundPortcallId = await findPortCallId(db, pilotage, location);
+            expect(foundPortcallId).toEqual(portcallId);
+        });
+
+        test("findPortCallId - not found when portcall older than 36 hours", async () => {
+            const portcallId = 1234567;
+            const mmsi = 123;
+            const locode = "FIABC";
+            const portcall = newPortCall(
+                newTimestamp({ mmsi, locode }),
+                portcallId,
+                subHours(Date.now(), 37)
+            );
+            await insertPortCall(db, portcall);
+
+            const pilotage = createPilotage(mmsi, locode);
+            const location = createLocation(locode);
+
+            const foundPortcallId = await findPortCallId(db, pilotage, location);
+            expect(foundPortcallId).toBeUndefined();
+        });
+
+        test("findPortCallId - return portcallId relating to outgoing pilotage if portcallId found for both start and end location", async () => {
+            const portcallId1 = 1234567;
+            const portcallId2 = 7654321;
+            const mmsi = 123;
+            const locodeFrom = "FIABC";
+            const locodeTo = "FIDEF";
+            const portcall1 = newPortCall(newTimestamp({ mmsi, locode: locodeFrom }), portcallId1);
+            const portcall2 = newPortCall(newTimestamp({ mmsi, locode: locodeTo }), portcallId2);
+            await insertPortCall(db, portcall1);
+            await insertPortCall(db, portcall2);
+
+            const pilotage = createPilotage(mmsi, locodeFrom, locodeTo);
+            const location = createLocation(locodeTo, locodeFrom);
+
+            const foundPortcallId = await findPortCallId(db, pilotage, location);
+            expect(foundPortcallId).toEqual(portcallId1);
         });
 
         test("getTimestamps - empty", async () => {

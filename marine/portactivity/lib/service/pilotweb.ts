@@ -13,7 +13,6 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
     const pilotages = JSON.parse(message) as Pilotage[];
 
     console.info("method=getMessagesFromPilotweb source=Pilotweb receivedCount=%d", pilotages.length);
-    console.info("DEBUG pilotages received: %s", JSON.stringify(pilotages));
 
     return inDatabase(async (db: DTDatabase) => {
         const idMap = await PilotagesDAO.getTimestamps(db);
@@ -69,7 +68,7 @@ async function removeMissingPilotages(
 async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[]): Promise<ApiTimestamp[]> {
     return (
         await Promise.all(
-            newAndUpdated.map(async (p: Pilotage): Promise<ApiTimestamp | null> => {
+            newAndUpdated.map(async (p: Pilotage): Promise<ApiTimestamp | undefined> => {
                 const base = createApiTimestamp(p);
 
                 if (base) {
@@ -95,13 +94,13 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
 
                     console.info("skipping pilotage %d, missing portcallId", p.id);
                 }
-                return null;
+                return undefined;
             })
         )
     ).filter((x) => !!x) as ApiTimestamp[];
 }
 
-function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | null> {
+function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise<number | undefined> {
     if (p.portnetPortCallId) {
         return Promise.resolve(p.portnetPortCallId);
     }

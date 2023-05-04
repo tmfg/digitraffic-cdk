@@ -123,13 +123,17 @@ export function newPortAreaDetails(
     };
 }
 
-export function newPortCall(timestamp: ApiTimestamp, portcallId?: number): PortCall {
+export function newPortCall(
+    timestamp: ApiTimestamp,
+    portcallId?: number,
+    portcallTimestamp = new Date()
+): PortCall {
     return {
         port_call_id: portcallId ?? timestamp.portcallId ?? -1,
         radio_call_sign: "a",
         radio_call_sign_type: "fake",
         vessel_name: uuidv4(),
-        port_call_timestamp: new Date(),
+        port_call_timestamp: portcallTimestamp,
         port_to_visit: timestamp.location.port,
         mmsi: timestamp.ship.mmsi ?? someNumber(),
         imo_lloyds: timestamp.ship.imo ?? someNumber()
