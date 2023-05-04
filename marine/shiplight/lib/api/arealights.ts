@@ -5,7 +5,7 @@ import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export interface AreaLightsBrightenRequest {
     /**
-     * Route id
+     * Route id (areaId)
      */
     readonly routeId: number;
 
@@ -18,6 +18,16 @@ export interface AreaLightsBrightenRequest {
      * Time to set the brightness on in minutes
      */
     readonly time: number;
+
+    /**
+     * MMSI of ship triggering brighten request
+     */
+    readonly MMSI: string;
+
+    /**
+     * Name of ship triggering brighten request
+     */
+    readonly shipName: string;
 }
 
 export interface AreaLightsBrightenResponse {
