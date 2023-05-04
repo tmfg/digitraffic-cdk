@@ -1,16 +1,16 @@
+import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { SNSEvent } from "aws-lambda";
+import { AwakeAiETAShipApi } from "../../api/awake_ai_ship";
+import { DbETAShip } from "../../dao/timestamps";
 import { PortactivityEnvKeys } from "../../keys";
 import { AwakeAiETAShipService } from "../../service/awake_ai_eta_ship";
-import { AwakeAiETAShipApi } from "../../api/awake_ai_ship";
-import { SNSEvent } from "aws-lambda";
-import { DbETAShip } from "../../dao/timestamps";
 import { sendMessage } from "../../service/queue-service";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
-import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 
 let service: AwakeAiETAShipService | undefined;
 
-const queueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 interface UpdateAwakeAiTimestampsSecret extends GenericSecret {
     readonly voyagesurl: string;

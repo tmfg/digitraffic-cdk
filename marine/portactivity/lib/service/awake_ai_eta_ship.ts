@@ -26,11 +26,11 @@ interface AwakeAiETAResponseAndShip {
 export class AwakeAiETAShipService {
     private readonly api: AwakeAiETAShipApi;
 
-    readonly overriddenDestinations = ["FIHEL", "FIPOR", "FIHKO"];
+    readonly overriddenDestinations: readonly string[] = ["FIHEL", "FIPOR", "FIHKO"] as const;
 
-    readonly publishAsETBDestinations = ["FIRAU"];
+    readonly publishAsETBDestinations: readonly string[] = ["FIRAU"] as const;
 
-    readonly publishAsETPDestinations = ["FIRAU", "FIKOK", "FIKAS", "FIPOR"];
+    readonly publishAsETPDestinations: readonly string[] = ["FIRAU", "FIKOK", "FIKAS", "FIPOR"] as const;
 
     constructor(api: AwakeAiETAShipApi) {
         this.api = api;

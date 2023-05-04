@@ -37,7 +37,7 @@ describe("schedules", () => {
         description: string,
         serviceFn: (service: SchedulesService) => Promise<ApiTimestamp[]>,
         calculated: boolean
-    ) {
+    ): void {
         test(description, async () => {
             const api = createApi();
             const getSchedulesTimestampsSpy = jest
@@ -80,10 +80,10 @@ describe("schedules", () => {
 
         expect(timestamps.length).toBe(6);
         timestamps
-            .filter((ts) => ts.eventType == EventType.ETA)
+            .filter((ts) => ts.eventType === EventType.ETA)
             .forEach((ts) => verifyStructure(ts, EventType.ETA, false));
         timestamps
-            .filter((ts) => ts.eventType == EventType.ETD)
+            .filter((ts) => ts.eventType === EventType.ETD)
             .forEach((ts) => verifyStructure(ts, EventType.ETD, false));
     });
 
@@ -115,10 +115,10 @@ describe("schedules", () => {
 
         expect(timestamps.length).toBe(6);
         timestamps
-            .filter((ts) => ts.eventType == EventType.ETA)
+            .filter((ts) => ts.eventType === EventType.ETA)
             .forEach((ts) => verifyStructure(ts, EventType.ETA, true));
         timestamps
-            .filter((ts) => ts.eventType == EventType.ETD)
+            .filter((ts) => ts.eventType === EventType.ETD)
             .forEach((ts) => verifyStructure(ts, EventType.ETD, true));
     });
 
@@ -152,7 +152,6 @@ describe("schedules", () => {
 function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean): SchedulesResponse {
     return {
         schedules: {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             schedule: Array.from({ length: schedules }).map((_) => ({
                 $: { UUID: uuid },
                 timetable: [
@@ -199,16 +198,20 @@ function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean):
     };
 }
 
-function createApi() {
+function createApi(): SchedulesApi {
     return new SchedulesApi("");
 }
 
-function verifyStructure(ts: ApiTimestamp, eventType: EventType.ETA | EventType.ETD, calculated: boolean) {
+function verifyStructure(
+    ts: ApiTimestamp,
+    eventType: EventType.ETA | EventType.ETD,
+    calculated: boolean
+): void {
     expect(ts.ship.mmsi).toBe(Number(mmsi));
     expect(ts.ship.imo).toBe(Number(imo));
     expect(ts.location.port).toBe(locode);
     expect(ts.eventType).toBe(eventType);
-    expect(ts.eventTime).toBe(eventType == EventType.ETA ? etaEventTime : etdEventTime);
-    expect(ts.recordTime).toBe(eventType == EventType.ETA ? etaTimestamp : etdTimestamp);
+    expect(ts.eventTime).toBe(eventType === EventType.ETA ? etaEventTime : etdEventTime);
+    expect(ts.recordTime).toBe(eventType === EventType.ETA ? etaTimestamp : etdTimestamp);
     expect(ts.source).toBe(calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL);
 }

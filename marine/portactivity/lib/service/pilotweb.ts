@@ -28,7 +28,7 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
     });
 }
 
-async function removeTimestamps(db: DTDatabase, pilotageIds: number[]) {
+async function removeTimestamps(db: DTDatabase, pilotageIds: number[]): Promise<void> {
     if (pilotageIds.length > 0) {
         const sourceIds = pilotageIds.map((id) => id.toString());
 
@@ -110,7 +110,7 @@ function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise
     return PilotagesDAO.findPortCallId(db, p, location);
 }
 
-function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | null {
+function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | undefined {
     const eventTime = getMaxDate(pilotage.vesselEta, pilotage.pilotBoardingTime).toISOString();
 
     if (pilotage.state === "ESTIMATE" || pilotage.state === "NOTICE") {
@@ -135,7 +135,7 @@ function createApiTimestamp(pilotage: Pilotage): Partial<ApiTimestamp> | null {
         };
     }
 
-    return null;
+    return undefined;
 }
 
 function getMaxDate(date1string: string, date2string: string | undefined): Date {

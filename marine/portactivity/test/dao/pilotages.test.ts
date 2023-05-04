@@ -9,7 +9,7 @@ import { subHours } from "date-fns";
 describe(
     "db-pilotages-public",
     dbTestBase((db: DTDatabase) => {
-        function createPilotage(mmsi = 123, start = "ABC", end = "DEF"): Pilotage {
+        function createPilotage(mmsi: number = 123, start: string = "ABC", end: string = "DEF"): Pilotage {
             return {
                 id: 1,
                 state: "TEST",
@@ -32,7 +32,7 @@ describe(
             };
         }
 
-        function createLocation(port = "ABC", from = "DEF"): Location {
+        function createLocation(port: string = "ABC", from: string = "DEF"): Location {
             return {
                 port,
                 from
