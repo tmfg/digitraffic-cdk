@@ -17,16 +17,13 @@ async function* walk(dir: string): AsyncGenerator<string> {
     This adds changing timestamp to lambda-code, thus making it
     possible to version lambdas(new version needs changes in source code)
  */
-async function main() {
+async function main(): Promise<void> {
     for await (const file of walk("dist/lambda")) {
         let fileContent = await fs.readFile(file, {
-            encoding: "utf-8",
+            encoding: "utf-8"
         });
         if (fileContent.includes(versionVariableName)) {
-            fileContent = fileContent.substring(
-                0,
-                fileContent.lastIndexOf("\n")
-            );
+            fileContent = fileContent.substring(0, fileContent.lastIndexOf("\n"));
         }
         fileContent += `\nconst ${versionVariableName} = ${+new Date()};`;
 

@@ -26,18 +26,18 @@ export class CFBehavior {
         this.lambdaTypes = new Set();
     }
 
-    static path(path = "*"): CFBehavior {
+    static path(path: string = "*"): CFBehavior {
         return new CFBehavior(path);
     }
 
-    static standard(path = "*", ...cacheHeaders: string[]): CFBehavior {
+    static standard(path: string = "*", ...cacheHeaders: string[]): CFBehavior {
         return new CFBehavior(path)
             .withCacheHeaders(...cacheHeaders)
             .withGzipRequirementLambda()
             .withHttpHeadersLambda();
     }
 
-    static passAll(path = "*", ...cacheHeaders: string[]): CFBehavior {
+    static passAll(path: string = "*", ...cacheHeaders: string[]): CFBehavior {
         return new CFBehavior(path).withCacheHeaders(...cacheHeaders).allowAllMethods();
     }
 
@@ -130,7 +130,7 @@ export class CFDomain extends CFOrigin {
         this.domainName = domainName;
     }
 
-    static passAllDomain(domainName: string) {
+    static passAllDomain(domainName: string): CFDomain {
         return new CFDomain(domainName, CFBehavior.passAll());
     }
 
@@ -158,7 +158,7 @@ export class CFDomain extends CFOrigin {
         return domain;
     }
 
-    static mqtt(domainName: string) {
+    static mqtt(domainName: string): CFDomain {
         const domain = new CFDomain(domainName, CFBehavior.passAll("mqtt*").allowHttpAndHttps());
 
         domain.originProtocolPolicy = OriginProtocolPolicy.HTTP_ONLY;
@@ -166,7 +166,7 @@ export class CFDomain extends CFOrigin {
         return domain;
     }
 
-    private addHeader(name: string, value: string) {
+    private addHeader(name: string, value: string): this {
         this.headers[name] = value;
 
         return this;
@@ -176,7 +176,7 @@ export class CFDomain extends CFOrigin {
 export class S3Domain extends CFOrigin {
     s3BucketName: string;
     s3Domain?: string;
-    createOAI = true;
+    createOAI: boolean = true;
 
     constructor(s3BucketName: string, ...behaviors: CFBehavior[]) {
         super(behaviors);
@@ -184,7 +184,7 @@ export class S3Domain extends CFOrigin {
         this.s3BucketName = s3BucketName;
     }
 
-    static swagger(s3BucketName: string, path = "swagger/*"): S3Domain {
+    static swagger(s3BucketName: string, path: string = "swagger/*"): S3Domain {
         return this.s3(s3BucketName, CFBehavior.path(path).withCacheTtl(120).withIndexHtmlFunction());
     }
 
@@ -225,9 +225,9 @@ export interface StreamingLogProps {
 }
 
 export interface CFProps {
-    readonly realtimeLogConfigArn?: string;
+    readonly realtimeLogConfigArn?: string; // remove optionality when centralized logging is default
     readonly elasticProps?: ElasticProps;
-    readonly elasticAppName?: string;
+    readonly elasticAppName: string; // remove this when centralized logging is default
     readonly distributions: DistributionProps[];
     readonly lambdaParameters?: CFLambdaParameters;
 }

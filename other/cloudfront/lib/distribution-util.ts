@@ -5,13 +5,11 @@ import {
     SourceConfiguration
 } from "aws-cdk-lib/aws-cloudfront";
 import { CfnResource, Stack, Tags } from "aws-cdk-lib";
-import { Role } from "aws-cdk-lib/aws-iam";
 import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
 import { createWebAcl } from "./acl/acl-creator";
-import { CFProps, DistributionProps } from "./app-props";
-import { StreamingConfig } from "./streaming-util";
+import { DistributionProps } from "./app-props";
 
 export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
     return {
@@ -40,7 +38,7 @@ export function createDistribution(
 ): CloudFrontWebDistribution {
     const webAcl = doCreateWebAcl(stack, distributionProps);
     const viewerCertificate =
-        distributionProps.acmCertRef == null
+        distributionProps.acmCertRef === null
             ? undefined
             : createViewerCertificate(distributionProps.acmCertRef, distributionProps.aliasNames);
 
@@ -62,8 +60,6 @@ function createDistributionWithStreamingLogging(
     webAcl: CfnWebACL | undefined,
     realtimeLogConfigArn: string
 ): CloudFrontWebDistribution {
-    const env = distributionProps.environmentName;
-
     const distribution = new CloudFrontWebDistribution(stack, distributionProps.distributionName, {
         originConfigs,
         viewerCertificate,
@@ -84,7 +80,7 @@ function addRealtimeLogging(
     distribution: CloudFrontWebDistribution,
     realtimeLogConfigArn: string,
     originCount: number
-) {
+): void {
     const distributionCf = distribution.node.defaultChild as CfnResource;
 
     for (let i = 1; i < originCount; i++) {

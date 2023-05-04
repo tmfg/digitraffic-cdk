@@ -1,6 +1,11 @@
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { Annotations, Aspects, Stack, StackProps } from "aws-cdk-lib";
-import { CfnDistribution, OriginAccessIdentity } from "aws-cdk-lib/aws-cloudfront";
+import {
+    CfnDistribution,
+    CloudFrontWebDistribution,
+    OriginAccessIdentity,
+    ResponseHeadersPolicy
+} from "aws-cdk-lib/aws-cloudfront";
 import {
     CompositePrincipal,
     ManagedPolicy,
@@ -25,12 +30,22 @@ import {
     LambdaType
 } from "./lambda/lambda-creator";
 import { createOriginConfig } from "./origin-configs";
-import { createRealtimeLogging, StreamingConfig } from "./streaming-util";
+import { createRealtimeLogging } from "./streaming-util";
 
 type ViewerPolicyMap = Record<string, string>;
 
 interface MutablePolicy {
     viewerProtocolPolicy: string;
+}
+
+interface MutableCacheBehavior {
+    responseHeadersPolicyId: string;
+}
+
+interface LambdaTypes {
+    readonly lambdaTypes: Set<LambdaType>;
+    readonly functionTypes: Set<FunctionType>;
+    readonly ipRestrictions: Set<string>;
 }
 
 export class CloudfrontCdkStack extends Stack {
@@ -58,20 +73,21 @@ export class CloudfrontCdkStack extends Stack {
             return cloudfrontProps.realtimeLogConfigArn;
         }
 
-        const writeToESRole = this.createWriteToESRole(this, cloudfrontProps.elasticProps as ElasticProps);
+        if (!cloudfrontProps.elasticProps) {
+            throw new Error("ElasticProps missing from " + cloudfrontProps.elasticAppName);
+        }
 
-        return (
-            cloudfrontProps.realtimeLogConfigArn ??
-            createRealtimeLogging(
-                this,
-                writeToESRole,
-                cloudfrontProps.elasticAppName as string,
-                cloudfrontProps.elasticProps as ElasticProps
-            ).loggingConfig.attrArn
-        );
+        const writeToESRole = this.createWriteToESRole(this, cloudfrontProps.elasticProps);
+
+        return createRealtimeLogging(
+            this,
+            writeToESRole,
+            cloudfrontProps.elasticAppName,
+            cloudfrontProps.elasticProps
+        ).loggingConfig.attrArn;
     }
 
-    validateDefaultBehaviors(props: DistributionProps[]) {
+    validateDefaultBehaviors(props: DistributionProps[]): void {
         props.forEach((distribution) => {
             // check default behaviors
             const defaults = distribution.origins.flatMap((d) => d.behaviors).filter((b) => b.path === "*");
@@ -85,7 +101,7 @@ export class CloudfrontCdkStack extends Stack {
         });
     }
 
-    createWriteToESRole(stack: Construct, elasticProps: ElasticProps) {
+    createWriteToESRole(stack: Construct, elasticProps: ElasticProps): Role {
         const lambdaRole = new Role(stack, "WriteToElasticRole", {
             assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
             roleName: "WriteToElasticRole"
@@ -119,9 +135,9 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaRole;
     }
 
-    findLambdaTypes(props: DistributionProps[]) {
-        const lambdaTypes = new Set();
-        const functionTypes = new Set();
+    findLambdaTypes(props: DistributionProps[]): LambdaTypes {
+        const lambdaTypes = new Set<LambdaType>();
+        const functionTypes = new Set<FunctionType>();
         const ipRestrictions = new Set<string>();
 
         props
@@ -226,7 +242,7 @@ export class CloudfrontCdkStack extends Stack {
         distributionProps: DistributionProps,
         lambdaMap: LambdaHolder,
         realtimeLogConfigArn: string
-    ) {
+    ): CloudFrontWebDistribution {
         const oai = distributionProps.originAccessIdentity
             ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`)
             : undefined;
@@ -248,6 +264,10 @@ export class CloudfrontCdkStack extends Stack {
             // handle all behaviors
             behaviors.forEach((cb: CfnDistribution.CacheBehaviorProperty) => {
                 this.setViewerPolicy(cb, viewerPolicies, cb.pathPattern);
+
+                // set CORS headers
+                (cb as MutableCacheBehavior).responseHeadersPolicyId =
+                    ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS.responseHeadersPolicyId;
             });
 
             // and the default behavior
@@ -265,7 +285,7 @@ export class CloudfrontCdkStack extends Stack {
         behavior: CfnDistribution.CacheBehaviorProperty,
         viewerPolicyMap: ViewerPolicyMap,
         pathPattern: string
-    ) {
+    ): void {
         const viewerProtocolPolicy = viewerPolicyMap[pathPattern];
 
         if (viewerProtocolPolicy) {
@@ -278,7 +298,7 @@ export class CloudfrontCdkStack extends Stack {
 
         domains.forEach((d) => {
             d.behaviors.forEach((b) => {
-                if (b.viewerProtocolPolicy != null) {
+                if (b.viewerProtocolPolicy) {
                     policyMap[b.path] = b.viewerProtocolPolicy;
                 }
             });

@@ -210,7 +210,7 @@ function getApiPath(query: string): string {
 }
 
 function parseQuery(query: string): string {
-    if (query.length == 0) {
+    if (query.length === 0) {
         return "";
     }
 
@@ -278,6 +278,6 @@ function parseQuery(query: string): string {
     return queryStringHelper.stringify(resp);
 }
 
-function getValue(input: string | string[], delimiter = ","): string {
+function getValue(input: string | string[], delimiter: string = ","): string {
     return Array.isArray(input) ? input.join(delimiter) : input;
 }

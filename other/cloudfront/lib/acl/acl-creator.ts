@@ -9,18 +9,18 @@ const BLOCK_429_WITH_DIGITRAFFIC_ACTION: CfnWebACL.RuleActionProperty = {
     block: {
         customResponse: {
             responseCode: 429,
-            customResponseBodyKey: RESPONSEKEY_WITH_DIGITRAFFIC_USER,
-        },
-    },
+            customResponseBodyKey: RESPONSEKEY_WITH_DIGITRAFFIC_USER
+        }
+    }
 };
 
 const BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION: CfnWebACL.RuleActionProperty = {
     block: {
         customResponse: {
             responseCode: 429,
-            customResponseBodyKey: RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER,
-        },
-    },
+            customResponseBodyKey: RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER
+        }
+    }
 };
 
 interface RuleProperty {
@@ -32,7 +32,7 @@ function createRuleProperty(
     name: string,
     priority: number,
     rule: RuleProperty,
-    overrideAction = true
+    overrideAction: boolean = true
 ): CfnWebACL.RuleProperty {
     return {
         ...{
@@ -41,18 +41,15 @@ function createRuleProperty(
             visibilityConfig: {
                 sampledRequestsEnabled: true,
                 cloudWatchMetricsEnabled: true,
-                metricName: name,
-            },
+                metricName: name
+            }
         },
         ...rule,
-        ...(overrideAction ? { overrideAction: { none: {} } } : {}),
+        ...(overrideAction ? { overrideAction: { none: {} } } : {})
     };
 }
 
-type CustomResponseBodies = Record<
-    string,
-    CfnWebACL.CustomResponseBodyProperty | IResolvable
->;
+type CustomResponseBodies = Record<string, CfnWebACL.CustomResponseBodyProperty | IResolvable>;
 
 function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
     const customResponseBodies: CustomResponseBodies = {};
@@ -60,24 +57,20 @@ function createCustomResponseBodies(rules: WafRules): CustomResponseBodies {
     if (rules.withHeaderLimit) {
         customResponseBodies[RESPONSEKEY_WITH_DIGITRAFFIC_USER] = {
             content: `Request rate is limited to ${rules.withHeaderLimit} requests in a 5 minute window.`,
-            contentType: "TEXT_PLAIN",
+            contentType: "TEXT_PLAIN"
         };
     }
     if (rules.withoutHeaderLimit) {
         customResponseBodies[RESPONSEKEY_WITHOUT_DIGITRAFFIC_USER] = {
             content: `Request rate is limited to ${rules.withoutHeaderLimit} requests in a 5 minute window.`,
-            contentType: "TEXT_PLAIN",
+            contentType: "TEXT_PLAIN"
         };
     }
 
     return customResponseBodies;
 }
 
-export function createWebAcl(
-    stack: Stack,
-    environment: string,
-    rules: WafRules
-): CfnWebACL {
+export function createWebAcl(stack: Stack, environment: string, rules: WafRules): CfnWebACL {
     const generatedRules = createRules(rules);
     const customResponseBodies = createCustomResponseBodies(rules);
 
@@ -87,10 +80,10 @@ export function createWebAcl(
         visibilityConfig: {
             cloudWatchMetricsEnabled: true,
             metricName: "WAF-Blocked",
-            sampledRequestsEnabled: false,
+            sampledRequestsEnabled: false
         },
         rules: generatedRules,
-        customResponseBodies,
+        customResponseBodies
     });
 }
 
@@ -112,10 +105,7 @@ function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
                 1,
                 {
                     action: BLOCK_429_WITH_DIGITRAFFIC_ACTION,
-                    statement: createThrottleStatement(
-                        rules.withHeaderLimit,
-                        true
-                    ),
+                    statement: createThrottleStatement(rules.withHeaderLimit, true)
                 },
                 false
             )
@@ -129,10 +119,7 @@ function createRules(rules: WafRules): CfnWebACL.RuleProperty[] {
                 2,
                 {
                     action: BLOCK_429_WITHOUT_DIGITRAFFIC_ACTION,
-                    statement: createThrottleStatement(
-                        rules.withoutHeaderLimit,
-                        false
-                    ),
+                    statement: createThrottleStatement(rules.withoutHeaderLimit, false)
                 },
                 false
             )
@@ -151,10 +138,10 @@ function createRuleAWSCommonRuleSet(): CfnWebACL.RuleProperty {
                 excludedRules: [
                     { name: "NoUserAgent_HEADER" },
                     { name: "SizeRestrictions_BODY" },
-                    { name: "GenericRFI_BODY" },
-                ],
-            },
-        },
+                    { name: "GenericRFI_BODY" }
+                ]
+            }
+        }
     });
 }
 
@@ -163,9 +150,9 @@ function createAWSReputationList(): CfnWebACL.RuleProperty {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
-                name: "AWSManagedRulesAmazonIpReputationList",
-            },
-        },
+                name: "AWSManagedRulesAmazonIpReputationList"
+            }
+        }
     });
 }
 
@@ -174,9 +161,9 @@ function createAWSKnownBadInput(): CfnWebACL.RuleProperty {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
-                name: "AWSManagedRulesKnownBadInputsRuleSet",
-            },
-        },
+                name: "AWSManagedRulesKnownBadInputsRuleSet"
+            }
+        }
     });
 }
 
@@ -185,28 +172,25 @@ function createAWSAntiSQLInjection(): CfnWebACL.RuleProperty {
         statement: {
             managedRuleGroupStatement: {
                 vendorName: "AWS",
-                name: "AWSManagedRulesSQLiRuleSet",
-            },
-        },
+                name: "AWSManagedRulesSQLiRuleSet"
+            }
+        }
     });
 }
 
-function createThrottleStatement(
-    limit: number,
-    headerMustBePresent: boolean
-): CfnWebACL.StatementProperty {
+function createThrottleStatement(limit: number, headerMustBePresent: boolean): CfnWebACL.StatementProperty {
     // this statement matches empty digitraffic-user -header
     const matchStatement: CfnWebACL.StatementProperty = {
         sizeConstraintStatement: {
             comparisonOperator: headerMustBePresent ? "GT" : "GE",
             fieldToMatch: {
                 singleHeader: {
-                    Name: "digitraffic-user",
-                },
+                    Name: "digitraffic-user"
+                }
             },
             textTransformations: [{ priority: 0, type: "NONE" }],
-            size: 0,
-        } as CfnWebACL.SizeConstraintStatementProperty,
+            size: 0
+        } as CfnWebACL.SizeConstraintStatementProperty
     };
 
     // header present       -> size > 0
@@ -216,19 +200,15 @@ function createThrottleStatement(
         rateBasedStatement: {
             aggregateKeyType: "IP",
             limit: limit,
-            scopeDownStatement: headerMustBePresent
-                ? matchStatement
-                : notStatement(matchStatement),
-        },
+            scopeDownStatement: headerMustBePresent ? matchStatement : notStatement(matchStatement)
+        }
     };
 }
 
-function notStatement(
-    statement: CfnWebACL.StatementProperty
-): CfnWebACL.StatementProperty {
+function notStatement(statement: CfnWebACL.StatementProperty): CfnWebACL.StatementProperty {
     return {
         notStatement: {
-            statement,
-        },
+            statement
+        }
     };
 }

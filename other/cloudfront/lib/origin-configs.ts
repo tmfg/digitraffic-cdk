@@ -3,7 +3,7 @@ import {
     Behavior,
     LambdaFunctionAssociation,
     OriginAccessIdentity,
-    SourceConfiguration,
+    SourceConfiguration
 } from "aws-cdk-lib/aws-cloudfront";
 import { CfnDistribution } from "aws-cdk-lib/aws-cloudfront/lib/cloudfront.generated";
 import { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
@@ -24,14 +24,10 @@ export function createOriginConfig(
 
         const domainName = origin.s3Domain ?? "s3.eu-west-1.amazonaws.com";
 
-        const bucket = Bucket.fromBucketAttributes(
-            stack,
-            `ImportedBucketName-${origin.s3BucketName}`,
-            {
-                bucketArn: `arn:aws:s3:::${origin.s3BucketName}`,
-                bucketRegionalDomainName: `${origin.s3BucketName}.${domainName}`,
-            }
-        );
+        const bucket = Bucket.fromBucketAttributes(stack, `ImportedBucketName-${origin.s3BucketName}`, {
+            bucketArn: `arn:aws:s3:::${origin.s3BucketName}`,
+            bucketRegionalDomainName: `${origin.s3BucketName}.${domainName}`
+        });
 
         if (origin.createOAI) {
             bucket.grantRead(oai);
@@ -40,10 +36,10 @@ export function createOriginConfig(
         return {
             s3OriginSource: {
                 s3BucketSource: bucket,
-                originAccessIdentity: oai,
+                originAccessIdentity: oai
                 //                originPath: origin.originPath,
             },
-            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap),
+            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap)
         };
     } else if (origin instanceof CFDomain) {
         return {
@@ -53,9 +49,9 @@ export function createOriginConfig(
                 httpsPort: origin.httpsPort ?? 443,
                 originProtocolPolicy: origin.originProtocolPolicy,
                 originPath: origin.originPath,
-                originHeaders: createOriginHeaders(origin),
+                originHeaders: createOriginHeaders(origin)
             },
-            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap),
+            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap)
         };
     }
 
@@ -72,21 +68,15 @@ function createOriginHeaders(domain: CFDomain): Record<string, string> {
     return headers;
 }
 
-function createBehaviors(
-    stack: Stack,
-    behaviors: CFBehavior[],
-    lambdaMap: LambdaHolder
-): Behavior[] {
-    return behaviors.map((b) =>
-        createBehavior(stack, b, lambdaMap, b.path === "*")
-    );
+function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: LambdaHolder): Behavior[] {
+    return behaviors.map((b) => createBehavior(stack, b, lambdaMap, b.path === "*"));
 }
 
 function createBehavior(
     stack: Stack,
     b: CFBehavior,
     lambdaMap: LambdaHolder,
-    isDefaultBehavior = false
+    isDefaultBehavior: boolean = false
 ): Behavior {
     //console.info('creating behavior %s with default %d', b.path, isDefaultBehavior);
     const headers = [...b.cacheHeaders];
@@ -94,7 +84,7 @@ function createBehavior(
     const forwardedValues: CfnDistribution.ForwardedValuesProperty = {
         headers,
         queryString: true,
-        queryStringCacheKeys: b.queryCacheKeys,
+        queryStringCacheKeys: b.queryCacheKeys
     };
 
     return {
@@ -106,14 +96,11 @@ function createBehavior(
         defaultTtl: Duration.seconds(b.cacheTtl),
         forwardedValues,
         functionAssociations: getCloudfrontFunctions(b, lambdaMap),
-        lambdaFunctionAssociations: getLambdas(b, lambdaMap),
+        lambdaFunctionAssociations: getLambdas(b, lambdaMap)
     };
 }
 
-function getCloudfrontFunctions(
-    b: CFBehavior,
-    lambdaMap: LambdaHolder
-): FunctionAssociation[] {
+function getCloudfrontFunctions(b: CFBehavior, lambdaMap: LambdaHolder): FunctionAssociation[] {
     const functionAssociations: FunctionAssociation[] = [];
 
     b.functionTypes.forEach((type) => {
@@ -123,10 +110,7 @@ function getCloudfrontFunctions(
     return functionAssociations;
 }
 
-function getLambdas(
-    b: CFBehavior,
-    lambdaMap: LambdaHolder
-): LambdaFunctionAssociation[] {
+function getLambdas(b: CFBehavior, lambdaMap: LambdaHolder): LambdaFunctionAssociation[] {
     const lambdaFunctionAssociations: LambdaFunctionAssociation[] = [];
 
     b.lambdaTypes.forEach((type) => {
@@ -134,9 +118,7 @@ function getLambdas(
     });
 
     if (b.ipRestriction) {
-        lambdaFunctionAssociations.push(
-            lambdaMap.getRestriction(b.ipRestriction)
-        );
+        lambdaFunctionAssociations.push(lambdaMap.getRestriction(b.ipRestriction));
     }
 
     return lambdaFunctionAssociations;

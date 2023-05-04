@@ -1,12 +1,7 @@
 import { Duration, Stack } from "aws-cdk-lib";
 import * as Cloudfront from "aws-cdk-lib/aws-cloudfront";
-import { Role } from "aws-cdk-lib/aws-iam";
-import {
-    Function as AWSFunction,
-    InlineCode,
-    Runtime,
-    Version,
-} from "aws-cdk-lib/aws-lambda";
+import type { Role } from "aws-cdk-lib/aws-iam";
+import { Function as AWSFunction, InlineCode, Runtime, Version } from "aws-cdk-lib/aws-lambda";
 import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 import fs from "node:fs";
 
@@ -17,32 +12,24 @@ export enum LambdaType {
     IP_RESTRICTION,
     WEATHERCAM_HTTP_HEADERS,
     LAM_REDIRECT,
-    LAM_HEADERS,
+    LAM_HEADERS
 }
 
 export enum FunctionType {
-    INDEX_HTML,
+    INDEX_HTML
 }
 
-function readBodyWithVersion(fileName: string) {
+function readBodyWithVersion(fileName: string): string {
     const versionString = new Date().toISOString();
     const body = fs.readFileSync(fileName);
 
     return body.toString().replace(/EXT_VERSION/gi, versionString);
 }
 
-export function createGzipRequirement(
-    stack: Stack,
-    edgeLambdaRole: Role
-): Version {
+export function createGzipRequirement(stack: Stack, edgeLambdaRole: Role): Version {
     const body = readBodyWithVersion("dist/lambda/lambda-gzip-requirement.js");
 
-    return createVersionedFunction(
-        stack,
-        edgeLambdaRole,
-        "gzip-requirement",
-        body
-    );
+    return createVersionedFunction(stack, edgeLambdaRole, "gzip-requirement", body);
 }
 
 export function createWeathercamRedirect(
@@ -57,12 +44,7 @@ export function createWeathercamRedirect(
         .replace(/EXT_HOST_NAME/gi, hostName)
         .replace(/EXT_DOMAIN_NAME/gi, domainName);
 
-    return createVersionedFunction(
-        stack,
-        edgeLambdaRole,
-        "weathercam-redirect",
-        functionBody
-    );
+    return createVersionedFunction(stack, edgeLambdaRole, "weathercam-redirect", functionBody);
 }
 
 export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
@@ -71,23 +53,13 @@ export function createHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
     return createVersionedFunction(stack, edgeLambdaRole, "http-headers", body);
 }
 
-export function createWeathercamHttpHeaders(
-    stack: Stack,
-    edgeLambdaRole: Role
-): Version {
-    const body = readBodyWithVersion(
-        "dist/lambda/lambda-weathercam-http-headers.js"
-    );
+export function createWeathercamHttpHeaders(stack: Stack, edgeLambdaRole: Role): Version {
+    const body = readBodyWithVersion("dist/lambda/lambda-weathercam-http-headers.js");
 
-    return createVersionedFunction(
-        stack,
-        edgeLambdaRole,
-        "weathercam-http-headers",
-        body
-    );
+    return createVersionedFunction(stack, edgeLambdaRole, "weathercam-http-headers", body);
 }
 
-export function createIndexHtml(stack: Stack) {
+export function createIndexHtml(stack: Stack): Cloudfront.Function {
     const body = readBodyWithVersion("lib/lambda/lambda-index-html.js");
 
     return createCloudfrontFunction(stack, "index-html", body);
@@ -102,26 +74,12 @@ export function createIpRestriction(
     const body = readBodyWithVersion("dist/lambda/lambda-ip-restriction.js");
     const functionBody = body.toString().replace(/EXT_IP/gi, ipList);
 
-    return createVersionedFunction(
-        stack,
-        edgeLambdaRole,
-        `ip-restriction-${path}`,
-        functionBody
-    );
+    return createVersionedFunction(stack, edgeLambdaRole, `ip-restriction-${path}`, functionBody);
 }
 
-export function createLamRedirect(
-    stack: Stack,
-    edgeLambdaRole: Role,
-    smRef: string
-): Version {
+export function createLamRedirect(stack: Stack, edgeLambdaRole: Role, smRef: string): Version {
     const body = readBodyWithVersion("dist/lambda/lambda-lam-redirect.js");
-    const edgeLambda = createFunction(
-        stack,
-        edgeLambdaRole,
-        "lam-redirect",
-        body
-    );
+    const edgeLambda = createFunction(stack, edgeLambdaRole, "lam-redirect", body);
 
     // Allow read-access to secrets manager
     const secret = Secret.fromSecretCompleteArn(stack, "Secret", smRef);
@@ -139,9 +97,9 @@ export function createCloudfrontFunction(
     stack: Stack,
     functionName: string,
     functionBody: string
-) {
+): Cloudfront.Function {
     return new Cloudfront.Function(stack, functionName, {
-        code: Cloudfront.FunctionCode.fromInline(functionBody),
+        code: Cloudfront.FunctionCode.fromInline(functionBody)
     });
 }
 
@@ -158,7 +116,7 @@ export function createFunction(
         handler: "index.handler",
         role: edgeLambdaRole,
         reservedConcurrentExecutions: 10,
-        timeout: Duration.seconds(2),
+        timeout: Duration.seconds(2)
     });
 }
 
@@ -168,6 +126,5 @@ export function createVersionedFunction(
     functionName: string,
     functionBody: string
 ): Version {
-    return createFunction(stack, edgeLambdaRole, functionName, functionBody)
-        .currentVersion;
+    return createFunction(stack, edgeLambdaRole, functionName, functionBody).currentVersion;
 }
