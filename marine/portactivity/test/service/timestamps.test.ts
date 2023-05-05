@@ -74,7 +74,6 @@ describe(
 
         test("saveTimestamp - no conflict returns updated", async () => {
             const timestamp = newTimestamp();
-
             const ret = await TimestampsService.saveTimestamp(timestamp, db);
 
             expect(ret?.location_locode).toBe(timestamp.location.port);
