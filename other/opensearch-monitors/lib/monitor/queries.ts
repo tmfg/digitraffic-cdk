@@ -17,7 +17,10 @@ export interface ShouldQuery {
 }
 
 export interface BoolQuery {
-    bool: MustQuery | MustNotQuery | ShouldQuery;
+    bool: {
+        must: Query[];
+        must_not: Query[];
+    };
 }
 
 export interface MatchPhraseQuery {

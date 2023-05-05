@@ -4,6 +4,7 @@ import {
     BoolQuery,
     ExistsQuery,
     MatchPhraseQuery,
+    MustNotQuery,
     MustQuery,
     Order,
     Query,
@@ -35,12 +36,13 @@ export function exists(field: string): ExistsQuery {
     };
 }
 
-function bool(bool: BoolQuery["bool"]): BoolQuery {
-    return { bool };
-}
-
-function must(queries: Query[]): MustQuery {
-    return { must: queries };
+function bool(must: Query[], mustNot: Query[]): BoolQuery {
+    return {
+        bool: {
+            must,
+            must_not: mustNot
+        }
+    };
 }
 
 function sort(field: OSLogField, order: Order): Sort {
@@ -74,6 +76,7 @@ export class OsMonitorBuilder {
     readonly index: string;
     readonly destinations: string[];
     readonly phrases: Query[];
+    readonly notPhrases: Query[];
 
     messageSubject: string;
     rangeInMinutes: number;
@@ -88,6 +91,7 @@ export class OsMonitorBuilder {
         this.messageSubject = config.messageSubject;
         this.rangeInMinutes = config.rangeInMinutes;
         this.phrases = ([] as Query[]).concat(config.phrases);
+        this.notPhrases = [];
         this.trigger = triggerWhenLinesFound(
             this.name,
             this.destinations,
@@ -136,6 +140,12 @@ export class OsMonitorBuilder {
         return this;
     }
 
+    not(...phrases: Query[]): this {
+        this.notPhrases.push(...phrases);
+
+        return this;
+    }
+
     /**
      * Timerange in minutes
      */
@@ -180,7 +190,7 @@ export class OsMonitorBuilder {
             indices: [this.index],
             query: {
                 size: 1,
-                query: bool(must([createTimeRange(this.rangeInMinutes), ...this.phrases])),
+                query: bool([createTimeRange(this.rangeInMinutes), ...this.phrases], this.notPhrases),
                 sort: [sort("@timestamp", "desc")]
             },
 
