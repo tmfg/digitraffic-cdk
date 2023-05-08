@@ -77,46 +77,13 @@ describe(
             expect((await findAll(db)).length).toBe(1);
         });
 
-        test("updateTimestamp - mmsi values for same imo", async () => {
-            const imo = 123;
-
-            const mmsi1 = 345;
-            const mmsi2 = 678;
-
-            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo }));
-
-            const updatedTimestamp = {
-                ...timestamp,
-                ship: {
-                    ...timestamp.ship,
-                    mmsi: mmsi1
-                }
-            };
-
-            const againUpdatedTimestamp = {
-                ...timestamp,
-                ship: {
-                    ...timestamp.ship,
-                    mmsi: mmsi2
-                }
-            };
+        test("updateTimestamp - no duplicate rows with null mmsi", async () => {
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp());
 
             await TimestampsDb.updateTimestamp(db, timestamp);
-            await TimestampsDb.updateTimestamp(db, updatedTimestamp);
-            await TimestampsDb.updateTimestamp(db, againUpdatedTimestamp);
+            expect(await TimestampsDb.updateTimestamp(db, timestamp)).toBeNull();
 
-            const timestamps = await findAll(db);
-
-            expect(timestamps.length).toEqual(3);
-            expect(
-                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === null)
-            ).toBeDefined();
-            expect(
-                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === mmsi1)
-            ).toBeDefined();
-            expect(
-                timestamps.find((timestamp) => timestamp.ship_imo === imo && timestamp.ship_mmsi === mmsi2)
-            ).toBeDefined();
+            expect((await findAll(db)).length).toBe(1);
         });
 
         test("createUpdateValues - mmsi 0", () => {

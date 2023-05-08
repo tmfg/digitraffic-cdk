@@ -249,14 +249,13 @@ describe(
 
         test("findByImo - null mmsi", async () => {
             const imo = 1234567;
-            const timestamp = newTimestamp({ imo });
-            const timestampNullMmsi = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ imo }));
 
-            await insert(db, [timestamp, timestampNullMmsi]);
+            await insert(db, [timestamp]);
 
             const foundTimestamps = await TimestampsDb.findByImo(db, imo);
 
-            expect(foundTimestamps.length).toBe(2);
+            expect(foundTimestamps.length).toBe(1);
             expect(foundTimestamps.find((ts) => ts.ship_mmsi === null)).toBeDefined();
         });
 
@@ -276,14 +275,13 @@ describe(
 
         test("findByLocode - null mmsi", async () => {
             const locode = "AA111";
-            const timestamp = newTimestamp({ locode });
-            const timestampNullMmsi = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ locode }));
 
-            await insert(db, [timestamp, timestampNullMmsi]);
+            await insert(db, [timestamp]);
 
             const foundTimestamps = await TimestampsDb.findByLocode(db, locode);
 
-            expect(foundTimestamps.length).toBe(2);
+            expect(foundTimestamps.length).toBe(1);
             expect(foundTimestamps.find((ts) => ts.ship_mmsi === null)).toBeDefined();
         });
 
@@ -518,14 +516,13 @@ describe(
 
         test("findBySource - null mmsi", async () => {
             const source = "Portnet";
-            const timestamp = newTimestamp({ source });
-            const timestampNullMmsi = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], timestamp);
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship", "mmsi"], newTimestamp({ source }));
 
-            await insert(db, [timestamp, timestampNullMmsi]);
+            await insert(db, [timestamp]);
 
             const foundTimestamps = await TimestampsDb.findBySource(db, source);
 
-            expect(foundTimestamps.length).toBe(2);
+            expect(foundTimestamps.length).toBe(1);
             expect(foundTimestamps.find((ts) => ts.ship_mmsi === null)).toBeDefined();
         });
 
