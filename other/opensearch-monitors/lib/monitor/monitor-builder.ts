@@ -1,16 +1,6 @@
 import { OSLogField } from "./fields";
 import { OSMonitor } from "./monitor";
-import {
-    BoolQuery,
-    ExistsQuery,
-    MatchPhraseQuery,
-    MustNotQuery,
-    MustQuery,
-    Order,
-    Query,
-    RangeQuery,
-    Sort
-} from "./queries";
+import { BoolQuery, ExistsQuery, MatchPhraseQuery, Order, Query, RangeQuery, Sort } from "./queries";
 import { OSTrigger, triggerWhenLineCountOutside, triggerWhenLinesFound } from "./triggers";
 
 export interface MonitorConfig {
@@ -74,7 +64,6 @@ export class OsMonitorBuilder {
     readonly name: string;
     readonly cron: string;
     readonly index: string;
-    readonly destinations: string[];
     readonly phrases: Query[];
     readonly notPhrases: Query[];
 
@@ -87,14 +76,13 @@ export class OsMonitorBuilder {
         this.name = `${config.env.toUpperCase()} ${name}`;
         this.cron = config.cron;
         this.index = config.index;
-        this.destinations = config.slackDestinations;
         this.messageSubject = config.messageSubject;
         this.rangeInMinutes = config.rangeInMinutes;
         this.phrases = ([] as Query[]).concat(config.phrases);
         this.notPhrases = [];
         this.trigger = triggerWhenLinesFound(
             this.name,
-            this.destinations,
+            this.config.slackDestinations,
             getThrottle(config),
             this.messageSubject
         );
@@ -161,7 +149,7 @@ export class OsMonitorBuilder {
     notInRange(from: number, to: number): this {
         this.trigger = triggerWhenLineCountOutside(
             this.name,
-            this.destinations,
+            this.config.slackDestinations,
             getThrottle(this.config),
             from,
             to,
@@ -174,7 +162,7 @@ export class OsMonitorBuilder {
     moreThan(threshold: number = 0): this {
         this.trigger = triggerWhenLinesFound(
             this.name,
-            this.destinations,
+            this.config.slackDestinations,
             getThrottle(this.config),
             this.messageSubject,
             threshold
@@ -190,7 +178,14 @@ export class OsMonitorBuilder {
             indices: [this.index],
             query: {
                 size: 1,
-                query: bool([createTimeRange(this.rangeInMinutes), ...this.phrases], this.notPhrases),
+                query: bool(
+                    [
+                        createTimeRange(this.rangeInMinutes),
+                        matchPhrase("env", this.config.env),
+                        ...this.phrases
+                    ],
+                    this.notPhrases
+                ),
                 sort: [sort("@timestamp", "desc")]
             },
 
