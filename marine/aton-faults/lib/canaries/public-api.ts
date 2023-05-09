@@ -1,13 +1,10 @@
-import {
-    ResponseChecker,
-    UrlChecker,
-} from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
+import { ResponseChecker, UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import assert from "assert";
 import { Feature, FeatureCollection } from "geojson";
 
 const API_PATH = "/prod/api/aton/v1/faults";
 
-export const handler = async () => {
+export const handler = async (): Promise<string> => {
     const checker = await UrlChecker.createV2();
     const rs = ResponseChecker.forGeojson();
 
@@ -15,11 +12,7 @@ export const handler = async () => {
         API_PATH + "?language=fi",
         rs.checkJson((json: FeatureCollection) => {
             assert.ok(json.features.length > 10);
-            assert.ok(
-                json.features.some(
-                    (f: Feature) => f.properties?.state === "Kirjattu"
-                )
-            );
+            assert.ok(json.features.some((f: Feature) => f.properties?.state === "Kirjattu"));
         })
     );
 
@@ -27,11 +20,7 @@ export const handler = async () => {
         API_PATH + "?language=sv",
         rs.checkJson((json: FeatureCollection) => {
             assert.ok(json.features.length > 10);
-            assert.ok(
-                json.features.some(
-                    (f: Feature) => f.properties?.state === "Registrerad"
-                )
-            );
+            assert.ok(json.features.some((f: Feature) => f.properties?.state === "Registrerad"));
         })
     );
 
@@ -40,11 +29,7 @@ export const handler = async () => {
         API_PATH + "?language=ge",
         rs.checkJson((json: FeatureCollection) => {
             assert.ok(json.features.length > 10);
-            assert.ok(
-                json.features.some(
-                    (f: Feature) => f.properties?.state === "Registered"
-                )
-            );
+            assert.ok(json.features.some((f: Feature) => f.properties?.state === "Registered"));
         })
     );
 

@@ -13,7 +13,7 @@ describe(
     dbTestBase((db: DTDatabase) => {
         test("getFaults124ById - not found", async () => {
             const nullFault = await FaultsService.getFaultS124ById(db, 666);
-            expect(nullFault).toBeNull();
+            expect(nullFault).not.toBeDefined();
         });
 
         test("getFaultS124ById creates valid XML", async () => {
@@ -40,7 +40,7 @@ describe(
             const fault = newFault();
             await insert(db, [fault]);
 
-            const faults = await FaultsService.findAllFaults(Language.FI, 10);
+            const [faults] = await FaultsService.findAllFaults(Language.FI, 10);
 
             expect(faults.features.length).toBe(1);
             const props = faults.features[0].properties as FaultProps;

@@ -57,6 +57,5 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
 };
 
 function getLanguage(lang: string): Language {
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     return Language[lang.toUpperCase() as keyof typeof Language] ?? Language.EN;
 }

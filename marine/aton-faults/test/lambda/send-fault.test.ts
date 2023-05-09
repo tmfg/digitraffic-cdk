@@ -2,9 +2,10 @@ jest.mock("@digitraffic/common/dist/aws/runtime/secrets/secret-holder", () => {
     return {
         SecretHolder: {
             create: jest.fn(() => ({
-                get: jest.fn(() => Promise.resolve(TEST_ATON_SECRET)),
-            })),
-        },
+                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                get: jest.fn(() => Promise.resolve(TEST_ATON_SECRET))
+            }))
+        }
     };
 });
 
@@ -12,9 +13,9 @@ jest.mock("@digitraffic/common/dist/aws/runtime/secrets/proxy-holder", () => {
     return {
         ProxyHolder: {
             create: jest.fn(() => ({
-                setCredentials: jest.fn(() => Promise.resolve()),
-            })),
-        },
+                setCredentials: jest.fn(() => Promise.resolve())
+            }))
+        }
     };
 });
 
@@ -23,10 +24,7 @@ import { handlerFn } from "../../lib/lambda/send-s124/send-s124";
 import { newFault } from "../testdata";
 import { SQSEvent } from "aws-lambda";
 import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
-import {
-    S124Type,
-    SendS124Event,
-} from "../../lib/model/upload-voyageplan-event";
+import { S124Type, SendS124Event } from "../../lib/model/upload-voyageplan-event";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 const SERVER_PORT = 30123;
 
@@ -40,24 +38,21 @@ describe(
                 const fault = newFault({
                     geometry: {
                         lat: 60.285807,
-                        lon: 27.321659,
-                    },
+                        lon: 27.321659
+                    }
                 });
                 await insert(db, [fault]);
                 const s124Event: SendS124Event = {
                     type: S124Type.FAULT,
                     id: fault.id,
-                    callbackEndpoint: `http://localhost:${SERVER_PORT}/area`,
+                    callbackEndpoint: `http://localhost:${SERVER_PORT}/area`
                 };
 
                 server.listen(SERVER_PORT, {
-                    "/area": (
-                        url: string | undefined,
-                        data: string | undefined
-                    ) => {
+                    "/area": (url: string | undefined, data: string | undefined) => {
                         receivedData = data;
                         return "";
-                    },
+                    }
                 });
 
                 await handlerFn()(createSqsEvent(s124Event));
@@ -75,8 +70,8 @@ function createSqsEvent(sendFaultEvent: SendS124Event): SQSEvent {
     return {
         Records: [
             {
-                body: JSON.stringify(sendFaultEvent),
-            },
-        ],
+                body: JSON.stringify(sendFaultEvent)
+            }
+        ]
     } as SQSEvent;
 }

@@ -1,8 +1,5 @@
 import { DbFault } from "../lib/model/fault";
-import {
-    assertCount,
-    dbTestBase as commonDbTestBase,
-} from "@digitraffic/common/dist/test/db-testutils";
+import { assertCount, dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { JSON_CACHE_KEY } from "@digitraffic/common/dist/database/cached";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as xsdValidator from "xsd-schema-validator";
@@ -42,14 +39,14 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 virtualNavaids: false,
                 validityEndTime: "2021-10-24T13:00:00+03:00",
                 validityStartTime: "2021-10-22T17:00:00+03:00",
-                navigationLineInfo: null,
-            },
+                navigationLineInfo: null
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [21.4424804047364, 60.471819169784396],
+                coordinates: [21.4424804047364, 60.471819169784396]
             },
             properties: {
                 id: 20623,
@@ -79,14 +76,14 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 virtualNavaids: false,
                 validityEndTime: null,
                 validityStartTime: "2021-10-13T14:15:00+03:00",
-                navigationLineInfo: null,
-            },
+                navigationLineInfo: null
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [25.6153615119869, 60.2156614213976],
+                coordinates: [25.6153615119869, 60.2156614213976]
             },
             properties: {
                 id: 20504,
@@ -117,14 +114,14 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 virtualNavaids: false,
                 validityEndTime: null,
                 validityStartTime: null,
-                navigationLineInfo: null,
-            },
+                navigationLineInfo: null
+            }
         },
         {
             type: "Feature",
             geometry: {
                 type: "Point",
-                coordinates: [24.4347596329857, 65.26428690371449],
+                coordinates: [24.4347596329857, 65.26428690371449]
             },
             properties: {
                 id: 20502,
@@ -137,8 +134,7 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 areasFi: "PERÄMERI",
                 areasSv: "BOTTENVIKEN",
                 tooltip: "TL:84515 Kiisla, Vasenreunamerkki [Vahvistettu]",
-                contentsEn:
-                    "\r\nEDGEMARK KIISLA NR 84515\r\nIN POS 65-15,8 N 024-26,1 E\r\nUNLIT",
+                contentsEn: "\r\nEDGEMARK KIISLA NR 84515\r\nIN POS 65-15,8 N 024-26,1 E\r\nUNLIT",
                 contentsFi:
                     "\r\nREUNAMERKKI KIISLA NR 84515\r\nPAIKASSA 65-15,8 N 024-26,1 E\r\nVALO EI TOIMI",
                 contentsSv:
@@ -155,8 +151,8 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 virtualNavaids: false,
                 validityEndTime: null,
                 validityStartTime: null,
-                navigationLineInfo: null,
-            },
+                navigationLineInfo: null
+            }
         },
         {
             type: "Feature",
@@ -189,8 +185,8 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 virtualNavaids: false,
                 validityEndTime: null,
                 validityStartTime: null,
-                navigationLineInfo: null,
-            },
+                navigationLineInfo: null
+            }
         },
         {
             type: "Feature",
@@ -223,8 +219,8 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 virtualNavaids: false,
                 validityEndTime: null,
                 validityStartTime: null,
-                navigationLineInfo: null,
-            },
+                navigationLineInfo: null
+            }
         },
         {
             type: "Feature",
@@ -257,55 +253,42 @@ export const TEST_ACTIVE_WARNINGS_VALID = {
                 virtualNavaids: false,
                 validityEndTime: null,
                 validityStartTime: "2021-04-14T15:00:00+03:00",
-                navigationLineInfo: null,
-            },
-        },
-    ],
+                navigationLineInfo: null
+            }
+        }
+    ]
 };
 
 export const TEST_ATON_SECRET: AtonSecret = {
     certificate: "",
     privatekey: "",
     ca: "",
-    serviceRegistryUrl: "",
+    serviceRegistryUrl: ""
 };
 
-export function validateS124(faultS124: string) {
-    xsdValidator.validateXML(
-        faultS124,
-        "test/service/S124.xsd",
-        (err, result) => {
-            expect(err).toBeFalsy();
-            expect(result.valid).toBe(true);
-        }
-    );
+export function validateS124(faultS124: string): void {
+    xsdValidator.validateXML(faultS124, "test/service/S124.xsd", (err, result) => {
+        expect(err).toBeFalsy();
+        expect(result.valid).toBe(true);
+    });
 }
 
 export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "marine",
-        "marine",
-        "localhost:54321/marine"
-    );
+    return commonDbTestBase(fn, truncate, "marine", "marine", "localhost:54321/marine");
 }
 
 async function truncate(db: DTDatabase): Promise<void> {
     await db.tx((t) => {
-        return t.batch([
-            t.none("DELETE FROM aton_fault"),
-            t.none("DELETE FROM cached_json"),
-        ]);
+        return t.batch([t.none("DELETE FROM aton_fault"), t.none("DELETE FROM cached_json")]);
     });
 }
 
-export async function assertFaultCount(db: DTDatabase, count: number) {
+export async function assertFaultCount(db: DTDatabase, count: number): Promise<void> {
     await assertCount(db, "select count(*) from aton_fault", count);
 }
 
-export function insert(db: DTDatabase, faults: DbFault[]): Promise<null[]> {
-    return db.tx((t) => {
+export async function insert(db: DTDatabase, faults: DbFault[]): Promise<void> {
+    await db.tx((t) => {
         return t.batch(
             faults.map((f: DbFault): Promise<null> => {
                 return t.none(
@@ -359,7 +342,7 @@ export function insert(db: DTDatabase, faults: DbFault[]): Promise<null[]> {
                         f.fairway_name_fi,
                         f.fairway_name_sv,
                         f.area_number,
-                        f.geometry,
+                        f.geometry
                     ]
                 );
             })
@@ -367,12 +350,9 @@ export function insert(db: DTDatabase, faults: DbFault[]): Promise<null[]> {
     });
 }
 
-export function insertActiveWarnings<T>(
-    db: DTDatabase,
-    value: T
-): Promise<null> {
-    return db.none(
-        "insert into cached_json(cache_id, content, last_updated) values ($1, $2, now())",
-        [JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE, value]
-    );
+export async function insertActiveWarnings<T>(db: DTDatabase, value: T): Promise<void> {
+    await db.none("insert into cached_json(cache_id, content, last_updated) values ($1, $2, now())", [
+        JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE,
+        value
+    ]);
 }

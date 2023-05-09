@@ -6,13 +6,13 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ATON_FAULTS_CHECK } from "./faults";
 import { FaultFeature } from "../model/fault";
 
-export async function updateFaults(url: string, domain: string) {
+export async function updateFaults(url: string, domain: string): Promise<void> {
     const start = Date.now();
 
     const newFaults = await new FaultsApi(url).getFaults();
     const validated = newFaults.filter(validate);
 
-    return inDatabase((db: DTDatabase) => {
+    await inDatabase((db: DTDatabase) => {
         return db.tx((t) => {
             return t.batch([
                 ...FaultsDB.updateFaults(db, domain, validated),

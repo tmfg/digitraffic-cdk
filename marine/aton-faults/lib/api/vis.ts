@@ -48,7 +48,7 @@ interface InstanceUri {
     readonly endpointUri: string;
 }
 
-export async function query(imo: string, url: string): Promise<string | null> {
+export async function query(imo: string, url: string): Promise<string | undefined> {
     const queryUrl = `${url}/api/_search/serviceInstance?query=imo:${imo}`;
     logger.info({
         method: "VisApi.query",
@@ -73,7 +73,7 @@ export async function query(imo: string, url: string): Promise<string | null> {
                 method: "VisApi.query",
                 message: "empty instanceList!"
             });
-            return null;
+            return undefined;
         } else if (instanceList.length === 1) {
             return instanceList[0].endpointUri;
         }
@@ -83,7 +83,7 @@ export async function query(imo: string, url: string): Promise<string | null> {
             message: `instancelist length ${instanceList.length}`
         });
 
-        return null;
+        return undefined;
     } catch (error) {
         logException(logger, error);
 

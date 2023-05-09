@@ -31,14 +31,19 @@ const EMPTY_FEATURECOLLECTION_FI: FeatureCollection = {
 
 describe("get-faults", () => {
     jest.spyOn(FaultsService, "findAllFaults").mockImplementation((language: Language) => {
-        if (language == Language.FI) {
-            return Promise.resolve(EMPTY_FEATURECOLLECTION_FI);
+        if (language === Language.FI) {
+            return Promise.resolve([EMPTY_FEATURECOLLECTION_FI, new Date()]);
         }
 
-        return Promise.resolve(EMPTY_FEATURECOLLECTION_EN);
+        return Promise.resolve([EMPTY_FEATURECOLLECTION_EN, new Date()]);
     });
 
-    async function expectResponse<T>(language: string, fixed_in_hours: string, status: number, expected?: T) {
+    async function expectResponse<T>(
+        language: string,
+        fixed_in_hours: string,
+        status: number,
+        expected?: T
+    ): Promise<void> {
         const response = await handler({ language, fixed_in_hours });
 
         //console.info("response %s", JSON.stringify(response, null, 2));

@@ -35,7 +35,8 @@ async function getVisService(): Promise<VisService> {
 export function handlerFn(sqs: SQS): (event: UploadVoyagePlanEvent) => Promise<void> {
     return async function (event: UploadVoyagePlanEvent): Promise<void> {
         if (!visService) {
-            visService = await getVisService();
+            const service = await getVisService();
+            if (!visService) visService = service;
         }
 
         let voyagePlan: RtzVoyagePlan;
@@ -68,7 +69,7 @@ export function handlerFn(sqs: SQS): (event: UploadVoyagePlanEvent) => Promise<v
     };
 }
 
-function decodeSecretValue(value: string | undefined) {
+function decodeSecretValue(value: string | undefined): string {
     // for tests, no need to inject base64-stuff into secret
     if (!value) {
         return "";

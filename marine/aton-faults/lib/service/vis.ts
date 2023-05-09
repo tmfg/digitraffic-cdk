@@ -7,7 +7,7 @@ export class VisService {
     private readonly privateKey: string;
     private readonly serviceRegistryUrl: string;
 
-    constructor(ca: string, clientCertificate: string, privateKey: string, serviceRegistryUrl = "") {
+    constructor(ca: string, clientCertificate: string, privateKey: string, serviceRegistryUrl: string = "") {
         this.ca = ca;
         this.clientCertificate = clientCertificate;
         this.privateKey = privateKey;
@@ -40,7 +40,7 @@ export class VisService {
         }
     }
 
-    async queryCallBackForImo(imo: string): Promise<string | null> {
+    async queryCallBackForImo(imo: string): Promise<string | undefined> {
         const start = Date.now();
 
         try {

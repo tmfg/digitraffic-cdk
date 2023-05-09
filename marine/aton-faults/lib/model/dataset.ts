@@ -14,7 +14,7 @@ export interface S124Member {
             "gml:id": string;
         };
         id: string;
-        geometry: unknown;
+        geometry: S100PointProperty | unknown;
         Subject?: {
             text: string;
         };
@@ -87,5 +87,16 @@ export interface S124DataSet {
         "gml:boundedBy": GmlEnvelope;
         member: S124Member;
         imember: S124IMember;
+    };
+}
+
+export interface S100PointProperty {
+    "S100:pointProperty": {
+        "S100:Point": {
+            $: {
+                "gml:id": string;
+            };
+            "gml:pos": string;
+        };
     };
 }

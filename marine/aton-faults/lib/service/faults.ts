@@ -16,6 +16,7 @@ export const ATON_FAULTS_CHECK = "ATON_FAULTS_CHECK";
 export interface FaultProps {
     readonly id: number;
     readonly entry_timestamp: Date;
+    // eslint-disable-next-line @rushstack/no-new-null
     readonly fixed_timestamp: Date | null;
     readonly type: string;
     readonly domain: string;
@@ -35,6 +36,7 @@ export interface FaultProps {
 export function findAllFaults(
     language: Language,
     fixedInHours: number
+    // eslint-disable-next-line @rushstack/no-new-null
 ): Promise<[FeatureCollection, Date | null]> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
         const features = await FaultsDB.findAll(db, language, fixedInHours, convertFeature);
@@ -44,13 +46,13 @@ export function findAllFaults(
     });
 }
 
-export async function getFaultS124ById(db: DTDatabase, faultId: number): Promise<string | null> {
+export async function getFaultS124ById(db: DTDatabase, faultId: number): Promise<string | undefined> {
     const start = Date.now();
     const fault = await FaultsDB.getFaultById(db, faultId);
 
     try {
         if (!fault) {
-            return null;
+            return undefined;
         }
 
         return new Builder().buildObject(S124Converter.convertFault(fault));

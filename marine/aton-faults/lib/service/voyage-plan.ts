@@ -18,7 +18,7 @@ export class VoyagePlanService {
         this.sendS124QueueUrl = sendS124QueueUrl;
     }
 
-    async handleVoyagePlan(voyagePlan: RtzVoyagePlan) {
+    async handleVoyagePlan(voyagePlan: RtzVoyagePlan): Promise<void> {
         await this.sendFaultsForVoyagePlan(voyagePlan);
         await this.sendWarningsForVoyagePlan(voyagePlan);
     }

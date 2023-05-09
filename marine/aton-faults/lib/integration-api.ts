@@ -14,7 +14,7 @@ import {
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 
-export function create(stack: DigitrafficStack, s124Queue: Queue) {
+export function create(stack: DigitrafficStack, s124Queue: Queue): void {
     const integrationApi = new DigitrafficRestApi(stack, "ATON-Integration", "ATON Faults integration API");
 
     // set response for missing auth token to 501 as desired by API registrar
@@ -30,7 +30,7 @@ function createUploadVoyagePlanHandler(
     messageResponseModel: Model,
     s124Queue: Queue,
     integrationApi: DigitrafficRestApi
-) {
+): void {
     const handler = createHandler(stack, s124Queue);
 
     const resource = integrationApi.root.addResource("s124").addResource("voyagePlans");
@@ -53,7 +53,7 @@ function createIntegrationResource(
     messageResponseModel: Model,
     resource: Resource,
     handler: MonitoredFunction
-) {
+): void {
     const integration = defaultIntegration(handler, {
         passthroughBehavior: PassthroughBehavior.NEVER,
         disableCors: true,

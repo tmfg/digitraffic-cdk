@@ -1,7 +1,7 @@
 import { DbFault, FaultState } from "../lib/model/fault";
 import { v4 as uuidv4 } from "uuid";
 
-export function someNumber() {
+export function someNumber(): number {
     return Math.floor(Math.random() * 999999);
 }
 
@@ -36,9 +36,7 @@ export function newFault(props?: {
         fairway_name_sv: "name in swedish",
         area_number: 1,
         area_description: "area 51",
-        geometry: `POINT(${props?.geometry?.lon ?? someNumber()} ${
-            props?.geometry?.lat ?? someNumber()
-        })`,
+        geometry: `POINT(${props?.geometry?.lon ?? someNumber()} ${props?.geometry?.lat ?? someNumber()})`
     };
 }
 

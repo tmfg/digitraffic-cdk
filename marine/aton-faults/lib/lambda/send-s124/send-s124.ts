@@ -22,7 +22,7 @@ const proxyHolder = ProxyHolder.create();
 /**
  * This handler should only receive and send a single S124-message
  */
-export function handlerFn() {
+export function handlerFn(): (event: SQSEvent) => Promise<void> {
     return async (event: SQSEvent): Promise<void> => {
         await proxyHolder
             .setCredentials()

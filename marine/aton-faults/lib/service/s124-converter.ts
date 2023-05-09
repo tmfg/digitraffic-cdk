@@ -8,7 +8,8 @@ import {
     S124Member,
     S124IMember,
     S124MessageSeriesIdentifier,
-    S124FixedDateRange
+    S124FixedDateRange,
+    S100PointProperty
 } from "../model/dataset";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -109,7 +110,7 @@ export function convertFault(fault: DbFault): S124DataSet {
     return createDataSet(id, boundedBy, member, imember);
 }
 
-export function convertWarning(warning: Feature) {
+export function convertWarning(warning: Feature): S124DataSet {
     const p = warning.properties as Record<string, string | number>;
     const year = new Date(p.creationTime).getFullYear() - 2000;
     const warningId = p.id as number;
@@ -229,7 +230,7 @@ function createFixedDateRangeForFault(fault: DbFault): S124FixedDateRange {
     };
 }
 
-function createGeometryForWarning(geometry: Geometry, id: string) {
+function createGeometryForWarning(geometry: Geometry, id: string): S100PointProperty | unknown {
     if (geometry.type === "Point") {
         return createPointProperty(`${geometry.coordinates[0]} ${geometry.coordinates[1]}`, id);
     }
@@ -241,7 +242,7 @@ function createGeometryForWarning(geometry: Geometry, id: string) {
     return {};
 }
 
-function createPointProperty(geometry: string, id: string) {
+function createPointProperty(geometry: string, id: string): S100PointProperty {
     return {
         "S100:pointProperty": {
             "S100:Point": {
@@ -254,7 +255,7 @@ function createPointProperty(geometry: string, id: string) {
     };
 }
 
-function createCoordinatePair(geometry: string) {
+function createCoordinatePair(geometry: string): string {
     const g = wkx.Geometry.parse(Buffer.from(geometry, "hex")).toGeoJSON() as { coordinates: string[] };
 
     return `${g.coordinates[0]} ${g.coordinates[1]}`;

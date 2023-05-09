@@ -70,8 +70,8 @@ describe(
 
             const faultIds = await FaultsDb.findFaultIdsByRoute(db, route);
             expect(faultIds.length).toBe(2);
-            expect(faultIds.find((id) => id == faultAvoin.id)).not.toBeNull();
-            expect(faultIds.find((id) => id == faultKirjattu.id)).not.toBeNull();
+            expect(faultIds.find((id) => id === faultAvoin.id)).not.toBeNull();
+            expect(faultIds.find((id) => id === faultKirjattu.id)).not.toBeNull();
         });
 
         test("getFaultById - found", async () => {

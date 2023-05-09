@@ -1,8 +1,5 @@
 import { RtzVoyagePlan } from "@digitraffic/common/dist/marine/rtz";
-import {
-    DTDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as CachedDao from "@digitraffic/common/dist/database/cached";
 import booleanDisjoint from "@turf/boolean-disjoint";
 import buffer from "@turf/buffer";
@@ -13,7 +10,7 @@ const MAX_DISTANCE_NM = 15;
 
 export async function findWarningsForVoyagePlan(
     voyagePlan: RtzVoyagePlan
-): Promise<FeatureCollection | null> {
+): Promise<FeatureCollection | undefined> {
     const warnings = await inDatabaseReadonly((db: DTDatabase) => {
         return CachedDao.getJsonFromCache<FeatureCollection>(
             db,
@@ -22,7 +19,7 @@ export async function findWarningsForVoyagePlan(
     });
 
     if (!warnings) {
-        return null;
+        return undefined;
     }
 
     const voyageLineString = lineString(
@@ -36,7 +33,7 @@ export async function findWarningsForVoyagePlan(
         (f: Feature) =>
             !booleanDisjoint(
                 buffer(f.geometry, MAX_DISTANCE_NM, {
-                    units: "nauticalmiles",
+                    units: "nauticalmiles"
                 }),
                 voyageLineString
             )
@@ -52,20 +49,15 @@ export async function findWarningsForVoyagePlan(
  * @param db
  * @param id
  */
-export async function findWarning(
-    db: DTDatabase,
-    id: number
-): Promise<Feature | null> {
+export async function findWarning(db: DTDatabase, id: number): Promise<Feature | undefined> {
     const warnings = await CachedDao.getJsonFromCache<FeatureCollection>(
         db,
         CachedDao.JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE
     );
 
     if (!warnings) {
-        return null;
+        return undefined;
     }
 
-    return (
-        warnings.features.find((f: Feature) => f.properties?.id === id) ?? null
-    );
+    return warnings.features.find((f: Feature) => f.properties?.id === id) ?? undefined;
 }

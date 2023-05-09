@@ -169,7 +169,7 @@ export function findAll<T>(
 }
 
 function parseHelsinkiTime(date: string | null): Date | null {
-    if (date != null) {
+    if (date !== null) {
         // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
         return zonedTimeToUtc(date, "Europe/Helsinki");
     }
