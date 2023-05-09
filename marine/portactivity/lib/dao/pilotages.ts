@@ -3,11 +3,13 @@ import { PreparedStatement } from "pg-promise";
 import { Pilotage } from "../model/pilotage";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
+export const PORTCALL_TIMESTAMP_AGE_LIMIT = `NOW() - INTERVAL '36 HOURS'`;
+
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL =
     "select id, schedule_updated from pilotage where state != 'FINISHED'";
 const GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS = new PreparedStatement({
     name: "get-active-pilotage-timestamps",
-    text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL,
+    text: GET_ACTIVE_PILOTAGE_TIMESTAMPS_SQL
 });
 
 const UPSERT_PILOTAGES_SQL = `insert into pilotage(id, vessel_imo, vessel_mmsi, vessel_eta, pilot_boarding_time, pilotage_end_time, schedule_updated, schedule_source, state, 
@@ -54,7 +56,7 @@ const FIND_PORTCALL_SQL = `
             )
         )  
         AND pc.port_to_visit = $3::CHARACTER VARYING(5)
-        AND pc.port_call_timestamp > (NOW() - INTERVAL '24 HOURS')
+        AND pc.port_call_timestamp > (${PORTCALL_TIMESTAMP_AGE_LIMIT})
         LIMIT 1
 `;
 
@@ -73,46 +75,36 @@ export async function findPortCallId(
     db: DTDatabase,
     pilotage: Pilotage,
     location: Location
-): Promise<number | null> {
+): Promise<number | undefined> {
     const p1 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [
         pilotage.vessel.mmsi,
         pilotage.vessel.imo,
-        location.port,
+        location.port
     ]);
     const p2 = await db.oneOrNone<DbPortcallId>(FIND_PORTCALL_SQL, [
         pilotage.vessel.mmsi,
         pilotage.vessel.imo,
-        location.from,
+        location.from
     ]);
 
     if (p1 && p2 && location.port !== location.from) {
-        console.info(
-            "portcalls found for both %s and %s",
-            location.port,
-            location.from
-        );
+        console.info("portcalls found for both %s and %s", location.port, location.from);
         return p2.port_call_id;
     }
 
     if (!p1 && !p2) {
-        console.info(
-            "no portcalls found for %s or %s",
-            location.port,
-            location.from
-        );
+        console.info("no portcalls found for %s or %s", location.port, location.from);
     } else if (p1) {
         return p1.port_call_id;
     } else if (p2) {
         return p2.port_call_id;
     }
 
-    return null;
+    return undefined;
 }
 
 export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
-    const timestamps = await db.manyOrNone<DbPilotageTimestamp>(
-        GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS
-    );
+    const timestamps = await db.manyOrNone<DbPilotageTimestamp>(GET_ACTIVE_PILOTAGE_TIMESTAMPS_PS);
     const idMap: TimestampMap = new Map();
 
     timestamps.forEach((ts) => idMap.set(ts.id, ts.schedule_updated));
@@ -120,10 +112,7 @@ export async function getTimestamps(db: DTDatabase): Promise<TimestampMap> {
     return idMap;
 }
 
-export function updatePilotages(
-    db: DTDatabase,
-    pilotages: Pilotage[]
-): Promise<unknown> {
+export function updatePilotages(db: DTDatabase, pilotages: Pilotage[]): Promise<unknown> {
     if (pilotages.length > 0) {
         return Promise.all(
             pilotages.map((pilotage) =>
@@ -141,7 +130,7 @@ export function updatePilotages(
                     routeStart: pilotage.route.start.code,
                     routeStartBerth: pilotage.route.start.berth?.code,
                     routeEnd: pilotage.route.end.code,
-                    routeEndBerth: pilotage.route.end.berth?.code,
+                    routeEndBerth: pilotage.route.end.berth?.code
                 })
             )
         );
@@ -150,10 +139,7 @@ export function updatePilotages(
     return Promise.resolve();
 }
 
-export function deletePilotages(
-    db: DTDatabase,
-    pilotageIds: number[]
-): Promise<number[]> {
+export function deletePilotages(db: DTDatabase, pilotageIds: number[]): Promise<number[]> {
     if (pilotageIds.length > 0) {
         return db.manyOrNone<number>(DELETE_PILOTAGES_SQL, [pilotageIds]);
     }

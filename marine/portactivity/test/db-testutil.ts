@@ -233,7 +233,7 @@ export function insertPilotage(
     ]);
 }
 
-export function mockSecrets<T>(secret: T) {
+export function mockSecrets<T>(secret: T): void {
     sinon.stub(RdsHolder.prototype, "setCredentials").resolves();
     sinon.stub(SecretHolder.prototype, "get").resolves(secret);
 }

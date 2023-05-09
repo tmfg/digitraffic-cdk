@@ -7,7 +7,7 @@ function needInit(): boolean {
     return Object.keys(pilotwebToPortnetLocodeMap).length === 0;
 }
 
-function initMap() {
+function initMap(): void {
     pilotwebToPortnetLocodeMap.FIKOY = 'FIKOK';
 
     pilotwebToPortnetLocodeMap.FIPIE = 'FIPRS';

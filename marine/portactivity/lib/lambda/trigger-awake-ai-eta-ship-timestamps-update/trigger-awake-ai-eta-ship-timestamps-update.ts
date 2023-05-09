@@ -1,18 +1,18 @@
+import * as MessagingUtil from "@digitraffic/common/dist/aws/runtime/messaging";
+import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { SNS } from "aws-sdk";
+import * as R from "ramda";
+import { PortactivityEnvKeys } from "../../keys";
 import { ports } from "../../service/portareas";
 import * as TimestampService from "../../service/timestamps";
-import { PortactivityEnvKeys } from "../../keys";
-import { SNS } from "aws-sdk";
-import * as MessagingUtil from "@digitraffic/common/dist/aws/runtime/messaging";
-import * as R from "ramda";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
-import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 
-const publishTopic = envValue(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
+const publishTopic = getEnvVariable(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 const CHUNK_SIZE = 10;
 
 const rdsHolder = RdsHolder.create();
 
-export function handlerFn(sns: SNS) {
+export function handlerFn(sns: SNS): () => Promise<void> {
     return () => {
         return rdsHolder.setCredentials().then(async () => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
@@ -31,11 +31,7 @@ export function handlerFn(sns: SNS) {
             }
 
             for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {
-                await MessagingUtil.snsPublish(
-                    JSON.stringify(chunk),
-                    publishTopic,
-                    sns
-                );
+                await MessagingUtil.snsPublish(JSON.stringify(chunk), publishTopic, sns);
             }
         });
     };

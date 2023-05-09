@@ -45,7 +45,7 @@ export class AwakeAiPortApi {
         resource: AwakeAiPortResource,
         locode: string,
         predictionType: AwakeAiPredictionType,
-        maxSequenceNo = 1
+        maxSequenceNo: number = 1
     ): Promise<AwakeAiPortResponse> {
         const start = Date.now();
         try {
@@ -72,7 +72,7 @@ export class AwakeAiPortApi {
         }
     }
 
-    async getETAs(locode: string, maxSequenceNo = 1) {
+    async getETAs(locode: string, maxSequenceNo: number = 1): Promise<AwakeAiPortResponse> {
         return this.getPredictions(
             AwakeAiPortResource.ARRIVALS,
             locode,
@@ -81,7 +81,7 @@ export class AwakeAiPortApi {
         );
     }
 
-    async getETDs(locode: string, maxSequenceNo = 1) {
+    async getETDs(locode: string, maxSequenceNo: number = 1): Promise<AwakeAiPortResponse> {
         return this.getPredictions(
             AwakeAiPortResource.DEPARTURES,
             locode,
