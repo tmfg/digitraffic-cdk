@@ -1,7 +1,7 @@
 import { Aspects, Stack } from "aws-cdk-lib";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { EmailSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
-import * as iam from 'aws-cdk-lib/aws-iam';
+import { Effect, PolicyStatement, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { MonitoringConfiguration } from "./app-props";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Construct } from "constructs";
@@ -54,12 +54,12 @@ export class MonitoringStack extends Stack {
             topicName
         });
 
-        topic.addToResourcePolicy(new iam.PolicyStatement({
-            effect: iam.Effect.ALLOW,
+        topic.addToResourcePolicy(new PolicyStatement({
+            effect: Effect.ALLOW,
             actions: ["SNS:Publish"],
             resources: [topic.topicArn],
             principals: [
-                new iam.ServicePrincipal("cloudwatch.amazonaws.com")
+                new ServicePrincipal("cloudwatch.amazonaws.com")
             ],
             conditions: {
                 "ArnLike": {
