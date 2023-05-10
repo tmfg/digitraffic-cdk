@@ -7,7 +7,6 @@ export function create(stack: DigitrafficStack): void {
     const updateLambda = createUpdateLightsLambda(stack);
 
     stack.grantSecret(updateLambda);
-    // eslint-disable-next-line no-new
     new DigitrafficLogSubscriptions(stack, updateLambda);
 
     Scheduler.everyMinute(stack, "Shiplight-Scheduler", updateLambda);

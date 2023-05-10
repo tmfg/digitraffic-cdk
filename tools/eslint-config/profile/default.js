@@ -109,7 +109,8 @@ module.exports = {
 
                 // old way
                 "*-stack.ts",
-                "*-api.ts"
+                "*-api.ts",
+                "internal-*.ts"
             ],
             rules: {
                 "no-new": "off"
