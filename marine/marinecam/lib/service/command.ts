@@ -73,7 +73,7 @@ export abstract class Command<T> {
             logger.error({
                 method: "Command.checkError",
                 message: "Command failed",
-                details: JSON.stringify(result)
+                customDetails: JSON.stringify(result)
             });
 
             throw new Error("Command Failed " + resultCode);

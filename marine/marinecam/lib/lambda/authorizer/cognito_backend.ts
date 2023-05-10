@@ -43,7 +43,7 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
                     logger.info({
                         method: "CognitoBackend.loginUser",
                         message: "authenticateUser failed",
-                        details: JSON.stringify(result)
+                        customDetails: JSON.stringify(result)
                     });
 
                     resolve(null);
@@ -57,7 +57,7 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
             logger.error({
                 method: "CognitoBackend.loginUser",
                 message: "authenticateUser failed",
-                details: JSON.stringify(error)
+                customDetails: JSON.stringify(error)
             });
         }
     });
@@ -69,14 +69,14 @@ function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userA
             logger.info({
                 method: "CognitoBackend.changeUserPassword",
                 message: "success",
-                details: JSON.stringify(result)
+                customDetails: JSON.stringify(result)
             });
         },
         onFailure: (result) => {
             logger.info({
                 method: "CognitoBackend.changeUserPassword",
                 message: "failure",
-                details: JSON.stringify(result)
+                customDetails: JSON.stringify(result)
             });
         }
     });

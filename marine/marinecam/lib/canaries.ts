@@ -9,25 +9,17 @@ import { MobileServerProps } from "./app-props";
 
 export class Canaries {
     constructor(stack: DigitrafficStack, publicApi: DigitrafficRestApi) {
-        if (stack.configuration.stackFeatures?.enableCanaries) {
-            const dbRole = new DigitrafficCanaryRole(
-                stack,
-                "marinecam-db"
-            ).withDatabaseAccess();
+        if (stack.configuration.stackFeatures?.enableCanaries != false) {
+            const dbRole = new DigitrafficCanaryRole(stack, "marinecam-db").withDatabaseAccess();
 
-            if (
-                (stack.configuration as MobileServerProps).enableKeyProtectedApi
-            ) {
-                const urlRole = new DigitrafficCanaryRole(
-                    stack,
-                    "marinecam-url"
-                );
+            if ((stack.configuration as MobileServerProps).enableKeyProtectedApi) {
+                const urlRole = new DigitrafficCanaryRole(stack, "marinecam-url");
                 UrlCanary.create(stack, urlRole, publicApi, {
                     name: "mc-restricted",
                     schedule: Schedule.rate(Duration.minutes(30)),
                     alarm: {
-                        topicArn: stack.configuration.alarmTopicArn,
-                    },
+                        topicArn: stack.configuration.alarmTopicArn
+                    }
                 });
             }
 
