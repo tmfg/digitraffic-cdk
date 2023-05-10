@@ -25,34 +25,28 @@ const SQL_FIND_VALUES_FOR_MONTH = `select csc.domain_name, csc.name counter_name
 
 const PS_INSERT_COUNTER_VALUES = new PreparedStatement({
     name: "insert-values",
-    text: SQL_INSERT_VALUES,
+    text: SQL_INSERT_VALUES
 });
 
 const PS_GET_VALUES = new PreparedStatement({
     name: "find-values",
-    text: SQL_FIND_VALUES,
+    text: SQL_FIND_VALUES
 });
 
 const PS_FIND_VALUES_FOR_MONTH = new PreparedStatement({
     name: "find-data-for-month",
-    text: SQL_FIND_VALUES_FOR_MONTH,
+    text: SQL_FIND_VALUES_FOR_MONTH
 });
 
-export function insertCounterValues(
+export async function insertCounterValues(
     db: DTDatabase,
     siteId: number,
     interval: number,
     data: ApiData[]
-) {
-    return Promise.all(
+): Promise<void> {
+    await Promise.allSettled(
         data.map((d) => {
-            return db.none(PS_INSERT_COUNTER_VALUES, [
-                siteId,
-                d.date,
-                d.counts,
-                d.status,
-                interval,
-            ]);
+            return db.none(PS_INSERT_COUNTER_VALUES, [siteId, d.date, d.counts, d.status, interval]);
         })
     );
 }
@@ -67,12 +61,7 @@ export function findValues(
     const startDate = new Date(Date.UTC(year, month - 1, 1));
     const endDate = new Date(new Date(startDate).setMonth(month));
 
-    return db.manyOrNone(PS_GET_VALUES, [
-        startDate,
-        endDate,
-        nullString(domainName),
-        nullNumber(counterId),
-    ]);
+    return db.manyOrNone(PS_GET_VALUES, [startDate, endDate, nullString(domainName), nullNumber(counterId)]);
 }
 
 export function findDataForMonth(
@@ -89,6 +78,6 @@ export function findDataForMonth(
         startDate,
         endDate,
         nullString(domainName),
-        nullNumber(counterId),
+        nullNumber(counterId)
     ]);
 }

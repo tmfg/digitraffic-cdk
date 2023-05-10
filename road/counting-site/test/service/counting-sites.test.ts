@@ -1,12 +1,7 @@
-import {
-    dbTestBase,
-    insertCounter,
-    insertData,
-    insertDomain,
-    insertLastUpdated,
-} from "../db-testutil";
+import { dbTestBase, insertCounter, insertData, insertDomain, insertLastUpdated } from "../db-testutil";
 import * as CountingSitesService from "../../lib/service/counting-sites";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { FeatureCollection } from "geojson";
 
 describe(
     "counting-sites service tests",
@@ -14,7 +9,7 @@ describe(
         const DOMAIN1 = "DOMAIN1";
         const DOMAIN2 = "DOMAIN2";
 
-        function assertDataLines(csv: string, expected: number) {
+        function assertDataLines(csv: string, expected: number): void {
             // every line ends with \n and every csv contains header
             // so empty csv has one line ending -> splits to 2 parts
 
@@ -54,9 +49,7 @@ describe(
             await insertCounter(db, 1, DOMAIN1, 1);
 
             // no counters
-            const counters = await CountingSitesService.findCounters(
-                "not_found"
-            );
+            const counters = await CountingSitesService.findCounters("not_found");
 
             expect(counters.features).toHaveLength(0);
         });
@@ -73,8 +66,11 @@ describe(
             expect(counters1.features).toHaveLength(2);
 
             // one counter on domain2
-            const counters2 = await CountingSitesService.findCounters(DOMAIN2);
+            const counters2: FeatureCollection = await CountingSitesService.findCounters(DOMAIN2);
             expect(counters2.features).toHaveLength(1);
+            expect((counters2.features[0].properties?.lastDataTimestamp as string).toString()).toMatch(
+                new RegExp("(\\d{4})-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})Z")
+            );
         });
 
         test("findCounters - two domains find both", async () => {
@@ -90,11 +86,7 @@ describe(
         });
 
         test("findData - empty", async () => {
-            const data = await CountingSitesService.findCounterValues(
-                2021,
-                10,
-                "0"
-            );
+            const data = await CountingSitesService.findCounterValues(2021, 10, "0");
 
             expect(data).toHaveLength(0);
         });
@@ -104,44 +96,21 @@ describe(
             await insertCounter(db, 1, DOMAIN1, 1);
             await insertData(db, 1, 15);
 
-            const data1 = await CountingSitesService.findCounterValues(
-                2021,
-                10,
-                "2"
-            );
+            const data1 = await CountingSitesService.findCounterValues(2021, 10, "2");
             expect(data1).toHaveLength(0);
 
-            const data2 = await CountingSitesService.findCounterValues(
-                2021,
-                10,
-                "1"
-            );
+            const data2 = await CountingSitesService.findCounterValues(2021, 10, "1");
             expect(data2).toHaveLength(1);
 
-            const data3 = await CountingSitesService.findCounterValues(
-                2021,
-                10,
-                "",
-                DOMAIN2
-            );
+            const data3 = await CountingSitesService.findCounterValues(2021, 10, "", DOMAIN2);
             expect(data3).toHaveLength(0);
 
-            const data4 = await CountingSitesService.findCounterValues(
-                2021,
-                10,
-                "",
-                DOMAIN1
-            );
+            const data4 = await CountingSitesService.findCounterValues(2021, 10, "", DOMAIN1);
             expect(data4).toHaveLength(1);
         });
 
         test("getCsvData - empty", async () => {
-            const data = await CountingSitesService.getValuesForMonth(
-                2021,
-                10,
-                "",
-                ""
-            );
+            const data = await CountingSitesService.getValuesForMonth(2021, 10, "", "");
 
             assertDataLines(data, 0);
         });
@@ -152,36 +121,16 @@ describe(
             await insertCounter(db, 1, DOMAIN1, 1);
             await insertData(db, 1, 15);
 
-            const data1 = await CountingSitesService.getValuesForMonth(
-                2021,
-                9,
-                "",
-                ""
-            );
+            const data1 = await CountingSitesService.getValuesForMonth(2021, 9, "", "");
             assertDataLines(data1, 0);
 
-            const data2 = await CountingSitesService.getValuesForMonth(
-                2021,
-                10,
-                "",
-                ""
-            );
+            const data2 = await CountingSitesService.getValuesForMonth(2021, 10, "", "");
             assertDataLines(data2, 1);
 
-            const data3 = await CountingSitesService.getValuesForMonth(
-                2021,
-                10,
-                DOMAIN2,
-                ""
-            );
+            const data3 = await CountingSitesService.getValuesForMonth(2021, 10, DOMAIN2, "");
             assertDataLines(data3, 0);
 
-            const data4 = await CountingSitesService.getValuesForMonth(
-                2021,
-                10,
-                DOMAIN1,
-                ""
-            );
+            const data4 = await CountingSitesService.getValuesForMonth(2021, 10, DOMAIN1, "");
             assertDataLines(data4, 1);
         });
     })

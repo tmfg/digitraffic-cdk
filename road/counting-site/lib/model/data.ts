@@ -1,14 +1,10 @@
-import {
-    JsonSchema,
-    JsonSchemaType,
-    JsonSchemaVersion,
-} from "aws-cdk-lib/aws-apigateway";
+import { JsonSchema, JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
 
 export interface ApiData {
     readonly date: string;
     readonly isoDate: Date;
-    readonly counts: number | null;
-    readonly status: number | null;
+    readonly counts: number | undefined;
+    readonly status: number | undefined;
 }
 
 export interface DbData {
@@ -47,20 +43,20 @@ export const dataProperties: JsonSchema = {
             dataTimestamp: {
                 type: JsonSchemaType.STRING,
                 format: "date-time",
-                description: "Data interval start",
+                description: "Data interval start"
             },
             interval: {
                 type: JsonSchemaType.NUMBER,
-                description: "Interval length in minutes",
+                description: "Interval length in minutes"
             },
             count: {
                 type: JsonSchemaType.NUMBER,
-                description: "Counter count",
+                description: "Counter count"
             },
             status: {
                 type: JsonSchemaType.NUMBER,
-                description: "Counter status",
-            },
-        },
-    },
+                description: "Counter status"
+            }
+        }
+    }
 };

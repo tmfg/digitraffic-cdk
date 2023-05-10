@@ -1,13 +1,10 @@
 import { DatabaseCountChecker } from "@digitraffic/common/dist/aws/infra/canaries/database-checker";
 import { DataType } from "@digitraffic/common/dist/database/last-updated";
 
-export const handler = () => {
+export const handler = (): Promise<string> => {
     const checker = DatabaseCountChecker.createForProxy();
 
-    checker.expectOneOrMore(
-        "domains not empty",
-        "select count(*) from counting_site_domain"
-    );
+    checker.expectOneOrMore("domains not empty", "select count(*) from counting_site_domain");
 
     checker.expectOneOrMore(
         "counters data updated in last 48 hours",

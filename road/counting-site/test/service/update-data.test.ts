@@ -6,6 +6,7 @@ import * as DataDAO from "../../lib/dao/data";
 import * as sinon from "sinon";
 import { ApiData } from "../../lib/model/data";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { SinonSpy } from "sinon";
 
 const DOMAIN_NAME = "TEST_DOMAIN";
 
@@ -18,13 +19,11 @@ describe(
             sinon.restore();
         });
 
-        function mockApiResponse(response: ApiData[]) {
-            return sinon
-                .stub(EcoCounterApi.prototype, "getDataForSite")
-                .returns(Promise.resolve(response));
+        function mockApiResponse(response: ApiData[]): SinonSpy {
+            return sinon.stub(EcoCounterApi.prototype, "getDataForSite").returns(Promise.resolve(response));
         }
 
-        async function assertDataInDb(expected: number, counterId: string) {
+        async function assertDataInDb(expected: number, counterId: string): Promise<void> {
             const data = await DataDAO.findValues(db, 2015, 9, counterId, "");
             expect(data).toHaveLength(expected);
         }
@@ -53,8 +52,8 @@ describe(
                 date: "2015-09-25T05:00:00+0000",
                 isoDate: new Date("2015-09-25T05:00:00+0200"),
                 counts: 1,
-                status: 1,
-            },
+                status: 1
+            }
         ];
 
         test("updateDataForDomain - one counter and data", async () => {
@@ -71,9 +70,7 @@ describe(
         test("updateDataForDomain - one counter and data, last update week ago", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
-            await db.any(
-                "update counting_site_counter set last_data_timestamp=now() - interval '7 days'"
-            );
+            await db.any("update counting_site_counter set last_data_timestamp=now() - interval '7 days'");
             const counterApiResponse = mockApiResponse(RESPONSE_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");
@@ -85,9 +82,7 @@ describe(
         test("updateDataForDomain - one counter and data - no need to update", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await insertCounter(db, 1, DOMAIN_NAME, 1);
-            await db.any(
-                "update counting_site_counter set last_data_timestamp=now()"
-            );
+            await db.any("update counting_site_counter set last_data_timestamp=now()");
             const counterApiResponse = mockApiResponse(RESPONSE_DATA);
 
             await updateDataForDomain(DOMAIN_NAME, "", "");

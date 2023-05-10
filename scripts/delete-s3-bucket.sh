@@ -8,7 +8,7 @@ FULL_ENV=${1:-"NONE"}
 BUCKET=${2:-"NONE"}
 
 SCRIPT_DIR=$(dirname "$0")
-. ${SCRIPT_DIR}/cdk-set-env.sh ${FULL_ENV}
+. ${SCRIPT_DIR}/cdk-set-env.conf ${FULL_ENV}
 
 # Check second parameter is given
 if [ -z "$2" ]; then

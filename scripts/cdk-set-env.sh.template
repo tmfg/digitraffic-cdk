@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
 # TODO: Update correct values to every TODO
-# TODO: Rename script to: cdk-set-env.sh
+# TODO: Rename script to: cdk-set-env.conf
 
 # Execute in shell:
-# . cdk-set-env.sh <env>
+# . cdk-set-env.conf <env>
 
 # Read env
 ENV=${1:-"NONE"}
