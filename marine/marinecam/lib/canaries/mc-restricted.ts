@@ -1,19 +1,14 @@
-import {
-    ResponseChecker,
-    UrlChecker,
-} from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
+import { ResponseChecker, UrlChecker } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import assert from "assert";
 import { Camera } from "../model/camera";
 
 const METADATA_IBNET_URL = "/prod/api/marinecam/ibnet/metadata";
-const CAMERA_IBNET_URL =
-    "/prod/api/marinecam/ibnet/1305f095-4338-4f16-bbcf-b4a7a2a38abc.jpg";
+const CAMERA_IBNET_URL = "/prod/api/marinecam/ibnet/1305f095-4338-4f16-bbcf-b4a7a2a38abc.jpg";
 
 const METADATA_CAMERAS_URL = "/prod/api/marinecam/cameras/metadata";
-const CAMERA_CAMERAS_URL =
-    "/prod/api/marinecam/cameras/1305f095-4338-4f16-bbcf-b4a7a2a38abc.jpg";
+const CAMERA_CAMERAS_URL = "/prod/api/marinecam/cameras/1305f095-4338-4f16-bbcf-b4a7a2a38abc.jpg";
 
-export const handler = async () => {
+export const handler: () => Promise<string> = async () => {
     const checker = await UrlChecker.createV2();
     const jsonChecker = ResponseChecker.forJson();
     const imageChecker = ResponseChecker.forJpeg();

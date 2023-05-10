@@ -7,7 +7,7 @@ import { Camera } from "../../model/camera";
 
 const rdsHolder = RdsHolder.create();
 
-export const handler = () => {
+export const handler: () => Promise<LambdaResponse> = () => {
     return rdsHolder
         .setCredentials()
         .then(() => MetadataService.listAllCameras(["Saimaa"]))

@@ -1,6 +1,6 @@
 import { DatabaseCountChecker } from "@digitraffic/common/dist/aws/infra/canaries/database-checker";
 
-export const handler = () => {
+export const handler: () => Promise<string> = () => {
     const checker = DatabaseCountChecker.createForRds();
 
     checker.expectOneOrMore("cameras not empty", "select count(*) from camera");

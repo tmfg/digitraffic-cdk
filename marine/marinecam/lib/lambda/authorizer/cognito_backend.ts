@@ -15,7 +15,7 @@ const POOL_DATA = {
 
 const userPool = new CognitoUserPool(POOL_DATA);
 
-function createCognitoUser(username: string) {
+function createCognitoUser(username: string): CognitoUser {
     const userData = {
         Username: username,
         Pool: userPool
@@ -24,7 +24,7 @@ function createCognitoUser(username: string) {
     return new CognitoUser(userData);
 }
 
-export function loginUser(username: string, password: string): Promise<CognitoUserSession | null> {
+export function loginUser(username: string, password: string): Promise<CognitoUserSession | undefined> {
     const authDetails = new AuthenticationDetails({
         Username: username,
         Password: password
@@ -46,7 +46,7 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
                         customDetails: JSON.stringify(result)
                     });
 
-                    resolve(null);
+                    resolve(undefined);
                 },
 
                 newPasswordRequired: (userAttributes: object) => {
@@ -63,7 +63,7 @@ export function loginUser(username: string, password: string): Promise<CognitoUs
     });
 }
 
-function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: object) {
+function changeUserPassword(cognitoUser: CognitoUser, newPassword: string, userAttributes: object): void {
     cognitoUser.completeNewPasswordChallenge(newPassword, userAttributes, {
         onSuccess: (result) => {
             logger.info({

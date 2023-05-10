@@ -6,7 +6,11 @@ import { writeFile } from "fs/promises";
 
 const BASE64 = "base64";
 
-export function storeImage(cameraId: string, image: string, bucketName: string) {
+export function storeImage(
+    cameraId: string,
+    image: string,
+    bucketName: string
+): Promise<void | ManagedUpload.SendData> {
     const imageName = `${cameraId}.jpg`;
 
     logger.info({
