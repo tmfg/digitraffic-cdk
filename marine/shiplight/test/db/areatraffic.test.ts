@@ -98,7 +98,10 @@ describe(
             expect(traffic).toHaveLength(0);
         });
 
-        async function insertAreaTrafficAndVessel(mmsi: number, shipName = "test_vessel") {
+        async function insertAreaTrafficAndVessel(
+            mmsi: number,
+            shipName: string = "test_vessel"
+        ): Promise<void> {
             await insertAreaTraffic(db, 1, "test_area", 10, "POLYGON((0 0, 10 0, 10 10, 0 10, 0 0))");
             await insertVessel(db, mmsi, shipName);
         }

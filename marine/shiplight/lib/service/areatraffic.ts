@@ -4,7 +4,7 @@ import { DbAreaTraffic, DbAreaTrafficResult } from "../db/areatraffic";
 import { AreaTraffic } from "../model/areatraffic";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-export async function updateAreaTrafficSendTime(areaId: number) {
+export async function updateAreaTrafficSendTime(areaId: number): Promise<unknown> {
     return inDatabase((db: DTDatabase) => {
         logger.info({
             method: "AreatrafficService.updateAreaTrafficSendTime",
@@ -22,7 +22,7 @@ export function getAreaTraffic(): Promise<AreaTraffic[]> {
 
         logger.info({
             method: "AreatrafficService.getAreaTraffic",
-            count: areas.length
+            customCount: areas.length
         });
 
         areas.forEach((area) => {
@@ -49,7 +49,7 @@ function dbAreaTrafficResultToAreaTraffic(result: DbAreaTrafficResult): AreaTraf
     return {
         areaId: result.id,
         durationInMinutes: result.brighten_duration_min,
-        visibilityInMeters: null,
+        visibilityInMeters: undefined,
         ship: {
             name: result.ship_name,
             mmsi: result.ship_mmsi

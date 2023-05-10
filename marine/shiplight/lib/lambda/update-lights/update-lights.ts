@@ -37,7 +37,7 @@ export async function handlerFn(
         for (const area of areas) {
             logger.info({
                 method: "UpdateLights.handler",
-                sourceId: area.areaId
+                customSourceId: area.areaId
             });
 
             try {

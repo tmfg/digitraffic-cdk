@@ -2,7 +2,7 @@ import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { ShipTypes } from "../lib/db/areatraffic";
 
-export function dbTestBase(fn: (db: DTDatabase) => void) {
+export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
     return commonDbTestBase(fn, truncate, "marine", "marine", "localhost:54321/marine");
 }
 
@@ -11,7 +11,7 @@ interface Area {
     brighten_end?: Date;
 }
 
-export async function assertArea(db: DTDatabase, id: number, duration?: number) {
+export async function assertArea(db: DTDatabase, id: number, duration?: number): Promise<void> {
     const area = await db.tx((t) => {
         return t.oneOrNone<Area | null>("select brighten_sent,brighten_end from areatraffic where id = $1", [
             id
@@ -47,7 +47,11 @@ export async function insertAreaTraffic(
     });
 }
 
-export async function insertVessel(db: DTDatabase, mmsi: number, shipName = "test_vessel"): Promise<void> {
+export async function insertVessel(
+    db: DTDatabase,
+    mmsi: number,
+    shipName: string = "test_vessel"
+): Promise<void> {
     await db.tx(async (t) => {
         await t.none(
             "INSERT INTO vessel(mmsi,timestamp,name,ship_type,reference_point_a,reference_point_b,reference_point_c,reference_point_d,pos_type,draught,imo,eta) " +
@@ -62,7 +66,7 @@ export async function insertVesselLocation(
     mmsi: number,
     timestamp: number,
     x: number,
-    speed = 3
+    speed: number = 3
 ): Promise<void> {
     await db.tx(async (t) => {
         await t.none(

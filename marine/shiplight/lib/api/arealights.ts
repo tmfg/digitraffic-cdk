@@ -12,6 +12,7 @@ export interface AreaLightsBrightenRequest {
     /**
      * Visibility in metres
      */
+    // eslint-disable-next-line @rushstack/no-new-null
     readonly visibility: number | null;
 
     /**
@@ -69,7 +70,7 @@ export class AreaLightsApi {
                         logger.error({
                             method: "AreaLightsApi.updateLightsForArea",
                             message: "failed",
-                            status: error.response.status
+                            customStatus: error.response.status
                         });
 
                         return Promise.reject(`API returned status ${error.response.status}`);
@@ -77,7 +78,7 @@ export class AreaLightsApi {
                         logger.error({
                             method: "AreaLightsApi.updateLightsForArea",
                             message: "error with request",
-                            details: JSON.stringify(error.request)
+                            customDetails: JSON.stringify(error.request)
                         });
                         return Promise.reject("Error with request");
                     }

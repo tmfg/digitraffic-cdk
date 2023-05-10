@@ -2,7 +2,7 @@ import { AreaVisibilityApi } from "../api/areavisibility";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 interface AreaVisibilityWrapper {
-    readonly visibilityInMeters: number | null;
+    readonly visibilityInMeters: number | undefined;
 }
 
 export class AreaVisibilityService {
@@ -27,13 +27,13 @@ export class AreaVisibilityService {
             logger.info({
                 method: "AreavisibilityService.getVisibilityForAreaInMetres",
                 message: `got visibility ${resp.visibilityInMeters} for area ${areaId}`,
-                lastUpdated: resp.lastUpdated
+                customLastUpdated: resp.lastUpdated
             });
 
             return { visibilityInMeters: resp.visibilityInMeters };
         } catch (error) {
             // error logged at API level
-            return { visibilityInMeters: null };
+            return { visibilityInMeters: undefined };
         }
     }
 }

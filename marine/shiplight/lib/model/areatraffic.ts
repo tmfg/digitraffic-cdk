@@ -6,6 +6,6 @@ export interface AreaTrafficShip {
 export interface AreaTraffic {
     readonly areaId: number;
     readonly durationInMinutes: number;
-    readonly visibilityInMeters: number | null;
+    readonly visibilityInMeters: number | undefined;
     readonly ship: AreaTrafficShip;
 }

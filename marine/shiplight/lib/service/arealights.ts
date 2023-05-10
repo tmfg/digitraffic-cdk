@@ -19,16 +19,16 @@ export class AreaLightsService {
 
         logger.info({
             method: "ArealightsService.updateLightsForArea",
-            duration: areaTraffic.durationInMinutes,
-            visibility: areaTraffic.visibilityInMeters?.toString(),
-            mmsi: areaTraffic.ship.mmsi
+            customDuration: areaTraffic.durationInMinutes,
+            customVisibility: areaTraffic.visibilityInMeters?.toString(),
+            customMmsi: areaTraffic.ship.mmsi
         });
 
         await retry(
             async () => {
                 const response = await this.api.updateLightsForArea({
                     routeId: areaId,
-                    visibility: areaTraffic.visibilityInMeters,
+                    visibility: areaTraffic.visibilityInMeters ?? null,
                     time: areaTraffic.durationInMinutes,
                     MMSI: areaTraffic.ship.mmsi.toString(),
                     shipName: areaTraffic.ship.name

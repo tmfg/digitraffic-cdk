@@ -30,7 +30,7 @@ export class AreaVisibilityApi {
                 logger.error({
                     method: "AreaVisibilityApi.getVisibilityForArea",
                     message: "failed",
-                    status: resp.status
+                    customStatus: resp.status
                 });
                 return Promise.reject();
             }
@@ -43,7 +43,7 @@ export class AreaVisibilityApi {
 
             throw new Error("Getting visibility for area failed");
         } finally {
-            logger.error({
+            logger.info({
                 method: "AreaVisibilityApi.getVisibilityForArea",
                 tookMs: Date.now() - start
             });

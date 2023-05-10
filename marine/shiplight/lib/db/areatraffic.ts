@@ -62,6 +62,7 @@ export function getAreaTraffic(db: DTDatabase): Promise<DbAreaTrafficResult[]> {
     return db.manyOrNone(PS_GET_AREA_TRAFFIC);
 }
 
-export function updateAreaTrafficSendTime(db: DTDatabase, areaId: number) {
+// eslint-disable-next-line @rushstack/no-new-null
+export function updateAreaTrafficSendTime(db: DTDatabase, areaId: number): Promise<null> {
     return db.none(PS_UPDATE_AREA_TRAFFIC_SENDTIME, [areaId]);
 }
