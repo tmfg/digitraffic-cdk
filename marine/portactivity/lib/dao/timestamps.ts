@@ -8,6 +8,7 @@ import { parseISO } from "date-fns";
 
 export const TIMESTAMPS_BEFORE = `NOW() - INTERVAL '12 HOURS'`;
 export const PORTNET_TIMESTAMPS_UPPER_LIMIT = `NOW() + INTERVAL '14 DAYS'`;
+export const VESSEL_LOCATION_AGE_LIMIT = `NOW() - INTERVAL '1 HOURS'`;
 
 const OLD_TIMESTAMP_INTERVAL = "7 days";
 
@@ -376,6 +377,13 @@ const FIND_IMO_BY_MMSI_SQL = `
     ) AS imo
 `.trim();
 
+const FIND_VESSEL_SOG = `
+    SELECT sog FROM public.vessel_location 
+        WHERE mmsi = $1 AND
+        modified > ${VESSEL_LOCATION_AGE_LIMIT} 
+        ORDER BY modified DESC LIMIT 1;
+`.trim();
+
 const DELETE_OLD_TIMESTAMPS_SQL = `
     WITH deleted AS (
         DELETE FROM port_call_timestamp WHERE event_time < now() - INTERVAL '${OLD_TIMESTAMP_INTERVAL}' RETURNING *
@@ -460,6 +468,14 @@ export function findVtsShipImosTooCloseToPortByPortCallId(
 ): Promise<DbImo[]> {
     // Prepared statement use not possible due to dynamic IN-list
     return db.tx((t) => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds]));
+}
+
+export async function findVesselSpeed(db: DTDatabase, mmsi?: number): Promise<number | undefined> {
+    if (mmsi) {
+        const result = await db.oneOrNone<{ sog: number }>(FIND_VESSEL_SOG, [mmsi]);
+        return result?.sog ?? undefined;
+    }
+    return undefined;
 }
 
 export function findPortnetTimestampsForAnotherLocode(
