@@ -17,10 +17,7 @@ interface UpdateAwakeAiTimestampsSecret extends GenericSecret {
     readonly voyagesauth: string;
 }
 
-const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>(
-    "awake",
-    ["url", "auth"]
-);
+const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>("awake", ["url", "auth"]);
 
 export const handler = (event: SNSEvent) => {
     // always a single event, guaranteed by SNS
@@ -28,23 +25,13 @@ export const handler = (event: SNSEvent) => {
 
     return secretHolder.get().then(async (secret) => {
         if (!service) {
-            service = new AwakeAiETAShipService(
-                new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth)
-            );
+            service = new AwakeAiETAShipService(new AwakeAiETAShipApi(secret.voyagesurl, secret.voyagesauth));
         }
         const timestamps = await service.getAwakeAiTimestamps(ships);
 
         const start = Date.now();
-        console.info(
-            "method=updateAwakeAiETAShipTimestamps.handler count=%d",
-            timestamps.length
-        );
-        await Promise.allSettled(
-            timestamps.map((ts) => sendMessage(ts, queueUrl))
-        );
-        console.info(
-            "method=updateAwakeAiETAShipTimestamps.handler tookMs=%d",
-            Date.now() - start
-        );
+        console.info("method=updateAwakeAiETAShipTimestamps.handler count=%d", timestamps.length);
+        await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
+        console.info("method=updateAwakeAiETAShipTimestamps.handler tookMs=%d", Date.now() - start);
     });
 };

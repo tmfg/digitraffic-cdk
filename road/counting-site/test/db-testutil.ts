@@ -3,14 +3,8 @@ import { DataType } from "@digitraffic/common/dist/database/last-updated";
 import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "road",
-        "road",
-        "localhost:54322/road"
-    );
+export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
+    return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");
 }
 
 function truncate(db: DTDatabase): Promise<void> {
@@ -22,11 +16,8 @@ function truncate(db: DTDatabase): Promise<void> {
     });
 }
 
-export function insertDomain(
-    db: DTDatabase,
-    domainName: string
-): Promise<null> {
-    return db.tx((t) => {
+export async function insertDomain(db: DTDatabase, domainName: string): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `
                 insert into counting_site_domain("name", description, added_timestamp)
@@ -40,27 +31,27 @@ export function insertDomain(
     });
 }
 
-export function insertCounter(
+export async function insertCounter(
     db: DTDatabase,
     id: number,
     domainName: string,
     userType: number
-): Promise<null> {
-    return db.tx((t) => {
+): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `
-                insert into counting_site_counter(id, site_id, domain_name, name, site_domain, location, user_type_id, "interval", direction, added_timestamp)
+                insert into counting_site_counter(id, site_id, domain_name, name, site_domain, location, user_type_id, "interval", direction, added_timestamp, last_data_timestamp)
                 values(
                        $1, $1,
                        $2, 'name', 'DOMAIN', 'POINT(10 10)',
-                       $3, 15, 1, current_date)                
+                       $3, 15, 1, current_date, current_timestamp - interval '3 days')
             `,
             [id, domainName, userType]
         );
     });
 }
-export function insertData(db: DTDatabase, counterId: number, count: number) {
-    return db.tx((t) => {
+export async function insertData(db: DTDatabase, counterId: number, count: number): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `insert into counting_site_data(id, counter_id, data_timestamp, count, interval)
                        values (NEXTVAL('counting_site_data_id_seq'), $1, '2021-10-31T00:00:00' , $2, 15)       
@@ -70,12 +61,8 @@ export function insertData(db: DTDatabase, counterId: number, count: number) {
     });
 }
 
-export function insertLastUpdated(
-    db: DTDatabase,
-    id: number,
-    updated: Date
-): Promise<null> {
-    return db.tx((t) => {
+export async function insertLastUpdated(db: DTDatabase, id: number, updated: Date): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `
                 insert into data_updated(id, data_type, updated)
@@ -91,11 +78,11 @@ export async function withServer(
     url: string,
     response: string,
     fn: (server: TestHttpServer) => Promise<void>
-) {
+): Promise<void> {
     const server = new TestHttpServer();
 
     const props = {
-        [url]: () => response,
+        [url]: () => response
     };
 
     server.listen(port, props, false);

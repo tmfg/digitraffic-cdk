@@ -11,24 +11,14 @@ const domainPrefix = envValue(CountingSitesEnvKeys.DOMAIN_PREFIX);
 const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<CountingSitesSecret>(domainPrefix);
 
-export const handler = () => {
+export const handler = async (): Promise<void> => {
     const start = Date.now();
 
-    proxyHolder
+    await proxyHolder
         .setCredentials()
         .then(() => secretHolder.get())
-        .then((secret) =>
-            UpdateService.updateDataForDomain(
-                domainName,
-                secret.apiKey,
-                secret.url
-            )
-        )
+        .then((secret) => UpdateService.updateDataForDomain(domainName, secret.apiKey, secret.url))
         .finally(() => {
-            console.info(
-                "method=updateData.%s tookMs=%d",
-                domainName,
-                Date.now() - start
-            );
+            console.info("method=updateData.%s tookMs=%d", domainName, Date.now() - start);
         });
 };

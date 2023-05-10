@@ -21,8 +21,8 @@ const SQL_ALL_COUNTERS_FEATURE_COLLECTION = `select json_build_object(
                                             'userType', user_type_id,
                                             'interval', interval,
                                             'direction', direction,
-                                            'lastDataTimestamp', last_data_timestamp,
-                                            'removedTimestamp', removed_timestamp
+                                            'lastDataTimestamp', to_char(last_data_timestamp at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+                                            'removedTimestamp', to_char(removed_timestamp at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
                                         )
                                 )
                         ), '[]')
@@ -52,67 +52,53 @@ const SQL_UPDATER_COUNTER_TIMESTAMP = `update counting_site_counter
 
 const PS_ALL_COUNTERS = new PreparedStatement({
     name: "select-counters",
-    text: SQL_ALL_COUNTERS,
+    text: SQL_ALL_COUNTERS
 });
 
 const PS_FIND_COUNTERS_FEATURE_COLLECTION = new PreparedStatement({
     name: "select-counters-feature-collection",
-    text: SQL_ALL_COUNTERS_FEATURE_COLLECTION,
+    text: SQL_ALL_COUNTERS_FEATURE_COLLECTION
 });
 
 const PS_INSERT_COUNTER = new PreparedStatement({
     name: "insert-counter",
-    text: SQL_INSERT_COUNTER,
+    text: SQL_INSERT_COUNTER
 });
 
 const PS_UPDATE_COUNTER = new PreparedStatement({
     name: "update-counter",
-    text: SQL_UPDATE_COUNTER,
+    text: SQL_UPDATE_COUNTER
 });
 
 const PS_UPDATE_COUNTER_TIMESTAMP = new PreparedStatement({
     name: "update-counter-timestamp",
-    text: SQL_UPDATER_COUNTER_TIMESTAMP,
+    text: SQL_UPDATER_COUNTER_TIMESTAMP
 });
 
-export function nullString(value: string): string | null {
-    return value === "" ? null : value;
+export function nullString(value: string): string | undefined {
+    return value === "" ? undefined : value;
 }
 
-export function nullNumber(value: string): number | null {
-    return value === "" ? null : Number.parseInt(value);
+export function nullNumber(value: string): number | undefined {
+    return value === "" ? undefined : Number.parseInt(value);
 }
 
 interface DbCollection {
     collection: FeatureCollection;
 }
 
-export function findCounters(
-    db: DTDatabase,
-    domain: string,
-    counterId: string
-): Promise<FeatureCollection> {
+export function findCounters(db: DTDatabase, domain: string, counterId: string): Promise<FeatureCollection> {
     return db
-        .one<DbCollection>(PS_FIND_COUNTERS_FEATURE_COLLECTION, [
-            nullString(domain),
-            nullNumber(counterId),
-        ])
+        .one<DbCollection>(PS_FIND_COUNTERS_FEATURE_COLLECTION, [nullString(domain), nullNumber(counterId)])
         .then((r) => r.collection);
 }
 
-export function findAllCountersForUpdateForDomain(
-    db: DTDatabase,
-    domain: string
-): Promise<DbCounter[]> {
+export function findAllCountersForUpdateForDomain(db: DTDatabase, domain: string): Promise<DbCounter[]> {
     return db.manyOrNone(PS_ALL_COUNTERS, [domain]);
 }
 
-export function insertCounters(
-    db: DTDatabase,
-    domain: string,
-    counters: ApiCounter[]
-): Promise<null[]> {
-    return Promise.all(
+export async function insertCounters(db: DTDatabase, domain: string, counters: ApiCounter[]): Promise<void> {
+    await Promise.allSettled(
         counters.map((c) =>
             db.none(PS_INSERT_COUNTER, [
                 c.id,
@@ -122,44 +108,36 @@ export function insertCounters(
                 `POINT(${c.longitude} ${c.latitude})`,
                 c.userType,
                 c.interval,
-                c.sens,
+                c.sens
             ])
         )
     );
 }
 
-export function removeCounters(
-    db: DTDatabase,
-    counters: DbCounter[]
-): Promise<null> {
+export async function removeCounters(db: DTDatabase, counters: DbCounter[]): Promise<void> {
     if (counters.length > 0) {
-        return db.none(SQL_REMOVE_COUNTERS, [counters.map((c) => c.id)]);
+        await db.none(SQL_REMOVE_COUNTERS, [counters.map((c) => c.id)]);
     }
-
-    return Promise.resolve(null);
 }
 
-export function updateCounters(
-    db: DTDatabase,
-    counters: ApiCounter[]
-): Promise<null[]> {
-    return Promise.all(
+export async function updateCounters(db: DTDatabase, counters: ApiCounter[]): Promise<void> {
+    await Promise.allSettled(
         counters.map((c) =>
             db.none(PS_UPDATE_COUNTER, [
                 c.domain,
                 `POINT(${c.longitude} ${c.latitude})`,
                 c.interval,
                 c.sens,
-                c.id,
+                c.id
             ])
         )
     );
 }
 
-export function updateCounterTimestamp(
+export async function updateCounterTimestamp(
     db: DTDatabase,
     counterId: number,
     timestamp: Date
-): Promise<null> {
-    return db.none(PS_UPDATE_COUNTER_TIMESTAMP, [timestamp, counterId]);
+): Promise<void> {
+    await db.none(PS_UPDATE_COUNTER_TIMESTAMP, [timestamp, counterId]);
 }

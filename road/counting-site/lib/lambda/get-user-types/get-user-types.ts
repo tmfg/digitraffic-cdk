@@ -4,7 +4,7 @@ import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-respon
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = () => {
+export const handler = (): Promise<LambdaResponse> => {
     const start = Date.now();
 
     return proxyHolder
@@ -12,9 +12,6 @@ export const handler = () => {
         .then(() => CountingSitesService.getUserTypes())
         .then((types) => LambdaResponse.okJson(types))
         .finally(() => {
-            console.info(
-                "method=CountingSites.GetUserTypes tookMs=%d",
-                Date.now() - start
-            );
+            console.info("method=CountingSites.GetUserTypes tookMs=%d", Date.now() - start);
         });
 };
