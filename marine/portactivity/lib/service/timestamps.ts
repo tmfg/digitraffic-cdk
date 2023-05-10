@@ -195,7 +195,7 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
     }
 }
 
-export function deleteOldTimestampsAndPilotages() {
+export function deleteOldTimestampsAndPilotages(): Promise<void> {
     return inDatabase((db: DTDatabase) => {
         return db.tx(async (t) => {
             const deletedPilotagesCount = await TimestampsDB.deleteOldPilotages(t);

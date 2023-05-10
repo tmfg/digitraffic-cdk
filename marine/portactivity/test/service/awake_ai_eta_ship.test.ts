@@ -346,7 +346,7 @@ function awakeTimestampFromTimestamp(
     portArea?: string,
     eventType?: EventType
 ): ApiTimestamp {
-    if (timestamp == undefined) {
+    if (timestamp === undefined) {
         fail();
     }
 

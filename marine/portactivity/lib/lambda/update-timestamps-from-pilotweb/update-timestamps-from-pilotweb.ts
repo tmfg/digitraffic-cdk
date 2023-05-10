@@ -2,11 +2,11 @@ import { sendMessage } from "../../service/queue-service";
 import * as PilotwebService from "../../service/pilotweb";
 import { PortactivityEnvKeys } from "../../keys";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
-const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
+const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
 interface PilotWebSecret extends GenericSecret {
     readonly url: string;
