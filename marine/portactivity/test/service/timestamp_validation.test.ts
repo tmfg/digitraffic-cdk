@@ -2,11 +2,13 @@ import {
     SHIP_SPEED_STATIONARY_THRESHOLD_KNOT_TENTHS,
     shipIsStationary,
     validateTimestamp
-} from "../../lib/model/validation";
+} from "../../lib/service/timestamp_validation";
 import { newTimestamp } from "../testdata";
 import { dbTestBase, insertVesselLocation } from "../db-testutil";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../../lib/model/eventsource";
+import * as R from "ramda";
+import { ApiTimestamp } from "../../lib/model/timestamp";
 
 describe(
     "timestamp model",
@@ -16,51 +18,41 @@ describe(
         });
 
         test("validateTimestamp - missing eventType", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp as any).eventType;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(["eventType"], newTimestamp());
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing eventTime", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp as any).eventTime;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(["eventTime"], newTimestamp());
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - invalid eventTime", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            (timestamp as any).eventTime = "123456-qwerty";
-
+            const timestamp = R.assoc("eventTime", "123456-qwerty", newTimestamp()) as Partial<ApiTimestamp>;
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - invalid eventTimeConfidenceLowerDiff", async () => {
-            const timestamp = newTimestamp({
-                eventTimeConfidenceUpperDiff: 1000
-            });
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            (timestamp as any).eventTimeConfidenceLowerDiff = "-1000a";
+            const timestamp = R.assoc(
+                "eventTimeConfidenceLowerDiff",
+                "-1000a",
+                newTimestamp({
+                    eventTimeConfidenceUpperDiff: 1000
+                })
+            ) as unknown as Partial<ApiTimestamp>;
 
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceLowerDiff");
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceUpperDiff");
         });
 
         test("validateTimestamp - invalid eventTimeConfidenceUpperDiff", async () => {
-            const timestamp = newTimestamp({
-                eventTimeConfidenceLowerDiff: -1000
-            });
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            (timestamp as any).eventTimeConfidenceUpperDiff = "1000a";
+            const timestamp = R.assoc(
+                "eventTimeConfidenceUpperDiff",
+                "-1000a",
+                newTimestamp({
+                    eventTimeConfidenceLowerDiff: 1000
+                })
+            ) as unknown as Partial<ApiTimestamp>;
 
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceLowerDiff");
             expect(await validateTimestamp(timestamp, db)).not.toHaveProperty("eventTimeConfidenceUpperDiff");
@@ -99,67 +91,40 @@ describe(
         });
 
         test("validateTimestamp - missing recordTime", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp as any).recordTime;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(["recordTime"], newTimestamp());
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - invalid recordTime", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            (timestamp as any).recordTime = "123456-qwerty";
-
+            const timestamp = R.assoc("recordTime", "123456-qwerty", newTimestamp()) as Partial<ApiTimestamp>;
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing source", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp as any).source;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(["source"], newTimestamp());
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing ship", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp as any).ship;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(["ship"], newTimestamp());
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing mmsi & imo", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp.ship as any).mmsi;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp.ship as any).imo;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(
+                ["ship", "mmsi"],
+                R.dissocPath<ApiTimestamp>(["ship", "imo"], newTimestamp())
+            );
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing location", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp as any).location;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(["location"], newTimestamp());
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
         test("validateTimestamp - missing port", async () => {
-            const timestamp = newTimestamp();
-
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-            delete (timestamp.location as any).port;
-
+            const timestamp = R.dissocPath<ApiTimestamp>(["location", "port"], newTimestamp());
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 

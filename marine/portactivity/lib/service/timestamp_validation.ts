@@ -1,6 +1,6 @@
-import { EventSource } from "./eventsource";
+import { EventSource } from "../model/eventsource";
 import { findVesselSpeed } from "../dao/timestamps";
-import { ApiTimestamp, EventType } from "./timestamp";
+import { ApiTimestamp, EventType } from "../model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { isValid, parseISO } from "date-fns";
 
