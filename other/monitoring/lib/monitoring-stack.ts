@@ -54,22 +54,25 @@ export class MonitoringStack extends Stack {
             topicName
         });
 
-        topic.addToResourcePolicy(new PolicyStatement({
-            effect: Effect.ALLOW,
-            actions: ["SNS:Publish"],
-            resources: [topic.topicArn],
-            principals: [
-                new ServicePrincipal("cloudwatch.amazonaws.com")
-            ],
-            conditions: {
-                "ArnLike": {
-                    "aws:SourceArn": `arn:aws:cloudwatch:${this.region}:${this.account}:alarm:*`
-                },
-                "StringEquals": {
-                    "aws:SourceAccount": this.account
+        topic.addToResourcePolicy(
+            new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ["SNS:Publish"],
+                resources: [topic.topicArn],
+                principals: [
+                    new ServicePrincipal("cloudwatch.amazonaws.com"),
+                    new ServicePrincipal("events.amazonaws.com")
+                ],
+                conditions: {
+                    ArnLike: {
+                        "aws:SourceArn": `arn:aws:cloudwatch:${this.region}:${this.account}:alarm:*`
+                    },
+                    StringEquals: {
+                        "aws:SourceAccount": this.account
+                    }
                 }
-            }
-        }));
+            })
+        );
 
         topic.addSubscription(new EmailSubscription(email));
 
