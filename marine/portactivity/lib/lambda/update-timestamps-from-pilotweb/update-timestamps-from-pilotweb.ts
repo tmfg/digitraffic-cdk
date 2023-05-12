@@ -21,19 +21,11 @@ export const handler = function (): Promise<void> {
         .setCredentials()
         .then(() => secretHolder.get())
         .then(async (secret) => {
-            const timestamps = await PilotwebService.getMessagesFromPilotweb(
-                secret.url,
-                secret.auth
-            );
+            const timestamps = await PilotwebService.getMessagesFromPilotweb(secret.url, secret.auth);
 
-            console.info(
-                "method=updatePilotwebTimestamps.handler count=%d",
-                timestamps.length
-            );
+            console.info("method=updatePilotwebTimestamps.handler count=%d", timestamps.length);
 
-            await Promise.allSettled(
-                timestamps.map((ts) => sendMessage(ts, sqsQueueUrl))
-            );
+            await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)));
         })
         .catch((error) => {
             console.error("error %s", (error as Error).stack);

@@ -4,12 +4,12 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = (event: Record<string, string>) => {
+export const handler = (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
     const counterId = event.counterId;
 
     if (Number.isNaN(Number(counterId))) {
-        return LambdaResponse.notFound();
+        return Promise.resolve(LambdaResponse.notFound());
     }
 
     return proxyHolder
@@ -27,9 +27,6 @@ export const handler = (event: Record<string, string>) => {
             return LambdaResponse.internalError();
         })
         .finally(() => {
-            console.info(
-                "method=CountingSites.GetCounter tookMs=%d",
-                Date.now() - start
-            );
+            console.info("method=CountingSites.GetCounter tookMs=%d", Date.now() - start);
         });
 };

@@ -4,7 +4,7 @@ import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = (event: Record<string, string>) => {
+export const handler = (event: Record<string, string>): Promise<LambdaResponse> => {
     const start = Date.now();
     const domainName = event.domainName;
 
@@ -20,9 +20,6 @@ export const handler = (event: Record<string, string>) => {
             return LambdaResponse.internalError();
         })
         .finally(() => {
-            console.info(
-                "method=CountingSites.GetCounters tookMs=%d",
-                Date.now() - start
-            );
+            console.info("method=CountingSites.GetCounters tookMs=%d", Date.now() - start);
         });
 };

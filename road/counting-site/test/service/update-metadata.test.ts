@@ -1,10 +1,5 @@
 import { updateMetadataForDomain } from "../../lib/service/update";
-import {
-    dbTestBase,
-    insertCounter,
-    insertDomain,
-    withServer,
-} from "../db-testutil";
+import { dbTestBase, insertCounter, insertDomain, withServer } from "../db-testutil";
 import { TestHttpServer } from "@digitraffic/common/dist/test/httpserver";
 import * as CounterDAO from "../../lib/dao/counter";
 import { URL_ALL_SITES } from "../../lib/api/eco-counter";
@@ -24,11 +19,8 @@ describe(
             domain: string,
             expected: number,
             fn?: (x: DbCounter[]) => void
-        ) {
-            const counters = await CounterDAO.findAllCountersForUpdateForDomain(
-                db,
-                domain
-            );
+        ): Promise<void> {
+            const counters = await CounterDAO.findAllCountersForUpdateForDomain(db, domain);
             expect(counters).toHaveLength(expected);
 
             if (fn) {
@@ -39,7 +31,7 @@ describe(
         async function withServerAllSites(
             response: string,
             fn: (server: TestHttpServer) => Promise<void>
-        ) {
+        ): Promise<void> {
             return await withServer(PORT, URL_ALL_SITES, response, fn);
         }
 
@@ -47,18 +39,11 @@ describe(
             await assertCountersInDb(DOMAIN_NAME, 0);
             await insertDomain(db, DOMAIN_NAME);
 
-            await withServerAllSites(
-                EMPTY_DATA,
-                async (server: TestHttpServer) => {
-                    await updateMetadataForDomain(
-                        DOMAIN_NAME,
-                        "",
-                        `http://localhost:${PORT}`
-                    );
+            await withServerAllSites(EMPTY_DATA, async (server: TestHttpServer) => {
+                await updateMetadataForDomain(DOMAIN_NAME, "", `http://localhost:${PORT}`);
 
-                    expect(server.getCallCount()).toEqual(1);
-                }
-            );
+                expect(server.getCallCount()).toEqual(1);
+            });
 
             await assertCountersInDb(DOMAIN_NAME, 0);
         });
@@ -75,36 +60,25 @@ describe(
                         longitude: 10,
                         userType: 1,
                         interval: 15,
-                        sens: 1,
-                    },
-                ],
-            },
+                        sens: 1
+                    }
+                ]
+            }
         ]);
 
         test("updateMetadataForDomain - insert", async () => {
             await insertDomain(db, DOMAIN_NAME);
             await assertCountersInDb(DOMAIN_NAME, 0);
 
-            await withServerAllSites(
-                RESPONSE_ONE_COUNTER,
-                async (server: TestHttpServer) => {
-                    await updateMetadataForDomain(
-                        DOMAIN_NAME,
-                        "",
-                        `http://localhost:${PORT}`
-                    );
+            await withServerAllSites(RESPONSE_ONE_COUNTER, async (server: TestHttpServer) => {
+                await updateMetadataForDomain(DOMAIN_NAME, "", `http://localhost:${PORT}`);
 
-                    expect(server.getCallCount()).toEqual(1);
-                }
-            );
+                expect(server.getCallCount()).toEqual(1);
+            });
 
-            await assertCountersInDb(
-                DOMAIN_NAME,
-                1,
-                (counters: DbCounter[]) => {
-                    expect(counters[0].name).toEqual("DOMAINNAME COUNTERNAME");
-                }
-            );
+            await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
+                expect(counters[0].name).toEqual("DOMAINNAME COUNTERNAME");
+            });
 
             await assertCountersInDb("WRONG", 0);
         });
@@ -114,18 +88,11 @@ describe(
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await assertCountersInDb(DOMAIN_NAME, 1);
 
-            await withServerAllSites(
-                RESPONSE_ONE_COUNTER,
-                async (server: TestHttpServer) => {
-                    await updateMetadataForDomain(
-                        DOMAIN_NAME,
-                        "",
-                        `http://localhost:${PORT}`
-                    );
+            await withServerAllSites(RESPONSE_ONE_COUNTER, async (server: TestHttpServer) => {
+                await updateMetadataForDomain(DOMAIN_NAME, "", `http://localhost:${PORT}`);
 
-                    expect(server.getCallCount()).toEqual(1);
-                }
-            );
+                expect(server.getCallCount()).toEqual(1);
+            });
 
             await assertCountersInDb(DOMAIN_NAME, 1);
         });
@@ -135,26 +102,15 @@ describe(
             await insertCounter(db, 1, DOMAIN_NAME, 1);
             await assertCountersInDb(DOMAIN_NAME, 1);
 
-            await withServerAllSites(
-                EMPTY_DATA,
-                async (server: TestHttpServer) => {
-                    await updateMetadataForDomain(
-                        DOMAIN_NAME,
-                        "",
-                        `http://localhost:${PORT}`
-                    );
+            await withServerAllSites(EMPTY_DATA, async (server: TestHttpServer) => {
+                await updateMetadataForDomain(DOMAIN_NAME, "", `http://localhost:${PORT}`);
 
-                    expect(server.getCallCount()).toEqual(1);
-                }
-            );
+                expect(server.getCallCount()).toEqual(1);
+            });
 
-            await assertCountersInDb(
-                DOMAIN_NAME,
-                1,
-                (counters: DbCounter[]) => {
-                    expect(counters[0].removed_timestamp).not.toBeNull();
-                }
-            );
+            await assertCountersInDb(DOMAIN_NAME, 1, (counters: DbCounter[]) => {
+                expect(counters[0].removed_timestamp).not.toBeNull();
+            });
         });
     })
 );

@@ -32,7 +32,7 @@ import { Construct } from "constructs";
 export class PrivateApi {
     private readonly stack: DigitrafficStack;
     private readonly bucket: Bucket;
-    public readonly restApi;
+    public readonly restApi: DigitrafficRestApi;
 
     // authorizer protected
     private imageResource: Resource;
@@ -98,19 +98,19 @@ export class PrivateApi {
         readImageRole: Role,
         userPool: UserPool,
         userPoolClient: UserPoolClient
-    ) {
+    ): void {
         const authorizer = this.createLambdaAuthorizer(userPool, userPoolClient);
 
         this.createGetImageResource(authorizer, readImageRole);
         this.createListCamerasResource(authorizer);
     }
 
-    createApikeyProtectedResources(readImageRole: Role) {
+    createApikeyProtectedResources(readImageRole: Role): void {
         this.createImageResource(readImageRole, this.ibnetImageResource, this.apiImageResource);
         this.createMetadataResource(this.ibnetMetadataResource, this.apiMetadataResource);
     }
 
-    createResourceTree(stack: DigitrafficStack) {
+    createResourceTree(stack: DigitrafficStack): void {
         // old authorizer protected resources
         if ((stack.configuration as MobileServerProps).enablePasswordProtectedApi) {
             const camerasResource = this.restApi.root.addResource("cameras");
@@ -133,7 +133,7 @@ export class PrivateApi {
         }
     }
 
-    createMetadataResource(...resources: Resource[]) {
+    createMetadataResource(...resources: Resource[]): void {
         const metadataLambda = MonitoredDBFunction.create(this.stack, "get-metadata");
 
         const metadataIntegration = new DigitrafficIntegration(
@@ -153,7 +153,7 @@ export class PrivateApi {
         );
     }
 
-    createListCamerasResource(authorizer: RequestAuthorizer) {
+    createListCamerasResource(authorizer: RequestAuthorizer): void {
         const listCamerasLambda = MonitoredDBFunction.create(this.stack, "list-cameras");
 
         const listCamerasIntegration = new DigitrafficIntegration(
@@ -189,7 +189,7 @@ export class PrivateApi {
         return readImageRole;
     }
 
-    createImageResource(readImageRole: Role, ...resources: Resource[]) {
+    createImageResource(readImageRole: Role, ...resources: Resource[]): void {
         const getImageIntegration = new AwsIntegration({
             service: "s3",
             path: this.bucket.bucketName + "/images/Saimaa/{objectName}",
@@ -244,7 +244,7 @@ export class PrivateApi {
         );
     }
 
-    createGetImageResource(authorizer: RequestAuthorizer, readImageRole: Role) {
+    createGetImageResource(authorizer: RequestAuthorizer, readImageRole: Role): void {
         const getImageIntegration = new AwsIntegration({
             service: "s3",
             path: this.bucket.bucketName + "/images/{folderName}/{objectName}",

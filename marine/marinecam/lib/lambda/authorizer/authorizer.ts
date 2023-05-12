@@ -19,7 +19,11 @@ const EFFECT_DENY = "Deny";
 
 const KEY_COGNITO_GROUPS = "cognito:groups";
 
-export const handler = async function (
+export const handler: (
+    event: APIGatewayRequestAuthorizerEvent,
+    context: Context,
+    callback: Callback<APIGatewayAuthorizerResult>
+) => Promise<void> = async function (
     event: APIGatewayRequestAuthorizerEvent,
     context: Context,
     callback: Callback<APIGatewayAuthorizerResult>
@@ -38,6 +42,7 @@ export const handler = async function (
     }
 };
 
+// eslint-disable-next-line @rushstack/no-new-null
 function parseAuthentication(
     headers: APIGatewayRequestAuthorizerEventHeaders | null
 ): [string, string] | undefined {
@@ -86,7 +91,7 @@ async function generatePolicy(
     } as AuthResponse;
 }
 
-function checkAuthorization(user: CognitoUserSession | null, group: string): string {
+function checkAuthorization(user: CognitoUserSession | undefined, group: string): string {
     if (user) {
         const userGroups = user.getAccessToken().payload[KEY_COGNITO_GROUPS] as string[] | null;
 

@@ -46,9 +46,9 @@ export class Session {
     // this increases for every command
     sequenceId: number;
     // this is received after successful connect and must be used in every command after that
-    connectionId: string;
+    connectionId: string | undefined = undefined;
 
-    constructor(url: string, acceptSelfSignedCertificate = false, certificate?: string) {
+    constructor(url: string, acceptSelfSignedCertificate: boolean = false, certificate?: string) {
         this.communicationUrl = url + COMMUNICATION_URL_PART;
         this.videoUrl = url + VIDEO_URL_PART;
         this.sequenceId = 1;
@@ -77,7 +77,7 @@ export class Session {
         const xml = command.createXml(this.sequenceId, this.connectionId);
         this.sequenceId++;
 
-        //        console.info("sending:" + xml);
+        logger.debug("sending:" + xml);
 
         const resp = await this.post<string>(this.communicationUrl, xml);
 
@@ -88,7 +88,7 @@ export class Session {
         const response: CommandResponse = (await parse(resp.data)) as CommandResponse;
         command.checkError(response);
 
-        //        console.info("response " + JSON.stringify(response, null, 2));
+        logger.debug("response " + JSON.stringify(response, null, 2));
 
         return command.getResult(response);
     }
@@ -162,7 +162,7 @@ export class Session {
         return this.sendMessage(command);
     }
 
-    async getFrameFromStream(videoId: string): Promise<string | null> {
+    async getFrameFromStream(videoId: string): Promise<string | undefined> {
         const streamUrl = this.videoUrl + videoId;
 
         logger.info({
@@ -179,7 +179,7 @@ export class Session {
 
         // if no data, return empty
         if (dataSize === 0) {
-            return null;
+            return undefined;
         }
 
         // else remove skip header and return jpeg base64-encoded

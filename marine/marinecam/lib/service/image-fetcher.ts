@@ -11,14 +11,14 @@ export async function updateAllCameras(
     password: string,
     bucketName: string,
     certificate: string
-) {
+): Promise<void> {
     const cameraIds = await MetadataService.getAllCameraIdsForGroup(CAMERA_GROUP_ID);
     const session = await loginToCameraServer(url, username, password, certificate);
 
     return updateAllImages(cameraIds, session, bucketName);
 }
 
-async function updateAllImages(cameraIds: string[], session: Session, bucketName: string) {
+async function updateAllImages(cameraIds: string[], session: Session, bucketName: string): Promise<void> {
     const updatedCameras = [] as string[];
 
     await Promise.allSettled(
@@ -55,7 +55,7 @@ async function loginToCameraServer(
     return session;
 }
 
-async function getImageFromCamera(session: Session, cameraId: string): Promise<string | null> {
+async function getImageFromCamera(session: Session, cameraId: string): Promise<string | undefined> {
     // to get image, we need to request stream, rewind stream to current time and then request on frame from the stream
     // of course close stream after
     const videoId = await session.requestStream(cameraId);

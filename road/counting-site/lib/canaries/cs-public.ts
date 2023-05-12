@@ -3,7 +3,7 @@ import {
     ContentTypeChecker,
     GeoJsonChecker,
     HeaderChecker,
-    UrlChecker,
+    UrlChecker
 } from "@digitraffic/common/dist/aws/infra/canaries/url-checker";
 import { DbData } from "../model/data";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
@@ -21,7 +21,7 @@ const VALUES_URL = BASE_URL + "values";
 const COUNTERS_URL = BASE_URL + "counters";
 const CSV_URL = BASE_URL + "values.csv";
 
-export const handler = async () => {
+export const handler = async (): Promise<string> => {
     const checker = await UrlChecker.createV2();
 
     // check user types
@@ -66,17 +66,13 @@ export const handler = async () => {
     await checker.expect200(
         VALUES_URL + "?counter_id=4",
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
-        HeaderChecker.checkHeaderMissing(
-            constants.HTTP2_HEADER_CONTENT_DISPOSITION
-        ),
+        HeaderChecker.checkHeaderMissing(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
         ContentChecker.checkJson((json: DbData[]) => {
             Asserter.assertLengthGreaterThan(json, 10);
         })
     );
     await checker.expect400(VALUES_URL + "?counter_id=4&year=2300&month=5");
-    await checker.expect400(
-        VALUES_URL + "?counter_id=4&year=bad_input&month=5"
-    );
+    await checker.expect400(VALUES_URL + "?counter_id=4&year=bad_input&month=5");
 
     // counters
     await checker.expect403WithoutApiKey(COUNTERS_URL + "?domain_name=Oulu");
@@ -103,23 +99,16 @@ export const handler = async () => {
 
     // counter
     await checker.expect403WithoutApiKey(COUNTERS_URL + "/13");
-    await checker.expect200(
-        COUNTERS_URL + "/13",
-        GeoJsonChecker.validFeatureCollection()
-    );
+    await checker.expect200(COUNTERS_URL + "/13", GeoJsonChecker.validFeatureCollection());
     await checker.expect404(COUNTERS_URL + "/999999");
     await checker.expect404(COUNTERS_URL + "/bad_input");
 
     // csv values
-    await checker.expect403WithoutApiKey(
-        CSV_URL + "?year=2022&month=01&counter_id=15"
-    );
+    await checker.expect403WithoutApiKey(CSV_URL + "?year=2022&month=01&counter_id=15");
     await checker.expect200(
         CSV_URL + "?year=2022&month=01&counter_id=15",
         ContentTypeChecker.checkContentType(MediaType.TEXT_CSV),
-        HeaderChecker.checkHeaderExists(
-            constants.HTTP2_HEADER_CONTENT_DISPOSITION
-        ),
+        HeaderChecker.checkHeaderExists(constants.HTTP2_HEADER_CONTENT_DISPOSITION),
         ContentChecker.checkResponse((body) => {
             Asserter.assertLengthGreaterThan(body.split("\n"), 10);
         })

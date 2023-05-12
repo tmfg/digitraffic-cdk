@@ -7,16 +7,16 @@ const rdsHolder = RdsHolder.create();
 
 const GROUP_SEPARATOR = ",";
 
-export const handler = (event: Record<string, string>) => {
+export const handler: (event: Record<string, string>) => Promise<Camera[]> = (
+    event: Record<string, string>
+) => {
     const usersGroups = getUserGroups(event.groups);
 
     if (usersGroups.length === 0) {
         return Promise.resolve([] as Camera[]);
     }
 
-    return rdsHolder
-        .setCredentials()
-        .then(() => MetadataService.listAllCameras(usersGroups));
+    return rdsHolder.setCredentials().then(() => MetadataService.listAllCameras(usersGroups));
 };
 
 // eventGroups is in form [group1, group2...]

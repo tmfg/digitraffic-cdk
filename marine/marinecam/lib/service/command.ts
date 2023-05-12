@@ -47,9 +47,9 @@ export abstract class Command<T> {
         return `<InputParams>${inputs}</InputParams>`;
     }
 
-    public createXml(sequenceId: number, connectionId: string | null): string {
+    public createXml(sequenceId: number, connectionId: string | undefined): string {
         const connection =
-            connectionId == null ? "<ConnectionId/>" : `<ConnectionId>${connectionId}</ConnectionId>`;
+            connectionId === undefined ? "<ConnectionId/>" : `<ConnectionId>${connectionId}</ConnectionId>`;
 
         return `<?xml version="1.0" encoding="utf-8"?>
 <Communication xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -66,7 +66,7 @@ export abstract class Command<T> {
 
     public abstract getResult(result: CommandResponse): T;
 
-    public checkError(result: CommandResponse) {
+    public checkError(result: CommandResponse): void {
         const resultCode = result.Communication.Command[0].Result;
 
         if (resultCode === "Error") {
@@ -82,7 +82,6 @@ export abstract class Command<T> {
 }
 
 class DefaultCommand extends Command<void> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     public getResult(result: CommandResponse): void {
         // do nothing
     }

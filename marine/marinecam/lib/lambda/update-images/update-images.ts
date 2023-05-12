@@ -11,7 +11,7 @@ const rdsHolder = RdsHolder.create();
 const secretHolder = SecretHolder.create<MarinecamSecret>("mobile_server");
 const bucketName = getEnvVariable(MarinecamEnvKeys.BUCKET_NAME);
 
-export const handler = () => {
+export const handler: () => Promise<void> = () => {
     return rdsHolder
         .setCredentials()
         .then(() => secretHolder.get())

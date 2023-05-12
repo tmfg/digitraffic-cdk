@@ -6,54 +6,35 @@ import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 
 export class InternalLambdas {
     constructor(stack: DigitrafficStack) {
-        const updateMetadataLambda =
-            InternalLambdas.createUpdateMetadataLambdaForOulu(stack);
-        const updateDataLambda =
-            InternalLambdas.createUpdateDataLambdaForOulu(stack);
+        const updateMetadataLambda = InternalLambdas.createUpdateMetadataLambdaForOulu(stack);
+        const updateDataLambda = InternalLambdas.createUpdateDataLambdaForOulu(stack);
 
-        Scheduler.everyHour(
-            stack,
-            "RuleForMetadataUpdate",
-            updateMetadataLambda
-        );
+        Scheduler.everyHour(stack, "RuleForMetadataUpdate", updateMetadataLambda);
         Scheduler.everyHour(stack, "RuleForDataUpdate", updateDataLambda);
 
-        new DigitrafficLogSubscriptions(
-            stack,
-            updateMetadataLambda,
-            updateDataLambda
-        );
+        // eslint-disable-next-line no-new
+        new DigitrafficLogSubscriptions(stack, updateMetadataLambda, updateDataLambda);
         stack.grantSecret(updateMetadataLambda, updateDataLambda);
     }
 
-    private static createUpdateMetadataLambdaForOulu(
-        stack: DigitrafficStack
-    ): MonitoredFunction {
+    private static createUpdateMetadataLambdaForOulu(stack: DigitrafficStack): MonitoredFunction {
         const environment = stack.createLambdaEnvironment();
         environment[CountingSitesEnvKeys.DOMAIN_NAME] = "Oulu";
         environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = "cs.oulu";
 
-        return MonitoredFunction.createV2(
-            stack,
-            "update-metadata",
-            environment,
-            {
-                functionName:
-                    stack.configuration.shortName + "-UpdateMetadata-Oulu",
-            }
-        );
+        return MonitoredFunction.createV2(stack, "update-metadata", environment, {
+            functionName: stack.configuration.shortName + "-UpdateMetadata-Oulu"
+        });
     }
 
-    private static createUpdateDataLambdaForOulu(
-        stack: DigitrafficStack
-    ): MonitoredFunction {
+    private static createUpdateDataLambdaForOulu(stack: DigitrafficStack): MonitoredFunction {
         const environment = stack.createLambdaEnvironment();
         environment[CountingSitesEnvKeys.DOMAIN_NAME] = "Oulu";
         environment[CountingSitesEnvKeys.DOMAIN_PREFIX] = "cs.oulu";
 
         return MonitoredFunction.createV2(stack, "update-data", environment, {
             functionName: stack.configuration.shortName + "-UpdateData-Oulu",
-            memorySize: 256,
+            memorySize: 256
         });
     }
 }

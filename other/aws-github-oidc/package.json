@@ -6,7 +6,9 @@
   },
   "scripts": {
     "build": "tsc",
+    "cdk": "npx cdk@latest",
     "ci:eslint-report": "",
+    "lint": "eslint --cache .",
     "test": "echo no tests for this project",
     "watch": "tsc -w"
   },

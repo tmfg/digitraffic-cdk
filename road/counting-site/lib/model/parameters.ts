@@ -7,11 +7,8 @@ export interface ValuesQueryParameters {
     counter_id: string;
 }
 
-export function validate(parameters: ValuesQueryParameters): string | null {
-    if (
-        (parameters.year && !parameters.month) ||
-        (parameters.month && !parameters.year)
-    ) {
+export function validate(parameters: ValuesQueryParameters): string | undefined {
+    if ((parameters.year && !parameters.month) || (parameters.month && !parameters.year)) {
         return "Both year and month are required";
     }
 
@@ -23,5 +20,5 @@ export function validate(parameters: ValuesQueryParameters): string | null {
         return `Month ${parameters.month} must be between 1 and 12`;
     }
 
-    return null;
+    return undefined;
 }

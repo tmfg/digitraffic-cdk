@@ -27,20 +27,12 @@ export const handler = (): Promise<void> => {
                 service = new SchedulesService(new SchedulesApi(secret.url));
             }
 
-            const vtsControlTimestamps =
-                await service.getTimestampsUnderVtsControl();
-            const calculatedTimestamps =
-                await service.getCalculatedTimestamps();
-            const timestamps =
-                vtsControlTimestamps.concat(calculatedTimestamps);
+            const vtsControlTimestamps = await service.getTimestampsUnderVtsControl();
+            const calculatedTimestamps = await service.getCalculatedTimestamps();
+            const timestamps = vtsControlTimestamps.concat(calculatedTimestamps);
 
-            console.info(
-                "method=updateSchedulesTimestamps.handler count=%d",
-                timestamps.length
-            );
+            console.info("method=updateSchedulesTimestamps.handler count=%d", timestamps.length);
 
-            await Promise.allSettled(
-                timestamps.map((ts) => sendMessage(ts, sqsQueueUrl))
-            );
+            await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)));
         });
 };

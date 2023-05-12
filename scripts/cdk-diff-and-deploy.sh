@@ -9,7 +9,7 @@ FULL_ENV=${1:-"NONE"}
 echo "<app>-<env>: ${FULL_ENV}"
 
 SCRIPT_DIR=$(dirname "$0")
-. ${SCRIPT_DIR}/cdk-set-env.sh ${FULL_ENV}
+. ${SCRIPT_DIR}/cdk-set-env.conf ${FULL_ENV}
 
 OPERATION=${2:-"NONE"}
 STACK_NAME=${3:-"NONE"}
@@ -70,7 +70,7 @@ DO_OPERATION=false
 if [[ "${OPERATION}" == "diff" ]]; then
     DO_OPERATION=true
 else
-    read -p "Are you sure you wanna run: pnpm dlx cdk@latest ${OPERATION} ${STACK}? " -n 1 -r
+    read -p "Are you sure you wanna run: npx cdk@latest ${OPERATION} ${STACK}? " -n 1 -r
     echo    # move to a new line
     if [[ $REPLY =~ ^[Yy]$ ]]
     then
@@ -87,9 +87,9 @@ then
 
   if [[ "${OPERATION}" == "diff" ]]
   then
-      # pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
+      # npx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY} 2>
       # Use script too capture command output and save it to file
-      script /tmp/cdk_out.txt pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+      script /tmp/cdk_out.txt npx cdk@latest  ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
 
       read -p "Do you wanna see formatted diff in browser? " -n 1 -r
       echo    # move to a new line
@@ -101,10 +101,10 @@ then
         # first egrep takes lines without red, gsed removes ansi colour codes and last grep removes unwanted lines
         egrep -v '\x1b\[31m' /tmp/cdk_out.txt | gsed -e 's/\x1b\[[0-9;]*m//g' | grep -v "${SKIP_LINES_PATTERN}" > /tmp/cdk_new.txt
         # Make a diff with full context and convert it to html
-        diff -u -U 1000000 /tmp/cdk_old.txt /tmp/cdk_new.txt | pnpm dlx diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
+        diff -u -U 1000000 /tmp/cdk_old.txt /tmp/cdk_new.txt | npx diff2html-cli@latest -i stdin --style side -d char  --title "CDK diff ${FULL_ENV}: ${STACK}"
       fi
     else
-        pnpm dlx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
+        npx cdk@latest ${OPERATION} ${STACK} --debug --concurrency=${CONCURRENCY}
     fi
 fi
 
