@@ -1,5 +1,5 @@
 import {
-    SHIP_SPEED_STATIONARY_THRESHOLD_KNOT_TENTHS,
+    SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS,
     shipIsStationary,
     validateTimestamp
 } from "../../lib/service/timestamp_validation";
@@ -132,7 +132,7 @@ describe(
             const mmsi = 123;
             const timestamp = newTimestamp({ mmsi, source: EventSource.SCHEDULES_CALCULATED });
 
-            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOT_TENTHS - 0.1);
+            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS - 0.1);
 
             expect(await shipIsStationary(db, timestamp)).toEqual(true);
             //expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
@@ -142,7 +142,7 @@ describe(
             const mmsi = 123;
             const timestamp = newTimestamp({ mmsi, source: EventSource.SCHEDULES_CALCULATED });
 
-            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOT_TENTHS + 0.1);
+            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS + 0.1);
 
             expect(await shipIsStationary(db, timestamp)).toEqual(false);
             //const validatedTimestamp = await validateTimestamp(timestamp, db);
