@@ -1,6 +1,7 @@
 import { Aspects, Stack } from "aws-cdk-lib";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { EmailSubscription } from "aws-cdk-lib/aws-sns-subscriptions";
+import { Effect, PolicyStatement, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { MonitoringConfiguration } from "./app-props";
 import { StringParameter } from "aws-cdk-lib/aws-ssm";
 import { Construct } from "constructs";
@@ -52,6 +53,26 @@ export class MonitoringStack extends Stack {
         const topic = new Topic(this, topicName, {
             topicName
         });
+
+        topic.addToResourcePolicy(
+            new PolicyStatement({
+                effect: Effect.ALLOW,
+                actions: ["SNS:Publish"],
+                resources: [topic.topicArn],
+                principals: [
+                    new ServicePrincipal("cloudwatch.amazonaws.com"),
+                    new ServicePrincipal("events.amazonaws.com")
+                ],
+                conditions: {
+                    ArnLike: {
+                        "aws:SourceArn": `arn:aws:cloudwatch:${this.region}:${this.account}:alarm:*`
+                    },
+                    StringEquals: {
+                        "aws:SourceAccount": this.account
+                    }
+                }
+            })
+        );
 
         topic.addSubscription(new EmailSubscription(email));
 
