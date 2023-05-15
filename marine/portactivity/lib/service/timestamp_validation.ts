@@ -1,5 +1,5 @@
 import { EventSource } from "../model/eventsource";
-import { findVesselSpeed } from "../dao/timestamps";
+import { findVesselSpeedAndNavStatus } from "../dao/timestamps";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { isValid, parseISO } from "date-fns";
@@ -113,11 +113,12 @@ function validateConfidenceInterval(timestamp: Partial<ApiTimestamp>): boolean {
 }
 
 export async function shipIsStationary(db: DTDatabase, timestamp: Partial<ApiTimestamp>): Promise<boolean> {
-    const vesselSpeed = await findVesselSpeed(db, timestamp.ship?.mmsi);
-    if (vesselSpeed && vesselSpeed < SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS) {
+    const shipStatus = await findVesselSpeedAndNavStatus(db, timestamp.ship?.mmsi);
+    if (shipStatus && shipStatus.sog < SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS) {
         console.info(
-            "method=validateTimestamp stationary ship with sog %d %s",
-            vesselSpeed,
+            "method=validateTimestamp stationary ship with sog %d and nav status %d %s",
+            shipStatus.sog,
+            shipStatus.nav_stat,
             JSON.stringify(timestamp)
         );
         return true;

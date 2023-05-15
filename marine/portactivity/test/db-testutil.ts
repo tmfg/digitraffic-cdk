@@ -234,12 +234,17 @@ export function insertPilotage(
     ]);
 }
 
-export async function insertVesselLocation(db: DTDatabase, mmsi: number, speed: number = 3): Promise<void> {
+export async function insertVesselLocation(
+    db: DTDatabase,
+    mmsi: number,
+    speed: number = 3,
+    navStatus: number = 0
+): Promise<void> {
     await db.tx(async (t) => {
         await t.none(
             "INSERT INTO public.vessel_location(mmsi,timestamp_ext,x,y,sog,cog,nav_stat,rot,pos_acc,raim,timestamp) " +
-                "values ($1, $2, 1, 1, $3, 1, 1, 1, true, true, 1)",
-            [mmsi, Date.now(), speed]
+                "values ($1, $2, 1, 1, $3, 1, $4, 1, true, true, 1)",
+            [mmsi, Date.now(), speed, navStatus]
         );
     });
 }

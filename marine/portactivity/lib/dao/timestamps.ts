@@ -53,6 +53,11 @@ export interface DbImo {
     readonly imo: number;
 }
 
+export interface DbShipStatus {
+    readonly sog: number;
+    readonly nav_stat: number;
+}
+
 const INSERT_ESTIMATE_SQL = `
     INSERT INTO port_call_timestamp(
         event_type,
@@ -377,8 +382,8 @@ const FIND_IMO_BY_MMSI_SQL = `
     ) AS imo
 `.trim();
 
-const FIND_VESSEL_SOG = `
-    SELECT sog FROM public.vessel_location 
+const FIND_VESSEL_SOG_AND_NAV_STATUS = `
+    SELECT sog, nav_stat FROM public.vessel_location 
         WHERE mmsi = $1 AND
         modified > ${VESSEL_LOCATION_AGE_LIMIT} 
         ORDER BY modified DESC LIMIT 1;
@@ -470,10 +475,20 @@ export function findVtsShipImosTooCloseToPortByPortCallId(
     return db.tx((t) => t.manyOrNone(SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT, [portcallIds]));
 }
 
-export async function findVesselSpeed(db: DTDatabase, mmsi?: number): Promise<number | undefined> {
+export async function findVesselSpeedAndNavStatus(
+    db: DTDatabase,
+    mmsi?: number
+): Promise<DbShipStatus | undefined> {
     if (mmsi) {
-        const result = await db.oneOrNone<{ sog: number }>(FIND_VESSEL_SOG, [mmsi]);
-        return result?.sog ?? undefined;
+        const result = await db.oneOrNone<{ sog: number; nav_stat: number }>(FIND_VESSEL_SOG_AND_NAV_STATUS, [
+            mmsi
+        ]);
+        return result?.sog && result?.nav_stat
+            ? {
+                  sog: result.sog,
+                  nav_stat: result.nav_stat
+              }
+            : undefined;
     }
     return undefined;
 }

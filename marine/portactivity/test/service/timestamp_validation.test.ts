@@ -132,7 +132,7 @@ describe(
             const mmsi = 123;
             const timestamp = newTimestamp({ mmsi, source: EventSource.SCHEDULES_CALCULATED });
 
-            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS - 0.1);
+            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS - 0.1, 1);
 
             expect(await shipIsStationary(db, timestamp)).toEqual(true);
             //expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
@@ -142,7 +142,7 @@ describe(
             const mmsi = 123;
             const timestamp = newTimestamp({ mmsi, source: EventSource.SCHEDULES_CALCULATED });
 
-            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS + 0.1);
+            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS + 0.1, 0);
 
             expect(await shipIsStationary(db, timestamp)).toEqual(false);
             //const validatedTimestamp = await validateTimestamp(timestamp, db);
