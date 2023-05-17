@@ -259,7 +259,8 @@ export class CloudfrontCdkStack extends Stack {
             const cfnDistribution = distribution.node.defaultChild as CfnDistribution;
             const distributionConfig =
                 cfnDistribution.distributionConfig as CfnDistribution.DistributionConfigProperty;
-            const behaviors = distributionConfig.cacheBehaviors as CfnDistribution.CacheBehaviorProperty[];
+            const behaviors = (distributionConfig.cacheBehaviors ??
+                []) as CfnDistribution.CacheBehaviorProperty[];
 
             // handle all behaviors
             behaviors.forEach((cb: CfnDistribution.CacheBehaviorProperty) => {
@@ -276,6 +277,9 @@ export class CloudfrontCdkStack extends Stack {
                 viewerPolicies,
                 "*"
             );
+
+            (distributionConfig.defaultCacheBehavior as MutableCacheBehavior).responseHeadersPolicyId =
+                ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS.responseHeadersPolicyId;
         }
 
         return distribution;

@@ -71,6 +71,12 @@ export class CFBehavior {
         return this;
     }
 
+    public httpOnly(): this {
+        this.viewerProtocolPolicy = "http-only";
+
+        return this;
+    }
+
     public withIpRestrictionLambda(restriction: string): this {
         this.ipRestriction = restriction;
 
@@ -168,6 +174,12 @@ export class CFDomain extends CFOrigin {
 
     private addHeader(name: string, value: string): this {
         this.headers[name] = value;
+
+        return this;
+    }
+
+    public httpOnly(): this {
+        this.originProtocolPolicy = OriginProtocolPolicy.HTTP_ONLY;
 
         return this;
     }

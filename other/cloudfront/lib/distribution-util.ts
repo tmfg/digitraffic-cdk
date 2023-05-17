@@ -64,7 +64,8 @@ function createDistributionWithStreamingLogging(
         originConfigs,
         viewerCertificate,
         webACLId: webAcl?.attrArn,
-        httpVersion: HttpVersion.HTTP2_AND_3
+        httpVersion: HttpVersion.HTTP2_AND_3,
+        defaultRootObject: ""
     });
 
     if (!distributionProps.disableShieldAdvanced) {
