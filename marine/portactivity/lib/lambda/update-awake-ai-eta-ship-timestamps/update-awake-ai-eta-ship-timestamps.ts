@@ -2,6 +2,7 @@ import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secr
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SNSEvent } from "aws-lambda";
+import { parseISO } from "date-fns";
 import { AwakeAiETAShipApi } from "../../api/awake_ai_ship";
 import { DbETAShip } from "../../dao/timestamps";
 import { PortactivityEnvKeys } from "../../keys";
@@ -17,11 +18,18 @@ interface UpdateAwakeAiTimestampsSecret extends GenericSecret {
     readonly voyagesauth: string;
 }
 
+interface SnsETAShip extends Omit<DbETAShip, "eta"> {
+    readonly eta: string;
+}
+
 const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>("awake", ["url", "auth"]);
 
 export const handler = (event: SNSEvent) => {
     // always a single event, guaranteed by SNS
-    const ships = JSON.parse(event.Records[0].Sns.Message) as DbETAShip[];
+    const ships = (JSON.parse(event.Records[0].Sns.Message) as SnsETAShip[]).map((ship) => ({
+        ...ship,
+        eta: parseISO(ship.eta)
+    }));
 
     return secretHolder.get().then(async (secret) => {
         if (!service) {
