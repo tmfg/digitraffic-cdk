@@ -134,7 +134,7 @@ export class PublicApi {
             getModelReference(featureModel.modelId, publicApi.restApiId)
         );
         // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
-        (geojsonSchemaWithDataUpdatedTime as any).dataUpdatedTime = {
+        (geojsonSchemaWithDataUpdatedTime as any).properties.dataUpdatedTime = {
             type: JsonSchemaType.STRING,
             format: "date-time",
             description: "Data updated timestamp"

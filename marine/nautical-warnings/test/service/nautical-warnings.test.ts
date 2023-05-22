@@ -85,11 +85,11 @@ describe(
         });
 
         test("convertDate - null", () => {
-            expect(convertDate(null, DATETIME_FORMAT_2)).toBeUndefined();
+            expect(convertDate(null, DATETIME_FORMAT_2)).toBeNull();
         });
 
         test("convertDate - empty", () => {
-            expect(convertDate("", DATETIME_FORMAT_2)).toBeUndefined();
+            expect(convertDate("", DATETIME_FORMAT_2)).toBeNull();
         });
 
         test("convertDate - invalid format", () => {

@@ -77,8 +77,8 @@ export function findCounterValues(
     return inDatabaseReadonly((db: DTDatabase) => {
         return DataDAO.findValues(
             db,
-            year ?? new Date().getUTCFullYear(),
-            month ?? new Date().getUTCMonth() + 1,
+            year || new Date().getUTCFullYear(),
+            month || new Date().getUTCMonth() + 1,
             counterId,
             domainName
         );

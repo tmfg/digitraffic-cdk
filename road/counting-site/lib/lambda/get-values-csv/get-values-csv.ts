@@ -13,8 +13,8 @@ export const handler = (event: ValuesQueryParameters): Promise<LambdaResponse> =
         return Promise.resolve(LambdaResponse.badRequest(validationError));
     }
 
-    const year = event.year ?? new Date().getUTCFullYear();
-    const month = event.month ?? new Date().getUTCMonth() + 1;
+    const year = event.year || new Date().getUTCFullYear();
+    const month = event.month || new Date().getUTCMonth() + 1;
 
     const filename = `${year}-${month}.csv`;
 

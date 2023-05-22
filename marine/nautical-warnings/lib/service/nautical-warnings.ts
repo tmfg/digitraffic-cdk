@@ -173,9 +173,9 @@ function convertBoolean(value: number): boolean {
  * Takes in a localdate as a formatted string in given format and returns it as iso-formatted string.
  */
 // eslint-disable-next-line @rushstack/no-new-null
-export function convertDate(value: string | null, ...formatStrings: string[]): string | undefined {
+export function convertDate(value: string | null, ...formatStrings: string[]): string | null {
     if (!value) {
-        return undefined;
+        return null;
     }
 
     for (const formatString of formatStrings) {
@@ -194,7 +194,8 @@ export function convertDate(value: string | null, ...formatStrings: string[]): s
     return "Invalid date";
 }
 
-export function convertDateNoExeptionThrown(value: string, formatString: string): string | undefined {
+// eslint-disable-next-line @rushstack/no-new-null
+export function convertDateNoExeptionThrown(value: string, formatString: string): string | null {
     try {
         const parsed = parse(value, formatString, new Date()); // Parses date in local timezone
         const offsetToHelsinkiMs = getTimeOffsetToMs("Europe/Helsinki", parsed);
@@ -204,7 +205,7 @@ export function convertDateNoExeptionThrown(value: string, formatString: string)
         }
         return parsed.toISOString();
     } catch (e: unknown) {
-        return undefined;
+        return null;
     }
 }
 
