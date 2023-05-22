@@ -1,4 +1,4 @@
-import { SlackEmoji, SlackMessage, sendSlackMessage } from "./slack";
+import { sendSlackMessage, SlackEmoji, SlackMessage } from "./slack";
 
 export interface OSAction {
     readonly destination: string;
@@ -29,7 +29,7 @@ function notBetween(lower: number, upper: number): string {
 
 export enum OSMessageSubjects {
     LAMBDA_ERRORS = "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.method}} {{ctx.results.0.hits.hits.0._source.message}}",
-    JAVA_ERRORS = "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}}",
+    JAVA_ERRORS = "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.logger_name}} {{ctx.results.0.hits.hits.0._source.message}} in {{ctx.results.0.hits.hits.0._source.app}}",
     LAMBDA_TIMEOUT = "{{ctx.results.0.hits.hits.0._source.@timestamp}} {{ctx.results.0.hits.hits.0._source.@log_group}}"
 }
 
