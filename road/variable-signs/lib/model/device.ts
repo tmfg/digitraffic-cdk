@@ -1,7 +1,7 @@
 export interface DbDevice {
     id: string;
-    updated_date: Date;
-    deleted_date: Date | null;
+    modified: Date;
+    deleted_date: Date | undefined;
     type: string;
     road_address: string;
     direction: string;

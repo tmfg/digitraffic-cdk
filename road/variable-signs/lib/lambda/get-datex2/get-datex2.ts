@@ -5,13 +5,13 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = () => {
+export const handler = (): Promise<LambdaResponse> => {
     const start = Date.now();
 
     return proxyHolder
         .setCredentials()
         .then(() => VariableSignsService.findActiveSignsDatex2())
-        .then((datex) => LambdaResponse.ok(datex))
+        .then(([datex, lastModified]) => LambdaResponse.ok(datex).withTimestamp(lastModified))
         .finally(() => {
             logger.info({
                 method: "GetDatex2.handler",

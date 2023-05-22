@@ -20,7 +20,7 @@ export async function insertDomain(db: DTDatabase, domainName: string): Promise<
     await db.tx((t) => {
         return t.none(
             `
-                insert into counting_site_domain("name", description, added_timestamp)
+                insert into counting_site_domain("name", description, created)
                 values(
                        $1,
                        'description',
@@ -40,11 +40,11 @@ export async function insertCounter(
     await db.tx((t) => {
         return t.none(
             `
-                insert into counting_site_counter(id, site_id, domain_name, name, site_domain, location, user_type_id, "interval", direction, added_timestamp, last_data_timestamp)
+                insert into counting_site_counter(id, site_id, domain_name, name, site_domain, location, user_type_id, "interval", direction, last_data_timestamp)
                 values(
                        $1, $1,
                        $2, 'name', 'DOMAIN', 'POINT(10 10)',
-                       $3, 15, 1, current_date, current_timestamp - interval '3 days')
+                       $3, 15, 1, current_timestamp - interval '3 days')
             `,
             [id, domainName, userType]
         );

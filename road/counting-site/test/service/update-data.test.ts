@@ -24,8 +24,9 @@ describe(
         }
 
         async function assertDataInDb(expected: number, counterId: string): Promise<void> {
-            const data = await DataDAO.findValues(db, 2015, 9, counterId, "");
+            const [data, lastModified] = await DataDAO.findValues(db, 2015, 9, counterId, "");
             expect(data).toHaveLength(expected);
+            expect(lastModified).toBeDefined();
         }
 
         test("updateDataForDomain - no counters", async () => {

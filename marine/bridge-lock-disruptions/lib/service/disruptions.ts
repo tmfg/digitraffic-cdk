@@ -9,17 +9,21 @@ import { createFeatureCollection, isValidGeoJson } from "@digitraffic/common/dis
 import { DisruptionFeature } from "../api/disruptions";
 import { Geometry } from "wkx";
 import { parse } from "date-fns";
+import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
 
 export const DISRUPTIONS_DATE_FORMAT = "d.M.yyyy H:mm";
 const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
 
-export function findAllDisruptions(): Promise<FeatureCollection> {
+export function findAllDisruptions(): Promise<[FeatureCollection, Date]> {
     const start = Date.now();
-    return inDatabaseReadonly(async (db: DTDatabase) => {
+    return inDatabaseReadonly(async (db: DTDatabase): Promise<[FeatureCollection, Date]> => {
         const disruptions = await DisruptionsDB.findAll(db);
         const disruptionsFeatures = disruptions.map(convertFeature);
-        const lastUpdated = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE);
-        return createFeatureCollection(disruptionsFeatures, lastUpdated);
+        const lastUpdated = ((await LastUpdatedDB.getUpdatedTimestamp(
+            db,
+            BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE
+        )) ?? EPOCH) as Date;
+        return [createFeatureCollection(disruptionsFeatures, lastUpdated), lastUpdated];
     }).finally(() => {
         logger.info({
             method: "DisruptionsService.findAllDisruptions",
@@ -28,7 +32,7 @@ export function findAllDisruptions(): Promise<FeatureCollection> {
     });
 }
 
-export async function saveDisruptions(disruptions: SpatialDisruption[]) {
+export async function saveDisruptions(disruptions: SpatialDisruption[]): Promise<void> {
     const start = Date.now();
     await inDatabase(async (db: DTDatabase) => {
         await DisruptionsDB.deleteAllButDisruptions(
@@ -44,13 +48,13 @@ export async function saveDisruptions(disruptions: SpatialDisruption[]) {
     }).then((a) => {
         logger.info({
             method: "DisruptionsService.saveDisruptions",
-            count: a.length,
+            message: `Saved count=${a.length}`,
             tookMs: Date.now() - start
         });
     });
 }
 
-export async function fetchRemoteDisruptions(endpointUrl: string) {
+export async function fetchRemoteDisruptions(endpointUrl: string): Promise<SpatialDisruption[]> {
     const disruptions = await DisruptionsApi.getDisruptions(endpointUrl);
     const validDisruptions = disruptions.filter(validateGeoJson);
     return validDisruptions.map(featureToDisruption);
@@ -75,7 +79,7 @@ export function normalizeDisruptionDate(dateStr: string): Date {
     return parse(dateStr, DISRUPTIONS_DATE_FORMAT, new Date());
 }
 
-export function validateGeoJson(geoJson: GeoJSON) {
+export function validateGeoJson(geoJson: GeoJSON): boolean {
     try {
         return isValidGeoJson(geoJson);
     } catch (e) {

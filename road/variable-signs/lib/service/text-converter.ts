@@ -1,11 +1,4 @@
-import {
-    findSymbol,
-    InputSymbols,
-    isValidSymbol,
-    TextSymbol,
-    SymbolType,
-    getSymbolType,
-} from "./textSymbol";
+import { findSymbol, InputSymbols, isValidSymbol, TextSymbol, SymbolType, getSymbolType } from "./textSymbol";
 import { InputError } from "@digitraffic/common/dist/types/input-error";
 
 const MAX_LENGTH = 30;
@@ -16,7 +9,7 @@ const ERROR_MAX_LENGTH = `Max length is ${MAX_LENGTH}`;
 const ERROR_ONE_UNDERSCORE = "Text can only contain one underscore(_)";
 const ERROR_INVALID_SYMBOL = "Invalid symbol";
 
-function error(errorText: string) {
+function error(errorText: string): void {
     throw new InputError(errorText);
 }
 
@@ -34,7 +27,7 @@ function validate(text: string): string {
     return checked;
 }
 
-function checkSize(text: string) {
+function checkSize(text: string): void {
     if (text.length < 1) {
         error(ERROR_NO_CONTENT);
     } else if (text.length > MAX_LENGTH) {
@@ -42,7 +35,7 @@ function checkSize(text: string) {
     }
 }
 
-function checkUnderlines(text: string) {
+function checkUnderlines(text: string): void {
     const count = text.split("_").length - 1;
 
     if (count > 1) {
@@ -104,9 +97,7 @@ function creteSvg(symbolList: TextSymbol[]): string {
 
 // convert given string-list to list of symbols, add end if needed
 function convertToSymbols(symbols: Symbols): TextSymbol[] {
-    const symbolList = symbols.symbols.map((s) =>
-        findSymbol(symbols.symbolType, s)
-    ) as TextSymbol[];
+    const symbolList = symbols.symbols.map((s) => findSymbol(symbols.symbolType, s)) as TextSymbol[];
 
     // and end symbol, if first symbol is starting borders
     if (symbolList[0].startsBorders()) {
@@ -129,7 +120,7 @@ function findUsedSymbolTexts(text: string): Symbols {
     if (singleSymbol) {
         return {
             symbolType: SymbolType.SINGLE,
-            symbols: [singleSymbol],
+            symbols: [singleSymbol]
         };
     }
 
@@ -164,14 +155,14 @@ function findUsedSymbolTexts(text: string): Symbols {
 
     return {
         symbolType: symbolType,
-        symbols: symbolList,
+        symbols: symbolList
     };
 }
 
 const BEGIN_SYMBOLS = [
     InputSymbols.ROAD.toString(),
     InputSymbols.DETOUR.toString(),
-    InputSymbols.DIVERSION.toString(),
+    InputSymbols.DIVERSION.toString()
 ];
 
 function getSymbol(text: string): string {
@@ -184,10 +175,10 @@ function getSymbol(text: string): string {
     return text;
 }
 
-function findSingleSymbol(text: string): string | null {
+function findSingleSymbol(text: string): string | undefined {
     const symbol = findSymbol(SymbolType.SINGLE, text.toUpperCase());
 
-    return symbol?.isSingleSymbol() ? text : null;
+    return symbol?.isSingleSymbol() ? text : undefined;
 }
 
 interface Symbols {

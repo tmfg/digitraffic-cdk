@@ -23,8 +23,8 @@ export const handler = (event: ValuesQueryParameters): Promise<LambdaResponse> =
                 event.domain_name
             )
         )
-        .then((data) => {
-            return LambdaResponse.okJson(data);
+        .then(([data, lastModified]) => {
+            return LambdaResponse.okJson(data).withTimestamp(lastModified);
         })
         .catch((error: Error) => {
             console.info("error " + error.toString());

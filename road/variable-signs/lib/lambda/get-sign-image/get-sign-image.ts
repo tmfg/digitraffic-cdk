@@ -3,12 +3,18 @@ import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-respon
 import { InputError } from "@digitraffic/common/dist/types/input-error";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-export const handler = (event: Record<string, string>) => {
+/**
+ * Update IMPLEMENTATION_LAST_MODIFIED when ever making changes to implementation.
+ */
+const IMPLEMENTATION_LAST_MODIFIED = new Date("2022-11-24T00:00:00Z");
+export const handler = (event: Record<string, string>): LambdaResponse => {
     const start = Date.now();
     const text = event.text;
 
     try {
-        return LambdaResponse.ok(TextConverterService.convertTextToSvg(text));
+        return LambdaResponse.ok(TextConverterService.convertTextToSvg(text)).withTimestamp(
+            IMPLEMENTATION_LAST_MODIFIED
+        );
     } catch (e) {
         // bad user input -> 400
         if (e instanceof InputError) {

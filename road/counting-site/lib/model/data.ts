@@ -13,6 +13,7 @@ export interface DbData {
     readonly interval: number;
     readonly count: number;
     readonly status: number;
+    readonly modified: Date;
 }
 
 export interface ResponseData {
@@ -31,6 +32,7 @@ export interface DbCsvData {
     readonly interval: number;
     readonly count: number;
     readonly status: number;
+    readonly modified: Date;
 }
 
 export const dataProperties: JsonSchema = {

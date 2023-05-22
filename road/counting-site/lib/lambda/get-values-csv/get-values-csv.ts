@@ -22,7 +22,7 @@ export const handler = (event: ValuesQueryParameters): Promise<LambdaResponse> =
         .setCredentials()
         .then(() => CountingSitesService.getValuesForMonth(year, month, event.domain_name, event.counter_id))
         .then((data) => {
-            return LambdaResponse.ok(data, filename);
+            return LambdaResponse.ok(data[0], filename).withTimestamp(data[1]);
         })
         .catch((error: Error) => {
             console.info("error " + error.toString());

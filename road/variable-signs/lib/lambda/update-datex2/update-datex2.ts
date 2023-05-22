@@ -5,7 +5,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = (event: Record<string, string>) => {
+export const handler = (event: Record<string, string>): Promise<StatusCodeValue> => {
     const datex2 = event.body;
     const start = Date.now();
 

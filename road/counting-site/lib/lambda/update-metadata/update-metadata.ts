@@ -3,10 +3,10 @@ import { CountingSitesSecret } from "../../model/counting-sites-secret";
 import { CountingSitesEnvKeys } from "../../keys";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
-const domainName = envValue(CountingSitesEnvKeys.DOMAIN_NAME);
-const domainPrefix = envValue(CountingSitesEnvKeys.DOMAIN_PREFIX);
+const domainName = getEnvVariable(CountingSitesEnvKeys.DOMAIN_NAME);
+const domainPrefix = getEnvVariable(CountingSitesEnvKeys.DOMAIN_PREFIX);
 
 const proxyHolder = ProxyHolder.create();
 const secretHolder = SecretHolder.create<CountingSitesSecret>(domainPrefix);

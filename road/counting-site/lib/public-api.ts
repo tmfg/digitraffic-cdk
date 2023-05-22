@@ -1,6 +1,6 @@
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_apis";
-import { Model, Resource } from "aws-cdk-lib/aws-apigateway";
+import { JsonSchemaType, Model, Resource } from "aws-cdk-lib/aws-apigateway";
 import { MonitoredDBFunction } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { DocumentationPart } from "@digitraffic/common/dist/aws/infra/documentation";
@@ -130,10 +130,16 @@ export class PublicApi {
             "CounterFeatureModel",
             featureSchema(getModelReference(counterModel.modelId, publicApi.restApiId))
         );
-        this.geoJsonResponseModel = publicApi.addJsonModel(
-            "CountersModel",
-            geojsonSchema(getModelReference(featureModel.modelId, publicApi.restApiId))
+        const geojsonSchemaWithDataUpdatedTime = geojsonSchema(
+            getModelReference(featureModel.modelId, publicApi.restApiId)
         );
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
+        (geojsonSchemaWithDataUpdatedTime as any).dataUpdatedTime = {
+            type: JsonSchemaType.STRING,
+            format: "date-time",
+            description: "Data updated timestamp"
+        };
+        this.geoJsonResponseModel = publicApi.addJsonModel("CountersModel", geojsonSchemaWithDataUpdatedTime);
 
         this.csvValuesResponseModel = publicApi.addCSVModel("CSVDataModel");
     }
@@ -268,6 +274,7 @@ export class PublicApi {
         });
     }
 
+    // TODO implement static last-updated ie. 2022-01-27T00:00:00Z
     createDirectionsEndpoint(): void {
         DigitrafficStaticIntegration.json(this.directionsResource, {
             1: "In",

@@ -10,7 +10,7 @@ export const handler = (): Promise<LambdaResponse> => {
     return proxyHolder
         .setCredentials()
         .then(() => CountingSitesService.getUserTypes())
-        .then((types) => LambdaResponse.okJson(types))
+        .then(([types, lastModified]) => LambdaResponse.okJson(types).withTimestamp(lastModified))
         .finally(() => {
             console.info("method=CountingSites.GetUserTypes tookMs=%d", Date.now() - start);
         });

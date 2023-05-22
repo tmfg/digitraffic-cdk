@@ -1,8 +1,4 @@
-import {
-    DTDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
-import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as DatexDB from "../db/datex2";
 
 const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
@@ -26,26 +22,21 @@ const DATEX2_TEMPLATE = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 </d2LogicalModel>
 `;
 
-export function findActiveSignsDatex2(): Promise<string> {
+export function findActiveSignsDatex2(): Promise<[string, Date]> {
     return inDatabaseReadonly(async (db: DTDatabase) => {
-        const datex2: string[] = (await DatexDB.findAll(db)).map(
-            (d) => d.datex2
-        );
-        const lastUpdated = await LastUpdatedDB.getLastUpdated(
-            db,
-            LastUpdatedDB.DataType.VS_DATEX2
-        );
+        const [datex2DbSituations, lastModified] = await DatexDB.findAll(db);
+        const datex2: string[] = datex2DbSituations.map((d) => d.datex2);
 
-        return createResponse(datex2, lastUpdated);
+        return [createResponse(datex2, lastModified), lastModified];
     });
 }
 
-function createResponse(datex2: string[], lastUpdated: Date | null): string {
+function createResponse(datex2: string[], lastUpdated: Date | undefined): string {
     const publicationTime = lastUpdated ?? new Date();
     const situations = datex2.join("\n");
 
-    return DATEX2_TEMPLATE.replace(
-        "PUBLICATION_TIME",
-        publicationTime.toISOString()
-    ).replace("SITUATIONS", situations);
+    return DATEX2_TEMPLATE.replace("PUBLICATION_TIME", publicationTime.toISOString()).replace(
+        "SITUATIONS",
+        situations
+    );
 }

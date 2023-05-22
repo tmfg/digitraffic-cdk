@@ -84,17 +84,17 @@ describe("text-converter-tests", () => {
         expectError("NUOLI_VASENYYLOS");
     });
 
-    function expectValue(text: string, elements: string[] = []) {
+    function expectValue(text: string, elements: string[] = []): void {
         const svg = convertTextToSvg(text);
 
         expectElements(svg, elements);
     }
 
-    function expectError(text: string, errorText = "") {
+    function expectError(text: string, errorText: string = ""): void {
         expect(() => convertTextToSvg(text)).toThrow(errorText);
     }
 
-    function expectElements(svg: string, elements: string[]) {
+    function expectElements(svg: string, elements: string[]): void {
         const usedSymbols = findUsedSymbols(svg);
 
         //        console.info("symbols " + usedSymbols);

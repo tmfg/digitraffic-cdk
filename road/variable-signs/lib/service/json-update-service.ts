@@ -55,7 +55,7 @@ export async function updateJsonMetadata(metadata: TloikMetatiedot): Promise<Sta
     return StatusCodeValue.OK;
 }
 
-function createLaiteIdMap(metatiedot: TloikMetatiedot) {
+function createLaiteIdMap(metatiedot: TloikMetatiedot): DeviceIdMap {
     const idMap: DeviceIdMap = new Map();
 
     metatiedot.laitteet.forEach((laite) => idMap.set(laite.tunnus, laite));
@@ -74,9 +74,9 @@ async function updateDevices(
     for (const device of devices) {
         const apiDevice = idMap.get(device.id);
 
-        if (apiDevice != undefined) {
+        if (apiDevice !== undefined) {
             // a device from the API was found to match device in DB
-            if (device.deleted_date != null) {
+            if (device.deleted_date) {
                 logger.info({
                     method: "JsonUpdateService.updateDevices",
                     message: "Updating deleted device " + device.id
@@ -88,7 +88,7 @@ async function updateDevices(
             updatedCount++;
 
             idMap.delete(device.id);
-        } else if (device.deleted_date == null) {
+        } else if (!device.deleted_date) {
             // no device from the API was found to match device in DB, and the device in DB is not marked deleted
             logger.info({
                 method: "JsonUpdateService.updateDevices",
