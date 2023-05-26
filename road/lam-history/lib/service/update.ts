@@ -8,7 +8,7 @@ export async function handleMetadataUpdate(
     apikey: string,
     s3: string,
     filename: string
-) {
+): Promise<void> {
     const start = Date.now();
 
     console.info("method=handleMetadataUpdate fetch url=%s", url);
@@ -18,28 +18,18 @@ export async function handleMetadataUpdate(
 
         // Store to bucket
         await uploadToS3Internal(s3, resp, filename).catch((err) => {
-            console.error(
-                "method=handleMetadataUpdate file=%s failed=%o",
-                filename,
-                err
-            );
+            console.error("method=handleMetadataUpdate uploadToS3Internal file=%s failed=%o", filename, err);
+            throw err;
         });
     } catch (err) {
         console.error("method=handleMetadataUpdate unexpected error", err);
+        throw err;
     } finally {
-        console.info(
-            "method=handleMetadataUpdate file=%s tookMs=%d",
-            filename,
-            Date.now() - start
-        );
+        console.info("method=handleMetadataUpdate file=%s tookMs=%d", filename, Date.now() - start);
     }
 }
 
-function uploadToS3Internal(
-    bucketName: string,
-    body: S3.Body,
-    filename: string
-): Promise<void> {
+function uploadToS3Internal(bucketName: string, body: S3.Body, filename: string): Promise<void> {
     return uploadToS3(
         bucketName,
         body,
@@ -56,11 +46,11 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
         const result = await axios.get<ServerResponse>(url, {
             headers: {
                 Accept: "application/json",
-                "x-api-key": apikey,
+                "x-api-key": apikey
             },
-            validateStatus: function (status) {
+            validateStatus: function (status: number) {
                 return status === 200;
-            },
+            }
         });
 
         return JSON.stringify(result.data);
@@ -77,29 +67,17 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
                 );
             } else if (error.request) {
                 // no response from server
-                console.error(
-                    "method=getFromServer url=%s failed with no response %s",
-                    url,
-                    error.request
-                );
+                console.error("method=getFromServer url=%s failed with no response %s", url, error.request);
             } else {
                 // set up failed
-                console.error(
-                    "method=getFromServer url=%s failed in setup %s",
-                    url,
-                    error.message
-                );
+                console.error("method=getFromServer url=%s failed in setup %s", url, error.message);
             }
         } else {
             console.error("method=getFromServer url=%s failed %s", url, error);
         }
         return Promise.reject();
     } finally {
-        console.info(
-            "method=getFromServer url=%s tookMs=%d",
-            url,
-            Date.now() - start
-        );
+        console.info("method=getFromServer url=%s tookMs=%d", url, Date.now() - start);
     }
 }
 

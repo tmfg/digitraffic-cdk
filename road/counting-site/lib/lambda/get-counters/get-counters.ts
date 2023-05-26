@@ -11,8 +11,8 @@ export const handler = (event: Record<string, string>): Promise<LambdaResponse> 
     return proxyHolder
         .setCredentials()
         .then(() => CountingSitesService.findCounters(domainName))
-        .then((featureCollection) => {
-            return LambdaResponse.okJson(featureCollection);
+        .then(([featureCollection, lastModified]) => {
+            return LambdaResponse.okJson(featureCollection).withTimestamp(lastModified);
         })
         .catch((error: Error) => {
             console.info("error " + error.toString());

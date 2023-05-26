@@ -1,8 +1,4 @@
-import {
-    JsonSchema,
-    JsonSchemaType,
-    JsonSchemaVersion,
-} from "aws-cdk-lib/aws-apigateway";
+import { JsonSchema, JsonSchemaType, JsonSchemaVersion } from "aws-cdk-lib/aws-apigateway";
 
 export interface ApiCounter {
     readonly id: number;
@@ -26,7 +22,8 @@ export interface DbCounter {
     readonly user_type_id: number;
     readonly interval: number;
     readonly direction: number;
-    readonly added_timestamp: Date;
+    readonly created: Date;
+    readonly modified: Date;
     readonly last_data_timestamp?: Date;
     readonly removed_timestamp?: Date;
 }
@@ -38,37 +35,42 @@ export const counterProperties: JsonSchema = {
     properties: {
         id: {
             type: JsonSchemaType.INTEGER,
-            description: "Counter id",
+            description: "Counter id"
         },
         name: {
             type: JsonSchemaType.STRING,
-            description: "Counter name",
+            description: "Counter name"
         },
         domain: {
             type: JsonSchemaType.STRING,
-            description: "Domain name",
+            description: "Domain name"
         },
         userType: {
             type: JsonSchemaType.INTEGER,
-            description: "Counter type",
+            description: "Counter type"
         },
         interval: {
             type: JsonSchemaType.INTEGER,
-            description: "Data recording interval in minutes",
+            description: "Data recording interval in minutes"
         },
         direction: {
             type: JsonSchemaType.INTEGER,
-            description: "Counter direction",
+            description: "Counter direction"
         },
         lastDataTimestamp: {
             type: JsonSchemaType.STRING,
             format: "date-time",
-            description: "Timestamp of last data",
+            description: "Timestamp of last data"
         },
         removedTimestamp: {
             type: JsonSchemaType.STRING,
             format: "date-time",
-            description: "Removal timestamp",
+            description: "Removal timestamp"
         },
-    },
+        dataUpdatedTime: {
+            type: JsonSchemaType.STRING,
+            format: "date-time",
+            description: "Data updated timestamp"
+        }
+    }
 };

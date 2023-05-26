@@ -14,10 +14,13 @@ export type NginxField = "@timestamp";
 // prettier-ignore
 export type CloudfrontField = "@timestamp" | "env" | "clientCountryCode" | "edgeDetailedResultType" | "edgeLocation" | "edgeResultType" | "httpMethod" | "httpStatusCode" | "request" | "subdomain" | "timeToFirstByte"
 
+export type HttpUserAgentField = "@fields.http_user_agent";
+
 export type OSLogField =
     | DefaultField
     | DefaultJavaField
     | DefaultLambdaField
     | AppField
     | NginxField
-    | CloudfrontField;
+    | CloudfrontField
+    | HttpUserAgentField;

@@ -13,11 +13,7 @@ export type NauticalWarningConfiguration = StackConfiguration & {
 export class NauticalWarningsStack extends DigitrafficStack {
     readonly secret: ISecret; // override, not optional
 
-    constructor(
-        scope: Construct,
-        id: string,
-        configuration: NauticalWarningConfiguration
-    ) {
+    constructor(scope: Construct, id: string, configuration: NauticalWarningConfiguration) {
         super(scope, id, configuration);
 
         new InternalLambdas(this);

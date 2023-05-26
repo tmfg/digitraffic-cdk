@@ -18,16 +18,9 @@ export class PublicApi {
     private v1ImageResource: Resource;
 
     constructor(stack: DigitrafficStack) {
-        this.restApi = new DigitrafficRestApi(
-            stack,
-            "VariableSigns-public",
-            "Variable Signs public API"
-        );
+        this.restApi = new DigitrafficRestApi(stack, "VariableSigns-public", "Variable Signs public API");
 
-        this.restApi.createUsagePlan(
-            "VariableSigns Api Key",
-            "VariableSigns Usage Plan"
-        );
+        this.restApi.createUsagePlan("VariableSigns Api Key", "VariableSigns Usage Plan");
 
         this.createV1ResourcePaths();
         this.createDatex2Resource(stack);
@@ -35,7 +28,7 @@ export class PublicApi {
         this.createV1Documentation();
     }
 
-    createV1ResourcePaths() {
+    createV1ResourcePaths(): void {
         this.apiResource = this.restApi.root.addResource("api");
 
         const vsResource = this.apiResource.addResource("variable-sign");
@@ -47,7 +40,7 @@ export class PublicApi {
         this.v1ImageResource = imagesResource.addResource("{text}");
     }
 
-    createV1Documentation() {
+    createV1Documentation(): void {
         this.restApi.documentResource(
             this.v1Datex2Resource,
             DocumentationPart.method(
@@ -59,11 +52,7 @@ export class PublicApi {
 
         this.restApi.documentResource(
             this.v1ImageResource,
-            DocumentationPart.method(
-                VARIABLE_SIGN_TAGS_V1,
-                "GetImage",
-                "Generate svg-image from given text"
-            ),
+            DocumentationPart.method(VARIABLE_SIGN_TAGS_V1, "GetImage", "Generate svg-image from given text"),
             DocumentationPart.queryParameter(
                 "text",
                 "formatted [text] from variable sign text rows, without the brackets"
@@ -71,24 +60,19 @@ export class PublicApi {
         );
     }
 
-    createDatex2Resource(stack: DigitrafficStack) {
+    createDatex2Resource(stack: DigitrafficStack): void {
         const environment = stack.createLambdaEnvironment();
 
-        const getDatex2Lambda = MonitoredDBFunction.create(
-            stack,
-            "get-datex2",
-            environment,
-            {
-                reservedConcurrentExecutions: 3,
-            }
-        );
+        const getDatex2Lambda = MonitoredDBFunction.create(stack, "get-datex2", environment, {
+            reservedConcurrentExecutions: 3
+        });
 
         const getImageLambda = MonitoredDBFunction.create(
             stack,
             "get-sign-image",
             {},
             {
-                reservedConcurrentExecutions: 3,
+                reservedConcurrentExecutions: 3
             }
         );
 
@@ -98,28 +82,16 @@ export class PublicApi {
         ).build();
 
         const xmlModel = addSimpleServiceModel("XmlModel", this.restApi);
-        const svgModel = addSimpleServiceModel(
-            "SvgModel",
-            this.restApi,
-            MediaType.IMAGE_SVG
-        );
+        const svgModel = addSimpleServiceModel("SvgModel", this.restApi, MediaType.IMAGE_SVG);
 
-        ["GET", "HEAD"].forEach((httpMethod) => {
+        ["GET", "HEAD"].forEach((httpMethod): void => {
             this.v1Datex2Resource.addMethod(httpMethod, getDatex2Integration, {
                 apiKeyRequired: true,
-                methodResponses: [
-                    DigitrafficMethodResponse.response200(
-                        xmlModel,
-                        MediaType.APPLICATION_XML
-                    ),
-                ],
+                methodResponses: [DigitrafficMethodResponse.response200(xmlModel, MediaType.APPLICATION_XML)]
             });
         });
 
-        const getImageIntegration = new DigitrafficIntegration(
-            getImageLambda,
-            MediaType.IMAGE_SVG
-        )
+        const getImageIntegration = new DigitrafficIntegration(getImageLambda, MediaType.IMAGE_SVG)
             .addPathParameter("text")
             .build();
 
@@ -127,16 +99,13 @@ export class PublicApi {
             this.v1ImageResource.addMethod(httpMethod, getImageIntegration, {
                 apiKeyRequired: true,
                 requestParameters: {
-                    "method.request.path.text": true,
+                    "method.request.path.text": true
                 },
                 methodResponses: [
-                    DigitrafficMethodResponse.response200(
-                        svgModel,
-                        MediaType.IMAGE_SVG
-                    ),
+                    DigitrafficMethodResponse.response200(svgModel, MediaType.IMAGE_SVG),
                     DigitrafficMethodResponse.response400(),
-                    DigitrafficMethodResponse.response500(),
-                ],
+                    DigitrafficMethodResponse.response500()
+                ]
             });
         });
     }

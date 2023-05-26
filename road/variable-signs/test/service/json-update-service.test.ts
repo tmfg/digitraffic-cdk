@@ -2,10 +2,7 @@ import * as JsonUpdateService from "../../lib/service/json-update-service";
 import { TloikLaite, TloikMetatiedot } from "../../lib/model/metatiedot";
 import { dbTestBase } from "../db-testutil";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import {
-    TloikLiikennemerkinTila,
-    TloikTilatiedot,
-} from "../../lib/model/tilatiedot";
+import { TloikLiikennemerkinTila, TloikTilatiedot } from "../../lib/model/tilatiedot";
 import { Countable } from "@digitraffic/common/dist/database/models";
 
 const TEST_DEVICE: TloikLaite = {
@@ -15,9 +12,9 @@ const TEST_DEVICE: TloikLaite = {
         ajosuunta: "",
         ajorata: "",
         n: 30,
-        e: 30,
+        e: 30
     },
-    tyyppi: "test",
+    tyyppi: "test"
 };
 
 const TEST_DEVICE_DATA: TloikLiikennemerkinTila = {
@@ -27,15 +24,15 @@ const TEST_DEVICE_DATA: TloikLiikennemerkinTila = {
         {
             naytto: 1,
             rivi: 1,
-            teksti: "row1",
+            teksti: "row1"
         },
         {
             naytto: 1,
             rivi: 2,
-            teksti: "row2",
-        },
+            teksti: "row2"
+        }
     ],
-    luotettavuus: "12",
+    luotettavuus: "12"
 };
 
 describe(
@@ -66,6 +63,7 @@ describe(
             await new Promise((resolve) => setTimeout(resolve, 1000));
 
             // then update
+            metadata.laitteet[0].sijainti.ajorata = "vasen";
             await JsonUpdateService.updateJsonMetadata(metadata);
             const updated = await getUpdatedDate(db, "test");
 
@@ -104,7 +102,7 @@ describe(
 
         test("update data - one", async () => {
             const tilatiedot: TloikTilatiedot = {
-                liikennemerkit: [TEST_DEVICE_DATA],
+                liikennemerkit: [TEST_DEVICE_DATA]
             };
             await JsonUpdateService.updateJsonData(tilatiedot);
 
@@ -113,19 +111,19 @@ describe(
     })
 );
 
-function assertActiveDeviceCount(db: DTDatabase, expected: number) {
+function assertActiveDeviceCount(db: DTDatabase, expected: number): Promise<void> {
     return db
         .one("select count(*) from device where deleted_date is null")
         .then((value: Countable) => expect(value.count).toEqual(expected));
 }
 
-function assertDeletedDeviceCount(db: DTDatabase, expected: number) {
+function assertDeletedDeviceCount(db: DTDatabase, expected: number): Promise<void> {
     return db
         .one("select count(*) from device where deleted_date is not null")
         .then((value: Countable) => expect(value.count).toEqual(expected));
 }
 
-function assertDeviceDataCount(db: DTDatabase, expected: number) {
+function assertDeviceDataCount(db: DTDatabase, expected: number): Promise<void> {
     return db
         .one("select count(*) from device_data")
         .then((value: Countable) => expect(value.count).toEqual(expected));
@@ -133,6 +131,6 @@ function assertDeviceDataCount(db: DTDatabase, expected: number) {
 
 function getUpdatedDate(db: DTDatabase, id: string): Promise<Date> {
     return db
-        .one("select updated_date from device where id = $1", [id])
-        .then((value: { updated_date: Date }) => value.updated_date);
+        .one("select modified from device where id = $1", [id])
+        .then((value: { modified: Date }) => value.modified);
 }

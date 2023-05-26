@@ -82,7 +82,7 @@ if [[ "${DO_OPERATION}" == true ]]
 then
   echo "Start at $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
   echo
-  echo "pnpm dlx cdk@latest ${OPERATION} ${STACK}"
+  echo "npx cdk@latest ${OPERATION} ${STACK}"
   echo
 
   if [[ "${OPERATION}" == "diff" ]]

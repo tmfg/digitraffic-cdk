@@ -3,13 +3,14 @@ import { ApiCounter, DbCounter } from "../model/counter";
 import { FeatureCollection } from "geojson";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 
-const SQL_ALL_COUNTERS = `select id, site_id, domain_name, site_domain, name, ST_Y(location::geometry) as lat, ST_Y(location::geometry) as lon, user_type_id, interval, direction, added_timestamp, last_data_timestamp, removed_timestamp
+const SQL_ALL_COUNTERS = `select id, site_id, domain_name, site_domain, name, ST_Y(location::geometry) as lat, ST_Y(location::geometry) as lon, user_type_id, interval, direction, created, modified, last_data_timestamp, removed_timestamp
     from counting_site_counter
     where domain_name = $1
     order by id`;
 
 const SQL_ALL_COUNTERS_FEATURE_COLLECTION = `select json_build_object(
                     'type', 'FeatureCollection',
+                    'dataUpdatedTime', to_char(coalesce(max(modified), to_timestamp(0)) at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
                     'features', coalesce(json_agg(
                             json_build_object(
                                     'type', 'Feature',
@@ -22,7 +23,8 @@ const SQL_ALL_COUNTERS_FEATURE_COLLECTION = `select json_build_object(
                                             'interval', interval,
                                             'direction', direction,
                                             'lastDataTimestamp', to_char(last_data_timestamp at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
-                                            'removedTimestamp', to_char(removed_timestamp at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
+                                            'removedTimestamp', to_char(removed_timestamp at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"'),
+                                            'dataUpdatedTime', to_char(modified at time zone 'utc', 'YYYY-MM-DD"T"HH24:MI:SS"Z"')
                                         )
                                 )
                         ), '[]')
@@ -32,8 +34,8 @@ const SQL_ALL_COUNTERS_FEATURE_COLLECTION = `select json_build_object(
      and (id = $2 or $2 is null)
      `;
 
-const SQL_INSERT_COUNTER = `insert into counting_site_counter(id, site_id, domain_name, site_domain, name, location, user_type_id, interval, direction, added_timestamp)
-    values (NEXTVAL('counting_site_counter_id_seq'), $1, $2, $3, $4, $5, $6, $7, $8, now())`;
+const SQL_INSERT_COUNTER = `insert into counting_site_counter(id, site_id, domain_name, site_domain, name, location, user_type_id, interval, direction)
+    values (NEXTVAL('counting_site_counter_id_seq'), $1, $2, $3, $4, $5, $6, $7, $8)`;
 
 const SQL_REMOVE_COUNTERS = `update counting_site_counter
     set removed_timestamp = now()

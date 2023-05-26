@@ -2,6 +2,7 @@ import * as CountingSitesService from "../../service/counting-sites";
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response";
 import { validate, ValuesQueryParameters } from "../../model/parameters";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -23,15 +24,22 @@ export const handler = (event: ValuesQueryParameters): Promise<LambdaResponse> =
                 event.domain_name
             )
         )
-        .then((data) => {
-            return LambdaResponse.okJson(data);
+        .then(([data, lastModified]) => {
+            return LambdaResponse.okJson(data).withTimestamp(lastModified);
         })
         .catch((error: Error) => {
             console.info("error " + error.toString());
-
+            logger.error({
+                method: "CountingSites.GetData",
+                message: "Failed to get values",
+                error: error
+            });
             return LambdaResponse.internalError();
         })
         .finally(() => {
-            console.info("method=CountingSites.GetData tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "CountingSites.GetData",
+                tookMs: Date.now() - start
+            });
         });
 };

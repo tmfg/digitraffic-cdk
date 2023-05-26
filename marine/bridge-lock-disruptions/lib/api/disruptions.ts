@@ -8,9 +8,7 @@ export async function getDisruptions(endpointUrl: string): Promise<DisruptionFea
     if (resp.status !== 200) {
         logger.error({
             method: "DisruptionsApi.getDisruptions",
-            message: "Fetching disruptions failed",
-            code: resp.status,
-            details: resp.statusText
+            message: `Fetching disruptions failed code: ${resp.status} details: ${resp.statusText}`
         });
         throw new Error("Fetching disruptions failed");
     }
@@ -44,8 +42,8 @@ export function getDisruptionsFromServer(url: string) {
         })
         .then((a) => {
             logger.info({
-                method: "DisruptionsApi.getDisruptionsFromServer",
-                count: a.data.features.length,
+                method: `DisruptionsApi.getDisruptionsFromServer`,
+                message: `count=${a.data.features.length}`,
                 tookMs: Date.now() - start
             });
 

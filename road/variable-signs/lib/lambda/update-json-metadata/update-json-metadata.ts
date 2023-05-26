@@ -6,7 +6,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const proxyHolder = ProxyHolder.create();
 
-export const handler = (event: Record<string, string>) => {
+export const handler = (event: Record<string, string>): Promise<StatusCodeValue> => {
     const jsonMetadata = event.body;
     const start = Date.now();
 

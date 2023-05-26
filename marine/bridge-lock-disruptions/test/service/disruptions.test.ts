@@ -10,21 +10,21 @@ describe(
     dbTestBase((db: DTDatabase) => {
         test("findAllDisruptions", async () => {
             const disruptions = Array.from({
-                length: Math.floor(Math.random() * 10),
+                length: Math.floor(Math.random() * 10)
             }).map(() => {
                 return newDisruption();
             });
             await insertDisruption(db, disruptions);
 
-            const fetchedDisruptions =
-                await DisruptionsService.findAllDisruptions();
+            const [fetchedDisruptions, lastModified] = await DisruptionsService.findAllDisruptions();
 
             expect(fetchedDisruptions.features.length).toBe(disruptions.length);
+            expect(lastModified.getTime()).toBeCloseTo(Date.now(), -4); // max 5 s diff
         });
 
         test("saveDisruptions - all new", async () => {
             const disruptions = Array.from({
-                length: Math.floor(Math.random() * 10),
+                length: Math.floor(Math.random() * 10)
             }).map(() => {
                 return newDisruption();
             });
@@ -37,7 +37,7 @@ describe(
 
         test("saveDisruptions - remove one old", async () => {
             const disruptions = Array.from({
-                length: Math.floor(Math.random() * 10),
+                length: Math.floor(Math.random() * 10)
             }).map(() => {
                 return newDisruption();
             });
@@ -52,16 +52,13 @@ describe(
 
         test("validateGeoJson", () => {
             // single valid feature
-            expect(
-                TEST_FEATURE_COLLECTION.features.filter(
-                    DisruptionsService.validateGeoJson
-                ).length
-            ).toBe(1);
+            expect(TEST_FEATURE_COLLECTION.features.filter(DisruptionsService.validateGeoJson).length).toBe(
+                1
+            );
         });
 
         test("normalizeDisruptionDate", () => {
-            const normalized =
-                DisruptionsService.normalizeDisruptionDate("5.4.2020 1:01");
+            const normalized = DisruptionsService.normalizeDisruptionDate("5.4.2020 1:01");
 
             expect(normalized.getFullYear()).toBe(2020);
             expect(normalized.getMonth() + 1).toBe(4);

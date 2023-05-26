@@ -27,7 +27,7 @@ export async function updateDatex2(datex2: string): Promise<StatusCodeValue> {
     await inDatabase((db: DTDatabase) => {
         return db.tx((tx: DTTransaction) => {
             return tx.batch([
-                ...DeviceDB.saveDatex2(tx, situations, timestamp),
+                DeviceDB.saveDatex2(tx, situations),
                 LastUpdatedDB.updateLastUpdated(tx, LastUpdatedDB.DataType.VS_DATEX2, timestamp)
             ]);
         });

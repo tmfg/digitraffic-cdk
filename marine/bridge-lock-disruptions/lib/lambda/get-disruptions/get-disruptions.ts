@@ -10,7 +10,9 @@ export const handler = (): Promise<LambdaResponse> => {
     return proxyHolder
         .setCredentials()
         .then(() => findAllDisruptions())
-        .then((disruptions) => LambdaResponse.ok(JSON.stringify(disruptions)))
+        .then(([disruptions, lastModified]) =>
+            LambdaResponse.ok(JSON.stringify(disruptions)).withTimestamp(lastModified)
+        )
         .catch((error: Error) => {
             logException(logger, error, true);
 

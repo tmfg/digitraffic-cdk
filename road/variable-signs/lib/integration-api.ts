@@ -21,68 +21,41 @@ export class IntegrationApi {
         this.createJsonDataV1Handler(stack);
         this.createJsonMetadataV1Handler(stack);
 
-        this.restApi.createUsagePlan(
-            "Integration API key",
-            "Integration Usage Plan"
-        );
+        this.restApi.createUsagePlan("Integration API key", "Integration Usage Plan");
     }
 
-    createResourcePaths() {
+    createResourcePaths(): void {
         const vsResource = this.restApi.root.addResource("variable-signs");
         const v1Resource = vsResource.addResource("v1");
 
         this.updateDatex2Resource = v1Resource.addResource("update-datex2");
         this.updateJsonDataResource = v1Resource.addResource("update-data");
-        this.updateJsonMetadataResource =
-            v1Resource.addResource("update-metadata");
+        this.updateJsonMetadataResource = v1Resource.addResource("update-metadata");
     }
 
-    createDatexV1Handler(stack: DigitrafficStack) {
-        const updateDatexV1Handler = MonitoredDBFunction.create(
-            stack,
-            "update-datex2",
-            undefined,
-            {
-                memorySize: 256,
-            }
-        );
+    createDatexV1Handler(stack: DigitrafficStack): void {
+        const updateDatexV1Handler = MonitoredDBFunction.create(stack, "update-datex2", undefined, {
+            memorySize: 256
+        });
 
-        this.updateDatex2Resource.addMethod(
-            "PUT",
-            new LambdaIntegration(updateDatexV1Handler),
-            {
-                apiKeyRequired: true,
-            }
-        );
+        this.updateDatex2Resource.addMethod("PUT", new LambdaIntegration(updateDatexV1Handler), {
+            apiKeyRequired: true
+        });
     }
 
-    createJsonDataV1Handler(stack: DigitrafficStack) {
-        const updateJsonHandler = MonitoredDBFunction.create(
-            stack,
-            "update-json-data"
-        );
+    createJsonDataV1Handler(stack: DigitrafficStack): void {
+        const updateJsonHandler = MonitoredDBFunction.create(stack, "update-json-data");
 
-        this.updateJsonDataResource.addMethod(
-            "PUT",
-            new LambdaIntegration(updateJsonHandler),
-            {
-                apiKeyRequired: true,
-            }
-        );
+        this.updateJsonDataResource.addMethod("PUT", new LambdaIntegration(updateJsonHandler), {
+            apiKeyRequired: true
+        });
     }
 
-    private createJsonMetadataV1Handler(stack: DigitrafficStack) {
-        const updateJsonHandler = MonitoredDBFunction.create(
-            stack,
-            "update-json-metadata"
-        );
+    private createJsonMetadataV1Handler(stack: DigitrafficStack): void {
+        const updateJsonHandler = MonitoredDBFunction.create(stack, "update-json-metadata");
 
-        this.updateJsonMetadataResource.addMethod(
-            "PUT",
-            new LambdaIntegration(updateJsonHandler),
-            {
-                apiKeyRequired: true,
-            }
-        );
+        this.updateJsonMetadataResource.addMethod("PUT", new LambdaIntegration(updateJsonHandler), {
+            apiKeyRequired: true
+        });
     }
 }

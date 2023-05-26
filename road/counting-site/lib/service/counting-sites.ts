@@ -9,27 +9,32 @@ import { createObjectCsvStringifier } from "csv-writer";
 import * as R from "ramda";
 import { ResultUserTypes } from "../model/usertype";
 import { FeatureCollection } from "geojson";
+import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
 
-export function getUserTypes(): Promise<ResultUserTypes> {
+export function getUserTypes(): Promise<[ResultUserTypes, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
         return UserTypeDAO.findAllUserTypes(db);
     });
 }
 
-export function getDomains(): Promise<ResultDomain[]> {
+export function getDomains(): Promise<[ResultDomain[], Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
         return DomainDAO.findAllDomains(db);
-    }).then((domains) =>
-        domains.map(
+    }).then((domains) => {
+        const results = domains.map(
             (d) =>
                 ({
                     name: d.name,
                     description: d.description,
-                    addedTimestamp: d.added_timestamp,
-                    removedTimestamp: d.removed_timestamp
+                    addedTimestamp: d.created,
+                    removedTimestamp: d.removed_timestamp,
+                    dataUpdatedTime: d.modified
                 } satisfies ResultDomain)
-        )
-    );
+        );
+        const lastModified = results.map((r) => r.dataUpdatedTime).reduce((a, b) => (a > b ? a : b), EPOCH);
+
+        return [results, lastModified];
+    });
 }
 
 export function getValuesForMonth(
@@ -37,10 +42,10 @@ export function getValuesForMonth(
     month: number,
     domainName: string,
     counterId: string
-): Promise<string> {
+): Promise<[string, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
         return DataDAO.findDataForMonth(db, year, month, domainName, counterId);
-    }).then((data) => {
+    }).then(([data, lastModified]) => {
         const csv = createObjectCsvStringifier({
             header: [
                 { id: "domain_name", title: "DOMAIN" },
@@ -59,7 +64,7 @@ export function getValuesForMonth(
         );
         const rows = data.length === 0 ? "" : csv.stringifyRecords(dataOut);
 
-        return `${csv.getHeaderString() ?? ""}${rows}`;
+        return [`${csv.getHeaderString() ?? ""}${rows}`, lastModified];
     });
 }
 
@@ -68,16 +73,16 @@ export function findCounterValues(
     month?: number,
     counterId: string = "",
     domainName: string = ""
-): Promise<ResponseData[]> {
+): Promise<[ResponseData[], Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
         return DataDAO.findValues(
             db,
-            year ?? new Date().getUTCFullYear(),
-            month ?? new Date().getUTCMonth() + 1,
+            year || new Date().getUTCFullYear(),
+            month || new Date().getUTCMonth() + 1,
             counterId,
             domainName
         );
-    }).then((data) =>
+    }).then(([data, lastModified]) => [
         data.map(
             (row) =>
                 ({
@@ -87,12 +92,21 @@ export function findCounterValues(
                     count: row.count,
                     status: row.status
                 } satisfies ResponseData)
-        )
-    );
+        ),
+        lastModified
+    ]);
 }
 
-export function findCounters(domain: string = "", counterId: string = ""): Promise<FeatureCollection> {
+export function findCounters(
+    domain: string = "",
+    counterId: string = ""
+): Promise<[FeatureCollection, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return CounterDAO.findCounters(db, domain, counterId);
+        return CounterDAO.findCounters(db, domain, counterId).then((featureCollection) => {
+            // FeatureCollection has un standard dataUpdatedTime field in sql query
+            const collectionWithDataUpdatedTime = featureCollection as unknown as { dataUpdatedTime: string };
+            const lastModified = new Date(collectionWithDataUpdatedTime.dataUpdatedTime);
+            return [featureCollection, lastModified];
+        });
     });
 }

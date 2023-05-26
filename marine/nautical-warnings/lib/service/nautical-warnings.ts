@@ -7,21 +7,48 @@ import {
     inDatabase,
     inDatabaseReadonly
 } from "@digitraffic/common/dist/database/database";
-import { parse, formatISO } from "date-fns";
+import { parse } from "date-fns";
 import { Feature, FeatureCollection, GeoJsonProperties } from "geojson";
 import { isFeatureCollection } from "@digitraffic/common/dist/utils/geometry";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { utcToZonedTime } from "date-fns-tz";
+import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
 
-export function getActiveWarnings(): Promise<FeatureCollection | null> {
+const EMPTY_FEATURE_COLLECTION: FeatureCollection = {
+    type: "FeatureCollection",
+    features: []
+};
+export function getActiveWarnings(): Promise<[FeatureCollection, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE);
+        return CachedDao.getFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE).then((result) => {
+            if (result) {
+                return [
+                    {
+                        ...(result.content as FeatureCollection),
+                        ...{ dataUpdatedTime: result.modified.toISOString() }
+                    } as FeatureCollection,
+                    result.modified
+                ];
+            }
+            return [{ ...EMPTY_FEATURE_COLLECTION, ...{ dataUpdatedTime: EPOCH.toISOString() } }, EPOCH];
+        });
     });
 }
 
-export function getArchivedWarnings(): Promise<FeatureCollection | null> {
+export function getArchivedWarnings(): Promise<[FeatureCollection, Date]> {
     return inDatabaseReadonly((db: DTDatabase) => {
-        return CachedDao.getJsonFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED);
+        return CachedDao.getFromCache(db, JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED).then((result) => {
+            if (result) {
+                return [
+                    {
+                        ...(result.content as FeatureCollection),
+                        ...{ dataUpdatedTime: result.modified.toISOString() }
+                    } as FeatureCollection,
+                    result.modified
+                ];
+            }
+            return [{ ...EMPTY_FEATURE_COLLECTION, ...{ dataUpdatedTime: EPOCH.toISOString() } }, EPOCH];
+        });
     });
 }
 
@@ -47,20 +74,25 @@ function validateAndUpdate(
     tx: DTDatabase | DTTransaction,
     cacheKey: JSON_CACHE_KEY,
     featureCollection: FeatureCollection
-): Promise<null> {
+): Promise<void> {
     if (isFeatureCollection(featureCollection)) {
-        return CachedDao.updateCachedJson(tx, cacheKey, convertFeatureCollection(featureCollection));
+        const fc = convertFeatureCollection(featureCollection);
+        const lastModified = fc.features
+            .map((f) => getMaxDate(f.properties?.publishingTime as Date, f.properties?.creationTime as Date))
+            .reduce((a, b) => (a > b ? a : b), EPOCH);
+        return CachedDao.updateCachedJson(tx, cacheKey, fc, lastModified);
     } else {
         logger.error({
             method: "NauticalWarningsService.validateAndUpdate",
-            message: "Invalid geojson for " + cacheKey
+            message: `Invalid GeoJSON for ${cacheKey}`
         });
         logger.debug(featureCollection);
     }
 
-    return Promise.resolve(null);
+    return Promise.resolve();
 }
 
+/* eslint-disable @rushstack/no-new-null */
 interface JsonProperties {
     ID: string;
     ALUEET_FI: string;
@@ -88,6 +120,7 @@ interface JsonProperties {
     ANTOPAIVA: string | null;
     TIEDOKSIANTAJA: string;
 }
+/* eslint-enable @rushstack/no-new-null */
 
 function convertFeatureCollection(original: FeatureCollection): FeatureCollection {
     original.features.forEach((f: Feature) => {
@@ -139,13 +172,14 @@ function convertBoolean(value: number): boolean {
 /**
  * Takes in a localdate as a formatted string in given format and returns it as iso-formatted string.
  */
+// eslint-disable-next-line @rushstack/no-new-null
 export function convertDate(value: string | null, ...formatStrings: string[]): string | null {
     if (!value) {
         return null;
     }
 
     for (const formatString of formatStrings) {
-        const converted = convert(value, formatString);
+        const converted = convertDateNoExeptionThrown(value, formatString);
 
         if (converted) {
             return converted;
@@ -160,12 +194,55 @@ export function convertDate(value: string | null, ...formatStrings: string[]): s
     return "Invalid date";
 }
 
-export function convert(value: string, formatString: string) {
+// eslint-disable-next-line @rushstack/no-new-null
+export function convertDateNoExeptionThrown(value: string, formatString: string): string | null {
     try {
-        const converted = utcToZonedTime(parse(value, formatString, new Date()), "Europe/Helsinki");
+        const parsed = parse(value, formatString, new Date()); // Parses date in local timezone
+        const offsetToHelsinkiMs = getTimeOffsetToMs("Europe/Helsinki", parsed);
 
-        return formatISO(converted);
+        if (offsetToHelsinkiMs !== 0) {
+            return new Date(parsed.getTime() + offsetToHelsinkiMs).toISOString();
+        }
+        return parsed.toISOString();
     } catch (e: unknown) {
         return null;
     }
+}
+
+function getTimezoneOffsetInSeconds(targetTimezone: string): number {
+    const localDate = new Date();
+    const localOffsetMinutes = localDate.getTimezoneOffset(); // Offset in minutes
+
+    const targetDate = new Date().toLocaleString("fi-FI", { timeZone: targetTimezone });
+    const targetOffsetMinutes = new Date(targetDate).getTimezoneOffset(); // Offset in minutes
+
+    const offsetDifferenceSeconds = (localOffsetMinutes - targetOffsetMinutes) * 60;
+
+    return offsetDifferenceSeconds;
+}
+
+/**
+ * Returns how much needs to be added to given local time, to move it to same local time in target timezone.
+ * Ie. 10:00 in Oslo (+01:00) to 10:00 in Helsinki (+02:00) -> this returns -1 h in millisenconds as
+ * at 9:00 in Oslo the time in Helsinki is 10:00, so we need to subtract one hour from the local time.
+ * So we get 8:00 in Oslo and to 9:00 in Helsinki.
+ *
+ * @param targetTimezone that we want to count difference
+ * @param localDateTimeReference time when to calculate the difference to take in account summer/winter time
+ */
+function getTimeOffsetToMs(targetTimezone: string, localDateTimeReference: Date): number {
+    // millis keeps going regardless the time and
+    // will make targetDate to have difference in millis
+    const date = new Date(localDateTimeReference.setMilliseconds(0));
+    // const date = new Date(new Date().setMilliseconds(0));
+    const targetTime = date.toLocaleString("en-US", { timeZone: targetTimezone });
+    const targetDate = new Date(targetTime);
+    return date.getTime() - targetDate.getTime();
+}
+
+function getMaxDate(date1: Date | undefined, date2: Date | undefined): Date {
+    if (date1 && date2) {
+        return date1 > date2 ? date1 : date2;
+    }
+    return date1 ?? date2 ?? EPOCH;
 }

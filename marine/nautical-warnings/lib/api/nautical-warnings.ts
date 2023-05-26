@@ -34,8 +34,8 @@ export class NauticalWarningsApi {
 
             if (resp.status !== 200) {
                 logger.error({
-                    method: "NauticalWarningsApi.getWarnings",
-                    status: resp.status
+                    method: `NauticalWarningsApi.getWarnings`,
+                    message: `Got response code ${resp.status} ${resp.statusText}`
                 });
 
                 return Promise.reject(resp);
