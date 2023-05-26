@@ -28,5 +28,7 @@ export interface CloudfrontConfiguration {
     readonly distributions: {
         readonly id: string;
         readonly threshold?: number;
+        /** used only for reporting */
+        readonly name: string;
     }[];
 }
