@@ -36,7 +36,6 @@ importers:
     specifiers:
       '@aws-cdk/aws-synthetics-alpha': 2.78.0-alpha.0
       '@types/aws-lambda': ~8.10.115
-      '@types/etag': ^1.8.1
       '@types/geojson': ^7946.0.10
       '@types/jest': ^29.5.1
       '@types/lodash': ^4.14.194
@@ -53,7 +52,6 @@ importers:
       eslint: ~8.40.0
       eslint-config-prettier: ^8.8.0
       eslint-plugin-deprecation: ~1.4.1
-      etag: ^1.8.1
       geojson-validation: ^1.0.2
       husky: ^8.0.3
       jest: ^29.5.0
@@ -72,12 +70,10 @@ importers:
       typescript: ~4.9.5
       velocityjs: 2.0.6
     dependencies:
-      etag: 1.8.1
       lodash: 4.17.21
     devDependencies:
       '@aws-cdk/aws-synthetics-alpha': 2.78.0-alpha.0_jtbsl23dv42nrqpaljgjlafo7q
       '@types/aws-lambda': 8.10.115
-      '@types/etag': 1.8.1
       '@types/geojson': 7946.0.10
       '@types/jest': 29.5.1
       '@types/lodash': 4.14.194
@@ -385,7 +381,7 @@ importers:
     specifiers:
       '@digitraffic-cdk/eslint-config': workspace:*
       '@digitraffic-cdk/toolchain': workspace:*
-      '@digitraffic/common': 2023.5.22-1
+      '@digitraffic/common': 2023.5.25-1
       '@rushstack/eslint-config': ^3.2.0
       '@types/aws-lambda': ~8.10.114
       '@types/geojson': ^7946.0.10
@@ -415,7 +411,7 @@ importers:
       ts-node: ^10.9.1
       typescript: ~4.9.5
     dependencies:
-      '@digitraffic/common': 2023.5.22-1_evcryxqe66b6kmsfw2qbwn5tmq
+      '@digitraffic/common': 2023.5.25-1_qkj3u3gw6a22xzgkvmqwsnzfmu
       aws-cdk-lib: 2.78.0_constructs@10.2.17
       axios: 1.4.0
       axios-retry: 3.5.0
@@ -1184,7 +1180,7 @@ importers:
     specifiers:
       '@digitraffic-cdk/eslint-config': workspace:*
       '@digitraffic-cdk/toolchain': workspace:*
-      '@digitraffic/common': 2023.5.22-1
+      '@digitraffic/common': 2023.5.25-1
       '@rushstack/eslint-config': ^3.2.0
       '@types/aws-lambda': ~8.10.114
       '@types/geojson': ^7946.0.10
@@ -1213,7 +1209,7 @@ importers:
       types-ramda: ~0.29.1
       typescript: ~4.9.5
     dependencies:
-      '@digitraffic/common': 2023.5.22-1_dknjqo2ie2lxswnu3zvde6uknq
+      '@digitraffic/common': 2023.5.25-1_onkqkwv2rlj4unkvm2jsiba4dm
       aws-cdk-lib: 2.76.0_constructs@10.2.2
       axios: 1.4.0
       constructs: 10.2.2
@@ -1648,7 +1644,7 @@ importers:
     specifiers:
       '@digitraffic-cdk/eslint-config': workspace:*
       '@digitraffic-cdk/toolchain': workspace:*
-      '@digitraffic/common': 2023.5.22-1
+      '@digitraffic/common': 2023.5.25-1
       '@rushstack/eslint-config': ^3.2.0
       '@types/aws-lambda': ~8.10.114
       '@types/jest': ^29.5.1
@@ -1672,7 +1668,7 @@ importers:
       ts-node: ^10.9.1
       typescript: ~4.9.5
     dependencies:
-      '@digitraffic/common': 2023.5.22-1_dknjqo2ie2lxswnu3zvde6uknq
+      '@digitraffic/common': 2023.5.25-1_onkqkwv2rlj4unkvm2jsiba4dm
       aws-cdk-lib: 2.76.0_constructs@10.2.2
       axios: 1.4.0
       constructs: 10.2.2
@@ -2807,8 +2803,8 @@ packages:
       pg-promise: 11.4.3_pg-native@3.0.1
     dev: false
 
-  /@digitraffic/common/2023.5.22-1_dknjqo2ie2lxswnu3zvde6uknq:
-    resolution: {integrity: sha512-EZzTMxzs5VZc8hrvTryHL7RKS5Kls1SgOlH37Opr5jdJ97GiF6/Y7tbi2WtYOmWKzibLRyCmEcFBWSUdvahj7g==}
+  /@digitraffic/common/2023.5.25-1_onkqkwv2rlj4unkvm2jsiba4dm:
+    resolution: {integrity: sha512-M5GedBffi0/kPwJ1QNVLLDSrJPxneTc2msnnNqtrjnSx14JdM3sATFzOsr+CDpfwyN1Qqb+m8GpACenWw8+LPQ==}
     engines: {node: '>=14 <17 || >=18 <19'}
     peerDependencies:
       '@aws-cdk/aws-synthetics-alpha': ^2.78.0-alpha.0
@@ -2818,6 +2814,7 @@ packages:
       axios: ^1.2.6
       change-case: ^4.1.2
       constructs: ^10.2.17
+      etag: ^1.8.1
       geojson-validation: ^1.0.2
       moment: ^2.29.4
       node-ttl: ^0.2.0
@@ -2831,6 +2828,7 @@ packages:
       axios: 1.4.0
       change-case: 4.1.2
       constructs: 10.2.2
+      etag: 1.8.1
       geojson-validation: 1.0.2
       lodash: 4.17.21
       moment: 2.29.4
@@ -2839,8 +2837,8 @@ packages:
       pg-promise: 11.4.3_pg-native@3.0.1
     dev: false
 
-  /@digitraffic/common/2023.5.22-1_evcryxqe66b6kmsfw2qbwn5tmq:
-    resolution: {integrity: sha512-EZzTMxzs5VZc8hrvTryHL7RKS5Kls1SgOlH37Opr5jdJ97GiF6/Y7tbi2WtYOmWKzibLRyCmEcFBWSUdvahj7g==}
+  /@digitraffic/common/2023.5.25-1_qkj3u3gw6a22xzgkvmqwsnzfmu:
+    resolution: {integrity: sha512-M5GedBffi0/kPwJ1QNVLLDSrJPxneTc2msnnNqtrjnSx14JdM3sATFzOsr+CDpfwyN1Qqb+m8GpACenWw8+LPQ==}
     engines: {node: '>=14 <17 || >=18 <19'}
     peerDependencies:
       '@aws-cdk/aws-synthetics-alpha': ^2.78.0-alpha.0
@@ -2850,6 +2848,7 @@ packages:
       axios: ^1.2.6
       change-case: ^4.1.2
       constructs: ^10.2.17
+      etag: ^1.8.1
       geojson-validation: ^1.0.2
       moment: ^2.29.4
       node-ttl: ^0.2.0
@@ -2863,6 +2862,7 @@ packages:
       axios: 1.4.0
       change-case: 4.1.2
       constructs: 10.2.17
+      etag: 1.8.1
       geojson-validation: 1.0.2
       lodash: 4.17.21
       moment: 2.29.4
@@ -3958,12 +3958,6 @@ packages:
 
   /@types/crypto-js/4.1.1:
     resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==}
-    dev: true
-
-  /@types/etag/1.8.1:
-    resolution: {integrity: sha512-bsKkeSqN7HYyYntFRAmzcwx/dKW4Wa+KVMTInANlI72PWLQmOpZu96j0OqHZGArW4VQwCmJPteQlXaUDeOB0WQ==}
-    dependencies:
-      '@types/node': 18.15.13
     dev: true
 
   /@types/geojson/7946.0.10:
