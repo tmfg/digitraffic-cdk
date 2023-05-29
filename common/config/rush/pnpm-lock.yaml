@@ -36,6 +36,7 @@ importers:
     specifiers:
       '@aws-cdk/aws-synthetics-alpha': 2.78.0-alpha.0
       '@types/aws-lambda': ~8.10.115
+      '@types/etag': ^1.8.1
       '@types/geojson': ^7946.0.10
       '@types/jest': ^29.5.1
       '@types/lodash': ^4.14.194
@@ -52,6 +53,7 @@ importers:
       eslint: ~8.40.0
       eslint-config-prettier: ^8.8.0
       eslint-plugin-deprecation: ~1.4.1
+      etag: ^1.8.1
       geojson-validation: ^1.0.2
       husky: ^8.0.3
       jest: ^29.5.0
@@ -70,10 +72,12 @@ importers:
       typescript: ~4.9.5
       velocityjs: 2.0.6
     dependencies:
+      etag: 1.8.1
       lodash: 4.17.21
     devDependencies:
       '@aws-cdk/aws-synthetics-alpha': 2.78.0-alpha.0_jtbsl23dv42nrqpaljgjlafo7q
       '@types/aws-lambda': 8.10.115
+      '@types/etag': 1.8.1
       '@types/geojson': 7946.0.10
       '@types/jest': 29.5.1
       '@types/lodash': 4.14.194
@@ -3958,6 +3962,12 @@ packages:
 
   /@types/crypto-js/4.1.1:
     resolution: {integrity: sha512-BG7fQKZ689HIoc5h+6D2Dgq1fABRa0RbBWKBd9SP/MVRVXROflpm5fhwyATX5duFmbStzyzyycPB8qUYKDH3NA==}
+    dev: true
+
+  /@types/etag/1.8.1:
+    resolution: {integrity: sha512-bsKkeSqN7HYyYntFRAmzcwx/dKW4Wa+KVMTInANlI72PWLQmOpZu96j0OqHZGArW4VQwCmJPteQlXaUDeOB0WQ==}
+    dependencies:
+      '@types/node': 18.15.13
     dev: true
 
   /@types/geojson/7946.0.10:
