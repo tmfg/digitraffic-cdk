@@ -1,6 +1,5 @@
 import {
     SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS,
-    shipIsStationary,
     validateTimestamp
 } from "../../lib/service/timestamp_validation";
 import { newTimestamp } from "../testdata";
@@ -8,7 +7,8 @@ import { dbTestBase, insertVesselLocation } from "../db-testutil";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../../lib/model/eventsource";
 import * as R from "ramda";
-import { ApiTimestamp } from "../../lib/model/timestamp";
+import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
+import { NavStatus } from "../../lib/model/ais-status";
 
 describe(
     "timestamp model",
@@ -128,25 +128,61 @@ describe(
             expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
         });
 
-        test("validateTimestamp - vts prediction and stationary ship", async () => {
+        test("validateTimestamp - vts prediction and ship speed under threshold", async () => {
             const mmsi = 123;
-            const timestamp = newTimestamp({ mmsi, source: EventSource.SCHEDULES_CALCULATED });
+            const timestamp = newTimestamp({
+                eventType: EventType.ETA,
+                mmsi,
+                source: EventSource.SCHEDULES_CALCULATED
+            });
 
-            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS - 0.1, 1);
+            await insertVesselLocation(
+                db,
+                mmsi,
+                SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS - 0.1,
+                NavStatus.UNDER_WAY_USING_ENGINE
+            );
 
-            expect(await shipIsStationary(db, timestamp)).toEqual(true);
-            //expect(await validateTimestamp(timestamp, db)).toEqual(undefined);
+            const validatedTimestamp = await validateTimestamp(timestamp, db);
+            expect(validatedTimestamp).toEqual(undefined);
         });
 
-        test("validateTimestamp - vts prediction and moving ship", async () => {
+        test("validateTimestamp - vts prediction and moving ship with valid nav status", async () => {
             const mmsi = 123;
-            const timestamp = newTimestamp({ mmsi, source: EventSource.SCHEDULES_CALCULATED });
+            const timestamp = newTimestamp({
+                eventType: EventType.ETA,
+                mmsi,
+                source: EventSource.SCHEDULES_CALCULATED
+            });
 
-            await insertVesselLocation(db, mmsi, SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS + 0.1, 0);
+            await insertVesselLocation(
+                db,
+                mmsi,
+                SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS + 0.1,
+                NavStatus.UNDER_WAY_USING_ENGINE
+            );
 
-            expect(await shipIsStationary(db, timestamp)).toEqual(false);
-            //const validatedTimestamp = await validateTimestamp(timestamp, db);
-            //expect(validatedTimestamp?.ship.mmsi).toEqual(mmsi);
+            const validatedTimestamp = await validateTimestamp(timestamp, db);
+            expect(validatedTimestamp?.ship.mmsi).toEqual(mmsi);
+        });
+
+        test("validateTimestamp - vts prediction and invalid navigational status", async () => {
+            const mmsi = 123;
+            const timestamp = newTimestamp({
+                eventType: EventType.ETA,
+                mmsi,
+                source: EventSource.SCHEDULES_CALCULATED
+            });
+
+            await insertVesselLocation(
+                db,
+                mmsi,
+                SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS + 0.1,
+                NavStatus.AT_ANCHOR
+            );
+
+            const validatedTimestamp = await validateTimestamp(timestamp, db);
+            expect(validatedTimestamp).toEqual(undefined);
         });
     })
 );

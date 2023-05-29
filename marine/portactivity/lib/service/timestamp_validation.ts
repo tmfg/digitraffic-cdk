@@ -3,6 +3,7 @@ import { findVesselSpeedAndNavStatus } from "../dao/timestamps";
 import { ApiTimestamp, EventType } from "../model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { isValid, parseISO } from "date-fns";
+import { NavStatus } from "../model/ais-status";
 
 export const SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS = 2;
 
@@ -67,8 +68,26 @@ export async function validateTimestamp(
         return undefined;
     }
 
-    if (timestamp.source === EventSource.SCHEDULES_CALCULATED && (await shipIsStationary(db, timestamp))) {
-        //return undefined;
+    // filter unreliable ETA predictions from VTS Schedules API
+    if (timestamp.eventType === EventType.ETA && timestamp.source === EventSource.SCHEDULES_CALCULATED) {
+        const shipStatus = await findVesselSpeedAndNavStatus(db, timestamp.ship?.mmsi);
+        if (shipStatus && !navStatusIsValid(shipStatus.nav_stat)) {
+            console.warn(
+                "method=validateTimestamp VTS prediction for ship with invalid ais status %d %s",
+                shipStatus.nav_stat,
+                JSON.stringify(timestamp)
+            );
+            return undefined;
+        }
+        if (shipStatus && shipStatus.sog < SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS) {
+            console.warn(
+                "method=validateTimestamp VTS prediction for stationary ship with sog %d and ais status %d %s",
+                shipStatus.sog,
+                shipStatus.nav_stat,
+                JSON.stringify(timestamp)
+            );
+            return undefined;
+        }
     }
 
     return {
@@ -112,16 +131,10 @@ function validateConfidenceInterval(timestamp: Partial<ApiTimestamp>): boolean {
     return true;
 }
 
-export async function shipIsStationary(db: DTDatabase, timestamp: Partial<ApiTimestamp>): Promise<boolean> {
-    const shipStatus = await findVesselSpeedAndNavStatus(db, timestamp.ship?.mmsi);
-    if (shipStatus && shipStatus.sog < SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS) {
-        console.info(
-            "method=validateTimestamp stationary ship with sog %d and nav status %d %s",
-            shipStatus.sog,
-            shipStatus.nav_stat,
-            JSON.stringify(timestamp)
-        );
-        return true;
-    }
-    return false;
+function navStatusIsValid(navStatus: number): boolean {
+    return !(
+        navStatus === NavStatus.AT_ANCHOR ||
+        navStatus === NavStatus.MOORED ||
+        navStatus === NavStatus.AGROUND
+    );
 }

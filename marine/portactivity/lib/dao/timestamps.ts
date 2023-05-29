@@ -483,7 +483,7 @@ export async function findVesselSpeedAndNavStatus(
         const result = await db.oneOrNone<{ sog: number; nav_stat: number }>(FIND_VESSEL_SOG_AND_NAV_STATUS, [
             mmsi
         ]);
-        return result?.sog && result?.nav_stat
+        return result
             ? {
                   sog: result.sog,
                   nav_stat: result.nav_stat
