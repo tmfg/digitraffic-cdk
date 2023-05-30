@@ -7,11 +7,11 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const publishTopic = getEnvVariable(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 
-export function handlerFn(sns: SNS) {
+export function handlerFn(sns: SNS): () => Promise<void> {
     return async () => {
         logger.info({
             method: "TriggerAwakeAiETDPortTimestampsUpdate.handler",
-            message: `Triggering ETD port update for ${ETD_PORTS.length} ports`
+            customPortTriggerCount: ETD_PORTS.length
         });
         for (const port of ETD_PORTS) {
             await MessagingUtil.snsPublish(port, publishTopic, sns);

@@ -6,7 +6,7 @@ import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const rdsHolder = RdsHolder.create();
 
-export const handler = () => {
+export const handler = (): Promise<LambdaResponse>  => {
     return rdsHolder
         .setCredentials()
         .then(async () => {

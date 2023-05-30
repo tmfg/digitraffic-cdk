@@ -14,7 +14,7 @@ import {addHours, subHours} from "date-fns";
 describe(
     "service Awake.AI ATx",
     dbTestBase((db: DTDatabase) => {
-        function createAiATXApi() {
+        function createAiATXApi(): AwakeAiATXApi {
             return new AwakeAiATXApi("", "", WebSocket);
         }
 
@@ -87,7 +87,7 @@ describe(
         function createPortcall(
             atxMessage: AwakeAIATXTimestampMessage,
             portcallId: number
-        ) {
+        ): Promise<void> {
             return db.tx(async (t) => {
                 await insertPortCall(t, {
                     port_call_id: portcallId,

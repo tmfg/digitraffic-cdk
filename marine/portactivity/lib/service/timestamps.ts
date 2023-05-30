@@ -223,12 +223,12 @@ export function deleteOldTimestampsAndPilotages(): Promise<void> {
             const deletedPilotagesCount = await TimestampsDB.deleteOldPilotages(t);
             logger.info({
                 method: "TimeStampsService.deleteOldTimestampsAndPilotages",
-                message: `deleted pilotages count=${deletedPilotagesCount}`
+                customDeletedPilotagesCount: deletedPilotagesCount
             });
             const deletedTimestampsCount = await TimestampsDB.deleteOldTimestamps(t);
             logger.info({
                 method: "TimeStampsService.deleteOldTimestampsAndPilotages",
-                message: `deleted timestamps count=${deletedTimestampsCount}`
+                customDeletedTimestampsCount: deletedTimestampsCount
             });
         });
     });

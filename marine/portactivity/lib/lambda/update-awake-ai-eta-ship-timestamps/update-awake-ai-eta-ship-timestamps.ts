@@ -25,7 +25,7 @@ interface SnsETAShip extends Omit<DbETAShip, "eta"> {
 
 const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>("awake", ["url", "auth"]);
 
-export const handler = (event: SNSEvent) => {
+export const handler = (event: SNSEvent): Promise<void> => {
     // always a single event, guaranteed by SNS
     const ships = (JSON.parse(event.Records[0].Sns.Message) as SnsETAShip[]).map((ship) => ({
         ...ship,

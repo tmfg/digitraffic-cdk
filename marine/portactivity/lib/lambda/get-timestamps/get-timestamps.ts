@@ -14,7 +14,7 @@ interface GetTimeStampsEvent {
 
 const rdsHolder = RdsHolder.create();
 
-export const handler = (event: GetTimeStampsEvent) => {
+export const handler = (event: GetTimeStampsEvent): Promise<LambdaResponse> => {
     return rdsHolder
         .setCredentials()
         .then(async () => {

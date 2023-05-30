@@ -55,7 +55,10 @@ describe(
             expect(removed).toHaveLength(1);
         });
 
-        function testFound(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+        function testFound(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
             test(`${description} - found`, async () => {
                 const timestamp = Object.assign(newTimestamp(), {
                     recordTime: new Date().toISOString() // avoid filtering
@@ -70,7 +73,7 @@ describe(
         function testFoundInFuture(
             description: string,
             fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
-        ) {
+        ): void {
             test(`${description} - found 71 h in the future`, async () => {
                 const timestamp = Object.assign(newTimestamp(), {
                     recordTime: new Date().toISOString(), // avoid filtering,
@@ -109,7 +112,10 @@ describe(
             TimestampsDb.findBySource(db, timestamp.source)
         );
 
-        function testNotFound(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+        function testNotFound(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
             test(`${description} - not found`, async () => {
                 const timestamp = Object.assign(newTimestamp(), {
                     recordTime: new Date().toISOString() // avoid filtering
@@ -134,7 +140,10 @@ describe(
             TimestampsDb.findByLocode(db, timestamp.source + "asdf")
         );
 
-        function testNewest(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+        function testNewest(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
             test(`${description} - multiple - only newest`, async () => {
                 const timestamp = newTimestamp();
                 const timestamp2Date = new Date();
@@ -166,7 +175,10 @@ describe(
             TimestampsDb.findBySource(db, timestamp.source)
         );
 
-        function testTooOld(description: string, fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>) {
+        function testTooOld(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
             test(`${description} - too old`, async () => {
                 const timestamp = Object.assign(newTimestamp(), {
                     eventTime: subDays(new Date(), 13).toISOString()
@@ -194,7 +206,7 @@ describe(
         function testTooFarInTheFuture(
             description: string,
             fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
-        ) {
+        ): void {
             test(`${description} - Portnet timestamp too far in the future`, async () => {
                 const timestamp = Object.assign(newTimestamp({ source: EventSource.PORTNET }), {
                     eventTime: addDays(new Date(), 15).toISOString() // enable filtering
@@ -531,7 +543,7 @@ describe(
             eventType: EventType,
             eventTime: Date,
             expectPortcallIdFound: boolean
-        ) {
+        ): void {
             test(`findPortcallId - ${description}`, async () => {
                 const timestamp = newTimestamp({
                     eventTime,
@@ -630,15 +642,15 @@ describe(
             expect(deletedCount).toBe(0);
         });
 
-        function olderThanAWeek() {
+        function olderThanAWeek(): Date {
             return subHours(subDays(new Date(), 7), getRandomInteger(0, 999));
         }
 
-        function newerThanAWeek() {
+        function newerThanAWeek(): Date {
             return addHours(subDays(new Date(), 7), getRandomInteger(0, 999));
         }
 
-        function createPortcall(timestamp: ApiTimestamp) {
+        function createPortcall(timestamp: ApiTimestamp): Promise<void> {
             return db.tx(async (t) => {
                 await insertPortCall(t, newPortCall(timestamp));
                 await insertPortAreaDetails(t, newPortAreaDetails(timestamp));

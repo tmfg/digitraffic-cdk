@@ -11,13 +11,13 @@ import { getRandomInteger, shuffle } from "@digitraffic/common/dist/test/testuti
 import { addMinutes, parseISO, subMinutes } from "date-fns";
 
 describe("event-sourceutil", () => {
-    function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp) {
+    function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp): void {
         expect(mergedTimestamps.length).toBe(1);
         const merged = mergedTimestamps[0];
         expectTimestamp(timestamp, merged);
     }
 
-    function expectTimestamp(actual: ApiTimestamp, expected: ApiTimestamp) {
+    function expectTimestamp(actual: ApiTimestamp, expected: ApiTimestamp): void {
         expect(actual.portcallId).toBe(expected.portcallId);
         expect(actual.source).toBe(expected.source);
         expect(actual.eventType).toBe(expected.eventType);

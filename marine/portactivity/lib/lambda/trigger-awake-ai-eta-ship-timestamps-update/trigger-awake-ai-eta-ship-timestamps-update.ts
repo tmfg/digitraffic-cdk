@@ -19,7 +19,7 @@ export function handlerFn(sns: SNS): () => Promise<void> {
             const ships = await TimestampService.findETAShipsByLocode(ports);
             logger.info({
                 method: "TriggerAwakeAiETATimestampsUpdate.handler",
-                message: `Triggering ETA ship update for ${ships.length} ships`
+                customShipTriggerCount: ships.length
             });
 
             for (const ship of ships) {

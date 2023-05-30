@@ -1,4 +1,4 @@
-import { saveTimestamp } from "../../service/timestamps";
+import { saveTimestamp, UpdatedTimestamp } from "../../service/timestamps";
 import { validateTimestamp } from "../../service/timestamp_validation";
 import { ApiTimestamp } from "../../model/timestamp";
 import { SQSEvent } from "aws-lambda";
@@ -11,7 +11,7 @@ import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const rdsHolder = RdsHolder.create();
 
-export function handlerFn() {
+export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void | UpdatedTimestamp>[]> {
     return (event: SQSEvent) => {
         return rdsHolder.setCredentials().then(() => {
             return inDatabase((db: DTDatabase) => {

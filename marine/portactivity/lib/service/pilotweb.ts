@@ -42,6 +42,10 @@ async function removeTimestamps(db: DTDatabase, pilotageIds: number[]): Promise<
         const sourceIds = pilotageIds.map((id) => id.toString());
 
         const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EventSource.PILOTWEB, sourceIds);
+        logger.info({
+            method: "PilotwebService.removeTimestamps",
+            message: `removed: ${JSON.stringify(timestampsRemoved)}`
+        });
     }
 }
 

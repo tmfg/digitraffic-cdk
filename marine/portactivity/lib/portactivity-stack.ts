@@ -48,7 +48,7 @@ export class PortActivityStack extends DigitrafficStack {
         });
     }
 
-    createRdsProxy(secret: ISecret, clusterIdentifier: string) {
+    createRdsProxy(secret: ISecret, clusterIdentifier: string): void {
         if (!this.vpc || !this.lambdaDbSg) {
             throw new Error("vpc and lambdaDbSg required!");
         }
