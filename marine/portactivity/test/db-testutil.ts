@@ -32,6 +32,7 @@ export async function truncate(db: DTDatabase | DTTransaction): Promise<void> {
         await t.none("DELETE FROM public.vessel");
         await t.none("DELETE FROM public.port_area_details");
         await t.none("DELETE FROM public.port_call");
+        await t.none("DELETE FROM public.vessel_location");
     });
 }
 
@@ -231,6 +232,21 @@ export function insertPilotage(
             }
         }
     ]);
+}
+
+export async function insertVesselLocation(
+    db: DTDatabase,
+    mmsi: number,
+    speed: number = 3,
+    navStatus: number = 0
+): Promise<void> {
+    await db.tx(async (t) => {
+        await t.none(
+            "INSERT INTO public.vessel_location(mmsi,timestamp_ext,x,y,sog,cog,nav_stat,rot,pos_acc,raim,timestamp) " +
+                "values ($1, $2, 1, 1, $3, 1, $4, 1, true, true, 1)",
+            [mmsi, Date.now(), speed, navStatus]
+        );
+    });
 }
 
 export function mockSecrets<T>(secret: T): void {

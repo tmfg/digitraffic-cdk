@@ -1,5 +1,6 @@
 import { saveTimestamp } from "../../service/timestamps";
-import { ApiTimestamp, validateTimestamp } from "../../model/timestamp";
+import { validateTimestamp } from "../../service/timestamp_validation";
+import { ApiTimestamp } from "../../model/timestamp";
 import { SQSEvent } from "aws-lambda";
 import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
 import middy from "@middy/core";
@@ -13,7 +14,7 @@ export function handlerFn() {
         return rdsHolder.setCredentials().then(() => {
             return inDatabase((db: DTDatabase) => {
                 return Promise.allSettled(
-                    event.Records.map((r) => {
+                    event.Records.map(async (r) => {
                         const partial = JSON.parse(r.body) as Partial<ApiTimestamp>;
                         const start = Date.now();
                         console.info(
@@ -21,7 +22,7 @@ export function handlerFn() {
                             partial
                         );
 
-                        const timestamp = validateTimestamp(partial);
+                        const timestamp = await validateTimestamp(partial, db);
 
                         if (!timestamp) {
                             console.warn(
