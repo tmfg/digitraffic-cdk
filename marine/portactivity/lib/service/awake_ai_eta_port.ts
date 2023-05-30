@@ -14,6 +14,7 @@ import {
 } from "./awake_ai_etx_helper";
 import { EventSource } from "../model/eventsource";
 import { addHours, isBefore, parseISO } from "date-fns";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class AwakeAiETAPortService {
     private readonly api: AwakeAiPortApi;
@@ -24,11 +25,12 @@ export class AwakeAiETAPortService {
 
     private validateArrivalTime(etaPrediction: AwakeAiVoyageEtaPrediction): boolean {
         if (isBefore(parseISO(etaPrediction.arrivalTime), addHours(Date.now(), 24))) {
-            console.warn(
-                `method=AwakeAiETAPortService.getAwakeAiTimestamps arrival is closer than 24 hours, not persisting ETA: ${JSON.stringify(
+            logger.warn({
+                method: "AwakeAiETAPortService.getAwakeAiTimestamps",
+                message: `arrival is closer than 24 hours, not persisting ETA: ${JSON.stringify(
                     etaPrediction
                 )}`
-            );
+            });
             return false;
         }
         return true;
@@ -41,11 +43,12 @@ export class AwakeAiETAPortService {
                 // filter out predictions originating from digitraffic portcall api
                 .filter((etaPrediction) => {
                     if (isDigitrafficEtaPrediction(etaPrediction)) {
-                        console.warn(
-                            `method=AwakeAiETAPortService.getAwakeAiTimestamps received Digitraffic ETA prediction, IMO: ${
-                                schedule.ship.imo
-                            }, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(etaPrediction)}`
-                        );
+                        logger.warn({
+                            method: "AwakeAiETAPortService.getAwakeAiTimestamps",
+                            message: `received Digitraffic ETA prediction, IMO: ${schedule.ship.imo}, MMSI: ${
+                                schedule.ship.mmsi
+                            }, prediction: ${JSON.stringify(etaPrediction)}`
+                        });
                         return false;
                     }
                     return true;
@@ -57,14 +60,16 @@ export class AwakeAiETAPortService {
     async getAwakeAiTimestamps(locode: string): Promise<ApiTimestamp[]> {
         const resp = await this.api.getETAs(locode);
 
-        console.info(
-            `method=AwakeAiETAPortService.getAwakeAiTimestamps Received ETA response: ${JSON.stringify(resp)}`
-        );
+        logger.info({
+            method: "AwakeAiETAPortService.getAwakeAiTimestamps",
+            message: `Received ETA response: ${JSON.stringify(resp)}`
+        });
 
         if (!resp.schedule) {
-            console.warn(
-                `method=AwakeAiETAPortService.getAwakeAiTimestamps no ETA received, state=${resp.type}`
-            );
+            logger.warn({
+                method: "AwakeAiETAPortService.getAwakeAiTimestamps",
+                message: `no ETA received, state=${resp.type}`
+            });
             return [];
         }
 

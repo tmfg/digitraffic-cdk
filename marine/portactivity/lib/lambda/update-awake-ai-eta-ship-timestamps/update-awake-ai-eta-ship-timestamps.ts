@@ -8,6 +8,7 @@ import { DbETAShip } from "../../dao/timestamps";
 import { PortactivityEnvKeys } from "../../keys";
 import { AwakeAiETAShipService } from "../../service/awake_ai_eta_ship";
 import { sendMessage } from "../../service/queue-service";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let service: AwakeAiETAShipService | undefined;
 
@@ -38,8 +39,14 @@ export const handler = (event: SNSEvent) => {
         const timestamps = await service.getAwakeAiTimestamps(ships);
 
         const start = Date.now();
-        console.info("method=updateAwakeAiETAShipTimestamps.handler count=%d", timestamps.length);
+        logger.info({
+            method: "UpdateAwakeAiETAShipTimestamps.handler",
+            message: `received ${timestamps.length} timestamps`
+        });
         await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
-        console.info("method=updateAwakeAiETAShipTimestamps.handler tookMs=%d", Date.now() - start);
+        logger.info({
+            method: "UpdateAwakeAiETAShipTimestamps.handler",
+            tookMs: Date.now() - start
+        });
     });
 };

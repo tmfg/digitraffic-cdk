@@ -8,22 +8,17 @@ import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import WebSocket from "ws";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 interface UpdateAwakeAiATXTimestampsSecret extends GenericSecret {
     readonly atxurl: string;
     readonly atxauth: string;
 }
 
-const expectedKeys = [
-    PortactivitySecretKeys.AWAKE_ATX_URL,
-    PortactivitySecretKeys.AWAKE_ATX_AUTH
-];
+const expectedKeys = [PortactivitySecretKeys.AWAKE_ATX_URL, PortactivitySecretKeys.AWAKE_ATX_AUTH];
 
 const rdsHolder = RdsHolder.create();
-const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>(
-    "awake",
-    expectedKeys
-);
+const secretHolder = SecretHolder.create<UpdateAwakeAiATXTimestampsSecret>("awake", expectedKeys);
 
 const sqsQueueUrl = envValue(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
@@ -37,21 +32,16 @@ export async function handler(event: unknown, context: Context) {
         .setCredentials()
         .then(() => secretHolder.get())
         .then(async (secret: UpdateAwakeAiATXTimestampsSecret) => {
-            
             const service = new AwakeAiATXService(
                 new AwakeAiATXApi(secret.atxurl, secret.atxauth, WebSocket)
             );
 
-            const timestamps = await service.getATXs(
-                context.getRemainingTimeInMillis() - SQS_SEND_TIME
-            );
-            console.info(
-                "method=updateAwakeAiAtxTimestamps.handler count=%d",
-                timestamps.length
-            );
+            const timestamps = await service.getATXs(context.getRemainingTimeInMillis() - SQS_SEND_TIME);
+            logger.info({
+                method: "UpdateAwakeAiAtxTimestamps.handler",
+                message: `received ${timestamps.length} timestamps`
+            });
 
-            await Promise.allSettled(
-                timestamps.map((ts) => sendMessage(ts, sqsQueueUrl))
-            );
+            await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)));
         });
 }

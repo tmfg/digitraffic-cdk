@@ -5,6 +5,7 @@ import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/databa
 import moment from "moment-timezone";
 import { EventSource } from "../model/eventsource";
 import { AwakeAiZoneType } from "../api/awake_common";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class AwakeAiATXService {
     private readonly api: AwakeAiATXApi;
@@ -21,13 +22,17 @@ export class AwakeAiATXService {
                 .map(async (atx: AwakeAIATXTimestampMessage) => {
                     // pick the first supported LOCODE
                     if (atx.locodes.length > 1) {
-                        console.warn(
-                            "method=getATXs More than one locode for timestamp! IMO %s locodes %s",
-                            atx.imo,
-                            atx.locodes
-                        );
+                        logger.warn({
+                            method: "AwakeAiATXService.getATXs",
+                            message: `More than one locode for timestamp! IMO ${
+                                atx.imo
+                            } locodes ${JSON.stringify(atx.locodes)}`
+                        });
                     } else if (!atx.locodes.length) {
-                        console.error("method=getATXs No locode for timestamp! IMO %s", atx.imo);
+                        logger.error({
+                            method: "AwakeAiATXService.getATXs",
+                            message: `No locode for timestamp! IMO ${atx.imo}`
+                        });
                     }
                     const port = atx.locodes[0];
                     const eventType =
@@ -58,11 +63,10 @@ export class AwakeAiATXService {
                             portcallId
                         } as ApiTimestamp;
                     } else {
-                        console.warn(
-                            "method=getATXs no portcall found for %s IMO",
-                            atx.zoneEventType,
-                            atx.imo
-                        );
+                        logger.warn({
+                            method: "AwakeAiATXService.getATXs",
+                            message: `no portcall found for ${atx.zoneEventType} IMO ${atx.imo}`
+                        });
                         return null;
                     }
                 });

@@ -9,6 +9,7 @@ import {
 } from "./awake_ai_etx_helper";
 import { EventSource } from "../model/eventsource";
 import { isBefore, parseISO } from "date-fns";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export class AwakeAiETDPortService {
     private readonly api: AwakeAiPortApi;
@@ -24,14 +25,16 @@ export class AwakeAiETDPortService {
     async getAwakeAiTimestamps(locode: string): Promise<ApiTimestamp[]> {
         const resp = await this.api.getETDs(locode);
 
-        console.info(
-            `method=AwakeAiETDPortService.getAwakeAiTimestamps Received ETD response: ${JSON.stringify(resp)}`
-        );
+        logger.info({
+            method: "AwakeAiETDPortService.getAwakeAiTimestamps",
+            message: `Received ETD response: ${JSON.stringify(resp)}`
+        });
 
         if (!resp.schedule) {
-            console.warn(
-                `method=AwakeAiETDPortService.getAwakeAiTimestamps no ETD received, state=${resp.type}`
-            );
+            logger.warn({
+                method: "AwakeAiETDPortService.getAwakeAiTimestamps",
+                message: `no ETD received, state=${resp.type}`
+            });
             return [];
         }
 
@@ -44,13 +47,14 @@ export class AwakeAiETDPortService {
                         .filter(isAwakeEtdPrediction)
                         .filter((etdPrediction) => {
                             if (this.departureTimeInThePast(etdPrediction.departureTime)) {
-                                console.warn(
-                                    `method=AwakeAiETDPortService.getAwakeAiTimestamps ETD prediction event time in the past, IMO: ${
+                                logger.warn({
+                                    method: "AwakeAiETDPortService.getAwakeAiTimestamps",
+                                    message: `ETD prediction event time in the past, IMO: ${
                                         schedule.ship.imo
                                     }, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
                                         etdPrediction
                                     )}`
-                                );
+                                });
                                 return false;
                             }
                             return true;
@@ -58,13 +62,14 @@ export class AwakeAiETDPortService {
                         // filter out predictions originating from digitraffic portcall api
                         .filter((etdPrediction) => {
                             if (isDigitrafficEtdPrediction(etdPrediction)) {
-                                console.warn(
-                                    `method=AwakeAiETDPortService.getAwakeAiTimestamps received Digitraffic ETD prediction, IMO: ${
+                                logger.warn({
+                                    method: "AwakeAiETDPortService.getAwakeAiTimestamps",
+                                    message: `received Digitraffic ETD prediction, IMO: ${
                                         schedule.ship.imo
                                     }, MMSI: ${schedule.ship.mmsi}, prediction: ${JSON.stringify(
                                         etdPrediction
                                     )}`
-                                );
+                                });
                                 return false;
                             }
                             return true;

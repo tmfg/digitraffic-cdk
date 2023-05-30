@@ -6,6 +6,7 @@ import * as R from "ramda";
 import { PortactivityEnvKeys } from "../../keys";
 import { ports } from "../../service/portareas";
 import * as TimestampService from "../../service/timestamps";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const publishTopic = getEnvVariable(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);
 const CHUNK_SIZE = 10;
@@ -16,18 +17,16 @@ export function handlerFn(sns: SNS): () => Promise<void> {
     return () => {
         return rdsHolder.setCredentials().then(async () => {
             const ships = await TimestampService.findETAShipsByLocode(ports);
-            console.info(
-                "method=triggerAwakeAiETAShipTimestampsUpdate.handler Triggering ETA ship update for count=%d ships",
-                ships.length
-            );
+            logger.info({
+                method: "TriggerAwakeAiETATimestampsUpdate.handler",
+                message: `Triggering ETA ship update for ${ships.length} ships`
+            });
 
             for (const ship of ships) {
-                console.info(
-                    "method=triggerAwakeAiETATimestampsUpdate.handler Triggering ETA update for ship with IMO: %d, LOCODE: %s, portcallid: %d",
-                    ship.imo,
-                    ship.locode,
-                    ship.portcall_id
-                );
+                logger.info({
+                    method: "TriggerAwakeAiETATimestampsUpdate.handler",
+                    message: `Triggering ETA update for ship with IMO: ${ship.imo}, LOCODE: ${ship.locode}, portcallid: ${ship.portcall_id}`
+                });
             }
 
             for (const chunk of R.splitEvery(CHUNK_SIZE, ships)) {

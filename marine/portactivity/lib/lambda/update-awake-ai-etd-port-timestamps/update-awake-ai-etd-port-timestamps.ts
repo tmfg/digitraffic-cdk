@@ -7,6 +7,7 @@ import { AwakeAiPortApi } from "../../api/awake_ai_port";
 import { SNSEvent } from "aws-lambda";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { sendMessage } from "../../service/queue-service";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const queueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
@@ -33,8 +34,14 @@ export function handler(event: SNSEvent): Promise<void> {
             const timestamps = await service.getAwakeAiTimestamps(locode);
 
             const start = Date.now();
-            console.info("method=updateAwakeAiETDPortTimestamps.handler count=%d", timestamps.length);
+            logger.info({
+                method: "UpdateAwakeAiETDPortTimestamps.handler",
+                message: `received ${timestamps.length} timestamps`
+            });
             await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
-            console.info("method=updateAwakeAiETDPortTimestamps.handler tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "UpdateAwakeAiETDPortTimestamps.handler",
+                tookMs: Date.now() - start
+            });
         });
 }

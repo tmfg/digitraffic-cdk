@@ -12,6 +12,7 @@ import { Port } from "./portareas";
 import * as R from "ramda";
 import { EventSource } from "../model/eventsource";
 import { parseISO } from "date-fns";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean;
@@ -35,28 +36,31 @@ export function saveTimestamp(
 
         if (!portcallId) {
             if (timestamp.source !== EventSource.AWAKE_AI_PRED) {
-                console.warn(
-                    "method=saveTimestamp no port call id could be found for, not persisting timestamp: %s",
-                    JSON.stringify(timestamp)
-                );
+                logger.warn({
+                    method: "ProcessQueue.saveTimestamp",
+                    message: `no port call id could be found for, not persisting timestamp: ${JSON.stringify(
+                        timestamp
+                    )}`
+                });
                 // resolve so this gets removed from the queue
                 return undefined;
             } else {
-                console.info(
-                    "method=saveTimestamp portcall id not found but persisting because source is: %s, timestamp: %s",
-                    EventSource.AWAKE_AI_PRED,
-                    JSON.stringify(timestamp)
-                );
+                logger.info({
+                    method: "ProcessQueue.saveTimestamp",
+                    message: `portcall id not found but persisting because source is: ${
+                        EventSource.AWAKE_AI_PRED
+                    }, timestamp: ${JSON.stringify(timestamp)}`
+                });
             }
         }
 
         // do not persist timestamp if no imo is found
         const imo = timestamp.ship.imo ?? (await TimestampsDB.findImoByMmsi(db, timestamp.ship.mmsi));
         if (!imo) {
-            console.warn(
-                "method=saveTimestamp IMO not found for timestamp, not persisting %s",
-                JSON.stringify(timestamp)
-            );
+            logger.warn({
+                method: "ProcessQueue.saveTimestamp",
+                message: `IMO not found for timestamp, not persisting ${JSON.stringify(timestamp)}`
+            });
             // resolve so this gets removed from the queue
             return undefined;
         }
@@ -67,7 +71,10 @@ export function saveTimestamp(
                 ? timestamp.ship.mmsi
                 : await TimestampsDB.findMmsiByImo(db, timestamp.ship.imo);
         if (!mmsi) {
-            console.warn("method=saveTimestamp MMSI not found for timestamp %s", JSON.stringify(timestamp));
+            logger.warn({
+                method: "ProcessQueue.saveTimestamp",
+                message: `MMSI not found for timestamp ${JSON.stringify(timestamp)}`
+            });
         }
 
         const ship: Ship = {
@@ -108,10 +115,12 @@ async function removeOldTimestamps(
             timestamp.location.port
         );
         if (timestampsAnotherLocode.length) {
-            console.info(
-                "method=doSaveTimestamp deleting timestamps with changed locode,timestamp ids: %s",
-                timestampsAnotherLocode.map((e) => e.id).toString()
-            );
+            logger.info({
+                method: "ProcessQueue.removeOldTimestamps",
+                message: `deleting timestamps with changed locode,timestamp ids: ${timestampsAnotherLocode
+                    .map((e) => e.id)
+                    .toString()}`
+            });
             await tx.batch(timestampsAnotherLocode.map((e) => TimestampsDB.deleteById(tx, e.id)));
         }
     }
@@ -136,24 +145,36 @@ export async function findAllTimestamps(
         } else if (source) {
             return TimestampsDB.findBySource(db, source);
         }
-        console.warn("method=findAllTimestamps no locode, mmsi, imo or source given");
+        logger.warn({
+            method: "GetTimestamps.findAllTimestamps",
+            message: "no locode, mmsi, imo or source given"
+        });
         return [];
     })
         .finally(() => {
-            console.info("method=findAllTimestamps tookMs=%d", Date.now() - start);
+            logger.info({
+                method: "GetTimestamps.findAllTimestamps",
+                tookMs: Date.now() - start
+            });
         })
         .then((tss: DbTimestamp[]) => tss.map(dbTimestampToPublicApiTimestamp));
     return mergeTimestamps(timestamps);
 }
 
 export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
-    console.info("method=findETAShipsByLocode find for %s", ports.toString());
+    logger.info({
+        method: "TimeStampsService.findETAShipsByLocode",
+        message: `find for ${ports.toString()}`
+    });
 
     const startFindPortnetETAsByLocodes = Date.now();
     const portnetShips = await inDatabaseReadonly((db: DTDatabase) => {
         return TimestampsDB.findPortnetETAsByLocodes(db, ports);
     }).finally(() => {
-        console.info("method=findPortnetETAsByLocodes tookMs=%d", Date.now() - startFindPortnetETAsByLocodes);
+        logger.info({
+            method: "TimeStampsService.findPortnetETAsByLocodes",
+            tookMs: Date.now() - startFindPortnetETAsByLocodes
+        });
     });
 
     // handle multiple ETAs for the same day: calculate ETA only for the port call closest to NOW
@@ -161,12 +182,10 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
     const newestShips = Object.values(shipsByImo)
         .flatMap((ships) => R.head(R.sortBy((ship: DbETAShip) => ship.eta, ships)))
         .filter((ship): ship is DbETAShip => ship !== undefined);
-
-    console.info(
-        "method=findPortnetETAsByLocodes ships count before newest ETA filtering %d, after newest ETA filtering %d",
-        portnetShips.length,
-        newestShips.length
-    );
+    logger.info({
+        method: "TimeStampsService.findETAShipsByLocode",
+        message: `ships count before newest ETA filtering ${portnetShips.length} after newest ETA filtering ${newestShips.length}`
+    });
 
     if (newestShips.length) {
         const startFindVtsShipsTooCloseToPort = Date.now();
@@ -177,18 +196,21 @@ export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> 
                     newestShips.map((ship) => ship.portcall_id)
                 )
             ).map((ship) => ship.imo);
-            console.info("method=findETAShipsByLocode Ships too close to port", shipsTooCloseToPortImos);
+            logger.info({
+                method: "TimeStampsService.findETAShipsByLocode",
+                message: `Ships too close to port ${JSON.stringify(shipsTooCloseToPortImos)}`
+            });
             const filteredShips = newestShips.filter((ship) => shipsTooCloseToPortImos.includes(ship.imo));
-            console.info(
-                "method=findETAShipsByLocode Did not fetch ETA for ships too close to port",
-                filteredShips
-            );
+            logger.info({
+                method: "TimeStampsService.findETAShipsByLocode",
+                message: `Did not fetch ETA for ships too close to port ${JSON.stringify(filteredShips)}`
+            });
             return newestShips.filter((ship) => !shipsTooCloseToPortImos.includes(ship.imo));
         }).finally(() => {
-            console.info(
-                "method=startFindVtsShipsTooCloseToPort tookMs=%d",
-                Date.now() - startFindVtsShipsTooCloseToPort
-            );
+            logger.info({
+                method: "TimeStampsService.findETAShipsByLocode",
+                tookMs: Date.now() - startFindVtsShipsTooCloseToPort
+            });
         });
     } else {
         return Promise.resolve([]);
@@ -199,16 +221,15 @@ export function deleteOldTimestampsAndPilotages(): Promise<void> {
     return inDatabase((db: DTDatabase) => {
         return db.tx(async (t) => {
             const deletedPilotagesCount = await TimestampsDB.deleteOldPilotages(t);
-            console.info(
-                "method=TimestampsService.deleteOldTimestamps pilotages count=%d",
-                deletedPilotagesCount
-            );
-
+            logger.info({
+                method: "TimeStampsService.deleteOldTimestampsAndPilotages",
+                message: `deleted pilotages count=${deletedPilotagesCount}`
+            });
             const deletedTimestampsCount = await TimestampsDB.deleteOldTimestamps(t);
-            console.info(
-                "method=TimestampsService.deleteOldTimestamps timestamps count=%d",
-                deletedTimestampsCount
-            );
+            logger.info({
+                method: "TimeStampsService.deleteOldTimestampsAndPilotages",
+                message: `deleted timestamps count=${deletedTimestampsCount}`
+            });
         });
     });
 }
