@@ -41,7 +41,7 @@ export const handler = (event: SNSEvent) => {
         const start = Date.now();
         logger.info({
             method: "UpdateAwakeAiETAShipTimestamps.handler",
-            message: `received ${timestamps.length} timestamps`
+            customTimestampsReceivedCount: timestamps.length
         });
         await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
         logger.info({

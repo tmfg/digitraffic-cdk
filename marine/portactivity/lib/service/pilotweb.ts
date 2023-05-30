@@ -14,7 +14,7 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
 
     logger.info({
         method: "PilotwebService.getMessagesFromPilotweb",
-        message: `received ${pilotages.length} pilotages`
+        customPilotagesReceivedCount: pilotages.length
     });
 
     return inDatabase(async (db: DTDatabase) => {
@@ -42,10 +42,6 @@ async function removeTimestamps(db: DTDatabase, pilotageIds: number[]): Promise<
         const sourceIds = pilotageIds.map((id) => id.toString());
 
         const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EventSource.PILOTWEB, sourceIds);
-        logger.debug({
-            method: "PilotwebService.removeTimestamps",
-            message: `removed: ${JSON.stringify(timestampsRemoved)}`
-        });
     }
 }
 
@@ -58,7 +54,7 @@ async function updateAllPilotages(
 
     logger.info({
         method: "PilotwebService.updateAllPilotages",
-        message: `updated ${newAndUpdated.length} pilotages`
+        customPilotagesUpdatedCount: newAndUpdated.length
     });
 
     await PilotagesDAO.updatePilotages(db, newAndUpdated);
@@ -75,7 +71,7 @@ async function removeMissingPilotages(
 
     logger.info({
         method: "PilotwebService.removeMissingPilotages",
-        message: `deleted ${removedIds.length} pilotages`
+        customDeletedPilotagesCount: removedIds.length
     });
 
     await PilotagesDAO.deletePilotages(db, removedIds);

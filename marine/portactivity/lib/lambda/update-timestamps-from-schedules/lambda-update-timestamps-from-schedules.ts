@@ -34,7 +34,7 @@ export const handler = (): Promise<void> => {
 
             logger.info({
                 method: "UpdateSchedulesTimestamps.handler",
-                message: `received ${timestamps.length} timestamps`
+                customTimestampsReceivedCount: timestamps.length
             });
 
             await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)));

@@ -36,7 +36,7 @@ export function handler(event: SNSEvent): Promise<void> {
             const start = Date.now();
             logger.info({
                 method: "UpdateAwakeAiETDPortTimestamps.handler",
-                message: `received ${timestamps.length} timestamps`
+                customTimestampsReceivedCount: timestamps.length
             });
             await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
             logger.info({

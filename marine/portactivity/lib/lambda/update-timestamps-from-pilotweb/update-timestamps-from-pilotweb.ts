@@ -5,6 +5,7 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { GenericSecret } from "@digitraffic/common/dist/aws/runtime/secrets/secret";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
@@ -25,15 +26,12 @@ export const handler = function (): Promise<void> {
             const timestamps = await PilotwebService.getMessagesFromPilotweb(secret.url, secret.auth);
             logger.info({
                 method: "UpdatePilotwebTimestamps.handler",
-                message: `received ${timestamps.length} pilotages`
+                customTimestampsReceivedCount: timestamps.length
             });
 
             await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)));
         })
         .catch((error) => {
-            logger.error({
-                method: "UpdatePilotwebTimestamps.handler",
-                error: error
-            });
+            logException(logger, error);
         });
 };

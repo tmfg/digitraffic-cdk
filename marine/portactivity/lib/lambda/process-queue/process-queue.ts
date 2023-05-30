@@ -7,6 +7,7 @@ import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import { RdsHolder } from "@digitraffic/common/dist/aws/runtime/secrets/rds-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const rdsHolder = RdsHolder.create();
 
@@ -49,11 +50,7 @@ export function handlerFn() {
                                 }
                             })
                             .catch((error) => {
-                                logger.error({
-                                    method: "ProcessQueue.handler",
-                                    message: "update failed",
-                                    error: error
-                                });
+                                logException(logger, error);
                             });
                         logger.debug({
                             method: "ProcessQueue.handler",

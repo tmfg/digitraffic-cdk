@@ -5,6 +5,7 @@ import * as URL from "url";
 import { PortActivityParameterKeys } from "../keys";
 import { PutParameterResult } from "aws-sdk/clients/ssm";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 interface AwakeAiATXMessage {
     msgType: AwakeAiATXEventType;
@@ -107,10 +108,7 @@ export const getFromParameterStore = async (name: string): Promise<string | unde
         const parameter = await new SSM().getParameter(ssmParams).promise();
         return Promise.resolve(parameter.Parameter?.Value);
     } catch (error: unknown) {
-        logger.error({
-            method: "AwakeAiATXApi.getFromParameterStore",
-            error: error
-        });
+        logException(logger, error);
         return Promise.reject();
     }
 };
@@ -168,12 +166,7 @@ export class AwakeAiATXApi {
                                     message: `Updated subscriptionId to ${receivedSubscriptionId}`
                                 })
                             )
-                            .catch((error) =>
-                                logger.error({
-                                    method: "AwakeAiATXApi.getATXs",
-                                    error: error
-                                })
-                            );
+                            .catch((error) => logException(logger, error));
                     }
                     break;
                 }
@@ -190,10 +183,7 @@ export class AwakeAiATXApi {
 
         return new Promise((resolve, reject) => {
             webSocket.on("error", (error) => {
-                logger.error({
-                    method: "AwakeAiATXApi.getATXs",
-                    error: error
-                });
+                logException(logger, error);
                 reject("Error");
             });
             setTimeout(() => {
