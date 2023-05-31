@@ -116,188 +116,168 @@ export const ramiMessageSchema = z
                                                     )
                                                     .nullable(),
                                                 recipientAudioMessagesToDeliver: z
-                                                    .union([
-                                                        z
-                                                            .object({
-                                                                audioContentType: z
-                                                                    .enum(["AUDIO_TEXT", "AUDIO_FILE"])
-                                                                    .describe("type of audio content"),
-                                                                audioText: z
-                                                                    .array(
-                                                                        z
-                                                                            .union([
-                                                                                z
-                                                                                    .object({
-                                                                                        language: z
-                                                                                            .string()
-                                                                                            .describe(
-                                                                                                "identifies the language of the audio content"
-                                                                                            ),
-                                                                                        text: z
-                                                                                            .string()
-                                                                                            .describe(
-                                                                                                "audio text used for tts system"
-                                                                                            )
-                                                                                    })
-                                                                                    .describe(
-                                                                                        "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
-                                                                                    ),
-                                                                                z
-                                                                                    .null()
-                                                                                    .describe(
-                                                                                        "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
-                                                                                    )
+                                                    .object({
+                                                        audioContentType: z
+                                                            .enum(["AUDIO_TEXT", "AUDIO_FILE"])
+                                                            .describe("type of audio content"),
+                                                        audioText: z
+                                                            .array(
+                                                                z
+                                                                    .object({
+                                                                        language: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "identifies the language of the audio content"
+                                                                            ),
+                                                                        text: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "audio text used for tts system"
+                                                                            )
+                                                                    })
+                                                                    .describe(
+                                                                        "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
+                                                                    )
+                                                            )
+                                                            .nullable()
+                                                            .optional(),
+                                                        media: z
+                                                            .string()
+                                                            .describe(
+                                                                "used only for audio file, in this case audio content type is AUDIO_FILE"
+                                                            )
+                                                            .nullable()
+                                                            .describe(
+                                                                "used only for audio file, in this case audio content type is AUDIO_FILE"
+                                                            )
+                                                            .optional(),
+                                                        scheduledAudioDeliveryRules: z
+                                                            .union([
+                                                                z
+                                                                    .object({
+                                                                        audioSchedulationType: z
+                                                                            .enum([
+                                                                                "NOW",
+                                                                                "DELIVERY_AT",
+                                                                                "REPEAT_EVERY"
                                                                             ])
                                                                             .describe(
-                                                                                "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
-                                                                            )
-                                                                    )
-                                                                    .nullable()
-                                                                    .optional(),
-                                                                media: z
-                                                                    .string()
-                                                                    .describe(
-                                                                        "used only for audio file, in this case audio content type is AUDIO_FILE"
-                                                                    )
-                                                                    .nullable()
-                                                                    .describe(
-                                                                        "used only for audio file, in this case audio content type is AUDIO_FILE"
-                                                                    )
-                                                                    .optional(),
-                                                                scheduledAudioDeliveryRules: z
-                                                                    .union([
-                                                                        z
-                                                                            .object({
-                                                                                audioSchedulationType: z
-                                                                                    .enum([
-                                                                                        "NOW",
-                                                                                        "DELIVERY_AT",
-                                                                                        "REPEAT_EVERY"
-                                                                                    ])
-                                                                                    .describe(
-                                                                                        "type of audio schedulation"
-                                                                                    ),
-                                                                                repetitions: z
-                                                                                    .number()
-                                                                                    .int()
-                                                                                    .gte(0)
-                                                                                    .describe(
-                                                                                        "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                repeatEvery: z
-                                                                                    .number()
-                                                                                    .int()
-                                                                                    .describe(
-                                                                                        "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                startDateTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                endDateTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                startTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                endTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                daysOfWeek: z
-                                                                                    .array(
-                                                                                        z
-                                                                                            .enum([
-                                                                                                "SUNDAY",
-                                                                                                "MONDAY",
-                                                                                                "TUESDAY",
-                                                                                                "WEDNESDAY",
-                                                                                                "THURSDAY",
-                                                                                                "FRIDAY",
-                                                                                                "SATURDAY"
-                                                                                            ])
-                                                                                            .describe(
-                                                                                                "Day of week"
-                                                                                            )
-                                                                                    )
-                                                                                    .max(7)
-                                                                                    .describe(
-                                                                                        "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                deliveryAtDateTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
-                                                                                    )
-                                                                                    .optional()
-                                                                            })
-                                                                            .describe(
-                                                                                "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
+                                                                                "type of audio schedulation"
                                                                             ),
-                                                                        z
-                                                                            .null()
+                                                                        repetitions: z
+                                                                            .number()
+                                                                            .int()
+                                                                            .gte(0)
                                                                             .describe(
-                                                                                "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
+                                                                                "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
                                                                             )
-                                                                    ])
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        repeatEvery: z
+                                                                            .number()
+                                                                            .int()
+                                                                            .describe(
+                                                                                "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        startDateTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        endDateTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        startTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        endTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        daysOfWeek: z
+                                                                            .array(
+                                                                                z
+                                                                                    .enum([
+                                                                                        "SUNDAY",
+                                                                                        "MONDAY",
+                                                                                        "TUESDAY",
+                                                                                        "WEDNESDAY",
+                                                                                        "THURSDAY",
+                                                                                        "FRIDAY",
+                                                                                        "SATURDAY"
+                                                                                    ])
+                                                                                    .describe("Day of week")
+                                                                            )
+                                                                            .max(7)
+                                                                            .describe(
+                                                                                "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        deliveryAtDateTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
+                                                                            )
+                                                                            .optional()
+                                                                    })
+                                                                    .describe(
+                                                                        "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
+                                                                    ),
+                                                                z
+                                                                    .null()
                                                                     .describe(
                                                                         "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
                                                                     )
-                                                            })
+                                                            ])
                                                             .describe(
-                                                                "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
-                                                            ),
-                                                        z
-                                                            .null()
-                                                            .describe(
-                                                                "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
+                                                                "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
                                                             )
-                                                    ])
+                                                    })
+                                                    .describe(
+                                                        "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
+                                                    )
+                                                    .nullable()
                                                     .describe(
                                                         "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
                                                     )
@@ -472,188 +452,168 @@ export const ramiMessageSchema = z
                                                         .describe("vehicle journey identifiers information")
                                                 ),
                                                 recipientAudioMessagesToDeliver: z
-                                                    .union([
-                                                        z
-                                                            .object({
-                                                                audioContentType: z
-                                                                    .enum(["AUDIO_TEXT", "AUDIO_FILE"])
-                                                                    .describe("type of audio content"),
-                                                                audioText: z
-                                                                    .array(
-                                                                        z
-                                                                            .union([
-                                                                                z
-                                                                                    .object({
-                                                                                        language: z
-                                                                                            .string()
-                                                                                            .describe(
-                                                                                                "identifies the language of the audio content"
-                                                                                            ),
-                                                                                        text: z
-                                                                                            .string()
-                                                                                            .describe(
-                                                                                                "audio text used for tts system"
-                                                                                            )
-                                                                                    })
-                                                                                    .describe(
-                                                                                        "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
-                                                                                    ),
-                                                                                z
-                                                                                    .null()
-                                                                                    .describe(
-                                                                                        "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
-                                                                                    )
+                                                    .object({
+                                                        audioContentType: z
+                                                            .enum(["AUDIO_TEXT", "AUDIO_FILE"])
+                                                            .describe("type of audio content"),
+                                                        audioText: z
+                                                            .array(
+                                                                z
+                                                                    .object({
+                                                                        language: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "identifies the language of the audio content"
+                                                                            ),
+                                                                        text: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "audio text used for tts system"
+                                                                            )
+                                                                    })
+                                                                    .describe(
+                                                                        "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
+                                                                    )
+                                                            )
+                                                            .nullable()
+                                                            .optional(),
+                                                        media: z
+                                                            .string()
+                                                            .describe(
+                                                                "used only for audio file, in this case audio content type is AUDIO_FILE"
+                                                            )
+                                                            .nullable()
+                                                            .describe(
+                                                                "used only for audio file, in this case audio content type is AUDIO_FILE"
+                                                            )
+                                                            .optional(),
+                                                        scheduledAudioDeliveryRules: z
+                                                            .union([
+                                                                z
+                                                                    .object({
+                                                                        audioSchedulationType: z
+                                                                            .enum([
+                                                                                "NOW",
+                                                                                "DELIVERY_AT",
+                                                                                "REPEAT_EVERY"
                                                                             ])
                                                                             .describe(
-                                                                                "information about audio text. This part is present if the audio content type is AUDIO_TEXT"
-                                                                            )
-                                                                    )
-                                                                    .nullable()
-                                                                    .optional(),
-                                                                media: z
-                                                                    .string()
-                                                                    .describe(
-                                                                        "used only for audio file, in this case audio content type is AUDIO_FILE"
-                                                                    )
-                                                                    .nullable()
-                                                                    .describe(
-                                                                        "used only for audio file, in this case audio content type is AUDIO_FILE"
-                                                                    )
-                                                                    .optional(),
-                                                                scheduledAudioDeliveryRules: z
-                                                                    .union([
-                                                                        z
-                                                                            .object({
-                                                                                audioSchedulationType: z
-                                                                                    .enum([
-                                                                                        "NOW",
-                                                                                        "DELIVERY_AT",
-                                                                                        "REPEAT_EVERY"
-                                                                                    ])
-                                                                                    .describe(
-                                                                                        "type of audio schedulation"
-                                                                                    ),
-                                                                                repetitions: z
-                                                                                    .number()
-                                                                                    .int()
-                                                                                    .gte(0)
-                                                                                    .describe(
-                                                                                        "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                repeatEvery: z
-                                                                                    .number()
-                                                                                    .int()
-                                                                                    .describe(
-                                                                                        "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                startDateTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                endDateTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                startTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                endTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                daysOfWeek: z
-                                                                                    .array(
-                                                                                        z
-                                                                                            .enum([
-                                                                                                "SUNDAY",
-                                                                                                "MONDAY",
-                                                                                                "TUESDAY",
-                                                                                                "WEDNESDAY",
-                                                                                                "THURSDAY",
-                                                                                                "FRIDAY",
-                                                                                                "SATURDAY"
-                                                                                            ])
-                                                                                            .describe(
-                                                                                                "Day of week"
-                                                                                            )
-                                                                                    )
-                                                                                    .max(7)
-                                                                                    .describe(
-                                                                                        "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
-                                                                                    )
-                                                                                    .optional(),
-                                                                                deliveryAtDateTime: z
-                                                                                    .string()
-                                                                                    .describe(
-                                                                                        "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
-                                                                                    )
-                                                                                    .nullable()
-                                                                                    .describe(
-                                                                                        "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
-                                                                                    )
-                                                                                    .optional()
-                                                                            })
-                                                                            .describe(
-                                                                                "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
+                                                                                "type of audio schedulation"
                                                                             ),
-                                                                        z
-                                                                            .null()
+                                                                        repetitions: z
+                                                                            .number()
+                                                                            .int()
+                                                                            .gte(0)
                                                                             .describe(
-                                                                                "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
+                                                                                "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
                                                                             )
-                                                                    ])
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        repeatEvery: z
+                                                                            .number()
+                                                                            .int()
+                                                                            .describe(
+                                                                                "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "period of time that must pass between an audio repetition and the next. This field is in seconds. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        startDateTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling start date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        endDateTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling end date. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        startTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling start time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        endTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "scheduling end time. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        daysOfWeek: z
+                                                                            .array(
+                                                                                z
+                                                                                    .enum([
+                                                                                        "SUNDAY",
+                                                                                        "MONDAY",
+                                                                                        "TUESDAY",
+                                                                                        "WEDNESDAY",
+                                                                                        "THURSDAY",
+                                                                                        "FRIDAY",
+                                                                                        "SATURDAY"
+                                                                                    ])
+                                                                                    .describe("Day of week")
+                                                                            )
+                                                                            .max(7)
+                                                                            .describe(
+                                                                                "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "days of the week when the rule is valid. If the list is empty it is valid every day. It is only used for REPEAT_EVERY type scheduling"
+                                                                            )
+                                                                            .optional(),
+                                                                        deliveryAtDateTime: z
+                                                                            .string()
+                                                                            .describe(
+                                                                                "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
+                                                                            )
+                                                                            .nullable()
+                                                                            .describe(
+                                                                                "message delivery date and time. It is only used for DELIVERY_AT type scheduling"
+                                                                            )
+                                                                            .optional()
+                                                                    })
+                                                                    .describe(
+                                                                        "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
+                                                                    ),
+                                                                z
+                                                                    .null()
                                                                     .describe(
                                                                         "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
                                                                     )
-                                                            })
+                                                            ])
                                                             .describe(
-                                                                "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
-                                                            ),
-                                                        z
-                                                            .null()
-                                                            .describe(
-                                                                "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
+                                                                "The delivery rules can be of three types: \n  - NOW the message must be delivered at the time of insertion. \n  - DELIVERY_AT the message must be delivered on the date-time _deliveryAtDateTime_. \n  - REPEAT_EVERY the message begins to be delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _daysOfWeek_ conditions."
                                                             )
-                                                    ])
+                                                    })
+                                                    .describe(
+                                                        "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
+                                                    )
+                                                    .nullable()
                                                     .describe(
                                                         "audio message to deliver. This part is present if the content type is AUDIO or AUDIO_VIDEO type for a ScheduledMessage"
                                                     )
@@ -922,29 +882,18 @@ export const ramiMessageSchema = z
                                                 audioTexts: z
                                                     .array(
                                                         z
-                                                            .union([
-                                                                z
-                                                                    .object({
-                                                                        language: z
-                                                                            .string()
-                                                                            .describe(
-                                                                                "identifies the language of the content"
-                                                                            ),
-                                                                        audioText: z
-                                                                            .string()
-                                                                            .describe(
-                                                                                "audio text used for tts system"
-                                                                            )
-                                                                    })
+                                                            .object({
+                                                                language: z
+                                                                    .string()
                                                                     .describe(
-                                                                        "audio message content to be delivered for monitored journey scheduled message"
+                                                                        "identifies the language of the content"
                                                                     ),
-                                                                z
-                                                                    .null()
+                                                                audioText: z
+                                                                    .string()
                                                                     .describe(
-                                                                        "audio message content to be delivered for monitored journey scheduled message"
+                                                                        "audio text used for tts system"
                                                                     )
-                                                            ])
+                                                            })
                                                             .describe(
                                                                 "audio message content to be delivered for monitored journey scheduled message"
                                                             )
@@ -1084,7 +1033,7 @@ type RamiScheduledMessageRecipient = Pick<
     "onGroundRecipient"
 >["onGroundRecipient"];
 
-export type RamiMessageVideoContent = NonNullable<
+export type RamiScheduledMessageVideoContent = NonNullable<
     Pick<
         NonNullable<RamiScheduledMessageRecipient>,
         "recipientVideoMessagesToDeliver"

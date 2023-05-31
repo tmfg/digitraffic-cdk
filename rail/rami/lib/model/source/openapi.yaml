@@ -58,7 +58,6 @@ components:
         - DELIVERY_AT
         - REPEAT_EVERY
     AudioText:
-      nullable: true
       required:
         - language
         - text
@@ -252,7 +251,6 @@ components:
         - audioText
         - language
       type: object
-      nullable: true
       properties:
         language:
           type: string

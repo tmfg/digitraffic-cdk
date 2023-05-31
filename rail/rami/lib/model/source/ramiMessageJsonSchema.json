@@ -40,10 +40,7 @@
         "language",
         "text"
       ],
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": "object",
       "properties": {
         "language": {
           "type": "string",
@@ -296,10 +293,7 @@
         "audioText",
         "language"
       ],
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": "object",
       "properties": {
         "language": {
           "type": "string",
@@ -550,10 +544,8 @@
         "audioContentType",
         "scheduledAudioDeliveryRules"
       ],
-      "type": [
-        "object",
-        "null"
-      ],
+      "type": "object",
+      "nullable": true,
       "properties": {
         "audioContentType": {
           "$ref": "#/definitions/AudioContentTypeEnum"
