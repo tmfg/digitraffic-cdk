@@ -97,31 +97,24 @@ export const ramiMessageSchema = z
                                                 messageContentType: z
                                                     .enum(["AUDIO", "VIDEO", "AUDIO_VIDEO"])
                                                     .describe("message content type"),
-                                                deliveryPoints: z.array(
-                                                    z
-                                                        .union([
-                                                            z
-                                                                .object({
-                                                                    id: z
-                                                                        .string()
-                                                                        .describe(
-                                                                            "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
-                                                                        ),
-                                                                    nameLong: z.string().nullable().optional()
-                                                                })
-                                                                .describe(
-                                                                    "point where to deliver the scheduled message"
-                                                                ),
-                                                            z
-                                                                .null()
-                                                                .describe(
-                                                                    "point where to deliver the scheduled message"
-                                                                )
-                                                        ])
-                                                        .describe(
-                                                            "point where to deliver the scheduled message"
-                                                        )
-                                                ),
+                                                deliveryPoints: z
+                                                    .array(
+                                                        z
+                                                            .object({
+                                                                id: z
+                                                                    .string()
+                                                                    .describe(
+                                                                        "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
+                                                                    ),
+                                                                nameLong: z
+                                                                    .union([z.string(), z.null()])
+                                                                    .optional()
+                                                            })
+                                                            .describe(
+                                                                "point where to deliver the scheduled message"
+                                                            )
+                                                    )
+                                                    .nullable(),
                                                 recipientAudioMessagesToDeliver: z
                                                     .union([
                                                         z
@@ -315,25 +308,14 @@ export const ramiMessageSchema = z
                                                             .object({
                                                                 videoTexts: z.array(
                                                                     z
-                                                                        .union([
-                                                                            z
-                                                                                .object({
-                                                                                    language: z
-                                                                                        .string()
-                                                                                        .describe(
-                                                                                            "identifies the language of the video content"
-                                                                                        ),
-                                                                                    text: z.string()
-                                                                                })
+                                                                        .object({
+                                                                            language: z
+                                                                                .string()
                                                                                 .describe(
-                                                                                    "information about video text"
+                                                                                    "identifies the language of the video content"
                                                                                 ),
-                                                                            z
-                                                                                .null()
-                                                                                .describe(
-                                                                                    "information about video text"
-                                                                                )
-                                                                        ])
+                                                                            text: z.string()
+                                                                        })
                                                                         .describe(
                                                                             "information about video text"
                                                                         )
@@ -554,7 +536,7 @@ export const ramiMessageSchema = z
                                                                                 repetitions: z
                                                                                     .number()
                                                                                     .int()
-                                                                                    .gte(1)
+                                                                                    .gte(0)
                                                                                     .describe(
                                                                                         "number of times the audio message must be repeated each occurens. It is only used for REPEAT_EVERY type scheduling"
                                                                                     )
@@ -682,25 +664,14 @@ export const ramiMessageSchema = z
                                                             .object({
                                                                 videoTexts: z.array(
                                                                     z
-                                                                        .union([
-                                                                            z
-                                                                                .object({
-                                                                                    language: z
-                                                                                        .string()
-                                                                                        .describe(
-                                                                                            "identifies the language of the video content"
-                                                                                        ),
-                                                                                    text: z.string()
-                                                                                })
+                                                                        .object({
+                                                                            language: z
+                                                                                .string()
                                                                                 .describe(
-                                                                                    "information about video text"
+                                                                                    "identifies the language of the video content"
                                                                                 ),
-                                                                            z
-                                                                                .null()
-                                                                                .describe(
-                                                                                    "information about video text"
-                                                                                )
-                                                                        ])
+                                                                            text: z.string()
+                                                                        })
                                                                         .describe(
                                                                             "information about video text"
                                                                         )
@@ -847,28 +818,16 @@ export const ramiMessageSchema = z
                                                 externalPoints: z
                                                     .array(
                                                         z
-                                                            .union([
-                                                                z
-                                                                    .object({
-                                                                        id: z
-                                                                            .string()
-                                                                            .describe(
-                                                                                "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
-                                                                            ),
-                                                                        nameLong: z
-                                                                            .string()
-                                                                            .nullable()
-                                                                            .optional()
-                                                                    })
+                                                            .object({
+                                                                id: z
+                                                                    .string()
                                                                     .describe(
-                                                                        "point where to deliver the scheduled message"
+                                                                        "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
                                                                     ),
-                                                                z
-                                                                    .null()
-                                                                    .describe(
-                                                                        "point where to deliver the scheduled message"
-                                                                    )
-                                                            ])
+                                                                nameLong: z
+                                                                    .union([z.string(), z.null()])
+                                                                    .optional()
+                                                            })
                                                             .describe(
                                                                 "point where to deliver the scheduled message"
                                                             )
@@ -942,23 +901,20 @@ export const ramiMessageSchema = z
                                 messageContentType: z
                                     .enum(["AUDIO", "VIDEO", "AUDIO_VIDEO"])
                                     .describe("message content type"),
-                                deliveryPoints: z.array(
-                                    z
-                                        .union([
-                                            z
-                                                .object({
-                                                    id: z
-                                                        .string()
-                                                        .describe(
-                                                            "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
-                                                        ),
-                                                    nameLong: z.string().nullable().optional()
-                                                })
-                                                .describe("point where to deliver the scheduled message"),
-                                            z.null().describe("point where to deliver the scheduled message")
-                                        ])
-                                        .describe("point where to deliver the scheduled message")
-                                ),
+                                deliveryPoints: z
+                                    .array(
+                                        z
+                                            .object({
+                                                id: z
+                                                    .string()
+                                                    .describe(
+                                                        "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
+                                                    ),
+                                                nameLong: z.union([z.string(), z.null()]).optional()
+                                            })
+                                            .describe("point where to deliver the scheduled message")
+                                    )
+                                    .nullable(),
                                 audioMessageContents: z
                                     .union([
                                         z
@@ -1080,27 +1036,14 @@ export const ramiMessageSchema = z
                                 videoTexts: z
                                     .array(
                                         z
-                                            .union([
-                                                z
-                                                    .object({
-                                                        language: z
-                                                            .string()
-                                                            .describe(
-                                                                "identifies the language of the content"
-                                                            ),
-                                                        videoText: z
-                                                            .string()
-                                                            .describe("audio text used for tts system")
-                                                    })
-                                                    .describe(
-                                                        "video message content to be delivered for monitored journey scheduled message"
-                                                    ),
-                                                z
-                                                    .null()
-                                                    .describe(
-                                                        "video message content to be delivered for monitored journey scheduled message"
-                                                    )
-                                            ])
+                                            .object({
+                                                language: z
+                                                    .string()
+                                                    .describe("identifies the language of the content"),
+                                                videoText: z
+                                                    .string()
+                                                    .describe("audio text used for tts system")
+                                            })
                                             .describe(
                                                 "video message content to be delivered for monitored journey scheduled message"
                                             )
@@ -1131,7 +1074,19 @@ export const ramiMessageSchema = z
             .describe("Optional extention of payload object")
             .optional()
     })
-    .strict()
-    .describe("Container of the message");
+    .strict();
 
 export type RamiMessage = z.infer<typeof ramiMessageSchema>;
+
+// only onGroundRecipient recipient type is used in practice with scheduledMessages
+type RamiScheduledMessageRecipient = Pick<
+    NonNullable<RamiMessage["payload"]["scheduledMessage"]>,
+    "onGroundRecipient"
+>["onGroundRecipient"];
+
+export type RamiMessageVideoContent = NonNullable<
+    Pick<
+        NonNullable<RamiScheduledMessageRecipient>,
+        "recipientVideoMessagesToDeliver"
+    >["recipientVideoMessagesToDeliver"]
+>;
