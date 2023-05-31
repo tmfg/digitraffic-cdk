@@ -1033,9 +1033,16 @@ type RamiScheduledMessageRecipient = Pick<
     "onGroundRecipient"
 >["onGroundRecipient"];
 
-export type RamiScheduledMessageVideoContent = NonNullable<
+export type RamiScheduledMessageVideo = NonNullable<
     Pick<
         NonNullable<RamiScheduledMessageRecipient>,
         "recipientVideoMessagesToDeliver"
     >["recipientVideoMessagesToDeliver"]
+>;
+
+export type RamiScheduledMessageAudio = NonNullable<
+    Pick<
+        NonNullable<RamiScheduledMessageRecipient>,
+        "recipientAudioMessagesToDeliver"
+    >["recipientAudioMessagesToDeliver"]
 >;

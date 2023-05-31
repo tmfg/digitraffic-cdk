@@ -5,30 +5,34 @@ export interface DtRamiMessage {
     readonly startValidity: Date;
     readonly endValidity: Date;
     readonly trainNumber?: number;
-    readonly trainDepartureDate?: Date;
+    readonly trainDepartureLocalDate?: string;
     readonly journeyRef?: string;
     readonly stations?: string[];
-    readonly video?: VideoContent;
-    readonly audio?: AudioContent;
+    readonly video?: DtVideoContent;
+    readonly audio?: DtAudioContent;
 }
 
-export interface VideoContent {
+export interface DtVideoContent {
     readonly textFi?: string;
     readonly textSv?: string;
     readonly textEn?: string;
     readonly deliveryType?: string;
     readonly startDateTime?: Date;
     readonly endDateTime?: Date;
+    readonly startTime?: string;
+    readonly endTime?: string;
     readonly daysOfWeek?: DayOfWeek[];
 }
 
-export interface AudioContent {
+export interface DtAudioContent {
     readonly textFi?: string;
     readonly textSv?: string;
     readonly textEn?: string;
     readonly deliveryType?: string;
     readonly startDateTime?: Date;
     readonly endDateTime?: Date;
+    readonly startTime?: string;
+    readonly endTime?: string;
     readonly daysOfWeek?: DayOfWeek[];
     readonly deliveryAt?: Date;
 }
