@@ -15,15 +15,15 @@ export const handler = () => {
     );
 
     checker.expectOne(
-        "active cache updated in last 15 minutes",
+        "active cache updated in last 3 days",
         `select count(*) from cached_json where cache_id = '${JSON_CACHE_KEY.NAUTICAL_WARNINGS_ACTIVE}'
-            and last_updated > now() - interval '15 minutes'`
+            and last_updated > now() - interval '3 days'`
     );
 
     checker.expectOne(
-        "archived cache updated in last 15 minutes",
+        "archived cache updated in last 3 days",
         `select count(*) from cached_json where cache_id = '${JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED}'
-            and last_updated > now() - interval '15 minutes'`
+            and last_updated > now() - interval '3 days'`
     );
 
     return checker.expect();
