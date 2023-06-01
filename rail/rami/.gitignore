@@ -10,17 +10,6 @@
 !/*.md
 !/*.sh
 
-!/config/
-!/config/*.json
-!/docs/
-!/docs/*
-!/database/
-!/database/Dockerfile
-!/database/**/
-!/database/**/*.sql
-!/database/**/*.md
-!/database/**/*.sh
-!/database/**/*.conf
 !/lib/
 !/lib/**/
 !/lib/**/*.ts

@@ -197,6 +197,11 @@
       "projectFolder": "rail/rata",
       "tags": ["cdk", "rail"]
     },
+    {
+      "packageName": "rami",
+      "projectFolder": "rail/rami",
+      "tags": ["cdk", "rail"]
+    },
 
     // road
     {

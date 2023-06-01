@@ -8,7 +8,8 @@ export class RamiStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {
         super(scope, id, configuration);
 
-        const sqs = DigitrafficSqsQueue.create(this, "RamiMessageQueue", {
+        const queueName = "RamiMessageQueue";
+        const sqs = DigitrafficSqsQueue.create(this, queueName, {
             receiveMessageWaitTime: Duration.seconds(5),
             visibilityTimeout: Duration.seconds(60)
         });
