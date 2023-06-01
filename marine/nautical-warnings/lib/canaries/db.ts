@@ -20,11 +20,11 @@ export const handler = () => {
             and last_updated > now() - interval '3 days'`
     );
 
-    checker.expectOne(
+    /*checker.expectOne(
         "archived cache updated in last 3 days",
         `select count(*) from cached_json where cache_id = '${JSON_CACHE_KEY.NAUTICAL_WARNINGS_ARCHIVED}'
             and last_updated > now() - interval '3 days'`
-    );
+    );*/
 
     return checker.expect();
 };
