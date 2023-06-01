@@ -37,10 +37,13 @@ export interface DtAudioContent {
     readonly deliveryAt?: Date;
 }
 
-const daysOfWeek = ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY", "SUNDAY"] as const;
+export const daysOfWeek = [
+    "SUNDAY",
+    "MONDAY",
+    "TUESDAY",
+    "WEDNESDAY",
+    "THURSDAY",
+    "FRIDAY",
+    "SATURDAY"
+] as const;
 export type DayOfWeek = (typeof daysOfWeek)[number];
-
-export enum RamiMessageType {
-    MONITORED_JOURNEY_SCHEDULED_MESSAGE = "MONITORED_JOURNEY_SCHEDULED_MESSAGE",
-    SCHEDULED_MESSAGE = "SCHEDULED_MESSAGE"
-}

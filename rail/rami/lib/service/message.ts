@@ -1,12 +1,14 @@
+import { ramiMessageSchema } from "../model/rami-message-schema";
+import { DtAudioContent, DtRamiMessage, DtVideoContent } from "../model/dt-rami-message";
+import { parseISO } from "date-fns";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 import {
     RamiMessage,
-    ramiMessageSchema,
+    RamiMessageType,
     RamiScheduledMessageAudio,
     RamiScheduledMessageVideo
-} from "../model/rami-message-schema";
-import { DtAudioContent, DtRamiMessage, DtVideoContent, RamiMessageType } from "../model/dt-rami-message";
-import { parseISO } from "date-fns";
-import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../../test/testdata";
+} from "../model/rami-message";
 
 interface DeliveryPoint {
     readonly id: string;
@@ -27,6 +29,16 @@ const LanguageCodes = {
 } as const;
 
 type LanguageCode = (typeof LanguageCodes)[keyof typeof LanguageCodes];
+
+export function processRamiMessage(message: unknown): DtRamiMessage | undefined {
+    try {
+        const parsedMessage = ramiMessageSchema.parse(message);
+        return ramiMessageToDtRamiMessage(parsedMessage);
+    } catch (e) {
+        logException(logger, e);
+    }
+    return undefined;
+}
 
 export function ramiMessageToDtRamiMessage(message: RamiMessage): DtRamiMessage {
     return {

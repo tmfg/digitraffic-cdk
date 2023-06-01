@@ -1024,25 +1024,3 @@ export const ramiMessageSchema = z
             .optional()
     })
     .strict();
-
-export type RamiMessage = z.infer<typeof ramiMessageSchema>;
-
-// only onGroundRecipient recipient type is used in practice with scheduledMessages
-type RamiScheduledMessageRecipient = Pick<
-    NonNullable<RamiMessage["payload"]["scheduledMessage"]>,
-    "onGroundRecipient"
->["onGroundRecipient"];
-
-export type RamiScheduledMessageVideo = NonNullable<
-    Pick<
-        NonNullable<RamiScheduledMessageRecipient>,
-        "recipientVideoMessagesToDeliver"
-    >["recipientVideoMessagesToDeliver"]
->;
-
-export type RamiScheduledMessageAudio = NonNullable<
-    Pick<
-        NonNullable<RamiScheduledMessageRecipient>,
-        "recipientAudioMessagesToDeliver"
-    >["recipientAudioMessagesToDeliver"]
->;
