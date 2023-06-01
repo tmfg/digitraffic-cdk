@@ -9,7 +9,6 @@
 !/*.json
 !/*.md
 !/*.sh
-!/**/json/*.json
 
 !/config/
 !/config/*.json
@@ -25,6 +24,7 @@
 !/lib/
 !/lib/**/
 !/lib/**/*.ts
+!/lib/model/source/*
 !/test/
 !/test/**/
 !/test/**/*.ts
