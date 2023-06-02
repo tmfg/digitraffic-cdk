@@ -1,6 +1,7 @@
 export interface DtRamiMessage {
     readonly id: string;
     readonly version: number;
+    readonly messageType: string;
     readonly created: Date;
     readonly startValidity: Date;
     readonly endValidity: Date;
@@ -35,6 +36,8 @@ export interface DtAudioContent {
     readonly endTime?: string;
     readonly daysOfWeek?: DayOfWeek[];
     readonly deliveryAt?: Date;
+    readonly repetitions?: number;
+    readonly repeatEvery?: number;
 }
 
 export const daysOfWeek = [

@@ -45,6 +45,7 @@ export function ramiMessageToDtRamiMessage({ payload }: RamiMessage): DtRamiMess
     return {
         id: payload.messageId,
         version: payload.messageVersion,
+        messageType: payload.messageType,
         created: parseISO(payload.creationDateTime),
         startValidity: parseISO(payload.startValidity),
         endValidity: parseISO(payload.endValidity),
@@ -99,6 +100,8 @@ function parseScheduledMessageAudio(audioMessage: RamiScheduledMessageAudio): Dt
                 : undefined,
             startTime: audioMessage.scheduledAudioDeliveryRules.startTime ?? undefined,
             endTime: audioMessage.scheduledAudioDeliveryRules.endTime ?? undefined,
+            repetitions: audioMessage.scheduledAudioDeliveryRules.repetitions ?? undefined,
+            repeatEvery: audioMessage.scheduledAudioDeliveryRules.repeatEvery ?? undefined,
             daysOfWeek: audioMessage.scheduledAudioDeliveryRules.daysOfWeek ?? undefined,
             deliveryAt: audioMessage.scheduledAudioDeliveryRules.deliveryAtDateTime
                 ? parseISO(audioMessage.scheduledAudioDeliveryRules.deliveryAtDateTime)
@@ -150,7 +153,6 @@ function parseScheduledMessageVideo(videoMessage: RamiScheduledMessageVideo): Dt
 }
 
 function getTextInLanguage(texts: TextContent[], languageCode: LanguageCode): string | undefined {
-    if (!texts) return undefined;
     const textContent = texts.find((text) => text.language === languageCode);
     return textContent?.text ?? textContent?.videoText ?? textContent?.audioText ?? undefined;
 }
