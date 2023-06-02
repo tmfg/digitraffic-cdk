@@ -4,7 +4,7 @@ import { processRamiMessage } from "../../service/message";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 
-export function handlerFn() {
+export function handlerFn(): (event: SQSEvent) => void {
     return (event: SQSEvent) => {
         event.Records.map((r) => {
             const parsedRamiMessage = processRamiMessage(JSON.parse(r.body));

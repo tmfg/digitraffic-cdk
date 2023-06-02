@@ -5,6 +5,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { logException } from "@digitraffic/common/dist/utils/logging";
 import {
     RamiMessage,
+    RamiMessagePayload,
     RamiMessageType,
     RamiScheduledMessageAudio,
     RamiScheduledMessageVideo
@@ -12,7 +13,7 @@ import {
 
 interface DeliveryPoint {
     readonly id: string;
-    readonly nameLong?: string | null | undefined;
+    readonly nameLong?: string;
 }
 
 interface TextContent {
@@ -40,38 +41,36 @@ export function processRamiMessage(message: unknown): DtRamiMessage | undefined 
     return undefined;
 }
 
-export function ramiMessageToDtRamiMessage(message: RamiMessage): DtRamiMessage {
+export function ramiMessageToDtRamiMessage({ payload }: RamiMessage): DtRamiMessage {
     return {
-        id: message.payload.messageId,
-        version: message.payload.messageVersion,
-        created: parseISO(message.payload.creationDateTime),
-        startValidity: parseISO(message.payload.startValidity),
-        endValidity: parseISO(message.payload.endValidity),
-        trainNumber: message.payload.monitoredJourneyScheduledMessage?.vehicleJourney?.vehicleJourneyName
-            ? parseInt(message.payload.monitoredJourneyScheduledMessage?.vehicleJourney?.vehicleJourneyName)
+        id: payload.messageId,
+        version: payload.messageVersion,
+        created: parseISO(payload.creationDateTime),
+        startValidity: parseISO(payload.startValidity),
+        endValidity: parseISO(payload.endValidity),
+        trainNumber: payload.monitoredJourneyScheduledMessage?.vehicleJourney?.vehicleJourneyName
+            ? parseInt(payload.monitoredJourneyScheduledMessage?.vehicleJourney?.vehicleJourneyName)
             : undefined,
-        trainDepartureLocalDate:
-            message.payload.monitoredJourneyScheduledMessage?.vehicleJourney?.dataFrameRef,
-        journeyRef: message.payload.monitoredJourneyScheduledMessage?.vehicleJourney?.datedVehicleJourneyRef,
-        stations: getDeliveryPoints(message),
-        video: getVideoContent(message),
-        audio: getAudioContent(message)
+        trainDepartureLocalDate: payload.monitoredJourneyScheduledMessage?.vehicleJourney?.dataFrameRef,
+        journeyRef: payload.monitoredJourneyScheduledMessage?.vehicleJourney?.datedVehicleJourneyRef,
+        stations: getDeliveryPoints(payload),
+        video: getVideoContent(payload),
+        audio: getAudioContent(payload)
     };
 }
 
-function getAudioContent(message: RamiMessage): DtAudioContent | undefined {
+function getAudioContent(payload: RamiMessagePayload): DtAudioContent | undefined {
     if (
-        message.payload.messageType === RamiMessageType.SCHEDULED_MESSAGE &&
-        message.payload.scheduledMessage?.onGroundRecipient?.recipientAudioMessagesToDeliver
+        payload.messageType === RamiMessageType.SCHEDULED_MESSAGE &&
+        payload.scheduledMessage?.onGroundRecipient?.recipientAudioMessagesToDeliver
     ) {
-        const audioMessage =
-            message.payload.scheduledMessage?.onGroundRecipient?.recipientAudioMessagesToDeliver;
+        const audioMessage = payload.scheduledMessage?.onGroundRecipient?.recipientAudioMessagesToDeliver;
         return parseScheduledMessageAudio(audioMessage);
     } else if (
-        message.payload.messageType === RamiMessageType.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
-        message.payload.monitoredJourneyScheduledMessage?.audioMessageContents
+        payload.messageType === RamiMessageType.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
+        payload.monitoredJourneyScheduledMessage?.audioMessageContents
     ) {
-        const audioMessage = message.payload.monitoredJourneyScheduledMessage?.audioMessageContents;
+        const audioMessage = payload.monitoredJourneyScheduledMessage.audioMessageContents;
         const audioTexts = audioMessage.audioTexts as TextContent[];
         return {
             textFi: getTextInLanguage(audioTexts, LanguageCodes.FI),
@@ -108,19 +107,18 @@ function parseScheduledMessageAudio(audioMessage: RamiScheduledMessageAudio): Dt
     };
 }
 
-function getVideoContent(message: RamiMessage): DtVideoContent | undefined {
+function getVideoContent(payload: RamiMessagePayload): DtVideoContent | undefined {
     if (
-        message.payload.messageType === RamiMessageType.SCHEDULED_MESSAGE &&
-        message.payload.scheduledMessage?.onGroundRecipient?.recipientVideoMessagesToDeliver
+        payload.messageType === RamiMessageType.SCHEDULED_MESSAGE &&
+        payload.scheduledMessage?.onGroundRecipient?.recipientVideoMessagesToDeliver
     ) {
-        const videoMessage =
-            message.payload.scheduledMessage.onGroundRecipient.recipientVideoMessagesToDeliver;
+        const videoMessage = payload.scheduledMessage.onGroundRecipient.recipientVideoMessagesToDeliver;
         return parseScheduledMessageVideo(videoMessage);
     } else if (
-        message.payload.messageType === RamiMessageType.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
-        message.payload.monitoredJourneyScheduledMessage?.videoTexts
+        payload.messageType === RamiMessageType.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
+        payload.monitoredJourneyScheduledMessage?.videoTexts
     ) {
-        const videoTexts = message.payload.monitoredJourneyScheduledMessage?.videoTexts as TextContent[];
+        const videoTexts = payload.monitoredJourneyScheduledMessage.videoTexts as TextContent[];
         return {
             textFi: getTextInLanguage(videoTexts, LanguageCodes.FI),
             textSv: getTextInLanguage(videoTexts, LanguageCodes.SV),
@@ -151,31 +149,24 @@ function parseScheduledMessageVideo(videoMessage: RamiScheduledMessageVideo): Dt
     };
 }
 
-function getTextInLanguage(texts: TextContent[] | null, languageCode: LanguageCode): string | undefined {
+function getTextInLanguage(texts: TextContent[], languageCode: LanguageCode): string | undefined {
     if (!texts) return undefined;
-    const textContent = texts.find((text) => text?.language === languageCode);
-    if (textContent?.text) return textContent.text;
-    if (textContent?.videoText) return textContent.videoText;
-    if (textContent?.audioText) return textContent.audioText;
-    return undefined;
+    const textContent = texts.find((text) => text.language === languageCode);
+    return textContent?.text ?? textContent?.videoText ?? textContent?.audioText ?? undefined;
 }
 
-function getDeliveryPoints(message: RamiMessage): string[] | undefined {
+function getDeliveryPoints(payload: RamiMessagePayload): string[] | undefined {
     if (
-        message.payload.messageType === RamiMessageType.SCHEDULED_MESSAGE &&
-        message.payload.scheduledMessage?.onGroundRecipient?.deliveryPoints
+        payload.messageType === RamiMessageType.SCHEDULED_MESSAGE &&
+        payload.scheduledMessage?.onGroundRecipient?.deliveryPoints
     ) {
-        return mapDeliveryPointsToStationCodes(
-            message.payload.scheduledMessage.onGroundRecipient.deliveryPoints
-        );
+        return mapDeliveryPointsToStationCodes(payload.scheduledMessage.onGroundRecipient.deliveryPoints);
     }
     if (
-        message.payload.messageType === RamiMessageType.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
-        message.payload.monitoredJourneyScheduledMessage?.deliveryPoints
+        payload.messageType === RamiMessageType.MONITORED_JOURNEY_SCHEDULED_MESSAGE &&
+        payload.monitoredJourneyScheduledMessage?.deliveryPoints
     ) {
-        return mapDeliveryPointsToStationCodes(
-            message.payload.monitoredJourneyScheduledMessage.deliveryPoints
-        );
+        return mapDeliveryPointsToStationCodes(payload.monitoredJourneyScheduledMessage.deliveryPoints);
     }
     return undefined;
 }

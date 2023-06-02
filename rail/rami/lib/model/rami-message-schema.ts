@@ -106,9 +106,7 @@ export const ramiMessageSchema = z
                                                                     .describe(
                                                                         "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
                                                                     ),
-                                                                nameLong: z
-                                                                    .union([z.string(), z.null()])
-                                                                    .optional()
+                                                                nameLong: z.string().optional()
                                                             })
                                                             .describe(
                                                                 "point where to deliver the scheduled message"
@@ -784,9 +782,7 @@ export const ramiMessageSchema = z
                                                                     .describe(
                                                                         "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
                                                                     ),
-                                                                nameLong: z
-                                                                    .union([z.string(), z.null()])
-                                                                    .optional()
+                                                                nameLong: z.string().optional()
                                                             })
                                                             .describe(
                                                                 "point where to deliver the scheduled message"
@@ -798,13 +794,11 @@ export const ramiMessageSchema = z
                                                     .string()
                                                     .describe("scheduling start date-time")
                                                     .nullable()
-                                                    .describe("scheduling start date-time")
                                                     .optional(),
                                                 endDateTime: z
                                                     .string()
                                                     .describe("scheduling end date-time")
                                                     .nullable()
-                                                    .describe("scheduling end date-time")
                                                     .optional()
                                             })
                                             .describe(
@@ -870,7 +864,7 @@ export const ramiMessageSchema = z
                                                     .describe(
                                                         "**This refers to code external to Moova**. It is retrieved by invoking the SVCPLN-NetworkCode service"
                                                     ),
-                                                nameLong: z.union([z.string(), z.null()]).optional()
+                                                nameLong: z.string().optional()
                                             })
                                             .describe("point where to deliver the scheduled message")
                                     )

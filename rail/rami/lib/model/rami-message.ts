@@ -2,6 +2,7 @@ import { ramiMessageSchema } from "./rami-message-schema";
 import { z } from "zod";
 
 export type RamiMessage = z.infer<typeof ramiMessageSchema>;
+export type RamiMessagePayload = Pick<RamiMessage, "payload">["payload"];
 
 export enum RamiMessageType {
     MONITORED_JOURNEY_SCHEDULED_MESSAGE = "MONITORED_JOURNEY_SCHEDULED_MESSAGE",
