@@ -132,7 +132,7 @@ async function getKibanaResult(
     return output;
 }
 
-async function getKibanaResults(
+export async function getKibanaResults(
     keyFigures: KeyFigure[],
     apiPaths: { transportType: string; paths: Set<string> }[],
     event: KeyFigureLambdaEvent
@@ -143,12 +143,7 @@ async function getKibanaResults(
         for (const apiPath of apiPaths) {
             console.info(`Running: ${apiPath.transportType}`);
             kibanaResults.push(
-                await getKibanaResult(
-                    keyFigures,
-                    startDate,
-                    endDate,
-                    `@transport_type:${apiPath.transportType}`
-                )
+                getKibanaResult(keyFigures, startDate, endDate, `@transport_type:${apiPath.transportType}`)
             );
         }
     }
@@ -157,7 +152,7 @@ async function getKibanaResults(
         for (const path of apiPath.paths) {
             console.info(`Running: ${path}`);
             kibanaResults.push(
-                await getKibanaResult(
+                getKibanaResult(
                     keyFigures,
                     startDate,
                     endDate,
@@ -167,7 +162,8 @@ async function getKibanaResults(
         }
     }
 
-    return kibanaResults.flat();
+    const foo = await Promise.all(kibanaResults);
+    return foo.flat();
 }
 
 async function getRowAmountWithDateNameFilter(
@@ -235,7 +231,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
     }
 }
 
-async function getApiPaths(): Promise<{ transportType: string; paths: Set<string> }[]> {
+export async function getApiPaths(): Promise<{ transportType: string; paths: Set<string> }[]> {
     const railSwaggerPaths = await getPaths("https://rata.digitraffic.fi/swagger/openapi.json");
     const roadSwaggerPaths = await getPaths("https://tie.digitraffic.fi/swagger/openapi.json");
     const marineSwaggerPaths = await getPaths("https://meri.digitraffic.fi/swagger/openapi.json");
@@ -269,7 +265,7 @@ async function getApiPaths(): Promise<{ transportType: string; paths: Set<string
     ];
 }
 
-function getKeyFigures(): KeyFigure[] {
+export function getKeyFigures(): KeyFigure[] {
     return esQueries.map((entry) => {
         return { ...entry, query: JSON.stringify(entry.query) };
     });
