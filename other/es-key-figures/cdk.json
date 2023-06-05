@@ -1,5 +1,5 @@
 {
-  "app": "npx ts-node bin/es-key-figures.ts",
+  "app": "node dist/out/bin/es-key-figures-app.js",
   "context": {
     "@aws-cdk/aws-rds:lowercaseDbIdentifier": false
   }
