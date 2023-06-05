@@ -4,14 +4,14 @@
   "private": true,
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "tsc && npm run postbuild",
-    "postbuild": "esbuild lib/lambda/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
-    "bundle-watch": "find lib/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node lib/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "build": "heft build --clean || npm run postbuild",
+    "postbuild": "esbuild src/lambda/*.ts --log-level=warning --bundle --platform=node --outdir=dist/lambda --external:aws-sdk --target=node16",
+    "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "echo no tests for this project",
-    "watch": "tsc -w"
+    "watch": "heft build --clean --watch"
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
@@ -24,10 +24,14 @@
     "source-map-support": "^0.5.21"
   },
   "devDependencies": {
+    "@digitraffic-cdk/digitraffic-cdk-rig": "workspace:*",
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.2.0",
+    "@rushstack/heft": "^0.50.0",
+    "@rushstack/heft-jest-plugin": "^0.5.6",
     "@types/aws-lambda": "~8.10.114",
+    "@types/heft-jest": "~1.0.3",
     "@types/jest": "^29.5.1",
     "@types/mysql": "^2.15.15",
     "@types/node": "18.15.13",

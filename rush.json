@@ -261,7 +261,7 @@
       "tags": ["internal"]
     },
     {
-      "packageName": "@digitraffic-cdk/rig",
+      "packageName": "@digitraffic-cdk/digitraffic-cdk-rig",
       "projectFolder": "tools/rig",
       "tags": ["internal"]
     },
