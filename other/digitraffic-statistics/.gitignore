@@ -1,25 +1,26 @@
 *
 
-!.eslintignore
-!.eslintrc.json
-!.gitignore
-!cdk.json
-!tsconfig.json
-!package.json
+!/.eslintignore
+!/.eslintrc.json
+!/.gitignore
+!/cdk.json
+!/tsconfig.json
+!/package.json
 
-!lib/
-!lib/**/
-!lib/**/*.ts
+!/lib/
+!/lib/**/
+!/lib/**/*.ts
 
-!digitraffic-figures/
-!digitraffic-figures/**/
-!digitraffic-figures/dbfigures/sql
-!digitraffic-figures/digitraffic_figures/
-!digitraffic-figures/**/*.py
-!digitraffic-figures/dbfigures/sql/*.sql
-!digitraffic-figures/.env.example
-!digitraffic-figures/docker-compose.yml
-!digitraffic-figures/Dockerfile
-!digitraffic-figures/Makefile
-!digitraffic-figures/requirements.txt
-!digitraffic-figures/update_requirements.sh
+!/digitraffic-figures/
+!/digitraffic-figures/**/
+!/digitraffic-figures/dbfigures/sql
+!/digitraffic-figures/app.py
+!/digitraffic-figures/digitraffic_figures/
+!/digitraffic-figures/digitraffic_figures/**/*.py
+!/digitraffic-figures/dbfigures/sql/*.sql
+!/digitraffic-figures/.env.example
+!/digitraffic-figures/docker-compose.yml
+!/digitraffic-figures/Dockerfile
+!/digitraffic-figures/Makefile
+!/digitraffic-figures/requirements.txt
+!/digitraffic-figures/update_requirements.sh
