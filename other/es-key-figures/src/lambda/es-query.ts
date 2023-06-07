@@ -1,43 +1,122 @@
 import "source-map-support/register";
 import * as AWSx from "aws-sdk";
+import type { IncomingMessage } from "http";
 
 const AWS = AWSx as any;
 
 const region = "eu-west-1";
 
-export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
-    return new Promise((resolve) => {
-        const creds = new AWS.EnvironmentCredentials("AWS");
-        const req = new AWS.HttpRequest(endpoint);
-        const index = "dt-nginx-*";
+class HttpError extends Error {
+    statusCode: number;
 
-        req.method = "POST";
-        req.path = `/${index}/${path}`;
-        req.region = region;
-        req.headers.Host = endpoint.host;
-        req.headers["Content-Type"] = "application/json";
-        req.body = query;
+    constructor(statusCode: number, message: string) {
+        super(message);
+        this.statusCode = statusCode;
+    }
+}
 
-        const signer = new AWS.Signers.V4(req, "es");
-        signer.addAuthorization(creds, new Date());
+const retryStatusCodes = new Set([
+    // 403 näyttää tulevan aina sillon tällön ilman mitään ilmeistä syytä
+    403,
+    // Opensearch ainakin huutaa 429, jos tekee liian monta kyselyä liian nopeasti
+    429
+]);
 
-        const send = new AWS.NodeHttpClient();
-
-        send.handleRequest(
-            req,
-            null,
-            function (httpResp: any) {
-                let respBody = "";
-                httpResp.on("data", function (chunk: any) {
-                    respBody += chunk;
-                });
-                httpResp.on("end", function (chunk: any) {
-                    resolve(JSON.parse(respBody));
-                });
-            },
-            function (err: any) {
-                console.error("Error: " + err);
+function isLastRetry(retryCount: number) {
+    return retryCount > 5;
+}
+export async function retryRequest<T>(request: () => Promise<T>): Promise<T> {
+    let retryCount = 0;
+    while (!isLastRetry(retryCount)) {
+        try {
+            return await request();
+        } catch (error) {
+            if (isLastRetry(retryCount)) {
+                throw error;
             }
-        );
-    });
+            if (error instanceof HttpError) {
+                if (retryStatusCodes.has(error.statusCode)) {
+                    retryCount++;
+                    const seconds = 2 ** retryCount;
+                    console.info(
+                        `Retrying request in ${seconds} seconds due to status code ${error.statusCode} (retry count: ${retryCount})`
+                    );
+                    await new Promise((resolve) => setTimeout(resolve, 1000 * seconds));
+                }
+            } else {
+                throw error;
+            }
+        }
+    }
+}
+
+function handleResponseFromEs(
+    successCallback: (result: Record<string, unknown>) => void,
+    failedCallback: (code: number, message: string) => void
+) {
+    return (httpResp: IncomingMessage) => {
+        const statusCode = httpResp.statusCode;
+        if (statusCode < 200 || statusCode >= 300) {
+            failedCallback(
+                statusCode,
+                `OpenSearch responded with status code ${httpResp.statusCode}. The error message was: ${httpResp.statusMessage}`
+            );
+            return;
+        }
+        let respBody = "";
+        httpResp.on("data", function (chunk: any) {
+            respBody += chunk;
+        });
+        httpResp.on("end", function (chunk: any) {
+            try {
+                successCallback(JSON.parse(respBody));
+            } catch (e) {
+                console.log(`Failed to parse response body: ${respBody}`);
+            }
+        });
+    };
+}
+
+export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
+    const creds = new AWS.EnvironmentCredentials("AWS");
+    const req = new AWS.HttpRequest(endpoint);
+    const index = "dt-nginx-*";
+
+    req.method = "POST";
+    req.path = `/${index}/${path}`;
+    req.region = region;
+    req.headers.Host = endpoint.host;
+    req.headers["Content-Type"] = "application/json";
+    req.body = query;
+
+    const signer = new AWS.Signers.V4(req, "es");
+    signer.addAuthorization(creds, new Date());
+
+    const client = new AWS.NodeHttpClient();
+
+    const makeRequest = async (): Promise<Record<string, unknown>> => {
+        return new Promise((resolve, reject) => {
+            client.handleRequest(
+                req,
+                null,
+                handleResponseFromEs(
+                    (result) => {
+                        resolve(result);
+                    },
+                    (code, message) => {
+                        reject(new HttpError(code, message));
+                    }
+                ),
+                function (err: any) {
+                    console.error("Error: " + err);
+                }
+            );
+        });
+    };
+    try {
+        return await retryRequest(makeRequest);
+    } catch (error) {
+        console.error(`Request failed: ${error}`);
+        throw error;
+    }
 }

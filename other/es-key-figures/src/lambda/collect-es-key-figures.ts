@@ -143,16 +143,21 @@ export async function getKibanaResults(
         for (const apiPath of apiPaths) {
             console.info(`Running: ${apiPath.transportType}`);
             kibanaResults.push(
-                getKibanaResult(keyFigures, startDate, endDate, `@transport_type:${apiPath.transportType}`)
+                await getKibanaResult(
+                    keyFigures,
+                    startDate,
+                    endDate,
+                    `@transport_type:${apiPath.transportType}`
+                )
             );
         }
     }
 
     for (const apiPath of apiPaths) {
         for (const path of apiPath.paths) {
-            console.info(`Running: ${path}`);
+            console.info(`Running path: ${path}`);
             kibanaResults.push(
-                getKibanaResult(
+                await getKibanaResult(
                     keyFigures,
                     startDate,
                     endDate,
@@ -162,8 +167,9 @@ export async function getKibanaResults(
         }
     }
 
-    const foo = await Promise.all(kibanaResults);
-    return foo.flat();
+    //const foo = await Promise.all(kibanaResults);
+    //return foo.flat();
+    return kibanaResults.flat();
 }
 
 async function getRowAmountWithDateNameFilter(

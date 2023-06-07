@@ -5,8 +5,8 @@ import {
     getKibanaResults
 } from "./lambda/collect-es-key-figures";
 
-export const handler = async (transportType: string) => {
-    const apiPaths = (await getApiPaths()).filter((s) => s.transportType === transportType);
+export const handler = async (event: KeyFigureLambdaEvent) => {
+    const apiPaths = (await getApiPaths()).filter((s) => s.transportType === event.TRANSPORT_TYPE);
 
     const pathsToProcess = [...apiPaths[0].paths];
     const middleIndex = Math.ceil(pathsToProcess.length / 2);
@@ -30,11 +30,14 @@ export const handler = async (transportType: string) => {
 
     const keyFigures = getKeyFigures();
 
-    console.log(JSON.stringify({ apiPaths, firstHalf, secondHalf }));
+    //console.log(JSON.stringify({ apiPaths, firstHalf, secondHalf }));
 
-    const kibanaResults = await getKibanaResults(keyFigures, apiPaths, {} as KeyFigureLambdaEvent);
+    const kibanaResults = await getKibanaResults(keyFigures, apiPaths, event);
 
     console.log(JSON.stringify(kibanaResults));
+    return Promise.resolve(true);
 };
 
-handler("rail").catch((error) => console.error(JSON.stringify({ message: "error", error })));
+handler({ TRANSPORT_TYPE: "road" }).catch((error) =>
+    console.error(JSON.stringify({ message: "error", error }))
+);
