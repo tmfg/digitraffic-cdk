@@ -3,8 +3,9 @@ import * as R from "ramda";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
 import { TyokoneenseurannanKirjaus } from "../lib/model/models";
 
-const ID_PLACEHOLDER = "ID_PLACEHOLDER";
-const TK_PLACEHOLDER = "TK_PLACEHOLDER";
+const REGEXP_ID = new RegExp("ID_PLACEHOLDER", "g");
+const REGEXP_TK = new RegExp("TK_PLACEHOLDER", "g");
+
 const TRACKING_JSON_WITH_3_OBSERVATIONS = `{
             "otsikko": {
                 "lahettaja": {
@@ -94,20 +95,11 @@ const TRACKING_JSON_WITH_3_OBSERVATIONS = `{
             ]
         }`;
 
-export function getTrackingJsonWith3Observations(
-    id: string,
-    tyokoneId?: string
-): string {
+export function getTrackingJsonWith3Observations(id: string, tyokoneId?: string): string {
     if (tyokoneId) {
-        return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(
-            new RegExp(ID_PLACEHOLDER, "g"),
-            id
-        ).replace(new RegExp(TK_PLACEHOLDER, "g"), tyokoneId);
+        return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(REGEXP_ID, id).replace(REGEXP_TK, tyokoneId);
     }
-    return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(
-        new RegExp(ID_PLACEHOLDER, "g"),
-        id
-    ).replace(new RegExp(TK_PLACEHOLDER, "g"), "123456789");
+    return TRACKING_JSON_WITH_3_OBSERVATIONS.replace(REGEXP_ID, id).replace(REGEXP_TK, "123456789");
 }
 
 export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
@@ -116,22 +108,18 @@ export function getTrackingJsonWith3ObservationsAndMissingSendingSystem(
 ): string {
     const validJson = getTrackingJsonWith3Observations(id, tyokoneId);
     const trackingJson = JSON.parse(validJson) as TyokoneenseurannanKirjaus;
-    return JSON.stringify(
-        R.dissocPath(["otsikko", "lahettaja", "jarjestelma"], trackingJson)
-    );
+    return JSON.stringify(R.dissocPath(["otsikko", "lahettaja", "jarjestelma"], trackingJson));
 }
 
 export function assertObservationData(
     srcObservations: DbObservationData[],
     results: DbObservationData[]
-) {
+): void {
     results.forEach((resultObservation) => {
         const resultObservationWithoutId = R.dissoc("id", resultObservation);
 
         const foundSrcObservations = srcObservations.filter(
-            (o) =>
-                o.observationTime.getTime() ===
-                resultObservationWithoutId.observationTime.getTime()
+            (o) => o.observationTime.getTime() === resultObservationWithoutId.observationTime.getTime()
         );
         expect(foundSrcObservations.length).toBe(1);
 

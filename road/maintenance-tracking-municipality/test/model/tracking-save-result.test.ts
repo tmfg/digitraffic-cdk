@@ -16,9 +16,7 @@ describe("tracking-save-result-model-test", () => {
 
     test("sum", () => {
         expectSizeSaveErrors(
-            new TrackingSaveResult(1, 2, 3).add(
-                new TrackingSaveResult(10, 20, 30)
-            ),
+            new TrackingSaveResult(1, 2, 3).add(new TrackingSaveResult(10, 20, 30)),
             11,
             22,
             33
@@ -26,21 +24,11 @@ describe("tracking-save-result-model-test", () => {
     });
 
     test("addError", () => {
-        expectSizeSaveErrors(
-            new TrackingSaveResult(1, 2, 3).addSaved(10),
-            11,
-            3,
-            3
-        );
+        expectSizeSaveErrors(new TrackingSaveResult(1, 2, 3).addSaved(10), 11, 3, 3);
     });
 
     test("addError", () => {
-        expectSizeSaveErrors(
-            new TrackingSaveResult(1, 2, 3).addError(10),
-            11,
-            2,
-            4
-        );
+        expectSizeSaveErrors(new TrackingSaveResult(1, 2, 3).addError(10), 11, 2, 4);
     });
 });
 
@@ -49,7 +37,7 @@ function expectSizeSaveErrors(
     sizeBytes: number,
     saved: number,
     errors: number
-) {
+): void {
     expect(result.sizeBytes).toEqual(sizeBytes);
     expect(result.saved).toEqual(saved);
     expect(result.errors).toEqual(errors);

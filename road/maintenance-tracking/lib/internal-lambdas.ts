@@ -33,7 +33,7 @@ export function createProcessQueueAndDlqLambda(
     sqsExtendedMessageBucketArn: string,
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
-) {
+): void {
     createProcessQueueLambda(
         queueAndDLQ.queue,
         dlqBucket.urlForObject(),
@@ -50,7 +50,7 @@ function createProcessQueueLambda(
     sqsExtendedMessageBucketArn: string,
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
-) {
+): void {
     const role = createLambdaRoleWithReadS3Policy(stack, sqsExtendedMessageBucketArn);
 
     const secret = stack.secret;
@@ -86,7 +86,7 @@ function createProcessDLQLambda(
     dlq: Queue,
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
-) {
+): void {
     const lambdaEnv = stack.createLambdaEnvironment();
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_DLQ_BUCKET_NAME] = dlqBucket.bucketName;
 

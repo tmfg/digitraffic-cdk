@@ -1,35 +1,31 @@
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SQS } from "aws-sdk";
-import moment from "moment-timezone";
+import { parseISO } from "date-fns";
 import * as R from "ramda";
 import { SqsConsumer, SqsProducer } from "sns-sqs-big-payload";
 import * as MaintenanceTrackingDb from "../dao/maintenance-tracking-dao";
 import { MaintenanceTrackingEnvKeys } from "../keys";
 import { Havainto, TyokoneenseurannanKirjaus } from "../model/models";
 import * as MaintenanceTrackingService from "./maintenance-tracking";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let sqsConsumerInstance: SqsConsumer | undefined;
 
 /**
  * @param createNew should call create new instance of use old if it exists
  */
-export function getSqsConsumerInstance(createNew = false) {
+export function getSqsConsumerInstance(createNew: boolean = false): SqsConsumer {
     if (createNew || !sqsConsumerInstance) {
         sqsConsumerInstance = createSqsConsumer(
             getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL),
-            getEnvVariable("AWS_REGION"),
-            "processMaintenanceTrackingQueue"
+            getEnvVariable("AWS_REGION")
         );
     }
     return sqsConsumerInstance;
 }
 
 // https://github.com/aspecto-io/sns-sqs-big-payload#sqs-producer
-export function createSqsProducer(
-    sqsQueueUrl: string,
-    region: string,
-    sqsBucketName: string
-): SqsProducer {
+export function createSqsProducer(sqsQueueUrl: string, region: string, sqsBucketName: string): SqsProducer {
     return SqsProducer.create({
         queueUrl: sqsQueueUrl,
         region: region,
@@ -39,7 +35,7 @@ export function createSqsProducer(
         // If true, library uses compatibility mode with Amazon SQS Extended Client Library for Java
         // See https://github.com/awslabs/amazon-sqs-java-extended-client-lib
         extendedLibraryCompatibility: false,
-        s3Bucket: sqsBucketName,
+        s3Bucket: sqsBucketName
     });
 }
 
@@ -50,11 +46,7 @@ interface SqsBigMessage {
 }
 
 // See https://github.com/aspecto-io/sns-sqs-big-payload/blob/master/docs/usage-in-lambda.md
-function createSqsConsumer(
-    sqsQueueUrl: string,
-    region: string,
-    logFunctionName: string
-): SqsConsumer {
+function createSqsConsumer(sqsQueueUrl: string, region: string): SqsConsumer {
     return SqsConsumer.create({
         queueUrl: sqsQueueUrl,
         region: region,
@@ -65,21 +57,15 @@ function createSqsConsumer(
         },
         // Callback to handle message. Payload is parsed JSON object
         handleMessage: (message: SqsBigMessage) => {
-            return handleMessage(
-                message.payload,
-                message.message,
-                message.s3PayloadMeta,
-                logFunctionName
-            );
-        },
+            return handleMessage(message.payload, message.message, message.s3PayloadMeta);
+        }
     });
 }
 
 export async function handleMessage(
     payload: TyokoneenseurannanKirjaus,
     message: SQS.Message,
-    s3PayloadMeta: S3PayloadMeta | undefined,
-    logFunctionName: string
+    s3PayloadMeta: S3PayloadMeta | undefined
 ): Promise<void> {
     /*
     s3PayloadMeta:
@@ -92,67 +78,55 @@ export async function handleMessage(
     */
     let s3Uri = "–";
     if (s3PayloadMeta?.Location) {
-        console.info(
-            `method=${logFunctionName} big-payload s3PayloadMeta: ${JSON.stringify(
-                s3PayloadMeta
-            )}`
-        );
+        logger.debug({
+            method: "SqsBigPayload.handleMessage",
+            message: `big-payload s3PayloadMeta: ${JSON.stringify(s3PayloadMeta)}`
+        });
         s3Uri = s3PayloadMeta.Location;
     }
 
     const trackingJson = payload;
     const trackingJsonString = JSON.stringify(payload);
     const messageSizeBytes = Buffer.byteLength(trackingJsonString);
-    const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
+    const sendingTime = parseISO(trackingJson.otsikko.lahetysaika);
 
     if (!trackingJson.otsikko.lahettaja.jarjestelma) {
-        console.warn(
-            `method=${logFunctionName} observations sendingSystem is empty using UNKNOWN s3Uri=%s`,
-            s3Uri
-        );
+        logger.warn({
+            method: "SqsBigPayload.handleMessage",
+            message: `observations sendingSystem is empty using UNKNOWN s3Uri=${s3Uri}`
+        });
     }
 
-    const sendingSystem = R.pathOr(
-        "UNKNOWN",
-        ["otsikko", "lahettaja", "jarjestelma"],
-        trackingJson
+    const sendingSystem = R.pathOr("UNKNOWN", ["otsikko", "lahettaja", "jarjestelma"], trackingJson);
+    const observationDatas: MaintenanceTrackingDb.DbObservationData[] = trackingJson.havainnot.map(
+        (havainto: Havainto) =>
+            MaintenanceTrackingService.convertToDbObservationData(havainto, sendingTime, sendingSystem, s3Uri)
     );
-    const observationDatas: MaintenanceTrackingDb.DbObservationData[] =
-        trackingJson.havainnot.map((havainto: Havainto) =>
-            MaintenanceTrackingService.convertToDbObservationData(
-                havainto,
-                sendingTime,
-                sendingSystem,
-                s3Uri
-            )
-        );
 
     try {
         const start = Date.now();
-        const insertCount: number =
-            await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(
-                observationDatas
-            );
-        const end = Date.now();
-        console.info(
-            `method=${logFunctionName} messageSendingTime=%s observations domain=harja insertCount=%d of total count=%d observations tookMs=%d total message sizeBytes=%d`,
-            sendingTime.toISOString(),
-            insertCount,
-            observationDatas.length,
-            end - start,
-            messageSizeBytes
+        const insertCount: number = await MaintenanceTrackingService.saveMaintenanceTrackingObservationData(
+            observationDatas
         );
+        const end = Date.now();
+        logger.info({
+            method: "SqsBigPayload.handleMessage",
+            message: `observations messageSendingTime=${sendingTime.toISOString()}`,
+            tookMs: end - start,
+            customDomain: "state-roads",
+            customInsertCount: insertCount,
+            customCount: observationDatas.length,
+            customSizeBytes: messageSizeBytes
+        });
     } catch (e) {
-        const clones =
-            MaintenanceTrackingDb.cloneObservationsWithoutJson(
-                observationDatas
-            );
-        console.error(
-            `method=${logFunctionName} Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(
+        const clones = MaintenanceTrackingDb.cloneObservationsWithoutJson(observationDatas);
+        logger.error({
+            method: "SqsBigPayload.handleMessage",
+            message: `Error while handling tracking from SQS to db observationDatas: ${JSON.stringify(
                 clones
             )}`,
-            e
-        );
+            error: e
+        });
         return Promise.reject(e);
     }
     return Promise.resolve();

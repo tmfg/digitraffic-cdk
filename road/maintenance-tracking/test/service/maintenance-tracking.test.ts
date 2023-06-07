@@ -3,7 +3,7 @@ import { TyokoneenseurannanKirjaus } from "../../lib/model/models";
 import {
     cleanMaintenanceTrackingData,
     createMaintenanceTrackingMessageHash,
-    saveMaintenanceTrackingObservationData,
+    saveMaintenanceTrackingObservationData
 } from "../../lib/service/maintenance-tracking";
 import {
     createObservationsDbDatas,
@@ -13,12 +13,10 @@ import {
     insertMaintenanceTracking,
     truncate,
     upsertDomain,
-    upsertWorkMachine,
+    upsertWorkMachine
 } from "../db-testutil";
-import {
-    assertObservationData,
-    getTrackingJsonWith3Observations,
-} from "../testdata";
+import { assertObservationData, getTrackingJsonWith3Observations } from "../testdata";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 describe(
     "maintenance-tracking",
@@ -38,12 +36,8 @@ describe(
         test("saveMaintenanceTrackingObservationData should succeed for two different messages", async () => {
             const json1 = getTrackingJsonWith3Observations("1", "456");
             const json2 = getTrackingJsonWith3Observations("2", "654");
-            await saveMaintenanceTrackingObservationData(
-                createObservationsDbDatas(json1)
-            );
-            await saveMaintenanceTrackingObservationData(
-                createObservationsDbDatas(json2)
-            );
+            await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
+            await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));
 
             const fetchedTrackings = await findAllObservations(db);
             expect(fetchedTrackings.length).toBe(6);
@@ -53,12 +47,8 @@ describe(
             const json1 = getTrackingJsonWith3Observations("1", "1");
             const json2 = getTrackingJsonWith3Observations("2", "1");
 
-            await saveMaintenanceTrackingObservationData(
-                createObservationsDbDatas(json1)
-            );
-            await saveMaintenanceTrackingObservationData(
-                createObservationsDbDatas(json2)
-            );
+            await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
+            await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));
 
             const fetchedTrackings = await findAllObservations(db);
             expect(fetchedTrackings.length).toBe(3);
@@ -71,35 +61,23 @@ describe(
                 "[293358, 6889074]"
             );
 
-            await saveMaintenanceTrackingObservationData(
-                createObservationsDbDatas(json1)
-            );
-            await saveMaintenanceTrackingObservationData(
-                createObservationsDbDatas(json2)
-            );
+            await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json1));
+            await saveMaintenanceTrackingObservationData(createObservationsDbDatas(json2));
 
             const fetchedTrackings = await findAllObservations(db);
             expect(fetchedTrackings.length).toBe(4);
         });
 
         test("createMaintenanceTrackingMessageHash should equals for same message but different viestintunniste id", () => {
-            const h1 = createMaintenanceTrackingMessageHash(
-                getTrackingJsonWith3Observations("1", "1")
-            );
-            const h2 = createMaintenanceTrackingMessageHash(
-                getTrackingJsonWith3Observations("2", "1")
-            );
+            const h1 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations("1", "1"));
+            const h2 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations("2", "1"));
             // Assert has is same for same json with different viestitunniste
             expect(h1).toBe(h2);
         });
 
         test("createMaintenanceTrackingMessageHash should differ for different message", () => {
-            const h1 = createMaintenanceTrackingMessageHash(
-                getTrackingJsonWith3Observations("1", "123")
-            );
-            const h2 = createMaintenanceTrackingMessageHash(
-                getTrackingJsonWith3Observations("1", "321")
-            );
+            const h1 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations("1", "123"));
+            const h2 = createMaintenanceTrackingMessageHash(getTrackingJsonWith3Observations("1", "321"));
             // Assert has is not same for same json with different data content excluding viestitunniste
             expect(h1).not.toBe(h2);
         });
@@ -110,12 +88,8 @@ describe(
             ) as TyokoneenseurannanKirjaus;
             expect(tracking.havainnot.length).toBe(3);
             const observation = tracking.havainnot[0].havainto;
-            const h1 = createMaintenanceTrackingMessageHash(
-                JSON.stringify(observation)
-            );
-            const h2 = createMaintenanceTrackingMessageHash(
-                JSON.stringify(observation)
-            );
+            const h1 = createMaintenanceTrackingMessageHash(JSON.stringify(observation));
+            const h2 = createMaintenanceTrackingMessageHash(JSON.stringify(observation));
             // Assert has is same for same json with different viestitunniste
             expect(h1).toBe(h2);
         });
@@ -127,12 +101,8 @@ describe(
             expect(tracking.havainnot.length).toBe(3);
             const observation1 = tracking.havainnot[0].havainto;
             const observation2 = tracking.havainnot[1].havainto;
-            const h1 = createMaintenanceTrackingMessageHash(
-                JSON.stringify(observation1)
-            );
-            const h2 = createMaintenanceTrackingMessageHash(
-                JSON.stringify(observation2)
-            );
+            const h1 = createMaintenanceTrackingMessageHash(JSON.stringify(observation1));
+            const h2 = createMaintenanceTrackingMessageHash(JSON.stringify(observation2));
             // Assert has is same for same json with different viestitunniste
             expect(h1).not.toBe(h2);
         });
@@ -158,50 +128,16 @@ describe(
             const wMId = await upsertWorkMachine(db);
             await upsertDomain(db, "state-roads");
 
-            const id1 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 60 * 3 + 1)
-            ); // endTime over 3h -> delete
-            const id2 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 60 * 2 + 1)
-            ); // endTime over 2h -> delete
-            const id3 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 70)
-            ); // endTime over 1h -> delete
-            const id4 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 65),
-                id3
-            ); // endTime over 1h -> delete
-            const id5 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 61),
-                id4
-            ); // endTime over 1h, but ref from id4 -> no delete
-            const id6 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 59),
-                id5
-            ); // endTime inside 1h -> no delete
-            const id7 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 55),
-                id6
-            ); // endTime inside 1h -> no delete
+            const id1 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 60 * 3 + 1)); // endTime over 3h -> delete
+            const id2 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 60 * 2 + 1)); // endTime over 2h -> delete
+            const id3 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 70)); // endTime over 1h -> delete
+            const id4 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 65), id3); // endTime over 1h -> delete
+            const id5 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 61), id4); // endTime over 1h, but ref from id4 -> no delete
+            const id6 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 59), id5); // endTime inside 1h -> no delete
+            const id7 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 55), id6); // endTime inside 1h -> no delete
 
             const idsBeforeCleanup = await findAllTrackingIds(db);
-            console.info(
-                `idsBeforeCleanup: ${JSON.stringify(idsBeforeCleanup)}`
-            );
+            logger.debug(`idsBeforeCleanup: ${JSON.stringify(idsBeforeCleanup)}`);
             expect(idsBeforeCleanup.length).toEqual(7);
             expect(idsBeforeCleanup.includes(id1)).toBe(true);
             expect(idsBeforeCleanup.includes(id2)).toBe(true);
@@ -214,7 +150,7 @@ describe(
             await cleanMaintenanceTrackingData(1);
 
             const idsAfterCleanup = await findAllTrackingIds(db);
-            console.info(`idsAfterCleanup: ${JSON.stringify(idsAfterCleanup)}`);
+            logger.debug(`idsAfterCleanup: ${JSON.stringify(idsAfterCleanup)}`);
             expect(idsAfterCleanup.length).toEqual(3);
 
             expect(idsAfterCleanup.includes(id5)).toBe(true);
@@ -228,33 +164,19 @@ describe(
             const wMId = await upsertWorkMachine(db);
             await upsertDomain(db, "state-roads");
 
-            await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 60 * 3 + 1)
-            ); // endTime over 3h -> delete
-            await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 60 * 2 + 1)
-            ); // endTime over 2h -> delete
+            await insertMaintenanceTracking(db, wMId, minusMinutes(now, 60 * 3 + 1)); // endTime over 3h -> delete
+            await insertMaintenanceTracking(db, wMId, minusMinutes(now, 60 * 2 + 1)); // endTime over 2h -> delete
             await insertMaintenanceTracking(db, wMId, minusMinutes(now, 70)); // endTime over 1h -> delete
-            const id4 = await insertMaintenanceTracking(
-                db,
-                wMId,
-                minusMinutes(now, 65)
-            ); // endTime over 1h -> Should delete, but needs to leave one tracking/domain -> no delete
+            const id4 = await insertMaintenanceTracking(db, wMId, minusMinutes(now, 65)); // endTime over 1h -> Should delete, but needs to leave one tracking/domain -> no delete
 
             const idsBeforeCleanup = await findAllTrackingIds(db);
-            console.info(
-                `idsBeforeCleanup: ${JSON.stringify(idsBeforeCleanup)}`
-            );
+            logger.debug(`idsBeforeCleanup: ${JSON.stringify(idsBeforeCleanup)}`);
             expect(idsBeforeCleanup.length).toEqual(4);
 
             await cleanMaintenanceTrackingData(1);
 
             const idsAfterCleanup = await findAllTrackingIds(db);
-            console.info(`idsAfterCleanup: ${JSON.stringify(idsAfterCleanup)}`);
+            logger.debug(`idsAfterCleanup: ${JSON.stringify(idsAfterCleanup)}`);
             expect(idsAfterCleanup.length).toEqual(1);
 
             // Latest tracking should exist
@@ -263,6 +185,6 @@ describe(
     })
 );
 
-function minusMinutes(time: Date, minutes: number) {
+function minusMinutes(time: Date, minutes: number): Date {
     return new Date(time.getTime() - 1000 * 60 * minutes);
 }

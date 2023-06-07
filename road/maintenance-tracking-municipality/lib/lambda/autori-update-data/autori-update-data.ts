@@ -7,21 +7,18 @@ import { MaintenanceTrackingAutoriSecret } from "../../model/maintenance-trackin
 import { TrackingSaveResult } from "../../model/tracking-save-result";
 import { AutoriUpdate } from "../../service/autori-update";
 import * as CommonUpdate from "../../service/common-update";
+import logger from "../../service/maintenance-logger";
 
-const domainName = getEnvVariable(
-    MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME
-);
-const domainPrefix = getEnvVariable(
-    MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX
-);
+const domainName = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME);
+const domainPrefix = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_PREFIX);
 
 const proxyHolder = ProxyHolder.create();
-const secretHolder =
-    SecretHolder.create<MaintenanceTrackingAutoriSecret>(domainPrefix);
+const secretHolder = SecretHolder.create<MaintenanceTrackingAutoriSecret>(domainPrefix);
 let autoriUpdateServiceHolder: AutoriUpdate | undefined;
 
 export const handler = (): Promise<TrackingSaveResult> => {
     const start = Date.now();
+    const method = "MaintenanceTrackingMunicipality.updateTrackingsForDomain";
 
     return proxyHolder
         .setCredentials()
@@ -31,59 +28,58 @@ export const handler = (): Promise<TrackingSaveResult> => {
             try {
                 await CommonUpdate.upsertDomain(domainName);
                 await autoriUpdateService.updateContractsForDomain(domainName);
-                await autoriUpdateService.updateTaskMappingsForDomain(
-                    domainName
-                );
+                await autoriUpdateService.updateTaskMappingsForDomain(domainName);
 
                 return autoriUpdateService
                     .updateTrackingsForDomain(domainName)
                     .then((savedResult) => {
-                        console.info(
-                            `method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} count=${
-                                savedResult.saved
-                            } errors=${savedResult.errors} sizeBytes=${
-                                savedResult.sizeBytes
-                            } tookMs=${Date.now() - start}`
-                        );
+                        logger.info({
+                            method,
+                            message: `errors ${savedResult.errors}`,
+                            tookMs: Date.now() - start,
+                            customSizeBytes: savedResult.sizeBytes,
+                            customCount: savedResult.saved,
+                            customDomain: domainName
+                        });
                         return savedResult;
                     })
-                    .catch((error) => {
-                        console.error(
-                            `method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} failed after ${
-                                Date.now() - start
-                            } ms`,
+                    .catch((error: Error) => {
+                        logger.error({
+                            method,
+                            message: `failed after ${Date.now() - start} ms`,
+                            customDomain: domainName,
                             error
-                        );
+                        });
                         throw error;
                     });
             } catch (error) {
-                console.error(
-                    `method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} failed after ${
-                        Date.now() - start
-                    } ms`,
+                logger.error({
+                    method,
+                    message: `failed after ${Date.now() - start} ms`,
+                    customDomain: domainName,
                     error
-                );
+                });
                 throw error;
             }
         })
         .finally(() => {
-            console.info(
-                `method=MaintenanceTrackingMunicipality.updateTrackingsForDomain domain=${domainName} tookMs=${
-                    Date.now() - start
-                }`
-            );
+            logger.info({
+                method,
+                message: `finished`,
+                customDomain: domainName,
+                tookMs: Date.now() - start
+            });
         });
 };
 
-function getAutoriUpdateService(
-    secret: MaintenanceTrackingAutoriSecret
-): AutoriUpdate {
+function getAutoriUpdateService(secret: MaintenanceTrackingAutoriSecret): AutoriUpdate {
     if (autoriUpdateServiceHolder) {
         return autoriUpdateServiceHolder;
     }
-    console.info(
-        `method=MaintenanceTrackingMunicipality.getAutoriUpdateService domain=${domainName} lambda was cold`
-    );
+    logger.info({
+        method: "MaintenanceTrackingMunicipality.getAutoriUpdateService",
+        message: `domain=${domainName} lambda was cold`
+    });
     const autoriApi = new AutoriApi(secret);
     return new AutoriUpdate(autoriApi);
 }
