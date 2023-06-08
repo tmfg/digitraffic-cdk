@@ -5,10 +5,14 @@ import {
     getKibanaResults
 } from "./lambda/collect-es-key-figures";
 
-export const handler = async (transportType: string) => {
+export const handler = async (transportType: string): Promise<void> => {
     const apiPaths = (await getApiPaths()).filter((s) => s.transportType === transportType);
+    const firstPath = apiPaths[0];
 
-    const pathsToProcess = [...apiPaths[0].paths];
+    if (!firstPath) {
+        throw new Error("No paths found");
+    }
+    const pathsToProcess = [...firstPath.paths];
     const middleIndex = Math.ceil(pathsToProcess.length / 2);
 
     const firstHalf = pathsToProcess.splice(0, middleIndex);
