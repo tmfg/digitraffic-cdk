@@ -410,7 +410,7 @@ function friendlyFilterString(filter: string): string {
     return filter.match('request_uri:"(.*)"')?.[1] ?? filter;
 }
 
-export async function handler() {
+export async function handler(): Promise<boolean> {
     const filters = (await query("select distinct filter from key_figures")) as { filter: string }[];
     console.log(filters);
 
@@ -429,5 +429,5 @@ export async function handler() {
         );
     }
 
-    return new Promise((resolve, reject) => resolve(true));
+    return Promise.resolve(true);
 }
