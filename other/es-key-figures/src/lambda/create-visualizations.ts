@@ -415,12 +415,12 @@ export async function handler(): Promise<boolean> {
     console.log(filters);
 
     const bucketName = "eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw";
-    uploadToS3(bucketName, await createIndex(), `index.html`, undefined, "text/html");
+    await uploadToS3(bucketName, await createIndex(), `index.html`, undefined, "text/html");
 
     for (const row of filters) {
         const filter = row.filter;
         console.log(`Processing: ${filter}`);
-        uploadToS3(
+        await uploadToS3(
             bucketName,
             await createDetailPage(filter),
             `${base64encodeFilter(filter)}.html`,
