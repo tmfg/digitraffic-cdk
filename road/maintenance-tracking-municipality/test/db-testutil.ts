@@ -1,50 +1,28 @@
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import {
-    DbDomain,
-    DbDomainContract,
-    DbMaintenanceTracking,
-} from "../lib/model/db-data";
+import { DbDomain, DbDomainContract, DbMaintenanceTracking } from "../lib/model/db-data";
 
-export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "road",
-        "road",
-        "localhost:54322/road"
-    );
+export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
+    return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");
 }
 
-export function dbTestBaseNoTruncate(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(
-        fn,
-        () => Promise.resolve(),
-        "road",
-        "road",
-        "localhost:54322/road"
-    );
+export function dbTestBaseNoTruncate(fn: (db: DTDatabase) => void): () => void {
+    return commonDbTestBase(fn, () => Promise.resolve(), "road", "road", "localhost:54322/road");
 }
 
 export function truncate(db: DTDatabase): Promise<void> {
     return db.tx(async (t) => {
         await t.none("TRUNCATE maintenance_tracking CASCADE");
         await t.none("TRUNCATE maintenance_tracking_work_machine CASCADE");
-        await t.none(
-            "TRUNCATE maintenance_tracking_domain_task_mapping CASCADE"
-        );
+        await t.none("TRUNCATE maintenance_tracking_domain_task_mapping CASCADE");
         await t.none("TRUNCATE maintenance_tracking_domain_contract CASCADE");
         await t.none("TRUNCATE maintenance_tracking_domain CASCADE");
         await t.none("TRUNCATE data_updated");
     });
 }
 
-export function insertDomain(
-    db: DTDatabase,
-    domainName: string,
-    source?: string
-): Promise<null> {
-    return db.tx((t) => {
+export async function insertDomain(db: DTDatabase, domainName: string, source?: string): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `insert into maintenance_tracking_domain(name, source)
                 values($1,$2)
@@ -55,14 +33,14 @@ export function insertDomain(
     });
 }
 
-export function insertDomaindTaskMapping(
+export async function insertDomaindTaskMapping(
     db: DTDatabase,
     name: string,
     originalId: string,
     domainName: string,
     ignore: boolean
-): Promise<null> {
-    return db.tx((t) => {
+): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `
                 insert into maintenance_tracking_domain_task_mapping(name, original_id, domain, ignore)
@@ -72,10 +50,7 @@ export function insertDomaindTaskMapping(
     });
 }
 
-export function insertDbDomaindContract(
-    db: DTDatabase,
-    contract: DbDomainContract
-) {
+export function insertDbDomaindContract(db: DTDatabase, contract: DbDomainContract): Promise<void> {
     return insertDomaindContract(
         db,
         contract.domain,
@@ -87,7 +62,7 @@ export function insertDbDomaindContract(
     );
 }
 
-export function insertDomaindContract(
+export async function insertDomaindContract(
     db: DTDatabase,
     domainName: string,
     contract: string,
@@ -96,29 +71,18 @@ export function insertDomaindContract(
     startDate?: Date,
     endDate?: Date,
     dataLastUpdated?: Date
-): Promise<null> {
-    return db.tx((t) => {
+): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `
                 INSERT INTO maintenance_tracking_domain_contract(domain, contract, name, start_date, end_date, data_last_updated, source)
                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-            [
-                domainName,
-                contract,
-                name,
-                startDate,
-                endDate,
-                dataLastUpdated,
-                source,
-            ]
+            [domainName, contract, name, startDate, endDate, dataLastUpdated, source]
         );
     });
 }
 
-export function findAllDomaindContracts(
-    db: DTDatabase,
-    domainName: string
-): Promise<DbDomainContract[]> {
+export function findAllDomaindContracts(db: DTDatabase, domainName: string): Promise<DbDomainContract[]> {
     return db.tx((t) => {
         return t.manyOrNone(
             `
@@ -130,10 +94,7 @@ export function findAllDomaindContracts(
     });
 }
 
-export function getDomain(
-    db: DTDatabase,
-    domainName: string
-): Promise<DbDomain> {
+export function getDomain(db: DTDatabase, domainName: string): Promise<DbDomain> {
     return db.tx((t) => {
         return t.one(
             `
@@ -161,10 +122,7 @@ export function getDomaindContract(
     });
 }
 
-export function findAllTrackings(
-    db: DTDatabase,
-    domainName: string
-): Promise<DbMaintenanceTracking[]> {
+export function findAllTrackings(db: DTDatabase, domainName: string): Promise<DbMaintenanceTracking[]> {
     return db.tx((t) => {
         return t
             .manyOrNone(

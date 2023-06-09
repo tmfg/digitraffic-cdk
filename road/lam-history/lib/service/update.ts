@@ -2,7 +2,9 @@ import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { S3 } from "aws-sdk";
 import axios, { AxiosError } from "axios";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
+const SERVICE = "UpdateService";
 export async function handleMetadataUpdate(
     url: string,
     apikey: string,
@@ -11,21 +13,36 @@ export async function handleMetadataUpdate(
 ): Promise<void> {
     const start = Date.now();
 
-    console.info("method=handleMetadataUpdate fetch url=%s", url);
+    logger.info({
+        method: `${SERVICE}.handleMetadataUpdate`,
+        message: `fetch url=${url}`
+    });
 
     try {
         const resp = await getFromServer(url, apikey);
 
         // Store to bucket
-        await uploadToS3Internal(s3, resp, filename).catch((err) => {
-            console.error("method=handleMetadataUpdate uploadToS3Internal file=%s failed=%o", filename, err);
-            throw err;
+        await uploadToS3Internal(s3, resp, filename).catch((error: Error) => {
+            logger.error({
+                method: `${SERVICE}.handleMetadataUpdate`,
+                message: `uploadToS3Internal file=${filename} failed`,
+                error
+            });
+            throw error;
         });
-    } catch (err) {
-        console.error("method=handleMetadataUpdate unexpected error", err);
-        throw err;
+    } catch (error) {
+        logger.error({
+            method: `${SERVICE}.handleMetadataUpdate`,
+            message: `update failed`,
+            error
+        });
+        throw error;
     } finally {
-        console.info("method=handleMetadataUpdate file=%s tookMs=%d", filename, Date.now() - start);
+        logger.info({
+            method: `${SERVICE}.handleMetadataUpdate`,
+            message: `update file=${filename}`,
+            tookMs: Date.now() - start
+        });
     }
 }
 
@@ -59,25 +76,42 @@ async function getFromServer(url: string, apikey: string): Promise<string> {
             if (error.response) {
                 // error response
                 const response = error.response;
-                console.error(
-                    "method=getFromServer url=%s failed with return code %d and data %s",
-                    url,
-                    response.status,
-                    response.data
-                );
+                logger.error({
+                    method: `${SERVICE}.getFromServer`,
+                    message: `url=${url} failed with return code ${response.status} and data ${JSON.stringify(
+                        response.data
+                    )}`,
+                    error
+                });
             } else if (error.request) {
                 // no response from server
-                console.error("method=getFromServer url=%s failed with no response %s", url, error.request);
+                logger.error({
+                    method: `${SERVICE}.getFromServer`,
+                    message: `url=${url} failed with no response ${JSON.stringify(error.request)}`,
+                    error
+                });
             } else {
                 // set up failed
-                console.error("method=getFromServer url=%s failed in setup %s", url, error.message);
+                logger.error({
+                    method: `${SERVICE}.getFromServer`,
+                    message: `url=${url} failed in setup ${error.message}`,
+                    error
+                });
             }
         } else {
-            console.error("method=getFromServer url=%s failed %s", url, error);
+            logger.error({
+                method: `${SERVICE}.getFromServer`,
+                message: `update failed`,
+                error
+            });
         }
         return Promise.reject();
     } finally {
-        console.info("method=getFromServer url=%s tookMs=%d", url, Date.now() - start);
+        logger.info({
+            method: `${SERVICE}.getFromServer`,
+            message: `url=${url}`,
+            tookMs: Date.now() - start
+        });
     }
 }
 

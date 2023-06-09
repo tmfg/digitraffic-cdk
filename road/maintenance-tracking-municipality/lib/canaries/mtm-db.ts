@@ -3,11 +3,9 @@ import { DataType } from "@digitraffic/common/dist/database/last-updated";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { MaintenanceTrackingMunicipalityEnvKeys } from "../keys";
 
-const domainName = getEnvVariable(
-    MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME
-);
+const domainName = getEnvVariable(MaintenanceTrackingMunicipalityEnvKeys.DOMAIN_NAME);
 
-export const handler = () => {
+export const handler = (): Promise<string> => {
     const checker = DatabaseCountChecker.createForProxy();
 
     checker.expectOneOrMore(

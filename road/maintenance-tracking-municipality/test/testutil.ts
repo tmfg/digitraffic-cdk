@@ -1,24 +1,11 @@
-import {
-    getRandomInteger,
-    getRandomNumber,
-} from "@digitraffic/common/dist/test/testutils";
-import {
-    GeoJsonLineString,
-    GeoJsonPoint,
-} from "@digitraffic/common/dist/utils/geojson-types";
+import { getRandomInteger, getRandomNumber } from "@digitraffic/common/dist/test/testutils";
+import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { Feature, Geometry, LineString, Point, Position } from "geojson";
 import { cloneDeep } from "lodash";
-import moment from "moment";
-import {
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbMaintenanceTracking,
-} from "../lib/model/db-data";
-import {
-    ApiWorkevent,
-    ApiWorkeventDevice,
-    ApiWorkeventIoDevice,
-} from "../lib/model/paikannin-api-data";
+import add from "date-fns/add";
+import sub from "date-fns/sub";
+import { DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking } from "../lib/model/db-data";
+import { ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice } from "../lib/model/paikannin-api-data";
 import {
     PAIKANNIN_OPERATION_BRUSHING,
     PAIKANNIN_OPERATION_PAVING,
@@ -26,7 +13,7 @@ import {
     X_MAX,
     X_MIN,
     Y_MAX,
-    Y_MIN,
+    Y_MIN
 } from "./testconstants";
 
 export function createDbDomainContract(
@@ -38,10 +25,10 @@ export function createDbDomainContract(
         contract: contract,
         data_last_updated: dataLastUpdated,
         domain: domain,
-        start_date: moment().subtract(30, "days").toDate(),
-        end_date: moment().add(30, "days").toDate(),
+        start_date: add(new Date(), { days: -30 }),
+        end_date: add(new Date(), { days: 30 }),
         name: "Urakka 1",
-        source: "Foo / Bar",
+        source: "Foo / Bar"
     };
 }
 
@@ -67,7 +54,7 @@ export function createDbMaintenanceTracking(
         domain: contract.domain,
         contract: contract.contract,
         message_original_id: "none",
-        finished: false,
+        finished: false
     };
 }
 
@@ -81,7 +68,7 @@ export function createTaskMapping(
         name: harjaTask,
         domain: domain,
         ignore: ignore,
-        original_id: domainOperation,
+        original_id: domainOperation
     };
 }
 
@@ -95,7 +82,7 @@ const KM_IN_Y = 0.00899321606;
  */
 export function createZigZagCoordinates(
     coordinateCount: number,
-    distBetweenPointsM = 100
+    distBetweenPointsM: number = 100
 ): Position[] {
     // a = sqr(c^2/2)
     const distInXyKm = Math.sqrt(Math.pow(distBetweenPointsM / 1000, 2) / 2);
@@ -104,7 +91,7 @@ export function createZigZagCoordinates(
     const x = getRandomNumber(X_MIN, X_MAX);
     const y = getRandomNumber(Y_MIN, Y_MAX);
     return Array.from({ length: coordinateCount }).map((i, index) => {
-        const even: boolean = index % 2 == 0;
+        const even: boolean = index % 2 === 0;
         // Make linestring to go zigzag, so it wont be simplified
         const nextX = x + index * xAddition;
         const nextY = y + (even ? 0 : yAddition);
@@ -118,19 +105,13 @@ export function createZigZagCoordinates(
  */
 export function createLineStringGeometry(
     coordinateCount: number,
-    distBetweenPointsM = 100
+    distBetweenPointsM: number = 100
 ): GeoJsonLineString {
-    const coordinates: Position[] = createZigZagCoordinates(
-        coordinateCount,
-        distBetweenPointsM
-    );
+    const coordinates: Position[] = createZigZagCoordinates(coordinateCount, distBetweenPointsM);
     return createLineString(coordinates);
 }
 
-export function createLineStringGeometries(
-    minCount: number,
-    maxCount: number
-): LineString[] {
+export function createLineStringGeometries(minCount: number, maxCount: number): LineString[] {
     return Array.from({ length: getRandomNumber(minCount, maxCount) }, () => {
         return createLineStringGeometry(getRandomInteger(2, 10), 100);
     });
@@ -139,23 +120,23 @@ export function createLineStringGeometries(
 export function createLineString(coordinates: Position[]): GeoJsonLineString {
     return {
         type: "LineString",
-        coordinates: coordinates,
+        coordinates: coordinates
     };
 }
 
 export function createFeature(geometry: Geometry): Feature {
     return {
         type: "Feature",
-        geometry: geometry,
+        geometry: geometry
     } as Feature;
 }
 
-export function dateInPastMinutes(minutes: number) {
-    return moment().subtract(minutes, "minutes").toDate();
+export function dateInPastMinutes(minutes: number): Date {
+    return add(new Date(), { minutes: -1 * minutes });
 }
 
-export function addMinutes(reference: Date, minutes: number) {
-    return moment(reference).add(minutes, "minutes").toDate();
+export function addMinutes(reference: Date, minutes: number): Date {
+    return add(reference, { minutes: minutes });
 }
 
 export function createGeoJSONPoint(xyz: Position): Point {
@@ -169,16 +150,13 @@ export function createApiRouteDataForEveryMinute(
     operations: ApiWorkeventIoDevice[] = [
         PAIKANNIN_OPERATION_BRUSHING,
         PAIKANNIN_OPERATION_PAVING,
-        PAIKANNIN_OPERATION_SALTING,
+        PAIKANNIN_OPERATION_SALTING
     ]
 ): ApiWorkeventDevice {
     // Update for every event + minute
-    const timeMoment = moment(endTime).subtract(
-        geometry.coordinates.length,
-        "minutes"
-    );
+    let eventTime = sub(endTime, { minutes: geometry.coordinates.length });
     const events: ApiWorkevent[] = geometry.coordinates.map((position) => {
-        timeMoment.add(1, "minutes");
+        eventTime = add(eventTime, { minutes: 1 });
         return {
             deviceId: deviceId,
             heading: 0,
@@ -187,15 +165,15 @@ export function createApiRouteDataForEveryMinute(
             speed: 10,
             altitude: position[2],
             deviceName: deviceId.toString(),
-            timest: timeMoment.toISOString(),
+            timest: eventTime.toISOString(),
             ioChannels: cloneDeep(operations),
-            timestamp: timeMoment.toDate(),
+            timestamp: eventTime
         };
     });
 
     return {
         deviceId: deviceId,
         deviceName: deviceId.toString(),
-        workEvents: events,
+        workEvents: events
     };
 }

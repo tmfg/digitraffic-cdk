@@ -9,19 +9,13 @@ const END_POINT: Position = [27.688935, 62.892983];
 
 describe("UtilsTests", () => {
     test("createHarjaId", () => {
-        const id: bigint = Utils.createHarjaId(
-            "3330de39-9d1d-457b-a6fd-a800cf6e7f99"
-        );
+        const id: bigint = Utils.createHarjaId("3330de39-9d1d-457b-a6fd-a800cf6e7f99");
         expect(id).toBe(BigInt("365522198665597071").valueOf());
     });
 
     test("createHarjaIdNotEqual", () => {
-        const id1: bigint = Utils.createHarjaId(
-            "3330de39-9d1d-457b-a6fd-a800cf6e7f99"
-        );
-        const id2: bigint = Utils.createHarjaId(
-            "3330de39-9d1d-457b-a6fd-a800cf6e7f98"
-        );
+        const id1: bigint = Utils.createHarjaId("3330de39-9d1d-457b-a6fd-a800cf6e7f99");
+        const id2: bigint = Utils.createHarjaId("3330de39-9d1d-457b-a6fd-a800cf6e7f98");
         expect(id1).not.toEqual(id2);
     });
 
@@ -29,8 +23,7 @@ describe("UtilsTests", () => {
         const message = `{"message":"This is a message"}`;
         const objectMessage = JSON.parse(message) as Record<string, unknown>;
         const messageSize = Utils.countEstimatedSizeOfMessage(message);
-        const objectMessageSize =
-            Utils.countEstimatedSizeOfMessage(objectMessage);
+        const objectMessageSize = Utils.countEstimatedSizeOfMessage(objectMessage);
         expect(messageSize).toEqual(31);
         expect(messageSize).toEqual(objectMessageSize);
     });
@@ -49,12 +42,8 @@ describe("UtilsTests", () => {
     test("getTrackingStartPoint with line string", () => {
         const mt = createDbMaintenanceTracking(true);
         const start = Utils.getTrackingStartPoint(mt);
-        expect(start[0]).toEqual(
-            (mt.geometry as GeoJsonLineString).coordinates[0][0]
-        );
-        expect(start[1]).toEqual(
-            (mt.geometry as GeoJsonLineString).coordinates[0][1]
-        );
+        expect(start[0]).toEqual((mt.geometry as GeoJsonLineString).coordinates[0][0]);
+        expect(start[1]).toEqual((mt.geometry as GeoJsonLineString).coordinates[0][1]);
     });
 
     test("getTrackingStartPoint without line string", () => {
@@ -65,9 +54,7 @@ describe("UtilsTests", () => {
     });
 });
 
-function createDbMaintenanceTracking(
-    withLineString: boolean
-): DbMaintenanceTracking {
+function createDbMaintenanceTracking(withLineString: boolean): DbMaintenanceTracking {
     return {
         contract: "",
         domain: "",
@@ -82,7 +69,7 @@ function createDbMaintenanceTracking(
         sending_time: new Date(),
         start_time: new Date(),
         tasks: [],
-        work_machine_id: 0,
+        work_machine_id: 0
         /* eslint-enable */
     };
 }
