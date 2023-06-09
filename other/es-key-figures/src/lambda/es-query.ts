@@ -56,6 +56,7 @@ function handleResponseFromEs(
 ) {
     return (httpResp: IncomingMessage) => {
         const statusCode = httpResp.statusCode;
+        console.log(`OpenSearch responded with status code ${statusCode}`);
         if (statusCode < 200 || statusCode >= 300) {
             failedCallback(
                 statusCode,
@@ -77,8 +78,13 @@ function handleResponseFromEs(
     };
 }
 
-export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
+function addCredentialsToEsRequest(req: AWS.HttpRequest) {
     const creds = new AWS.EnvironmentCredentials("AWS");
+    const signer = new AWS.Signers.V4(req, "es");
+    signer.addAuthorization(creds, new Date());
+}
+
+function createRequestForEs(endpoint: AWS.Endpoint, query: string, path: string) {
     const req = new AWS.HttpRequest(endpoint);
     const index = "dt-nginx-*";
 
@@ -89,28 +95,32 @@ export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, pat
     req.headers["Content-Type"] = "application/json";
     req.body = query;
 
-    const signer = new AWS.Signers.V4(req, "es");
-    signer.addAuthorization(creds, new Date());
+    return req;
+}
+
+function handleRequest(client, req, callback) {
+    client.handleRequest(req, null, callback, function (err: any) {
+        console.error("Error: " + err);
+    });
+}
+export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
+    const req = createRequestForEs(endpoint, query, path);
+
+    addCredentialsToEsRequest(req);
 
     const client = new AWS.NodeHttpClient();
 
     const makeRequest = async (): Promise<Record<string, unknown>> => {
         return new Promise((resolve, reject) => {
-            client.handleRequest(
-                req,
-                null,
-                handleResponseFromEs(
-                    (result) => {
-                        resolve(result);
-                    },
-                    (code, message) => {
-                        reject(new HttpError(code, message));
-                    }
-                ),
-                function (err: any) {
-                    console.error("Error: " + err);
+            const callback = handleResponseFromEs(
+                (result) => {
+                    resolve(result);
+                },
+                (code, message) => {
+                    reject(new HttpError(code, message));
                 }
             );
+            handleRequest(client, req, callback);
         });
     };
     try {

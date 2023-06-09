@@ -10,7 +10,7 @@
     "cdk": "cdk",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "echo no tests for this project",
+    "test": "heft test --clean",
     "watch": "heft build --clean --watch"
   },
   "dependencies": {
@@ -39,6 +39,7 @@
     "esbuild": "0.17.17",
     "eslint": "~8.38.0",
     "jest": "^29.5.0",
+    "node-mocks-http": "~1.12.2",
     "parallelshell": "3.0.2",
     "sinon": "15.0.4",
     "ts-jest": "^29.1.0",
