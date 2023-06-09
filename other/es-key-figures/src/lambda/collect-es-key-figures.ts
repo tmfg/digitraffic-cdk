@@ -78,7 +78,7 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
             mysqlOpts.host
         },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
             .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
-            .join("")}`
+            .join(",")}`
     );
 
     const keyFigures = getKeyFigures();

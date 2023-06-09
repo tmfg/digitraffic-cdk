@@ -133,7 +133,7 @@ async function createDetailPage(filter: string): Promise<string> {
                 )) as KeyFiguresQueryResult
             )
                 .map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)
-                .join("")} ] }`
+                .join(",")} ] }`
         )} 
         ${createGraph(
             "bytesOut",
@@ -144,7 +144,7 @@ async function createDetailPage(filter: string): Promise<string> {
                 )) as KeyFiguresQueryResult
             )
                 .map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)
-                .join("")} ] }`
+                .join(",")} ] }`
         )}
         ${createGraph(
             "uniqueIPs",
@@ -155,7 +155,7 @@ async function createDetailPage(filter: string): Promise<string> {
                 )) as KeyFiguresQueryResult
             )
                 .map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)
-                .join("")} ] }`
+                .join(",")} ] }`
         )}            
         ${createGraph(
             "top10digitrafficUsers",
