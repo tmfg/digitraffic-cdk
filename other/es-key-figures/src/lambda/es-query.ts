@@ -3,15 +3,13 @@ import * as AWSx from "aws-sdk";
 
 const AWS = AWSx as any;
 
-const region = 'eu-west-1';
+const region = "eu-west-1";
 
-export async function fetchDataFromEs(endpoint: AWS.Endpoint,
-    query: string,
-    path: string): Promise<any> {
-    return new Promise(resolve => {
+export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
+    return new Promise((resolve) => {
         const creds = new AWS.EnvironmentCredentials("AWS");
         const req = new AWS.HttpRequest(endpoint);
-        const index = 'dt-nginx-*';
+        const index = "dt-nginx-*";
 
         req.method = "POST";
         req.path = `/${index}/${path}`;
@@ -25,19 +23,21 @@ export async function fetchDataFromEs(endpoint: AWS.Endpoint,
 
         const send = new AWS.NodeHttpClient();
 
-        send.handleRequest(req,
+        send.handleRequest(
+            req,
             null,
             function (httpResp: any) {
                 let respBody = "";
                 httpResp.on("data", function (chunk: any) {
                     respBody += chunk;
                 });
-                httpResp.on("end", function (chunk: any) {
+                httpResp.on("end", function () {
                     resolve(JSON.parse(respBody));
                 });
             },
             function (err: any) {
                 console.error("Error: " + err);
-            });
+            }
+        );
     });
 }
