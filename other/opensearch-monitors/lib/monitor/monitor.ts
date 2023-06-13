@@ -38,7 +38,7 @@ export function opensearchMonitor(osMonitor: OSMonitor): unknown {
             {
                 search: {
                     indices: osMonitor.indices,
-                    query: osMonitor.query
+                    query: { ...osMonitor.query, track_total_hits: true } // track all hits, not just 10000
                 }
             }
         ],

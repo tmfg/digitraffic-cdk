@@ -1,8 +1,5 @@
 // eslint-disable camelcase
-import {
-    GeoJsonPoint,
-    GeoJsonLineString,
-} from "@digitraffic/common/dist/utils/geojson-types";
+import { GeoJsonPoint, GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 
 export interface DbWorkMachine {
     readonly harjaId: bigint;
@@ -11,7 +8,7 @@ export interface DbWorkMachine {
 }
 
 export interface DbMaintenanceTracking {
-    readonly id?: number | null;
+    readonly id?: number | undefined;
     readonly sending_system: string;
     readonly sending_time: Date;
     readonly last_point: GeoJsonPoint;
@@ -25,7 +22,7 @@ export interface DbMaintenanceTracking {
     readonly contract: string;
     readonly message_original_id: string;
     readonly tasks: string[];
-    previous_tracking_id?: number | null;
+    previous_tracking_id?: number | undefined;
     // This is additional meta data, not saved to db, but used to update previous tracking
     start_direction?: number; //
 }

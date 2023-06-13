@@ -1,12 +1,12 @@
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { PreparedStatement } from "pg-promise";
-import * as R from "ramda";
 import { DbNumberId } from "../model/db-data";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum Status {
     UNHANDLED = "UNHANDLED",
     HANDLED = "HANDLED",
-    ERROR = "ERROR",
+    ERROR = "ERROR"
 }
 
 export interface DbObservationData {
@@ -50,28 +50,29 @@ const UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL = `
 export function insertMaintenanceTrackingObservationData(
     db: DTDatabase,
     observations: DbObservationData[]
-): Promise<(DbNumberId | null)[]> {
+): Promise<(DbNumberId | undefined)[]> {
     return db.tx((t) => {
         return t.batch(
             observations.map((observation) =>
-                db.oneOrNone(
-                    UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
-                    observation
-                )
+                db
+                    .oneOrNone<DbNumberId | undefined>(
+                        UPSERT_MAINTENANCE_TRACKING_OBSERVATION_DATA_SQL,
+                        observation
+                    )
+                    .then((result) => (result === null ? undefined : result))
             )
         );
     });
 }
 
-const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS =
-    new PreparedStatement({
-        name: "PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS",
-        text: `
+const PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS = new PreparedStatement({
+    name: "PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS",
+    text: `
         UPDATE maintenance_tracking
         SET previous_tracking_id = NULL
         WHERE end_time < (now() - $1 * INTERVAL '1 hour')
-`,
-    });
+`
+});
 
 const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new PreparedStatement({
     name: "PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS",
@@ -84,31 +85,25 @@ const PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS = new PreparedStatement({
           -- Delete only, if there is at least one later tracking left to database. We need to leave at least one row/domain
           -- to get last modified date for REST API
           AND EXISTS(SELECT NULL FROM maintenance_tracking t WHERE t.domain = tgt.domain AND t.created > tgt.created);
-`,
+`
 });
 
-export function cleanMaintenanceTrackingData(
-    db: DTDatabase,
-    hoursToKeep: number
-): Promise<void> {
+export function cleanMaintenanceTrackingData(db: DTDatabase, hoursToKeep: number): Promise<void> {
     return db.tx((t) => {
-        const cleanUpQuery = t.none(
-            PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS,
-            [hoursToKeep]
-        );
-        const deleteQuery = t.none(
-            PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS,
-            [hoursToKeep]
-        );
+        const cleanUpQuery = t.none(PS_CLEAR_PREVIOUS_MAINTENANCE_TRACKING_ID_OLDER_THAN_HOURS, [
+            hoursToKeep
+        ]);
+        const deleteQuery = t.none(PS_DELETE_MAINTENANCE_TRACKINGS_OLDER_THAN_HOURS, [hoursToKeep]);
         // These should and must be run in given order https://github.com/vitaly-t/pg-promise/issues/307
         return t
             .batch([cleanUpQuery, deleteQuery])
             .then(() => Promise.resolve())
-            .catch((error) => {
-                console.error(
-                    "method=cleanMaintenanceTrackingData update failed %s",
+            .catch((error: Error) => {
+                logger.error({
+                    method: "MaintenanceTrackingDao.cleanMaintenanceTrackingData",
+                    message: "cleanup failed",
                     error
-                );
+                });
                 throw error;
             });
     });
@@ -119,7 +114,7 @@ const PS_GET_OLDEST_MAINTENANCE_TRACKING_HOURS = new PreparedStatement({
     text: `
         select round(EXTRACT(EPOCH FROM (now() - min(end_time)))/60/60) AS hours
         from maintenance_tracking;
-`,
+`
 });
 
 export function getOldestTrackingHours(db: DTDatabase): Promise<number> {
@@ -130,8 +125,8 @@ export function getOldestTrackingHours(db: DTDatabase): Promise<number> {
         .then((result: { hours: number }) => result.hours);
 }
 
-export function cloneObservationsWithoutJson(
-    datas: DbObservationData[]
-): DbObservationData[] {
-    return R.map(R.assoc("json", "{...REMOVED...}"), datas);
+export function cloneObservationsWithoutJson(datas: DbObservationData[]): DbObservationData[] {
+    return datas.map((d: DbObservationData) => {
+        return { ...d, json: "{...REMOVED...}" };
+    });
 }

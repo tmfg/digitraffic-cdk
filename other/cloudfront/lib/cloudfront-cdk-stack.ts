@@ -1,9 +1,11 @@
 import { StackCheckingAspect } from "@digitraffic/common/dist/aws/infra/stack/stack-checking-aspect";
 import { Annotations, Aspects, Stack, StackProps } from "aws-cdk-lib";
 import {
+    CachePolicy,
     CfnDistribution,
     CloudFrontWebDistribution,
     OriginAccessIdentity,
+    OriginRequestPolicy,
     ResponseHeadersPolicy
 } from "aws-cdk-lib/aws-cloudfront";
 import {
@@ -39,6 +41,8 @@ interface MutablePolicy {
 }
 
 interface MutableCacheBehavior {
+    cachePolicyId: string;
+    originRequestPolicyId: string;
     responseHeadersPolicyId: string;
 }
 
@@ -269,6 +273,14 @@ export class CloudfrontCdkStack extends Stack {
                 // set CORS headers
                 (cb as MutableCacheBehavior).responseHeadersPolicyId =
                     ResponseHeadersPolicy.CORS_ALLOW_ALL_ORIGINS.responseHeadersPolicyId;
+
+                // handle swagger
+                if (cb.pathPattern.includes("swagger")) {
+                    // for swagger, disable caching and set s3 cors policy
+                    (cb as MutableCacheBehavior).originRequestPolicyId =
+                        OriginRequestPolicy.CORS_S3_ORIGIN.originRequestPolicyId;
+                    (cb as MutableCacheBehavior).cachePolicyId = CachePolicy.CACHING_DISABLED.cachePolicyId;
+                }
             });
 
             // and the default behavior

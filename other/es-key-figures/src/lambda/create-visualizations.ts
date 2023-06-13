@@ -1,7 +1,11 @@
+import mysql from "mysql";
+import util from "node:util";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
 interface KeyFigure {
     filter: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any;
     name: string;
     from: Date;
@@ -10,21 +14,21 @@ interface KeyFigure {
     query: string;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const mysql = require("mysql");
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const util = require("util");
+type KeyFiguresQueryResult = { from: Date; value: number }[];
 
-const conn = mysql.createConnection({
-    host: process.env.MYSQL_ENDPOINT,
-    user: process.env.MYSQL_USERNAME,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
-});
+const mysqlOpts = {
+    host: getEnvVariable("MYSQL_ENDPOINT"),
+    user: getEnvVariable("MYSQL_USERNAME"),
+    password: getEnvVariable("MYSQL_PASSWORD"),
+    database: getEnvVariable("MYSQL_DATABASE")
+};
+
+const conn = mysql.createConnection(mysqlOpts);
 
 const query = util.promisify(conn.query).bind(conn);
 
-const createGraph = function (id: string, otsikko: string, data: any): string {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createGraph(id: string, otsikko: string, data: any): string {
     return `
 	nv.addGraph(function() {
         var chart = nv.models.lineChart()
@@ -53,53 +57,54 @@ const createGraph = function (id: string, otsikko: string, data: any): string {
         return chart;
     });
   `;
-};
+}
 
-const topDataToGraphData = function (data: KeyFigure[]): { values: [Date, number][]; key: string }[] {
+function topDataToGraphData(data: KeyFigure[]): { values: [Date, number][]; key: string }[] {
     const output: { [key: string]: [Date, number][] } = {};
     for (const rivi of data) {
-        const valueJson = JSON.parse(rivi.value);
-        for (const key of Object.keys(valueJson)) {
-            if (output[key] == null) {
-                output[key] = [];
+        const valueJson = JSON.parse(rivi.value) as Record<string, number>;
+        for (const [key, value] of Object.entries(valueJson)) {
+            let item = output[key];
+            if (!item) {
+                item = [];
             }
 
-            output[key].push([rivi.from, valueJson[key]]);
+            item.push([rivi.from, value]);
+            output[key] = item;
         }
     }
 
     const highlightData: { values: [Date, number][]; key: string }[] = [];
 
-    for (const key of Object.keys(output)) {
-        highlightData.push({ key: key, values: output[key] });
+    for (const [key, values] of Object.entries(output)) {
+        highlightData.push({ key, values });
     }
 
     return highlightData;
-};
+}
 
-const endDataToGraphData = function (data: KeyFigure[]): { values: [Date, number][]; key: string }[] {
+function endDataToGraphData(data: KeyFigure[]): { values: [Date, number][]; key: string }[] {
     const output: { [key: string]: [Date, number][] } = {};
     for (const rivi of data) {
         const value = rivi.value as number;
-        if (output[rivi.filter] == null) {
-            output[rivi.filter] = [];
+        let item = output[rivi.filter];
+        if (!item) {
+            item = [];
         }
-        output[rivi.filter].push([rivi.from, value]);
+        item.push([rivi.from, value]);
+        output[rivi.filter] = item;
     }
 
     const highlightData: { values: [Date, number][]; key: string }[] = [];
 
-    for (const key of Object.keys(output)) {
-        highlightData.push({
-            key: friendlyFilterString(key),
-            values: output[key]
-        });
+    for (const [key, values] of Object.entries(output)) {
+        highlightData.push({ key: friendlyFilterString(key), values });
     }
 
     return highlightData;
-};
+}
 
-const createDetailPage = async function (filter: string): Promise<string> {
+async function createDetailPage(filter: string): Promise<string> {
     return `
   <html>
   <head>  
@@ -123,36 +128,42 @@ const createDetailPage = async function (filter: string): Promise<string> {
             "requests",
             `Requests (${friendlyFilterString(filter)})`,
             `{key:'Requests', values: [${(
-                await query(
+                (await query(
                     `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Http req' order by \`from\` asc`
-                )
-            ).map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)} ] }`
+                )) as KeyFiguresQueryResult
+            )
+                .map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)
+                .join(",")} ] }`
         )} 
         ${createGraph(
             "bytesOut",
             `Bytes out (${friendlyFilterString(filter)})`,
             `{key:'Bytes out', values: [${(
-                await query(
+                (await query(
                     `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Bytes Out' order by \`from\` asc`
-                )
-            ).map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)} ] }`
+                )) as KeyFiguresQueryResult
+            )
+                .map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)
+                .join(",")} ] }`
         )}
         ${createGraph(
             "uniqueIPs",
             `Unique IPs (${friendlyFilterString(filter)})`,
             `{key:'Unique IPs', values: [${(
-                await query(
+                (await query(
                     `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Unique IPs' order by \`from\` asc`
-                )
-            ).map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)} ] }`
+                )) as KeyFiguresQueryResult
+            )
+                .map((s: { from: Date; value: number }) => `[${s.from.getTime()}, ${Number(s.value)}]`)
+                .join(",")} ] }`
         )}            
         ${createGraph(
             "top10digitrafficUsers",
             `Top 10 Digitraffic-Users (${friendlyFilterString(filter)})`,
             topDataToGraphData(
-                await query(
+                (await query(
                     `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 digitraffic-users' order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -161,9 +172,9 @@ const createDetailPage = async function (filter: string): Promise<string> {
             "top10IPs",
             `Top 10 IPs (${friendlyFilterString(filter)})`,
             topDataToGraphData(
-                await query(
+                (await query(
                     `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 IPs' order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -172,9 +183,9 @@ const createDetailPage = async function (filter: string): Promise<string> {
             "top10userAgents",
             `Top 10 User agents (${friendlyFilterString(filter)})`,
             topDataToGraphData(
-                await query(
+                (await query(
                     `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 User Agents' order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -183,9 +194,9 @@ const createDetailPage = async function (filter: string): Promise<string> {
             "top10referers",
             `Top 10 Referers (${friendlyFilterString(filter)})`,
             topDataToGraphData(
-                await query(
+                (await query(
                     `select value, \`from\` from key_figures where filter = '${filter}' and name = 'Top 10 Referers' order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -221,12 +232,12 @@ const createDetailPage = async function (filter: string): Promise<string> {
   </body>
   </html>
 `;
-};
+}
 
-const createIndex = async function (): Promise<string> {
-    const filters: { filter: string; filterValue: number }[] = await query(
+async function createIndex(): Promise<string> {
+    const filters = (await query(
         "select distinct kf_outer.filter as filter, (select kf_inner.value from key_figures kf_inner where kf_inner.filter = kf_outer.filter and kf_inner.name = 'Http req' order by kf_inner.`from` desc limit 1) as filterValue from key_figures kf_outer  order by filterValue desc"
-    );
+    )) as { filter: string; filterValue: number }[];
     const filterHeader = "<table><tr><th>Endpoint</th><th>Requests (last month)</th></tr>";
 
     let roadFilterHtml = filterHeader;
@@ -302,9 +313,9 @@ const createIndex = async function (): Promise<string> {
             "requests",
             `Requests`,
             endDataToGraphData(
-                await query(
+                (await query(
                     `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Http req' order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -313,9 +324,9 @@ const createIndex = async function (): Promise<string> {
             "bytesOut",
             `Bytes out`,
             endDataToGraphData(
-                await query(
+                (await query(
                     `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Bytes Out' order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -324,9 +335,9 @@ const createIndex = async function (): Promise<string> {
             "uniqueIPs",
             `Unique IPs`,
             endDataToGraphData(
-                await query(
+                (await query(
                     `select * from key_figures where filter in ('@transport_type:road','@transport_type:rail','@transport_type:marine','@transport_type:*') and name = 'Unique IPs' order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -335,9 +346,9 @@ const createIndex = async function (): Promise<string> {
             "roadEndpoints",
             `Road Requests`,
             endDataToGraphData(
-                await query(
+                (await query(
                     `select * from key_figures where filter like '@transport_type:road AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -346,9 +357,9 @@ const createIndex = async function (): Promise<string> {
             "railEndpoints",
             `Rail Requests`,
             endDataToGraphData(
-                await query(
+                (await query(
                     `select * from key_figures where filter like '@transport_type:rail AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -357,9 +368,9 @@ const createIndex = async function (): Promise<string> {
             "marineEndpoints",
             `Marine Requests`,
             endDataToGraphData(
-                await query(
+                (await query(
                     `select * from key_figures where filter like '@transport_type:marine AND %' and name = 'Http req' and value > 50000 order by \`from\` asc`
-                )
+                )) as KeyFigure[]
             ).map(
                 (s) => `{key:'${s.key}', values: [${s.values.map((o) => `[${o[0].getTime()}, ${o[1]}]`)} ] }`
             )
@@ -389,27 +400,27 @@ const createIndex = async function (): Promise<string> {
   </body>
   </html>
 `;
-};
+}
 
-const base64encodeFilter = function (filter: string): string {
+function base64encodeFilter(filter: string): string {
     return Buffer.from(filter).toString("base64");
-};
+}
 
-const friendlyFilterString = function (filter: string): string {
+function friendlyFilterString(filter: string): string {
     return filter.match('request_uri:"(.*)"')?.[1] ?? filter;
-};
+}
 
-export const handler = async () => {
-    const filters: { filter: string }[] = await query("select distinct filter from key_figures");
+export async function handler(): Promise<boolean> {
+    const filters = (await query("select distinct filter from key_figures")) as { filter: string }[];
     console.log(filters);
 
     const bucketName = "eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw";
-    uploadToS3(bucketName, await createIndex(), `index.html`, undefined, "text/html");
+    await uploadToS3(bucketName, await createIndex(), `index.html`, undefined, "text/html");
 
     for (const row of filters) {
         const filter = row.filter;
         console.log(`Processing: ${filter}`);
-        uploadToS3(
+        await uploadToS3(
             bucketName,
             await createDetailPage(filter),
             `${base64encodeFilter(filter)}.html`,
@@ -418,5 +429,5 @@ export const handler = async () => {
         );
     }
 
-    return new Promise((resolve, reject) => resolve(true));
-};
+    return Promise.resolve(true);
+}

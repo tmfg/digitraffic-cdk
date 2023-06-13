@@ -18,3 +18,11 @@
 !/test/
 !/test/**/
 !/test/**/*.ts
+
+!resources/
+!resources/*.css
+!resources/*.html
+!resources/*.png
+!resources/*.js
+!resources/LICENSE
+!resources/version.txt

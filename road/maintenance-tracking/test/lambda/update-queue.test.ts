@@ -10,7 +10,6 @@ import * as LambdaUpdateQueue from "../../lib/lambda/update-queue/update-queue";
 import * as SqsBigPayload from "../../lib/service/sqs-big-payload";
 import { getRandompId, getTrackingJsonWith3Observations } from "../testdata";
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
 const testEvent = require("../test-apigw-event") as APIGatewayEvent;
 
 function createSqsProducerForTest(): SqsProducer {
@@ -27,33 +26,24 @@ describe("update-queue", () => {
 
     test("no records - should reject", async () => {
         const sqsClient: SqsProducer = createSqsProducerForTest();
-        const sendMessageStub = sandbox
-            .stub(sqsClient, "sendJSON")
-            .returns(Promise.resolve());
+        const sendMessageStub = sandbox.stub(sqsClient, "sendJSON").returns(Promise.resolve());
 
         await expect(() =>
             LambdaUpdateQueue.handlerFn(sqsClient)({ ...testEvent, body: null })
-        ).rejects.toMatchObject(
-            LambdaUpdateQueue.invalidRequest("Empty message")
-        );
+        ).rejects.toMatchObject(LambdaUpdateQueue.invalidRequest("Empty message"));
 
         expect(sendMessageStub.notCalled).toBe(true);
     });
 
     test("single valid record", async () => {
-        const jsonString = getTrackingJsonWith3Observations(
-            getRandompId(),
-            getRandompId()
-        );
+        const jsonString = getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const sqsClient: SqsProducer = createSqsProducerForTest();
-        const sendMessageStub = sandbox
-            .stub(sqsClient, "sendJSON")
-            .returns(Promise.resolve());
+        const sendMessageStub = sandbox.stub(sqsClient, "sendJSON").returns(Promise.resolve());
 
         await expect(
             LambdaUpdateQueue.handlerFn(sqsClient)({
                 ...testEvent,
-                body: jsonString,
+                body: jsonString
             })
         ).resolves.toMatchObject(LambdaUpdateQueue.ok());
 
@@ -61,9 +51,7 @@ describe("update-queue", () => {
     });
 
     test("invalid record", async () => {
-        const json =
-            `invalid json ` +
-            getTrackingJsonWith3Observations(getRandompId(), getRandompId());
+        const json = `invalid json ` + getTrackingJsonWith3Observations(getRandompId(), getRandompId());
         const sqsClient: SqsProducer = createSqsProducerForTest();
         const sendMessageStub = sandbox.stub(sqsClient, "sendJSON");
 

@@ -218,12 +218,6 @@
       "tags": ["cdk", "road"]
     },
     {
-      "packageName": "maintenance-tracking-watch",
-      "projectFolder": "road/maintenance-tracking-log-watcher",
-      "decoupledLocalDependencies": ["@digitraffic/common"],
-      "tags": ["cdk", "road"]
-    },
-    {
       "packageName": "maintenance-tracking-municipality",
       "projectFolder": "road/maintenance-tracking-municipality",
       "decoupledLocalDependencies": ["@digitraffic/common"],

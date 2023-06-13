@@ -3,23 +3,18 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { SRID_WGS84 } from "@digitraffic/common/dist/utils/geometry";
-import moment from "moment-timezone";
 import * as sinon from "sinon";
 import { DbObservationData } from "../lib/dao/maintenance-tracking-dao";
 import { Havainto, TyokoneenseurannanKirjaus } from "../lib/model/models";
 import { convertToDbObservationData } from "../lib/service/maintenance-tracking";
+import { parseISO } from "date-fns";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(
-        fn,
-        truncate,
-        "road",
-        "road",
-        "localhost:54322/road"
-    );
+export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
+    return commonDbTestBase(fn, truncate, "road", "road", "localhost:54322/road");
 }
 
-export async function truncate(db: DTDatabase) {
+export async function truncate(db: DTDatabase): Promise<void> {
     try {
         await db.tx(async (t) => {
             return await t.batch([
@@ -52,18 +47,20 @@ export async function truncate(db: DTDatabase) {
                     `DELETE
                      FROM maintenance_tracking_domain
                      WHERE created > '2000-01-01T00:00:00Z'`
-                ),
+                )
             ]);
         });
     } catch (e) {
-        console.error("truncate failed", e);
+        logger.error({
+            method: "DbTestUtil.truncate",
+            message: "truncate failed",
+            error: e
+        });
         throw e;
     }
 }
 
-export function findAllObservations(
-    db: DTDatabase
-): Promise<DbObservationData[]> {
+export function findAllObservations(db: DTDatabase): Promise<DbObservationData[]> {
     return db.tx((t) => {
         return t.manyOrNone(`
             SELECT  id,
@@ -82,20 +79,13 @@ export function findAllObservations(
     });
 }
 
-export function createObservationsDbDatas(
-    jsonString: string
-): DbObservationData[] {
+export function createObservationsDbDatas(jsonString: string): DbObservationData[] {
     // Parse JSON to get sending time
     const trackingJson = JSON.parse(jsonString) as TyokoneenseurannanKirjaus;
-    const sendingTime = moment(trackingJson.otsikko.lahetysaika).toDate();
+    const sendingTime = parseISO(trackingJson.otsikko.lahetysaika);
     const sendingSystem = trackingJson.otsikko.lahettaja.jarjestelma;
     return trackingJson.havainnot.map((havainto: Havainto) => {
-        return convertToDbObservationData(
-            havainto,
-            sendingTime,
-            sendingSystem,
-            "https://s3Uri.com"
-        );
+        return convertToDbObservationData(havainto, sendingTime, sendingSystem, "https://s3Uri.com");
     });
 }
 
@@ -130,7 +120,7 @@ export function insertMaintenanceTracking(
     db: DTDatabase,
     workMachineId: number,
     endTime: Date,
-    previousTrackingId: number | null = null
+    previousTrackingId?: number
 ): Promise<number> {
     return db.tx((t) => {
         return t
@@ -148,13 +138,17 @@ export function insertMaintenanceTracking(
                 null, // contract
                 null, // message_original_id
                 previousTrackingId, // previous_tracking_id
-                endTime, // created
+                endTime // created
             ])
             .then((value) => {
                 return value.id;
             })
-            .catch((error) => {
-                console.error("method=upsertMaintenanceTracking failed", error);
+            .catch((error: Error) => {
+                logger.error({
+                    method: "DbTestUtil.upsertMaintenanceTracking",
+                    message: "failed",
+                    error
+                });
                 throw error;
             });
     });
@@ -173,8 +167,8 @@ export function upsertWorkMachine(db: DTDatabase): Promise<number> {
         .then((value) => value.id);
 }
 
-export function upsertDomain(db: DTDatabase, domain: string): Promise<null> {
-    return db.tx((t) => {
+export async function upsertDomain(db: DTDatabase, domain: string): Promise<void> {
+    await db.tx((t) => {
         return t.none(
             `
             INSERT INTO maintenance_tracking_domain(name, source)
@@ -197,7 +191,7 @@ export function findAllTrackingIds(db: DTDatabase): Promise<number[]> {
         .then((result) => result.map((value) => value.id));
 }
 
-export function mockSecrets<T>(secret: T) {
+export function mockSecrets<T>(secret: T): void {
     sinon.stub(RdsHolder.prototype, "setCredentials").resolves();
     sinon.stub(SecretHolder.prototype, "get").resolves(secret);
 }

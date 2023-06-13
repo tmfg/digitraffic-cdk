@@ -39,7 +39,7 @@ export function createOriginConfig(
                 originAccessIdentity: oai
                 //                originPath: origin.originPath,
             },
-            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap)
+            behaviors: createBehaviors(origin.behaviors, lambdaMap, true)
         };
     } else if (origin instanceof CFDomain) {
         return {
@@ -51,7 +51,7 @@ export function createOriginConfig(
                 originPath: origin.originPath,
                 originHeaders: createOriginHeaders(origin)
             },
-            behaviors: createBehaviors(stack, origin.behaviors, lambdaMap)
+            behaviors: createBehaviors(origin.behaviors, lambdaMap, false)
         };
     }
 
@@ -68,17 +68,26 @@ function createOriginHeaders(domain: CFDomain): Record<string, string> {
     return headers;
 }
 
-function createBehaviors(stack: Stack, behaviors: CFBehavior[], lambdaMap: LambdaHolder): Behavior[] {
-    return behaviors.map((b) => createBehavior(stack, b, lambdaMap, b.path === "*"));
+function createBehaviors(behaviors: CFBehavior[], lambdaMap: LambdaHolder, isS3Origin: boolean): Behavior[] {
+    return behaviors.map((b) => createBehavior(b, lambdaMap, b.path === "*", isS3Origin));
 }
 
 function createBehavior(
-    stack: Stack,
     b: CFBehavior,
     lambdaMap: LambdaHolder,
-    isDefaultBehavior: boolean = false
+    isDefaultBehavior: boolean,
+    isS3Origin: boolean
 ): Behavior {
     //console.info('creating behavior %s with default %d', b.path, isDefaultBehavior);
+    if (isS3Origin && b.path.includes("swagger")) {
+        if (b.cacheHeaders.length > 0) {
+            throw new Error("Swagger origin has cache headers!");
+        }
+        if (b.queryCacheKeys && b.queryCacheKeys.length > 0) {
+            throw new Error("Swagger origin has cache keys!" + b.queryCacheKeys);
+        }
+    }
+
     const headers = [...b.cacheHeaders];
 
     const forwardedValues: CfnDistribution.ForwardedValuesProperty = {

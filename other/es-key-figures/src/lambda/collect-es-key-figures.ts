@@ -5,8 +5,10 @@ import axios, { AxiosError } from "axios";
 import mysql from "mysql";
 import { HttpError } from "@digitraffic/common/src/types/http-error";
 import { retryRequest } from "@digitraffic/common/src/utils/retry";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 
-const endpoint = new AWS.Endpoint(process.env.ES_ENDPOINT as string);
+const ES_ENDPOINT = getEnvVariable("ES_ENDPOINT");
+const endpoint = new AWS.Endpoint(ES_ENDPOINT);
 
 const currentDate = new Date();
 const startDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1, 0, 0, 0, 0);
@@ -16,12 +18,14 @@ const endDate = new Date(currentDate.getFullYear(), currentDate.getMonth() - 0, 
 const KEY_FIGURES_TABLE_NAME = "key_figures";
 const DUPLICATES_TABLE_NAME = "duplicates";
 
-const connection = mysql.createConnection({
-    host: process.env.MYSQL_ENDPOINT,
-    user: process.env.MYSQL_USERNAME,
-    password: process.env.MYSQL_PASSWORD,
-    database: process.env.MYSQL_DATABASE
-});
+const mysqlOpts = {
+    host: getEnvVariable("MYSQL_ENDPOINT"),
+    user: getEnvVariable("MYSQL_USERNAME"),
+    password: getEnvVariable("MYSQL_PASSWORD"),
+    database: getEnvVariable("MYSQL_DATABASE")
+};
+
+const connection = mysql.createConnection(mysqlOpts);
 
 const query = (sql: string, values?: string[]) => {
     return new Promise((resolve, reject) => {
@@ -53,25 +57,30 @@ export interface KeyFigureLambdaEvent {
 
 export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => {
     const apiPaths = (await getApiPaths()).filter((s) => s.transportType === event.TRANSPORT_TYPE);
+    const firstPath = apiPaths[0];
 
-    const pathsToProcess = [...apiPaths[0].paths];
+    if (!firstPath) {
+        throw new Error("No paths found");
+    }
+
+    const pathsToProcess = [...firstPath.paths];
     const middleIndex = Math.ceil(pathsToProcess.length / 2);
 
     const firstHalf = pathsToProcess.splice(0, middleIndex);
     const secondHalf = pathsToProcess.splice(-middleIndex);
 
     if (event.PART === 1) {
-        apiPaths[0].paths = new Set(firstHalf);
+        firstPath.paths = new Set(firstHalf);
     } else if (event.PART === 2) {
-        apiPaths[0].paths = new Set(secondHalf);
+        firstPath.paths = new Set(secondHalf);
     }
 
     console.info(
-        `ES: ${process.env.ES_ENDPOINT}, MySQL: ${
-            process.env.MYSQL_ENDPOINT
-        },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths.map(
-            (s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`
-        )}`
+        `ES: ${ES_ENDPOINT}, MySQL: ${
+            mysqlOpts.host
+        },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
+            .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
+            .join(",")}`
     );
 
     const keyFigures = getKeyFigures();
@@ -145,12 +154,7 @@ export async function getKibanaResults(
         for (const apiPath of apiPaths) {
             console.info(`Running: ${apiPath.transportType}`);
             kibanaResults.push(
-                await getKibanaResult(
-                    keyFigures,
-                    startDate,
-                    endDate,
-                    `@transport_type:${apiPath.transportType}`
-                )
+                getKibanaResult(keyFigures, startDate, endDate, `@transport_type:${apiPath.transportType}`)
             );
         }
     }
@@ -159,7 +163,7 @@ export async function getKibanaResults(
         for (const path of apiPath.paths) {
             console.info(`Running path: ${path}`);
             kibanaResults.push(
-                await getKibanaResult(
+                getKibanaResult(
                     keyFigures,
                     startDate,
                     endDate,
@@ -169,9 +173,8 @@ export async function getKibanaResults(
         }
     }
 
-    //const foo = await Promise.all(kibanaResults);
-    //return foo.flat();
-    return kibanaResults.flat();
+    const foo = await Promise.all(kibanaResults);
+    return foo.flat();
 }
 
 async function getRowAmountWithDateNameFilter(
@@ -181,11 +184,15 @@ async function getRowAmountWithDateNameFilter(
 ): Promise<number> {
     try {
         const resultKey = "count";
-        const existingRowsFromDate = await query(
+        const existingRowsFromDate = (await query(
             "SELECT COUNT(*) AS ? FROM ?? WHERE `from` = ? AND `name` = ? AND `filter` = ?;",
             [resultKey, KEY_FIGURES_TABLE_NAME, isoDate, name, filter]
-        );
-        return Promise.resolve((existingRowsFromDate as Record<string, unknown>[])[0][resultKey] as number);
+        )) as { count: number }[];
+        const firstRow = existingRowsFromDate[0];
+        if (!firstRow) {
+            throw new Error("Could not find any rows");
+        }
+        return Promise.resolve(firstRow[resultKey]);
     } catch (error: unknown) {
         console.error("Error querying database: ", error);
         throw error;
@@ -206,6 +213,12 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
         "CREATE TABLE ?? ( `id` INT UNSIGNED NOT NULL AUTO_INCREMENT, `from` DATE NOT NULL, `to` DATE NOT NULL, `name` VARCHAR(100) NOT NULL,`filter` VARCHAR(1000) NOT NULL, `query` VARCHAR(1000) NOT NULL, `value` JSON NOT NULL, PRIMARY KEY (`id`))";
     const CREATE_KEY_FIGURES_INDEX = "CREATE INDEX filter_name_date ON ?? (`filter`, `name`, `from`, `to`);";
 
+    const kibanaResult = kibanaResults[0];
+
+    if (!kibanaResult) {
+        throw new Error("No kibana results available");
+    }
+
     try {
         const tables = await query("show tables");
 
@@ -217,14 +230,14 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
         const startIsoDate = startDate.toISOString().substring(0, 10);
         const existingRows = await getRowAmountWithDateNameFilter(
             startIsoDate,
-            kibanaResults[0].name,
-            kibanaResults[0].filter
+            kibanaResult.name,
+            kibanaResult.filter
         );
 
         // save duplicate rows to a separate table if current set of results already exists in database
         if (existingRows > 0) {
             console.info(
-                `Found existing result '${kibanaResults[0].name}' where 'from' is '${startIsoDate}' and filter is '${kibanaResults[0].filter}', saving to table ${DUPLICATES_TABLE_NAME}`
+                `Found existing result '${kibanaResult.name}' where 'from' is '${startIsoDate}' and filter is '${kibanaResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`
             );
             await query("DROP TABLE IF EXISTS ??", [DUPLICATES_TABLE_NAME]);
             await query(CREATE_KEY_FIGURES_TABLE, [DUPLICATES_TABLE_NAME]);
@@ -284,7 +297,7 @@ export function getKeyFigures(): KeyFigure[] {
 
 export async function getPaths(endpointUrl: string): Promise<Set<string>> {
     try {
-        const resp = await axios.get(endpointUrl, {
+        const resp = await axios.get<{ paths: string[] }>(endpointUrl, {
             headers: { "accept-encoding": "gzip" }
         });
         if (resp.status !== 200) {
@@ -296,9 +309,12 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
         const paths = resp.data.paths;
 
         const output = new Set<string>();
-        for (const pathsKey in paths) {
-            const splitResult = pathsKey.split("{");
-            output.add(splitResult[0].endsWith("/") ? splitResult[0] : splitResult[0] + "/");
+        for (const pathsKey of paths) {
+            const splitResult = pathsKey.split("{")[0];
+            if (!splitResult) {
+                throw new Error("Couldn't split the path");
+            }
+            output.add(splitResult.endsWith("/") ? splitResult : splitResult + "/");
         }
 
         return output;

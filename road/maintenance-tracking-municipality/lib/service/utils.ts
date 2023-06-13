@@ -2,7 +2,7 @@ import crypto from "crypto";
 import { Position } from "geojson";
 import { DbMaintenanceTracking } from "../model/db-data";
 import { GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
-
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 /**
  * Creates bigint hash value from given string
  * @param src
@@ -17,11 +17,9 @@ export function countEstimatedSizeOfMessage(message: string | object): number {
     if (message) {
         try {
             // Just estimate of the size of data
-            return Buffer.byteLength(
-                typeof message === "string" ? message : JSON.stringify(message)
-            );
-        } catch (e) {
-            console.error(`method=utils.countEstimatedSizeOfMessage`, e);
+            return Buffer.byteLength(typeof message === "string" ? message : JSON.stringify(message));
+        } catch (error) {
+            logger.error({ method: "Utils.countEstimatedSizeOfMessage", error });
         }
     }
     return 0;
@@ -47,9 +45,7 @@ export function calculateSpeedInMS(distanceM: number, timeS: number): number {
     return distanceM / timeS;
 }
 
-export function getTrackingStartPoint(
-    tracking: DbMaintenanceTracking
-): Position {
+export function getTrackingStartPoint(tracking: DbMaintenanceTracking): Position {
     if (tracking.geometry instanceof GeoJsonPoint) {
         return tracking.geometry.coordinates;
     }
@@ -60,11 +56,5 @@ export function getTrackingEndPoint(tracking: DbMaintenanceTracking): Position {
     if (tracking.geometry instanceof GeoJsonPoint) {
         return tracking.geometry.coordinates;
     }
-    return tracking.geometry.coordinates[
-        tracking.geometry.coordinates.length - 1
-    ];
-}
-
-export function convertSpeedKmHToMS(speedInKmH: number): number {
-    return speedInKmH / 3.6;
+    return tracking.geometry.coordinates[tracking.geometry.coordinates.length - 1];
 }

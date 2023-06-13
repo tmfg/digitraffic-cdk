@@ -5,37 +5,36 @@ import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import { SQSEvent, SQSRecord } from "aws-lambda";
 import { MaintenanceTrackingEnvKeys } from "../../keys";
 import { getSqsConsumerInstance } from "../../service/sqs-big-payload";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let rdsHolder: RdsHolder | undefined;
 
-function getRdsHolder() {
+function getRdsHolder(): RdsHolder {
     if (!rdsHolder) {
-        console.info(`method=processMaintenanceTrackingQueue lambda was cold`);
+        logger.info({
+            method: "MaintenanceTracking.processQueue",
+            message: `lambda was cold`
+        });
         rdsHolder = RdsHolder.create();
     }
     return rdsHolder;
 }
 
-export const handler = middy(handlerFn()).use(
-    sqsPartialBatchFailureMiddleware()
-);
+export const handler = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());
 
-export function handlerFn() {
+export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return (event: SQSEvent): Promise<PromiseSettledResult<void>[]> => {
         return getRdsHolder()
             .setCredentials()
             .then(async () => {
-                const sqsBucketName = getEnvVariable(
-                    MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME
-                );
-                const sqsQueueUrl = getEnvVariable(
-                    MaintenanceTrackingEnvKeys.SQS_QUEUE_URL
-                );
+                const sqsBucketName = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME);
+                const sqsQueueUrl = getEnvVariable(MaintenanceTrackingEnvKeys.SQS_QUEUE_URL);
                 const region = getEnvVariable("AWS_REGION");
 
-                console.info(
-                    `method=processMaintenanceTrackingQueue Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`
-                );
+                logger.info({
+                    method: "MaintenanceTracking.processQueue",
+                    message: `Environment sqsBucketName: ${sqsBucketName}, sqsQueueUrl: ${sqsQueueUrl} events: ${event.Records.length} and region: ${region}`
+                });
 
                 const sqsConsumer = getSqsConsumerInstance();
 
@@ -45,14 +44,15 @@ export function handlerFn() {
                             // clone event as library uses PascalCase properties -> include properties in camelCase and PascalCase
                             const clone = cloneRecordWithCamelAndPascal(record);
                             await sqsConsumer.processMessage(clone, {
-                                deleteAfterProcessing: false,
+                                deleteAfterProcessing: false
                             }); // Delete is done by S3 lifecycle
                             return Promise.resolve();
                         } catch (e) {
-                            console.error(
-                                `method=processMaintenanceTrackingQueue Error while handling tracking from SQS`,
-                                e
-                            );
+                            logger.error({
+                                method: "MaintenanceTracking.processQueue",
+                                message: "Error while handling tracking from SQS",
+                                error: e
+                            });
                             return Promise.reject(e);
                         }
                     })

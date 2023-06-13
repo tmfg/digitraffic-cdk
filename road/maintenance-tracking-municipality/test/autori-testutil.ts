@@ -1,16 +1,13 @@
 import { randomString } from "@digitraffic/common/dist/test/testutils";
 import { Feature, Geometry } from "geojson";
-import moment from "moment";
-import {
-    ApiContractData,
-    ApiOperationData,
-    ApiRouteData,
-} from "../lib/model/autori-api-data";
+import add from "date-fns/add";
+import sub from "date-fns/sub";
+import { ApiContractData, ApiOperationData, ApiRouteData } from "../lib/model/autori-api-data";
 import {
     AUTORI_OPERATION_BRUSHING,
     AUTORI_OPERATION_PAVING,
     AUTORI_OPERATION_SALTING,
-    VEHICLE_TYPE,
+    VEHICLE_TYPE
 } from "./testconstants";
 
 /**
@@ -22,11 +19,7 @@ import {
 export function createApiRouteData(
     updated: Date,
     geometries: Geometry[],
-    operations: string[] = [
-        AUTORI_OPERATION_BRUSHING,
-        AUTORI_OPERATION_PAVING,
-        AUTORI_OPERATION_SALTING,
-    ]
+    operations: string[] = [AUTORI_OPERATION_BRUSHING, AUTORI_OPERATION_PAVING, AUTORI_OPERATION_SALTING]
 ): ApiRouteData {
     const features: Feature[] = createApiRoutedataFeatures(geometries);
     return {
@@ -34,26 +27,23 @@ export function createApiRouteData(
         user: VEHICLE_TYPE,
         geography: {
             features: features,
-            type: "FeatureCollection",
+            type: "FeatureCollection"
         },
         created: new Date().toISOString(),
         updated: updated.toISOString(),
         id: randomString(),
-        startTime:
-            createTrackingStartTimeFromUpdatedTime(updated).toISOString(),
+        startTime: createTrackingStartTimeFromUpdatedTime(updated).toISOString(),
         endTime: createTrackingEndTimeFromUpdatedTime(updated).toISOString(),
-        operations: operations,
+        operations: operations
     };
 }
 
-export function createTrackingStartTimeFromUpdatedTime(
-    updatedTime: Date
-): Date {
-    return moment(updatedTime).subtract(5, "minutes").toDate();
+export function createTrackingStartTimeFromUpdatedTime(updatedTime: Date): Date {
+    return sub(updatedTime, { minutes: 5 });
 }
 
 export function createTrackingEndTimeFromUpdatedTime(updatedTime: Date): Date {
-    return moment(updatedTime).subtract(1, "minutes").toDate();
+    return sub(updatedTime, { minutes: 1 });
 }
 
 export function createApiRoutedataFeatures(geometries: Geometry[]): Feature[] {
@@ -63,30 +53,27 @@ export function createApiRoutedataFeatures(geometries: Geometry[]): Feature[] {
             geometry: geometries[i],
             properties: {
                 streetAddress: "Patukatu 1-10, Oulu",
-                featureType: "StreetAddress",
-            },
+                featureType: "StreetAddress"
+            }
         };
     });
 }
 
-export function createApiOperationData(
-    id: string,
-    operationName: string
-): ApiOperationData {
+export function createApiOperationData(id: string, operationName: string): ApiOperationData {
     return {
         id: id,
-        operationName: operationName,
+        operationName: operationName
     };
 }
 
 export function createApiContractData(
     name: string,
-    endDate = moment().add(30, "days").toDate()
+    endDate: Date = add(new Date(), { days: 30 })
 ): ApiContractData {
     return {
         id: randomString(),
         name: name,
-        startDate: moment().subtract(30, "days").toISOString(),
-        endDate: endDate.toISOString(),
+        startDate: sub(new Date(), { days: 30 }).toISOString(),
+        endDate: endDate.toISOString()
     };
 }

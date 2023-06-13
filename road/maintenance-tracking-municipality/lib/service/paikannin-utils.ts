@@ -1,8 +1,5 @@
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
-import {
-    GeoJsonLineString,
-    GeoJsonPoint,
-} from "@digitraffic/common/dist/utils/geojson-types";
+import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import { distanceBetweenPositionsInM } from "@digitraffic/common/dist/utils/geometry";
 import * as CommonUtils from "@digitraffic/common/dist/utils/utils";
 import { Position } from "geojson";
@@ -11,14 +8,11 @@ import {
     DbDomainContract,
     DbDomainTaskMapping,
     DbMaintenanceTracking,
-    DbWorkMachine,
+    DbWorkMachine
 } from "../model/db-data";
-import {
-    ApiWorkevent,
-    ApiWorkeventDevice,
-    ApiWorkeventIoDevice,
-} from "../model/paikannin-api-data";
+import { ApiWorkevent, ApiWorkeventDevice, ApiWorkeventIoDevice } from "../model/paikannin-api-data";
 import * as Utils from "./utils";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 /**
  * Filtters ApiWorkeventDevice.workEvents those doesn't have valid operations that are mapped for domain.
@@ -36,20 +30,13 @@ export function filterEventsWithoutTasks(
                 deviceName: device.deviceName,
                 workEvents: device.workEvents.filter((we) => {
                     const operations =
-                        we.ioChannels.length > 0
-                            ? we.ioChannels.map((e) => e.name).toString()
-                            : undefined;
-                    const result = hasValidOperations(
-                        we.ioChannels,
-                        taskMappings
-                    );
+                        we.ioChannels.length > 0 ? we.ioChannels.map((e) => e.name).toString() : undefined;
+                    const result = hasValidOperations(we.ioChannels, taskMappings);
                     if (operations && !result) {
-                        console.info(
-                            `DEBUG method=PaikanninUtils.filterEventsWithoutTasks ${operations}`
-                        );
+                        logger.debug(`method=PaikanninUtils.filterEventsWithoutTasks ${operations}`);
                     }
                     return result;
-                }),
+                })
             };
         })
         .filter((device) => device.workEvents.length > 0);
@@ -71,14 +58,10 @@ const MIN_DATE = new Date(-8640000000000000);
  */
 export function groupEventsToIndividualTrackings(
     events: ApiWorkevent[],
-    filterBeforeOrEquaTime = MIN_DATE
+    filterBeforeOrEquaTime: Date = MIN_DATE
 ): ApiWorkevent[][] {
     // ascending order
-    const ordered = events
-        .slice()
-        .sort((a, b) =>
-            a.timestamp.getTime() < b.timestamp.getTime() ? -1 : 1
-        );
+    const ordered = events.slice().sort((a, b) => (a.timestamp.getTime() < b.timestamp.getTime() ? -1 : 1));
     return toEventGroups(ordered, filterBeforeOrEquaTime);
 }
 
@@ -105,11 +88,7 @@ function toEventGroups(
 
     // If element is older than allowed throw it away
     if (nextEvent.timestamp.getTime() <= filterBeforeOrEquaTime.getTime()) {
-        return toEventGroups(
-            sourceEvents,
-            filterBeforeOrEquaTime,
-            targetGroups
-        );
+        return toEventGroups(sourceEvents, filterBeforeOrEquaTime, targetGroups);
     } else if (targetGroups.length > 0) {
         // Take prev event from groups and compare it to next
         const prevGroup: ApiWorkevent[] = targetGroups[targetGroups.length - 1];
@@ -137,11 +116,10 @@ function toEventGroups(
                 prevGroup.push(nextEvent); // continue in previous group
             } else {
                 // Create new group but append next point also as end point for previous point tracking
-                const endEventClone: ApiWorkevent =
-                    cloneApiWorkeventWithNewTasks(
-                        nextEvent,
-                        prevEvent.ioChannels
-                    );
+                const endEventClone: ApiWorkevent = cloneApiWorkeventWithNewTasks(
+                    nextEvent,
+                    prevEvent.ioChannels
+                );
                 prevGroup.push(endEventClone);
                 targetGroups.push([nextEvent]); // This will be start of the newGroup
             }
@@ -149,18 +127,10 @@ function toEventGroups(
             // Not extending previous tracking -> create new group
             targetGroups.push([nextEvent]);
         }
-        return toEventGroups(
-            sourceEvents,
-            filterBeforeOrEquaTime,
-            targetGroups
-        );
+        return toEventGroups(sourceEvents, filterBeforeOrEquaTime, targetGroups);
     } else {
         targetGroups.push([nextEvent]); // create new group
-        return toEventGroups(
-            sourceEvents,
-            filterBeforeOrEquaTime,
-            targetGroups
-        );
+        return toEventGroups(sourceEvents, filterBeforeOrEquaTime, targetGroups);
     }
 }
 
@@ -169,36 +139,29 @@ function toEventGroups(
  * @param next time of next tracking start time
  * @return true if next brefore is after previous and time limit is not over
  */
-export function isOverTimeLimit(previous: Date, next: Date) {
+export function isOverTimeLimit(previous: Date, next: Date): boolean {
     const diff = CommonDateUtils.countDiffInSeconds(previous, next);
     return (
         diff < 0 ||
-        CommonDateUtils.countDiffInSeconds(previous, next) >
-            Constants.PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S
+        CommonDateUtils.countDiffInSeconds(previous, next) > Constants.PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S
     );
 }
 
-export function isOverDistanceLimitInMeters(distanceInM: number) {
+export function isOverDistanceLimitInMeters(distanceInM: number): boolean {
     return distanceInM > Constants.PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M;
 }
 
-function isSameTasks(
-    ioChannels1: ApiWorkeventIoDevice[],
-    ioChannels2: ApiWorkeventIoDevice[]
-): boolean {
-    if (ioChannels1.length != ioChannels2.length) {
+function isSameTasks(ioChannels1: ApiWorkeventIoDevice[], ioChannels2: ApiWorkeventIoDevice[]): boolean {
+    if (ioChannels1.length !== ioChannels2.length) {
         return false;
     }
     const ioChannel1Strings = ioChannelsToStrings(ioChannels2);
     const ioChannel2Strings = ioChannelsToStrings(ioChannels2);
-    return CommonUtils.bothArraysHasSameValues(
-        ioChannel1Strings,
-        ioChannel2Strings
-    );
+    return CommonUtils.bothArraysHasSameValues(ioChannel1Strings, ioChannel2Strings);
 }
 
 function ioChannelsToStrings(ioChannels: ApiWorkeventIoDevice[]): string[] {
-    return ioChannels.reduce(function (previousValue: string[], ioChannel) {
+    return ioChannels.reduce(function (previousValue: string[], ioChannel: ApiWorkeventIoDevice) {
         return previousValue.concat(ioChannel.name);
     }, []);
 }
@@ -224,42 +187,35 @@ export function isExtendingPreviousTracking(
     sameTasksForDebug?: boolean
 ): boolean {
     if (isOverTimeLimit(previousTime, nextTime)) {
-        console.info(
-            `method=PaikanninUtils.isExtendingPreviousTracking FALSE isOverTimeLimit: ${CommonDateUtils.countDiffInSeconds(
-                previousTime,
-                nextTime
-            )}` +
+        logger.info({
+            method: "PaikanninUtils.isExtendingPreviousTracking",
+            message:
+                `FALSE isOverTimeLimit: ${CommonDateUtils.countDiffInSeconds(previousTime, nextTime)}` +
                 ` > ${
                     Constants.PAIKANNIN_MAX_TIME_BETWEEN_TRACKINGS_S
                 }[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} ` +
-                `positions: ${JSON.stringify(
-                    previousPosition
-                )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(
-                    sameTasksForDebug
-                )}`
-        );
+                `positions: ${JSON.stringify(previousPosition)} -> ${JSON.stringify(
+                    nextPosition
+                )} ${getDebugForSameTasks(sameTasksForDebug)}`
+        });
         return false;
     }
 
     const distInM = distanceBetweenPositionsInM(previousPosition, nextPosition);
 
     if (isOverDistanceLimitInMeters(distInM)) {
-        console.info(
-            `method=PaikanninUtils.isExtendingPreviousTracking FALSE isOverDistanceLimitInMeters ${distInM}[m] > ${
+        logger.info({
+            method: "PaikanninUtils.isExtendingPreviousTracking",
+            message: `FALSE isOverDistanceLimitInMeters ${distInM}[m] > ${
                 Constants.PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M
             }[m] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
                 previousPosition
-            )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(
-                sameTasksForDebug
-            )}`
-        );
+            )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`
+        });
         return false;
     }
 
-    const timeInSeconds = CommonDateUtils.countDiffInSeconds(
-        previousTime,
-        nextTime
-    );
+    const timeInSeconds = CommonDateUtils.countDiffInSeconds(previousTime, nextTime);
     const speedInKmH = Utils.calculateSpeedInKmH(distInM, timeInSeconds);
 
     // 1. Nopeus 65 - 50, etäisyy
@@ -276,51 +232,46 @@ export function isExtendingPreviousTracking(
     // dist <= 50 => ok
     if (
         distInM > DIST_50 &&
-        (speedInKmH > Constants.PAIKANNIN_MAX_SPEED_BETWEEN_TRACKINGS_KMH ||
-            !isFinite(speedInKmH))
+        (speedInKmH > Constants.PAIKANNIN_MAX_SPEED_BETWEEN_TRACKINGS_KMH || !isFinite(speedInKmH))
     ) {
         // GPS accuracy and simplification/saving resolution to db might move location a bit and then when comparing
         // it with next point the result is infinity/really high in speed. If point has moved significantly and speed is high
         // then consider as a break to previous point
-        console.info(
-            `method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_50}[m] && speedInKmH: ${speedInKmH}[km/h] > ${
+        logger.info({
+            method: "PaikanninUtils.isExtendingPreviousTracking",
+            message: `FALSE distInM: ${distInM}[m] > ${DIST_50}[m] && speedInKmH: ${speedInKmH}[km/h] > ${
                 Constants.PAIKANNIN_MAX_SPEED_BETWEEN_TRACKINGS_KMH
             }[km/h] for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
                 previousPosition
-            )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(
-                sameTasksForDebug
-            )}`
-        );
+            )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`
+        });
         return false;
     } else if (distInM > DIST_550) {
-        console.info(
-            `method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_550}[m] && && ${speedInKmH}[km/h] for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
+        logger.info({
+            method: "PaikanninUtils.isExtendingPreviousTracking",
+            message: `FALSE distInM: ${distInM}[m] > ${DIST_550}[m] && && ${speedInKmH}[km/h] for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
                 previousPosition
-            )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(
-                sameTasksForDebug
-            )}`
-        );
+            )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`
+        });
         return false;
     } else if (distInM > DIST_200) {
         if (speedInKmH < 20) {
-            console.info(
-                `method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_200}[m] && ${speedInKmH}[km/h] < 25 for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
+            logger.info({
+                method: "PaikanninUtils.isExtendingPreviousTracking",
+                message: `FALSE distInM: ${distInM}[m] > ${DIST_200}[m] && ${speedInKmH}[km/h] < 25 for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
                     previousPosition
-                )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(
-                    sameTasksForDebug
-                )}`
-            );
+                )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`
+            });
             return false;
         }
     } else if (distInM > DIST_50) {
         if (speedInKmH < 5) {
-            console.info(
-                `method=PaikanninUtils.isExtendingPreviousTracking FALSE distInM: ${distInM}[m] > ${DIST_50}[m] && ${speedInKmH}[km/h] < 5 for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
+            logger.info({
+                method: "PaikanninUtils.isExtendingPreviousTracking",
+                message: `FALSE distInM: ${distInM}[m] > ${DIST_50}[m] && ${speedInKmH}[km/h] < 5 for time: ${timeInSeconds}[s] between: ${previousTime.toISOString()} –> ${nextTime.toISOString()} positions: ${JSON.stringify(
                     previousPosition
-                )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(
-                    sameTasksForDebug
-                )}`
-            );
+                )} -> ${JSON.stringify(nextPosition)} ${getDebugForSameTasks(sameTasksForDebug)}`
+            });
             return false;
         }
     }
@@ -334,22 +285,18 @@ function getDebugForSameTasks(sameTasksForDebug?: boolean): string {
     return `sameTasks: ${sameTasksForDebug.toString()}`;
 }
 
-export function createDbWorkMachine(
-    domainName: string,
-    deviceId: number,
-    deviceName: string
-): DbWorkMachine {
+export function createDbWorkMachine(domainName: string, deviceId: number, deviceName: string): DbWorkMachine {
     return {
         harjaUrakkaId: Utils.createHarjaId(domainName),
         harjaId: BigInt(deviceId),
-        type: `domainName: ${domainName} / deviceId: ${deviceId} / deviceName: ${deviceName}`,
+        type: `domainName: ${domainName} / deviceId: ${deviceId} / deviceName: ${deviceName}`
     };
 }
 
 function cloneApiWorkeventWithNewTasks(
     prevEvent: ApiWorkevent,
     ioChannels: ApiWorkeventIoDevice[]
-) {
+): ApiWorkevent {
     const ioChannelsClone: ApiWorkeventIoDevice[] = [];
     ioChannels.forEach((val) => ioChannelsClone.push(Object.assign({}, val)));
     return {
@@ -362,7 +309,7 @@ function cloneApiWorkeventWithNewTasks(
         lat: prevEvent.lat,
         lon: prevEvent.lon,
         speed: prevEvent.speed,
-        timestamp: prevEvent.timestamp,
+        timestamp: prevEvent.timestamp
     };
 }
 
@@ -382,15 +329,10 @@ export function getTasksForOperations(
         return [];
     }
 
-    return operations.reduce(function (filtered: string[], operation) {
-        const taskMapping = taskMappings.find(
-            (mapping: DbDomainTaskMapping): boolean => {
-                return (
-                    mapping.original_id == operation.name.trim() &&
-                    !mapping.ignore
-                );
-            }
-        );
+    return operations.reduce(function (filtered: string[], operation: ApiWorkeventIoDevice) {
+        const taskMapping = taskMappings.find((mapping: DbDomainTaskMapping): boolean => {
+            return mapping.original_id === operation.name.trim() && !mapping.ignore;
+        });
         if (taskMapping && !filtered.includes(taskMapping.name)) {
             return filtered.concat(taskMapping.name);
         }
@@ -412,41 +354,30 @@ export function hasValidOperations(
 
 export function createLineStringFromEvents(
     events: ApiWorkevent[]
-): GeoJsonPoint | GeoJsonLineString | null {
+): GeoJsonPoint | GeoJsonLineString | undefined {
     if (events.length < 1) {
-        return null;
+        return undefined;
     }
-    const lineStringCoordinates: Position[] = events.reduce(
-        (coordinates: Position[], nextEvent) => {
-            const nextCoordinate: Position = [
-                nextEvent.lon,
-                nextEvent.lat,
-                nextEvent.altitude,
-            ];
-            if (coordinates.length > 0) {
-                const previousCoordinate: Position =
-                    coordinates[coordinates.length - 1];
-                // Linestring points must differ from previous values
-                if (
-                    previousCoordinate[0] != nextCoordinate[0] ||
-                    previousCoordinate[1] != nextCoordinate[1]
-                ) {
-                    coordinates.push(nextCoordinate);
-                }
-            } else {
+    const lineStringCoordinates: Position[] = events.reduce((coordinates: Position[], nextEvent) => {
+        const nextCoordinate: Position = [nextEvent.lon, nextEvent.lat, nextEvent.altitude];
+        if (coordinates.length > 0) {
+            const previousCoordinate: Position = coordinates[coordinates.length - 1];
+            // Linestring points must differ from previous values
+            if (previousCoordinate[0] !== nextCoordinate[0] || previousCoordinate[1] !== nextCoordinate[1]) {
                 coordinates.push(nextCoordinate);
             }
-            return coordinates;
-        },
-        []
-    );
+        } else {
+            coordinates.push(nextCoordinate);
+        }
+        return coordinates;
+    }, []);
 
-    if (lineStringCoordinates.length == 1) {
+    if (lineStringCoordinates.length === 1) {
         return new GeoJsonPoint(lineStringCoordinates[0]);
     } else if (lineStringCoordinates.length > 1) {
         return new GeoJsonLineString(lineStringCoordinates);
     }
-    return null;
+    return undefined;
 }
 
 export function createDbMaintenanceTracking(
@@ -454,27 +385,19 @@ export function createDbMaintenanceTracking(
     workMachineId: number,
     events: ApiWorkevent[],
     taskMappings: DbDomainTaskMapping[]
-): DbMaintenanceTracking | null {
-    const tasks: string[] = getTasksForOperations(
-        events[0].ioChannels,
-        taskMappings
-    );
+): DbMaintenanceTracking | undefined {
+    const tasks: string[] = getTasksForOperations(events[0].ioChannels, taskMappings);
     if (tasks.length === 0) {
-        return null;
+        return undefined;
     }
 
     const firstEvent = events[0];
     // lastPoint
     const lastEvent = events[events.length - 1];
-    const lastPoint = new GeoJsonPoint([
-        lastEvent.lon,
-        lastEvent.lat,
-        lastEvent.altitude,
-    ]);
-    const geometry: GeoJsonLineString | GeoJsonPoint | null =
-        createLineStringFromEvents(events);
+    const lastPoint = new GeoJsonPoint([lastEvent.lon, lastEvent.lat, lastEvent.altitude]);
+    const geometry: GeoJsonLineString | GeoJsonPoint | undefined = createLineStringFromEvents(events);
     if (!geometry) {
-        return null;
+        return undefined;
     }
     return {
         // direction: 0,
@@ -492,7 +415,7 @@ export function createDbMaintenanceTracking(
         contract: contract.contract,
         message_original_id: "none",
         finished: true,
-        // This is additional meta data, not saved to eb but used to update previous tracking
-        start_direction: lastEvent.heading,
+        // This is additional metadata, not saved to db but used to update previous tracking
+        start_direction: lastEvent.heading
     };
 }
