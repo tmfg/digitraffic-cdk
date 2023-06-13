@@ -14,8 +14,8 @@ export const validRamiMonitoredJourneyScheduledMessage = {
         messageType: "MONITORED_JOURNEY_SCHEDULED_MESSAGE",
         operation: "INSERT",
         creationDateTime: "2023-05-21T06:10:10.217Z",
-        startValidity: "2023-05-21T06:10:10.217Z",
-        endValidity: "2023-05-23T00:00:00Z",
+        startValidity: "2023-06-12T06:10:10.217Z",
+        endValidity: "2023-06-20T00:00:00Z",
         scheduledMessage: null,
         monitoredJourneyScheduledMessage: {
             vehicleJourney: {
