@@ -287,27 +287,26 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
         const resp = await axios.get(endpointUrl, {
             headers: { "accept-encoding": "gzip" }
         });
+        if (resp.status !== 200) {
+            console.error("Fetching faults failed: " + resp.statusText);
+
+            return new Set<string>();
+        }
+
+        const paths = resp.data.paths;
+
+        const output = new Set<string>();
+        for (const pathsKey in paths) {
+            const splitResult = pathsKey.split("{");
+            output.add(splitResult[0].endsWith("/") ? splitResult[0] : splitResult[0] + "/");
+        }
+
+        return output;
     } catch (error) {
         if (error instanceof AxiosError && error.response.status === 403) {
             throw new HttpError(403, error.message);
         }
     }
-
-    if (resp.status !== 200) {
-        console.error("Fetching faults failed: " + resp.statusText);
-
-        return new Set<string>();
-    }
-
-    const paths = resp.data.paths;
-
-    const output = new Set<string>();
-    for (const pathsKey in paths) {
-        const splitResult = pathsKey.split("{");
-        output.add(splitResult[0].endsWith("/") ? splitResult[0] : splitResult[0] + "/");
-    }
-
-    return output;
 }
 
 function removeIllegalChars(bucketKey: string): string {
