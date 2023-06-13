@@ -101,13 +101,12 @@ function createRequestForEs(endpoint: AWS.Endpoint, query: string, path: string)
     return req;
 }
 
-export function handleRequest(client, req, callback) {
+function handleRequest(client, req, callback) {
     client.handleRequest(req, null, callback, function (err: any) {
         console.error("Error: " + err);
     });
 }
 
-export const bar = handleRequest;
 export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
     const req = createRequestForEs(endpoint, query, path);
 
@@ -125,7 +124,7 @@ export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, pat
                     reject(new HttpError(code, message));
                 }
             );
-            bar(client, req, callback);
+            handleRequest(client, req, callback);
         });
     };
     try {
