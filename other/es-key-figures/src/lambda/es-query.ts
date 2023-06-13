@@ -1,57 +1,12 @@
 import "source-map-support/register";
 import * as AWSx from "aws-sdk";
+import { retryRequest } from "@digitraffic/common/dist/utils/retry";
+import { HttpError } from "@digitraffic/common/dist/types/http-error";
 import type { IncomingMessage } from "http";
 
 const AWS = AWSx as any;
 
 const region = "eu-west-1";
-
-class HttpError extends Error {
-    statusCode: number;
-
-    constructor(statusCode: number, message: string) {
-        super(message);
-        this.statusCode = statusCode;
-    }
-}
-
-const retryStatusCodes = new Set([
-    // 403 näyttää tulevan aina sillon tällön ilman mitään ilmeistä syytä
-    403,
-    // Opensearch ainakin huutaa 429, jos tekee liian monta kyselyä liian nopeasti
-    429
-]);
-
-function isLastRetry(retryCount: number) {
-    return retryCount > 5;
-}
-
-// Tämä muuttuja on testejä varten määritelty täällä.
-export let retryCount = 0;
-export async function retryRequest<T>(request: () => Promise<T>): Promise<T> {
-    retryCount = 0;
-    while (!isLastRetry(retryCount)) {
-        try {
-            return await request();
-        } catch (error) {
-            if (isLastRetry(retryCount)) {
-                throw error;
-            }
-            if (error instanceof HttpError) {
-                if (retryStatusCodes.has(error.statusCode)) {
-                    retryCount++;
-                    const seconds = 2 ** retryCount;
-                    console.info(
-                        `Retrying request in ${seconds} seconds due to status code ${error.statusCode} (retry count: ${retryCount})`
-                    );
-                    await new Promise((resolve) => setTimeout(resolve, 1000 * seconds));
-                }
-            } else {
-                throw error;
-            }
-        }
-    }
-}
 
 function handleResponseFromEs(
     successCallback: (result: Record<string, unknown>) => void,

@@ -1,8 +1,10 @@
 import * as AWS from "aws-sdk";
 import { fetchDataFromEs } from "./es-query";
 import { esQueries } from "../es_queries";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import mysql from "mysql";
+import { HttpError } from "@digitraffic/common/src/types/http-error";
+import { retryRequest } from "@digitraffic/common/src/utils/retry";
 
 const endpoint = new AWS.Endpoint(process.env.ES_ENDPOINT as string);
 
@@ -238,9 +240,12 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
 }
 
 export async function getApiPaths(): Promise<{ transportType: string; paths: Set<string> }[]> {
-    const railSwaggerPaths = await getPaths("https://rata.digitraffic.fi/swagger/openapi.json");
-    const roadSwaggerPaths = await getPaths("https://tie.digitraffic.fi/swagger/openapi.json");
-    const marineSwaggerPaths = await getPaths("https://meri.digitraffic.fi/swagger/openapi.json");
+    const railSwaggerPaths = await retryRequest(getPaths, "https://rata.digitraffic.fi/swagger/openapi.json");
+    const roadSwaggerPaths = await retryRequest(getPaths, "https://tie.digitraffic.fi/swagger/openapi.json");
+    const marineSwaggerPaths = await retryRequest(
+        getPaths,
+        "https://meri.digitraffic.fi/swagger/openapi.json"
+    );
 
     railSwaggerPaths.add("/api/v2/graphql/");
     railSwaggerPaths.add("/api/v1/trains/history");
@@ -278,9 +283,15 @@ export function getKeyFigures(): KeyFigure[] {
 }
 
 export async function getPaths(endpointUrl: string): Promise<Set<string>> {
-    const resp = await axios.get(endpointUrl, {
-        headers: { "accept-encoding": "gzip" }
-    });
+    try {
+        const resp = await axios.get(endpointUrl, {
+            headers: { "accept-encoding": "gzip" }
+        });
+    } catch (error) {
+        if (error instanceof AxiosError && error.response.status === 403) {
+            throw new HttpError(403, error.message);
+        }
+    }
 
     if (resp.status !== 200) {
         console.error("Fetching faults failed: " + resp.statusText);

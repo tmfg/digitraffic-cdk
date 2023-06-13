@@ -16,6 +16,7 @@ jest.mock("aws-sdk", () => {
 // @ts-ignore
 const AWS = require("aws-sdk");
 const esQuery = require("../../lambda/es-query");
+const retry = require("@digitraffic/common/dist/utils/retry");
 
 test("fetchDataFromEs retries after a response of 429", async () => {
     //nock()
@@ -30,6 +31,6 @@ test("fetchDataFromEs retries after a response of 429", async () => {
 
     //jest.fn().mockImplementationOnce(() => {});
 
-    expect(esQuery.retryCount).toBe(1);
+    expect(retry.retryCount).toBe(1);
     //expect(esQuery.handleRequest).toHaveBeenCalledTimes(2);
 }, 10000);
