@@ -25,8 +25,11 @@ const retryStatusCodes = new Set([
 function isLastRetry(retryCount: number) {
     return retryCount > 5;
 }
+
+// Tämä muuttuja on testejä varten määritelty täällä.
+export let retryCount = 0;
 export async function retryRequest<T>(request: () => Promise<T>): Promise<T> {
-    let retryCount = 0;
+    retryCount = 0;
     while (!isLastRetry(retryCount)) {
         try {
             return await request();
@@ -98,11 +101,13 @@ function createRequestForEs(endpoint: AWS.Endpoint, query: string, path: string)
     return req;
 }
 
-function handleRequest(client, req, callback) {
+export function handleRequest(client, req, callback) {
     client.handleRequest(req, null, callback, function (err: any) {
         console.error("Error: " + err);
     });
 }
+
+export const bar = handleRequest;
 export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
     const req = createRequestForEs(endpoint, query, path);
 
@@ -120,7 +125,7 @@ export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, pat
                     reject(new HttpError(code, message));
                 }
             );
-            handleRequest(client, req, callback);
+            bar(client, req, callback);
         });
     };
     try {
