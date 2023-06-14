@@ -1,11 +1,11 @@
 import type { ValueOf } from "@digitraffic/common/dist/types/util-types.js";
 import type { z } from "zod";
-import type { ramiMessageSchema } from "./schema/rami-message-schema.js";
+import type { ramiMessageSchema } from "./zod-schema/rami-message.js";
 import type {
     recipientAudioMessagesToDeliver,
     recipientVideoMessagesToDeliver
-} from "./schema/scheduled-message-schema.js";
-import type { monitoredJourneyScheduledMessage } from "./schema/monitored-journey-scheduled-message-schema.js";
+} from "./zod-schema/scheduled-message.js";
+import type { monitoredJourneyScheduledMessage } from "./zod-schema/monitored-journey-scheduled-message.js";
 
 export type RamiMessage = z.infer<typeof ramiMessageSchema>;
 export type RamiMessagePayload = Pick<RamiMessage, "payload">["payload"];

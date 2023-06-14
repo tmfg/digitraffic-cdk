@@ -1,8 +1,39 @@
+import { formatInTimeZone } from "date-fns-tz";
 import type { Connection } from "mysql2/promise.js";
 import { DtRamiMessage, WEEKDAYS, WeekDay } from "../model/dt-rami-message.js";
 import { inDatabase, inTransaction } from "../util/database.js";
-import { formatInTimeZone2 } from "../util/date.js";
-import { formatInTimeZone } from "date-fns-tz";
+
+export interface DbRamiAudio {
+    readonly text_fi?: string | null;
+    readonly text_sv?: string | null;
+    readonly text_en?: string | null;
+    readonly delivery_rules: {
+        readonly start_date?: Date | null;
+        readonly end_date?: Date | null;
+        readonly start_time?: string | null;
+        readonly end_time?: string | null;
+        readonly days?: string | null;
+        readonly delivery_type?: string | null;
+        readonly event_type?: string | null;
+        readonly delivery_at?: Date | null;
+        readonly repetitions?: number | null;
+        readonly repeat_every?: number | null;
+    };
+}
+
+export interface DbRamiVideo {
+    readonly text_fi?: string | null;
+    readonly text_sv?: string | null;
+    readonly text_en?: string | null;
+    readonly delivery_rules: {
+        readonly start_date?: Date | null;
+        readonly end_date?: Date | null;
+        readonly start_time?: string | null;
+        readonly end_time?: string | null;
+        readonly days?: string | null;
+        readonly delivery_type?: string | null;
+    };
+}
 
 export interface DbRamiMessage {
     readonly id: string;
@@ -10,31 +41,11 @@ export interface DbRamiMessage {
     readonly created_source: Date;
     readonly start_validity: Date;
     readonly end_validity: Date;
-    readonly train_number: number | null;
-    readonly train_departure_date: string | null;
-    readonly stations: string | null;
-    readonly audio_text_fi?: string | null;
-    readonly audio_text_sv?: string | null;
-    readonly audio_text_en?: string | null;
-    readonly audio_start_date?: Date | null;
-    readonly audio_end_date?: Date | null;
-    readonly audio_start_time?: string | null;
-    readonly audio_end_time?: string | null;
-    readonly audio_days?: string | null;
-    readonly audio_delivery_type?: string | null;
-    readonly audio_event_type?: string | null;
-    readonly audio_delivery_at?: Date | null;
-    readonly audio_repetitions?: number | null;
-    readonly audio_repeat_every?: number | null;
-    readonly video_text_fi?: string | null;
-    readonly video_text_sv?: string | null;
-    readonly video_text_en?: string | null;
-    readonly video_start_date?: Date | null;
-    readonly video_end_date?: Date | null;
-    readonly video_start_time?: string | null;
-    readonly video_end_time?: string | null;
-    readonly video_days?: string | null;
-    readonly video_delivery_type?: string | null;
+    readonly train_number?: number | null;
+    readonly train_departure_date?: string | null;
+    readonly stations?: string | null;
+    readonly audio: DbRamiAudio;
+    readonly video: DbRamiVideo;
 }
 
 const INSERT_RAMI_MESSAGE =
@@ -61,28 +72,8 @@ SELECT
     rm.train_number,
     DATE_FORMAT(rm.train_departure_date, '%Y-%m-%d') as train_departure_date,
     GROUP_CONCAT(rms.station_short_code) as stations,
-    rma.text_fi as audio_text_fi,
-    rma.text_sv as audio_text_sv,
-    rma.text_en as audio_text_en,
-    rma.start_date_time as audio_start_date,
-    rma.end_date_time as audio_end_date,
-    rma.start_time as audio_start_time,
-    rma.end_time as audio_end_time,
-    rma.delivery_type as audio_delivery_type,
-    rma.event_type as audio_event_type,
-    rma.delivery_at as audio_delivery_at,
-    rma.repetitions as audio_repetitions,
-    rma.repeat_every as audio_repeat_every,
-    export_set(rma.days_of_week, '1', '0', '', 7) as audio_days,
-    rmv.text_fi as video_text_fi,
-    rmv.text_sv as video_text_sv,
-    rmv.text_en as video_text_en,
-    rmv.start_date_time as video_start_date,
-    rmv.end_date_time as video_end_date,
-    rmv.start_time as video_start_time,
-    rmv.end_time as video_end_time,
-    rmv.delivery_type as video_delivery_type,
-    export_set(rmv.days_of_week, '1', '0', '', 7) as video_days
+    JSON_OBJECT('text_fi', rma.text_fi, 'text_sv', rma.text_sv, 'text_en', rma.text_en, 'delivery_rules', JSON_OBJECT('start_date', rma.start_date_time, 'end_date', rma.end_date_time, 'start_time', rma.start_time, 'end_time', rma.end_time, 'delivery_type', rma.delivery_type, 'days', NULLIF(EXPORT_SET(rma.days_of_week, '1', '0', '', 7), '0000000'), 'event_type', rma.event_type, 'delivery_at', rma.delivery_at, 'repetitions', rma.repetitions, 'repeat_every', rma.repeat_every)) as audio,
+    JSON_OBJECT('text_fi', rmv.text_fi, 'text_sv', rmv.text_sv, 'text_en', rmv.text_en, 'delivery_rules', JSON_OBJECT('start_date', rmv.start_date_time, 'end_date', rmv.end_date_time, 'start_time', rmv.start_time, 'end_time', rmv.end_time, 'delivery_type', rmv.delivery_type, 'days', NULLIF(EXPORT_SET(rmv.days_of_week, '1', '0', '', 7), '0000000'))) as video
 FROM
     rami_message rm
     JOIN (
@@ -104,18 +95,18 @@ FROM
 WHERE
     rm.deleted IS NULL
     AND
-    rm.start_validity <= UTC_TIMESTAMP()
-    AND rm.end_validity >= UTC_TIMESTAMP()
+    rm.start_validity <= NOW()
+    AND rm.end_validity >= NOW()
     AND (
-        ? IS NULL
-        OR rm.train_number = ?
+        NULLIF(?, '') IS NULL
+        OR rm.train_number = NULLIF(?, '')
     )
     AND (
-        ? IS NULL
-        OR rm.train_departure_date = ?
+        NULLIF(?, '') IS NULL
+        OR rm.train_departure_date = NULLIF(?, '')
     )
     AND (
-        ? IS NULL
+        NULLIF(?, '') IS NULL
         OR rm.id IN (
             SELECT
                 rmx.id
@@ -134,7 +125,7 @@ WHERE
                 JOIN rami_message_station rmsx ON rmx.id = rmsx.rami_message_id
                 AND rmx.version = rmsx.rami_message_version
             WHERE
-                rmsx.station_short_code = ?
+                rmsx.station_short_code = NULLIF(?, '')
         )
     )
 GROUP BY
@@ -175,7 +166,7 @@ export async function findActiveMessages(
     station: string | null = null
 ): Promise<DbRamiMessage[]> {
     const [rows] = await inDatabase(async (conn: Connection) => {
-        return conn.execute(FIND_ACTIVE, [
+        return conn.query(FIND_ACTIVE, [
             trainNumber,
             trainNumber,
             trainDepartureDate,

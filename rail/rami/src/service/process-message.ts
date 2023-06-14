@@ -13,7 +13,7 @@ import {
     RamiScheduledMessageAudio,
     RamiScheduledMessageVideo
 } from "../model/rami-message.js";
-import { ramiMessageSchema } from "../model/schema/rami-message-schema.js";
+import { ramiMessageSchema } from "../model/zod-schema/rami-message.js";
 
 interface DeliveryPoint {
     readonly id: string;

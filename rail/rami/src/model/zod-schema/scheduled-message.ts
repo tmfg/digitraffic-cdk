@@ -132,25 +132,15 @@ export const recipientVideoMessagesToDeliver = z
                 videoSchedulationType: z
                     .enum(["WHEN", "CONTINUOS_VISUALIZATION"])
                     .describe("type of audio schedulation"),
-                startDateTime: z
-                    .string()
-                    .describe("scheduling start date")
-                    .nullable()
-                    .describe("scheduling start date"),
-                endDateTime: z
-                    .string()
-                    .describe("scheduling end date")
-                    .nullable()
-                    .describe("scheduling end date"),
+                startDateTime: z.string().nullable().describe("scheduling start date"),
+                endDateTime: z.string().nullable().describe("scheduling end date"),
                 startTime: z
                     .string()
-                    .describe("scheduling start time. Could be null for CONTINUOS_DELIVERY type scheduling")
                     .nullable()
                     .describe("scheduling start time. Could be null for CONTINUOS_DELIVERY type scheduling")
                     .optional(),
                 endTime: z
                     .string()
-                    .describe("scheduling end time. Could be null for CONTINUOS_DELIVERY type scheduling")
                     .nullable()
                     .describe("scheduling end time. Could be null for CONTINUOS_DELIVERY type scheduling")
                     .optional(),

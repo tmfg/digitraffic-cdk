@@ -3,6 +3,7 @@ import type { Construct } from "constructs";
 import { DigitrafficStack, StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
 import { DigitrafficSqsQueue } from "@digitraffic/common/dist/aws/infra/sqs-queue.js";
 import * as InternalLambdas from "./internal-lambdas.js";
+import { PublicApi } from "./public-api.js";
 
 export class RamiStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: StackConfiguration) {
@@ -15,5 +16,6 @@ export class RamiStack extends DigitrafficStack {
         });
 
         InternalLambdas.create(this, sqs);
+        const publicApi = new PublicApi(this);
     }
 }

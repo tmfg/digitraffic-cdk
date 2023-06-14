@@ -1,6 +1,6 @@
 import { z } from "zod";
-import { scheduledMessage } from "./scheduled-message-schema";
-import { monitoredJourneyScheduledMessage } from "./monitored-journey-scheduled-message-schema";
+import { scheduledMessage } from "./scheduled-message";
+import { monitoredJourneyScheduledMessage } from "./monitored-journey-scheduled-message";
 
 export const headers = z
     .object({

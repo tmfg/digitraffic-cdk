@@ -2,7 +2,7 @@ import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.j
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
 import type { SQSEvent } from "aws-lambda";
-import { parseMessage, processMessage } from "../../service/message.js";
+import { parseMessage, processMessage } from "../../service/process-message.js";
 
 export function handlerFn() {
     return (event: SQSEvent) => {
