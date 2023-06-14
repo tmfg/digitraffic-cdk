@@ -343,6 +343,7 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
         if (error instanceof AxiosError && error.response.status === 403) {
             throw new HttpError(403, error.message);
         }
+        throw error;
     }
 }
 

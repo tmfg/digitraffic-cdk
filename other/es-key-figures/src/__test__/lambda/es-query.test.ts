@@ -1,3 +1,5 @@
+export {};
+
 const nock = require("nock");
 function V4() {
     this.addAuthorization = jest.fn((req, credentials) => {});
