@@ -19,18 +19,11 @@ const esQuery = require("../../lambda/es-query");
 const retry = require("@digitraffic/common/dist/utils/retry");
 
 test("fetchDataFromEs retries after a response of 429", async () => {
-    //nock()
-    //http://localhost/dt-nginx-*/path
     nock("http://localhost")
         .post("/dt-nginx-*/path")
         .reply(429)
         .post("/dt-nginx-*/path")
         .reply(200, { foo: "bar" });
-    //AWS.NodeHttpClient.mockIncomingStatusCodeOnce(429).mockIncomingStatusCodeOnce(200);
     await esQuery.fetchDataFromEs(new AWS.Endpoint("http://localhost"), "query", "path");
-
-    //jest.fn().mockImplementationOnce(() => {});
-
     expect(retry.retryCount).toBe(1);
-    //expect(esQuery.handleRequest).toHaveBeenCalledTimes(2);
 }, 10000);
