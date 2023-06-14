@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig-esm.json",
+  "module": "node16",
+  "moduleResolution": "node16",
+  "compilerOptions": {
+    "declaration": true,
+    "outDir": "../../../../dist/out"
+  },
+  "include": ["../../../../src/**/*.ts"]
+}
