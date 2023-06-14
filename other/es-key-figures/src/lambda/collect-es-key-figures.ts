@@ -6,6 +6,9 @@ import mysql from "mysql";
 import { HttpError } from "@digitraffic/common/src/types/http-error";
 import { retryRequest } from "@digitraffic/common/src/utils/retry";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { DtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger";
+
+const logger = new DtLogger();
 
 const ES_ENDPOINT = getEnvVariable("ES_ENDPOINT");
 const endpoint = new AWS.Endpoint(ES_ENDPOINT);
@@ -75,13 +78,14 @@ export const handler = async (event: KeyFigureLambdaEvent): Promise<boolean> => 
         firstPath.paths = new Set(secondHalf);
     }
 
-    console.info(
-        `ES: ${ES_ENDPOINT}, MySQL: ${
+    logger.info({
+        message: `ES: ${ES_ENDPOINT}, MySQL: ${
             mysqlOpts.host
         },  Range: ${startDate.toISOString()} -> ${endDate.toISOString()}, Paths: ${apiPaths
             .map((s) => `${s.transportType}, ${Array.from(s.paths).join(", ")}`)
-            .join(",")}`
-    );
+            .join(",")}`,
+        method: "collect-es-key-figures.handler"
+    });
 
     const keyFigures = getKeyFigures();
 
@@ -134,7 +138,10 @@ async function getKibanaResult(
             }
             keyFigureResult.value = value;
         } else {
-            console.error(`Unknown type: ${keyFigure.type}`);
+            logger.error({
+                message: `Unknown type: ${keyFigure.type}`,
+                method: "collect-es-key-figures.getKibanaResult"
+            });
         }
 
         output.push(keyFigureResult);
@@ -152,7 +159,10 @@ export async function getKibanaResults(
 
     if (!event.PART || event.PART === 1) {
         for (const apiPath of apiPaths) {
-            console.info(`Running: ${apiPath.transportType}`);
+            logger.info({
+                message: `Running: ${apiPath.transportType}`,
+                method: "collect-es-key-figures.getKibanaResults"
+            });
             kibanaResults.push(
                 getKibanaResult(keyFigures, startDate, endDate, `@transport_type:${apiPath.transportType}`)
             );
@@ -161,7 +171,10 @@ export async function getKibanaResults(
 
     for (const apiPath of apiPaths) {
         for (const path of apiPath.paths) {
-            console.info(`Running path: ${path}`);
+            logger.info({
+                message: `Running path: ${path}`,
+                method: "collect-es-key-figures.getKibanaResults"
+            });
             kibanaResults.push(
                 getKibanaResult(
                     keyFigures,
@@ -194,7 +207,11 @@ async function getRowAmountWithDateNameFilter(
         }
         return Promise.resolve(firstRow[resultKey]);
     } catch (error: unknown) {
-        console.error("Error querying database: ", error);
+        logger.error({
+            message: "Error querying database: ",
+            error,
+            method: "collect-es-key-figures.getRowAmountWithDateNameFilter"
+        });
         throw error;
     }
 }
@@ -236,9 +253,10 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
 
         // save duplicate rows to a separate table if current set of results already exists in database
         if (existingRows > 0) {
-            console.info(
-                `Found existing result '${kibanaResult.name}' where 'from' is '${startIsoDate}' and filter is '${kibanaResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`
-            );
+            logger.info({
+                message: `Found existing result '${kibanaResult.name}' where 'from' is '${startIsoDate}' and filter is '${kibanaResult.filter}', saving to table ${DUPLICATES_TABLE_NAME}`,
+                method: "collect-es-key-figures.persistToDatabase"
+            });
             await query("DROP TABLE IF EXISTS ??", [DUPLICATES_TABLE_NAME]);
             await query(CREATE_KEY_FIGURES_TABLE, [DUPLICATES_TABLE_NAME]);
             await query(CREATE_KEY_FIGURES_INDEX, [DUPLICATES_TABLE_NAME]);
@@ -247,7 +265,10 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
             await insertFigures(kibanaResults, KEY_FIGURES_TABLE_NAME);
         }
     } catch (error) {
-        console.error("Error persisting: ", error);
+        logger.error({
+            message: `Error persisting: ${error.toString()}`,
+            method: "collect-es-key-figures.persistToDatabase"
+        });
         throw error;
     }
 }
@@ -301,7 +322,10 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
             headers: { "accept-encoding": "gzip" }
         });
         if (resp.status !== 200) {
-            console.error("Fetching faults failed: " + resp.statusText);
+            logger.error({
+                message: "Fetching faults failed: " + resp.statusText,
+                method: "collect-es-key-figures.getPaths"
+            });
 
             return new Set<string>();
         }

@@ -2,7 +2,10 @@ import "source-map-support/register";
 import * as AWSx from "aws-sdk";
 import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";
+import { DtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger";
 import type { IncomingMessage } from "http";
+
+const logger = new DtLogger();
 
 const AWS = AWSx as any;
 
@@ -14,7 +17,10 @@ function handleResponseFromEs(
 ) {
     return (httpResp: IncomingMessage) => {
         const statusCode = httpResp.statusCode;
-        console.log(`OpenSearch responded with status code ${statusCode}`);
+        logger.info({
+            message: `OpenSearch responded with status code ${statusCode}`,
+            method: "es-query.handleResponseFromEs"
+        });
         if (statusCode < 200 || statusCode >= 300) {
             failedCallback(
                 statusCode,
@@ -30,7 +36,10 @@ function handleResponseFromEs(
             try {
                 successCallback(JSON.parse(respBody));
             } catch (e) {
-                console.log(`Failed to parse response body: ${respBody}`);
+                logger.info({
+                    message: `Failed to parse response body: ${respBody}`,
+                    method: "es-query.handleResponseFromEs"
+                });
             }
         });
     };
@@ -58,7 +67,10 @@ function createRequestForEs(endpoint: AWSx.Endpoint, query: string, path: string
 
 function handleRequest(client, req, callback) {
     client.handleRequest(req, null, callback, function (err: any) {
-        console.error("Error: " + err);
+        logger.error({
+            message: "Error: " + err,
+            method: "es-query.handleRequest"
+        });
     });
 }
 
@@ -85,7 +97,7 @@ export async function fetchDataFromEs(endpoint: AWSx.Endpoint, query: string, pa
     try {
         return await retryRequest(makeRequest);
     } catch (error) {
-        console.error(`Request failed: ${error}`);
+        logger.error({ message: `Request failed: ${error}`, method: "es-query.fetchDataFromEs" });
         throw error;
     }
 }
