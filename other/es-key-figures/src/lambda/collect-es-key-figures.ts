@@ -206,8 +206,7 @@ async function getRowAmountWithDateNameFilter(
         return Promise.resolve(firstRow[resultKey]);
     } catch (error: unknown) {
         logger.error({
-            message: "Error querying database: ",
-            error,
+            message: "Error querying database: " + (error instanceof Error && error.message),
             method: "collect-es-key-figures.getRowAmountWithDateNameFilter"
         });
         throw error;
@@ -264,7 +263,7 @@ async function persistToDatabase(kibanaResults: KeyFigureResult[]) {
         }
     } catch (error) {
         logger.error({
-            message: `Error persisting: ${error.toString()}`,
+            message: `Error persisting: ${error instanceof Error && error.message}`,
             method: "collect-es-key-figures.persistToDatabase"
         });
         throw error;

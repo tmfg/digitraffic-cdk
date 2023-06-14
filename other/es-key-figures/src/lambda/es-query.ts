@@ -64,9 +64,9 @@ function createRequestForEs(endpoint: AWSx.Endpoint, query: string, path: string
 }
 
 function handleRequest(client, req, callback) {
-    client.handleRequest(req, null, callback, function (err: any) {
+    client.handleRequest(req, null, callback, function (err: Error) {
         logger.error({
-            message: "Error: " + err,
+            message: "Error: " + err.message,
             method: "es-query.handleRequest"
         });
     });
@@ -94,8 +94,11 @@ export async function fetchDataFromEs(endpoint: AWSx.Endpoint, query: string, pa
     };
     try {
         return await retryRequest(makeRequest);
-    } catch (error) {
-        logger.error({ message: `Request failed: ${error}`, method: "es-query.fetchDataFromEs" });
+    } catch (error: unknown) {
+        logger.error({
+            message: `Request failed: ${error instanceof Error && error.message}`,
+            method: "es-query.fetchDataFromEs"
+        });
         throw error;
     }
 }
