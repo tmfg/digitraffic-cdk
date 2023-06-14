@@ -1,5 +1,6 @@
 import { addHours } from "date-fns";
 import type { DtRamiMessage } from "../model/dt-rami-message";
+import type { RamiMessageOperation } from "../model/rami-message";
 import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata";
 
 export function createDtRamiMessage(properties: {
@@ -32,48 +33,61 @@ export function createDtRamiMessage(properties: {
     };
 }
 
-export function createMonitoredJourneyScheduledMessage(
-    start: Date,
-    end: Date,
-    trainNumber?: number,
-    trainDepartureDate?: string,
-    station?: string,
-    messageId?: string
-): unknown {
+export function createMonitoredJourneyScheduledMessage(properties: {
+    operation?: RamiMessageOperation;
+    start?: Date;
+    end?: Date;
+    trainNumber?: number;
+    trainDepartureDate?: string;
+    station?: string;
+    messageId?: string;
+}): unknown {
     const payload = validRamiMonitoredJourneyScheduledMessage.payload;
     return {
         ...validRamiMonitoredJourneyScheduledMessage,
         payload: {
             ...payload,
-            messageId: messageId ?? payload.messageId,
-            startValidity: start.toISOString(),
-            endValidity: end.toISOString(),
+            operation: properties.operation ?? payload.operation,
+            messageId: properties.messageId ?? payload.messageId,
+            startValidity: properties.start ? properties.start.toISOString() : new Date().toISOString(),
+            endValidity: properties.end
+                ? properties.end.toISOString()
+                : addHours(new Date(), 1).toISOString(),
             monitoredJourneyScheduledMessage: {
                 ...payload.monitoredJourneyScheduledMessage,
                 vehicleJourney: {
                     ...payload.monitoredJourneyScheduledMessage.vehicleJourney,
                     vehicleJourneyName:
-                        trainNumber?.toString() ??
+                        properties.trainNumber?.toString() ??
                         payload.monitoredJourneyScheduledMessage.vehicleJourney.vehicleJourneyName,
                     dataFrameRef:
-                        trainDepartureDate ??
+                        properties.trainDepartureDate ??
                         payload.monitoredJourneyScheduledMessage.vehicleJourney.dataFrameRef
                 },
-                deliveryPoints: station
-                    ? [{ id: station, nameLong: "" }]
+                deliveryPoints: properties.station
+                    ? [{ id: properties.station, nameLong: "" }]
                     : payload.monitoredJourneyScheduledMessage.deliveryPoints
             }
         }
     };
 }
 
-export function createScheduledMessage(start: Date, end: Date): unknown {
+export function createScheduledMessage(properties: {
+    operation?: RamiMessageOperation;
+    start?: Date;
+    end?: Date;
+    trainNumber?: number;
+    trainDepartureDate?: string;
+    station?: string;
+    messageId?: string;
+}): unknown {
     return {
         ...validRamiScheduledMessage,
         payload: {
             ...validRamiScheduledMessage.payload,
-            startValidity: start.toISOString(),
-            endValidity: end.toISOString()
+            operation: properties.operation ?? validRamiScheduledMessage.payload.operation,
+            startValidity: properties.start ? properties.start.toISOString() : new Date().toISOString(),
+            endValidity: properties.end ? properties.end.toISOString() : addHours(new Date(), 1).toISOString()
         }
     };
 }

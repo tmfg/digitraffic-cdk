@@ -1,7 +1,8 @@
 import type { Connection } from "mysql2/promise.js";
 import { DtRamiMessage, WEEKDAYS, WeekDay } from "../model/dt-rami-message.js";
 import { inDatabase, inTransaction } from "../util/database.js";
-import { formatInTimeZone } from "../util/date.js";
+import { formatInTimeZone2 } from "../util/date.js";
+import { formatInTimeZone } from "date-fns-tz";
 
 export interface DbRamiMessage {
     readonly id: string;
@@ -103,8 +104,8 @@ FROM
 WHERE
     rm.deleted IS NULL
     AND
-    rm.start_validity <= NOW()
-    AND rm.end_validity >= NOW()
+    rm.start_validity <= UTC_TIMESTAMP()
+    AND rm.end_validity >= UTC_TIMESTAMP()
     AND (
         ? IS NULL
         OR rm.train_number = ?
@@ -209,9 +210,9 @@ function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown[] {
         message.id,
         message.version,
         message.messageType,
-        formatInTimeZone(message.created, "yyyy-MM-dd HH:mm", "UTC"),
-        formatInTimeZone(message.startValidity, "yyyy-MM-dd HH:mm", "UTC"),
-        formatInTimeZone(message.endValidity, "yyyy-MM-dd HH:mm", "UTC"),
+        formatInTimeZone(message.created, "UTC", "yyyy-MM-dd HH:mm"),
+        formatInTimeZone(message.startValidity, "UTC", "yyyy-MM-dd HH:mm"),
+        formatInTimeZone(message.endValidity, "UTC", "yyyy-MM-dd HH:mm"),
         message.trainNumber ?? null,
         message.trainDepartureLocalDate ?? null,
         message.journeyRef ?? null
@@ -233,10 +234,10 @@ function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown[]
         message.video?.textEn ?? null,
         message.video?.deliveryType ?? null,
         message.video?.startDateTime
-            ? formatInTimeZone(message.video.startDateTime, "yyyy-MM-dd HH:mm", "UTC")
+            ? formatInTimeZone(message.video.startDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
         message.video?.endDateTime
-            ? formatInTimeZone(message.video.endDateTime, "yyyy-MM-dd HH:mm", "UTC")
+            ? formatInTimeZone(message.video.endDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
         message.video?.startTime ?? null,
         message.video?.endTime ?? null,
@@ -254,10 +255,10 @@ function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown[]
         message.audio?.deliveryType ?? null,
         message.audio?.eventType ?? null,
         message.audio?.startDateTime
-            ? formatInTimeZone(message.audio.startDateTime, "yyyy-MM-dd HH:mm", "UTC")
+            ? formatInTimeZone(message.audio.startDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
         message.audio?.endDateTime
-            ? formatInTimeZone(message.audio.endDateTime, "yyyy-MM-dd HH:mm", "UTC")
+            ? formatInTimeZone(message.audio.endDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
         message.audio?.startTime ?? null,
         message.audio?.endTime ?? null,

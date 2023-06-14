@@ -9,10 +9,11 @@ import {
     RamiMessageOperations,
     RamiMessagePayload,
     RamiMessageTypes,
+    RamiMonitoredJourneyScheduledMessageAudio,
     RamiScheduledMessageAudio,
     RamiScheduledMessageVideo
 } from "../model/rami-message.js";
-import { ramiMessageSchema } from "../model/rami-message-schema.js";
+import { ramiMessageSchema } from "../model/schema/rami-message-schema.js";
 
 interface DeliveryPoint {
     readonly id: string;
@@ -96,16 +97,25 @@ function getAudioContent(payload: RamiMessagePayload): DtAudioContent | undefine
         payload.monitoredJourneyScheduledMessage?.audioMessageContents
     ) {
         const audioMessage = payload.monitoredJourneyScheduledMessage.audioMessageContents;
-        const audioTexts = audioMessage.audioTexts as TextContent[];
-        return {
-            textFi: getTextInLanguage(audioTexts, LanguageCodes.FI),
-            textSv: getTextInLanguage(audioTexts, LanguageCodes.SV),
-            textEn: getTextInLanguage(audioTexts, LanguageCodes.EN),
-            deliveryType: audioMessage.deliveryType ?? undefined
-        };
+        return parseMonitoredJourneyScheduledMessageAudio(audioMessage);
     }
 
     return undefined;
+}
+
+function parseMonitoredJourneyScheduledMessageAudio(
+    audioMessage: RamiMonitoredJourneyScheduledMessageAudio
+): DtAudioContent {
+    const audioTexts = audioMessage.audioTexts as TextContent[];
+    return {
+        textFi: getTextInLanguage(audioTexts, LanguageCodes.FI),
+        textSv: getTextInLanguage(audioTexts, LanguageCodes.SV),
+        textEn: getTextInLanguage(audioTexts, LanguageCodes.EN),
+        deliveryType: audioMessage.deliveryType ?? undefined,
+        repeatEvery: audioMessage.deliveryRules?.repeatEvery ?? undefined,
+        repetitions: audioMessage.deliveryRules?.repetitions ?? undefined,
+        eventType: audioMessage.deliveryRules?.eventType ? audioMessage.deliveryRules?.eventType : undefined
+    };
 }
 
 function parseScheduledMessageAudio(audioMessage: RamiScheduledMessageAudio): DtAudioContent {
