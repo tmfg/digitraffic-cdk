@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Attach Node.js debugger" type="ChromiumRemoteDebugType" factoryName="Chromium Remote" port="9999">
     <method v="2">
-      <option name="RunConfigurationTask" enabled="false" run_configuration_name="Run Lambda" run_configuration_type="ShConfigurationType" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="Run Lambda" run_configuration_type="ShConfigurationType" />
     </method>
   </configuration>
 </component>
