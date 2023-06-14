@@ -36,13 +36,13 @@ function handleResponseFromEs(
     };
 }
 
-function addCredentialsToEsRequest(req: AWS.HttpRequest) {
+function addCredentialsToEsRequest(req: AWSx.HttpRequest) {
     const creds = new AWS.EnvironmentCredentials("AWS");
     const signer = new AWS.Signers.V4(req, "es");
     signer.addAuthorization(creds, new Date());
 }
 
-function createRequestForEs(endpoint: AWS.Endpoint, query: string, path: string) {
+function createRequestForEs(endpoint: AWSx.Endpoint, query: string, path: string) {
     const req = new AWS.HttpRequest(endpoint);
     const index = "dt-nginx-*";
 
@@ -62,7 +62,7 @@ function handleRequest(client, req, callback) {
     });
 }
 
-export async function fetchDataFromEs(endpoint: AWS.Endpoint, query: string, path: string): Promise<any> {
+export async function fetchDataFromEs(endpoint: AWSx.Endpoint, query: string, path: string): Promise<any> {
     const req = createRequestForEs(endpoint, query, path);
 
     addCredentialsToEsRequest(req);
