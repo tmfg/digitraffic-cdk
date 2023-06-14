@@ -3,12 +3,10 @@ import { fetchDataFromEs } from "./es-query";
 import { esQueries } from "../es_queries";
 import axios, { AxiosError } from "axios";
 import mysql from "mysql";
-import { HttpError } from "@digitraffic/common/src/types/http-error";
-import { retryRequest } from "@digitraffic/common/src/utils/retry";
+import { HttpError } from "@digitraffic/common/dist/types/http-error";
+import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { DtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger";
-
-const logger = new DtLogger();
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const ES_ENDPOINT = getEnvVariable("ES_ENDPOINT");
 const endpoint = new AWS.Endpoint(ES_ENDPOINT);

@@ -2,10 +2,8 @@ import "source-map-support/register";
 import * as AWSx from "aws-sdk";
 import { retryRequest } from "@digitraffic/common/dist/utils/retry";
 import { HttpError } from "@digitraffic/common/dist/types/http-error";
-import { DtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import type { IncomingMessage } from "http";
-
-const logger = new DtLogger();
 
 const AWS = AWSx as any;
 

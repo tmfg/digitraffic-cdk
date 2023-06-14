@@ -2,9 +2,7 @@ import mysql from "mysql";
 import util from "node:util";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { DtLogger } from "@digitraffic/common/dist/aws/runtime/dt-logger";
-
-const logger = new DtLogger();
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 interface KeyFigure {
     filter: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
