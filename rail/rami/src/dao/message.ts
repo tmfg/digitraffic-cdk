@@ -49,16 +49,16 @@ export interface DbRamiMessage {
 }
 
 const INSERT_RAMI_MESSAGE =
-    "INSERT INTO rami_message(id, version, message_type, created_source, start_validity, end_validity, train_number, train_departure_date, journey_ref) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    "INSERT INTO rami_message(id, version, message_type, created_source, start_validity, end_validity, train_number, train_departure_date, journey_ref) VALUES (:id, :version, :messageType, :created, :startValidity, :endValidity, :trainNumber, :trainDepartureDate, :journeyRef)";
 
 const INSERT_RAMI_MESSAGE_STATIONS =
     "INSERT INTO rami_message_station(rami_message_id, rami_message_version, station_short_code) VALUES ?";
 
 const INSERT_RAMI_MESSAGE_VIDEO =
-    "INSERT INTO rami_message_video(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, start_date_time, end_date_time, start_time, end_time, days_of_week) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, b?)";
+    "INSERT INTO rami_message_video(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, start_date_time, end_date_time, start_time, end_time, days_of_week) VALUES (:id, :version, :textFi, :textSv, :textEn, :deliveryType, :startDateTime, :endDateTime, :startTime, :endTime, b:days)";
 
 const INSERT_RAMI_MESSAGE_AUDIO =
-    "INSERT INTO rami_message_audio(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, event_type, start_date_time, end_date_time, start_time, end_time, days_of_week, delivery_at, repetitions, repeat_every) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, b?, ?, ?, ?)";
+    "INSERT INTO rami_message_audio(rami_message_id, rami_message_version, text_fi, text_sv, text_en, delivery_type, start_date_time, end_date_time, start_time, end_time, days_of_week, event_type, delivery_at, repetitions, repeat_every) VALUES (:id, :version, :textFi, :textSv, :textEn, :deliveryType, :startDateTime, :endDateTime, :startTime, :endTime, b:days, :eventType, :deliveryAt, :repetitions, :repeatEvery)";
 
 const SET_DELETED = "UPDATE rami_message SET deleted = NOW() WHERE id = ?";
 
@@ -98,15 +98,15 @@ WHERE
     rm.start_validity <= NOW()
     AND rm.end_validity >= NOW()
     AND (
-        NULLIF(?, '') IS NULL
-        OR rm.train_number = NULLIF(?, '')
+        NULLIF(:trainNumber, '') IS NULL
+        OR rm.train_number = NULLIF(:trainNumber, '')
     )
     AND (
-        NULLIF(?, '') IS NULL
-        OR rm.train_departure_date = NULLIF(?, '')
+        NULLIF(:trainDepartureDate, '') IS NULL
+        OR rm.train_departure_date = NULLIF(:trainDepartureDate, '')
     )
     AND (
-        NULLIF(?, '') IS NULL
+        NULLIF(:station, '') IS NULL
         OR rm.id IN (
             SELECT
                 rmx.id
@@ -125,7 +125,7 @@ WHERE
                 JOIN rami_message_station rmsx ON rmx.id = rmsx.rami_message_id
                 AND rmx.version = rmsx.rami_message_version
             WHERE
-                rmsx.station_short_code = NULLIF(?, '')
+                rmsx.station_short_code = NULLIF(:station, '')
         )
     )
 GROUP BY
@@ -166,14 +166,11 @@ export async function findActiveMessages(
     station: string | null = null
 ): Promise<DbRamiMessage[]> {
     const [rows] = await inDatabase(async (conn: Connection) => {
-        return conn.query(FIND_ACTIVE, [
-            trainNumber,
+        return conn.query(FIND_ACTIVE, {
             trainNumber,
             trainDepartureDate,
-            trainDepartureDate,
-            station,
             station
-        ]);
+        });
     });
     return rows as DbRamiMessage[];
 }
@@ -190,24 +187,24 @@ export async function insertMessage(message: DtRamiMessage): Promise<void> {
     });
 }
 
-export async function setMessageDeleted(message: DtRamiMessage): Promise<void> {
+export async function setMessageDeleted(messageId: string): Promise<void> {
     return inTransaction(async (conn: Connection) => {
-        await conn.query(SET_DELETED, [message.id]);
+        await conn.query(SET_DELETED, [messageId]);
     });
 }
 
-function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown[] {
-    return [
-        message.id,
-        message.version,
-        message.messageType,
-        formatInTimeZone(message.created, "UTC", "yyyy-MM-dd HH:mm"),
-        formatInTimeZone(message.startValidity, "UTC", "yyyy-MM-dd HH:mm"),
-        formatInTimeZone(message.endValidity, "UTC", "yyyy-MM-dd HH:mm"),
-        message.trainNumber ?? null,
-        message.trainDepartureLocalDate ?? null,
-        message.journeyRef ?? null
-    ];
+function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown {
+    return {
+        id: message.id,
+        version: message.version,
+        messageType: message.messageType,
+        created: formatInTimeZone(message.created, "UTC", "yyyy-MM-dd HH:mm"),
+        startValidity: formatInTimeZone(message.startValidity, "UTC", "yyyy-MM-dd HH:mm"),
+        endValidity: formatInTimeZone(message.endValidity, "UTC", "yyyy-MM-dd HH:mm"),
+        trainNumber: message.trainNumber ?? null,
+        trainDepartureDate: message.trainDepartureLocalDate ?? null,
+        journeyRef: message.journeyRef ?? null
+    };
 }
 
 function createDtRamiMessageStationInsertValues(message: DtRamiMessage): (string | number)[][][] | null {
@@ -216,48 +213,48 @@ function createDtRamiMessageStationInsertValues(message: DtRamiMessage): (string
         : null;
 }
 
-function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown[] {
-    return [
-        message.id,
-        message.version,
-        message.video?.textFi ?? null,
-        message.video?.textSv ?? null,
-        message.video?.textEn ?? null,
-        message.video?.deliveryType ?? null,
-        message.video?.startDateTime
+function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown {
+    return {
+        id: message.id,
+        version: message.version,
+        textFi: message.video?.textFi ?? null,
+        textSv: message.video?.textSv ?? null,
+        textEn: message.video?.textEn ?? null,
+        deliveryType: message.video?.deliveryType ?? null,
+        startDateTime: message.video?.startDateTime
             ? formatInTimeZone(message.video.startDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
-        message.video?.endDateTime
+        endDateTime: message.video?.endDateTime
             ? formatInTimeZone(message.video.endDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
-        message.video?.startTime ?? null,
-        message.video?.endTime ?? null,
-        message.video?.daysOfWeek ? mapDaysToBits(message.video.daysOfWeek) : "0000000"
-    ];
+        startTime: message.video?.startTime ?? null,
+        endTime: message.video?.endTime ?? null,
+        days: message.video?.daysOfWeek ? mapDaysToBits(message.video.daysOfWeek) : "0000000"
+    };
 }
 
-function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown[] {
-    return [
-        message.id,
-        message.version,
-        message.audio?.textFi ?? null,
-        message.audio?.textSv ?? null,
-        message.audio?.textEn ?? null,
-        message.audio?.deliveryType ?? null,
-        message.audio?.eventType ?? null,
-        message.audio?.startDateTime
+function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown {
+    return {
+        id: message.id,
+        version: message.version,
+        textFi: message.audio?.textFi ?? null,
+        textSv: message.audio?.textSv ?? null,
+        textEn: message.audio?.textEn ?? null,
+        deliveryType: message.audio?.deliveryType ?? null,
+        startDateTime: message.audio?.startDateTime
             ? formatInTimeZone(message.audio.startDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
-        message.audio?.endDateTime
+        endDateTime: message.audio?.endDateTime
             ? formatInTimeZone(message.audio.endDateTime, "UTC", "yyyy-MM-dd HH:mm")
             : null,
-        message.audio?.startTime ?? null,
-        message.audio?.endTime ?? null,
-        message.audio?.daysOfWeek ? mapDaysToBits(message.audio.daysOfWeek) : "0000000",
-        message.audio?.deliveryAt ?? null,
-        message.audio?.repetitions ?? null,
-        message.audio?.repeatEvery ?? null
-    ];
+        startTime: message.audio?.startTime ?? null,
+        endTime: message.audio?.endTime ?? null,
+        days: message.audio?.daysOfWeek ? mapDaysToBits(message.audio.daysOfWeek) : "0000000",
+        eventType: message.audio?.eventType ?? null,
+        deliveryAt: message.audio?.deliveryAt ?? null,
+        repetitions: message.audio?.repetitions ?? null,
+        repeatEvery: message.audio?.repeatEvery ?? null
+    };
 }
 
 export type WeekDayBitString = `${"0" | "1"}${"0" | "1"}${"0" | "1"}${"0" | "1"}${"0" | "1"}${"0" | "1"}${

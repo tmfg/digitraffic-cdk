@@ -50,7 +50,7 @@ export function processMessage(message: DtRamiMessage): Promise<void> {
             method: "RamiMessageService.processMessage",
             message: `Deleting RAMI message id: ${message.id}`
         });
-        return setMessageDeleted(message);
+        return setMessageDeleted(message.id);
     }
     return Promise.reject();
 }

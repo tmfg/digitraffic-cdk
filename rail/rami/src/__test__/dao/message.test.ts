@@ -127,7 +127,7 @@ describe(
             const result = await findActiveMessages();
             expect(result.length).toEqual(1);
 
-            await setMessageDeleted(message);
+            await setMessageDeleted(message.id);
             const resultAfterDelete = await findActiveMessages();
             expect(resultAfterDelete.length).toEqual(0);
         });
