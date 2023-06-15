@@ -66,14 +66,14 @@ const FIND_ACTIVE = `
 SELECT
     rm.id,
     rm.version,
-    rm.created_source,
-    rm.start_validity,
-    rm.end_validity,
+    DATE_FORMAT(rm.created_source, '%Y-%m-%dT%TZ') as created_source,
+    DATE_FORMAT(rm.start_validity, '%Y-%m-%dT%TZ') as start_validity,
+    DATE_FORMAT(rm.end_validity, '%Y-%m-%dT%TZ') as end_validity,
     rm.train_number,
     DATE_FORMAT(rm.train_departure_date, '%Y-%m-%d') as train_departure_date,
     GROUP_CONCAT(rms.station_short_code) as stations,
-    JSON_OBJECT('text_fi', rma.text_fi, 'text_sv', rma.text_sv, 'text_en', rma.text_en, 'delivery_rules', JSON_OBJECT('start_date', rma.start_date_time, 'end_date', rma.end_date_time, 'start_time', rma.start_time, 'end_time', rma.end_time, 'delivery_type', rma.delivery_type, 'days', NULLIF(EXPORT_SET(rma.days_of_week, '1', '0', '', 7), '0000000'), 'event_type', rma.event_type, 'delivery_at', rma.delivery_at, 'repetitions', rma.repetitions, 'repeat_every', rma.repeat_every)) as audio,
-    JSON_OBJECT('text_fi', rmv.text_fi, 'text_sv', rmv.text_sv, 'text_en', rmv.text_en, 'delivery_rules', JSON_OBJECT('start_date', rmv.start_date_time, 'end_date', rmv.end_date_time, 'start_time', rmv.start_time, 'end_time', rmv.end_time, 'delivery_type', rmv.delivery_type, 'days', NULLIF(EXPORT_SET(rmv.days_of_week, '1', '0', '', 7), '0000000'))) as video
+    JSON_OBJECT('text_fi', rma.text_fi, 'text_sv', rma.text_sv, 'text_en', rma.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rma.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rma.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rma.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rma.end_time, '%k:%i'), 'delivery_type', rma.delivery_type, 'days', NULLIF(EXPORT_SET(rma.days_of_week, '1', '0', '', 7), '0000000'), 'event_type', rma.event_type, 'delivery_at', rma.delivery_at, 'repetitions', rma.repetitions, 'repeat_every', rma.repeat_every)) as audio,
+    JSON_OBJECT('text_fi', rmv.text_fi, 'text_sv', rmv.text_sv, 'text_en', rmv.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rmv.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rmv.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rmv.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rmv.end_time, '%k:%i'), 'delivery_type', rmv.delivery_type, 'days', NULLIF(EXPORT_SET(rmv.days_of_week, '1', '0', '', 7), '0000000'))) as video
 FROM
     rami_message rm
     JOIN (

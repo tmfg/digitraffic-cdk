@@ -95,7 +95,7 @@ export class PublicApi {
         this.publicApi.documentResource(
             activeResource,
             DocumentationPart.method(
-                ["active"],
+                ["passenger-information"],
                 "GetActiveMessages",
                 "Get currently active passenger information messages"
             ),
@@ -111,25 +111,29 @@ export class PublicApi {
     }
 
     createServiceModels(api: DigitrafficRestApi): ModelWithReference {
-        const textModel = addServiceModel("TextModel", api, TextSchema);
+        const textModel = addServiceModel("PassengerInformationTextContent", api, TextSchema);
         const audioModel = addServiceModel(
-            "AudioModel",
+            "PassengerInformationAudio",
             this.publicApi,
             createAudioSchema(getModelReference(textModel.modelId, api.restApiId))
         );
         const videoModel = addServiceModel(
-            "VideoModel",
+            "PassengerInformationVideo",
             this.publicApi,
             createVideoSchema(getModelReference(textModel.modelId, api.restApiId))
         );
         const messageModel = addServiceModel(
-            "MessageModel",
+            "PassengerInformationMessage",
             this.publicApi,
             createPassengerInformationMessageSchema(
                 getModelReference(audioModel.modelId, api.restApiId),
                 getModelReference(videoModel.modelId, api.restApiId)
             )
         );
-        return addServiceModel("MessagesModel", this.publicApi, createArraySchema(messageModel, api));
+        return addServiceModel(
+            "PassengerInformationMessages",
+            this.publicApi,
+            createArraySchema(messageModel, api)
+        );
     }
 }

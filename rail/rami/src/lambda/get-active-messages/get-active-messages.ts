@@ -1,7 +1,6 @@
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response.js";
 import { parse } from "date-fns";
 import { getActiveMessages } from "../../service/get-message.js";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
 
 interface GetActiveMessageEvent {
     readonly train_number?: number;
@@ -10,7 +9,6 @@ interface GetActiveMessageEvent {
 }
 
 export const handler = async (event: GetActiveMessageEvent): Promise<LambdaResponse> => {
-    logger.debug(JSON.stringify(event));
     if (event.train_number && isNaN(event.train_number)) {
         return LambdaResponse.badRequest("trainNumber is not a number");
     }
@@ -18,6 +16,5 @@ export const handler = async (event: GetActiveMessageEvent): Promise<LambdaRespo
         return LambdaResponse.badRequest("trainDepartureDate should be in format yyyy-MM-dd");
     }
     const messages = await getActiveMessages(event.train_number, event.train_departure_date, event.station);
-    logger.debug(JSON.stringify(messages));
     return LambdaResponse.okJson(messages);
 };
