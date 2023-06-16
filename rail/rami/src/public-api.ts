@@ -12,7 +12,7 @@ import {
     createArraySchema,
     getModelReference
 } from "@digitraffic/common/dist/utils/api-model.js";
-import type { IModel, RequestValidator, Resource } from "aws-cdk-lib/aws-apigateway";
+import { EndpointType, type IModel, type RequestValidator, type Resource } from "aws-cdk-lib/aws-apigateway";
 import {
     TextSchema,
     createAudioSchema,
@@ -27,7 +27,9 @@ export class PublicApi {
 
     constructor(stack: DigitrafficStack) {
         const apiName = "RAMI (passenger-information)";
-        this.publicApi = new DigitrafficRestApi(stack, "RAMI-public", apiName);
+        this.publicApi = new DigitrafficRestApi(stack, "RAMI-public", apiName, undefined, {
+            endpointTypes: [EndpointType.PRIVATE]
+        });
 
         this.apiKeyId = createDefaultUsagePlan(this.publicApi, apiName).keyId;
         const validator = addDefaultValidator(this.publicApi);
@@ -79,7 +81,7 @@ export class PublicApi {
             .build();
 
         activeResource.addMethod("GET", getActiveMessageIntegration, {
-            apiKeyRequired: false,
+            apiKeyRequired: true,
             requestParameters: {
                 "method.request.querystring.station": false,
                 "method.request.querystring.train_number": false,
