@@ -1,6 +1,6 @@
 import { subHours } from "date-fns";
 import {
-    WeekDayBitString,
+    WeekDaysBitString,
     findActiveMessages,
     insertMessage,
     mapBitsToDays,
@@ -19,7 +19,7 @@ describe(
             const result = await findActiveMessages();
             expect(result[0]?.id).toEqual(message.id);
             expect(result[0]?.stations?.split(",").sort()).toEqual(message?.stations?.sort());
-            expect(mapBitsToDays(result[0]?.video?.delivery_rules?.days as WeekDayBitString).sort()).toEqual(
+            expect(mapBitsToDays(result[0]?.video?.delivery_rules?.days as WeekDaysBitString).sort()).toEqual(
                 message.video?.daysOfWeek?.sort()
             );
         });

@@ -1,8 +1,7 @@
-import { formatInTimeZone } from "date-fns-tz";
+import { MYSQL_DATETIME_FORMAT, dateToUTCString } from "@digitraffic/common/dist/utils/date-utils.js";
 import type { Connection } from "mysql2/promise.js";
 import { DtRamiMessage, WEEKDAYS, WeekDay } from "../model/dt-rami-message.js";
 import { inDatabase, inTransaction } from "../util/database.js";
-
 export interface DbRamiAudio {
     readonly text_fi?: string | null;
     readonly text_sv?: string | null;
@@ -98,15 +97,15 @@ WHERE
     rm.start_validity <= NOW()
     AND rm.end_validity >= NOW()
     AND (
-        NULLIF(:trainNumber, '') IS NULL
-        OR rm.train_number = NULLIF(:trainNumber, '')
+        :trainNumber IS NULL
+        OR rm.train_number = :trainNumber
     )
     AND (
-        NULLIF(:trainDepartureDate, '') IS NULL
-        OR rm.train_departure_date = NULLIF(:trainDepartureDate, '')
+        :trainDepartureDate IS NULL
+        OR rm.train_departure_date = :trainDepartureDate
     )
     AND (
-        NULLIF(:station, '') IS NULL
+        :station IS NULL
         OR rm.id IN (
             SELECT
                 rmx.id
@@ -125,7 +124,7 @@ WHERE
                 JOIN rami_message_station rmsx ON rmx.id = rmsx.rami_message_id
                 AND rmx.version = rmsx.rami_message_version
             WHERE
-                rmsx.station_short_code = NULLIF(:station, '')
+                rmsx.station_short_code = :station
         )
     )
 GROUP BY
@@ -178,12 +177,9 @@ export async function findActiveMessages(
 export async function insertMessage(message: DtRamiMessage): Promise<void> {
     return inTransaction(async (conn: Connection): Promise<void> => {
         await conn.query(INSERT_RAMI_MESSAGE, createDtRamiMessageInsertValues(message));
-        if (message.stations)
-            await conn.query(INSERT_RAMI_MESSAGE_STATIONS, createDtRamiMessageStationInsertValues(message));
-        if (message.audio)
-            await conn.query(INSERT_RAMI_MESSAGE_AUDIO, createDtRamiMessageAudioInsertValues(message));
-        if (message.video)
-            await conn.query(INSERT_RAMI_MESSAGE_VIDEO, createDtRamiMessageVideoInsertValues(message));
+        await conn.query(INSERT_RAMI_MESSAGE_STATIONS, createDtRamiMessageStationInsertValues(message));
+        await conn.query(INSERT_RAMI_MESSAGE_AUDIO, createDtRamiMessageAudioInsertValues(message));
+        await conn.query(INSERT_RAMI_MESSAGE_VIDEO, createDtRamiMessageVideoInsertValues(message));
     });
 }
 
@@ -198,9 +194,9 @@ function createDtRamiMessageInsertValues(message: DtRamiMessage): unknown {
         id: message.id,
         version: message.version,
         messageType: message.messageType,
-        created: formatInTimeZone(message.created, "UTC", "yyyy-MM-dd HH:mm"),
-        startValidity: formatInTimeZone(message.startValidity, "UTC", "yyyy-MM-dd HH:mm"),
-        endValidity: formatInTimeZone(message.endValidity, "UTC", "yyyy-MM-dd HH:mm"),
+        created: dateToUTCString(message.created, MYSQL_DATETIME_FORMAT),
+        startValidity: dateToUTCString(message.startValidity, MYSQL_DATETIME_FORMAT),
+        endValidity: dateToUTCString(message.endValidity, MYSQL_DATETIME_FORMAT),
         trainNumber: message.trainNumber ?? null,
         trainDepartureDate: message.trainDepartureLocalDate ?? null,
         journeyRef: message.journeyRef ?? null
@@ -222,10 +218,10 @@ function createDtRamiMessageVideoInsertValues(message: DtRamiMessage): unknown {
         textEn: message.video?.textEn ?? null,
         deliveryType: message.video?.deliveryType ?? null,
         startDateTime: message.video?.startDateTime
-            ? formatInTimeZone(message.video.startDateTime, "UTC", "yyyy-MM-dd HH:mm")
+            ? dateToUTCString(message.video.startDateTime, MYSQL_DATETIME_FORMAT)
             : null,
         endDateTime: message.video?.endDateTime
-            ? formatInTimeZone(message.video.endDateTime, "UTC", "yyyy-MM-dd HH:mm")
+            ? dateToUTCString(message.video.endDateTime, MYSQL_DATETIME_FORMAT)
             : null,
         startTime: message.video?.startTime ?? null,
         endTime: message.video?.endTime ?? null,
@@ -242,10 +238,10 @@ function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown {
         textEn: message.audio?.textEn ?? null,
         deliveryType: message.audio?.deliveryType ?? null,
         startDateTime: message.audio?.startDateTime
-            ? formatInTimeZone(message.audio.startDateTime, "UTC", "yyyy-MM-dd HH:mm")
+            ? dateToUTCString(message.audio.startDateTime, MYSQL_DATETIME_FORMAT)
             : null,
         endDateTime: message.audio?.endDateTime
-            ? formatInTimeZone(message.audio.endDateTime, "UTC", "yyyy-MM-dd HH:mm")
+            ? dateToUTCString(message.audio.endDateTime, MYSQL_DATETIME_FORMAT)
             : null,
         startTime: message.audio?.startTime ?? null,
         endTime: message.audio?.endTime ?? null,
@@ -256,16 +252,15 @@ function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown {
         repeatEvery: message.audio?.repeatEvery ?? null
     };
 }
+type BitString = `${"0" | "1"}`;
+export type WeekDaysBitString =
+    `${BitString}${BitString}${BitString}${BitString}${BitString}${BitString}${BitString}`;
 
-export type WeekDayBitString = `${"0" | "1"}${"0" | "1"}${"0" | "1"}${"0" | "1"}${"0" | "1"}${"0" | "1"}${
-    | "0"
-    | "1"}`;
-
-function mapDaysToBits(days: WeekDay[]): WeekDayBitString {
-    return WEEKDAYS.map((day) => (days.includes(day) ? "1" : "0")).join("") as WeekDayBitString;
+function mapDaysToBits(days: WeekDay[]): WeekDaysBitString {
+    return WEEKDAYS.map((day) => (days.includes(day) ? "1" : "0")).join("") as WeekDaysBitString;
 }
 
-export function mapBitsToDays(days: WeekDayBitString): WeekDay[] {
+export function mapBitsToDays(days: WeekDaysBitString): WeekDay[] {
     const dayBits = days.split("").reverse();
     const dayStrings: WeekDay[] = [];
     for (let i = 0; i < dayBits.length; i++) {

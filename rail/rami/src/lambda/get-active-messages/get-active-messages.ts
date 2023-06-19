@@ -1,20 +1,37 @@
 import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-response.js";
-import { parse } from "date-fns";
+import { z } from "zod";
 import { getActiveMessages } from "../../service/get-message.js";
 
-interface GetActiveMessageEvent {
-    readonly train_number?: number;
-    readonly train_departure_date?: string;
-    readonly station?: string;
-}
+// absent query parameters exist in lambda event as empty strings -> transform to undefined
+export const lambdaEventSchema = z.object({
+    train_number: z.coerce
+        .number()
+        .min(1)
+        .or(z.literal("").transform(() => undefined))
+        .optional(),
+    train_departure_date: z
+        .string()
+        .regex(/^\d{4}\-\d{2}\-\d{2}$/, "train_departure_date should be in format yyyy-MM-dd")
+        .or(z.literal("").transform(() => undefined))
+        .optional(),
+    station: z
+        .string()
+        .min(1)
+        .or(z.literal("").transform(() => undefined))
+        .optional()
+});
 
-export const handler = async (event: GetActiveMessageEvent): Promise<LambdaResponse> => {
-    if (event.train_number && isNaN(event.train_number)) {
-        return LambdaResponse.badRequest("trainNumber is not a number");
+export type GetActiveMessagesEvent = z.infer<typeof lambdaEventSchema>;
+
+export const handler = async (event: GetActiveMessagesEvent): Promise<LambdaResponse> => {
+    const parsedEvent = lambdaEventSchema.safeParse(event);
+    if (!parsedEvent.success) {
+        return LambdaResponse.badRequest(JSON.stringify(parsedEvent.error.format()));
     }
-    if (event.train_departure_date && !parse(event.train_departure_date, "yyyy-MM-dd", new Date())) {
-        return LambdaResponse.badRequest("trainDepartureDate should be in format yyyy-MM-dd");
-    }
-    const messages = await getActiveMessages(event.train_number, event.train_departure_date, event.station);
+    const messages = await getActiveMessages(
+        parsedEvent.data.train_number,
+        parsedEvent.data.train_departure_date,
+        parsedEvent.data.station
+    );
     return LambdaResponse.okJson(messages);
 };

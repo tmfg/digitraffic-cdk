@@ -1,4 +1,4 @@
-import { DbRamiMessage, WeekDayBitString, findActiveMessages, mapBitsToDays } from "../dao/message";
+import { DbRamiMessage, WeekDaysBitString, findActiveMessages, mapBitsToDays } from "../dao/message";
 import type { WeekDay } from "../model/dt-rami-message";
 
 interface PassengerInformationText {
@@ -81,7 +81,7 @@ function dbRamiMessageToPassengerInformationMessage(message: DbRamiMessage): Pas
                         startTime: message.audio?.delivery_rules?.start_time ?? undefined,
                         endTime: message.audio?.delivery_rules?.end_time ?? undefined,
                         weekDays: message.audio?.delivery_rules?.days
-                            ? mapBitsToDays(message.audio.delivery_rules.days as WeekDayBitString)
+                            ? mapBitsToDays(message.audio.delivery_rules.days as WeekDaysBitString)
                             : undefined,
                         deliveryType: message.audio?.delivery_rules?.delivery_type ?? undefined,
                         repetitions: message.audio?.delivery_rules?.repetitions ?? undefined,
@@ -105,7 +105,7 @@ function dbRamiMessageToPassengerInformationMessage(message: DbRamiMessage): Pas
                         startTime: message.video?.delivery_rules.start_time ?? undefined,
                         endTime: message.video?.delivery_rules.end_time ?? undefined,
                         weekDays: message.video?.delivery_rules.days
-                            ? mapBitsToDays(message.video.delivery_rules.days as WeekDayBitString)
+                            ? mapBitsToDays(message.video.delivery_rules.days as WeekDaysBitString)
                             : undefined,
                         deliveryType: message.video?.delivery_rules.delivery_type ?? undefined
                     }

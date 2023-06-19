@@ -188,7 +188,12 @@ function parseScheduledMessageVideo(videoMessage: RamiScheduledMessageVideo): Dt
 
 function getTextInLanguage(texts: TextContent[], languageCode: LanguageCode): string | undefined {
     const textContent = texts.find((text) => text.language === languageCode);
-    return textContent?.text ?? textContent?.videoText ?? textContent?.audioText ?? undefined;
+    return (
+        textContent?.text?.trim() ??
+        textContent?.videoText?.trim() ??
+        textContent?.audioText?.trim() ??
+        undefined
+    );
 }
 
 function getDeliveryPoints(payload: RamiMessagePayload): string[] | undefined {

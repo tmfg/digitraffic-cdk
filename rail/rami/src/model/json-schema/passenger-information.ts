@@ -61,7 +61,7 @@ export function createVideoSchema(textReference: string): JsonSchema {
                         type: JsonSchemaType.STRING,
                         enum: ["WHEN", "CONTINUOS_VISUALIZATION"],
                         description:
-                            "CONTINUOS_VISUALIZATION: the message is delivered from _startDateTime_ (at _startTime_ if exists) to _endDateTime_ (at _endTime_ if exists) \\n WHEN: the message is delivered  from  _startDateTime_ to _endDateTime_ only in the time interval between _startTime_ and _endTime_ for each day in _weekDays_"
+                            "CONTINUOS_VISUALIZATION: the message is delivered from _startDateTime_ (at _startTime_ if exists) to _endDateTime_ (at _endTime_ if exists) \n WHEN: the message is delivered  from  _startDateTime_ to _endDateTime_ only in the time interval between _startTime_ and _endTime_ for each day in _weekDays_"
                     }
                 }
             }
@@ -109,7 +109,7 @@ export function createAudioSchema(textReference: string): JsonSchema {
                         type: JsonSchemaType.STRING,
                         enum: ["NOW", "DELIVERY_AT", "REPEAT_EVERY", "ON_EVENT", "ON_SCHEDULE"],
                         description:
-                            "NOW: the message is delivered at the time of insertion \\n DELIVERY_AT: the message is delivered on the date-time _deliveryAt_ \\n REPEAT_EVERY: the message is delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _weekDays_ conditions \\n ON_SCHEDULE: the message is delivered for a specific vehicle journey when a scheduling date happens at a station (e.g. estimated arrival time \\n ON_EVENT: the message is delivered for a vehicle journey when an event specified in _eventType_ (e.g. ARRIVING) happens for a station defined in _stations_"
+                            "NOW: the message is delivered at the time of insertion \n DELIVERY_AT: the message is delivered on the date-time _deliveryAt_ \n REPEAT_EVERY: the message is delivered from _startDateTime_ at _startTime_ to _endDateTime_ at _endTime_ evaluating the repetition conditions and _weekDays_ conditions \n ON_SCHEDULE: the message is delivered for a specific vehicle journey when a scheduling date happens at a station (e.g. estimated arrival time) \n ON_EVENT: the message is delivered for a vehicle journey when an event specified in _eventType_ (e.g. ARRIVING) happens for a station defined in _stations_"
                     },
                     eventType: {
                         type: JsonSchemaType.STRING,

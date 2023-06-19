@@ -12,10 +12,6 @@ export const headers = z
             .describe(
                 "kafka partition key where the message is sent in the specific topic. The message id is used"
             )
-
-            .describe(
-                "kafka partition key where the message is sent in the specific topic. The message id is used"
-            )
             .nullable()
             .optional(),
         eventType: z.string().nullable().describe("Type of event"),
