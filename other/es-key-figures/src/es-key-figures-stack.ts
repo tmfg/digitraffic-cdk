@@ -43,7 +43,7 @@ export class EsKeyFiguresStack extends Stack {
             roleName: "CreateVisualizationsRoleRole"
         });
 
-        const htmlBucket = new s3.Bucket(this, "eskeyfigurevisualizationsED2D48A3", {
+        const htmlBucket = new s3.Bucket(this, "es-key-figure-visualizations", {
             versioned: false
         });
 
