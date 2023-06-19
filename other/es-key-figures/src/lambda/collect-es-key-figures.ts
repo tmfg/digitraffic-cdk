@@ -315,7 +315,7 @@ export function getKeyFigures(): KeyFigure[] {
 
 export async function getPaths(endpointUrl: string): Promise<Set<string>> {
     try {
-        const resp = await axios.get<{ paths: string[] }>(endpointUrl, {
+        const resp = await axios.get<{ paths: { [path: string]: unknown } }>(endpointUrl, {
             headers: { "accept-encoding": "gzip" }
         });
         if (resp.status !== 200) {
@@ -330,7 +330,8 @@ export async function getPaths(endpointUrl: string): Promise<Set<string>> {
         const paths = resp.data.paths;
 
         const output = new Set<string>();
-        for (const pathsKey of paths) {
+        // eslint-disable-next-line guard-for-in
+        for (const pathsKey in paths) {
             const splitResult = pathsKey.split("{")[0];
             if (!splitResult) {
                 throw new Error("Couldn't split the path");
