@@ -2,7 +2,7 @@ import mysql from "mysql";
 import util from "node:util";
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 interface KeyFigure {
     filter: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -412,14 +412,14 @@ function friendlyFilterString(filter: string): string {
 
 export async function handler(): Promise<boolean> {
     const filters = (await query("select distinct filter from key_figures")) as { filter: string }[];
-    console.log(filters);
+    logger.info({ message: filters.toString(), method: "create-visualizations.handler" });
 
     const bucketName = "eskeyfiguresstackprod-eskeyfigurevisualizationsed-tbpqoiyk33bw";
     await uploadToS3(bucketName, await createIndex(), `index.html`, undefined, "text/html");
 
     for (const row of filters) {
         const filter = row.filter;
-        console.log(`Processing: ${filter}`);
+        logger.info({ message: `Processing: ${filter}`, method: "create-visualizations.handler" });
         await uploadToS3(
             bucketName,
             await createDetailPage(filter),

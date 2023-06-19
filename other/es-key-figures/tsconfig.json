@@ -2,6 +2,8 @@
   "extends": "./node_modules/@digitraffic-cdk/toolchain/includes/tsconfig-cdk.json",
   "compilerOptions": {
     "outDir": "dist/out",
-    "exactOptionalPropertyTypes": false
+    "exactOptionalPropertyTypes": false,
+    "noUnusedParameters": false,
+    "strict": false
   }
 }
