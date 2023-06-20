@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "~3.348.0",
-    "@digitraffic/common": "2023.5.25-1",
+    "@digitraffic/common": "2023.6.19-1",
     "@middy/core": "^4.3.1",
     "@middy/sqs-partial-batch-failure": "^4.3.1",
     "aws-cdk-lib": "~2.76.0",
