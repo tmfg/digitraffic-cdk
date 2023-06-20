@@ -4,6 +4,7 @@ import { ApiTimestamp, EventType } from "../model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { isValid, parseISO } from "date-fns";
 import { NavStatus } from "../model/ais-status";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS = 2;
 
@@ -12,59 +13,101 @@ export async function validateTimestamp(
     db: DTDatabase
 ): Promise<ApiTimestamp | undefined> {
     if (!timestamp.eventType || !Object.values(EventType).includes(timestamp.eventType)) {
-        console.warn("Invalid eventType for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Invalid eventType for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!timestamp.eventTime) {
-        console.warn("Missing eventTime for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Missing eventTime for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!isValid(parseISO(timestamp.eventTime))) {
-        console.warn("Invalid eventTime for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Invalid eventTime for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!timestamp.recordTime) {
-        console.warn("Missing recordTime for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Missing recordTime for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!isValid(parseISO(timestamp.recordTime))) {
-        console.warn("Invalid recordTime for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Invalid recordTime for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!timestamp.source) {
-        console.warn("Missing source for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Missing source for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!timestamp.ship) {
-        console.warn("Missing ship info for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Missing ship info for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!timestamp.ship.mmsi && !timestamp.ship.imo) {
-        console.warn("Both MMSI and IMO are missing for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Both MMSI and IMO are missing for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!timestamp.location) {
-        console.warn("Missing location info for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Missing location info for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (!timestamp.location.port) {
-        console.warn("Missing port for timestamp", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Missing port for timestamp ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (timestamp.location.port.length > 5) {
-        console.warn("Locode too long", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `Locode too long ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (timestamp.location.from && timestamp.location.from.length > 5) {
-        console.warn("From locode too long", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `From locode too long ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (timestamp.location.portArea && timestamp.location.portArea.length > 6) {
-        console.warn("PortArea too long", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `PortArea too long ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
     if (timestamp.source === EventSource.AWAKE_AI_PRED && timestamp.eventType === EventType.ETD) {
-        console.warn("ETD prediction from Awake.AI - not persisting", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `ETD prediction from Awake.AI - not persisting ${JSON.stringify(timestamp)}`
+        });
         return undefined;
     }
 
@@ -72,20 +115,21 @@ export async function validateTimestamp(
     if (timestamp.eventType === EventType.ETA && timestamp.source === EventSource.SCHEDULES_CALCULATED) {
         const shipStatus = await findVesselSpeedAndNavStatus(db, timestamp.ship?.mmsi);
         if (shipStatus && !navStatusIsValid(shipStatus.nav_stat)) {
-            console.warn(
-                "method=validateTimestamp VTS prediction for ship with invalid ais status %d %s",
-                shipStatus.nav_stat,
-                JSON.stringify(timestamp)
-            );
+            logger.warn({
+                method: "ProcessQueue.validateTimestamp",
+                message: `VTS prediction for ship with invalid ais status ${
+                    shipStatus.nav_stat
+                } ${JSON.stringify(timestamp)}`
+            });
             return undefined;
         }
         if (shipStatus && shipStatus.sog < SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS) {
-            console.warn(
-                "method=validateTimestamp VTS prediction for stationary ship with sog %d and ais status %d %s",
-                shipStatus.sog,
-                shipStatus.nav_stat,
-                JSON.stringify(timestamp)
-            );
+            logger.warn({
+                method: "ProcessQueue.validateTimestamp",
+                message: `VTS prediction for stationary ship with sog ${shipStatus.sog} and ais status ${
+                    shipStatus.nav_stat
+                } ${JSON.stringify(timestamp)}`
+            });
             return undefined;
         }
     }
@@ -109,23 +153,40 @@ export async function validateTimestamp(
 function validateConfidenceInterval(timestamp: Partial<ApiTimestamp>): boolean {
     if (!timestamp.eventTimeConfidenceLowerDiff || !timestamp.eventTimeConfidenceUpperDiff) return false;
     if (isNaN(timestamp.eventTimeConfidenceLowerDiff)) {
-        console.warn("eventTimeConfidenceLowerDiff is not a number", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `eventTimeConfidenceLowerDiff is not a number ${JSON.stringify(timestamp)}`
+        });
         return false;
     }
     if (isNaN(timestamp.eventTimeConfidenceUpperDiff)) {
-        console.warn("eventTimeConfidenceUpperDiff is not a number", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `eventTimeConfidenceUpperDiff is not a number ${JSON.stringify(timestamp)}`
+        });
         return false;
     }
     if (timestamp.eventTimeConfidenceLowerDiff > timestamp.eventTimeConfidenceUpperDiff) {
-        console.warn("eventTimeConfidenceLowerDiff is greater than eventTimeConfidenceUpperDiff", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `eventTimeConfidenceLowerDiff is greater than eventTimeConfidenceUpperDiff ${JSON.stringify(
+                timestamp
+            )}`
+        });
         return false;
     }
     if (timestamp.eventTimeConfidenceLowerDiff > 0) {
-        console.warn("eventTimeConfidenceLowerDiff is greater than zero", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `eventTimeConfidenceLowerDiff is greater than zero ${JSON.stringify(timestamp)}`
+        });
         return false;
     }
     if (timestamp.eventTimeConfidenceUpperDiff < 0) {
-        console.warn("eventTimeConfidenceUpperDiff is less than zero", timestamp);
+        logger.warn({
+            method: "ProcessQueue.validateTimestamp",
+            message: `eventTimeConfidenceUpperDiff is less than zero ${JSON.stringify(timestamp)}`
+        });
         return false;
     }
     return true;

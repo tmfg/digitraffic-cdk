@@ -20,14 +20,14 @@ export class SchedulesService {
         return this.doGetTimestamps(true);
     }
 
-    private async doGetTimestamps(calculated: boolean) {
+    private async doGetTimestamps(calculated: boolean): Promise<ApiTimestamp[]> {
         const timestampsEast = await this.api.getSchedulesTimestamps(SchedulesDirection.EAST, calculated);
         const timestampsWest = await this.api.getSchedulesTimestamps(SchedulesDirection.WEST, calculated);
         return this.filterTimestamps(this.schedulesToTimestamps(timestampsEast, calculated))
             .concat(this.filterTimestamps(this.schedulesToTimestamps(timestampsWest, calculated)));
     }
 
-    filterTimestamps(timestamps: ApiTimestamp[]) {
+    filterTimestamps(timestamps: ApiTimestamp[]): ApiTimestamp[] {
         return timestamps
             .filter(ts => ports.includes(ts.location.port))
             .filter(ts =>

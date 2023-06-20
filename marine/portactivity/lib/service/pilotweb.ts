@@ -2,7 +2,7 @@ import * as PilotwebAPI from "../api/pilotweb";
 import * as PilotagesDAO from "../dao/pilotages";
 import * as TimestampDAO from "../dao/timestamps";
 import * as LocationConverter from "./location-converter";
-
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { ApiTimestamp, EventType, Location } from "../model/timestamp";
 import { Pilotage } from "../model/pilotage";
 import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
@@ -12,15 +12,24 @@ export async function getMessagesFromPilotweb(host: string, authHeader: string):
     const message = await PilotwebAPI.getMessages(host, authHeader);
     const pilotages = JSON.parse(message) as Pilotage[];
 
-    console.info("method=getMessagesFromPilotweb source=Pilotweb receivedCount=%d", pilotages.length);
+    logger.info({
+        method: "PilotwebService.getMessagesFromPilotweb",
+        customPilotagesReceivedCount: pilotages.length
+    });
 
     return inDatabase(async (db: DTDatabase) => {
         const idMap = await PilotagesDAO.getTimestamps(db);
         const pilotageIds = await removeMissingPilotages(db, idMap, pilotages);
         const updated = await updateAllPilotages(db, idMap, pilotages);
 
-        console.info("DEBUG updated pilotages: %s", JSON.stringify(updated));
-        console.info("DEBUG timestamps to remove %s", JSON.stringify(pilotageIds));
+        logger.debug({
+            method: "PilotwebService.getMessagesFromPilotweb",
+            message: `updated pilotages: ${JSON.stringify(updated)}`
+        });
+        logger.debug({
+            method: "PilotwebService.getMessagesFromPilotweb",
+            message: `timestamps to remove: ${JSON.stringify(pilotageIds)}`
+        });
 
         await removeTimestamps(db, pilotageIds);
 
@@ -33,7 +42,10 @@ async function removeTimestamps(db: DTDatabase, pilotageIds: number[]): Promise<
         const sourceIds = pilotageIds.map((id) => id.toString());
 
         const timestampsRemoved = await TimestampDAO.removeTimestamps(db, EventSource.PILOTWEB, sourceIds);
-        console.log("DEBUG removed %s", timestampsRemoved);
+        logger.info({
+            method: "PilotwebService.removeTimestamps",
+            message: `removed: ${JSON.stringify(timestampsRemoved)}`
+        });
     }
 }
 
@@ -44,7 +56,10 @@ async function updateAllPilotages(
 ): Promise<Pilotage[]> {
     const newAndUpdated = findNewAndUpdated(idMap, pilotages);
 
-    console.info("updatedCount=%d", newAndUpdated.length);
+    logger.info({
+        method: "PilotwebService.updateAllPilotages",
+        customPilotagesUpdatedCount: newAndUpdated.length
+    });
 
     await PilotagesDAO.updatePilotages(db, newAndUpdated);
 
@@ -58,7 +73,10 @@ async function removeMissingPilotages(
 ): Promise<number[]> {
     const removedIds = findRemoved(idMap, pilotages);
 
-    console.info("deletedCount=%d", removedIds.length);
+    logger.info({
+        method: "PilotwebService.removeMissingPilotages",
+        customDeletedPilotagesCount: removedIds.length
+    });
 
     await PilotagesDAO.deletePilotages(db, removedIds);
 
@@ -92,7 +110,10 @@ async function convertUpdatedTimestamps(db: DTDatabase, newAndUpdated: Pilotage[
                         } as ApiTimestamp;
                     }
 
-                    console.info("skipping pilotage %d, missing portcallId", p.id);
+                    logger.info({
+                        method: "PilotwebService.convertUpdatedTimestamps",
+                        message: `skipping pilotage ${p.id}, missing portcallId`
+                    });
                 }
                 return undefined;
             })
@@ -105,7 +126,10 @@ function getPortCallId(db: DTDatabase, p: Pilotage, location: Location): Promise
         return Promise.resolve(p.portnetPortCallId);
     }
 
-    console.info("no portcallid from pilotage %d", p.id);
+    logger.info({
+        method: "PilotwebService.getPortCallId",
+        message: `no portcallid from pilotage ${p.id}`
+    });
 
     return PilotagesDAO.findPortCallId(db, p, location);
 }

@@ -117,7 +117,7 @@ describe("AwakeAiETAPortService(", () => {
     });
 });
 
-function createApi() {
+function createApi(): AwakeAiPortApi {
     return new AwakeAiPortApi("", "");
 }
 
