@@ -1,8 +1,9 @@
 import { uploadToS3 } from "@digitraffic/common/dist/aws/runtime/s3";
 import { PortactivityEnvKeys } from "../../keys";
-import { envValue } from "@digitraffic/common/dist/aws/runtime/environment";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
-const bucketName = envValue(PortactivityEnvKeys.BUCKET_NAME);
+const bucketName = getEnvVariable(PortactivityEnvKeys.BUCKET_NAME);
 
 interface DlqEvent {
     readonly Records: {
@@ -12,9 +13,10 @@ interface DlqEvent {
 
 export const handler = async (event: DlqEvent): Promise<void> => {
     const millis = new Date().getTime();
-    console.info(
-        `method=portactivityTimestampsProcessDLQ.handler portCallDLQRecordsReceived=${event.Records.length}`
-    );
+    logger.info({
+        method: "PortactivityTimestampsProcessDLQ.handler",
+        customPortcallDLQRecordsReceivedCount: event.Records.length
+    });
     const uploads = event.Records.map((e, idx: number) =>
         uploadToS3(bucketName, e.body, `timestamp-${millis}-${idx}.json`)
     );

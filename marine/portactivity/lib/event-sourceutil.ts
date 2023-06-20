@@ -49,7 +49,7 @@ export function dateAverage(dates: Date[]): string {
     return new Date(averageMillis).toISOString();
 }
 
-function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number) {
+function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number): boolean {
     const diffMinutes = differenceInMinutes(date1, date2, { roundingMethod: "ceil" });
     return diffMinutes >= maxDiffMinutes;
 }

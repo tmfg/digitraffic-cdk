@@ -360,7 +360,7 @@ function awakeTimestampFromTimestamp(
     };
 }
 
-function expectJustEta(ship: DbETAShip, voyageTimestamp: AwakeAiShipApiResponse, timestamps: ApiTimestamp[]) {
+function expectJustEta(ship: DbETAShip, voyageTimestamp: AwakeAiShipApiResponse, timestamps: ApiTimestamp[]): void {
     expect(timestamps.length).toBe(1);
     const etaTimestamp = timestamps.find((ts) => ts.eventType === EventType.ETA);
 
@@ -373,7 +373,7 @@ function expectEtaAndEtb(
     ship: DbETAShip,
     voyageTimestamp: AwakeAiShipApiResponse,
     timestamps: ApiTimestamp[]
-) {
+): void {
     expect(timestamps.length).toBe(2);
     const etaTimestamp = timestamps.find((ts) => ts.eventType === EventType.ETA);
     const etbTimestamp = timestamps.find((ts) => ts.eventType === EventType.ETB);

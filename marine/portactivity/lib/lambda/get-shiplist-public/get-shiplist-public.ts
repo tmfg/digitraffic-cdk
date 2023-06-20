@@ -18,7 +18,7 @@ export interface ShiplistSecret extends GenericSecret {
 function response(
     statusCode: number,
     message: string,
-    contentType = MediaType.TEXT_PLAIN
+    contentType: MediaType = MediaType.TEXT_PLAIN
 ): ProxyLambdaResponse {
     return {
         statusCode,
@@ -91,7 +91,7 @@ export const handler = (event: ProxyLambdaRequest): Promise<ProxyLambdaResponse>
         });
 };
 
-function getPageSource(shiplist: PublicApiTimestamp[]) {
+function getPageSource(shiplist: PublicApiTimestamp[]): string {
     return `
 <html>
 

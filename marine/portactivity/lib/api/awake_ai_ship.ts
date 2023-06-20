@@ -1,6 +1,7 @@
 import axios from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { AwakeAiPredictedVoyage, AwakeAiShip } from "./awake_common";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum AwakeAiShipResponseType {
     OK = "OK",
@@ -49,7 +50,10 @@ export class AwakeAiETAShipApi {
             if (locode) {
                 url += `&destination=${locode}`;
             }
-            console.info(`AwakeAiETAShipApi.getETA calling URL ${url}`);
+            logger.info({
+                method: "AwakeAiETAShipApi.getETA",
+                message: `calling URL ${url}`
+            });
             const resp = await axios.get(url, {
                 headers: {
                     Authorization: this.apiKey,
@@ -67,7 +71,10 @@ export class AwakeAiETAShipApi {
             }
             throw error;
         } finally {
-            console.log(`method=AwakeAiETAShipApi.getETA tookMs=${Date.now() - start}`);
+            logger.info({
+                method: "AwakeAiETAShipApi.getETA",
+                tookMs: Date.now() - start
+            });
         }
     }
 

@@ -2,6 +2,7 @@ import { Location } from "../model/timestamp";
 import { PreparedStatement } from "pg-promise";
 import { Pilotage } from "../model/pilotage";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export const PORTCALL_TIMESTAMP_AGE_LIMIT = `NOW() - INTERVAL '36 HOURS'`;
 
@@ -88,12 +89,18 @@ export async function findPortCallId(
     ]);
 
     if (p1 && p2 && location.port !== location.from) {
-        console.info("portcalls found for both %s and %s", location.port, location.from);
+        logger.info({
+            method: "PilotwebService.convertUpdatedTimestamps",
+            message: `portcall found for ${location.port}${location.from ? " and " + location.from : ""}`
+        });
         return p2.port_call_id;
     }
 
     if (!p1 && !p2) {
-        console.info("no portcalls found for %s or %s", location.port, location.from);
+        logger.info({
+            method: "PilotwebService.convertUpdatedTimestamps",
+            message: `no portcall found for ${location.port}${location.from ? " or " + location.from : ""}`
+        });
     } else if (p1) {
         return p1.port_call_id;
     } else if (p2) {

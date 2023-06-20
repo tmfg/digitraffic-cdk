@@ -44,7 +44,7 @@ function createUpdateTimestampResource(
     integrationApi: DigitrafficRestApi,
     queue: Queue,
     timestampModel: Model
-) {
+): void {
     const apiResource = integrationApi.root.addResource("api");
     const integrationResource = apiResource.addResource("integration");
     const timestampResource = integrationResource.addResource("timestamps");
@@ -77,7 +77,7 @@ function createUpdateTimestampResource(
     );
 }
 
-function createUsagePlan(integrationApi: RestApi) {
+function createUsagePlan(integrationApi: RestApi): void {
     const apiKey = integrationApi.addApiKey(
         "Port Activity Integration API key"
     );

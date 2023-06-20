@@ -92,7 +92,7 @@ function addDLQAlarm(
     stack: DigitrafficStack,
     queue: Queue,
     config: PortactivityConfiguration
-) {
+): void {
     const alarmName = "PortActivity-TimestampsDLQAlarm";
     queue
         .metricNumberOfMessagesReceived({
