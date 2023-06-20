@@ -28,7 +28,7 @@ export function createDtRamiMessage(properties: {
         },
         video: {
             textFi: "videoteksti",
-            daysOfWeek: ["TUESDAY", "SATURDAY"]
+            daysOfWeek: ["TUESDAY", "FRIDAY"]
         }
     };
 }

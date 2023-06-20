@@ -1,13 +1,8 @@
 import { subHours } from "date-fns";
-import {
-    WeekDaysBitString,
-    findActiveMessages,
-    insertMessage,
-    mapBitsToDays,
-    setMessageDeleted
-} from "../../dao/message";
+import { findActiveMessages, insertMessage, setMessageDeleted } from "../../dao/message";
 import { dbTestBase } from "../db-testutil";
 import { createDtRamiMessage } from "../testdata-util";
+import { WeekDaysBitString, mapBitsToDays } from "../../util/weekdays";
 
 describe(
     "rami messages",
@@ -130,6 +125,14 @@ describe(
             await setMessageDeleted(message.id);
             const resultAfterDelete = await findActiveMessages();
             expect(resultAfterDelete.length).toEqual(0);
+        });
+        test("insert and get - weekday bits are correctly mapped", async () => {
+            const message = createDtRamiMessage({});
+            await insertMessage(message);
+            const result = await findActiveMessages();
+            expect(mapBitsToDays(result[0]?.video?.delivery_rules?.days as WeekDaysBitString).sort()).toEqual(
+                message.video?.daysOfWeek?.sort()
+            );
         });
     })
 );

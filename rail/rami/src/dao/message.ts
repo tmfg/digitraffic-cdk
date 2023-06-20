@@ -1,7 +1,9 @@
 import { MYSQL_DATETIME_FORMAT, dateToUTCString } from "@digitraffic/common/dist/utils/date-utils.js";
 import type { Connection } from "mysql2/promise.js";
-import { DtRamiMessage, WEEKDAYS, WeekDay } from "../model/dt-rami-message.js";
+import type { DtRamiMessage } from "../model/dt-rami-message.js";
+import { mapDaysToBits } from "../util/weekdays.js";
 import { inDatabase, inTransaction } from "../util/database.js";
+
 export interface DbRamiAudio {
     readonly text_fi?: string | null;
     readonly text_sv?: string | null;
@@ -71,8 +73,8 @@ SELECT
     rm.train_number,
     DATE_FORMAT(rm.train_departure_date, '%Y-%m-%d') as train_departure_date,
     GROUP_CONCAT(rms.station_short_code) as stations,
-    JSON_OBJECT('text_fi', rma.text_fi, 'text_sv', rma.text_sv, 'text_en', rma.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rma.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rma.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rma.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rma.end_time, '%k:%i'), 'delivery_type', rma.delivery_type, 'days', NULLIF(EXPORT_SET(rma.days_of_week, '1', '0', '', 7), '0000000'), 'event_type', rma.event_type, 'delivery_at', rma.delivery_at, 'repetitions', rma.repetitions, 'repeat_every', rma.repeat_every)) as audio,
-    JSON_OBJECT('text_fi', rmv.text_fi, 'text_sv', rmv.text_sv, 'text_en', rmv.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rmv.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rmv.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rmv.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rmv.end_time, '%k:%i'), 'delivery_type', rmv.delivery_type, 'days', NULLIF(EXPORT_SET(rmv.days_of_week, '1', '0', '', 7), '0000000'))) as video
+    JSON_OBJECT('text_fi', rma.text_fi, 'text_sv', rma.text_sv, 'text_en', rma.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rma.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rma.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rma.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rma.end_time, '%k:%i'), 'delivery_type', rma.delivery_type, 'days', NULLIF(REVERSE(EXPORT_SET(rma.days_of_week, '1', '0', '', 7)), '0000000'), 'event_type', rma.event_type, 'delivery_at', rma.delivery_at, 'repetitions', rma.repetitions, 'repeat_every', rma.repeat_every)) as audio,
+    JSON_OBJECT('text_fi', rmv.text_fi, 'text_sv', rmv.text_sv, 'text_en', rmv.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rmv.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rmv.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rmv.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rmv.end_time, '%k:%i'), 'delivery_type', rmv.delivery_type, 'days', NULLIF(REVERSE(EXPORT_SET(rmv.days_of_week, '1', '0', '', 7)), '0000000'))) as video
 FROM
     rami_message rm
     JOIN (
@@ -251,20 +253,4 @@ function createDtRamiMessageAudioInsertValues(message: DtRamiMessage): unknown {
         repetitions: message.audio?.repetitions ?? null,
         repeatEvery: message.audio?.repeatEvery ?? null
     };
-}
-type BitString = `${"0" | "1"}`;
-export type WeekDaysBitString =
-    `${BitString}${BitString}${BitString}${BitString}${BitString}${BitString}${BitString}`;
-
-function mapDaysToBits(days: WeekDay[]): WeekDaysBitString {
-    return WEEKDAYS.map((day) => (days.includes(day) ? "1" : "0")).join("") as WeekDaysBitString;
-}
-
-export function mapBitsToDays(days: WeekDaysBitString): WeekDay[] {
-    const dayBits = days.split("").reverse();
-    const dayStrings: WeekDay[] = [];
-    for (let i = 0; i < dayBits.length; i++) {
-        if (dayBits[i] === "1") dayStrings.push(WEEKDAYS[i] as unknown as WeekDay);
-    }
-    return dayStrings;
 }

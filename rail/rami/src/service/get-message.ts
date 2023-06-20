@@ -1,5 +1,6 @@
-import { DbRamiMessage, WeekDaysBitString, findActiveMessages, mapBitsToDays } from "../dao/message";
-import type { WeekDay } from "../model/dt-rami-message";
+import { DbRamiMessage, findActiveMessages } from "../dao/message.js";
+import { WeekDaysBitString, mapBitsToDays } from "../util/weekdays.js";
+import type { WeekDay } from "../model/dt-rami-message.js";
 
 interface PassengerInformationText {
     readonly fi?: string;
