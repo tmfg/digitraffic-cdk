@@ -53,7 +53,7 @@ export function createVideoSchema(textReference: string): JsonSchema {
                         type: JsonSchemaType.ARRAY,
                         items: {
                             type: JsonSchemaType.STRING,
-                            enum: Object.keys(WEEKDAYS)
+                            enum: Object.values(WEEKDAYS)
                         },
                         description: "Days of week on which video is delivered"
                     },

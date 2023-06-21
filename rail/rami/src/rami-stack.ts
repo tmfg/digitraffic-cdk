@@ -11,6 +11,6 @@ export class RamiStack extends DigitrafficStack {
         super(scope, id, configuration);
 
         InternalLambdas.create(this, configuration.dlqBucketName);
-	        const publicApi = new PublicApi(this);
-	}
+        const publicApi = new PublicApi(this);
+    }
 }

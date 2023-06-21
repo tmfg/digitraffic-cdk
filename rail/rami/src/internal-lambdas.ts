@@ -17,7 +17,7 @@ export function create(stack: DigitrafficStack, dlqBucketName: string): void {
     const sqs = createSQS(stack, dlq);
     const dlqBucket = createDLQBucket(stack, dlqBucketName);
     createProcessQueueLambda(stack, sqs);
-    createProcessDLQLambda(stack, sqs, dlqBucket);
+    createProcessDLQLambda(stack, dlq, dlqBucket);
 }
 
 function createSQS(stack: DigitrafficStack, dlq: Queue): DigitrafficSqsQueue {
