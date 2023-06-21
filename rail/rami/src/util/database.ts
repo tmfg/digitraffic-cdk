@@ -37,14 +37,11 @@ export async function inTransaction(fn: (conn: Connection) => Promise<void>): Pr
         await fn(conn);
         await conn.commit();
     } catch (error: unknown) {
-        logger.error({
-            method: `database.${inTransaction.name}`,
-            message: "Unexpected error occured during mysql transaction. Rollbacking...",
-            error
-        });
         await conn.rollback();
+        return Promise.reject(error);
     }
     conn.release();
+    return Promise.resolve();
 }
 
 export async function inDatabase<T>(fn: (conn: Connection) => Promise<T>): Promise<T> {

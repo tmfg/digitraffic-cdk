@@ -10,20 +10,21 @@ export function handlerFn() {
         return Promise.allSettled(
             event.Records.map(async (r) => {
                 const start = Date.now();
-                try {
-                    const parsedRamiMessage = parseMessage(JSON.parse(r.body));
-                    logger.info({
-                        method: "RAMI-ProcessQueue.handler",
-                        customParsedRamiMessage: JSON.stringify(parsedRamiMessage)
+                const parsedRamiMessage = parseMessage(JSON.parse(r.body));
+                logger.info({
+                    method: "RAMI-ProcessQueue.handler",
+                    customParsedRamiMessage: JSON.stringify(parsedRamiMessage)
+                });
+                if (parsedRamiMessage)
+                    await processMessage(parsedRamiMessage).catch((error): unknown => {
+                        logException(logger, error);
+                        return Promise.reject(error);
                     });
-                    if (parsedRamiMessage) await processMessage(parsedRamiMessage);
-                } catch (error: unknown) {
-                    logException(logger, error);
-                }
                 logger.info({
                     method: "RAMI-ProcessQueue.handler",
                     tookMs: Date.now() - start
                 });
+                return Promise.resolve();
             })
         );
     };
