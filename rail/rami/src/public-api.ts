@@ -77,7 +77,7 @@ export class PublicApi {
             getActiveMessagesLambda,
             MediaType.APPLICATION_JSON
         )
-            .addQueryParameter("train_number", "train_departure_date", "station")
+            .addQueryParameter("train_number", "train_departure_date", "station", "only_general")
             .build();
 
         activeResource.addMethod("GET", getActiveMessageIntegration, {
@@ -85,7 +85,8 @@ export class PublicApi {
             requestParameters: {
                 "method.request.querystring.station": false,
                 "method.request.querystring.train_number": false,
-                "method.request.querystring.train_departure_date": false
+                "method.request.querystring.train_departure_date": false,
+                "method.request.querystring.only_general": false
             },
             requestValidator: validator,
             methodResponses: [
@@ -106,7 +107,11 @@ export class PublicApi {
                 "train_departure_date",
                 "Train departure date in format YYYY-MM-DD"
             ),
-            DocumentationPart.queryParameter("station", `Station identifier, e.g. "HKI"`)
+            DocumentationPart.queryParameter("station", `Station identifier, e.g. "HKI"`),
+            DocumentationPart.queryParameter(
+                "only_general",
+                "If _true_, return only general notices (messages not related to a _trainNumber_)"
+            )
         );
 
         return getActiveMessagesLambda;

@@ -106,6 +106,7 @@ WHERE
         :trainDepartureDate IS NULL
         OR rm.train_departure_date = :trainDepartureDate
     )
+    AND IF(:onlyGeneral IS TRUE, rm.message_type = 'SCHEDULED_MESSAGE', TRUE)
     AND (
         :station IS NULL
         OR rm.id IN (
@@ -164,13 +165,15 @@ GROUP BY
 export async function findActiveMessages(
     trainNumber: number | null = null,
     trainDepartureDate: string | null = null,
-    station: string | null = null
+    station: string | null = null,
+    onlyGeneral: boolean | null = null
 ): Promise<DbRamiMessage[]> {
     const [rows] = await inDatabase(async (conn: Connection) => {
         return conn.query(FIND_ACTIVE, {
             trainNumber,
             trainDepartureDate,
-            station
+            station,
+            onlyGeneral
         });
     });
     return rows as DbRamiMessage[];

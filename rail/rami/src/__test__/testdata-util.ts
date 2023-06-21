@@ -14,7 +14,7 @@ export function createDtRamiMessage(properties: {
     return {
         id: properties.id ?? "abc",
         version: 1,
-        messageType: "MONITORED_JOURNEY_SCHEDULED_MESSAGE",
+        messageType: properties.trainNumber ? "MONITORED_JOURNEY_SCHEDULED_MESSAGE" : "SCHEDULED_MESSAGE",
         operation: "INSERT",
         trainNumber: properties.trainNumber,
         trainDepartureLocalDate: properties.trainDepartureLocalDate,

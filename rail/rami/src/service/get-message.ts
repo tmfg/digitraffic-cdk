@@ -52,9 +52,10 @@ interface PassengerInformationMessage {
 export async function getActiveMessages(
     trainNumber?: number,
     trainDepartureDate?: string,
-    station?: string
+    station?: string,
+    onlyGeneral?: boolean
 ): Promise<PassengerInformationMessage[]> {
-    const activeMessages = await findActiveMessages(trainNumber, trainDepartureDate, station);
+    const activeMessages = await findActiveMessages(trainNumber, trainDepartureDate, station, onlyGeneral);
     return activeMessages.map(dbRamiMessageToPassengerInformationMessage);
 }
 

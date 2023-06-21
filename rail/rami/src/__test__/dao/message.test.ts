@@ -5,7 +5,7 @@ import { createDtRamiMessage } from "../testdata-util";
 import { WeekDaysBitString, mapBitsToDays } from "../../util/weekdays";
 
 describe(
-    "rami messages",
+    "dao",
     dbTestBase(() => {
         test("insertMessage - insert valid DtRamiMessage", async () => {
             const message = createDtRamiMessage({});
@@ -88,6 +88,21 @@ describe(
             expect(result[0]?.id).toEqual(message?.id);
             expect(result[0]?.train_departure_date).toEqual(trainDepartureLocalDate);
         });
+        test("findActiveMessages - filter by only general", async () => {
+            const generalMessage = createDtRamiMessage({
+                id: "abc"
+            });
+            const trainRelatedMessage = createDtRamiMessage({
+                id: "def",
+                trainNumber: 1
+            });
+            await insertMessage(generalMessage);
+            await insertMessage(trainRelatedMessage);
+
+            const messages = await findActiveMessages(undefined, undefined, undefined, true);
+            expect(messages.length).toBe(1);
+            expect(messages[0]?.id).toEqual(generalMessage.id);
+        });
         test("findActiveMessages - find by all parameters", async () => {
             const stations = ["HKI", "LPR"] as const;
             const trainNumber = 666;
@@ -104,10 +119,15 @@ describe(
                 trainDepartureLocalDate,
                 stations: [...stations]
             });
+            const thirdMessage = createDtRamiMessage({
+                id: "ghi",
+                stations: [...stations]
+            });
             await insertMessage(message);
             await insertMessage(anotherMessage);
+            await insertMessage(thirdMessage);
 
-            const result = await findActiveMessages(trainNumber, trainDepartureLocalDate, stations[0]);
+            const result = await findActiveMessages(trainNumber, trainDepartureLocalDate, stations[0], false);
             expect(result.length).toEqual(1);
             expect(result[0]?.id).toEqual(message?.id);
             expect(result[0]?.stations?.includes(stations[0])).toEqual(true);

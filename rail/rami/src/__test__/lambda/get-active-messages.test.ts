@@ -20,11 +20,11 @@ describe(
             expect(result.status).toEqual(400);
         });
         test("parse lambda event - no parameters", () => {
-            const lambdaEventMessage = createGetMessagesLambdaEvent("", "", "");
+            const lambdaEventMessage = createGetMessagesLambdaEvent();
             const parsedEvent = lambdaEventSchema.safeParse(lambdaEventMessage);
             expect(parsedEvent.success);
             if (parsedEvent.success)
-                expect(Object.values(parsedEvent.data)).toEqual([undefined, undefined, undefined]);
+                expect(Object.values(parsedEvent.data)).toEqual([undefined, undefined, undefined, undefined]);
         });
         test("parse lambda event - parameters", () => {
             const lambdaEventMessage = createGetMessagesLambdaEvent("1");
@@ -38,11 +38,13 @@ describe(
 function createGetMessagesLambdaEvent(
     train_number: string = "",
     train_departure_date: string = "",
-    station: string = ""
+    station: string = "",
+    only_general: string = ""
 ): Record<string, string> {
     return {
         train_number,
         train_departure_date,
-        station
+        station,
+        only_general
     };
 }
