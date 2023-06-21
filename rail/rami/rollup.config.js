@@ -5,34 +5,45 @@ import json from "@rollup/plugin-json";
 import typescript from "@rollup/plugin-typescript";
 import terser from "@rollup/plugin-terser";
 
-export default {
-    input: "src/lambda/process-queue/process-queue.ts",
-    output: {
-        file: "dist/lambda/process-queue.mjs",
-        format: "esm",
-        sourcemap: true
-    },
-    plugins: [
-        nodeResolve({
-            preferBuiltins: true,
-            exportConditions: ["node"]
-        }),
-        json(),
-        commonjs(),
-        typescript(),
-        babel({
-            presets: [
-                [
-                    "@babel/preset-env",
-                    {
-                        targets: {
-                            esmodules: true
-                        }
+const plugins = [
+    nodeResolve({
+        preferBuiltins: true,
+        exportConditions: ["node"]
+    }),
+    json(),
+    commonjs(),
+    typescript(),
+    babel({
+        presets: [
+            [
+                "@babel/preset-env",
+                {
+                    targets: {
+                        esmodules: true
                     }
-                ]
-            ],
-            babelHelpers: "bundled"
-        }),
-        terser()
-    ]
-};
+                }
+            ]
+        ],
+        babelHelpers: "bundled"
+    }),
+    terser()
+];
+
+const outputOptions = (fileName) => ({
+    file: `dist/lambda/${fileName}/${fileName}.mjs`,
+    format: "esm",
+    sourcemap: true
+});
+
+export default [
+    {
+        input: "src/lambda/process-queue/process-queue.ts",
+        output: outputOptions("process-queue"),
+        plugins
+    },
+    {
+        input: "src/lambda/process-dlq/process-dlq.ts",
+        output: outputOptions("process-dlq"),
+        plugins
+    }
+];

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "all-watch": "parallelshell \"npm run watch\" \"npm run bundle-watch\"",
-    "build": "heft build --clean && npm run postbuild && npm run fix-bundle-path",
+    "build": "heft build --clean && npm run postbuild",
     "postbuild": "npm run compile-lambdas",
     "bundle-watch": "find src/lambda -name '*.ts' | entr -rc npx esbuild  --bundle --platform=node src/lambda/**/*.ts --outdir=dist/lambda --external:aws-sdk --target=node16",
     "cdk": "cdk",
@@ -14,23 +14,24 @@
     "clean:force": "rimraf dist cdk.out node_modules",
     "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --format=esm --target=es2022 --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics --target=node16",
     "compile-lambdas": "rushx rollup",
-    "fix-bundle-path": "mkdir dist/lambda/process-queue && cp dist/lambda/*.* dist/lambda/process-queue/",
     "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "lint": "eslint --cache .",
     "rollup": "rollup -c",
     "synth-sam": "cdk synth --no-staging > template.yaml",
     "test": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean --max-workers 1",
     "test_errors": "npm test 2>&1 | grep 'FAIL'",
-    "watch": "heft test --clean --watch --max-workers 1"
+    "watch": "NODE_OPTIONS='--experimental-vm-modules' heft test --clean --watch --max-workers 1"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "~3.354.0",
     "@aws-sdk/client-secrets-manager": "~3.348.0",
-    "@digitraffic/common": "2023.5.25-1",
+    "@digitraffic/common": "2023.6.19-1",
     "@middy/core": "^4.3.1",
     "@middy/sqs-partial-batch-failure": "^4.3.1",
     "aws-cdk-lib": "~2.76.0",
     "constructs": "10.2.2",
     "date-fns": "~2.29.3",
+    "date-fns-tz": "~2.0.0",
     "mysql2": "^3.0.1",
     "source-map-support": "^0.5.21",
     "spex": "^3.3.0",
@@ -57,6 +58,7 @@
     "@types/node": "18.15.13",
     "eslint": "~8.38.0",
     "parallelshell": "3.0.2",
+    "rollup": "~3.25.1",
     "typescript": "~4.9.5"
   }
 }
