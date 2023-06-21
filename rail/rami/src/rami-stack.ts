@@ -1,21 +1,16 @@
-import { Duration } from "aws-cdk-lib";
-import type { Construct } from "constructs";
 import { DigitrafficStack, StackConfiguration } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
-import { DigitrafficSqsQueue } from "@digitraffic/common/dist/aws/infra/sqs-queue.js";
+import type { Construct } from "constructs";
 import * as InternalLambdas from "./internal-lambdas.js";
 import { PublicApi } from "./public-api.js";
 
+interface RamiConfiguration extends StackConfiguration {
+    readonly dlqBucketName: string;
+}
 export class RamiStack extends DigitrafficStack {
-    constructor(scope: Construct, id: string, configuration: StackConfiguration) {
+    constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
         super(scope, id, configuration);
 
-        const queueName = "RamiMessageQueue";
-        const sqs = DigitrafficSqsQueue.create(this, queueName, {
-            receiveMessageWaitTime: Duration.seconds(5),
-            visibilityTimeout: Duration.seconds(60)
-        });
-
-        InternalLambdas.create(this, sqs);
-        const publicApi = new PublicApi(this);
-    }
+        InternalLambdas.create(this, configuration.dlqBucketName);
+	        const publicApi = new PublicApi(this);
+	}
 }

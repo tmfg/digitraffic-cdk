@@ -42,6 +42,11 @@ export default [
         plugins
     },
     {
+        input: "src/lambda/process-dlq/process-dlq.ts",
+        output: outputOptions("process-dlq"),
+		plugins
+	},
+	{
         input: "src/lambda/get-active-messages/get-active-messages.ts",
         output: outputOptions("get-active-messages"),
         plugins
