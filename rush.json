@@ -16,9 +16,9 @@
    * path segment in the "$schema" field for all your Rush config files.  This will ensure
    * correct error-underlining and tab-completion for editors such as VS Code.
    */
-  "rushVersion": "5.93.1",
+  "rushVersion": "5.100.1",
 
-  "pnpmVersion": "7.32.2",
+  "pnpmVersion": "8.2.0",
   "nodeSupportedVersionRange": ">=16.13.0 <17.0.0 || >=18.0.0 <19.0.0",
   "ensureConsistentVersions": false,
 
