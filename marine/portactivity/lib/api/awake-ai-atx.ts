@@ -1,5 +1,5 @@
 import { WebSocket } from "ws";
-import { AwakeAiZoneType } from "./awake_common";
+import { AwakeAiZoneType } from "./awake-common";
 import { SSM } from "aws-sdk";
 import * as URL from "url";
 import { PortActivityParameterKeys } from "../keys";

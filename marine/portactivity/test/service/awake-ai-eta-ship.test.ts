@@ -4,8 +4,8 @@ import {
     AwakeAiShipApiResponse,
     AwakeAiShipPredictability,
     AwakeAiShipResponseType
-} from "../../lib/api/awake_ai_ship";
-import { AwakeAiETAShipService } from "../../lib/service/awake_ai_eta_ship";
+} from "../../lib/api/awake-ai-ship";
+import { AwakeAiETAShipService } from "../../lib/service/awake-ai-eta-ship";
 import { DbETAShip } from "../../lib/dao/timestamps";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import {
@@ -14,13 +14,14 @@ import {
     AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageStatus,
     AwakeAiZoneType
-} from "../../lib/api/awake_common";
+} from "../../lib/api/awake-common";
 import { getRandomInteger, randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { EventSource } from "../../lib/model/eventsource";
 import { addHours } from "date-fns";
+import { LOCODE } from "../../lib/model/locode";
 
 describe("AwakeAiETAShipService", () => {
-    test("getAwakeAiTimestamps - creates both ETA and ETB only for FIRAU", async () => {
+    test("getAwakeAiTimestamps - creates both ETA and ETB for FIRAU", async () => {
         const api = createApi();
         const service = new AwakeAiETAShipService(api);
         const ship = newDbETAShip("FIRAU");
@@ -360,7 +361,11 @@ function awakeTimestampFromTimestamp(
     };
 }
 
-function expectJustEta(ship: DbETAShip, voyageTimestamp: AwakeAiShipApiResponse, timestamps: ApiTimestamp[]): void {
+function expectJustEta(
+    ship: DbETAShip,
+    voyageTimestamp: AwakeAiShipApiResponse,
+    timestamps: ApiTimestamp[]
+): void {
     expect(timestamps.length).toBe(1);
     const etaTimestamp = timestamps.find((ts) => ts.eventType === EventType.ETA);
 

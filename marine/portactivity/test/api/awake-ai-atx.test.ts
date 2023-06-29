@@ -1,5 +1,5 @@
-import {newAwakeATXMessage} from "../testdata";
-import * as API from "../../lib/api/awake_ai_atx";
+import { newAwakeATXMessage } from "../testdata";
+import * as API from "../../lib/api/awake-ai-atx";
 
 const NO_OP = jest.fn();
 
@@ -17,7 +17,7 @@ describe("api-awake-ai-atx", () => {
                 }
             },
             send: sendMock,
-            close: NO_OP,
+            close: NO_OP
         }));
 
         // assume parameter store to not contain subscriptionId on first run
@@ -28,9 +28,7 @@ describe("api-awake-ai-atx", () => {
         await api.getATXs(10);
 
         // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-        expect(sendMock.mock.calls[0][0]).toEqual(
-            JSON.stringify(API.SUBSCRIPTION_MESSAGE)
-        );
+        expect(sendMock.mock.calls[0][0]).toEqual(JSON.stringify(API.SUBSCRIPTION_MESSAGE));
     });
 
     test("getATXs - existing session resumes with subscription id", async () => {
@@ -44,13 +42,13 @@ describe("api-awake-ai-atx", () => {
                     callback(
                         JSON.stringify({
                             subscriptionId,
-                            msgType: API.AwakeAiATXEventType.SUBSCRIPTION_STATUS,
+                            msgType: API.AwakeAiATXEventType.SUBSCRIPTION_STATUS
                         })
                     );
                 }
             },
             send: sendMock,
-            close: NO_OP,
+            close: NO_OP
         }));
         const api = new API.AwakeAiATXApi("", "", WebSocket);
 
@@ -74,7 +72,7 @@ describe("api-awake-ai-atx", () => {
                 }
             },
             send: jest.fn(),
-            close: NO_OP,
+            close: NO_OP
         }));
         const api = new API.AwakeAiATXApi("", "", WebSocket);
 
@@ -92,7 +90,7 @@ describe("api-awake-ai-atx", () => {
                 }
             },
             send: jest.fn(),
-            close: NO_OP,
+            close: NO_OP
         }));
         const api = new API.AwakeAiATXApi("", "", WebSocket);
 

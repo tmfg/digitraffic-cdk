@@ -3,10 +3,10 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SNSEvent } from "aws-lambda";
 import { parseISO } from "date-fns";
-import { AwakeAiETAShipApi } from "../../api/awake_ai_ship";
+import { AwakeAiETAShipApi } from "../../api/awake-ai-ship";
 import { DbETAShip } from "../../dao/timestamps";
 import { PortactivityEnvKeys } from "../../keys";
-import { AwakeAiETAShipService } from "../../service/awake_ai_eta_ship";
+import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship";
 import { sendMessage } from "../../service/queue-service";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 

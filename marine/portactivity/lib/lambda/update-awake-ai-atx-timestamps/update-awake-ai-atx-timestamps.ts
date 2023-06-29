@@ -1,7 +1,7 @@
 import { PortactivityEnvKeys, PortactivitySecretKeys } from "../../keys";
 import { sendMessage } from "../../service/queue-service";
-import { AwakeAiATXService } from "../../service/awake_ai_atx";
-import { AwakeAiATXApi } from "../../api/awake_ai_atx";
+import { AwakeAiATXService } from "../../service/awake-ai-atx";
+import { AwakeAiATXApi } from "../../api/awake-ai-atx";
 import { Context } from "aws-lambda";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";

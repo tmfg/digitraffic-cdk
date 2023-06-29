@@ -1,7 +1,7 @@
 import {
     SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS,
     validateTimestamp
-} from "../../lib/service/timestamp_validation";
+} from "../../lib/service/timestamp-validation";
 import { newTimestamp } from "../testdata";
 import { dbTestBase, insertVesselLocation } from "../db-testutil";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
