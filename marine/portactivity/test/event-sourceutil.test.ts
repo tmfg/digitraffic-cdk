@@ -85,6 +85,8 @@ describe("event-sourceutil", () => {
 
         const merged = mergeTimestamps(timestamps);
         expect(merged.length).toBe(2);
+        expect(merged.filter((ts) => ts.eventType === EventType.ETA).length).toBe(1);
+        expect(merged.filter((ts) => ts.eventType === EventType.ETB).length).toBe(1);
     });
 
     test("mergeTimestamps - timestamps are sorted after merge", () => {

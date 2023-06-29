@@ -13,6 +13,7 @@ import * as R from "ramda";
 import { EventSource } from "../model/eventsource";
 import { parseISO } from "date-fns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { time } from "console";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean;
@@ -158,7 +159,10 @@ export async function findAllTimestamps(
             });
         })
         .then((tss: DbTimestamp[]) => tss.map(dbTimestampToPublicApiTimestamp));
-    return mergeTimestamps(timestamps);
+    return mergeTimestamps(timestamps).map((timestamp) => ({
+        ...timestamp,
+        source: getDisplayableNameForEventSource(timestamp.source)
+    }));
 }
 
 export async function findETAShipsByLocode(ports: Port[]): Promise<DbETAShip[]> {
@@ -239,7 +243,7 @@ function dbTimestampToPublicApiTimestamp(ts: DbTimestamp): PublicApiTimestamp {
         eventType: ts.event_type,
         eventTime: ts.event_time.toISOString(),
         recordTime: ts.record_time.toISOString(),
-        source: getDisplayableNameForEventSource(ts.event_source),
+        source: ts.event_source,
         sourceId: ts.source_id,
         ship: {
             mmsi: ts.ship_mmsi,
