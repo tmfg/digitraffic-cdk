@@ -101,6 +101,12 @@ export class CFBehavior {
         return this;
     }
 
+    public allowGetHeadOptionsMethods(): this {
+        this.allowedMethods = CloudFrontAllowedMethods.GET_HEAD_OPTIONS;
+
+        return this;
+    }
+
     public withGzipRequirementLambda(): this {
         return this.withLambda(LambdaType.GZIP_REQUIREMENT);
     }
