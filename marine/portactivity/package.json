@@ -16,7 +16,7 @@
     "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "lint": "eslint --cache .",
     "synth-sam": "cdk synth --no-staging > template.yaml",
-    "test": "jest --detectOpenHandles",
+    "test": "jest --detectOpenHandles --forceExit",
     "test_errors": "npm test 2>&1 | grep 'FAIL'",
     "watch": "tsc -w"
   },

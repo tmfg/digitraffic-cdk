@@ -5,7 +5,7 @@ import {
     VTS_TIMESTAMP_TOO_OLD_MINUTES
 } from "../lib/event-sourceutil";
 import { newTimestamp } from "./testdata";
-import { ApiTimestamp } from "../lib/model/timestamp";
+import { ApiTimestamp, EventType } from "../lib/model/timestamp";
 import { EventSource } from "../lib/model/eventsource";
 import { getRandomInteger, shuffle } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO, subMinutes } from "date-fns";
@@ -63,6 +63,27 @@ describe("event-sourceutil", () => {
 
         const merged = mergeTimestamps(timestamps);
 
+        expect(merged.length).toBe(2);
+    });
+
+    test("mergeTimestamps - VTS A ETB timestamps are merged", () => {
+        const portcallId = 1;
+        const timestamps = [
+            newTimestamp({ source: EventSource.AWAKE_AI, portcallId, eventType: EventType.ETB }),
+            newTimestamp({
+                source: EventSource.SCHEDULES_CALCULATED,
+                portcallId,
+                eventType: EventType.ETB
+            }),
+            newTimestamp({ source: EventSource.AWAKE_AI, portcallId, eventType: EventType.ETA }),
+            newTimestamp({
+                source: EventSource.SCHEDULES_CALCULATED,
+                portcallId,
+                eventType: EventType.ETA
+            })
+        ];
+
+        const merged = mergeTimestamps(timestamps);
         expect(merged.length).toBe(2);
     });
 
