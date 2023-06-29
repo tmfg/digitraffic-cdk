@@ -83,14 +83,16 @@ describe(
                     imo,
                     portcallId,
                     eventType: EventType.ETA,
-                    eventTime: earlier
+                    eventTime: earlier,
+                    recordTime: earlier
                 }),
                 newTimestamp({
                     source: EventSource.SCHEDULES_CALCULATED,
                     imo,
                     portcallId,
                     eventType: EventType.ETA,
-                    eventTime: later
+                    eventTime: later,
+                    recordTime: later
                 })
             ];
 
@@ -99,8 +101,11 @@ describe(
             const foundTimestamps = await TimestampsService.findAllTimestamps(undefined, undefined, imo);
 
             expect(foundTimestamps.length).toBe(1);
+            // eventtime should be the average of the two eventtimes
             expect(parseISO(foundTimestamps[0].eventTime).valueOf()).toBeGreaterThan(earlier.valueOf());
             expect(parseISO(foundTimestamps[0].eventTime).valueOf()).toBeLessThan(later.valueOf());
+            // recordtime should be from higher priority source
+            expect(parseISO(foundTimestamps[0].recordTime).valueOf()).toEqual(later.valueOf());
         });
 
         test("saveTimestamp - no conflict returns updated", async () => {
