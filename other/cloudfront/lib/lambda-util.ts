@@ -11,6 +11,12 @@ interface Response {
 
 export function addCorsHeaders(response: Response): void {
     const responseHeaders = response.headers;
+    responseHeaders["access-control-allow-origin"] = [
+        {
+            key: "access-control-allow-origin",
+            value: "*"
+        }
+    ];
     responseHeaders["access-control-allow-methods"] = [
         {
             key: "access-control-allow-methods",
