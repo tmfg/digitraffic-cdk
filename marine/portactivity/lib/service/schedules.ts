@@ -1,11 +1,19 @@
-import {Destination, SchedulesApi, SchedulesDirection, SchedulesResponse, Timestamp, Vessel} from "../api/schedules";
-import {ApiTimestamp, EventType} from "../model/timestamp";
-import {ports} from "./portareas";
-import moment from 'moment-timezone';
-import {EventSource} from "../model/eventsource";
+import moment from "moment-timezone";
+import {
+    Destination,
+    SchedulesApi,
+    SchedulesDirection,
+    SchedulesResponse,
+    Timestamp,
+    Vessel
+} from "../api/schedules";
+import { EventSource } from "../model/eventsource";
+import { Locode } from "../model/locode";
+import { ApiTimestamp, EventType } from "../model/timestamp";
+import { VTS_A_ETB_PORTS } from "../model/vts-a-etb-ports";
+import { ports } from "./portareas";
 
 export class SchedulesService {
-
     private readonly api: SchedulesApi;
 
     constructor(api: SchedulesApi) {
@@ -23,33 +31,46 @@ export class SchedulesService {
     private async doGetTimestamps(calculated: boolean): Promise<ApiTimestamp[]> {
         const timestampsEast = await this.api.getSchedulesTimestamps(SchedulesDirection.EAST, calculated);
         const timestampsWest = await this.api.getSchedulesTimestamps(SchedulesDirection.WEST, calculated);
-        return this.filterTimestamps(this.schedulesToTimestamps(timestampsEast, calculated))
-            .concat(this.filterTimestamps(this.schedulesToTimestamps(timestampsWest, calculated)));
+        return this.filterTimestamps(this.schedulesToTimestamps(timestampsEast, calculated)).concat(
+            this.filterTimestamps(this.schedulesToTimestamps(timestampsWest, calculated))
+        );
     }
 
     filterTimestamps(timestamps: ApiTimestamp[]): ApiTimestamp[] {
         return timestamps
-            .filter(ts => ports.includes(ts.location.port))
-            .filter(ts =>
-                ts.eventType === EventType.ETD ? moment(ts.eventTime) >= moment().subtract(5, 'minutes') : true);
+            .filter((ts) => ports.includes(ts.location.port))
+            .filter((ts) =>
+                ts.eventType === EventType.ETD
+                    ? moment(ts.eventTime) >= moment().subtract(5, "minutes")
+                    : true
+            );
     }
 
     schedulesToTimestamps(resp: SchedulesResponse, calculated: boolean): ApiTimestamp[] {
-        return resp.schedules.schedule.flatMap(s => {
+        return resp.schedules.schedule.flatMap((s) => {
             const timestamps: ApiTimestamp[] = [];
             const tt = s.timetable[0];
             if (!tt.destination) {
                 return timestamps;
             }
             if (tt.eta) {
-                timestamps.push(this.toTimestamp(
-                    tt.eta[0], tt.destination[0], s.vessel[0], calculated, EventType.ETA,
-                ));
+                const timestamp = this.toTimestamp(
+                    tt.eta[0],
+                    tt.destination[0],
+                    s.vessel[0],
+                    calculated,
+                    EventType.ETA
+                );
+                timestamps.push(timestamp);
+                // also generate an ETB timestamp for VTS calculated ETA if destination is in list of locodes to be published as ETB timestamps
+                if (calculated && VTS_A_ETB_PORTS.includes(tt.destination[0].$.locode as Locode)) {
+                    timestamps.push({ ...timestamp, eventType: EventType.ETB });
+                }
             }
             if (tt.etd) {
-                timestamps.push(this.toTimestamp(
-                    tt.etd[0], tt.destination[0], s.vessel[0], calculated, EventType.ETD,
-                ));
+                timestamps.push(
+                    this.toTimestamp(tt.etd[0], tt.destination[0], s.vessel[0], calculated, EventType.ETD)
+                );
             }
             return timestamps;
         });
@@ -60,12 +81,11 @@ export class SchedulesService {
         destination: Destination,
         vessel: Vessel,
         calculated: boolean,
-        eventType: EventType.ETA | EventType.ETD,
+        eventType: EventType.ETA | EventType.ETD | EventType.ETB
     ): ApiTimestamp {
-
         return {
             location: {
-                port: destination.$.locode, // TODO portArea when portfacility translation works
+                port: destination.$.locode // TODO portArea when portfacility translation works
             },
             eventType,
             eventTime: ts.$.time,
@@ -73,9 +93,8 @@ export class SchedulesService {
             source: calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL,
             ship: {
                 mmsi: Number(vessel.$.mmsi),
-                imo: Number(vessel.$.imo),
-            },
+                imo: Number(vessel.$.imo)
+            }
         };
     }
-
 }

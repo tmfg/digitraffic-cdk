@@ -14,7 +14,7 @@ import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { EventSource } from "../../lib/model/eventsource";
 import * as R from "ramda";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { addHours, parseISO, subDays } from "date-fns";
+import { addHours, addMinutes, parseISO, subDays } from "date-fns";
 
 describe(
     "timestamps",
@@ -70,6 +70,42 @@ describe(
                 eventTimeConfidenceLowerDiff: null,
                 eventTimeConfidenceUpperDiff: null
             });
+        });
+
+        test("findAllTimestamps - VTS A timestamps are merged", async () => {
+            const portcallId = 1;
+            const imo = 12345678;
+            const earlier = new Date();
+            const later = addMinutes(earlier, 30);
+            const timestamps = [
+                newTimestamp({
+                    source: EventSource.AWAKE_AI,
+                    imo,
+                    portcallId,
+                    eventType: EventType.ETA,
+                    eventTime: earlier,
+                    recordTime: earlier
+                }),
+                newTimestamp({
+                    source: EventSource.SCHEDULES_CALCULATED,
+                    imo,
+                    portcallId,
+                    eventType: EventType.ETA,
+                    eventTime: later,
+                    recordTime: later
+                })
+            ];
+
+            await insert(db, timestamps);
+
+            const foundTimestamps = await TimestampsService.findAllTimestamps(undefined, undefined, imo);
+
+            expect(foundTimestamps.length).toBe(1);
+            // eventtime should be the average of the two eventtimes
+            expect(parseISO(foundTimestamps[0].eventTime).valueOf()).toBeGreaterThan(earlier.valueOf());
+            expect(parseISO(foundTimestamps[0].eventTime).valueOf()).toBeLessThan(later.valueOf());
+            // recordtime should be from higher priority source
+            expect(parseISO(foundTimestamps[0].recordTime).valueOf()).toEqual(later.valueOf());
         });
 
         test("saveTimestamp - no conflict returns updated", async () => {

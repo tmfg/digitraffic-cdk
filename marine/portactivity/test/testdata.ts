@@ -3,8 +3,8 @@ import {
     AwakeAiATXEventType,
     AwakeAIATXTimestampMessage,
     AwakeATXZoneEventType
-} from "../lib/api/awake_ai_atx";
-import { AwakeAiZoneType } from "../lib/api/awake_common";
+} from "../lib/api/awake-ai-atx";
+import { AwakeAiZoneType } from "../lib/api/awake-common";
 import { v4 as uuidv4 } from "uuid";
 import { getRandomNumber } from "@digitraffic/common/dist/test/testutils";
 

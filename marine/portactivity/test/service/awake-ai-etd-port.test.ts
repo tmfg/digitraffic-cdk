@@ -5,13 +5,13 @@ import {
     AwakeAiVoyageEtdPrediction,
     AwakeAiVoyageStatus,
     AwakeAiZoneType
-} from "../../lib/api/awake_common";
+} from "../../lib/api/awake-common";
 import * as sinon from "sinon";
-import { AwakeAiPortApi, AwakeAiPortResponse } from "../../lib/api/awake_ai_port";
+import { AwakeAiPortApi, AwakeAiPortResponse } from "../../lib/api/awake-ai-port";
 import { addHours, subHours } from "date-fns";
-import { AwakeAiETDPortService } from "../../lib/service/awake_ai_etd_port";
+import { AwakeAiETDPortService } from "../../lib/service/awake-ai-etd-port";
 import { getRandomNumber, randomBoolean } from "@digitraffic/common/dist/test/testutils";
-import { createAwakeAiPortResponse } from "./awake_ai_etx_port_testutil";
+import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil";
 
 describe("AwakeAiETDPortService", () => {
     test("getAwakeAiTimestamps - filter Digitraffic ETD predictions", async () => {

@@ -8,10 +8,10 @@ import {
     AwakeArrivalPortCallPrediction,
     AwakeURN,
     digitrafficPortCallString
-} from "../api/awake_common";
+} from "../api/awake-common";
 import { ApiTimestamp, EventType, Location, Ship } from "../model/timestamp";
 import { EventSource } from "../model/eventsource";
-import { AwakeAiPortSchedule } from "../api/awake_ai_port";
+import { AwakeAiPortSchedule } from "../api/awake-ai-port";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum AwakeDataState {
