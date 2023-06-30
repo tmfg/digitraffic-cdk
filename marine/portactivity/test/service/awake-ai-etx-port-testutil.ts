@@ -1,5 +1,5 @@
-import { AwakeAiPrediction, AwakeAiPredictionType, AwakeAiVoyageStatus } from "../../lib/api/awake_common";
-import { AwakeAiPortResponse, AwakeAiPortResponseType } from "../../lib/api/awake_ai_port";
+import { AwakeAiPrediction, AwakeAiPredictionType, AwakeAiVoyageStatus } from "../../lib/api/awake-common";
+import { AwakeAiPortResponse, AwakeAiPortResponseType } from "../../lib/api/awake-ai-port";
 import { randomIMO, randomMMSI } from "../testdata";
 
 export function createAwakeAiPortResponse(

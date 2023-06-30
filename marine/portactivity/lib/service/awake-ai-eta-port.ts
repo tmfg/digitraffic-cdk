@@ -4,14 +4,14 @@ import {
     AwakeAiVoyageEtaPrediction,
     AwakeAiZoneType,
     AwakeArrivalPortCallPrediction
-} from "../api/awake_common";
-import { AwakeAiPortApi, AwakeAiPortSchedule } from "../api/awake_ai_port";
+} from "../api/awake-common";
+import { AwakeAiPortApi, AwakeAiPortSchedule } from "../api/awake-ai-port";
 import {
     etaPredictionToTimestamp,
     isAwakeEtaPrediction,
     isDigitrafficEtaPrediction,
     voyageUnderwayOrNotStarted
-} from "./awake_ai_etx_helper";
+} from "./awake-ai-etx-helper";
 import { EventSource } from "../model/eventsource";
 import { addHours, isBefore, parseISO } from "date-fns";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";

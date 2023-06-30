@@ -1,5 +1,5 @@
 import { saveTimestamp, UpdatedTimestamp } from "../../service/timestamps";
-import { validateTimestamp } from "../../service/timestamp_validation";
+import { validateTimestamp } from "../../service/timestamp-validation";
 import { ApiTimestamp } from "../../model/timestamp";
 import { SQSEvent } from "aws-lambda";
 import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";

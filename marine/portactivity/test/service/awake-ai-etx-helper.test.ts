@@ -1,5 +1,5 @@
-import * as AwakeAiETAHelper from "../../lib/service/awake_ai_etx_helper";
-import { isPortcallPrediction } from "../../lib/service/awake_ai_etx_helper";
+import * as AwakeAiETAHelper from "../../lib/service/awake-ai-etx-helper";
+import { isPortcallPrediction } from "../../lib/service/awake-ai-etx-helper";
 import {
     AwakeAiPredictionMetadata,
     AwakeAiPredictionType,
@@ -7,7 +7,7 @@ import {
     AwakeAiZoneType,
     AwakeDigitrafficPortCallURN,
     AwakeURN
-} from "../../lib/api/awake_common";
+} from "../../lib/api/awake-common";
 import { EventSource } from "../../lib/model/eventsource";
 import { randomIMO, randomMMSI } from "../testdata";
 import { randomBoolean } from "@digitraffic/common/dist/test/testutils";

@@ -2,7 +2,7 @@ import { PortactivityEnvKeys } from "../../keys";
 import { SNS } from "aws-sdk";
 import * as MessagingUtil from "@digitraffic/common/dist/aws/runtime/messaging";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
-import { ETD_PORTS } from "../../model/awake_etx_ports";
+import { ETD_PORTS } from "../../model/awake-ai-etx-ports";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const publishTopic = getEnvVariable(PortactivityEnvKeys.PUBLISH_TOPIC_ARN);

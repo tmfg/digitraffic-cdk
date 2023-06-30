@@ -1,8 +1,7 @@
-import { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
+import { differenceInMinutes, parseISO } from "date-fns";
 import * as R from "ramda";
 import { EventSource } from "./model/eventsource";
-import { getLast } from "@digitraffic/common/dist/utils/utils";
-import { differenceInMinutes, parseISO } from "date-fns";
+import { ApiTimestamp, PublicApiTimestamp } from "./model/timestamp";
 
 export const VTS_A = "VTS A";
 export const VTS_O = "VTS O";
@@ -105,7 +104,10 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
         if (vtsAStamps.length > 1) {
             addToList = addToList.filter((t) => !vtsAStamps.includes(t));
 
-            const highestPriority = getLast(vtsAStamps, (ts) => eventSourcePriorities.get(ts.source) ?? -1);
+            const highestPriority = vtsAStamps.sort(
+                (a, b) =>
+                    (eventSourcePriorities.get(b.source) ?? 0) - (eventSourcePriorities.get(a.source) ?? 0)
+            )[0];
 
             addToList.push({
                 ...highestPriority,
