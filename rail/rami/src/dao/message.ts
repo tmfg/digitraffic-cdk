@@ -97,7 +97,7 @@ WHERE
     rm.deleted IS NULL
     AND
     rm.start_validity <= NOW()
-    AND rm.end_validity >= NOW()
+    AND rm.end_validity > NOW()
     AND (
         :trainNumber IS NULL
         OR rm.train_number = :trainNumber

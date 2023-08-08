@@ -1,11 +1,11 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
 import middy from "@middy/core";
 import sqsPartialBatchFailureMiddleware from "@middy/sqs-partial-batch-failure";
-import type { SQSEvent } from "aws-lambda";
+import type { Handler, SQSEvent } from "aws-lambda";
 import { parseMessage, processMessage } from "../../service/process-message.js";
 import { logException } from "@digitraffic/common/dist/utils/logging.js";
 
-export function handlerFn() {
+export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<void>[]> {
     return (event: SQSEvent) => {
         return Promise.allSettled(
             event.Records.map(async (r) => {
@@ -30,4 +30,4 @@ export function handlerFn() {
     };
 }
 
-export const handler = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());
+export const handler: Handler = middy(handlerFn()).use(sqsPartialBatchFailureMiddleware());
