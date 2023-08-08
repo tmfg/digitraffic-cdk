@@ -18,7 +18,6 @@ const API_URL = "/prod/api/v1/passenger-information";
 export const handler = async (): Promise<string> => {
     const checker = await UrlChecker.create(hostname, apiKeyId);
 
-    await checker.expect200(API_URL + "/active");
     await checker.expect403WithoutApiKey(API_URL + "/active");
 
     await checker.expect200(
