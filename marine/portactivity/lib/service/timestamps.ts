@@ -6,7 +6,7 @@ import {
     inDatabase,
     inDatabaseReadonly
 } from "@digitraffic/common/dist/database/database";
-import { ApiTimestamp, PublicApiTimestamp, Ship } from "../model/timestamp";
+import { ApiTimestamp, EventType, PublicApiTimestamp, Ship } from "../model/timestamp";
 import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
 import { Port } from "./portareas";
 import * as R from "ramda";
@@ -29,12 +29,15 @@ export function saveTimestamp(
             (await TimestampsDB.findPortcallId(
                 db,
                 timestamp.location.port,
-                timestamp.eventType,
+                timestamp.eventType === EventType.ETB &&
+                    (timestamp.source === EventSource.SCHEDULES_CALCULATED ||
+                        timestamp.source === EventSource.AWAKE_AI)
+                    ? EventType.ETA
+                    : timestamp.eventType,
                 parseISO(timestamp.eventTime),
                 timestamp.ship.mmsi,
                 timestamp.ship.imo
             ));
-
         if (!portcallId) {
             if (timestamp.source !== EventSource.AWAKE_AI_PRED) {
                 logger.warn({
