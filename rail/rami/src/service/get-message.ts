@@ -2,13 +2,13 @@ import { DbRamiMessage, findActiveMessages } from "../dao/message.js";
 import { WeekDaysBitString, mapBitsToDays } from "../util/weekdays.js";
 import type { WeekDay } from "../model/dt-rami-message.js";
 
-interface PassengerInformationText {
+export interface PassengerInformationText {
     readonly fi?: string;
     readonly sv?: string;
     readonly en?: string;
 }
 
-interface PassengerInformationAudio {
+export interface PassengerInformationAudio {
     readonly text: PassengerInformationText;
     readonly deliveryRules?: {
         readonly startDateTime?: Date;
@@ -24,7 +24,7 @@ interface PassengerInformationAudio {
     };
 }
 
-interface PassengerInformationVideo {
+export interface PassengerInformationVideo {
     readonly text: PassengerInformationText;
     readonly deliveryRules?: {
         readonly startDateTime?: Date;
@@ -36,7 +36,7 @@ interface PassengerInformationVideo {
     };
 }
 
-interface PassengerInformationMessage {
+export interface PassengerInformationMessage {
     readonly id: string;
     readonly version: number;
     readonly creationDateTime: Date;
