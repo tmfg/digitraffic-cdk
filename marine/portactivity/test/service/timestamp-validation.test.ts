@@ -9,6 +9,7 @@ import { EventSource } from "../../lib/model/eventsource";
 import * as R from "ramda";
 import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { NavStatus } from "../../lib/model/ais-status";
+import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 
 describe(
     "timestamp model",
@@ -131,7 +132,7 @@ describe(
         test("validateTimestamp - vts prediction and ship speed under threshold", async () => {
             const mmsi = 123;
             const timestamp = newTimestamp({
-                eventType: EventType.ETA,
+                eventType: [EventType.ETA, EventType.ETB][getRandomInteger(0, 1)],
                 mmsi,
                 source: EventSource.SCHEDULES_CALCULATED
             });
@@ -150,7 +151,7 @@ describe(
         test("validateTimestamp - vts prediction and moving ship with valid nav status", async () => {
             const mmsi = 123;
             const timestamp = newTimestamp({
-                eventType: EventType.ETA,
+                eventType: [EventType.ETA, EventType.ETB][getRandomInteger(0, 1)],
                 mmsi,
                 source: EventSource.SCHEDULES_CALCULATED
             });
@@ -169,7 +170,7 @@ describe(
         test("validateTimestamp - vts prediction and invalid navigational status", async () => {
             const mmsi = 123;
             const timestamp = newTimestamp({
-                eventType: EventType.ETA,
+                eventType: [EventType.ETA, EventType.ETB][getRandomInteger(0, 1)],
                 mmsi,
                 source: EventSource.SCHEDULES_CALCULATED
             });
