@@ -1,15 +1,14 @@
+import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import * as R from "ramda";
+import { NavStatus } from "../../lib/model/ais-status";
+import { EventSource } from "../../lib/model/eventsource";
+import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import {
     SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS,
     validateTimestamp
 } from "../../lib/service/timestamp-validation";
-import { newTimestamp } from "../testdata";
 import { dbTestBase, insertVesselLocation } from "../db-testutil";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
-import { EventSource } from "../../lib/model/eventsource";
-import * as R from "ramda";
-import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
-import { NavStatus } from "../../lib/model/ais-status";
-import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
+import { newTimestamp } from "../testdata";
 
 describe(
     "timestamp model",
@@ -131,8 +130,13 @@ describe(
 
         test("validateTimestamp - vts prediction and ship speed under threshold", async () => {
             const mmsi = 123;
-            const timestamp = newTimestamp({
-                eventType: [EventType.ETA, EventType.ETB][getRandomInteger(0, 1)],
+            const etaTimestamp = newTimestamp({
+                eventType: EventType.ETA,
+                mmsi,
+                source: EventSource.SCHEDULES_CALCULATED
+            });
+            const etbTimestamp = newTimestamp({
+                eventType: EventType.ETB,
                 mmsi,
                 source: EventSource.SCHEDULES_CALCULATED
             });
@@ -144,14 +148,22 @@ describe(
                 NavStatus.UNDER_WAY_USING_ENGINE
             );
 
-            const validatedTimestamp = await validateTimestamp(timestamp, db);
-            expect(validatedTimestamp).toEqual(undefined);
+            const validatedEtaTimestamp = await validateTimestamp(etaTimestamp, db);
+            expect(validatedEtaTimestamp).toEqual(undefined);
+
+            const validatedEtbTimestamp = await validateTimestamp(etbTimestamp, db);
+            expect(validatedEtbTimestamp).toEqual(undefined);
         });
 
         test("validateTimestamp - vts prediction and moving ship with valid nav status", async () => {
             const mmsi = 123;
-            const timestamp = newTimestamp({
-                eventType: [EventType.ETA, EventType.ETB][getRandomInteger(0, 1)],
+            const etaTimestamp = newTimestamp({
+                eventType: EventType.ETA,
+                mmsi,
+                source: EventSource.SCHEDULES_CALCULATED
+            });
+            const etbTimestamp = newTimestamp({
+                eventType: EventType.ETB,
                 mmsi,
                 source: EventSource.SCHEDULES_CALCULATED
             });
@@ -163,14 +175,22 @@ describe(
                 NavStatus.UNDER_WAY_USING_ENGINE
             );
 
-            const validatedTimestamp = await validateTimestamp(timestamp, db);
-            expect(validatedTimestamp?.ship.mmsi).toEqual(mmsi);
+            const validatedEtaTimestamp = await validateTimestamp(etaTimestamp, db);
+            expect(validatedEtaTimestamp?.ship.mmsi).toEqual(mmsi);
+
+            const validatedEtbTimestamp = await validateTimestamp(etbTimestamp, db);
+            expect(validatedEtbTimestamp?.ship.mmsi).toEqual(mmsi);
         });
 
         test("validateTimestamp - vts prediction and invalid navigational status", async () => {
             const mmsi = 123;
-            const timestamp = newTimestamp({
-                eventType: [EventType.ETA, EventType.ETB][getRandomInteger(0, 1)],
+            const etaTimestamp = newTimestamp({
+                eventType: EventType.ETA,
+                mmsi,
+                source: EventSource.SCHEDULES_CALCULATED
+            });
+            const etbTimestamp = newTimestamp({
+                eventType: EventType.ETB,
                 mmsi,
                 source: EventSource.SCHEDULES_CALCULATED
             });
@@ -182,8 +202,11 @@ describe(
                 NavStatus.AT_ANCHOR
             );
 
-            const validatedTimestamp = await validateTimestamp(timestamp, db);
-            expect(validatedTimestamp).toEqual(undefined);
+            const validatedEtaTimestamp = await validateTimestamp(etaTimestamp, db);
+            expect(validatedEtaTimestamp).toEqual(undefined);
+
+            const validatedEtbTimestamp = await validateTimestamp(etbTimestamp, db);
+            expect(validatedEtbTimestamp).toEqual(undefined);
         });
     })
 );

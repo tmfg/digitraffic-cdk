@@ -1,22 +1,28 @@
-import * as TimestampsDB from "../dao/timestamps";
-import { DbETAShip, DbTimestamp, DbTimestampIdAndLocode, DbUpdatedTimestamp } from "../dao/timestamps";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import {
     DTDatabase,
     DTTransaction,
     inDatabase,
     inDatabaseReadonly
 } from "@digitraffic/common/dist/database/database";
-import { ApiTimestamp, EventType, PublicApiTimestamp, Ship } from "../model/timestamp";
-import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
-import { Port } from "./portareas";
-import * as R from "ramda";
-import { EventSource } from "../model/eventsource";
 import { parseISO } from "date-fns";
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
-import { time } from "console";
+import * as R from "ramda";
+import * as TimestampsDB from "../dao/timestamps";
+import { DbETAShip, DbTimestamp, DbTimestampIdAndLocode, DbUpdatedTimestamp } from "../dao/timestamps";
+import { getDisplayableNameForEventSource, isPortnetTimestamp, mergeTimestamps } from "../event-sourceutil";
+import { EventSource } from "../model/eventsource";
+import { ApiTimestamp, EventType, PublicApiTimestamp, Ship } from "../model/timestamp";
+import { Port } from "./portareas";
 
 export interface UpdatedTimestamp extends DbUpdatedTimestamp {
     readonly locodeChanged: boolean;
+}
+
+function getPortcallEventType(timestamp: ApiTimestamp): EventType {
+    return timestamp.eventType === EventType.ETB &&
+        (timestamp.source === EventSource.SCHEDULES_CALCULATED || timestamp.source === EventSource.AWAKE_AI)
+        ? EventType.ETA
+        : timestamp.eventType;
 }
 
 export function saveTimestamp(
@@ -29,11 +35,7 @@ export function saveTimestamp(
             (await TimestampsDB.findPortcallId(
                 db,
                 timestamp.location.port,
-                timestamp.eventType === EventType.ETB &&
-                    (timestamp.source === EventSource.SCHEDULES_CALCULATED ||
-                        timestamp.source === EventSource.AWAKE_AI)
-                    ? EventType.ETA
-                    : timestamp.eventType,
+                getPortcallEventType(timestamp),
                 parseISO(timestamp.eventTime),
                 timestamp.ship.mmsi,
                 timestamp.ship.imo
