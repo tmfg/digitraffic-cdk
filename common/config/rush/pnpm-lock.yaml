@@ -1172,7 +1172,7 @@ importers:
       '@digitraffic-cdk/digitraffic-cdk-rig': workspace:*
       '@digitraffic-cdk/eslint-config': workspace:*
       '@digitraffic-cdk/toolchain': workspace:*
-      '@digitraffic/common': workspace:*
+      '@digitraffic/common': 2023.8.10-1
       '@middy/core': ^4.3.1
       '@middy/sqs-partial-batch-failure': ^4.3.1
       '@rollup/plugin-babel': ~6.0.3
@@ -1204,7 +1204,7 @@ importers:
     dependencies:
       '@aws-sdk/client-s3': 3.354.0
       '@aws-sdk/client-secrets-manager': 3.348.0
-      '@digitraffic/common': link:../../lib/digitraffic-common
+      '@digitraffic/common': 2023.8.10-1_mtixrjxtdgjmazch3gbn7uitr4
       '@middy/core': 4.4.3
       '@middy/sqs-partial-batch-failure': 4.4.3
       aws-cdk-lib: 2.85.0_constructs@10.2.61
@@ -1941,7 +1941,6 @@ packages:
     dependencies:
       aws-cdk-lib: 2.85.0_constructs@10.2.61
       constructs: 10.2.61
-    dev: true
 
   /@aws-cdk/cfnspec/2.68.0:
     resolution: {integrity: sha512-g062ljKOvMaeEgp2GR2ewoF3BzeGYpu+AA7UvN/SN+2S0detSwU+qHlxSFeTe0DLyCFaMttNEh81VmYCfiHtpg==}
@@ -5267,6 +5266,41 @@ packages:
       node-ttl: 0.2.0
       pg-native: 3.0.1
       pg-promise: 11.4.3_pg-native@3.0.1
+    dev: false
+
+  /@digitraffic/common/2023.8.10-1_mtixrjxtdgjmazch3gbn7uitr4:
+    resolution: {integrity: sha512-qLwLP92AyxF5Jir0p7Sm96CJxzo/6ll8ugyqVBs0iRQVjCfz97c2rZ05IcrMZGm5ha43slq6zHZMsFlVNKdcig==}
+    engines: {node: '>=14 <17 || >=18 <19'}
+    peerDependencies:
+      '@aws-cdk/aws-synthetics-alpha': ^2.85.0-alpha.0
+      '@types/geojson': ^7946.0.10
+      aws-cdk-lib: ^2.85.0
+      aws-sdk: ^2.1405.0
+      axios: ^1.2.6
+      change-case: ^4.1.2
+      constructs: ^10.2.17
+      date-fns: ~2.30.0
+      date-fns-tz: ~2.0.0
+      etag: ^1.8.1
+      geojson-validation: ^1.0.2
+      node-ttl: ^0.2.0
+      pg-native: ^3.0.1
+      pg-promise: ^11.5.0
+    dependencies:
+      '@aws-cdk/aws-synthetics-alpha': 2.85.0-alpha.0_hulhuzwqfhahfxjyn7rrx25gje
+      '@types/geojson': 7946.0.10
+      aws-cdk-lib: 2.85.0_constructs@10.2.61
+      aws-sdk: 2.1405.0
+      axios: 1.4.0
+      change-case: 4.1.2
+      constructs: 10.2.61
+      date-fns: 2.29.3
+      date-fns-tz: 2.0.0_date-fns@2.29.3
+      etag: 1.8.1
+      geojson-validation: 1.0.2
+      node-ttl: 0.2.0
+      pg-native: 3.0.1
+      pg-promise: 11.5.3_pg-native@3.0.1
     dev: false
 
   /@esbuild/android-arm/0.17.17:

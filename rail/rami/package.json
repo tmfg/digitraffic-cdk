@@ -12,7 +12,7 @@
     "ci:eslint-report": "eslint . --format html -o report.html || true",
     "clean": "rimraf dist cdk.out",
     "clean:force": "rimraf dist cdk.out node_modules",
-    "compile-canaries": "npx esbuild src/canaries/*.ts --log-level=warning --bundle --target=node16 --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics",
+    "compile-canaries": "esbuild src/canaries/*.ts --log-level=warning --bundle --target=node16 --platform=node --outdir=dist/nodejs/node_modules --external:aws-sdk --external:Synthetics",
     "compile-lambdas": "rushx rollup",
     "link-common": "rm -rf node_modules/@digitraffic && mkdir -p node_modules/@digitraffic && ln -s ../../../../../digitraffic-common-private/ node_modules/@digitraffic/common",
     "lint": "eslint --cache .",
@@ -25,7 +25,7 @@
   "dependencies": {
     "@aws-sdk/client-s3": "~3.354.0",
     "@aws-sdk/client-secrets-manager": "~3.348.0",
-    "@digitraffic/common": "workspace:*",
+    "@digitraffic/common": "2023.8.10-1",
     "@middy/core": "^4.3.1",
     "@middy/sqs-partial-batch-failure": "^4.3.1",
     "aws-cdk-lib": "^2.85.0",
