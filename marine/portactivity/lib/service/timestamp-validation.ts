@@ -112,12 +112,15 @@ export async function validateTimestamp(
     }
 
     // filter unreliable ETA predictions from VTS Schedules API
-    if (timestamp.eventType === EventType.ETA && timestamp.source === EventSource.SCHEDULES_CALCULATED) {
+    if (
+        (timestamp.eventType === EventType.ETA || timestamp.eventType === EventType.ETB) &&
+        timestamp.source === EventSource.SCHEDULES_CALCULATED
+    ) {
         const shipStatus = await findVesselSpeedAndNavStatus(db, timestamp.ship?.mmsi);
         if (shipStatus && !navStatusIsValid(shipStatus.nav_stat)) {
             logger.warn({
                 method: "ProcessQueue.validateTimestamp",
-                message: `VTS prediction for ship with invalid ais status ${
+                message: `VTS prediction for ship with invalid AIS status ${
                     shipStatus.nav_stat
                 } ${JSON.stringify(timestamp)}`
             });
@@ -126,9 +129,9 @@ export async function validateTimestamp(
         if (shipStatus && shipStatus.sog < SHIP_SPEED_STATIONARY_THRESHOLD_KNOTS) {
             logger.warn({
                 method: "ProcessQueue.validateTimestamp",
-                message: `VTS prediction for stationary ship with sog ${shipStatus.sog} and ais status ${
-                    shipStatus.nav_stat
-                } ${JSON.stringify(timestamp)}`
+                message: `VTS prediction for stationary ship with speed ${
+                    shipStatus.sog
+                } knots and AIS status ${shipStatus.nav_stat} ${JSON.stringify(timestamp)}`
             });
             return undefined;
         }

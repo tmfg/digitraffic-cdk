@@ -218,6 +218,55 @@ describe(
             expect(ret?.ship_imo).toBe(vessel.imo);
         });
 
+        test("saveTimestamp - portcall id found for ETB timestamp from VTS A source", async () => {
+            const vtsTimestamp = R.dissocPath<ApiTimestamp>(
+                ["portcallId"],
+                newTimestamp({
+                    eventType: EventType.ETB,
+                    eventTime: addHours(Date.now(), 1),
+                    locode: "FIRAU",
+                    imo: 1234567,
+                    mmsi: 7654321,
+                    source: EventSource.SCHEDULES_CALCULATED
+                })
+            );
+            const awakeTimestamp = {
+                ...vtsTimestamp,
+                eventTime: addMinutes(parseISO(vtsTimestamp.eventTime), 30).toISOString(),
+                source: EventSource.AWAKE_AI
+            };
+
+            const portcallId = 456123;
+            await insertPortCall(db, newPortCall(vtsTimestamp, portcallId));
+            await insertPortAreaDetails(
+                db,
+                newPortAreaDetails(vtsTimestamp, {
+                    portcallId,
+                    eta: addHours(parseISO(vtsTimestamp.eventTime), 1)
+                })
+            );
+
+            await TimestampsService.saveTimestamp(vtsTimestamp, db);
+            await TimestampsService.saveTimestamp(awakeTimestamp, db);
+
+            const timestamps = await findAll(db);
+            expect(timestamps.length).toBe(2);
+
+            const apiTimestamps = await TimestampsService.findAllTimestamps(
+                vtsTimestamp.location.port,
+                undefined,
+                undefined
+            );
+
+            expect(apiTimestamps.length).toBe(1);
+            expect(parseISO(apiTimestamps[0].eventTime).getTime()).toBeGreaterThan(
+                parseISO(vtsTimestamp.eventTime).getTime()
+            );
+            expect(parseISO(apiTimestamps[0].eventTime).getTime()).toBeLessThan(
+                parseISO(awakeTimestamp.eventTime).getTime()
+            );
+        });
+
         test("findETAShipsByLocode - same port later in day - just one ETA", async () => {
             const locode = "FILOL";
             const imo = 123456;
