@@ -193,21 +193,21 @@ export class PublicApi {
             ),
             DocumentationPart.pathParameter(
                 "date",
-                "Date or date-time on or after which message was created or updated. For example _2023-01-01_ or _2023-01-01T12:00Z"
+                "Date or date-time on or after which message was created or updated. For example _2023-01-01_ or _2023-01-01T12:00Z_"
             ),
             DocumentationPart.queryParameter("train_number", "Train number"),
             DocumentationPart.queryParameter(
                 "train_departure_date",
                 "Train departure date in format YYYY-MM-DD"
             ),
-            DocumentationPart.queryParameter("station", `Station identifier, e.g. "HKI"`),
+            DocumentationPart.queryParameter("station", `Station identifier, for example _HKI_`),
             DocumentationPart.queryParameter(
                 "only_general",
                 "If _true_, return only general notices (messages not related to a _trainNumber_). _false_ by default"
             ),
             DocumentationPart.queryParameter(
                 "only_active",
-                "If _true_, return only currently active messages. _false_ returns all messages updated after _date_ regardless of validity dates. _true_ by default"
+                "If _true_, return only currently active messages. _false_ returns all messages updated after _{date}_ regardless of validity dates. _true_ by default"
             )
         );
 

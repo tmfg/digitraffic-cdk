@@ -193,6 +193,8 @@ FROM
     JOIN rami_message_video rmv ON rm.id = rmv.rami_message_id
     AND rm.version = rmv.rami_message_version
 WHERE
+    rm.deleted IS NULL 
+    AND  
     rm.created_source >= :updatedAfter
     AND IF(:onlyActive IS TRUE, rm.start_validity <= NOW() AND rm.end_validity > NOW(), TRUE)
     AND IF(:onlyGeneral IS TRUE, rm.message_type = 'SCHEDULED_MESSAGE', TRUE)
