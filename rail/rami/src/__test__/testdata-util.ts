@@ -4,6 +4,7 @@ import type { RamiMessageOperation } from "../model/rami-message";
 import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "./testdata";
 
 export function createDtRamiMessage(properties: {
+    created?: Date;
     start?: Date;
     end?: Date;
     trainNumber?: number;
@@ -19,7 +20,7 @@ export function createDtRamiMessage(properties: {
         trainNumber: properties.trainNumber,
         trainDepartureLocalDate: properties.trainDepartureLocalDate,
         stations: properties.stations ?? ["PSL"],
-        created: properties.start ?? new Date(),
+        created: properties.created ?? properties.start ?? new Date(),
         startValidity: properties.start ?? new Date(),
         endValidity: properties.end ?? addHours(new Date(), 1),
         audio: {

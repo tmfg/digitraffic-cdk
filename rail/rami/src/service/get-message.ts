@@ -1,4 +1,4 @@
-import { DbRamiMessage, findActiveMessages } from "../dao/message.js";
+import { DbRamiMessage, findActiveMessages, findMessagesUpdatedAfter } from "../dao/message.js";
 import { WeekDaysBitString, mapBitsToDays } from "../util/weekdays.js";
 import type { WeekDay } from "../model/dt-rami-message.js";
 
@@ -57,6 +57,25 @@ export async function getActiveMessages(
 ): Promise<PassengerInformationMessage[]> {
     const activeMessages = await findActiveMessages(trainNumber, trainDepartureDate, station, onlyGeneral);
     return activeMessages.map(dbRamiMessageToPassengerInformationMessage);
+}
+
+export async function getMessagesUpdatedAfter(
+    updatedAfter: Date,
+    trainNumber?: number,
+    trainDepartureDate?: string,
+    station?: string,
+    onlyGeneral?: boolean,
+    onlyActive: boolean = true
+): Promise<PassengerInformationMessage[]> {
+    const messagesUpdatedAfter = await findMessagesUpdatedAfter(
+        updatedAfter,
+        trainNumber,
+        trainDepartureDate,
+        station,
+        onlyGeneral,
+        onlyActive
+    );
+    return messagesUpdatedAfter.map(dbRamiMessageToPassengerInformationMessage);
 }
 
 function dbRamiMessageToPassengerInformationMessage(message: DbRamiMessage): PassengerInformationMessage {

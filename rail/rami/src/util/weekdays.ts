@@ -10,9 +10,8 @@ export function mapDaysToBits(days: WeekDay[]): WeekDaysBitString {
 
 export function mapBitsToDays(days: WeekDaysBitString): WeekDay[] {
     const dayBits = days.split("");
-    const dayStrings: WeekDay[] = [];
-    return WEEKDAYS.reduce((acc, val, index) => {
+    return WEEKDAYS.reduce<WeekDay[]>((acc, val, index) => {
         const i = parseInt(dayBits[index] as unknown as string);
         return i === 1 ? [...acc, val] : acc;
-    }, dayStrings);
+    }, []);
 }

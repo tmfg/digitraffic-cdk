@@ -44,11 +44,16 @@ export default [
     {
         input: "src/lambda/process-dlq/process-dlq.ts",
         output: outputOptions("process-dlq"),
-		plugins
-	},
-	{
+        plugins
+    },
+    {
         input: "src/lambda/get-active-messages/get-active-messages.ts",
         output: outputOptions("get-active-messages"),
+        plugins
+    },
+    {
+        input: "src/lambda/get-messages-updated-after/get-messages-updated-after.ts",
+        output: outputOptions("get-messages-updated-after"),
         plugins
     }
 ];

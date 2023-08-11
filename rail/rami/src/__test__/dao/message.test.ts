@@ -1,5 +1,10 @@
-import { subHours } from "date-fns";
-import { findActiveMessages, insertMessage, setMessageDeleted } from "../../dao/message";
+import { addDays, addHours, subDays, subHours } from "date-fns";
+import {
+    findActiveMessages,
+    findMessagesUpdatedAfter,
+    insertMessage,
+    setMessageDeleted
+} from "../../dao/message";
 import { dbTestBase } from "../db-testutil";
 import { createDtRamiMessage } from "../testdata-util";
 import { WeekDaysBitString, mapBitsToDays } from "../../util/weekdays";
@@ -134,6 +139,57 @@ describe(
             expect(result[0]?.stations?.includes(stations[1])).toEqual(true);
             expect(result[0]?.train_departure_date).toEqual(trainDepartureLocalDate);
             expect(result[0]?.train_number).toEqual(trainNumber);
+        });
+        test("findMessagesUpdatedAfter - correct", async () => {
+            const date = subDays(new Date(), 2);
+            const messageBeforeDate = createDtRamiMessage({ id: "abc", created: subDays(date, 1) });
+            const messageAfterDate = createDtRamiMessage({
+                id: "def",
+                created: addDays(date, 1)
+            });
+
+            await insertMessage(messageBeforeDate);
+            await insertMessage(messageAfterDate);
+
+            const result = await findMessagesUpdatedAfter(date);
+
+            expect(result.length).toEqual(1);
+            expect(result[0]?.id).toEqual(messageAfterDate.id);
+        });
+        test("findMessagesUpdatedAfter - only active messages by default", async () => {
+            const date = subDays(new Date(), 2);
+            const messageBeforeDate = createDtRamiMessage({ id: "abc", created: subDays(date, 1) });
+            const inactiveMessageAfterDate = createDtRamiMessage({
+                id: "def",
+                start: addHours(date, 24),
+                end: addHours(date, 26),
+                created: addHours(date, 24)
+            });
+
+            await insertMessage(messageBeforeDate);
+            await insertMessage(inactiveMessageAfterDate);
+
+            const result = await findMessagesUpdatedAfter(date);
+
+            expect(result.length).toEqual(0);
+        });
+        test("findMessagesUpdatedAfter - inactive messages returned if parameter set", async () => {
+            const date = subDays(new Date(), 2);
+            const messageBeforeDate = createDtRamiMessage({ id: "abc", created: subDays(date, 1) });
+            const inactiveMessageAfterDate = createDtRamiMessage({
+                id: "def",
+                start: addHours(date, 24),
+                end: addHours(date, 26),
+                created: addHours(date, 24)
+            });
+
+            await insertMessage(messageBeforeDate);
+            await insertMessage(inactiveMessageAfterDate);
+
+            const result = await findMessagesUpdatedAfter(date, null, null, null, null, false);
+
+            expect(result.length).toEqual(1);
+            expect(result[0]?.id).toEqual(inactiveMessageAfterDate.id);
         });
         test("setMessageDeleted - not found in active messages anymore", async () => {
             const message = createDtRamiMessage({});

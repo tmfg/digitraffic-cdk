@@ -162,6 +162,103 @@ GROUP BY
     rmv.delivery_type 
 `;
 
+const FIND_UPDATED_AFTER = `
+SELECT
+    rm.id,
+    rm.version,
+    DATE_FORMAT(rm.created_source, '%Y-%m-%dT%TZ') as created_source,
+    DATE_FORMAT(rm.start_validity, '%Y-%m-%dT%TZ') as start_validity,
+    DATE_FORMAT(rm.end_validity, '%Y-%m-%dT%TZ') as end_validity,
+    rm.train_number,
+    DATE_FORMAT(rm.train_departure_date, '%Y-%m-%d') as train_departure_date,
+    GROUP_CONCAT(rms.station_short_code) as stations,
+    JSON_OBJECT('text_fi', rma.text_fi, 'text_sv', rma.text_sv, 'text_en', rma.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rma.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rma.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rma.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rma.end_time, '%k:%i'), 'delivery_type', rma.delivery_type, 'days', NULLIF(REVERSE(EXPORT_SET(rma.days_of_week, '1', '0', '', 7)), '0000000'), 'event_type', rma.event_type, 'delivery_at', rma.delivery_at, 'repetitions', rma.repetitions, 'repeat_every', rma.repeat_every)) as audio,
+    JSON_OBJECT('text_fi', rmv.text_fi, 'text_sv', rmv.text_sv, 'text_en', rmv.text_en, 'delivery_rules', JSON_OBJECT('start_date', DATE_FORMAT(rmv.start_date_time, '%Y-%m-%dT%TZ'), 'end_date', DATE_FORMAT(rmv.end_date_time, '%Y-%m-%dT%TZ'), 'start_time', DATE_FORMAT(rmv.start_time, '%k:%i'), 'end_time', DATE_FORMAT(rmv.end_time, '%k:%i'), 'delivery_type', rmv.delivery_type, 'days', NULLIF(REVERSE(EXPORT_SET(rmv.days_of_week, '1', '0', '', 7)), '0000000'))) as video
+FROM
+    rami_message rm
+    JOIN (
+        SELECT
+            rmx.id,
+            MAX(rmx.version) as version
+        FROM
+            rami_message rmx
+        GROUP BY
+            rmx.id
+    ) latest ON rm.id = latest.id
+    AND rm.version = latest.version
+    JOIN rami_message_station rms ON rm.id = rms.rami_message_id
+    AND rm.version = rms.rami_message_version
+    JOIN rami_message_audio rma ON rm.id = rma.rami_message_id
+    AND rm.version = rma.rami_message_version
+    JOIN rami_message_video rmv ON rm.id = rmv.rami_message_id
+    AND rm.version = rmv.rami_message_version
+WHERE
+    rm.created_source >= :updatedAfter
+    AND IF(:onlyActive IS TRUE, rm.start_validity <= NOW() AND rm.end_validity > NOW(), TRUE)
+    AND IF(:onlyGeneral IS TRUE, rm.message_type = 'SCHEDULED_MESSAGE', TRUE)
+    AND (
+        :trainNumber IS NULL
+        OR rm.train_number = :trainNumber
+    )
+    AND (
+        :trainDepartureDate IS NULL
+        OR rm.train_departure_date = :trainDepartureDate
+    )
+    AND (
+        :station IS NULL
+        OR rm.id IN (
+            SELECT
+                rmx.id
+            FROM
+                rami_message rmx
+                JOIN (
+                    SELECT
+                        rmx.id,
+                        MAX(rmx.version) as version
+                    from
+                        rami_message rmx
+                    group by
+                        rmx.id
+                ) latest ON rmx.id = latest.id
+                AND rmx.version = latest.version
+                JOIN rami_message_station rmsx ON rmx.id = rmsx.rami_message_id
+                AND rmx.version = rmsx.rami_message_version
+            WHERE
+                rmsx.station_short_code = :station
+        )
+    )
+GROUP BY
+    rm.id,
+    rm.version,
+    rm.created_source,
+    rm.start_validity,
+    rm.end_validity,
+    rm.train_number,
+    rm.train_departure_date,
+    rma.text_fi,
+    rma.text_sv,
+    rma.text_en,
+    rma.start_date_time,
+    rma.end_date_time,
+    rma.start_time,
+    rma.end_time,
+    rma.days_of_week,
+    rma.delivery_type,
+    rma.event_type,
+    rma.delivery_at,
+    rma.repetitions,
+    rma.repeat_every,
+    rmv.text_fi,
+    rmv.text_sv,
+    rmv.text_en,
+    rmv.start_date_time,
+    rmv.end_date_time,
+    rmv.start_time,
+    rmv.end_time,
+    rmv.days_of_week,
+    rmv.delivery_type 
+`;
+
 export async function findActiveMessages(
     trainNumber: number | null = null,
     trainDepartureDate: string | null = null,
@@ -174,6 +271,27 @@ export async function findActiveMessages(
             trainDepartureDate,
             station,
             onlyGeneral
+        });
+    });
+    return rows as DbRamiMessage[];
+}
+
+export async function findMessagesUpdatedAfter(
+    updatedAfter: Date,
+    trainNumber: number | null = null,
+    trainDepartureDate: string | null = null,
+    station: string | null = null,
+    onlyGeneral: boolean | null = null,
+    onlyActive: boolean = true
+): Promise<DbRamiMessage[]> {
+    const [rows] = await inDatabase(async (conn: Connection) => {
+        return conn.query(FIND_UPDATED_AFTER, {
+            updatedAfter,
+            trainNumber,
+            trainDepartureDate,
+            station,
+            onlyGeneral,
+            onlyActive
         });
     });
     return rows as DbRamiMessage[];

@@ -54,5 +54,14 @@ export const handler = async (): Promise<string> => {
         })
     );
 
+    const yesterday = subHours(Date.now(), 24);
+    await checker.expect200(
+        API_URL + `/updated-after/${yesterday.toISOString()}`,
+        ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
+        ContentChecker.checkJson((json: PassengerInformationMessage[]) => {
+            Asserter.assertLengthGreaterThan(json, 0);
+        })
+    );
+
     return checker.done();
 };

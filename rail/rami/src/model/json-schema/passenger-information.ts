@@ -130,7 +130,7 @@ export function createAudioSchema(textReference: string): JsonSchema {
                     repeatEvery: {
                         type: JsonSchemaType.INTEGER,
                         description:
-                            "Period of time in seconds between repetitions of message when  _deliveryType_ is REPEAT_EVERY"
+                            "Period of time in minutes between repetitions of message when  _deliveryType_ is REPEAT_EVERY"
                     }
                 }
             }

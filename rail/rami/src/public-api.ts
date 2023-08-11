@@ -50,6 +50,14 @@ export class PublicApi {
             errorResponseModel,
             validator
         );
+
+        this.createMessagesUpdatedAfterResource(
+            stack,
+            resource,
+            passengerInformationMessagesModel,
+            errorResponseModel,
+            validator
+        );
     }
 
     createActiveMessagesResource(
@@ -116,6 +124,94 @@ export class PublicApi {
         );
 
         return getActiveMessagesLambda;
+    }
+
+    createMessagesUpdatedAfterResource(
+        stack: DigitrafficStack,
+        resource: Resource,
+        messageJsonModel: IModel,
+        errorResponseModel: IModel,
+        validator: RequestValidator
+    ): MonitoredDBFunction {
+        const updatedAfterResource = resource.addResource("updated-after").addResource("{date}");
+        const lambdaEnv = {
+            ...(stack.configuration.secretId && { SECRET_ID: stack.configuration.secretId }),
+            DB_APPLICATION: "avoindata"
+        };
+        const getMessagesUpdatedAfterLambda = MonitoredDBFunction.create(
+            stack,
+            "get-messages-updated-after",
+            lambdaEnv,
+            {
+                timeout: 15,
+                memorySize: 512,
+                reservedConcurrentExecutions: 20,
+                errorAlarmProps: {
+                    create: true,
+                    threshold: 3
+                }
+            }
+        );
+
+        const getMessagesUpdatedAfterIntegration = new DigitrafficIntegration(
+            getMessagesUpdatedAfterLambda,
+            MediaType.APPLICATION_JSON
+        )
+            .addPathParameter("date")
+            .addQueryParameter(
+                "train_number",
+                "train_departure_date",
+                "station",
+                "only_general",
+                "only_active"
+            )
+            .build();
+
+        updatedAfterResource.addMethod("GET", getMessagesUpdatedAfterIntegration, {
+            apiKeyRequired: true,
+            requestParameters: {
+                "method.request.path.date": true,
+                "method.request.querystring.station": false,
+                "method.request.querystring.train_number": false,
+                "method.request.querystring.train_departure_date": false,
+                "method.request.querystring.only_general": false,
+                "method.request.querystring.only_active": false
+            },
+            requestValidator: validator,
+            methodResponses: [
+                DigitrafficMethodResponse.response200(messageJsonModel, MediaType.APPLICATION_JSON),
+                DigitrafficMethodResponse.response400(errorResponseModel)
+            ]
+        });
+
+        this.publicApi.documentResource(
+            updatedAfterResource,
+            DocumentationPart.method(
+                ["passenger-information"],
+                "GetMessagesUpdatedAfter",
+                "Get messages updated after date"
+            ),
+            DocumentationPart.pathParameter(
+                "date",
+                "Date or date-time on or after which message was created or updated. For example _2023-01-01_ or _2023-01-01T12:00Z"
+            ),
+            DocumentationPart.queryParameter("train_number", "Train number"),
+            DocumentationPart.queryParameter(
+                "train_departure_date",
+                "Train departure date in format YYYY-MM-DD"
+            ),
+            DocumentationPart.queryParameter("station", `Station identifier, e.g. "HKI"`),
+            DocumentationPart.queryParameter(
+                "only_general",
+                "If _true_, return only general notices (messages not related to a _trainNumber_). _false_ by default"
+            ),
+            DocumentationPart.queryParameter(
+                "only_active",
+                "If _true_, return only currently active messages. _false_ returns all messages updated after _date_ regardless of validity dates. _true_ by default"
+            )
+        );
+
+        return getMessagesUpdatedAfterLambda;
     }
 
     createServiceModels(api: DigitrafficRestApi): ModelWithReference {
