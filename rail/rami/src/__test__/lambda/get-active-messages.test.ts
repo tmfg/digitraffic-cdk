@@ -1,5 +1,6 @@
 import { insertMessage } from "../../dao/message";
-import { lambdaEventSchema, handler } from "../../lambda/get-active-messages/get-active-messages";
+import { handler } from "../../lambda/get-active-messages/get-active-messages";
+import { getActiveMessagesLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event";
 import { dbTestBase } from "../db-testutil";
 import { createDtRamiMessage } from "../testdata-util";
 

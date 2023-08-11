@@ -1,9 +1,7 @@
 import { parseISO } from "date-fns";
-import {
-    handler,
-    lambdaEventSchema
-} from "../../lambda/get-messages-updated-after/get-messages-updated-after";
+import { handler } from "../../lambda/get-messages-updated-after/get-messages-updated-after";
 import { dbTestBase } from "../db-testutil";
+import { getMessagesUpdatedAfterLambdaEvent as lambdaEventSchema } from "../../model/zod-schema/lambda-event";
 
 describe(
     "get-messages-updated-after lambda",
@@ -23,11 +21,11 @@ describe(
             expect(parsedEvent.success);
             if (parsedEvent.success)
                 expect(Object.values(parsedEvent.data)).toEqual([
+                    undefined,
+                    undefined,
+                    undefined,
+                    undefined,
                     parseISO(dateString),
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
                     undefined
                 ]);
         });
