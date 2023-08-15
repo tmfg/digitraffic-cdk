@@ -5,7 +5,6 @@
 !.gitignore
 !cdk.json
 !package.json
-!rollup.config.js
 !tscconfig.json
 
 !config/
