@@ -116,10 +116,10 @@ export class PublicApi {
                 "train_departure_date",
                 "Train departure date in format YYYY-MM-DD"
             ),
-            DocumentationPart.queryParameter("station", `Station identifier, e.g. "HKI"`),
+            DocumentationPart.queryParameter("station", `Station identifier, for example _HKI_`),
             DocumentationPart.queryParameter(
                 "only_general",
-                "If _true_, return only general notices (messages not related to a _trainNumber_)"
+                "If _true_, return only general notices (notices not related to a train number). _false_ by default"
             )
         );
 
@@ -203,7 +203,7 @@ export class PublicApi {
             DocumentationPart.queryParameter("station", `Station identifier, for example _HKI_`),
             DocumentationPart.queryParameter(
                 "only_general",
-                "If _true_, return only general notices (messages not related to a _trainNumber_). _false_ by default"
+                "If _true_, return only general notices (notices not related to a train number). _false_ by default"
             ),
             DocumentationPart.queryParameter(
                 "only_active",
