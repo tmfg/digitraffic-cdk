@@ -10,6 +10,7 @@ import { PublicApi } from "./public-api.js";
 export interface RamiConfiguration extends StackConfiguration {
     readonly dlqBucketName: string;
     readonly dlqNotificationDuration?: Duration;
+    readonly enablePublicApi: boolean;
 }
 export class RamiStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
@@ -18,9 +19,11 @@ export class RamiStack extends DigitrafficStack {
         const dlq = this.createDLQ(this);
         const sqs = this.createSQS(this, dlq);
         InternalLambdas.create(this, sqs, dlq, configuration.dlqBucketName);
-        const publicApi = new PublicApi(this);
-        if (!this.secret) throw new Error("secret not found");
-        Canaries.create(this, dlq, publicApi, this.secret);
+        if (configuration.enablePublicApi === true) {
+            const publicApi = new PublicApi(this);
+            if (!this.secret) throw new Error("secret not found");
+            Canaries.create(this, dlq, publicApi, this.secret);
+        }
     }
 
     createSQS(stack: DigitrafficStack, dlq: Queue): DigitrafficSqsQueue {
