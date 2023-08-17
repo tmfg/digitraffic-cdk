@@ -200,6 +200,7 @@
     {
       "packageName": "rami",
       "projectFolder": "rail/rami",
+      "decoupledLocalDependencies": ["@digitraffic/common"],
       "tags": ["cdk", "rail"]
     },
 

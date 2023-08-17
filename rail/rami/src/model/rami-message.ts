@@ -1,6 +1,11 @@
 import type { ValueOf } from "@digitraffic/common/dist/types/util-types.js";
-import type { ramiMessageSchema } from "./rami-message-schema.js";
 import type { z } from "zod";
+import type { ramiMessageSchema } from "./zod-schema/rami-message.js";
+import type {
+    recipientAudioMessagesToDeliver,
+    recipientVideoMessagesToDeliver
+} from "./zod-schema/scheduled-message.js";
+import type { monitoredJourneyScheduledMessage } from "./zod-schema/monitored-journey-scheduled-message.js";
 
 export type RamiMessage = z.infer<typeof ramiMessageSchema>;
 export type RamiMessagePayload = Pick<RamiMessage, "payload">["payload"];
@@ -14,22 +19,12 @@ export type RamiMessageType = ValueOf<typeof RamiMessageTypes>;
 export const RamiMessageOperations = { INSERT: "INSERT", UPDATE: "UPDATE", DELETE: "DELETE" } as const;
 export type RamiMessageOperation = ValueOf<typeof RamiMessageOperations>;
 
-// only onGroundRecipient recipient type is used in practice with scheduledMessages
-type RamiScheduledMessageRecipient = Pick<
-    NonNullable<RamiMessage["payload"]["scheduledMessage"]>,
-    "onGroundRecipient"
->["onGroundRecipient"];
+export type RamiScheduledMessageVideo = NonNullable<z.infer<typeof recipientVideoMessagesToDeliver>>;
+export type RamiScheduledMessageAudio = NonNullable<z.infer<typeof recipientAudioMessagesToDeliver>>;
 
-export type RamiScheduledMessageVideo = NonNullable<
-    Pick<
-        NonNullable<RamiScheduledMessageRecipient>,
-        "recipientVideoMessagesToDeliver"
-    >["recipientVideoMessagesToDeliver"]
+export type RamiMonitoredJourneyScheduledMessage = NonNullable<
+    z.infer<typeof monitoredJourneyScheduledMessage>
 >;
-
-export type RamiScheduledMessageAudio = NonNullable<
-    Pick<
-        NonNullable<RamiScheduledMessageRecipient>,
-        "recipientAudioMessagesToDeliver"
-    >["recipientAudioMessagesToDeliver"]
+export type RamiMonitoredJourneyScheduledMessageAudio = NonNullable<
+    Pick<RamiMonitoredJourneyScheduledMessage, "audioMessageContents">["audioMessageContents"]
 >;

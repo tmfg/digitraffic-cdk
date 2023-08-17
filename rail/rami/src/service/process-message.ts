@@ -9,10 +9,11 @@ import {
     RamiMessageOperations,
     RamiMessagePayload,
     RamiMessageTypes,
+    RamiMonitoredJourneyScheduledMessageAudio,
     RamiScheduledMessageAudio,
     RamiScheduledMessageVideo
 } from "../model/rami-message.js";
-import { ramiMessageSchema } from "../model/rami-message-schema.js";
+import { ramiMessageSchema } from "../model/zod-schema/rami-message.js";
 
 interface DeliveryPoint {
     readonly id: string;
@@ -49,7 +50,7 @@ export function processMessage(message: DtRamiMessage): Promise<void> {
             method: "RamiMessageService.processMessage",
             message: `Deleting RAMI message id: ${message.id}`
         });
-        return setMessageDeleted(message);
+        return setMessageDeleted(message.id);
     }
     return Promise.reject();
 }
@@ -96,16 +97,25 @@ function getAudioContent(payload: RamiMessagePayload): DtAudioContent | undefine
         payload.monitoredJourneyScheduledMessage?.audioMessageContents
     ) {
         const audioMessage = payload.monitoredJourneyScheduledMessage.audioMessageContents;
-        const audioTexts = audioMessage.audioTexts as TextContent[];
-        return {
-            textFi: getTextInLanguage(audioTexts, LanguageCodes.FI),
-            textSv: getTextInLanguage(audioTexts, LanguageCodes.SV),
-            textEn: getTextInLanguage(audioTexts, LanguageCodes.EN),
-            deliveryType: audioMessage.deliveryType ?? undefined
-        };
+        return parseMonitoredJourneyScheduledMessageAudio(audioMessage);
     }
 
     return undefined;
+}
+
+function parseMonitoredJourneyScheduledMessageAudio(
+    audioMessage: RamiMonitoredJourneyScheduledMessageAudio
+): DtAudioContent {
+    const audioTexts = audioMessage.audioTexts as TextContent[];
+    return {
+        textFi: getTextInLanguage(audioTexts, LanguageCodes.FI),
+        textSv: getTextInLanguage(audioTexts, LanguageCodes.SV),
+        textEn: getTextInLanguage(audioTexts, LanguageCodes.EN),
+        deliveryType: audioMessage.deliveryType ?? undefined,
+        repeatEvery: audioMessage.deliveryRules?.repeatEvery ?? undefined,
+        repetitions: audioMessage.deliveryRules?.repetitions ?? undefined,
+        eventType: audioMessage.deliveryRules?.eventType ? audioMessage.deliveryRules?.eventType : undefined
+    };
 }
 
 function parseScheduledMessageAudio(audioMessage: RamiScheduledMessageAudio): DtAudioContent {
@@ -178,7 +188,12 @@ function parseScheduledMessageVideo(videoMessage: RamiScheduledMessageVideo): Dt
 
 function getTextInLanguage(texts: TextContent[], languageCode: LanguageCode): string | undefined {
     const textContent = texts.find((text) => text.language === languageCode);
-    return textContent?.text ?? textContent?.videoText ?? textContent?.audioText ?? undefined;
+    return (
+        textContent?.text?.trim() ??
+        textContent?.videoText?.trim() ??
+        textContent?.audioText?.trim() ??
+        undefined
+    );
 }
 
 function getDeliveryPoints(payload: RamiMessagePayload): string[] | undefined {

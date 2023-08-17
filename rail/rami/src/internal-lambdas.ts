@@ -1,40 +1,19 @@
-import { DigitrafficSqsQueue } from "@digitraffic/common/dist/aws/infra/sqs-queue.js";
 import {
     MonitoredDBFunction,
     MonitoredFunction
 } from "@digitraffic/common/dist/aws/infra/stack/monitoredfunction.js";
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
-import { Duration } from "aws-cdk-lib";
 import { PolicyStatement } from "aws-cdk-lib/aws-iam";
 import { Runtime } from "aws-cdk-lib/aws-lambda";
 import { SqsEventSource } from "aws-cdk-lib/aws-lambda-event-sources";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
-import { Queue, QueueEncryption } from "aws-cdk-lib/aws-sqs";
+import type { Queue } from "aws-cdk-lib/aws-sqs";
 import { RamiEnvKeys } from "./keys.js";
 
-export function create(stack: DigitrafficStack, dlqBucketName: string): void {
-    const dlq = createDLQ(stack);
-    const sqs = createSQS(stack, dlq);
+export function create(stack: DigitrafficStack, sqs: Queue, dlq: Queue, dlqBucketName: string): void {
     const dlqBucket = createDLQBucket(stack, dlqBucketName);
     createProcessQueueLambda(stack, sqs);
-    createProcessDLQLambda(stack, sqs, dlqBucket);
-}
-
-function createSQS(stack: DigitrafficStack, dlq: Queue): DigitrafficSqsQueue {
-    return DigitrafficSqsQueue.create(stack, "SQS", {
-        receiveMessageWaitTime: Duration.seconds(5),
-        visibilityTimeout: Duration.seconds(60),
-        deadLetterQueue: { queue: dlq, maxReceiveCount: 2 }
-    });
-}
-
-function createDLQ(stack: DigitrafficStack): Queue {
-    const dlqName = "RAMI-DLQ";
-    return new Queue(stack, dlqName, {
-        queueName: dlqName,
-        receiveMessageWaitTime: Duration.seconds(20),
-        encryption: QueueEncryption.KMS_MANAGED
-    });
+    createProcessDLQLambda(stack, dlq, dlqBucket);
 }
 
 function createDLQBucket(stack: DigitrafficStack, bucketName: string): Bucket {

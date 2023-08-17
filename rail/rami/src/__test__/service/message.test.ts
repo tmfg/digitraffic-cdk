@@ -1,11 +1,13 @@
-import { findAll, mapBitsToDays } from "../../dao/message";
-import { parseMessage, processMessage } from "../../service/message";
+import { RamiMessageOperations } from "../../model/rami-message";
+import { getActiveMessages } from "../../service/get-message";
+import { parseMessage, processMessage } from "../../service/process-message";
 import { dbTestBase } from "../db-testutil";
 import {
     invalidRamiScheduledMessage,
     validRamiMonitoredJourneyScheduledMessage,
     validRamiScheduledMessage
 } from "../testdata";
+import { createMonitoredJourneyScheduledMessage, createScheduledMessage } from "../testdata-util";
 
 describe("parse message", () => {
     test("parseMessage - valid monitoredJourneyScheduledMessage is correctly parsed", () => {
@@ -27,48 +29,59 @@ describe("parse message", () => {
 });
 
 describe(
-    "process parsed message",
+    "process message",
     dbTestBase(() => {
-        test("processMessage - insert", async () => {
-            const message = parseMessage(validRamiMonitoredJourneyScheduledMessage);
-            if (message) await processMessage(message);
-            const result = await findAll();
+        test("processMessage - insert valid monitoredJourneyScheduledMessage", async () => {
+            const message = parseMessage(createMonitoredJourneyScheduledMessage({}));
+            if (!message) fail();
+            await processMessage(message);
 
-            console.log(JSON.stringify((result as any)[0][0]));
-
-            expect((result as any)[0][0]["id"]).toEqual(message?.id);
-            expect((result as any)[0][0]["stations"].split(",").sort()).toEqual(message?.stations?.sort());
+            const activeMessages = await getActiveMessages();
+            expect(activeMessages.length).toEqual(1);
+            expect(activeMessages[0]?.id).toEqual(message.id);
         });
-        test("processMessage - update", async () => {
-            const message = parseMessage(validRamiScheduledMessage);
-            if (message) await processMessage(message);
-            const result = await findAll();
+        test("processMessage - insert valid scheduledMessage", async () => {
+            const message = parseMessage(createScheduledMessage({}));
+            if (!message) fail();
+            await processMessage(message);
 
-            console.log(JSON.stringify((result as any)[0][0]));
-
-            expect((result as any)[0][0]["id"]).toEqual(message?.id);
-            expect(mapBitsToDays((result as any)[0][0]["video_days"]).sort()).toEqual(
-                message?.video?.daysOfWeek?.sort()
-            );
+            const activeMessages = await getActiveMessages();
+            expect(activeMessages.length).toEqual(1);
+            expect(activeMessages[0]?.id).toEqual(message.id);
         });
-        test("processMessage - delete", async () => {
-            const message = parseMessage(validRamiScheduledMessage);
-            if (message) {
-                await processMessage(message);
-                await processMessage({ ...message, version: message.version + 1, operation: "UPDATE" });
-                await processMessage({ ...message, operation: "DELETE" });
-            }
-            const result = await findAll();
+        test("processMessage - update valid message", async () => {
+            const message = parseMessage(createScheduledMessage({ operation: RamiMessageOperations.INSERT }));
+            if (!message) fail();
+            const updatedMessage = {
+                ...message,
+                operation: RamiMessageOperations.UPDATE,
+                version: message.version + 1
+            };
+            await processMessage(message);
+            await processMessage(updatedMessage);
 
-            console.log(JSON.stringify((result as any)[0][0]));
+            const activeMessages = await getActiveMessages();
+            expect(activeMessages.length).toEqual(1);
+            expect(activeMessages[0]?.id).toEqual(message.id);
+            expect(activeMessages[0]?.version).toEqual(updatedMessage.version);
+        });
+        test("processMessage - delete message", async () => {
+            const message = parseMessage(createScheduledMessage({ operation: RamiMessageOperations.INSERT }));
+            if (!message) fail();
+            await processMessage(message);
 
-            expect((result as any)[0][0]["id"]).toEqual(message?.id);
-            expect((result as any)[0][0]["version"]).toEqual(message?.version);
-            expect((result as any)[0][0]["deleted"]).not.toBeNull();
+            const activeMessages = await getActiveMessages();
+            expect(activeMessages.length).toEqual(1);
+            expect(activeMessages[0]?.id).toEqual(message.id);
 
-            expect((result as any)[0][1]["id"]).toEqual(message?.id);
-            expect((result as any)[0][1]["version"]).toEqual((message?.version as unknown as number) + 1);
-            expect((result as any)[0][1]["deleted"]).not.toBeNull();
+            const deletedMessage = {
+                ...message,
+                operation: RamiMessageOperations.DELETE
+            };
+            await processMessage(deletedMessage);
+
+            const activeMessagesAfterDelete = await getActiveMessages();
+            expect(activeMessagesAfterDelete.length).toEqual(0);
         });
     })
 );

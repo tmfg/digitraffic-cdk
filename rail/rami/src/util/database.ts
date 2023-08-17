@@ -1,8 +1,7 @@
-import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
+import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
 import type { Connection, FieldPacket, OkPacket, ResultSetHeader, RowDataPacket } from "mysql2/promise.js";
 import { Pool, createPool } from "mysql2/promise.js";
 import { getFromEnvOrSecret } from "./secret.js";
-import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
 
 interface MysqlOpts {
     host: string;
@@ -77,6 +76,7 @@ export async function initMysqlDbConnection(): Promise<Pool> {
         idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
         queueLimit: 0,
         enableKeepAlive: true,
-        keepAliveInitialDelay: 0
+        keepAliveInitialDelay: 0,
+        namedPlaceholders: true
     });
 }
