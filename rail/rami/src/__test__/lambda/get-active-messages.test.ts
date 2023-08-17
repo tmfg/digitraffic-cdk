@@ -12,23 +12,22 @@ describe(
                 trainNumber: 1
             });
             await insertMessage(message);
-            const result = await handler(createGetMessagesLambdaEvent("1"));
+            const result = await handler(createGetMessagesLambdaEvent({ train_number: "1" }));
             expect(result.status).toEqual(200);
         });
         test("handler - invalid parameters", async () => {
             await insertMessage(createDtRamiMessage({}));
-            const result = await handler(createGetMessagesLambdaEvent("0"));
+            const result = await handler(createGetMessagesLambdaEvent({ train_number: "0" }));
             expect(result.status).toEqual(400);
         });
         test("parse lambda event - no parameters", () => {
-            const lambdaEventMessage = createGetMessagesLambdaEvent();
+            const lambdaEventMessage = createGetMessagesLambdaEvent({});
             const parsedEvent = lambdaEventSchema.safeParse(lambdaEventMessage);
             expect(parsedEvent.success);
-            if (parsedEvent.success)
-                expect(Object.values(parsedEvent.data)).toEqual([undefined, undefined, undefined, undefined]);
+            if (parsedEvent.success) expect(parsedEvent.data).toEqual({});
         });
         test("parse lambda event - parameters", () => {
-            const lambdaEventMessage = createGetMessagesLambdaEvent("1");
+            const lambdaEventMessage = createGetMessagesLambdaEvent({ train_number: "1" });
             const parsedEvent = lambdaEventSchema.safeParse(lambdaEventMessage);
             expect(parsedEvent.success);
             if (parsedEvent.success) expect(parsedEvent.data.train_number).toEqual(1);
@@ -36,16 +35,16 @@ describe(
     })
 );
 
-function createGetMessagesLambdaEvent(
-    train_number: string = "",
-    train_departure_date: string = "",
-    station: string = "",
-    only_general: string = ""
-): Record<string, string> {
+function createGetMessagesLambdaEvent(params: {
+    train_number?: string;
+    train_departure_date?: string;
+    station?: string;
+    only_general?: string;
+}): Record<string, string> {
     return {
-        train_number,
-        train_departure_date,
-        station,
-        only_general
+        train_number: params.train_number ?? "",
+        train_departure_date: params.train_departure_date ?? "",
+        station: params.station ?? "",
+        only_general: params.only_general ?? ""
     };
 }

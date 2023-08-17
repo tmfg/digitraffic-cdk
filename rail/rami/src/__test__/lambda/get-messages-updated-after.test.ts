@@ -7,45 +7,39 @@ describe(
     "get-messages-updated-after lambda",
     dbTestBase(() => {
         test("handler - valid parameters", async () => {
-            const result = await handler(createGetMessagesUpdatedAfterLambdaEvent("2023-01-01"));
+            const result = await handler(createGetMessagesUpdatedAfterLambdaEvent({ date: "2023-01-01" }));
             expect(result.status).toEqual(200);
         });
         test("handler - invalid parameters", async () => {
-            const result = await handler(createGetMessagesUpdatedAfterLambdaEvent("abc"));
+            const result = await handler(createGetMessagesUpdatedAfterLambdaEvent({ date: "abc" }));
             expect(result.status).toEqual(400);
         });
         test("handler - date parsing", () => {
             const dateString = "2023-01-01T12:00Z";
-            const lambdaEventMessage = createGetMessagesUpdatedAfterLambdaEvent(dateString);
+            const lambdaEventMessage = createGetMessagesUpdatedAfterLambdaEvent({ date: dateString });
             const parsedEvent = lambdaEventSchema.safeParse(lambdaEventMessage);
             expect(parsedEvent.success);
-            if (parsedEvent.success)
-                expect(Object.values(parsedEvent.data)).toEqual([
-                    undefined,
-                    undefined,
-                    undefined,
-                    undefined,
-                    parseISO(dateString),
-                    undefined
-                ]);
+            if (parsedEvent.success) {
+                expect(parsedEvent.data).toEqual({ date: parseISO(dateString) });
+            }
         });
     })
 );
 
-function createGetMessagesUpdatedAfterLambdaEvent(
-    date: string = "",
-    train_number: string = "",
-    train_departure_date: string = "",
-    station: string = "",
-    only_general: string = "",
-    only_active: string = ""
-): Record<string, string> {
+function createGetMessagesUpdatedAfterLambdaEvent(params: {
+    date?: string;
+    train_number?: string;
+    train_departure_date?: string;
+    station?: string;
+    only_general?: string;
+    only_active?: string;
+}): Record<string, string> {
     return {
-        date,
-        train_number,
-        train_departure_date,
-        station,
-        only_general,
-        only_active
+        date: params.date ?? "",
+        train_number: params.train_number ?? "",
+        train_departure_date: params.train_departure_date ?? "",
+        station: params.station ?? "",
+        only_general: params.only_general ?? "",
+        only_active: params.only_active ?? ""
     };
 }
