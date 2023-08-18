@@ -9,7 +9,7 @@ import { CfnWebACL } from "aws-cdk-lib/aws-wafv2";
 import { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront/lib/web-distribution";
 
 import { createWebAcl } from "./acl/acl-creator";
-import { DistributionProps } from "./app-props";
+import { CFProps, DistributionProps } from "./app-props";
 
 export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
     return {
@@ -30,36 +30,34 @@ function doCreateWebAcl(stack: Stack, props: DistributionProps): CfnWebACL | und
     return undefined;
 }
 
+export interface CreateDistributionProps {
+    readonly distributionProps: DistributionProps;
+    readonly originConfigs: SourceConfiguration[];
+    readonly realtimeLogConfigArn: string;
+    readonly logging?: CFProps["logging"];
+}
+
 export function createDistribution(
     stack: Stack,
-    distributionProps: DistributionProps,
-    originConfigs: SourceConfiguration[],
-    realtimeLogConfigArn: string
+    createDistributionProps: CreateDistributionProps
 ): CloudFrontWebDistribution {
+    const { distributionProps } = createDistributionProps;
     const webAcl = doCreateWebAcl(stack, distributionProps);
     const viewerCertificate =
         distributionProps.acmCertRef === null
             ? undefined
             : createViewerCertificate(distributionProps.acmCertRef, distributionProps.aliasNames);
 
-    return createDistributionWithStreamingLogging(
-        stack,
-        distributionProps,
-        originConfigs,
-        viewerCertificate,
-        webAcl,
-        realtimeLogConfigArn
-    );
+    return createDistributionWithStreamingLogging(stack, createDistributionProps, viewerCertificate, webAcl);
 }
 
 function createDistributionWithStreamingLogging(
     stack: Stack,
-    distributionProps: DistributionProps,
-    originConfigs: SourceConfiguration[],
+    createDistributionProps: CreateDistributionProps,
     viewerCertificate: ViewerCertificate | undefined,
-    webAcl: CfnWebACL | undefined,
-    realtimeLogConfigArn: string
+    webAcl: CfnWebACL | undefined
 ): CloudFrontWebDistribution {
+    const { distributionProps, originConfigs } = createDistributionProps;
     const distribution = new CloudFrontWebDistribution(stack, distributionProps.distributionName, {
         originConfigs,
         viewerCertificate,
@@ -72,19 +70,23 @@ function createDistributionWithStreamingLogging(
         Tags.of(distribution).add("EnableShieldAdvanced", "true");
     }
 
-    addRealtimeLogging(distribution, realtimeLogConfigArn, originConfigs.length);
+    addRealtimeLogging(distribution, createDistributionProps);
 
     return distribution;
 }
 
 function addRealtimeLogging(
     distribution: CloudFrontWebDistribution,
-    realtimeLogConfigArn: string,
-    originCount: number
+    createDistributionProps: CreateDistributionProps
 ): void {
+    const {
+        originConfigs: { length },
+        realtimeLogConfigArn,
+        logging
+    } = createDistributionProps;
     const distributionCf = distribution.node.defaultChild as CfnResource;
 
-    for (let i = 1; i < originCount; i++) {
+    for (let i = 1; i < length; i++) {
         distributionCf.addPropertyOverride(
             `DistributionConfig.CacheBehaviors.${i - 1}.RealtimeLogConfigArn`,
             realtimeLogConfigArn
@@ -95,4 +97,10 @@ function addRealtimeLogging(
         "DistributionConfig.DefaultCacheBehavior.RealtimeLogConfigArn",
         realtimeLogConfigArn
     );
+
+    if (logging) {
+        const { bucketArn, prefix } = logging;
+        distributionCf.addPropertyOverride("DistributionConfig.Logging.Bucket", bucketArn);
+        distributionCf.addPropertyOverride("DistributionConfig.Logging.Prefix", prefix);
+    }
 }
