@@ -249,7 +249,7 @@ export interface CFProps {
     readonly distributions: DistributionProps[];
     readonly lambdaParameters?: CFLambdaParameters;
     /** Enable standard S3 logging for CF distributions */
-    readonly logging?: {
+    readonly bucketLogging?: {
         readonly bucket: `${string}.s3.amazonaws.com`;
         readonly prefix: string;
     };

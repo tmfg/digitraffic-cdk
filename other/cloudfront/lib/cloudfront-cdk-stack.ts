@@ -56,7 +56,7 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
-        const { distributions, lambdaParameters, logging } = cloudfrontProps;
+        const { distributions, lambdaParameters, bucketLogging } = cloudfrontProps;
 
         this.validateDefaultBehaviors(distributions);
 
@@ -64,7 +64,12 @@ export class CloudfrontCdkStack extends Stack {
         const realtimeLogConfigArn = this.getLogConfigArn(cloudfrontProps);
 
         distributions.forEach((distributionProps) =>
-            this.createDistribution({ distributionProps, lambdaMap, realtimeLogConfigArn, logging })
+            this.createDistribution({
+                distributionProps,
+                lambdaMap,
+                realtimeLogConfigArn,
+                bucketLogging
+            })
         );
 
         Aspects.of(this).add(new StackCheckingAspect());
@@ -244,9 +249,9 @@ export class CloudfrontCdkStack extends Stack {
         distributionProps: DistributionProps;
         lambdaMap: LambdaHolder;
         realtimeLogConfigArn: string;
-        logging?: CFProps["logging"];
+        bucketLogging?: CFProps["bucketLogging"];
     }): CloudFrontWebDistribution {
-        const { distributionProps, lambdaMap, realtimeLogConfigArn, logging } = props;
+        const { distributionProps, lambdaMap, realtimeLogConfigArn, bucketLogging } = props;
         const oai = distributionProps.originAccessIdentity
             ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`)
             : undefined;
@@ -257,7 +262,7 @@ export class CloudfrontCdkStack extends Stack {
             distributionProps,
             originConfigs,
             realtimeLogConfigArn,
-            logging
+            bucketLogging
         });
 
         // cdk does not support viewerPolicy as it should

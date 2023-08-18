@@ -35,7 +35,7 @@ export interface CreateDistributionProps {
     readonly distributionProps: DistributionProps;
     readonly originConfigs: SourceConfiguration[];
     readonly realtimeLogConfigArn: string;
-    readonly logging?: CFProps["logging"];
+    readonly bucketLogging?: CFProps["bucketLogging"];
 }
 
 export function createDistribution(
@@ -84,7 +84,7 @@ function addRealtimeLogging(
         originConfigs: { length },
         realtimeLogConfigArn,
         distributionProps,
-        logging
+        bucketLogging
     } = createDistributionProps;
     const distributionCf = distribution.node.defaultChild as CfnResource;
 
@@ -100,8 +100,8 @@ function addRealtimeLogging(
         realtimeLogConfigArn
     );
 
-    if (logging) {
-        const { bucket, prefix } = logging;
+    if (bucketLogging) {
+        const { bucket, prefix } = bucketLogging;
         const alias = _.get(distributionProps, "aliasNames[0]", "default");
         distributionCf.addPropertyOverride("DistributionConfig.Logging.Bucket", bucket);
         distributionCf.addPropertyOverride("DistributionConfig.Logging.Prefix", `${prefix}/${alias}`);
