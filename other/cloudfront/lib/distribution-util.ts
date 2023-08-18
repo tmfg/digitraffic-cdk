@@ -10,6 +10,7 @@ import { ViewerCertificate } from "aws-cdk-lib/aws-cloudfront/lib/web-distributi
 
 import { createWebAcl } from "./acl/acl-creator";
 import { CFProps, DistributionProps } from "./app-props";
+import _ from "lodash";
 
 export function createViewerCertificate(acmCertificateArn: string, aliases: string[]): ViewerCertificate {
     return {
@@ -82,6 +83,7 @@ function addRealtimeLogging(
     const {
         originConfigs: { length },
         realtimeLogConfigArn,
+        distributionProps,
         logging
     } = createDistributionProps;
     const distributionCf = distribution.node.defaultChild as CfnResource;
@@ -99,8 +101,9 @@ function addRealtimeLogging(
     );
 
     if (logging) {
-        const { bucketArn, prefix } = logging;
-        distributionCf.addPropertyOverride("DistributionConfig.Logging.Bucket", bucketArn);
-        distributionCf.addPropertyOverride("DistributionConfig.Logging.Prefix", prefix);
+        const { bucket, prefix } = logging;
+        const alias = _.get(distributionProps, "aliasNames[0]", "default");
+        distributionCf.addPropertyOverride("DistributionConfig.Logging.Bucket", bucket);
+        distributionCf.addPropertyOverride("DistributionConfig.Logging.Prefix", `${prefix}/${alias}`);
     }
 }
