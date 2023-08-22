@@ -1103,6 +1103,9 @@ importers:
       constructs:
         specifier: 10.2.61
         version: 10.2.61
+      lodash:
+        specifier: ~4.17.21
+        version: 4.17.21
       p-limit:
         specifier: 4.0.0
         version: 4.0.0
@@ -1122,6 +1125,9 @@ importers:
       '@types/aws-lambda':
         specifier: ~8.10.119
         version: 8.10.119
+      '@types/lodash':
+        specifier: ~4.14.197
+        version: 4.14.197
       '@types/node':
         specifier: 18.15.13
         version: 18.15.13
@@ -4106,6 +4112,10 @@ packages:
 
   /@types/lodash@4.14.195:
     resolution: {integrity: sha512-Hwx9EUgdwf2GLarOjQp5ZH8ZmblzcbTBC2wtQWNKARBSxM9ezRIAUpeDTgoQRAFB0+8CNWXVA9+MaSOzOF3nPg==}
+    dev: true
+
+  /@types/lodash@4.14.197:
+    resolution: {integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==}
     dev: true
 
   /@types/minimatch@5.1.2:

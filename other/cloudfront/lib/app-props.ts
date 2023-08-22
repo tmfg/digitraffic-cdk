@@ -248,6 +248,11 @@ export interface CFProps {
     readonly elasticAppName: string; // remove this when centralized logging is default
     readonly distributions: DistributionProps[];
     readonly lambdaParameters?: CFLambdaParameters;
+    /** Enable standard S3 logging for CF distributions */
+    readonly bucketLogging?: {
+        readonly bucket: `${string}.s3.amazonaws.com`;
+        readonly prefix: string;
+    };
 }
 
 export interface CFLambdaParameters {

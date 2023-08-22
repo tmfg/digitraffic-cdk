@@ -56,17 +56,20 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
-        this.validateDefaultBehaviors(cloudfrontProps.distributions);
+        const { distributions, lambdaParameters, bucketLogging } = cloudfrontProps;
 
-        const lambdaMap = this.createLambdaMap(
-            cloudfrontProps.distributions,
-            cloudfrontProps.lambdaParameters
-        );
+        this.validateDefaultBehaviors(distributions);
 
-        const distributionLogConfigArn = this.getLogConfigArn(cloudfrontProps);
+        const lambdaMap = this.createLambdaMap(distributions, lambdaParameters);
+        const realtimeLogConfigArn = this.getLogConfigArn(cloudfrontProps);
 
-        cloudfrontProps.distributions.forEach((p) =>
-            this.createDistribution(p, lambdaMap, distributionLogConfigArn)
+        distributions.forEach((distributionProps) =>
+            this.createDistribution({
+                distributionProps,
+                lambdaMap,
+                realtimeLogConfigArn,
+                bucketLogging
+            })
         );
 
         Aspects.of(this).add(new StackCheckingAspect());
@@ -242,18 +245,25 @@ export class CloudfrontCdkStack extends Stack {
         return lambdaMap;
     }
 
-    createDistribution(
-        distributionProps: DistributionProps,
-        lambdaMap: LambdaHolder,
-        realtimeLogConfigArn: string
-    ): CloudFrontWebDistribution {
+    createDistribution(props: {
+        distributionProps: DistributionProps;
+        lambdaMap: LambdaHolder;
+        realtimeLogConfigArn: string;
+        bucketLogging?: CFProps["bucketLogging"];
+    }): CloudFrontWebDistribution {
+        const { distributionProps, lambdaMap, realtimeLogConfigArn, bucketLogging } = props;
         const oai = distributionProps.originAccessIdentity
             ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`)
             : undefined;
         const originConfigs = distributionProps.origins.map((d) =>
             createOriginConfig(this, d, oai, lambdaMap)
         );
-        const distribution = createDistribution(this, distributionProps, originConfigs, realtimeLogConfigArn);
+        const distribution = createDistribution(this, {
+            distributionProps,
+            originConfigs,
+            realtimeLogConfigArn,
+            bucketLogging
+        });
 
         // cdk does not support viewerPolicy as it should
         // so collect map of policies and force them into cloudformation

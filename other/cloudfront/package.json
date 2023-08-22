@@ -30,6 +30,7 @@
     "@digitraffic/common": "2023.6.27-1",
     "aws-cdk-lib": "~2.85.0",
     "constructs": "10.2.61",
+    "lodash": "~4.17.21",
     "p-limit": "4.0.0",
     "source-map-support": "^0.5.21"
   },
@@ -38,6 +39,7 @@
     "@digitraffic-cdk/toolchain": "workspace:*",
     "@rushstack/eslint-config": "^3.3.2",
     "@types/aws-lambda": "~8.10.119",
+    "@types/lodash": "~4.14.197",
     "@types/node": "18.15.13",
     "@types/sinon": "10.0.15",
     "aws-sdk": "~2.1405.0",
