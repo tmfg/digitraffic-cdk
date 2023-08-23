@@ -116,6 +116,7 @@ export class OsMonitorBuilder {
         return this.and(matchPhrase(field, value));
     }
 
+    /** recreate trigger after you call this! */
     withMessageSubject(subject: string): this {
         this.messageSubject = subject;
 
