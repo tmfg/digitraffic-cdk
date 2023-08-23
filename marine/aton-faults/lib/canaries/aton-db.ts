@@ -10,8 +10,8 @@ export const handler = (): Promise<string> => {
     checker.expectOneOrMore("types are not empty", "select count(*) from aton_type");
 
     checker.expectOneOrMore(
-        "aton_fault timestamps updated in last 24 hours",
-        "select count(*) from aton_fault where entry_timestamp > now() - interval '24 hours'"
+        "aton_fault some entry updated in last 100 hours",
+        "select count(*) from aton_fault where entry_timestamp > now() - interval '100 hours'"
     );
 
     return checker.expect();

@@ -1,5 +1,5 @@
 import { FaultsApi } from "../api/faults";
-import { DTDatabase, inDatabase } from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import * as FaultsDB from "../db/faults";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
@@ -13,7 +13,7 @@ export async function updateFaults(url: string, domain: string): Promise<void> {
     const validated = newFaults.filter(validate);
 
     await inDatabase((db: DTDatabase) => {
-        return db.tx((t) => {
+        return db.tx((t: DTTransaction) => {
             return t.batch([
                 ...FaultsDB.updateFaults(db, domain, validated),
                 LastUpdatedDB.updateUpdatedTimestamp(db, ATON_FAULTS_CHECK, new Date(start))
@@ -30,7 +30,7 @@ export async function updateFaults(url: string, domain: string): Promise<void> {
 }
 
 function validate(fault: FaultFeature): boolean {
-    if (fault.properties.FAULT_TYPE === "Aiheeton") {
+    if (fault.properties.FAULT_STATE === "Aiheeton") {
         logger.info({
             method: "UpdateFaultsService.validate",
             message: "Aiheeton id",
@@ -38,5 +38,5 @@ function validate(fault: FaultFeature): boolean {
         });
     }
 
-    return fault.properties.FAULT_TYPE !== "Kirjattu";
+    return fault.properties.FAULT_STATE !== "Kirjattu";
 }
