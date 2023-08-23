@@ -1,6 +1,6 @@
 import * as sinon from "sinon";
-import { AwakeAiETAPortService } from "../../lib/service/awake_ai_eta_port";
-import { AwakeAiPortApi, AwakeAiPortResponse } from "../../lib/api/awake_ai_port";
+import { AwakeAiETAPortService } from "../../lib/service/awake-ai-eta-port";
+import { AwakeAiPortApi, AwakeAiPortResponse } from "../../lib/api/awake-ai-port";
 import {
     AwakeAiPrediction,
     AwakeAiPredictionMetadata,
@@ -8,10 +8,10 @@ import {
     AwakeAiVoyageEtaPrediction,
     AwakeAiVoyageStatus,
     AwakeAiZoneType
-} from "../../lib/api/awake_common";
+} from "../../lib/api/awake-common";
 import { getRandomNumber, randomBoolean } from "@digitraffic/common/dist/test/testutils";
 import { addHours, subHours } from "date-fns";
-import { createAwakeAiPortResponse } from "./awake_ai_etx_port_testutil";
+import { createAwakeAiPortResponse } from "./awake-ai-etx-port-testutil";
 
 describe("AwakeAiETAPortService(", () => {
     test("getAwakeAiTimestamps - no schedule", async () => {
@@ -117,7 +117,7 @@ describe("AwakeAiETAPortService(", () => {
     });
 });
 
-function createApi() {
+function createApi(): AwakeAiPortApi {
     return new AwakeAiPortApi("", "");
 }
 

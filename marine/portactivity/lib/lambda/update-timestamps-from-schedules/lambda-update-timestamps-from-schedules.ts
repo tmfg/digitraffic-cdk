@@ -6,6 +6,7 @@ import { SchedulesApi } from "../../api/schedules";
 import { PortactivityEnvKeys } from "../../keys";
 import { sendMessage } from "../../service/queue-service";
 import { SchedulesService } from "../../service/schedules";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const sqsQueueUrl = getEnvVariable(PortactivityEnvKeys.PORTACTIVITY_QUEUE_URL);
 
@@ -31,7 +32,10 @@ export const handler = (): Promise<void> => {
             const calculatedTimestamps = await service.getCalculatedTimestamps();
             const timestamps = vtsControlTimestamps.concat(calculatedTimestamps);
 
-            console.info("method=updateSchedulesTimestamps.handler count=%d", timestamps.length);
+            logger.info({
+                method: "UpdateSchedulesTimestamps.handler",
+                customTimestampsReceivedCount: timestamps.length
+            });
 
             await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, sqsQueueUrl)));
         });

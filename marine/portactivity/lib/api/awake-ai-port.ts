@@ -1,6 +1,7 @@
 import axios from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import { AwakeAiPredictedVoyage, AwakeAiPredictionType, AwakeAiShip } from "./awake_common";
+import { AwakeAiPredictedVoyage, AwakeAiPredictionType, AwakeAiShip } from "./awake-common";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum AwakeAiPortResponseType {
     OK = "OK",
@@ -50,7 +51,11 @@ export class AwakeAiPortApi {
         const start = Date.now();
         try {
             const url = `${this.url}/port/${locode}/${resource}?maxSequenceNo=${maxSequenceNo}&predictionType=${predictionType}&predictionType=${AwakeAiPredictionType.ARRIVAL_PORT_CALL}&predictionMetadata=true`;
-            console.info(`AwakeAiETAPortApi.getETAs calling URL ${url}`);
+
+            logger.info({
+                method: "AwakeAiPortApi.getPredictions",
+                message: `calling URL ${url}`
+            });
             const resp = await axios.get(url, {
                 headers: {
                     Authorization: this.apiKey,
@@ -68,7 +73,10 @@ export class AwakeAiPortApi {
             }
             throw error;
         } finally {
-            console.log(`method=AwakeAiETAPortApi.getETAs tookMs=${Date.now() - start}`);
+            logger.info({
+                method: "AwakeAiPortApi.getPredictions",
+                tookMs: Date.now() - start
+            });
         }
     }
 

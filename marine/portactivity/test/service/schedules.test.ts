@@ -12,9 +12,9 @@ const vesselName = "TEST";
 const callsign = "TEST_CALLSIGN";
 const mmsi = "123456789";
 const imo = "1234567";
-const locode = ports[0];
+const defaultLocode = ports[0];
 const destination = "Foobar";
-const portfacility = `${locode}-1`;
+const portfacility = `${defaultLocode}-1`;
 const etaEventTime = "2021-04-27T20:00:00Z";
 const etaTimestamp = "2021-04-27T06:17:36Z";
 const etdEventTime = "2021-04-27T20:00:00Z";
@@ -87,13 +87,33 @@ describe("schedules", () => {
             .forEach((ts) => verifyStructure(ts, EventType.ETD, false));
     });
 
+    test("SchedulesService.schedulesToTimestamps - calculated FIRAU - [x] ETA [ ] ETD", () => {
+        const api = createApi();
+        const service = new SchedulesService(api);
+        const etaCount = 3;
+        const locode = "FIRAU";
+        const timestamps = service.schedulesToTimestamps(
+            createSchedulesResponse(etaCount, true, false, locode),
+            true
+        );
+        expect(timestamps.length).toBe(etaCount * 2);
+        timestamps
+            .filter((ts) => ts.eventType === EventType.ETA)
+            .forEach((ts) => verifyStructure(ts, EventType.ETA, true, locode));
+        timestamps
+            .filter((ts) => ts.eventType === EventType.ETB)
+            .forEach((ts) => verifyStructure(ts, EventType.ETB, true, locode));
+    });
+
     test("SchedulesService.schedulesToTimestamps - calculated - [x] ETA [ ] ETD", () => {
         const api = createApi();
         const service = new SchedulesService(api);
-
-        const timestamps = service.schedulesToTimestamps(createSchedulesResponse(3, true, false), true);
-
-        expect(timestamps.length).toBe(3);
+        const etaCount = 3;
+        const timestamps = service.schedulesToTimestamps(
+            createSchedulesResponse(etaCount, true, false),
+            true
+        );
+        expect(timestamps.length).toBe(etaCount);
         timestamps.forEach((ts) => verifyStructure(ts, EventType.ETA, true));
     });
 
@@ -122,6 +142,28 @@ describe("schedules", () => {
             .forEach((ts) => verifyStructure(ts, EventType.ETD, true));
     });
 
+    test("SchedulesService.schedulesToTimestamps - calculated FIRAU - [x] ETA [x] ETD", () => {
+        const api = createApi();
+        const service = new SchedulesService(api);
+        const schedulesCount = 3;
+        const locode = "FIRAU";
+        const timestamps = service.schedulesToTimestamps(
+            createSchedulesResponse(schedulesCount, true, true, locode),
+            true
+        );
+
+        expect(timestamps.length).toBe(3 * schedulesCount);
+        timestamps
+            .filter((ts) => ts.eventType === EventType.ETA)
+            .forEach((ts) => verifyStructure(ts, EventType.ETA, true, locode));
+        timestamps
+            .filter((ts) => ts.eventType === EventType.ETB)
+            .forEach((ts) => verifyStructure(ts, EventType.ETB, true, locode));
+        timestamps
+            .filter((ts) => ts.eventType === EventType.ETD)
+            .forEach((ts) => verifyStructure(ts, EventType.ETD, true, locode));
+    });
+
     test("filterTimestamps - older than 5 minutes are filtered", () => {
         const api = createApi();
         const service = new SchedulesService(api);
@@ -129,7 +171,7 @@ describe("schedules", () => {
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: subHours(Date.now(), getRandomNumber(6, 9999)),
-            locode
+            locode: defaultLocode
         });
 
         expect(service.filterTimestamps([etd]).length).toBe(0);
@@ -142,14 +184,19 @@ describe("schedules", () => {
         const etd: ApiTimestamp = newTimestamp({
             eventType: EventType.ETD,
             eventTime: subMinutes(Date.now(), getRandomNumber(1, 5)),
-            locode
+            locode: defaultLocode
         });
 
         expect(service.filterTimestamps([etd]).length).toBe(1);
     });
 });
 
-function createSchedulesResponse(schedules: number, eta: boolean, etd: boolean): SchedulesResponse {
+function createSchedulesResponse(
+    schedules: number,
+    eta: boolean,
+    etd: boolean,
+    locode: string = defaultLocode
+): SchedulesResponse {
     return {
         schedules: {
             schedule: Array.from({ length: schedules }).map((_) => ({
@@ -204,14 +251,19 @@ function createApi(): SchedulesApi {
 
 function verifyStructure(
     ts: ApiTimestamp,
-    eventType: EventType.ETA | EventType.ETD,
-    calculated: boolean
+    eventType: EventType.ETA | EventType.ETD | EventType.ETB,
+    calculated: boolean,
+    locode: string = defaultLocode
 ): void {
     expect(ts.ship.mmsi).toBe(Number(mmsi));
     expect(ts.ship.imo).toBe(Number(imo));
     expect(ts.location.port).toBe(locode);
     expect(ts.eventType).toBe(eventType);
-    expect(ts.eventTime).toBe(eventType === EventType.ETA ? etaEventTime : etdEventTime);
-    expect(ts.recordTime).toBe(eventType === EventType.ETA ? etaTimestamp : etdTimestamp);
+    expect(ts.eventTime).toBe(
+        eventType === EventType.ETA || eventType === EventType.ETB ? etaEventTime : etdEventTime
+    );
+    expect(ts.recordTime).toBe(
+        eventType === EventType.ETA || eventType === EventType.ETB ? etaTimestamp : etdTimestamp
+    );
     expect(ts.source).toBe(calculated ? EventSource.SCHEDULES_CALCULATED : EventSource.SCHEDULES_VTS_CONTROL);
 }

@@ -8,10 +8,11 @@ import {
     AwakeArrivalPortCallPrediction,
     AwakeURN,
     digitrafficPortCallString
-} from "../api/awake_common";
+} from "../api/awake-common";
 import { ApiTimestamp, EventType, Location, Ship } from "../model/timestamp";
 import { EventSource } from "../model/eventsource";
-import { AwakeAiPortSchedule } from "../api/awake_ai_port";
+import { AwakeAiPortSchedule } from "../api/awake-ai-port";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 export enum AwakeDataState {
     OK = "OK",
@@ -100,54 +101,50 @@ export function etaPredictionToTimestamp(
 ): ApiTimestamp | undefined {
     // should always be ETA for ETA predictions but check just in case
     if (prediction.predictionType !== AwakeAiPredictionType.ETA) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etaPredictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.WRONG_PREDICTION_TYPE,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etaPredictionToTimestamp",
+            message: `state=${
+                AwakeDataState.WRONG_PREDICTION_TYPE
+            }, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId ?? "undefined"}`
+        });
         return undefined;
     }
 
     if (!prediction.arrivalTime) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etaPredictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.NO_PREDICTED_ETA,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etaPredictionToTimestamp",
+            message: `state=${AwakeDataState.NO_PREDICTED_ETA}, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${
+                portcallId ?? "undefined"
+            }`
+        });
         return undefined;
     }
 
     if (!locodeIsFinnish(prediction.locode)) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etaPredictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.PREDICTED_LOCATION_OUTSIDE_FINLAND,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etaPredictionToTimestamp",
+            message: `state=${
+                AwakeDataState.PREDICTED_LOCATION_OUTSIDE_FINLAND
+            }, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId ?? "undefined"}`
+        });
         return undefined;
     }
 
     if (!prediction.recordTime) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etaPredictionToTimestamp state=%s, using current time, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.NO_RECORD_TIME,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etaPredictionToTimestamp",
+            message: `state=${
+                AwakeDataState.NO_RECORD_TIME
+            }, using current time, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId ?? "undefined"}`
+        });
     }
 
-    console.info(
-        "method=AwakeAiPredictionHelper.etaPredictionToTimestamp prediction was valid, IMO: %d, LOCODE: %s, portcallid: %d",
-        imo,
-        locode,
-        portcallId
-    );
+    logger.info({
+        method: "AwakeAiEtxHelper.etaPredictionToTimestamp",
+        message: `prediction was valid, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${
+            portcallId ?? "undefined"
+        }`
+    });
 
     const timestamp = createApiTimestamp(
         { mmsi, imo },
@@ -173,54 +170,50 @@ export function etdPredictionToTimestamp(
     portCallPrediction?: AwakeArrivalPortCallPrediction
 ): ApiTimestamp | undefined {
     if (prediction.predictionType !== AwakeAiPredictionType.ETD) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etdPredictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.WRONG_PREDICTION_TYPE,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etdPredictionToTimestamp",
+            message: `state=${
+                AwakeDataState.WRONG_PREDICTION_TYPE
+            }, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId ?? "undefined"}`
+        });
         return undefined;
     }
 
     if (!prediction.departureTime) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etdPredictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.NO_PREDICTED_ETD,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etdPredictionToTimestamp",
+            message: `state=${AwakeDataState.NO_PREDICTED_ETD}, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${
+                portcallId ?? "undefined"
+            }`
+        });
         return undefined;
     }
 
     if (!locodeIsFinnish(prediction.locode)) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etdPredictionToTimestamp state=%s, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.PREDICTED_LOCATION_OUTSIDE_FINLAND,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etdPredictionToTimestamp",
+            message: `state=${
+                AwakeDataState.PREDICTED_LOCATION_OUTSIDE_FINLAND
+            }, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId ?? "undefined"}`
+        });
         return undefined;
     }
 
     if (!prediction.recordTime) {
-        console.warn(
-            "method=AwakeAiPredictionHelper.etdPredictionToTimestamp state=%s, using current time, IMO: %d, LOCODE: %s, portcallid: %d",
-            AwakeDataState.NO_RECORD_TIME,
-            imo,
-            locode,
-            portcallId
-        );
+        logger.warn({
+            method: "AwakeAiEtxHelper.etdPredictionToTimestamp",
+            message: `state=${
+                AwakeDataState.NO_RECORD_TIME
+            }, using current time, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${portcallId ?? "undefined"}`
+        });
     }
 
-    console.info(
-        "method=AwakeAiPredictionHelper.etdPredictionToTimestamp prediction was valid, IMO: %d, LOCODE: %s, portcallid: %d",
-        imo,
-        locode,
-        portcallId
-    );
+    logger.info({
+        method: "AwakeAiEtxHelper.etdPredictionToTimestamp",
+        message: `prediction was valid, IMO: ${imo}, LOCODE: ${locode}, portcallid: ${
+            portcallId ?? "undefined"
+        }`
+    });
 
     const timestamp = createApiTimestamp(
         { mmsi, imo },

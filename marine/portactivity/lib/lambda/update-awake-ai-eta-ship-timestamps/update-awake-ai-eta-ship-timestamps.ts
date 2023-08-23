@@ -3,11 +3,12 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
 import { SNSEvent } from "aws-lambda";
 import { parseISO } from "date-fns";
-import { AwakeAiETAShipApi } from "../../api/awake_ai_ship";
+import { AwakeAiETAShipApi } from "../../api/awake-ai-ship";
 import { DbETAShip } from "../../dao/timestamps";
 import { PortactivityEnvKeys } from "../../keys";
-import { AwakeAiETAShipService } from "../../service/awake_ai_eta_ship";
+import { AwakeAiETAShipService } from "../../service/awake-ai-eta-ship";
 import { sendMessage } from "../../service/queue-service";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 let service: AwakeAiETAShipService | undefined;
 
@@ -24,7 +25,7 @@ interface SnsETAShip extends Omit<DbETAShip, "eta"> {
 
 const secretHolder = SecretHolder.create<UpdateAwakeAiTimestampsSecret>("awake", ["url", "auth"]);
 
-export const handler = (event: SNSEvent) => {
+export const handler = (event: SNSEvent): Promise<void> => {
     // always a single event, guaranteed by SNS
     const ships = (JSON.parse(event.Records[0].Sns.Message) as SnsETAShip[]).map((ship) => ({
         ...ship,
@@ -38,8 +39,14 @@ export const handler = (event: SNSEvent) => {
         const timestamps = await service.getAwakeAiTimestamps(ships);
 
         const start = Date.now();
-        console.info("method=updateAwakeAiETAShipTimestamps.handler count=%d", timestamps.length);
+        logger.info({
+            method: "UpdateAwakeAiETAShipTimestamps.handler",
+            customTimestampsReceivedCount: timestamps.length
+        });
         await Promise.allSettled(timestamps.map((ts) => sendMessage(ts, queueUrl)));
-        console.info("method=updateAwakeAiETAShipTimestamps.handler tookMs=%d", Date.now() - start);
+        logger.info({
+            method: "UpdateAwakeAiETAShipTimestamps.handler",
+            tookMs: Date.now() - start
+        });
     });
 };
