@@ -1,6 +1,6 @@
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import axios, { AxiosRequestConfig, AxiosResponse } from "axios";
-import * as https from "https";
+import { Agent } from "https";
 import util from "util";
 import { parseString } from "xml2js";
 import axiosRetry from "axios-retry";
@@ -29,10 +29,12 @@ const COMPR_LEVEL = "70";
 const DEST_WIDTH = "1280";
 const DEST_HEIGHT = "720";
 
+const AXIOS_TIMEOUT_MILLIS = 4000;
+
 const COMMUNICATION_URL_PART = "/Communication";
 const VIDEO_URL_PART = "/Video/";
 
-const agent = new https.Agent({
+const agent = new Agent({
     rejectUnauthorized: false
 });
 
@@ -41,7 +43,7 @@ const parse = util.promisify(parseString);
 export class Session {
     readonly communicationUrl: string;
     readonly videoUrl: string;
-    readonly agent: https.Agent;
+    readonly agent: Agent;
 
     // this increases for every command
     sequenceId: number;
@@ -54,7 +56,7 @@ export class Session {
         this.sequenceId = 1;
 
         if (acceptSelfSignedCertificate) {
-            this.agent = new https.Agent({
+            this.agent = new Agent({
                 rejectUnauthorized: false
             });
         } else {
@@ -62,7 +64,7 @@ export class Session {
                 throw new Error("No certificate!");
             }
 
-            this.agent = new https.Agent({
+            this.agent = new Agent({
                 rejectUnauthorized: false,
                 cert: certificate
             });
@@ -70,7 +72,10 @@ export class Session {
     }
 
     post<T>(url: string, xml: string, configuration?: AxiosRequestConfig): Promise<AxiosResponse<T>> {
-        return axios.post<T>(url, xml, { ...configuration, ...{ httpsAgent: agent, timeout: 3000 } });
+        return axios.post<T>(url, xml, {
+            ...configuration,
+            ...{ httpsAgent: agent, timeout: AXIOS_TIMEOUT_MILLIS }
+        });
     }
 
     async sendMessage<T>(command: Command<T>): Promise<T> {
