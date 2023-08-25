@@ -6,6 +6,7 @@ import type { Construct } from "constructs";
 import * as Canaries from "./canaries.js";
 import * as InternalLambdas from "./internal-lambdas.js";
 import { PublicApi } from "./public-api.js";
+import { IntegrationApi } from "./integration-api.js";
 
 export interface RamiConfiguration extends StackConfiguration {
     readonly dlqBucketName: string;
@@ -15,9 +16,9 @@ export interface RamiConfiguration extends StackConfiguration {
 export class RamiStack extends DigitrafficStack {
     constructor(scope: Construct, id: string, configuration: RamiConfiguration) {
         super(scope, id, configuration);
-
         const dlq = this.createDLQ(this);
         const sqs = this.createSQS(this, dlq);
+        const integrationApi = new IntegrationApi(this, sqs, dlq);
         InternalLambdas.create(this, sqs, dlq, configuration.dlqBucketName);
         if (configuration.enablePublicApi === true) {
             const publicApi = new PublicApi(this);

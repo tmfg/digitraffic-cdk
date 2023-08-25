@@ -26,7 +26,7 @@ export class PublicApi {
     readonly apiKeyId: string;
 
     constructor(stack: DigitrafficStack) {
-        const apiName = "RAMI (passenger-information)";
+        const apiName = "RAMI (passenger information) public API";
         this.publicApi = new DigitrafficRestApi(stack, "RAMI-public", apiName, undefined, {
             endpointTypes: [EndpointType.PRIVATE]
         });

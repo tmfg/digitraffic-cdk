@@ -78,8 +78,6 @@ export class AvoinDataStack extends Stack {
             "updaterTaskRole",
             props.avoinData.updater.ecsTaskRoleArn
         );
-
-        this.addAllowSqsSendPolicy(updaterEcsTaskRole);
     }
 
     private server(props: RataProps): void {
