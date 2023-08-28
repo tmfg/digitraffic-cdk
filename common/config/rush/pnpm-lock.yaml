@@ -1182,6 +1182,7 @@ importers:
       '@types/aws-lambda': ~8.10.114
       '@types/heft-jest': ~1.0.3
       '@types/jest': ^29.5.1
+      '@types/lodash': ~4.14.197
       '@types/node': 18.15.13
       ajv: ~8.12.0
       ajv-formats: ~2.1.1
@@ -1191,6 +1192,7 @@ importers:
       date-fns-tz: ~2.0.0
       esbuild: 0.19.2
       eslint: ~8.38.0
+      lodash: ~4.17.21
       mysql2: ^3.0.1
       parallelshell: 3.0.2
       source-map-support: ^0.5.21
@@ -1225,9 +1227,11 @@ importers:
       '@types/aws-lambda': 8.10.115
       '@types/heft-jest': 1.0.3
       '@types/jest': 29.5.1
+      '@types/lodash': 4.14.197
       '@types/node': 18.15.13
       esbuild: 0.19.2
       eslint: 8.38.0
+      lodash: 4.17.21
       parallelshell: 3.0.2
       typescript: 4.9.5
 
@@ -7710,6 +7714,10 @@ packages:
 
   /@types/lodash/4.14.195:
     resolution: {integrity: sha512-Hwx9EUgdwf2GLarOjQp5ZH8ZmblzcbTBC2wtQWNKARBSxM9ezRIAUpeDTgoQRAFB0+8CNWXVA9+MaSOzOF3nPg==}
+    dev: true
+
+  /@types/lodash/4.14.197:
+    resolution: {integrity: sha512-BMVOiWs0uNxHVlHBgzTIqJYmj+PgCo4euloGF+5m4okL3rEYzM2EEv78mw8zWSMM57dM7kVIgJ2QDvwHSoCI5g==}
     dev: true
 
   /@types/minimatch/5.1.2:

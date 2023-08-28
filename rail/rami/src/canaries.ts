@@ -36,7 +36,7 @@ export function create(stack: DigitrafficStack, dlq: Queue, publicApi: PublicApi
 }
 
 function addDLQAlarm(stack: DigitrafficStack, queue: Queue, config: RamiConfiguration): void {
-    const alarmName = "RAMI-TimestampsDLQAlarm";
+    const alarmName = "RAMI-DLQAlarm";
     queue
         .metricNumberOfMessagesReceived({
             period: config.dlqNotificationDuration

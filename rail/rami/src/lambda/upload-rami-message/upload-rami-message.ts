@@ -25,7 +25,7 @@ export const handler = async (messageBody: object | undefined): Promise<LambdaRe
                 customInvalidMessage: JSON.stringify(messageBody),
                 customValidationErrors: validationResult.errors
             });
-            // send invalid messages and error report to dlq
+            // send invalid message and error report to dlq
             await sendToSqs(
                 DLQ_URL,
                 2,

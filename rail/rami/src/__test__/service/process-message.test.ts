@@ -1,29 +1,29 @@
+import _ from "lodash";
 import { RamiMessageOperations } from "../../model/rami-message";
 import { getActiveMessages } from "../../service/get-message";
 import { parseMessage, processMessage } from "../../service/process-message";
 import { dbTestBase } from "../db-testutil";
-import {
-    invalidRamiScheduledMessage,
-    validRamiMonitoredJourneyScheduledMessage,
-    validRamiScheduledMessage
-} from "../testdata";
+import { validRamiMonitoredJourneyScheduledMessage, validRamiScheduledMessage } from "../testdata";
 import { createMonitoredJourneyScheduledMessage, createScheduledMessage } from "../testdata-util";
 
 describe("parse message", () => {
     test("parseMessage - valid monitoredJourneyScheduledMessage is correctly parsed", () => {
         const processedMessage = parseMessage(validRamiMonitoredJourneyScheduledMessage);
-        console.log(JSON.stringify(processedMessage, null, 2));
         expect(processedMessage?.id).toEqual(validRamiMonitoredJourneyScheduledMessage.payload.messageId);
     });
 
     test("parseMessage - valid scheduledMessage is correctly parsed", () => {
         const processedMessage = parseMessage(validRamiScheduledMessage);
-        console.log(JSON.stringify(processedMessage, null, 2));
         expect(processedMessage?.id).toEqual(validRamiScheduledMessage.payload.messageId);
     });
 
     test("parseMessage - invalid message is correctly parsed", () => {
-        const processedMessage = parseMessage(invalidRamiScheduledMessage);
+        const invalidMessage = _.set(
+            _.cloneDeep(validRamiMonitoredJourneyScheduledMessage),
+            ["payload", "messageId"],
+            undefined
+        );
+        const processedMessage = parseMessage(invalidMessage);
         expect(processedMessage).not.toBeDefined();
     });
 });
