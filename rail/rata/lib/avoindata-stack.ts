@@ -29,6 +29,11 @@ export class AvoinDataStack extends Stack {
         });
 
         const vpc = ec2.Vpc.fromLookup(this, "defaultVpc", { vpcId: props.common.vpcId });
+
+        vpc.addInterfaceEndpoint("ApiGatewayEndpoint", {
+            service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY
+        });
+
         this.createLambdaDbSg(vpc);
     }
 
