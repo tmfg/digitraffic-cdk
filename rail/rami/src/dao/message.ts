@@ -1,3 +1,4 @@
+/* eslint-disable @rushstack/no-new-null */
 import { MYSQL_DATETIME_FORMAT, dateToUTCString } from "@digitraffic/common/dist/utils/date-utils.js";
 import type { Connection } from "mysql2/promise.js";
 import type { DtRamiMessage } from "../model/dt-rami-message.js";
@@ -5,34 +6,34 @@ import { mapDaysToBits } from "../util/weekdays.js";
 import { inDatabase, inTransaction } from "../util/database.js";
 
 export interface DbRamiAudio {
-    readonly text_fi?: string | null;
-    readonly text_sv?: string | null;
-    readonly text_en?: string | null;
+    readonly text_fi: string | null;
+    readonly text_sv: string | null;
+    readonly text_en: string | null;
     readonly delivery_rules: {
-        readonly start_date?: Date | null;
-        readonly end_date?: Date | null;
-        readonly start_time?: string | null;
-        readonly end_time?: string | null;
-        readonly days?: string | null;
-        readonly delivery_type?: string | null;
-        readonly event_type?: string | null;
-        readonly delivery_at?: Date | null;
-        readonly repetitions?: number | null;
-        readonly repeat_every?: number | null;
+        readonly start_date: Date | null;
+        readonly end_date: Date | null;
+        readonly start_time: string | null;
+        readonly end_time: string | null;
+        readonly days: string | null;
+        readonly delivery_type: string | null;
+        readonly event_type: string | null;
+        readonly delivery_at: Date | null;
+        readonly repetitions: number | null;
+        readonly repeat_every: number | null;
     };
 }
 
 export interface DbRamiVideo {
-    readonly text_fi?: string | null;
-    readonly text_sv?: string | null;
-    readonly text_en?: string | null;
+    readonly text_fi: string | null;
+    readonly text_sv: string | null;
+    readonly text_en: string | null;
     readonly delivery_rules: {
-        readonly start_date?: Date | null;
-        readonly end_date?: Date | null;
-        readonly start_time?: string | null;
-        readonly end_time?: string | null;
-        readonly days?: string | null;
-        readonly delivery_type?: string | null;
+        readonly start_date: Date | null;
+        readonly end_date: Date | null;
+        readonly start_time: string | null;
+        readonly end_time: string | null;
+        readonly days: string | null;
+        readonly delivery_type: string | null;
     };
 }
 
@@ -42,9 +43,9 @@ export interface DbRamiMessage {
     readonly created_source: Date;
     readonly start_validity: Date;
     readonly end_validity: Date;
-    readonly train_number?: number | null;
-    readonly train_departure_date?: string | null;
-    readonly stations?: string | null;
+    readonly train_number: number | null;
+    readonly train_departure_date: string | null;
+    readonly stations: string | null;
     readonly audio: DbRamiAudio;
     readonly video: DbRamiVideo;
 }

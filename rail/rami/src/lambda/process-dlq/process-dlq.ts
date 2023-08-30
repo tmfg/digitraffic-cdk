@@ -2,6 +2,7 @@ import { getEnvVariable } from "@digitraffic/common/dist/utils/utils.js";
 import { RamiEnvKeys } from "../../keys.js";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default.js";
 import { uploadToS3 } from "../../util/s3.js";
+import { logException } from "@digitraffic/common/dist/utils/logging.js";
 
 const bucketName = getEnvVariable(RamiEnvKeys.SQS_DLQ_BUCKET_NAME);
 
@@ -20,5 +21,7 @@ export const handler = async (event: DlqEvent): Promise<void> => {
     const uploads = event.Records.map((e, idx: number) =>
         uploadToS3(bucketName, e.body, `message-${millis}-${idx}.json`)
     );
-    await Promise.all(uploads);
+    await Promise.allSettled(uploads).catch((error): void => {
+        logException(logger, error);
+    });
 };

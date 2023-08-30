@@ -13,7 +13,7 @@ import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 const hostname = getEnvVariable(ENV_HOSTNAME);
 const apiKeyId = getEnvVariable(ENV_API_KEY);
 
-const API_URL = "/prod/api/v1/passenger-information";
+const API_URL = "/prod/api/v1/passenger-information" as const;
 
 export const handler = async (): Promise<string> => {
     const checker = await UrlChecker.create(hostname, apiKeyId);

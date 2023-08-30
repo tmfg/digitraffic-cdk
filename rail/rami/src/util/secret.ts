@@ -26,7 +26,7 @@ function getSmClient(): SecretsManager {
 
 export type GenericSecret = Record<string, string>;
 
-export async function getSecret<Secret>(secretId: string, prefix = ""): Promise<Secret> {
+export async function getSecret<Secret>(secretId: string, prefix: string = ""): Promise<Secret> {
     const secretObj = await getSmClient().getSecretValue({
         SecretId: secretId
     });

@@ -15,11 +15,12 @@ export function handlerFn(): (event: SQSEvent) => Promise<PromiseSettledResult<v
                     method: "RAMI-ProcessQueue.handler",
                     customParsedRamiMessage: JSON.stringify(parsedRamiMessage)
                 });
-                if (parsedRamiMessage)
+                if (parsedRamiMessage) {
                     await processMessage(parsedRamiMessage).catch((error): unknown => {
                         logException(logger, error);
                         return Promise.reject(error);
                     });
+                }
                 logger.info({
                     method: "RAMI-ProcessQueue.handler",
                     tookMs: Date.now() - start
