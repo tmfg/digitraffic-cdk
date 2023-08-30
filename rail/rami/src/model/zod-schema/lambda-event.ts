@@ -28,4 +28,4 @@ export const getMessagesUpdatedAfterLambdaEvent = z.intersection(
         only_active: optionalBoolean
     })
 );
-export type GetMessagesUpdatedAfterEvent = z.infer<typeof getActiveMessagesLambdaEvent>;
+export type GetMessagesUpdatedAfterEvent = z.infer<typeof getMessagesUpdatedAfterLambdaEvent>;
