@@ -44,7 +44,7 @@ export const handler = async (): Promise<string> => {
     );
 
     await checker.expect200(
-        `${API_URL}}/active?only_general=true`,
+        `${API_URL}/active?only_general=true`,
         ContentTypeChecker.checkContentType(MediaType.APPLICATION_JSON),
         ContentChecker.checkJson((json: PassengerInformationMessage[]) => {
             Asserter.assertEquals(
