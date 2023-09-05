@@ -3,6 +3,7 @@ import { StackProps } from "aws-cdk-lib";
 export interface RataProps extends StackProps {
     common: {
         ecsClusterArn: string;
+        vpcId: string;
     };
     avoinData: {
         database: {
@@ -18,6 +19,7 @@ export interface RataProps extends StackProps {
             ecrRepo: string;
             taskDefinitionArn: string;
             serviceArn: string;
+            ecsTaskRoleArn: string;
         };
         graphQL: {
             ecrRepo: string;

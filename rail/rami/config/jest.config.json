@@ -1,0 +1,4 @@
+{
+  "extends": "@digitraffic-cdk/digitraffic-cdk-rig/profiles/cdk/config/jest.config.json",
+  "setupFiles": ["<rootDir>/dist/out/__test__/setup"]
+}

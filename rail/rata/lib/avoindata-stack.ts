@@ -1,9 +1,10 @@
 import { CfnOutput, Stack } from "aws-cdk-lib";
-import { Construct } from "constructs";
 import * as ec2 from "aws-cdk-lib/aws-ec2";
-import * as rds from "aws-cdk-lib/aws-rds";
 import * as ecr from "aws-cdk-lib/aws-ecr";
 import * as ecs from "aws-cdk-lib/aws-ecs";
+import * as iam from "aws-cdk-lib/aws-iam";
+import * as rds from "aws-cdk-lib/aws-rds";
+import { Construct } from "constructs";
 import { RataProps } from "./rata-props";
 
 export class AvoinDataStack extends Stack {
@@ -24,8 +25,16 @@ export class AvoinDataStack extends Stack {
             props.common.ecsClusterArn
         );
         new CfnOutput(this, "ecsClusterOutput", {
-            value: ecsCluster.clusterName,
+            value: ecsCluster.clusterName
         });
+
+        const vpc = ec2.Vpc.fromLookup(this, "defaultVpc", { vpcId: props.common.vpcId });
+
+        vpc.addInterfaceEndpoint("ApiGatewayEndpoint", {
+            service: ec2.InterfaceVpcEndpointAwsService.APIGATEWAY
+        });
+
+        this.createLambdaDbSg(vpc);
     }
 
     private database(props: RataProps) {
@@ -35,30 +44,29 @@ export class AvoinDataStack extends Stack {
             props.avoinData.database.securityGroupId
         );
         new CfnOutput(this, "avoinDataDbSecurityGroupIdOutput", {
-            value: securityGroup.securityGroupId,
+            value: securityGroup.securityGroupId
         });
 
-        const databaseCluster: rds.IDatabaseCluster =
-            rds.DatabaseCluster.fromDatabaseClusterAttributes(
-                this,
-                "avoinDataDBCluster",
-                {
-                    clusterIdentifier: props.avoinData.database.clusterId,
-                }
-            );
+        const databaseCluster: rds.IDatabaseCluster = rds.DatabaseCluster.fromDatabaseClusterAttributes(
+            this,
+            "avoinDataDBCluster",
+            {
+                clusterIdentifier: props.avoinData.database.clusterId
+            }
+        );
         new CfnOutput(this, "avoinDataDbClusterArnOutput", {
-            value: databaseCluster.clusterIdentifier,
+            value: databaseCluster.clusterIdentifier
         });
     }
 
-    private updater(props: RataProps) {
+    private updater(props: RataProps): void {
         const updaterEcrRepo = ecr.Repository.fromRepositoryName(
             this,
             "updaterEcrRepo",
             props.avoinData.updater.ecrRepo
         );
         new CfnOutput(this, "updaterEcrRepoArnOutput", {
-            value: updaterEcrRepo.repositoryArn,
+            value: updaterEcrRepo.repositoryArn
         });
 
         const updaterTaskDefinition = ecs.TaskDefinition.fromTaskDefinitionArn(
@@ -67,18 +75,24 @@ export class AvoinDataStack extends Stack {
             props.avoinData.updater.taskDefinitionArn
         );
         new CfnOutput(this, "updaterTaskDefinitionOutput", {
-            value: updaterTaskDefinition.taskDefinitionArn,
+            value: updaterTaskDefinition.taskDefinitionArn
         });
+
+        const updaterEcsTaskRole = iam.Role.fromRoleArn(
+            this,
+            "updaterTaskRole",
+            props.avoinData.updater.ecsTaskRoleArn
+        );
     }
 
-    private server(props: RataProps) {
+    private server(props: RataProps): void {
         const serverEcrRepo = ecr.Repository.fromRepositoryName(
             this,
             "serverEcrRepo",
             props.avoinData.server.ecrRepo
         );
         new CfnOutput(this, "serverEcrRepoArnOutput", {
-            value: serverEcrRepo.repositoryArn,
+            value: serverEcrRepo.repositoryArn
         });
 
         const serverTaskDefinition = ecs.TaskDefinition.fromTaskDefinitionArn(
@@ -87,38 +101,55 @@ export class AvoinDataStack extends Stack {
             props.avoinData.server.taskDefinitionArn
         );
         new CfnOutput(this, "serverTaskDefinitionOutput", {
-            value: serverTaskDefinition.taskDefinitionArn,
+            value: serverTaskDefinition.taskDefinitionArn
         });
     }
 
-    private graphQL(props: RataProps) {
+    private graphQL(props: RataProps): void {
         const graphQLEcrRepo = ecr.Repository.fromRepositoryName(
             this,
             "graphQlEcrRepo",
             props.avoinData.graphQL.ecrRepo
         );
         new CfnOutput(this, "graphqlEcrRepoOutput", {
-            value: graphQLEcrRepo.repositoryName,
+            value: graphQLEcrRepo.repositoryName
         });
 
-        const ecsService: ecs.IFargateService =
-            ecs.FargateService.fromFargateServiceArn(
-                this,
-                "graphqlService",
-                props.avoinData.graphQL.serviceArn
-            );
+        const ecsService: ecs.IFargateService = ecs.FargateService.fromFargateServiceArn(
+            this,
+            "graphqlService",
+            props.avoinData.graphQL.serviceArn
+        );
         new CfnOutput(this, "graphqlServiceOutput", {
-            value: ecsService.serviceName,
+            value: ecsService.serviceName
         });
 
-        const taskDefinition: ecs.ITaskDefinition =
-            ecs.TaskDefinition.fromTaskDefinitionArn(
-                this,
-                "graphqlTaskDefinition",
-                props.avoinData.graphQL.taskDefinitionArn
-            );
+        const taskDefinition: ecs.ITaskDefinition = ecs.TaskDefinition.fromTaskDefinitionArn(
+            this,
+            "graphqlTaskDefinition",
+            props.avoinData.graphQL.taskDefinitionArn
+        );
         new CfnOutput(this, "graphqlTaskDefinitionOutput", {
-            value: taskDefinition.taskDefinitionArn,
+            value: taskDefinition.taskDefinitionArn
         });
+    }
+
+    private createLambdaDbSg(vpc: ec2.IVpc): void {
+        new ec2.SecurityGroup(this, "lambdaDbSg", {
+            vpc,
+            description: "Security group to allow traffic between Lambda and database",
+            allowAllOutbound: true,
+            securityGroupName: "lambdaDbSg"
+        });
+    }
+
+    private addAllowSqsSendPolicy(role: iam.IRole): void {
+        role.addToPrincipalPolicy(
+            new iam.PolicyStatement({
+                effect: iam.Effect.ALLOW,
+                actions: ["sqs:SendMessage"],
+                resources: ["*"]
+            })
+        );
     }
 }

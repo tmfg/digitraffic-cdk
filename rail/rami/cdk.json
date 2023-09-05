@@ -1,0 +1,3 @@
+{
+  "app": "node dist/out/bin/rami-app.js"
+}
