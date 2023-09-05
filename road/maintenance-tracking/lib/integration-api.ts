@@ -3,17 +3,9 @@ import { createRestApi } from "@digitraffic/common/dist/aws/infra/stack/rest_api
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 import { createSubscription } from "@digitraffic/common/dist/aws/infra/stack/subscription";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans";
-import {
-    addDefaultValidator,
-    addServiceModel,
-} from "@digitraffic/common/dist/utils/api-model";
+import { addDefaultValidator, addServiceModel } from "@digitraffic/common/dist/utils/api-model";
 import { Resource, RestApi } from "aws-cdk-lib/aws-apigateway";
-import {
-    ManagedPolicy,
-    PolicyStatement,
-    Role,
-    ServicePrincipal,
-} from "aws-cdk-lib/aws-iam";
+import { ManagedPolicy, PolicyStatement, Role, ServicePrincipal } from "aws-cdk-lib/aws-iam";
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { Construct } from "constructs";
 import { MaintenanceTrackingEnvKeys } from "./keys";
@@ -27,7 +19,7 @@ import {
     Koordinaattisijainti,
     Organisaatio,
     Tunniste,
-    Viivageometriasijainti,
+    Viivageometriasijainti
 } from "./model/maintenance-tracking-schema";
 import apigateway = require("aws-cdk-lib/aws-apigateway");
 
@@ -36,7 +28,7 @@ export function createIntegrationApiAndHandlerLambda(
     sqsExtendedMessageBucketArn: string,
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
-) {
+): void {
     const integrationApi = createRestApi(
         stack,
         "MaintenanceTracking-Integration",
@@ -45,10 +37,7 @@ export function createIntegrationApiAndHandlerLambda(
 
     addServiceModelToIntegrationApi(integrationApi);
 
-    const apiResource = createUpdateMaintenanceTrackingApiGatewayResource(
-        stack,
-        integrationApi
-    );
+    const apiResource = createUpdateMaintenanceTrackingApiGatewayResource(stack, integrationApi);
     createUpdateRequestHandlerLambda(
         apiResource,
         queue,
@@ -59,20 +48,13 @@ export function createIntegrationApiAndHandlerLambda(
     createDefaultUsagePlan(integrationApi, "Maintenance Tracking Integration");
 }
 
-function addServiceModelToIntegrationApi(integrationApi: RestApi) {
+function addServiceModelToIntegrationApi(integrationApi: RestApi): void {
     const tunnisteModel = addServiceModel("Tunniste", integrationApi, Tunniste);
-    const organisaatioModel = addServiceModel(
-        "Organisaatio",
-        integrationApi,
-        Organisaatio
-    );
+    const organisaatioModel = addServiceModel("Organisaatio", integrationApi, Organisaatio);
     const otsikkoModel = addServiceModel(
         "Otsikko",
         integrationApi,
-        createSchemaOtsikko(
-            organisaatioModel.modelReference,
-            tunnisteModel.modelReference
-        )
+        createSchemaOtsikko(organisaatioModel.modelReference, tunnisteModel.modelReference)
     );
     const koordinaattisijaintiModel = addServiceModel(
         "Koordinaattisijainti",
@@ -92,18 +74,13 @@ function addServiceModelToIntegrationApi(integrationApi: RestApi) {
             viivageometriasijaintiModel.modelReference
         )
     );
-    const havaintoSchema = createSchemaHavainto(
-        geometriaSijaintiModel.modelReference
-    );
+    const havaintoSchema = createSchemaHavainto(geometriaSijaintiModel.modelReference);
     addServiceModel("Havainto", integrationApi, havaintoSchema);
 
     addServiceModel(
         "TyokoneenseurannanKirjaus",
         integrationApi,
-        createSchemaTyokoneenseurannanKirjaus(
-            otsikkoModel.modelReference,
-            havaintoSchema
-        )
+        createSchemaTyokoneenseurannanKirjaus(otsikkoModel.modelReference, havaintoSchema)
     );
 }
 
@@ -126,10 +103,9 @@ function createUpdateRequestHandlerLambda(
     sqsExtendedMessageBucketArn: string,
     stackConfiguration: MaintenanceTrackingStackConfiguration,
     stack: DigitrafficStack
-) {
+): void {
     const lambdaEnv = stack.createLambdaEnvironment();
-    lambdaEnv[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] =
-        stackConfiguration.sqsMessageBucketName;
+    lambdaEnv[MaintenanceTrackingEnvKeys.SQS_BUCKET_NAME] = stackConfiguration.sqsMessageBucketName;
     lambdaEnv[MaintenanceTrackingEnvKeys.SQS_QUEUE_URL] = queue.queueUrl;
 
     const lambdaRole = createLambdaRoleWithWriteToSqsAndS3Policy(
@@ -138,25 +114,16 @@ function createUpdateRequestHandlerLambda(
         sqsExtendedMessageBucketArn
     );
 
-    const updateRequestsHandler = MonitoredFunction.createV2(
-        stack,
-        "update-queue",
-        lambdaEnv,
-        {
-            reservedConcurrentExecutions: 100,
-            timeout: 60,
-            role: lambdaRole,
-            memorySize: 256,
-        }
-    );
+    const updateRequestsHandler = MonitoredFunction.createV2(stack, "update-queue", lambdaEnv, {
+        reservedConcurrentExecutions: 100,
+        timeout: 60,
+        role: lambdaRole,
+        memorySize: 256
+    });
 
-    requests.addMethod(
-        "POST",
-        new apigateway.LambdaIntegration(updateRequestsHandler),
-        {
-            apiKeyRequired: true,
-        }
-    );
+    requests.addMethod("POST", new apigateway.LambdaIntegration(updateRequestsHandler), {
+        apiKeyRequired: true
+    });
     // Create log subscription
     createSubscription(
         updateRequestsHandler,
@@ -170,10 +137,10 @@ function createLambdaRoleWithWriteToSqsAndS3Policy(
     stack: Construct,
     sqsArn: string,
     sqsExtendedMessageBucketArn: string
-) {
+): Role {
     const lambdaRole = new Role(stack, `SendMessageToSqsRole`, {
         assumedBy: new ServicePrincipal("lambda.amazonaws.com"),
-        roleName: `SendMessageToSqsRole`,
+        roleName: `SendMessageToSqsRole`
     });
 
     const sqsPolicyStatement = new PolicyStatement();
@@ -186,14 +153,10 @@ function createLambdaRoleWithWriteToSqsAndS3Policy(
     s3PolicyStatement.addResources(sqsExtendedMessageBucketArn + "/*");
 
     lambdaRole.addManagedPolicy(
-        ManagedPolicy.fromAwsManagedPolicyName(
-            "service-role/AWSLambdaBasicExecutionRole"
-        )
+        ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaBasicExecutionRole")
     );
     lambdaRole.addManagedPolicy(
-        ManagedPolicy.fromAwsManagedPolicyName(
-            "service-role/AWSLambdaVPCAccessExecutionRole"
-        )
+        ManagedPolicy.fromAwsManagedPolicyName("service-role/AWSLambdaVPCAccessExecutionRole")
     );
 
     lambdaRole.addToPolicy(sqsPolicyStatement);

@@ -1,10 +1,7 @@
 import { Queue } from "aws-cdk-lib/aws-sqs";
 import { SnsAction } from "aws-cdk-lib/aws-cloudwatch-actions";
 import { Topic } from "aws-cdk-lib/aws-sns";
-import {
-    ComparisonOperator,
-    TreatMissingData,
-} from "aws-cdk-lib/aws-cloudwatch";
+import { ComparisonOperator, TreatMissingData } from "aws-cdk-lib/aws-cloudwatch";
 import { Schedule } from "@aws-cdk/aws-synthetics-alpha";
 import { UrlCanary } from "@digitraffic/common/dist/aws/infra/canaries/url-canary";
 import { DatabaseCanary } from "@digitraffic/common/dist/aws/infra/canaries/database-canary";
@@ -15,27 +12,12 @@ import { PublicApi } from "./public-api";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 
 export class Canaries {
-    constructor(
-        stack: DigitrafficStack,
-        dlq: Queue,
-        publicApi: PublicApi,
-        secret: ISecret
-    ) {
-        addDLQAlarm(
-            stack,
-            dlq,
-            stack.configuration as PortactivityConfiguration
-        );
+    constructor(stack: DigitrafficStack, dlq: Queue, publicApi: PublicApi, secret: ISecret) {
+        addDLQAlarm(stack, dlq, stack.configuration as PortactivityConfiguration);
 
         if (stack.configuration.stackFeatures?.enableCanaries ?? false) {
-            const urlRole = new DigitrafficCanaryRole(
-                stack,
-                "portactivity-url"
-            );
-            const dbRole = new DigitrafficCanaryRole(
-                stack,
-                "portactivity-db"
-            ).withDatabaseAccess();
+            const urlRole = new DigitrafficCanaryRole(stack, "portactivity-url");
+            const dbRole = new DigitrafficCanaryRole(stack, "portactivity-db").withDatabaseAccess();
 
             new UrlCanary(
                 stack,
@@ -47,8 +29,8 @@ export class Canaries {
                     secret: stack.configuration.secretId,
                     alarm: {
                         alarmName: "PortActivity-PublicAPI-Alarm",
-                        topicArn: stack.configuration.warningTopicArn,
-                    },
+                        topicArn: stack.configuration.warningTopicArn
+                    }
                 },
                 stack.secret
             );
@@ -60,8 +42,8 @@ export class Canaries {
                 apiKeyId: publicApi.apiKeyId,
                 alarm: {
                     alarmName: "PortActivity-PrivateAPI-Alarm",
-                    topicArn: stack.configuration.warningTopicArn,
-                },
+                    topicArn: stack.configuration.warningTopicArn
+                }
             });
 
             new DatabaseCanary(stack, dbRole, secret, {
@@ -71,8 +53,8 @@ export class Canaries {
                 handler: "daytime-db.handler",
                 alarm: {
                     alarmName: "PortActivity-Db-Day-Alarm",
-                    topicArn: stack.configuration.warningTopicArn,
-                },
+                    topicArn: stack.configuration.warningTopicArn
+                }
             });
 
             new DatabaseCanary(stack, dbRole, secret, {
@@ -81,33 +63,25 @@ export class Canaries {
                 handler: "db.handler",
                 alarm: {
                     alarmName: "PortActivity-Db-Alarm",
-                    topicArn: stack.configuration.warningTopicArn,
-                },
+                    topicArn: stack.configuration.warningTopicArn
+                }
             });
         }
     }
 }
 
-function addDLQAlarm(
-    stack: DigitrafficStack,
-    queue: Queue,
-    config: PortactivityConfiguration
-) {
+function addDLQAlarm(stack: DigitrafficStack, queue: Queue, config: PortactivityConfiguration): void {
     const alarmName = "PortActivity-TimestampsDLQAlarm";
     queue
         .metricNumberOfMessagesReceived({
-            period: config.dlqNotificationDuration,
+            period: config.dlqNotificationDuration
         })
         .createAlarm(stack, alarmName, {
             alarmName,
             threshold: 0,
             evaluationPeriods: 1,
             treatMissingData: TreatMissingData.NOT_BREACHING,
-            comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD,
+            comparisonOperator: ComparisonOperator.GREATER_THAN_THRESHOLD
         })
-        .addAlarmAction(
-            new SnsAction(
-                Topic.fromTopicArn(stack, "Topic", config.warningTopicArn)
-            )
-        );
+        .addAlarmAction(new SnsAction(Topic.fromTopicArn(stack, "Topic", config.warningTopicArn)));
 }

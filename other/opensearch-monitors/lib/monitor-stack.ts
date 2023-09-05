@@ -34,7 +34,8 @@ export interface OSMonitorsConfiguration {
  * Because you can't create OpenSearch VPC Endpoint with cdk(yet), you have to enroll this in two stages.
  *
  * When deploying for the first time, deploy with createLambda = false.  Then manually create
- * the OpenSearch VPC Endpoint and configure its address to osVpcEndpoint and deploy again with createLambda = true
+ * the OpenSearch VPC Endpoint in same vpc and private subnets as this stack and AccessOpenSearchSG security group created by this stack
+ * and then configure endpoint address to osVpcEndpoint and deploy again with createLambda = true
  *
  */
 export class UpdateOSMonitorsStack extends Stack {

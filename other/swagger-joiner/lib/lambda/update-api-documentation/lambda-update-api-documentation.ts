@@ -41,8 +41,5 @@ export function getLatestVersion(versions: ListOfDocumentationVersion): number {
     if (!versions.length) {
         return 0;
     }
-
-    const versionNumbers = versions.map((v) => Number(v.version));
-    versionNumbers.sort().reverse();
-    return versionNumbers[0];
+    return versions.map((v) => Number(v.version)).sort((a, b) => b - a)[0];
 }

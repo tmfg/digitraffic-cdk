@@ -1,32 +1,26 @@
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
-import {
-    GeoJsonLineString,
-    GeoJsonPoint,
-} from "@digitraffic/common/dist/utils/geojson-types";
+import { GeoJsonLineString, GeoJsonPoint } from "@digitraffic/common/dist/utils/geojson-types";
 import * as GeometryUtils from "@digitraffic/common/dist/utils/geometry";
 import { Feature, Geometry, LineString, Position } from "geojson";
-import moment from "moment";
+import sub from "date-fns/sub";
 import {
     AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
     AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M,
     AUTORI_MAX_MINUTES_TO_HISTORY,
     AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH,
-    AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S,
+    AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S
 } from "../constants";
-import {
-    ApiContractData,
-    ApiOperationData,
-    ApiRouteData,
-} from "../model/autori-api-data";
+import { ApiContractData, ApiOperationData, ApiRouteData } from "../model/autori-api-data";
 import {
     DbDomainContract,
     DbDomainTaskMapping,
     DbMaintenanceTracking,
-    DbWorkMachine,
+    DbWorkMachine
 } from "../model/db-data";
 import { UNKNOWN_TASK_NAME } from "../model/tracking-save-result";
 import * as Utils from "./utils";
 import { createHarjaId } from "./utils";
+import logger from "./maintenance-logger";
 
 /**
  * This fixes:
@@ -34,9 +28,7 @@ import { createHarjaId } from "./utils";
  * - Just one geometry/ApiRouteData allowed -> will create multiple ApiRouteData objects from one if it contains multiple geometries
  * @param originalRouteData data to fix
  */
-export function fixApiRouteDatas(
-    originalRouteData: ApiRouteData[]
-): ApiRouteData[] {
+export function fixApiRouteDatas(originalRouteData: ApiRouteData[]): ApiRouteData[] {
     const sortedRouteData: ApiRouteData[] = originalRouteData
         .slice()
         .sort((a, b) =>
@@ -65,12 +57,12 @@ function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
             if (f.geometry.type === "Point") {
                 fixedFeatures.push(f);
             } else if (f.geometry.type !== "LineString") {
-                console.error(
-                    `method=AutoriUtils.fixApiRouteData Not supported geometry type: ${f.geometry.type}`
-                );
+                logger.error({
+                    method: "AutoriUtils.fixApiRouteData",
+                    message: `Not supported geometry type: ${f.geometry.type}`
+                });
             } else {
-                const newFeatures: Feature[] =
-                    groupFeaturesToIndividualGeometries(f);
+                const newFeatures: Feature[] = groupFeaturesToIndividualGeometries(f);
                 fixedFeatures.push(...newFeatures);
             }
         });
@@ -79,17 +71,17 @@ function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
             user: routeData.user,
             geography: {
                 type: "FeatureCollection",
-                features: [feature],
+                features: [feature]
             },
             created: routeData.created,
             updated: routeData.updated,
             id: routeData.id,
             startTime: routeData.startTime,
             endTime: routeData.endTime,
-            operations: routeData.operations,
+            operations: routeData.operations
         }));
-    } catch (e) {
-        console.error(`method=AutoriUtils.fixApiRouteData failed`, e);
+    } catch (error) {
+        logger.error({ method: "AutoriUtils.fixApiRouteData", message: "failed", error });
         // On error keep original
         return [routeData];
     }
@@ -102,42 +94,36 @@ function fixApiRouteData(routeData: ApiRouteData): ApiRouteData[] {
  *
  * @param feature Feature to be fixed
  */
-export function groupFeaturesToIndividualGeometries(
-    feature: Feature
-): Feature[] {
+export function groupFeaturesToIndividualGeometries(feature: Feature): Feature[] {
     try {
         if (feature.geometry.type === "Point") {
             return [feature];
         }
 
         const geom = feature.geometry as LineString;
-        const positionGroups: Position[][] = toPositionGroups(
-            geom.coordinates.slice()
-        );
+        const positionGroups: Position[][] = toPositionGroups(geom.coordinates.slice());
 
         const newFeatures = positionGroups.map((positions) => {
             const g: Geometry =
-                positions.length == 1
-                    ? new GeoJsonPoint(positions[0])
-                    : new GeoJsonLineString(positions);
+                positions.length === 1 ? new GeoJsonPoint(positions[0]) : new GeoJsonLineString(positions);
             return {
                 type: "Feature",
-                geometry: g,
+                geometry: g
             } as Feature;
         });
         if (newFeatures.length > 1) {
-            console.info(
-                `method=AutoriUtils.groupFeaturesToIndividualGeometries split feature: ${JSON.stringify(
-                    feature
-                )} to ${JSON.stringify(newFeatures)}`
-            );
+            logger.info({
+                method: "AutoriUtils.groupFeaturesToIndividualGeometries",
+                message: `split feature: ${JSON.stringify(feature)} to ${JSON.stringify(newFeatures)}`
+            });
         }
         return newFeatures;
-    } catch (e) {
-        console.error(
-            `method=AutoriUtils.groupFeaturesToIndividualGeometries failed`,
-            e
-        );
+    } catch (error) {
+        logger.error({
+            method: "AutoriUtils.groupFeaturesToIndividualGeometries",
+            message: "failed",
+            error
+        });
         // On error keep original
         return [feature];
     }
@@ -148,10 +134,7 @@ export function groupFeaturesToIndividualGeometries(
  * @param sourceGeometry
  * @param targetGeometries
  */
-function toPositionGroups(
-    sourceGeometry: Position[],
-    targetGeometries: Position[][] = []
-): Position[][] {
+function toPositionGroups(sourceGeometry: Position[], targetGeometries: Position[][] = []): Position[][] {
     // Check we have events in array
     if (!sourceGeometry.length) {
         return targetGeometries;
@@ -165,10 +148,8 @@ function toPositionGroups(
 
     if (targetGeometries.length > 0) {
         // Take prev Position from groups and compare it to next
-        const prevLineString: Position[] =
-            targetGeometries[targetGeometries.length - 1];
-        const prevPosition: Position =
-            prevLineString[prevLineString.length - 1];
+        const prevLineString: Position[] = targetGeometries[targetGeometries.length - 1];
+        const prevPosition: Position = prevLineString[prevLineString.length - 1];
 
         // Throw position to trash if it same as previous
         if (GeometryUtils.areDistinctPositions(prevPosition, nextPosition)) {
@@ -190,12 +171,10 @@ function toPositionGroups(
  * @param next time of next tracking start time
  * @return true if next brefore is after previous and time limit is not over
  */
-export function isOverTimeLimit(previous: Date, next: Date) {
+export function isOverTimeLimit(previous: Date, next: Date): boolean {
     const diff = CommonDateUtils.countDiffInSeconds(previous, next);
     return (
-        diff < 0 ||
-        CommonDateUtils.countDiffInSeconds(previous, next) >
-            AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S
+        diff < 0 || CommonDateUtils.countDiffInSeconds(previous, next) > AUTORI_MAX_TIME_BETWEEN_TRACKINGS_S
     );
 }
 
@@ -221,30 +200,14 @@ export function isExtendingPreviousTracking(
     if (previousTime && nextTime && isOverTimeLimit(previousTime, nextTime)) {
         return false;
     }
-    const distInM = GeometryUtils.distanceBetweenPositionsInM(
-        previousPosition,
-        nextPosition
-    );
-    const diffInS =
-        previousTime && nextTime
-            ? CommonDateUtils.countDiffInSeconds(previousTime, nextTime)
-            : 0;
-    const speedInKmH =
-        previousTime && nextTime
-            ? Utils.calculateSpeedInKmH(distInM, diffInS)
-            : 0;
+    const distInM = GeometryUtils.distanceBetweenPositionsInM(previousPosition, nextPosition);
+    const diffInS = previousTime && nextTime ? CommonDateUtils.countDiffInSeconds(previousTime, nextTime) : 0;
+    const speedInKmH = previousTime && nextTime ? Utils.calculateSpeedInKmH(distInM, diffInS) : 0;
     if (distInM > AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M) {
         return false;
-    } else if (
-        isFinite(speedInKmH) &&
-        diffInS > 0 &&
-        speedInKmH > AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH
-    ) {
+    } else if (isFinite(speedInKmH) && diffInS > 0 && speedInKmH > AUTORI_MAX_SPEED_BETWEEN_TRACKINGS_KMH) {
         return false;
-    } else if (
-        !isFinite(speedInKmH) &&
-        distInM > AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M
-    ) {
+    } else if (!isFinite(speedInKmH) && distInM > AUTORI_MAX_DISTANCE_WHEN_INFINITE_SPEED_M) {
         // Simplification/saving resolution to db might move location of previous tracking's end point a bit and then when comparing
         // it with next tracking's start point the result is infinity in speed. If point has moved significantly then consider as
         // discontinuation to previous point
@@ -258,20 +221,15 @@ export function isExtendingPreviousTracking(
  * @param operations to map
  * @param taskMappings mapping of tasks from database
  */
-export function getTasksForOperations(
-    operations: string[],
-    taskMappings: DbDomainTaskMapping[]
-): string[] {
+export function getTasksForOperations(operations: string[], taskMappings: DbDomainTaskMapping[]): string[] {
     if (operations.length < 1) {
         return [];
     }
 
-    return operations.reduce(function (filtered: string[], operation) {
-        const taskMapping = taskMappings.find(
-            (mapping: DbDomainTaskMapping): boolean => {
-                return mapping.original_id == operation && !mapping.ignore;
-            }
-        );
+    return operations.reduce(function (filtered: string[], operation: string) {
+        const taskMapping = taskMappings.find((mapping: DbDomainTaskMapping): boolean => {
+            return mapping.original_id === operation && !mapping.ignore;
+        });
         if (taskMapping && !filtered.includes(taskMapping.name)) {
             return filtered.concat(taskMapping.name);
         }
@@ -284,50 +242,36 @@ export function getTasksForOperations(
  *
  * @param contract for which the time should be resolved
  */
-export function resolveNextStartTimeForDataFromApi(
-    contract: DbDomainContract
-): Date {
+export function resolveNextStartTimeForDataFromApi(contract: DbDomainContract): Date {
     // Allowed to get last 5 min data, no further history, use max 7 min to have no gaps in data
-    const maxDate = moment()
-        .subtract(AUTORI_MAX_MINUTES_TO_HISTORY, "minutes")
-        .toDate();
+    const maxDate = sub(new Date(), { minutes: AUTORI_MAX_MINUTES_TO_HISTORY });
 
-    let resolvedTime = moment()
-        .subtract(AUTORI_MAX_MINUTES_TO_HISTORY, "minutes")
-        .toDate();
+    let resolvedTime = sub(new Date(), { minutes: AUTORI_MAX_MINUTES_TO_HISTORY });
     if (contract.data_last_updated) {
-        console.debug(
-            `DEBUG method=AutoriUpdate.resolveContractLastUpdateTime contract=${
-                contract.contract
-            } and domain=${
+        logger.debug(
+            `method=AutoriUpdate.resolveContractLastUpdateTime contract=${contract.contract} and domain=${
                 contract.domain
             } using contract.data_last_updated ${contract.data_last_updated.toISOString()}`
         );
         resolvedTime = contract.data_last_updated;
     } else if (contract.start_date) {
-        console.debug(
-            `DEBUG method=AutoriUpdate.resolveContractLastUpdateTime contract=${
-                contract.contract
-            } and domain=${
+        logger.debug(
+            `method=AutoriUpdate.resolveContractLastUpdateTime contract=${contract.contract} and domain=${
                 contract.domain
             } using contract.start_date ${contract.start_date.toISOString()}`
         );
         resolvedTime = contract.start_date;
     } else {
-        console.debug(
-            `DEBUG method=AutoriUpdate.resolveContractLastUpdateTime contract=${
-                contract.contract
-            } and domain=${
+        logger.debug(
+            `method=AutoriUpdate.resolveContractLastUpdateTime contract=${contract.contract} and domain=${
                 contract.domain
             } using -7, 'minutes' ${resolvedTime.toLocaleString()}`
         );
     }
 
-    const result = new Date(
-        Math.max(resolvedTime.getTime(), maxDate.getTime())
-    );
-    console.debug(
-        `DEBUG method=AutoriUpdate.resolveContractLastUpdateTime resolvedTime=${resolvedTime.toISOString()} maxDate=${maxDate.toISOString()}  result=${result.toISOString()} `
+    const result = new Date(Math.max(resolvedTime.getTime(), maxDate.getTime()));
+    logger.debug(
+        `method=AutoriUpdate.resolveContractLastUpdateTime resolvedTime=${resolvedTime.toISOString()} maxDate=${maxDate.toISOString()} result=${result.toISOString()} `
     );
     return result;
 }
@@ -343,7 +287,7 @@ export function createDbWorkMachine(
         harjaId: createHarjaId(user + (vehicleType ?? "")),
         type: `domainName: ${domainName} / contractId: ${contractId} / user: ${user} vehicleType: ${
             vehicleType ?? ""
-        }`,
+        }`
     };
 }
 
@@ -355,14 +299,10 @@ export function createDbDomainContracts(
         domain: domainName,
         contract: contract.id,
         name: contract.name,
-        start_date: contract.startDate
-            ? CommonDateUtils.dateFromIsoString(contract.startDate)
-            : undefined,
-        end_date: contract.endDate
-            ? CommonDateUtils.dateFromIsoString(contract.endDate)
-            : undefined,
+        start_date: contract.startDate ? CommonDateUtils.dateFromIsoString(contract.startDate) : undefined,
+        end_date: contract.endDate ? CommonDateUtils.dateFromIsoString(contract.endDate) : undefined,
         data_last_updated: undefined,
-        source: undefined,
+        source: undefined
     }));
 }
 
@@ -373,9 +313,9 @@ export function createDbDomainTaskMappings(
     return operations.map((operation) => ({
         name: UNKNOWN_TASK_NAME,
         original_id: operation.id,
-        // TODO original_name: operation.operationName,
+        // original_name: operation.operationName,
         domain: domainName,
-        ignore: true,
+        ignore: true
     }));
 }
 
@@ -384,54 +324,53 @@ export function createDbMaintenanceTracking(
     routeData: ApiRouteData,
     contract: DbDomainContract,
     harjaTasks: string[]
-): DbMaintenanceTracking | null {
+): DbMaintenanceTracking | undefined {
     if (harjaTasks.length === 0) {
-        console.info(
-            `method=AutoriUpdate.createDbMaintenanceTracking domain=${contract.domain} contract=${contract.contract} No tasks for tracking api id ${routeData.id} -> no data to save`
-        );
-        return null;
+        logger.info({
+            method: "AutoriUpdate.createDbMaintenanceTracking",
+            message: `No tasks for tracking api id ${routeData.id} -> no data to save`,
+            customDomain: contract.domain,
+            customContract: contract.contract
+        });
+        return undefined;
     }
 
     if (!routeData.geography?.features) {
-        console.info(
-            `method=AutoriUpdate.createDbMaintenanceTracking No geography domain=${
-                contract.domain
-            } contract=${contract.contract} data: ${JSON.stringify(routeData)}`
-        );
-        return null;
+        logger.info({
+            method: `AutoriUpdate.createDbMaintenanceTracking`,
+            message: `no geography data: ${JSON.stringify(routeData)}`,
+            customDomain: contract.domain,
+            customContract: contract.contract
+        });
+        return undefined;
     }
 
     if (routeData.geography.features.length > 1) {
-        console.warn(
-            `method=AutoriUpdate.createDbMaintenanceTracking geography.features length bigger than 1 domain=${
-                contract.domain
-            } contract=${contract.contract} data: ${JSON.stringify(routeData)}`
-        );
+        logger.warn({
+            method: `AutoriUpdate.createDbMaintenanceTracking`,
+            message: `geography.features length bigger than 1 data: ${JSON.stringify(routeData)}`,
+            customDomain: contract.domain,
+            customContract: contract.contract
+        });
     }
 
     const f = routeData.geography.features[0];
     let lastPoint: GeoJsonPoint;
     let geometry: GeoJsonPoint | GeoJsonLineString;
 
-    if (f.geometry.type == "Point") {
+    if (f.geometry.type === "Point") {
         lastPoint = new GeoJsonPoint(f.geometry.coordinates);
         geometry = lastPoint;
-    } else if (f.geometry.type == "LineString") {
-        lastPoint = new GeoJsonPoint(
-            f.geometry.coordinates[f.geometry.coordinates.length - 1]
-        );
+    } else if (f.geometry.type === "LineString") {
+        lastPoint = new GeoJsonPoint(f.geometry.coordinates[f.geometry.coordinates.length - 1]);
         geometry = new GeoJsonLineString(f.geometry.coordinates);
     } else {
-        throw new Error(
-            `Unsupported geometry type for maintenance tracking ${f.geometry.type}`
-        );
+        throw new Error(`Unsupported geometry type for maintenance tracking ${f.geometry.type}`);
     }
 
     return {
         direction: undefined,
-        sending_time: CommonDateUtils.dateFromIsoString(
-            routeData.created ?? new Date().toISOString()
-        ),
+        sending_time: CommonDateUtils.dateFromIsoString(routeData.created ?? new Date().toISOString()),
         start_time: CommonDateUtils.dateFromIsoString(routeData.startTime),
         end_time: CommonDateUtils.dateFromIsoString(routeData.endTime),
         last_point: lastPoint,
@@ -442,6 +381,6 @@ export function createDbMaintenanceTracking(
         domain: contract.domain,
         contract: contract.contract,
         message_original_id: routeData.id,
-        finished: false,
+        finished: false
     };
 }

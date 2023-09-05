@@ -5,27 +5,16 @@ import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
 import { fail } from "assert";
 import { Position } from "geojson";
 import { getRandompId } from "maintenance-tracking/test/testdata";
-import moment from "moment";
+import sub from "date-fns/sub";
 import * as sinon from "sinon";
 import { PaikanninApi } from "../../lib/api/paikannin";
 import { PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M } from "../../lib/constants";
 import * as DataDb from "../../lib/dao/data";
-import {
-    DbDomainContract,
-    DbDomainTaskMapping,
-    DbMaintenanceTracking,
-} from "../../lib/model/db-data";
-import {
-    ApiDevice,
-    ApiIoChannel,
-    ApiWorkeventDevice,
-} from "../../lib/model/paikannin-api-data";
+import { DbDomainContract, DbDomainTaskMapping, DbMaintenanceTracking } from "../../lib/model/db-data";
+import { ApiDevice, ApiIoChannel, ApiWorkeventDevice } from "../../lib/model/paikannin-api-data";
 import { UNKNOWN_TASK_NAME } from "../../lib/model/tracking-save-result";
 import { PaikanninUpdate } from "../../lib/service/paikannin-update";
-import {
-    getTrackingEndPoint,
-    getTrackingStartPoint,
-} from "../../lib/service/utils";
+import { getTrackingEndPoint, getTrackingStartPoint } from "../../lib/service/utils";
 import {
     dbTestBase,
     findAllTrackings,
@@ -33,7 +22,7 @@ import {
     insertDbDomaindContract,
     insertDomain,
     insertDomaindTaskMapping,
-    truncate,
+    truncate
 } from "../db-testutil";
 import {
     DOMAIN_1,
@@ -42,19 +31,19 @@ import {
     PAIKANNIN_OPERATION_BRUSHING,
     PAIKANNIN_OPERATION_PAVING,
     PAIKANNIN_OPERATION_SALTING,
-    POINT_START,
+    POINT_START
 } from "../testconstants";
 import {
     createApiRouteDataForEveryMinute,
     createDbDomainContract,
     createLineString,
     createLineStringGeometry,
-    createZigZagCoordinates,
+    createZigZagCoordinates
 } from "../testutil";
 
 const paikanninUpdateService = createPaikanninUpdateService();
 
-function createPaikanninUpdateService() {
+function createPaikanninUpdateService(): PaikanninUpdate {
     return new PaikanninUpdate(PaikanninApi.prototype);
 }
 
@@ -71,11 +60,7 @@ describe(
 
             await paikanninUpdateService.upsertContractForDomain(DOMAIN_1);
 
-            const contract: DbDomainContract = await getDomaindContract(
-                db,
-                DOMAIN_1,
-                DOMAIN_1
-            );
+            const contract: DbDomainContract = await getDomaindContract(db, DOMAIN_1, DOMAIN_1);
             expect(contract.domain).toEqual(DOMAIN_1);
             expect(contract.contract).toEqual(DOMAIN_1);
             expect(contract.source).toBeNull();
@@ -90,46 +75,32 @@ describe(
 
             const ioChannels1: ApiIoChannel[] = [
                 createApiIoChannel(PAIKANNIN_OPERATION_SALTING.name),
-                createApiIoChannel(PAIKANNIN_OPERATION_BRUSHING.name),
+                createApiIoChannel(PAIKANNIN_OPERATION_BRUSHING.name)
             ];
             const device1: ApiDevice = createDevice(ioChannels1);
             const ioChannels2: ApiIoChannel[] = [
                 createApiIoChannel(PAIKANNIN_OPERATION_SALTING.name),
-                createApiIoChannel(PAIKANNIN_OPERATION_PAVING.name),
+                createApiIoChannel(PAIKANNIN_OPERATION_PAVING.name)
             ];
             const device2: ApiDevice = createDevice(ioChannels2);
             mockGetDevicesApiResponse([device1, device2]);
 
             await paikanninUpdateService.updateTaskMappingsForDomain(DOMAIN_1);
 
-            const mappings: DbDomainTaskMapping[] =
-                await DataDb.getTaskMappings(db, DOMAIN_1);
+            const mappings: DbDomainTaskMapping[] = await DataDb.getTaskMappings(db, DOMAIN_1);
             expect(mappings.length).toEqual(3);
 
-            const operationNames: string[] = mappings.map(
-                (value) => value.original_id
-            );
-            expect(
-                operationNames.includes(PAIKANNIN_OPERATION_SALTING.name)
-            ).toEqual(true);
-            expect(
-                operationNames.includes(PAIKANNIN_OPERATION_BRUSHING.name)
-            ).toEqual(true);
-            expect(
-                operationNames.includes(PAIKANNIN_OPERATION_PAVING.name)
-            ).toEqual(true);
+            const operationNames: string[] = mappings.map((value) => value.original_id);
+            expect(operationNames.includes(PAIKANNIN_OPERATION_SALTING.name)).toEqual(true);
+            expect(operationNames.includes(PAIKANNIN_OPERATION_BRUSHING.name)).toEqual(true);
+            expect(operationNames.includes(PAIKANNIN_OPERATION_PAVING.name)).toEqual(true);
             mappings.forEach((value) => expect(value.ignore).toEqual(true));
-            mappings.forEach((value) =>
-                expect(value.name).toEqual(UNKNOWN_TASK_NAME)
-            );
+            mappings.forEach((value) => expect(value.name).toEqual(UNKNOWN_TASK_NAME));
         });
 
         test("updateTrackings", async () => {
             await insertDomain(db, DOMAIN_1);
-            await insertDbDomaindContract(
-                db,
-                createDbDomainContract(DOMAIN_1, DOMAIN_1)
-            );
+            await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
 
             await insertDomaindTaskMapping(
                 db,
@@ -147,22 +118,20 @@ describe(
             );
 
             // Create two routes, 10 and 0 minutes old
-            const past10 = moment().subtract(10, "minutes").toDate();
+            const past10 = sub(new Date(), { minutes: 10 });
             const past0 = new Date();
-            const route2d: ApiWorkeventDevice =
-                createApiRouteDataForEveryMinute(
-                    1,
-                    past10,
-                    createLineStringGeometry(10, 200),
-                    [PAIKANNIN_OPERATION_BRUSHING]
-                );
-            const route1d: ApiWorkeventDevice =
-                createApiRouteDataForEveryMinute(
-                    1,
-                    past0,
-                    createLineStringGeometry(9, 200),
-                    [PAIKANNIN_OPERATION_PAVING]
-                );
+            const route2d: ApiWorkeventDevice = createApiRouteDataForEveryMinute(
+                1,
+                past10,
+                createLineStringGeometry(10, 200),
+                [PAIKANNIN_OPERATION_BRUSHING]
+            );
+            const route1d: ApiWorkeventDevice = createApiRouteDataForEveryMinute(
+                1,
+                past0,
+                createLineStringGeometry(9, 200),
+                [PAIKANNIN_OPERATION_PAVING]
+            );
 
             mockGetWorkEventsApiResponse([route2d]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
@@ -188,11 +157,7 @@ describe(
             expect(checked).toBeTruthy();
 
             if (checked) {
-                Asserter.assertToBeCloseTo(
-                    checked.getTime(),
-                    past0.getTime(),
-                    700
-                );
+                Asserter.assertToBeCloseTo(checked.getTime(), past0.getTime(), 700);
             } else {
                 fail("checked was null");
             }
@@ -200,10 +165,7 @@ describe(
 
         test("updateTrackings invalid linestring", async () => {
             await insertDomain(db, DOMAIN_1);
-            await insertDbDomaindContract(
-                db,
-                createDbDomainContract(DOMAIN_1, DOMAIN_1)
-            );
+            await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
 
             await insertDomaindTaskMapping(
                 db,
@@ -238,25 +200,14 @@ describe(
             expect(trackings[0].geometry).toBeTruthy();
             expect(trackings[0].geometry).toEqual(trackings[0].last_point);
 
-            Asserter.assertToBeCloseTo(
-                trackings[0].last_point.coordinates[0],
-                POINT_START[0],
-                0.000001
-            );
-            Asserter.assertToBeCloseTo(
-                trackings[0].last_point.coordinates[1],
-                POINT_START[1],
-                0.000001
-            );
+            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[0], POINT_START[0], 0.000001);
+            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[1], POINT_START[1], 0.000001);
             expect(trackings[0].last_point.coordinates[2]).toEqual(0);
         });
 
         test("updateTrackings and split on big distance between points", async () => {
             await insertDomain(db, DOMAIN_1);
-            await insertDbDomaindContract(
-                db,
-                createDbDomainContract(DOMAIN_1, DOMAIN_1)
-            );
+            await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
 
             await insertDomaindTaskMapping(
                 db,
@@ -266,22 +217,16 @@ describe(
                 false
             );
 
-            const ln = createLineStringGeometry(
-                22,
-                PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M - 10
-            );
+            const ln = createLineStringGeometry(22, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M - 10);
             // remove two elements from the middle so there will be over PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_KM jump
             // in the middle of coordinates -> should be divided in two distinct trackings
             ln.coordinates.splice(10, 2);
 
             // Create one route and big jump between routes, 10 and 0 minutes old
             const end = new Date();
-            const route: ApiWorkeventDevice = createApiRouteDataForEveryMinute(
-                1,
-                end,
-                ln,
-                [PAIKANNIN_OPERATION_BRUSHING]
-            );
+            const route: ApiWorkeventDevice = createApiRouteDataForEveryMinute(1, end, ln, [
+                PAIKANNIN_OPERATION_BRUSHING
+            ]);
 
             mockGetWorkEventsApiResponse([route]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
@@ -290,9 +235,7 @@ describe(
             const trackings = await findAllTrackings(db, DOMAIN_1);
 
             expect(trackings.length).toEqual(2);
-            expect(trackings[0].end_time).toEqual(
-                moment(end).subtract(10, "minutes").toDate()
-            );
+            expect(trackings[0].end_time).toEqual(sub(end, { minutes: 10 }));
             expect(trackings[1].end_time).toEqual(end);
 
             expect(trackings[0].geometry.coordinates.length).toEqual(10);
@@ -301,10 +244,7 @@ describe(
 
         test("updateTrackings and continue previous", async () => {
             await insertDomain(db, DOMAIN_1);
-            await insertDbDomaindContract(
-                db,
-                createDbDomainContract(DOMAIN_1, DOMAIN_1)
-            );
+            await insertDbDomaindContract(db, createDbDomainContract(DOMAIN_1, DOMAIN_1));
 
             await insertDomaindTaskMapping(
                 db,
@@ -314,16 +254,13 @@ describe(
                 false
             );
 
-            const coords = createZigZagCoordinates(
-                20,
-                PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M - 10
-            );
+            const coords = createZigZagCoordinates(20, PAIKANNIN_MAX_DISTANCE_BETWEEN_TRACKINGS_M - 10);
             const coords1 = coords.slice(0, 10);
             const coords2 = coords.slice(10);
 
             // Create two routes of one linear work
             const end2 = new Date();
-            const end1 = moment(end2).subtract(10, "minutes").toDate();
+            const end1 = sub(end2, { minutes: 10 });
 
             const route1: ApiWorkeventDevice = createApiRouteDataForEveryMinute(
                 1,
@@ -344,10 +281,7 @@ describe(
             mockGetWorkEventsApiResponse([route2]);
             await paikanninUpdateService.updateTrackingsForDomain(DOMAIN_1);
 
-            const trackings: DbMaintenanceTracking[] = await findAllTrackings(
-                db,
-                DOMAIN_1
-            );
+            const trackings: DbMaintenanceTracking[] = await findAllTrackings(db, DOMAIN_1);
 
             expect(trackings.length).toEqual(2);
             // First tracking's end is extended to next tracking start
@@ -357,9 +291,7 @@ describe(
             expect(trackings[0].id).toEqual(trackings[1].previous_tracking_id);
 
             const prevEnd: Position = trackings[0].last_point.coordinates;
-            const prevLineStringEnd: Position = getTrackingEndPoint(
-                trackings[0]
-            );
+            const prevLineStringEnd: Position = getTrackingEndPoint(trackings[0]);
             const nextStart: Position = getTrackingStartPoint(trackings[1]);
 
             // Check marked end poind is same as next start as it's extending previous one
@@ -372,14 +304,12 @@ describe(
             expect(prevLineStringEnd[2]).toEqual(nextStart[2]);
         });
 
-        function mockGetDevicesApiResponse(response: ApiDevice[]) {
-            return sinon
-                .stub(PaikanninApi.prototype, "getDevices")
-                .returns(Promise.resolve(response));
+        function mockGetDevicesApiResponse(response: ApiDevice[]): void {
+            sinon.stub(PaikanninApi.prototype, "getDevices").returns(Promise.resolve(response));
         }
 
-        function mockGetWorkEventsApiResponse(response: ApiWorkeventDevice[]) {
-            return sinon
+        function mockGetWorkEventsApiResponse(response: ApiWorkeventDevice[]): void {
+            sinon
                 .stub(PaikanninApi.prototype, "getWorkEvents")
                 .withArgs(sinon.match.any, sinon.match.any)
                 .returns(Promise.resolve(response));
@@ -389,7 +319,7 @@ describe(
             return {
                 id: getRandompId(),
                 description: "Foo",
-                ioChannels: ioChannels,
+                ioChannels: ioChannels
             };
         }
 
@@ -397,7 +327,7 @@ describe(
             return {
                 id: getRandomInteger(1, 10000),
                 name: name,
-                enabled: true,
+                enabled: true
             };
         }
     })

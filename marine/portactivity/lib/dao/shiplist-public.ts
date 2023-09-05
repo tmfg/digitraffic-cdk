@@ -37,7 +37,10 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
                   ELSE DATE(px.event_time) = DATE(pe.event_time)
                   END
           ) AND
-        pe.event_time > NOW() - INTERVAL '1 HOURS' AND
+        CASE WHEN (pe.event_type = 'ATA' OR pe.event_type = 'ATD')
+        THEN pe.event_time > NOW() - INTERVAL '6 HOURS'
+        ELSE pe.event_time > NOW() - INTERVAL '1 HOURS' 
+        END AND
         pe.event_time < NOW() + $2 * INTERVAL '1 HOUR' AND
         CASE WHEN pe.event_type = 'ETA'
         THEN NOT EXISTS(SELECT px.id FROM port_call_timestamp px WHERE px.portcall_id = pe.portcall_id AND px.event_type = 'ATA')

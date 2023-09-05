@@ -5,22 +5,13 @@ import * as Sqs from "./sqs";
 import { PublicApi } from "./public-api";
 import { PortactivityConfiguration } from "./app-props";
 import { BlockPublicAccess, Bucket } from "aws-cdk-lib/aws-s3";
-import {
-    DatabaseCluster,
-    DatabaseClusterEngine,
-    DatabaseProxy,
-    ProxyTarget,
-} from "aws-cdk-lib/aws-rds";
+import { DatabaseCluster, DatabaseClusterEngine, DatabaseProxy, ProxyTarget } from "aws-cdk-lib/aws-rds";
 import { ISecret } from "aws-cdk-lib/aws-secretsmanager";
 import { Canaries } from "./canaries";
 import { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack";
 
 export class PortActivityStack extends DigitrafficStack {
-    constructor(
-        scope: Construct,
-        id: string,
-        config: PortactivityConfiguration
-    ) {
+    constructor(scope: Construct, id: string, config: PortactivityConfiguration) {
         super(scope, id, config);
 
         if (!this.secret) {
@@ -32,7 +23,7 @@ export class PortActivityStack extends DigitrafficStack {
         const queueAndDLQ = Sqs.createQueue(this);
         const dlqBucket = new Bucket(this, "DLQBucket", {
             bucketName: config.dlqBucketName,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
 
         InternalLambdas.create(this, queueAndDLQ, dlqBucket);
@@ -44,23 +35,19 @@ export class PortActivityStack extends DigitrafficStack {
 
         new Bucket(this, "DocumentationBucket", {
             bucketName: config.documentationBucketName,
-            blockPublicAccess: BlockPublicAccess.BLOCK_ALL,
+            blockPublicAccess: BlockPublicAccess.BLOCK_ALL
         });
     }
 
-    createRdsProxy(secret: ISecret, clusterIdentifier: string) {
+    createRdsProxy(secret: ISecret, clusterIdentifier: string): void {
         if (!this.vpc || !this.lambdaDbSg) {
             throw new Error("vpc and lambdaDbSg required!");
         }
 
-        const cluster = DatabaseCluster.fromDatabaseClusterAttributes(
-            this,
-            "DbCluster",
-            {
-                clusterIdentifier,
-                engine: DatabaseClusterEngine.AURORA_POSTGRESQL,
-            }
-        );
+        const cluster = DatabaseCluster.fromDatabaseClusterAttributes(this, "DbCluster", {
+            clusterIdentifier,
+            engine: DatabaseClusterEngine.AURORA_POSTGRESQL
+        });
 
         // CDK tries to allow connections between proxy and cluster
         // this does not work on cluster references
@@ -75,7 +62,7 @@ export class PortActivityStack extends DigitrafficStack {
             secrets: [secret],
             proxyTarget: ProxyTarget.fromCluster(cluster),
             securityGroups: [this.lambdaDbSg],
-            requireTLS: false,
+            requireTLS: false
         });
     }
 }

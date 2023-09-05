@@ -7,7 +7,9 @@ export interface CommandResponse {
 }
 
 interface ResponseCommand {
-    readonly Result: string;
+    readonly Name: string[];
+    readonly Result: string[];
+    readonly ErrorCode: string[];
     readonly OutputParams: {
         Param: ResponseParam[];
     }[];
@@ -22,6 +24,25 @@ interface ResponseParam {
     };
 }
 
+export type InputParameter =
+    | "Username"
+    | "Password"
+    | "CameraId"
+    | "DestWidth"
+    | "DestHeight"
+    | "ComprLevel"
+    | "Time"
+    | "SignalType"
+    | "MethodType"
+    | "Fps"
+    | "KeyFramesOnly"
+    | "RequestSize"
+    | "StreamType"
+    | "ResizeAvailable"
+    | "Blocking"
+    | "VideoId"
+    | "Speed";
+
 export abstract class Command<T> {
     readonly name: string;
     readonly inputParameters: Record<string, string>;
@@ -31,7 +52,7 @@ export abstract class Command<T> {
         this.name = name;
     }
 
-    public addInputParameters(name: string, value: string): this {
+    public addInputParameters(name: InputParameter, value: string): this {
         this.inputParameters[name] = value;
 
         return this;
@@ -67,16 +88,21 @@ export abstract class Command<T> {
     public abstract getResult(result: CommandResponse): T;
 
     public checkError(result: CommandResponse): void {
-        const resultCode = result.Communication.Command[0].Result;
+        const resultCommand = result.Communication.Command[0];
+        const commandResult = resultCommand.Result[0];
+        const commandName = resultCommand.Name[0];
 
-        if (resultCode === "Error") {
+        if (commandResult === "Error") {
             logger.error({
                 method: "Command.checkError",
                 message: "Command failed",
+                customCommand: commandName,
                 customDetails: JSON.stringify(result)
             });
 
-            throw new Error("Command Failed " + resultCode);
+            const errorCode = resultCommand.ErrorCode[0];
+
+            throw new Error("Command Failed with error code " + errorCode);
         }
     }
 }

@@ -12,16 +12,16 @@
   },
   "dependencies": {
     "@digitraffic/common": "2022.11.23-5",
-    "aws-cdk-lib": "~2.76.0",
-    "constructs": "10.2.2"
+    "aws-cdk-lib": "~2.85.0",
+    "constructs": "10.2.61"
   },
   "devDependencies": {
     "@digitraffic-cdk/eslint-config": "workspace:*",
     "@digitraffic-cdk/toolchain": "workspace:*",
-    "@rushstack/eslint-config": "^3.2.0",
-    "@types/aws-lambda": "~8.10.114",
+    "@rushstack/eslint-config": "^3.3.2",
+    "@types/aws-lambda": "~8.10.119",
     "@types/node": "18.15.13",
-    "eslint": "~8.38.0",
+    "eslint": "~8.43.0",
     "typescript": "~4.9.5"
   },
   "externals": [

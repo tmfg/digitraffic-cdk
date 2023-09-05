@@ -18,15 +18,16 @@ export const handler = async (event: Record<string, string>): Promise<LambdaResp
             )
         );
     } catch (e) {
+        // bad user input -> 400
+        if (e instanceof InputError) {
+            return Promise.resolve(LambdaResponse.badRequest(e.message));
+        }
+
         logger.error({
             method: "GetSignImage.handler",
             message: `failed to convert text ${text} to image`,
             error: e
         });
-        // bad user input -> 400
-        if (e instanceof InputError) {
-            return Promise.resolve(LambdaResponse.badRequest(e.message));
-        }
 
         // other errors -> 500
         return Promise.resolve(LambdaResponse.internalError());

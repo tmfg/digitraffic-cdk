@@ -1,6 +1,7 @@
 import axios from "axios";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export interface AreaVisibilityResponse {
     // ISO 8601
@@ -36,10 +37,7 @@ export class AreaVisibilityApi {
             }
             return resp.data as AreaVisibilityResponse;
         } catch (error) {
-            logger.error({
-                method: "AreaVisibilityApi.getVisibilityForArea",
-                message: "failed"
-            });
+            logException(logger, error);
 
             throw new Error("Getting visibility for area failed");
         } finally {

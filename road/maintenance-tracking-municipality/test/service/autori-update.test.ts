@@ -1,25 +1,16 @@
-import {
-    DTDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
 import { Asserter } from "@digitraffic/common/dist/test/asserter";
 import * as CommonDateUtils from "@digitraffic/common/dist/utils/date-utils";
 import { GeoJsonLineString } from "@digitraffic/common/dist/utils/geojson-types";
 import { Position } from "geojson";
-import moment from "moment";
+import add from "date-fns/add";
+import sub from "date-fns/sub";
 import * as sinon from "sinon";
 import { AutoriApi } from "../../lib/api/autori";
-import {
-    AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M,
-    AUTORI_MAX_MINUTES_TO_HISTORY,
-} from "../../lib/constants";
+import { AUTORI_MAX_DISTANCE_BETWEEN_TRACKINGS_M, AUTORI_MAX_MINUTES_TO_HISTORY } from "../../lib/constants";
 import * as DataDb from "../../lib/dao/data";
-import {
-    ApiContractData,
-    ApiOperationData,
-    ApiRouteData,
-} from "../../lib/model/autori-api-data";
+import { ApiContractData, ApiOperationData, ApiRouteData } from "../../lib/model/autori-api-data";
 import { DbDomainContract, DbDomainTaskMapping } from "../../lib/model/db-data";
 import { UNKNOWN_TASK_NAME } from "../../lib/model/tracking-save-result";
 import { AutoriUpdate } from "../../lib/service/autori-update";
@@ -32,7 +23,7 @@ import {
     insertDomain,
     insertDomaindContract,
     insertDomaindTaskMapping,
-    truncate,
+    truncate
 } from "../db-testutil";
 import {
     AUTORI_OPERATION_BRUSHING,
@@ -43,17 +34,14 @@ import {
     HARJA_PAVING,
     HARJA_SALTING,
     POINT_START,
-    SOURCE_1,
+    SOURCE_1
 } from "../testconstants";
-import {
-    createLineString,
-    createLineStringGeometries,
-    createZigZagCoordinates,
-} from "../testutil";
+import { createLineString, createLineStringGeometries, createZigZagCoordinates } from "../testutil";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const autoriUpdateService = createAutoriUpdateService();
 
-function createAutoriUpdateService() {
+function createAutoriUpdateService(): AutoriUpdate {
     return new AutoriUpdate(AutoriApi.prototype);
 }
 
@@ -66,73 +54,62 @@ describe(
         });
 
         test("resolveNextStartTimeForDataFetchFromHistory", () => {
-            const lastUdated = moment().subtract(1, "minutes").toDate();
+            const lastUdated = sub(new Date(), { minutes: 1 });
             const contract = {
                 contract: CONTRACT_ID,
                 data_last_updated: lastUdated,
                 domain: DOMAIN_1,
-                start_date: moment().subtract(30, "days").toDate(),
-                end_date: moment().add(30, "days").toDate(),
+                start_date: sub(new Date(), { days: 30 }),
+                end_date: add(new Date(), { days: 30 }),
                 name: "Urakka 1",
-                source: "Foo / Bar",
+                source: "Foo / Bar"
             } as DbDomainContract;
-            const resolved =
-                AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
+            const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
             expect(resolved).toEqual(lastUdated);
         });
 
         test("resolveNextStartTimeForDataFetchFromHistory over 12 month", () => {
             // max from 1.1.2022 or < 12 months - 1h
-            const shouldResolveTo = moment()
-                .subtract(AUTORI_MAX_MINUTES_TO_HISTORY, "minutes")
-                .toDate();
+            const shouldResolveTo = sub(new Date(), { minutes: AUTORI_MAX_MINUTES_TO_HISTORY });
 
-            const lastUdated = moment().subtract(13, "months").toDate();
+            const lastUdated = sub(new Date(), { months: 13 });
             const contract = {
                 contract: CONTRACT_ID,
                 data_last_updated: lastUdated,
                 domain: DOMAIN_1,
-                start_date: moment().subtract(30, "days").toDate(),
-                end_date: moment().add(30, "days").toDate(),
+                start_date: sub(new Date(), { days: 30 }),
+                end_date: add(new Date(), { days: 30 }),
                 name: "Urakka 1",
-                source: "Foo / Bar",
+                source: "Foo / Bar"
             } as DbDomainContract;
-            const resolved =
-                AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
-            Asserter.assertToBeCloseTo(
-                resolved.getTime(),
-                shouldResolveTo.getTime(),
-                10000
-            );
+            const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
+            Asserter.assertToBeCloseTo(resolved.getTime(), shouldResolveTo.getTime(), 10000);
         });
 
         test("resolveNextStartTimeForDataFetchFromHistory start date", () => {
-            const startDate = moment().subtract(2, "minutes").toDate();
+            const startDate = sub(new Date(), { minutes: 2 });
             const contract = {
                 contract: CONTRACT_ID,
                 data_last_updated: undefined,
                 domain: DOMAIN_1,
                 start_date: startDate,
-                end_date: moment().add(30, "days").toDate(),
+                end_date: add(new Date(), { days: 30 }),
                 name: "Urakka 1",
-                source: "Foo / Bar",
+                source: "Foo / Bar"
             } as DbDomainContract;
-            const resolved =
-                AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
+            const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
             expect(resolved).toEqual(startDate);
         });
 
         test("resolveNextStartTimeForDataFetchFromHistory fall back", () => {
-            const fallBackMin = moment()
-                .subtract(AUTORI_MAX_MINUTES_TO_HISTORY, "minutes")
-                .subtract(1, "seconds")
-                .toDate()
-                .getTime();
-            const fallBackMax = moment()
-                .subtract(AUTORI_MAX_MINUTES_TO_HISTORY, "minutes")
-                .add(1, "seconds")
-                .toDate()
-                .getTime();
+            const fallBackMin = sub(new Date(), {
+                minutes: AUTORI_MAX_MINUTES_TO_HISTORY,
+                seconds: 1 // one second more than max value
+            }).getTime();
+            const fallBackMax = sub(new Date(), {
+                minutes: AUTORI_MAX_MINUTES_TO_HISTORY,
+                seconds: -1 // sub -1 s == add 1 s. Sub max minutes and add one second.
+            }).getTime();
             const contract = {
                 contract: CONTRACT_ID,
                 data_last_updated: undefined,
@@ -140,13 +117,10 @@ describe(
                 start_date: undefined,
                 end_date: undefined,
                 name: "Urakka 1",
-                source: "Foo / Bar",
+                source: "Foo / Bar"
             } as DbDomainContract;
-            const resolved =
-                AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
-            console.info(
-                `min ${fallBackMin} actual ${resolved.getTime()} max ${fallBackMax}`
-            );
+            const resolved = AutoriUtils.resolveNextStartTimeForDataFromApi(contract);
+            logger.debug(`min ${fallBackMin} actual ${resolved.getTime()} max ${fallBackMax}`);
             expect(resolved.getTime()).toBeGreaterThanOrEqual(fallBackMin);
             expect(resolved.getTime()).toBeLessThanOrEqual(fallBackMax);
         });
@@ -155,83 +129,55 @@ describe(
             await insertDomain(db, DOMAIN_1, SOURCE_1);
 
             const operations = [
-                AutoriTestutils.createApiOperationData(
-                    AUTORI_OPERATION_BRUSHING,
-                    DOMAIN_1
-                ),
-                AutoriTestutils.createApiOperationData(
-                    AUTORI_OPERATION_PAVING,
-                    DOMAIN_1
-                ),
+                AutoriTestutils.createApiOperationData(AUTORI_OPERATION_BRUSHING, DOMAIN_1),
+                AutoriTestutils.createApiOperationData(AUTORI_OPERATION_PAVING, DOMAIN_1)
             ];
             mockGetOperationsApiResponse(operations);
 
             await autoriUpdateService.updateTaskMappingsForDomain(DOMAIN_1);
 
-            const taskMappings1: DbDomainTaskMapping[] =
-                await inDatabaseReadonly((ro: DTDatabase) => {
-                    return DataDb.getTaskMappings(ro, DOMAIN_1);
-                });
+            const taskMappings1: DbDomainTaskMapping[] = await inDatabaseReadonly((ro: DTDatabase) => {
+                return DataDb.getTaskMappings(ro, DOMAIN_1);
+            });
 
             expect(taskMappings1.length).toEqual(2);
             expect(taskMappings1[0].name).toEqual(UNKNOWN_TASK_NAME);
             expect(taskMappings1[1].name).toEqual(UNKNOWN_TASK_NAME);
-            expect(
-                taskMappings1.find(
-                    (t) => t.original_id == AUTORI_OPERATION_BRUSHING
-                )?.domain
-            ).toEqual(DOMAIN_1);
-            expect(
-                taskMappings1.find(
-                    (t) => t.original_id == AUTORI_OPERATION_PAVING
-                )?.domain
-            ).toEqual(DOMAIN_1);
+            expect(taskMappings1.find((t) => t.original_id === AUTORI_OPERATION_BRUSHING)?.domain).toEqual(
+                DOMAIN_1
+            );
+            expect(taskMappings1.find((t) => t.original_id === AUTORI_OPERATION_PAVING)?.domain).toEqual(
+                DOMAIN_1
+            );
         });
 
         test("updateTasks existing not changed", async () => {
             await insertDomain(db, DOMAIN_1, SOURCE_1);
-            await insertDomaindTaskMapping(
-                db,
-                HARJA_SALTING,
-                AUTORI_OPERATION_BRUSHING,
-                DOMAIN_1,
-                false
-            );
+            await insertDomaindTaskMapping(db, HARJA_SALTING, AUTORI_OPERATION_BRUSHING, DOMAIN_1, false);
 
-            const operations = [
-                AutoriTestutils.createApiOperationData(
-                    AUTORI_OPERATION_BRUSHING,
-                    DOMAIN_1
-                ),
-            ];
+            const operations = [AutoriTestutils.createApiOperationData(AUTORI_OPERATION_BRUSHING, DOMAIN_1)];
             mockGetOperationsApiResponse(operations);
 
             await autoriUpdateService.updateTaskMappingsForDomain(DOMAIN_1);
 
-            const taskMappings1: DbDomainTaskMapping[] =
-                await inDatabaseReadonly((ro: DTDatabase) => {
-                    return DataDb.getTaskMappings(ro, DOMAIN_1);
-                });
+            const taskMappings1: DbDomainTaskMapping[] = await inDatabaseReadonly((ro: DTDatabase) => {
+                return DataDb.getTaskMappings(ro, DOMAIN_1);
+            });
 
             expect(taskMappings1.length).toEqual(1);
             expect(taskMappings1[0].name).toEqual(HARJA_SALTING);
             expect(taskMappings1[0].ignore).toEqual(false);
             expect(taskMappings1[0].domain).toEqual(DOMAIN_1);
-            expect(taskMappings1[0].original_id).toEqual(
-                AUTORI_OPERATION_BRUSHING
-            );
+            expect(taskMappings1[0].original_id).toEqual(AUTORI_OPERATION_BRUSHING);
         });
 
         test("updateContracts", async () => {
             const contract1Name = "Urakka 1";
             const contract2Name = "Urakka 2";
-            const contract1NewEndDate = moment().add(1, "years").toDate();
+            const contract1NewEndDate = add(new Date(), { years: 1 });
             const contracts = [
-                AutoriTestutils.createApiContractData(
-                    contract1Name,
-                    contract1NewEndDate
-                ),
-                AutoriTestutils.createApiContractData(contract2Name),
+                AutoriTestutils.createApiContractData(contract1Name, contract1NewEndDate),
+                AutoriTestutils.createApiContractData(contract2Name)
             ];
             await insertDomain(db, DOMAIN_1, SOURCE_1);
 
@@ -243,9 +189,7 @@ describe(
                 contract1.id,
                 contract1.name,
                 SOURCE_1,
-                contract1.startDate
-                    ? CommonDateUtils.dateFromIsoString(contract1.startDate)
-                    : undefined,
+                contract1.startDate ? CommonDateUtils.dateFromIsoString(contract1.startDate) : undefined,
                 new Date()
             );
 
@@ -255,10 +199,9 @@ describe(
             await autoriUpdateService.updateContractsForDomain(DOMAIN_1);
 
             // We should only get the existing with updated end date as the new one don't have source
-            const contractsWithSouce: DbDomainContract[] =
-                await inDatabaseReadonly((ro: DTDatabase) => {
-                    return DataDb.getContractsWithSource(ro, DOMAIN_1);
-                });
+            const contractsWithSouce: DbDomainContract[] = await inDatabaseReadonly((ro: DTDatabase) => {
+                return DataDb.getContractsWithSource(ro, DOMAIN_1);
+            });
 
             expect(contractsWithSouce.length).toEqual(1);
             expect(contractsWithSouce[0].contract).toEqual(contract1.id);
@@ -268,16 +211,16 @@ describe(
             expect(contractsWithSouce[0].end_date).toEqual(contract1NewEndDate);
 
             const all = await findAllDomaindContracts(db, DOMAIN_1);
-            const dbContract2 = all.find((c) => c.contract == contracts[1].id);
+            const dbContract2 = all.find((c) => c.contract === contracts[1].id);
             expect(dbContract2?.name).toEqual(contract2Name);
             expect(dbContract2?.source).toBeNull();
         });
 
         test("updateTrackings", async () => {
             const contractName = "Urakka 1";
-            const past3 = moment().subtract(6, "minutes").toDate();
-            const past2 = moment().subtract(4, "minutes").toDate();
-            const past1 = moment().subtract(2, "minutes").toDate();
+            const past3 = sub(new Date(), { minutes: 6 });
+            const past2 = sub(new Date(), { minutes: 4 });
+            const past1 = sub(new Date(), { minutes: 2 });
 
             await insertDomain(db, DOMAIN_1, SOURCE_1);
             await insertDomaindContract(
@@ -286,24 +229,12 @@ describe(
                 CONTRACT_ID,
                 contractName,
                 SOURCE_1,
-                moment().subtract(1, "months").toDate(),
-                moment().add(1, "months").toDate(),
+                sub(new Date(), { months: 1 }),
+                add(new Date(), { months: 1 }),
                 past3
             );
-            await insertDomaindTaskMapping(
-                db,
-                HARJA_BRUSHING,
-                AUTORI_OPERATION_BRUSHING,
-                DOMAIN_1,
-                false
-            );
-            await insertDomaindTaskMapping(
-                db,
-                HARJA_PAVING,
-                AUTORI_OPERATION_PAVING,
-                DOMAIN_1,
-                false
-            );
+            await insertDomaindTaskMapping(db, HARJA_BRUSHING, AUTORI_OPERATION_BRUSHING, DOMAIN_1, false);
+            await insertDomaindTaskMapping(db, HARJA_PAVING, AUTORI_OPERATION_PAVING, DOMAIN_1, false);
 
             // Create two routes, 2 days and 1 day old
             const route2d: ApiRouteData = AutoriTestutils.createApiRouteData(
@@ -327,12 +258,8 @@ describe(
             const updateTime = Date.now();
             const trackings = await findAllTrackings(db, DOMAIN_1);
             expect(trackings.length).toEqual(2);
-            const olderTracking = trackings.find(
-                (t) => t.message_original_id == route2d.id
-            );
-            const latestTracking = trackings.find(
-                (t) => t.message_original_id == route1d.id
-            );
+            const olderTracking = trackings.find((t) => t.message_original_id === route2d.id);
+            const latestTracking = trackings.find((t) => t.message_original_id === route1d.id);
 
             expect(olderTracking?.tasks.length).toEqual(1);
             expect(olderTracking?.tasks).toContain(HARJA_BRUSHING);
@@ -368,8 +295,7 @@ describe(
             expect(trackings.length).toBe(2);
             trackings.forEach((value) => {
                 expect(value.last_point.coordinates[2]).toEqual(0.5);
-                const coordinates = (value.geometry as GeoJsonLineString)
-                    .coordinates;
+                const coordinates = (value.geometry as GeoJsonLineString).coordinates;
                 expect(coordinates.length).toBeGreaterThanOrEqual(1);
                 coordinates.forEach((c) => {
                     expect(c[2]).toEqual(0.5);
@@ -387,16 +313,10 @@ describe(
                 contractName,
                 SOURCE_1,
                 new Date(),
-                moment().add(1, "months").toDate(),
+                add(new Date(), { months: 1 }),
                 new Date()
             );
-            await insertDomaindTaskMapping(
-                db,
-                HARJA_BRUSHING,
-                AUTORI_OPERATION_BRUSHING,
-                DOMAIN_1,
-                false
-            );
+            await insertDomaindTaskMapping(db, HARJA_BRUSHING, AUTORI_OPERATION_BRUSHING, DOMAIN_1, false);
 
             // Create one route with invalid linestring
             const route: ApiRouteData = AutoriTestutils.createApiRouteData(
@@ -414,24 +334,16 @@ describe(
             expect(trackings[0].geometry).toBeTruthy();
             expect(trackings[0].geometry).toEqual(trackings[0].last_point);
 
-            Asserter.assertToBeCloseTo(
-                trackings[0].last_point.coordinates[0],
-                POINT_START[0],
-                0.000001
-            );
-            Asserter.assertToBeCloseTo(
-                trackings[0].last_point.coordinates[1],
-                POINT_START[1],
-                0.000001
-            );
+            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[0], POINT_START[0], 0.000001);
+            Asserter.assertToBeCloseTo(trackings[0].last_point.coordinates[1], POINT_START[1], 0.000001);
             expect(trackings[0].last_point.coordinates[2]).toEqual(0);
         });
 
         test("updateTrackings and set previous reference", async () => {
             const contractName = "Urakka 1";
-            const updated1 = moment().subtract(15, "minutes").toDate();
-            const updated2 = moment(updated1).add(5, "minutes").toDate();
-            const updated3 = moment().subtract(2, "minutes").toDate();
+            const updated1 = sub(new Date(), { minutes: 15 });
+            const updated2 = add(updated1, { minutes: 5 });
+            const updated3 = sub(new Date(), { minutes: 2 });
 
             await insertDomain(db, DOMAIN_1, SOURCE_1);
             await insertDomaindContract(
@@ -440,24 +352,12 @@ describe(
                 CONTRACT_ID,
                 contractName,
                 SOURCE_1,
-                moment().subtract(1, "months").toDate(),
-                moment().add(1, "months").toDate(),
+                sub(new Date(), { months: 1 }),
+                add(new Date(), { months: 1 }),
                 updated1
             );
-            await insertDomaindTaskMapping(
-                db,
-                HARJA_BRUSHING,
-                AUTORI_OPERATION_BRUSHING,
-                DOMAIN_1,
-                false
-            );
-            await insertDomaindTaskMapping(
-                db,
-                HARJA_PAVING,
-                AUTORI_OPERATION_PAVING,
-                DOMAIN_1,
-                false
-            );
+            await insertDomaindTaskMapping(db, HARJA_BRUSHING, AUTORI_OPERATION_BRUSHING, DOMAIN_1, false);
+            await insertDomaindTaskMapping(db, HARJA_PAVING, AUTORI_OPERATION_PAVING, DOMAIN_1, false);
 
             // Create two routes, 2 days and 1 day old
             const coordinates: Position[] = createZigZagCoordinates(
@@ -482,7 +382,7 @@ describe(
                     updated3,
                     [createLineString(coords3)],
                     [AUTORI_OPERATION_BRUSHING]
-                ),
+                )
             ];
 
             mockGetWorkEventsApiResponse(routes);
@@ -500,20 +400,16 @@ describe(
             expect(trackings[2].geometry.coordinates.length).toEqual(17);
         });
 
-        function mockGetOperationsApiResponse(response: ApiOperationData[]) {
-            return sinon
-                .stub(AutoriApi.prototype, "getOperations")
-                .returns(Promise.resolve(response));
+        function mockGetOperationsApiResponse(response: ApiOperationData[]): void {
+            sinon.stub(AutoriApi.prototype, "getOperations").returns(Promise.resolve(response));
         }
 
-        function mockGetContractsApiResponse(response: ApiContractData[]) {
-            return sinon
-                .stub(AutoriApi.prototype, "getContracts")
-                .returns(Promise.resolve(response));
+        function mockGetContractsApiResponse(response: ApiContractData[]): void {
+            sinon.stub(AutoriApi.prototype, "getContracts").returns(Promise.resolve(response));
         }
 
-        function mockGetWorkEventsApiResponse(response: ApiRouteData[]) {
-            return sinon
+        function mockGetWorkEventsApiResponse(response: ApiRouteData[]): void {
+            sinon
                 .stub(AutoriApi.prototype, "getNextRouteDataForContract")
                 .withArgs(sinon.match.any, sinon.match.any, sinon.match.any)
                 .returns(Promise.resolve(response));

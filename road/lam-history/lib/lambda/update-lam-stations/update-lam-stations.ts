@@ -4,6 +4,7 @@ import { LamHistoryEnvKeys } from "../../keys";
 
 import { TmsHistorySecret } from "../../model/tms-history-secret";
 import { handleMetadataUpdate } from "../../service/update";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
 const bucketName = getEnvVariable(LamHistoryEnvKeys.BUCKET_NAME);
 const secretHolder = SecretHolder.create<TmsHistorySecret>("tms-history");
@@ -19,5 +20,8 @@ export const handler = async (): Promise<void> => {
     // Update pistejoukko-data
     await handleMetadataUpdate(secret.pistejoukkoUrl, secret.snowflakeApikey, bucketName, "pistejoukot.json");
 
-    console.info("method=lamHistory.updateMetadata tookMs=%d", Date.now() - start);
+    logger.info({
+        method: "TmsHistory.updateLamStations",
+        tookMs: Date.now() - start
+    });
 };

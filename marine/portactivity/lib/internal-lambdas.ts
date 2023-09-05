@@ -25,7 +25,7 @@ import { PortactivityConfiguration } from "./app-props";
 import { Topic } from "aws-cdk-lib/aws-sns";
 import { Scheduler } from "@digitraffic/common/dist/aws/infra/scheduler";
 
-export function create(stack: DigitrafficStack, queueAndDLQ: QueueAndDLQ, dlqBucket: Bucket) {
+export function create(stack: DigitrafficStack, queueAndDLQ: QueueAndDLQ, dlqBucket: Bucket): void {
     createProcessQueueLambda(queueAndDLQ.queue, stack);
     createProcessDLQLambda(dlqBucket, queueAndDLQ.dlq, stack);
 
@@ -150,7 +150,11 @@ export function create(stack: DigitrafficStack, queueAndDLQ: QueueAndDLQ, dlqBuc
     }
 }
 
-function createTriggerAwakeAiETXTimestampsLambda(stack: DigitrafficStack, topic: Topic, lambdaName: string) {
+function createTriggerAwakeAiETXTimestampsLambda(
+    stack: DigitrafficStack,
+    topic: Topic,
+    lambdaName: string
+): MonitoredFunction {
     const environment = stack.createLambdaEnvironment();
     environment[PortactivityEnvKeys.PUBLISH_TOPIC_ARN] = topic.topicArn;
     const lambda = MonitoredFunction.createV2(stack, lambdaName, environment, {

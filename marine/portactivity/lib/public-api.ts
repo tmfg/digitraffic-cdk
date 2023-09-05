@@ -163,7 +163,11 @@ export class PublicApi {
         return lambda;
     }
 
-    createTimestampMetadataResource(stack: DigitrafficStack, publicApi: RestApi, metadataResource: Resource) {
+    createTimestampMetadataResource(
+        stack: DigitrafficStack,
+        publicApi: RestApi,
+        metadataResource: Resource
+    ): void {
         const timestampMetadataResource = metadataResource.addResource("timestamps");
 
         new DigitrafficStaticIntegration(

@@ -42,7 +42,6 @@ export const handler: (
     }
 };
 
-// eslint-disable-next-line @rushstack/no-new-null
 function parseAuthentication(
     headers: APIGatewayRequestAuthorizerEventHeaders | null
 ): [string, string] | undefined {

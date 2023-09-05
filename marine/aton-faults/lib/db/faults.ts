@@ -108,8 +108,8 @@ const PS_FAULT_IDS_BY_AREA = new PreparedStatement({
     text: FAULT_IDS_BY_AREA
 });
 
-export function getFaultById(db: DTDatabase, faultId: number): Promise<DbFault | null> {
-    return db.oneOrNone(PS_FAULT_BY_ID, [faultId]);
+export function getFaultById(db: DTDatabase, faultId: number): Promise<DbFault | undefined> {
+    return db.oneOrNone(PS_FAULT_BY_ID, [faultId]).then((result: DbFault | null) => result ?? undefined);
 }
 
 interface DbFaultId {
@@ -168,11 +168,11 @@ export function findAll<T>(
     return db.manyOrNone(ps, [fixedLimit]).then((faults) => faults.map(conversion));
 }
 
-function parseHelsinkiTime(date: string | null): Date | null {
+function parseHelsinkiTime(date: string | null): Date | undefined {
     if (date !== null) {
         // incoming dates are in Finnish-time without timezone-info, this probably handles it correctly
         return zonedTimeToUtc(date, "Europe/Helsinki");
     }
 
-    return null;
+    return undefined;
 }
