@@ -4,6 +4,7 @@
 !.eslintrc.cjs
 !.gitignore
 !package.json
+!README.md
 !tscconfig.json
 
 !config/
