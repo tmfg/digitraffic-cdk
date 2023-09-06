@@ -4,7 +4,11 @@ import { globby } from "globby";
 import fs from "fs-extra";
 import chalk from "chalk";
 
-function getPackageJsons() {
+interface PackageJson {
+    dependencies: Record<string, string>;
+}
+
+function getPackageJsons(): Promise<string[]> {
     return globby([
         "aviation/*/package.json",
         "marine/*/package.json",
@@ -16,7 +20,7 @@ function getPackageJsons() {
     ]);
 }
 
-function checkDependencies(packageJson) {
+function checkDependencies(packageJson: PackageJson): [string, string][] {
     if ("dependencies" in packageJson) {
         const dependencies = Object.entries(packageJson.dependencies);
         return dependencies.filter(([key]) => key.startsWith("@types/"));
@@ -24,12 +28,12 @@ function checkDependencies(packageJson) {
     return [];
 }
 
-async function run() {
+async function run(): Promise<void> {
     const packages = await getPackageJsons();
     const dependencies = await Promise.all(
         packages.map(async (file) => ({
             project: file.replace("/package.json", ""),
-            items: checkDependencies(await fs.readJson(file))
+            items: checkDependencies((await fs.readJson(file)) as PackageJson)
         }))
     );
     const results = dependencies.filter(({ items }) => items.length !== 0);
