@@ -6,6 +6,7 @@
     "build:bundle": "npm run build && npm run bundle",
     "bundle": "esbuild --bundle src/cli/*.ts --outdir=dist/cli --platform=node --target=node18 --format=cjs",
     "ci:eslint-report": "eslint . --format html -o report.html || true",
+    "publish:cdk": "npm run build:bundle && cp dist/cli/*.js ../../common/scripts/",
     "test": "heft test --clean"
   },
   "dependencies": {

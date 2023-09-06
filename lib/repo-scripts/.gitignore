@@ -9,6 +9,10 @@
 !config/
 !config/*.json
 
+!dist/
+!dist/cli/
+!dist/cli/*.js
+
 !src/
 !src/**/
 !src/**/*.ts
