@@ -1,4 +1,4 @@
-#!/usr/bin/env node --input-type=module
+#!/usr/bin/env node
 
 import { globby } from "globby";
 import fs from "fs-extra";
@@ -50,4 +50,4 @@ async function run(): Promise<void> {
     }
 }
 
-await run();
+run().catch((error: Error) => console.error(error));

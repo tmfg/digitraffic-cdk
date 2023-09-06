@@ -1,4 +1,4 @@
-#!/usr/bin/env node --input-type=module
+#!/usr/bin/env node
 /* eslint-disable no-unused-expressions */
 
 import _ from "lodash";
@@ -55,4 +55,4 @@ async function run(): Promise<void> {
     $`git submodule update --init --recursive`;
 }
 
-await run();
+run().catch((error: Error) => console.error(error));
