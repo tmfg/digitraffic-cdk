@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --input-type=module
 
 import { globby } from "globby";
 import fs from "fs-extra";

@@ -1,4 +1,4 @@
-#!/usr/bin/env node
+#!/usr/bin/env node --input-type=module
 
 import _ from "lodash";
 import fs from "fs-extra";

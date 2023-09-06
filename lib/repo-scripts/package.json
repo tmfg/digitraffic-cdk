@@ -2,9 +2,11 @@
   "name": "@digitraffic-cdk/repo-scripts",
   "version": "1.0.0",
   "scripts": {
-    "build": "",
-    "ci:esbuild-report": "",
-    "test": ""
+    "build": "heft build --clean",
+    "build:bundle": "npm run build && npm run bundle",
+    "bundle": "esbuild --bundle src/cli/*.ts --outdir=dist/bundle --platform=node --target=node18 --format=esm",
+    "ci:eslint-report": "eslint . --format html -o report.html || true",
+    "test": "heft test --clean"
   },
   "dependencies": {
     "chalk": "~5.3.0",
