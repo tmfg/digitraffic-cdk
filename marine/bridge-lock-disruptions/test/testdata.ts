@@ -3,7 +3,7 @@ import { FeatureCollection } from "geojson";
 import { DISRUPTIONS_DATE_FORMAT } from "../lib/service/disruptions";
 import { format } from "date-fns";
 
-export function someNumber() {
+export function someNumber(): number {
     return Math.floor(Math.random() * 999999);
 }
 

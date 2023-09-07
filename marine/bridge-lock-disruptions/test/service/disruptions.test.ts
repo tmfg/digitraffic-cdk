@@ -1,64 +1,59 @@
-import { dbTestBase, insertDisruption } from "../db-testutil";
-import { newDisruption } from "../testdata";
-import * as DisruptionsService from "../../lib/service/disruptions";
-import * as DisruptionsDb from "../../lib/db/disruptions";
+import { dbTestBase } from "../db-testutil";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { TEST_FEATURE_COLLECTION } from "../testdisruptions";
+import { DisruptionsTestDriver } from "./disruptions.test.driver";
+import { normalizeDisruptionDate, validateGeoJson } from "../../lib/service/disruptions";
 
 describe(
     "disruptions",
     dbTestBase((db: DTDatabase) => {
+        let driver: DisruptionsTestDriver;
+
+        beforeEach(() => {
+            driver = new DisruptionsTestDriver(db);
+        });
+
         test("findAllDisruptions", async () => {
-            const disruptions = Array.from({
-                length: Math.floor(Math.random() * 10)
-            }).map(() => {
-                return newDisruption();
-            });
-            await insertDisruption(db, disruptions);
-
-            const [fetchedDisruptions, lastModified] = await DisruptionsService.findAllDisruptions();
-
-            expect(fetchedDisruptions.features.length).toBe(disruptions.length);
-            expect(lastModified.getTime()).toBeCloseTo(Date.now(), -4); // max 5 s diff
+            await driver.saveAndAssertDisruptions(DisruptionsTestDriver.createRandomDisruptions());
+            await driver.assertTimestampsCheckedAndUpdated();
         });
 
-        test("saveDisruptions - all new", async () => {
-            const disruptions = Array.from({
-                length: Math.floor(Math.random() * 10)
-            }).map(() => {
-                return newDisruption();
-            });
-
-            await DisruptionsService.saveDisruptions(disruptions);
-
-            const savedDisruptions = await DisruptionsDb.findAll(db);
-            expect(savedDisruptions.length).toBe(disruptions.length);
+        test("saveDisruptions - empty - no changes", async () => {
+            await driver.saveAndAssertDisruptions([]);
+            await driver.assertTimestampsCheckedNotUpdated();
         });
 
-        test("saveDisruptions - remove one old", async () => {
-            const disruptions = Array.from({
-                length: Math.floor(Math.random() * 10)
-            }).map(() => {
-                return newDisruption();
-            });
+        test("saveDisruptions - remove one old and add new ones", async () => {
+            await driver.saveAndAssertDisruptions(DisruptionsTestDriver.createRandomDisruptions(1));
+            await driver.saveAndAssertDisruptions(DisruptionsTestDriver.createRandomDisruptions(5));
+            await driver.assertTimestampsCheckedAndUpdated();
+        });
 
-            await insertDisruption(db, [newDisruption()]);
-            expect((await DisruptionsDb.findAll(db)).length).toBe(1); // one already exists
-            await DisruptionsService.saveDisruptions(disruptions);
+        test("saveDisruptions - remove old ones", async () => {
+            await driver.saveAndAssertDisruptions(DisruptionsTestDriver.createRandomDisruptions());
+            await driver.saveAndAssertDisruptions([]);
+            await driver.assertTimestampsCheckedAndUpdated();
+        });
 
-            const savedDisruptions = await DisruptionsDb.findAll(db);
-            expect(savedDisruptions.length).toBe(disruptions.length);
+        test("saveDisruptions - update one with same data", async () => {
+            await driver.saveAndAssertDisruptions(DisruptionsTestDriver.createRandomDisruptions(1));
+            await driver.saveAndAssertDisruptions(driver.lastDisruptions);
+            await driver.assertTimestampsCheckedNotUpdated();
+        });
+
+        test("saveDisruptions - update multiple with same data", async () => {
+            await driver.saveAndAssertDisruptions(DisruptionsTestDriver.createRandomDisruptions(3));
+            await driver.saveAndAssertDisruptions(driver.lastDisruptions);
+            await driver.assertTimestampsCheckedNotUpdated();
         });
 
         test("validateGeoJson", () => {
             // single valid feature
-            expect(TEST_FEATURE_COLLECTION.features.filter(DisruptionsService.validateGeoJson).length).toBe(
-                1
-            );
+            expect(TEST_FEATURE_COLLECTION.features.filter(validateGeoJson).length).toBe(1);
         });
 
         test("normalizeDisruptionDate", () => {
-            const normalized = DisruptionsService.normalizeDisruptionDate("5.4.2020 1:01");
+            const normalized = normalizeDisruptionDate("5.4.2020 1:01");
 
             expect(normalized.getFullYear()).toBe(2020);
             expect(normalized.getMonth() + 1).toBe(4);

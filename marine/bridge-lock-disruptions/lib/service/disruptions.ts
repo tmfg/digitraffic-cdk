@@ -1,6 +1,10 @@
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
-import * as DisruptionsDB from "../db/disruptions";
-import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
+import {
+    DTDatabase,
+    DTTransaction,
+    inDatabaseReadonly,
+    inTransaction
+} from "@digitraffic/common/dist/database/database";
 import { Feature, FeatureCollection, GeoJSON, Geometry as GeoJSONGeometry } from "geojson";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 import { Disruption, SpatialDisruption } from "../model/disruption";
@@ -10,19 +14,21 @@ import { DisruptionFeature } from "../api/disruptions";
 import { Geometry } from "wkx";
 import { parse } from "date-fns";
 import { EPOCH } from "@digitraffic/common/dist/utils/date-utils";
+import { DbDisruption, deleteAllButDisruptions, findAll, updateDisruptions } from "../db/disruptions";
 
-export const DISRUPTIONS_DATE_FORMAT = "d.M.yyyy H:mm";
-const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
+export const DISRUPTIONS_DATE_FORMAT = "d.M.yyyy H:mm" as const;
+
+export const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS" as const;
+export const BRIDGE_LOCK_DISRUPTIONS_CHECK = "BRIDGE_LOCK_DISRUPTIONS_CHECK" as const;
 
 export function findAllDisruptions(): Promise<[FeatureCollection, Date]> {
     const start = Date.now();
     return inDatabaseReadonly(async (db: DTDatabase): Promise<[FeatureCollection, Date]> => {
-        const disruptions = await DisruptionsDB.findAll(db);
+        const disruptions = await findAll(db);
         const disruptionsFeatures = disruptions.map(convertFeature);
-        const lastUpdated = ((await LastUpdatedDB.getUpdatedTimestamp(
-            db,
-            BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE
-        )) ?? EPOCH) as Date;
+        const lastUpdated =
+            (await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE)) ?? EPOCH;
+
         return [createFeatureCollection(disruptionsFeatures, lastUpdated), lastUpdated];
     }).finally(() => {
         logger.info({
@@ -34,21 +40,38 @@ export function findAllDisruptions(): Promise<[FeatureCollection, Date]> {
 
 export async function saveDisruptions(disruptions: SpatialDisruption[]): Promise<void> {
     const start = Date.now();
-    await inDatabase(async (db: DTDatabase) => {
-        await DisruptionsDB.deleteAllButDisruptions(
-            db,
+    let deletedCount = 0;
+    let updatedCount = 0;
+
+    await inTransaction(async (tx: DTTransaction) => {
+        deletedCount = await deleteAllButDisruptions(
+            tx,
             disruptions.map((d) => d.Id)
         );
-        return db.tx((t) => {
-            return t.batch([
-                ...DisruptionsDB.updateDisruptions(db, disruptions),
-                LastUpdatedDB.updateUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE, new Date(start))
-            ]);
-        });
-    }).then((a) => {
+
+        updatedCount = (await tx.batch(updateDisruptions(tx, disruptions.reverse()))).reduce(
+            (sum, c) => sum + c,
+            0
+        );
+
+        const updatedTimestampUpdates = [
+            LastUpdatedDB.updateUpdatedTimestamp(tx, BRIDGE_LOCK_DISRUPTIONS_CHECK, new Date(start))
+        ];
+
+        // update timestamp only if new distributions are added/modified/deleted
+        if (deletedCount > 0 || updatedCount > 0) {
+            updatedTimestampUpdates.push(
+                LastUpdatedDB.updateUpdatedTimestamp(tx, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE, new Date(start))
+            );
+        }
+
+        return tx.batch(updatedTimestampUpdates);
+    }).finally(() => {
         logger.info({
             method: "DisruptionsService.saveDisruptions",
-            message: `Saved count=${a.length}`,
+            customCount: disruptions.length,
+            customUpdatedCount: updatedCount,
+            customDeletedCount: deletedCount,
             tookMs: Date.now() - start
         });
     });
@@ -94,7 +117,7 @@ export function validateGeoJson(geoJson: GeoJSON): boolean {
     }
 }
 
-export function convertFeature(disruption: DisruptionsDB.DbDisruption): Feature {
+export function convertFeature(disruption: DbDisruption): Feature {
     const properties: Disruption = {
         Id: disruption.id,
         Type_Id: disruption.type_id,

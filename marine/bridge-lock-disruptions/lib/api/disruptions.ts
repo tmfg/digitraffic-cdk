@@ -1,5 +1,5 @@
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Feature, Geometry } from "geojson";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
 
@@ -32,7 +32,7 @@ export interface DisruptionProperties {
     geometry: Geometry;
 }
 
-export function getDisruptionsFromServer(url: string) {
+export function getDisruptionsFromServer(url: string): Promise<AxiosResponse<ApiFeatures>> {
     const start = Date.now();
     return axios
         .get<ApiFeatures>(url, {

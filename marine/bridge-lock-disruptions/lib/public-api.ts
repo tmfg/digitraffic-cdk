@@ -50,7 +50,11 @@ export class PublicApi {
         );
     }
 
-    createDisruptionsResource(publicApi: RestApi, disruptionsJsonModel: IModel, stack: DigitrafficStack) {
+    createDisruptionsResource(
+        publicApi: RestApi,
+        disruptionsJsonModel: IModel,
+        stack: DigitrafficStack
+    ): void {
         const getDisruptionsLambda = MonitoredDBFunction.create(stack, "get-disruptions");
         const getDisruptionsIntegration = new DigitrafficIntegration(
             getDisruptionsLambda,
@@ -72,7 +76,7 @@ export class PublicApi {
         });
     }
 
-    createResourcePaths(publicApi: RestApi) {
+    createResourcePaths(publicApi: RestApi): void {
         const apiResource = publicApi.root.addResource("api");
 
         // new paths

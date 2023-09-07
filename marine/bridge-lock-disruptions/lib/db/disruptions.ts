@@ -1,16 +1,16 @@
 import { SpatialDisruption } from "../model/disruption";
-import { DTDatabase } from "@digitraffic/common/dist/database/database";
+import { DTDatabase, DTTransaction } from "@digitraffic/common/dist/database/database";
 import { Geometry } from "geojson";
 
 export interface DbDisruption {
-    id: number;
-    type_id: number;
-    start_date: Date;
-    end_date: Date;
-    geometry: string; // this is wkb when fetched from database
-    description_fi: string;
-    description_sv?: string;
-    description_en?: string;
+    readonly id: number;
+    readonly type_id: number;
+    readonly start_date: Date;
+    readonly end_date: Date;
+    readonly geometry: string; // this is wkb when fetched from database
+    readonly description_fi: string;
+    readonly description_sv?: string;
+    readonly description_en?: string;
 }
 
 // save with actual GeoJSON
@@ -19,7 +19,7 @@ interface DistruptionSaveObject extends Omit<DbDisruption, "geometry"> {
 }
 
 const UPSERT_DISRUPTIONS_SQL = `
-    INSERT INTO bridgelock_disruption (
+    INSERT INTO bridgelock_disruption as bd (
         id,
         type_id,
         start_date,
@@ -41,13 +41,14 @@ const UPSERT_DISRUPTIONS_SQL = `
            )
     ON CONFLICT(id) DO
     UPDATE SET
-        type_id = $(type_id),
-        start_date = $(start_date),
-        end_date = $(end_date),
-        geometry = ST_GeomFromGeoJSON($(geometry)),
-        description_fi = $(description_fi),
-        description_sv = $(description_sv),
-        description_en = $(description_en)
+        type_id = excluded.type_id,
+        start_date = excluded.start_date,
+        end_date = excluded.end_date,
+        geometry = excluded.geometry,
+        description_fi = excluded.description_fi,
+        description_sv = excluded.description_sv,
+        description_en = excluded.description_en
+    WHERE bd IS DISTINCT FROM excluded
 `;
 
 const SELECT_DISRUPTION_SQL = `
@@ -63,38 +64,30 @@ const SELECT_DISRUPTION_SQL = `
     FROM bridgelock_disruption
 `;
 
-export function findAll(db: DTDatabase): Promise<DbDisruption[]> {
+export function findAll(db: DTDatabase | DTTransaction): Promise<DbDisruption[]> {
     return db.tx((t) => t.manyOrNone(SELECT_DISRUPTION_SQL));
 }
 
 export function updateDisruptions(
-    db: DTDatabase,
+    db: DTTransaction | DTDatabase,
     disruptions: SpatialDisruption[]
-): Promise<null>[] {
+): Promise<number>[] {
     return disruptions.map((disruption) => {
-        return db.none(UPSERT_DISRUPTIONS_SQL, createEditObject(disruption));
+        return db.result(UPSERT_DISRUPTIONS_SQL, createEditObject(disruption), (r) => r.rowCount);
     });
 }
 
-export function deleteAllButDisruptions(
-    db: DTDatabase,
-    ids: number[]
-): Promise<null> {
+export function deleteAllButDisruptions(db: DTTransaction | DTDatabase, ids: number[]): Promise<number> {
     if (ids.length === 0) {
-        return db.tx((t) => t.none("DELETE FROM bridgelock_disruption"));
+        return db.tx((t) => t.result("DELETE FROM bridgelock_disruption", [], (r) => r.rowCount));
     } else {
         return db.tx((t) =>
-            t.none(
-                "DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)",
-                ids
-            )
+            t.result("DELETE FROM bridgelock_disruption WHERE id NOT IN ($1:csv)", [ids], (r) => r.rowCount)
         );
     }
 }
 
-export function createEditObject(
-    disruption: SpatialDisruption
-): DistruptionSaveObject {
+export function createEditObject(disruption: SpatialDisruption): DistruptionSaveObject {
     return {
         id: disruption.Id,
         type_id: disruption.Type_Id,
@@ -103,6 +96,6 @@ export function createEditObject(
         geometry: disruption.geometry,
         description_fi: disruption.DescriptionFi,
         description_sv: disruption.DescriptionSv,
-        description_en: disruption.DescriptionEn,
+        description_en: disruption.DescriptionEn
     };
 }

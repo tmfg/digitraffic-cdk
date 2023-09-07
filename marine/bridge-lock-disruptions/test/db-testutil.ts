@@ -3,9 +3,10 @@ import * as DisruptionsDb from "../lib/db/disruptions";
 import { dbTestBase as commonDbTestBase } from "@digitraffic/common/dist/test/db-testutils";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import * as LastUpdatedDB from "@digitraffic/common/dist/database/last-updated";
+import { BRIDGE_LOCK_DISRUPTIONS_CHECK, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE } from "../lib/service/disruptions";
 
-export function dbTestBase(fn: (db: DTDatabase) => void) {
-    return commonDbTestBase(fn, truncate, "marine", "marine", "localhost:54321/marine");
+export function dbTestBase(fn: (db: DTDatabase) => void): () => void {
+    return commonDbTestBase(fn, truncate, "marine", "marine", "127.0.0.1:54321/marine");
 }
 
 export async function truncate(db: DTDatabase): Promise<void> {
@@ -14,7 +15,25 @@ export async function truncate(db: DTDatabase): Promise<void> {
     });
 }
 
-const BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE = "BRIDGE_LOCK_DISRUPTIONS";
+export interface UpdatedTimestamps {
+    updated: number;
+    checked: number;
+}
+
+export async function getUpdatedTimestamps(db: DTDatabase): Promise<UpdatedTimestamps> {
+    const updated = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_DATA_TYPE);
+    const checked = await LastUpdatedDB.getUpdatedTimestamp(db, BRIDGE_LOCK_DISRUPTIONS_CHECK);
+
+    if (!updated || !checked) {
+        throw new Error("nulls detected");
+    }
+
+    return {
+        updated: updated.getTime(),
+        checked: checked.getTime()
+    };
+}
+
 export async function insertDisruption(db: DTDatabase, disruptions: SpatialDisruption[]): Promise<void> {
     await db.tx(async (t) => {
         const queries: Promise<null>[] = disruptions.map((disruption) => {
