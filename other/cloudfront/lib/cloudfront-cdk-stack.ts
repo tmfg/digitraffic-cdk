@@ -56,7 +56,7 @@ export class CloudfrontCdkStack extends Stack {
     constructor(scope: Construct, id: string, cloudfrontProps: CFProps, props?: StackProps) {
         super(scope, id, props);
 
-        const { distributions, lambdaParameters, bucketLogging } = cloudfrontProps;
+        const { distributions, lambdaParameters, bucketLogging, secretsArn } = cloudfrontProps;
 
         this.validateDefaultBehaviors(distributions);
 
@@ -68,7 +68,8 @@ export class CloudfrontCdkStack extends Stack {
                 distributionProps,
                 lambdaMap,
                 realtimeLogConfigArn,
-                bucketLogging
+                bucketLogging,
+                secretsArn
             })
         );
 
@@ -250,13 +251,14 @@ export class CloudfrontCdkStack extends Stack {
         lambdaMap: LambdaHolder;
         realtimeLogConfigArn: string;
         bucketLogging?: CFProps["bucketLogging"];
+        secretsArn?: string;
     }): CloudFrontWebDistribution {
-        const { distributionProps, lambdaMap, realtimeLogConfigArn, bucketLogging } = props;
+        const { distributionProps, lambdaMap, realtimeLogConfigArn, bucketLogging, secretsArn } = props;
         const oai = distributionProps.originAccessIdentity
             ? new OriginAccessIdentity(this, `${distributionProps.environmentName}-oai`)
             : undefined;
         const originConfigs = distributionProps.origins.map((d) =>
-            createOriginConfig(this, d, oai, lambdaMap)
+            createOriginConfig(this, d, oai, lambdaMap, secretsArn)
         );
         const distribution = createDistribution(this, {
             distributionProps,
