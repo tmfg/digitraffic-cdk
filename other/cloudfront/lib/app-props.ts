@@ -135,6 +135,7 @@ export class CFDomain extends CFOrigin {
     httpPort?: number;
     httpsPort?: number;
     apiKey?: string;
+    cfName?: string;
     headers: Record<string, string> = {};
 
     constructor(domainName: string, ...behaviors: CFBehavior[]) {
@@ -158,6 +159,22 @@ export class CFDomain extends CFOrigin {
         const domain = this.apiGateway(domainName, ...behaviors);
 
         domain.apiKey = apiKey;
+
+        return domain;
+    }
+
+    /**
+     * Creates a domain that adds a custom header to the request made to the origin. This header can be used by
+     * the origin (most likely an ALB) to check that the request is coming from this CloudFront.
+     *
+     * @param domainName
+     * @param cfName
+     * @param behaviors
+     */
+    static alb(domainName: string, cfName: string, ...behaviors: CFBehavior[]): CFDomain {
+        const domain = new CFDomain(domainName, ...behaviors);
+
+        domain.cfName = cfName;
 
         return domain;
     }
@@ -247,6 +264,7 @@ export interface CFProps {
     readonly elasticProps?: ElasticProps;
     readonly elasticAppName: string; // remove this when centralized logging is default
     readonly distributions: DistributionProps[];
+    readonly secretsArn?: string;
     readonly lambdaParameters?: CFLambdaParameters;
     /** Enable standard S3 logging for CF distributions */
     readonly bucketLogging?: {

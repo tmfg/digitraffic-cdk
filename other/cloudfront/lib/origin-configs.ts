@@ -1,4 +1,4 @@
-import { Duration, Stack } from "aws-cdk-lib";
+import { Arn, Duration, Stack } from "aws-cdk-lib";
 import {
     Behavior,
     LambdaFunctionAssociation,
@@ -10,12 +10,14 @@ import { FunctionAssociation } from "aws-cdk-lib/aws-cloudfront/lib/function";
 import { Bucket } from "aws-cdk-lib/aws-s3";
 import { CFBehavior, CFDomain, CFOrigin, S3Domain } from "./app-props";
 import { LambdaHolder } from "./lambda-holder";
+import { Secret } from "aws-cdk-lib/aws-secretsmanager";
 
 export function createOriginConfig(
     stack: Stack,
     origin: CFOrigin,
     oai: OriginAccessIdentity | undefined,
-    lambdaMap: LambdaHolder
+    lambdaMap: LambdaHolder,
+    secretsArn: string | undefined
 ): SourceConfiguration {
     if (origin instanceof S3Domain) {
         if (!oai) {
@@ -49,7 +51,7 @@ export function createOriginConfig(
                 httpsPort: origin.httpsPort ?? 443,
                 originProtocolPolicy: origin.originProtocolPolicy,
                 originPath: origin.originPath,
-                originHeaders: createOriginHeaders(origin)
+                originHeaders: createOriginHeaders(origin, secretsArn, stack)
             },
             behaviors: createBehaviors(origin.behaviors, lambdaMap, false)
         };
@@ -58,11 +60,24 @@ export function createOriginConfig(
     throw new Error(`Unknown distribution type ` + origin.constructor.name);
 }
 
-function createOriginHeaders(domain: CFDomain): Record<string, string> {
+function createOriginHeaders(
+    domain: CFDomain,
+    secretsArn: string | undefined,
+    stack: Stack
+): Record<string, string> {
     const headers = { ...domain.headers };
 
     if (domain.apiKey !== undefined) {
         headers["x-api-key"] = domain.apiKey;
+    }
+    if (domain.cfName !== undefined) {
+        if (secretsArn === undefined) {
+            throw new Error("Secrets ARN was undefined!");
+        }
+        const secret = Secret.fromSecretCompleteArn(stack, domain.cfName + "-secret", secretsArn);
+        const cfHeaderName = secret.secretValueFromJson("cfHeaderName").toString();
+        const cfHeaderValue = secret.secretValueFromJson("cfHeaderValue").toString();
+        headers[cfHeaderName] = cfHeaderValue;
     }
 
     return headers;
