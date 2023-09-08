@@ -34,7 +34,7 @@
     /**
      * The list of shell commands to run before the Rush installation starts
      */
-    "preRushInstall": ["common/scripts/run-with-zx.sh common/scripts/git-init-submodule.mjs"],
+    "preRushInstall": ["node common/scripts/git-init-submodule.js"],
 
     /**
      * The list of shell commands to run after the Rush installation finishes
@@ -255,6 +255,11 @@
     },
 
     // internal / tools
+    {
+      "packageName": "@digitraffic-cdk/repo-scripts",
+      "projectFolder": "lib/repo-scripts",
+      "tags": ["internal"]
+    },
     {
       "packageName": "@digitraffic-cdk/eslint-config",
       "projectFolder": "tools/eslint-config",
