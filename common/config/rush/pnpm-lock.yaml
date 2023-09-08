@@ -1754,8 +1754,8 @@ importers:
         specifier: ~3.395.0
         version: 3.395.0
       '@digitraffic/common':
-        specifier: 2023.8.10-1
-        version: 2023.8.10-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.10)(aws-cdk-lib@2.85.0)(aws-sdk@2.1405.0)(axios@1.4.0)(change-case@4.1.2)(constructs@10.2.61)(date-fns-tz@2.0.0)(date-fns@2.29.3)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.3)
+        specifier: 2023.9.8-1
+        version: 2023.9.8-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.10)(aws-cdk-lib@2.85.0)(aws-sdk@2.1405.0)(axios@1.4.0)(change-case@4.1.2)(constructs@10.2.61)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.3)
       '@middy/core':
         specifier: ^4.3.1
         version: 4.4.3
@@ -1775,11 +1775,11 @@ importers:
         specifier: ^10.2.17
         version: 10.2.61
       date-fns:
-        specifier: ~2.29.3
-        version: 2.29.3
+        specifier: ~2.30.0
+        version: 2.30.0
       date-fns-tz:
         specifier: ~2.0.0
-        version: 2.0.0(date-fns@2.29.3)
+        version: 2.0.0(date-fns@2.30.0)
       mysql2:
         specifier: ^3.0.1
         version: 3.3.3
@@ -5949,8 +5949,8 @@ packages:
       pg-promise: 11.5.3(pg-native@3.0.1)
     dev: false
 
-  /@digitraffic/common@2023.8.10-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.10)(aws-cdk-lib@2.85.0)(aws-sdk@2.1405.0)(axios@1.4.0)(change-case@4.1.2)(constructs@10.2.61)(date-fns-tz@2.0.0)(date-fns@2.29.3)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.3):
-    resolution: {integrity: sha512-qLwLP92AyxF5Jir0p7Sm96CJxzo/6ll8ugyqVBs0iRQVjCfz97c2rZ05IcrMZGm5ha43slq6zHZMsFlVNKdcig==}
+  /@digitraffic/common@2023.9.8-1(@aws-cdk/aws-synthetics-alpha@2.85.0-alpha.0)(@types/geojson@7946.0.10)(aws-cdk-lib@2.85.0)(aws-sdk@2.1405.0)(axios@1.4.0)(change-case@4.1.2)(constructs@10.2.61)(date-fns-tz@2.0.0)(date-fns@2.30.0)(etag@1.8.1)(geojson-validation@1.0.2)(node-ttl@0.2.0)(pg-native@3.0.1)(pg-promise@11.5.3):
+    resolution: {integrity: sha512-qZh6r6p8RLS7fclb5ek/Zb62LrRmPj8utE9x6fkeDp36gwp6ggKFSPTb+SC2LyCDwtcVYMPjSKVBcBW4f/oBbA==}
     engines: {node: '>=14 <17 || >=18 <19'}
     peerDependencies:
       '@aws-cdk/aws-synthetics-alpha': ^2.85.0-alpha.0
@@ -5975,8 +5975,8 @@ packages:
       axios: 1.4.0
       change-case: 4.1.2
       constructs: 10.2.61
-      date-fns: 2.29.3
-      date-fns-tz: 2.0.0(date-fns@2.29.3)
+      date-fns: 2.30.0
+      date-fns-tz: 2.0.0(date-fns@2.30.0)
       etag: 1.8.1
       geojson-validation: 1.0.2
       node-ttl: 0.2.0
@@ -8955,25 +8955,12 @@ packages:
     engines: {node: '>= 12'}
     dev: false
 
-  /date-fns-tz@2.0.0(date-fns@2.29.3):
-    resolution: {integrity: sha512-OAtcLdB9vxSXTWHdT8b398ARImVwQMyjfYGkKD2zaGpHseG2UPHbHjXELReErZFxWdSLph3c2zOaaTyHfOhERQ==}
-    peerDependencies:
-      date-fns: '>=2.0.0'
-    dependencies:
-      date-fns: 2.29.3
-    dev: false
-
   /date-fns-tz@2.0.0(date-fns@2.30.0):
     resolution: {integrity: sha512-OAtcLdB9vxSXTWHdT8b398ARImVwQMyjfYGkKD2zaGpHseG2UPHbHjXELReErZFxWdSLph3c2zOaaTyHfOhERQ==}
     peerDependencies:
       date-fns: '>=2.0.0'
     dependencies:
       date-fns: 2.30.0
-
-  /date-fns@2.29.3:
-    resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
-    engines: {node: '>=0.11'}
-    dev: false
 
   /date-fns@2.30.0:
     resolution: {integrity: sha512-fnULvOpxnC5/Vg3NCiWelDsLiUc9bRwAPs/+LfTLNvetFCtCTN+yQz15C/fs4AwX1R9K5GLtLfn8QW+dWisaAw==}

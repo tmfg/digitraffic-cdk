@@ -6,6 +6,7 @@ import { DigitrafficRestApi } from "@digitraffic/common/dist/aws/infra/stack/res
 import type { DigitrafficStack } from "@digitraffic/common/dist/aws/infra/stack/stack.js";
 import { createDefaultUsagePlan } from "@digitraffic/common/dist/aws/infra/usage-plans.js";
 import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes.js";
+import type { ModelWithReference } from "@digitraffic/common/dist/aws/types/model-with-reference.js";
 import {
     addDefaultValidator,
     addServiceModel,
@@ -19,7 +20,6 @@ import {
     createPassengerInformationMessageSchema,
     createVideoSchema
 } from "./model/json-schema/passenger-information.js";
-import type { ModelWithReference } from "@digitraffic/common/dist/aws/types/model-with-reference.js";
 
 export class PublicApi {
     readonly publicApi: DigitrafficRestApi;
@@ -104,6 +104,8 @@ export class PublicApi {
             ]
         });
 
+        this.publicApi.addCorsOptions(activeResource);
+
         this.publicApi.documentResource(
             activeResource,
             DocumentationPart.method(
@@ -183,6 +185,8 @@ export class PublicApi {
                 DigitrafficMethodResponse.response400(errorResponseModel)
             ]
         });
+
+        this.publicApi.addCorsOptions(updatedAfterResource);
 
         this.publicApi.documentResource(
             updatedAfterResource,
