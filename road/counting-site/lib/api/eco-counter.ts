@@ -3,6 +3,8 @@ import { MediaType } from "@digitraffic/common/dist/aws/types/mediatypes";
 import { ApiCounter } from "../model/counter";
 import { ApiData } from "../model/data";
 import { ApiChannel, ApiSite } from "../model/site";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 export const URL_ALL_SITES = "/api/1.0/site";
 export const URL_SITE_DATA = "/api/1.0/data/site";
@@ -20,28 +22,37 @@ export class EcoCounterApi {
         const start = Date.now();
         const serverUrl = `${this.endpointUrl}${url}`;
 
-        console.info("sending to url " + serverUrl);
+        logger.info({
+            method: "EcoCounterApi.getFromServer",
+            message: "sending to url " + serverUrl
+        });
 
         try {
             const resp = await axios.get<T>(serverUrl, {
                 headers: {
                     accept: MediaType.APPLICATION_JSON,
-                    Authorization: this.token,
-                },
+                    Authorization: this.token
+                }
             });
             if (resp.status !== 200) {
-                console.error(
-                    `method=${method} returned status=${resp.status}`
-                );
+                logger.error({
+                    method: "EcoCounterApi.getFromServer",
+                    customHttpMethod: method,
+                    customStatus: resp.status
+                });
+
                 return Promise.reject();
             }
             return resp.data;
         } catch (error) {
-            console.error(`error from ${serverUrl}`);
-            console.error(`method=${method} failed`);
+            logException(logger, error);
+
             return Promise.reject();
         } finally {
-            console.info(`method=${method} tookMs=${Date.now() - start}`);
+            logger.info({
+                method: "EcoCounterApi.getFromServer",
+                tookMs: Date.now() - start
+            });
         }
     }
 
@@ -49,12 +60,7 @@ export class EcoCounterApi {
         return this.getFromServer("getSites", URL_ALL_SITES);
     }
 
-    getDataForSite(
-        siteId: number,
-        interval: number,
-        from: Date,
-        to: Date
-    ): Promise<ApiData[]> {
+    getDataForSite(siteId: number, interval: number, from: Date, to: Date): Promise<ApiData[]> {
         const fromString = from.toISOString().substring(0, 19); // strip milliseconds
         const toString = to.toISOString().substring(0, 19);
         const intervalString = interval === 60 ? "hour" : `${interval}m`;
@@ -75,8 +81,8 @@ export class EcoCounterApi {
                     c.id,
                     {
                         ...c,
-                        ...{ name: `${site.name} ${c.name}` },
-                    },
+                        ...{ name: `${site.name} ${c.name}` }
+                    }
                 ])
         );
 

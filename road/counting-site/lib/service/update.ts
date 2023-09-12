@@ -1,15 +1,17 @@
-import * as CounterDAO from "../dao/counter";
-import * as DataDAO from "../dao/data";
-import {
-    DTDatabase,
-    inDatabase,
-    inDatabaseReadonly,
-} from "@digitraffic/common/dist/database/database";
+import { DTDatabase, inDatabase, inDatabaseReadonly } from "@digitraffic/common/dist/database/database";
 import { EcoCounterApi } from "../api/eco-counter";
 import { ApiCounter, DbCounter } from "../model/counter";
 import moment from "moment";
-import * as LastUpdatedDb from "@digitraffic/common/dist/database/last-updated";
-import { DataType } from "@digitraffic/common/dist/database/last-updated";
+import { DataType, updateLastUpdated } from "@digitraffic/common/dist/database/last-updated";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import {
+    findAllCountersForUpdateForDomain,
+    insertCounters,
+    removeCounters,
+    updateCounterTimestamp,
+    updateCounters
+} from "../dao/counter";
+import { insertCounterValues } from "../dao/data";
 
 export async function updateMetadataForDomain(
     domainName: string,
@@ -21,42 +23,23 @@ export async function updateMetadataForDomain(
     const countersInApi = await api.getAllCounters(); // site_id -> counter
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
-    const [newCounters, removedCounters, updatedCounters] = compareCounters(
-        countersInApi,
-        countersInDb
-    );
+    const [newCounters, removedCounters, updatedCounters] = compareCounters(countersInApi, countersInDb);
 
     return inDatabase(async (db) => {
         const updatedTimestamp = new Date();
 
-        await CounterDAO.insertCounters(db, domainName, newCounters);
-        await CounterDAO.removeCounters(db, removedCounters);
-        await CounterDAO.updateCounters(db, updatedCounters);
+        await insertCounters(db, domainName, newCounters);
+        await removeCounters(db, removedCounters);
+        await updateCounters(db, updatedCounters);
 
-        if (
-            newCounters.length > 0 ||
-            removedCounters.length > 0 ||
-            updatedCounters.length > 0
-        ) {
-            await LastUpdatedDb.updateLastUpdated(
-                db,
-                DataType.COUNTING_SITES_METADATA,
-                updatedTimestamp
-            );
+        if (newCounters.length > 0 || removedCounters.length > 0 || updatedCounters.length > 0) {
+            await updateLastUpdated(db, DataType.COUNTING_SITES_METADATA, updatedTimestamp);
         }
-        await LastUpdatedDb.updateLastUpdated(
-            db,
-            DataType.COUNTING_SITES_METADATA_CHECK,
-            updatedTimestamp
-        );
+        await updateLastUpdated(db, DataType.COUNTING_SITES_METADATA_CHECK, updatedTimestamp);
     });
 }
 
-export async function updateDataForDomain(
-    domainName: string,
-    apiKey: string,
-    url: string
-): Promise<void> {
+export async function updateDataForDomain(domainName: string, apiKey: string, url: string): Promise<void> {
     const api = new EcoCounterApi(apiKey, url);
     const countersInDb = await getAllCountersFromDb(domainName); // site_id -> counter
 
@@ -77,44 +60,33 @@ export async function updateDataForDomain(
                         endStamp.toDate()
                     );
 
-                    console.info(
-                        "method=updateDataForDomain counter=%d updatedCount=%d",
-                        counter.id,
-                        data.length
-                    );
+                    logger.info({
+                        method: "UpdateService.updateDataForDomain",
+                        customCounter: counter.id,
+                        customUpdatedCount: data.length
+                    });
 
-                    await DataDAO.insertCounterValues(
-                        db,
-                        counter.id,
-                        counter.interval,
-                        data
-                    );
-                    return CounterDAO.updateCounterTimestamp(
-                        db,
-                        counter.id,
-                        endStamp.toDate()
-                    );
+                    await insertCounterValues(db, counter.id, counter.interval, data);
+                    return updateCounterTimestamp(db, counter.id, endStamp.toDate());
                 }
 
-                console.info("no need to update %d", counter.id);
+                logger.info({
+                    method: "UpdateService.updateDataForDomain",
+                    message: `no need to update ${counter.id}`
+                });
+
                 return;
             })
         );
 
-        await LastUpdatedDb.updateLastUpdated(
-            db,
-            DataType.COUNTING_SITES_DATA,
-            new Date()
-        );
+        await updateLastUpdated(db, DataType.COUNTING_SITES_DATA, new Date());
     });
 }
 
 function isDataUpdateNeeded(counter: DbCounter): boolean {
     return (
         !counter.last_data_timestamp ||
-        moment(counter.last_data_timestamp).isBefore(
-            moment().subtract(2, "days")
-        )
+        moment(counter.last_data_timestamp).isBefore(moment().subtract(2, "days"))
     );
 }
 
@@ -137,11 +109,9 @@ function compareCounters(
     return [newCounters, removedCounters, updatedCounters];
 }
 
-async function getAllCountersFromDb(
-    domain: string
-): Promise<Record<number, DbCounter>> {
+async function getAllCountersFromDb(domain: string): Promise<Record<number, DbCounter>> {
     const counters = await inDatabaseReadonly((db) => {
-        return CounterDAO.findAllCountersForUpdateForDomain(db, domain);
+        return findAllCountersForUpdateForDomain(db, domain);
     });
 
     return Object.fromEntries(counters.map((c: DbCounter) => [c.site_id, c]));

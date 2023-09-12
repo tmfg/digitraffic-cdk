@@ -4,6 +4,8 @@ import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secre
 import { CountingSitesSecret } from "../../model/counting-sites-secret";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const domainName = getEnvVariable(CountingSitesEnvKeys.DOMAIN_NAME);
 const domainPrefix = getEnvVariable(CountingSitesEnvKeys.DOMAIN_PREFIX);
@@ -18,7 +20,13 @@ export const handler = async (): Promise<void> => {
         .setCredentials()
         .then(() => secretHolder.get())
         .then((secret) => UpdateService.updateDataForDomain(domainName, secret.apiKey, secret.url))
+        .catch((error: Error) => {
+            logException(logger, error);
+        })
         .finally(() => {
-            console.info("method=updateData.%s tookMs=%d", domainName, Date.now() - start);
+            logger.info({
+                method: `updateData.${domainName}`,
+                tookMs: Date.now() - start
+            });
         });
 };

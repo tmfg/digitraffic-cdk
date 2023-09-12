@@ -4,6 +4,8 @@ import { CountingSitesEnvKeys } from "../../keys";
 import { SecretHolder } from "@digitraffic/common/dist/aws/runtime/secrets/secret-holder";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { getEnvVariable } from "@digitraffic/common/dist/utils/utils";
+import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const domainName = getEnvVariable(CountingSitesEnvKeys.DOMAIN_NAME);
 const domainPrefix = getEnvVariable(CountingSitesEnvKeys.DOMAIN_PREFIX);
@@ -18,7 +20,13 @@ export const handler = async (): Promise<void> => {
         .setCredentials()
         .then(() => secretHolder.get())
         .then((secret) => UpdateService.updateMetadataForDomain(domainName, secret.apiKey, secret.url))
+        .catch((error: Error) => {
+            logException(logger, error);
+        })
         .finally(() => {
-            console.info("method=updateMetadata.%s tookMs=%d", domainName, Date.now() - start);
+            logger.info({
+                method: `updateMetadata.${domainName}`,
+                tookMs: Date.now() - start
+            });
         });
 };

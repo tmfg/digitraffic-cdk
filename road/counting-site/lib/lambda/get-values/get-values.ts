@@ -3,6 +3,7 @@ import { LambdaResponse } from "@digitraffic/common/dist/aws/types/lambda-respon
 import { validate, ValuesQueryParameters } from "../../model/parameters";
 import { ProxyHolder } from "@digitraffic/common/dist/aws/runtime/secrets/proxy-holder";
 import { logger } from "@digitraffic/common/dist/aws/runtime/dt-logger-default";
+import { logException } from "@digitraffic/common/dist/utils/logging";
 
 const proxyHolder = ProxyHolder.create();
 
@@ -28,12 +29,8 @@ export const handler = (event: ValuesQueryParameters): Promise<LambdaResponse> =
             return LambdaResponse.okJson(data).withTimestamp(lastModified);
         })
         .catch((error: Error) => {
-            console.info("error " + error.toString());
-            logger.error({
-                method: "CountingSites.GetData",
-                message: "Failed to get values",
-                error: error
-            });
+            logException(logger, error);
+
             return LambdaResponse.internalError();
         })
         .finally(() => {
