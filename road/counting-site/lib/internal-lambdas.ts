@@ -12,7 +12,6 @@ export class InternalLambdas {
         Scheduler.everyHour(stack, "RuleForMetadataUpdate", updateMetadataLambda);
         Scheduler.everyHour(stack, "RuleForDataUpdate", updateDataLambda);
 
-        // eslint-disable-next-line no-new
         new DigitrafficLogSubscriptions(stack, updateMetadataLambda, updateDataLambda);
         stack.grantSecret(updateMetadataLambda, updateDataLambda);
     }
