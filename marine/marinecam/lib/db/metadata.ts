@@ -33,7 +33,7 @@ export function updateCameraMetadata(
     db: DTDatabase,
     cameraIds: string[],
     updated: Date
-): Promise<PromiseSettledResult<null>[]> {
+): Promise<PromiseSettledResult<unknown>[]> {
     return Promise.allSettled(
         cameraIds.map((cameraId: string) => {
             return db.none(PS_UPDATE_TIMESTAMP, [updated, cameraId]);

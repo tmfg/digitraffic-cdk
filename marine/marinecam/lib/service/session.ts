@@ -29,7 +29,7 @@ const COMPR_LEVEL = "70";
 const DEST_WIDTH = "1280";
 const DEST_HEIGHT = "720";
 
-const AXIOS_TIMEOUT_MILLIS = 4000;
+const AXIOS_TIMEOUT_MILLIS = 8000;
 
 const COMMUNICATION_URL_PART = "/Communication";
 const VIDEO_URL_PART = "/Video/";
@@ -82,7 +82,7 @@ export class Session {
         const xml = command.createXml(this.sequenceId, this.connectionId);
         this.sequenceId++;
 
-        logger.debug("sending:" + xml);
+        //        logger.debug("sending:" + xml);
 
         const resp = await this.post<string>(this.communicationUrl, xml);
 
@@ -93,7 +93,7 @@ export class Session {
         const response: CommandResponse = (await parse(resp.data)) as CommandResponse;
         command.checkError(response);
 
-        logger.debug("response " + JSON.stringify(response, null, 2));
+        //        logger.debug("response " + JSON.stringify(response, null, 2));
 
         return command.getResult(response);
     }
