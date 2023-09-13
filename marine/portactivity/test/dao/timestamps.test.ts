@@ -13,7 +13,8 @@ import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../../lib/model/eventsource";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
+import { addDays, addHours, addMinutes, subDays, subHours, subMinutes } from "date-fns";
+import { saveTimestamp } from "../../lib/service/timestamps";
 import * as R from "ramda";
 
 const EVENT_SOURCE = "TEST";
@@ -172,6 +173,54 @@ describe(
             TimestampsDb.findByLocode(db, timestamp.location.port)
         );
         testNewest("findBySource", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findBySource(db, timestamp.source)
+        );
+
+        function testMissingPortCallId(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
+            test(`${description} - PRED timestamp without portcallId  - only latest found for combination of imo and locode`, async () => {
+                const recordTime = new Date();
+                const eventTime = addHours(recordTime, 10);
+
+                const predTimestamp = R.dissocPath<ApiTimestamp>(
+                    ["portcallId"],
+                    newTimestamp({
+                        source: EventSource.AWAKE_AI_PRED,
+                        recordTime,
+                        eventTime,
+                        eventType: EventType.ETA,
+                        imo: 1234567,
+                        locode: "FIHEL"
+                    })
+                );
+
+                const olderPredTimestamp = {
+                    ...predTimestamp,
+                    eventTime: addDays(eventTime, 1).toISOString(),
+                    recordTime: subDays(recordTime, 1).toISOString()
+                };
+
+                await insert(db, [predTimestamp, olderPredTimestamp]);
+
+                const foundTimestamps = await fn(predTimestamp);
+
+                expect(foundTimestamps.length).toBe(1);
+                expect(foundTimestamps[0].record_time.toISOString()).toBe(predTimestamp.recordTime);
+            });
+        }
+
+        testMissingPortCallId("findByMmsi", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1)
+        );
+        testMissingPortCallId("findByImo", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1)
+        );
+        testMissingPortCallId("findByLocode", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByLocode(db, timestamp.location.port)
+        );
+        testMissingPortCallId("findBySource", (timestamp: ApiTimestamp) =>
             TimestampsDb.findBySource(db, timestamp.source)
         );
 

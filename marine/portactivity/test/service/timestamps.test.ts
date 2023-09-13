@@ -218,6 +218,27 @@ describe(
             expect(ret?.ship_imo).toBe(vessel.imo);
         });
 
+        test("saveTimestamp - not saved with missing portcallId when timestamp is not PRED", async () => {
+            Object.values(EventSource)
+                .filter((source) => source !== EventSource.AWAKE_AI_PRED)
+                .forEach(async (source) => {
+                    const timestamp = R.dissocPath<ApiTimestamp>(["portcallId"], newTimestamp({ source }));
+                    const ret = await TimestampsService.saveTimestamp(timestamp, db);
+                    expect(ret).not.toBeDefined();
+                });
+        });
+
+        test("saveTimestamp - saved with missing portcallId when timestamp is PRED", async () => {
+            const predTimestamp = R.dissocPath<ApiTimestamp>(
+                ["portcallId"],
+                newTimestamp({
+                    source: EventSource.AWAKE_AI_PRED
+                })
+            );
+            const ret = await TimestampsService.saveTimestamp(predTimestamp, db);
+            expect(ret).toBeDefined();
+        });
+
         test("saveTimestamp - portcall id found for ETB timestamp from VTS A source", async () => {
             const vtsTimestamp = R.dissocPath<ApiTimestamp>(
                 ["portcallId"],

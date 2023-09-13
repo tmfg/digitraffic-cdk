@@ -124,7 +124,7 @@ const SELECT_BY_LOCODE = `
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  ELSE TRUE
                   END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
@@ -155,10 +155,7 @@ const SELECT_PORTNET_ETA_SHIP_IMO_BY_LOCODE = `
                   px.location_locode = pe.location_locode AND
                   px.event_source = pe.event_source AND
                   px.ship_mmsi = pe.ship_mmsi AND
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+                  px.portcall_id = pe.portcall_id
           ) AND
           pe.event_time < NOW() + INTERVAL '84 HOUR' AND
           pe.event_type = 'ETA' AND
@@ -179,10 +176,7 @@ const SELECT_VTS_A_SHIP_TOO_CLOSE_TO_PORT = `
                   px.location_locode = pe.location_locode AND
                   px.event_source = pe.event_source AND
                   px.ship_mmsi = pe.ship_mmsi AND
-                  CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
-                  THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
-                  END
+                  px.portcall_id = pe.portcall_id
           ) AND
           pe.portcall_id IN ($1:list) AND
           pe.event_type = '${EventType.ETA}' AND
@@ -217,7 +211,7 @@ const SELECT_BY_MMSI = `
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  ELSE TRUE
                   END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
@@ -257,7 +251,7 @@ const SELECT_BY_IMO = `
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  ELSE TRUE
                   END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
@@ -297,7 +291,7 @@ const SELECT_BY_SOURCE = `
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  ELSE TRUE
                   END
           ) AND
         pe.event_time > ${TIMESTAMPS_BEFORE} AND
