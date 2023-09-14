@@ -1,13 +1,14 @@
 import _ from "lodash";
 import fs from "fs-extra";
+import { renameKeys } from "./core";
 
-export interface Module {
-    path: string;
-    url: string;
+export interface GitSubModule {
+    readonly path: string;
+    readonly url: string;
 }
 
 export interface Settings {
-    "git-submodules": Module[];
+    readonly gitSubmodules: GitSubModule[];
 }
 
 export type FileType = "default" | "override";
@@ -23,5 +24,5 @@ export async function getRepoFile(name: string, type: FileType = "default"): Pro
 export async function getSettings(): Promise<Settings> {
     const defaultSettings = await getRepoFile("settings", "default");
     const overrideSettings = await getRepoFile("settings", "override");
-    return _.merge(defaultSettings, overrideSettings) as Settings;
+    return renameKeys(_.merge(defaultSettings, overrideSettings)) as Settings;
 }
