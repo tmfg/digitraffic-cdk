@@ -53,6 +53,20 @@ function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number):
     return diffMinutes >= maxDiffMinutes;
 }
 
+function isDuplicateWithPortcallId(
+    timestamp: PublicApiTimestamp,
+    potentialDuplicate: PublicApiTimestamp
+): boolean {
+    return (
+        potentialDuplicate.source === timestamp.source &&
+        potentialDuplicate.ship.imo === timestamp.ship.imo &&
+        potentialDuplicate.location.port === timestamp.location.port &&
+        potentialDuplicate.eventType === timestamp.eventType &&
+        potentialDuplicate.eventTime === timestamp.eventTime &&
+        !!potentialDuplicate.portcallId
+    );
+}
+
 /**
  * Checks if certain types of timestamps from an equivalent source can be merged.
  * @param timestamps
@@ -97,6 +111,25 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
         // filter out any worse quality PRED estimates if VTS A estimates are available
         if (vtsAStamps.length) {
             addToList = addToList.filter((t) => t.source !== EventSource.AWAKE_AI_PRED);
+        }
+
+        // filter out duplicate PRED estimates with missing portcallId if they exist
+        if (
+            addToList.find(
+                (timestamp) => !timestamp.portcallId && timestamp.source === EventSource.AWAKE_AI_PRED
+            )
+        ) {
+            addToList = addToList.filter(
+                (timestamp) =>
+                    !(
+                        !timestamp.portcallId &&
+                        byPortcallId.find((timestamps) =>
+                            timestamps.find((potentialDuplicate) =>
+                                isDuplicateWithPortcallId(timestamp, potentialDuplicate)
+                            )
+                        )
+                    )
+            );
         }
 
         // build an average timestamp from the calculated timestamps and discard the rest

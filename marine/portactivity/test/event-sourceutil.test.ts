@@ -9,6 +9,7 @@ import { ApiTimestamp, EventType } from "../lib/model/timestamp";
 import { EventSource } from "../lib/model/eventsource";
 import { getRandomInteger, shuffle } from "@digitraffic/common/dist/test/testutils";
 import { addMinutes, parseISO, subMinutes } from "date-fns";
+import * as R from "ramda";
 
 describe("event-sourceutil", () => {
     function expectSingleTimestamp(mergedTimestamps: ApiTimestamp[], timestamp: ApiTimestamp): void {
@@ -178,7 +179,7 @@ describe("event-sourceutil", () => {
         expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
     });
 
-    test("PRED timestamps are filtered out if VTS a timestamps are available", () => {
+    test("mergeTimestamps - PRED timestamps are filtered out if VTS a timestamps are available", () => {
         const portcallId = 1;
         const awakeTimestamp = newTimestamp({
             source: EventSource.AWAKE_AI,
@@ -193,7 +194,7 @@ describe("event-sourceutil", () => {
         expectSingleTimestamp(mergeTimestamps(timestamps) as ApiTimestamp[], awakeTimestamp);
     });
 
-    test("PRED timestamps with multiple ships", () => {
+    test("mergeTimestamps - PRED timestamps with multiple ships", () => {
         const awakeTimestamp1 = newTimestamp({
             source: EventSource.AWAKE_AI,
             portcallId: 1
@@ -213,5 +214,20 @@ describe("event-sourceutil", () => {
         expect(merged.length).toBe(2);
         expectTimestamp(merged[0], awakeTimestamp1);
         expectTimestamp(merged[1], predTimestamp2);
+    });
+
+    test("mergeTimestamps - discard duplicate PRED timestamp with missing portcallId", () => {
+        const predTimestampWithoutPortcallId = R.dissocPath<ApiTimestamp>(
+            ["portcallId"],
+            newTimestamp({
+                source: EventSource.AWAKE_AI_PRED
+            })
+        );
+        const duplicateWithPortcallId = { ...predTimestampWithoutPortcallId, portcallId: 123 };
+        const timestamps = [predTimestampWithoutPortcallId, duplicateWithPortcallId];
+        const merged = mergeTimestamps(timestamps) as ApiTimestamp[];
+
+        expect(merged.length).toBe(1);
+        expectTimestamp(merged[0], duplicateWithPortcallId);
     });
 });
