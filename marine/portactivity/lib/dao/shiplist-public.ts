@@ -34,7 +34,7 @@ const SELECT_BY_LOCODE_PUBLIC_SHIPLIST = `
                   px.event_source = pe.event_source AND
                   CASE WHEN px.portcall_id IS NOT NULL AND pe.portcall_id IS NOT NULL
                   THEN px.portcall_id = pe.portcall_id
-                  ELSE DATE(px.event_time) = DATE(pe.event_time)
+                  ELSE TRUE
                   END
           ) AND
         CASE WHEN (pe.event_type = 'ATA' OR pe.event_type = 'ATD')

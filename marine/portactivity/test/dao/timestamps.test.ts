@@ -180,7 +180,7 @@ describe(
             description: string,
             fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
         ): void {
-            test(`${description} - PRED timestamp without portcallId  - only latest found for combination of imo and locode`, async () => {
+            test(`${description} - PRED timestamp without portcallId  - only latest timestamp found for combination of imo, locode, eventType and source`, async () => {
                 const recordTime = new Date();
                 const eventTime = addHours(recordTime, 10);
 
@@ -221,6 +221,58 @@ describe(
             TimestampsDb.findByLocode(db, timestamp.location.port)
         );
         testMissingPortCallId("findBySource", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findBySource(db, timestamp.source)
+        );
+
+        function testMissingPortCallIdWithPastEventtime(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
+            test(`${description} - PRED timestamp without portcallId  - no events are returned for combination of imo, locode, eventType and source when latest timestamp has eventTime in the past`, async () => {
+                const date = new Date();
+
+                const latestRecordTime = subDays(date, 2);
+                const olderRecordTime = subDays(date, 3);
+
+                const futureEventTime = addDays(date, 1);
+                const pastEventTime = subDays(date, 1);
+
+                const latestPredTimestamp = R.dissocPath<ApiTimestamp>(
+                    ["portcallId"],
+                    newTimestamp({
+                        source: EventSource.AWAKE_AI_PRED,
+                        recordTime: latestRecordTime,
+                        eventTime: pastEventTime,
+                        eventType: EventType.ETA,
+                        imo: 1234567,
+                        locode: "FIHEL"
+                    })
+                );
+
+                const olderPredTimestamp = {
+                    ...latestPredTimestamp,
+                    eventTime: futureEventTime.toISOString(),
+                    recordTime: olderRecordTime.toISOString()
+                };
+
+                await insert(db, [latestPredTimestamp, olderPredTimestamp]);
+
+                const foundTimestamps = await fn(latestPredTimestamp);
+
+                expect(foundTimestamps.length).toBe(0);
+            });
+        }
+
+        testMissingPortCallIdWithPastEventtime("findByMmsi", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1)
+        );
+        testMissingPortCallIdWithPastEventtime("findByImo", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1)
+        );
+        testMissingPortCallIdWithPastEventtime("findByLocode", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByLocode(db, timestamp.location.port)
+        );
+        testMissingPortCallIdWithPastEventtime("findBySource", (timestamp: ApiTimestamp) =>
             TimestampsDb.findBySource(db, timestamp.source)
         );
 
