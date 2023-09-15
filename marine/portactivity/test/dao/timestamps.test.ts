@@ -176,6 +176,16 @@ describe(
             TimestampsDb.findBySource(db, timestamp.source)
         );
 
+        /**
+         * Normally timestamps are recognized as relating to a specific event by a portcallId, and two timestamps
+         * with different portcallIds are distinct regardless of the values of other fields.
+         * However, portcallId is optional in the case of timestamps with source 'Awake.AI Pred'.
+         * If there are timestamps where portcallId is null, the DAO should return only the latest (determined by recordTime) timestamp
+         * for each combination of ship (imo), location (locode), event type (e.g. 'ETA') and source (currently this can only have the value 'Awake.AI Pred' in these cases).
+         *
+         * This test inserts into the database two timestamps relating to the same imo, locode, event type and source. Neither timestamp has a portcallId.
+         * Only the latest (by recordTime) timestamp should be returned in this case.
+         */
         function testMissingPortCallId(
             description: string,
             fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>

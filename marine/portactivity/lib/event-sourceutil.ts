@@ -53,6 +53,23 @@ function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number):
     return diffMinutes >= maxDiffMinutes;
 }
 
+function filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps: PublicApiTimestamp[]) {
+    // timestamp is filtered out if:
+    // it does not have a portcallId
+    // AND
+    // in the given list of timestamps, there exists a timestamp with otherwise identical values and a portcallId
+    return timestamps.filter(
+        (timestamp) =>
+            !(
+                !timestamp.portcallId &&
+                timestamp.source == EventSource.AWAKE_AI_PRED &&
+                timestamps.find((potentialDuplicate) =>
+                    isDuplicateWithPortcallId(timestamp, potentialDuplicate)
+                )
+            )
+    );
+}
+
 function isDuplicateWithPortcallId(
     timestamp: PublicApiTimestamp,
     potentialDuplicate: PublicApiTimestamp
@@ -74,11 +91,14 @@ function isDuplicateWithPortcallId(
 export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTimestamp[] {
     const ret: PublicApiTimestamp[] = [];
 
+    // leave out duplicate PRED estimates with missing portcallId if they exist
+    const filteredTimestamps = filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps);
+
     // group by portcall id and event type
     const byPortcallId: PublicApiTimestamp[][] = R.compose(
         R.values,
         R.groupBy((ts: PublicApiTimestamp) => (ts.portcallId ?? -1).toString() + ts.eventType)
-    )(timestamps);
+    )(filteredTimestamps);
 
     // timestamps relating to specific port call
     for (const portcallTimestamps of byPortcallId) {
@@ -111,25 +131,6 @@ export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTime
         // filter out any worse quality PRED estimates if VTS A estimates are available
         if (vtsAStamps.length) {
             addToList = addToList.filter((t) => t.source !== EventSource.AWAKE_AI_PRED);
-        }
-
-        // filter out duplicate PRED estimates with missing portcallId if they exist
-        if (
-            addToList.find(
-                (timestamp) => !timestamp.portcallId && timestamp.source === EventSource.AWAKE_AI_PRED
-            )
-        ) {
-            addToList = addToList.filter(
-                (timestamp) =>
-                    !(
-                        !timestamp.portcallId &&
-                        byPortcallId.find((timestamps) =>
-                            timestamps.find((potentialDuplicate) =>
-                                isDuplicateWithPortcallId(timestamp, potentialDuplicate)
-                            )
-                        )
-                    )
-            );
         }
 
         // build an average timestamp from the calculated timestamps and discard the rest
