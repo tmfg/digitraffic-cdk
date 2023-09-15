@@ -28,3 +28,5 @@ export async function init(): Promise<void> {
     echo`Initializing git submodules`;
     $`git submodule update --init --recursive`;
 }
+
+export async function deinit(): Promise<void> {}
