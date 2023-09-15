@@ -17,3 +17,10 @@ export function renameKeys(obj: object): object {
 
     return obj;
 }
+
+// eslint-disable-next-line @rushstack/no-new-null
+export function isValue<T>(value: T | undefined | null): value is T {
+    return !_.isEmpty(value);
+}
+
+export type ValueOf<Obj> = Obj[keyof Obj];
