@@ -53,6 +53,37 @@ function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number):
     return diffMinutes >= maxDiffMinutes;
 }
 
+function filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps: PublicApiTimestamp[]) {
+    // timestamp is filtered out if:
+    // it does not have a portcallId
+    // AND
+    // in the given list of timestamps, there exists a timestamp with otherwise identical values and a portcallId
+    return timestamps.filter(
+        (timestamp) =>
+            !(
+                !timestamp.portcallId &&
+                timestamp.source == EventSource.AWAKE_AI_PRED &&
+                timestamps.find((potentialDuplicate) =>
+                    isDuplicateWithPortcallId(timestamp, potentialDuplicate)
+                )
+            )
+    );
+}
+
+function isDuplicateWithPortcallId(
+    timestamp: PublicApiTimestamp,
+    potentialDuplicate: PublicApiTimestamp
+): boolean {
+    return (
+        potentialDuplicate.source === timestamp.source &&
+        potentialDuplicate.ship.imo === timestamp.ship.imo &&
+        potentialDuplicate.location.port === timestamp.location.port &&
+        potentialDuplicate.eventType === timestamp.eventType &&
+        potentialDuplicate.eventTime === timestamp.eventTime &&
+        !!potentialDuplicate.portcallId
+    );
+}
+
 /**
  * Checks if certain types of timestamps from an equivalent source can be merged.
  * @param timestamps
@@ -60,11 +91,14 @@ function datesDifferByMinutes(date1: Date, date2: Date, maxDiffMinutes: number):
 export function mergeTimestamps(timestamps: PublicApiTimestamp[]): PublicApiTimestamp[] {
     const ret: PublicApiTimestamp[] = [];
 
+    // leave out duplicate PRED estimates with missing portcallId if they exist
+    const filteredTimestamps = filterDuplicateAwakeAiPredTimestampsWithoutPortcallId(timestamps);
+
     // group by portcall id and event type
     const byPortcallId: PublicApiTimestamp[][] = R.compose(
         R.values,
         R.groupBy((ts: PublicApiTimestamp) => (ts.portcallId ?? -1).toString() + ts.eventType)
-    )(timestamps);
+    )(filteredTimestamps);
 
     // timestamps relating to specific port call
     for (const portcallTimestamps of byPortcallId) {

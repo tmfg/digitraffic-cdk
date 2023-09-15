@@ -13,7 +13,8 @@ import { ApiTimestamp, EventType } from "../../lib/model/timestamp";
 import { DTDatabase } from "@digitraffic/common/dist/database/database";
 import { EventSource } from "../../lib/model/eventsource";
 import { getRandomInteger } from "@digitraffic/common/dist/test/testutils";
-import { addDays, addHours, addMinutes, subDays, subHours } from "date-fns";
+import { addDays, addHours, addMinutes, subDays, subHours, subMinutes } from "date-fns";
+import { saveTimestamp } from "../../lib/service/timestamps";
 import * as R from "ramda";
 
 const EVENT_SOURCE = "TEST";
@@ -172,6 +173,116 @@ describe(
             TimestampsDb.findByLocode(db, timestamp.location.port)
         );
         testNewest("findBySource", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findBySource(db, timestamp.source)
+        );
+
+        /**
+         * Normally timestamps are recognized as relating to a specific event by a portcallId, and two timestamps
+         * with different portcallIds are distinct regardless of the values of other fields.
+         * However, portcallId is optional in the case of timestamps with source 'Awake.AI Pred'.
+         * If there are timestamps where portcallId is null, the DAO should return only the latest (determined by recordTime) timestamp
+         * for each combination of ship (imo), location (locode), event type (e.g. 'ETA') and source (currently this can only have the value 'Awake.AI Pred' in these cases).
+         *
+         * This test inserts into the database two timestamps relating to the same imo, locode, event type and source. Neither timestamp has a portcallId.
+         * Only the latest (by recordTime) timestamp should be returned in this case.
+         */
+        function testMissingPortCallId(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
+            test(`${description} - PRED timestamp without portcallId  - only latest timestamp found for combination of imo, locode, eventType and source`, async () => {
+                const recordTime = new Date();
+                const eventTime = addHours(recordTime, 10);
+
+                const predTimestamp = R.dissocPath<ApiTimestamp>(
+                    ["portcallId"],
+                    newTimestamp({
+                        source: EventSource.AWAKE_AI_PRED,
+                        recordTime,
+                        eventTime,
+                        eventType: EventType.ETA,
+                        imo: 1234567,
+                        locode: "FIHEL"
+                    })
+                );
+
+                const olderPredTimestamp = {
+                    ...predTimestamp,
+                    eventTime: addDays(eventTime, 1).toISOString(),
+                    recordTime: subDays(recordTime, 1).toISOString()
+                };
+
+                await insert(db, [predTimestamp, olderPredTimestamp]);
+
+                const foundTimestamps = await fn(predTimestamp);
+
+                expect(foundTimestamps.length).toBe(1);
+                expect(foundTimestamps[0].record_time.toISOString()).toBe(predTimestamp.recordTime);
+            });
+        }
+
+        testMissingPortCallId("findByMmsi", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1)
+        );
+        testMissingPortCallId("findByImo", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1)
+        );
+        testMissingPortCallId("findByLocode", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByLocode(db, timestamp.location.port)
+        );
+        testMissingPortCallId("findBySource", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findBySource(db, timestamp.source)
+        );
+
+        function testMissingPortCallIdWithPastEventtime(
+            description: string,
+            fn: (timestamp: ApiTimestamp) => Promise<DbTimestamp[]>
+        ): void {
+            test(`${description} - PRED timestamp without portcallId  - no events are returned for combination of imo, locode, eventType and source when latest timestamp has eventTime in the past`, async () => {
+                const date = new Date();
+
+                const latestRecordTime = subDays(date, 2);
+                const olderRecordTime = subDays(date, 3);
+
+                const futureEventTime = addDays(date, 1);
+                const pastEventTime = subDays(date, 1);
+
+                const latestPredTimestamp = R.dissocPath<ApiTimestamp>(
+                    ["portcallId"],
+                    newTimestamp({
+                        source: EventSource.AWAKE_AI_PRED,
+                        recordTime: latestRecordTime,
+                        eventTime: pastEventTime,
+                        eventType: EventType.ETA,
+                        imo: 1234567,
+                        locode: "FIHEL"
+                    })
+                );
+
+                const olderPredTimestamp = {
+                    ...latestPredTimestamp,
+                    eventTime: futureEventTime.toISOString(),
+                    recordTime: olderRecordTime.toISOString()
+                };
+
+                await insert(db, [latestPredTimestamp, olderPredTimestamp]);
+
+                const foundTimestamps = await fn(latestPredTimestamp);
+
+                expect(foundTimestamps.length).toBe(0);
+            });
+        }
+
+        testMissingPortCallIdWithPastEventtime("findByMmsi", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByMmsi(db, timestamp.ship.mmsi ?? -1)
+        );
+        testMissingPortCallIdWithPastEventtime("findByImo", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByImo(db, timestamp.ship.imo ?? -1)
+        );
+        testMissingPortCallIdWithPastEventtime("findByLocode", (timestamp: ApiTimestamp) =>
+            TimestampsDb.findByLocode(db, timestamp.location.port)
+        );
+        testMissingPortCallIdWithPastEventtime("findBySource", (timestamp: ApiTimestamp) =>
             TimestampsDb.findBySource(db, timestamp.source)
         );
 

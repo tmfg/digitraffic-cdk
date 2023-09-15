@@ -136,8 +136,9 @@ export class PublicApi {
             stack.createLambdaEnvironment(),
             {
                 functionName: "PortActivity-PublicShiplist",
-                timeout: 28,
-                reservedConcurrentExecutions: 6
+                timeout: 60,
+                reservedConcurrentExecutions: 6,
+                memorySize: 256
             }
         );
 
