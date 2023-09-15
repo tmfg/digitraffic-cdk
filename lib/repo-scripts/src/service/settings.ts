@@ -2,13 +2,13 @@ import _ from "lodash";
 import fs from "fs-extra";
 import { renameKeys } from "./core";
 
-export interface GitSubModule {
+export interface GitSubmodule {
     readonly path: string;
     readonly url: string;
 }
 
 export interface Settings {
-    readonly gitSubmodules: GitSubModule[];
+    readonly gitSubmodules: GitSubmodule[];
 }
 
 export type FileType = "default" | "override";

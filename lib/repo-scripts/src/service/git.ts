@@ -1,10 +1,10 @@
 /* eslint-disable no-unused-expressions */
-import type { Module } from "./settings";
+import type { GitSubmodule } from "./settings";
 import fs from "fs-extra";
 import { $, echo } from "zx";
 import * as Settings from "../service/settings";
 
-function createSubmoduleString({ path, url }: Module): string {
+function createSubmoduleString({ path, url }: GitSubmodule): string {
     return `
 [submodule "${path}"]
 	path = ${path}
@@ -12,7 +12,7 @@ function createSubmoduleString({ path, url }: Module): string {
 `;
 }
 
-function createSubmoduleFile(modules: Module[]): string {
+function createSubmoduleFile(modules: GitSubmodule[]): string {
     return modules.map(createSubmoduleString).join("\n");
 }
 
